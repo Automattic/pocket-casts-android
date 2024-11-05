@@ -43,7 +43,11 @@ class UpdateEpisodeDetailsTask @AssistedInject constructor(
                 return
             }
 
-            val episodeUuids = episodes.map { it.uuid }
+            val episodeUuids = episodes.filterNot { ignoreEpisode(it) }.map { it.uuid }
+            if (episodeUuids.isEmpty()) {
+                LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "$TASK_NAME - no episodes found to check")
+                return
+            }
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "$TASK_NAME - enqueued ${episodeUuids.joinToString()}")
             val workData = Data.Builder()
                 .putStringArray(INPUT_EPISODE_UUIDS, episodeUuids.toTypedArray())
@@ -53,6 +57,13 @@ class UpdateEpisodeDetailsTask @AssistedInject constructor(
                 .setInputData(workData)
                 .build()
             WorkManager.getInstance(context).beginUniqueWork(TASK_NAME, ExistingWorkPolicy.APPEND, workRequest).enqueue()
+        }
+
+        /**
+         * Don't bother calling episodes that are downloaded as the download tasks checks the content type.
+         */
+        private fun ignoreEpisode(episode: PodcastEpisode): Boolean {
+            return episode.isQueued || episode.isDownloaded || episode.isDownloading || episode.isArchived
         }
     }
 
@@ -75,6 +86,10 @@ class UpdateEpisodeDetailsTask @AssistedInject constructor(
 
             for (episodeUuid in episodeUuids) {
                 val episode = episodeManager.findByUuid(episodeUuid) ?: continue
+                if (ignoreEpisode(episode)) {
+                    info("Ignoring episode ${episode.uuid}")
+                    continue
+                }
                 val downloadUrl = episode.downloadUrl?.toHttpUrlOrNull() ?: continue
                 val request = Request.Builder()
                     .url(downloadUrl)
