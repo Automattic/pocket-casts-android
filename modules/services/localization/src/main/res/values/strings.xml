@@ -635,6 +635,22 @@
     <string name="podcast_refresh_artwork">Refresh artwork</string>
     <string name="podcast_rate">Rate %s</string>
     <string name="podcast_cover_description">Cover of %s podcast</string>
+    <plurals name="day">
+        <item quantity="one">day</item>
+        <item quantity="other">days</item>
+    </plurals>
+    <plurals name="hour">
+        <item quantity="one">hour</item>
+        <item quantity="other">hours</item>
+    </plurals>
+    <plurals name="minute">
+        <item quantity="one">minute</item>
+        <item quantity="other">minutes</item>
+    </plurals>
+    <plurals name="second">
+        <item quantity="one">second</item>
+        <item quantity="other">seconds</item>
+    </plurals>
 
     <!-- Give Rating -->
 
