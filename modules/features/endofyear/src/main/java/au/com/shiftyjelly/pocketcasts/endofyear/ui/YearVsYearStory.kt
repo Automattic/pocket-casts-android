@@ -186,6 +186,7 @@ private fun BoxWithConstraintsScope.YearVsYearBalls(
     YearVsYearBall(
         circleSize = configuration.lastYear.circleSize,
         circleColor = Color.White,
+        text = "2023",
         textFactory = configuration.lastYear.textFactory,
         textColor = story.backgroundColor,
         modifier = Modifier
@@ -198,6 +199,7 @@ private fun BoxWithConstraintsScope.YearVsYearBalls(
     YearVsYearBall(
         circleSize = configuration.thisYear.circleSize,
         circleColor = Color.Black,
+        text = "2024",
         textColor = story.backgroundColor,
         textFactory = configuration.thisYear.textFactory,
         modifier = Modifier
@@ -214,6 +216,7 @@ private fun YearVsYearBall(
     circleColor: Color,
     textFactory: HumaneTextFactory,
     textColor: Color,
+    text: String,
     modifier: Modifier = Modifier,
 ) {
     if (textFactory.maxSize <= circleSize * 1.1f) {
@@ -223,7 +226,7 @@ private fun YearVsYearBall(
                 .background(circleColor, CircleShape),
         ) {
             textFactory.HumaneText(
-                text = "2023",
+                text = text,
                 color = textColor,
                 modifier = Modifier.align(Alignment.Center),
             )
@@ -234,7 +237,7 @@ private fun YearVsYearBall(
             modifier = modifier,
         ) {
             textFactory.HumaneText(
-                text = "2023",
+                text = text,
                 color = circleColor,
             )
             Spacer(
