@@ -75,7 +75,7 @@ interface PodcastManager {
     /** Update methods  */
     fun updatePodcast(podcast: Podcast)
 
-    fun updateAllAutoDownloadStatus(autoDownloadStatus: Int)
+    suspend fun updateAllAutoDownloadStatus(autoDownloadStatus: Int)
     suspend fun updateAllShowNotifications(showNotifications: Boolean)
     fun updateAutoDownloadStatus(podcast: Podcast, autoDownloadStatus: Int)
     suspend fun updateAutoAddToUpNext(podcast: Podcast, autoAddToUpNext: Podcast.AutoAddUpNext)

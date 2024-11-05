@@ -620,7 +620,7 @@ class PodcastManagerImpl @Inject constructor(
         podcastDao.update(podcast)
     }
 
-    override fun updateAllAutoDownloadStatus(autoDownloadStatus: Int) {
+    override suspend fun updateAllAutoDownloadStatus(autoDownloadStatus: Int) {
         podcastDao.updateAllAutoDownloadStatus(autoDownloadStatus)
     }
 
