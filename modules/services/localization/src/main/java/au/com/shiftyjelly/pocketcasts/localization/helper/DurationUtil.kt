@@ -31,7 +31,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
  * @return A formatted string representing the duration, with units and values up to the specified
  * constraints.
  */
-fun Duration.toFriendlyStirng(
+fun Duration.toFriendlyString(
     resources: Resources,
     maxPartCount: Int = 2,
     minUnit: FriendlyDurationUnit = FriendlyDurationUnit.Second,
@@ -41,7 +41,7 @@ fun Duration.toFriendlyStirng(
     var usedParts = 0
     var timeLeft = this
 
-    val units = FriendlyDurationUnit.entries.reversed().filter { it in minUnit..maxUnit }
+    val units = FriendlyDurationUnit.reversedEntries.filter { it in minUnit..maxUnit }
     for (unit in units) {
         val wholeUnitDuration = unit.inWholeUnits(timeLeft)
         if (usedParts < maxPartCount && wholeUnitDuration > Duration.ZERO) {
@@ -68,7 +68,7 @@ enum class FriendlyDurationUnit(
         durationUnit = DurationUnit.MINUTES,
         resourceId = LR.plurals.minute,
     ),
-    Hours(
+    Hour(
         durationUnit = DurationUnit.HOURS,
         resourceId = LR.plurals.hour,
     ),
@@ -94,4 +94,8 @@ enum class FriendlyDurationUnit(
     internal fun inWholeUnits(duration: Duration) = toUnitCount(duration).toDuration(durationUnit)
 
     private fun toUnitCount(duration: Duration) = duration.toInt(durationUnit)
+
+    internal companion object {
+        val reversedEntries = FriendlyDurationUnit.entries.reversed()
+    }
 }

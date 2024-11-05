@@ -16,7 +16,7 @@ class DurationUtilTest {
     fun daysSingular() {
         val duration = 1.days
 
-        val text = duration.toFriendlyStirng(resources)
+        val text = duration.toFriendlyString(resources)
 
         assertEquals("1 day", text)
     }
@@ -25,7 +25,7 @@ class DurationUtilTest {
     fun daysPlural() {
         val duration = 2.days
 
-        val text = duration.toFriendlyStirng(resources)
+        val text = duration.toFriendlyString(resources)
 
         assertEquals("2 days", text)
     }
@@ -34,7 +34,7 @@ class DurationUtilTest {
     fun hoursSingular() {
         val duration = 1.hours
 
-        val text = duration.toFriendlyStirng(resources)
+        val text = duration.toFriendlyString(resources)
 
         assertEquals("1 hour", text)
     }
@@ -43,7 +43,7 @@ class DurationUtilTest {
     fun hoursPlural() {
         val duration = 2.hours
 
-        val text = duration.toFriendlyStirng(resources)
+        val text = duration.toFriendlyString(resources)
 
         assertEquals("2 hours", text)
     }
@@ -52,7 +52,7 @@ class DurationUtilTest {
     fun minutesSingular() {
         val duration = 1.minutes
 
-        val text = duration.toFriendlyStirng(resources)
+        val text = duration.toFriendlyString(resources)
 
         assertEquals("1 minute", text)
     }
@@ -61,7 +61,7 @@ class DurationUtilTest {
     fun minutesPlural() {
         val duration = 2.minutes
 
-        val text = duration.toFriendlyStirng(resources)
+        val text = duration.toFriendlyString(resources)
 
         assertEquals("2 minutes", text)
     }
@@ -70,7 +70,7 @@ class DurationUtilTest {
     fun secondsSingular() {
         val duration = 1.seconds
 
-        val text = duration.toFriendlyStirng(resources)
+        val text = duration.toFriendlyString(resources)
 
         assertEquals("1 second", text)
     }
@@ -79,7 +79,7 @@ class DurationUtilTest {
     fun secondsPlural() {
         val duration = 2.seconds
 
-        val text = duration.toFriendlyStirng(resources)
+        val text = duration.toFriendlyString(resources)
 
         assertEquals("2 seconds", text)
     }
@@ -88,7 +88,7 @@ class DurationUtilTest {
     fun subSecondDurationIsZeroSeconds() {
         val duration = 1.seconds - 1.nanoseconds
 
-        val text = duration.toFriendlyStirng(resources)
+        val text = duration.toFriendlyString(resources)
 
         assertEquals("0 seconds", text)
     }
@@ -97,7 +97,7 @@ class DurationUtilTest {
     fun maxLimitDurationToDays() {
         val duration = 1.days + 2.hours + 3.minutes + 4.seconds
 
-        val text = duration.toFriendlyStirng(resources, maxUnit = FriendlyDurationUnit.Day)
+        val text = duration.toFriendlyString(resources, maxUnit = FriendlyDurationUnit.Day)
 
         assertEquals("1 day 2 hours", text)
     }
@@ -106,7 +106,7 @@ class DurationUtilTest {
     fun maxLimitDurationToHours() {
         val duration = 1.days + 2.hours + 3.minutes + 4.seconds
 
-        val text = duration.toFriendlyStirng(resources, maxUnit = FriendlyDurationUnit.Hours)
+        val text = duration.toFriendlyString(resources, maxUnit = FriendlyDurationUnit.Hour)
 
         assertEquals("26 hours 3 minutes", text)
     }
@@ -115,7 +115,7 @@ class DurationUtilTest {
     fun maxLimitDurationToMinutes() {
         val duration = 1.days + 2.hours + 3.minutes + 4.seconds
 
-        val text = duration.toFriendlyStirng(resources, maxUnit = FriendlyDurationUnit.Minute)
+        val text = duration.toFriendlyString(resources, maxUnit = FriendlyDurationUnit.Minute)
 
         assertEquals("1563 minutes 4 seconds", text)
     }
@@ -124,7 +124,7 @@ class DurationUtilTest {
     fun maxLimitDurationToSeconds() {
         val duration = 1.days + 2.hours + 3.minutes + 4.seconds
 
-        val text = duration.toFriendlyStirng(resources, maxUnit = FriendlyDurationUnit.Second)
+        val text = duration.toFriendlyString(resources, maxUnit = FriendlyDurationUnit.Second)
 
         assertEquals("93784 seconds", text)
     }
@@ -133,7 +133,7 @@ class DurationUtilTest {
     fun minLimitDurationToDays() {
         val duration = 1.days + 2.hours + 3.minutes + 4.seconds
 
-        val text = duration.toFriendlyStirng(resources, minUnit = FriendlyDurationUnit.Day, maxPartCount = 4)
+        val text = duration.toFriendlyString(resources, minUnit = FriendlyDurationUnit.Day, maxPartCount = 4)
 
         assertEquals("1 day", text)
     }
@@ -142,7 +142,7 @@ class DurationUtilTest {
     fun minLimitDurationToHours() {
         val duration = 1.days + 2.hours + 3.minutes + 4.seconds
 
-        val text = duration.toFriendlyStirng(resources, minUnit = FriendlyDurationUnit.Hours, maxPartCount = 4)
+        val text = duration.toFriendlyString(resources, minUnit = FriendlyDurationUnit.Hour, maxPartCount = 4)
 
         assertEquals("1 day 2 hours", text)
     }
@@ -151,7 +151,7 @@ class DurationUtilTest {
     fun minLimitDurationToMinutes() {
         val duration = 1.days + 2.hours + 3.minutes + 4.seconds
 
-        val text = duration.toFriendlyStirng(resources, minUnit = FriendlyDurationUnit.Minute, maxPartCount = 4)
+        val text = duration.toFriendlyString(resources, minUnit = FriendlyDurationUnit.Minute, maxPartCount = 4)
 
         assertEquals("1 day 2 hours 3 minutes", text)
     }
@@ -160,7 +160,7 @@ class DurationUtilTest {
     fun minLimitDurationToSeconds() {
         val duration = 1.days + 2.hours + 3.minutes + 4.seconds
 
-        val text = duration.toFriendlyStirng(resources, minUnit = FriendlyDurationUnit.Second, maxPartCount = 4)
+        val text = duration.toFriendlyString(resources, minUnit = FriendlyDurationUnit.Second, maxPartCount = 4)
 
         assertEquals("1 day 2 hours 3 minutes 4 seconds", text)
     }
@@ -169,27 +169,27 @@ class DurationUtilTest {
     fun limitPartsToMaxPartCount() {
         val duration = 1.days + 2.hours + 3.minutes + 4.seconds
 
-        assertEquals("1 day 2 hours 3 minutes 4 seconds", duration.toFriendlyStirng(resources, maxPartCount = 4))
-        assertEquals("1 day 2 hours 3 minutes", duration.toFriendlyStirng(resources, maxPartCount = 3))
-        assertEquals("1 day 2 hours", duration.toFriendlyStirng(resources, maxPartCount = 2))
-        assertEquals("1 day", duration.toFriendlyStirng(resources, maxPartCount = 1))
+        assertEquals("1 day 2 hours 3 minutes 4 seconds", duration.toFriendlyString(resources, maxPartCount = 4))
+        assertEquals("1 day 2 hours 3 minutes", duration.toFriendlyString(resources, maxPartCount = 3))
+        assertEquals("1 day 2 hours", duration.toFriendlyString(resources, maxPartCount = 2))
+        assertEquals("1 day", duration.toFriendlyString(resources, maxPartCount = 1))
     }
 
     @Test
     fun useMinUnitIfMaxPartCountIsTooLow() {
         val duration = 1.days + 2.hours + 3.minutes + 4.seconds
 
-        assertEquals("1 day", duration.toFriendlyStirng(resources, minUnit = FriendlyDurationUnit.Day, maxPartCount = 0))
-        assertEquals("26 hours", duration.toFriendlyStirng(resources, minUnit = FriendlyDurationUnit.Hours, maxPartCount = 0))
-        assertEquals("1563 minutes", duration.toFriendlyStirng(resources, minUnit = FriendlyDurationUnit.Minute, maxPartCount = 0))
-        assertEquals("93784 seconds", duration.toFriendlyStirng(resources, minUnit = FriendlyDurationUnit.Second, maxPartCount = 0))
+        assertEquals("1 day", duration.toFriendlyString(resources, minUnit = FriendlyDurationUnit.Day, maxPartCount = 0))
+        assertEquals("26 hours", duration.toFriendlyString(resources, minUnit = FriendlyDurationUnit.Hour, maxPartCount = 0))
+        assertEquals("1563 minutes", duration.toFriendlyString(resources, minUnit = FriendlyDurationUnit.Minute, maxPartCount = 0))
+        assertEquals("93784 seconds", duration.toFriendlyString(resources, minUnit = FriendlyDurationUnit.Second, maxPartCount = 0))
     }
 
     @Test
     fun skipZeroParts() {
         val duration = 1.days + 3.minutes // no hours
 
-        val text = duration.toFriendlyStirng(resources)
+        val text = duration.toFriendlyString(resources)
 
         assertEquals("1 day 3 minutes", text)
     }

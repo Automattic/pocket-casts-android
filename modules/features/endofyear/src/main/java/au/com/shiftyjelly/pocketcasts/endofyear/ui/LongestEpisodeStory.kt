@@ -45,7 +45,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.endofyear.StoryCaptureController
 import au.com.shiftyjelly.pocketcasts.localization.helper.FriendlyDurationUnit
-import au.com.shiftyjelly.pocketcasts.localization.helper.toFriendlyStirng
+import au.com.shiftyjelly.pocketcasts.localization.helper.toFriendlyString
 import au.com.shiftyjelly.pocketcasts.models.to.LongestEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Story
 import dev.shreyaspatil.capturable.capturable
@@ -248,7 +248,7 @@ private fun TextInfo(
             text = stringResource(
                 LR.string.end_of_year_story_longest_episode_title,
                 remember(story.episode.duration, context) {
-                    story.episode.duration.toFriendlyStirng(
+                    story.episode.duration.toFriendlyString(
                         resources = context.resources,
                         minUnit = FriendlyDurationUnit.Minute,
                     )
