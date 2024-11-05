@@ -399,7 +399,7 @@
     <string name="player_play_failed_check_internet">Could not load podcast. Please check your internet connection and try again.</string>
     <string name="player_played_up_to">Played up to %s</string>
     <string name="player_time_remaining">Time remaining %s</string>
-    <string name="swipe_affordance_content_description">Swipe Affordance</string>
+    <string name="drag_down_to_dismiss_content_description">Drag down to dismiss</string>
 
     <!-- Chapters -->
 
@@ -635,6 +635,22 @@
     <string name="podcast_refresh_artwork">Refresh artwork</string>
     <string name="podcast_rate">Rate %s</string>
     <string name="podcast_cover_description">Cover of %s podcast</string>
+    <plurals name="day">
+        <item quantity="one">day</item>
+        <item quantity="other">days</item>
+    </plurals>
+    <plurals name="hour">
+        <item quantity="one">hour</item>
+        <item quantity="other">hours</item>
+    </plurals>
+    <plurals name="minute">
+        <item quantity="one">minute</item>
+        <item quantity="other">minutes</item>
+    </plurals>
+    <plurals name="second">
+        <item quantity="one">second</item>
+        <item quantity="other">seconds</item>
+    </plurals>
 
     <!-- Give Rating -->
 

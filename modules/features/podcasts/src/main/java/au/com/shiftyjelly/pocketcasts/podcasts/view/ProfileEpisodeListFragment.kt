@@ -22,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
@@ -421,9 +422,15 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
             if (isVisible) {
                 setContent {
                     AppTheme(theme.activeTheme) {
+                        CallOnce {
+                            analyticsTracker.track(AnalyticsEvent.FREE_UP_SPACE_BANNER_SHOWN)
+                        }
                         ManageDownloadsCard(
                             totalDownloadSize = downloadedEpisodesSize,
-                            onManageDownloadsClick = { showCleanupSettings() },
+                            onManageDownloadsClick = {
+                                analyticsTracker.track(AnalyticsEvent.FREE_UP_SPACE_MANAGE_DOWNLOADS_TAPPED, mapOf("source" to SourceView.DOWNLOADS.analyticsValue))
+                                showFragment(ManualCleanupFragment.newInstance())
+                            },
                         )
                     }
                 }
