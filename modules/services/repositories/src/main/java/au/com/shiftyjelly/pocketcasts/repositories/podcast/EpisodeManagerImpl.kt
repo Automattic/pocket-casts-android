@@ -841,10 +841,8 @@ class EpisodeManagerImpl @Inject constructor(
             }
         }
 
-        if (episodes.isNotEmpty()) {
-            if (downloadMetaData) {
-                downloadEpisodesFileDetails(addedEpisodes)
-            }
+        if (addedEpisodes.isNotEmpty() && downloadMetaData) {
+            downloadEpisodesFileDetails(addedEpisodes)
         }
 
         return addedEpisodes
