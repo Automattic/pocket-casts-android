@@ -13,10 +13,10 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.activityViewModels
@@ -40,6 +40,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
+import au.com.shiftyjelly.pocketcasts.ui.helper.ColorUtils
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Debouncer
@@ -54,6 +55,8 @@ import com.google.android.material.button.MaterialButtonToggleGroup
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -288,6 +291,11 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
 
     private fun FragmentEffectsBinding.setupEffectsSettingsSegmentedTabBar() {
         effectsSettingsSegmentedTabBar.setContent {
+            val podcastHeaderBackgroundColor by viewModel.playingEpisodeLive.asFlow()
+                .map { it.second }
+                .distinctUntilChangedBy { it }
+                .collectAsStateWithLifecycle(null)
+
             val podcastEffectsData by viewModel.effectsLive.asFlow()
                 .distinctUntilChanged { t1, t2 ->
                     t1.podcast.uuid == t2.podcast.uuid &&
@@ -299,12 +307,16 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
             val podcast = podcastEffectsData?.podcast ?: return@setContent
 
             if (podcastEffectsData?.showCustomEffectsSettings == true) {
+                val selectedTabTextColor = podcastHeaderBackgroundColor?.let {
+                    Color(android.graphics.Color.parseColor(ColorUtils.colorIntToHexString(it)))
+                } ?: Color.Black
                 EffectsSettingsSegmentedTabBar(
                     selectedItem = if (podcastEffectsData?.podcast?.overrideGlobalEffects == true) {
                         PlaybackEffectsSettingsTab.ThisPodcast
                     } else {
                         PlaybackEffectsSettingsTab.AllPodcasts
                     },
+                    selectedTabTextColor = selectedTabTextColor,
                     onItemSelected = {
                         viewModel.onEffectsSettingsSegmentedTabSelected(podcast, PlaybackEffectsSettingsTab.entries[it])
                     },
@@ -318,6 +330,7 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
     @Composable
     private fun EffectsSettingsSegmentedTabBar(
         modifier: Modifier = Modifier,
+        selectedTabTextColor: Color,
         selectedItem: PlaybackEffectsSettingsTab,
         onItemSelected: (selectedItemIndex: Int) -> Unit,
     ) {
@@ -325,13 +338,11 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
             items = PlaybackEffectsSettingsTab.entries.map { stringResource(it.labelResId) },
             selectedIndex = PlaybackEffectsSettingsTab.entries.indexOf(selectedItem),
             colors = SegmentedTabBarDefaults.colors.copy(
-                selectedTabBackgroundColor = MaterialTheme.theme.colors.playerContrast06.copy(alpha = .1f),
-                borderColor = MaterialTheme.theme.colors.playerContrast03.copy(alpha = .4f),
+                selectedTabBackgroundColor = MaterialTheme.theme.colors.playerContrast01,
+                selectedTabTextColor = selectedTabTextColor,
+                borderColor = MaterialTheme.theme.colors.playerContrast03,
             ),
             cornerRadius = 120.dp,
-            textStyle = SegmentedTabBarDefaults.textStyle.copy(
-                fontSize = 13.sp,
-            ),
             modifier = modifier.fillMaxWidth(),
             onItemSelected = onItemSelected,
         )
@@ -342,6 +353,7 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
     private fun EffectsSettingsSegmentedBarPreview() {
         EffectsSettingsSegmentedTabBar(
             selectedItem = PlaybackEffectsSettingsTab.AllPodcasts,
+            selectedTabTextColor = Color.Black,
             onItemSelected = {},
         )
     }

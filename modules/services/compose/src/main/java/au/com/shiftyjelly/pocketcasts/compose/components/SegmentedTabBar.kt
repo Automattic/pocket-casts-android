@@ -1,12 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.compose.components
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -14,13 +12,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
 import androidx.compose.material.LocalMinimumInteractiveComponentEnforcement
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
@@ -31,7 +27,6 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -77,9 +72,6 @@ fun SegmentedTabBar(
                             onItemSelected(index)
                         },
                     )
-                    if (index < items.size - 1) {
-                        Divider(colors.borderColor)
-                    }
                 }
             }
         }
@@ -107,37 +99,15 @@ private fun RowScope.SegmentedTab(
             .defaultMinSize(minWidth = SegmentedTabBarDefaults.tabMinSize)
             .semantics { role = Role.Tab },
     ) {
-        if (isSelected) {
-            Icon(
-                imageVector = Icons.Filled.Check,
-                contentDescription = null,
-                tint = colors.selectedTabIconColor,
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-        }
         Text(
             text = text,
             color = if (isSelected) colors.selectedTabTextColor else colors.unSelectedTabTextColor,
+            style = MaterialTheme.typography.button,
             fontSize = textStyle.fontSize,
-            letterSpacing = textStyle.letterSpacing,
-            lineHeight = 18.sp,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            fontWeight = FontWeight.W500,
         )
     }
-}
-
-@Composable
-private fun Divider(
-    color: Color,
-) {
-    Spacer(
-        modifier = Modifier
-            .background(color)
-            .width(SegmentedTabBarDefaults.borderThickness)
-            .height(SegmentedTabBarDefaults.height),
-    )
 }
 
 object SegmentedTabBarDefaults {
@@ -146,15 +116,14 @@ object SegmentedTabBarDefaults {
     val borderThickness = 1.0.dp
     val textStyle = TextStyle(
         fontSize = 15.sp,
-        letterSpacing = -(0.08).sp,
     )
-    val height: Dp = 40.dp
+    val height: Dp = 43.dp
     val tabMinSize: Dp = 150.dp
 }
 
 data class SegmentedTabBarColors(
-    val selectedTabBackgroundColor: Color = Color.White.copy(alpha = .1f),
-    val selectedTabTextColor: Color = Color.White,
+    val selectedTabBackgroundColor: Color = Color.White,
+    val selectedTabTextColor: Color = Color.Black,
     val selectedTabIconColor: Color = Color.White,
     val unSelectedTabBackgroundColor: Color = Color.Transparent,
     val unSelectedTabTextColor: Color = Color.White,
