@@ -25,8 +25,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.Devices
+import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDirection
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
-import au.com.shiftyjelly.pocketcasts.compose.components.ScrollDirection
 import au.com.shiftyjelly.pocketcasts.compose.components.ScrollingRow
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
@@ -35,7 +35,6 @@ import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.to.Story
 import dev.shreyaspatil.capturable.capturable
 import java.io.File
-import kotlin.math.roundToLong
 import kotlin.math.tan
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -68,14 +67,14 @@ internal fun NumberOfShowsStory(
         ) {
             PodcastCoverCarousel(
                 podcastIds = story.topShowIds,
-                scrollDirection = ScrollDirection.Left,
+                scrollDirection = HorizontalDirection.Left,
                 coverSize = smallCoverSize,
                 coverElevation = 0.dp,
                 spacingSize = smallSpacingSize,
             )
             PodcastCoverCarousel(
                 podcastIds = story.bottomShowIds,
-                scrollDirection = ScrollDirection.Right,
+                scrollDirection = HorizontalDirection.Right,
                 coverSize = largeCoverSize,
                 coverElevation = 12.dp,
                 spacingSize = largeSpacingSize,
@@ -126,7 +125,7 @@ internal fun NumberOfShowsStory(
 @Composable
 private fun PodcastCoverCarousel(
     podcastIds: List<String>,
-    scrollDirection: ScrollDirection,
+    scrollDirection: HorizontalDirection,
     coverSize: Dp,
     coverElevation: Dp,
     spacingSize: Dp,
@@ -135,8 +134,6 @@ private fun PodcastCoverCarousel(
     ScrollingRow(
         items = podcastIds,
         scrollDirection = scrollDirection,
-        scrollByPixels = 1f,
-        scrollDelay = { (60 / it.density).roundToLong().coerceAtLeast(4L) },
         horizontalArrangement = Arrangement.spacedBy(spacingSize),
         modifier = modifier,
     ) { podcastId ->
