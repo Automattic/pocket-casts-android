@@ -315,7 +315,7 @@ class RefreshPodcastsThread(
             }
 
             // only download the meta data for this episode for the first 10 episodes, after that we'd overwhelm the users phone
-            val downloadMetaData = episodes.size + newEpisodeCount < 10
+            val downloadMetaData = !podcast.isAutoDownloadNewEpisodes && (episodes.size + newEpisodeCount < 10)
             val addedDate = Date()
             for (episode in episodes) {
                 episode.addedDate = addedDate
