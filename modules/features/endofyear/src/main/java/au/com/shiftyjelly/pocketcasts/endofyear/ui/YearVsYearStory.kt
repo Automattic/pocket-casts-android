@@ -5,7 +5,8 @@ import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
@@ -14,11 +15,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredSize
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -27,18 +25,16 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
-import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.Devices
@@ -109,161 +105,69 @@ private fun ColumnScope.ComparisonSection(
     areCirclesVisible: Boolean,
     forceCirclesVisible: Boolean,
 ) {
-    Box(
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxWidth()
             .weight(1f),
     ) {
-        if (story.yearOverYearChange in 0.9..1.1) {
-            SameListeningTime(
-                measurements = measurements,
-            )
-        } else {
-            DifferentListeningTime(
-                story = story,
-                measurements = measurements,
-                areCirclesVisible = areCirclesVisible,
-                forceCirclesVisible = forceCirclesVisible,
-            )
-        }
-    }
-}
-
-@Composable
-private fun BoxScope.SameListeningTime(
-    measurements: EndOfYearMeasurements,
-) {
-    val fontSize = 150.nonScaledSp * measurements.smallDeviceFactor
-    // Humane font has a lot bottom space
-    // Precalculate texts' heights to properly size them
-    val density = LocalDensity.current
-    val measurer = rememberTextMeasurer()
-    val textHeight = remember {
-        density.run {
-            measurer.measure(
-                text = "2023",
-                style = TextStyle(
-                    fontFamily = humaneFontFamily,
-                    fontSize = fontSize,
-                ),
-            ).firstBaseline.toDp()
-        }
-    }
-
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .align(Alignment.CenterStart)
-            .offset(x = measurements.width / 8, -measurements.width / 8)
-            .rotate(15f),
-    ) {
-        Text(
-            text = "2023",
-            fontSize = fontSize,
-            fontFamily = humaneFontFamily,
-            color = Color.White,
-            modifier = Modifier.requiredHeight(textHeight),
-        )
-        Spacer(
-            modifier = Modifier.height(16.dp),
-        )
-        Box(
-            modifier = Modifier
-                .size(8.dp)
-                .background(Color.White, CircleShape),
-        )
-    }
-
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .align(Alignment.CenterEnd)
-            .offset(x = -measurements.width / 8, measurements.width / 20)
-            .rotate(-15f),
-    ) {
-        Text(
-            text = "2024",
-            fontSize = fontSize,
-            fontFamily = humaneFontFamily,
-            color = Color.Black,
-            modifier = Modifier.requiredHeight(textHeight),
-        )
-        Spacer(
-            modifier = Modifier.height(16.dp),
-        )
-        Box(
-            modifier = Modifier
-                .size(8.dp)
-                .background(Color.Black, CircleShape),
+        YearVsYearBalls(
+            story = story,
+            measurements = measurements,
+            areCirclesVisible = areCirclesVisible,
+            forceCirclesVisible = forceCirclesVisible,
         )
     }
 }
 
 @Composable
-private fun BoxScope.DifferentListeningTime(
+private fun BoxWithConstraintsScope.YearVsYearBalls(
     story: Story.YearVsYear,
     measurements: EndOfYearMeasurements,
     areCirclesVisible: Boolean,
     forceCirclesVisible: Boolean,
 ) {
-    val (smallText, largeText) = if (story.thisYearDuration > story.lastYearDuration) {
-        "2023" to "2024"
-    } else {
-        "2024" to "2023"
-    }
-    val smallFontSize = 128.nonScaledSp * measurements.smallDeviceFactor
-    val largeFontSize = 150.nonScaledSp * measurements.smallDeviceFactor
-    // Humane font has a lot bottom space
-    // Precalculate texts' heights to properly size them
-    val density = LocalDensity.current
-    val measurer = rememberTextMeasurer()
-    val smallTextHeight = remember {
-        density.run {
-            measurer.measure(
-                text = smallText,
-                style = TextStyle(
-                    fontFamily = humaneFontFamily,
-                    fontSize = smallFontSize,
-                ),
-            ).firstBaseline.toDp()
-        }
-    }
-    val largeTextHeight = remember {
-        density.run {
-            measurer.measure(
-                text = largeText,
-                style = TextStyle(
-                    fontFamily = humaneFontFamily,
-                    fontSize = largeFontSize,
-                ),
-            ).firstBaseline.toDp()
-        }
-    }
+    val smallTextFactory = rememberHumaneTextFactory(128.nonScaledSp * measurements.smallDeviceFactor)
+    val largeTextFactory = rememberHumaneTextFactory(150.nonScaledSp * measurements.smallDeviceFactor)
 
-    val smallSize = 292.dp * measurements.scale * measurements.smallDeviceFactor
-    val largeSize = 348.dp * measurements.scale * measurements.smallDeviceFactor
-    val configuration = if (smallText == "2023") {
-        YearVsYearConfiguration(
-            lastYearFontSize = smallFontSize,
-            lastYearTextHeight = smallTextHeight,
-            lastYearSize = smallSize,
-            lastYearOffset = DpOffset(x = -smallSize / 5, y = -smallSize / 5),
-            thisYearFontSize = largeFontSize,
-            thisYearTextHeight = largeTextHeight,
-            thisYearSize = largeSize,
-            thisYearOffset = DpOffset(x = largeSize / 4, largeSize / 10),
-        )
-    } else {
-        YearVsYearConfiguration(
-            lastYearFontSize = largeFontSize,
-            lastYearTextHeight = largeTextHeight,
-            lastYearSize = largeSize,
-            lastYearOffset = DpOffset(x = -largeSize / 4, -largeSize / 10),
-            thisYearFontSize = smallFontSize,
-            thisYearTextHeight = smallTextHeight,
-            thisYearSize = smallSize,
-            thisYearOffset = DpOffset(x = smallSize / 5, y = smallSize / 5),
-        )
+    val baseSize = 350.dp * measurements.smallDeviceFactor
+    val configuration = remember(story.yearOverYearChange) {
+        when (story.yearOverYearChange) {
+            in 0.9..1.1 -> YearVsYearConfiguration(
+                lastYear = BallConfiguration(
+                    circleSize = 8.dp,
+                    textFactory = largeTextFactory,
+                ),
+                thisYear = BallConfiguration(
+                    circleSize = 8.dp,
+                    textFactory = largeTextFactory,
+                ),
+                offset = DpOffset(maxWidth / 4.5f, maxHeight / 8),
+            )
+
+            in 1.1..Double.POSITIVE_INFINITY -> YearVsYearConfiguration(
+                lastYear = BallConfiguration(
+                    circleSize = (baseSize / story.yearOverYearChange.toFloat()).coerceAtLeast(8.dp),
+                    textFactory = smallTextFactory,
+                ),
+                thisYear = BallConfiguration(
+                    circleSize = baseSize,
+                    textFactory = largeTextFactory,
+                ),
+                offset = DpOffset(maxWidth / 3.5f, maxHeight / 10),
+            )
+
+            else -> YearVsYearConfiguration(
+                lastYear = BallConfiguration(
+                    circleSize = baseSize,
+                    textFactory = largeTextFactory,
+                ),
+                thisYear = BallConfiguration(
+                    circleSize = (baseSize * story.yearOverYearChange.toFloat()).coerceAtLeast(8.dp),
+                    textFactory = smallTextFactory,
+                ),
+                offset = DpOffset(maxWidth / 3.5f, maxHeight / 10),
+            )
+        }
     }
 
     val scale = remember { Animatable(if (areCirclesVisible) 1f else 0f) }
@@ -279,56 +183,81 @@ private fun BoxScope.DifferentListeningTime(
         )
     }
 
-    Box(
+    YearVsYearBall(
+        circleSize = configuration.lastYear.circleSize,
+        circleColor = Color.White,
+        textFactory = configuration.lastYear.textFactory,
+        textColor = story.backgroundColor,
         modifier = Modifier
-            .align(Alignment.CenterStart)
-            .scale(if (forceCirclesVisible) 1f else scale.value)
-            .offset(configuration.lastYearOffset.x, configuration.lastYearOffset.y)
-            .requiredSize(configuration.lastYearSize)
-            .background(Color.White, CircleShape),
-    ) {
-        Text(
-            text = "2023",
-            fontSize = configuration.lastYearFontSize,
-            fontFamily = humaneFontFamily,
-            color = story.backgroundColor,
-            modifier = Modifier
-                .align(Alignment.Center)
-                .requiredHeight(configuration.lastYearTextHeight)
-                .rotate(15f),
-        )
-    }
+            .align(Alignment.Center)
+            .offset(-configuration.offset.x, -configuration.offset.y)
+            .rotate(15f)
+            .scale(if (forceCirclesVisible) 1f else scale.value),
+    )
 
-    Box(
+    YearVsYearBall(
+        circleSize = configuration.thisYear.circleSize,
+        circleColor = Color.Black,
+        textColor = story.backgroundColor,
+        textFactory = configuration.thisYear.textFactory,
         modifier = Modifier
-            .align(Alignment.CenterEnd)
-            .scale(if (forceCirclesVisible) 1f else scale.value)
-            .offset(configuration.thisYearOffset.x, configuration.thisYearOffset.y)
-            .requiredSize(configuration.thisYearSize)
-            .background(Color.Black, CircleShape),
-    ) {
-        Text(
-            text = "2024",
-            fontSize = configuration.thisYearFontSize,
-            fontFamily = humaneFontFamily,
-            color = story.backgroundColor,
-            modifier = Modifier
-                .align(Alignment.Center)
-                .requiredHeight(configuration.thisYearTextHeight)
-                .rotate(-15f),
-        )
+            .align(Alignment.Center)
+            .offset(configuration.offset.x, configuration.offset.y)
+            .rotate(-15f)
+            .scale(if (forceCirclesVisible) 1f else scale.value),
+    )
+}
+
+@Composable
+private fun YearVsYearBall(
+    circleSize: Dp,
+    circleColor: Color,
+    textFactory: HumaneTextFactory,
+    textColor: Color,
+    modifier: Modifier = Modifier,
+) {
+    if (textFactory.maxSize <= circleSize * 1.1f) {
+        Box(
+            modifier = modifier
+                .requiredSize(circleSize)
+                .background(circleColor, CircleShape),
+        ) {
+            textFactory.HumaneText(
+                text = "2023",
+                color = textColor,
+                modifier = Modifier.align(Alignment.Center),
+            )
+        }
+    } else {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = modifier,
+        ) {
+            textFactory.HumaneText(
+                text = "2023",
+                color = circleColor,
+            )
+            Spacer(
+                modifier = Modifier.height(16.dp),
+            )
+            Box(
+                modifier = Modifier
+                    .requiredSize(circleSize)
+                    .background(circleColor, CircleShape),
+            )
+        }
     }
 }
 
-private class YearVsYearConfiguration(
-    val lastYearFontSize: TextUnit,
-    val lastYearTextHeight: Dp,
-    val lastYearSize: Dp,
-    val lastYearOffset: DpOffset,
-    val thisYearFontSize: TextUnit,
-    val thisYearTextHeight: Dp,
-    val thisYearSize: Dp,
-    val thisYearOffset: DpOffset,
+private data class YearVsYearConfiguration(
+    val lastYear: BallConfiguration,
+    val thisYear: BallConfiguration,
+    val offset: DpOffset,
+)
+
+private data class BallConfiguration(
+    val circleSize: Dp,
+    val textFactory: HumaneTextFactory,
 )
 
 @Composable
@@ -338,14 +267,7 @@ private fun TextInfo(
     controller: StoryCaptureController,
     onShareStory: (File) -> Unit,
 ) {
-    Column(
-        modifier = Modifier.background(
-            brush = Brush.verticalGradient(
-                0f to Color.Transparent,
-                0.1f to story.backgroundColor,
-            ),
-        ),
-    ) {
+    Column {
         val badgeId = when (story.subscriptionTier) {
             SubscriptionTier.PLUS -> IR.drawable.end_of_year_2024_year_vs_year_plus_badge
             SubscriptionTier.PATRON -> IR.drawable.end_of_year_2024_year_vs_year_patron_badge
@@ -414,12 +336,14 @@ private fun TextInfo(
 
 @Preview(device = Devices.PortraitRegular)
 @Composable
-private fun YearVsYearThisYearPreview() {
+private fun TotalTimePreview(
+    @PreviewParameter(YearVsYearRatioProvider::class) durations: Pair<Int, Int>,
+) {
     PreviewBox(currentPage = 8) { measurements ->
         YearVsYearStory(
             story = Story.YearVsYear(
-                lastYearDuration = 2.hours,
-                thisYearDuration = 3.hours,
+                lastYearDuration = durations.first.hours,
+                thisYearDuration = durations.second.hours,
                 subscriptionTier = SubscriptionTier.PLUS,
             ),
             measurements = measurements,
@@ -432,12 +356,12 @@ private fun YearVsYearThisYearPreview() {
 
 @Preview(device = Devices.PortraitRegular)
 @Composable
-private fun YearVsYearThisYearLargePreview() {
+private fun YearVsYearPatronPreviow() {
     PreviewBox(currentPage = 8) { measurements ->
         YearVsYearStory(
             story = Story.YearVsYear(
-                lastYearDuration = 0.hours,
-                thisYearDuration = 3.hours,
+                lastYearDuration = 100.hours,
+                thisYearDuration = 100.hours,
                 subscriptionTier = SubscriptionTier.PATRON,
             ),
             measurements = measurements,
@@ -448,38 +372,16 @@ private fun YearVsYearThisYearLargePreview() {
     }
 }
 
-@Preview(device = Devices.PortraitRegular)
-@Composable
-private fun YearVsYearLastYearPreview() {
-    PreviewBox(currentPage = 8) { measurements ->
-        YearVsYearStory(
-            story = Story.YearVsYear(
-                lastYearDuration = 3.hours,
-                thisYearDuration = 2.hours,
-                subscriptionTier = SubscriptionTier.PLUS,
-            ),
-            measurements = measurements,
-            areCirclesVisible = true,
-            controller = StoryCaptureController.preview(),
-            onShareStory = {},
-        )
-    }
-}
-
-@Preview(device = Devices.PortraitRegular)
-@Composable
-private fun YearVsYearEqualPreview() {
-    PreviewBox(currentPage = 8) { measurements ->
-        YearVsYearStory(
-            story = Story.YearVsYear(
-                lastYearDuration = 100.hours,
-                thisYearDuration = 101.hours,
-                subscriptionTier = SubscriptionTier.PLUS,
-            ),
-            measurements = measurements,
-            areCirclesVisible = true,
-            controller = StoryCaptureController.preview(),
-            onShareStory = {},
-        )
-    }
+private class YearVsYearRatioProvider : PreviewParameterProvider<Pair<Int, Int>> {
+    override val values = sequenceOf(
+        0 to 1,
+        100 to 500,
+        100 to 200,
+        100 to 120,
+        120 to 100,
+        200 to 100,
+        500 to 100,
+        1 to 0,
+        0 to 0,
+    )
 }
