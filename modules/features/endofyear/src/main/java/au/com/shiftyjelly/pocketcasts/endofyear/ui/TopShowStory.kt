@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -44,7 +45,8 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.endofyear.StoryCaptureController
 import au.com.shiftyjelly.pocketcasts.localization.R
-import au.com.shiftyjelly.pocketcasts.localization.helper.StatsHelper
+import au.com.shiftyjelly.pocketcasts.localization.helper.FriendlyDurationUnit
+import au.com.shiftyjelly.pocketcasts.localization.helper.toFriendlyStirng
 import au.com.shiftyjelly.pocketcasts.models.to.Story
 import au.com.shiftyjelly.pocketcasts.models.to.TopPodcast
 import dev.shreyaspatil.capturable.capturable
@@ -203,14 +205,18 @@ private fun TopShowInfo(
         Spacer(
             modifier = Modifier.height(16.dp),
         )
+        val context = LocalContext.current
         TextP40(
             text = stringResource(
                 R.string.end_of_year_story_top_podcast_subtitle,
                 story.show.playedEpisodeCount,
-                StatsHelper.secondsToFriendlyString(
-                    story.show.playbackTime.inWholeSeconds,
-                    LocalContext.current.resources,
-                ),
+                remember(story.show.playbackTime, context) {
+                    story.show.playbackTime.toFriendlyStirng(
+                        resources = context.resources,
+                        maxPartCount = 3,
+                        minUnit = FriendlyDurationUnit.Minute,
+                    )
+                },
             ),
             fontSize = 15.sp,
             disableAutoScale = true,

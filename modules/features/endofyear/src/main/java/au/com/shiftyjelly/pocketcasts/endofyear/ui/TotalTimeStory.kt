@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,7 +25,8 @@ import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.components.AutoResizeText
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.endofyear.StoryCaptureController
-import au.com.shiftyjelly.pocketcasts.localization.helper.StatsHelper
+import au.com.shiftyjelly.pocketcasts.localization.helper.FriendlyDurationUnit
+import au.com.shiftyjelly.pocketcasts.localization.helper.toFriendlyStirng
 import au.com.shiftyjelly.pocketcasts.models.to.Story
 import dev.shreyaspatil.capturable.capturable
 import java.io.File
@@ -118,15 +120,26 @@ internal fun TotalTimeStory(
     }
 }
 
+@Composable
 private fun getListeningTimeTexts(
     context: Context,
     duration: Duration,
 ): ListeningTimeTexts {
-    val timeText = StatsHelper.secondsToFriendlyString(duration.inWholeSeconds, context.resources)
-    val timeTextStrings = timeText.split(" ")
-    val mainNumber = timeTextStrings.firstOrNull() ?: ""
-    val subtitle = timeTextStrings.drop(1)
-        .joinToString(separator = " ", postfix = " ${context.getString(LR.string.end_of_year_listening_time_subtitle)}")
+    val (mainNumber, subtitle) = remember(duration, context) {
+        val timeText = duration.toFriendlyStirng(
+            resources = context.resources,
+            maxPartCount = 3,
+            minUnit = FriendlyDurationUnit.Minute,
+            maxUnit = if (duration < 100.hours) FriendlyDurationUnit.Hours else FriendlyDurationUnit.Day,
+        )
+        val timeTextStrings = timeText.split(" ")
+        val mainNumber = timeTextStrings.firstOrNull() ?: ""
+        val subtitle = timeTextStrings.drop(1).joinToString(
+            separator = " ",
+            postfix = " ${context.getString(LR.string.end_of_year_listening_time_subtitle)}",
+        )
+        mainNumber to subtitle
+    }
     return ListeningTimeTexts(mainNumber, subtitle)
 }
 
@@ -155,6 +168,7 @@ private fun TotalTimePreview(
 private class PlaybackTimeProvider : PreviewParameterProvider<Duration> {
     override val values = sequenceOf(
         Duration.ZERO,
+        99.hours + 12.minutes + 6.seconds,
         36.days + 12.hours + 30.minutes + 10.seconds,
         22.hours + 30.minutes + 10.seconds,
         120.days + 12.hours + 30.minutes + 10.seconds,

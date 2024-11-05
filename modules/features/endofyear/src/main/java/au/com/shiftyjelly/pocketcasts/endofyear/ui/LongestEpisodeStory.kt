@@ -44,7 +44,8 @@ import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.endofyear.StoryCaptureController
-import au.com.shiftyjelly.pocketcasts.localization.helper.StatsHelper
+import au.com.shiftyjelly.pocketcasts.localization.helper.FriendlyDurationUnit
+import au.com.shiftyjelly.pocketcasts.localization.helper.toFriendlyStirng
 import au.com.shiftyjelly.pocketcasts.models.to.LongestEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Story
 import dev.shreyaspatil.capturable.capturable
@@ -242,10 +243,16 @@ private fun TextInfo(
         Spacer(
             modifier = Modifier.height(16.dp),
         )
+        val context = LocalContext.current
         TextH10(
             text = stringResource(
                 LR.string.end_of_year_story_longest_episode_title,
-                StatsHelper.secondsToFriendlyString(story.episode.duration.inWholeSeconds, LocalContext.current.resources),
+                remember(story.episode.duration, context) {
+                    story.episode.duration.toFriendlyStirng(
+                        resources = context.resources,
+                        minUnit = FriendlyDurationUnit.Minute,
+                    )
+                },
             ),
             fontScale = measurements.smallDeviceFactor,
             disableAutoScale = true,
