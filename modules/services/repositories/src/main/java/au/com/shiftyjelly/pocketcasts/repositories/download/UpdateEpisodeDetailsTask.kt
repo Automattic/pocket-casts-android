@@ -60,7 +60,7 @@ class UpdateEpisodeDetailsTask @AssistedInject constructor(
         }
 
         /**
-         * Don't bother calling episodes that are downloaded as the download tasks checks the content type.
+         * Don't bother calling episodes that are downloaded as the download task checks the content type.
          */
         private fun ignoreEpisode(episode: PodcastEpisode): Boolean {
             return episode.isQueued || episode.isDownloaded || episode.isDownloading || episode.isArchived
