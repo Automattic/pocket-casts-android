@@ -139,6 +139,10 @@ class AutoDownloadSettingsFragment :
                 settings.bottomInset.collect {
                     view.updatePadding(bottom = it)
                 }
+                viewModel.hasEpisodesWithAutoDownloadEnabled.collect {
+                    setupNewEpisodesToggleStatusCheck()
+                    onNewEpisodesToggleChange(viewModel.getAutoDownloadNewEpisodes())
+                }
             }
         }
     }
@@ -159,7 +163,7 @@ class AutoDownloadSettingsFragment :
                 setOnPreferenceChangeListener { _, newValue ->
                     if (newValue is Boolean) {
                         viewModel.onNewEpisodesChange(newValue)
-                        handleNewEpisodesToggle(newValue.toAutoDownloadStatus())
+                        onNewEpisodesToggleChange(newValue.toAutoDownloadStatus())
                     }
                     true
                 }
@@ -238,17 +242,17 @@ class AutoDownloadSettingsFragment :
         updateView()
     }
 
-    private fun handleNewEpisodesToggle(status: Int) {
+    private fun onNewEpisodesToggleChange(status: Int) {
         lifecycleScope.launch {
             if (status == Podcast.AUTO_DOWNLOAD_OFF) {
                 viewModel.updateAllAutoDownloadStatus(Podcast.AUTO_DOWNLOAD_OFF)
             }
-            updateNewEpisodesSwitch(status)
+            updateNewEpisodesPreferencesVisibility(status)
             updatePodcastsSummary()
         }
     }
 
-    private fun updateNewEpisodesSwitch(status: Int) {
+    private fun updateNewEpisodesPreferencesVisibility(status: Int) {
         val podcastsPreference = podcastsPreference ?: return
         val podcastsLimitPreference = podcastsAutoDownloadLimitPreference ?: return
         val podcastsCategory = podcastsCategory ?: return
@@ -352,13 +356,13 @@ class AutoDownloadSettingsFragment :
         updateFiltersSelectedSummary()
 
         upNextPreference.isChecked = viewModel.getAutoDownloadUpNext()
-        setupNewEpisodesToggle()
+        setupNewEpisodesToggleStatusCheck()
         autoDownloadOnlyDownloadOnWifi.isChecked = viewModel.getAutoDownloadUnmeteredOnly()
         autoDownloadOnlyWhenCharging.isChecked = viewModel.getAutoDownloadOnlyWhenCharging()
         if (FeatureFlag.isEnabled(Feature.AUTO_DOWNLOAD)) {
             newEpisodesPreference?.summary = getString(LR.string.settings_auto_download_new_episodes_description)
         }
-        handleNewEpisodesToggle(viewModel.getAutoDownloadNewEpisodes())
+        onNewEpisodesToggleChange(viewModel.getAutoDownloadNewEpisodes())
     }
 
     private fun countPodcastsAutoDownloading(): Single<Int> {
@@ -391,7 +395,7 @@ class AutoDownloadSettingsFragment :
             )
     }
 
-    private fun setupNewEpisodesToggle() {
+    private fun setupNewEpisodesToggleStatusCheck() {
         val value = viewModel.getAutoDownloadNewEpisodes()
         when (value) {
             Podcast.AUTO_DOWNLOAD_OFF -> {
