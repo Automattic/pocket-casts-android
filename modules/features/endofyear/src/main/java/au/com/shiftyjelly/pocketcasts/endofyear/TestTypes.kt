@@ -27,11 +27,10 @@ enum class MyStateClass {
     DoneShowWelcomeInReferralFlow,
 }
 
-data class MyOtherData(
-    @DrawableRes val imageResId: Int,
+data class MyOtherData(@DrawableRes val imageResId: Int) {
     @StringRes val contentDescriptionResourceId: Int,
     @StringRes val titleResourceId: Int,
     @StringRes val descriptionResourceId: Int,
     val imageHeight: Dp,
     val imageTopPadding: Dp,
-)
+}
