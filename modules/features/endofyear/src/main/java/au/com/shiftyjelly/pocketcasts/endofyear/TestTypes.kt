@@ -19,3 +19,19 @@ internal class InternalWithoutTests {
 private class PrivateType {
     fun print() = "Test"
 }
+
+enum class MyStateClass {
+    Done,
+    DoneGoToDiscover,
+    DoneShowPlusPromotion,
+    DoneShowWelcomeInReferralFlow,
+}
+
+data class MyOtherData(
+    @DrawableRes val imageResId: Int,
+    @StringRes val contentDescriptionResourceId: Int,
+    @StringRes val titleResourceId: Int,
+    @StringRes val descriptionResourceId: Int,
+    val imageHeight: Dp,
+    val imageTopPadding: Dp,
+)
