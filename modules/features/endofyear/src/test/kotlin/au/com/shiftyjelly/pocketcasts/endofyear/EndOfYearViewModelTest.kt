@@ -673,6 +673,21 @@ class EndOfYearViewModelTest {
         assertEquals(7, viewModel.getPreviousStoryIndex(stories.indexOf<Ending>()))
     }
 
+    @Test
+    fun `plus interstitial has max progress`() = runTest {
+        endOfYearSync.isSynced.add(true)
+        endOfYearManager.stats.add(stats)
+        subscriptionTier.emit(SubscriptionTier.NONE)
+
+        viewModel.syncData()
+        viewModel.uiState.test {
+            val stories = awaitStories()
+
+            viewModel.onStoryChanged(stories.getStoryOfType<PlusInterstitial>())
+            assertEquals(1f, awaitItem().storyProgress)
+        }
+    }
+
     private suspend fun TurbineTestContext<UiState>.awaitStories(): List<Story> {
         return (awaitItem() as UiState.Synced).stories
     }

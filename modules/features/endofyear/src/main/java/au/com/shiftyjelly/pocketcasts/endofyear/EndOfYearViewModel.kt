@@ -182,6 +182,8 @@ class EndOfYearViewModel @AssistedInject constructor(
                     }
                     _switchStory.emit(Unit)
                 }
+            } else {
+                progress.value = 1f
             }
         }
     }

@@ -274,6 +274,7 @@ internal fun BoxScope.TopControls(
             state = pagerState,
             progress = progress,
             activeColor = Color.Black,
+            isProgressedActive = false,
         )
         Spacer(
             modifier = Modifier.height(10.dp),

@@ -166,7 +166,7 @@ private fun PlusInfo(
 @Preview(device = Devices.PortraitRegular)
 @Composable
 private fun PlusInterstitialPreview() {
-    PreviewBox(currentPage = 7) { measurements ->
+    PreviewBox(currentPage = 7, progress = 1f) { measurements ->
         PlusInterstitialStory(
             story = Story.PlusInterstitial,
             measurements = measurements,
