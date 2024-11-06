@@ -2153,10 +2153,11 @@
     <string name="paywall_layout_reviews_review_six_message">PC has been my go-to for years. I\'ve tried other podcast apps and always come back to PC for their simplicity, Ul and support. Definitely worth checking it out, especially if you have grown tired of your current podcast app.</string>
     <string name="paywall_layout_reviews_review_six_date">Mar 8</string>
 
-    <string name="folders_plus_prompt">Organize your podcasts with Pocket Casts Plus, and more</string>
-    <string name="themes_plus_prompt">Get exclusive themes with Pocket Casts Plus, and more</string>
-    <string name="icons_plus_prompt">Get exclusive app icons with Pocket Casts Plus, and more</string>
-    <string name="files_plus_prompt">Upload your files with Pocket Casts Plus, and more</string>
+    <string name="folders_plus_prompt">Organize your podcasts with Pocket&#160;Casts&#160;Plus, and more</string>
+    <string name="themes_plus_prompt">Get exclusive themes with Pocket&#160;Casts&#160;Plus, and more</string>
+    <string name="icons_plus_prompt">Get exclusive app icons with Pocket&#160;Casts&#160;Plus, and more</string>
+    <string name="files_plus_prompt">Upload your files with Pocket&#160;Casts&#160;Plus, and more</string>
+    <string name="up_next_shuffle_plus_prompt">Shuffle your episodes with Pocket&#160;Casts&#160;Plus, and more</string>
 
     <!-- Engage SDK -->
     <string name="engage_sdk_recently_played" translatable="false">@string/nova_launcher_recently_played</string>
@@ -2204,6 +2205,5 @@
     <!-- Up Next Shuffle -->
     <string name="up_next_shuffle_button_content_description">Up next shuffle</string>
     <string name="up_next_shuffle_disable_button_content_description">Up next shuffle disable</string>
-    <string name="up_next_shuffle_plus_prompt">Shuffle your episodes with Pocket Casts Plus, and more</string>
 
 </resources>
