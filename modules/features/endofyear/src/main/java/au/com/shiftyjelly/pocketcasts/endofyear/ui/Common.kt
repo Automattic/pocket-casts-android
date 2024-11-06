@@ -159,7 +159,7 @@ internal fun rememberHumaneTextFactory(
         HumaneTextFactory(
             fontSize = fontSize,
             fontWeight = fontWeight,
-            textHeight = density.run { (measurement.firstBaseline * 1.005f).toDp() },
+            textHeight = density.run { (measurement.firstBaseline * 1.01f).toDp() },
             textWidth = density.run { measurement.size.width.toDp() },
         )
     }
