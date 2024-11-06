@@ -198,6 +198,7 @@ internal class HumaneTextFactory(
 @Composable
 internal fun PreviewBox(
     currentPage: Int,
+    progress: Float = 0.5f,
     content: @Composable (EndOfYearMeasurements) -> Unit,
 ) {
     BoxWithConstraints {
@@ -212,7 +213,7 @@ internal fun PreviewBox(
         content(measurements)
         TopControls(
             pagerState = rememberPagerState(initialPage = currentPage, pageCount = { 11 }),
-            progress = 0f,
+            progress = progress,
             measurements = measurements,
             onClose = {},
         )

@@ -28,6 +28,7 @@ fun PagerProgressingIndicator(
     modifier: Modifier = Modifier,
     activeColor: Color = Color.White,
     inactiveColor: Color = activeColor.copy(alpha = 0.3f),
+    isProgressedActive: Boolean = true,
 ) {
     if (state.pageCount <= 0) {
         return
@@ -49,7 +50,7 @@ fun PagerProgressingIndicator(
             } else if (index > state.currentPage) {
                 SolidColor(inactiveColor)
             } else {
-                SolidColor(activeColor)
+                SolidColor(if (isProgressedActive) activeColor else inactiveColor)
             }
             Box(
                 modifier
@@ -96,5 +97,10 @@ private fun PagerProgressingIndicatorPreview() = Column(
     PagerProgressingIndicator(
         state = rememberPagerState(initialPage = 2, pageCount = { 4 }),
         progress = 0.75f,
+    )
+    PagerProgressingIndicator(
+        state = rememberPagerState(initialPage = 2, pageCount = { 4 }),
+        progress = 0.75f,
+        isProgressedActive = false,
     )
 }
