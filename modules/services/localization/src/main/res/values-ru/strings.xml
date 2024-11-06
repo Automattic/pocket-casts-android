@@ -14,7 +14,6 @@ Language: ru
     <string name="eoy_story_ratings_subtitle_1">Ого, сколько %1$d-звёздных оценок! Благодарим за то, что вы выразили признательность своим любимым авторам!</string>
     <string name="eoy_story_ratings_title_2">Ой! Оценок подкастов ещё нет</string>
     <string name="eoy_story_ratings_title_1">Давайте посмотрим ваши оценки!</string>
-    <string name="end_of_year_story_top_podcast_title">Ваш любимый подкаст в 2024 году: %1$s</string>
     <string name="referrals_failed_to_load_offer">К сожалению, при получении ссылки на источник перехода возникла проблема.</string>
     <string name="transcript_error_not_available">К сожалению, в этом выпуске нет расшифровки.</string>
     <string name="referrals_banner_hide_label">Скрыть баннер</string>
@@ -588,7 +587,6 @@ Language: ru
     <string name="end_of_year_story_top_categories">Ваши любимые рубрики</string>
     <string name="end_of_year_story_epilogue_subtitle">Не забудьте поделиться с друзьями и рассказать о любимых подкастерах</string>
     <string name="end_of_year_story_top_podcasts_share_text">Мои любимые подкасты этого года! %1$s</string>
-    <string name="end_of_year_story_top_podcast_subtitle">Вы прослушали %1$d выпусков (-а) общей продолжительностью %2$s</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">Но было одно шоу, которое вы слушали снова и снова…</string>
     <string name="end_of_year_story_listened_to_numbers">Вы прослушали %1$d шоу и %2$d выпусков</string>
     <string name="end_of_year_story_listened_to_categories_share_text">Я выбрал(а) %1$d рубрик(и) в 2023 году</string>

@@ -14,7 +14,6 @@ Language: zh_TW
     <string name="eoy_story_ratings_subtitle_1">哇！好多 %1$d 星級評分！ 謝謝你與最愛創作者分享支持心意！</string>
     <string name="eoy_story_ratings_title_2">糟糕！ 目前沒有可顯示的 Podcast 評分</string>
     <string name="eoy_story_ratings_title_1">讓我們看看你的評分！</string>
-    <string name="end_of_year_story_top_podcast_title">你在 2024 年最愛的 Podcast 是「%1$s」</string>
     <string name="referrals_failed_to_load_offer">不好意思，擷取推薦連結時發生錯誤。</string>
     <string name="transcript_error_not_available">不好意思，此單集不提供逐字稿。</string>
     <string name="referrals_banner_hide_label">隱藏此橫幅</string>
@@ -588,7 +587,6 @@ Language: zh_TW
     <string name="end_of_year_story_top_categories">你最愛的分類</string>
     <string name="end_of_year_story_epilogue_subtitle">別忘了與朋友分享，並向你最喜愛的 Podcast 創作者致意</string>
     <string name="end_of_year_story_top_podcasts_share_text">本年度我最愛的 Podcast！ %1$s</string>
-    <string name="end_of_year_story_top_podcast_subtitle">你收聽了 %1$d 集，總共 %2$s</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">但有個節目你已成為忠實聽眾了…</string>
     <string name="end_of_year_story_listened_to_numbers">你一共收聽了 %1$d 個不同節目和 %2$d 集內容</string>
     <string name="end_of_year_story_listened_to_categories_share_text">我在 2023 年收聽了 %1$d 個不同的分類</string>

@@ -14,7 +14,6 @@ Language: de
     <string name="eoy_story_ratings_subtitle_1">Wow, so viele %1$d-Sterne-Bewertungen! Vielen Dank, dass du deine Lieblingsersteller unterstützt!</string>
     <string name="eoy_story_ratings_title_2">Tut uns leid! Hier gibt es noch keine Podcast-Bewertungen</string>
     <string name="eoy_story_ratings_title_1">Sehen wir uns deine Bewertungen an!</string>
-    <string name="end_of_year_story_top_podcast_title">Dein Top-Podcast im Jahr 2024 war %1$s</string>
     <string name="referrals_failed_to_load_offer">Entschuldigung! Beim Abrufen des Referral-Links ist ein Fehler aufgetreten.</string>
     <string name="transcript_error_not_available">Entschuldigung! Für diese Folge ist kein Transkript verfügbar.</string>
     <string name="referrals_banner_hide_label">Dieses Banner ausblenden</string>
@@ -588,7 +587,6 @@ Language: de
     <string name="end_of_year_story_top_categories">Deine Top-Kategorien</string>
     <string name="end_of_year_story_epilogue_subtitle">Vergiss nicht, sie mit deinen Freunden zu teilen und deine bevorzugten Podcast-Ersteller dankend zu erwähnen</string>
     <string name="end_of_year_story_top_podcasts_share_text">Meine Top-Podcasts des Jahres! %1$s</string>
-    <string name="end_of_year_story_top_podcast_subtitle">Du hast dir %1$d Folgen mit einer Gesamtdauer von %2$s angehört</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">Aber es gab eine, die dir besonders gut gefallen hat …</string>
     <string name="end_of_year_story_listened_to_numbers">Du hast dir insgesamt %1$d verschiedene Shows und %2$d Folgen angehört</string>
     <string name="end_of_year_story_listened_to_categories_share_text">Ich habe mir im Jahr 2023 %1$d unterschiedliche Kategorien angehört</string>

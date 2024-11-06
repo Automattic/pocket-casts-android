@@ -14,7 +14,6 @@ Language: zh_CN
     <string name="eoy_story_ratings_subtitle_1">哇，这么多 %1$d 星评价！ 感谢您对您所喜爱的创作者表达欣赏！</string>
     <string name="eoy_story_ratings_title_2">哎呀！ 暂无播客评分可向您展示</string>
     <string name="eoy_story_ratings_title_1">让我们看看您的评分！</string>
-    <string name="end_of_year_story_top_podcast_title">您的 2024 年热门播客为 %1$s</string>
     <string name="referrals_failed_to_load_offer">很抱歉，获取您的推荐链接时出错了。</string>
     <string name="transcript_error_not_available">很抱歉，本剧集没有文字转录稿。</string>
     <string name="referrals_banner_hide_label">隐藏此横幅</string>
@@ -588,7 +587,6 @@ Language: zh_CN
     <string name="end_of_year_story_top_categories">您的热门分类</string>
     <string name="end_of_year_story_epilogue_subtitle">不要忘记共享给朋友，告诉他们您最喜欢的播客创作者</string>
     <string name="end_of_year_story_top_podcasts_share_text">我的年度热门播客！ %1$s</string>
-    <string name="end_of_year_story_top_podcast_subtitle">您收听了 %1$d 部剧集，共 %2$s 部</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">但还有一个您经常收听的播客…</string>
     <string name="end_of_year_story_listened_to_numbers">您总共收听了 %1$d 个不同的节目和 %2$d 部剧集</string>
     <string name="end_of_year_story_listened_to_categories_share_text">我在 2023 年收听了 %1$d 种不同的分类</string>

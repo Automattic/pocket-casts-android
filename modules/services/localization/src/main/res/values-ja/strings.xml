@@ -14,7 +14,6 @@ Language: ja_JP
     <string name="eoy_story_ratings_subtitle_1">%1$dつ星評価がとても多いですね ! お気に入りのクリエイターへの熱い思いを共有していただき、ありがとうございます。</string>
     <string name="eoy_story_ratings_title_2">おっと ! 表示するポッドキャストの評価はまだありません</string>
     <string name="eoy_story_ratings_title_1">あなたの評価を確認しましょう。</string>
-    <string name="end_of_year_story_top_podcast_title">2024年のあなたのお気に入りポッドキャストは%1$sでした</string>
     <string name="referrals_failed_to_load_offer">申し訳ありません、リファラルリンクの取得中にエラーが発生しました。</string>
     <string name="transcript_error_not_available">申し訳ありません、このエピソードではトランスクリプトを利用できません。</string>
     <string name="referrals_banner_hide_label">このバナーを非表示</string>
@@ -588,7 +587,6 @@ Language: ja_JP
     <string name="end_of_year_story_top_categories">トップカテゴリー</string>
     <string name="end_of_year_story_epilogue_subtitle">友達と共有したりお気に入りのポッドキャストクリエイターにエールを送ったりしましょう</string>
     <string name="end_of_year_story_top_podcasts_share_text">今年再生数が多かったポッドキャストはこちら ! %1$s</string>
-    <string name="end_of_year_story_top_podcast_subtitle">%1$d話のエピソードで合計%2$s聴きました</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">何度も聴いたエピソードもありました…</string>
     <string name="end_of_year_story_listened_to_numbers">%1$d個のショーで合計%2$d話のエピソードを聴きました</string>
     <string name="end_of_year_story_listened_to_categories_share_text">2023年は%1$d個のカテゴリーを聴きました</string>

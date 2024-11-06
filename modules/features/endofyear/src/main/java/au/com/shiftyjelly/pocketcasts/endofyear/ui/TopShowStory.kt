@@ -195,7 +195,7 @@ private fun TopShowInfo(
         TextH10(
             text = stringResource(
                 R.string.end_of_year_story_top_podcast_title,
-                story.show.title,
+                2024,
             ),
             fontScale = measurements.smallDeviceFactor,
             disableAutoScale = true,
@@ -217,6 +217,7 @@ private fun TopShowInfo(
                         minUnit = FriendlyDurationUnit.Minute,
                     )
                 },
+                story.show.title,
             ),
             fontSize = 15.sp,
             disableAutoScale = true,

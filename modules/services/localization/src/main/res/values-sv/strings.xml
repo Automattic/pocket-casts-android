@@ -14,7 +14,6 @@ Language: sv_SE
     <string name="eoy_story_ratings_subtitle_1">Wow, så många %1$d-stjärniga betyg Tack för att du delar kärleken till dina favoritkreatörer.</string>
     <string name="eoy_story_ratings_title_2">Oj då! Inga podcastbetyg att visa dig ännu</string>
     <string name="eoy_story_ratings_title_1">Låt oss se dina betyg.</string>
-    <string name="end_of_year_story_top_podcast_title">Din favoritpodcast 2024 var %1$s</string>
     <string name="referrals_failed_to_load_offer">Något gick fel vid hämtningen av din hänvisningslänk.</string>
     <string name="transcript_error_not_available">Det finns ingen transkription tillgänglig för det här avsnittet.</string>
     <string name="referrals_banner_hide_label">Dölj den här bannern</string>
@@ -588,7 +587,6 @@ Language: sv_SE
     <string name="end_of_year_story_top_categories">Dina favoritkategorier</string>
     <string name="end_of_year_story_epilogue_subtitle">Glöm inte att dela med dina vänner och att berätta om dina favoritpodcastkreatörer</string>
     <string name="end_of_year_story_top_podcasts_share_text">Mina favoritpodcasts för året. %1$s</string>
-    <string name="end_of_year_story_top_podcast_subtitle">Du lyssnade på %1$d avsnitt i sammanlagt %2$s</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">Det fanns dock ett avsnitt som du fortsatte att komma tillbaka till …</string>
     <string name="end_of_year_story_listened_to_numbers">Du lyssnade sammanlagt på %1$d olika podcasts och %2$d avsnitt</string>
     <string name="end_of_year_story_listened_to_categories_share_text">Jag lyssnade på %1$d olika kategorier under 2023</string>

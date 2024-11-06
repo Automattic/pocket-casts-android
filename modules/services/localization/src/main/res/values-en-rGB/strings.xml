@@ -293,7 +293,6 @@ Language: en_GB
     <string name="onboarding_forgot_password">Forgot password?</string>
     <string name="log_in">Log in</string>
     <string name="end_of_year_story_top_podcasts_share_text">My top podcasts of the year! %1$s</string>
-    <string name="end_of_year_story_top_podcast_subtitle">You listened to %1$d episodes for a total of %2$s</string>
     <string name="end_of_year_create_account_to_see">Save your podcasts in the cloud, get your end of year review and sync your progress with other devices.</string>
     <string name="end_of_year_story_top_categories_share_text">My most listened to podcast categories</string>
     <string name="end_of_year_story_top_categories">Your Top Categories</string>

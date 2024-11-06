@@ -14,7 +14,6 @@ Language: ko_KR
     <string name="eoy_story_ratings_subtitle_1">와, 별 %1$d개짜리 평가가 많군요! 좋아하는 제작자에 대한 애정을 공유해 주셔서 감사합니다!</string>
     <string name="eoy_story_ratings_title_2">이런! 아직 보여드릴 만한 팟캐스트 평가가 없습니다.</string>
     <string name="eoy_story_ratings_title_1">회원님이 평가해 주세요!</string>
-    <string name="end_of_year_story_top_podcast_title">회원님의 2024년 상위 팟캐스트는 %1$s이었습니다.</string>
     <string name="referrals_failed_to_load_offer">죄송합니다. 추천 링크를 가져오는 중에 문제가 발생했습니다.</string>
     <string name="transcript_error_not_available">죄송합니다. 이 에피소드에서는 대본을 사용할 수 없습니다.</string>
     <string name="referrals_banner_hide_label">배너 숨기기</string>
@@ -588,7 +587,6 @@ Language: ko_KR
     <string name="end_of_year_story_top_categories">회원님의 상위 카테고리</string>
     <string name="end_of_year_story_epilogue_subtitle">잊지 말고 친구와 공유하고 즐겨 찾는 팟캐스트 창작자에게 감사 인사 보내기</string>
     <string name="end_of_year_story_top_podcasts_share_text">나의 올해 상위 팟캐스트입니다! %1$s</string>
-    <string name="end_of_year_story_top_podcast_subtitle">총 %2$s 동안 %1$d개 에피소드를 청취하셨습니다.</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">그러나 반복 청취한 것이 있었습니다…</string>
     <string name="end_of_year_story_listened_to_numbers">청취하신 총 프로그램 %1$d개, 에피소드 %2$d개</string>
     <string name="end_of_year_story_listened_to_categories_share_text">내가 2023년에 청취한 카테고리는 %1$d가지</string>

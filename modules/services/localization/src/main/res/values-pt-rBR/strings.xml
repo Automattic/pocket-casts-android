@@ -14,7 +14,6 @@ Language: pt_BR
     <string name="eoy_story_ratings_subtitle_1">Uau! Quantas classificações com %1$d estrelas. Obrigado por compartilhar todo o seu amor pelos seus criadores favoritos.</string>
     <string name="eoy_story_ratings_title_2">Vish! Ainda não há classificações em podcasts</string>
     <string name="eoy_story_ratings_title_1">Vamos ver suas classificações!</string>
-    <string name="end_of_year_story_top_podcast_title">Seu principal podcast em 2024 foi %1$s</string>
     <string name="referrals_failed_to_load_offer">Ocorreu um erro ao buscar seu link de indicação.</string>
     <string name="transcript_error_not_available">Não há transcrição disponível para este episódio.</string>
     <string name="referrals_banner_hide_label">Ocultar este banner</string>
@@ -588,7 +587,6 @@ Language: pt_BR
     <string name="end_of_year_story_top_categories">Suas principais categorias</string>
     <string name="end_of_year_story_epilogue_subtitle">Não esqueça de compartilhar com seus amigos e agradecer a seus criadores favoritos</string>
     <string name="end_of_year_story_top_podcasts_share_text">Meus principais podcasts do ano! %1$s</string>
-    <string name="end_of_year_story_top_podcast_subtitle">Você ouviu %1$d episódios em um total de %2$s</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">Mas tinha um que sempre fazia você pedir bis…</string>
     <string name="end_of_year_story_listened_to_numbers">Você ouviu %1$d programas diferentes e %2$d episódios no total</string>
     <string name="end_of_year_story_listened_to_categories_share_text">Eu ouvi %1$d categorias diferentes em 2023</string>
