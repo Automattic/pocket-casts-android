@@ -359,7 +359,7 @@ private fun TotalTimePreview(
 
 @Preview(device = Devices.PortraitRegular)
 @Composable
-private fun YearVsYearPatronPreviow() {
+private fun YearVsYearPatronPreview() {
     PreviewBox(currentPage = 8) { measurements ->
         YearVsYearStory(
             story = Story.YearVsYear(
