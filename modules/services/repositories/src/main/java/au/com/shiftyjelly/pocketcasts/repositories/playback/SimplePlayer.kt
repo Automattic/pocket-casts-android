@@ -23,6 +23,8 @@ import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
@@ -243,12 +245,15 @@ class SimplePlayer(
                 // Reset episode caching if the error is due to read position out of range
                 // https://github.com/androidx/media/issues/1032#issuecomment-1921375048
                 // https://github.com/google/ExoPlayer/issues/10577
-                if (error.errorCode == PlaybackException.ERROR_CODE_IO_READ_POSITION_OUT_OF_RANGE) {
+                // Internal ref: p1730809737477079-slack-C02A333D8LQ
+                if (FeatureFlag.isEnabled(Feature.RESET_EPISODE_CACHE_ON_416_ERROR) &&
+                    error.errorCode == PlaybackException.ERROR_CODE_IO_READ_POSITION_OUT_OF_RANGE
+                ) {
                     episodeLocation?.let {
                         dataSourceFactory.resetEpisodeCaching(
                             episodeLocation = it,
                             onCachingReset = { episodeUuid -> onPlayerEvent(this@SimplePlayer, PlayerEvent.CachingReset(episodeUuid)) },
-                            onCachingComplete = { episodeUuid -> onPlayerEvent(this@SimplePlayer, PlayerEvent.CachingComplete(episodeUuid)) }
+                            onCachingComplete = { episodeUuid -> onPlayerEvent(this@SimplePlayer, PlayerEvent.CachingComplete(episodeUuid)) },
                         )
                     }
                     return
