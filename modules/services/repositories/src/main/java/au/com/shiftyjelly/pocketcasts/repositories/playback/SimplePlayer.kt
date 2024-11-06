@@ -14,6 +14,7 @@ import androidx.media3.common.Player
 import androidx.media3.common.Tracks
 import androidx.media3.common.VideoSize
 import androidx.media3.common.util.UnstableApi
+import androidx.media3.datasource.HttpDataSource.InvalidResponseCodeException
 import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
@@ -242,12 +243,12 @@ class SimplePlayer(
             }
 
             override fun onPlayerError(error: PlaybackException) {
-                // Reset episode caching if the error is due to read position out of range
+                // Reset episode caching if 416 error response code is received
                 // https://github.com/androidx/media/issues/1032#issuecomment-1921375048
                 // https://github.com/google/ExoPlayer/issues/10577
                 // Internal ref: p1730809737477079-slack-C02A333D8LQ
                 if (FeatureFlag.isEnabled(Feature.RESET_EPISODE_CACHE_ON_416_ERROR) &&
-                    error.errorCode == PlaybackException.ERROR_CODE_IO_READ_POSITION_OUT_OF_RANGE
+                    (error.cause as? InvalidResponseCodeException)?.responseCode == 416
                 ) {
                     episodeLocation?.let {
                         dataSourceFactory.resetEpisodeCaching(
