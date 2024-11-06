@@ -399,6 +399,7 @@
     <string name="player_play_failed_check_internet">Could not load podcast. Please check your internet connection and try again.</string>
     <string name="player_played_up_to">Played up to %s</string>
     <string name="player_time_remaining">Time remaining %s</string>
+    <string name="drag_down_to_dismiss_content_description">Drag down to dismiss</string>
 
     <!-- Chapters -->
 
@@ -634,6 +635,22 @@
     <string name="podcast_refresh_artwork">Refresh artwork</string>
     <string name="podcast_rate">Rate %s</string>
     <string name="podcast_cover_description">Cover of %s podcast</string>
+    <plurals name="day">
+        <item quantity="one">day</item>
+        <item quantity="other">days</item>
+    </plurals>
+    <plurals name="hour">
+        <item quantity="one">hour</item>
+        <item quantity="other">hours</item>
+    </plurals>
+    <plurals name="minute">
+        <item quantity="one">minute</item>
+        <item quantity="other">minutes</item>
+    </plurals>
+    <plurals name="second">
+        <item quantity="one">second</item>
+        <item quantity="other">seconds</item>
+    </plurals>
 
     <!-- Give Rating -->
 
@@ -2190,9 +2207,10 @@
 
     <!-- Manage Downloaded Episodes -->
     <string name="pencil_clean_up_icon_content_description">Pencil Clean Up</string>
-    <string name="you_are_running_low_on_storage">You\'re running low on storage</string>
+    <string name="need_to_free_up_space">Need to free up space?</string>
     <string name="save_space_by_managing_downloaded_episodes">Save %1$s – by managing downloaded episodes.</string>
-    <string name="manage_downloads">Manage Downloads</string>
+    <string name="manage_downloads">Manage downloads</string>
+    <string name="maybe_later">Maybe Later</string>
 
     <!-- Up Next Shuffle -->
     <string name="up_next_shuffle_button_content_description">Up next shuffle</string>

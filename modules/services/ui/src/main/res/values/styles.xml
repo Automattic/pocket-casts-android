@@ -179,4 +179,29 @@
     <style name="TextAppearanceCarHint">
         <item name="android:textSize">20sp</item>
     </style>
+
+    <style name="TrimMode.Button.Left" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="shapeAppearanceOverlay">@style/TrimMode.ShapeAppearance.Corner.Left</item>
+    </style>
+
+    <style name="TrimMode.Button.Right" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="shapeAppearanceOverlay">@style/TrimMode.ShapeAppearance.Corner.Right</item>
+    </style>
+
+    <style name="TrimMode.ShapeAppearance.Corner.Left" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopRight">0dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+        <item name="cornerSizeTopLeft">@dimen/trim_mode_button_corner_radius</item>
+        <item name="cornerSizeBottomLeft">@dimen/trim_mode_button_corner_radius</item>
+    </style>
+
+    <style name="TrimMode.ShapeAppearance.Corner.Right" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopLeft">0dp</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+        <item name="cornerSizeTopRight">@dimen/trim_mode_button_corner_radius</item>
+        <item name="cornerSizeBottomRight">@dimen/trim_mode_button_corner_radius</item>
+    </style>
+
 </resources>

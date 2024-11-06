@@ -4,10 +4,7 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.os.Build
-import android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
 import android.text.format.DateUtils
-import android.widget.Toast
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent.PLAYER_SLEEP_TIMER_RESTARTED
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -18,7 +15,6 @@ import javax.inject.Singleton
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Singleton
 class SleepTimer @Inject constructor(
@@ -134,26 +130,15 @@ class SleepTimer @Inject constructor(
         val sleepIntent = getSleepIntent()
         val alarmManager = getAlarmManager()
         alarmManager.cancel(sleepIntent)
-
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
-            Toast.makeText(context, LR.string.player_sleep_timer_start_failed, Toast.LENGTH_LONG).show()
-            context.startActivity(
-                Intent(ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
-                    // Because we're not launching this from an activity context, we must add the FLAG_ACTIVITY_NEW_TASK flag
-                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
-            )
+        return try {
+            LogBuffer.i(TAG, "Starting...")
+            alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, timeMs, sleepIntent)
+            sleepTimeMs = timeMs
+            lastTimeSleepTimeHasFinished = timeMs.milliseconds
+            true
+        } catch (e: Exception) {
+            LogBuffer.e(LogBuffer.TAG_CRASH, e, "Unable to start sleep timer.")
             false
-        } else {
-            return try {
-                LogBuffer.i(TAG, "Starting...")
-                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, timeMs, sleepIntent)
-                sleepTimeMs = timeMs
-                lastTimeSleepTimeHasFinished = timeMs.milliseconds
-                true
-            } catch (e: Exception) {
-                LogBuffer.e(LogBuffer.TAG_CRASH, e, "Unable to start sleep timer.")
-                false
-            }
         }
     }
 

@@ -38,6 +38,7 @@ import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudFilesFragment
 import au.com.shiftyjelly.pocketcasts.profile.databinding.FragmentProfileBinding
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsClaimGuestPassBannerCard
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsIconWithTooltip
+import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.settings.HelpFragment
@@ -277,7 +278,10 @@ class ProfileFragment : BaseFragment() {
             AppTheme(theme.activeTheme) {
                 EndOfYearPromptCard(
                     onClick = {
-                        analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_PROFILE_CARD_TAPPED)
+                        analyticsTracker.track(
+                            AnalyticsEvent.END_OF_YEAR_PROFILE_CARD_TAPPED,
+                            mapOf("year" to EndOfYearManager.YEAR_TO_SYNC.value),
+                        )
                         // once stories prompt card is tapped, we don't want to show stories launch modal if not already shown
                         if (settings.getEndOfYearShowModal()) {
                             settings.setEndOfYearShowModal(false)

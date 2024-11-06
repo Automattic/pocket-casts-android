@@ -24,13 +24,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.Devices
-import au.com.shiftyjelly.pocketcasts.compose.components.ScrollDirection
+import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDirection
 import au.com.shiftyjelly.pocketcasts.compose.components.ScrollingRow
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.extensions.nonScaledSp
 import au.com.shiftyjelly.pocketcasts.models.to.Story
-import kotlin.math.roundToLong
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -73,14 +72,14 @@ private fun ColumnScope.ByeByeSection(
             .requiredWidth(measurements.width * 1.5f),
     ) {
         ByeByeText(
-            scrollDirection = ScrollDirection.Left,
+            scrollDirection = HorizontalDirection.Left,
             textFactory = textFactory,
         )
         Spacer(
             modifier = Modifier.height(12.dp * measurements.smallDeviceFactor),
         )
         ByeByeText(
-            scrollDirection = ScrollDirection.Right,
+            scrollDirection = HorizontalDirection.Right,
             textFactory = textFactory,
         )
     }
@@ -88,11 +87,10 @@ private fun ColumnScope.ByeByeSection(
 
 @Composable
 private fun ByeByeText(
-    scrollDirection: ScrollDirection,
+    scrollDirection: HorizontalDirection,
     textFactory: HumaneTextFactory,
 ) {
     ScrollingRow(
-        scrollDelay = { (20 / it.density).roundToLong().coerceAtLeast(4L) },
         items = listOf("THANKS", "MERCI", "GRACIAS", "OBRIGADO", "GRATKI"),
         scrollDirection = scrollDirection,
     ) { text ->
