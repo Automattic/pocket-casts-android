@@ -59,10 +59,8 @@ class UpdateEpisodeDetailsTask @AssistedInject constructor(
             WorkManager.getInstance(context).beginUniqueWork(TASK_NAME, ExistingWorkPolicy.APPEND, workRequest).enqueue()
         }
 
-        /**
-         * Don't bother calling episodes that are downloaded as the download task checks the content type.
-         */
         private fun ignoreEpisode(episode: PodcastEpisode): Boolean {
+            // Skip metadata check for episodes that are already downloaded, as the download task also checks the content type.
             return episode.isQueued || episode.isDownloaded || episode.isDownloading || episode.isArchived
         }
     }
