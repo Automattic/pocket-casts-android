@@ -1,8 +1,10 @@
 7.77
 -----
 *   New Features
-    *   Add custom playback effects settings for podcast in the player
+   *   Add custom playback effects settings for podcast in the player
         ([#3042](https://github.com/Automattic/pocket-casts-android/issues/3042))
+   *   Add Playback 2024 summary
+        ([#3123](https://github.com/Automattic/pocket-casts-android/pull/3123))
 *   Updates
     *   Renamed the podcast action 'Subscribe' to 'Follow'
         ([#3120](https://github.com/Automattic/pocket-casts-android/pull/3120))
