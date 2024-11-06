@@ -345,3 +345,7 @@ internal enum class StoryProgressPauseReason {
     ScreenshotDialog,
     TakingScreenshot,
 }
+
+private class PrivateType2 {
+    fun print() = "Test"
+}
