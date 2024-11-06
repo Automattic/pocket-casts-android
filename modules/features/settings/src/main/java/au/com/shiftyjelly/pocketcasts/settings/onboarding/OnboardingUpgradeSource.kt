@@ -3,6 +3,8 @@ package au.com.shiftyjelly.pocketcasts.settings.onboarding
 enum class OnboardingUpgradeSource(val analyticsValue: String) {
     ACCOUNT_DETAILS("account_details"),
     APPEARANCE("appearance"),
+    ICONS("icons"),
+    THEMES("themes"),
     BOOKMARKS("bookmarks"),
     BOOKMARKS_SHELF_ACTION("bookmarks_shelf_action"),
     END_OF_YEAR("end_of_year"),

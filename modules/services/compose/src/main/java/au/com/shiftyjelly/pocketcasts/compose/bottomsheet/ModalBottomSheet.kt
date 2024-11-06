@@ -26,11 +26,11 @@ fun ModalBottomSheet(
     onExpanded: () -> Unit,
     shouldShow: Boolean,
     content: BottomSheetContentState.Content,
-) {
-    val sheetState = rememberModalBottomSheetState(
+    sheetState: ModalBottomSheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
         skipHalfExpanded = true,
-    )
+    ),
+) {
     val coroutineScope = rememberCoroutineScope()
     var isSheetShown by remember { mutableStateOf(false) }
 
@@ -132,7 +132,7 @@ private fun hideBottomSheet(coroutineScope: CoroutineScope, sheetState: ModalBot
     }
 }
 
-fun displayBottomSheet(coroutineScope: CoroutineScope, sheetState: ModalBottomSheetState) {
+private fun displayBottomSheet(coroutineScope: CoroutineScope, sheetState: ModalBottomSheetState) {
     coroutineScope.launch {
         sheetState.show()
     }

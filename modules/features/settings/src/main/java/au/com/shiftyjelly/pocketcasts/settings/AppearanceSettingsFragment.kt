@@ -88,7 +88,7 @@ class AppearanceSettingsFragment : BaseFragment() {
                             }
                         } else {
                             viewModel.updateChangeThemeType(Pair(beforeThemeType, afterThemeType))
-                            openOnboardingFlow()
+                            openOnboardingFlow(source = OnboardingUpgradeSource.THEMES)
                             scrollToCurrentTheme()
                         }
                     }
@@ -106,7 +106,7 @@ class AppearanceSettingsFragment : BaseFragment() {
                                 .show()
                         } else {
                             viewModel.updateChangeAppIconType(Pair(beforeAppIconType, afterAppIconType))
-                            openOnboardingFlow(afterAppIconType.tier)
+                            openOnboardingFlow(afterAppIconType.tier, source = OnboardingUpgradeSource.ICONS)
                         }
                     }
                     binding.appIconRecyclerView.setHasFixedSize(true)
@@ -241,10 +241,10 @@ class AppearanceSettingsFragment : BaseFragment() {
         viewModel.onShown()
     }
 
-    private fun openOnboardingFlow(tier: SubscriptionTier? = null) {
+    private fun openOnboardingFlow(tier: SubscriptionTier? = null, source: OnboardingUpgradeSource = OnboardingUpgradeSource.APPEARANCE) {
         val onboardingFlow = tier?.takeIf { tier == SubscriptionTier.PATRON }?.let {
-            OnboardingFlow.Upsell(source = OnboardingUpgradeSource.APPEARANCE, showPatronOnly = true)
-        } ?: OnboardingFlow.Upsell(OnboardingUpgradeSource.APPEARANCE)
+            OnboardingFlow.Upsell(source = source, showPatronOnly = true)
+        } ?: OnboardingFlow.Upsell(source)
         OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
     }
 
