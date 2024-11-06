@@ -1,12 +1,15 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.ui
 
-import androidx.compose.animation.core.CubicBezierEasing
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.animateIntOffset
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -16,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -36,8 +40,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.util.lerp
 import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
@@ -114,32 +120,69 @@ private fun BarsSection(
     forceBarsVisible: Boolean,
     modifier: Modifier,
 ) {
-    val transition = updateTransition(
-        targetState = areBarsVisible,
-        label = "bars-transition",
-    )
-    val alpha by transition.animateFloat(
-        label = "alpha",
-        transitionSpec = {
-            tween(
-                durationMillis = if (forceBarsVisible) 0 else 300,
-                easing = CubicBezierEasing(0f, 0f, 0.58f, 1.0f),
-            )
-        },
-        targetValueByState = { state ->
-            when (state) {
-                true -> 1f
-                false -> 0f
-            }
-        },
-    )
-
-    Box(
+    BoxWithConstraints(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 24.dp)
-            .alpha(if (forceBarsVisible) 1f else alpha),
+            .padding(horizontal = 24.dp),
     ) {
+        val transition = updateTransition(
+            targetState = areBarsVisible,
+            label = "bars-transition",
+        )
+        val density = LocalDensity.current
+        val baseOffset = density.run { (maxHeight * 1.1f).roundToPx() }
+        val barsOffset by transition.animateIntOffset(
+            label = "bar-offset",
+            transitionSpec = {
+                spring(
+                    dampingRatio = Spring.DampingRatioLowBouncy,
+                    stiffness = 50f,
+                    visibilityThreshold = IntOffset(1, 1),
+                )
+            },
+            targetValueByState = { state ->
+                when (state) {
+                    true -> IntOffset.Zero
+                    false -> IntOffset(0, baseOffset)
+                }
+            },
+        )
+        val completionOffset by transition.animateIntOffset(
+            label = "completion-offset",
+            transitionSpec = {
+                spring(
+                    dampingRatio = lerp(Spring.DampingRatioMediumBouncy, Spring.DampingRatioLowBouncy, story.completionRate.toFloat()),
+                    stiffness = lerp(25f, 40f, story.completionRate.toFloat()),
+                    visibilityThreshold = IntOffset(1, 1),
+                )
+            },
+            targetValueByState = { state ->
+                when (state) {
+                    true -> IntOffset.Zero
+                    false -> IntOffset(0, (baseOffset * story.completionRate).roundToInt())
+                }
+            },
+        )
+
+        val textFactory = rememberHumaneTextFactory(
+            fontSize = 112.nonScaledSp,
+        )
+        val textAlpha by transition.animateFloat(
+            label = "text-alpha",
+            transitionSpec = {
+                spring(
+                    dampingRatio = Spring.DampingRatioLowBouncy,
+                    stiffness = 50f,
+                )
+            },
+            targetValueByState = { state ->
+                when (state) {
+                    true -> 1f
+                    false -> 0f
+                }
+            },
+        )
+
         // Subcomposition is needed because we need accurate measurements.
         // Otherwise completion rate of 100% won't match the bars' height exactly.
         SubcomposeLayout { constraints ->
@@ -150,6 +193,7 @@ private fun BarsSection(
                 val bar = subcompose("bar-$index") {
                     Box(
                         modifier = Modifier
+                            .offset { if (forceBarsVisible) IntOffset.Zero else barsOffset }
                             .padding(top = SpaceHeight)
                             .fillMaxWidth(0.58f)
                             .height(BarHeight)
@@ -167,9 +211,6 @@ private fun BarsSection(
             val barsHeightPx = (bars.sumOf { it.height } - spaceHeightPx).coerceAtLeast(0)
 
             val completionBar = subcompose("completion-bar") {
-                val textFactory = rememberHumaneTextFactory(
-                    fontSize = 112.nonScaledSp,
-                )
                 val completedPercent = (story.completionRate * 100).roundToInt()
                 val completionHeight = LocalDensity.current.run {
                     (barsHeightPx * story.completionRate).roundToInt().toDp()
@@ -179,36 +220,48 @@ private fun BarsSection(
                 Box(
                     contentAlignment = Alignment.BottomEnd,
                     modifier = Modifier
+                        .offset { if (forceBarsVisible) IntOffset.Zero else completionOffset }
                         .fillMaxWidth(0.58f)
                         .fillMaxHeight(),
                 ) {
-                    Box(
-                        contentAlignment = Alignment.BottomEnd,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(completionHeight)
-                            .background(Color.Black),
-                    ) {
-                        if (completionHeight > textFactory.textHeight + 32.dp) {
+                    if (completionHeight >= textFactory.textHeight + 32.dp) {
+                        Box(
+                            contentAlignment = Alignment.BottomEnd,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(completionHeight)
+                                .background(Color.Black),
+                        ) {
                             textFactory.HumaneText(
                                 text = text,
                                 color = story.backgroundColor,
                                 paddingValues = PaddingValues(bottom = 16.dp, end = 16.dp),
                             )
                         }
-                    }
-
-                    if (completionHeight < textFactory.textHeight + 32.dp) {
-                        textFactory.HumaneText(
-                            text = text,
-                            color = Color.Black,
-                            paddingValues = if (completedPercent == 0) {
-                                PaddingValues()
-                            } else {
-                                PaddingValues(bottom = 16.dp)
-                            },
-                            modifier = Modifier.offset(y = -completionHeight),
-                        )
+                    } else {
+                        Column(
+                            verticalArrangement = Arrangement.Bottom,
+                            horizontalAlignment = Alignment.End,
+                            modifier = Modifier.wrapContentSize(),
+                        ) {
+                            textFactory.HumaneText(
+                                text = text,
+                                color = Color.Black,
+                                paddingValues = if (completedPercent == 0) {
+                                    PaddingValues()
+                                } else {
+                                    PaddingValues(bottom = 16.dp)
+                                },
+                                modifier = Modifier.alpha(if (forceBarsVisible) 1f else textAlpha),
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .offset { if (forceBarsVisible) IntOffset.Zero else completionOffset }
+                                    .fillMaxWidth()
+                                    .height(completionHeight)
+                                    .background(Color.Black),
+                            )
+                        }
                     }
                 }
             }[0].measure(constraints)
@@ -237,7 +290,9 @@ private fun CompletionRateInfo(
     controller: StoryCaptureController,
     onShareStory: (File) -> Unit,
 ) {
-    Column {
+    Column(
+        Modifier.background(story.backgroundColor),
+    ) {
         Spacer(
             modifier = Modifier.height(16.dp),
         )
