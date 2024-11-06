@@ -240,6 +240,19 @@ class SimplePlayer(
             }
 
             override fun onPlayerError(error: PlaybackException) {
+                // Reset episode caching if the error is due to read position out of range
+                // https://github.com/androidx/media/issues/1032#issuecomment-1921375048
+                // https://github.com/google/ExoPlayer/issues/10577
+                if (error.errorCode == PlaybackException.ERROR_CODE_IO_READ_POSITION_OUT_OF_RANGE) {
+                    episodeLocation?.let {
+                        dataSourceFactory.resetEpisodeCaching(
+                            episodeLocation = it,
+                            onCachingReset = { episodeUuid -> onPlayerEvent(this@SimplePlayer, PlayerEvent.CachingReset(episodeUuid)) },
+                            onCachingComplete = { episodeUuid -> onPlayerEvent(this@SimplePlayer, PlayerEvent.CachingComplete(episodeUuid)) }
+                        )
+                    }
+                    return
+                }
                 LogBuffer.e(LogBuffer.TAG_PLAYBACK, error, "Play failed.")
                 val event = PlayerEvent.PlayerError(error.message ?: "", error)
                 this@SimplePlayer.onError(event)
