@@ -109,7 +109,7 @@ private fun ImageContent(modifier: Modifier = Modifier) {
             painter = painterResource(IR.drawable.end_of_year_2024_sticker_1),
             contentDescription = null,
             modifier = Modifier
-                .offset(x = -90.dp, y = -58.dp)
+                .offset(x = -imageSize.width / 4f, y = -imageSize.height / 4f)
                 .size(width = 116.dp, height = 88.dp),
         )
     }
