@@ -391,7 +391,6 @@ class AutoDownloadSettingsFragment :
             )
     }
 
-    @SuppressLint("CheckResult")
     private fun setupNewEpisodesToggle() {
         val value = viewModel.getAutoDownloadNewEpisodes()
         when (value) {
