@@ -14,6 +14,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManagerImpl
+import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearSync
+import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearSyncImpl
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationDrawer
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationDrawerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
@@ -40,6 +42,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
 import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManagerImpl
+import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager
+import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
@@ -177,4 +181,10 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun provideTranscriptsManager(transcriptsManagerImpl: TranscriptsManagerImpl): TranscriptsManager
+
+    @Binds
+    abstract fun provideReferralManager(referralManagerImpl: ReferralManagerImpl): ReferralManager
+
+    @Binds
+    abstract fun provideEndOfYearSync(endOfYearSyncImpl: EndOfYearSyncImpl): EndOfYearSync
 }

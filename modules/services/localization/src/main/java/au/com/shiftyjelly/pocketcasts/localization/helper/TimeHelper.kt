@@ -130,25 +130,6 @@ object TimeHelper {
         )
     }
 
-    /**
-     * Milliseconds to string e.g. 11:43 or 2:18:90
-     */
-    fun getTimeLeftOnlyNumbers(currentTimeMs: Int, durationMs: Int): String {
-        val timeLeftMs: Int = when {
-            durationMs <= 0 -> 0
-            currentTimeMs <= 0 -> durationMs
-            else -> durationMs - currentTimeMs
-        }
-        return if (timeLeftMs <= 0) formattedMs(0) else "-${formattedMs(timeLeftMs)}"
-    }
-
-    /**
-     * Milliseconds to string e.g. 11:43 or 2:18:90
-     */
-    fun formattedMs(ms: Int): String {
-        return formattedSeconds(ms.toDouble() / 1000.0)
-    }
-
     fun formattedSeconds(seconds: Double, hoursFormat: String = "%d:%02d:%02d", noHoursFormat: String = "%02d:%02d"): String {
         var secs = seconds
         if (secs < 0) {

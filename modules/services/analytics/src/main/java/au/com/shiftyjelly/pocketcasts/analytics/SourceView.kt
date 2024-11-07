@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.analytics
 enum class SourceView(val analyticsValue: String) {
     AUTO_PAUSE("auto_pause"),
     AUTO_PLAY("auto_play"),
+    AUTO_DOWNLOAD("auto_download"),
     BOTTOM_SHELF("bottom_shelf"),
     CLIP_SHARING("clip_sharing"),
     CHROMECAST("chromecast"),
@@ -40,6 +41,7 @@ enum class SourceView(val analyticsValue: String) {
     PODCAST_SCREEN("podcast_screen"),
     PODCAST_SETTINGS("podcast_settings"),
     PROFILE("profile"),
+    REFERRALS("referrals"),
     SEARCH("search"),
     SEARCH_RESULTS("search_results"),
     SHARE_LIST("share_list"),
@@ -49,6 +51,7 @@ enum class SourceView(val analyticsValue: String) {
     UNKNOWN("unknown"),
     UP_NEXT("up_next"),
     WHATS_NEW("whats_new"),
+    STORAGE_AND_DATA_USAGE("storage_and_data_usage"),
     WIDGET_PLAYER_LARGE("widget_player_large"),
     WIDGET_PLAYER_MEDIUM("widget_player_medium"),
     WIDGET_PLAYER_OLD("widget_player_old"),

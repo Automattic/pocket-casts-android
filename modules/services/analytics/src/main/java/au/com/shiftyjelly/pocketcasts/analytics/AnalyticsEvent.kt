@@ -155,6 +155,8 @@ enum class AnalyticsEvent(val key: String) {
     UPLOADED_FILES_MULTI_SELECT_EXITED("uploaded_files_multi_select_exited"),
     UPLOADED_FILES_SORT_BY_CHANGED("uploaded_files_sort_by_changed"),
     UPLOADED_FILES_ADD_FILE_TAPPED("uploaded_files_add_file_tapped"),
+    UPLOADED_FILES_INVALID_FILE_ERROR("uploaded_files_invalid_file_error"),
+    UPLOADED_FILES_UPLOAD_FAILED("uploaded_files_upload_failed"),
 
     /* User File Details View */
     USER_FILE_DETAIL_SHOWN("user_file_detail_shown"),
@@ -313,6 +315,7 @@ enum class AnalyticsEvent(val key: String) {
     UP_NEXT_MULTI_SELECT_EXITED("up_next_multi_select_exited"),
     UP_NEXT_QUEUE_REORDERED("up_next_queue_reordered"),
     UP_NEXT_DISMISSED("up_next_dismissed"),
+    UP_NEXT_SHUFFLE_ENABLED("up_next_shuffle_enabled"),
 
     /* Player */
     PLAYER_SHOWN("player_shown"),
@@ -328,8 +331,11 @@ enum class AnalyticsEvent(val key: String) {
     PLAYER_SLEEP_TIMER_EXTENDED("player_sleep_timer_extended"),
     PLAYER_SLEEP_TIMER_CANCELLED("player_sleep_timer_cancelled"),
     PLAYER_SLEEP_TIMER_RESTARTED("player_sleep_timer_restarted"),
+    PLAYER_SLEEP_TIMER_SETTINGS_TAPPED("player_sleep_timer_settings_tapped"),
 
     /* Player - Playback effects */
+    PLAYBACK_EFFECT_SETTINGS_VIEW_APPEARED("playback_effect_settings_view_appeared"),
+    PLAYBACK_EFFECT_SETTINGS_CHANGED("playback_effect_settings_changed"),
     PLAYBACK_EFFECT_SPEED_CHANGED("playback_effect_speed_changed"),
     PLAYBACK_EFFECT_TRIM_SILENCE_TOGGLED("playback_effect_trim_silence_toggled"),
     PLAYBACK_EFFECT_TRIM_SILENCE_AMOUNT_CHANGED("playback_effect_trim_silence_amount_changed"),
@@ -418,9 +424,9 @@ enum class AnalyticsEvent(val key: String) {
     END_OF_YEAR_STORY_SHOWN("end_of_year_story_shown"),
     END_OF_YEAR_STORY_SHARE("end_of_year_story_share"),
     END_OF_YEAR_STORY_SHARED("end_of_year_story_shared"),
-    END_OF_YEAR_STORY_RETRY_BUTTON_TAPPED("end_of_year_story_retry_button_tapped"),
     END_OF_YEAR_PROFILE_CARD_TAPPED("end_of_year_profile_card_tapped"),
     END_OF_YEAR_UPSELL_SHOWN("end_of_year_upsell_shown"),
+    END_OF_YEAR_LEARN_RATINGS_SHOWN("end_of_year_learn_ratings_shown"),
 
     /* Welcome */
     WELCOME_SHOWN("welcome_shown"),
@@ -471,6 +477,7 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_AUTO_DOWNLOAD_SHOWN("settings_auto_download_shown"),
     SETTINGS_AUTO_DOWNLOAD_UP_NEXT_TOGGLED("settings_auto_download_up_next_toggled"),
     SETTINGS_AUTO_DOWNLOAD_NEW_EPISODES_TOGGLED("settings_auto_download_new_episodes_toggled"),
+    SETTINGS_AUTO_DOWNLOAD_LIMIT_DOWNLOADS_CHANGED("settings_auto_download_limit_downloads_changed"),
     SETTINGS_AUTO_DOWNLOAD_PODCASTS_CHANGED("settings_auto_download_podcasts_changed"),
     SETTINGS_AUTO_DOWNLOAD_FILTERS_CHANGED("settings_auto_download_filters_changed"),
     SETTINGS_AUTO_DOWNLOAD_ONLY_ON_WIFI_TOGGLED("settings_auto_download_only_on_wifi_toggled"),
@@ -505,6 +512,7 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_GENERAL_MEDIA_NOTIFICATION_CONTROLS_SHOW_CUSTOM_TOGGLED("settings_general_media_notification_controls_show_custom_toggled"),
     SETTINGS_GENERAL_MEDIA_NOTIFICATION_CONTROLS_ORDER_CHANGED("settings_general_media_notification_controls_order_changed"),
     SETTINGS_GENERAL_AUTOPLAY_TOGGLED("settings_general_autoplay_toggled"),
+    SETTINGS_GENERAL_USE_REAL_TIME_FOR_PLAYBACK_REMAINING_TIME("settings_use_real_time_for_playback_remaining_time"),
 
     /* Settings - Headphone controls */
     SETTINGS_HEADPHONE_CONTROLS_SHOWN("settings_headphone_controls_shown"),
@@ -632,16 +640,6 @@ enum class AnalyticsEvent(val key: String) {
     POCKET_CASTS_CHAMPION_DIALOG_SHOWN("pocket_casts_champion_dialog_shown"),
     POCKET_CASTS_CHAMPION_DIALOG_RATE_BUTTON_TAPPED("pocket_casts_champion_dialog_rate_button_tapped"),
 
-    /* Kids */
-    KIDS_PROFILE_BANNER_SEEN("kids_profile_banner_seen"),
-    KIDS_PROFILE_EARLY_ACCESS_REQUESTED("kids_profile_early_access_requested"),
-    KIDS_PROFILE_BANNER_DISMISSED("kids_profile_banner_dismissed"),
-    KIDS_PROFILE_FEEDBACK_SENT("kids_profile_feedback_sent"),
-    KIDS_PROFILE_SEND_FEEDBACK_TAPPED("kids_profile_send_feedback_tapped"),
-    KIDS_PROFILE_NO_THANK_YOU_TAPPED("kids_profile_no_thank_you_tapped"),
-    KIDS_PROFILE_THANK_YOU_FOR_YOUR_INTEREST_SEEN("kids_profile_thank_you_for_your_interest_seen"),
-    KIDS_PROFILE_FEEDBACK_FORM_SEEN("kids_profile_feedback_form_seen"),
-
     /* Transcripts */
     TRANSCRIPT_SHOWN("transcript_shown"),
     TRANSCRIPT_DISMISSED("transcript_dismissed"),
@@ -650,4 +648,24 @@ enum class AnalyticsEvent(val key: String) {
     TRANSCRIPT_SEARCH_SHOWN("transcript_search_shown"),
     TRANSCRIPT_SEARCH_NEXT_RESULT("transcript_search_next_result"),
     TRANSCRIPT_SEARCH_PREVIOUS_RESULT("transcript_search_previous_result"),
+
+    /* Referrals */
+    REFERRAL_TOOLTIP_SHOWN("referral_tooltip_shown"),
+    REFERRAL_TOOLTIP_TAPPED("referral_tooltip_tapped"),
+    REFERRAL_SHARE_SCREEN_SHOWN("referral_share_screen_shown"),
+    REFERRAL_SHARE_SCREEN_DISMISSED("referral_share_screen_dismissed"),
+    REFERRAL_PASS_SHARED("referral_pass_shared"),
+    REFERRAL_CLAIM_SCREEN_SHOWN("referral_claim_screen_shown"),
+    REFERRAL_ACTIVATE_TAPPED("referral_activate_tapped"),
+    REFERRAL_NOT_NOW_TAPPED("referral_not_now_tapped"),
+    REFERRAL_PASS_BANNER_SHOWN("referral_pass_banner_shown"),
+    REFERRAL_PASS_BANNER_HIDE_TAPPED("referral_pass_banner_hide_tapped"),
+    REFERRAL_PURCHASE_SHOWN("referral_purchase_shown"),
+    REFERRAL_PURCHASE_SUCCESS("referral_purchase_success"),
+
+    /* Free Up Space */
+    FREE_UP_SPACE_BANNER_SHOWN("free_up_space_banner_shown"),
+    FREE_UP_SPACE_MODAL_SHOWN("free_up_space_modal_shown"),
+    FREE_UP_SPACE_MANAGE_DOWNLOADS_TAPPED("free_up_space_manage_downloads_tapped"),
+    FREE_UP_SPACE_MAYBE_LATER_TAPPED("free_up_space_maybe_later_tapped"),
 }

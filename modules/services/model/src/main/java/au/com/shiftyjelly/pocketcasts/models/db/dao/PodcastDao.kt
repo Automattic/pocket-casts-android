@@ -7,7 +7,6 @@ import androidx.room.OnConflictStrategy.Companion.REPLACE
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import au.com.shiftyjelly.pocketcasts.models.db.helper.TopPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.CuratedPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
@@ -363,19 +362,6 @@ abstract class PodcastDao {
 
     @Query("UPDATE podcasts SET grouping = :grouping, grouping_modified = :modified, sync_status = 0 WHERE subscribed = 1")
     abstract fun updatePodcastGroupingForAll(grouping: PodcastGrouping, modified: Date = Date())
-
-    @Query(
-        """
-         SELECT DISTINCT podcast_episodes.uuid as episodeId, podcasts.uuid, podcasts.title, podcasts.author, podcasts.primary_color as tintColorForLightBg, podcasts.secondary_color as tintColorForDarkBg, SUM(podcast_episodes.played_up_to) as totalPlayedTime, COUNT(podcast_episodes.uuid) as numberOfPlayedEpisodes
-            FROM podcast_episodes
-            JOIN podcasts ON podcast_episodes.podcast_id = podcasts.uuid
-            WHERE podcast_episodes.last_playback_interaction_date IS NOT NULL AND podcast_episodes.last_playback_interaction_date > :fromEpochMs AND podcast_episodes.last_playback_interaction_date < :toEpochMs
-            GROUP BY podcast_id
-            ORDER BY totalPlayedTime DESC, numberOfPlayedEpisodes DESC
-            LIMIT :limit
-        """,
-    )
-    abstract suspend fun findTopPodcasts(fromEpochMs: Long, toEpochMs: Long, limit: Int): List<TopPodcast>
 
     @Query("SELECT * FROM podcasts ORDER BY random() LIMIT :limit")
     abstract suspend fun findRandomPodcasts(limit: Int): List<Podcast>

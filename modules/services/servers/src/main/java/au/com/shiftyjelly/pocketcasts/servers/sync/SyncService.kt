@@ -17,6 +17,11 @@ import com.pocketcasts.service.api.BookmarksResponse
 import com.pocketcasts.service.api.PodcastRatingAddRequest
 import com.pocketcasts.service.api.PodcastRatingResponse
 import com.pocketcasts.service.api.PodcastRatingShowRequest
+import com.pocketcasts.service.api.PodcastRatingsResponse
+import com.pocketcasts.service.api.ReferralCodeResponse
+import com.pocketcasts.service.api.ReferralRedemptionRequest
+import com.pocketcasts.service.api.ReferralRedemptionResponse
+import com.pocketcasts.service.api.ReferralValidationResponse
 import com.pocketcasts.service.api.SupportFeedbackRequest
 import com.pocketcasts.service.api.UserPodcastListRequest
 import com.pocketcasts.service.api.UserPodcastListResponse
@@ -35,6 +40,7 @@ import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
+import retrofit2.http.Query
 import retrofit2.http.Url
 
 interface SyncService {
@@ -73,7 +79,7 @@ interface SyncService {
     fun syncUpdate(@FieldMap fields: Map<String, String>): Single<au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse>
 
     @POST("/up_next/sync")
-    fun upNextSync(@Header("Authorization") authorization: String, @Body request: UpNextSyncRequest): Single<UpNextSyncResponse>
+    suspend fun upNextSync(@Header("Authorization") authorization: String, @Body request: UpNextSyncRequest): UpNextSyncResponse
 
     @POST("/user/last_sync_at")
     fun getLastSyncAt(@Header("Authorization") authorization: String, @Body request: BasicRequest): Single<LastSyncAtResponse>
@@ -161,10 +167,27 @@ interface SyncService {
     suspend fun getPodcastRating(@Header("Authorization") authorization: String, @Body request: PodcastRatingShowRequest): PodcastRatingResponse
 
     @Headers("Content-Type: application/octet-stream")
+    @GET("/user/podcast_rating/list")
+    suspend fun getPodcastRatings(@Header("Authorization") authorization: String): Response<PodcastRatingsResponse>
+
+    @Headers("Content-Type: application/octet-stream")
     @POST("/anonymous/feedback")
     suspend fun sendAnonymousFeedback(@Body request: SupportFeedbackRequest): Response<Void>
 
     @Headers("Content-Type: application/octet-stream")
     @POST("/support/feedback")
     suspend fun sendFeedback(@Header("Authorization") authorization: String, @Body request: SupportFeedbackRequest): Response<Void>
+
+    // Referral
+    @Headers("Content-Type: application/octet-stream")
+    @GET("/referrals/code")
+    suspend fun getReferralCode(@Header("Authorization") authorization: String): Response<ReferralCodeResponse>
+
+    @Headers("Content-Type: application/octet-stream")
+    @GET("/referrals/validate")
+    suspend fun validateReferralCode(@Header("Authorization") authorization: String, @Query("code") code: String): Response<ReferralValidationResponse>
+
+    @Headers("Content-Type: application/octet-stream")
+    @POST("/referrals/redeem")
+    suspend fun redeemReferralCode(@Header("Authorization") authorization: String, @Body request: ReferralRedemptionRequest): Response<ReferralRedemptionResponse>
 }

@@ -8,8 +8,10 @@ import au.com.shiftyjelly.pocketcasts.models.di.ModelModule
 import au.com.shiftyjelly.pocketcasts.models.di.addTypeConverters
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
+import au.com.shiftyjelly.pocketcasts.models.type.AutoDownloadLimitSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
@@ -50,10 +52,13 @@ class PodcastManagerTest {
 
         val episodeManager = mock<EpisodeManager>()
         val playlistManager = mock<PlaylistManager>()
+        val downloadManager = mock<DownloadManager>()
 
         val settings = mock<Settings> {
             on { podcastGroupingDefault } doReturn UserSetting.Mock(PodcastGrouping.None, mock())
             on { showArchivedDefault } doReturn UserSetting.Mock(false, mock())
+            on { autoDownloadNewEpisodes } doReturn UserSetting.Mock(true, mock())
+            on { autoDownloadLimit } doReturn UserSetting.Mock(AutoDownloadLimitSetting.TWO_LATEST_EPISODE, mock())
         }
 
         val syncManagerSignedOut = mock<SyncManager> {
@@ -76,7 +81,7 @@ class PodcastManagerTest {
             .build()
 
         val refreshServiceManager = mock<RefreshServiceManager> {}
-        val subscribeManager = SubscribeManager(appDatabase, podcastCacheService, staticServiceManager, syncManagerSignedOut, application, settings)
+        val subscribeManager = SubscribeManager(appDatabase, podcastCacheService, staticServiceManager, syncManagerSignedOut, episodeManager, downloadManager, application, settings)
         podcastDao = appDatabase.podcastDao()
         podcastManagerSignedOut = PodcastManagerImpl(
             episodeManager = episodeManager,

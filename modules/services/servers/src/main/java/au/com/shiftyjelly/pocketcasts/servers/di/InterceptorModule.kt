@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.servers.di
 import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.BuildConfig
+import au.com.shiftyjelly.pocketcasts.servers.CleanAndRetryInterceptor
 import au.com.shiftyjelly.pocketcasts.servers.OkHttpInterceptor
 import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
 import au.com.shiftyjelly.pocketcasts.servers.toClientInterceptor
@@ -61,6 +62,16 @@ object InterceptorModule {
         }
         responseBuilder.build()
     }
+
+    private val cleanAndRetryInterceptor = CleanAndRetryInterceptor(
+        headersToRemove = listOf(
+            // Remove our custom User-Agent. Internal ref: p1730724100345749-slack-C07J5LNP4SF
+            "User-Agent",
+            // Remove Sentry stuff from requests as well to make it more pure.
+            "sentry-trace",
+            "baggage",
+        ),
+    ).toClientInterceptor() // Must be client interceptor. Otherwise calls cannot be retried.
 
     @Provides
     @TokenInterceptor
@@ -157,6 +168,14 @@ object InterceptorModule {
         return buildList {
             add(userAgentInterceptor.toClientInterceptor())
             add(crashLoggingInterceptor.toClientInterceptor())
+            add(cleanAndRetryInterceptor)
+
+            if (BuildConfig.DEBUG) {
+                val loggingInterceptor = HttpLoggingInterceptor().apply {
+                    level = HttpLoggingInterceptor.Level.HEADERS
+                }
+                add(loggingInterceptor.toClientInterceptor())
+            }
         }
     }
 
@@ -185,6 +204,14 @@ object InterceptorModule {
         return buildList {
             add(userAgentInterceptor.toClientInterceptor())
             add(crashLoggingInterceptor.toClientInterceptor())
+            add(cleanAndRetryInterceptor)
+
+            if (BuildConfig.DEBUG) {
+                val loggingInterceptor = HttpLoggingInterceptor().apply {
+                    level = HttpLoggingInterceptor.Level.HEADERS
+                }
+                add(loggingInterceptor.toClientInterceptor())
+            }
         }
     }
 }

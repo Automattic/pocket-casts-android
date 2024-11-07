@@ -4,6 +4,9 @@ import android.content.Context
 import android.os.Build
 import android.os.SystemClock
 import androidx.annotation.VisibleForTesting
+import androidx.lifecycle.ProcessLifecycleOwner
+import androidx.lifecycle.lifecycleScope
+import androidx.work.WorkManager
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
@@ -12,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.UserPodcastRating
 import au.com.shiftyjelly.pocketcasts.models.to.StatsBundle
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
@@ -27,6 +31,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
 import au.com.shiftyjelly.pocketcasts.repositories.shortcuts.PocketCastsShortcuts
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
@@ -51,10 +56,13 @@ import io.reactivex.rxkotlin.Singles
 import io.reactivex.schedulers.Schedulers
 import java.time.Instant
 import java.util.Date
+import java.util.Locale
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.roundToInt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.rx2.rxCompletable
 import kotlinx.coroutines.rx2.rxSingle
@@ -79,6 +87,7 @@ class PodcastSyncProcess(
     var subscriptionManager: SubscriptionManager,
     var folderManager: FolderManager,
     var syncManager: SyncManager,
+    var ratingsManager: RatingsManager,
     val crashLogging: CrashLogging,
     val analyticsTracker: AnalyticsTracker,
 ) : CoroutineScope {
@@ -123,6 +132,7 @@ class PodcastSyncProcess(
                     syncPlayHistory()
                 },
             )
+            .andThen(syncRatings())
         return syncUpNextObservable
             .doOnError { throwable ->
                 crashLogging.sendReport(throwable, message = "Sync failed")
@@ -258,7 +268,7 @@ class PodcastSyncProcess(
 
     private fun importPodcast(podcastResponse: UserPodcastResponse?): Maybe<Podcast> {
         val podcastUuid = podcastResponse?.uuid ?: return Maybe.empty()
-        return podcastManager.subscribeToPodcastRx(podcastUuid = podcastUuid, sync = false)
+        return podcastManager.subscribeToPodcastRx(podcastUuid = podcastUuid, sync = false, shouldAutoDownload = false)
             .flatMap { podcast -> updatePodcastSyncValues(podcast, podcastResponse).toSingleDefault(podcast) }
             .toMaybe()
             .doOnError { LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, it, "Could not import server podcast %s", podcastUuid) }
@@ -286,12 +296,16 @@ class PodcastSyncProcess(
         podcastManager.updatePodcast(podcast)
     }
 
-    private fun syncUpNext(): Completable {
-        return Completable.fromAction {
-            val startTime = SystemClock.elapsedRealtime()
-            UpNextSyncJob.run(syncManager, context)
-            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - sync up next - ${String.format("%d ms", SystemClock.elapsedRealtime() - startTime)}")
-        }
+    private fun syncUpNext() = Completable.create { emitter ->
+        val startTime = SystemClock.elapsedRealtime()
+        val workRequestId = UpNextSyncWorker.enqueue(syncManager, context)
+        workRequestId?.let {
+            ProcessLifecycleOwner.get().lifecycleScope.launch {
+                WorkManager.getInstance(context).getWorkInfoByIdFlow(it).first { it.state.isFinished }
+                emitter.onComplete()
+            }
+        } ?: emitter.onComplete()
+        LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - sync up next - ${String.format(Locale.ENGLISH, "%d ms", SystemClock.elapsedRealtime() - startTime)}")
     }
 
     private fun syncPlayHistory(): Completable {
@@ -319,6 +333,21 @@ class PodcastSyncProcess(
                     Completable.complete()
                 }
             }
+    }
+
+    private fun syncRatings(): Completable {
+        return rxCompletable {
+            syncManager.getPodcastRatings()?.podcastRatingsList
+                ?.mapNotNull { rating ->
+                    val modifiedAt = rating.modifiedAt.toDate() ?: return@mapNotNull null
+                    UserPodcastRating(
+                        podcastUuid = rating.podcastUuid,
+                        rating = rating.podcastRating,
+                        modifiedAt = modifiedAt,
+                    )
+                }
+                ?.let { ratingsManager.updateUserRatings(it) }
+        }
     }
 
     private fun uploadChanges(): Pair<String, List<PodcastEpisode>> {
@@ -769,7 +798,7 @@ class PodcastSyncProcess(
         val isSubscribed = podcastSync.subscribed
         val podcastUuid = podcastSync.uuid
         if (podcastSync.subscribed && isSubscribed && podcastUuid != null) {
-            return podcastManager.subscribeToPodcastRx(podcastUuid, sync = false)
+            return podcastManager.subscribeToPodcastRx(podcastUuid, sync = false, shouldAutoDownload = false)
                 .doOnSuccess { podcast ->
                     applyPodcastSyncUpdatesToPodcast(podcast, podcastSync)
                     podcastManager.updatePodcast(podcast)

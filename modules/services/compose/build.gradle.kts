@@ -25,6 +25,7 @@ dependencies {
 
     implementation(platform(libs.compose.bom))
 
+    implementation(libs.androidx.webkit)
     implementation(libs.coil.compose)
     implementation(libs.compose.activity)
     implementation(libs.compose.animation)

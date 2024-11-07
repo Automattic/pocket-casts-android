@@ -1,49 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.5.2" type="baseline" client="gradle" dependencies="true" name="AGP (8.5.2)" variant="all" version="8.5.2">
-
-    <issue
-        id="MissingPermission"
-        message="Call requires permission which may be rejected by user: code should explicitly check to see if permission is available (with `checkPermission`) or explicitly handle a potential `SecurityException`"
-        errorLine1="        notificationManager.notify(notificationId, notification)"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/PlayerNotificationManager.kt"
-            line="20"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="MissingPermission"
-        message="Call requires permission which may be rejected by user: code should explicitly check to see if permission is available (with `checkPermission`) or explicitly handle a potential `SecurityException`"
-        errorLine1="            manager.notify(notificationTag, NotificationBroadcastReceiver.NOTIFICATION_ID, notification)"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/refresh/RefreshPodcastsThread.kt"
-            line="568"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="MissingPermission"
-        message="Call requires permission which may be rejected by user: code should explicitly check to see if permission is available (with `checkPermission`) or explicitly handle a potential `SecurityException`"
-        errorLine1="            manager.notify(NotificationBroadcastReceiver.NOTIFICATION_TAG_NEW_EPISODES_PRIMARY, NotificationBroadcastReceiver.NOTIFICATION_ID, summaryNotification)"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/refresh/RefreshPodcastsThread.kt"
-            line="658"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="MissingPermission"
-        message="Call requires permission which may be rejected by user: code should explicitly check to see if permission is available (with `checkPermission`) or explicitly handle a potential `SecurityException`"
-        errorLine1="        NotificationManagerCompat.from(context)"
-        errorLine2="        ^">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/sync/TokenErrorNotification.kt"
-            line="38"
-            column="9"/>
-    </issue>
+<issues format="6" by="lint 8.7.1" type="baseline" client="gradle" dependencies="true" name="AGP (8.7.1)" variant="all" version="8.7.1">
 
     <issue
         id="MissingSuperCall"
@@ -85,7 +41,7 @@
         errorLine2="                 ~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/player/view/EffectsFragment.kt"
-            line="57"
+            line="77"
             column="18"/>
     </issue>
 
@@ -129,7 +85,7 @@
         errorLine2="                 ~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/podcasts/view/ProfileEpisodeListFragment.kt"
-            line="191"
+            line="202"
             column="18"/>
     </issue>
 
@@ -161,8 +117,19 @@
         errorLine1="    override fun onAttach(context: Context) {"
         errorLine2="                 ~~~~~~~~">
         <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/settings/StorageSettingsFragment.kt"
+            line="48"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="MissingSuperCall"
+        message="Overriding method should call `super.onAttach`"
+        errorLine1="    override fun onAttach(context: Context) {"
+        errorLine2="                 ~~~~~~~~">
+        <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/player/view/UpNextFragment.kt"
-            line="208"
+            line="209"
             column="18"/>
     </issue>
 
@@ -173,7 +140,7 @@
         errorLine2="                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/AndroidManifest.xml"
-            line="511"
+            line="528"
             column="33"/>
     </issue>
 
@@ -184,7 +151,7 @@
         errorLine2="                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/AndroidManifest.xml"
-            line="513"
+            line="530"
             column="33"/>
     </issue>
 
@@ -211,39 +178,6 @@
     </issue>
 
     <issue
-        id="SpecifyForegroundServiceType"
-        message="Missing dataSync foregroundServiceType in the AndroidManifest.xml"
-        errorLine1="            ForegroundInfo("
-        errorLine2="            ^">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/download/task/DownloadEpisodeTask.kt"
-            line="198"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="SpecifyForegroundServiceType"
-        message="Missing dataSync foregroundServiceType in the AndroidManifest.xml"
-        errorLine1="            ForegroundInfo(notificationId, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/download/FixDownloadsWorker.kt"
-            line="74"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="SpecifyForegroundServiceType"
-        message="Missing dataSync foregroundServiceType in the AndroidManifest.xml"
-        errorLine1="            ForegroundInfo("
-        errorLine2="            ^">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/opml/OpmlImportTask.kt"
-            line="288"
-            column="13"/>
-    </issue>
-
-    <issue
         id="DiffUtilEquals"
         message="Suspicious equality check: `equals()` is not implemented in Object"
         errorLine1="        return oldItem == newItem"
@@ -266,63 +200,30 @@
     </issue>
 
     <issue
-        id="FlowOperatorInvokedInComposition"
-        message="Flow operator functions should not be invoked within composition"
-        errorLine1="                    .distinctUntilChanged { t1, t2 ->"
-        errorLine2="                     ~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/player/view/bookmark/BookmarksFragment.kt"
-            line="109"
-            column="22"/>
-    </issue>
-
-    <issue
         id="PrivateResource"
-        message="The resource `@dimen/design_bottom_navigation_height` is marked as private in com.google.android.material:material:1.9.0"
+        message="The resource `@dimen/design_bottom_navigation_height` is marked as private in com.google.android.material:material:1.11.0"
         errorLine1="        val padding = resources.getDimension(MR.dimen.design_bottom_navigation_height).toInt()"
         errorLine2="                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/ui/MainActivity.kt"
-            line="962"
+            line="1009"
             column="55"/>
     </issue>
 
     <issue
         id="PrivateResource"
-        message="The resource `@dimen/design_bottom_navigation_height` is marked as private in com.google.android.material:material:1.9.0"
+        message="The resource `@dimen/design_bottom_navigation_height` is marked as private in com.google.android.material:material:1.11.0"
         errorLine1="        val padding = resources.getDimension(MR.dimen.design_bottom_navigation_height).toInt() + miniPlayerHeight"
         errorLine2="                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/ui/MainActivity.kt"
-            line="969"
+            line="1016"
             column="55"/>
     </issue>
 
     <issue
         id="PrivateResource"
-        message="The resource `@style/Theme_MediaRouter` is marked as private in androidx.mediarouter:mediarouter:1.6.0-beta01"
-        errorLine1="    val castContext = ContextThemeWrapper(context, R.style.Theme_MediaRouter)"
-        errorLine2="                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/views/extensions/MediaRouteButton.kt"
-            line="11"
-            column="52"/>
-    </issue>
-
-    <issue
-        id="PrivateResource"
-        message="The resource `@attr/mediaRouteButtonStyle` is marked as private in androidx.mediarouter:mediarouter:1.6.0-beta01"
-        errorLine1="    val attrs = castContext.obtainStyledAttributes(null, R.styleable.MediaRouteButton, R.attr.mediaRouteButtonStyle, 0)"
-        errorLine2="                                                                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/views/extensions/MediaRouteButton.kt"
-            line="12"
-            column="88"/>
-    </issue>
-
-    <issue
-        id="PrivateResource"
-        message="The resource `@dimen/design_bottom_navigation_height` is marked as private in com.google.android.material:material:1.9.0"
+        message="The resource `@dimen/design_bottom_navigation_height` is marked as private in com.google.android.material:material:1.11.0"
         errorLine1="            android:paddingBottom=&quot;@dimen/design_bottom_navigation_height&quot;"
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -404,7 +305,7 @@
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/fragment_effects.xml"
-            line="60"
+            line="70"
             column="17"/>
     </issue>
 
@@ -415,7 +316,7 @@
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/fragment_effects.xml"
-            line="97"
+            line="107"
             column="17"/>
     </issue>
 
@@ -538,148 +439,6 @@
             file="src/main/res/values-sw350dp/strings.xml"
             line="3"
             column="13"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="Unnecessary; SDK_INT is always >= 24"
-        errorLine1="                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {"
-        errorLine2="                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/podcasts/view/episode/EpisodeFragment.kt"
-            line="340"
-            column="29"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="Unnecessary; SDK_INT is never &lt; 24"
-        errorLine1="        if (Build.VERSION.SDK_INT &lt; 24) {"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/utils/Network.kt"
-            line="26"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="Unnecessary; SDK_INT is always >= 24"
-        errorLine1="                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {"
-        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/PlaybackService.kt"
-            line="248"
-            column="21"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="Unnecessary; SDK_INT is always >= 24"
-        errorLine1="            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/refresh/RefreshPodcastsThread.kt"
-            line="529"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="Unnecessary; SDK_INT is always >= 24"
-        errorLine1="        val locale: Locale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {"
-        errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/preferences/SettingsImpl.kt"
-            line="487"
-            column="34"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="Unnecessary; SDK_INT is always >= 24"
-        errorLine1="        if (Build.VERSION.SDK_INT >= 21) {"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/views/helper/SwipeToArchiveCallback.kt"
-            line="407"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="Unnecessary; SDK_INT is always >= 24"
-        errorLine1="    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/views/extensions/SwitchExt.kt"
-            line="13"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="Unnecessary; SDK_INT is always >= 24"
-        errorLine1="    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/views/extensions/SwitchExt.kt"
-            line="45"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="Unnecessary; SDK_INT is always >= 24"
-        errorLine1="        return if (tag.length &lt;= MAX_TAG_LENGTH || Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {"
-        errorLine2="                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/utils/TimberDebugTree.kt"
-            line="55"
-            column="52"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="Unnecessary; SDK_INT is always >= 24"
-        errorLine1="    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/views/extensions/View.kt"
-            line="60"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="This folder configuration (`v24`) is unnecessary; `minSdkVersion` is 24. Merge all the resources in this folder into `layout`.">
-        <location
-            file="src/main/res/layout-v24"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="Unnecessary; SDK_INT is always >= 24"
-        errorLine1="        tools:targetApi=&quot;n&quot;"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/settings_pocketcasts_settings_fragment.xml"
-            line="25"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="This folder configuration (`v23`) is unnecessary; `minSdkVersion` is 24. Merge all the resources in this folder into `values`.">
-        <location
-            file="src/main/res/values-v23"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="This folder configuration (`v24`) is unnecessary; `minSdkVersion` is 24. Merge all the resources in this folder into `values`.">
-        <location
-            file="src/main/res/values-v24"/>
     </issue>
 
     <issue
@@ -1354,17 +1113,6 @@
             file="../modules/features/cartheme/src/main/res/drawable/car_unbounded_ripple_background.xml"
             line="17"
             column="1"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.color.modal_image_content_background_color` appears to be unused"
-        errorLine1="    &lt;color name=&quot;modal_image_content_background_color&quot;>#FF6262&lt;/color>"
-        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="../modules/features/endofyear/src/main/res/values/colors.xml"
-            line="3"
-            column="12"/>
     </issue>
 
     <issue
@@ -4202,17 +3950,6 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.drawable.heart` appears to be unused"
-        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
-        errorLine2="^">
-        <location
-            file="../modules/features/endofyear/src/main/res/drawable/heart.xml"
-            line="1"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
         message="The resource `R.drawable.highlight_circle` appears to be unused"
         errorLine1="&lt;shape xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
         errorLine2="^">
@@ -4880,17 +4617,6 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.drawable.logo_white` appears to be unused"
-        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
-        errorLine2="^">
-        <location
-            file="../modules/features/endofyear/src/main/res/drawable/logo_white.xml"
-            line="1"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
         message="The resource `R.menu.menu_about` appears to be unused"
         errorLine1="&lt;menu xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
         errorLine2="^">
@@ -5077,7 +4803,7 @@
         errorLine1="&lt;Switch"
         errorLine2="^">
         <location
-            file="../modules/features/cartheme/src/main/res/layout-v24/preference_car_switch_widget.xml"
+            file="../modules/features/cartheme/src/main/res/layout/preference_car_switch_widget.xml"
             line="19"
             column="1"/>
     </issue>
@@ -5266,17 +4992,6 @@
         <location
             file="../modules/features/discover/src/main/res/drawable/primary_ui_3_8_round.xml"
             line="2"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.drawable.rectangle` appears to be unused"
-        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
-        errorLine2="^">
-        <location
-            file="../modules/features/endofyear/src/main/res/drawable/rectangle.xml"
-            line="1"
             column="1"/>
     </issue>
 
@@ -6361,7 +6076,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="../modules/services/ui/src/main/res/values/themes.xml"
-            line="404"
+            line="402"
             column="12"/>
     </issue>
 
@@ -6372,7 +6087,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="../modules/services/ui/src/main/res/values/themes.xml"
-            line="405"
+            line="403"
             column="12"/>
     </issue>
 
@@ -6383,7 +6098,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="../modules/services/ui/src/main/res/values/themes.xml"
-            line="406"
+            line="404"
             column="12"/>
     </issue>
 
@@ -6394,7 +6109,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="../modules/services/ui/src/main/res/values/themes.xml"
-            line="1635"
+            line="1634"
             column="12"/>
     </issue>
 
@@ -7057,7 +6772,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="../modules/features/player/src/main/res/layout/adapter_up_next_footer.xml"
-            line="62"
+            line="54"
             column="13"/>
     </issue>
 
@@ -7068,7 +6783,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="../modules/features/player/src/main/res/layout/adapter_up_next_footer.xml"
-            line="71"
+            line="63"
             column="13"/>
     </issue>
 
@@ -7629,7 +7344,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="../modules/features/podcasts/src/main/res/layout/fragment_profile_episode_list.xml"
-            line="13"
+            line="14"
             column="13"/>
     </issue>
 

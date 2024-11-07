@@ -72,6 +72,7 @@ private fun Content(
         is OnboardingFlow.PlusAccountUpgradeNeedsLogin,
         OnboardingFlow.InitialOnboarding,
         OnboardingFlow.EngageSdk,
+        OnboardingFlow.ReferralLoginOrSignUp,
         -> OnboardingNavRoute.logInOrSignUp
 
         // Cannot use OnboardingNavRoute.PlusUpgrade.routeWithSource here, it is set as a defaultValue in the PlusUpgrade composable,
@@ -79,13 +80,20 @@ private fun Content(
         is OnboardingFlow.PlusAccountUpgrade,
         is OnboardingFlow.PlusFlow,
         -> OnboardingNavRoute.PlusUpgrade.route
+
+        is OnboardingFlow.Welcome,
+        -> OnboardingNavRoute.welcome
     }
 
     val onAccountCreated = {
-        navController.navigate(OnboardingRecommendationsFlow.route) {
-            // clear backstack after account is created
-            popUpTo(OnboardingNavRoute.logInOrSignUp) {
-                inclusive = true
+        if (flow is OnboardingFlow.ReferralLoginOrSignUp) {
+            exitOnboarding(OnboardingExitInfo(showWelcomeInReferralFlow = true))
+        } else {
+            navController.navigate(OnboardingRecommendationsFlow.route) {
+                // clear backstack after account is created
+                popUpTo(OnboardingNavRoute.logInOrSignUp) {
+                    inclusive = true
+                }
             }
         }
     }
@@ -119,6 +127,7 @@ private fun Content(
                         // This should never happen. If the user isn't logged in they should be in the AccountUpgradeNeedsLogin flow
                         is OnboardingFlow.PlusAccountUpgrade,
                         is OnboardingFlow.PatronAccountUpgrade,
+                        is OnboardingFlow.Welcome,
                         -> throw IllegalStateException("Account upgrade flow tried to present LoginOrSignupPage")
 
                         OnboardingFlow.PlusAccountUpgradeNeedsLogin,
@@ -133,6 +142,7 @@ private fun Content(
                         OnboardingFlow.InitialOnboarding,
                         OnboardingFlow.LoggedOut,
                         OnboardingFlow.EngageSdk,
+                        OnboardingFlow.ReferralLoginOrSignUp,
                         -> exitOnboarding(OnboardingExitInfo())
                     }
                 },
@@ -209,11 +219,14 @@ private fun Content(
             val userCreatedNewAccount = when (upgradeSource) {
                 OnboardingUpgradeSource.ACCOUNT_DETAILS,
                 OnboardingUpgradeSource.APPEARANCE,
+                OnboardingUpgradeSource.ICONS,
+                OnboardingUpgradeSource.THEMES,
                 OnboardingUpgradeSource.BOOKMARKS,
                 OnboardingUpgradeSource.BOOKMARKS_SHELF_ACTION,
                 OnboardingUpgradeSource.END_OF_YEAR,
                 OnboardingUpgradeSource.FILES,
                 OnboardingUpgradeSource.FOLDERS,
+                OnboardingUpgradeSource.FOLDERS_PODCAST_SCREEN,
                 OnboardingUpgradeSource.HEADPHONE_CONTROLS_SETTINGS,
                 OnboardingUpgradeSource.LOGIN,
                 OnboardingUpgradeSource.LOGIN_PLUS_PROMOTION,
@@ -224,6 +237,7 @@ private fun Content(
                 OnboardingUpgradeSource.SETTINGS,
                 OnboardingUpgradeSource.SLUMBER_STUDIOS,
                 OnboardingUpgradeSource.WHATS_NEW_SKIP_CHAPTERS,
+                OnboardingUpgradeSource.UP_NEXT_SHUFFLE,
                 OnboardingUpgradeSource.UNKNOWN,
                 -> false
 
@@ -285,7 +299,9 @@ private fun onLoginToExistingAccount(
         OnboardingFlow.LoggedOut,
         OnboardingFlow.EngageSdk,
         -> exitOnboarding(OnboardingExitInfo(showPlusPromotionForFreeUser = true))
-
+        OnboardingFlow.ReferralLoginOrSignUp,
+        -> exitOnboarding(OnboardingExitInfo(showPlusPromotionForFreeUser = false))
+        OnboardingFlow.Welcome -> Unit // this should never happens, login is not initiated from welcome screen
         is OnboardingFlow.PlusAccountUpgrade,
         is OnboardingFlow.PatronAccountUpgrade,
         OnboardingFlow.PlusAccountUpgradeNeedsLogin,

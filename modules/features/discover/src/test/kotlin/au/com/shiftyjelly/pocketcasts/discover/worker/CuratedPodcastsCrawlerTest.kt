@@ -30,7 +30,7 @@ class CuratedPodcastsCrawlerTest {
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
             .create<ListWebService>()
-        crawler = CuratedPodcastsCrawler(service)
+        crawler = CuratedPodcastsCrawler(service, staticHostUrl = server.url("/static").toString())
     }
 
     @Test
@@ -49,7 +49,7 @@ class CuratedPodcastsCrawlerTest {
 
         val podcasts = crawler.crawl("android").getOrThrow()
 
-        assertEqualsInAnyOrder(emptyList<CuratedPodcast>(), podcasts)
+        assertEqualsInAnyOrder(emptyList(), podcasts)
     }
 
     @Test
@@ -327,7 +327,7 @@ class CuratedPodcastsCrawlerTest {
 
         val podcasts = crawler.crawl("android").getOrThrow()
 
-        assertEqualsInAnyOrder(emptyList<CuratedPodcast>(), podcasts)
+        assertEqualsInAnyOrder(emptyList(), podcasts)
     }
 
     @Test
@@ -352,7 +352,7 @@ class CuratedPodcastsCrawlerTest {
 
         val podcasts = crawler.crawl("android").getOrThrow()
 
-        assertEqualsInAnyOrder(emptyList<CuratedPodcast>(), podcasts)
+        assertEqualsInAnyOrder(emptyList(), podcasts)
     }
 
     @Test
@@ -377,7 +377,7 @@ class CuratedPodcastsCrawlerTest {
 
         val podcasts = crawler.crawl("android").getOrThrow()
 
-        assertEqualsInAnyOrder(emptyList<CuratedPodcast>(), podcasts)
+        assertEqualsInAnyOrder(emptyList(), podcasts)
     }
 
     @Test
@@ -441,7 +441,7 @@ class CuratedPodcastsCrawlerTest {
             |    "sponsored": false,
             |    "type": "podcast_list",
             |    "title": "Featured",
-            |    "source": "${server.url("/")}",
+            |    "source": "${server.url("/featured.json")}",
             |    "summary_style": "",
             |    "expanded_style": "",
             |    "regions": []
@@ -478,6 +478,10 @@ class CuratedPodcastsCrawlerTest {
             ),
             podcasts,
         )
+
+        // Skip initial request
+        server.takeRequest()
+        assertEquals("/static/engage/featured.json", server.takeRequest().path)
     }
 
     private fun enqueueDiscoverPage(layout: String) {

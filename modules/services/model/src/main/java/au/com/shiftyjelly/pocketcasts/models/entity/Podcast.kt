@@ -297,6 +297,30 @@ data class Podcast(
             }
         }
     }
+
+    /**
+     * Copies playback effect settings from a source podcast to this podcast
+     */
+    fun copyPlaybackEffects(
+        sourcePodcast: Podcast,
+    ) {
+        sourcePodcast.overrideGlobalEffectsModified?.takeIf { overrideGlobalEffectsModified?.before(it) ?: true }?.let {
+            overrideGlobalEffects = sourcePodcast.overrideGlobalEffects
+            overrideGlobalEffectsModified = sourcePodcast.overrideGlobalEffectsModified
+        }
+        sourcePodcast.playbackSpeedModified?.takeIf { playbackSpeedModified?.before(it) ?: true }?.let {
+            playbackSpeed = sourcePodcast.playbackSpeed
+            playbackSpeedModified = sourcePodcast.playbackSpeedModified
+        }
+        sourcePodcast.volumeBoostedModified?.takeIf { volumeBoostedModified?.before(it) ?: true }?.let {
+            isVolumeBoosted = sourcePodcast.isVolumeBoosted
+            volumeBoostedModified = sourcePodcast.volumeBoostedModified
+        }
+        sourcePodcast.trimModeModified?.takeIf { trimModeModified?.before(it) ?: true }?.let {
+            trimMode = sourcePodcast.trimMode
+            trimModeModified = sourcePodcast.trimModeModified
+        }
+    }
 }
 
 private val DEFAULT_SERVER_LIGHT_TINT_COLOR = Color.parseColor("#F44336")

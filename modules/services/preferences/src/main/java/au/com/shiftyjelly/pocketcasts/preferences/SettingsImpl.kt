@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.models.type.AutoDownloadLimitSetting
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
@@ -51,6 +52,7 @@ import com.jakewharton.rxrelay2.BehaviorRelay
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.nio.charset.Charset
+import java.time.Instant
 import java.util.Date
 import java.util.Locale
 import java.util.UUID
@@ -60,6 +62,8 @@ import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.PBEParameterSpec
 import javax.inject.Inject
 import kotlin.math.max
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -110,6 +114,12 @@ class SettingsImpl @Inject constructor(
             val allItems = items.distinct() + (ShelfItem.entries - items)
             allItems.joinToString(separator = ",", transform = ShelfItem::id)
         },
+    )
+
+    override val upNextShuffle: UserSetting<Boolean> = UserSetting.BoolPref(
+        sharedPrefKey = "upNextShuffle",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
     )
 
     override val refreshStateObservable = BehaviorRelay.create<RefreshState>().apply {
@@ -312,6 +322,22 @@ class SettingsImpl @Inject constructor(
         refreshStateObservable.accept(refreshState)
     }
 
+    override fun setDismissLowStorageModalTime(lastUpdateTime: Long) {
+        val editor = sharedPreferences.edit()
+        editor.putLong(Settings.LAST_DISMISS_LOW_STORAGE_MODAL_TIME, lastUpdateTime)
+        editor.apply()
+    }
+
+    override fun shouldShowLowStorageModalAfterSnooze(): Boolean {
+        val lastSnoozeTime = sharedPreferences.getLong(Settings.LAST_DISMISS_LOW_STORAGE_MODAL_TIME, 0)
+
+        if (lastSnoozeTime == 0L) return true
+
+        val timeSinceDismiss = (System.currentTimeMillis() - lastSnoozeTime).milliseconds
+
+        return timeSinceDismiss >= 7.days
+    }
+
     override fun getRefreshState(): RefreshState? {
         return refreshStateObservable.value
     }
@@ -383,6 +409,14 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
         fromString = { PlayOverNotificationSetting.fromPreferenceString(it) },
         toString = { it.preferenceInt.toString() },
+    )
+
+    override val autoDownloadLimit = UserSetting.PrefFromString(
+        sharedPrefKey = "autoDownloadLimit",
+        defaultValue = AutoDownloadLimitSetting.TWO_LATEST_EPISODE,
+        sharedPrefs = sharedPreferences,
+        fromString = { AutoDownloadLimitSetting.fromPreferenceString(it) ?: AutoDownloadLimitSetting.TWO_LATEST_EPISODE },
+        toString = { it.id.toString() },
     )
 
     override fun setLastModified(lastModified: String?) {
@@ -484,13 +518,7 @@ class SettingsImpl @Inject constructor(
             return languageCode
         }
 
-        val locale: Locale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            context.resources.configuration.locales[0]
-        } else {
-            @Suppress("DEPRECATION")
-            context.resources.configuration.locale
-        }
-
+        val locale: Locale = context.resources.configuration.locales[0]
         val language = locale.country.lowercase(Locale.US) // e.g. de
 
         for (i in Settings.SUPPORTED_LANGUAGE_CODES.indices) {
@@ -536,6 +564,12 @@ class SettingsImpl @Inject constructor(
 
     override val autoDownloadUpNext = UserSetting.BoolPref(
         sharedPrefKey = "autoDownloadUpNext",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val autoDownloadNewEpisodes = UserSetting.BoolPref(
+        sharedPrefKey = "autoDownloadNewEpisodes",
         defaultValue = false,
         sharedPrefs = sharedPreferences,
     )
@@ -1287,12 +1321,6 @@ class SettingsImpl @Inject constructor(
         setBoolean(END_OF_YEAR_SHOW_MODAL_2023_KEY, value)
     }
 
-    override var showKidsBanner: UserSetting<Boolean> = UserSetting.BoolPref(
-        sharedPrefKey = "ShowKidsBannerKey",
-        defaultValue = true,
-        sharedPrefs = sharedPreferences,
-    )
-
     override fun getEndOfYearShowModal(): Boolean =
         getBoolean(END_OF_YEAR_SHOW_MODAL_2023_KEY, true)
 
@@ -1481,6 +1509,18 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
+    override val referralClaimCode = UserSetting.StringPref(
+        sharedPrefKey = "referralCode",
+        defaultValue = "",
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val showReferralWelcome = UserSetting.BoolPref(
+        sharedPrefKey = "showReferralWelcome",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
+
     private val _playerOrUpNextBottomSheetState = MutableSharedFlow<Int>(onBufferOverflow = BufferOverflow.DROP_OLDEST, replay = 1)
     override val playerOrUpNextBottomSheetState: Flow<Int>
         get() = _playerOrUpNextBottomSheetState.asSharedFlow().distinctUntilChanged()
@@ -1488,4 +1528,18 @@ class SettingsImpl @Inject constructor(
     override fun updatePlayerOrUpNextBottomSheetState(state: Int) {
         _playerOrUpNextBottomSheetState.tryEmit(state)
     }
+
+    override val lastEoySyncTimestamp = UserSetting.PrefFromString<Instant>(
+        sharedPrefKey = "eoy_sync_timestamp",
+        defaultValue = Instant.EPOCH,
+        sharedPrefs = sharedPreferences,
+        fromString = { value -> runCatching { Instant.parse(value) }.getOrDefault(Instant.EPOCH) },
+        toString = { value -> value.toString() },
+    )
+
+    override val useRealTimeForPlaybackRemaingTime = UserSetting.BoolPref(
+        sharedPrefKey = "use_real_time_for_playback_remaining_time",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
 }

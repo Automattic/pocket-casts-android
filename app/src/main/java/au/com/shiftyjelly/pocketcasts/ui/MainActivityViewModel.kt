@@ -36,6 +36,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
+import kotlinx.coroutines.reactive.collect
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -56,6 +57,9 @@ class MainActivityViewModel
     private val _state = MutableStateFlow(State())
     val state = _state.asStateFlow()
 
+    private val _downloadedEpisodeState = MutableStateFlow(DownloadedEpisodesState())
+    val downloadedEpisodeState = _downloadedEpisodeState.asStateFlow()
+
     private val _snackbarMessage = MutableSharedFlow<Int>()
     val snackbarMessage = _snackbarMessage.asSharedFlow()
 
@@ -73,6 +77,13 @@ class MainActivityViewModel
             if (!state.value.shouldShowWhatsNew) {
                 updateStoriesModalShowState(settings.getEndOfYearShowModal())
             }
+        }
+
+        viewModelScope.launch {
+            episodeManager.observeDownloadedEpisodes()
+                .collect { result ->
+                    _downloadedEpisodeState.update { state -> state.copy(downloadedEpisodes = result.sumOf { it.sizeInBytes }) }
+                }
         }
     }
 
@@ -115,7 +126,7 @@ class MainActivityViewModel
         return signInState.isExpiredTrial && !settings.getTrialFinishedSeen()
     }
 
-    suspend fun isEndOfYearStoriesEligible() = endOfYearManager.isEligibleForStories()
+    suspend fun isEndOfYearStoriesEligible() = endOfYearManager.isEligibleForEndOfYear()
     fun updateStoriesModalShowState(show: Boolean) {
         viewModelScope.launch {
             shouldShowStoriesModal.value = show &&
@@ -198,6 +209,10 @@ class MainActivityViewModel
 
     data class State(
         val shouldShowWhatsNew: Boolean = false,
+    )
+
+    data class DownloadedEpisodesState(
+        val downloadedEpisodes: Long = 0L,
     )
 
     sealed class NavigationState {

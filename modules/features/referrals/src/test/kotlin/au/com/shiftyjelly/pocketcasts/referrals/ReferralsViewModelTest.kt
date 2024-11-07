@@ -1,14 +1,20 @@
 package au.com.shiftyjelly.pocketcasts.referrals
 
 import app.cash.turbine.test
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfo
+import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfoPlayStore
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
+import au.com.shiftyjelly.pocketcasts.referrals.ReferralsViewModel.UiState
+import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralOfferInfoProvider
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
@@ -37,8 +43,12 @@ class ReferralsViewModelTest {
 
     private val userManager: UserManager = mock()
     private val settings: Settings = mock()
+    private val referralOfferInfoProvider: ReferralOfferInfoProvider = mock()
+    private val referralOfferInfo: ReferralsOfferInfoPlayStore = mock()
+    private val analyticsTracker: AnalyticsTracker = mock()
     private lateinit var viewModel: ReferralsViewModel
     private val email = "support@pocketcasts.com"
+    private val referralClaimCode = "referral_code"
     private val statusAndroidPaidSubscription = SubscriptionStatus.Paid(
         expiry = Date(),
         autoRenew = true,
@@ -53,19 +63,37 @@ class ReferralsViewModelTest {
 
     @Before
     fun setUp() {
-        FeatureFlag.setEnabled(Feature.REFERRALS, true)
-        whenever(settings.showReferralsTooltip).thenReturn(UserSetting.Mock(true, mock()))
+        FeatureFlag.setEnabled(Feature.REFERRALS_CLAIM, true)
+        FeatureFlag.setEnabled(Feature.REFERRALS_SEND, true)
+        whenever(referralOfferInfo.subscriptionWithOffer).thenReturn(mock<Subscription.Trial>())
         whenever(settings.playerOrUpNextBottomSheetState).thenReturn(flowOf(BottomSheetBehavior.STATE_COLLAPSED))
     }
 
     @Test
-    fun `referrals gift icon is not shown if feature flag is disabled`() = runTest {
-        FeatureFlag.setEnabled(Feature.REFERRALS, false)
+    fun `gift icon ,tooltip, profile banner are not shown if referral subscription offer not found`() = runTest {
+        whenever(referralOfferInfo.subscriptionWithOffer).thenReturn(null)
+        initViewModel(offerInfo = referralOfferInfo)
+
+        viewModel.state.test {
+            assertEquals(
+                UiState.Loaded(
+                    showIcon = false,
+                    showTooltip = false,
+                    showProfileBanner = false,
+                ),
+                awaitItem(),
+            )
+        }
+    }
+
+    @Test
+    fun `referrals gift icon hidden if referrals send feature flag is disabled`() = runTest {
+        FeatureFlag.setEnabled(Feature.REFERRALS_SEND, false)
 
         initViewModel()
 
         viewModel.state.test {
-            assertEquals(false, awaitItem().showIcon)
+            assertEquals(false, (awaitItem() as UiState.Loaded).showIcon)
         }
     }
 
@@ -74,7 +102,7 @@ class ReferralsViewModelTest {
         initViewModel(SignInState.SignedOut)
 
         viewModel.state.test {
-            assertEquals(false, awaitItem().showIcon)
+            assertEquals(false, (awaitItem() as UiState.Loaded).showIcon)
         }
     }
 
@@ -88,12 +116,13 @@ class ReferralsViewModelTest {
         )
 
         viewModel.state.test {
-            assertEquals(false, awaitItem().showIcon)
+            assertEquals(false, (awaitItem() as UiState.Loaded).showIcon)
         }
     }
 
     @Test
     fun `referrals gift icon is shown for plus account`() = runTest {
+        whenever(referralOfferInfo.subscriptionWithOffer).thenReturn(mock<Subscription.Trial>())
         initViewModel(
             SignInState.SignedIn(
                 email,
@@ -102,7 +131,7 @@ class ReferralsViewModelTest {
         )
 
         viewModel.state.test {
-            assertEquals(true, awaitItem().showIcon)
+            assertEquals(true, (awaitItem() as UiState.Loaded).showIcon)
         }
     }
 
@@ -116,7 +145,7 @@ class ReferralsViewModelTest {
         )
 
         viewModel.state.test {
-            assertEquals(true, awaitItem().showIcon)
+            assertEquals(true, (awaitItem() as UiState.Loaded).showIcon)
         }
     }
 
@@ -125,7 +154,7 @@ class ReferralsViewModelTest {
         initViewModel()
 
         viewModel.state.test {
-            assertEquals(true, awaitItem().showTooltip)
+            assertEquals(true, (awaitItem() as UiState.Loaded).showTooltip)
         }
     }
 
@@ -134,7 +163,7 @@ class ReferralsViewModelTest {
         initViewModel(SignInState.SignedOut)
 
         viewModel.state.test {
-            assertEquals(false, awaitItem().showTooltip)
+            assertEquals(false, (awaitItem() as UiState.Loaded).showTooltip)
         }
     }
 
@@ -145,14 +174,120 @@ class ReferralsViewModelTest {
         viewModel.onIconClick()
 
         viewModel.state.test {
-            assertEquals(false, awaitItem().showTooltip)
+            assertEquals(false, (awaitItem() as UiState.Loaded).showTooltip)
         }
     }
 
-    private fun initViewModel(
+    @Test
+    fun `tooltip is hidden on tooltip click`() = runTest {
+        initViewModel()
+
+        viewModel.onTooltipClick()
+
+        viewModel.state.test {
+            assertEquals(false, (awaitItem() as UiState.Loaded).showTooltip)
+        }
+    }
+
+    @Test
+    fun `tooltip hidden if referrals send feature flag is disabled`() = runTest {
+        FeatureFlag.setEnabled(Feature.REFERRALS_SEND, false)
+
+        initViewModel()
+
+        viewModel.state.test {
+            assertEquals(false, (awaitItem() as UiState.Loaded).showTooltip)
+        }
+    }
+
+    @Test
+    fun `profile banner is hidden if referral code is empty`() = runTest {
+        initViewModel(
+            referralCode = "",
+        )
+
+        viewModel.state.test {
+            assertEquals(false, (awaitItem() as UiState.Loaded).showProfileBanner)
+        }
+    }
+
+    @Test
+    fun `profile banner is hidden if signed in as paid`() = runTest {
+        initViewModel(
+            signInState = SignInState.SignedIn(email, statusAndroidPaidSubscription),
+        )
+
+        viewModel.state.test {
+            assertEquals(false, (awaitItem() as UiState.Loaded).showProfileBanner)
+        }
+    }
+
+    @Test
+    fun `profile banner is shown if signed in as free and referral code not empty`() = runTest {
+        initViewModel(
+            signInState = SignInState.SignedIn(email, SubscriptionStatus.Free()),
+            referralCode = referralClaimCode,
+        )
+
+        viewModel.state.test {
+            assertEquals(true, (awaitItem() as UiState.Loaded).showProfileBanner)
+        }
+    }
+
+    @Test
+    fun `profile banner is shown if signed out and referral code not empty`() = runTest {
+        initViewModel(
+            signInState = SignInState.SignedOut,
+            referralCode = referralClaimCode,
+        )
+
+        viewModel.state.test {
+            assertEquals(true, (awaitItem() as UiState.Loaded).showProfileBanner)
+        }
+    }
+
+    @Test
+    fun `profile banner is hidden on hide banner click`() = runTest {
+        initViewModel(
+            signInState = SignInState.SignedOut,
+            referralCode = referralClaimCode,
+        )
+
+        viewModel.onHideBannerClick()
+
+        viewModel.state.test {
+            assertEquals(false, (awaitItem() as UiState.Loaded).showProfileBanner)
+        }
+    }
+
+    @Test
+    fun `profile banner is hidden if referrals claim feature is disabled`() = runTest {
+        FeatureFlag.setEnabled(Feature.REFERRALS_CLAIM, false)
+        initViewModel(
+            signInState = SignInState.SignedOut,
+            referralCode = referralClaimCode,
+        )
+
+        viewModel.state.test {
+            assertEquals(false, (awaitItem() as UiState.Loaded).showProfileBanner)
+        }
+    }
+
+    private suspend fun initViewModel(
         signInState: SignInState = SignInState.SignedIn(email, statusAndroidPaidSubscription),
+        offerInfo: ReferralsOfferInfo = referralOfferInfo,
+        referralCode: String = referralClaimCode,
+        showReferralsTooltipUserSetting: UserSetting<Boolean> = UserSetting.Mock(true, mock()),
     ) {
+        whenever(settings.showReferralsTooltip).thenReturn(showReferralsTooltipUserSetting)
+        whenever(referralOfferInfoProvider.referralOfferInfo()).thenReturn(offerInfo)
         whenever(userManager.getSignInState()).thenReturn(Flowable.just(signInState))
-        viewModel = ReferralsViewModel(userManager, settings)
+        whenever(settings.referralClaimCode).thenReturn(UserSetting.Mock(referralCode, mock()))
+        viewModel = ReferralsViewModel(
+            userManager = userManager,
+            settings = settings,
+            referralOfferInfoProvider = referralOfferInfoProvider,
+            analyticsTracker = analyticsTracker,
+        )
     }
 }

@@ -4,4 +4,6 @@
     <dimen name="bottom_sheet_corner_radius">8dp</dimen>
     <dimen name="bottom_sheet_top_padding">10dp</dimen>
     <dimen name="divider_height">1dp</dimen>
+    <dimen name="mini_player_height">68dp</dimen>
+    <dimen name="trim_mode_button_corner_radius">18dp</dimen>
 </resources>

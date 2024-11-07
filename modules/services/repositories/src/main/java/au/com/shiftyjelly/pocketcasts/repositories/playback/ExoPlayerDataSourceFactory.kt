@@ -31,6 +31,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.time.Duration.Companion.seconds
 import okhttp3.OkHttpClient
+import timber.log.Timber
 
 @Singleton
 @OptIn(UnstableApi::class)
@@ -72,6 +73,7 @@ class ExoPlayerDataSourceFactory @Inject constructor(
     fun createMediaSource(
         episodeLocation: EpisodeLocation,
         clipRange: ClosedRange<Long>? = null,
+        onCachingComplete: (String) -> Unit = {},
     ): MediaSource? {
         val episodeUri = episodeLocation.uri ?: return null
         val mediaItem = MediaItem.Builder()
@@ -94,9 +96,12 @@ class ExoPlayerDataSourceFactory @Inject constructor(
         val cacheFactory = cacheFactory
             .setCacheWriteDataSinkFactory(null)
             .takeIf { episodeLocation.episode.shouldUseCache() }
-        if (cacheFactory != null) {
-            CacheWorker.startCachingEntireEpisode(context, episodeUri.toString(), episodeLocation.episode.uuid)
-        }
+
+        startCachingEntireEpisodeIfNeeded(
+            cacheDataSourceFactory = cacheFactory,
+            episodeLocation = episodeLocation,
+            onCachingComplete = onCachingComplete,
+        )
 
         val dataFactory = cacheFactory ?: defaultFactory
         return when {
@@ -104,6 +109,52 @@ class ExoPlayerDataSourceFactory @Inject constructor(
             (clipRange != null) -> DefaultMediaSourceFactory(dataFactory, extractorsFactory)
             else -> ProgressiveMediaSource.Factory(dataFactory, extractorsFactory)
         }.createMediaSource(mediaItem)
+    }
+
+    private fun startCachingEntireEpisodeIfNeeded(
+        cacheDataSourceFactory: CacheDataSource.Factory? = null,
+        episodeLocation: EpisodeLocation,
+        onCachingComplete: (String) -> Unit,
+    ) {
+        val episodeUri = episodeLocation.uri ?: return
+        val cacheFactory = cacheDataSourceFactory ?: cacheFactory
+            .setCacheWriteDataSinkFactory(null)
+            .takeIf { episodeLocation.episode.shouldUseCache() }
+
+        if (cacheFactory != null) {
+            CacheWorker.startCachingEntireEpisode(
+                context = context,
+                url = episodeUri,
+                episodeUuid = episodeLocation.episode.uuid,
+                onCachingComplete = onCachingComplete,
+            )
+        }
+    }
+
+    fun resetEpisodeCaching(
+        episodeLocation: EpisodeLocation,
+        onCachingReset: (String) -> Unit,
+        onCachingComplete: (String) -> Unit,
+    ) {
+        val episodeUuid = episodeLocation.episode.uuid
+        try {
+            if (episodeLocation.episode.shouldUseCache().not()) return
+
+            cache?.removeResource(episodeUuid)
+            onCachingReset(episodeUuid)
+
+            startCachingEntireEpisodeIfNeeded(
+                cacheDataSourceFactory = cacheFactory,
+                episodeLocation = episodeLocation,
+                onCachingComplete = onCachingComplete,
+            )
+            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Caching reset complete for episode id: $episodeUuid")
+        } catch (e: Exception) {
+            val errorMessage = "Failed to reset episode caching for episode $episodeUuid"
+            Timber.e(e, errorMessage)
+            crashLogging.sendReport(e, message = errorMessage)
+            LogBuffer.e(LogBuffer.TAG_PLAYBACK, errorMessage)
+        }
     }
 
     private fun BaseEpisode.shouldUseCache() = !isDownloaded && !isDownloading && settings.cacheEntirePlayingEpisode.value && FeatureFlag.isEnabled(Feature.CACHE_ENTIRE_PLAYING_EPISODE)

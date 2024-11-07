@@ -108,14 +108,11 @@ private fun Content(
                         color = MaterialTheme.colors.onSecondary,
                         text = podcast.author,
                         style = MaterialTheme.typography.body2.merge(
-                            @Suppress("DEPRECATION")
-                            (
-                                TextStyle(
-                                    platformStyle = PlatformTextStyle(
-                                        includeFontPadding = false,
-                                    ),
-                                )
+                            TextStyle(
+                                platformStyle = PlatformTextStyle(
+                                    includeFontPadding = false,
                                 ),
+                            ),
                         ),
                     )
                 }

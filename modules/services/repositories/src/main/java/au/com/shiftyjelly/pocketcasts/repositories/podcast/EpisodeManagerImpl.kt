@@ -10,11 +10,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
-import au.com.shiftyjelly.pocketcasts.models.db.helper.EpisodesStartedAndCompleted
-import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
-import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
-import au.com.shiftyjelly.pocketcasts.models.db.helper.LongestEpisode
-import au.com.shiftyjelly.pocketcasts.models.db.helper.YearOverYearListeningTime
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -486,18 +481,18 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override fun markAsPlayedAsync(episode: BaseEpisode?, playbackManager: PlaybackManager, podcastManager: PodcastManager) {
+    override fun markAsPlayedAsync(episode: BaseEpisode?, playbackManager: PlaybackManager, podcastManager: PodcastManager, shouldShuffleUpNext: Boolean) {
         launch {
-            markAsPlayed(episode, playbackManager, podcastManager)
+            markAsPlayed(episode, playbackManager, podcastManager, shouldShuffleUpNext)
         }
     }
 
-    override fun markAsPlayed(episode: BaseEpisode?, playbackManager: PlaybackManager, podcastManager: PodcastManager) {
+    override fun markAsPlayed(episode: BaseEpisode?, playbackManager: PlaybackManager, podcastManager: PodcastManager, shouldShuffleUpNext: Boolean) {
         if (episode == null) {
             return
         }
 
-        playbackManager.removeEpisode(episode, source = SourceView.UNKNOWN, userInitiated = false)
+        playbackManager.removeEpisode(episode, source = SourceView.UNKNOWN, userInitiated = false, shouldShuffleUpNext = shouldShuffleUpNext)
 
         episode.playingStatus = EpisodePlayingStatus.COMPLETED
 
@@ -535,7 +530,7 @@ class EpisodeManagerImpl @Inject constructor(
         episodeDao.delete(episode)
     }
 
-    override suspend fun deleteEpisodeFile(episode: BaseEpisode?, playbackManager: PlaybackManager?, disableAutoDownload: Boolean, updateDatabase: Boolean, removeFromUpNext: Boolean) {
+    override suspend fun deleteEpisodeFile(episode: BaseEpisode?, playbackManager: PlaybackManager?, disableAutoDownload: Boolean, updateDatabase: Boolean, removeFromUpNext: Boolean, shouldShuffleUpNext: Boolean) {
         episode ?: return
 
         Timber.d("Deleting episode file ${episode.title}")
@@ -545,7 +540,7 @@ class EpisodeManagerImpl @Inject constructor(
 
         // if the episode is currently playing, then stop it. Note: it will not be stopped if coming from the player as it is controlling the playback logic.
         if (removeFromUpNext) {
-            playbackManager?.removeEpisode(episode, source = SourceView.UNKNOWN, userInitiated = false)
+            playbackManager?.removeEpisode(episode, source = SourceView.UNKNOWN, userInitiated = false, shouldShuffleUpNext = shouldShuffleUpNext)
         }
 
         cleanUpDownloadFiles(episode)
@@ -660,7 +655,7 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override fun archive(episode: PodcastEpisode, playbackManager: PlaybackManager, sync: Boolean) {
+    override fun archive(episode: PodcastEpisode, playbackManager: PlaybackManager, sync: Boolean, shouldShuffleUpNext: Boolean) {
         if (sync) {
             episodeDao.updateArchived(true, System.currentTimeMillis(), episode.uuid)
         } else {
@@ -668,18 +663,18 @@ class EpisodeManagerImpl @Inject constructor(
         }
         episode.isArchived = true
         runBlocking {
-            cleanUpEpisode(episode, playbackManager)
+            cleanUpEpisode(episode, playbackManager, shouldShuffleUpNext)
         }
     }
 
     @Suppress("NAME_SHADOWING")
-    private suspend fun cleanUpEpisode(episode: BaseEpisode, playbackManager: PlaybackManager?) {
+    private suspend fun cleanUpEpisode(episode: BaseEpisode, playbackManager: PlaybackManager?, shouldShuffleUpNext: Boolean = false) {
         val playbackManager = playbackManager ?: return
         if (episode.isDownloaded || episode.isDownloading || episode.downloadTaskId != null) {
             // FIXME doesn't seem this is necessary since it is handled by deleteEpisodeFile
             downloadManager.removeEpisodeFromQueue(episode, "episode manager")
         }
-        deleteEpisodeFile(episode, playbackManager, disableAutoDownload = true, updateDatabase = true, removeFromUpNext = true)
+        deleteEpisodeFile(episode, playbackManager, disableAutoDownload = true, updateDatabase = true, removeFromUpNext = true, shouldShuffleUpNext = shouldShuffleUpNext)
 
         // FIXME doesn't seem this is necessary since it is handled by deleteEpisodeFile
         playbackManager.removeEpisode(episode, source = SourceView.UNKNOWN, userInitiated = false)
@@ -1029,27 +1024,6 @@ class EpisodeManagerImpl @Inject constructor(
             }
     }
 
-    override suspend fun calculateListeningTime(fromEpochMs: Long, toEpochMs: Long): Long? =
-        episodeDao.calculateListeningTime(fromEpochMs, toEpochMs)
-
-    override suspend fun findListenedCategories(fromEpochMs: Long, toEpochMs: Long): List<ListenedCategory> =
-        episodeDao.findListenedCategories(fromEpochMs, toEpochMs)
-
-    override suspend fun findListenedNumbers(fromEpochMs: Long, toEpochMs: Long): ListenedNumbers =
-        episodeDao.findListenedNumbers(fromEpochMs, toEpochMs)
-
-    override suspend fun findLongestPlayedEpisode(fromEpochMs: Long, toEpochMs: Long): LongestEpisode? =
-        episodeDao.findLongestPlayedEpisode(fromEpochMs, toEpochMs)
-
-    override suspend fun countEpisodesPlayedUpto(fromEpochMs: Long, toEpochMs: Long, playedUpToInSecs: Long): Int =
-        episodeDao.countEpisodesPlayedUpto(fromEpochMs, toEpochMs, playedUpToInSecs)
-
-    override suspend fun findEpisodeInteractedBefore(fromEpochMs: Long): PodcastEpisode? =
-        episodeDao.findEpisodeInteractedBefore(fromEpochMs)
-
-    override suspend fun countEpisodesInListeningHistory(fromEpochMs: Long, toEpochMs: Long): Int =
-        episodeDao.findEpisodesCountInListeningHistory(fromEpochMs, toEpochMs)
-
     override suspend fun calculatePlayedUptoSumInSecsWithinDays(days: Int): Double {
         val query =
             "last_playback_interaction_date IS NOT NULL AND last_playback_interaction_date > 0 ORDER BY last_playback_interaction_date DESC LIMIT 1000"
@@ -1064,28 +1038,6 @@ class EpisodeManagerImpl @Inject constructor(
         }
         return totalPlaytime
     }
-
-    override suspend fun yearOverYearListeningTime(
-        fromEpochMsPreviousYear: Long,
-        toEpochMsPreviousYear: Long,
-        fromEpochMsCurrentYear: Long,
-        toEpochMsCurrentYear: Long,
-    ): YearOverYearListeningTime {
-        val previousYearListeningTime = episodeDao.calculateListeningTime(fromEpochMsPreviousYear, toEpochMsPreviousYear)
-        val currentYearListeningTime = episodeDao.calculateListeningTime(fromEpochMsCurrentYear, toEpochMsCurrentYear)
-        return YearOverYearListeningTime(
-            totalPlayedTimeLastYear = previousYearListeningTime ?: 0L,
-            totalPlayedTimeThisYear = currentYearListeningTime ?: 0L,
-        )
-    }
-
-    override suspend fun countEpisodesStartedAndCompleted(
-        fromEpochMs: Long,
-        toEpochMs: Long,
-    ) = EpisodesStartedAndCompleted(
-        started = episodeDao.countEpisodesStarted(fromEpochMs, toEpochMs),
-        completed = episodeDao.countEpisodesCompleted(fromEpochMs, toEpochMs),
-    )
 
     /**
      * Get the latest episode url from the server and persist it if it is different from

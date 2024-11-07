@@ -9,8 +9,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.annotation.OptIn
 import androidx.annotation.StringRes
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isInvisible
@@ -29,10 +27,8 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment.StoriesSource
-import au.com.shiftyjelly.pocketcasts.endofyear.views.EndOfYearPromptCard
-import au.com.shiftyjelly.pocketcasts.kids.KidsBottomSheetDialog
-import au.com.shiftyjelly.pocketcasts.kids.KidsProfileCard
+import au.com.shiftyjelly.pocketcasts.endofyear.StoriesActivity.StoriesSource
+import au.com.shiftyjelly.pocketcasts.endofyear.ui.EndOfYearPromptCard
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralSecondsMinutesHoursDaysOrYears
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksContainerFragment
@@ -42,6 +38,7 @@ import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudFilesFragment
 import au.com.shiftyjelly.pocketcasts.profile.databinding.FragmentProfileBinding
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsClaimGuestPassBannerCard
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsIconWithTooltip
+import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.settings.HelpFragment
@@ -186,8 +183,6 @@ class ProfileFragment : BaseFragment() {
             }
         }
 
-        binding.setupKidsBanner()
-
         binding.setupReferralsClaimGuestPassCard()
 
         viewModel.podcastCount.observe(viewLifecycleOwner) {
@@ -217,7 +212,7 @@ class ProfileFragment : BaseFragment() {
             }
         }
 
-        if (FeatureFlag.isEnabled(Feature.REFERRALS)) {
+        if (FeatureFlag.isEnabled(Feature.REFERRALS_SEND)) {
             binding.btnGift.setContent {
                 AppTheme(theme.activeTheme) {
                     ReferralsIconWithTooltip()
@@ -283,7 +278,10 @@ class ProfileFragment : BaseFragment() {
             AppTheme(theme.activeTheme) {
                 EndOfYearPromptCard(
                     onClick = {
-                        analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_PROFILE_CARD_TAPPED)
+                        analyticsTracker.track(
+                            AnalyticsEvent.END_OF_YEAR_PROFILE_CARD_TAPPED,
+                            mapOf("year" to EndOfYearManager.YEAR_TO_SYNC.value),
+                        )
                         // once stories prompt card is tapped, we don't want to show stories launch modal if not already shown
                         if (settings.getEndOfYearShowModal()) {
                             settings.setEndOfYearShowModal(false)
@@ -291,28 +289,6 @@ class ProfileFragment : BaseFragment() {
                         (activity as? FragmentHostListener)?.showStoriesOrAccount(StoriesSource.PROFILE.value)
                     },
                 )
-            }
-        }
-    }
-
-    private fun FragmentProfileBinding.setupKidsBanner() {
-        kidsBannerCard.setContent {
-            AppTheme(theme.activeTheme) {
-                val showKidsBanner by viewModel.showKidsBanner.collectAsState()
-
-                if (showKidsBanner) {
-                    analyticsTracker.track(AnalyticsEvent.KIDS_PROFILE_BANNER_SEEN)
-                    KidsProfileCard(
-                        onDismiss = {
-                            analyticsTracker.track(AnalyticsEvent.KIDS_PROFILE_BANNER_DISMISSED)
-                            viewModel.dismissKidsBanner()
-                        },
-                        onRequestEarlyAccess = {
-                            analyticsTracker.track(AnalyticsEvent.KIDS_PROFILE_EARLY_ACCESS_REQUESTED)
-                            KidsBottomSheetDialog().show(parentFragmentManager, "KidsBottomSheetDialog")
-                        },
-                    )
-                }
             }
         }
     }

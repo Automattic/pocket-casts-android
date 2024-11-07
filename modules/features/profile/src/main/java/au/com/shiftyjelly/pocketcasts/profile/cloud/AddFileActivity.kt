@@ -36,6 +36,8 @@ import androidx.media3.extractor.mp3.Mp3Extractor
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivity
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.deeplink.CloudFilesDeepLink
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
@@ -142,6 +144,8 @@ class AddFileActivity :
     @Inject lateinit var playbackManager: PlaybackManager
 
     @Inject lateinit var settings: Settings
+
+    @Inject lateinit var analyticsTracker: AnalyticsTracker
 
     private val viewModel: AddFileViewModel by viewModels()
 
@@ -472,61 +476,83 @@ class AddFileActivity :
             return
         }
 
-        try {
-            binding.layoutLoading.isVisible = true
-            val uri = dataUri ?: return
-            val intentType = intent.type ?: getMimetypeOfContent(uri) ?: uriToFileType(binding.lblFilename.text.toString())
-            if (!(intentType.startsWith("audio/") || intentType.startsWith("video/"))) {
-                return
-            }
+        binding.layoutLoading.isVisible = true
+        val uri = dataUri ?: return
+        val intentType = intent.type ?: getMimetypeOfContent(uri) ?: uriToFileType(binding.lblFilename.text.toString())
+        if (!(intentType.startsWith("audio/") || intentType.startsWith("video/"))) {
+            return
+        }
+
+        if (isUriInvalid(uri)) {
+            analyticsTracker.track(AnalyticsEvent.UPLOADED_FILES_INVALID_FILE_ERROR, mapOf("uri" to uri.toString()))
+
+            Timber.e("Could not upload invalid file")
+
+            val message = getString(LR.string.profile_cloud_add_invalid_file)
+            handleErrorWhenLoadingFile(errorMessage = message)
+        } else {
             launch(Dispatchers.IO) {
-                val userEpisode = UserEpisode(uuid = uuid, publishedDate = Date(), fileType = intent.type)
+                try {
+                    val userEpisode = UserEpisode(uuid = uuid, publishedDate = Date(), fileType = intent.type)
 
-                val savePath = DownloadHelper.pathForEpisode(userEpisode, fileStorage) ?: throw Exception("File path empty")
-                val outFile = File(savePath)
+                    val savePath = DownloadHelper.pathForEpisode(userEpisode, fileStorage) ?: throw Exception("File path empty")
+                    val outFile = File(savePath)
 
-                contentResolver.openInputStream(uri).use { inputStream ->
-                    saveInputStreamToFile(outFile, inputStream)
-                }
-                val imageFile = saveBitmapToFile()
+                    contentResolver.openInputStream(uri).use { inputStream ->
+                        saveInputStreamToFile(outFile, inputStream)
+                    }
+                    val imageFile = saveBitmapToFile()
 
-                userEpisode.downloadedFilePath = outFile.absolutePath
-                userEpisode.episodeStatus = EpisodeStatusEnum.DOWNLOADED
-                userEpisode.title = binding.txtFilename.text.toString()
-                userEpisode.durationMs = length?.toInt() ?: 0
-                userEpisode.fileType = intentType
-                userEpisode.sizeInBytes = sizeInBytes ?: 0
+                    userEpisode.downloadedFilePath = outFile.absolutePath
+                    userEpisode.episodeStatus = EpisodeStatusEnum.DOWNLOADED
+                    userEpisode.title = binding.txtFilename.text.toString()
+                    userEpisode.durationMs = length?.toInt() ?: 0
+                    userEpisode.fileType = intentType
+                    userEpisode.sizeInBytes = sizeInBytes ?: 0
 
-                if (imageFile != null && isCustomImageSelected()) {
-                    userEpisode.artworkUrl = imageFile.absolutePath
-                    userEpisode.hasCustomImage = true
-                } else {
-                    userEpisode.tintColorIndex = colorAdapter.selectedIndex
-                    userEpisode.hasCustomImage = false
-                }
-
-                userEpisodeManager.add(userEpisode, playbackManager)
-                userEpisodeManager.autoUploadToCloudIfReq(userEpisode)
-
-                launch(Dispatchers.Main) {
-                    if (isFileChooserMode) {
-                        finish()
+                    if (imageFile != null && isCustomImageSelected()) {
+                        userEpisode.artworkUrl = imageFile.absolutePath
+                        userEpisode.hasCustomImage = true
                     } else {
-                        startActivity(CloudFilesDeepLink.toIntent(this@AddFileActivity))
-                        finish()
+                        userEpisode.tintColorIndex = colorAdapter.selectedIndex
+                        userEpisode.hasCustomImage = false
+                    }
+
+                    userEpisodeManager.add(userEpisode, playbackManager)
+                    userEpisodeManager.autoUploadToCloudIfReq(userEpisode)
+
+                    launch(Dispatchers.Main) {
+                        if (isFileChooserMode) {
+                            finish()
+                        } else {
+                            startActivity(CloudFilesDeepLink.toIntent(this@AddFileActivity))
+                            finish()
+                        }
+                    }
+                } catch (e: Exception) {
+                    analyticsTracker.track(AnalyticsEvent.UPLOADED_FILES_UPLOAD_FAILED, mapOf("uri" to uri.toString()))
+
+                    Timber.e(e, "Could not load file")
+
+                    launch(Dispatchers.Main) {
+                        handleErrorWhenLoadingFile(errorMessage = getString(LR.string.profile_cloud_add_file_error, e.message))
                     }
                 }
             }
-        } catch (e: Exception) {
-            binding.layoutLoading.isVisible = false
-            Timber.e(e, "Could not load file")
-            AlertDialog.Builder(this)
-                .setTitle(LR.string.error)
-                .setMessage(getString(LR.string.profile_cloud_add_file_error, e.message))
-                .setPositiveButton(LR.string.ok, null)
-                .show()
         }
     }
+
+    private fun handleErrorWhenLoadingFile(errorMessage: String) {
+        binding.layoutLoading.isVisible = false
+
+        AlertDialog.Builder(this)
+            .setTitle(LR.string.error)
+            .setMessage(errorMessage)
+            .setPositiveButton(LR.string.ok, null)
+            .show()
+    }
+
+    private fun isUriInvalid(uri: Uri?): Boolean = uri == null || contentResolver.getType(uri) == null
 
     private fun uriToFileType(filename: String): String {
         if (!filename.contains(".")) return "audio/mp3"

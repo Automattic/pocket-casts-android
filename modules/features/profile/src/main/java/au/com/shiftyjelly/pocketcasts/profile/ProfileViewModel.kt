@@ -33,14 +33,12 @@ class ProfileViewModel @Inject constructor(
 
     val signInState: LiveData<SignInState> = userManager.getSignInState().toLiveData()
 
-    val showKidsBanner = settings.showKidsBanner.flow
-
     val refreshObservable: LiveData<RefreshState> =
         settings.refreshStateObservable
             .toFlowable(BackpressureStrategy.LATEST)
             .toLiveData()
 
-    suspend fun isEndOfYearStoriesEligible() = endOfYearManager.isEligibleForStories()
+    suspend fun isEndOfYearStoriesEligible() = endOfYearManager.isEligibleForEndOfYear()
 
     fun clearFailedRefresh() {
         val lastSuccess = settings.getLastSuccessRefreshState()
@@ -55,9 +53,5 @@ class ProfileViewModel @Inject constructor(
 
         val daysListened = statsManager.mergedTotalListeningTimeSec
         daysListenedCount.value = daysListened
-    }
-
-    fun dismissKidsBanner() {
-        settings.showKidsBanner.set(value = false, updateModifiedAt = true)
     }
 }

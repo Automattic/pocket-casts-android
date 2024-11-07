@@ -14,6 +14,7 @@ import androidx.media3.common.Player
 import androidx.media3.common.Tracks
 import androidx.media3.common.VideoSize
 import androidx.media3.common.util.UnstableApi
+import androidx.media3.datasource.HttpDataSource.InvalidResponseCodeException
 import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
@@ -23,6 +24,8 @@ import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
@@ -172,6 +175,14 @@ class SimplePlayer(
         return player?.volume
     }
 
+    /**
+     * 1.0 represents the maximum/default volume,
+     * while 0.0 represents complete silence
+     */
+    fun restoreVolume() {
+        player?.volume = 1.0f
+    }
+
     override fun setPodcast(podcast: Podcast?) {}
 
     @OptIn(UnstableApi::class)
@@ -232,6 +243,22 @@ class SimplePlayer(
             }
 
             override fun onPlayerError(error: PlaybackException) {
+                // Reset episode caching if 416 error response code is received
+                // https://github.com/androidx/media/issues/1032#issuecomment-1921375048
+                // https://github.com/google/ExoPlayer/issues/10577
+                // Internal ref: p1730809737477079-slack-C02A333D8LQ
+                if (FeatureFlag.isEnabled(Feature.RESET_EPISODE_CACHE_ON_416_ERROR) &&
+                    (error.cause as? InvalidResponseCodeException)?.responseCode == 416
+                ) {
+                    episodeLocation?.let {
+                        dataSourceFactory.resetEpisodeCaching(
+                            episodeLocation = it,
+                            onCachingReset = { episodeUuid -> onPlayerEvent(this@SimplePlayer, PlayerEvent.CachingReset(episodeUuid)) },
+                            onCachingComplete = { episodeUuid -> onPlayerEvent(this@SimplePlayer, PlayerEvent.CachingComplete(episodeUuid)) },
+                        )
+                    }
+                    return
+                }
                 LogBuffer.e(LogBuffer.TAG_PLAYBACK, error, "Play failed.")
                 val event = PlayerEvent.PlayerError(error.message ?: "", error)
                 this@SimplePlayer.onError(event)
@@ -245,7 +272,9 @@ class SimplePlayer(
             onError(PlayerEvent.PlayerError("No episode location found"))
             return
         }
-        val source = dataSourceFactory.createMediaSource(episodeLocation)
+        val source = dataSourceFactory.createMediaSource(episodeLocation) {
+            onPlayerEvent(this, PlayerEvent.CachingComplete(it))
+        }
         if (source == null) {
             onError(PlayerEvent.PlayerError("Episode has no source"))
             return

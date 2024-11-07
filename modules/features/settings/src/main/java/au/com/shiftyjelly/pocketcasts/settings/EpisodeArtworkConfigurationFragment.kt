@@ -6,6 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
@@ -15,6 +17,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -29,6 +32,7 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
 class EpisodeArtworkConfigurationFragment : BaseFragment() {
@@ -88,6 +92,9 @@ class EpisodeArtworkConfigurationFragment : BaseFragment() {
                     ArtworkElement(artworkConfiguration, element, onUpdateConfiguration)
                 }
             }
+            Spacer(
+                modifier = Modifier.height(dimensionResource(UR.dimen.mini_player_height)),
+            )
         }
     }
 
@@ -129,5 +136,6 @@ class EpisodeArtworkConfigurationFragment : BaseFragment() {
         ArtworkConfiguration.Element.Starred -> LR.string.profile_navigation_starred
         ArtworkConfiguration.Element.Bookmarks -> LR.string.bookmarks
         ArtworkConfiguration.Element.ListeningHistory -> LR.string.profile_navigation_listening_history
+        ArtworkConfiguration.Element.Podcasts -> LR.string.podcasts
     }
 }

@@ -1,15 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-09-11 12:09:42+0000
+Translation-Revision-Date: 2024-10-23 11:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="end_of_year_story_longest_episode_subtitle">Det var \"%1$s\" från \"%2$s\"</string>
+    <string name="end_of_year_listening_time_subtitle">Sammanlagt lyssnande på podcasts</string>
+    <string name="eoy_story_ratings_learn_button_label">Läs om betyg</string>
+    <string name="eoy_story_ratings_subtitle_3">Visste du att du kan betygsätta shower nu? Dela kärleken till dina favoritkreatörer och hjälp dem att synas.</string>
+    <string name="eoy_story_ratings_subtitle_2">Tack för att du delar din feedback med kreatörscommunityn</string>
+    <string name="eoy_story_ratings_subtitle_1">Wow, så många %1$d-stjärniga betyg Tack för att du delar kärleken till dina favoritkreatörer.</string>
+    <string name="eoy_story_ratings_title_2">Oj då! Inga podcastbetyg att visa dig ännu</string>
+    <string name="eoy_story_ratings_title_1">Låt oss se dina betyg.</string>
+    <string name="referrals_failed_to_load_offer">Något gick fel vid hämtningen av din hänvisningslänk.</string>
+    <string name="transcript_error_not_available">Det finns ingen transkription tillgänglig för det här avsnittet.</string>
+    <string name="referrals_banner_hide_label">Dölj den här bannern</string>
+    <string name="referrals_banner_long_press_label">Dölj hänvisningsbannern för att göra anspråk på pass.</string>
+    <string name="end_of_year_prompt_card_title">Uppspelning 2024\när här.</string>
+    <string name="settings_auto_download_limit_auto_downloads">Begränsa automatiska nedladdningar</string>
+    <string name="settings_auto_download_limit_all_latest_episodes">Alla senaste avsnitt</string>
+    <string name="settings_auto_download_limit_ten_latest_episode">De 10 senaste avsnitten</string>
+    <string name="settings_auto_download_limit_five_latest_episode">De 5 senaste avsnitten</string>
+    <string name="settings_auto_download_limit_three_latest_episode">De 3 senaste avsnitten</string>
+    <string name="settings_auto_download_limit_two_latest_episode">De 2 senaste avsnitten</string>
+    <string name="settings_auto_download_limit_latest_episode">Det senaste avsnittet</string>
+    <string name="settings_auto_download_limit_off">Av</string>
+    <string name="settings_auto_download_limit">Begränsa nedladdningar</string>
+    <string name="settings_auto_download_new_episodes_description">Ladda ner nya avsnitt när de släpps och hantera din lagring genom att sätta en gräns för hur många avsnitt som sparas.</string>
+    <string name="referrals_redeem_code_failed">Det gick inte att lösa in koden. Försök igen senare.</string>
+    <string name="referrals_create_subscription_failed">Det gick inte att skapa en prenumeration. Försök igen senare.</string>
+    <string name="referrals_guest_pass_card_title">Gästpass för %1$s</string>
+    <string name="referrals_claim_guest_pass_description">Medlemskapet förnyas automatiskt som ett årligt betalmedlemskap för %s.</string>
+    <string name="profile_cloud_add_invalid_file">Det gick inte att läsa in den valda filen. Försök igen eller välj en annan fil.</string>
+    <string name="error_generic_message">Något gick fel. Försök igen senare.</string>
+    <string name="player_sleep_timer_settings">Inställningar för sovtimer</string>
+    <string name="referrals_share_text">Hej! Använd länken nedan för att göra anspråk på ditt %1$s gästpass för Pocket Casts Plus och ta del av podcasts på alla dina enheter.</string>
+    <string name="referrals_share_subject">%1$s gästpass för Pocket Casts</string>
+    <string name="referrals_invalid_offer_title">Detta erbjudande är inte tillgängligt</string>
+    <string name="referrals_invalid_offer_description">Detta gästpass kan endast lösas in en gång och är tillgängligt för användare utan en aktiv Plus- eller Patron-prenumeration. Tack för att du lyssnar.</string>
+    <string name="referrals_claim_guest_pass_title">Gör anspråk på ditt gästpass för %1$s</string>
+    <string name="referrals_activate_my_pass">Aktivera mitt pass</string>
+    <string name="referrals_tooltip_message">Ge bort %1$s med Pocket Casts Plus.</string>
+    <string name="referrals_claim_guess_pass_banner_card_subtitle">Lås upp den fullständiga lyssningsupplevelsen</string>
+    <string name="referrals_claim_guess_pass_banner_card_title">Gör anspråk på ditt %1$s gästpass för Plus</string>
+    <string name="referrals_share_guest_pass">Dela gästpass</string>
+    <string name="referrals_send_guest_pass_title">Ge bort %1$s med Pocket Casts Plus</string>
     <string name="move_down">Flytta ner</string>
     <string name="move_up">Flytta upp</string>
+    <string name="search_episodes_not_found_summary">Vi kunde inte hitta något avsnitt för denna sökning. Prova med ett annat nyckelord.</string>
     <string name="search_episodes_not_found_title">Inga avsnitt hittades</string>
-    <string name="transcript_error_not_available">Det finns ingen transkription tillgänglig för det här avsnittet.</string>
     <string name="paywall_layout_reviews_review_six_date">8 mar</string>
     <string name="paywall_layout_reviews_review_six_message">PC har varit min favorit i flera år. Jag har provat andra podcast-appar men kommer alltid tillbaka till PC för enkelheten, Ul och supporten. Det är helt klart värt att prova, särskilt om du har tröttnat på din nuvarande podcast-app.</string>
     <string name="paywall_layout_reviews_review_six_title">Den bästa podcast-appen</string>
@@ -82,13 +123,10 @@ Language: sv_SE
     <string name="share_start_position">Starta</string>
     <string name="share_clip_too_long_message">Klippet är längre än avsnittet: %s</string>
     <string name="share_invalid_clip_message">Klippets början måste vara före klippets slut</string>
-    <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Lås upp exklusiva funktioner med Pocket Casts Plus</string>
     <string name="go_to_next">Gå till nästa</string>
     <string name="go_to_previous">Gå till föregående</string>
     <string name="share_error_message">Kan inte dela. Försök igen senare.</string>
     <string name="share_clip_sharing_clip">Skapar klipp …</string>
-    <string name="something_went_wrong_when_sending_feedback">Något gick fel. Försök skicka din feedback igen.</string>
-    <string name="thank_you_for_your_feedback">Tack för din feedback!</string>
     <string name="share_clip_create_audio_description">Generera en .mp3-ljudfil</string>
     <string name="share_clip_create_audio_label">Skapa ljudfil</string>
     <string name="share_clip_edit_label">Redigera klipp</string>
@@ -97,24 +135,11 @@ Language: sv_SE
     <string name="share_clip_start_position">%s Starta</string>
     <string name="transcript_empty">Transkriptionen är tom.</string>
     <string name="share_link_clip">Klipplänk</string>
-    <string name="swipe_affordance_icon">Swipe Affordance-ikon</string>
-    <string name="feedback_form_placeholder">Jag vill filtrera avsnitt efter</string>
-    <string name="send_feedback_title">Vad skulle du vilja se i en barnprofil för Pocket Casts?</string>
-    <string name="no_thank_you">Nej tack</string>
-    <string name="send_feedback">Skicka feedback</string>
-    <string name="kids_bottom_sheet_description">Du kommer att få en notis via appen när barnprofilen är redo. Vill du berätta för oss vad du skulle vilja se?</string>
-    <string name="thank_you_for_your_interest">Tack för visat intresse</string>
     <string name="share_link_bookmark">Bokmärk länk</string>
     <string name="share_link_episode_position">Positionslänk för avsnitt</string>
     <string name="share_link_episode">Avsnittslänk</string>
     <string name="share_link_podcast">Podcastlänk</string>
     <string name="share_link_copied_feedback">Länk kopierad till urklipp</string>
-    <string name="kids_profile_face_image">Ansiktsbild för barnprofil</string>
-    <string name="request_early_access">Begär tidig åtkomst</string>
-    <string name="kids_profile_banner_description">En ny profil med endast innehåll för barn för att hålla ordning på dina prenumerationer.</string>
-    <string name="soon_label">Snart</string>
-    <string name="kids_profile_banner">Banner för barnprofil</string>
-    <string name="kids_profile">Barnprofil</string>
     <string name="pocket_casts_logo">Pocket Casts-logotyp</string>
     <string name="rate_pocket_casts">Betygsätt Pocket Casts</string>
     <string name="pocket_casts_champion_dialog_description">Tack för att du varit med oss sedan starten. Om du tycker om att använda vår app vill vi gärna höra din feedback.</string>
@@ -140,6 +165,9 @@ Language: sv_SE
     <string name="settings_advanced_cache_entire_playing_episode">Cacheminne för uppspelning av avsnitt</string>
     <string name="playback">Uppspelning</string>
     <string name="podcast_share_clip">Klipp</string>
+    <string name="episode_queued_for_download">Avsnitt placerat i kö för nedladdning</string>
+    <string name="episode_was_removed">Avsnittet togs bort</string>
+    <string name="remove_downloaded_file">Ta bort nedladdad fil</string>
     <string name="settings_export_database_failed">Export av databas misslyckades</string>
     <string name="settings_export_database">Exportera databas</string>
     <string name="settings_sleep_timer_auto_restart_summary">Om det här alternativet är aktiverat kommer sömntimern att starta om automatiskt om du spelar upp ett avsnitt inom 5 minuter efter den senaste pausen.</string>
@@ -232,26 +260,16 @@ Language: sv_SE
     <string name="bookmark_not_found">Bokmärke hittades inte</string>
     <string name="settings_use_dark_up_next_details">När det är aktiverat kommer Up Next alltid att använda mörkt tema, eller matcha det aktuella temat när det är inaktiverat</string>
     <string name="settings_use_dark_up_next">Använd mörkt Up Next-tema</string>
-    <string name="end_of_year_stories_completion_rate_share_text">Min slutförandegrad för 2023</string>
-    <string name="end_of_year_stories_subscribe_to_plus">Prenumerera på Plus och ta reda på hur du lyssnar jämfört med 2022, annan rolig statistik och Premium-funktioner som bokmärken och mappar.</string>
     <string name="end_of_year_stories_theres_more">Och det finns mer!</string>
     <string name="end_of_year_stories_year_completion_rate">slutförandegrad</string>
     <string name="end_of_year_stories_year_completion_rate_subtitle">Av de %1$d avsnitt du började lyssna på lyssnade du sammanlagt på %2$d</string>
     <string name="end_of_year_stories_year_completion_rate_title">Din slutförandegrad i år var %1$d%%</string>
-    <string name="end_of_year_stories_year_over_share_text">Min lyssningstid för 2023 jämfört med 2022</string>
     <string name="eoy_year_over_year_title_skyrocketed">Jämfört med 2022 har din lyssningstid skjutit i höjden!</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">Ack ja … det finns ett liv att leva, eller hur?</string>
-    <string name="end_of_year_stories_year_over_year_title_went_down">Jämfört med 2022 har din lyssningstid minskat något</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">Och det sägs att kontinuitet är nyckeln till framgång … eller något i den stilen!</string>
-    <string name="end_of_year_stories_year_over_year_title_flat">Jämfört med 2022 var din lyssningstid ganska oförändrad</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_went_up">Är du redo att toppa 2024?</string>
-    <string name="end_of_year_stories_year_over_year_title_went_up">Jämfört med 2022 ökade din lyssningstid med hisnande %1$s%%</string>
     <string name="end_of_year_prompt_card_summary">Se din lyssningsstatistik, dina favoritpodcasts och mycket mer.</string>
-    <string name="end_of_year_story_epilogue_title">Tack för att ni lyssnat med oss i år.\nVi ses 2024!</string>
-    <string name="end_of_year_story_longest_episode_subtitle">Det var ingen mindre än \"%1$s\" från \"%2$s\"</string>
     <string name="end_of_year_story_longest_episode_title">Det längsta avsnittet du lyssnade på var %1$s</string>
     <string name="end_of_year_replay">Spela upp igen</string>
-    <string name="end_of_year_listening_time_subtitle">Vi hoppas att du älskade varje minut av det!</string>
     <string name="end_of_year_listening_time_title">Detta var den sammanlagda tiden du lyssnade på podcasts.</string>
     <string name="end_of_year_story_top_categories_subtitle">Du lyssnade på %1$s avsnitt i sammanlagt %2$s</string>
     <string name="end_of_year_story_top_categories_title">Visste du att %1$s var din favoritkategori</string>
@@ -261,7 +279,6 @@ Language: sv_SE
     <string name="discover_category_health_abbreviation">Hälsa</string>
     <string name="eoy_story_top_podcasts_subtitle">Det här är de fem podcasts du lyssnade mest på 2023\"</string>
     <string name="eoy_story_top_podcasts_title">Du lyssnade även mycket på dessa podcasts.</string>
-    <string name="end_of_year_story_top_podcast_title">%1$s var den podcast du lyssnade mest på under 2023</string>
     <string name="end_of_year_share_story">Dela den här berättelsen</string>
     <string name="podcast_log_in_to_rate">Du måste logga in för att ge ett betyg</string>
     <string name="podcast_submit_rating_no_internet">Ingen internetanslutning hittades. Anslut till internet för att lämna ett betyg.</string>
@@ -550,6 +567,7 @@ Language: sv_SE
     <string name="onboarding_plus_feature_folders_text">Organisera dina podcasts i mappar och håll dem synkroniserade på alla dina enheter.</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Lyssna på fler med våra Windows-, macOS- och webbappar.</string>
     <string name="onboarding_plus_feature_desktop_and_web_apps_title">Dator- och webbappar</string>
+    <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Allt du älskar med Pocket Casts och mer därtill</string>
     <string name="onboarding_recommendations_import">Importera</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">Gör Pocket Casts till ditt genom att välja dina favoritpodcasts eller importera dem från en annan podcastspelare. Du kan alltid göra detta senare.</string>
     <string name="onboarding_recommendations_find_favorite_podcasts">Hitta dina favoritpodcasts</string>
@@ -568,12 +586,7 @@ Language: sv_SE
     <string name="end_of_year_story_top_categories_share_text">Mina mest lyssnade podcastkategorier</string>
     <string name="end_of_year_story_top_categories">Dina favoritkategorier</string>
     <string name="end_of_year_story_epilogue_subtitle">Glöm inte att dela med dina vänner och att berätta om dina favoritpodcastkreatörer</string>
-    <string name="end_of_year_story_longest_episode_share_text">Det längsta avsnittet jag lyssnade på under 2023 %1$s</string>
-    <string name="end_of_year_story_top_podcasts_list_title">Mina favoritpodcasts 2022</string>
     <string name="end_of_year_story_top_podcasts_share_text">Mina favoritpodcasts för året. %1$s</string>
-    <string name="end_of_year_story_top_podcast_share_text">Min favoritpodcast 2023! %1$s</string>
-    <string name="end_of_year_story_top_podcast_subtitle">Du lyssnade på %1$d avsnitt i sammanlagt %2$s</string>
-    <string name="end_of_year_story_listened_to_numbers_share_text">Jag lyssnade på %1$d olika podcasts och %2$d avsnitt under 2023</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">Det fanns dock ett avsnitt som du fortsatte att komma tillbaka till …</string>
     <string name="end_of_year_story_listened_to_numbers">Du lyssnade sammanlagt på %1$d olika podcasts och %2$d avsnitt</string>
     <string name="end_of_year_story_listened_to_categories_share_text">Jag lyssnade på %1$d olika kategorier under 2023</string>
@@ -581,7 +594,6 @@ Language: sv_SE
     <string name="end_of_year_story_listened_to_categories">Du lyssnade på %1$d olika kategorier i år</string>
     <string name="end_of_year_story_listened_to_share_text">Jag lyssnade på podcasts %1$s i år</string>
     <string name="end_of_year_story_intro_title">Låt oss fira ditt lyssningsår.</string>
-    <string name="end_of_year_launch_modal_image_title">Podcastår</string>
     <string name="settings_media_notification_controls">Mediaaviseringskontroller</string>
     <string name="playback_speed">Uppspelningshastighet</string>
     <string name="volume_boost_enabled_not_valid">Volymökning aktiverad-värdet måste vara \"true\" eller \"false\", men var  %1$s</string>
@@ -617,10 +629,8 @@ Language: sv_SE
     <string name="no_episodes_in_filter_x">Inga avsnitt i filtret %1$s</string>
     <string name="filter_x_not_found">Filtret %1$s hittades inte</string>
     <string name="must_provide_filter_name">Filternamn måste anges</string>
-    <string name="end_of_year_launch_modal_secondary_button_title">Inte nu</string>
-    <string name="end_of_year_launch_modal_primary_button_title">Visa mitt 2023</string>
+    <string name="end_of_year_launch_modal_primary_button_title">Visa Min uppspelning 2024</string>
     <string name="end_of_year_launch_modal_summary">Se dina favoritpodcasts och -kategorier, lyssningsstatistik med mera. Dela med vänner och berätta om dina favoritkreatörer.</string>
-    <string name="end_of_year_launch_modal_title">Ditt podcastår</string>
     <string name="settings_app_icon_halloween">Halloween</string>
     <string name="settings_show_played_summary">Avsnitt som du har spelat klart kommer fortfarande att visas</string>
     <string name="settings_show_played">Visa spelade avsnitt</string>

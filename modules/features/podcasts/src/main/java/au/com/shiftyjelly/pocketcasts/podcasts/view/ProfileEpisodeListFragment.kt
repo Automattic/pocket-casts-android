@@ -21,6 +21,8 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
@@ -42,9 +44,13 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.settings.AutoDownloadSettingsFragment
 import au.com.shiftyjelly.pocketcasts.settings.ManualCleanupFragment
+import au.com.shiftyjelly.pocketcasts.settings.viewmodel.ManualCleanupViewModel
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.isDeviceRunningOnLowStorage
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
@@ -78,11 +84,11 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
     }
 
     companion object {
+        const val OPTION_KEY = "option"
+        const val CLEAN_UP = "clean_up"
         private const val SELECT_ALL_KEY = "select_all"
-        private const val OPTION_KEY = "option"
         private const val AUTO_DOWNLOAD_SETTINGS = "auto_download_settings"
         private const val STOP_ALL_DOWNLOADS = "stop_all_downloads"
-        private const val CLEAN_UP = "clean_up"
         private const val CLEAR_HISTORY = "clear_history"
 
         fun newInstance(mode: Mode): ProfileEpisodeListFragment {
@@ -123,6 +129,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
     lateinit var bookmarkManager: BookmarkManager
 
     private val viewModel: ProfileEpisodeListViewModel by viewModels()
+    private val cleanUpViewModel: ManualCleanupViewModel by viewModels()
     private val episodeListBookmarkViewModel: EpisodeListBookmarkViewModel by viewModels()
     private val swipeButtonLayoutViewModel: SwipeButtonLayoutViewModel by viewModels()
     private lateinit var imageRequestFactory: PocketCastsImageRequestFactory
@@ -247,12 +254,25 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
             )
         }
 
+        if (mode is Mode.Downloaded && FeatureFlag.isEnabled(Feature.MANAGE_DOWNLOADED_EPISODES)) {
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    cleanUpViewModel.state.collect { state ->
+                        updateManageDownloadsCard(state.diskSpaceViews.sumOf { it.episodesBytesSize })
+                    }
+                }
+            }
+        } else {
+            binding?.manageDownloadsCard?.isVisible = false
+        }
+
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.state.collect { state ->
                     when (state) {
                         is State.Empty -> {
                             binding?.recyclerView?.isVisible = false
+                            binding?.manageDownloadsCard?.isVisible = false
                             binding?.emptyLayout?.isVisible = true
                             binding?.lblEmptyTitle?.setText(state.titleRes)
                             binding?.lblEmptySummary?.setText(state.summaryRes)
@@ -394,6 +414,28 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
             menu = if (mode.showMenu) R.menu.menu_profile_list else null,
         )
         toolbar.setOnMenuItemClickListener(this)
+    }
+
+    private suspend fun updateManageDownloadsCard(downloadedEpisodesSize: Long) {
+        binding?.manageDownloadsCard?.apply {
+            isVisible = downloadedEpisodesSize != 0L && isDeviceRunningOnLowStorage()
+            if (isVisible) {
+                setContent {
+                    AppTheme(theme.activeTheme) {
+                        CallOnce {
+                            analyticsTracker.track(AnalyticsEvent.FREE_UP_SPACE_BANNER_SHOWN)
+                        }
+                        ManageDownloadsCard(
+                            totalDownloadSize = downloadedEpisodesSize,
+                            onManageDownloadsClick = {
+                                analyticsTracker.track(AnalyticsEvent.FREE_UP_SPACE_MANAGE_DOWNLOADS_TAPPED, mapOf("source" to SourceView.DOWNLOADS.analyticsValue))
+                                showFragment(ManualCleanupFragment.newInstance())
+                            },
+                        )
+                    }
+                }
+            }
+        }
     }
 
     override fun onMenuItemClick(item: MenuItem): Boolean {

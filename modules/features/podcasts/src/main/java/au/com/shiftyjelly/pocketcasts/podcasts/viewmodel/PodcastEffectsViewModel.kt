@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.podcasts.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
+import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -11,7 +12,10 @@ import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.utils.Debouncer
 import au.com.shiftyjelly.pocketcasts.utils.extensions.roundedSpeed
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
@@ -31,8 +35,8 @@ class PodcastEffectsViewModel
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
-    private var updatedSpeed: Double? = null
     lateinit var podcast: LiveData<Podcast>
+    private val playbackSpeedTrackingDebouncer = Debouncer()
 
     fun loadPodcast(uuid: String) {
         podcast = podcastManager
@@ -90,9 +94,13 @@ class PodcastEffectsViewModel
         val podcast = this.podcast.value ?: return
         val roundedSpeed = speed.roundedSpeed()
         podcastManager.updatePlaybackSpeed(podcast, roundedSpeed)
-        updatedSpeed = roundedSpeed
         if (shouldUpdatePlaybackManager()) {
             playbackManager.updatePlayerEffects(podcast.playbackEffects)
+        }
+        viewModelScope.launch {
+            playbackSpeedTrackingDebouncer.debounce {
+                trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_SPEED_CHANGED, mapOf(PlaybackManager.SPEED_KEY to roundedSpeed))
+            }
         }
     }
 
@@ -103,11 +111,16 @@ class PodcastEffectsViewModel
         return podcastUuid == podcast.uuid
     }
 
-    fun trackSpeedChangeIfNeeded() {
-        updatedSpeed?.let { trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_SPEED_CHANGED, mapOf(PlaybackManager.SPEED_KEY to it)) }
-    }
-
     fun trackPlaybackEffectsEvent(event: AnalyticsEvent, props: Map<String, Any> = emptyMap()) {
-        playbackManager.trackPlaybackEffectsEvent(event, props, SourceView.PODCAST_SETTINGS)
+        playbackManager.trackPlaybackEffectsEvent(
+            event = event,
+            props = buildMap {
+                putAll(props)
+                if (FeatureFlag.isEnabled(Feature.CUSTOM_PLAYBACK_SETTINGS)) {
+                    put("settings", "local")
+                }
+            },
+            sourceView = SourceView.PODCAST_SETTINGS,
+        )
     }
 }

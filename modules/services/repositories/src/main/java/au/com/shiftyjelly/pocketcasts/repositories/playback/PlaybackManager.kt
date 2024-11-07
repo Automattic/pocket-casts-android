@@ -190,7 +190,7 @@ open class PlaybackManager @Inject constructor(
 
     private var updateCount = 0
     private var resettingPlayer = false
-    private var lastBufferedUpTo: Int = 0
+    private var episodeLastBufferStatus: EpisodeBufferStatus? = null
     private var focusWasPlaying: Date? = null
     private var forcePlayerSwitch = false
     private var updateTimerDisposable: Disposable? = null
@@ -541,6 +541,7 @@ open class PlaybackManager @Inject constructor(
         when (sourceView) {
             SourceView.AUTO_PAUSE,
             SourceView.AUTO_PLAY,
+            SourceView.AUTO_DOWNLOAD,
             SourceView.CLIP_SHARING,
             SourceView.CHROMECAST,
             SourceView.DISCOVER,
@@ -568,6 +569,7 @@ open class PlaybackManager @Inject constructor(
             SourceView.UP_NEXT,
             SourceView.STATS,
             SourceView.WHATS_NEW,
+            SourceView.STORAGE_AND_DATA_USAGE,
             SourceView.NOTIFICATION_BOOKMARK,
             SourceView.METERED_NETWORK_CHANGE,
             SourceView.WIDGET_PLAYER_SMALL,
@@ -576,6 +578,7 @@ open class PlaybackManager @Inject constructor(
             SourceView.WIDGET_PLAYER_OLD,
             SourceView.SHARE_LIST,
             SourceView.BOTTOM_SHELF,
+            SourceView.REFERRALS,
             SourceView.SEARCH,
             SourceView.SEARCH_RESULTS,
             SourceView.NOVA_LAUNCHER_RECENTLY_PLAYED,
@@ -1023,7 +1026,7 @@ open class PlaybackManager @Inject constructor(
     }
 
     private val removeMutex = Mutex()
-    fun removeEpisode(episodeToRemove: BaseEpisode?, source: SourceView, userInitiated: Boolean = true) {
+    fun removeEpisode(episodeToRemove: BaseEpisode?, source: SourceView, userInitiated: Boolean = true, shouldShuffleUpNext: Boolean = false) {
         launch {
             if (episodeToRemove == null) {
                 return@launch
@@ -1045,7 +1048,7 @@ open class PlaybackManager @Inject constructor(
                     }
                 }
 
-                upNextQueue.removeEpisode(episodeToRemove)
+                upNextQueue.removeEpisode(episodeToRemove, shouldShuffleUpNext)
                 if (userInitiated) {
                     episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_REMOVED_FROM_UP_NEXT, source, episodeToRemove.uuid)
                 }
@@ -1294,7 +1297,7 @@ open class PlaybackManager @Inject constructor(
             }
 
             // remove from Up Next
-            upNextQueue.removeEpisode(episode)
+            upNextQueue.removeEpisode(episode, shouldShuffleUpNext = settings.upNextShuffle.value)
 
             // stop the downloads
             episodeManager.updateAutoDownloadStatus(episode, PodcastEpisode.AUTO_DOWNLOAD_STATUS_IGNORE)
@@ -1575,6 +1578,24 @@ open class PlaybackManager @Inject constructor(
                 )
             }
         }
+    }
+
+    private suspend fun onCachingComplete(episodeUuid: String) {
+        val episode = getCurrentEpisode()
+        episode?.takeIf { it.uuid == episodeUuid }
+            ?.let {
+                updateBufferPosition(EpisodeBufferStatus(episodeUuid, episode.durationMs))
+                bufferUpdateTimerDisposable?.dispose()
+            }
+    }
+
+    private suspend fun onCachingReset(episodeUuid: String) {
+        val episode = getCurrentEpisode()
+        episode?.takeIf { it.uuid == episodeUuid }
+            ?.let {
+                updateBufferPosition(EpisodeBufferStatus(episodeUuid, 0))
+                setupBufferUpdateTimer(episode)
+            }
     }
 
     @Volatile
@@ -2195,6 +2216,8 @@ open class PlaybackManager @Inject constructor(
                 is PlayerEvent.PlayerError -> onPlayerError(event)
                 is PlayerEvent.RemoteMetadataNotMatched -> onRemoteMetaDataNotMatched(event.remoteEpisodeUuid)
                 is PlayerEvent.EpisodeChanged -> onEpisodeChanged(event.episodeUuid)
+                is PlayerEvent.CachingComplete -> onCachingComplete(event.episodeUuid)
+                is PlayerEvent.CachingReset -> onCachingReset(event.episodeUuid)
             }
         }
     }
@@ -2274,22 +2297,24 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
-    private suspend fun updateBufferPosition() {
+    private suspend fun updateBufferPosition(
+        episodeBufferStatus: EpisodeBufferStatus? = null,
+    ) {
         val episode = getCurrentEpisode()
         val player = player
         if (episode == null || player == null || !player.isStreaming) {
             return
         }
-        val bufferedUpToMs = getBufferedUpToMs()
-        if (bufferedUpToMs == lastBufferedUpTo) {
+        val episodeNewBufferStatus = episodeBufferStatus ?: EpisodeBufferStatus(episode.uuid, getBufferedUpToMs())
+        if (episodeLastBufferStatus == episodeNewBufferStatus) {
             return
         }
         withContext(Dispatchers.Main) {
             playbackStateRelay.blockingFirst().let { playbackState ->
-                playbackStateRelay.accept(playbackState.copy(bufferedMs = bufferedUpToMs, lastChangeFrom = LastChangeFrom.OnUpdateBufferPosition.value))
+                playbackStateRelay.accept(playbackState.copy(bufferedMs = episodeNewBufferStatus.bufferedUpToMs, lastChangeFrom = LastChangeFrom.OnUpdateBufferPosition.value))
             }
         }
-        lastBufferedUpTo = bufferedUpToMs
+        episodeLastBufferStatus = episodeNewBufferStatus
     }
 
     private fun setupUpdateTimer() {
@@ -2378,7 +2403,10 @@ open class PlaybackManager @Inject constructor(
         if (player == null || !player.isStreaming || player.isRemote || episode.isDownloading) {
             return
         }
-        lastBufferedUpTo = -1
+        val isEpisodeFullyBuffered = episodeLastBufferStatus == EpisodeBufferStatus(episode.uuid, episode.durationMs)
+        if (isEpisodeFullyBuffered) return
+
+        episodeLastBufferStatus = null
         bufferUpdateTimerDisposable?.dispose()
         bufferUpdateTimerDisposable = Observable.interval(UPDATE_TIMER_POLL_TIME, UPDATE_TIMER_POLL_TIME, TimeUnit.MILLISECONDS, Schedulers.io())
             .switchMapCompletable {
@@ -2531,10 +2559,15 @@ open class PlaybackManager @Inject constructor(
         props: Map<String, Any> = emptyMap(),
         sourceView: SourceView,
     ) {
-        val properties = HashMap<String, Any>()
-        properties[SOURCE_KEY] = sourceView.analyticsValue
-        properties.putAll(props)
-        analyticsTracker.track(event, properties)
+        val contentType = if (getCurrentEpisode()?.isVideo == true) ContentType.VIDEO else ContentType.AUDIO
+        analyticsTracker.track(
+            event = event,
+            properties = buildMap {
+                put(SOURCE_KEY, sourceView.analyticsValue)
+                put(CONTENT_TYPE_KEY, contentType.analyticsValue)
+                putAll(props)
+            },
+        )
     }
 
     fun setNotificationPermissionChecker(notificationPermissionChecker: NotificationPermissionChecker) {
@@ -2544,6 +2577,10 @@ open class PlaybackManager @Inject constructor(
     fun isSleepAfterEpisodeEnabled(): Boolean = episodesUntilSleep != 0
 
     fun isSleepAfterChapterEnabled(): Boolean = chaptersUntilSleep != 0
+
+    fun restorePlayerVolume() {
+        (player as? SimplePlayer)?.restoreVolume()
+    }
 
     private fun getCurrentChapterUuidForSleepTime(playbackState: PlaybackState): String? {
         val currentChapter = playbackState.chapters.getChapter(playbackState.positionMs.milliseconds)
@@ -2567,10 +2604,12 @@ open class PlaybackManager @Inject constructor(
         this["chapterUuid"] = value
     }
 
-    private enum class ContentType(val analyticsValue: String) {
+    enum class ContentType(val analyticsValue: String) {
         AUDIO("audio"),
         VIDEO("video"),
     }
+
+    data class EpisodeBufferStatus(val episodeUuid: String, val bufferedUpToMs: Int)
 
     enum class LastChangeFrom(val value: String) {
         OnInit("Init"),

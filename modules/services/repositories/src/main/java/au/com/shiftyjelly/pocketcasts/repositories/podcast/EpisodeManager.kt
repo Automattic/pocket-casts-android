@@ -1,11 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.models.db.helper.EpisodesStartedAndCompleted
-import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
-import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
-import au.com.shiftyjelly.pocketcasts.models.db.helper.LongestEpisode
-import au.com.shiftyjelly.pocketcasts.models.db.helper.YearOverYearListeningTime
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -82,8 +77,8 @@ interface EpisodeManager {
     fun markAsNotPlayed(episode: BaseEpisode?)
     suspend fun markAllAsPlayed(episodes: List<BaseEpisode>, playbackManager: PlaybackManager, podcastManager: PodcastManager)
     fun markedAsPlayedExternally(episode: PodcastEpisode, playbackManager: PlaybackManager, podcastManager: PodcastManager)
-    fun markAsPlayedAsync(episode: BaseEpisode?, playbackManager: PlaybackManager, podcastManager: PodcastManager)
-    fun markAsPlayed(episode: BaseEpisode?, playbackManager: PlaybackManager, podcastManager: PodcastManager)
+    fun markAsPlayedAsync(episode: BaseEpisode?, playbackManager: PlaybackManager, podcastManager: PodcastManager, shouldShuffleUpNext: Boolean = false)
+    fun markAsPlayed(episode: BaseEpisode?, playbackManager: PlaybackManager, podcastManager: PodcastManager, shouldShuffleUpNext: Boolean = false)
     fun markAsPlaybackError(episode: BaseEpisode?, errorMessage: String?)
     fun markAsPlaybackError(episode: BaseEpisode?, event: PlayerEvent.PlayerError, isPlaybackRemote: Boolean)
     suspend fun starEpisode(episode: PodcastEpisode, starred: Boolean, sourceView: SourceView)
@@ -91,7 +86,7 @@ interface EpisodeManager {
     suspend fun toggleStarEpisode(episode: PodcastEpisode, sourceView: SourceView)
     fun clearPlaybackError(episode: BaseEpisode?)
     fun clearDownloadError(episode: PodcastEpisode?)
-    fun archive(episode: PodcastEpisode, playbackManager: PlaybackManager, sync: Boolean = true)
+    fun archive(episode: PodcastEpisode, playbackManager: PlaybackManager, sync: Boolean = true, shouldShuffleUpNext: Boolean = false)
     fun archivePlayedEpisode(episode: BaseEpisode, playbackManager: PlaybackManager, podcastManager: PodcastManager, sync: Boolean)
     fun unarchive(episode: BaseEpisode)
     suspend fun archiveAllInList(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager?)
@@ -108,7 +103,7 @@ interface EpisodeManager {
     fun deleteEpisodesWithoutSync(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager)
 
     fun deleteEpisodeWithoutSync(episode: PodcastEpisode?, playbackManager: PlaybackManager)
-    suspend fun deleteEpisodeFile(episode: BaseEpisode?, playbackManager: PlaybackManager?, disableAutoDownload: Boolean, updateDatabase: Boolean = true, removeFromUpNext: Boolean = true)
+    suspend fun deleteEpisodeFile(episode: BaseEpisode?, playbackManager: PlaybackManager?, disableAutoDownload: Boolean, updateDatabase: Boolean = true, removeFromUpNext: Boolean = true, shouldShuffleUpNext: Boolean = false)
 
     /** Utility methods  */
     suspend fun countEpisodes(): Int
@@ -132,21 +127,7 @@ interface EpisodeManager {
     suspend fun updatePlaybackInteractionDate(episode: BaseEpisode?)
     suspend fun deleteEpisodeFiles(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager, removeFromUpNext: Boolean = true)
     suspend fun findStaleDownloads(): List<PodcastEpisode>
-    suspend fun calculateListeningTime(fromEpochMs: Long, toEpochMs: Long): Long?
-    suspend fun findListenedCategories(fromEpochMs: Long, toEpochMs: Long): List<ListenedCategory>
-    suspend fun findListenedNumbers(fromEpochMs: Long, toEpochMs: Long): ListenedNumbers
-    suspend fun findLongestPlayedEpisode(fromEpochMs: Long, toEpochMs: Long): LongestEpisode?
-    suspend fun countEpisodesPlayedUpto(fromEpochMs: Long, toEpochMs: Long, playedUpToInSecs: Long): Int
-    suspend fun findEpisodeInteractedBefore(fromEpochMs: Long): PodcastEpisode?
-    suspend fun countEpisodesInListeningHistory(fromEpochMs: Long, toEpochMs: Long): Int
     suspend fun calculatePlayedUptoSumInSecsWithinDays(days: Int): Double
-    suspend fun yearOverYearListeningTime(
-        fromEpochMsPreviousYear: Long,
-        toEpochMsPreviousYear: Long,
-        fromEpochMsCurrentYear: Long,
-        toEpochMsCurrentYear: Long,
-    ): YearOverYearListeningTime
-    suspend fun countEpisodesStartedAndCompleted(fromEpochMs: Long, toEpochMs: Long): EpisodesStartedAndCompleted
 
     suspend fun updateDownloadUrl(episode: PodcastEpisode): String?
 

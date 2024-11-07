@@ -45,6 +45,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.databinding.ActivityMainBinding
 import au.com.shiftyjelly.pocketcasts.deeplink.AddBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.AssistantDeepLink
@@ -57,8 +58,9 @@ import au.com.shiftyjelly.pocketcasts.deeplink.DownloadsDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.NativeShareDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.OpmlImportDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.PlayFromSearchDeepLink
-import au.com.shiftyjelly.pocketcasts.deeplink.PocketCastsWebsiteDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.PocketCastsWebsiteGetDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.PromoCodeDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.ReferralsDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShareListDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowDiscoverDeepLink
@@ -72,9 +74,9 @@ import au.com.shiftyjelly.pocketcasts.deeplink.SignInDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.SonosDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.UpgradeAccountDeepLink
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment
-import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment
-import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment.StoriesSource
-import au.com.shiftyjelly.pocketcasts.endofyear.views.EndOfYearLaunchBottomSheet
+import au.com.shiftyjelly.pocketcasts.endofyear.StoriesActivity
+import au.com.shiftyjelly.pocketcasts.endofyear.StoriesActivity.StoriesSource
+import au.com.shiftyjelly.pocketcasts.endofyear.ui.EndOfYearLaunchBottomSheet
 import au.com.shiftyjelly.pocketcasts.filters.FiltersFragment
 import au.com.shiftyjelly.pocketcasts.localization.helper.LocaliseHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -104,9 +106,11 @@ import au.com.shiftyjelly.pocketcasts.profile.TrialFinishedFragment
 import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudFileBottomSheetFragment
 import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudFilesFragment
 import au.com.shiftyjelly.pocketcasts.profile.sonos.SonosAppLinkActivity
+import au.com.shiftyjelly.pocketcasts.referrals.ReferralsGuestPassFragment
 import au.com.shiftyjelly.pocketcasts.repositories.bumpstats.BumpStatsTask
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.di.NotificationPermissionChecker
+import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.opml.OpmlImportTask
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -125,6 +129,7 @@ import au.com.shiftyjelly.pocketcasts.search.SearchFragment
 import au.com.shiftyjelly.pocketcasts.servers.ServerCallback
 import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.discover.PodcastSearch
+import au.com.shiftyjelly.pocketcasts.settings.ManualCleanupFragment
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
@@ -135,6 +140,8 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Network
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.observeOnce
 import au.com.shiftyjelly.pocketcasts.view.BottomNavHideManager
@@ -145,6 +152,8 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
+import au.com.shiftyjelly.pocketcasts.views.lowstorage.LowStorageBottomSheetListener
+import au.com.shiftyjelly.pocketcasts.views.lowstorage.LowStorageLaunchBottomSheet
 import com.automattic.android.tracks.crashlogging.CrashLogging
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
@@ -185,6 +194,7 @@ class MainActivity :
     FragmentHostListener,
     PlayerBottomSheet.PlayerBottomSheetListener,
     SearchFragment.Listener,
+    LowStorageBottomSheetListener,
     OnboardingLauncher,
     CoroutineScope,
     NotificationPermissionChecker {
@@ -275,6 +285,9 @@ class MainActivity :
             OnboardingFinish.DoneShowPlusPromotion -> {
                 settings.setHasDoneInitialOnboarding()
                 OnboardingLauncher.openOnboardingFlow(this, OnboardingFlow.Upsell(OnboardingUpgradeSource.LOGIN_PLUS_PROMOTION))
+            }
+            OnboardingFinish.DoneShowWelcomeInReferralFlow -> {
+                settings.showReferralWelcome.set(true, updateModifiedAt = false)
             }
             null -> {
                 Timber.e("Unexpected null result from onboarding activity")
@@ -687,6 +700,7 @@ class MainActivity :
             fragmentManager = supportFragmentManager,
             analyticsTracker = analyticsTracker,
             episodeAnalytics = episodeAnalytics,
+            settings = settings,
         ).show(this)
     }
 
@@ -702,18 +716,58 @@ class MainActivity :
             ComposeView(viewGroup.context).apply {
                 setContent {
                     val shouldShow by viewModel.shouldShowStoriesModal.collectAsState()
-                    EndOfYearLaunchBottomSheet(
-                        parent = viewGroup,
-                        shouldShow = shouldShow,
-                        onClick = {
-                            showStoriesOrAccount(StoriesSource.MODAL.value)
-                        },
-                        onExpanded = {
-                            analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_MODAL_SHOWN)
-                            settings.setEndOfYearShowModal(false)
-                            viewModel.updateStoriesModalShowState(false)
-                        },
-                    )
+                    AppTheme(theme.activeTheme) {
+                        EndOfYearLaunchBottomSheet(
+                            parent = viewGroup,
+                            shouldShow = shouldShow,
+                            onClick = {
+                                showStoriesOrAccount(StoriesSource.MODAL.value)
+                            },
+                            onExpanded = {
+                                analyticsTracker.track(
+                                    AnalyticsEvent.END_OF_YEAR_MODAL_SHOWN,
+                                    mapOf("year" to EndOfYearManager.YEAR_TO_SYNC.value),
+                                )
+                                settings.setEndOfYearShowModal(false)
+                                viewModel.updateStoriesModalShowState(false)
+                            },
+                        )
+                    }
+                }
+            },
+        )
+    }
+
+    private fun setupLowStorageLaunchBottomSheet(sourceView: SourceView) {
+        val viewGroup = binding.modalBottomSheet
+        viewGroup.removeAllViews()
+        viewGroup.addView(
+            ComposeView(viewGroup.context).apply {
+                setContent {
+                    val downloadedEpisodesState by viewModel.downloadedEpisodeState.collectAsState()
+
+                    val shouldShow = downloadedEpisodesState.downloadedEpisodes != 0L &&
+                        settings.shouldShowLowStorageModalAfterSnooze() &&
+                        FeatureFlag.isEnabled(Feature.MANAGE_DOWNLOADED_EPISODES)
+
+                    AppTheme(theme.activeTheme) {
+                        LowStorageLaunchBottomSheet(
+                            parent = viewGroup,
+                            shouldShow = shouldShow,
+                            onManageDownloadsClick = {
+                                analyticsTracker.track(AnalyticsEvent.FREE_UP_SPACE_MANAGE_DOWNLOADS_TAPPED, mapOf("source" to sourceView.analyticsValue))
+                                addFragment(ManualCleanupFragment.newInstance())
+                            },
+                            onExpanded = {
+                                analyticsTracker.track(AnalyticsEvent.FREE_UP_SPACE_MODAL_SHOWN, mapOf("source" to sourceView.analyticsValue))
+                            },
+                            onMaybeLaterClick = {
+                                analyticsTracker.track(AnalyticsEvent.FREE_UP_SPACE_MAYBE_LATER_TAPPED, mapOf("source" to sourceView.analyticsValue))
+                                settings.setDismissLowStorageModalTime(System.currentTimeMillis())
+                            },
+                            totalDownloadSize = downloadedEpisodesState.downloadedEpisodes,
+                        )
+                    }
                 }
             },
         )
@@ -736,8 +790,7 @@ class MainActivity :
     }
 
     private fun showStories(source: StoriesSource) {
-        StoriesFragment.newInstance(source)
-            .show(supportFragmentManager, "stories_dialog")
+        StoriesActivity.open(this, source)
     }
 
     @Suppress("DEPRECATION")
@@ -900,7 +953,9 @@ class MainActivity :
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 settings.updatePlayerOrUpNextBottomSheetState(newState)
                 if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
-                    analyticsTracker.track(AnalyticsEvent.UP_NEXT_DISMISSED)
+                    if (bottomSheetTag == UpNextFragment::class.java.name) {
+                        analyticsTracker.track(AnalyticsEvent.UP_NEXT_DISMISSED)
+                    }
                     supportFragmentManager.findFragmentByTag(bottomSheetTag)?.let {
                         removeBottomSheetFragment(it)
                     }
@@ -1286,8 +1341,11 @@ class MainActivity :
                         }
                     }
                 }
-                is PocketCastsWebsiteDeepLink -> {
+                is PocketCastsWebsiteGetDeepLink -> {
                     // Do nothing when the user goes to https://pocketcasts.com/get it should either open the play store or the user's app
+                }
+                is ReferralsDeepLink -> {
+                    openReferralClaim(deepLink.code)
                 }
                 is ShowPodcastFromUrlDeepLink -> {
                     openPodcastUrl(deepLink.url)
@@ -1338,6 +1396,16 @@ class MainActivity :
             Timber.e(e)
             crashLogging.sendReport(e)
         }
+    }
+
+    private fun openReferralClaim(code: String) {
+        if (!FeatureFlag.isEnabled(Feature.REFERRALS_CLAIM)) {
+            return
+        }
+        settings.referralClaimCode.set(code, false)
+        openTab(VR.id.navigation_profile)
+        val fragment = ReferralsGuestPassFragment.newInstance(ReferralsGuestPassFragment.ReferralsPageType.Claim)
+        showBottomSheet(fragment)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -1597,5 +1665,11 @@ class MainActivity :
             .setBackgroundTint(ThemeColor.primaryUi01(Theme.ThemeType.DARK))
             .setTextColor(ThemeColor.primaryText01(Theme.ThemeType.DARK))
             .show()
+    }
+
+    override fun showModal(sourceView: SourceView) {
+        launch(Dispatchers.Main) {
+            setupLowStorageLaunchBottomSheet(sourceView)
+        }
     }
 }

@@ -6,18 +6,19 @@ import android.os.StrictMode
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
 import au.com.shiftyjelly.pocketcasts.crashlogging.InitializeRemoteLogging
 import au.com.shiftyjelly.pocketcasts.discover.worker.CuratedPodcastsSyncWorker
 import au.com.shiftyjelly.pocketcasts.engage.EngageSdkBridge
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextDao
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
-import au.com.shiftyjelly.pocketcasts.nova.NovaLauncherBridge
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
+import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearSync
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.file.StorageOptions
-import au.com.shiftyjelly.pocketcasts.repositories.jobs.VersionMigrationsJob
+import au.com.shiftyjelly.pocketcasts.repositories.jobs.VersionMigrationsWorker
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepTimerRestartWhenShakingDevice
@@ -35,6 +36,8 @@ import au.com.shiftyjelly.pocketcasts.shared.AppLifecycleObserver
 import au.com.shiftyjelly.pocketcasts.shared.DownloadStatisticsReporter
 import au.com.shiftyjelly.pocketcasts.ui.helper.AppIcon
 import au.com.shiftyjelly.pocketcasts.utils.TimberDebugTree
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBufferUncaughtExceptionHandler
 import au.com.shiftyjelly.pocketcasts.utils.log.RxJavaUncaughtExceptionHandling
@@ -116,11 +119,13 @@ class PocketCastsApplication : Application(), Configuration.Provider {
 
     @Inject lateinit var initializeRemoteLogging: InitializeRemoteLogging
 
-    @Inject lateinit var novaLauncherBridge: NovaLauncherBridge
-
     @Inject lateinit var databaseExportHelper: DatabaseExportHelper
 
     @Inject lateinit var engageSdkBridge: EngageSdkBridge
+
+    @Inject lateinit var experimentProvider: ExperimentProvider
+
+    @Inject lateinit var endOfYearSync: EndOfYearSync
 
     override fun onCreate() {
         if (BuildConfig.DEBUG) {
@@ -154,6 +159,7 @@ class PocketCastsApplication : Application(), Configuration.Provider {
         analyticsTracker.clearAllData()
         analyticsTracker.refreshMetadata()
         downloadStatisticsReporter.setup()
+        experimentProvider.initialize()
     }
 
     private fun setupCrashLogging() {
@@ -237,7 +243,7 @@ class PocketCastsApplication : Application(), Configuration.Provider {
                     Timber.e(e, "Unable to create opml folder.")
                 }
 
-                VersionMigrationsJob.run(
+                VersionMigrationsWorker.performMigrations(
                     podcastManager = podcastManager,
                     settings = settings,
                     syncManager = syncManager,
@@ -261,7 +267,6 @@ class PocketCastsApplication : Application(), Configuration.Provider {
         userEpisodeManager.monitorUploads(applicationContext)
         downloadManager.beginMonitoringWorkManager(applicationContext)
         userManager.beginMonitoringAccountManager(playbackManager)
-        novaLauncherBridge.monitorNovaLauncherIntegration()
         CuratedPodcastsSyncWorker.enqueuPeriodicWork(this)
         engageSdkBridge.registerIntegration()
 
@@ -272,6 +277,10 @@ class PocketCastsApplication : Application(), Configuration.Provider {
             .onEach { widgetManager.updateWidgetEpisodeArtwork(playbackManager) }
             .launchIn(applicationScope)
         keepPlayerWidgetsUpdated()
+
+        if (FeatureFlag.isEnabled(Feature.SYNC_EOY_DATA_ON_STARTUP)) {
+            applicationScope.launch { endOfYearSync.sync() }
+        }
 
         Timber.i("Launched ${BuildConfig.APPLICATION_ID}")
     }

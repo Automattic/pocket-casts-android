@@ -20,8 +20,8 @@ import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.reimagine.clip.ShareClipViewModel.SnackbarMessage
-import au.com.shiftyjelly.pocketcasts.reimagine.ui.BackgroundAssetController
 import au.com.shiftyjelly.pocketcasts.reimagine.ui.ShareColors
+import au.com.shiftyjelly.pocketcasts.reimagine.ui.rememberBackgroundAssetControler
 import au.com.shiftyjelly.pocketcasts.sharing.Clip
 import au.com.shiftyjelly.pocketcasts.sharing.SharingClient
 import au.com.shiftyjelly.pocketcasts.sharing.SocialPlatform
@@ -93,14 +93,14 @@ class ShareClipFragment : BaseDialogFragment() {
         savedInstanceState: Bundle?,
     ) = ComposeView(requireActivity()).apply {
         val platforms = SocialPlatform.getAvailablePlatforms(requireContext())
-        val assetController = BackgroundAssetController.create(requireContext().applicationContext, shareColors)
-        val listener = ShareClipListener(this@ShareClipFragment, viewModel, assetController, args.source)
         val isTalkbackOn = Util.isTalkbackOn(requireContext())
 
         setContent {
-            val uiState by viewModel.uiState.collectAsState()
+            val assetController = rememberBackgroundAssetControler(shareColors)
+            val listener = remember { ShareClipListener(this@ShareClipFragment, viewModel, assetController, args.source) }
             val snackbarHostState = remember { SnackbarHostState() }
 
+            val uiState by viewModel.uiState.collectAsState()
             ShareClipPage(
                 episode = uiState.episode,
                 podcast = uiState.podcast,

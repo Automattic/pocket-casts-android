@@ -61,10 +61,10 @@ include(":modules:features:reimagine")
 include(":modules:features:referrals")
 include(":modules:features:taskerplugin")
 include(":modules:features:widgets")
-include(":modules:features:kids")
 
 // services
 include(":modules:services:analytics")
+include(":modules:services:capturable")
 include(":modules:services:compose")
 include(":modules:services:crashlogging")
 include(":modules:services:deeplink")

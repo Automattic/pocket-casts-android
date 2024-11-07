@@ -100,31 +100,23 @@
                 app:layout_constraintTop_toBottomOf="@+id/lblDaysSaved" />
 
             <androidx.compose.ui.platform.ComposeView
-                android:id="@+id/referralsClaimGuestPassBannerCard"
+                android:id="@+id/endOfYearPromptCard"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:background="?attr/primary_ui_02"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="16dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/userView" />
 
             <androidx.compose.ui.platform.ComposeView
-                android:id="@+id/kidsBannerCard"
+                android:id="@+id/referralsClaimGuestPassBannerCard"
                 android:layout_width="0dp"
+                android:layout_marginTop="8dp"
                 android:layout_height="wrap_content"
-                android:background="?attr/primary_ui_02"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/referralsClaimGuestPassBannerCard" />
-
-            <androidx.compose.ui.platform.ComposeView
-                android:id="@+id/endOfYearPromptCard"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:background="?attr/primary_ui_02"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/kidsBannerCard" />
+                app:layout_constraintTop_toBottomOf="@+id/endOfYearPromptCard" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView"
@@ -135,7 +127,7 @@
                 android:paddingBottom="16dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/endOfYearPromptCard" />
+                app:layout_constraintTop_toBottomOf="@id/referralsClaimGuestPassBannerCard" />
 
             <TextView
                 android:id="@+id/lblRefreshStatus"
@@ -179,39 +171,32 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/btnRefresh"
                 app:layout_constraintBottom_toBottomOf="parent"/>
+
+            <androidx.compose.ui.platform.ComposeView
+                android:id="@+id/btnGift"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_gravity="end"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                app:layout_constraintEnd_toStartOf="@id/btnSettings"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageButton
+                android:id="@+id/btnSettings"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:background="?android:attr/actionBarItemBackground"
+                android:contentDescription="@string/settings"
+                android:src="@drawable/ic_profile_settings"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="?attr/primary_icon_01" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.core.widget.NestedScrollView>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:layout_marginTop="7dp"
-        android:layout_marginEnd="6dp"
-        android:layout_marginBottom="10dp">
-
-        <androidx.compose.ui.platform.ComposeView
-            android:id="@+id/btnGift"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_marginEnd="8dp"
-            app:layout_constraintEnd_toStartOf="@id/btnSettings"
-            app:layout_constraintTop_toTopOf="parent"/>
-
-        <ImageButton
-            android:id="@+id/btnSettings"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
-            android:layout_marginBottom="10dp"
-            android:background="?android:attr/actionBarItemBackground"
-            android:contentDescription="@string/settings"
-            android:src="@drawable/ic_profile_settings"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="?attr/primary_icon_01" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </FrameLayout>

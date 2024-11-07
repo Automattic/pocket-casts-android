@@ -45,6 +45,10 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.pocketcasts.service.api.PodcastRatingResponse
+import com.pocketcasts.service.api.PodcastRatingsResponse
+import com.pocketcasts.service.api.ReferralCodeResponse
+import com.pocketcasts.service.api.ReferralRedemptionResponse
+import com.pocketcasts.service.api.ReferralValidationResponse
 import com.pocketcasts.service.api.UserPodcastListResponse
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -385,6 +389,11 @@ class SyncManagerImpl @Inject constructor(
             syncServiceManager.getPodcastRating(podcastUuid, token)
         }
 
+    override suspend fun getPodcastRatings(): PodcastRatingsResponse? =
+        getCacheTokenOrLogin { token ->
+            syncServiceManager.getPodcastRatings(token)
+        }
+
     // Other
 
     override suspend fun exchangeSonos(): ExchangeSonosResponse =
@@ -423,10 +432,29 @@ class SyncManagerImpl @Inject constructor(
         syncServiceManager.namedSettings(request, token)
     }
 
-    override fun upNextSync(request: UpNextSyncRequest): Single<UpNextSyncResponse> =
-        getCacheTokenOrLoginRxSingle { token ->
+    override suspend fun upNextSync(request: UpNextSyncRequest): UpNextSyncResponse =
+        getCacheTokenOrLogin { token ->
             syncServiceManager.upNextSync(request, token)
         }
+
+    // Referral
+    override suspend fun getReferralCode(): Response<ReferralCodeResponse> {
+        return getCacheTokenOrLogin { token ->
+            syncServiceManager.getReferralCode(token)
+        }
+    }
+
+    override suspend fun validateReferralCode(code: String): Response<ReferralValidationResponse> {
+        return getCacheTokenOrLogin { token ->
+            syncServiceManager.validateReferralCode(token, code)
+        }
+    }
+
+    override suspend fun redeemReferralCode(code: String): Response<ReferralRedemptionResponse> {
+        return getCacheTokenOrLogin { token ->
+            syncServiceManager.redeemReferralCode(token, code)
+        }
+    }
 
 // private methods
 
@@ -527,7 +555,7 @@ class SyncManagerImpl @Inject constructor(
             AccountConstants.SignInType.Tokens -> syncServiceManager.loginToken(refreshToken = refreshToken)
         }
 
-    private suspend fun <T : Any> getCacheTokenOrLogin(serverCall: suspend (token: AccessToken) -> T): T {
+    private suspend fun <T> getCacheTokenOrLogin(serverCall: suspend (token: AccessToken) -> T): T {
         if (isLoggedIn()) {
             return try {
                 val token = syncAccountManager.getAccessToken() ?: refreshTokenSuspend()

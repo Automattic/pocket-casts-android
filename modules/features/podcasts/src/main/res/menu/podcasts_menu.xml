@@ -3,14 +3,14 @@
 
     <item
         android:id="@+id/folders_locked"
-        android:icon="@drawable/folder_lock_light"
+        android:icon="@drawable/ic_folder_plus"
         app:showAsAction="always"
         android:visible="false"
         android:title="@string/create_folder" />
 
     <item
         android:id="@+id/create_folder"
-        android:icon="@drawable/folder_create"
+        android:icon="@drawable/ic_folder_plus"
         app:showAsAction="always"
         android:visible="false"
         android:title="@string/create_folder" />

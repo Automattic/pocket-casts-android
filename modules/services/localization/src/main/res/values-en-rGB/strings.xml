@@ -277,6 +277,7 @@ Language: en_GB
     <string name="onboarding_plus_feature_themes_icons_title">Themes &amp; Icons</string>
     <string name="onboarding_plus_feature_cloud_storage_text">Upload your files to cloud storage and have them available everywhere.</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Listen in more places with our Windows, macOS, and Web apps.</string>
+    <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Everything you love about Pocket Casts, plus more</string>
     <string name="onboarding_recommendations_import">Import</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">Make Pocket Casts yours by selecting your favourite podcasts or import them from another podcast player. You can always do this later.</string>
     <string name="onboarding_recommendations_find_favorite_podcasts">Find your favourite podcasts</string>
@@ -292,16 +293,13 @@ Language: en_GB
     <string name="onboarding_forgot_password">Forgot password?</string>
     <string name="log_in">Log in</string>
     <string name="end_of_year_story_top_podcasts_share_text">My top podcasts of the year! %1$s</string>
-    <string name="end_of_year_story_top_podcast_subtitle">You listened to %1$d episodes for a total of %2$s</string>
     <string name="end_of_year_create_account_to_see">Save your podcasts in the cloud, get your end of year review and sync your progress with other devices.</string>
     <string name="end_of_year_story_top_categories_share_text">My most listened to podcast categories</string>
     <string name="end_of_year_story_top_categories">Your Top Categories</string>
     <string name="end_of_year_story_epilogue_subtitle">Don’t forget to share with your friends and give a shout out to your favourite podcast creators</string>
-    <string name="end_of_year_story_top_podcasts_list_title">My top podcasts of 2022</string>
     <string name="end_of_year_story_listened_to_categories_subtitle">Let’s take a look at some of your favourites…</string>
     <string name="end_of_year_story_listened_to_categories">You listened to %1$d different categories this year</string>
     <string name="end_of_year_story_intro_title">Let’s celebrate your year of listening!</string>
-    <string name="end_of_year_launch_modal_image_title">Year in Podcasts</string>
     <string name="settings_media_notification_controls">Media notification controls</string>
     <string name="playback_speed">Playback speed</string>
     <string name="trim_silence_mode_not_valid">Trim Silence Mode %1$s not valid</string>
@@ -337,9 +335,7 @@ Language: en_GB
     <string name="command_x_not_valid">Command %1$s not valid</string>
     <string name="must_provide_command_name">Must provide command name</string>
     <string name="no_episodes_in_filter_x">No episodes in Filter %1$s</string>
-    <string name="end_of_year_launch_modal_secondary_button_title">Not Now</string>
     <string name="end_of_year_launch_modal_summary">See your top podcasts, categories, listening stats and more. Share with friends and shout out your favourite creators!</string>
-    <string name="end_of_year_launch_modal_title">Your Year in Podcasts</string>
     <string name="settings_app_icon_halloween">Halloween</string>
     <string name="settings_show_played_summary">Episodes that you have finished playing will still be displayed</string>
     <string name="settings_show_played">Show played episodes</string>

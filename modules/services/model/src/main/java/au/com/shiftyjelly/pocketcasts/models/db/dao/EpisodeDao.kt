@@ -10,9 +10,6 @@ import androidx.room.Transaction
 import androidx.room.Update
 import androidx.sqlite.db.SupportSQLiteQuery
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
-import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
-import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
-import au.com.shiftyjelly.pocketcasts.models.db.helper.LongestEpisode
 import au.com.shiftyjelly.pocketcasts.models.db.helper.QueryHelper
 import au.com.shiftyjelly.pocketcasts.models.db.helper.UuidCount
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeDownloadFailureStatistics
@@ -277,6 +274,7 @@ abstract class EpisodeDao {
     @Query("SELECT * FROM podcast_episodes WHERE last_playback_interaction_date IS NOT NULL AND last_playback_interaction_date > 0 ORDER BY last_playback_interaction_date DESC LIMIT 1000")
     abstract fun observePlaybackHistory(): Flowable<List<PodcastEpisode>>
 
+    @Transaction
     @Query(
         """
         SELECT podcast_episodes.*
@@ -287,6 +285,7 @@ abstract class EpisodeDao {
           AND (UPPER(podcast_episodes.title) LIKE '%' || UPPER(:query) || '%'  ESCAPE '\'
                OR UPPER(podcasts.title) LIKE '%' || UPPER(:query) || '%'  ESCAPE '\')
         ORDER BY last_playback_interaction_date DESC
+        LIMIT 100
     """,
     )
     abstract fun filteredPlaybackHistoryFlow(query: String): Flow<List<PodcastEpisode>>
@@ -446,99 +445,6 @@ abstract class EpisodeDao {
 
     @Query("UPDATE podcast_episodes SET playing_status = :playingStatus, playing_status_modified = :modified, played_up_to = 0, played_up_to_modified = :modified WHERE uuid IN (:episodesUUIDs)")
     abstract suspend fun markAllUnplayed(episodesUUIDs: List<String>, modified: Long, playingStatus: EpisodePlayingStatus = EpisodePlayingStatus.NOT_PLAYED)
-
-    @Query("SELECT SUM(played_up_to) FROM podcast_episodes WHERE last_playback_interaction_date IS NOT NULL AND last_playback_interaction_date > :fromEpochMs AND last_playback_interaction_date < :toEpochMs")
-    abstract suspend fun calculateListeningTime(fromEpochMs: Long, toEpochMs: Long): Long?
-
-    @Query(
-        """
-        SELECT DISTINCT podcast_episodes.uuid as episodeId, 
-        COUNT(DISTINCT podcast_id) as numberOfPodcasts,
-        COUNT(DISTINCT podcast_episodes.uuid) as numberOfEpisodes,
-        SUM(played_up_to) as totalPlayedTime, 
-        SUBSTR(TRIM(podcasts.podcast_category),1,INSTR(trim(podcasts.podcast_category)||char(10),char(10))-1) as category,
-        podcasts.uuid as mostListenedPodcastId, 
-        podcasts.primary_color as mostListenedPodcastTintColor
-        FROM podcast_episodes
-        JOIN podcasts ON podcast_episodes.podcast_id = podcasts.uuid
-        WHERE podcast_episodes.last_playback_interaction_date IS NOT NULL AND podcast_episodes.last_playback_interaction_date > :fromEpochMs AND podcast_episodes.last_playback_interaction_date < :toEpochMs
-        AND category IS NOT NULL and category != ''
-        GROUP BY category
-        ORDER BY totalPlayedTime DESC
-        """,
-    )
-    abstract suspend fun findListenedCategories(fromEpochMs: Long, toEpochMs: Long): List<ListenedCategory>
-
-    @Query(
-        """
-        SELECT COUNT(DISTINCT podcast_episodes.uuid) as numberOfEpisodes, COUNT(DISTINCT podcasts.uuid) as numberOfPodcasts
-        FROM podcast_episodes
-        JOIN podcasts ON podcast_episodes.podcast_id = podcasts.uuid
-        WHERE podcast_episodes.last_playback_interaction_date IS NOT NULL AND podcast_episodes.last_playback_interaction_date > :fromEpochMs AND podcast_episodes.last_playback_interaction_date < :toEpochMs
-        """,
-    )
-    abstract suspend fun findListenedNumbers(fromEpochMs: Long, toEpochMs: Long): ListenedNumbers
-
-    @Query(
-        """
-        SELECT podcast_episodes.uuid, podcast_episodes.title, podcast_episodes.duration, podcasts.uuid as podcastUuid, podcasts.title as podcastTitle, podcasts.primary_color as tintColorForLightBg, podcasts.secondary_color as tintColorForDarkBg
-        FROM podcast_episodes
-        JOIN podcasts ON podcast_episodes.podcast_id = podcasts.uuid
-        WHERE podcast_episodes.last_playback_interaction_date IS NOT NULL AND podcast_episodes.last_playback_interaction_date > :fromEpochMs AND podcast_episodes.last_playback_interaction_date < :toEpochMs
-        ORDER BY podcast_episodes.played_up_to DESC
-        LIMIT 1
-        """,
-    )
-    abstract suspend fun findLongestPlayedEpisode(fromEpochMs: Long, toEpochMs: Long): LongestEpisode?
-
-    @Query(
-        """
-        SELECT COUNT(DISTINCT uuid) 
-        FROM podcast_episodes
-        WHERE played_up_to > :playedUpToInSecs 
-        AND podcast_episodes.last_playback_interaction_date IS NOT NULL AND podcast_episodes.last_playback_interaction_date > :fromEpochMs AND podcast_episodes.last_playback_interaction_date < :toEpochMs
-        """,
-    )
-    abstract suspend fun countEpisodesPlayedUpto(fromEpochMs: Long, toEpochMs: Long, playedUpToInSecs: Long): Int
-
-    @Query(
-        """
-        SELECT * 
-        FROM podcast_episodes
-        WHERE podcast_episodes.last_playback_interaction_date IS NOT NULL AND podcast_episodes.last_playback_interaction_date < :fromEpochMs AND podcast_episodes.last_playback_interaction_date != 0
-        LIMIT 1
-        """,
-    )
-    abstract suspend fun findEpisodeInteractedBefore(fromEpochMs: Long): PodcastEpisode?
-
-    @Query(
-        """
-        SELECT COUNT(*) 
-        FROM podcast_episodes
-        WHERE podcast_episodes.last_playback_interaction_date IS NOT NULL AND podcast_episodes.last_playback_interaction_date > :fromEpochMs AND podcast_episodes.last_playback_interaction_date < :toEpochMs
-        """,
-    )
-    abstract suspend fun findEpisodesCountInListeningHistory(fromEpochMs: Long, toEpochMs: Long): Int
-
-    @Query(
-        """
-            SELECT COUNT(DISTINCT uuid) AS started FROM podcast_episodes
-            WHERE podcast_episodes.last_playback_interaction_date IS NOT NULL 
-            AND podcast_episodes.last_playback_interaction_date > :fromEpochMs AND podcast_episodes.last_playback_interaction_date < :toEpochMs
-        """,
-    )
-    abstract suspend fun countEpisodesStarted(fromEpochMs: Long, toEpochMs: Long): Int
-
-    @Query(
-        """
-        SELECT COUNT(DISTINCT uuid) AS completed 
-        FROM podcast_episodes 
-        WHERE (playing_status = 2 OR played_up_to >= 0.9 * duration) 
-        AND podcast_episodes.last_playback_interaction_date IS NOT NULL 
-        AND podcast_episodes.last_playback_interaction_date > :fromEpochMs AND podcast_episodes.last_playback_interaction_date < :toEpochMs
-        """,
-    )
-    abstract suspend fun countEpisodesCompleted(fromEpochMs: Long, toEpochMs: Long): Int
 
     @Query(
         """

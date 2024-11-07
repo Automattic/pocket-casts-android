@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
-import au.com.shiftyjelly.pocketcasts.models.db.helper.TopPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.CuratedPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -59,15 +58,15 @@ interface PodcastManager {
     fun observeEpisodeCountByPodcatUuid(uuid: String): Flow<Int>
 
     /** Add methods  */
-    fun subscribeToPodcast(podcastUuid: String, sync: Boolean)
+    fun subscribeToPodcast(podcastUuid: String, sync: Boolean, shouldAutoDownload: Boolean = true)
 
     suspend fun subscribeToPodcastSuspend(podcastUuid: String, sync: Boolean = false): Podcast
-    fun subscribeToPodcastRx(podcastUuid: String, sync: Boolean = false): Single<Podcast>
+    fun subscribeToPodcastRx(podcastUuid: String, sync: Boolean = false, shouldAutoDownload: Boolean = true): Single<Podcast>
     fun findOrDownloadPodcastRx(podcastUuid: String): Single<Podcast>
     fun isSubscribingToPodcasts(): Boolean
     fun getSubscribedPodcastUuids(): Single<List<String>>
     fun isSubscribingToPodcast(podcastUuid: String): Boolean
-    fun addPodcast(podcastUuid: String, sync: Boolean, subscribed: Boolean): Single<Podcast>
+    fun addPodcast(podcastUuid: String, sync: Boolean, subscribed: Boolean, shouldAutoDownload: Boolean): Single<Podcast>
 
     fun addFolderPodcast(podcast: Podcast)
 
@@ -84,7 +83,7 @@ interface PodcastManager {
     suspend fun updateAutoAddToUpNextsIf(podcastUuids: List<String>, newValue: Podcast.AutoAddUpNext, onlyIfValue: Podcast.AutoAddUpNext)
     fun updateExcludeFromAutoArchive(podcast: Podcast, excludeFromAutoArchive: Boolean)
     fun updateOverrideGlobalEffects(podcast: Podcast, override: Boolean)
-    fun updateTrimMode(podcast: Podcast, trimMode: TrimMode)
+    suspend fun updateTrimMode(podcast: Podcast, trimMode: TrimMode)
     fun updateVolumeBoosted(podcast: Podcast, override: Boolean)
     fun updatePlaybackSpeed(podcast: Podcast, speed: Double)
     fun updateEffects(podcast: Podcast, effects: PlaybackEffects)
@@ -147,8 +146,6 @@ interface PodcastManager {
     suspend fun findAutoAddToUpNextPodcasts(): List<Podcast>
 
     suspend fun refreshPodcastFeed(podcastUuid: String): Boolean
-
-    suspend fun findTopPodcasts(fromEpochMs: Long, toEpochMs: Long, limit: Int): List<TopPodcast>
 
     suspend fun findRandomPodcasts(limit: Int): List<Podcast>
 

@@ -52,11 +52,13 @@ dependencies {
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.preference.ktx)
+    implementation(libs.androidx.webkit)
     implementation(libs.compose.animation)
     implementation(libs.compose.material)
     implementation(libs.compose.material.icons.core)
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.tooling.preview)
+    implementation(libs.compose.webview)
     implementation(libs.coroutines.core)
     implementation(libs.coroutines.rx2)
     implementation(libs.fragment.compose)

@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.models.type.AutoDownloadLimitSetting
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
@@ -29,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import io.reactivex.Observable
+import java.time.Instant
 import java.util.Date
 import kotlinx.coroutines.flow.Flow
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -73,6 +75,7 @@ interface Settings {
         const val SYNC_HISTORY_VERSION = 1
         const val SYNC_API_MODEL = "mobile"
         const val LAST_UPDATE_TIME = "LastUpdateTime"
+        const val LAST_DISMISS_LOW_STORAGE_MODAL_TIME = "LastDismissLowStorageModalTime"
         const val PREFERENCE_SKIP_FORWARD = "skipForward"
         const val PREFERENCE_SKIP_BACKWARD = "skipBack"
         const val PREFERENCE_STORAGE_CHOICE = "storageChoice"
@@ -259,6 +262,8 @@ interface Settings {
 
     val shelfItems: UserSetting<List<ShelfItem>>
 
+    val upNextShuffle: UserSetting<Boolean>
+
     fun getVersion(): String
     fun getVersionCode(): Int
 
@@ -306,6 +311,8 @@ interface Settings {
 
     val playOverNotification: UserSetting<PlayOverNotificationSetting>
 
+    val autoDownloadLimit: UserSetting<AutoDownloadLimitSetting>
+
     fun setLastModified(lastModified: String?)
     fun getLastModified(): String?
 
@@ -317,6 +324,9 @@ interface Settings {
 
     fun clearPlusPreferences()
 
+    fun setDismissLowStorageModalTime(lastUpdateTime: Long)
+    fun shouldShowLowStorageModalAfterSnooze(): Boolean
+
     val hideNotificationOnPause: UserSetting<Boolean>
 
     val streamingMode: UserSetting<Boolean>
@@ -326,6 +336,7 @@ interface Settings {
     val autoDownloadUnmeteredOnly: UserSetting<Boolean>
     val autoDownloadOnlyWhenCharging: UserSetting<Boolean>
     val autoDownloadUpNext: UserSetting<Boolean>
+    val autoDownloadNewEpisodes: UserSetting<Boolean>
 
     val artworkConfiguration: UserSetting<ArtworkConfiguration>
 
@@ -470,8 +481,6 @@ interface Settings {
     fun setEndOfYearShowModal(value: Boolean)
     fun getEndOfYearShowModal(): Boolean
 
-    var showKidsBanner: UserSetting<Boolean>
-
     fun hasCompletedOnboarding(): Boolean
     fun setHasDoneInitialOnboarding()
 
@@ -544,4 +553,11 @@ interface Settings {
 
     val playerOrUpNextBottomSheetState: Flow<Int>
     fun updatePlayerOrUpNextBottomSheetState(state: Int)
+
+    val referralClaimCode: UserSetting<String>
+    val showReferralWelcome: UserSetting<Boolean>
+
+    val lastEoySyncTimestamp: UserSetting<Instant>
+
+    val useRealTimeForPlaybackRemaingTime: UserSetting<Boolean>
 }

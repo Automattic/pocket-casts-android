@@ -9,7 +9,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PATRON_
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PLUS_MONTHLY_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PLUS_YEARLY_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper.mapProductIdToTier
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
@@ -50,6 +50,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
@@ -63,6 +66,7 @@ class SubscriptionManagerImpl @Inject constructor(
     private val syncManager: SyncManager,
     private val productDetailsInterceptor: ProductDetailsInterceptor,
     private val settings: Settings,
+    private val subscriptionMapper: SubscriptionMapper,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : SubscriptionManager,
     PurchasesUpdatedListener,
@@ -105,6 +109,12 @@ class SubscriptionManagerImpl @Inject constructor(
 
     override fun observeSubscriptionStatus(): Flowable<Optional<SubscriptionStatus>> {
         return subscriptionStatus.toFlowable(BackpressureStrategy.LATEST)
+    }
+
+    override fun subscriptionTier(): Flow<SubscriptionTier> {
+        return observeSubscriptionStatus().asFlow().map { status ->
+            (status.get() as? SubscriptionStatus.Paid)?.tier ?: SubscriptionTier.NONE
+        }.distinctUntilChanged()
     }
 
     override fun getSubscriptionStatus(allowCache: Boolean): Single<SubscriptionStatus> {
@@ -176,20 +186,15 @@ class SubscriptionManagerImpl @Inject constructor(
                     .setProductId(PLUS_YEARLY_PRODUCT_ID)
                     .setProductType(BillingClient.ProductType.SUBS)
                     .build(),
-            ).apply {
-                add(
-                    QueryProductDetailsParams.Product.newBuilder()
-                        .setProductId(PATRON_MONTHLY_PRODUCT_ID)
-                        .setProductType(BillingClient.ProductType.SUBS)
-                        .build(),
-                )
-                add(
-                    QueryProductDetailsParams.Product.newBuilder()
-                        .setProductId(PATRON_YEARLY_PRODUCT_ID)
-                        .setProductType(BillingClient.ProductType.SUBS)
-                        .build(),
-                )
-            }
+                QueryProductDetailsParams.Product.newBuilder()
+                    .setProductId(PATRON_MONTHLY_PRODUCT_ID)
+                    .setProductType(BillingClient.ProductType.SUBS)
+                    .build(),
+                QueryProductDetailsParams.Product.newBuilder()
+                    .setProductId(PATRON_YEARLY_PRODUCT_ID)
+                    .setProductType(BillingClient.ProductType.SUBS)
+                    .build(),
+            )
 
         val params = QueryProductDetailsParams.newBuilder()
             .setProductList(productList)
@@ -278,7 +283,7 @@ class SubscriptionManagerImpl @Inject constructor(
                         billingClient.acknowledgePurchase(acknowledgePurchaseParams, this@SubscriptionManagerImpl)
                     }
                     purchase.products.map {
-                        mapProductIdToTier(it.toString())
+                        Subscription.SubscriptionTier.fromProductId(it.toString())
                     }.distinct().forEach {
                         updateOfferEligible(it, false)
                     }
@@ -328,7 +333,7 @@ class SubscriptionManagerImpl @Inject constructor(
         val result = billingClient.queryPurchaseHistory(queryPurchaseHistoryParams)
         result.purchaseHistoryRecordList?.forEach {
             it.products.map { productId ->
-                mapProductIdToTier(productId)
+                Subscription.SubscriptionTier.fromProductId(productId)
             }.distinct().forEach { tier ->
                 updateOfferEligible(tier, false)
             }
@@ -430,10 +435,10 @@ class SubscriptionManagerImpl @Inject constructor(
             val subscriptions = when (productDetails) {
                 is ProductDetailsState.Error -> null
                 is ProductDetailsState.Loaded -> productDetails.productDetails.mapNotNull { productDetailsState ->
-                    Subscription.fromProductDetails(
+                    subscriptionMapper.mapFromProductDetails(
                         productDetails = productDetailsState,
                         isOfferEligible = isOfferEligible(
-                            mapProductIdToTier(productDetailsState.productId),
+                            Subscription.SubscriptionTier.fromProductId(productDetailsState.productId),
                         ),
                     )
                 }

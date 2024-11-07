@@ -1,10 +1,7 @@
-@file:Suppress("DEPRECATION")
 
 package au.com.shiftyjelly.pocketcasts.wear.ui.episode
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -19,15 +16,14 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
 import androidx.wear.compose.foundation.SwipeToDismissBoxState
+import androidx.wear.compose.navigation.composable
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.NotificationScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.NowPlayingPager
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ObtainConfirmationScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.NowPlayingScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.StreamingConfirmationScreen
 import com.google.android.horologist.compose.layout.ScalingLazyColumnDefaults
-import com.google.android.horologist.compose.navscaffold.NavScaffoldViewModel
-import com.google.android.horologist.compose.navscaffold.composable
-import com.google.android.horologist.compose.navscaffold.scrollable
+import com.google.android.horologist.compose.layout.rememberColumnState
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -43,7 +39,6 @@ object EpisodeScreenFlow {
     private const val deleteDownloadNotificationScreen = "deleteDownloadNotificationScreen"
     private const val removeFromUpNextNotificationScreen = "removeFromUpNextNotificationScreen"
 
-    @OptIn(ExperimentalFoundationApi::class)
     fun NavGraphBuilder.episodeGraph(
         navigateToPodcast: (podcastUuid: String) -> Unit,
         navController: NavController,
@@ -58,12 +53,8 @@ object EpisodeScreenFlow {
                 },
             ),
         ) {
-            @Suppress("DEPRECATION")
-            scrollable(
+            composable(
                 route = episodeScreen,
-                columnStateFactory = ScalingLazyColumnDefaults.belowTimeText(
-                    verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.Top),
-                ),
             ) {
                 // Listen for results from streaming confirmation screen
                 navController.currentBackStackEntry?.savedStateHandle
@@ -78,18 +69,18 @@ object EpisodeScreenFlow {
                         }
                     }
 
-                val pagerState = rememberPagerState { NowPlayingPager.pageCount }
                 val coroutineScope = rememberCoroutineScope()
 
-                @OptIn(ExperimentalFoundationApi::class)
                 NowPlayingPager(
                     navController = navController,
-                    pagerState = pagerState,
                     swipeToDismissState = swipeToDismissState,
-                    scrollableScaffoldContext = it,
                 ) {
                     EpisodeScreen(
-                        columnState = it.columnState,
+                        columnState = rememberColumnState(
+                            factory = ScalingLazyColumnDefaults.belowTimeText(
+                                verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.Top),
+                            ),
+                        ),
                         navigateToPodcast = navigateToPodcast,
                         navigateToUpNextOptions = { navController.navigate(upNextOptionsScreen) },
                         navigateToConfirmDeleteDownload = {
@@ -110,25 +101,23 @@ object EpisodeScreenFlow {
                 }
             }
 
-            @Suppress("DEPRECATION")
-            scrollable(upNextOptionsScreen) {
-                it.viewModel.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
-                val episodeScreenBackStackEntry = remember(it.backStackEntry) {
+            composable(
+                route = upNextOptionsScreen,
+            ) {
+                val episodeScreenBackStackEntry = remember(it) {
                     navController.getBackStackEntry(episodeScreen)
                 }
                 UpNextOptionsScreen(
-                    columnState = it.columnState,
                     episodeScreenViewModelStoreOwner = episodeScreenBackStackEntry, // Reuse view model from EpisodeScreen
                     onComplete = { navController.popBackStack() },
                 )
             }
 
-            @Suppress("DEPRECATION")
-            composable(deleteDownloadConfirmationScreen) {
-                it.viewModel.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
-
+            composable(
+                route = deleteDownloadConfirmationScreen,
+            ) {
                 // Reuse view model from EpisodeScreen
-                val episodeScreenViewModelStoreOwner = remember(it.backStackEntry) {
+                val episodeScreenViewModelStoreOwner = remember(it) {
                     navController.getBackStackEntry(episodeScreen)
                 }
                 val viewModel = hiltViewModel<EpisodeViewModel>(episodeScreenViewModelStoreOwner)
@@ -147,18 +136,18 @@ object EpisodeScreenFlow {
                 )
             }
 
-            @Suppress("DEPRECATION")
-            composable(deleteDownloadNotificationScreen) {
-                it.viewModel.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
+            composable(
+                route = deleteDownloadNotificationScreen,
+            ) {
                 NotificationScreen(
                     text = stringResource(LR.string.removed),
                     onClose = { navController.popBackStack() },
                 )
             }
 
-            @Suppress("DEPRECATION")
-            composable(removeFromUpNextNotificationScreen) {
-                it.viewModel.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
+            composable(
+                route = removeFromUpNextNotificationScreen,
+            ) {
                 NotificationScreen(
                     text = stringResource(LR.string.episode_removed_from_up_next),
                     onClose = { navController.popBackStack() },

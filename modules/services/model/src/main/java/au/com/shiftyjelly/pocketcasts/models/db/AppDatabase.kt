@@ -34,6 +34,7 @@ import au.com.shiftyjelly.pocketcasts.models.converter.UserEpisodeServerStatusCo
 import au.com.shiftyjelly.pocketcasts.models.db.dao.BookmarkDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.BumpStatsDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.ChapterDao
+import au.com.shiftyjelly.pocketcasts.models.db.dao.EndOfYearDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.ExternalDataDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.FolderDao
@@ -59,6 +60,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.SearchHistoryItem
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextChange
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.UserPodcastRating
 import au.com.shiftyjelly.pocketcasts.models.to.DbChapter
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import java.io.File
@@ -83,12 +85,14 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         DbChapter::class,
         CuratedPodcast::class,
         Transcript::class,
+        UserPodcastRating::class,
     ],
-    version = 100,
+    version = 104,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 81, to = 82, spec = AppDatabase.Companion.DeleteSilenceRemovedMigration::class),
         AutoMigration(from = 88, to = 89, spec = AppDatabase.Companion.DeleteAutomaticallyCachedMigration::class),
+        AutoMigration(from = 102, to = 103, spec = AppDatabase.Companion.DeleteAutoDownloadLimitMigration::class),
     ],
 )
 @TypeConverters(
@@ -127,6 +131,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun chapterDao(): ChapterDao
     abstract fun transcriptDao(): TranscriptDao
     abstract fun externalDataDao(): ExternalDataDao
+    abstract fun endOfYearDao(): EndOfYearDao
 
     fun databaseFiles() =
         openHelper.readableDatabase.path?.let {
@@ -841,6 +846,32 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_100_101 = addMigration(100, 101) { database ->
+            database.execSQL("ALTER TABLE podcasts ADD COLUMN auto_download_limit INTEGER")
+        }
+
+        val MIGRATION_101_102 = addMigration(101, 102) { database ->
+            database.execSQL(
+                """
+                    CREATE TABLE user_podcast_ratings(
+                        podcast_uuid TEXT NOT NULL PRIMARY KEY,
+                        rating INTEGER NOT NULL,
+                        modified_at INTEGER NOT NULL
+                    )
+                """.trimIndent(),
+            )
+        }
+
+        @DeleteColumn(
+            tableName = "podcasts",
+            columnName = "auto_download_limit",
+        )
+        class DeleteAutoDownloadLimitMigration : AutoMigrationSpec
+
+        val MIGRATION_103_104 = addMigration(103, 104) { database ->
+            database.execSQL("DELETE FROM curated_podcasts WHERE list_id IS 'featured'")
+        }
+
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
             databaseBuilder.addMigrations(
                 addMigration(1, 2) { },
@@ -1231,6 +1262,10 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_97_98,
                 MIGRATION_98_99,
                 MIGRATION_99_100,
+                MIGRATION_100_101,
+                MIGRATION_101_102,
+                // 102 to 103 added via auto migration
+                MIGRATION_103_104,
             )
         }
 

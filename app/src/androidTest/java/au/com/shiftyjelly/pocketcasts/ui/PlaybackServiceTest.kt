@@ -38,7 +38,6 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.timeout
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoMoreInteractions
 
 @RunWith(AndroidJUnit4::class)
 class PlaybackServiceTest {
@@ -184,6 +183,6 @@ class PlaybackServiceTest {
             .build()
         service.testPlaybackStateChange(metaData, stopped)
         testScheduler.triggerActions()
-        verifyNoMoreInteractions(testNotificationManager)
+        verify(testNotificationManager, timeout(5000).times(1)).cancel(eq(NotificationId.PLAYING.value))
     }
 }

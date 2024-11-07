@@ -2,10 +2,12 @@ package au.com.shiftyjelly.pocketcasts.compose.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -17,6 +19,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
@@ -52,6 +55,7 @@ fun AutoResizeText(
     maxLines: Int = Int.MAX_VALUE,
     onTextLayout: (TextLayoutResult) -> Unit = {},
     style: TextStyle = LocalTextStyle.current,
+    heightFactor: Float? = null,
 ) {
     val alignment = contentAlignment ?: when (textAlign) {
         TextAlign.Left -> Alignment.TopStart
@@ -118,6 +122,28 @@ fun AutoResizeText(
             shrunkFontSize = maxFontSize
         }
 
+        val heightModifier = if (heightFactor != null) {
+            val measurer = rememberTextMeasurer()
+            val measurement = remember(text) {
+                measurer.measure(
+                    text = text,
+                    style = TextStyle(
+                        fontSize = shrunkFontSize,
+                        lineHeight = lineHeight,
+                        fontWeight = fontWeight,
+                    ),
+                )
+            }
+            if (!measurement.didOverflowHeight) {
+                val height = LocalDensity.current.run { measurement.firstBaseline.toDp() * heightFactor }
+                Modifier.requiredHeight(height)
+            } else {
+                Modifier
+            }
+        } else {
+            Modifier
+        }
+
         Text(
             text = text,
             color = color,
@@ -132,6 +158,7 @@ fun AutoResizeText(
             onTextLayout = onTextLayout,
             maxLines = maxLines,
             style = style,
+            modifier = heightModifier,
         )
     }
 }

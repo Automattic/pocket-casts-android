@@ -21,6 +21,7 @@ class OnboardingActivityContract : ActivityResultContract<Intent, OnboardingActi
         Done,
         DoneGoToDiscover,
         DoneShowPlusPromotion,
+        DoneShowWelcomeInReferralFlow,
     }
 
     companion object {

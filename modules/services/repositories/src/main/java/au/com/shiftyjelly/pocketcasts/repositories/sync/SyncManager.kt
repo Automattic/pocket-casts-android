@@ -28,6 +28,10 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.login.ExchangeSonosResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.pocketcasts.service.api.PodcastRatingResponse
+import com.pocketcasts.service.api.PodcastRatingsResponse
+import com.pocketcasts.service.api.ReferralCodeResponse
+import com.pocketcasts.service.api.ReferralRedemptionResponse
+import com.pocketcasts.service.api.ReferralValidationResponse
 import com.pocketcasts.service.api.UserPodcastListResponse
 import io.reactivex.Completable
 import io.reactivex.Maybe
@@ -90,13 +94,19 @@ interface SyncManager : NamedSettingsCaller {
     // Rating
     suspend fun addPodcastRating(podcastUuid: String, rate: Int): PodcastRatingResponse
     suspend fun getPodcastRating(podcastUuid: String): PodcastRatingResponse
+    suspend fun getPodcastRatings(): PodcastRatingsResponse?
 
     // Other
     suspend fun exchangeSonos(): ExchangeSonosResponse
     fun getFilters(): Single<List<Playlist>>
     suspend fun loadStats(): StatsBundle
-    fun upNextSync(request: UpNextSyncRequest): Single<UpNextSyncResponse>
+    suspend fun upNextSync(request: UpNextSyncRequest): UpNextSyncResponse
     suspend fun getBookmarks(): List<Bookmark>
     suspend fun sendAnonymousFeedback(subject: String, inbox: String, message: String): Response<Void>
     suspend fun sendFeedback(subject: String, inbox: String, message: String): Response<Void>
+
+    // Referral
+    suspend fun getReferralCode(): Response<ReferralCodeResponse>
+    suspend fun validateReferralCode(code: String): Response<ReferralValidationResponse>
+    suspend fun redeemReferralCode(code: String): Response<ReferralRedemptionResponse>
 }

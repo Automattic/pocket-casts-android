@@ -7,7 +7,7 @@
     <au.com.shiftyjelly.pocketcasts.player.view.MiniPlayer
         android:id="@+id/miniPlayer"
         android:layout_width="match_parent"
-        android:layout_height="68dp" />
+        android:layout_height="@dimen/mini_player_height" />
 
     <FrameLayout
         android:id="@+id/player"

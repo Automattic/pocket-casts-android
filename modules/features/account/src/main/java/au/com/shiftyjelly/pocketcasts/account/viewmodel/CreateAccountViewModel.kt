@@ -8,10 +8,8 @@ import au.com.shiftyjelly.pocketcasts.analytics.TracksAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PLUS_MONTHLY_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PLUS_YEARLY_PRODUCT_ID
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchaseEvent
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
@@ -94,33 +92,6 @@ class CreateAccountViewModel
                 }
             }
         }
-    }
-
-    fun loadSubs() {
-        subscriptionManager.observeProductDetails()
-            .firstOrError()
-            .subscribeBy(
-                onSuccess = { productDetailsState ->
-                    if (productDetailsState is ProductDetailsState.Loaded) {
-                        val subscriptions = productDetailsState.productDetails
-                            .mapNotNull {
-                                Subscription.fromProductDetails(
-                                    productDetails = it,
-                                    isOfferEligible = subscriptionManager.isOfferEligible(SubscriptionMapper.mapProductIdToTier(it.productId)),
-                                )
-                            }
-                        val filteredOffer = Subscription.filterOffers(subscriptions)
-                        subscriptionManager.getDefaultSubscription(filteredOffer)?.let { updateSubscription(it) }
-                        createAccountState.postValue(CreateAccountState.ProductsLoaded(filteredOffer))
-                    } else {
-                        errorUpdate(CreateAccountError.CANNOT_LOAD_SUBS, true)
-                    }
-                },
-                onError = {
-                    errorUpdate(CreateAccountError.CANNOT_LOAD_SUBS, true)
-                },
-            )
-            .addTo(disposables)
     }
 
     private fun errorUpdate(error: CreateAccountError, add: Boolean) {

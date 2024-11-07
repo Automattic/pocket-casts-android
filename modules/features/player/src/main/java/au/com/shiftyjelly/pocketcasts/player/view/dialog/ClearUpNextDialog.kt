@@ -41,14 +41,16 @@ class ClearUpNextDialog(
         }
     }
 
-    fun showOrClear(fragmentManager: FragmentManager) {
+    fun showOrClear(fragmentManager: FragmentManager, tag: String) {
         val episodeCount = playbackManager.upNextQueue.queueEpisodes.size
         return if (episodeCount >= 3) {
-            show(fragmentManager, "mini_player_clear_dialog")
+            showClearUpNextConfirmationDialog(fragmentManager, tag)
         } else {
             clear()
         }
     }
+
+    fun showClearUpNextConfirmationDialog(fragmentManager: FragmentManager, tag: String) = show(fragmentManager, tag)
 
     companion object {
         private const val SOURCE_KEY = "source"

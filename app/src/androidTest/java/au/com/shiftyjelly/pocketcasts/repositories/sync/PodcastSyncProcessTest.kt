@@ -160,6 +160,7 @@ class PodcastSyncProcessTest {
                 subscriptionManager = mock(),
                 folderManager = folderManager,
                 syncManager = syncManager,
+                ratingsManager = mock(),
                 crashLogging = FakeCrashLogging(),
                 analyticsTracker = AnalyticsTracker.test(),
             )

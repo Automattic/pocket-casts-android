@@ -27,6 +27,11 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
 import com.pocketcasts.service.api.PodcastRatingAddRequest
 import com.pocketcasts.service.api.PodcastRatingResponse
 import com.pocketcasts.service.api.PodcastRatingShowRequest
+import com.pocketcasts.service.api.PodcastRatingsResponse
+import com.pocketcasts.service.api.ReferralCodeResponse
+import com.pocketcasts.service.api.ReferralRedemptionRequest
+import com.pocketcasts.service.api.ReferralRedemptionResponse
+import com.pocketcasts.service.api.ReferralValidationResponse
 import com.pocketcasts.service.api.SupportFeedbackRequest
 import com.pocketcasts.service.api.UserPodcastListResponse
 import com.pocketcasts.service.api.bookmarkRequest
@@ -142,7 +147,7 @@ open class SyncServiceManager @Inject constructor(
         return service.syncUpdate(fields)
     }
 
-    fun upNextSync(request: UpNextSyncRequest, token: AccessToken): Single<UpNextSyncResponse> =
+    suspend fun upNextSync(request: UpNextSyncRequest, token: AccessToken): UpNextSyncResponse =
         service.upNextSync(addBearer(token), request)
 
     fun getLastSyncAt(token: AccessToken): Single<String> =
@@ -273,6 +278,10 @@ open class SyncServiceManager @Inject constructor(
         return service.getPodcastRating(addBearer(token), request)
     }
 
+    suspend fun getPodcastRatings(token: AccessToken): PodcastRatingsResponse? {
+        return service.getPodcastRatings(addBearer(token)).body()
+    }
+
     suspend fun sendAnonymousFeedback(subject: String, inbox: String, message: String): Response<Void> {
         val request = SupportFeedbackRequest.newBuilder()
             .setSubject(subject)
@@ -289,6 +298,22 @@ open class SyncServiceManager @Inject constructor(
             .setMessage(message)
             .build()
         return service.sendFeedback(addBearer(token), request)
+    }
+
+    // Referral
+    suspend fun getReferralCode(token: AccessToken): Response<ReferralCodeResponse> {
+        return service.getReferralCode(addBearer(token))
+    }
+
+    suspend fun validateReferralCode(token: AccessToken, code: String): Response<ReferralValidationResponse> {
+        return service.validateReferralCode(addBearer(token), code)
+    }
+
+    suspend fun redeemReferralCode(token: AccessToken, code: String): Response<ReferralRedemptionResponse> {
+        val request = ReferralRedemptionRequest.newBuilder()
+            .setCode(code)
+            .build()
+        return service.redeemReferralCode(addBearer(token), request)
     }
 
     fun signOut() {

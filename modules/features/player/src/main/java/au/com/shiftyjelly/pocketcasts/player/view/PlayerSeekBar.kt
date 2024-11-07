@@ -11,10 +11,13 @@ import android.widget.TextView
 import androidx.appcompat.widget.AppCompatSeekBar
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.isVisible
-import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
+import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
+import au.com.shiftyjelly.pocketcasts.utils.toHhMmSs
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import me.zhanghai.android.materialprogressbar.MaterialProgressBar
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -22,8 +25,11 @@ class PlayerSeekBar @JvmOverloads constructor(context: Context, attrs: Attribute
     private val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
     private val view = inflater.inflate(R.layout.view_playback_seek_bar, this)
     private var seeking = false
-    private var currentTimeMs: Int = 0
-    private var durationMs: Int = 0
+    private var currentTime = Duration.ZERO
+    private var duration = Duration.ZERO
+    private var chapters = Chapters()
+    private var playbackSpeed = 1.0
+    private var adjustDuration = false
     private val seekBar = view.findViewById(R.id.seekBarInternal) as AppCompatSeekBar
     private val elapsedTimeText = view.findViewById(R.id.elapsedTime) as TextView
     private val remainingTimeText = view.findViewById(R.id.remainingTime) as TextView
@@ -47,19 +53,36 @@ class PlayerSeekBar @JvmOverloads constructor(context: Context, attrs: Attribute
         setupSeekBar()
     }
 
-    fun setCurrentTimeMs(currentTimeMs: Int) {
-        if (seeking) {
-            return
-        }
-        this.currentTimeMs = currentTimeMs
-        seekBar.progress = currentTimeMs / 1000
+    fun setAdjustDuration(adjust: Boolean) {
+        this.adjustDuration = adjust
         updateTextViews()
     }
 
-    fun setDurationMs(durationMs: Int) {
-        this.durationMs = durationMs
-        val durationSecs = durationMs / 1000
-        seekBar.max = durationSecs
+    fun setCurrentTime(currentTime: Duration) {
+        if (seeking) {
+            return
+        }
+        this.currentTime = currentTime
+        seekBar.progress = currentTime.inWholeSeconds.toInt()
+        updateTextViews()
+    }
+
+    fun setChapters(chapters: Chapters) {
+        if (seeking) {
+            return
+        }
+        this.chapters = chapters
+        updateTextViews()
+    }
+
+    fun setDuration(duration: Duration) {
+        this.duration = duration
+        seekBar.max = duration.inWholeSeconds.toInt()
+        updateTextViews()
+    }
+
+    fun setPlaybackSpeed(playbackSpeed: Double) {
+        this.playbackSpeed = playbackSpeed
         updateTextViews()
     }
 
@@ -83,7 +106,7 @@ class PlayerSeekBar @JvmOverloads constructor(context: Context, attrs: Attribute
         seekBar.secondaryProgress = 0
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onStopTrackingTouch(seekBar: SeekBar) {
-                changeListener?.onSeekPositionChangeStop(currentTimeMs) {
+                changeListener?.onSeekPositionChangeStop(currentTime) {
                     seeking = false
                 }
             }
@@ -96,33 +119,47 @@ class PlayerSeekBar @JvmOverloads constructor(context: Context, attrs: Attribute
             override fun onProgressChanged(seekBar: SeekBar, progressSecs: Int, fromUser: Boolean) {
                 if (!fromUser) return
 
-                currentTimeMs = progressSecs * 1000
+                currentTime = progressSecs.seconds
                 updateTextViews()
 
-                changeListener?.onSeekPositionChanging(currentTimeMs)
+                changeListener?.onSeekPositionChanging(currentTime)
             }
         })
     }
 
     private fun updateTextViews() {
-        if (durationMs <= 0) {
+        if (duration <= Duration.ZERO) {
             elapsedTimeText.text = ""
             elapsedTimeText.contentDescription = ""
             remainingTimeText.text = ""
             remainingTimeText.contentDescription = ""
         } else {
-            val elapsedTime = TimeHelper.formattedMs(currentTimeMs)
-            elapsedTimeText.text = elapsedTime
+            val elapsedTime = currentTime.toHhMmSs()
+            elapsedTimeText.text = currentTime.toHhMmSs()
             elapsedTimeText.contentDescription = resources.getString(LR.string.player_played_up_to, elapsedTime)
-            val timeRemaining = TimeHelper.getTimeLeftOnlyNumbers(currentTimeMs, durationMs)
-            remainingTimeText.text = timeRemaining
-            remainingTimeText.contentDescription = resources.getString(LR.string.player_time_remaining, timeRemaining.removePrefix("-"))
+            val timeLeft = remainingDuration()
+            val remaingingTime = buildString {
+                if (timeLeft > Duration.ZERO) {
+                    append('-')
+                }
+                append(timeLeft.toHhMmSs())
+            }
+            remainingTimeText.text = remaingingTime
+            remainingTimeText.contentDescription = resources.getString(LR.string.player_time_remaining, remaingingTime.removePrefix("-"))
         }
     }
 
+    private fun remainingDuration(): Duration {
+        return if (adjustDuration) {
+            (duration - currentTime - chapters.skippedChaptersDuration(currentTime)) / playbackSpeed
+        } else {
+            duration - currentTime
+        }.coerceAtLeast(Duration.ZERO)
+    }
+
     interface OnUserSeekListener {
-        fun onSeekPositionChangeStop(progress: Int, seekComplete: () -> Unit)
-        fun onSeekPositionChanging(progress: Int)
+        fun onSeekPositionChangeStop(progress: Duration, seekComplete: () -> Unit)
+        fun onSeekPositionChanging(progress: Duration)
         fun onSeekPositionChangeStart()
     }
 }

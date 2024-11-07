@@ -45,7 +45,6 @@ import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel.Transitio
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.reimagine.ShareDialogFragment
-import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -57,6 +56,7 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
+import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
@@ -74,17 +74,17 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlin.math.abs
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private const val UP_NEXT_FLING_VELOCITY_THRESHOLD = 1000.0f
 
 @AndroidEntryPoint
 class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
-    @Inject
-    lateinit var castManager: CastManager
-
     @Inject
     lateinit var playbackManager: PlaybackManager
 
@@ -136,12 +136,13 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         )
 
         binding.seekBar.changeListener = object : PlayerSeekBar.OnUserSeekListener {
-            override fun onSeekPositionChangeStop(progress: Int, seekComplete: () -> Unit) {
-                viewModel.seekToMs(progress, seekComplete)
-                playbackManager.trackPlaybackSeek(progress, SourceView.PLAYER)
+            override fun onSeekPositionChangeStop(progress: Duration, seekComplete: () -> Unit) {
+                val progressMs = progress.inWholeMilliseconds.toInt()
+                viewModel.seekToMs(progressMs, seekComplete)
+                playbackManager.trackPlaybackSeek(progressMs, SourceView.PLAYER)
             }
 
-            override fun onSeekPositionChanging(progress: Int) {}
+            override fun onSeekPositionChanging(progress: Duration) {}
 
             override fun onSeekPositionChangeStart() {
             }
@@ -158,6 +159,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             ShelfItem.Archive to binding.archive,
             ShelfItem.Bookmark to binding.bookmark,
             ShelfItem.Transcript to binding.transcript,
+            ShelfItem.Download to binding.download,
             ShelfItem.Report to binding.report,
         )
         viewModel.trimmedShelfLive.observe(viewLifecycleOwner) {
@@ -215,6 +217,17 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             trackShelfAction(ShelfItem.Report.analyticsValue)
             openUrl(settings.getReportViolationUrl())
         }
+        binding.download?.setOnClickListener {
+            trackShelfAction(ShelfItem.Download.analyticsValue)
+            viewModel.handleDownloadClickFromPlaybackActions(
+                onDownloadStart = {
+                    showSnackBar(text = getString(LR.string.episode_queued_for_download))
+                },
+                onDeleteStart = {
+                    showSnackBar(text = getString(LR.string.episode_was_removed))
+                },
+            )
+        }
         binding.videoView.playbackManager = playbackManager
         binding.videoView.setOnClickListener { onFullScreenVideoClick() }
 
@@ -240,8 +253,11 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             val playerContrast1 = ThemeColor.playerContrast01(headerViewModel.theme)
 
             binding.seekBar.setSeekBarState(
-                durationMs = headerViewModel.durationMs,
-                positionMs = headerViewModel.positionMs,
+                duration = headerViewModel.durationMs.milliseconds,
+                position = headerViewModel.positionMs.milliseconds,
+                chapters = headerViewModel.chapters,
+                playbackSpeed = headerViewModel.playbackEffects.playbackSpeed,
+                adjustDuration = headerViewModel.adjustRemainingTimeDuration,
                 tintColor = headerViewModel.iconTintColor,
                 bufferedUpTo = headerViewModel.bufferedUpToMs,
                 isBuffering = headerViewModel.isBuffering,
@@ -253,6 +269,34 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
             headerViewModel.episode?.let { episode ->
                 loadArtwork(episode, headerViewModel.useEpisodeArtwork, binding.artwork)
+
+                val isPodcast = episode is PodcastEpisode
+
+                val downloadIcon = when {
+                    isPodcast && (episode.isDownloading || episode.isQueued) -> IR.drawable.ic_download
+                    isPodcast && episode.isDownloaded -> IR.drawable.ic_downloaded_24dp
+                    else -> IR.drawable.ic_download
+                }
+
+                binding.download?.apply {
+                    setImageResource(downloadIcon)
+
+                    contentDescription = when {
+                        isPodcast && (episode.isDownloading || episode.isQueued) -> context.getString(LR.string.episode_downloading)
+                        isPodcast && episode.isDownloaded -> context.getString(LR.string.remove_downloaded_file)
+                        else -> context.getString(LR.string.download)
+                    }
+
+                    layoutParams = layoutParams?.apply {
+                        width = 0.dpToPx(context)
+                        height = 48.dpToPx(context)
+                    }
+
+                    scaleType = ImageView.ScaleType.CENTER
+
+                    val padding = 12.dpToPx(context)
+                    setPadding(padding, padding, padding, padding)
+                }
             }
 
             binding.podcastTitle.setOnClickListener {
@@ -345,8 +389,11 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             binding.nextChapter.isEnabled = !headerViewModel.isLastChapter
             binding.nextChapter.isVisible = headerViewModel.isChaptersPresent
             binding.seekBar.setSeekBarState(
-                durationMs = headerViewModel.durationMs,
-                positionMs = headerViewModel.positionMs,
+                duration = headerViewModel.durationMs.milliseconds,
+                position = headerViewModel.positionMs.milliseconds,
+                chapters = headerViewModel.chapters,
+                playbackSpeed = headerViewModel.playbackEffects.playbackSpeed,
+                adjustDuration = headerViewModel.adjustRemainingTimeDuration,
                 tintColor = headerViewModel.iconTintColor,
                 bufferedUpTo = headerViewModel.bufferedUpToMs,
                 isBuffering = headerViewModel.isBuffering,
@@ -673,5 +720,14 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             .setBackgroundTint(ThemeColor.primaryUi01(Theme.ThemeType.DARK))
             .setTextColor(ThemeColor.primaryText01(Theme.ThemeType.DARK))
             .show()
+    }
+
+    private fun showSnackBar(text: CharSequence) {
+        parentFragment?.view?.let {
+            Snackbar.make(it, text, Snackbar.LENGTH_SHORT)
+                .setBackgroundTint(ThemeColor.primaryUi01(Theme.ThemeType.LIGHT))
+                .setTextColor(ThemeColor.primaryText01(Theme.ThemeType.LIGHT))
+                .show()
+        }
     }
 }

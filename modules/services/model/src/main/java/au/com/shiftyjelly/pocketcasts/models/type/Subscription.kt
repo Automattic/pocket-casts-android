@@ -94,13 +94,20 @@ sealed interface Subscription {
         }
     }
 
-    enum class SubscriptionTier {
-        PLUS,
-        PATRON,
-        UNKNOWN,
+    enum class SubscriptionTier(val supportedProductIds: List<String>) {
+        PLUS(listOf(PLUS_MONTHLY_PRODUCT_ID, PLUS_YEARLY_PRODUCT_ID)),
+        PATRON(listOf(PATRON_MONTHLY_PRODUCT_ID, PATRON_YEARLY_PRODUCT_ID)),
+        UNKNOWN(emptyList()),
         ;
 
         companion object {
+            private val productIdToTierMap: Map<String, SubscriptionTier> = entries.flatMap { entry ->
+                entry.supportedProductIds.map { productId -> productId to entry }
+            }.toMap()
+
+            fun fromProductId(productId: String): SubscriptionTier =
+                productIdToTierMap[productId] ?: UNKNOWN
+
             fun fromUserTier(userTier: UserTier) = when (userTier) {
                 UserTier.Free -> UNKNOWN
                 UserTier.Plus -> PLUS
@@ -123,9 +130,8 @@ sealed interface Subscription {
         const val PATRON_YEARLY_PRODUCT_ID = "com.pocketcasts.yearly.patron"
         const val TRIAL_OFFER_ID = "plus-yearly-trial-30days"
         const val INTRO_OFFER_ID = "plus-yearly-intro-50percent"
+        const val REFERRAL_OFFER_ID = "plus-yearly-referral-two-months-free"
 
-        fun fromProductDetails(productDetails: ProductDetails, isOfferEligible: Boolean): Subscription? =
-            SubscriptionMapper.map(productDetails, isOfferEligible)
         fun filterOffers(subscriptions: List<Subscription>): List<Subscription> {
             val offers = subscriptions.count { it is WithOffer }
             val hasIntro = subscriptions.any { it is Intro }

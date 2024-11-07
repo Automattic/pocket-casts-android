@@ -1,14 +1,16 @@
 package au.com.shiftyjelly.pocketcasts.repositories.refresh
 
+import android.Manifest
 import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.os.Build
 import android.os.SystemClock
 import android.text.TextUtils
 import android.util.Pair
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
@@ -38,6 +40,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.NotificationBroadcastReceiver
 import au.com.shiftyjelly.pocketcasts.repositories.sync.PodcastSyncProcess
@@ -93,6 +96,7 @@ class RefreshPodcastsThread(
         fun notificationHelper(): NotificationHelper
         fun userManager(): UserManager
         fun syncManager(): SyncManager
+        fun ratingsManager(): RatingsManager
         fun crashLogging(): CrashLogging
         fun analyticsTracker(): AnalyticsTracker
     }
@@ -257,6 +261,7 @@ class RefreshPodcastsThread(
             subscriptionManager = entryPoint.subscriptionManager(),
             folderManager = entryPoint.folderManager(),
             syncManager = entryPoint.syncManager(),
+            ratingsManager = entryPoint.ratingsManager(),
             crashLogging = entryPoint.crashLogging(),
             analyticsTracker = entryPoint.analyticsTracker(),
         )
@@ -525,11 +530,8 @@ class RefreshPodcastsThread(
                 builder = builder.addAction(phoneActions[1])
             }
 
-            // Don't include three action on old devices because they don't fit
-            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
-                if (phoneActions.size > 2) {
-                    builder = builder.addAction(phoneActions[2])
-                }
+            if (phoneActions.size > 2) {
+                builder = builder.addAction(phoneActions[2])
             }
 
             if (isGroupNotification) {
@@ -565,7 +567,9 @@ class RefreshPodcastsThread(
                 }
             }
 
-            manager.notify(notificationTag, NotificationBroadcastReceiver.NOTIFICATION_ID, notification)
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+                manager.notify(notificationTag, NotificationBroadcastReceiver.NOTIFICATION_ID, notification)
+            }
         }
 
         private fun buildNotificationIntent(intentId: Int, intentName: String, episode: PodcastEpisode, notificationTag: String, context: Context): PendingIntent {
@@ -655,7 +659,9 @@ class RefreshPodcastsThread(
             }
 
             val manager = NotificationManagerCompat.from(context)
-            manager.notify(NotificationBroadcastReceiver.NOTIFICATION_TAG_NEW_EPISODES_PRIMARY, NotificationBroadcastReceiver.NOTIFICATION_ID, summaryNotification)
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+                manager.notify(NotificationBroadcastReceiver.NOTIFICATION_TAG_NEW_EPISODES_PRIMARY, NotificationBroadcastReceiver.NOTIFICATION_ID, summaryNotification)
+            }
         }
 
         private fun getPodcastNotificationWearBitmap(uuid: String?, podcastManager: PodcastManager, context: Context): Bitmap? {

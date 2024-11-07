@@ -14,6 +14,7 @@ import android.support.v4.media.MediaDescriptionCompat.STATUS_NOT_DOWNLOADED
 import androidx.annotation.DrawableRes
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.os.bundleOf
+import androidx.media.utils.MediaConstants.DESCRIPTION_EXTRAS_KEY_COMPLETION_PERCENTAGE
 import androidx.media.utils.MediaConstants.DESCRIPTION_EXTRAS_KEY_COMPLETION_STATUS
 import androidx.media.utils.MediaConstants.DESCRIPTION_EXTRAS_VALUE_COMPLETION_STATUS_FULLY_PLAYED
 import androidx.media.utils.MediaConstants.DESCRIPTION_EXTRAS_VALUE_COMPLETION_STATUS_NOT_PLAYED
@@ -213,15 +214,27 @@ object AutoConverter {
     private fun extrasForEpisode(episode: BaseEpisode): Bundle {
         val downloadStatus = if (episode.isDownloaded) STATUS_DOWNLOADED else STATUS_NOT_DOWNLOADED
 
-        val completionStatus = when (episode.playingStatus) {
-            EpisodePlayingStatus.NOT_PLAYED -> DESCRIPTION_EXTRAS_VALUE_COMPLETION_STATUS_NOT_PLAYED
-            EpisodePlayingStatus.IN_PROGRESS -> DESCRIPTION_EXTRAS_VALUE_COMPLETION_STATUS_PARTIALLY_PLAYED
-            EpisodePlayingStatus.COMPLETED -> DESCRIPTION_EXTRAS_VALUE_COMPLETION_STATUS_FULLY_PLAYED
+        val completionStatus: Int
+        val completionPercentage: Double
+        when (episode.playingStatus) {
+            EpisodePlayingStatus.NOT_PLAYED -> {
+                completionStatus = DESCRIPTION_EXTRAS_VALUE_COMPLETION_STATUS_NOT_PLAYED
+                completionPercentage = 0.0
+            }
+            EpisodePlayingStatus.IN_PROGRESS -> {
+                completionStatus = DESCRIPTION_EXTRAS_VALUE_COMPLETION_STATUS_PARTIALLY_PLAYED
+                completionPercentage = if (episode.duration == 0.0) 0.0 else (episode.playedUpTo / episode.duration).coerceIn(0.0, 1.0)
+            }
+            EpisodePlayingStatus.COMPLETED -> {
+                completionStatus = DESCRIPTION_EXTRAS_VALUE_COMPLETION_STATUS_FULLY_PLAYED
+                completionPercentage = 1.0
+            }
         }
 
         return bundleOf(
             EXTRA_DOWNLOAD_STATUS to downloadStatus,
             DESCRIPTION_EXTRAS_KEY_COMPLETION_STATUS to completionStatus,
+            DESCRIPTION_EXTRAS_KEY_COMPLETION_PERCENTAGE to completionPercentage,
         )
     }
 }

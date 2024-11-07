@@ -39,7 +39,7 @@ internal fun PlatformItem(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.clickable(
             interactionSource = remember(::MutableInteractionSource),
-            indication = ripple(color = shareColors.accent, bounded = false),
+            indication = ripple(color = shareColors.accent),
             onClickLabel = stringResource(LR.string.share_via, stringResource(platform.nameId)),
             role = Role.Button,
             onClick = { onClick(platform) },

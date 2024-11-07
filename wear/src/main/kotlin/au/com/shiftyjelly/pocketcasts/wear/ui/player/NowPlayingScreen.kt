@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.wear.ui.player
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Icon
@@ -13,7 +12,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -26,6 +24,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.wear.compose.foundation.ExperimentalWearFoundationApi
 import androidx.wear.compose.foundation.rememberActiveFocusRequester
+import androidx.wear.compose.foundation.rotary.rotaryScrollable
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Scaffold
 import au.com.shiftyjelly.pocketcasts.R
@@ -35,7 +34,7 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.component.MarqueeTextMediaDisplay
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.horologist.PodcastControlButtonsStyled
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.horologist.SetVolumeButtonStyled
 import com.google.android.horologist.audio.ui.VolumeUiState
-import com.google.android.horologist.compose.rotaryinput.onRotaryInputAccumulated
+import com.google.android.horologist.compose.rotaryinput.accumulatedBehavior
 import com.google.android.horologist.media.ui.components.background.ColorBackground
 import com.google.android.horologist.media.ui.components.display.MessageMediaDisplay
 import com.google.android.horologist.media.ui.screens.player.PlayerScreen
@@ -192,7 +191,6 @@ fun NowPlayingScreen(
     }
 }
 
-@Suppress("DEPRECATION")
 @Composable
 private fun PodcastColorBackground(
     state: NowPlayingViewModel.State.Loaded,
@@ -240,7 +238,7 @@ fun NowPlayingSettingsButtons(
 private fun Modifier.onVolumeChangeByScroll(
     focusRequester: FocusRequester,
     onVolumeChangeByScroll: (scrollPixels: Float) -> Unit,
-) =
-    onRotaryInputAccumulated(onValueChange = onVolumeChangeByScroll)
-        .focusRequester(focusRequester)
-        .focusable()
+) = rotaryScrollable(
+    behavior = accumulatedBehavior(onValueChange = onVolumeChangeByScroll),
+    focusRequester = focusRequester,
+)
