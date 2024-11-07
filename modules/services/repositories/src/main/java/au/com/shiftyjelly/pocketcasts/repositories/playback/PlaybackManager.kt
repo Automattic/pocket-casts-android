@@ -1589,6 +1589,15 @@ open class PlaybackManager @Inject constructor(
             }
     }
 
+    private suspend fun onCachingReset(episodeUuid: String) {
+        val episode = getCurrentEpisode()
+        episode?.takeIf { it.uuid == episodeUuid }
+            ?.let {
+                updateBufferPosition(EpisodeBufferStatus(episodeUuid, 0))
+                setupBufferUpdateTimer(episode)
+            }
+    }
+
     @Volatile
     private var observeChaptersJob: Job? = null
 
@@ -2208,6 +2217,7 @@ open class PlaybackManager @Inject constructor(
                 is PlayerEvent.RemoteMetadataNotMatched -> onRemoteMetaDataNotMatched(event.remoteEpisodeUuid)
                 is PlayerEvent.EpisodeChanged -> onEpisodeChanged(event.episodeUuid)
                 is PlayerEvent.CachingComplete -> onCachingComplete(event.episodeUuid)
+                is PlayerEvent.CachingReset -> onCachingReset(event.episodeUuid)
             }
         }
     }

@@ -171,6 +171,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
     ),
+    RESET_EPISODE_CACHE_ON_416_ERROR(
+        key = "reset_episode_cache_on_416_error",
+        title = "Reset episode cache on 416 error",
+        defaultValue = true,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = false,
+    ),
     ;
 
     companion object {
