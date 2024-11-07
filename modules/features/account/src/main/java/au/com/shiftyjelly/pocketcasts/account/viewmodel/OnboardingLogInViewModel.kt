@@ -79,7 +79,7 @@ class OnboardingLogInViewModel @Inject constructor(
             when (result) {
                 is LoginResult.Success -> {
                     podcastManager.refreshPodcastsAfterSignIn()
-                    experiments.initialize()
+                    experiments.refreshExperiments()
                     onSuccessfulLogin()
                 }
 

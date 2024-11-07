@@ -84,8 +84,8 @@ class OnboardingCreateAccountViewModel @Inject constructor(
             when (result) {
                 is LoginResult.Success -> {
                     podcastManager.refreshPodcastsAfterSignIn()
-                    experimentProvider.refreshExperiments()
                     analyticsTracker.refreshMetadata()
+                    experimentProvider.refreshExperiments()
                     onAccountCreated()
                 }
 

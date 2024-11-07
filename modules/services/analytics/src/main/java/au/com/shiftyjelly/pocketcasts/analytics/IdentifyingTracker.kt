@@ -29,7 +29,7 @@ abstract class IdentifyingTracker(
         }
     }
 
-    protected val anonID: String?
+    val anonID: String?
         get() {
             if (anonymousID == null) {
                 anonymousID = preferences.getString(anonIdPrefKey, null)
@@ -37,7 +37,7 @@ abstract class IdentifyingTracker(
             return anonymousID
         }
 
-    protected fun generateNewAnonID(): String {
+    internal fun generateNewAnonID(): String {
         val uuid = UUID.randomUUID().toString().replace("-", "")
         Timber.d("\uD83D\uDD35 New anonID generated in " + this.javaClass.simpleName + ": " + uuid)
         preferences.edit {
