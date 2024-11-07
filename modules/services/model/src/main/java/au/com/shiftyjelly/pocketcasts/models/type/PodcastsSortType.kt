@@ -43,8 +43,8 @@ enum class PodcastsSortType(
         clientId = 0,
         serverId = 0,
         labelId = R.string.podcasts_sort_by_date_added,
-        podcastComparator = compareBy { it.addedDate },
-        folderComparator = compareBy { it.addedDate },
+        podcastComparator = compareByDescending { it.addedDate },
+        folderComparator = compareByDescending { it.addedDate },
         analyticsValue = "date_added",
     ),
     DRAG_DROP(
@@ -88,7 +88,7 @@ enum class PodcastsSortType(
     }
 
     fun isAsc(): Boolean {
-        return clientId == DATE_ADDED_OLDEST_TO_NEWEST.clientId || clientId == NAME_A_TO_Z.clientId
+        return clientId == NAME_A_TO_Z.clientId
     }
 }
 
