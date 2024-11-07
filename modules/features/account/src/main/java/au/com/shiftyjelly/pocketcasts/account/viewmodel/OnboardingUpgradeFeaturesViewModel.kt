@@ -104,8 +104,11 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
 
         val showNotNow = source == OnboardingUpgradeSource.RECOMMENDATIONS
 
+        val isEligibleForExperiment = source == OnboardingUpgradeSource.PROFILE || source == OnboardingUpgradeSource.RECOMMENDATIONS
+
         val upgradeLayout = when {
             showPatronOnly -> UpgradeLayout.Original
+            !isEligibleForExperiment -> UpgradeLayout.Original
             FeatureFlag.isEnabled(Feature.EXPLAT_EXPERIMENT) -> {
                 when (val variation = experiments.getVariation(Experiment.PaywallUpgradeAATest)) {
                     is Variation.Control -> {
