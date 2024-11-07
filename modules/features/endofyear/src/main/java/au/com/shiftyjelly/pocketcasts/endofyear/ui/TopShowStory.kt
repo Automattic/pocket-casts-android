@@ -145,7 +145,7 @@ private fun ColumnScope.TopShowCover(
                         drawContent()
 
                         rotate(
-                            degrees = if (controller.isSharing) 0f else rotation.value,
+                            degrees = rotation.value,
                             pivot = Offset(widthPx / 2, heightPx / 2),
                         ) {
                             translate(
