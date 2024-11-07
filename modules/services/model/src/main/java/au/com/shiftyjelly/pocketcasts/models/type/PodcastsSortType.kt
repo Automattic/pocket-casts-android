@@ -22,14 +22,6 @@ enum class PodcastsSortType(
     val folderComparator: Comparator<FolderItem>,
     val analyticsValue: String,
 ) {
-    DATE_ADDED_OLDEST_TO_NEWEST(
-        clientId = 0,
-        serverId = 0,
-        labelId = R.string.podcasts_sort_by_date_added,
-        podcastComparator = compareBy { it.addedDate },
-        folderComparator = compareBy { it.addedDate },
-        analyticsValue = "date_added",
-    ),
     NAME_A_TO_Z(
         clientId = 2,
         serverId = 1,
@@ -46,6 +38,14 @@ enum class PodcastsSortType(
         podcastComparator = Comparator { _, _ -> 0 },
         folderComparator = Comparator { _, _ -> 0 },
         analyticsValue = "episode_release_date",
+    ),
+    DATE_ADDED_OLDEST_TO_NEWEST(
+        clientId = 0,
+        serverId = 0,
+        labelId = R.string.podcasts_sort_by_date_added,
+        podcastComparator = compareBy { it.addedDate },
+        folderComparator = compareBy { it.addedDate },
+        analyticsValue = "date_added",
     ),
     DRAG_DROP(
         clientId = 6,
