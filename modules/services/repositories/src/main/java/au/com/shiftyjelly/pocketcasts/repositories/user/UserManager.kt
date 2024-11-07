@@ -6,6 +6,7 @@ import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.analytics.TracksAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
@@ -21,7 +22,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
-import au.com.shiftyjelly.pocketcasts.repositories.sync.AccountManagerStatusInfo
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.android.tracks.crashlogging.CrashLogging
@@ -52,10 +52,10 @@ class UserManagerImpl @Inject constructor(
     val podcastManager: PodcastManager,
     val userEpisodeManager: UserEpisodeManager,
     private val analyticsTracker: AnalyticsTracker,
+    private val tracker: TracksAnalyticsTracker,
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val crashLogging: CrashLogging,
     private val experimentProvider: ExperimentProvider,
-    private val accountManager: AccountManagerStatusInfo,
     private val endOfYearSync: EndOfYearSync,
 ) : UserManager, CoroutineScope {
 
@@ -130,7 +130,8 @@ class UserManagerImpl @Inject constructor(
                     analyticsTracker.clearAllData()
                     analyticsTracker.refreshMetadata()
 
-                    experimentProvider.refreshExperiments()
+                    // Force experiments to refresh after signing out with an anonymous UUID
+                    experimentProvider.refreshExperiments(tracker.anonID)
 
                     settings.setEndOfYearShowModal(true)
                     endOfYearSync.reset()
