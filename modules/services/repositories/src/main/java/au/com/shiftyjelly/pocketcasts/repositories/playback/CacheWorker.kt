@@ -11,6 +11,7 @@ import androidx.media3.datasource.DataSpec
 import androidx.media3.datasource.cache.CacheWriter
 import androidx.work.Constraints
 import androidx.work.Data
+import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkInfo
@@ -92,8 +93,6 @@ class CacheWorker @AssistedInject constructor(
                 .putString(EPISODE_UUID_KEY, episodeUuid)
                 .build()
 
-            // Cancel previous caching work
-            WorkManager.getInstance(context).cancelAllWorkByTag(CACHE_WORKER_TAG)
             val constraints = Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
                 .build()
@@ -105,8 +104,8 @@ class CacheWorker @AssistedInject constructor(
 
             observeWorkerInfo(context, cacheWorkRequest, episodeUuid, onCachingComplete)
 
-            // Enqueue new caching work
-            WorkManager.getInstance(context).enqueue(cacheWorkRequest)
+            // Enqueue unique caching work by replacing any existing work with the same tag
+            WorkManager.getInstance(context).enqueueUniqueWork(CACHE_WORKER_TAG, ExistingWorkPolicy.REPLACE, cacheWorkRequest)
         }
 
         private fun observeWorkerInfo(
