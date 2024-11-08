@@ -31,7 +31,7 @@ abstract class ExternalDataDao {
         WHERE 
           podcasts.subscribed IS NOT 0
         ORDER BY
-          -- Order by oldest to newest date added
+          -- Order by newest to oldest date added
           CASE WHEN :sortOrder IS 0 THEN IFNULL(podcasts.added_date, 0) END DESC,
           -- Order by A-Z podcast title
           CASE WHEN :sortOrder IS 1 THEN (CASE
