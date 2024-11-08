@@ -28,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortType
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodcast
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
+import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -85,6 +86,7 @@ class PodcastViewModel
     private val settings: Settings,
     private val podcastAndEpisodeDetailsCoordinator: PodcastAndEpisodeDetailsCoordinator,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel(), CoroutineScope {
 
     private val disposables = CompositeDisposable()
@@ -210,7 +212,10 @@ class PodcastViewModel
     }
 
     fun updatePodcast(existingPodcast: Podcast) {
-        podcastManager.refreshPodcastInBackground(existingPodcast, playbackManager)
+        // Refresh the podcast application coroutine scope so the podcast continues to update if the view model is closed
+        applicationScope.launch {
+            podcastManager.refreshPodcast(existingPodcast, playbackManager)
+        }
     }
 
     fun subscribeToPodcast() {

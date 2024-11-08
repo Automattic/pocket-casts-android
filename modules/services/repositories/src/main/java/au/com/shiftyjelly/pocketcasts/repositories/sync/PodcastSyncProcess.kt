@@ -146,9 +146,17 @@ class PodcastSyncProcess(
     @VisibleForTesting
     fun performIncrementalSync(lastSyncTime: Instant): Completable {
         val uploadData = uploadChanges()
-        val uploadObservable = syncManager.syncUpdate(uploadData.first, lastSyncTime)
+        val uploadObservable = rxSingle {
+            val startTime = SystemClock.elapsedRealtime()
+            val updateResponse = syncManager.syncUpdate(uploadData.first, lastSyncTime)
+            logTime("Refresh - sync update", startTime)
+            updateResponse
+        }
         return uploadObservable.flatMap {
-            processServerResponse(it, uploadData.second)
+            val startTime = SystemClock.elapsedRealtime()
+            val response = processServerResponse(it, uploadData.second)
+            logTime("Refresh - process server response", startTime)
+            response
         }.ignoreElement()
     }
 

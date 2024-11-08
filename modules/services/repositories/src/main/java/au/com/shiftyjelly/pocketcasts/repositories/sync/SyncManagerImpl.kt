@@ -350,12 +350,12 @@ class SyncManagerImpl @Inject constructor(
 
 // Sync
 
-    override fun syncUpdate(data: String, lastSyncTime: Instant): Single<SyncUpdateResponse> =
+    override suspend fun syncUpdate(data: String, lastSyncTime: Instant): SyncUpdateResponse =
         getEmail()?.let { email ->
-            getCacheTokenOrLoginRxSingle { token ->
+            getCacheTokenOrLogin { token ->
                 syncServiceManager.syncUpdate(email, data, lastSyncTime, token)
             }
-        } ?: Single.error(Exception("Not logged in"))
+        } ?: throw Exception("Not logged in")
 
     override fun getLastSyncAt(): Single<String> =
         getCacheTokenOrLoginRxSingle { token ->

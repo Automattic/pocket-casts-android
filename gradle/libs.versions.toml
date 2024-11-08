@@ -106,6 +106,7 @@ dagger-hilt-core = { module = "com.google.dagger:hilt-core", version.ref = "hilt
 hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hilt-compiler" }
 hilt-navigation-compose = "androidx.hilt:hilt-navigation-compose:1.2.0"
 hilt-work = "androidx.hilt:hilt-work:1.2.0"
+dagger-hilt-testing = { module = "com.google.dagger:hilt-android-testing", version.ref = "hilt" }
 
 # Espresso
 espresso-contrib = { module = "androidx.test.espresso:espresso-contrib", version.ref = "espresso" }

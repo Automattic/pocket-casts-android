@@ -15,6 +15,7 @@ android {
 
     defaultConfig {
         applicationId = project.property("applicationId").toString()
+        testInstrumentationRunner = "au.com.shiftyjelly.pocketcasts.PocketCastsTestRunner"
         multiDexEnabled = true
     }
 
@@ -145,6 +146,7 @@ dependencies {
     androidTestImplementation(libs.compose.activity)
     androidTestImplementation(libs.compose.ui.test.junit)
     androidTestImplementation(libs.coroutines.test)
+    androidTestImplementation(libs.dagger.hilt.testing)
     androidTestImplementation(libs.espresso.contrib)
     androidTestImplementation(libs.espresso.core)
     androidTestImplementation(libs.jsonassert)

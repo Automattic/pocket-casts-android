@@ -87,7 +87,7 @@ interface SyncManager : NamedSettingsCaller {
     suspend fun getHomeFolder(): UserPodcastListResponse
     fun getPodcastEpisodes(podcastUuid: String): Single<PodcastEpisodesResponse>
 
-    fun syncUpdate(data: String, lastSyncTime: Instant): Single<SyncUpdateResponse>
+    suspend fun syncUpdate(data: String, lastSyncTime: Instant): SyncUpdateResponse
 
     fun episodeSync(request: EpisodeSyncRequest): Completable
 
