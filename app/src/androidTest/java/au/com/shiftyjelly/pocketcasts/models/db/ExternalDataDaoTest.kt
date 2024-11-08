@@ -183,7 +183,7 @@ class ExternalDataDaoTest {
 
         val podcastIds = externalDataDao.getSubscribedPodcasts(PodcastsSortType.DATE_ADDED_NEWEST_TO_OLDEST, limit = 100).map { it.id }
 
-        assertEquals(listOf("id-4", "id-3", "id-1", "id-2", "id-5"), podcastIds)
+        assertEquals(listOf("id-2", "id-1", "id-3", "id-4", "id-5"), podcastIds)
     }
 
     @Test

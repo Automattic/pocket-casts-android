@@ -31,8 +31,8 @@ abstract class ExternalDataDao {
         WHERE 
           podcasts.subscribed IS NOT 0
         ORDER BY
-          -- Order by oldest to newest date added, '9223372036854775807' is the max possible value putting things at the bottom
-          CASE WHEN :sortOrder IS 0 THEN IFNULL(podcasts.added_date, 9223372036854775807) END ASC,
+          -- Order by oldest to newest date added
+          CASE WHEN :sortOrder IS 0 THEN IFNULL(podcasts.added_date, 0) END DESC,
           -- Order by A-Z podcast title
           CASE WHEN :sortOrder IS 1 THEN (CASE
             WHEN UPPER(podcasts.title) LIKE 'THE %' THEN SUBSTR(UPPER(podcasts.title), 5)
