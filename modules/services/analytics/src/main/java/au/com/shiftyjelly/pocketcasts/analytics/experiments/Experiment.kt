@@ -5,7 +5,7 @@ interface ExperimentType {
 }
 
 enum class Experiment(override val identifier: String) : ExperimentType {
-    PaywallUpgradeAATest("pocketcasts_paywall_android_aa_test"),
+    PaywallUpgradeABTest("pocketcasts_paywall_upgrade_android_ab_test"),
     ;
 
     companion object {
