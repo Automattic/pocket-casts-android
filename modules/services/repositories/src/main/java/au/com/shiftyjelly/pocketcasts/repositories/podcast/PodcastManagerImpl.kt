@@ -587,6 +587,10 @@ class PodcastManagerImpl @Inject constructor(
         return podcastDao.countDownloadStatus(downloadStatus)
     }
 
+    override suspend fun hasEpisodesWithAutoDownloadStatus(downloadStatus: Int): Boolean {
+        return podcastDao.hasEpisodesWithAutoDownloadStatus(downloadStatus)
+    }
+
     override fun countDownloadStatusRx(downloadStatus: Int): Single<Int> {
         return Single.fromCallable { countDownloadStatus(downloadStatus) }
     }
@@ -620,7 +624,7 @@ class PodcastManagerImpl @Inject constructor(
         podcastDao.update(podcast)
     }
 
-    override fun updateAllAutoDownloadStatus(autoDownloadStatus: Int) {
+    override suspend fun updateAllAutoDownloadStatus(autoDownloadStatus: Int) {
         podcastDao.updateAllAutoDownloadStatus(autoDownloadStatus)
     }
 

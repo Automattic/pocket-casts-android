@@ -75,7 +75,7 @@ interface PodcastManager {
     /** Update methods  */
     fun updatePodcast(podcast: Podcast)
 
-    fun updateAllAutoDownloadStatus(autoDownloadStatus: Int)
+    suspend fun updateAllAutoDownloadStatus(autoDownloadStatus: Int)
     suspend fun updateAllShowNotifications(showNotifications: Boolean)
     fun updateAutoDownloadStatus(podcast: Podcast, autoDownloadStatus: Int)
     suspend fun updateAutoAddToUpNext(podcast: Podcast, autoAddToUpNext: Podcast.AutoAddUpNext)
@@ -126,6 +126,7 @@ interface PodcastManager {
     fun countSubscribedRx(): Single<Int>
     fun observeCountSubscribed(): Flowable<Int>
     fun countDownloadStatus(downloadStatus: Int): Int
+    suspend fun hasEpisodesWithAutoDownloadStatus(downloadStatus: Int): Boolean
     fun countDownloadStatusRx(downloadStatus: Int): Single<Int>
     fun countNotificationsOn(): Int
     fun countNotificationsOnRx(): Single<Int>

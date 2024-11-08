@@ -6,6 +6,7 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import au.com.shiftyjelly.pocketcasts.analytics.AppLifecycleAnalytics
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast.Companion.AUTO_DOWNLOAD_NEW_EPISODES
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
@@ -115,7 +116,7 @@ class AppLifecycleObserver constructor(
                     settings.autoPlayNextEpisodeOnEmpty.set(true, updateModifiedAt = false)
 
                     // For new users we want to auto download new episodes by default
-                    settings.autoDownloadNewEpisodes.set(true, updateModifiedAt = false)
+                    settings.autoDownloadNewEpisodes.set(AUTO_DOWNLOAD_NEW_EPISODES, updateModifiedAt = false)
                 }
             }
         } else if (previousVersionCode < versionCode) {
