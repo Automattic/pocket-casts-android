@@ -181,7 +181,7 @@ class ExternalDataDaoTest {
         podcastDao.insert(Podcast(uuid = "id-4", title = "title-4", isSubscribed = true, addedDate = Date(1)))
         podcastDao.insert(Podcast(uuid = "id-5", title = "title-5", isSubscribed = true, addedDate = null))
 
-        val podcastIds = externalDataDao.getSubscribedPodcasts(PodcastsSortType.DATE_ADDED_OLDEST_TO_NEWEST, limit = 100).map { it.id }
+        val podcastIds = externalDataDao.getSubscribedPodcasts(PodcastsSortType.DATE_ADDED_NEWEST_TO_OLDEST, limit = 100).map { it.id }
 
         assertEquals(listOf("id-4", "id-3", "id-1", "id-2", "id-5"), podcastIds)
     }
