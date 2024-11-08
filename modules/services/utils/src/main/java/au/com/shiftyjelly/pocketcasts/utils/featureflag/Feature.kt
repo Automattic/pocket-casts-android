@@ -152,7 +152,7 @@ enum class Feature(
         title = "Up Next Shuffle",
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Plus(patronExclusiveAccessRelease = null),
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
     CUSTOM_PLAYBACK_SETTINGS(
