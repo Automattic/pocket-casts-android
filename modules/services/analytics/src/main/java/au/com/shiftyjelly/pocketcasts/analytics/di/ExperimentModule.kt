@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.analytics.di
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.AccountStatusInfo
 import au.com.shiftyjelly.pocketcasts.analytics.BuildConfig
+import au.com.shiftyjelly.pocketcasts.analytics.TracksAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.Experiment
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
 import au.com.shiftyjelly.pocketcasts.servers.di.Cached
@@ -28,9 +29,10 @@ object ExperimentModule {
     @Provides
     @Singleton
     fun provideExperimentProvider(
-        accountStatusInfo: AccountStatusInfo,
+        tracksAnalyticsTracker: TracksAnalyticsTracker,
         repository: VariationsRepository,
-    ): ExperimentProvider = ExperimentProvider(accountStatusInfo, repository)
+        accountStatusInfo: AccountStatusInfo,
+    ): ExperimentProvider = ExperimentProvider(tracksAnalyticsTracker, repository, accountStatusInfo)
 
     @Provides
     @Singleton
