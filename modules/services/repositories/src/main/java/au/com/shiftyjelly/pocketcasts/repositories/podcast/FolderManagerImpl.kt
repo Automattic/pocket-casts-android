@@ -5,7 +5,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
-import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType.DATE_ADDED_OLDEST_TO_NEWEST
+import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType.DATE_ADDED_NEWEST_TO_OLDEST
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType.DRAG_DROP
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType.NAME_A_TO_Z
@@ -250,7 +250,7 @@ class FolderManagerImpl @Inject constructor(
 
             val itemsSorted = when (podcastSortType) {
                 NAME_A_TO_Z -> items.sortedWith(compareBy { PodcastsSortType.cleanStringForSort(it.title) })
-                DATE_ADDED_OLDEST_TO_NEWEST -> items.sortedWith(compareBy { it.addedDate })
+                DATE_ADDED_NEWEST_TO_OLDEST -> items.sortedWith(compareBy { it.addedDate })
                 DRAG_DROP -> items.sortedWith(compareBy { it.sortPosition })
                 else -> items
             }

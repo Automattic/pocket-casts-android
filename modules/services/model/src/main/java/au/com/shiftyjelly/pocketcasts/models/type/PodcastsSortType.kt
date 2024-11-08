@@ -39,7 +39,7 @@ enum class PodcastsSortType(
         folderComparator = Comparator { _, _ -> 0 },
         analyticsValue = "episode_release_date",
     ),
-    DATE_ADDED_OLDEST_TO_NEWEST(
+    DATE_ADDED_NEWEST_TO_OLDEST(
         clientId = 0,
         serverId = 0,
         labelId = R.string.podcasts_sort_by_date_added,
@@ -58,7 +58,7 @@ enum class PodcastsSortType(
     ;
 
     companion object {
-        val default = DATE_ADDED_OLDEST_TO_NEWEST
+        val default = DATE_ADDED_NEWEST_TO_OLDEST
 
         fun fromServerId(serverId: Int?): PodcastsSortType {
             if (serverId == null) {
