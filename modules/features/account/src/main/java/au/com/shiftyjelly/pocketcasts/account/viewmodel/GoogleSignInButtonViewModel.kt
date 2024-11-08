@@ -36,7 +36,6 @@ class GoogleSignInButtonViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTracker,
     @ApplicationContext private val context: Context,
     private val podcastManager: PodcastManager,
-    private val settings: Settings,
     private val syncManager: SyncManager,
 ) : ViewModel() {
 

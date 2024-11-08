@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.servers.extensions
 
 import com.squareup.moshi.JsonReader
 import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
 
 val JSON_DATE_FORMAT = SimpleDateFormat("yyyyMMddHHmmss", Locale.US)
@@ -25,18 +24,6 @@ fun JsonReader.nextLongOrNull(): Long? {
 
 fun JsonReader.nextStringOrNull(): String? {
     return if (peek() == JsonReader.Token.NULL) nextNull() else nextString()
-}
-
-fun JsonReader.nextDateOrNull(): Date? {
-    if (peek() == JsonReader.Token.NULL) {
-        return nextNull()
-    } else {
-        try {
-            return JSON_DATE_FORMAT.parse(nextString())
-        } catch (e: Exception) {
-            return null
-        }
-    }
 }
 
 fun JsonReader.nextBooleanOrDefault(default: Boolean): Boolean {

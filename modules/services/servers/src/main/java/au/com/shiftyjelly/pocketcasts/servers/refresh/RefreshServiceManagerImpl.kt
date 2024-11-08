@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.servers.refresh
 import android.os.Build
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.di.RefreshServiceRetrofit
-import java.text.SimpleDateFormat
 import java.util.Locale
 import javax.inject.Inject
 import retrofit2.Response
@@ -13,11 +12,6 @@ class RefreshServiceManagerImpl @Inject constructor(
     @RefreshServiceRetrofit retrofit: Retrofit,
     private val settings: Settings,
 ) : RefreshServiceManager {
-
-    companion object {
-        private val DATE_FORMAT = SimpleDateFormat("yyyyMMddHHmmss", Locale.US)
-    }
-
     private val service: RefreshService = retrofit.create(RefreshService::class.java)
 
     override suspend fun importOpml(urls: List<String>): Response<StatusResponse<ImportOpmlResponse>> {

@@ -391,14 +391,6 @@ open class PlaybackManager @Inject constructor(
         return episode != null
     }
 
-    fun isTrimSilenceSupported(): Boolean {
-        return player?.supportsTrimSilence() ?: false
-    }
-
-    fun isVolumeBoostSupported(): Boolean {
-        return player?.supportsVolumeBoost() ?: false
-    }
-
     private suspend fun onSwitchedToMeteredConnection() {
         val episode = getCurrentEpisode() ?: return
 
@@ -724,12 +716,6 @@ open class PlaybackManager @Inject constructor(
             if (wasEmpty) {
                 loadCurrentEpisode(play = false)
             }
-        }
-    }
-
-    fun moveEpisode(fromPosition: Int, toPosition: Int) {
-        launch {
-            upNextQueue.moveEpisode(fromPosition, toPosition)
         }
     }
 
@@ -2467,10 +2453,6 @@ open class PlaybackManager @Inject constructor(
                 loadCurrentEpisode(false)
             }
         }
-    }
-
-    fun loadQueueRx(): Completable {
-        return rxCompletable { loadQueue() }
     }
 
     private fun updatePausedPlaybackState() {
