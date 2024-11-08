@@ -1,11 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-10-22 16:54:03+0000
+Translation-Revision-Date: 2024-11-07 11:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="maybe_later">Misschien later</string>
+    <string name="settings_import_title">Podcasts importeren</string>
+    <string name="settings_subscribe_to_played">Op afgespeelde podcasts abonneren</string>
+    <string name="settings_export_subscriptions">Podcasts exporteren</string>
+    <string name="podcast_not_subscribed">Niet geabonneerd</string>
+    <string name="podcast_subscribed">Volgend</string>
+    <string name="podcasts_share_subscribe_to_all">ABONNEER OP ALLEMAAL</string>
+    <string name="podcasts_no_subscriptions">Geen podcasts gevonden</string>
+    <string name="unsubscribe">Niet meer volgen</string>
+    <string name="subscribe">Volgen</string>
+    <string name="save_space_by_managing_downloaded_episodes">Bewaar %1$s – door gedownloade afleveringen te beheren.</string>
+    <string name="pencil_clean_up_icon_content_description">Potlood opschonen</string>
+    <string name="podcast_this">Deze podcast</string>
+    <string name="end_of_year_cant_share_message">Dit verhaal kan niet gedeeld worden</string>
+    <string name="end_of_year_story_ratings_share_text">Ik heb %1$d verschillende podcasts beoordeeld in %2$d, me %3$d als mijn meest gegeven beoordeling</string>
+    <string name="end_of_year_stories_completion_rate_share_text">Mijn afrondingspercentage dit jaar was %1$d</string>
+    <string name="end_of_year_share_dialog_message">Plaats deze afbeelding op je sociale media en noem je favoriete shows en makers</string>
+    <string name="end_of_year_share_dialog_title">Dit verhaal delen?</string>
+    <string name="up_next_shuffle_disable_button_content_description">Hierna shuffle uitschakelen</string>
+    <string name="up_next_shuffle_button_content_description">Hierna shuffle</string>
+    <string name="podcast_ratings_page_title">Beoordelingen</string>
+    <string name="eoy_story_stories_subscribe_to_plus_button_label">Bekijk eens Pocket Casts Plus</string>
+    <string name="end_of_year_stories_subscribe_to_plus">Steun Pocket Casts door je in te schrijven voor Plus en krijg toegang tot meer statistieken en Premium-functies zoals bladwijzers, mappen en voorselectie van hoofdstukken!</string>
+    <string name="settings_real_time_playback_summary">Als dit is ingeschakeld, toont de speler de resterende tijd, aangepast aan de afspeelsnelheid en overgeslagen hoofdstukken.</string>
+    <string name="settings_real_time_playback">Resterende tijd aanpassen</string>
+    <string name="end_of_year_stories_year_over_year_title_went_up_a_lot">Ten opzichte van %1$s is je luistertijd gestegen met meer dan 500%%</string>
     <string name="end_of_year_story_longest_episode_subtitle">Het was \'%1$s\' van \'%2$s\'</string>
     <string name="end_of_year_listening_time_subtitle">totaal naar podcasts geluisterd</string>
     <string name="eoy_story_ratings_learn_button_label">Meer informatie over beoordelingen</string>
@@ -14,7 +40,6 @@ Language: nl
     <string name="eoy_story_ratings_subtitle_1">Wauw, zoveel beoordelingen van %1$d sterren! Bedankt dat je je liefde voor je favoriete makers toont!</string>
     <string name="eoy_story_ratings_title_2">Oh oh! Er zijn nog geen podcastbeoordelingen voor je</string>
     <string name="eoy_story_ratings_title_1">Laten we naar je beoordelingen kijken!</string>
-    <string name="end_of_year_story_top_podcast_title">Je beste podcast in 2024 was %1$s</string>
     <string name="referrals_failed_to_load_offer">Er is iets fout gegaan bij het ophalen van je verwijzingslink.</string>
     <string name="transcript_error_not_available">Er is helaas geen transcriptie beschikbaar voor deze aflevering.</string>
     <string name="referrals_banner_hide_label">Deze banner verbergen</string>
@@ -265,10 +290,16 @@ Language: nl
     <string name="end_of_year_stories_year_completion_rate">afrondingspercentage</string>
     <string name="end_of_year_stories_year_completion_rate_subtitle">Van de %1$d afleveringen waar je aan bent begonnen, heb je dit aantal helemaal afgekeken %2$d</string>
     <string name="end_of_year_stories_year_completion_rate_title">Je afrondingspercentage dit jaar was %1$d%%</string>
+    <string name="end_of_year_stories_year_over_share_text">Mijn luistertijd in %1$d, ten opzichte van %2$d</string>
     <string name="eoy_year_over_year_title_skyrocketed">Ten opzichte van 2022 is je luistertijd veel hoger!</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">Aaaah… er moet worden geleefd, toch?</string>
+    <string name="end_of_year_stories_year_over_year_title_went_down">Ten opzichte van %1$s is je luistertijd een klein beetje omlaag gegaan</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">Consistentie is de sleutel tot succes… of zoiets!</string>
+    <string name="end_of_year_stories_year_over_year_title_flat">Ten opzichte van %1$s is je luistertijd redelijk hetzelfde gebleven</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_went_up">Klaar om dit te overtreffen in %1$s?</string>
+    <string name="end_of_year_stories_year_over_year_title_went_up">Ten opzichte van %1$s is je luistertijd gestegen met maar liefst %2$s%%</string>
     <string name="end_of_year_prompt_card_summary">Bekijk je luisterstatistieken, top podcasts en meer.</string>
+    <string name="end_of_year_story_epilogue_title">Bedankt dat je dit jaar met ons geluisterd hebt.\nTot ziens in %1$d!</string>
     <string name="end_of_year_story_longest_episode_title">De langste aflevering waarnaar je hebt geluisterd was %1$s</string>
     <string name="end_of_year_replay">Opnieuw afspelen</string>
     <string name="end_of_year_listening_time_title">Dit was je totale luistertijd wat betreft podcasts.</string>
@@ -375,8 +406,7 @@ Language: nl
     <string name="settings_help_contact_support_no_phone_connection">Koppel je horloge met een telefoon waarop Pocket Casts is geïnstalleerd om je logboeken weer te geven of neem contact op met de klantenservice</string>
     <string name="settings_help_contact_support_email_sent_to_phone">Als je telefoon is gekoppeld, krijg je een pop-up met e-mailondersteuning te zien met je logboeken in de bijlage</string>
     <string name="podcast_loading">Je podcasts laden</string>
-    <string name="podcasts_subscribe_on_phone">Abonneer je op podcasts op je telefoon en ze verschijnen hier.</string>
-    <string name="podcasts_no_subscriptions">Geen podcast-abonnementen</string>
+    <string name="podcasts_subscribe_on_phone">Abonneer je podcasts op je telefoon en bekijk ze hier.</string>
     <string name="settings_could_not_open_on_phone">Kan niet worden geopend op telefoon</string>
     <string name="settings_open_on_phone">Openen op telefoon</string>
     <string name="settings_about_privacy_policy_available_at">Onze privacyverklaring is beschikbaar via %s</string>
@@ -527,7 +557,6 @@ Language: nl
     <string name="profile_cancel_confirm_subtitle">Hierdoor wordt je abonnement aangepast naar een gratis account.</string>
     <string name="settings_other_media_actions">Andere media-acties</string>
     <string name="settings_customize_buttons_displayed_in_android_13_notification_and_android_auto">Pas de knoppen aan die worden weergegeven in Android 13-afspeelmeldingen en Android Auto.</string>
-    <string name="podcast_not_subscribed">Niet geabonneerd</string>
     <string name="onboarding_import_from_other_apps_step_2">Gebruik het menu \'Delen\' van je telefoon om het bestand te versturen naar Pocket Casts. Je kunt het bestand ook importeren vanuit het instellingenmenu \'OPML importeren/exporteren\' in Pocket Casts.</string>
     <string name="onboarding_import_from_other_apps_step_1">Gebruik de exportoptie van de andere app en exporteer een OPML-bestand.</string>
     <string name="onboarding_can_import_from_opml">Pocket Casts kan podcasts importeren vanuit OPML-bestanden, dus wanneer je huidige app een OPML-bestand kan exporteren, kun je deze stappen volgen:</string>
@@ -587,8 +616,11 @@ Language: nl
     <string name="end_of_year_story_top_categories_share_text">Mijn meest beluisterde podcastcategorieën</string>
     <string name="end_of_year_story_top_categories">Je beste categorieën</string>
     <string name="end_of_year_story_epilogue_subtitle">Vergeet niet om te delen met je vrienden en een shoutout te geven naar je favoriete podcastmakers</string>
+    <string name="end_of_year_story_longest_episode_share_text">De langste aflevering waarnaar ik heb geluisterd in %1$d %2$s</string>
+    <string name="end_of_year_story_top_podcasts_list_title">Mijn beste podcasts van %1$d</string>
     <string name="end_of_year_story_top_podcasts_share_text">Mijn beste podcasts van het jaar! %1$s</string>
-    <string name="end_of_year_story_top_podcast_subtitle">Je hebt in totaal %2$s geluisterd naar %1$d afleveringen</string>
+    <string name="end_of_year_story_top_podcast_share_text">Mijn favoriete podcast van %1$d! %2$s</string>
+    <string name="end_of_year_story_listened_to_numbers_share_text">Ik heb in %3$d naar %1$d verschillende podcasts en %2$d afleveringen geluisterd</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">Maar er was er één waar je steeds maar weer naar terugkeerde …</string>
     <string name="end_of_year_story_listened_to_numbers">Je hebt naar %1$d verschillende shows en %2$d afleveringen geluisterd</string>
     <string name="end_of_year_story_listened_to_categories_share_text">Ik heb in 2023 naar %1$d verschillende categorieën geluisterd</string>
@@ -915,7 +947,7 @@ Language: nl
     <string name="settings_status_service_ad_blocker_help_singular">De meestvoorkomende oorzaak is dat je een adblocker hebt geconfigureerd op je telefoon of netwerk. Je moet het domein deblokkeren %s</string>
     <string name="settings_status_service_discover_summary">Het gedeelte Ontdekken van de app, waaronder podcasts zoeken.</string>
     <string name="settings_status_service_discover">Ontdekken en zoeken</string>
-    <string name="settings_status_service_account_summary">De service die wordt gebruikt om afleveringvoortgang, abonnementen, filters etc op te slaan.</string>
+    <string name="settings_status_service_account_summary">De service die wordt gebruikt om afleveringsvoortgang, abonnementen, filters etc. op te slaan.</string>
     <string name="settings_status_service_account">Accountservice</string>
     <string name="settings_status_service_refresh_summary">De service die wordt gebruikt om nieuwe afleveringen te vinden.</string>
     <string name="settings_status_service_refresh">Service vernieuwen</string>
@@ -926,7 +958,6 @@ Language: nl
     <string name="settings_status_service_internet">Internetverbinding</string>
     <string name="settings_status_description">Controleer je verbinding met belangrijke services. Dit helpt problemen met je verbinding, proxy\'s, VPN, adblocker en beveiligingsapps te identificeren.</string>
     <string name="settings_status_page">Statuspagina</string>
-    <string name="settings_import_title">Abonnementen importeren</string>
     <string name="settings_notification_default_sound">Standaardgeluid</string>
     <string name="settings_subscribe_to_played_summary">Podcasts waar je naar luistert worden automatisch toegevoegd aan het tabblad Podcasts</string>
     <string name="settings_opml_export_failed">Kan het OPML-bestand niet opslaan.</string>
@@ -1016,7 +1047,6 @@ Language: nl
     <string name="settings_title_about">Over</string>
     <string name="settings_title">Titel</string>
     <string name="settings_theme">Thema</string>
-    <string name="settings_subscribe_to_played">Abonneer je op afgespeelde podcasts</string>
     <string name="settings_storage_store_on">Sla podcasts op in</string>
     <string name="settings_storage_sorry">Sorry</string>
     <string name="settings_storage_size_free">%s gratis</string>
@@ -1060,7 +1090,7 @@ Language: nl
     <string name="settings_podcasts_selected_all">Alle podcasts</string>
     <string name="settings_podcast_episode_grouping_title_season">Seizoen</string>
     <string name="settings_podcast_episode_grouping_title_none">Geen</string>
-    <string name="settings_podcast_episode_grouping_summary_none">De afleveringen van nieuwe podcasts waarop je je abonneert, worden niet gegroepeerd.</string>
+    <string name="settings_podcast_episode_grouping_summary_none">De afleveringen van nieuwe podcasts waarop je je abonneert worden niet gegroepeerd.</string>
     <string name="settings_podcast_episode_grouping_summary">Nieuwe podcasts waarop je je abonneert tonen afleveringen gegroepeerd op %s.</string>
     <string name="settings_podcast_episode_grouping">Groepering van podcast-afleveringen</string>
     <string name="settings_podcast_custom">Aangepast voor deze podcast</string>
@@ -1105,8 +1135,7 @@ Language: nl
     <string name="settings_get_plus_and_more">Neem Pocket Casts Plus om deze functie en meer te ontgrendelen!</string>
     <string name="settings_general_player">Speler</string>
     <string name="settings_general_defaults">Standaard</string>
-    <string name="settings_export_subscriptions">Abonnementen exporteren</string>
-    <string name="settings_export_send_email_summary">Exporteer je meldingen in de nerdy (maar breed ondersteunde) OPML-indeling.</string>
+    <string name="settings_export_send_email_summary">Exporteer je podcasts in de nerdy (maar breed ondersteunde) OPML-indeling.</string>
     <string name="settings_export_send_email">Verstuur e-mail</string>
     <string name="settings_export_save_file_summary">Exporteer het OPML-bestanden naar je opslag.</string>
     <string name="settings_export_save_file">Bestand opslaan</string>
@@ -1508,7 +1537,6 @@ Language: nl
     <string name="podcast_supporter_cancelled">Ondersteuning geannuleerd</string>
     <string name="podcast_supporter">ONDERSTEUNER</string>
     <string name="podcast_support_this_podcast">Steun deze show</string>
-    <string name="podcast_subscribed">Geabonneerd</string>
     <string name="podcast_sort_episodes">Afleveringen sorteren</string>
     <string name="podcast_share_open_file_in">Bestand openen in…</string>
     <string name="podcast_share_episode">Aflevering delen</string>
@@ -1593,7 +1621,6 @@ Language: nl
     <string name="podcasts_share_missing_title">Voer een titel in voor je lijst.</string>
     <string name="podcasts_share_create_error">Oeps, we kunnen dit niet delen</string>
     <string name="podcasts_share_title">Titel</string>
-    <string name="podcasts_share_subscribe_to_all">OP ALLES ABONNEREN</string>
     <string name="podcasts_share_selected_podcasts">Geselecteerde podcasts delen</string>
     <string name="podcasts_share_select_all">Alles selecteren</string>
     <string name="podcasts_share_list">Gedeelde lijst</string>
@@ -1758,10 +1785,8 @@ Language: nl
     <string name="today">Vandaag</string>
     <string name="learn_more">Meer informatie</string>
     <string name="up_next">Hierna</string>
-    <string name="unsubscribe">Uitschrijven</string>
     <string name="unplayed">Niet-afgespeeld</string>
     <string name="unarchive_all">Alles dearchiveren</string>
-    <string name="subscribe">Abonneren</string>
     <string name="stream">Streamen</string>
     <string name="stop_downloading">Stoppen met downloaden</string>
     <string name="starred">Aan favorieten toegevoegd</string>

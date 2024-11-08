@@ -1,11 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-10-23 09:54:03+0000
+Translation-Revision-Date: 2024-11-06 09:54:13+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="maybe_later">나중에</string>
+    <string name="settings_import_title">팟캐스트 가져오기</string>
+    <string name="settings_subscribe_to_played">재생한 팟캐스트 팔로우하기</string>
+    <string name="settings_export_subscriptions">팟캐스트 내보내기</string>
+    <string name="podcast_not_subscribed">팔로우하지 않음</string>
+    <string name="podcast_subscribed">팔로우 중</string>
+    <string name="podcasts_share_subscribe_to_all">모두 팔로우하기</string>
+    <string name="podcasts_no_subscriptions">팟캐스트를 찾을 수 없음</string>
+    <string name="unsubscribe">팔로우 취소</string>
+    <string name="subscribe">팔로우하기</string>
+    <string name="up_next_shuffle_plus_prompt">Pocket Casts Plus 등에서 에피소드 순서 섞기</string>
+    <string name="save_space_by_managing_downloaded_episodes">다운로드한 에피소드를 관리하여 %1$s을(를) 저장하세요.</string>
+    <string name="pencil_clean_up_icon_content_description">연필 정리</string>
+    <string name="podcast_this">이 팟캐스트</string>
+    <string name="end_of_year_cant_share_message">이 스토리는 공유할 수 없습니다.</string>
+    <string name="end_of_year_story_ratings_share_text">내가 %2$d년에 평가한 팟캐스트는 %1$d가지, 가장 많이 사용한 평점은 %3$d</string>
+    <string name="end_of_year_stories_completion_rate_share_text">올해 완료율은 %1$d이었습니다.</string>
+    <string name="end_of_year_share_dialog_message">이 이미지를 회원님의 소셜 미디어에 붙여 넣고 즐겨 찾는 프로그램과 크리에이터에게 감사 인사를 보내세요.</string>
+    <string name="end_of_year_share_dialog_title">이 스토리 공유 여부</string>
+    <string name="up_next_shuffle_disable_button_content_description">다음 순서 섞기 비활성화</string>
+    <string name="up_next_shuffle_button_content_description">다음 순서 섞기</string>
+    <string name="podcast_ratings_page_title">평가</string>
+    <string name="eoy_story_stories_subscribe_to_plus_button_label">Pocket Casts Plus 알아보기</string>
+    <string name="end_of_year_stories_subscribe_to_plus">Plus를 구독해 Pocket Casts를 지원하고, 더 상세한 통계를 제공받고, 북마크, 폴더 또는 챕터 미리 선택과 같은 프리미엄 기능을 이용해 보세요.</string>
+    <string name="settings_real_time_playback_summary">이 설정을 켜면 재생 속도에 맞게 조정된 남은 시간과 건너뛴 챕터가 플레이어에 표시됩니다.</string>
+    <string name="settings_real_time_playback">남은 시간 조정</string>
+    <string name="end_of_year_stories_year_over_year_title_went_up_a_lot">%1$s년 대비 청취 시간이 500% 넘게 증가했습니다.%%</string>
     <string name="end_of_year_story_longest_episode_subtitle">\"%2$s\"의 \"%1$s\"이었습니다.</string>
     <string name="end_of_year_listening_time_subtitle">청취한 팟캐스트의 총 개수</string>
     <string name="eoy_story_ratings_learn_button_label">평가에 대해 알아보기</string>
@@ -14,7 +41,6 @@ Language: ko_KR
     <string name="eoy_story_ratings_subtitle_1">와, 별 %1$d개짜리 평가가 많군요! 좋아하는 제작자에 대한 애정을 공유해 주셔서 감사합니다!</string>
     <string name="eoy_story_ratings_title_2">이런! 아직 보여드릴 만한 팟캐스트 평가가 없습니다.</string>
     <string name="eoy_story_ratings_title_1">회원님이 평가해 주세요!</string>
-    <string name="end_of_year_story_top_podcast_title">회원님의 2024년 상위 팟캐스트는 %1$s이었습니다.</string>
     <string name="referrals_failed_to_load_offer">죄송합니다. 추천 링크를 가져오는 중에 문제가 발생했습니다.</string>
     <string name="transcript_error_not_available">죄송합니다. 이 에피소드에서는 대본을 사용할 수 없습니다.</string>
     <string name="referrals_banner_hide_label">배너 숨기기</string>
@@ -265,10 +291,16 @@ Language: ko_KR
     <string name="end_of_year_stories_year_completion_rate">완료율</string>
     <string name="end_of_year_stories_year_completion_rate_subtitle">시작하신 %1$d개 에피소드 중에서 총 %2$d개 완전히 청취</string>
     <string name="end_of_year_stories_year_completion_rate_title">올해 완료율은 %1$d%%이었습니다.</string>
+    <string name="end_of_year_stories_year_over_share_text">%2$d년 대비 내 %1$d년 청취 시간</string>
     <string name="eoy_year_over_year_title_skyrocketed">2022년 대비 청취 시간이 급증했습니다!</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">일상생활도 중요하겠죠?</string>
+    <string name="end_of_year_stories_year_over_year_title_went_down">%1$s년 대비 청취 시간이 조금 줄었습니다.</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">일관성이 성공의 열쇠라는 말도 있습니다!</string>
+    <string name="end_of_year_stories_year_over_year_title_flat">%1$s년 대비 청취 시간이 상당히 일정하게 유지되었습니다.</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_went_up">%1$s년에 정점을 찍을 준비가 되셨나요?</string>
+    <string name="end_of_year_stories_year_over_year_title_went_up">%1$s년에 비해 청취 시간이 %2$s%%나 늘었습니다.</string>
     <string name="end_of_year_prompt_card_summary">청취 통계, 상위 팟캐스트 등이 표시됩니다.</string>
+    <string name="end_of_year_story_epilogue_title">올해 청취해 주셔서 감사합니다.\n%1$d년에 뵙겠습니다!</string>
     <string name="end_of_year_story_longest_episode_title">청취하신 가장 긴 에피소드는 %1$s였습니다.</string>
     <string name="end_of_year_replay">다시 재생</string>
     <string name="end_of_year_listening_time_title">팟캐스트를 청취하셨던 총시간입니다.</string>
@@ -375,8 +407,7 @@ Language: ko_KR
     <string name="settings_help_contact_support_no_phone_connection">로그를 보거나 지원을 문의하려면 Pocket Casts가 설치되어 있는 스마트폰과 시계를 페어링하세요.</string>
     <string name="settings_help_contact_support_email_sent_to_phone">스마트폰이 현재 페어링되어 있으면 로그가 첨부된 이메일을 지원팀에 보내는 팝업이 표시됩니다.</string>
     <string name="podcast_loading">팟캐스트 로드하기</string>
-    <string name="podcasts_subscribe_on_phone">스마트폰에서 팟캐스트를 구독하면 여기에 팟캐스트가 표시됩니다.</string>
-    <string name="podcasts_no_subscriptions">구독한 팟캐스트 없음</string>
+    <string name="podcasts_subscribe_on_phone">스마트폰에서 팟캐스트를 팔로우하면 여기에 팟캐스트가 표시됩니다.</string>
     <string name="settings_could_not_open_on_phone">스마트폰을 열 수 없음</string>
     <string name="settings_open_on_phone">스마트폰에서 열기</string>
     <string name="settings_about_privacy_policy_available_at">개인정보 취급방침은 %s에 있습니다.</string>
@@ -527,7 +558,6 @@ Language: ko_KR
     <string name="profile_cancel_confirm_subtitle">그러면 요금제가 무료 계정으로 변경됩니다.</string>
     <string name="settings_other_media_actions">기타 미디어 작업</string>
     <string name="settings_customize_buttons_displayed_in_android_13_notification_and_android_auto">Android 13 재생 알림 및 Android Auto에 표시되는 버튼을 사용자 정의합니다.</string>
-    <string name="podcast_not_subscribed">구독하지 않음</string>
     <string name="onboarding_import_from_other_apps_step_2">스마트폰의 \"공유\" 메뉴를 사용하여 파일을 Pocket Casts로 보냅니다. 또는 Pocket Casts 설정 메뉴 “OPML 가져오기 및 내보내기”에서 파일을 가져옵니다.</string>
     <string name="onboarding_import_from_other_apps_step_1">다른 앱의 내보내기 옵션을 찾아서 OPML 파일을 내보냅니다.</string>
     <string name="onboarding_can_import_from_opml">Pocket Casts에서는 OPML 파일에서 팟캐스트를 가져올 수 있으므로 현재 앱에서 OPML 파일을 내보낼 수 있으면 다음과 같은 단계를 진행할 수 있습니다.</string>
@@ -587,8 +617,11 @@ Language: ko_KR
     <string name="end_of_year_story_top_categories_share_text">내가 가장 많이 청취하는 팟캐스트 카테고리</string>
     <string name="end_of_year_story_top_categories">회원님의 상위 카테고리</string>
     <string name="end_of_year_story_epilogue_subtitle">잊지 말고 친구와 공유하고 즐겨 찾는 팟캐스트 창작자에게 감사 인사 보내기</string>
+    <string name="end_of_year_story_longest_episode_share_text">%1$d년에 내가 청취한 가장 긴 에피소드 %2$s</string>
+    <string name="end_of_year_story_top_podcasts_list_title">나의 %1$d년 상위 팟캐스트</string>
     <string name="end_of_year_story_top_podcasts_share_text">나의 올해 상위 팟캐스트입니다! %1$s</string>
-    <string name="end_of_year_story_top_podcast_subtitle">총 %2$s 동안 %1$d개 에피소드를 청취하셨습니다.</string>
+    <string name="end_of_year_story_top_podcast_share_text">내가 즐겨찾는 %1$d년 팟캐스트입니다! %2$s</string>
+    <string name="end_of_year_story_listened_to_numbers_share_text">내가 %3$d년에 청취한 팟캐스트는 %1$d가지, 에피소드는 %2$d개</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">그러나 반복 청취한 것이 있었습니다…</string>
     <string name="end_of_year_story_listened_to_numbers">청취하신 총 프로그램 %1$d개, 에피소드 %2$d개</string>
     <string name="end_of_year_story_listened_to_categories_share_text">내가 2023년에 청취한 카테고리는 %1$d가지</string>
@@ -915,7 +948,7 @@ Language: ko_KR
     <string name="settings_status_service_ad_blocker_help_singular">가장 일반적인 원인은 스마트폰 또는 네트워크에 광고 차단기가 구성되어 있기 때문입니다. %s 도메인을 차단 해제해야 합니다.</string>
     <string name="settings_status_service_discover_summary">앱의 검색 섹션입니다(팟캐스트 검색 포함).</string>
     <string name="settings_status_service_discover">발견 및 검색</string>
-    <string name="settings_status_service_account_summary">에피소드 진행률, 구독, 필터 등을 저장하는 데 사용하는 서비스입니다.</string>
+    <string name="settings_status_service_account_summary">에피소드 진행률, 팔로우한 팟캐스트 등을 저장하는 데 사용하는 서비스입니다.</string>
     <string name="settings_status_service_account">계정 서비스</string>
     <string name="settings_status_service_refresh_summary">새 에피소드를 찾는 데 사용하는 서비스입니다.</string>
     <string name="settings_status_service_refresh">새로 고침 서비스</string>
@@ -926,7 +959,6 @@ Language: ko_KR
     <string name="settings_status_service_internet">인터넷 연결</string>
     <string name="settings_status_description">중요한 서비스의 연결을 확인하세요. 네트워크, 프록시, VPN, 광고 차단 및 보안 앱의 문제 진단에 도움이 됩니다.</string>
     <string name="settings_status_page">상태 페이지</string>
-    <string name="settings_import_title">구독 가져오기</string>
     <string name="settings_notification_default_sound">기본음</string>
     <string name="settings_subscribe_to_played_summary">청취하는 팟캐스트가 자동으로 팟캐스트 탭에 추가됩니다.</string>
     <string name="settings_opml_export_failed">OPML 파일을 저장할 수 없습니다.</string>
@@ -1016,7 +1048,6 @@ Language: ko_KR
     <string name="settings_title_about">소개</string>
     <string name="settings_title">제목</string>
     <string name="settings_theme">테마</string>
-    <string name="settings_subscribe_to_played">재생한 팟캐스트 구독</string>
     <string name="settings_storage_store_on">팟캐스트 저장 위치</string>
     <string name="settings_storage_sorry">죄송합니다</string>
     <string name="settings_storage_size_free">%s 무료</string>
@@ -1045,8 +1076,8 @@ Language: ko_KR
     <string name="settings_skip_back_time">뒤로 건너뛰기 시간</string>
     <string name="settings_show_artwork_details">그러면 연결된 블루투스 기기, 시계 등에도 아트워크가 표시됩니다.</string>
     <string name="settings_show_artwork">잠금 화면에 아트워크 표시</string>
-    <string name="settings_show_archived_summary_show">구독하는 새 팟캐스트에 아카이빙한 에피소드가 표시됩니다.</string>
-    <string name="settings_show_archived_summary_hide">구독하는 새 팟캐스트에 아카이빙한 에피소드가 표시되지 않습니다.</string>
+    <string name="settings_show_archived_summary_show">팔로우하는 새 팟캐스트에 아카이빙한 에피소드가 표시됩니다.</string>
+    <string name="settings_show_archived_summary_hide">팔로우하는 새 팟캐스트에 아카이빙한 에피소드가 표시되지 않습니다.</string>
     <string name="settings_show_archived_action_show">표시</string>
     <string name="settings_show_archived_action_hide">숨기기</string>
     <string name="settings_row_action_summary">아직 다운로드하지 않은 에피소드는 목록에 %s 버튼이 표시됩니다.</string>
@@ -1060,8 +1091,8 @@ Language: ko_KR
     <string name="settings_podcasts_selected_all">모든 팟캐스트</string>
     <string name="settings_podcast_episode_grouping_title_season">시즌</string>
     <string name="settings_podcast_episode_grouping_title_none">없음</string>
-    <string name="settings_podcast_episode_grouping_summary_none">구독하는 새 팟캐스트의 에피소드가 그룹화되지 않습니다.</string>
-    <string name="settings_podcast_episode_grouping_summary">구독하는 새 팟캐스트의 에피소드가 %s별로 그룹화됩니다.</string>
+    <string name="settings_podcast_episode_grouping_summary_none">팔로우하는 새 팟캐스트의 에피소드가 그룹화되지 않습니다.</string>
+    <string name="settings_podcast_episode_grouping_summary">팔로우하는 새 팟캐스트의 에피소드가 %s별로 그룹화됩니다.</string>
     <string name="settings_podcast_episode_grouping">팟캐스트 에피소드 그룹화</string>
     <string name="settings_podcast_custom">이 팟캐스트에 대한 사용자 정의</string>
     <string name="settings_podcast_artwork">팟캐스트 아트워크</string>
@@ -1097,7 +1128,7 @@ Language: ko_KR
     <string name="settings_import_opml_title">OPML 가져오기</string>
     <string name="settings_import_opml_stop">중지</string>
     <string name="settings_import_opml_progress">팟캐스트 %1$d/%2$d개</string>
-    <string name="settings_import_file_summary">다른 앱 또는 서비스에 팟캐스트 구독이 있으면 Pocket Casts에서는 OPML 파일에서 해당 구독을 가져올 수 있습니다.</string>
+    <string name="settings_import_file_summary">다른 앱 또는 서비스에 팟캐스트가 있으면 Pocket Casts에서는 OPML 파일에서 해당 구독을 가져올 수 있습니다.</string>
     <string name="settings_import_file">파일 선택</string>
     <string name="settings_import_choose_file">OPML 파일을 선택합니다.</string>
     <string name="settings_help_contact_support">후원 문의</string>
@@ -1105,8 +1136,7 @@ Language: ko_KR
     <string name="settings_get_plus_and_more">이 기능 등을 잠금 해제하려면 Pocket Casts Plus를 받으세요!</string>
     <string name="settings_general_player">플레이어</string>
     <string name="settings_general_defaults">기본</string>
-    <string name="settings_export_subscriptions">구독 내보내기</string>
-    <string name="settings_export_send_email_summary">특이하지만 널리 지원되는 OPML 형식으로 구독을 내보냅니다.</string>
+    <string name="settings_export_send_email_summary">특이하지만 널리 지원되는 OPML 형식으로 팟캐스트를 내보냅니다.</string>
     <string name="settings_export_send_email">이메일 보내기</string>
     <string name="settings_export_save_file_summary">저장 공간으로 OPML 파일을 내보냅니다.</string>
     <string name="settings_export_save_file">파일 저장</string>
@@ -1493,7 +1523,7 @@ Language: ko_KR
     <string name="podcast_effects_summary_speed">속도 %s배</string>
     <string name="podcast_included_in_filters">%s에 포함됨</string>
     <string name="podcast_not_in_filters">필터에 포함되지 않음</string>
-    <string name="podcast_unsubscribe_warning">구독을 해지하면 다운로드한 모든 파일이 삭제됩니다.</string>
+    <string name="podcast_unsubscribe_warning">팔로우를 취소하면 다운로드한 모든 파일이 삭제됩니다.</string>
     <string name="podcast_unsubscribe_downloaded_file_plural">다운로드한 파일 %d개</string>
     <string name="podcast_unsubscribe_downloaded_file_singular">다운로드한 파일 1개</string>
     <string name="podcast_share_open_fail">공유한 팟캐스트에 관한 상세 정보를 로드할 수 없습니다. 이 문제가 지속되면 공유한 사람에게 연락하여 무슨 일이 있는지 물어보세요.</string>
@@ -1508,7 +1538,6 @@ Language: ko_KR
     <string name="podcast_supporter_cancelled">후원 취소됨</string>
     <string name="podcast_supporter">후원자</string>
     <string name="podcast_support_this_podcast">이 프로그램 후원</string>
-    <string name="podcast_subscribed">구독됨</string>
     <string name="podcast_sort_episodes">에피소드 정렬</string>
     <string name="podcast_share_open_file_in">다음에서 파일 열기…</string>
     <string name="podcast_share_episode">에피소드 공유</string>
@@ -1593,7 +1622,6 @@ Language: ko_KR
     <string name="podcasts_share_missing_title">목록의 제목을 입력하세요.</string>
     <string name="podcasts_share_create_error">공유할 수 없음</string>
     <string name="podcasts_share_title">제목</string>
-    <string name="podcasts_share_subscribe_to_all">모두 팔로우</string>
     <string name="podcasts_share_selected_podcasts">선택한 팟캐스트 공유</string>
     <string name="podcasts_share_select_all">모두 선택</string>
     <string name="podcasts_share_list">공유한 목록</string>
@@ -1758,10 +1786,8 @@ Language: ko_KR
     <string name="today">오늘</string>
     <string name="learn_more">자세히 알아보세요.</string>
     <string name="up_next">다음 차례</string>
-    <string name="unsubscribe">구독 해지</string>
     <string name="unplayed">재생 안 됨</string>
     <string name="unarchive_all">모두 아카이빙 취소</string>
-    <string name="subscribe">구독</string>
     <string name="stream">스트리밍</string>
     <string name="stop_downloading">다운로드 중지</string>
     <string name="starred">즐겨찾기</string>

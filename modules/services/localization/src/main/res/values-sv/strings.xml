@@ -1,11 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-10-23 11:54:03+0000
+Translation-Revision-Date: 2024-11-07 13:54:11+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="maybe_later">Kanske senare</string>
+    <string name="settings_import_title">Importera podcasts</string>
+    <string name="settings_subscribe_to_played">Följ uppspelade podcasts</string>
+    <string name="settings_export_subscriptions">Exportera podcasts</string>
+    <string name="podcast_not_subscribed">Följer inte</string>
+    <string name="podcast_subscribed">Följer</string>
+    <string name="podcasts_share_subscribe_to_all">FÖLJ ALLA</string>
+    <string name="podcasts_no_subscriptions">Inga podcasts hittades</string>
+    <string name="unsubscribe">Sluta följa</string>
+    <string name="subscribe">Följ</string>
+    <string name="save_space_by_managing_downloaded_episodes">Spara %1$s – genom att hantera nedladdade avsnitt.</string>
+    <string name="pencil_clean_up_icon_content_description">Pennikon för rensning</string>
+    <string name="podcast_this">Den här podcasten</string>
+    <string name="end_of_year_cant_share_message">Den här berättelsen kan inte delas</string>
+    <string name="end_of_year_story_ratings_share_text">Jag betygsatte %1$d olika podcasts under %2$d, med %3$d som mitt mest använda betyg</string>
+    <string name="end_of_year_stories_completion_rate_share_text">Min slutförandegrad i år var %1$d</string>
+    <string name="end_of_year_share_dialog_message">Klistra in den här bilden på dina sociala medier och uppmärksamma dina favoritshower och deras skapare</string>
+    <string name="end_of_year_share_dialog_title">Dela den här berättelsen?</string>
+    <string name="up_next_shuffle_disable_button_content_description">Inaktivera slumpmässig Nästa-uppspelning</string>
+    <string name="up_next_shuffle_button_content_description">Slumpmässig Nästa-uppspelning</string>
+    <string name="podcast_ratings_page_title">Betyg</string>
+    <string name="eoy_story_stories_subscribe_to_plus_button_label">Kolla in Pocket Casts Plus</string>
+    <string name="end_of_year_stories_subscribe_to_plus">Stöd Pocket Casts genom att prenumerera på Plus och få mer statistik, plus premiumfunktioner som bokmärken, mappar och förvalda kapitel.</string>
+    <string name="settings_real_time_playback_summary">Om detta är aktiverat kommer spelaren att visa återstående tid, justerad för uppspelningshastighet och överhoppade kapitel.</string>
+    <string name="settings_real_time_playback">Justera återstående tid</string>
+    <string name="end_of_year_stories_year_over_year_title_went_up_a_lot">Jämfört med %1$s ökade din lyssningstid med över 500 %%</string>
     <string name="end_of_year_story_longest_episode_subtitle">Det var \"%1$s\" från \"%2$s\"</string>
     <string name="end_of_year_listening_time_subtitle">Sammanlagt lyssnande på podcasts</string>
     <string name="eoy_story_ratings_learn_button_label">Läs om betyg</string>
@@ -14,7 +40,6 @@ Language: sv_SE
     <string name="eoy_story_ratings_subtitle_1">Wow, så många %1$d-stjärniga betyg Tack för att du delar kärleken till dina favoritkreatörer.</string>
     <string name="eoy_story_ratings_title_2">Oj då! Inga podcastbetyg att visa dig ännu</string>
     <string name="eoy_story_ratings_title_1">Låt oss se dina betyg.</string>
-    <string name="end_of_year_story_top_podcast_title">Din favoritpodcast 2024 var %1$s</string>
     <string name="referrals_failed_to_load_offer">Något gick fel vid hämtningen av din hänvisningslänk.</string>
     <string name="transcript_error_not_available">Det finns ingen transkription tillgänglig för det här avsnittet.</string>
     <string name="referrals_banner_hide_label">Dölj den här bannern</string>
@@ -265,10 +290,16 @@ Language: sv_SE
     <string name="end_of_year_stories_year_completion_rate">slutförandegrad</string>
     <string name="end_of_year_stories_year_completion_rate_subtitle">Av de %1$d avsnitt du började lyssna på lyssnade du sammanlagt på %2$d</string>
     <string name="end_of_year_stories_year_completion_rate_title">Din slutförandegrad i år var %1$d%%</string>
+    <string name="end_of_year_stories_year_over_share_text">Min lyssningstid för %1$d jämfört med %2$d</string>
     <string name="eoy_year_over_year_title_skyrocketed">Jämfört med 2022 har din lyssningstid skjutit i höjden!</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">Ack ja … det finns ett liv att leva, eller hur?</string>
+    <string name="end_of_year_stories_year_over_year_title_went_down">Jämfört med %1$s har din lyssningstid minskat något</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">Och det sägs att kontinuitet är nyckeln till framgång … eller något i den stilen!</string>
+    <string name="end_of_year_stories_year_over_year_title_flat">Jämfört med %1$s var din lyssningstid ganska oförändrad</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_went_up">Är du redo att toppa det under %1$s?</string>
+    <string name="end_of_year_stories_year_over_year_title_went_up">Jämfört med %1$s ökade din lyssningstid med hisnande %2$s%%</string>
     <string name="end_of_year_prompt_card_summary">Se din lyssningsstatistik, dina favoritpodcasts och mycket mer.</string>
+    <string name="end_of_year_story_epilogue_title">Tack för att du lyssnat med oss i år.\nVi ses %1$d!</string>
     <string name="end_of_year_story_longest_episode_title">Det längsta avsnittet du lyssnade på var %1$s</string>
     <string name="end_of_year_replay">Spela upp igen</string>
     <string name="end_of_year_listening_time_title">Detta var den sammanlagda tiden du lyssnade på podcasts.</string>
@@ -375,8 +406,7 @@ Language: sv_SE
     <string name="settings_help_contact_support_no_phone_connection">Parkoppla din klocka med en telefon som har Pocket Casts installerat för att visa dina logga eller kontakta supporten</string>
     <string name="settings_help_contact_support_email_sent_to_phone">Om din telefon är parkopplad kommer ett popup-meddelande med en uppmaning om att e-posta supporten med dina loggar bifogade att visas</string>
     <string name="podcast_loading">Laddar dina podcasts</string>
-    <string name="podcasts_subscribe_on_phone">Prenumerera på podcasts på din telefon så visas de här.</string>
-    <string name="podcasts_no_subscriptions">Inga podcastprenumerationer</string>
+    <string name="podcasts_subscribe_on_phone">Följ podcasts på din telefon så visas de här.</string>
     <string name="settings_could_not_open_on_phone">Kunde inte öppnas på telefonen</string>
     <string name="settings_open_on_phone">Öppna på telefon</string>
     <string name="settings_about_privacy_policy_available_at">Vår integritetspolicy är tillgänglig på %s</string>
@@ -527,7 +557,6 @@ Language: sv_SE
     <string name="profile_cancel_confirm_subtitle">Detta kommer att ändra ditt paket till ett gratiskonto.</string>
     <string name="settings_other_media_actions">Övriga mediaåtgärder</string>
     <string name="settings_customize_buttons_displayed_in_android_13_notification_and_android_auto">Anpassa knapparna som visas i Android 13-uppspelningsaviseringar och Android Auto.</string>
-    <string name="podcast_not_subscribed">Prenumererar inte</string>
     <string name="onboarding_import_from_other_apps_step_2">Använd din telefons \"Dela\"-meny för att skicka filen till Pocket Casts. Alternativt kan du importera filen från Pocket Casts inställningsmeny \"Importera och exportera OPML\".</string>
     <string name="onboarding_import_from_other_apps_step_1">Hitta den andra appens exportalternativ och exportera en OPML-fil.</string>
     <string name="onboarding_can_import_from_opml">Pocket Casts kan importera podcasts från OPML-filer, så om din nuvarande app kan exportera en OPML-fil kan du följa dessa steg:</string>
@@ -587,8 +616,11 @@ Language: sv_SE
     <string name="end_of_year_story_top_categories_share_text">Mina mest lyssnade podcastkategorier</string>
     <string name="end_of_year_story_top_categories">Dina favoritkategorier</string>
     <string name="end_of_year_story_epilogue_subtitle">Glöm inte att dela med dina vänner och att berätta om dina favoritpodcastkreatörer</string>
+    <string name="end_of_year_story_longest_episode_share_text">Det längsta avsnittet jag lyssnade på under %1$d %2$s</string>
+    <string name="end_of_year_story_top_podcasts_list_title">Mina favoritpodcasts %1$d</string>
     <string name="end_of_year_story_top_podcasts_share_text">Mina favoritpodcasts för året. %1$s</string>
-    <string name="end_of_year_story_top_podcast_subtitle">Du lyssnade på %1$d avsnitt i sammanlagt %2$s</string>
+    <string name="end_of_year_story_top_podcast_share_text">Min favoritpodcast %1$d! %2$s</string>
+    <string name="end_of_year_story_listened_to_numbers_share_text">Jag lyssnade på %1$d olika podcasts och %2$d avsnitt under %3$d</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">Det fanns dock ett avsnitt som du fortsatte att komma tillbaka till …</string>
     <string name="end_of_year_story_listened_to_numbers">Du lyssnade sammanlagt på %1$d olika podcasts och %2$d avsnitt</string>
     <string name="end_of_year_story_listened_to_categories_share_text">Jag lyssnade på %1$d olika kategorier under 2023</string>
@@ -915,7 +947,7 @@ Language: sv_SE
     <string name="settings_status_service_ad_blocker_help_singular">Den vanligaste orsaken är att du har en annonsblockerare konfigurerad på din telefon eller i ditt nätverk. Du måste avblockera domänen %s</string>
     <string name="settings_status_service_discover_summary">Upptäck-sektionen i appen, med podcastsökning.</string>
     <string name="settings_status_service_discover">Upptäck och sök</string>
-    <string name="settings_status_service_account_summary">Tjänsten som används för att lagra avsnittsförlopp, prenumerationer, filter, osv.</string>
+    <string name="settings_status_service_account_summary">Tjänsten som används för att lagra avsnittsförlopp, podcasts du följer, filter, osv.</string>
     <string name="settings_status_service_account">Tjänsten Konto</string>
     <string name="settings_status_service_refresh_summary">Tjänsten som används för att hitta nya avsnitt.</string>
     <string name="settings_status_service_refresh">Tjänsten Uppdatera</string>
@@ -926,7 +958,6 @@ Language: sv_SE
     <string name="settings_status_service_internet">Internetanslutning</string>
     <string name="settings_status_description">Kontrollera din anslutning med viktiga tjänster Det hjälper till att diagnostisera problem med ditt nätverk, proxyservrar, VPN samt annonsblockerings- och säkerhetsappar.</string>
     <string name="settings_status_page">Statussida</string>
-    <string name="settings_import_title">Importera prenumerationer</string>
     <string name="settings_notification_default_sound">Standardljud</string>
     <string name="settings_subscribe_to_played_summary">Podcasts som du lyssnar på läggs automatiskt till på fliken Podcasts</string>
     <string name="settings_opml_export_failed">Det gick inte att spara OPML-filen.</string>
@@ -1016,7 +1047,6 @@ Language: sv_SE
     <string name="settings_title_about">Om</string>
     <string name="settings_title">Rubrik</string>
     <string name="settings_theme">Tema</string>
-    <string name="settings_subscribe_to_played">Prenumerera på spelade podcasts</string>
     <string name="settings_storage_store_on">Lagra podcasts på</string>
     <string name="settings_storage_sorry">Ledsen</string>
     <string name="settings_storage_size_free">%s gratis</string>
@@ -1045,8 +1075,8 @@ Language: sv_SE
     <string name="settings_skip_back_time">Tid att hoppa bakåt</string>
     <string name="settings_show_artwork_details">Detta visar även omslag på anslutna Bluetooth-enheter, klockor, osv.</string>
     <string name="settings_show_artwork">Visa omslag på låsskärmen</string>
-    <string name="settings_show_archived_summary_show">Nya podcasts som du prenumererar på kommer visa arkiverade avsnitt.</string>
-    <string name="settings_show_archived_summary_hide">Nya podcasts som du prenumererar på kommer inte visa arkiverade avsnitt.</string>
+    <string name="settings_show_archived_summary_show">Nya podcasts som du följer kommer att visa arkiverade avsnitt.</string>
+    <string name="settings_show_archived_summary_hide">Nya podcasts som du följer kommer inte att visa arkiverade avsnitt.</string>
     <string name="settings_show_archived_action_show">Visa</string>
     <string name="settings_show_archived_action_hide">Dölj</string>
     <string name="settings_row_action_summary">För avsnitt som inte har laddats ner än visar listor %s knappar.</string>
@@ -1060,8 +1090,8 @@ Language: sv_SE
     <string name="settings_podcasts_selected_all">Alla podcasts</string>
     <string name="settings_podcast_episode_grouping_title_season">Säsong</string>
     <string name="settings_podcast_episode_grouping_title_none">Ingen</string>
-    <string name="settings_podcast_episode_grouping_summary_none">Nya podcasts som du prenumererar på grupperar inte sina avsnitt.</string>
-    <string name="settings_podcast_episode_grouping_summary">Nya podcasts som du prenumererar på grupperar sina avsnitt efter %s.</string>
+    <string name="settings_podcast_episode_grouping_summary_none">Nya podcasts som du följer kommer inte att gruppera sina avsnitt.</string>
+    <string name="settings_podcast_episode_grouping_summary">Nya podcasts som du kommer inte att gruppera sina avsnitt efter %s.</string>
     <string name="settings_podcast_episode_grouping">Gruppering av podcastavsnitt</string>
     <string name="settings_podcast_custom">Anpassa för den här podcasten</string>
     <string name="settings_podcast_artwork">Podcastomslag</string>
@@ -1097,7 +1127,7 @@ Language: sv_SE
     <string name="settings_import_opml_title">Importera OPML</string>
     <string name="settings_import_opml_stop">Stoppa</string>
     <string name="settings_import_opml_progress">%1$d av %2$d podcasts</string>
-    <string name="settings_import_file_summary">Om du har podcastprenumerationer i någon annan app eller tjänst kan Pocket Casts importera dem från en OPML-fil.</string>
+    <string name="settings_import_file_summary">Om du har podcasts i någon annan app eller tjänst kan Pocket Casts importera dem från en OPML-fil.</string>
     <string name="settings_import_file">Välj fil</string>
     <string name="settings_import_choose_file">Välj en OPML-fil.</string>
     <string name="settings_help_contact_support">Kontakta supporten</string>
@@ -1105,8 +1135,7 @@ Language: sv_SE
     <string name="settings_get_plus_and_more">Skaffa Pocket Casts Plus för att låsa upp denna funktion och mer!</string>
     <string name="settings_general_player">Spelare</string>
     <string name="settings_general_defaults">Standardinställningar</string>
-    <string name="settings_export_subscriptions">Exportera prenumerationer</string>
-    <string name="settings_export_send_email_summary">Exportera dina prenumerationer i det supernördiga OPML-formatet (som stöds i stor utsträckning).</string>
+    <string name="settings_export_send_email_summary">Exportera dina podcasts i det supernördiga OPML-formatet (som stöds i stor utsträckning).</string>
     <string name="settings_export_send_email">Skicka e-post</string>
     <string name="settings_export_save_file_summary">Exportera OPML-filen till ditt lagringsutrymme.</string>
     <string name="settings_export_save_file">Spara fil</string>
@@ -1493,7 +1522,7 @@ Language: sv_SE
     <string name="podcast_effects_summary_speed">Hastighet %s×</string>
     <string name="podcast_included_in_filters">Ingår i %s</string>
     <string name="podcast_not_in_filters">Ingår inte i några filter</string>
-    <string name="podcast_unsubscribe_warning">Om du säger upp prenumerationen tas alla nedladdade filer bort.</string>
+    <string name="podcast_unsubscribe_warning">Om du slutar följa tas alla nedladdade filer bort.</string>
     <string name="podcast_unsubscribe_downloaded_file_plural">%d nedladdade filer</string>
     <string name="podcast_unsubscribe_downloaded_file_singular">1 nedladdad fil</string>
     <string name="podcast_share_open_fail">Det gick inte att läsa in informationen om den delade podcasten. Om problemet kvarstår kan du överväga att kontakta personen som delade den med dig och fråga vad problemet är.</string>
@@ -1508,7 +1537,6 @@ Language: sv_SE
     <string name="podcast_supporter_cancelled">Stöd avbrutet</string>
     <string name="podcast_supporter">SUPPORTER</string>
     <string name="podcast_support_this_podcast">Stöd den här showen</string>
-    <string name="podcast_subscribed">Prenumenerad</string>
     <string name="podcast_sort_episodes">Sortera avsnitt</string>
     <string name="podcast_share_open_file_in">Öppna fil i …</string>
     <string name="podcast_share_episode">Dela avsnitt</string>
@@ -1593,7 +1621,6 @@ Language: sv_SE
     <string name="podcasts_share_missing_title">Ange en rubrik för din lista.</string>
     <string name="podcasts_share_create_error">Hoppsan, kan inte att dela</string>
     <string name="podcasts_share_title">Rubrik</string>
-    <string name="podcasts_share_subscribe_to_all">PRENUMERERA PÅ ALLA</string>
     <string name="podcasts_share_selected_podcasts">Dela valda podcasts</string>
     <string name="podcasts_share_select_all">Välj alla</string>
     <string name="podcasts_share_list">Delad lista</string>
@@ -1758,10 +1785,8 @@ Language: sv_SE
     <string name="today">Idag</string>
     <string name="learn_more">Läs mer</string>
     <string name="up_next">Nästa</string>
-    <string name="unsubscribe">Avsluta prenumeration</string>
     <string name="unplayed">Ej uppspelat</string>
     <string name="unarchive_all">Avarkivera alla</string>
-    <string name="subscribe">Prenumerera</string>
     <string name="stream">Streama</string>
     <string name="stop_downloading">Sluta ladda ner</string>
     <string name="starred">Stjärnmärkt</string>

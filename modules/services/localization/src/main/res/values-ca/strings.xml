@@ -1,11 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-10-21 13:03:36+0000
+Translation-Revision-Date: 2024-11-02 23:25:25+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: ca
 -->
 <resources>
+    <string name="settings_import_title">Importar pòdcasts</string>
+    <string name="settings_subscribe_to_played">Segueix els pòdcasts reproduïts</string>
+    <string name="settings_export_subscriptions">Exportar pòdcasts</string>
+    <string name="podcast_not_subscribed">Sense seguir</string>
+    <string name="podcast_subscribed">Seguint</string>
+    <string name="podcasts_share_subscribe_to_all">SEGUEIX-LOS TOTS</string>
+    <string name="podcasts_no_subscriptions">No s\'han trobat pòdcasts</string>
+    <string name="unsubscribe">Deixar de seguir</string>
+    <string name="subscribe">Seguir</string>
+    <string name="up_next_shuffle_plus_prompt">Reprodueix els episodis de manera aleatòria amb Pocket Casts Plus, i més</string>
+    <string name="manage_downloads">Gestionar les descàrregues</string>
+    <string name="save_space_by_managing_downloaded_episodes">Estalvia %1$s – gestionant els episodis descarregats.</string>
+    <string name="pencil_clean_up_icon_content_description">Neteja del llapis</string>
+    <string name="podcast_this">Aquest pòdcast</string>
+    <string name="end_of_year_cant_share_message">Aquesta història no es pot compartir</string>
+    <string name="end_of_year_story_ratings_share_text">Vaig valorar %1$d pòdcasts diferents a %2$d, amb %3$d com la meva valoració més utilitzada</string>
+    <string name="end_of_year_stories_completion_rate_share_text">La meva taxa de finalització aquest any ha estat %1$d</string>
+    <string name="end_of_year_share_dialog_message">Copia aquesta imatge a les teves xarxes socials i fes una crida sobre els teus programes i creadors preferits</string>
+    <string name="end_of_year_share_dialog_title">Compartir aquesta història?</string>
+    <string name="up_next_shuffle_disable_button_content_description">Desactivar el mode aleatori a la cua \'Tot seguit\'</string>
+    <string name="up_next_shuffle_button_content_description">Mode aleatori a \'Tot seguit\'</string>
+    <string name="podcast_ratings_page_title">Valoracions</string>
+    <string name="eoy_story_stories_subscribe_to_plus_button_label">Consulta Pocket Casts Plus</string>
+    <string name="end_of_year_stories_subscribe_to_plus">Ajuda Pocket Casts subscrivint-te a Plus i obtén més estadístiques, a més de funcions Prèmium com ara marcadors, carpetes o capítols preseleccionats!</string>
+    <string name="settings_real_time_playback_summary">Si està activat, el reproductor mostrarà el temps restant, ajustat per la velocitat de reproducció i els capítols saltats.</string>
+    <string name="settings_real_time_playback">Ajusta el temps restant</string>
     <string name="end_of_year_stories_year_over_year_title_went_up_a_lot">Comparat amb %1$s, el teu temps que has escoltat ha augmentat més d\'un 500%%</string>
     <string name="end_of_year_story_longest_episode_subtitle">Era \"%1$s\" de \"%2$s\"</string>
     <string name="end_of_year_listening_time_subtitle">total escoltant pòdcasts</string>
@@ -15,7 +41,6 @@ Language: ca
     <string name="eoy_story_ratings_subtitle_1">Uau, quantes valoracions de %1$d estrelles! Gràcies per compartir l\'amor amb els teus creadors favorits!</string>
     <string name="eoy_story_ratings_title_2">Oh-oh! Encara no hi ha valoracions del pòdcast per a mostrar encara.</string>
     <string name="eoy_story_ratings_title_1">Anem a veure les teves valoracions!</string>
-    <string name="end_of_year_story_top_podcast_title">El teu millor pòdcast del 2024 va ser %1$s</string>
     <string name="referrals_failed_to_load_offer">Ho sento, però hi ha hagut un problema en obtenir el teu enllaç de referència.</string>
     <string name="transcript_error_not_available">Aquest episodi no té transcripció disponible</string>
     <string name="referrals_banner_hide_label">Amaga aquest banner</string>
@@ -167,6 +192,9 @@ Language: ca
     <string name="settings_advanced_cache_entire_playing_episode">L\'episodi es reprodueix a la memòria cau</string>
     <string name="playback">Reproducció</string>
     <string name="podcast_share_clip">Clip</string>
+    <string name="episode_queued_for_download">Episodi en cua per a descarregar</string>
+    <string name="episode_was_removed">L\'episodi ha estat eliminat</string>
+    <string name="remove_downloaded_file">Elimina el fitxer descarregat</string>
     <string name="settings_export_database_failed">Ha fallat l\'exportació de la base dades</string>
     <string name="settings_export_database">Exportar la base de dades</string>
     <string name="settings_sleep_timer_auto_restart_summary">Si està activat, el temporitzador de son es reiniciarà automàticament si reprodueixes un episodi als  5 minuts següents a l\'última pausa.</string>
@@ -263,6 +291,7 @@ Language: ca
     <string name="end_of_year_stories_year_completion_rate">taxa de finalització</string>
     <string name="end_of_year_stories_year_completion_rate_subtitle">Dels %1$d episodis que has començat, n\'has escoltat completament un total de %2$d</string>
     <string name="end_of_year_stories_year_completion_rate_title">La teva taxa de finalització enguany ha estat del %1$d%%</string>
+    <string name="end_of_year_stories_year_over_share_text">El meu %1$d temps escoltat comparat amb %2$d</string>
     <string name="eoy_year_over_year_title_skyrocketed">Comparat amb el 2022, el teu temps d\'escolta ha pujat com un coet!</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">Aaaah… la vida s\'ha de viure, no?</string>
     <string name="end_of_year_stories_year_over_year_title_went_down">Comparat amb %1$s, el teu que has escoltat ha baixat una mica.</string>
@@ -271,6 +300,7 @@ Language: ca
     <string name="end_of_year_stories_year_over_year_subtitle_went_up">Preparat per a superar-ho al %1$s?</string>
     <string name="end_of_year_stories_year_over_year_title_went_up">Comparat amb %1$s, el teu temps que ha escoltat ha augmentat un impressionant %2$s%%</string>
     <string name="end_of_year_prompt_card_summary">Consulta les teves estadístiques d\'escolta, els millors pòdcasts i molt més.</string>
+    <string name="end_of_year_story_epilogue_title">Gràcies per escoltar amb nosaltres aquest any.\nEns veiem el %1$d!</string>
     <string name="end_of_year_story_longest_episode_title">L\'episodi més llarg que vas escoltar va ser %1$s</string>
     <string name="end_of_year_replay">Torna a reproduir-ho</string>
     <string name="end_of_year_listening_time_title">Aquest va ser el vostre temps total escoltant pòdcasts</string>
@@ -377,8 +407,6 @@ Language: ca
     <string name="settings_help_contact_support_no_phone_connection">Emparella el teu rellotge amb un telèfon que tingui Pocket Casts instal·lat per veure els teus registres o contactar amb el suport</string>
     <string name="settings_help_contact_support_email_sent_to_phone">Si el telèfon està actualment emparellat, mostrarà una finestra emergent per enviar un correu electrònic al suport tècnic amb els teus registres adjunts</string>
     <string name="podcast_loading">Carregant els teus pòdcasts</string>
-    <string name="podcasts_subscribe_on_phone">Subscriu-te a pòdcasts al teu mòbil i apareixeran aquí.</string>
-    <string name="podcasts_no_subscriptions">No t\'has subscrit a cap pòdcast</string>
     <string name="settings_could_not_open_on_phone">No es pot obrir al telèfon</string>
     <string name="settings_open_on_phone">Obre al telèfon</string>
     <string name="settings_about_privacy_policy_available_at">Pots consultar la nostra política de privadesa a %s</string>
@@ -529,7 +557,6 @@ Language: ca
     <string name="profile_cancel_confirm_subtitle">Això canviarà el teu pla a un compte de franc.</string>
     <string name="settings_other_media_actions">Altres accions de mitjans</string>
     <string name="settings_customize_buttons_displayed_in_android_13_notification_and_android_auto">Personalitza els botons que es mostren a les notificacions de reproducció d\'Android 13 i Android Auto.</string>
-    <string name="podcast_not_subscribed">No t\'hi has subscrit</string>
     <string name="onboarding_import_from_other_apps_step_2">Utilitza el menú \'Compartir\' del teu telèfon per enviar el fitxer a Pocket Casts. Alternativament, importa el fitxer des del menú de configuració \'Importar i exportar OPML\' de Pocket Casts.</string>
     <string name="onboarding_import_from_other_apps_step_1">Troba l\'opció d\'exportació de l\'altra aplicació i exporta un fitxer OPML.</string>
     <string name="onboarding_can_import_from_opml">Pocket Casts pot importar pòdcasts des de fitxers OPML, així que si la teva aplicació actual pot exportar un fitxer OPML, pots seguir aquests passos:</string>
@@ -570,6 +597,7 @@ Language: ca
     <string name="onboarding_plus_feature_folders_text">Organitza els teus pòdcasts en carpetes i així els podràs tenir sincronitzats en tots els teus dispositius.</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Escolta a  més llocs amb les nostres aplicacions per a Windows, macOS i Web.</string>
     <string name="onboarding_plus_feature_desktop_and_web_apps_title">Aplicacions d\'escriptori i web</string>
+    <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Tot el que t\'agrada de Pocket Casts, i molt més</string>
     <string name="onboarding_recommendations_import">Importar</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">Fes que Pocket Casts sigui teu seleccionant els teus pòdcasts preferits o important-los d\'un altre reproductor de pòdcasts. Sempre ho pots fer més tard.</string>
     <string name="onboarding_recommendations_find_favorite_podcasts">Troba els teus pòdcasts preferits</string>
@@ -588,8 +616,11 @@ Language: ca
     <string name="end_of_year_story_top_categories_share_text">Les meves categories de pòdcasts més escoltades</string>
     <string name="end_of_year_story_top_categories">Les teves principals categories</string>
     <string name="end_of_year_story_epilogue_subtitle">No t\'oblidis de compartir-ho amb els teus amics i fer un reconeixement als teus creadors de pòdcast favorits</string>
+    <string name="end_of_year_story_longest_episode_share_text">L\'episodi més llarg que vaig escoltar en %1$d %2$s</string>
+    <string name="end_of_year_story_top_podcasts_list_title">Els meus pòdcasts preferits de %1$d</string>
     <string name="end_of_year_story_top_podcasts_share_text">Els meus pòdcasts preferits de l\'any! %1$s</string>
-    <string name="end_of_year_story_top_podcast_subtitle">Has escoltat %1$d episodis d\'un total de %2$s</string>
+    <string name="end_of_year_story_top_podcast_share_text">El meu pòdcast favorit de %1$d! %2$s</string>
+    <string name="end_of_year_story_listened_to_numbers_share_text">He escoltat %1$d pòdcasts diferents i %2$d episodis en %3$d.</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">Però n\'hi havia un al que tornaves…</string>
     <string name="end_of_year_story_listened_to_numbers">Has escoltat %1$d programes diferents i %2$d episodis en total</string>
     <string name="end_of_year_story_listened_to_categories_share_text">He escoltat %1$d categories diferents el 2023</string>
@@ -916,7 +947,6 @@ Language: ca
     <string name="settings_status_service_ad_blocker_help_singular">La causa més comuna és que tens un bloquejador de publicitat configurat al teu telèfon o xarxa. Haureu de desbloquejar el domini %s</string>
     <string name="settings_status_service_discover_summary">La secció Descobrir l\'aplicació i la cerca de pòdcast.</string>
     <string name="settings_status_service_discover">Descobrir i cercar</string>
-    <string name="settings_status_service_account_summary">El servei es fa servir per emmagatzemar el progrés dels episodis, les subscripcions, els filtres, etc.</string>
     <string name="settings_status_service_account">Servei del compte</string>
     <string name="settings_status_service_refresh_summary">Aquest servei s\'empra per cercar episodis nous.</string>
     <string name="settings_status_service_refresh">Servei d\'actualizació</string>
@@ -927,7 +957,6 @@ Language: ca
     <string name="settings_status_service_internet">Connexió a Internet</string>
     <string name="settings_status_description">Comprova la teva connexió amb serveis importants. Us ajudem a diagnosticar problemes de xarxes, proxies, VPN, bloquejadors de publicitat i aplicacions de seguretat.</string>
     <string name="settings_status_page">Pàgina d\'estat</string>
-    <string name="settings_import_title">Importar subscripcions</string>
     <string name="settings_notification_default_sound">So per defecte</string>
     <string name="settings_subscribe_to_played_summary">Els pòdcasts que escoltes s\'afegiran automàticament a la pestanya Pòdcasts</string>
     <string name="settings_opml_export_failed">No es pot desar el fitxer OPML.</string>
@@ -1017,7 +1046,6 @@ Language: ca
     <string name="settings_title_about">Quant a</string>
     <string name="settings_title">Títol</string>
     <string name="settings_theme">Tema</string>
-    <string name="settings_subscribe_to_played">Subscriu-te als pòdcasts reproduïts</string>
     <string name="settings_storage_store_on">Emmagatzemar els pòdcasts a</string>
     <string name="settings_storage_sorry">Ho sento</string>
     <string name="settings_storage_size_free">%s gratuït</string>
@@ -1046,8 +1074,6 @@ Language: ca
     <string name="settings_skip_back_time">Saltar temps cap enrere</string>
     <string name="settings_show_artwork_details">També es mostraran les caràtules als dispositius connectats per Bluetooth, rellotges, etc.</string>
     <string name="settings_show_artwork">Mostrar caràtules a la pantalla de bloqueig</string>
-    <string name="settings_show_archived_summary_show">Els nous pòdcasts als quals us subscriviu mostraran els episodis arxivats.</string>
-    <string name="settings_show_archived_summary_hide">Els nous pòdcasts als quals us subscriviu no mostraran els episodis arxivats.</string>
     <string name="settings_show_archived_action_show">Mostrar</string>
     <string name="settings_show_archived_action_hide">Amagar</string>
     <string name="settings_row_action_summary">Per als episodis que encara no s\'han descarregat, les llistes mostraran botons %s.</string>
@@ -1061,8 +1087,6 @@ Language: ca
     <string name="settings_podcasts_selected_all">Tots els pòdcasts</string>
     <string name="settings_podcast_episode_grouping_title_season">Temporada</string>
     <string name="settings_podcast_episode_grouping_title_none">Cap</string>
-    <string name="settings_podcast_episode_grouping_summary_none">Els pòdcasts nous als quals us subscriviu no agruparan els vostres episodis.</string>
-    <string name="settings_podcast_episode_grouping_summary">Els nous pòdcasts als quals et subscrius agruparan els episodis per %s.</string>
     <string name="settings_podcast_episode_grouping">Agrupació d\'episodis de pòdcast</string>
     <string name="settings_podcast_custom">Personalitzat per a aquest pòdcast</string>
     <string name="settings_podcast_artwork">Caràtules del pòdcast</string>
@@ -1098,7 +1122,6 @@ Language: ca
     <string name="settings_import_opml_title">Importar OPML</string>
     <string name="settings_import_opml_stop">Aturar</string>
     <string name="settings_import_opml_progress">%1$d de %2$d pòdcasts</string>
-    <string name="settings_import_file_summary">Si tens subscripcions de pòdcast en una altra app o servei, Pocket Casts les pot importar des d\'un fitxer OPML.</string>
     <string name="settings_import_file">Seleccionar fitxer</string>
     <string name="settings_import_choose_file">Tria un fitxer OPML.</string>
     <string name="settings_help_contact_support">Contacta amb el suport</string>
@@ -1106,8 +1129,6 @@ Language: ca
     <string name="settings_get_plus_and_more">Aconsegueix Pocket Casts Plus per desbloquejar aquesta funció i moltes més!</string>
     <string name="settings_general_player">Reproductor</string>
     <string name="settings_general_defaults">Per defecte</string>
-    <string name="settings_export_subscriptions">Exportar subscripcions</string>
-    <string name="settings_export_send_email_summary">Exporta les teves subscripcions en el format OPML super geek (però àmpliament compatible).</string>
     <string name="settings_export_send_email">Enviar correu electrònic</string>
     <string name="settings_export_save_file_summary">Exportar el fitxer OPML al teu emmagatzematge.</string>
     <string name="settings_export_save_file">Desar fitxer</string>
@@ -1494,7 +1515,6 @@ Language: ca
     <string name="podcast_effects_summary_speed">Velocitat %s×</string>
     <string name="podcast_included_in_filters">Inclòs a %s</string>
     <string name="podcast_not_in_filters">No inclòs a cap filtre</string>
-    <string name="podcast_unsubscribe_warning">Si deixes de seguir aquest pòdcast, s\'esborraran tots els arxius descarregats.</string>
     <string name="podcast_unsubscribe_downloaded_file_plural">%d Arxius descarregats</string>
     <string name="podcast_unsubscribe_downloaded_file_singular">1 arxiu descarregat</string>
     <string name="podcast_share_open_fail">No es poden carregar els detalls del pòdcast compartit. Si aquest problema persisteix, per què no et poses en contacte amb la persona que t\'ho va compartir i li preguntes què passa?</string>
@@ -1509,7 +1529,6 @@ Language: ca
     <string name="podcast_supporter_cancelled">Suport cancel·lat</string>
     <string name="podcast_supporter">COL·LABORADOR</string>
     <string name="podcast_support_this_podcast">Dona suport a aquest programa</string>
-    <string name="podcast_subscribed">Subscrit</string>
     <string name="podcast_sort_episodes">Ordenar episodis</string>
     <string name="podcast_share_open_file_in">Obrir l\'arxiu a…</string>
     <string name="podcast_share_episode">Compartir l\'episodi</string>
@@ -1594,7 +1613,6 @@ Language: ca
     <string name="podcasts_share_missing_title">Introdueix un títol per a la teva llista.</string>
     <string name="podcasts_share_create_error">Vaja, no s\'ha pogut compartir</string>
     <string name="podcasts_share_title">Títol</string>
-    <string name="podcasts_share_subscribe_to_all">SUBSCRIURE\'S A TOTS</string>
     <string name="podcasts_share_selected_podcasts">Comparteix els pòdcasts triats</string>
     <string name="podcasts_share_select_all">Selecciona-ho tot</string>
     <string name="podcasts_share_list">Llista compartida</string>
@@ -1759,10 +1777,8 @@ Language: ca
     <string name="today">Avui</string>
     <string name="learn_more">Més informació.</string>
     <string name="up_next">Tot seguit</string>
-    <string name="unsubscribe">Cancel·lar la subscripció</string>
     <string name="unplayed">No reproduït</string>
     <string name="unarchive_all">Desarxivar tot</string>
-    <string name="subscribe">Subscriu-me</string>
     <string name="stream">Transmissió</string>
     <string name="stop_downloading">Aturar la descàrrega</string>
     <string name="starred">Destacat</string>

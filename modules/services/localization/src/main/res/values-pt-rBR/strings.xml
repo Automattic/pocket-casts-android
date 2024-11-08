@@ -1,11 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-10-21 15:54:04+0000
+Translation-Revision-Date: 2024-11-06 16:54:03+0000
 Plural-Forms: nplurals=2; plural=(n > 1);
 Generator: GlotPress/2.4.0-alpha
 Language: pt_BR
 -->
 <resources>
+    <string name="maybe_later">Talvez mais tarde</string>
+    <string name="settings_import_title">Importar podcasts</string>
+    <string name="settings_subscribe_to_played">Seguir podcasts reproduzidos</string>
+    <string name="settings_export_subscriptions">Exportar podcasts</string>
+    <string name="podcast_not_subscribed">Não está seguindo</string>
+    <string name="podcast_subscribed">Seguindo</string>
+    <string name="podcasts_share_subscribe_to_all">SEGUIR TODOS</string>
+    <string name="podcasts_no_subscriptions">Nenhum podcast encontrado</string>
+    <string name="unsubscribe">Deixar de seguir</string>
+    <string name="subscribe">Seguir</string>
+    <string name="up_next_shuffle_plus_prompt">Alterne seus episódios com o Pocket Casts Plus e muito mais</string>
+    <string name="save_space_by_managing_downloaded_episodes">Economize %1$s ao gerenciar episódios baixados.</string>
+    <string name="pencil_clean_up_icon_content_description">Lápis de limpeza</string>
+    <string name="podcast_this">Este podcast</string>
+    <string name="end_of_year_cant_share_message">Este story não pode ser compartilhado</string>
+    <string name="end_of_year_story_ratings_share_text">Eu avaliei %1$d podcasts diferentes em %2$d, com %3$d como minha maior avaliação</string>
+    <string name="end_of_year_stories_completion_rate_share_text">Minha taxa de conclusão este ano foi de %1$d</string>
+    <string name="end_of_year_share_dialog_message">Cole esta imagem nas suas redes sociais para divulgar seus criadores e programas favoritos</string>
+    <string name="end_of_year_share_dialog_title">Compartilhar este story?</string>
+    <string name="up_next_shuffle_disable_button_content_description">Desativar próximo aleatório</string>
+    <string name="up_next_shuffle_button_content_description">Próximo aleatório</string>
+    <string name="podcast_ratings_page_title">Avaliações</string>
+    <string name="eoy_story_stories_subscribe_to_plus_button_label">Confira o Pocket Casts Plus</string>
+    <string name="end_of_year_stories_subscribe_to_plus">Junte-se ao Pocket Casts ao assinar o Plus e aumente as estatísticas, além de funcionalidades premium como pastas, favoritos e pré-seleção de capítulos!</string>
+    <string name="settings_real_time_playback_summary">Se o player estiver ligado, ele vai mostrar o tempo restante ajustado para a velocidade de reprodução e capítulos pulados.</string>
+    <string name="settings_real_time_playback">Ajustar tempo restante</string>
+    <string name="end_of_year_stories_year_over_year_title_went_up_a_lot">Em comparação com %1$s, seu tempo de streaming aumentou em mais de 500%%</string>
     <string name="end_of_year_story_longest_episode_subtitle">Foi \"%1$s\" de \"%2$s\"</string>
     <string name="end_of_year_listening_time_subtitle">no total ouvindo podcasts</string>
     <string name="eoy_story_ratings_learn_button_label">Entenda as classificações</string>
@@ -14,7 +41,6 @@ Language: pt_BR
     <string name="eoy_story_ratings_subtitle_1">Uau! Quantas classificações com %1$d estrelas. Obrigado por compartilhar todo o seu amor pelos seus criadores favoritos.</string>
     <string name="eoy_story_ratings_title_2">Vish! Ainda não há classificações em podcasts</string>
     <string name="eoy_story_ratings_title_1">Vamos ver suas classificações!</string>
-    <string name="end_of_year_story_top_podcast_title">Seu principal podcast em 2024 foi %1$s</string>
     <string name="referrals_failed_to_load_offer">Ocorreu um erro ao buscar seu link de indicação.</string>
     <string name="transcript_error_not_available">Não há transcrição disponível para este episódio.</string>
     <string name="referrals_banner_hide_label">Ocultar este banner</string>
@@ -265,10 +291,16 @@ Language: pt_BR
     <string name="end_of_year_stories_year_completion_rate">taxa de conclusão</string>
     <string name="end_of_year_stories_year_completion_rate_subtitle">Dos %1$d episódios que você começou, você concluiu um total de %2$d</string>
     <string name="end_of_year_stories_year_completion_rate_title">Sua taxa de conclusão este ano foi de %1$d%%</string>
+    <string name="end_of_year_stories_year_over_share_text">Meu tempo de streaming de %1$d em comparação com %2$d</string>
     <string name="eoy_year_over_year_title_skyrocketed">Em comparação com 2022, seu tempo de streaming disparou!</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">Poxa… tem sempre algo para se viver, né?</string>
+    <string name="end_of_year_stories_year_over_year_title_went_down">Em comparação com %1$s, seu tempo de streaming diminuiu um pouco</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">E dizem que continuidade é a chave do sucesso… ou algo parecido.</string>
+    <string name="end_of_year_stories_year_over_year_title_flat">Em comparação com %1$s, seu tempo de streaming permaneceu bastante consistente</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_went_up">Tudo pronto para se superar em %1$s?</string>
+    <string name="end_of_year_stories_year_over_year_title_went_up">Em comparação com %1$s, seu tempo de streaming aumentou muito %2$s%%</string>
     <string name="end_of_year_prompt_card_summary">Veja suas estatísticas de streaming, principais podcasts e muito mais.</string>
+    <string name="end_of_year_story_epilogue_title">Agradecemos por nos escolher este ano.\nNos vemos em %1$d!</string>
     <string name="end_of_year_story_longest_episode_title">O episódio mais longo que você ouviu foi %1$s</string>
     <string name="end_of_year_replay">Ouvir de novo</string>
     <string name="end_of_year_listening_time_title">Este foi o seu tempo total ouvindo podcasts.</string>
@@ -375,8 +407,7 @@ Language: pt_BR
     <string name="settings_help_contact_support_no_phone_connection">Pareie seu smartwatch com um telefone que tenha Pocket Casts instalado para visualizar seus registros ou entre em contato com o suporte</string>
     <string name="settings_help_contact_support_email_sent_to_phone">Se o seu telefone estiver pareado, aparecerá um pop-up para enviar um e-mail ao suporte com seus registros anexados</string>
     <string name="podcast_loading">Carregando os seus podcasts</string>
-    <string name="podcasts_subscribe_on_phone">Siga podcasts no seu telefone e eles vão aparecer aqui.</string>
-    <string name="podcasts_no_subscriptions">Nenhum podcast seguido</string>
+    <string name="podcasts_subscribe_on_phone">Siga podcasts no seu telefone e eles aparecerão aqui.</string>
     <string name="settings_could_not_open_on_phone">Não foi possível abrir no telefone</string>
     <string name="settings_open_on_phone">Abrir no telefone</string>
     <string name="settings_about_privacy_policy_available_at">Nossa Política de privacidade está disponível em %s</string>
@@ -527,7 +558,6 @@ Language: pt_BR
     <string name="profile_cancel_confirm_subtitle">Esta opção mudará seu plano para uma conta gratuita.</string>
     <string name="settings_other_media_actions">Outras ações de mídia</string>
     <string name="settings_customize_buttons_displayed_in_android_13_notification_and_android_auto">Personalize os botões exibidos nas notificações de reprodução do Android 13 e Android Auto.</string>
-    <string name="podcast_not_subscribed">Não assinado</string>
     <string name="onboarding_import_from_other_apps_step_2">Use o menu \"Compartilhar\" do seu telefone para enviar o arquivo para o Pocket Casts. Como alternativa, importe o arquivo do menu de configurações \"Importar/exportar OPML\" do Pocket Casts.</string>
     <string name="onboarding_import_from_other_apps_step_1">Encontre a opção de exportação de outro aplicativo e exporte um arquivo OPML.</string>
     <string name="onboarding_can_import_from_opml">O Pocket Casts pode importar podcasts de arquivos OPML, então, se seu aplicativo atual puder exportar um arquivo OPML, siga estas etapas:</string>
@@ -587,8 +617,11 @@ Language: pt_BR
     <string name="end_of_year_story_top_categories_share_text">Categorias dos podcasts que mais ouvi</string>
     <string name="end_of_year_story_top_categories">Suas principais categorias</string>
     <string name="end_of_year_story_epilogue_subtitle">Não esqueça de compartilhar com seus amigos e agradecer a seus criadores favoritos</string>
+    <string name="end_of_year_story_longest_episode_share_text">O episódio mais longo que eu ouvi em %1$d %2$s</string>
+    <string name="end_of_year_story_top_podcasts_list_title">Meus principais podcasts de %1$d</string>
     <string name="end_of_year_story_top_podcasts_share_text">Meus principais podcasts do ano! %1$s</string>
-    <string name="end_of_year_story_top_podcast_subtitle">Você ouviu %1$d episódios em um total de %2$s</string>
+    <string name="end_of_year_story_top_podcast_share_text">Meu podcast favorito de %1$d! %2$s</string>
+    <string name="end_of_year_story_listened_to_numbers_share_text">Eu ouvi %1$d podcasts diferentes e %2$d episódios em %3$d</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">Mas tinha um que sempre fazia você pedir bis…</string>
     <string name="end_of_year_story_listened_to_numbers">Você ouviu %1$d programas diferentes e %2$d episódios no total</string>
     <string name="end_of_year_story_listened_to_categories_share_text">Eu ouvi %1$d categorias diferentes em 2023</string>
@@ -915,7 +948,7 @@ Language: pt_BR
     <string name="settings_status_service_ad_blocker_help_singular">A causa mais comum é ter um bloqueador de anúncios configurado no seu telefone ou na sua rede. Você precisa desbloquear o domínio %s</string>
     <string name="settings_status_service_discover_summary">A seção Explorar do aplicativo, incluindo pesquisa de podcast.</string>
     <string name="settings_status_service_discover">Explorar e pesquisar</string>
-    <string name="settings_status_service_account_summary">O serviço usado para armazenar o progresso dos episódios, assinaturas, filtros, etc.</string>
+    <string name="settings_status_service_account_summary">O serviço usado para armazenar o progresso dos episódios, podcasts que você segue, filtros, etc.</string>
     <string name="settings_status_service_account">Serviço de conta</string>
     <string name="settings_status_service_refresh_summary">O serviço usado para encontrar novos episódios.</string>
     <string name="settings_status_service_refresh">Atualizar serviço</string>
@@ -926,7 +959,6 @@ Language: pt_BR
     <string name="settings_status_service_internet">Conexão com a Internet</string>
     <string name="settings_status_description">Verifique sua conexão com serviços importantes. Isso ajuda a identificar problemas na sua rede, nos proxies, na VPN e nos aplicativos de segurança e bloqueadores de anúncios.</string>
     <string name="settings_status_page">Página de status</string>
-    <string name="settings_import_title">Importar assinaturas</string>
     <string name="settings_notification_default_sound">Som padrão</string>
     <string name="settings_subscribe_to_played_summary">Os podcasts que você ouvir serão adicionados automaticamente à guia Podcasts</string>
     <string name="settings_opml_export_failed">Não foi possível salvar o arquivo OPML.</string>
@@ -1016,7 +1048,6 @@ Language: pt_BR
     <string name="settings_title_about">Sobre</string>
     <string name="settings_title">Título</string>
     <string name="settings_theme">Tema</string>
-    <string name="settings_subscribe_to_played">Assinar os podcasts reproduzidos</string>
     <string name="settings_storage_store_on">Armazenar os podcasts em</string>
     <string name="settings_storage_sorry">Desculpe</string>
     <string name="settings_storage_size_free">%s grátis</string>
@@ -1045,8 +1076,8 @@ Language: pt_BR
     <string name="settings_skip_back_time">Tempo de retorno</string>
     <string name="settings_show_artwork_details">Isso também mostrará arte em dispositivos conectados por Bluetooth, smartwatches, etc.</string>
     <string name="settings_show_artwork">Mostrar arte na tela de bloqueio</string>
-    <string name="settings_show_archived_summary_show">Os novos podcasts que você assinar exibirão os episódios arquivados.</string>
-    <string name="settings_show_archived_summary_hide">Os novos podcasts que você assinar não exibirão os episódios arquivados.</string>
+    <string name="settings_show_archived_summary_show">Os novos podcasts que você seguir exibirão os episódios arquivados.</string>
+    <string name="settings_show_archived_summary_hide">Os novos podcasts que você seguir não exibirão os episódios arquivados.</string>
     <string name="settings_show_archived_action_show">Mostrar</string>
     <string name="settings_show_archived_action_hide">Ocultar</string>
     <string name="settings_row_action_summary">Para episódios que ainda não foram baixados, a lista mostrará %s botões.</string>
@@ -1060,8 +1091,8 @@ Language: pt_BR
     <string name="settings_podcasts_selected_all">Todos os podcasts</string>
     <string name="settings_podcast_episode_grouping_title_season">Temporada</string>
     <string name="settings_podcast_episode_grouping_title_none">Nenhum</string>
-    <string name="settings_podcast_episode_grouping_summary_none">Os episódios dos novos podcasts que você assinar não serão agrupados.</string>
-    <string name="settings_podcast_episode_grouping_summary">Os episódios dos novos podcasts que você assinar serão agrupados por %s.</string>
+    <string name="settings_podcast_episode_grouping_summary_none">Os episódios dos novos podcasts que você seguir não serão agrupados.</string>
+    <string name="settings_podcast_episode_grouping_summary">Os episódios dos novos podcasts que você seguir serão agrupados por %s.</string>
     <string name="settings_podcast_episode_grouping">Agrupamento de episódios do podcast</string>
     <string name="settings_podcast_custom">Personalizado para este podcast</string>
     <string name="settings_podcast_artwork">Arte do podcast</string>
@@ -1097,7 +1128,7 @@ Language: pt_BR
     <string name="settings_import_opml_title">Importar OPML</string>
     <string name="settings_import_opml_stop">Parar</string>
     <string name="settings_import_opml_progress">%1$d de %2$d podcasts</string>
-    <string name="settings_import_file_summary">Se você tiver assinaturas de podcasts em outro aplicativo ou outro serviço, o Pocket Casts poderá importá-los com um arquivo OPML.</string>
+    <string name="settings_import_file_summary">Se você tiver podcasts em outro aplicativo ou serviço, o Pocket Casts poderá importá-los com um arquivo OPML.</string>
     <string name="settings_import_file">Selecionar arquivo</string>
     <string name="settings_import_choose_file">Escolha um arquivo OPML.</string>
     <string name="settings_help_contact_support">Falar com o suporte</string>
@@ -1105,8 +1136,7 @@ Language: pt_BR
     <string name="settings_get_plus_and_more">Assine o Pocket Casts Plus para obter esta e outras funcionalidades!</string>
     <string name="settings_general_player">Reprodutor</string>
     <string name="settings_general_defaults">Padrão</string>
-    <string name="settings_export_subscriptions">Exportar assinaturas</string>
-    <string name="settings_export_send_email_summary">Exporte suas assinaturas no formato supernerd (mas amplamente compatível) OPML.</string>
+    <string name="settings_export_send_email_summary">Exporte seus podcasts no formato supernerd (mas amplamente compatível) OPML.</string>
     <string name="settings_export_send_email">Enviar e-mail</string>
     <string name="settings_export_save_file_summary">Exporte o arquivo OPML para o seu armazenamento.</string>
     <string name="settings_export_save_file">Salvar arquivo</string>
@@ -1493,7 +1523,7 @@ Language: pt_BR
     <string name="podcast_effects_summary_speed">Velocidade %sx</string>
     <string name="podcast_included_in_filters">Incluso em %s</string>
     <string name="podcast_not_in_filters">Não incluso em nenhum filtro</string>
-    <string name="podcast_unsubscribe_warning">Cancelar a assinatura excluirá todos os arquivos baixados.</string>
+    <string name="podcast_unsubscribe_warning">Deixar de seguir excluirá todos os arquivos baixados.</string>
     <string name="podcast_unsubscribe_downloaded_file_plural">%d arquivos baixados</string>
     <string name="podcast_unsubscribe_downloaded_file_singular">1 arquivo baixado</string>
     <string name="podcast_share_open_fail">Não foi possível carregar detalhes do podcast compartilhado. Se esse problema persistir, tente perguntar o que aconteceu para a pessoa que o compartilhou com você.</string>
@@ -1508,7 +1538,6 @@ Language: pt_BR
     <string name="podcast_supporter_cancelled">Apoio cancelado</string>
     <string name="podcast_supporter">APOIADOR</string>
     <string name="podcast_support_this_podcast">Apoiar este programa</string>
-    <string name="podcast_subscribed">Assinado</string>
     <string name="podcast_sort_episodes">Ordenar episódios</string>
     <string name="podcast_share_open_file_in">Abrir arquivo em…</string>
     <string name="podcast_share_episode">Compartilhar episódio</string>
@@ -1593,7 +1622,6 @@ Language: pt_BR
     <string name="podcasts_share_missing_title">Dê um título para sua lista.</string>
     <string name="podcasts_share_create_error">Ops, não foi possível compartilhar</string>
     <string name="podcasts_share_title">Título</string>
-    <string name="podcasts_share_subscribe_to_all">ASSINAR TUDO</string>
     <string name="podcasts_share_selected_podcasts">Compartilhar podcasts selecionados</string>
     <string name="podcasts_share_select_all">Selecionar tudo</string>
     <string name="podcasts_share_list">Lista compartilhada</string>
@@ -1758,10 +1786,8 @@ Language: pt_BR
     <string name="today">Hoje</string>
     <string name="learn_more">Saiba mais</string>
     <string name="up_next">Próximos</string>
-    <string name="unsubscribe">Cancelar assinatura</string>
     <string name="unplayed">Não reproduzido</string>
     <string name="unarchive_all">Desarquivar tudo</string>
-    <string name="subscribe">Assinar</string>
     <string name="stream">Transmissão</string>
     <string name="stop_downloading">Parar o download</string>
     <string name="starred">Favorito</string>
