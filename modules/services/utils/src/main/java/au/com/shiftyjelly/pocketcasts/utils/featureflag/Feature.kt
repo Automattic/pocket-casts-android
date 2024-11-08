@@ -168,7 +168,7 @@ enum class Feature(
         title = "Manage Downloaded Episodes",
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
     RESET_EPISODE_CACHE_ON_416_ERROR(

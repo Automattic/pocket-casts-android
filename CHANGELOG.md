@@ -5,6 +5,8 @@
         ([#3042](https://github.com/Automattic/pocket-casts-android/issues/3042))
    *   Add Playback 2024 summary
         ([#3123](https://github.com/Automattic/pocket-casts-android/pull/3123))
+   *   Add the ability to get notified when device is running on low storage and has downloaded episodes
+       ([#3198](https://github.com/Automattic/pocket-casts-android/pull/3198))
 *   Updates
     *   Renamed the podcast action 'Subscribe' to 'Follow'
         ([#3120](https://github.com/Automattic/pocket-casts-android/pull/3120))
