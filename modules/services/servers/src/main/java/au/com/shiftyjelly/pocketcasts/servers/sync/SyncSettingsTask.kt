@@ -23,8 +23,6 @@ class SyncSettingsTask(context: Context, parameters: WorkerParameters) : Corouti
                 return Result.failure()
             }
 
-            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Settings synced")
-
             return Result.success()
         }
 

@@ -299,20 +299,23 @@ class PodcastSyncProcess(
     private fun syncUpNext() = Completable.create { emitter ->
         val startTime = SystemClock.elapsedRealtime()
         val workRequestId = UpNextSyncWorker.enqueue(syncManager, context)
-        workRequestId?.let {
+        if (workRequestId == null) {
+            logTime("Refresh - sync up next, work request id is null", startTime)
+            emitter.onComplete()
+        } else {
             ProcessLifecycleOwner.get().lifecycleScope.launch {
-                WorkManager.getInstance(context).getWorkInfoByIdFlow(it).first { it.state.isFinished }
+                WorkManager.getInstance(context).getWorkInfoByIdFlow(workRequestId).first { it.state.isFinished }
+                logTime("Refresh - sync up next", startTime)
                 emitter.onComplete()
             }
-        } ?: emitter.onComplete()
-        LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - sync up next - ${String.format(Locale.ENGLISH, "%d ms", SystemClock.elapsedRealtime() - startTime)}")
+        }
     }
 
     private fun syncPlayHistory(): Completable {
         return Completable.fromAction {
             val startTime = SystemClock.elapsedRealtime()
             SyncHistoryTask.scheduleToRun(context)
-            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - sync history - ${String.format("%d ms", SystemClock.elapsedRealtime() - startTime)}")
+            logTime("Refresh - sync play history", startTime)
         }
     }
 
@@ -320,7 +323,7 @@ class PodcastSyncProcess(
         return rxCompletable {
             val startTime = SystemClock.elapsedRealtime()
             SyncSettingsTask.run(settings, lastSyncTime, syncManager)
-            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - sync settings - ${String.format("%d ms", SystemClock.elapsedRealtime() - startTime)}")
+            logTime("Refresh - sync settings", startTime)
         }
     }
 
@@ -947,5 +950,10 @@ class PodcastSyncProcess(
         } else {
             bookmarkManager.upsertSynced(bookmark.copy(syncStatus = SyncStatus.SYNCED))
         }
+    }
+
+    private fun logTime(message: String, startTime: Long) {
+        val time = SystemClock.elapsedRealtime() - startTime
+        LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "$message - ${String.format(Locale.ENGLISH, "%d ms", time)}")
     }
 }
