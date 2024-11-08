@@ -151,7 +151,7 @@ class FolderEditViewModel
         val podcasts = podcastsSortedByReleaseDate
         return when (settings.podcastsSortType.value) {
             PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST -> podcastsSortedByReleaseDate
-            PodcastsSortType.DATE_ADDED_OLDEST_TO_NEWEST -> podcasts.sortedWith(compareBy { it.addedDate })
+            PodcastsSortType.DATE_ADDED_NEWEST_TO_OLDEST -> podcasts.sortedWith(compareBy { it.addedDate })
             PodcastsSortType.DRAG_DROP -> podcasts.sortedWith(compareBy { it.sortPosition })
             PodcastsSortType.NAME_A_TO_Z -> podcasts.sortedWith(compareBy { PodcastsSortType.cleanStringForSort(it.title) })
         }

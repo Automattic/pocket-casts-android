@@ -13,7 +13,7 @@ object FakeFileGenerator {
         color = 1,
         addedDate = Date(),
         sortPosition = 1,
-        podcastsSortType = PodcastsSortType.DATE_ADDED_OLDEST_TO_NEWEST,
+        podcastsSortType = PodcastsSortType.DATE_ADDED_NEWEST_TO_OLDEST,
         deleted = false,
         syncModified = 1L,
     )

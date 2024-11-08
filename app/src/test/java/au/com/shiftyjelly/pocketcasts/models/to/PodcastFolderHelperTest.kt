@@ -20,7 +20,7 @@ class PodcastFolderHelperTest {
         color = 0,
         addedDate = Date(),
         sortPosition = 0,
-        podcastsSortType = PodcastsSortType.DATE_ADDED_OLDEST_TO_NEWEST,
+        podcastsSortType = PodcastsSortType.DATE_ADDED_NEWEST_TO_OLDEST,
         deleted = false,
         syncModified = 0,
     )
@@ -31,7 +31,7 @@ class PodcastFolderHelperTest {
         color = 0,
         addedDate = Date(),
         sortPosition = 0,
-        podcastsSortType = PodcastsSortType.DATE_ADDED_OLDEST_TO_NEWEST,
+        podcastsSortType = PodcastsSortType.DATE_ADDED_NEWEST_TO_OLDEST,
         deleted = false,
         syncModified = 0,
     )
@@ -113,7 +113,7 @@ class PodcastFolderHelperTest {
         }
 
         PodcastFolderHelper.sortForSelectingPodcasts(
-            sortType = PodcastsSortType.DATE_ADDED_OLDEST_TO_NEWEST,
+            sortType = PodcastsSortType.DATE_ADDED_NEWEST_TO_OLDEST,
             podcastsSortedByReleaseDate = list,
             currentFolderUuid = null,
         ).let {

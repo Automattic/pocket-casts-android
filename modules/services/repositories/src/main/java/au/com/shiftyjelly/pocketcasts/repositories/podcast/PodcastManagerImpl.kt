@@ -490,7 +490,7 @@ class PodcastManagerImpl @Inject constructor(
     override fun observePodcastsInFolderOrderByUserChoice(folder: Folder): Flowable<List<Podcast>> {
         val sort = folder.podcastsSortType
         return when (sort) {
-            PodcastsSortType.DATE_ADDED_OLDEST_TO_NEWEST -> podcastDao.observeFolderOrderByAddedDate(folder.uuid, sort.isAsc())
+            PodcastsSortType.DATE_ADDED_NEWEST_TO_OLDEST -> podcastDao.observeFolderOrderByAddedDate(folder.uuid, sort.isAsc())
             PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST -> podcastDao.observeFolderOrderByLatestEpisode(folder.uuid, sort.isAsc())
             PodcastsSortType.DRAG_DROP -> podcastDao.observeFolderOrderByUserSort(folder.uuid)
             else -> podcastDao.observeFolderOrderByName(folder.uuid, sort.isAsc())
