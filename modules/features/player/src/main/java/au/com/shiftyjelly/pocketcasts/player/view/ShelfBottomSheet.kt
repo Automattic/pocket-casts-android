@@ -1,9 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.player.view
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
-import android.animation.ValueAnimator
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -30,8 +26,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.ChromeCastAnalytics
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
-import au.com.shiftyjelly.pocketcasts.ui.R
-import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.openUrl
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
@@ -74,9 +68,6 @@ class ShelfBottomSheet : BaseDialogFragment() {
     private val adapter by lazy { ShelfAdapter(theme = theme, editable = false, listener = this::onClick, dragListener = null) }
     private var binding: FragmentShelfBottomSheetBinding? = null
 
-    private val source: SourceView
-        get() = SourceView.fromString(arguments?.getString(ARG_SOURCE))
-
     private val episodeId: String?
         get() = arguments?.getString(ARG_EPISODE_ID)
 
@@ -101,10 +92,6 @@ class ShelfBottomSheet : BaseDialogFragment() {
             adapter.episode = it.second
             val shelfItemsToBeDisplayed = it.first.drop(4)
             adapter.submitList(shelfItemsToBeDisplayed)
-
-            if (source == SourceView.WHATS_NEW) {
-                binding.highlightAddBookmarkMenu(shelfItemsToBeDisplayed)
-            }
         }
 
         if (FeatureFlag.isEnabled(Feature.TRANSCRIPTS)) {
@@ -131,43 +118,6 @@ class ShelfBottomSheet : BaseDialogFragment() {
         binding.mediaRouteButton.setOnClickListener {
             chromeCastAnalytics.trackChromeCastViewShown()
         }
-    }
-
-    private fun FragmentShelfBottomSheetBinding.highlightAddBookmarkMenu(
-        shelfItems: List<ShelfItem>,
-    ) {
-        val bookmarkItemIndex = shelfItems.indexOf(ShelfItem.Bookmark)
-        recyclerView.post {
-            val itemView = recyclerView.findViewHolderForAdapterPosition(bookmarkItemIndex)?.itemView
-            itemView?.let {
-                it.setBackgroundColor(requireContext().getThemeColor(R.attr.primary_icon_02))
-                animateItemAlpha(itemView)
-            }
-        }
-    }
-
-    private fun animateItemAlpha(itemView: View) {
-        val flashAlphaAnimator = ValueAnimator.ofFloat(0f, 1f)
-        with(flashAlphaAnimator) {
-            duration = FLASH_ANIMATION_DURATION
-            addUpdateListener { animation ->
-                val alpha = animation.animatedValue as Float
-                itemView.background.alpha = (alpha * 255).toInt()
-            }
-
-            addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator) {
-                    super.onAnimationEnd(animation)
-                    itemView.background.alpha = 255
-                    itemView.setBackgroundColor(Color.TRANSPARENT)
-                    setFloatValues(0f)
-                }
-            })
-        }
-
-        itemView.postDelayed({
-            flashAlphaAnimator.start()
-        }, FLASH_ANIMATION_DELAY)
     }
 
     private fun onClick(item: ShelfItem, enabled: Boolean) {
@@ -264,8 +214,6 @@ class ShelfBottomSheet : BaseDialogFragment() {
     companion object {
         private const val ARG_SOURCE = "source"
         private const val ARG_EPISODE_ID = "episode_id"
-        private const val FLASH_ANIMATION_DURATION = 300L
-        private const val FLASH_ANIMATION_DELAY = 300L
         fun newInstance(
             sourceView: SourceView? = null,
             episodeId: String? = null,
