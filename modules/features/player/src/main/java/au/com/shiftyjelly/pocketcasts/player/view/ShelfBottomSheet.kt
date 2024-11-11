@@ -2,51 +2,37 @@ package au.com.shiftyjelly.pocketcasts.player.view
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import androidx.compose.runtime.getValue
 import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.asFlow
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.fragment.compose.content
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentShelfBottomSheetBinding
-import au.com.shiftyjelly.pocketcasts.player.view.shelf.MenuShelfItems
+import au.com.shiftyjelly.pocketcasts.player.view.shelf.ShelfBottomSheetPage
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
-import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel.Companion.AnalyticsProp
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.reimagine.ShareDialogFragment
-import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.ChromeCastAnalytics
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.extensions.openUrl
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
-import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.views.extensions.applyColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
-import com.google.android.gms.cast.framework.CastButtonFactory
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
-import kotlin.getValue
-import kotlinx.coroutines.flow.map
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
 class ShelfBottomSheet : BaseDialogFragment() {
-    @Inject lateinit var castManager: CastManager
-
     @Inject lateinit var analyticsTracker: AnalyticsTracker
 
     @Inject lateinit var chromeCastAnalytics: ChromeCastAnalytics
@@ -55,74 +41,36 @@ class ShelfBottomSheet : BaseDialogFragment() {
 
     @Inject lateinit var settings: Settings
 
-    override val statusBarColor: StatusBarColor? = null
-    private val episodeId: String?
-        get() = arguments?.getString(ARG_EPISODE_ID)
-
     private val playerViewModel: PlayerViewModel by activityViewModels()
-    private val viewModel: ShelfViewModel by viewModels(
-        extrasProducer = {
-            defaultViewModelCreationExtras.withCreationCallback<ShelfViewModel.Factory> { factory ->
-                factory.create(episodeId)
-            }
-        },
-    )
 
-    private var binding: FragmentShelfBottomSheetBinding? = null
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentShelfBottomSheetBinding.inflate(inflater, container, false)
-        return binding?.root
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        binding = null
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        val binding = binding ?: return
-        setupShelfListView()
-
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ) = content {
         playerViewModel.playingEpisodeLive.observe(viewLifecycleOwner) { (_, backgroundColor) ->
             applyColor(theme, backgroundColor)
         }
-
-        binding.btnEdit.setOnClickListener {
-            analyticsTracker.track(AnalyticsEvent.PLAYER_SHELF_OVERFLOW_MENU_REARRANGE_STARTED)
-            (activity as FragmentHostListener).showModal(ShelfFragment())
-            dismiss()
-        }
-
-        CastButtonFactory.setUpMediaRouteButton(view.context, binding.mediaRouteButton)
-        binding.mediaRouteButton.setOnClickListener {
-            chromeCastAnalytics.trackChromeCastViewShown()
-        }
-    }
-
-    private fun setupShelfListView() {
-        binding?.shelfItemsComposeView?.setContent {
-            AppTheme(theme.activeTheme) {
-                val trimmedShelf by playerViewModel.trimmedShelfLive.asFlow()
-                    .map { it.copy(it.first.drop(4), it.second) }
-                    .collectAsStateWithLifecycle(null)
-
-                trimmedShelf?.let { (shelfItems, episode) ->
-                    if (episode == null) return@let
-                    MenuShelfItems(
-                        shelfItems = shelfItems,
-                        episode = episode,
-                        isEditable = false,
-                        onClick = this@ShelfBottomSheet::onClick,
-                    )
-                }
-            }
+        AppTheme(theme.activeTheme) {
+            ShelfBottomSheetPage(
+                playerViewModel = playerViewModel,
+                onMediaRouteButtonClick = {
+                    chromeCastAnalytics.trackChromeCastViewShown()
+                },
+                onEditButtonClick = {
+                    analyticsTracker.track(AnalyticsEvent.PLAYER_SHELF_OVERFLOW_MENU_REARRANGE_STARTED)
+                    (activity as FragmentHostListener).showModal(ShelfFragment())
+                    dismiss()
+                },
+                onShelfItemClick = this@ShelfBottomSheet::onClick,
+            )
         }
     }
 
-    private fun onClick(item: ShelfItem, enabled: Boolean) {
+    private fun onClick(
+        item: ShelfItem,
+        enabled: Boolean,
+    ) {
         when (item) {
             ShelfItem.Effects -> {
                 EffectsFragment().show(parentFragmentManager, "effects")
@@ -162,8 +110,7 @@ class ShelfBottomSheet : BaseDialogFragment() {
                 }
             }
 
-            ShelfItem.Cast -> {
-                binding?.mediaRouteButton?.performClick()
+            ShelfItem.Cast -> { // Do nothing, handled in ShelfBottomSheetPage
             }
 
             ShelfItem.Played -> {
