@@ -1,8 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.type.AutoDownloadLimitSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -11,6 +13,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -23,6 +27,15 @@ class AutoDownloadSettingsViewModel @Inject constructor(
 
     override val coroutineContext = Dispatchers.Default
     private var isFragmentChangingConfigurations: Boolean = false
+
+    private var _hasEpisodesWithAutoDownloadEnabled: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val hasEpisodesWithAutoDownloadEnabled: StateFlow<Boolean> = _hasEpisodesWithAutoDownloadEnabled
+
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            _hasEpisodesWithAutoDownloadEnabled.value = podcastManager.hasEpisodesWithAutoDownloadStatus(Podcast.AUTO_DOWNLOAD_NEW_EPISODES)
+        }
+    }
 
     fun onShown() {
         if (!isFragmentChangingConfigurations) {
@@ -47,7 +60,7 @@ class AutoDownloadSettingsViewModel @Inject constructor(
     fun getAutoDownloadNewEpisodes() = settings.autoDownloadNewEpisodes.value
 
     fun onNewEpisodesChange(newValue: Boolean) {
-        settings.autoDownloadNewEpisodes.set(newValue, updateModifiedAt = true)
+        settings.autoDownloadNewEpisodes.set(newValue.toAutoDownloadStatus(), updateModifiedAt = true)
 
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_AUTO_DOWNLOAD_NEW_EPISODES_TOGGLED,
@@ -99,4 +112,13 @@ class AutoDownloadSettingsViewModel @Inject constructor(
     }
 
     fun getAutoDownloadOnlyWhenCharging() = settings.autoDownloadOnlyWhenCharging.value
+
+    suspend fun updateAllAutoDownloadStatus(status: Int) {
+        podcastManager.updateAllAutoDownloadStatus(status)
+    }
+}
+
+fun Boolean.toAutoDownloadStatus(): Int = when (this) {
+    true -> Podcast.AUTO_DOWNLOAD_NEW_EPISODES
+    false -> Podcast.AUTO_DOWNLOAD_OFF
 }

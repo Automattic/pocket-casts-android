@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import au.com.shiftyjelly.pocketcasts.analytics.AppLifecycleAnalytics
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
@@ -39,7 +40,7 @@ class AppLifecycleObserverTest {
 
     @Mock private lateinit var autoPlayNextEpisodeSetting: UserSetting<Boolean>
 
-    @Mock private lateinit var autoDownloadNewEpisodesSetting: UserSetting<Boolean>
+    @Mock private lateinit var autoDownloadNewEpisodesSetting: UserSetting<Int>
 
     @Mock private lateinit var useUpNextDarkThemeSetting: UserSetting<Boolean>
 
@@ -94,7 +95,7 @@ class AppLifecycleObserverTest {
 
         verify(appLifecycleAnalytics).onNewApplicationInstall()
         verify(autoPlayNextEpisodeSetting).set(true, updateModifiedAt = false)
-        verify(autoDownloadNewEpisodesSetting).set(true, updateModifiedAt = false)
+        verify(autoDownloadNewEpisodesSetting).set(Podcast.AUTO_DOWNLOAD_NEW_EPISODES, updateModifiedAt = false)
         verify(useUpNextDarkThemeSetting).set(false, updateModifiedAt = false)
 
         verify(appLifecycleAnalytics, never()).onApplicationUpgrade(any())

@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.DEFAULT_MAX_AUTO_ADD_LIMIT
+import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.GLOBAL_AUTO_DOWNLOAD_NONE
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.NOTIFICATIONS_DISABLED_MESSAGE_SHOWN
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.SETTINGS_ENCRYPT_SECRET
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls
@@ -568,9 +569,9 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override val autoDownloadNewEpisodes = UserSetting.BoolPref(
-        sharedPrefKey = "autoDownloadNewEpisodes",
-        defaultValue = false,
+    override val autoDownloadNewEpisodes = UserSetting.IntPref(
+        sharedPrefKey = "globalAutoDownloadNewEpisodes",
+        defaultValue = GLOBAL_AUTO_DOWNLOAD_NONE,
         sharedPrefs = sharedPreferences,
     )
 

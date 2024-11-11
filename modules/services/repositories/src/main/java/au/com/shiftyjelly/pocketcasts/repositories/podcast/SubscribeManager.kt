@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.GLOBAL_AUTO_DOWNLOAD_NONE
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
@@ -39,6 +40,10 @@ import io.reactivex.schedulers.Schedulers
 import java.util.Date
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.rxCompletable
 import timber.log.Timber
 
@@ -57,12 +62,19 @@ class SubscribeManager @Inject constructor(
     private val subscribeRelay: PublishRelay<PodcastSubscribe> by lazy { setupSubscribeRelay() }
     val subscriptionChangedRelay: PublishRelay<String> = PublishRelay.create()
 
+    private var _hasEpisodesWithAutoDownloadEnabled: MutableStateFlow<Boolean> = MutableStateFlow(false)
     private val uuidsInQueue = HashSet<String>()
     private val podcastDao = appDatabase.podcastDao()
     private val episodeDao = appDatabase.episodeDao()
     private val imageRequestFactory = PocketCastsImageRequestFactory(context, isDarkTheme = true)
 
     data class PodcastSubscribe(val podcastUuid: String, val sync: Boolean, val shouldAutoDownload: Boolean)
+
+    init {
+        CoroutineScope(Dispatchers.IO).launch {
+            _hasEpisodesWithAutoDownloadEnabled.value = podcastDao.hasEpisodesWithAutoDownloadStatus(AUTO_DOWNLOAD_NEW_EPISODES)
+        }
+    }
 
     @SuppressLint("CheckResult")
     private fun setupSubscribeRelay(): PublishRelay<PodcastSubscribe> {
@@ -207,8 +219,23 @@ class SubscribeManager @Inject constructor(
         return insertPodcastObservable.flatMap { podcast -> subscribeInsertEpisodes(podcast).toSingle { podcast } }
     }
 
-    private fun canDownloadEpisodesAfterSubscription(subscribed: Boolean, shouldAutoDownload: Boolean) =
-        subscribed && settings.autoDownloadNewEpisodes.value && shouldAutoDownload && FeatureFlag.isEnabled(Feature.AUTO_DOWNLOAD)
+    private fun canDownloadEpisodesAfterSubscription(
+        subscribed: Boolean,
+        shouldAutoDownload: Boolean,
+    ): Boolean {
+        val autoDownloadStatus = settings.autoDownloadNewEpisodes.value
+
+        val isAutoDownloadEnabled = if (autoDownloadStatus == GLOBAL_AUTO_DOWNLOAD_NONE) {
+            _hasEpisodesWithAutoDownloadEnabled.value
+        } else {
+            autoDownloadStatus == AUTO_DOWNLOAD_NEW_EPISODES
+        }
+
+        return subscribed &&
+            isAutoDownloadEnabled &&
+            shouldAutoDownload &&
+            FeatureFlag.isEnabled(Feature.AUTO_DOWNLOAD)
+    }
 
     private fun downloadPodcast(podcastUuid: String): Single<Podcast> {
         // download the podcast

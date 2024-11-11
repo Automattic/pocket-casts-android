@@ -74,8 +74,6 @@ Language: nb_NO
     <string name="settings_help_logs_sent_to_phone_check_phone">Hvis telefonen din er paret, vises en popup-melding med loggene</string>
     <string name="settings_help_phone_unavailable_message">Prøv på nytt når telefonen er koblet til klokken.</string>
     <string name="settings_watch_logs">Klokkelogger</string>
-    <string name="podcasts_no_subscriptions">Ingen podcaster du abonnerer på</string>
-    <string name="podcasts_subscribe_on_phone">Abonner på podcaster på telefonen, så vises de her</string>
     <string name="podcast_loading">Laster podcastene dine</string>
     <string name="settings_could_not_open_on_phone">Kan ikke åpne på telefon</string>
     <string name="settings_about_terms_of_service_available_at">Vilkårene for tjenesten er tilgjengelig på %s</string>
@@ -223,7 +221,6 @@ Language: nb_NO
     <string name="profile_cancel_confirm_subtitle">Dette endrer abonnementet til en gratiskonto.</string>
     <string name="profile_cancel_confirm_sub_expiry">Det nåværende abonnementet ditt vil forbli aktivt til %1$s.</string>
     <string name="profile_cancel_confirm_sub_expiry_date_fallback">utløpsdato</string>
-    <string name="podcast_not_subscribed">Ikke abonnent</string>
     <string name="settings_customize_buttons_displayed_in_android_13_notification_and_android_auto">Tilpass knappene som vises i Android 13-avspillingsvarslene og Android Auto.</string>
     <string name="settings_other_media_actions">Andre mediehandlinger</string>
     <string name="onboarding_import_from_castbox_step_3">Trykk på Innstillinger</string>
@@ -604,7 +601,6 @@ Language: nb_NO
     <string name="settings_status_service_ad_blocker_help_singular">Den vanligste årsaken er at du har konfigurert annonseblokkering på telefonen eller nettverket. Du må oppheve blokkeringen for domenet %s</string>
     <string name="settings_status_service_discover_summary">Oppdagingsdelen i appen, inkludert søking etter podcaster.</string>
     <string name="settings_status_service_discover">Oppdag og søk</string>
-    <string name="settings_status_service_account_summary">Tjenesten brukes til å lagre episodefremdrift, abonnementer, filtre osv.</string>
     <string name="settings_status_service_account">Kontotjeneste</string>
     <string name="settings_status_service_refresh_summary">Tjenesten brukes til å finne nye episoder.</string>
     <string name="settings_status_service_refresh">Oppdateringstjeneste</string>
@@ -615,7 +611,6 @@ Language: nb_NO
     <string name="settings_status_service_internet">Internett-tilkobling</string>
     <string name="settings_status_description">Kontroller tilkoblingen med viktige tjenester. Dette bidrar til å diagnostisere problemer med nettverk, proxyer, VPN, annonseblokkering og sikkerrhetsapper.</string>
     <string name="settings_status_page">Statusside</string>
-    <string name="settings_import_title">Importer abonnementer</string>
     <string name="settings_notification_default_sound">Standard lyd</string>
     <string name="settings_subscribe_to_played_summary">Podcaster du hører på, legges til automatisk på Podcaster-fanen</string>
     <string name="settings_opml_export_failed">Kan ikke lagre OPML-filen.</string>
@@ -705,7 +700,6 @@ Language: nb_NO
     <string name="settings_title_about">Om</string>
     <string name="settings_title">Tittel</string>
     <string name="settings_theme">Tema</string>
-    <string name="settings_subscribe_to_played">Abonner på avspilte podcaster</string>
     <string name="settings_storage_store_on">Lagre podcaster på</string>
     <string name="settings_storage_sorry">Beklager</string>
     <string name="settings_storage_size_free">%s ledig</string>
@@ -734,8 +728,6 @@ Language: nb_NO
     <string name="settings_skip_back_time">Hopp bakover i tid</string>
     <string name="settings_show_artwork_details">Dette vil også vise grafikk på tilkoblede Bluetooth-enheter, klokker osv.</string>
     <string name="settings_show_artwork">Vis grafikk på låseskjerm</string>
-    <string name="settings_show_archived_summary_show">Nye podcaster du abonnerer på, vil vise arkiverte episoder.</string>
-    <string name="settings_show_archived_summary_hide">Nye podcaster du abonnerer på, vil ikke vise arkiverte episoder.</string>
     <string name="settings_show_archived_action_show">Vis</string>
     <string name="settings_show_archived_action_hide">Skjul</string>
     <string name="settings_row_action_summary">For episoder som ennå ikke er lastet ned, vises %s-knapper i listen.</string>
@@ -749,8 +741,6 @@ Language: nb_NO
     <string name="settings_podcasts_selected_all">Alle podcaster</string>
     <string name="settings_podcast_episode_grouping_title_season">Sesong</string>
     <string name="settings_podcast_episode_grouping_title_none">Ingen</string>
-    <string name="settings_podcast_episode_grouping_summary_none">For nye podcaster du abonnerer på, blir ikke episodene gruppert.</string>
-    <string name="settings_podcast_episode_grouping_summary">For nye podcaster du abonnerer på, blir episodene gruppert etter %s.</string>
     <string name="settings_podcast_episode_grouping">Gruppering av podcast-episode</string>
     <string name="settings_podcast_custom">Egendefinert for denne podcasten</string>
     <string name="settings_podcast_artwork">Podcast-grafikk</string>
@@ -784,7 +774,6 @@ Language: nb_NO
     <string name="settings_import_opml_title">Importer OPML</string>
     <string name="settings_import_opml_stop">Stopp</string>
     <string name="settings_import_opml_progress">%1$d av %2$d podcaster</string>
-    <string name="settings_import_file_summary">Hvis du abonnerer på podcaster i en annen app eller tjeneste, kan Pocket Casts importere dem fra en OPML-fil.</string>
     <string name="settings_import_file">Velg fil</string>
     <string name="settings_import_choose_file">Velg en OPML-fil.</string>
     <string name="settings_help_contact_support">Kontakt støtte</string>
@@ -792,8 +781,6 @@ Language: nb_NO
     <string name="settings_get_plus_and_more">Skaff deg Pocket Casts Plus for å frigjøre denne funksjonen og mer!</string>
     <string name="settings_general_player">Avspiller</string>
     <string name="settings_general_defaults">Standarder</string>
-    <string name="settings_export_subscriptions">Eksporter abonnementer</string>
-    <string name="settings_export_send_email_summary">Eksporter abonnementene dine i OPML-formatet, som er ganske nerdete (men med bred støtte).</string>
     <string name="settings_export_send_email">Send e-post</string>
     <string name="settings_export_save_file_summary">Eksport OPML-filen til lagringen din.</string>
     <string name="settings_export_save_file">Lagre fil</string>
@@ -974,7 +961,6 @@ Language: nb_NO
     <string name="profile_navigation_listening_history">Lyttehistorikk</string>
     <string name="profile_navigation_files">Filer</string>
     <string name="profile_monthly">Månedlig</string>
-    <string name="profile_license_agreement">Pocket Casts respekterer personvernet ditt. Disse retningslinjene for personvern forklarer hvilke opplysninger vi samler inn om deg og hvorfor, hva vi gjør med disse opplysningene, og hvordan vi behandler dem. De gjelder for Pocket Casts-apper for iOS og Android og Pocket Casts-webtjenesten med tilknyttede macOS- og Windows-apper (kalt for \"tjenesten\", både samlet sett og i flertall). Ved å bruke tjenesten godtar du disse retningslinjene for personvern. Hvis du slår på push-varslinger i appen, lagrer vi push-tokenet som Apple leverer til oss, for å levere disse push-varslingene til enheten din. Hvis du kjøper webappen, lagrer vi en transaksjons-ID for kjøpet. Hvis du velger ikke å opprette en konto, og hvis du ikke bruker push-varslinger, blir ingen data om deg lagret på serverne våre. Pocket Casts-webtjenesten bruker også informasjonskapsler og lignende teknologi til å holde deg innlogget. Hvis du velger å generere en støtteforespørsel fra selve tjenesten, kan vi generere et vedlegg som inneholder flere data for hjelp til håndtering av støtteforespørselen, som du kan se på før den blir sendt inn.</string>
     <string name="profile_last_refresh">Siste oppdatering: %s siden</string>
     <string name="profile_joined">Ble med:</string>
     <string name="profile_get_plus">Skaff deg Pocket Casts Plus for å frigjøre denne funksjonen og mye mer!</string>
@@ -987,6 +973,7 @@ Language: nb_NO
     <string name="profile_files_add_filename">Navn</string>
     <string name="profile_files_add_custom_image">Legg til egendefinert bilde</string>
     <string name="profile_file_locked">låst</string>
+    <string name="profile_license_agreement">Pocket Casts respekterer personvernet ditt. Disse retningslinjene for personvern forklarer hvilke opplysninger vi samler inn om deg og hvorfor, hva vi gjør med disse opplysningene, og hvordan vi behandler dem. De gjelder for Pocket Casts-apper for iOS og Android og Pocket Casts-webtjenesten med tilknyttede macOS- og Windows-apper (kalt for \"tjenesten\", både samlet sett og i flertall). Ved å bruke tjenesten godtar du disse retningslinjene for personvern. Hvis du slår på push-varslinger i appen, lagrer vi push-tokenet som Apple leverer til oss, for å levere disse push-varslingene til enheten din. Hvis du kjøper webappen, lagrer vi en transaksjons-ID for kjøpet. Hvis du velger ikke å opprette en konto, og hvis du ikke bruker push-varslinger, blir ingen data om deg lagret på serverne våre. Pocket Casts-webtjenesten bruker også informasjonskapsler og lignende teknologi til å holde deg innlogget. Hvis du velger å generere en støtteforespørsel fra selve tjenesten, kan vi generere et vedlegg som inneholder flere data for hjelp til håndtering av støtteforespørselen, som du kan se på før den blir sendt inn.</string>
     <string name="profile_file">Fil</string>
     <string name="profile_feature_requires">Denne funksjonen krever\nPocket Casts Plus</string>
     <string name="profile_ends">Avsluttes %s</string>
@@ -1176,7 +1163,6 @@ Language: nb_NO
     <string name="podcast_effects_summary_speed">Hastighet %s×</string>
     <string name="podcast_included_in_filters">Inkludert i %s</string>
     <string name="podcast_not_in_filters">Ikke inkludert i noen filtre</string>
-    <string name="podcast_unsubscribe_warning">Hvis du sier opp abonnementet, slettes alle nedlastede filer.</string>
     <string name="podcast_unsubscribe_downloaded_file_plural">%d nedlastede filer</string>
     <string name="podcast_unsubscribe_downloaded_file_singular">1 nedlastet fil</string>
     <string name="podcast_share_open_fail">Kan ikke laste inn detaljer om delt podcast. Hvis problemet vedvarer, kan du kontakte personen som delte med deg, og spørre hva som skjer.</string>
@@ -1191,7 +1177,6 @@ Language: nb_NO
     <string name="podcast_supporter_cancelled">Støtte kansellert</string>
     <string name="podcast_supporter">STØTTESPILLER</string>
     <string name="podcast_support_this_podcast">Støtt dette programmet</string>
-    <string name="podcast_subscribed">Abonnert på</string>
     <string name="podcast_sort_episodes">Sorter episoder</string>
     <string name="podcast_share_open_file_in">Åpne fil i …</string>
     <string name="podcast_share_episode">Del episode</string>
@@ -1276,7 +1261,6 @@ Language: nb_NO
     <string name="podcasts_share_missing_title">Angi en tittel for listen.</string>
     <string name="podcasts_share_create_error">Obs, kan ikke dele</string>
     <string name="podcasts_share_title">Tittel</string>
-    <string name="podcasts_share_subscribe_to_all">ABONNER PÅ ALLE</string>
     <string name="podcasts_share_selected_podcasts">Del valgte podcaster</string>
     <string name="podcasts_share_select_all">Velg alle</string>
     <string name="podcasts_share_list">Delt liste</string>
@@ -1440,10 +1424,8 @@ Language: nb_NO
     <string name="today">I dag</string>
     <string name="learn_more">Finn ut mer.</string>
     <string name="up_next">Neste</string>
-    <string name="unsubscribe">Si opp abonnement</string>
     <string name="unplayed">Ikke avspilt</string>
     <string name="unarchive_all">Fjern alle fra arkiv</string>
-    <string name="subscribe">Abonner</string>
     <string name="stream">Strøm</string>
     <string name="stop_downloading">Stopp nedlasting</string>
     <string name="starred">Har fått stjerner</string>

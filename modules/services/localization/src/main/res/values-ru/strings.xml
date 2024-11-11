@@ -1,11 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-10-23 09:54:03+0000
+Translation-Revision-Date: 2024-11-07 09:54:03+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="maybe_later">Возможно, позже</string>
+    <string name="settings_import_title">Импортировать подкасты</string>
+    <string name="settings_subscribe_to_played">Подписаться на прослушанные подкасты</string>
+    <string name="settings_export_subscriptions">Экспорт подкастов</string>
+    <string name="podcast_not_subscribed">Нет подписки</string>
+    <string name="podcast_subscribed">Подписка</string>
+    <string name="podcasts_share_subscribe_to_all">ПОДПИСАТЬСЯ НА ВСЕ</string>
+    <string name="podcasts_no_subscriptions">Подкасты не найдены</string>
+    <string name="unsubscribe">Отменить подписку</string>
+    <string name="subscribe">Подписаться</string>
+    <string name="up_next_shuffle_plus_prompt">При помощи Pocket Casts Plus можно воспроизводить выпуски в случайном порядке и делать ещё много интересного.</string>
+    <string name="save_space_by_managing_downloaded_episodes">Сохраняйте %1$s — управляйте скачанными выпусками.</string>
+    <string name="pencil_clean_up_icon_content_description">Значок «Очистить» в виде карандаша</string>
+    <string name="podcast_this">Этот подкаст</string>
+    <string name="end_of_year_cant_share_message">Этой историей поделиться нельзя</string>
+    <string name="end_of_year_story_ratings_share_text">Я оценивал(а) разные подкасты (%1$d) в %2$d, чаще всего на %3$d.</string>
+    <string name="end_of_year_stories_completion_rate_share_text">Мой процент завершения в этом году равен %1$d</string>
+    <string name="end_of_year_share_dialog_message">Разместите это изображение в социальных сетях, чтобы рассказать о своих любимых шоу и авторах.</string>
+    <string name="end_of_year_share_dialog_title">Поделиться этой историей?</string>
+    <string name="up_next_shuffle_disable_button_content_description">Отключить следующий случайный выбор</string>
+    <string name="up_next_shuffle_button_content_description">Следующий случайный выбор</string>
+    <string name="podcast_ratings_page_title">Оценки</string>
+    <string name="eoy_story_stories_subscribe_to_plus_button_label">Попробуйте Pocket Casts Plus</string>
+    <string name="end_of_year_stories_subscribe_to_plus">Поддержите Pocket Casts, подписавшись на Plus, и пользуйтесь развёрнутой статистикой и премиум-функциями, например: закладками, папками и предварительным выбором глав.</string>
+    <string name="settings_real_time_playback_summary">Если эта функция включена, проигрыватель будет показывать оставшееся время с учётом скорости воспроизведения и пропущенных глав.</string>
+    <string name="settings_real_time_playback">Настроить оставшееся время</string>
+    <string name="end_of_year_stories_year_over_year_title_went_up_a_lot">В сравнении с %1$s годом вы провели на 500%% больше времени, слушая подкасты.</string>
     <string name="end_of_year_story_longest_episode_subtitle">Это был выпуск «%1$s» из «%2$s»</string>
     <string name="end_of_year_listening_time_subtitle">общее время прослушивания подкастов</string>
     <string name="eoy_story_ratings_learn_button_label">Подробнее об оценках</string>
@@ -264,10 +291,16 @@ Language: ru
     <string name="end_of_year_stories_year_completion_rate">процент завершения</string>
     <string name="end_of_year_stories_year_completion_rate_subtitle">Из %1$d запущенных эпизодов всего вы дослушали до конца %2$d</string>
     <string name="end_of_year_stories_year_completion_rate_title">Ваш процент завершения в этом году равен %1$d%%</string>
+    <string name="end_of_year_stories_year_over_share_text">Время прослушивания в %1$d году по сравнению с %2$d годом</string>
     <string name="eoy_year_over_year_title_skyrocketed">По сравнению с 2022 г. вы посвятили прослушиванию намного больше времени!</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">И… как, вам хватает времени на всё остальное?</string>
+    <string name="end_of_year_stories_year_over_year_title_went_down">По сравнению с %1$s годом вы стали слушать немного меньше.</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">Говорят, постоянство — ключ к успеху… или что-то в этом роде.</string>
+    <string name="end_of_year_stories_year_over_year_title_flat">Вы посвятили прослушиванию примерно столько же времени, сколько и в %1$s году.</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_went_up">Готовы превзойти свой рекорд в %1$s году?</string>
+    <string name="end_of_year_stories_year_over_year_title_went_up">По сравнению с %1$s годом ваше время прослушивания возросло сразу на %2$s%%</string>
     <string name="end_of_year_prompt_card_summary">Просмотрите свой топ подкастов, статистику прослушивания и другие показатели.</string>
+    <string name="end_of_year_story_epilogue_title">Благодарим за то, что вы слушали вместе с нами в этом году.\nЖдём вас снова в %1$d году!</string>
     <string name="end_of_year_story_longest_episode_title">Самым длинным эпизодом, который вы слушали, стал %1$s</string>
     <string name="end_of_year_replay">Прослушать ещё раз</string>
     <string name="end_of_year_listening_time_title">Это ваше общее время прослушивания подкастов.</string>
@@ -374,8 +407,7 @@ Language: ru
     <string name="settings_help_contact_support_no_phone_connection">Чтобы просмотреть журналы или связаться со службой поддержки, установите сопряжение часов с телефоном, на котором установлено приложение Pocket Casts.</string>
     <string name="settings_help_contact_support_email_sent_to_phone">Если сопряжение с телефоном установлено, он покажет всплывающее окно для отправки в службу поддержки эл. письма с приложенными журналами.</string>
     <string name="podcast_loading">Загрузка подкастов</string>
-    <string name="podcasts_subscribe_on_phone">Подпишитесь на подкасты на телефоне, и они появятся здесь.</string>
-    <string name="podcasts_no_subscriptions">Нет подписок на подкасты</string>
+    <string name="podcasts_subscribe_on_phone">Подписывайтесь на подкасты на телефоне, и они появятся здесь.</string>
     <string name="settings_could_not_open_on_phone">Не удалось открыть на телефоне</string>
     <string name="settings_open_on_phone">Открыть на телефоне</string>
     <string name="settings_about_privacy_policy_available_at">Нашу Политику конфиденциальности можно найти по адресу %s</string>
@@ -526,7 +558,6 @@ Language: ru
     <string name="profile_cancel_confirm_subtitle">При этом ваш тарифный план изменится на бесплатный.</string>
     <string name="settings_other_media_actions">Другие действия с медиафайлами</string>
     <string name="settings_customize_buttons_displayed_in_android_13_notification_and_android_auto">Настроить кнопки, отображаемые в уведомлениях о воспроизведении Android 13 и в Android Auto.</string>
-    <string name="podcast_not_subscribed">Нет подписки</string>
     <string name="onboarding_import_from_other_apps_step_2">Используйте меню \"Поделиться\" вашего смартфона, чтобы отправить файл в Pocket Casts. Или импортируйте файл в меню Pocket Casts \"Импорт и экспорт OPML\".</string>
     <string name="onboarding_import_from_other_apps_step_1">Найдите параметр экспорта в другом приложении и экспортируйте файл OPML.</string>
     <string name="onboarding_can_import_from_opml">Pocket Casts может импортировать подкасты из файлов OPML. Если ваше приложение поддерживает экспорт файлов OPML, выполните следующие действия:</string>
@@ -586,7 +617,11 @@ Language: ru
     <string name="end_of_year_story_top_categories_share_text">Рубрики подкастов, которые я слушаю чаще всего</string>
     <string name="end_of_year_story_top_categories">Ваши любимые рубрики</string>
     <string name="end_of_year_story_epilogue_subtitle">Не забудьте поделиться с друзьями и рассказать о любимых подкастерах</string>
+    <string name="end_of_year_story_longest_episode_share_text">Самый продолжительный выпуск, прослушанный мною в %1$d году: %2$s</string>
+    <string name="end_of_year_story_top_podcasts_list_title">Мои любимые подкасты в %1$d году</string>
     <string name="end_of_year_story_top_podcasts_share_text">Мои любимые подкасты этого года! %1$s</string>
+    <string name="end_of_year_story_top_podcast_share_text">Мой любимый подкаст в %1$d году! %2$s</string>
+    <string name="end_of_year_story_listened_to_numbers_share_text">Я прослушал(а) %1$d подкастов(а) и %2$d выпусков(а) в %3$d году</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">Но было одно шоу, которое вы слушали снова и снова…</string>
     <string name="end_of_year_story_listened_to_numbers">Вы прослушали %1$d шоу и %2$d выпусков</string>
     <string name="end_of_year_story_listened_to_categories_share_text">Я выбрал(а) %1$d рубрик(и) в 2023 году</string>
@@ -913,7 +948,7 @@ Language: ru
     <string name="settings_status_service_ad_blocker_help_singular">Чаще всего это связано с тем, что на вашем телефоне или в сети настроен блокировщик рекламы. Вам потребуется разблокировать домен %s</string>
     <string name="settings_status_service_discover_summary">Поисковый раздел приложения, включая поиск подкастов.</string>
     <string name="settings_status_service_discover">Поиск</string>
-    <string name="settings_status_service_account_summary">Этот сервис используется для хранения информации о состоянии прослушивания выпусков, подписках, фильтрах и т. д.</string>
+    <string name="settings_status_service_account_summary">Этот сервис используется для хранения информации о прослушивании выпусков, подписках на подкасты, фильтрах и т. д.</string>
     <string name="settings_status_service_account">Сервис учётной записи</string>
     <string name="settings_status_service_refresh_summary">Этот сервис используется для поиска новых выпусков.</string>
     <string name="settings_status_service_refresh">Сервис обновления</string>
@@ -924,7 +959,6 @@ Language: ru
     <string name="settings_status_service_internet">Подключение к Интернету</string>
     <string name="settings_status_description">Проверьте подключение к важным службам. Это помогает диагностировать проблемы с сетью, прокси-серверами, VPN, приложениями для блокировки рекламы и безопасности.</string>
     <string name="settings_status_page">Страница состояния</string>
-    <string name="settings_import_title">Важные подписки</string>
     <string name="settings_notification_default_sound">Звук по умолчанию</string>
     <string name="settings_subscribe_to_played_summary">Прослушиваемые вами подкасты будут автоматически добавляться на вкладку «Подкасты»</string>
     <string name="settings_opml_export_failed">Не удаётся сохранить файл OPML.</string>
@@ -1014,7 +1048,6 @@ Language: ru
     <string name="settings_title_about">О нас</string>
     <string name="settings_title">Заголовок</string>
     <string name="settings_theme">Тема</string>
-    <string name="settings_subscribe_to_played">Подписываться на воспроизводимые подкасты</string>
     <string name="settings_storage_store_on">Сохранять подкасты в</string>
     <string name="settings_storage_sorry">Извините</string>
     <string name="settings_storage_size_free">%s бесплатно</string>
@@ -1043,8 +1076,8 @@ Language: ru
     <string name="settings_skip_back_time">Интервал перемотки назад</string>
     <string name="settings_show_artwork_details">Ваша тема также будет отображаться на подключённых устройствах Bluetooth, часах и т. д.</string>
     <string name="settings_show_artwork">Показывать тему на экране блокировки</string>
-    <string name="settings_show_archived_summary_show">В новых подкастах, на которые вы подписались, будут показываться архивные выпуски.</string>
-    <string name="settings_show_archived_summary_hide">Новые подкасты, на которые вы подписались, не будут показывать архивные выпуски.</string>
+    <string name="settings_show_archived_summary_show">В новых подкастах, на которые вы подписаны, будут показываться архивные выпуски.</string>
+    <string name="settings_show_archived_summary_hide">В новых подкастах, на которые вы подписаны, не будут показываться архивные выпуски.</string>
     <string name="settings_show_archived_action_show">Показать</string>
     <string name="settings_show_archived_action_hide">Скрыть</string>
     <string name="settings_row_action_summary">Для эпизодов, которые ещё не скачаны, в списках будут показаны кнопки %s.</string>
@@ -1058,8 +1091,8 @@ Language: ru
     <string name="settings_podcasts_selected_all">Все подкасты</string>
     <string name="settings_podcast_episode_grouping_title_season">Сезон</string>
     <string name="settings_podcast_episode_grouping_title_none">Пусто</string>
-    <string name="settings_podcast_episode_grouping_summary_none">В новых подкастах, на которые вы подписались, выпуски не будут сгруппированы.</string>
-    <string name="settings_podcast_episode_grouping_summary">В новых подкастах, на которые вы подписались, выпуски будут сгруппированы по %s.</string>
+    <string name="settings_podcast_episode_grouping_summary_none">В новых подкастах, на которые вы подписаны, выпуски не будут сгруппированы.</string>
+    <string name="settings_podcast_episode_grouping_summary">В новых подкастах, на которые вы подписаны, выпуски будут сгруппированы по %s.</string>
     <string name="settings_podcast_episode_grouping">Группирование выпусков подкаста</string>
     <string name="settings_podcast_custom">Настроить для этого подкаста</string>
     <string name="settings_podcast_artwork">Тема подкаста</string>
@@ -1095,7 +1128,7 @@ Language: ru
     <string name="settings_import_opml_title">Импортировать OPML</string>
     <string name="settings_import_opml_stop">Остановить</string>
     <string name="settings_import_opml_progress">Подкасты: %1$d из %2$d</string>
-    <string name="settings_import_file_summary">Если у вас есть подписки на подкасты в другом приложении или сервисе, Pocket Casts может импортировать их из файла OPML.</string>
+    <string name="settings_import_file_summary">Если у вас есть подкасты в другом приложении или сервисе, Pocket Casts может импортировать их из файла OPML.</string>
     <string name="settings_import_file">Выбрать файл</string>
     <string name="settings_import_choose_file">Выберите файл OPML.</string>
     <string name="settings_help_contact_support">Обратиться в службу поддержки</string>
@@ -1103,8 +1136,7 @@ Language: ru
     <string name="settings_get_plus_and_more">Приобретите Pocket Casts Plus, чтобы разблокировать эту и множество других функций!</string>
     <string name="settings_general_player">Плеер</string>
     <string name="settings_general_defaults">По умолчанию</string>
-    <string name="settings_export_subscriptions">Экспортировать подписки</string>
-    <string name="settings_export_send_email_summary">Экспортируйте свои подписки в супернавороченном (но весьма популярном) формате OPML.</string>
+    <string name="settings_export_send_email_summary">Экспортируйте свои подкасты в супернавороченном (но весьма популярном) формате OPML.</string>
     <string name="settings_export_send_email">Послать сообщение по эл.почте</string>
     <string name="settings_export_save_file_summary">Экспортировать файл OPML в ваше хранилище.</string>
     <string name="settings_export_save_file">Сохранить файл</string>
@@ -1506,7 +1538,6 @@ Language: ru
     <string name="podcast_supporter_cancelled">Поддержка отменена</string>
     <string name="podcast_supporter">СПОНСОР</string>
     <string name="podcast_support_this_podcast">Поддержать это шоу</string>
-    <string name="podcast_subscribed">Подписано</string>
     <string name="podcast_sort_episodes">Упорядочить выпуски</string>
     <string name="podcast_share_open_file_in">Открыть файл в…</string>
     <string name="podcast_share_episode">Поделиться выпуском</string>
@@ -1591,7 +1622,6 @@ Language: ru
     <string name="podcasts_share_missing_title">Укажите заголовок для вашего списка.</string>
     <string name="podcasts_share_create_error">Ой, не удаётся поделиться</string>
     <string name="podcasts_share_title">Заголовок</string>
-    <string name="podcasts_share_subscribe_to_all">ПОДПИСАТЬСЯ НА ВСЁ</string>
     <string name="podcasts_share_selected_podcasts">Поделиться выбранными подкастами</string>
     <string name="podcasts_share_select_all">Выделить все</string>
     <string name="podcasts_share_list">Общий список</string>
@@ -1756,10 +1786,8 @@ Language: ru
     <string name="today">Сегодня</string>
     <string name="learn_more">Узнать больше</string>
     <string name="up_next">Следующие</string>
-    <string name="unsubscribe">Отменить подписку</string>
     <string name="unplayed">Не воспроизводился</string>
     <string name="unarchive_all">Разархивировать всё</string>
-    <string name="subscribe">Подписаться</string>
     <string name="stream">Трансляция</string>
     <string name="stop_downloading">Остановить скачивание</string>
     <string name="starred">Избранное</string>

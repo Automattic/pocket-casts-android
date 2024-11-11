@@ -1,11 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-10-22 11:54:03+0000
+Translation-Revision-Date: 2024-11-07 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="maybe_later">稍后再说</string>
+    <string name="settings_import_title">导入播客</string>
+    <string name="settings_subscribe_to_played">关注已播放的播客</string>
+    <string name="settings_export_subscriptions">导出播客</string>
+    <string name="podcast_not_subscribed">未关注</string>
+    <string name="podcast_subscribed">已关注</string>
+    <string name="podcasts_share_subscribe_to_all">关注全部</string>
+    <string name="podcasts_no_subscriptions">未找到播客</string>
+    <string name="unsubscribe">取消关注</string>
+    <string name="subscribe">关注</string>
+    <string name="up_next_shuffle_plus_prompt">使用 Pocket Casts Plus 随机排列您的剧集，以及更多内容</string>
+    <string name="save_space_by_managing_downloaded_episodes">节省 %1$s – 通过管理下载的剧集。</string>
+    <string name="pencil_clean_up_icon_content_description">铅笔清理</string>
+    <string name="podcast_this">此播客</string>
+    <string name="end_of_year_cant_share_message">此故事无法共享</string>
+    <string name="end_of_year_story_ratings_share_text">我在 %2$d 年对 %1$d 个不同的播客进行了评级，%3$d 是我最常用的评级</string>
+    <string name="end_of_year_stories_completion_rate_share_text">我今年的完成率为 %1$d</string>
+    <string name="end_of_year_share_dialog_message">将此图片粘贴到您的社交平台上，与大家分享您最喜欢的节目和创作者</string>
+    <string name="end_of_year_share_dialog_title">分享此故事？</string>
+    <string name="up_next_shuffle_disable_button_content_description">下一个随机播放禁用</string>
+    <string name="up_next_shuffle_button_content_description">下一个随机播放</string>
+    <string name="podcast_ratings_page_title">评级</string>
+    <string name="eoy_story_stories_subscribe_to_plus_button_label">了解 Pocket Casts Plus</string>
+    <string name="end_of_year_stories_subscribe_to_plus">通过订阅 Plus 为 Pocket Casts 提供支持，并获得更多统计信息，以及书签、文件夹或预选章节等高级功能！</string>
+    <string name="settings_real_time_playback_summary">如果开启，播放器会显示剩余时间，并根据播放速度和跳过的章节对此进行调整。</string>
+    <string name="settings_real_time_playback">调整剩余时间</string>
+    <string name="end_of_year_stories_year_over_year_title_went_up_a_lot">与 %1$s 年相比，您的收听时长增加了 500 %%以上</string>
     <string name="end_of_year_story_longest_episode_subtitle">从“%2$s”到“%1$s”</string>
     <string name="end_of_year_listening_time_subtitle">播客收听总量</string>
     <string name="eoy_story_ratings_learn_button_label">了解评分</string>
@@ -264,10 +291,16 @@ Language: zh_CN
     <string name="end_of_year_stories_year_completion_rate">完成率</string>
     <string name="end_of_year_stories_year_completion_rate_subtitle">从最初收听的 %1$d 集开始，您总共完整收听的时长为 %2$d</string>
     <string name="end_of_year_stories_year_completion_rate_title">您今年的完成率为 %1$d%%</string>
+    <string name="end_of_year_stories_year_over_share_text">我的 %1$d 年收听时长与 %2$d 年的比较情况</string>
     <string name="eoy_year_over_year_title_skyrocketed">相比于 2022 年，您的收听时长飙升！</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">啊哈…生活还得继续，不是吗？</string>
+    <string name="end_of_year_stories_year_over_year_title_went_down">与 %1$s 年相比，您的收听时长略微减少</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">人们常说，一致性是成功的关键…或诸如此类的话！</string>
+    <string name="end_of_year_stories_year_over_year_title_flat">与 %1$s 年相比，您的收听时长保持一致</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_went_up">准备在 %1$s 年进一步提升？</string>
+    <string name="end_of_year_stories_year_over_year_title_went_up">与 %1$s 年相比，您的收听时长激增 %2$s%%</string>
     <string name="end_of_year_prompt_card_summary">查看您的收听统计数据、热门播客等。</string>
+    <string name="end_of_year_story_epilogue_title">感谢您今年收听我们的播客。\n%1$d 年再见！</string>
     <string name="end_of_year_story_longest_episode_title">您收听的最长一集为 %1$s</string>
     <string name="end_of_year_replay">再次播放</string>
     <string name="end_of_year_listening_time_title">这是您收听播客的总时长。</string>
@@ -374,8 +407,7 @@ Language: zh_CN
     <string name="settings_help_contact_support_no_phone_connection">请将您的手表与已安装 Pocket Casts 的手机配对，以查看您的日志或联系支持人员</string>
     <string name="settings_help_contact_support_email_sent_to_phone">如果您的手机当前已配对，它将显示一个包含日志的电子邮件支持弹出窗口</string>
     <string name="podcast_loading">正在加载您的播客</string>
-    <string name="podcasts_subscribe_on_phone">在手机上订阅播客，这些博客就会显示在此处。</string>
-    <string name="podcasts_no_subscriptions">无订阅博客</string>
+    <string name="podcasts_subscribe_on_phone">在您的手机上关注播客，它们就会显示在此处。</string>
     <string name="settings_could_not_open_on_phone">无法在手机上打开</string>
     <string name="settings_open_on_phone">在手机上打开</string>
     <string name="settings_about_privacy_policy_available_at">请访问 %s 查看我们的隐私政策</string>
@@ -526,7 +558,6 @@ Language: zh_CN
     <string name="profile_cancel_confirm_subtitle">这会将您的套餐更改为免费帐户。</string>
     <string name="settings_other_media_actions">其他媒体操作</string>
     <string name="settings_customize_buttons_displayed_in_android_13_notification_and_android_auto">定制 Android 13 播放通知和 Android Auto 中显示的按钮。</string>
-    <string name="podcast_not_subscribed">未订阅</string>
     <string name="onboarding_import_from_other_apps_step_2">使用手机的“共享”菜单将文件发送到 Pocket Casts。 或者，通过 Pocket Casts 的“导入和导出 OPML”设置菜单导入文件。</string>
     <string name="onboarding_import_from_other_apps_step_1">找到其他应用程序的导出选项并导出 OPML 文件。</string>
     <string name="onboarding_can_import_from_opml">Pocket Casts 可以通过 OPML 文件导入播客，因此，如果您当前的应用程序可以导出 OPML 文件，您可以按照以下步骤操作：</string>
@@ -586,7 +617,11 @@ Language: zh_CN
     <string name="end_of_year_story_top_categories_share_text">我收听最多的播客分类</string>
     <string name="end_of_year_story_top_categories">您的热门分类</string>
     <string name="end_of_year_story_epilogue_subtitle">不要忘记共享给朋友，告诉他们您最喜欢的播客创作者</string>
+    <string name="end_of_year_story_longest_episode_share_text">%1$d 年我收听时间最长的剧集%2$s</string>
+    <string name="end_of_year_story_top_podcasts_list_title">我的 %1$d 年热门播客</string>
     <string name="end_of_year_story_top_podcasts_share_text">我的年度热门播客！ %1$s</string>
+    <string name="end_of_year_story_top_podcast_share_text">%1$d 年我最喜欢的播客！ %2$s</string>
+    <string name="end_of_year_story_listened_to_numbers_share_text">我在 %3$d 年收听了 %1$d 个不同的播客和 %2$d 部剧集</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">但还有一个您经常收听的播客…</string>
     <string name="end_of_year_story_listened_to_numbers">您总共收听了 %1$d 个不同的节目和 %2$d 部剧集</string>
     <string name="end_of_year_story_listened_to_categories_share_text">我在 2023 年收听了 %1$d 种不同的分类</string>
@@ -913,7 +948,7 @@ Language: zh_CN
     <string name="settings_status_service_ad_blocker_help_singular">最常见的原因是您的电话或网络上配置了广告拦截器。 您需要取消屏蔽域名 %s</string>
     <string name="settings_status_service_discover_summary">应用程序的“发现”部分，包括播客搜索。</string>
     <string name="settings_status_service_discover">发现和搜索</string>
-    <string name="settings_status_service_account_summary">该服务用于存储剧集进度、订阅、过滤器等。</string>
+    <string name="settings_status_service_account_summary">该服务用于存储剧集进度、您关注的播客、筛选器等。</string>
     <string name="settings_status_service_account">账户服务</string>
     <string name="settings_status_service_refresh_summary">该服务用于查找新剧集。</string>
     <string name="settings_status_service_refresh">刷新服务</string>
@@ -924,7 +959,6 @@ Language: zh_CN
     <string name="settings_status_service_internet">互联网连接</string>
     <string name="settings_status_description">检查您与重要服务的连接。 这有助于诊断网络、代理、VPN、广告拦截和安全应用程序的问题。</string>
     <string name="settings_status_page">状态页</string>
-    <string name="settings_import_title">导入订阅</string>
     <string name="settings_notification_default_sound">默认声音</string>
     <string name="settings_subscribe_to_played_summary">您收听的播客将自动添加到“播客”选项卡</string>
     <string name="settings_opml_export_failed">无法保存 OPML 文件。</string>
@@ -1014,7 +1048,6 @@ Language: zh_CN
     <string name="settings_title_about">关于</string>
     <string name="settings_title">标题</string>
     <string name="settings_theme">主题</string>
-    <string name="settings_subscribe_to_played">订阅已播放的播客</string>
     <string name="settings_storage_store_on">将播客存储至</string>
     <string name="settings_storage_sorry">抱歉</string>
     <string name="settings_storage_size_free">%s 免费</string>
@@ -1043,8 +1076,8 @@ Language: zh_CN
     <string name="settings_skip_back_time">后跳时间</string>
     <string name="settings_show_artwork_details">这还将显示已连接的蓝牙设备、手表等的插图。</string>
     <string name="settings_show_artwork">在锁定屏幕上显示插图</string>
-    <string name="settings_show_archived_summary_show">您订阅的新播客将显示已存档的剧集。</string>
-    <string name="settings_show_archived_summary_hide">您订阅的新播客不会显示已存档的剧集。</string>
+    <string name="settings_show_archived_summary_show">您关注的新播客会显示已存档的剧集。</string>
+    <string name="settings_show_archived_summary_hide">您关注的新播客不会显示已存档的剧集。</string>
     <string name="settings_show_archived_action_show">显示</string>
     <string name="settings_show_archived_action_hide">隐藏</string>
     <string name="settings_row_action_summary">对于尚未下载的剧集，列表将显示%s按钮。</string>
@@ -1058,8 +1091,8 @@ Language: zh_CN
     <string name="settings_podcasts_selected_all">所有播客</string>
     <string name="settings_podcast_episode_grouping_title_season">季</string>
     <string name="settings_podcast_episode_grouping_title_none">无</string>
-    <string name="settings_podcast_episode_grouping_summary_none">您订阅的新播客不会对其剧集进行分组。</string>
-    <string name="settings_podcast_episode_grouping_summary">您订阅的新播客将按%s对其剧集进行分组。</string>
+    <string name="settings_podcast_episode_grouping_summary_none">您关注的新播客不会对其剧集进行分组。</string>
+    <string name="settings_podcast_episode_grouping_summary">您关注的新播客会按 %s 对其剧集进行分组。</string>
     <string name="settings_podcast_episode_grouping">播客剧集分组</string>
     <string name="settings_podcast_custom">此播客的自定义设置</string>
     <string name="settings_podcast_artwork">播客插图</string>
@@ -1095,7 +1128,7 @@ Language: zh_CN
     <string name="settings_import_opml_title">导入 OPML</string>
     <string name="settings_import_opml_stop">停止</string>
     <string name="settings_import_opml_progress">%1$d 个播客，共 %2$d 个</string>
-    <string name="settings_import_file_summary">如果您在其他应用程序或服务中订阅了播客，Pocket Casts 可以从 OPML 文件导入。</string>
+    <string name="settings_import_file_summary">如果您在其他应用程序或服务中有播客，Pocket Casts 可以从 OPML 文件中将其导入。</string>
     <string name="settings_import_file">选择文件</string>
     <string name="settings_import_choose_file">选择 OPML 文件。</string>
     <string name="settings_help_contact_support">联系支持人员</string>
@@ -1103,8 +1136,7 @@ Language: zh_CN
     <string name="settings_get_plus_and_more">获取 Pocket Casts Plus 以解锁此功能及更多功能！</string>
     <string name="settings_general_player">播放器</string>
     <string name="settings_general_defaults">默认值</string>
-    <string name="settings_export_subscriptions">导出订阅</string>
-    <string name="settings_export_send_email_summary">以超级呆板 （但广受支持）的 OPML 格式导出您的订阅。</string>
+    <string name="settings_export_send_email_summary">以超级呆板（但广受支持）的 OPML 格式导出您的播客。</string>
     <string name="settings_export_send_email">发送电子邮件</string>
     <string name="settings_export_save_file_summary">将 OPML 文件导出到您的存储设备。</string>
     <string name="settings_export_save_file">保存文件</string>
@@ -1491,7 +1523,7 @@ Language: zh_CN
     <string name="podcast_effects_summary_speed">速度 %s×</string>
     <string name="podcast_included_in_filters">已包含在 %s 中</string>
     <string name="podcast_not_in_filters">不包括在任何过滤器中</string>
-    <string name="podcast_unsubscribe_warning">取消订阅将删除下载的所有文件。</string>
+    <string name="podcast_unsubscribe_warning">取消关注将删除所有下载的文件。</string>
     <string name="podcast_unsubscribe_downloaded_file_plural">%d 下载的文件</string>
     <string name="podcast_unsubscribe_downloaded_file_singular">1 个已下载的文件</string>
     <string name="podcast_share_open_fail">无法加载有关共享播客的详细信息。 如果此问题仍然存在，为什么不联系与您共享播客的人，并询问他们有什么问题。</string>
@@ -1506,7 +1538,6 @@ Language: zh_CN
     <string name="podcast_supporter_cancelled">支持已取消</string>
     <string name="podcast_supporter">支持者</string>
     <string name="podcast_support_this_podcast">支持此节目</string>
-    <string name="podcast_subscribed">已订阅</string>
     <string name="podcast_sort_episodes">排列剧集</string>
     <string name="podcast_share_open_file_in">文件打开方式…</string>
     <string name="podcast_share_episode">共享剧集</string>
@@ -1591,7 +1622,6 @@ Language: zh_CN
     <string name="podcasts_share_missing_title">请为您的列表输入标题。</string>
     <string name="podcasts_share_create_error">糟糕，无法共享</string>
     <string name="podcasts_share_title">标题</string>
-    <string name="podcasts_share_subscribe_to_all">订阅全部</string>
     <string name="podcasts_share_selected_podcasts">共享选定的播客</string>
     <string name="podcasts_share_select_all">选择全部</string>
     <string name="podcasts_share_list">共享列表</string>
@@ -1756,10 +1786,8 @@ Language: zh_CN
     <string name="today">今天</string>
     <string name="learn_more">了解更多</string>
     <string name="up_next">接下来播放</string>
-    <string name="unsubscribe">退订</string>
     <string name="unplayed">未播放</string>
     <string name="unarchive_all">全部取消存档</string>
-    <string name="subscribe">订阅</string>
     <string name="stream">流式传输</string>
     <string name="stop_downloading">停止下载</string>
     <string name="starred">已加星标</string>

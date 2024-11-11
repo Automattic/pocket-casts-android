@@ -58,7 +58,7 @@ class PodcastManagerTest {
         val settings = mock<Settings> {
             on { podcastGroupingDefault } doReturn UserSetting.Mock(PodcastGrouping.None, mock())
             on { showArchivedDefault } doReturn UserSetting.Mock(false, mock())
-            on { autoDownloadNewEpisodes } doReturn UserSetting.Mock(true, mock())
+            on { autoDownloadNewEpisodes } doReturn UserSetting.Mock(Podcast.AUTO_DOWNLOAD_NEW_EPISODES, mock())
             on { autoDownloadLimit } doReturn UserSetting.Mock(AutoDownloadLimitSetting.TWO_LATEST_EPISODE, mock())
         }
 

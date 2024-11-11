@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-08-29 11:49:23+0000
+Translation-Revision-Date: 2024-11-04 08:10:07+0000
 Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;
 Generator: GlotPress/2.4.0-alpha
 Language: ar
 -->
 <resources>
+    <string name="maybe_later">ربما لاحقًا</string>
     <string name="got_it">فهمت</string>
     <string name="try_again">حاول مرة أخرى</string>
     <string name="submit">إرسال</string>
@@ -77,8 +78,6 @@ Language: ar
     <string name="settings_help_logs_sent_to_phone_check_phone">في حال اقتران هاتفك حاليًا، سيعرض نافذة منبثقة تتضمن سجلاتك</string>
     <string name="settings_help_phone_unavailable_message">يرجى المحاولة مجددًا عند اتصال هاتفك بساعتك.</string>
     <string name="settings_watch_logs">سجلات الساعة</string>
-    <string name="podcasts_no_subscriptions">لا توجد حلقات بودكاست تم الاشتراك فيها</string>
-    <string name="podcasts_subscribe_on_phone">اشترك في حلقات البودكاست على هاتفك وستظهر هنا.</string>
     <string name="podcast_loading">تحميل حلقات البودكاست الخاصة بك</string>
     <string name="settings_could_not_open_on_phone">يتعذر الفتح في الهاتف</string>
     <string name="settings_about_terms_of_service_available_at">تتوافر شروط الخدمة لدينا في %s</string>
@@ -226,7 +225,6 @@ Language: ar
     <string name="profile_cancel_confirm_subtitle">سيؤدي ذلك إلى تغيير خطتك إلى حساب مجاني.</string>
     <string name="profile_cancel_confirm_sub_expiry">سيظل اشتراكك الحالي نشطًا حتى ⁦%1$s⁩ </string>
     <string name="profile_cancel_confirm_sub_expiry_date_fallback">تاريخ انتهاء الصلاحية الخاص بك</string>
-    <string name="podcast_not_subscribed">غير مشترك</string>
     <string name="settings_customize_buttons_displayed_in_android_13_notification_and_android_auto">خصص الأزرار المعروضة في تنبيهات تشغيل Android 13 وAndroid Auto.</string>
     <string name="settings_other_media_actions">إجراءات الوسائط الأخرى</string>
     <string name="onboarding_import_from_castbox_step_3">اضغط على \"إعدادات\".</string>
@@ -607,7 +605,6 @@ Language: ar
     <string name="settings_status_service_ad_blocker_help_singular">يتمثَّل السبب الأكثر شيوعًا في أن لديك مانع إعلانات تم تكوينه على هاتفك أو شبكتك. سيتعيَّن عليك فتح النطاق %s</string>
     <string name="settings_status_service_discover_summary">قسم الاكتشاف في التطبيق، بما في ذلك البحث عن بث صوتي.</string>
     <string name="settings_status_service_discover">الاكتشاف والبحث</string>
-    <string name="settings_status_service_account_summary">الخدمة المُستخدمة لتخزين تقدُّم الحلقة، والاشتراكات، وعوامل التصفية، وغير ذلك.</string>
     <string name="settings_status_service_account">خدمة الحساب</string>
     <string name="settings_status_service_refresh_summary">الخدمة المُستخدمة للعثور على حلقات جديدة.</string>
     <string name="settings_status_service_refresh">تحديث الخدمة</string>
@@ -618,7 +615,6 @@ Language: ar
     <string name="settings_status_service_internet">اتصال الإنترنت</string>
     <string name="settings_status_description">تحقَّق من اتصالك باستخدام خدمات مهمة. يساعدك هذا على تشخصيص المشكلات مع شبكتك، والبروكسي وVPN ومنع الإعلانات وتطبيقات الأمان.</string>
     <string name="settings_status_page">صفحة الحالة</string>
-    <string name="settings_import_title">استيراد اشتراكات</string>
     <string name="settings_notification_default_sound">الصوت الافتراضي</string>
     <string name="settings_subscribe_to_played_summary">ستتم إضافة البث الصوتي الذي تستمع إليه إلى علامة تبويب البث الصوتي تلقائيًا</string>
     <string name="settings_opml_export_failed">يتعذر حفظ ملف OPML.</string>
@@ -708,7 +704,6 @@ Language: ar
     <string name="settings_title_about">نبذة عن</string>
     <string name="settings_title">الاسم</string>
     <string name="settings_theme">القالب</string>
-    <string name="settings_subscribe_to_played">الاشتراك في البث الصوتي الذي تم تشغيله</string>
     <string name="settings_storage_store_on">تخزين البث الصوتي على</string>
     <string name="settings_storage_sorry">عذرًا</string>
     <string name="settings_storage_size_free">%s مجانًا</string>
@@ -737,8 +732,6 @@ Language: ar
     <string name="settings_skip_back_time">تخطي الوقت إلى الخلف</string>
     <string name="settings_show_artwork_details">سيقوم هذا كذلك بعرض العمل الفني على الأجهزة والساعات المتصلة بتقنية البلوتوث، وغير ذلك.</string>
     <string name="settings_show_artwork">عرض العمل الفني على شاشة القفل</string>
-    <string name="settings_show_archived_summary_show">سيعرض البث الصوتي الجديد الذي اشتركت فيه الحلقات التي تمت أرشفتها.</string>
-    <string name="settings_show_archived_summary_hide">لن يعرض البث الصوتي الجديد الذي اشتركت فيه الحلقات التي تمت أرشفتها.</string>
     <string name="settings_show_archived_action_show">عرض</string>
     <string name="settings_show_archived_action_hide">إخفاء</string>
     <string name="settings_row_action_summary">بالنسبة إلى الحلقات التي لم يتم تنزيلها بعد، ستعرض القوائم %s من الأزرار.</string>
@@ -752,8 +745,6 @@ Language: ar
     <string name="settings_podcasts_selected_all">جميع البث الصوتي</string>
     <string name="settings_podcast_episode_grouping_title_season">الموسم</string>
     <string name="settings_podcast_episode_grouping_title_none">بدون</string>
-    <string name="settings_podcast_episode_grouping_summary_none">لن يتم تجميع حلقات البث الصوتي الجديدة التي تشترك فيها.</string>
-    <string name="settings_podcast_episode_grouping_summary">سيتم تجميع حلقات البث الصوتي الجديدة التي تشترك فيها بواسطة %s.</string>
     <string name="settings_podcast_episode_grouping">تجميع حلقات البث الصوتي</string>
     <string name="settings_podcast_custom">مخصص لهذا البث الصوتي</string>
     <string name="settings_podcast_artwork">العمل الفني للبث الصوتي</string>
@@ -787,7 +778,6 @@ Language: ar
     <string name="settings_import_opml_title">استيراد OPML</string>
     <string name="settings_import_opml_stop">إيقاف</string>
     <string name="settings_import_opml_progress">⁦%1$d⁩ من ⁦%2$d⁩ من البث الصوتي</string>
-    <string name="settings_import_file_summary">إذا كانت لديك اشتراكات بث صوتي في تطبيق أو خدمة أخرى، فيمكن لـ Pocket Casts استيرادها من ملف OPML.</string>
     <string name="settings_import_file">تحديد ملف</string>
     <string name="settings_import_choose_file">اختر ملف OPML.</string>
     <string name="settings_help_contact_support">اتصل بالدعم</string>
@@ -795,8 +785,6 @@ Language: ar
     <string name="settings_get_plus_and_more">قم بتنزيل Pocket Casts Plus لفتح هذه الميزة والمزيد!</string>
     <string name="settings_general_player">المُشغِّل</string>
     <string name="settings_general_defaults">الإعدادات الافتراضية</string>
-    <string name="settings_export_subscriptions">تصدير اشتراكات</string>
-    <string name="settings_export_send_email_summary">قم بتصدير اشتراكاتك على هيئة تنسيق OPML الغريب للغاية (لكنه مدعوم على مستوى واسع).</string>
     <string name="settings_export_send_email">إرسال بريد إلكتروني</string>
     <string name="settings_export_save_file_summary">قم بتصدير ملف OPML إلى مساحة تخزينك.</string>
     <string name="settings_export_save_file">حفظ الملف</string>
@@ -978,6 +966,7 @@ Language: ar
     <string name="profile_navigation_listening_history">تاريخ الاستماع</string>
     <string name="profile_navigation_files">الملفات</string>
     <string name="profile_monthly">شهريًا</string>
+    <string name="profile_license_agreement">يُقدِّر Pocket Casts خصوصيتك. توضِّح سياسة الخصوصية هذه المعلومات التي نجمعها عنك والسبب وراء هذا، وما قد نفعله بتلك المعلومات وكيف نتعامل معها. تنطبق على تطبيقات Pocket Casts لنظام تشغيل iOS وAndroid وخدمة الويب Pocket Casts مع تطبيقات نظام تشغيل macOS وWindows المرتبطة (الخدمة مشتركة ومنفردة). باستخدام الخدمة، يعني أنك توافق على سياسة الخصوصية هذه. إذا قمت بتشغيل التنبيهات المنبثقة في التطبيق، فسنقوم بتخزين رمز الدفع المميز الذي توفره لنا Apple لتوصيل التنبيهات المنبثقة إلى جهازك. إذا اشتريت تطبيق الويب، فسنقوم بتخزين مُعرِّف المعاملة الخاصة بعملية الشراء الخاصة بك. إذا اخترت عدم إنشاء حساب ولم تستخدم التنبيهات المنبثقة، فلن يتم تخزين أي بيانات حولك على خوادمنا. تستخدم كذلك خدمة الويب Pocket Casts الكوكيز والتقنيات المشابهة للحفاظ على تسجيل دخولك. إذا اخترت إنشاء طلب دعم من داخل الخدمة، فقد نقوم بإنشاء مرفق يحتوي على بيانات إضافية للمساعدة على معالجة طلب الدعم الخاص بك الذي يرحب بك لعرضه قبل الإرسال.</string>
     <string name="profile_last_refresh">آخر تحديث: منذ %s</string>
     <string name="profile_joined">تم الانضمام:</string>
     <string name="profile_get_plus">قم بتنزيل Pocket Casts Plus لفتح هذه الميزة، بالإضافة إلى المزيد!</string>
@@ -985,7 +974,6 @@ Language: ar
     <string name="profile_forgot_your_password">نسيتُ كلمة المرور الخاصة بي</string>
     <string name="profile_files_remove_image">استبدال صورة</string>
     <string name="profile_files_empty_title">لا توجد ملفات</string>
-    <string name="profile_license_agreement">يُقدِّر Pocket Casts خصوصيتك. توضِّح سياسة الخصوصية هذه المعلومات التي نجمعها عنك والسبب وراء هذا، وما قد نفعله بتلك المعلومات وكيف نتعامل معها. تنطبق على تطبيقات Pocket Casts لنظام تشغيل iOS وAndroid وخدمة الويب Pocket Casts مع تطبيقات نظام تشغيل macOS وWindows المرتبطة (الخدمة مشتركة ومنفردة). باستخدام الخدمة، يعني أنك توافق على سياسة الخصوصية هذه. إذا قمت بتشغيل التنبيهات المنبثقة في التطبيق، فسنقوم بتخزين رمز الدفع المميز الذي توفره لنا Apple لتوصيل التنبيهات المنبثقة إلى جهازك. إذا اشتريت تطبيق الويب، فسنقوم بتخزين مُعرِّف المعاملة الخاصة بعملية الشراء الخاصة بك. إذا اخترت عدم إنشاء حساب ولم تستخدم التنبيهات المنبثقة، فلن يتم تخزين أي بيانات حولك على خوادمنا. تستخدم كذلك خدمة الويب Pocket Casts الكوكيز والتقنيات المشابهة للحفاظ على تسجيل دخولك. إذا اخترت إنشاء طلب دعم من داخل الخدمة، فقد نقوم بإنشاء مرفق يحتوي على بيانات إضافية للمساعدة على معالجة طلب الدعم الخاص بك الذي يرحب بك لعرضه قبل الإرسال.</string>
     <string name="profile_files_empty_summary">هل ترغب في الاستماع إلى ملفاتك الخاصة؟\nاضغط على زر + لفتحها في Pocket Casts، وستظهر هنا.</string>
     <string name="profile_files_addfile_save">حفظ</string>
     <string name="profile_files_add_filename">الاسم</string>
@@ -1179,7 +1167,6 @@ Language: ar
     <string name="podcast_effects_summary_speed">السرعة %s أضعاف</string>
     <string name="podcast_included_in_filters">مُضمَّن في %s</string>
     <string name="podcast_not_in_filters">غير مُضمَّن في أي عوامل تصفية</string>
-    <string name="podcast_unsubscribe_warning">سيؤدي إلغاء الاشتراك إلى حذف جميع الملفات التي تم تنزيلها.</string>
     <string name="podcast_unsubscribe_downloaded_file_plural">%d من الملفات التي تم تنزيلها</string>
     <string name="podcast_unsubscribe_downloaded_file_singular">ملف واحد تم تنزيله</string>
     <string name="podcast_share_open_fail">يتعذر تحميل تفاصيل حول البث الصوتي الذي تمت مشاركته. إذا كانت هذه المشكلة قائمة، فلما لا تتواصل مع الشخص الذي قام بمشاركته معك واسأله ما الأمر.</string>
@@ -1194,7 +1181,6 @@ Language: ar
     <string name="podcast_supporter_cancelled">تم إلغاء الدعم</string>
     <string name="podcast_supporter">مؤيد</string>
     <string name="podcast_support_this_podcast">دعم هذا العرض</string>
-    <string name="podcast_subscribed">مشترك</string>
     <string name="podcast_sort_episodes">فرز الحلقات</string>
     <string name="podcast_share_open_file_in">فتح الملف في…</string>
     <string name="podcast_share_episode">مشاركة الحلقة</string>
@@ -1279,7 +1265,6 @@ Language: ar
     <string name="podcasts_share_missing_title">يرجى إدخال اسم لقائمتك.</string>
     <string name="podcasts_share_create_error">عذرًا، تتعذر المشاركة</string>
     <string name="podcasts_share_title">الاسم</string>
-    <string name="podcasts_share_subscribe_to_all">الاشتراك في الكل</string>
     <string name="podcasts_share_selected_podcasts">مشاركة حلقات البث الصوتي المُحدَّدة</string>
     <string name="podcasts_share_select_all">تحديد الكل</string>
     <string name="podcasts_share_list">قائمة مشتركة</string>
@@ -1443,10 +1428,8 @@ Language: ar
     <string name="today">اليوم</string>
     <string name="learn_more">اعرف المزيد.</string>
     <string name="up_next">التالي</string>
-    <string name="unsubscribe">إلغاء الاشتراك</string>
     <string name="unplayed">لم يتم التشغيل</string>
     <string name="unarchive_all">إلغاء أرشفة الكل</string>
-    <string name="subscribe">اشترك</string>
     <string name="stream">بث</string>
     <string name="stop_downloading">إيقاف التنزيل</string>
     <string name="starred">تم الوسم بنجمة</string>

@@ -1,11 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-10-22 09:54:03+0000
+Translation-Revision-Date: 2024-11-06 09:54:04+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="maybe_later">後で</string>
+    <string name="settings_import_title">ポッドキャストをインポート</string>
+    <string name="settings_subscribe_to_played">再生したポッドキャストをフォロー</string>
+    <string name="settings_export_subscriptions">ポッドキャストをエクスポート</string>
+    <string name="podcast_not_subscribed">フォローしていない</string>
+    <string name="podcast_subscribed">フォロー中</string>
+    <string name="podcasts_share_subscribe_to_all">すべてをフォロー</string>
+    <string name="podcasts_no_subscriptions">ポッドキャストが見つかりません</string>
+    <string name="unsubscribe">フォロー解除</string>
+    <string name="subscribe">フォロー</string>
+    <string name="up_next_shuffle_plus_prompt">Pocket Casts Plus でエピソードをシャッフル、など</string>
+    <string name="save_space_by_managing_downloaded_episodes">ダウンロード済みエピソードを管理して %1$s を保存します。</string>
+    <string name="pencil_clean_up_icon_content_description">鉛筆のクリーンアップ</string>
+    <string name="podcast_this">このポッドキャスト</string>
+    <string name="end_of_year_cant_share_message">このストーリーは共有できません</string>
+    <string name="end_of_year_story_ratings_share_text">%2$dは%1$d個のポッドキャストを評価し、最もよく使った評価は%3$dでした</string>
+    <string name="end_of_year_stories_completion_rate_share_text">今年の完了率は%1$d です</string>
+    <string name="end_of_year_share_dialog_message">この画像をソーシャルに貼り付けて、お気に入りのショーや作成者を応援しましょう</string>
+    <string name="end_of_year_share_dialog_title">このストーリーを共有しませんか ?</string>
+    <string name="up_next_shuffle_disable_button_content_description">次のシャッフルの無効化</string>
+    <string name="up_next_shuffle_button_content_description">次のシャッフル</string>
+    <string name="podcast_ratings_page_title">評価機能</string>
+    <string name="eoy_story_stories_subscribe_to_plus_button_label">Pocket Casts Plus をチェック</string>
+    <string name="end_of_year_stories_subscribe_to_plus">Plus にサブスクリプションして Pocket Casts をサポートし、より多くの統計情報や、ブックマーク、フォルダー、チャプターの事前選択などのプレミアム機能を手に入れましょう。</string>
+    <string name="settings_real_time_playback_summary">オンにすると、再生速度とスキップされたチャプターに合わせて調整された残り時間がプレーヤーに表示されます。</string>
+    <string name="settings_real_time_playback">残り時間を調整</string>
+    <string name="end_of_year_stories_year_over_year_title_went_up_a_lot">%1$sと比較して、聴取時間が500%%以上増加しました</string>
     <string name="end_of_year_story_longest_episode_subtitle">「%2$s」の「%1$s」でした</string>
     <string name="end_of_year_listening_time_subtitle">ポッドキャストを聴いた合計</string>
     <string name="eoy_story_ratings_learn_button_label">評価について</string>
@@ -264,10 +291,16 @@ Language: ja_JP
     <string name="end_of_year_stories_year_completion_rate">完了率</string>
     <string name="end_of_year_stories_year_completion_rate_subtitle">開始した%1$d件のエピソードから合計%2$d件を最後まで聴きました</string>
     <string name="end_of_year_stories_year_completion_rate_title">今年の完了率は%1$d%% です</string>
+    <string name="end_of_year_stories_year_over_share_text">%1$dと%2$dの聴取時間の比較</string>
     <string name="eoy_year_over_year_title_skyrocketed">2022年と比較して、聴取時間が急増しました !</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">生きてこその人生ですね。</string>
+    <string name="end_of_year_stories_year_over_year_title_went_down">%1$sと比較して、聴取時間が少し減りました</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">一貫性が成功の鍵であるとかなんとか言われています。</string>
+    <string name="end_of_year_stories_year_over_year_title_flat">%1$sと比較して、聴取時間は一定していました</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_went_up">%1$sにこの記録を上回る準備はできていますか ?</string>
+    <string name="end_of_year_stories_year_over_year_title_went_up">%1$sと比較して、聴取時間が%2$s%%に急増しました</string>
     <string name="end_of_year_prompt_card_summary">視聴統計、人気のポッドキャストなどを確認します。</string>
+    <string name="end_of_year_story_epilogue_title">本年もご聴取いただきありがとうございました。\n%1$dもよろしくお願いいたします。</string>
     <string name="end_of_year_story_longest_episode_title">お聴きになった最長のエピソードは %1$s でした</string>
     <string name="end_of_year_replay">もう一度再生</string>
     <string name="end_of_year_listening_time_title">これはポッドキャストの合計聴取時間です。</string>
@@ -374,8 +407,7 @@ Language: ja_JP
     <string name="settings_help_contact_support_no_phone_connection">ログを表示したりサポートに連絡したりするには Pocket Casts がインストールされているスマートフォンとウォッチをペアリングしてください</string>
     <string name="settings_help_contact_support_email_sent_to_phone">スマートフォンが現在ペアリングされている場合は、ポップアップが表示され、サポートにログが添付されたメールが送信されます</string>
     <string name="podcast_loading">ポッドキャストを読み込み中</string>
-    <string name="podcasts_subscribe_on_phone">スマートフォンでポッドキャストを購読すると、こちらに表示されます。</string>
-    <string name="podcasts_no_subscriptions">購読されたポッドキャストはありません</string>
+    <string name="podcasts_subscribe_on_phone">スマートフォンでポッドキャストをフォローすると、こちらに表示されます。</string>
     <string name="settings_could_not_open_on_phone">スマートフォンを開けません</string>
     <string name="settings_open_on_phone">スマートフォンを開く</string>
     <string name="settings_about_privacy_policy_available_at">プライバシーポリシーは %s でご覧いただけます</string>
@@ -526,7 +558,6 @@ Language: ja_JP
     <string name="profile_cancel_confirm_subtitle">これにより、お客様のプランが無料アカウントに変更されます。</string>
     <string name="settings_other_media_actions">その他のメディアアクション</string>
     <string name="settings_customize_buttons_displayed_in_android_13_notification_and_android_auto">Android 13の再生通知と Android Auto に表示されるボタンをカスタマイズします。</string>
-    <string name="podcast_not_subscribed">購読していません</string>
     <string name="onboarding_import_from_other_apps_step_2">スマートフォンの「共有」メニューを使用してファイルを Pocket Casts に送信します。 または、Pocket Casts の「OPML をインポート / エクスポート」設定メニューからファイルをインポートします。</string>
     <string name="onboarding_import_from_other_apps_step_1">他のアプリのエクスポートオプションを探し、OPML ファイルをエクスポートします。</string>
     <string name="onboarding_can_import_from_opml">Pocket Casts では OPML ファイルのポッドキャストをインポートできます。現在のアプリで OPML ファイルをエクスポートできる場合は、次の手順に従います。</string>
@@ -586,7 +617,11 @@ Language: ja_JP
     <string name="end_of_year_story_top_categories_share_text">一番聴いたポッドキャストのカテゴリー</string>
     <string name="end_of_year_story_top_categories">トップカテゴリー</string>
     <string name="end_of_year_story_epilogue_subtitle">友達と共有したりお気に入りのポッドキャストクリエイターにエールを送ったりしましょう</string>
+    <string name="end_of_year_story_longest_episode_share_text">%1$dに聴いた最長のエピソード %2$s</string>
+    <string name="end_of_year_story_top_podcasts_list_title">%1$dに再生数が多かったポッドキャスト</string>
     <string name="end_of_year_story_top_podcasts_share_text">今年再生数が多かったポッドキャストはこちら ! %1$s</string>
+    <string name="end_of_year_story_top_podcast_share_text">%1$dのお気に入りのポッドキャストはこちら ! %2$s</string>
+    <string name="end_of_year_story_listened_to_numbers_share_text">%3$dは%1$d個のポッドキャストで%2$d話のエピソードを聴きました</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">何度も聴いたエピソードもありました…</string>
     <string name="end_of_year_story_listened_to_numbers">%1$d個のショーで合計%2$d話のエピソードを聴きました</string>
     <string name="end_of_year_story_listened_to_categories_share_text">2023年は%1$d個のカテゴリーを聴きました</string>
@@ -913,7 +948,7 @@ Language: ja_JP
     <string name="settings_status_service_ad_blocker_help_singular">最も一般的な原因は、スマートフォンかネットワークで広告ブロッカーを設定していることです。 ドメイン %s のブロックを解除する必要があります</string>
     <string name="settings_status_service_discover_summary">ポッドキャスト検索を含む、アプリの検出セクション。</string>
     <string name="settings_status_service_discover">検出と検索</string>
-    <string name="settings_status_service_account_summary">エピソードの進捗やサブスクリプション、フィルターなどを保存するのに使用するサービス。</string>
+    <string name="settings_status_service_account_summary">エピソードの進捗、フォローするポッドキャスト、フィルターなどを保存するために使用するサービスです。</string>
     <string name="settings_status_service_account">アカウントサービス</string>
     <string name="settings_status_service_refresh_summary">新しいエピソードを見つけるのに使用するサービス。</string>
     <string name="settings_status_service_refresh">サービスの再読み込み</string>
@@ -924,7 +959,6 @@ Language: ja_JP
     <string name="settings_status_service_internet">インターネット接続</string>
     <string name="settings_status_description">重要なサービスとの接続を確認してください。 これは、ネットワーク、プロキシ、VPN、広告ブロックアプリ、セキュリティアプリの問題を診断するのに役立ちます。</string>
     <string name="settings_status_page">ステータスページ</string>
-    <string name="settings_import_title">サブスクリプションをインポート</string>
     <string name="settings_notification_default_sound">デフォルトの音声</string>
     <string name="settings_subscribe_to_played_summary">聴いているポッドキャストは自動的に「ポッドキャスト」タブに追加されます</string>
     <string name="settings_opml_export_failed">OPML ファイルを保存できません。</string>
@@ -1014,7 +1048,6 @@ Language: ja_JP
     <string name="settings_title_about">アプリについて</string>
     <string name="settings_title">タイトル</string>
     <string name="settings_theme">テーマ</string>
-    <string name="settings_subscribe_to_played">再生済みポッドキャストに登録</string>
     <string name="settings_storage_store_on">ポッドキャストの保存先</string>
     <string name="settings_storage_sorry">申し訳ありません</string>
     <string name="settings_storage_size_free">%s 無料</string>
@@ -1043,8 +1076,8 @@ Language: ja_JP
     <string name="settings_skip_back_time">時間を巻き戻し</string>
     <string name="settings_show_artwork_details">接続されている Bluetooth 対応の端末や時計などのアートワークも表示されます。</string>
     <string name="settings_show_artwork">ロック画面にアートワークを表示</string>
-    <string name="settings_show_archived_summary_show">登録する新しいポッドキャストにアーカイブ済みエピソードが表示されます。</string>
-    <string name="settings_show_archived_summary_hide">登録する新しいポッドキャストにアーカイブ済みエピソードが表示されません。</string>
+    <string name="settings_show_archived_summary_show">フォローする新しいポッドキャストにアーカイブ済みエピソードが表示されます。</string>
+    <string name="settings_show_archived_summary_hide">フォローする新しいポッドキャストにアーカイブ済みエピソードが表示されません。</string>
     <string name="settings_show_archived_action_show">表示</string>
     <string name="settings_show_archived_action_hide">非表示</string>
     <string name="settings_row_action_summary">まだダウンロードしていないエピソードでは、リストに %s のボタンが表示されます。</string>
@@ -1058,8 +1091,8 @@ Language: ja_JP
     <string name="settings_podcasts_selected_all">すべてのポッドキャスト</string>
     <string name="settings_podcast_episode_grouping_title_season">シーズン</string>
     <string name="settings_podcast_episode_grouping_title_none">なし</string>
-    <string name="settings_podcast_episode_grouping_summary_none">登録する新しいポッドキャストでエピソードがグループ化されていません。</string>
-    <string name="settings_podcast_episode_grouping_summary">登録する新しいポッドキャストでは、%sを基準にエピソードがグループ化されています。</string>
+    <string name="settings_podcast_episode_grouping_summary_none">フォローする新しいポッドキャストでエピソードがグループ化されません。</string>
+    <string name="settings_podcast_episode_grouping_summary">フォローする新しいポッドキャストでは、エピソードが%sを基準にグループ化されます。</string>
     <string name="settings_podcast_episode_grouping">ポッドキャストエピソードのグループ化</string>
     <string name="settings_podcast_custom">このポッドキャスト専用にカスタマイズ</string>
     <string name="settings_podcast_artwork">ポッドキャストのアートワーク</string>
@@ -1095,7 +1128,7 @@ Language: ja_JP
     <string name="settings_import_opml_title">OPML をインポート</string>
     <string name="settings_import_opml_stop">停止</string>
     <string name="settings_import_opml_progress">%2$d件中%1$d件のポッドキャスト</string>
-    <string name="settings_import_file_summary">他のアプリやサービスにポッドキャストのサブスクリプションがある場合、Pocket Casts では OPML ファイルからそれらをインポートできます。</string>
+    <string name="settings_import_file_summary">他のアプリやサービスにポッドキャストがある場合、Pocket Casts では OPML ファイルからそれらをインポートできます。</string>
     <string name="settings_import_file">ファイルを選択</string>
     <string name="settings_import_choose_file">OPML ファイルを選択します。</string>
     <string name="settings_help_contact_support">サポートに問い合わせる</string>
@@ -1103,8 +1136,7 @@ Language: ja_JP
     <string name="settings_get_plus_and_more">Pocket Casts Plus を取得してこれらの機能を利用しましょう !</string>
     <string name="settings_general_player">プレーヤー</string>
     <string name="settings_general_defaults">デフォルト</string>
-    <string name="settings_export_subscriptions">サブスクリプションをエクスポート</string>
-    <string name="settings_export_send_email_summary">かなり特殊でありながら幅広くサポートされている OPML 形式でサブスクリプションをエクスポートします。</string>
+    <string name="settings_export_send_email_summary">かなり特殊でありながら幅広くサポートされている OPML 形式で、ポッドキャストをエクスポートします。</string>
     <string name="settings_export_send_email">メールを送信</string>
     <string name="settings_export_save_file_summary">OPML ファイルをストレージにエクスポートします。</string>
     <string name="settings_export_save_file">ファイルを保存</string>
@@ -1491,7 +1523,7 @@ Language: ja_JP
     <string name="podcast_effects_summary_speed">%s倍速</string>
     <string name="podcast_included_in_filters">%s に同梱</string>
     <string name="podcast_not_in_filters">どのフィルターにも含まれていません</string>
-    <string name="podcast_unsubscribe_warning">登録を解除するとダウンロード済みファイルがすべて削除されます。</string>
+    <string name="podcast_unsubscribe_warning">フォローを解除するとダウンロード済みファイルがすべて削除されます。</string>
     <string name="podcast_unsubscribe_downloaded_file_plural">%dダウンロード済みファイル</string>
     <string name="podcast_unsubscribe_downloaded_file_singular">1件のダウンロード済みファイル</string>
     <string name="podcast_share_open_fail">共有ポッドキャストの詳細を読み込めません。 この問題が解決されない場合は、共有した人物に連絡して何が起きているか確認してください。</string>
@@ -1506,7 +1538,6 @@ Language: ja_JP
     <string name="podcast_supporter_cancelled">キャンセル済みのサポート</string>
     <string name="podcast_supporter">サポーター</string>
     <string name="podcast_support_this_podcast">このショーをサポート</string>
-    <string name="podcast_subscribed">フォロー済み</string>
     <string name="podcast_sort_episodes">エピソードを並び替え</string>
     <string name="podcast_share_open_file_in">ファイルを別のアプリで開く…</string>
     <string name="podcast_share_episode">エピソードを共有</string>
@@ -1591,7 +1622,6 @@ Language: ja_JP
     <string name="podcasts_share_missing_title">リストのタイトルを入力してください。</string>
     <string name="podcasts_share_create_error">共有に失敗しました</string>
     <string name="podcasts_share_title">タイトル</string>
-    <string name="podcasts_share_subscribe_to_all">すべてに登録</string>
     <string name="podcasts_share_selected_podcasts">選択したポッドキャストを共有</string>
     <string name="podcasts_share_select_all">すべて選択</string>
     <string name="podcasts_share_list">共有リスト</string>
@@ -1756,10 +1786,8 @@ Language: ja_JP
     <string name="today">今日</string>
     <string name="learn_more">さらに詳しく</string>
     <string name="up_next">次のエピソード</string>
-    <string name="unsubscribe">フォロー解除</string>
     <string name="unplayed">未再生</string>
     <string name="unarchive_all">すべてのアーカイブを解除</string>
-    <string name="subscribe">フォロー</string>
     <string name="stream">ストリーム</string>
     <string name="stop_downloading">ダウンロードを停止</string>
     <string name="starred">星付き</string>
