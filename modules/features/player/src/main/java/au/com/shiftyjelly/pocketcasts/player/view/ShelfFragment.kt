@@ -21,10 +21,9 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
-import au.com.shiftyjelly.pocketcasts.player.R
-import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterShelfTitleBinding
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentShelfBinding
 import au.com.shiftyjelly.pocketcasts.player.view.shelf.ShelfItemRow
+import au.com.shiftyjelly.pocketcasts.player.view.shelf.ShelfTitleRow
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
@@ -244,7 +243,19 @@ class ShelfAdapter(val theme: Theme, val editable: Boolean, val listener: ((Shel
     var normalBackground = Color.TRANSPARENT
     var selectedBackground = Color.BLACK
 
-    class TitleViewHolder(val binding: AdapterShelfTitleBinding) : RecyclerView.ViewHolder(binding.root)
+    inner class TitleViewHolder(
+        val composeView: ComposeView,
+    ) : RecyclerView.ViewHolder(composeView) {
+        fun bind(item: ShelfTitle) {
+            composeView.setContent {
+                AppTheme(theme.activeTheme) {
+                    ShelfTitleRow(
+                        item = item,
+                    )
+                }
+            }
+        }
+    }
 
     inner class ItemViewHolder(
         val composeView: ComposeView,
@@ -297,18 +308,14 @@ class ShelfAdapter(val theme: Theme, val editable: Boolean, val listener: ((Shel
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        val inflater = LayoutInflater.from(parent.context)
-        return when (viewType) {
-            ShelfItemRow.VIEW_TYPE_ID -> {
-                ItemViewHolder(composeView = ComposeView(parent.context))
-            }
-            R.layout.adapter_shelf_title -> {
-                val binding = AdapterShelfTitleBinding.inflate(inflater, parent, false)
-                TitleViewHolder(binding)
-            }
-            else -> throw IllegalStateException("Unknown view type in shelf")
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = when (viewType) {
+        ShelfItemRow.VIEW_TYPE_ID -> {
+            ItemViewHolder(composeView = ComposeView(parent.context))
         }
+        ShelfTitleRow.VIEW_TYPE_ID -> {
+            TitleViewHolder(composeView = ComposeView(parent.context))
+        }
+        else -> throw IllegalStateException("Unknown view type in shelf")
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
@@ -317,13 +324,13 @@ class ShelfAdapter(val theme: Theme, val editable: Boolean, val listener: ((Shel
         if (item is ShelfItem && holder is ItemViewHolder) {
             holder.bind(item)
         } else if (item is ShelfTitle && holder is TitleViewHolder) {
-            holder.binding.lblTitle.setText(item.title)
+            holder.bind(item)
         }
     }
 
     override fun getItemViewType(position: Int): Int {
         return when (getItem(position)) {
-            is ShelfTitle -> R.layout.adapter_shelf_title
+            is ShelfTitle -> ShelfTitleRow.VIEW_TYPE_ID
             is ShelfItem -> ShelfItemRow.VIEW_TYPE_ID
             else -> throw IllegalStateException("Unknown item type in shelf")
         }
