@@ -1,6 +1,8 @@
 7.78
 -----
-
+*   Updates
+    *   Deferred addition to UpNext post update after sync 
+        ([#3211](https://github.com/Automattic/pocket-casts-android/pull/312))
 
 7.77
 -----
