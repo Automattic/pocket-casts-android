@@ -193,6 +193,9 @@ abstract class PodcastDao {
     @Update
     abstract fun update(podcast: Podcast)
 
+    @Update
+    abstract suspend fun updateSuspend(podcast: Podcast)
+
     fun updateRx(podcast: Podcast): Completable {
         return Completable.fromCallable { update(podcast) }
     }
@@ -208,6 +211,9 @@ abstract class PodcastDao {
 
     @Insert(onConflict = REPLACE)
     abstract fun insert(podcast: Podcast): Long
+
+    @Insert(onConflict = REPLACE)
+    abstract suspend fun insertSuspend(podcast: Podcast): Long
 
     fun insertRx(podcast: Podcast): Single<Podcast> {
         return Single.fromCallable {

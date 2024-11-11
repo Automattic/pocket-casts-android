@@ -18,11 +18,11 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SubscribeManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.PodcastRefresher
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.refresh.RefreshServiceManager
-import au.com.shiftyjelly.pocketcasts.sharedtest.FakeCrashLogging
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import com.squareup.moshi.Moshi
 import io.reactivex.Single
@@ -53,6 +53,7 @@ class PodcastManagerTest {
         val episodeManager = mock<EpisodeManager>()
         val playlistManager = mock<PlaylistManager>()
         val downloadManager = mock<DownloadManager>()
+        val podcastRefresher = mock<PodcastRefresher>()
 
         val settings = mock<Settings> {
             on { podcastGroupingDefault } doReturn UserSetting.Mock(PodcastGrouping.None, mock())
@@ -89,12 +90,11 @@ class PodcastManagerTest {
             settings = settings,
             context = application,
             subscribeManager = subscribeManager,
-            cacheServiceManager = podcastCacheService,
+            podcastRefresher = podcastRefresher,
             refreshServiceManager = refreshServiceManager,
             syncManager = syncManagerSignedOut,
             appDatabase = appDatabase,
             applicationScope = CoroutineScope(Dispatchers.Default),
-            crashLogging = FakeCrashLogging(),
         )
         podcastManagerSignedIn = PodcastManagerImpl(
             episodeManager = episodeManager,
@@ -102,12 +102,11 @@ class PodcastManagerTest {
             settings = settings,
             context = application,
             subscribeManager = subscribeManager,
-            cacheServiceManager = podcastCacheService,
+            podcastRefresher = podcastRefresher,
             refreshServiceManager = refreshServiceManager,
             syncManager = syncManagerSignedIn,
             applicationScope = CoroutineScope(Dispatchers.Default),
             appDatabase = appDatabase,
-            crashLogging = FakeCrashLogging(),
         )
     }
 

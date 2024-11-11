@@ -297,11 +297,17 @@ abstract class EpisodeDao {
     @Update
     abstract fun update(episode: PodcastEpisode)
 
+    @Update
+    abstract suspend fun updateSuspend(episode: PodcastEpisode)
+
     @Delete
     abstract fun delete(episode: PodcastEpisode)
 
     @Delete
     abstract fun deleteAll(episode: List<PodcastEpisode>)
+
+    @Delete
+    abstract suspend fun deleteAllSuspend(episode: List<PodcastEpisode>)
 
     @Query("DELETE FROM podcast_episodes")
     abstract suspend fun deleteAll()
@@ -310,7 +316,13 @@ abstract class EpisodeDao {
     abstract fun insert(episode: PodcastEpisode)
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
+    abstract suspend fun insertSuspend(episode: PodcastEpisode)
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     abstract fun insertAll(episodes: List<PodcastEpisode>)
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    abstract suspend fun insertAllSuspend(episodes: List<PodcastEpisode>)
 
     @Query("UPDATE podcast_episodes SET file_type = :fileType WHERE uuid = :uuid")
     abstract fun updateFileType(fileType: String, uuid: String)

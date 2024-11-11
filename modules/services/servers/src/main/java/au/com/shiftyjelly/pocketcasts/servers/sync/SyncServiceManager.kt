@@ -134,7 +134,7 @@ open class SyncServiceManager @Inject constructor(
     suspend fun namedSettings(request: NamedSettingsRequest, token: AccessToken): NamedSettingsResponse =
         service.namedSettings(addBearer(token), request)
 
-    fun syncUpdate(email: String, data: String, lastSyncTime: Instant, token: AccessToken): Single<au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse> {
+    suspend fun syncUpdate(email: String, data: String, lastSyncTime: Instant, token: AccessToken): au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse {
         val fields = mutableMapOf(
             "email" to email,
             "token" to token.value,
