@@ -114,13 +114,13 @@
     <string name="starred">Starred</string>
     <string name="stop_downloading">Stop downloading</string>
     <string name="stream">Stream</string>
-    <string name="subscribe">Subscribe</string>
+    <string name="subscribe">Follow</string>
     <string name="subscribe_to">Subscribe to %s</string>
     <string name="upgrade_to">Upgrade to %s</string>
     <string name="unarchive_all">Unarchive all</string>
     <string name="get_pocket_casts_plus">Get Pocket Casts Plus</string>
     <string name="unplayed">Unplayed</string>
-    <string name="unsubscribe">Unsubscribe</string>
+    <string name="unsubscribe">Unfollow</string>
     <string name="up_next">Up Next</string>
     <string name="learn_more">Learn more.</string>
     <string name="today">Today</string>
@@ -399,6 +399,7 @@
     <string name="player_play_failed_check_internet">Could not load podcast. Please check your internet connection and try again.</string>
     <string name="player_played_up_to">Played up to %s</string>
     <string name="player_time_remaining">Time remaining %s</string>
+    <string name="drag_down_to_dismiss_content_description">Drag down to dismiss</string>
 
     <!-- Chapters -->
 
@@ -445,7 +446,7 @@
     <string name="podcasts_menu_search_podcasts">Search podcasts</string>
     <string name="podcasts_menu_share_podcasts">Share podcasts</string>
     <string name="podcasts_menu_sort_by">Sort by</string>
-    <string name="podcasts_no_subscriptions">No subscribed podcasts</string>
+    <string name="podcasts_no_subscriptions">No podcasts found</string>
     <string name="podcasts_plural">%d Podcasts</string>
     <string name="podcasts_share">Share podcasts</string>
     <string name="podcasts_share_0_selected">0 selected</string>
@@ -459,7 +460,7 @@
     <string name="podcasts_share_failed_description">Something went wrong creating your share page.</string>
     <string name="podcasts_share_select_all">Select all</string>
     <string name="podcasts_share_selected_podcasts">Share selected podcasts</string>
-    <string name="podcasts_share_subscribe_to_all">SUBSCRIBE TO ALL</string>
+    <string name="podcasts_share_subscribe_to_all">FOLLOW ALL</string>
     <string name="podcasts_share_title">Title</string>
     <string name="podcasts_share_create_error">Oops unable to share</string>
     <string name="podcasts_share_missing_title">Please enter a title for your list.</string>
@@ -477,7 +478,7 @@
     <string name="podcasts_sort_by_release_date">Episode release date</string>
     <string name="podcasts_sort_by_title">"Title (A - Z)"</string>
     <string name="podcasts_sort_order">Sort order</string>
-    <string name="podcasts_subscribe_on_phone">Subscribe to podcasts on your phone and they\'ll appear here.</string>
+    <string name="podcasts_subscribe_on_phone">Follow podcasts on your phone and they\'ll appear here.</string>
     <string name="podcasts_time_to_add_some_podcasts">Time to add some Podcasts!</string>
     <string name="podcasts_time_to_add_some_podcasts_summary">You can add podcasts by searching above or if you are looking for some inspiration try the Discover tab.</string>
     <string name="podcasts_empty_folder">Your folder is empty</string>
@@ -603,8 +604,8 @@
     </plurals>
     <string name="podcast_show_archived" translatable="false">@string/show_archived</string>
     <string name="podcast_sort_episodes">Sort episodes</string>
-    <string name="podcast_subscribed">Subscribed</string>
-    <string name="podcast_not_subscribed">Not Subscribed</string>
+    <string name="podcast_subscribed">Following</string>
+    <string name="podcast_not_subscribed">Not Following</string>
     <string name="podcast_support_this_podcast">Support This Show</string>
     <string name="podcast_supporter">SUPPORTER</string>
     <string name="podcast_supporter_cancelled">Support cancelled</string>
@@ -620,7 +621,7 @@
     <string name="podcast_share_open_fail">Unable to load details about shared podcast. If this problem persists, why not reach out to the person who shared with you, and ask them what\'s up.</string>
     <string name="podcast_unsubscribe_downloaded_file_singular">1 Downloaded File</string>
     <string name="podcast_unsubscribe_downloaded_file_plural">%d Downloaded Files</string>
-    <string name="podcast_unsubscribe_warning">Unsubscribing will delete all downloaded files.</string>
+    <string name="podcast_unsubscribe_warning">Unfollowing will delete all downloaded files.</string>
     <string name="podcast_not_in_filters">Not included in any filters</string>
     <string name="podcast_included_in_filters">Included in %s</string>
     <string name="podcast_effects_summary_speed">Speed %s×</string>
@@ -634,6 +635,22 @@
     <string name="podcast_refresh_artwork">Refresh artwork</string>
     <string name="podcast_rate">Rate %s</string>
     <string name="podcast_cover_description">Cover of %s podcast</string>
+    <plurals name="day">
+        <item quantity="one">day</item>
+        <item quantity="other">days</item>
+    </plurals>
+    <plurals name="hour">
+        <item quantity="one">hour</item>
+        <item quantity="other">hours</item>
+    </plurals>
+    <plurals name="minute">
+        <item quantity="one">minute</item>
+        <item quantity="other">minutes</item>
+    </plurals>
+    <plurals name="second">
+        <item quantity="one">second</item>
+        <item quantity="other">seconds</item>
+    </plurals>
 
     <!-- Give Rating -->
 
@@ -1186,8 +1203,8 @@
     <string name="settings_export_save_file">Save file</string>
     <string name="settings_export_save_file_summary">Export the OPML file to your storage.</string>
     <string name="settings_export_send_email">Send email</string>
-    <string name="settings_export_send_email_summary">Export your subscriptions in the super geeky (but widely supported) OPML format.</string>
-    <string name="settings_export_subscriptions">Export subscriptions</string>
+    <string name="settings_export_send_email_summary">Export your podcasts in the super geeky (but widely supported) OPML format.</string>
+    <string name="settings_export_subscriptions">Export podcasts</string>
     <string name="settings_general_defaults">Defaults</string>
     <string name="settings_general_player">Player</string>
     <string name="settings_general_sleep_timer">Sleep Timer</string>
@@ -1212,7 +1229,7 @@
     <string name="settings_help_phone_unavailable_message">Please try again when your phone is connected to your watch.</string>
     <string name="settings_import_choose_file">Choose an OPML file.</string>
     <string name="settings_import_file">Select file</string>
-    <string name="settings_import_file_summary">If you have podcast subscriptions in another app or service, Pocket Casts can import them from an OPML file.</string>
+    <string name="settings_import_file_summary">If you have podcasts in another app or service, Pocket Casts can import them from an OPML file.</string>
     <string name="settings_import_url">By URL</string>
     <string name="settings_import_url_summary">Import your podcasts from an OPML file using a URL.</string>
     <string name="settings_import_opml_progress">%1$d of %2$d podcasts</string>
@@ -1275,8 +1292,8 @@
     <string name="settings_podcast_artwork">Podcast Artwork</string>
     <string name="settings_podcast_custom">Custom for this podcast</string>
     <string name="settings_podcast_episode_grouping">Podcast episode grouping</string>
-    <string name="settings_podcast_episode_grouping_summary">New podcasts you subscribe to will have their episodes grouped by %s.</string>
-    <string name="settings_podcast_episode_grouping_summary_none">New podcasts you subscribe to won\'t have their episodes grouped.</string>
+    <string name="settings_podcast_episode_grouping_summary">New podcasts you follow will have their episodes grouped by %s.</string>
+    <string name="settings_podcast_episode_grouping_summary_none">New podcasts you follow won\'t have their episodes grouped.</string>
     <string name="settings_podcast_episode_grouping_title_downloaded" translatable="false">@string/downloaded</string>
     <string name="settings_podcast_episode_grouping_title_none">None</string>
     <string name="settings_podcast_episode_grouping_title_season">Season</string>
@@ -1297,8 +1314,8 @@
     <string name="settings_show_archived" translatable="false">@string/show_archived</string>
     <string name="settings_show_archived_action_hide">Hide</string>
     <string name="settings_show_archived_action_show">Show</string>
-    <string name="settings_show_archived_summary_hide">New podcasts you subscribe to won\'t show archived episodes.</string>
-    <string name="settings_show_archived_summary_show">New podcasts you subscribe to will show archived episodes.</string>
+    <string name="settings_show_archived_summary_hide">New podcasts you follow won\'t show archived episodes.</string>
+    <string name="settings_show_archived_summary_show">New podcasts you follow will show archived episodes.</string>
     <string name="settings_show_artwork">Show artwork on lock screen</string>
     <string name="settings_show_artwork_details">This will also show artwork on connected Bluetooth devices, watches, etc.</string>
     <string name="settings_skip_back_time">Skip back time</string>
@@ -1338,7 +1355,7 @@
     <string name="settings_storage_store_on">Store podcasts on</string>
     <string name="settings_storage_fix_downloads">Fix downloads</string>
     <string name="settings_storage_fix_downloads_description">Attempt to restore any downloaded files if they are missing in the Pocket Casts app.</string>
-    <string name="settings_subscribe_to_played">Subscribe to played podcasts</string>
+    <string name="settings_subscribe_to_played">Follow played podcasts</string>
     <string name="settings_show_played">Show played episodes</string>
     <string name="settings_show_played_summary">Episodes that you have finished playing will still be displayed</string>
     <string name="settings_theme">Theme</string>
@@ -1472,7 +1489,7 @@
     <string name="settings_opml_export_failed">Unable to save the OPML file.</string>
     <string name="settings_subscribe_to_played_summary">Podcasts you listen to will be automatically added to the Podcasts tab</string>
     <string name="settings_notification_default_sound">Default sound</string>
-    <string name="settings_import_title">Import subscriptions</string>
+    <string name="settings_import_title">Import podcasts</string>
     <string name="settings_export_database">Export database</string>
     <string name="settings_export_database_failed">Database export failed</string>
     <string name="settings_status_page">Status Page</string>
@@ -1488,7 +1505,7 @@
     <string name="settings_status_service_refresh">Refresh Service</string>
     <string name="settings_status_service_refresh_summary">The service used to find new episodes.</string>
     <string name="settings_status_service_account">Account Service</string>
-    <string name="settings_status_service_account_summary">The service used to store episode progress, subscriptions, filters, etc.</string>
+    <string name="settings_status_service_account_summary">The service used to store episode progress, podcasts you follow, filters, etc.</string>
     <string name="settings_status_service_discover"><![CDATA[Discover & Search]]></string>
     <string name="settings_status_service_discover_summary">The discover section of the app, including podcast search.</string>
     <string name="settings_status_service_ad_blocker_help_singular">The most common cause is that you have an ad-blocker configured on your phone or network. You’ll need to unblock the domain %s</string>
@@ -1728,10 +1745,10 @@
     <string name="end_of_year_story_listened_to_numbers_subtitle">But there was one that you kept coming to…</string>
     <!-- Text that appear when someone share the listened numbers story to Twitter. %1$d is a placeholder for the number of podcasts listened and %2$d for the number of episodes. %3$d is the year. -->
     <string name="end_of_year_story_listened_to_numbers_share_text">I listened to %1$d different podcasts and %2$d episodes in %3$d</string>
-    <!-- Title for the story that display the most listened podcast by the user this year. %1$s is a placeholder for the podcast title. -->
-    <string name="end_of_year_story_top_podcast_title">Your top podcast in 2024 was %1$s</string>
-    <!-- Subtitle for the story that display the most listened podcast by the user this year. %1$d is a placeholder for the number of episodes and %2$s is a placeholder for the listened time. -->
-    <string name="end_of_year_story_top_podcast_subtitle">You listened to %1$d episodes for a total of %2$s</string>
+    <!-- Title for the story that display the most listened podcast by the user this year. %1$d is the year -->
+    <string name="end_of_year_story_top_podcast_title">This was your top podcast in %1$d</string>
+    <!-- Subtitle for the story that display the most listened podcast by the user this year. %1$d is the number of episodes, %2$s the listened time and %3$s is the podcast title. -->
+    <string name="end_of_year_story_top_podcast_subtitle">You listened to %1$d episodes for a total of %2$s of \"%3$s\"</string>
     <!-- Text that appear when someone share the top podcast of the year story to Twitter. %1$d is the year and %2$s is the URL to the podcast. -->
     <string name="end_of_year_story_top_podcast_share_text">My favorite podcast of %1$d! %2$s</string>
     <!-- Title for the story showing the top podcasts for the user in the current year. -->
@@ -2000,8 +2017,6 @@
     <string name="clear_before_adding">Clear Before Adding</string>
     <string name="dont_clear">Don\'t Clear</string>
     <string name="clear_up_next">Clear Up Next</string>
-    <string name="up_next_shuffle_button_content_description">Up next shuffle</string>
-    <string name="up_next_shuffle_disable_button_content_description">Up next shuffle disable</string>
     <string name="clear_all">Clear All</string>
     <string name="clear_search">Clear Search</string>
     <string name="add_mode">Add Mode</string>
@@ -2154,6 +2169,12 @@
     <string name="paywall_layout_reviews_review_six_message">PC has been my go-to for years. I\'ve tried other podcast apps and always come back to PC for their simplicity, Ul and support. Definitely worth checking it out, especially if you have grown tired of your current podcast app.</string>
     <string name="paywall_layout_reviews_review_six_date">Mar 8</string>
 
+    <string name="folders_plus_prompt">Organize your podcasts with Pocket&#160;Casts&#160;Plus, and more</string>
+    <string name="themes_plus_prompt">Get exclusive themes with Pocket&#160;Casts&#160;Plus, and more</string>
+    <string name="icons_plus_prompt">Get exclusive app icons with Pocket&#160;Casts&#160;Plus, and more</string>
+    <string name="files_plus_prompt">Upload your files with Pocket&#160;Casts&#160;Plus, and more</string>
+    <string name="up_next_shuffle_plus_prompt">Shuffle your episodes with Pocket&#160;Casts&#160;Plus, and more</string>
+
     <!-- Engage SDK -->
     <string name="engage_sdk_recently_played" translatable="false">@string/nova_launcher_recently_played</string>
     <string name="engage_sdk_new_releases" translatable="false">@string/nova_launcher_new_releases</string>
@@ -2192,8 +2213,13 @@
 
     <!-- Manage Downloaded Episodes -->
     <string name="pencil_clean_up_icon_content_description">Pencil Clean Up</string>
-    <string name="you_are_running_low_on_storage">You\'re running low on storage</string>
+    <string name="need_to_free_up_space">Need to free up space?</string>
     <string name="save_space_by_managing_downloaded_episodes">Save %1$s – by managing downloaded episodes.</string>
-    <string name="manage_downloads">Manage Downloads</string>
+    <string name="manage_downloads">Manage downloads</string>
+    <string name="maybe_later">Maybe Later</string>
+
+    <!-- Up Next Shuffle -->
+    <string name="up_next_shuffle_button_content_description">Up next shuffle</string>
+    <string name="up_next_shuffle_disable_button_content_description">Up next shuffle disable</string>
 
 </resources>

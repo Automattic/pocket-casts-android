@@ -164,9 +164,4 @@ class PodcastEffectsFragment : PreferenceFragmentCompat() {
         preferenceTrimSilence?.icon = context.getTintedDrawable(R.drawable.ic_silence, tintColor)
         preferenceBoostVolume?.icon = context.getTintedDrawable(R.drawable.ic_volumeboost, tintColor)
     }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        viewModel.trackSpeedChangeIfNeeded()
-    }
 }

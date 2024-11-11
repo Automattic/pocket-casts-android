@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -44,7 +45,8 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.endofyear.StoryCaptureController
 import au.com.shiftyjelly.pocketcasts.localization.R
-import au.com.shiftyjelly.pocketcasts.localization.helper.StatsHelper
+import au.com.shiftyjelly.pocketcasts.localization.helper.FriendlyDurationUnit
+import au.com.shiftyjelly.pocketcasts.localization.helper.toFriendlyString
 import au.com.shiftyjelly.pocketcasts.models.to.Story
 import au.com.shiftyjelly.pocketcasts.models.to.TopPodcast
 import dev.shreyaspatil.capturable.capturable
@@ -143,7 +145,7 @@ private fun ColumnScope.TopShowCover(
                         drawContent()
 
                         rotate(
-                            degrees = if (controller.isSharing) 0f else rotation.value,
+                            degrees = rotation.value,
                             pivot = Offset(widthPx / 2, heightPx / 2),
                         ) {
                             translate(
@@ -193,7 +195,7 @@ private fun TopShowInfo(
         TextH10(
             text = stringResource(
                 R.string.end_of_year_story_top_podcast_title,
-                story.show.title,
+                2024,
             ),
             fontScale = measurements.smallDeviceFactor,
             disableAutoScale = true,
@@ -203,14 +205,19 @@ private fun TopShowInfo(
         Spacer(
             modifier = Modifier.height(16.dp),
         )
+        val context = LocalContext.current
         TextP40(
             text = stringResource(
                 R.string.end_of_year_story_top_podcast_subtitle,
                 story.show.playedEpisodeCount,
-                StatsHelper.secondsToFriendlyString(
-                    story.show.playbackTime.inWholeSeconds,
-                    LocalContext.current.resources,
-                ),
+                remember(story.show.playbackTime, context) {
+                    story.show.playbackTime.toFriendlyString(
+                        resources = context.resources,
+                        maxPartCount = 3,
+                        minUnit = FriendlyDurationUnit.Minute,
+                    )
+                },
+                story.show.title,
             ),
             fontSize = 15.sp,
             disableAutoScale = true,

@@ -219,11 +219,14 @@ private fun Content(
             val userCreatedNewAccount = when (upgradeSource) {
                 OnboardingUpgradeSource.ACCOUNT_DETAILS,
                 OnboardingUpgradeSource.APPEARANCE,
+                OnboardingUpgradeSource.ICONS,
+                OnboardingUpgradeSource.THEMES,
                 OnboardingUpgradeSource.BOOKMARKS,
                 OnboardingUpgradeSource.BOOKMARKS_SHELF_ACTION,
                 OnboardingUpgradeSource.END_OF_YEAR,
                 OnboardingUpgradeSource.FILES,
                 OnboardingUpgradeSource.FOLDERS,
+                OnboardingUpgradeSource.FOLDERS_PODCAST_SCREEN,
                 OnboardingUpgradeSource.HEADPHONE_CONTROLS_SETTINGS,
                 OnboardingUpgradeSource.LOGIN,
                 OnboardingUpgradeSource.LOGIN_PLUS_PROMOTION,
@@ -234,6 +237,7 @@ private fun Content(
                 OnboardingUpgradeSource.SETTINGS,
                 OnboardingUpgradeSource.SLUMBER_STUDIOS,
                 OnboardingUpgradeSource.WHATS_NEW_SKIP_CHAPTERS,
+                OnboardingUpgradeSource.UP_NEXT_SHUFFLE,
                 OnboardingUpgradeSource.UNKNOWN,
                 -> false
 

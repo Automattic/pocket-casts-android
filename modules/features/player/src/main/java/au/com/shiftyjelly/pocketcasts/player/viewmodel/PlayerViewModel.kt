@@ -713,6 +713,7 @@ class PlayerViewModel @Inject constructor(
             podcast.overrideGlobalEffects = override
             saveEffects(effects, podcast)
         }
+        trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_SETTINGS_CHANGED)
     }
 
     fun clearPodcastEffects(podcast: Podcast) {
@@ -762,19 +763,41 @@ class PlayerViewModel @Inject constructor(
         }
     }
 
+    fun trackPlaybackEffectsEvent(
+        event: AnalyticsEvent,
+        properties: Map<String, Any> = emptyMap(),
+    ) {
+        playbackManager.trackPlaybackEffectsEvent(
+            event = event,
+            props = buildMap {
+                putAll(properties)
+                if (FeatureFlag.isEnabled(Feature.CUSTOM_PLAYBACK_SETTINGS)) {
+                    val settings = if (effectsLive.value?.podcast?.overrideGlobalEffects == true) {
+                        PlaybackEffectsSettingsTab.ThisPodcast.analyticsValue
+                    } else {
+                        PlaybackEffectsSettingsTab.AllPodcasts.analyticsValue
+                    }
+                    put(AnalyticsProp.SETTINGS, settings)
+                }
+            },
+            sourceView = SourceView.PLAYER_PLAYBACK_EFFECTS,
+        )
+    }
+
     sealed class TransitionState {
         data object OpenTranscript : TransitionState()
         data class CloseTranscript(val withTransition: Boolean) : TransitionState()
     }
 
     private object AnalyticsProp {
-        private const val episodeUuid = "episode_uuid"
-        private const val podcastUuid = "podcast_uuid"
-        fun transcriptDismissed(episodeId: String, podcastId: String) = mapOf(episodeId to episodeUuid, podcastId to podcastUuid)
+        private const val EPISODE_UUID = "episode_uuid"
+        private const val PODCAST_UUID = "podcast_uuid"
+        const val SETTINGS = "settings"
+        fun transcriptDismissed(episodeId: String, podcastId: String) = mapOf(episodeId to EPISODE_UUID, podcastId to PODCAST_UUID)
     }
 
-    enum class PlaybackEffectsSettingsTab(@StringRes val labelResId: Int) {
-        AllPodcasts(LR.string.podcasts_all),
-        ThisPodcast(LR.string.podcast_this),
+    enum class PlaybackEffectsSettingsTab(@StringRes val labelResId: Int, val analyticsValue: String) {
+        AllPodcasts(LR.string.podcasts_all, "global"),
+        ThisPodcast(LR.string.podcast_this, "local"),
     }
 }

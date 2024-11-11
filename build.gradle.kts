@@ -69,7 +69,7 @@ dependencyAnalysis {
     issues {
         all {
             onUsedTransitiveDependencies {
-                severity("ignore")
+                severity("warn")
             }
 
             onRuntimeOnly {

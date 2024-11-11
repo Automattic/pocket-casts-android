@@ -22,14 +22,6 @@ enum class PodcastsSortType(
     val folderComparator: Comparator<FolderItem>,
     val analyticsValue: String,
 ) {
-    DATE_ADDED_OLDEST_TO_NEWEST(
-        clientId = 0,
-        serverId = 0,
-        labelId = R.string.podcasts_sort_by_date_added,
-        podcastComparator = compareBy { it.addedDate },
-        folderComparator = compareBy { it.addedDate },
-        analyticsValue = "date_added",
-    ),
     NAME_A_TO_Z(
         clientId = 2,
         serverId = 1,
@@ -47,6 +39,14 @@ enum class PodcastsSortType(
         folderComparator = Comparator { _, _ -> 0 },
         analyticsValue = "episode_release_date",
     ),
+    DATE_ADDED_NEWEST_TO_OLDEST(
+        clientId = 0,
+        serverId = 0,
+        labelId = R.string.podcasts_sort_by_date_added,
+        podcastComparator = compareByDescending { it.addedDate },
+        folderComparator = compareByDescending { it.addedDate },
+        analyticsValue = "date_added",
+    ),
     DRAG_DROP(
         clientId = 6,
         serverId = 3,
@@ -58,7 +58,7 @@ enum class PodcastsSortType(
     ;
 
     companion object {
-        val default = DATE_ADDED_OLDEST_TO_NEWEST
+        val default = DATE_ADDED_NEWEST_TO_OLDEST
 
         fun fromServerId(serverId: Int?): PodcastsSortType {
             if (serverId == null) {
@@ -88,7 +88,7 @@ enum class PodcastsSortType(
     }
 
     fun isAsc(): Boolean {
-        return clientId == DATE_ADDED_OLDEST_TO_NEWEST.clientId || clientId == NAME_A_TO_Z.clientId
+        return clientId == NAME_A_TO_Z.clientId
     }
 }
 

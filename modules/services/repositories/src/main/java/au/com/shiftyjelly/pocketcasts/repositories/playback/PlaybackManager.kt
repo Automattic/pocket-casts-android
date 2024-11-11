@@ -541,6 +541,7 @@ open class PlaybackManager @Inject constructor(
         when (sourceView) {
             SourceView.AUTO_PAUSE,
             SourceView.AUTO_PLAY,
+            SourceView.AUTO_DOWNLOAD,
             SourceView.CLIP_SHARING,
             SourceView.CHROMECAST,
             SourceView.DISCOVER,
@@ -568,6 +569,7 @@ open class PlaybackManager @Inject constructor(
             SourceView.UP_NEXT,
             SourceView.STATS,
             SourceView.WHATS_NEW,
+            SourceView.STORAGE_AND_DATA_USAGE,
             SourceView.NOTIFICATION_BOOKMARK,
             SourceView.METERED_NETWORK_CHANGE,
             SourceView.WIDGET_PLAYER_SMALL,
@@ -1587,6 +1589,15 @@ open class PlaybackManager @Inject constructor(
             }
     }
 
+    private suspend fun onCachingReset(episodeUuid: String) {
+        val episode = getCurrentEpisode()
+        episode?.takeIf { it.uuid == episodeUuid }
+            ?.let {
+                updateBufferPosition(EpisodeBufferStatus(episodeUuid, 0))
+                setupBufferUpdateTimer(episode)
+            }
+    }
+
     @Volatile
     private var observeChaptersJob: Job? = null
 
@@ -2206,6 +2217,7 @@ open class PlaybackManager @Inject constructor(
                 is PlayerEvent.RemoteMetadataNotMatched -> onRemoteMetaDataNotMatched(event.remoteEpisodeUuid)
                 is PlayerEvent.EpisodeChanged -> onEpisodeChanged(event.episodeUuid)
                 is PlayerEvent.CachingComplete -> onCachingComplete(event.episodeUuid)
+                is PlayerEvent.CachingReset -> onCachingReset(event.episodeUuid)
             }
         }
     }
@@ -2547,10 +2559,15 @@ open class PlaybackManager @Inject constructor(
         props: Map<String, Any> = emptyMap(),
         sourceView: SourceView,
     ) {
-        val properties = HashMap<String, Any>()
-        properties[SOURCE_KEY] = sourceView.analyticsValue
-        properties.putAll(props)
-        analyticsTracker.track(event, properties)
+        val contentType = if (getCurrentEpisode()?.isVideo == true) ContentType.VIDEO else ContentType.AUDIO
+        analyticsTracker.track(
+            event = event,
+            properties = buildMap {
+                put(SOURCE_KEY, sourceView.analyticsValue)
+                put(CONTENT_TYPE_KEY, contentType.analyticsValue)
+                putAll(props)
+            },
+        )
     }
 
     fun setNotificationPermissionChecker(notificationPermissionChecker: NotificationPermissionChecker) {
@@ -2587,7 +2604,7 @@ open class PlaybackManager @Inject constructor(
         this["chapterUuid"] = value
     }
 
-    private enum class ContentType(val analyticsValue: String) {
+    enum class ContentType(val analyticsValue: String) {
         AUDIO("audio"),
         VIDEO("video"),
     }

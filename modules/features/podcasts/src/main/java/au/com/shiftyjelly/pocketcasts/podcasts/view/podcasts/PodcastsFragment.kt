@@ -144,11 +144,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
                 navigationIcon = navigationIcon,
             )
 
-            toolbar.menu.findItem(R.id.folders_locked)?.run {
-                isVisible = !isSignedInAsPlusOrPatron
-                setIcon(theme.folderLockedImageName)
-            }
-
+            toolbar.menu.findItem(R.id.folders_locked)?.isVisible = !isSignedInAsPlusOrPatron
             toolbar.menu.findItem(R.id.create_folder)?.isVisible = rootFolder && isSignedInAsPlusOrPatron
             toolbar.menu.findItem(R.id.search_podcasts)?.isVisible = rootFolder
 

@@ -172,7 +172,7 @@
                     app:strokeColor="@color/trim_stroke_color"
                     android:textAllCaps="false"
                     android:text="@string/player_effects_trim_mild"
-                    style="?attr/materialButtonOutlinedStyle"
+                    style="@style/TrimMode.Button.Left"
                     />
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/trimMedium"
@@ -194,7 +194,7 @@
                     app:strokeColor="@color/trim_stroke_color"
                     android:textAllCaps="false"
                     android:text="@string/player_effects_trim_mad_max"
-                    style="?attr/materialButtonOutlinedStyle"
+                    style="@style/TrimMode.Button.Right"
                     />
             </com.google.android.material.button.MaterialButtonToggleGroup>
             <TextView
@@ -203,7 +203,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:textColor="?attr/player_contrast_01"
+                android:textColor="?attr/player_contrast_02"
                 android:text="@string/player_trim_silence_detail"
                 app:layout_constraintLeft_toLeftOf="@id/trimSilenceLabel"
                 app:layout_constraintRight_toLeftOf="@id/switchTrim"
@@ -257,7 +257,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="@string/player_effects_voices_sound_louder"
-                android:textColor="?attr/player_contrast_01"
+                android:textColor="?attr/player_contrast_02"
                 app:layout_constraintLeft_toLeftOf="@id/trimSilenceLabel"
                 app:layout_constraintTop_toBottomOf="@id/volumeLabel" />
 

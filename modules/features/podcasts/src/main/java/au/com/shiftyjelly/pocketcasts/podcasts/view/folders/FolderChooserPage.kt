@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.folders
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -35,7 +36,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.rememberViewInteropNest
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralPodcasts
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
-import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.LargePageTitle
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getColor
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -68,7 +68,10 @@ fun FolderChooserPage(
                 onNewFolderClick = onNewFolderClick,
                 modifier = Modifier.weight(1f),
             )
-            Card(elevation = 8.dp) {
+            Card(
+                elevation = if (isSystemInDarkTheme()) 0.dp else 8.dp,
+                backgroundColor = Color.Transparent,
+            ) {
                 RowButton(
                     text = stringResource(LR.string.done),
                     onClick = { onCloseClick() },
@@ -99,8 +102,6 @@ private fun FolderList(
                 FolderMoveRow {
                     onNewFolderClick()
                 }
-                HorizontalDivider()
-                Spacer(modifier = Modifier.height(24.dp))
                 HorizontalDivider()
             }
         }
@@ -172,7 +173,7 @@ fun FolderMoveRow(modifier: Modifier = Modifier, onClick: () -> Unit) {
             modifier = Modifier.width(56.dp),
         ) {
             Icon(
-                painter = painterResource(R.drawable.folder_create),
+                painter = painterResource(IR.drawable.ic_folder_plus),
                 contentDescription = null,
                 tint = MaterialTheme.theme.colors.primaryInteractive01,
             )

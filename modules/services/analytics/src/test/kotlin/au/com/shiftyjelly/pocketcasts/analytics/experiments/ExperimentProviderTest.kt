@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.analytics.experiments
 
 import au.com.shiftyjelly.pocketcasts.analytics.AccountStatusInfo
+import au.com.shiftyjelly.pocketcasts.analytics.TracksAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.Variation.Control
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.Variation.Treatment
 import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
@@ -28,9 +29,10 @@ import org.mockito.kotlin.verify
 @OptIn(ExperimentalCoroutinesApi::class)
 class ExperimentProviderTest {
 
-    private lateinit var accountStatusInfo: AccountStatusInfo
     private lateinit var repository: VariationsRepository
     private lateinit var experimentProvider: ExperimentProvider
+    private lateinit var tracksAnalyticsTracker: TracksAnalyticsTracker
+    private lateinit var accountStatusInfo: AccountStatusInfo
 
     @get:Rule
     val featureFlagRule = InMemoryFeatureFlagRule()
@@ -40,13 +42,14 @@ class ExperimentProviderTest {
 
     @Before
     fun setUp() {
-        accountStatusInfo = mock(AccountStatusInfo::class.java)
         repository = mock(VariationsRepository::class.java)
-        experimentProvider = ExperimentProvider(accountStatusInfo, repository, coroutineRule.testDispatcher)
+        tracksAnalyticsTracker = mock(TracksAnalyticsTracker::class.java)
+        accountStatusInfo = mock(AccountStatusInfo::class.java)
+        experimentProvider = ExperimentProvider(tracksAnalyticsTracker, repository, accountStatusInfo, coroutineRule.testDispatcher)
     }
 
     @Test
-    fun `initialize should call repository initialize with correct uuid`() {
+    fun `should initialize with uuid`() {
         FeatureFlag.setEnabled(Feature.EXPLAT_EXPERIMENT, true)
 
         val uuid = "test-uuid"
@@ -59,15 +62,45 @@ class ExperimentProviderTest {
     }
 
     @Test
-    fun `initialize should generate uuid if accountStatusInfo getUuid is null`() {
+    fun `should initialize with anonID`() {
         FeatureFlag.setEnabled(Feature.EXPLAT_EXPERIMENT, true)
 
+        val uuid = "test-anonID"
+
         `when`(accountStatusInfo.getUuid()).thenReturn(null)
+        `when`(tracksAnalyticsTracker.anonID).thenReturn(uuid)
 
         experimentProvider.initialize()
 
-        verify(repository).initialize(anyString(), eq(null))
+        verify(repository).initialize(uuid)
         verify(accountStatusInfo).getUuid()
+        verify(tracksAnalyticsTracker).anonID
+    }
+
+    @Test
+    fun `should initialize with non null uuid`() {
+        FeatureFlag.setEnabled(Feature.EXPLAT_EXPERIMENT, true)
+
+        val uuid = "non-null-uuid"
+
+        `when`(accountStatusInfo.getUuid()).thenReturn(null)
+        `when`(tracksAnalyticsTracker.anonID).thenReturn(null)
+        `when`(tracksAnalyticsTracker.generateNewAnonID()).thenReturn(uuid)
+
+        experimentProvider.initialize()
+
+        verify(repository).initialize(uuid)
+    }
+
+    @Test
+    fun `should initialize with provided uuid`() {
+        FeatureFlag.setEnabled(Feature.EXPLAT_EXPERIMENT, true)
+
+        val uuid = "uuid"
+
+        experimentProvider.initialize(uuid)
+
+        verify(repository).initialize(uuid)
     }
 
     @Test

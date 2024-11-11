@@ -334,6 +334,8 @@ enum class AnalyticsEvent(val key: String) {
     PLAYER_SLEEP_TIMER_SETTINGS_TAPPED("player_sleep_timer_settings_tapped"),
 
     /* Player - Playback effects */
+    PLAYBACK_EFFECT_SETTINGS_VIEW_APPEARED("playback_effect_settings_view_appeared"),
+    PLAYBACK_EFFECT_SETTINGS_CHANGED("playback_effect_settings_changed"),
     PLAYBACK_EFFECT_SPEED_CHANGED("playback_effect_speed_changed"),
     PLAYBACK_EFFECT_TRIM_SILENCE_TOGGLED("playback_effect_trim_silence_toggled"),
     PLAYBACK_EFFECT_TRIM_SILENCE_AMOUNT_CHANGED("playback_effect_trim_silence_amount_changed"),
@@ -660,4 +662,10 @@ enum class AnalyticsEvent(val key: String) {
     REFERRAL_PASS_BANNER_HIDE_TAPPED("referral_pass_banner_hide_tapped"),
     REFERRAL_PURCHASE_SHOWN("referral_purchase_shown"),
     REFERRAL_PURCHASE_SUCCESS("referral_purchase_success"),
+
+    /* Free Up Space */
+    FREE_UP_SPACE_BANNER_SHOWN("free_up_space_banner_shown"),
+    FREE_UP_SPACE_MODAL_SHOWN("free_up_space_modal_shown"),
+    FREE_UP_SPACE_MANAGE_DOWNLOADS_TAPPED("free_up_space_manage_downloads_tapped"),
+    FREE_UP_SPACE_MAYBE_LATER_TAPPED("free_up_space_maybe_later_tapped"),
 }

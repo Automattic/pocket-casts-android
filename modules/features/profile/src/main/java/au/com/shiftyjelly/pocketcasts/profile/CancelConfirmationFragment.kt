@@ -242,7 +242,7 @@ class CancelConfirmationFragment : BaseDialogFragment() {
             text = stringResource(LR.string.profile_cancel_confirm_item_plus),
         ),
         Row(
-            iconResId = IR.drawable.folder_lock_dark,
+            iconResId = IR.drawable.ic_folder_lock,
             text = stringResource(LR.string.profile_cancel_confirm_item_folders),
         ),
         Row(
@@ -273,7 +273,7 @@ class CancelConfirmationFragment : BaseDialogFragment() {
                         text = stringResource(LR.string.profile_cancel_confirm_item_plus),
                     ),
                     Row(
-                        iconResId = IR.drawable.folder_lock_dark,
+                        iconResId = IR.drawable.ic_folder_lock,
                         text = stringResource(LR.string.profile_cancel_confirm_item_folders),
                     ),
                 ),

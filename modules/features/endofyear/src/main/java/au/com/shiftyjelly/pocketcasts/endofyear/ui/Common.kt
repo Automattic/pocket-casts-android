@@ -148,20 +148,19 @@ internal fun rememberHumaneTextFactory(
     // However, our designs use capital letters only and do not account for that empty space
     // and we have to adjust texts' heights accordingly.
     return remember {
+        val measurement = textMeasurer.measure(
+            text = "A",
+            style = TextStyle(
+                fontFamily = humaneFontFamily,
+                fontSize = fontSize,
+                fontWeight = fontWeight,
+            ),
+        )
         HumaneTextFactory(
             fontSize = fontSize,
             fontWeight = fontWeight,
-            textHeight = density.run {
-                val firstBaseLinePx = textMeasurer.measure(
-                    text = "A",
-                    style = TextStyle(
-                        fontFamily = humaneFontFamily,
-                        fontSize = fontSize,
-                        fontWeight = fontWeight,
-                    ),
-                ).firstBaseline * 1.005f
-                firstBaseLinePx.toDp()
-            },
+            textHeight = density.run { (measurement.firstBaseline * 1.01f).toDp() },
+            textWidth = density.run { measurement.size.width.toDp() },
         )
     }
 }
@@ -170,7 +169,10 @@ internal class HumaneTextFactory(
     val fontSize: TextUnit,
     val fontWeight: FontWeight,
     val textHeight: Dp,
+    val textWidth: Dp,
 ) {
+    val maxSize get() = maxOf(textWidth, textHeight)
+
     @Composable
     fun HumaneText(
         text: String,
@@ -196,6 +198,7 @@ internal class HumaneTextFactory(
 @Composable
 internal fun PreviewBox(
     currentPage: Int,
+    progress: Float = 0.5f,
     content: @Composable (EndOfYearMeasurements) -> Unit,
 ) {
     BoxWithConstraints {
@@ -210,7 +213,7 @@ internal fun PreviewBox(
         content(measurements)
         TopControls(
             pagerState = rememberPagerState(initialPage = currentPage, pageCount = { 11 }),
-            progress = 0f,
+            progress = progress,
             measurements = measurements,
             onClose = {},
         )

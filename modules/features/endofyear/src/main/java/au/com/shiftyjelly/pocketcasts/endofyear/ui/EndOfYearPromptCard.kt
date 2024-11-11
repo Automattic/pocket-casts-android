@@ -36,8 +36,8 @@ fun EndOfYearPromptCard(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
             .background(color = Color.Black, RoundedCornerShape(8.dp))
-            .padding(start = 24.dp, top = 16.dp, bottom = 16.dp)
-            .clickable { onClick.invoke() },
+            .clickable { onClick.invoke() }
+            .padding(start = 24.dp, top = 16.dp, bottom = 16.dp),
     ) {
         Column(
             modifier = modifier.weight(1.1f),

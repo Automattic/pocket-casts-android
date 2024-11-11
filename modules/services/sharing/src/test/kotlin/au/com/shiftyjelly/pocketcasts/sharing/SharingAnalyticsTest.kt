@@ -487,6 +487,7 @@ class SharingAnalyticsTest {
                 "story" to "number_of_shows",
                 "source" to "unknown",
                 "action" to "system_sheet",
+                "year" to 1000,
             ),
         )
     }
@@ -514,6 +515,7 @@ class SharingAnalyticsTest {
                 "story" to "top_1_show",
                 "source" to "unknown",
                 "action" to "system_sheet",
+                "year" to 1000,
             ),
         )
     }
@@ -536,6 +538,7 @@ class SharingAnalyticsTest {
                 "story" to "top_5_shows",
                 "source" to "unknown",
                 "action" to "system_sheet",
+                "year" to 1000,
             ),
         )
     }
@@ -563,6 +566,7 @@ class SharingAnalyticsTest {
                 "story" to "ratings",
                 "source" to "unknown",
                 "action" to "system_sheet",
+                "year" to 1000,
             ),
         )
     }
@@ -584,6 +588,7 @@ class SharingAnalyticsTest {
                 "story" to "total_time",
                 "source" to "unknown",
                 "action" to "system_sheet",
+                "year" to 1000,
             ),
         )
     }
@@ -612,6 +617,7 @@ class SharingAnalyticsTest {
                 "story" to "longest_episode",
                 "source" to "unknown",
                 "action" to "system_sheet",
+                "year" to 1000,
             ),
         )
     }
@@ -635,6 +641,7 @@ class SharingAnalyticsTest {
                 "story" to "year_vs_year",
                 "source" to "unknown",
                 "action" to "system_sheet",
+                "year" to 1000,
             ),
         )
     }
@@ -658,6 +665,7 @@ class SharingAnalyticsTest {
                 "story" to "completion_rate",
                 "source" to "unknown",
                 "action" to "system_sheet",
+                "year" to 1000,
             ),
         )
     }

@@ -24,7 +24,7 @@ enum class Feature(
         title = "End of Year 2024",
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = false,
     ),
     REPORT_VIOLATION(
@@ -151,8 +151,8 @@ enum class Feature(
         key = "up_next_shuffle",
         title = "Up Next Shuffle",
         defaultValue = BuildConfig.DEBUG,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        tier = FeatureTier.Plus(patronExclusiveAccessRelease = null),
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
     CUSTOM_PLAYBACK_SETTINGS(
@@ -160,7 +160,7 @@ enum class Feature(
         title = "Custom playback settings",
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
     MANAGE_DOWNLOADED_EPISODES(
@@ -168,8 +168,16 @@ enum class Feature(
         title = "Manage Downloaded Episodes",
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
+    ),
+    RESET_EPISODE_CACHE_ON_416_ERROR(
+        key = "reset_episode_cache_on_416_error",
+        title = "Reset episode cache on 416 error",
+        defaultValue = true,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = false,
     ),
     ;
 

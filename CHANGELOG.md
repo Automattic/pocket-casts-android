@@ -1,6 +1,26 @@
 7.77
 -----
-
+*   New Features
+   *   Add custom playback effects settings for podcast in the player
+        ([#3042](https://github.com/Automattic/pocket-casts-android/issues/3042))
+   *   Add Playback 2024 summary
+        ([#3123](https://github.com/Automattic/pocket-casts-android/pull/3123))
+   *   Add the ability to get notified when device is running on low storage and has downloaded episodes
+       ([#3198](https://github.com/Automattic/pocket-casts-android/pull/3198))
+   *   Add Up Next Shuffle
+       ([#3199](https://github.com/Automattic/pocket-casts-android/pull/3199))
+*   Updates
+    *   Renamed the podcast action 'Subscribe' to 'Follow'
+        ([#3120](https://github.com/Automattic/pocket-casts-android/pull/3120))
+    *   Improve the performance of the refresh on Wear OS and Android Automotive
+        ([#3171](https://github.com/Automattic/pocket-casts-android/pull/3171))
+    *   Improve connection when some podcasts failed to play or download
+        ([#3180](https://github.com/Automattic/pocket-casts-android/pull/3180))
+    *   Add new podcast subscriptions to the top instead of bottom for Data Added podcast sort order 
+        ([#3192](https://github.com/Automattic/pocket-casts-android/pull/3192)) 
+*   Bug Fixes
+    *   Use red color for the notification icons
+        ([#3154](https://github.com/Automattic/pocket-casts-android/pull/3154))
 
 7.76
 -----

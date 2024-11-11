@@ -158,6 +158,12 @@ data class ExternalPodcastView(
 ) {
     val coverSize get() = 960
     val coverUrl get() = podcastCover(id)
+
+    val landscapeCoverWidth get() = 1910
+    val landscapeCoverHeight get() = 1000
+    val landscapeCoverUrl get() = landscapePodcastCover(id)
 }
 
 private fun podcastCover(podcastId: String) = "${BuildConfig.SERVER_STATIC_URL}/discover/images/webp/960/$podcastId.webp"
+
+private fun landscapePodcastCover(podcastId: String) = "${BuildConfig.SERVER_STATIC_URL}/engage/$podcastId.jpg"

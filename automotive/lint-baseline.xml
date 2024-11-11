@@ -30,7 +30,7 @@
         errorLine2="                 ~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/player/view/EffectsFragment.kt"
-            line="57"
+            line="77"
             column="18"/>
     </issue>
 
@@ -63,7 +63,7 @@
         errorLine2="                 ~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/podcasts/view/ProfileEpisodeListFragment.kt"
-            line="196"
+            line="202"
             column="18"/>
     </issue>
 
@@ -95,8 +95,19 @@
         errorLine1="    override fun onAttach(context: Context) {"
         errorLine2="                 ~~~~~~~~">
         <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/settings/StorageSettingsFragment.kt"
+            line="48"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="MissingSuperCall"
+        message="Overriding method should call `super.onAttach`"
+        errorLine1="    override fun onAttach(context: Context) {"
+        errorLine2="                 ~~~~~~~~">
+        <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/player/view/UpNextFragment.kt"
-            line="206"
+            line="209"
             column="18"/>
     </issue>
 
@@ -195,7 +206,7 @@
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/fragment_effects.xml"
-            line="60"
+            line="70"
             column="17"/>
     </issue>
 
@@ -206,7 +217,7 @@
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/fragment_effects.xml"
-            line="97"
+            line="107"
             column="17"/>
     </issue>
 
@@ -6032,7 +6043,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~">
         <location
             file="../modules/services/ui/src/main/res/values/themes.xml"
-            line="1682"
+            line="1677"
             column="12"/>
     </issue>
 
@@ -6706,7 +6717,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="../modules/features/player/src/main/res/layout/adapter_up_next_footer.xml"
-            line="62"
+            line="54"
             column="13"/>
     </issue>
 
@@ -6717,7 +6728,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="../modules/features/player/src/main/res/layout/adapter_up_next_footer.xml"
-            line="71"
+            line="63"
             column="13"/>
     </issue>
 
@@ -7256,19 +7267,8 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="../modules/features/podcasts/src/main/res/layout/fragment_profile_episode_list.xml"
-            line="13"
+            line="14"
             column="13"/>
-    </issue>
-
-    <issue
-        id="UnusedIds"
-        message="The resource `R.id.recycler_view` appears to be unused"
-        errorLine1="    android:id=&quot;@+id/recycler_view&quot;"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="../modules/services/views/src/main/res/layout/fragment_recyclerview.xml"
-            line="3"
-            column="5"/>
     </issue>
 
     <issue
@@ -7588,17 +7588,6 @@
             file="src/main/res/xml/preferences_auto.xml"
             line="21"
             column="9"/>
-    </issue>
-
-    <issue
-        id="UnusedIds"
-        message="The resource `R.id.carousel` appears to be unused"
-        errorLine1="    android:id=&quot;@+id/carousel&quot;"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="../modules/features/discover/src/main/res/layout/row_carousel_list.xml"
-            line="3"
-            column="5"/>
     </issue>
 
     <issue

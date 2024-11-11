@@ -48,7 +48,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.Devices
-import au.com.shiftyjelly.pocketcasts.compose.components.ScrollDirection
+import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDirection
 import au.com.shiftyjelly.pocketcasts.compose.components.ScrollingRow
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
@@ -60,7 +60,6 @@ import au.com.shiftyjelly.pocketcasts.models.to.RatingStats
 import au.com.shiftyjelly.pocketcasts.models.to.Story
 import dev.shreyaspatil.capturable.capturable
 import java.io.File
-import kotlin.math.roundToLong
 import kotlinx.coroutines.delay
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -349,14 +348,14 @@ private fun ColumnScope.OopsiesSection(
             .requiredWidth(measurements.width * 1.5f),
     ) {
         OopsiesText(
-            scrollDirection = ScrollDirection.Left,
+            scrollDirection = HorizontalDirection.Left,
             textFactory = textFactory,
         )
         Spacer(
             modifier = Modifier.height(12.dp * measurements.smallDeviceFactor),
         )
         OopsiesText(
-            scrollDirection = ScrollDirection.Right,
+            scrollDirection = HorizontalDirection.Right,
             textFactory = textFactory,
         )
     }
@@ -364,11 +363,10 @@ private fun ColumnScope.OopsiesSection(
 
 @Composable
 private fun OopsiesText(
-    scrollDirection: ScrollDirection,
+    scrollDirection: HorizontalDirection,
     textFactory: HumaneTextFactory,
 ) {
     ScrollingRow(
-        scrollDelay = { (20 / it.density).roundToLong().coerceAtLeast(4L) },
         items = listOf("OOOOPSIES"),
         scrollDirection = scrollDirection,
     ) { text ->

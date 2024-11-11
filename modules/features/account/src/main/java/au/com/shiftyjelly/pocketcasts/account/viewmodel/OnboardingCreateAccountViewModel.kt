@@ -86,6 +86,7 @@ class OnboardingCreateAccountViewModel @Inject constructor(
                     podcastManager.refreshPodcastsAfterSignIn()
                     experimentProvider.refreshExperiments()
                     analyticsTracker.refreshMetadata()
+                    experimentProvider.refreshExperiments()
                     onAccountCreated()
                 }
 
