@@ -4,21 +4,20 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.runtime.getValue
 import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.lifecycle.asFlow
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentShelfBottomSheetBinding
 import au.com.shiftyjelly.pocketcasts.player.view.ShelfFragment.Companion.AnalyticsProp
+import au.com.shiftyjelly.pocketcasts.player.view.shelf.MenuShelfItems
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
-import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfBottomSheetViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.reimagine.ShareDialogFragment
@@ -31,16 +30,13 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.extensions.applyColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.google.android.gms.cast.framework.CastButtonFactory
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.map
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
@@ -58,18 +54,8 @@ class ShelfBottomSheet : BaseDialogFragment() {
     override val statusBarColor: StatusBarColor? = null
 
     private val playerViewModel: PlayerViewModel by activityViewModels()
-    private val viewModel: ShelfBottomSheetViewModel by viewModels(
-        extrasProducer = {
-            defaultViewModelCreationExtras.withCreationCallback<ShelfBottomSheetViewModel.Factory> { factory ->
-                factory.create(episodeId)
-            }
-        },
-    )
-    private val adapter by lazy { ShelfAdapter(theme = theme, editable = false, listener = this::onClick, dragListener = null) }
-    private var binding: FragmentShelfBottomSheetBinding? = null
 
-    private val episodeId: String?
-        get() = arguments?.getString(ARG_EPISODE_ID)
+    private var binding: FragmentShelfBottomSheetBinding? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentShelfBottomSheetBinding.inflate(inflater, container, false)
@@ -85,24 +71,7 @@ class ShelfBottomSheet : BaseDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val binding = binding ?: return
-        binding.recyclerView.adapter = adapter
-        binding.recyclerView.layoutManager = LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
-
-        playerViewModel.trimmedShelfLive.observe(viewLifecycleOwner) {
-            adapter.episode = it.second
-            val shelfItemsToBeDisplayed = it.first.drop(4)
-            adapter.submitList(shelfItemsToBeDisplayed)
-        }
-
-        if (FeatureFlag.isEnabled(Feature.TRANSCRIPTS)) {
-            viewLifecycleOwner.lifecycleScope.launch {
-                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    viewModel.uiState.collect { uiState ->
-                        adapter.isTranscriptAvailable = uiState.transcript != null
-                    }
-                }
-            }
-        }
+        setupShelfListView()
 
         playerViewModel.playingEpisodeLive.observe(viewLifecycleOwner) { (_, backgroundColor) ->
             applyColor(theme, backgroundColor)
@@ -117,6 +86,26 @@ class ShelfBottomSheet : BaseDialogFragment() {
         CastButtonFactory.setUpMediaRouteButton(view.context, binding.mediaRouteButton)
         binding.mediaRouteButton.setOnClickListener {
             chromeCastAnalytics.trackChromeCastViewShown()
+        }
+    }
+
+    private fun setupShelfListView() {
+        binding?.shelfItemsComposeView?.setContent {
+            AppTheme(theme.activeTheme) {
+                val trimmedShelf by playerViewModel.trimmedShelfLive.asFlow()
+                    .map { it.copy(it.first.drop(4), it.second) }
+                    .collectAsStateWithLifecycle(null)
+
+                trimmedShelf?.let { (shelfItems, episode) ->
+                    if (episode == null) return@let
+                    MenuShelfItems(
+                        shelfItems = shelfItems,
+                        episode = episode,
+                        isEditable = false,
+                        onClick = this@ShelfBottomSheet::onClick,
+                    )
+                }
+            }
         }
     }
 

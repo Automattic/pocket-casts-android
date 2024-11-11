@@ -1,63 +1,52 @@
 package au.com.shiftyjelly.pocketcasts.player.view
 
-import android.animation.AnimatorSet
-import android.animation.ArgbEvaluator
-import android.animation.ObjectAnimator
-import android.animation.PropertyValuesHolder
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.ui.platform.ComposeView
+import androidx.compose.runtime.getValue
 import androidx.fragment.app.activityViewModels
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.SimpleItemAnimator
+import androidx.lifecycle.asFlow
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentShelfBinding
-import au.com.shiftyjelly.pocketcasts.player.view.shelf.ShelfItemRow
-import au.com.shiftyjelly.pocketcasts.player.view.shelf.ShelfTitleRow
+import au.com.shiftyjelly.pocketcasts.player.view.shelf.MenuShelfItems
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel.Companion.moreActionsTitle
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel.Companion.shortcutTitle
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
-import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfTitle
+import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfRowItem
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.ColorUtils
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
-import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
-import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import au.com.shiftyjelly.pocketcasts.views.extensions.setRippleBackground
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Collections
 import javax.inject.Inject
+import kotlin.collections.filterIsInstance
+import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.map
 import timber.log.Timber
+import androidx.compose.ui.graphics.Color as composeColor
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
-class ShelfFragment : BaseFragment(), ShelfTouchCallback.ItemTouchHelperAdapter {
-    private var items = emptyList<Any>()
+class ShelfFragment : BaseFragment() {
+    private var items = emptyList<ShelfRowItem>()
 
     @Inject lateinit var analyticsTracker: AnalyticsTracker
 
     @Inject lateinit var settings: Settings
 
-    private lateinit var itemTouchHelper: ItemTouchHelper
     private val playerViewModel: PlayerViewModel by activityViewModels()
-    private val adapter by lazy { ShelfAdapter(theme = theme, editable = true, dragListener = this::onShelfItemStartDrag) }
-    private val shortcutTitle = ShelfTitle(LR.string.player_rearrange_actions_shown)
-    private val moreActionsTitle = ShelfTitle(LR.string.player_rearrange_actions_hidden)
     private var binding: FragmentShelfBinding? = null
-    private var dragStartPosition: Int? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentShelfBinding.inflate(inflater, container, false)
@@ -85,33 +74,54 @@ class ShelfFragment : BaseFragment(), ShelfTouchCallback.ItemTouchHelperAdapter 
 
         val backgroundColor = theme.playerBackground2Color(playerViewModel.podcast)
         val toolbarColor = theme.playerBackgroundColor(playerViewModel.podcast)
-        val selectedColor = theme.playerHighlight7Color(playerViewModel.podcast)
-
         view.setBackgroundColor(backgroundColor)
-        adapter.normalBackground = backgroundColor
         toolbar.setBackgroundColor(toolbarColor)
-        adapter.selectedBackground = ColorUtils.calculateCombinedColor(backgroundColor, selectedColor)
 
-        val recyclerView = binding.recyclerView
-        recyclerView.adapter = adapter
-        (recyclerView.itemAnimator as? SimpleItemAnimator)?.supportsChangeAnimations = false
-        (recyclerView.itemAnimator as? SimpleItemAnimator)?.changeDuration = 0
+        setupShelfListView(
+            onDragComplete = { fromIndex, toIndex, shelfItem ->
+                trackShelfItemMovedEvent(fromIndex, toIndex, shelfItem)
+                settings.shelfItems.set(items.filterIsInstance<ShelfItem>(), updateModifiedAt = true)
+            },
+        )
+    }
 
-        val callback = ShelfTouchCallback(listener = this)
-        itemTouchHelper = ItemTouchHelper(callback)
-        itemTouchHelper.attachToRecyclerView(recyclerView)
+    private fun setupShelfListView(
+        onDragComplete: (Int, Int, ShelfItem) -> Unit,
+    ) {
+        binding?.shelfItemsComposeView?.setContent {
+            AppTheme(theme.activeTheme) {
+                val backgroundColor = theme.playerBackground2Color(playerViewModel.podcast)
+                val selectedColor = theme.playerHighlight7Color(playerViewModel.podcast)
+                val selectedBackground = ColorUtils.calculateCombinedColor(backgroundColor, selectedColor)
 
-        playerViewModel.shelfLive.observe(viewLifecycleOwner) {
-            val itemsPlusTitles = mutableListOf<Any>()
-            itemsPlusTitles.addAll(it)
-            itemsPlusTitles.add(4, moreActionsTitle)
-            itemsPlusTitles.add(0, shortcutTitle)
-            items = itemsPlusTitles
-            adapter.submitList(items)
-        }
+                val shelfItems: List<ShelfRowItem> by playerViewModel.shelfLive.asFlow()
+                    .map {
+                        buildList<ShelfRowItem> {
+                            addAll(it)
+                            add(4, moreActionsTitle)
+                            add(0, shortcutTitle)
+                        }
+                    }
+                    .collectAsStateWithLifecycle(emptyList<ShelfRowItem>())
 
-        playerViewModel.playingEpisodeLive.observe(viewLifecycleOwner) { (episode, _) ->
-            adapter.episode = episode
+                val episode by playerViewModel.playingEpisodeLive.asFlow()
+                    .map { (episode, _) -> episode }
+                    .distinctUntilChangedBy { it.uuid }
+                    .collectAsStateWithLifecycle(null)
+                if (episode == null) return@AppTheme
+
+                MenuShelfItems(
+                    shelfItems = shelfItems,
+                    episode = episode as BaseEpisode,
+                    normalBackgroundColor = composeColor(Color.parseColor(ColorUtils.colorIntToHexString(backgroundColor))),
+                    selectedBackgroundColor = composeColor(Color.parseColor(ColorUtils.colorIntToHexString(selectedBackground))),
+                    isEditable = true,
+                    onShelfItemMove = { items, fromPosition, toPosition ->
+                        onShelfItemMove(items, fromPosition, toPosition, onDragComplete)
+                        this@ShelfFragment.items
+                    },
+                )
+            }
         }
     }
 
@@ -120,11 +130,17 @@ class ShelfFragment : BaseFragment(), ShelfTouchCallback.ItemTouchHelperAdapter 
         return super.onBackPressed()
     }
 
-    override fun onShelfItemMove(fromPosition: Int, toPosition: Int) {
+    private fun onShelfItemMove(
+        items: List<ShelfRowItem>,
+        fromPosition: Int,
+        toPosition: Int,
+        onDragComplete: (Int, Int, ShelfItem) -> Unit,
+    ) {
         val listData = items.toMutableList()
 
         Timber.d("Swapping $fromPosition to $toPosition")
         Timber.d("List: $listData")
+        val selectedShelfItem = listData[fromPosition] as ShelfItem
 
         if (fromPosition < toPosition) {
             for (index in fromPosition until toPosition) {
@@ -142,50 +158,32 @@ class ShelfFragment : BaseFragment(), ShelfTouchCallback.ItemTouchHelperAdapter 
         listData.add(4, moreActionsTitle)
         listData.add(0, shortcutTitle)
 
-        adapter.submitList(listData)
-        items = listData.toList()
-
-        Timber.d("Swapped: $items")
-    }
-
-    override fun onShelfItemStartDrag(viewHolder: ShelfAdapter.ItemViewHolder) {
-        dragStartPosition = viewHolder.bindingAdapterPosition
-        itemTouchHelper.startDrag(viewHolder)
-    }
-
-    override fun onShelfItemTouchHelperFinished(position: Int) {
-        trackShelfItemMovedEvent(position)
-        settings.shelfItems.set(items.filterIsInstance<ShelfItem>(), updateModifiedAt = true)
+        this@ShelfFragment.items = listData.toList()
+        onDragComplete(fromPosition, toPosition, selectedShelfItem)
+        Timber.d("Swapped: $listData")
     }
 
     private fun sectionTitleAt(position: Int) =
         if (position < items.indexOf(moreActionsTitle)) AnalyticsProp.Value.SHELF else AnalyticsProp.Value.OVERFLOW_MENU
 
-    private fun trackShelfItemMovedEvent(position: Int) {
-        dragStartPosition?.let {
-            val title = try {
-                (items[position] as? ShelfItem)?.analyticsValue
-            } catch (e: IndexOutOfBoundsException) {
-                LogBuffer.i(LogBuffer.TAG_INVALID_STATE, "Error getting title for position $position in ShelfFragment", e)
-            } ?: AnalyticsProp.Value.UNKNOWN
-            val movedFrom = sectionTitleAt(it)
-            val movedTo = sectionTitleAt(position)
-            val newPosition = if (movedTo == AnalyticsProp.Value.SHELF) {
-                position - 1
-            } else {
-                position - (items.indexOf(moreActionsTitle) + 1)
-            }
-            analyticsTracker.track(
-                AnalyticsEvent.PLAYER_SHELF_OVERFLOW_MENU_REARRANGE_ACTION_MOVED,
-                mapOf(
-                    AnalyticsProp.Key.ACTION to title,
-                    AnalyticsProp.Key.POSITION to newPosition, // it is the new position in section it was moved to
-                    AnalyticsProp.Key.MOVED_FROM to movedFrom,
-                    AnalyticsProp.Key.MOVED_TO to movedTo,
-                ),
-            )
-            dragStartPosition = null
+    private fun trackShelfItemMovedEvent(fromPosition: Int, toPosition: Int, shelfItem: ShelfItem) {
+        val title = shelfItem.analyticsValue
+        val movedFrom = sectionTitleAt(fromPosition)
+        val movedTo = sectionTitleAt(toPosition)
+        val newPosition = if (movedTo == AnalyticsProp.Value.SHELF) {
+            toPosition - 1
+        } else {
+            toPosition - (items.indexOf(moreActionsTitle) + 1)
         }
+        analyticsTracker.track(
+            AnalyticsEvent.PLAYER_SHELF_OVERFLOW_MENU_REARRANGE_ACTION_MOVED,
+            mapOf(
+                AnalyticsProp.Key.ACTION to title,
+                AnalyticsProp.Key.POSITION to newPosition, // it is the new position in section it was moved to
+                AnalyticsProp.Key.MOVED_FROM to movedFrom,
+                AnalyticsProp.Key.MOVED_TO to movedTo,
+            ),
+        )
     }
 
     private fun trackRearrangeFinishedEvent() {
@@ -208,129 +206,6 @@ class ShelfFragment : BaseFragment(), ShelfTouchCallback.ItemTouchHelperAdapter 
                 const val OVERFLOW_MENU = "overflow_menu"
                 const val UNKNOWN = "unknown"
             }
-        }
-    }
-}
-
-private val SHELF_ITEM_DIFF = object : DiffUtil.ItemCallback<Any>() {
-    override fun areItemsTheSame(oldItem: Any, newItem: Any): Boolean {
-        return if (oldItem is ShelfItem && newItem is ShelfItem) {
-            oldItem.id == newItem.id
-        } else {
-            return oldItem == newItem
-        }
-    }
-
-    override fun areContentsTheSame(oldItem: Any, newItem: Any): Boolean {
-        return true
-    }
-}
-
-class ShelfAdapter(val theme: Theme, val editable: Boolean, val listener: ((ShelfItem, Boolean) -> Unit)? = null, val dragListener: ((ItemViewHolder) -> Unit)?) : ListAdapter<Any, RecyclerView.ViewHolder>(SHELF_ITEM_DIFF) {
-    var episode: BaseEpisode? = null
-        set(value) {
-            field = value
-            notifyDataSetChanged()
-        }
-    var isTranscriptAvailable: Boolean = false
-        set(value) {
-            field = value
-            notifyDataSetChanged()
-        }
-
-    var normalBackground = Color.TRANSPARENT
-    var selectedBackground = Color.BLACK
-
-    inner class TitleViewHolder(
-        val composeView: ComposeView,
-    ) : RecyclerView.ViewHolder(composeView) {
-        fun bind(item: ShelfTitle) {
-            composeView.setContent {
-                AppTheme(theme.activeTheme) {
-                    ShelfTitleRow(
-                        item = item,
-                    )
-                }
-            }
-        }
-    }
-
-    inner class ItemViewHolder(
-        val composeView: ComposeView,
-    ) : RecyclerView.ViewHolder(composeView), ShelfTouchCallback.ItemTouchHelperViewHolder {
-
-        override fun onItemDrag() {
-            AnimatorSet().apply {
-                val backgroundView = itemView
-
-                val elevation = ObjectAnimator.ofPropertyValuesHolder(backgroundView, PropertyValuesHolder.ofFloat(View.TRANSLATION_Z, 16.dpToPx(backgroundView.resources.displayMetrics).toFloat()))
-
-                val color = ObjectAnimator.ofInt(backgroundView, "backgroundColor", normalBackground, selectedBackground)
-                color.setEvaluator(ArgbEvaluator())
-
-                playTogether(elevation, color)
-                start()
-            }
-        }
-
-        override fun onItemSwipe() {
-        }
-
-        override fun onItemClear() {
-            AnimatorSet().apply {
-                val backgroundView = itemView
-                val elevation = ObjectAnimator.ofPropertyValuesHolder(backgroundView, PropertyValuesHolder.ofFloat(View.TRANSLATION_Z, 0.toFloat()))
-
-                backgroundView.setRippleBackground(false)
-                play(elevation)
-                start()
-            }
-        }
-
-        fun bind(item: ShelfItem) {
-            composeView.setContent {
-                AppTheme(theme.activeTheme) {
-                    ShelfItemRow(
-                        episode = episode,
-                        item = item,
-                        isEditable = editable,
-                        isTranscriptAvailable = isTranscriptAvailable,
-                        onClick = {
-                            val isEnabled = item != ShelfItem.Transcript || isTranscriptAvailable
-                            listener?.invoke(item, isEnabled)
-                        },
-                        dragListener = { dragListener?.invoke(this) },
-                    )
-                }
-            }
-        }
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = when (viewType) {
-        ShelfItemRow.VIEW_TYPE_ID -> {
-            ItemViewHolder(composeView = ComposeView(parent.context))
-        }
-        ShelfTitleRow.VIEW_TYPE_ID -> {
-            TitleViewHolder(composeView = ComposeView(parent.context))
-        }
-        else -> throw IllegalStateException("Unknown view type in shelf")
-    }
-
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val item = getItem(position)
-
-        if (item is ShelfItem && holder is ItemViewHolder) {
-            holder.bind(item)
-        } else if (item is ShelfTitle && holder is TitleViewHolder) {
-            holder.bind(item)
-        }
-    }
-
-    override fun getItemViewType(position: Int): Int {
-        return when (getItem(position)) {
-            is ShelfTitle -> ShelfTitleRow.VIEW_TYPE_ID
-            is ShelfItem -> ShelfItemRow.VIEW_TYPE_ID
-            else -> throw IllegalStateException("Unknown item type in shelf")
         }
     }
 }

@@ -18,10 +18,6 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfTitle
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-object ShelfTitleRow {
-    const val VIEW_TYPE_ID = 2
-}
-
 @Composable
 fun ShelfTitleRow(
     item: ShelfTitle,
