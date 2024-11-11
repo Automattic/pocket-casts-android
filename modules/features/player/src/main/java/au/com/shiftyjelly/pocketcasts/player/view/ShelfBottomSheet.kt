@@ -71,7 +71,7 @@ class ShelfBottomSheet : BaseDialogFragment() {
             }
         },
     )
-    private val adapter = ShelfAdapter(editable = false, listener = this::onClick, dragListener = null)
+    private val adapter by lazy { ShelfAdapter(theme = theme, editable = false, listener = this::onClick, dragListener = null) }
     private var binding: FragmentShelfBottomSheetBinding? = null
 
     private val source: SourceView
@@ -94,7 +94,6 @@ class ShelfBottomSheet : BaseDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val binding = binding ?: return
-
         binding.recyclerView.adapter = adapter
         binding.recyclerView.layoutManager = LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
 
