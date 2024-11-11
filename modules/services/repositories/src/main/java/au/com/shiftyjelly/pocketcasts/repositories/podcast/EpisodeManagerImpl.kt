@@ -128,6 +128,10 @@ class EpisodeManagerImpl @Inject constructor(
         return episodeDao.findByPodcastOrderPublishedDateDesc(podcastUuid = podcast.uuid)
     }
 
+    override suspend fun findEpisodesByPodcastOrderedByPublishDateSuspend(podcast: Podcast): List<PodcastEpisode> {
+        return episodeDao.findByPodcastOrderPublishedDateDescSuspend(podcastUuid = podcast.uuid)
+    }
+
     override fun findLatestUnfinishedEpisodeByPodcast(podcast: Podcast): PodcastEpisode? {
         return episodeDao.findLatestUnfinishedEpisodeByPodcast(podcastUuid = podcast.uuid)
     }
@@ -509,15 +513,19 @@ class EpisodeManagerImpl @Inject constructor(
     }
 
     override fun deleteEpisodesWithoutSync(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager) {
+        runBlocking {
+            deleteEpisodesWithoutSyncSuspend(episodes, playbackManager)
+        }
+    }
+
+    override suspend fun deleteEpisodesWithoutSyncSuspend(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager) {
         if (episodes.isEmpty()) {
             return
         }
-        runBlocking {
-            for (episode in episodes) {
-                deleteEpisodeFile(episode, playbackManager, disableAutoDownload = false, updateDatabase = false)
-            }
+        for (episode in episodes) {
+            deleteEpisodeFile(episode, playbackManager, disableAutoDownload = false, updateDatabase = false)
         }
-        episodeDao.deleteAll(episodes)
+        episodeDao.deleteAllSuspend(episodes)
     }
 
     override fun deleteEpisodeWithoutSync(episode: PodcastEpisode?, playbackManager: PlaybackManager) {
@@ -591,6 +599,11 @@ class EpisodeManagerImpl @Inject constructor(
     override fun update(episode: PodcastEpisode?) {
         episode ?: return
         episodeDao.update(episode)
+    }
+
+    override suspend fun updateSuspend(episode: PodcastEpisode?) {
+        episode ?: return
+        episodeDao.updateSuspend(episode)
     }
 
     override fun setDownloadFailed(episode: BaseEpisode, errorMessage: String) {
@@ -821,15 +834,19 @@ class EpisodeManagerImpl @Inject constructor(
     }
 
     override fun add(episodes: List<PodcastEpisode>, podcastUuid: String, downloadMetaData: Boolean): List<PodcastEpisode> {
+        return runBlocking {
+            addSuspend(episodes, podcastUuid, downloadMetaData)
+        }
+    }
+
+    override suspend fun addSuspend(episodes: List<PodcastEpisode>, podcastUuid: String, downloadMetaData: Boolean): List<PodcastEpisode> {
         val addedEpisodes = mutableListOf<PodcastEpisode>()
         // add the episodes
         val episodesItr = episodes.iterator()
         while (episodesItr.hasNext()) {
             val episode = episodesItr.next()
             // check if the episode already exists
-            val existingEpisode = runBlocking {
-                findByUuid(episode.uuid)
-            }
+            val existingEpisode = findByUuid(episode.uuid)
             if (existingEpisode == null) {
                 episode.podcastUuid = podcastUuid
                 addedEpisodes.add(episode)
@@ -837,7 +854,7 @@ class EpisodeManagerImpl @Inject constructor(
         }
         if (addedEpisodes.isNotEmpty()) {
             addedEpisodes.chunked(250).forEach { chunkedEpisodes ->
-                episodeDao.insertAll(chunkedEpisodes)
+                episodeDao.insertAllSuspend(chunkedEpisodes)
             }
         }
 

@@ -66,7 +66,7 @@ data class PodcastRatingsResponse(
 
 interface PodcastCacheService {
     @GET("/mobile/podcast/full/{podcastUuid}")
-    fun getPodcastAndEpisodesRaw(@Path("podcastUuid") podcastUuid: String): Single<Response<PodcastResponse>>
+    suspend fun getPodcastAndEpisodesRaw(@Path("podcastUuid") podcastUuid: String): Response<PodcastResponse>
 
     @GET("/mobile/podcast/full/{podcastUuid}")
     fun getPodcastAndEpisodes(@Path("podcastUuid") podcastUuid: String): Single<PodcastResponse>

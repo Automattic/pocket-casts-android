@@ -74,6 +74,7 @@ interface PodcastManager {
 
     /** Update methods  */
     fun updatePodcast(podcast: Podcast)
+    suspend fun updatePodcastSuspend(podcast: Podcast)
 
     fun updateAllAutoDownloadStatus(autoDownloadStatus: Int)
     suspend fun updateAllShowNotifications(showNotifications: Boolean)
@@ -133,7 +134,7 @@ interface PodcastManager {
     fun refreshPodcastsIfRequired(fromLog: String)
     fun refreshPodcasts(fromLog: String)
     suspend fun refreshPodcastsAfterSignIn()
-    fun refreshPodcastInBackground(existingPodcast: Podcast, playbackManager: PlaybackManager)
+    suspend fun refreshPodcast(existingPodcast: Podcast, playbackManager: PlaybackManager)
     fun reloadFoldersFromServer()
 
     fun checkForEpisodesToDownload(episodeUuidsAdded: List<String>, downloadManager: DownloadManager)

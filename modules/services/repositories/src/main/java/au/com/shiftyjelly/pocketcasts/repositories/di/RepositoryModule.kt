@@ -49,6 +49,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryMa
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.sync.AccountManagerStatusInfo
+import au.com.shiftyjelly.pocketcasts.repositories.sync.PodcastRefresher
+import au.com.shiftyjelly.pocketcasts.repositories.sync.PodcastRefresherImpl
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncAccountManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
@@ -187,4 +189,7 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun provideEndOfYearSync(endOfYearSyncImpl: EndOfYearSyncImpl): EndOfYearSync
+
+    @Binds
+    abstract fun providePodcastRefresher(podcastRefresherImpl: PodcastRefresherImpl): PodcastRefresher
 }

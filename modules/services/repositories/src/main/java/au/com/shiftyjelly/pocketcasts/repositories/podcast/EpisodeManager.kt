@@ -34,6 +34,7 @@ interface EpisodeManager {
     fun findEpisodesByPodcastOrdered(podcast: Podcast): List<PodcastEpisode>
     suspend fun findEpisodesByPodcastOrderedSuspend(podcast: Podcast): List<PodcastEpisode>
     fun findEpisodesByPodcastOrderedByPublishDate(podcast: Podcast): List<PodcastEpisode>
+    suspend fun findEpisodesByPodcastOrderedByPublishDateSuspend(podcast: Podcast): List<PodcastEpisode>
     fun findNotificationEpisodes(date: Date): List<PodcastEpisode>
     fun findLatestUnfinishedEpisodeByPodcast(podcast: Podcast): PodcastEpisode?
     fun findLatestEpisodeToPlay(): PodcastEpisode?
@@ -54,10 +55,12 @@ interface EpisodeManager {
     /** Add methods  */
     fun add(episode: PodcastEpisode, downloadMetaData: Boolean): Boolean
     fun add(episodes: List<PodcastEpisode>, podcastUuid: String, downloadMetaData: Boolean): List<PodcastEpisode>
+    suspend fun addSuspend(episodes: List<PodcastEpisode>, podcastUuid: String, downloadMetaData: Boolean): List<PodcastEpisode>
     fun insert(episodes: List<PodcastEpisode>)
 
     /** Update methods  */
     fun update(episode: PodcastEpisode?)
+    suspend fun updateSuspend(episode: PodcastEpisode?)
 
     fun updatePlayedUpTo(episode: BaseEpisode?, playedUpTo: Double, forceUpdate: Boolean)
     fun updateDuration(episode: BaseEpisode?, durationInSecs: Double, syncChanges: Boolean)
@@ -101,6 +104,7 @@ interface EpisodeManager {
     /** Remove methods  */
     suspend fun deleteAll()
     fun deleteEpisodesWithoutSync(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager)
+    suspend fun deleteEpisodesWithoutSyncSuspend(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager)
 
     fun deleteEpisodeWithoutSync(episode: PodcastEpisode?, playbackManager: PlaybackManager)
     suspend fun deleteEpisodeFile(episode: BaseEpisode?, playbackManager: PlaybackManager?, disableAutoDownload: Boolean, updateDatabase: Boolean = true, removeFromUpNext: Boolean = true, shouldShuffleUpNext: Boolean = false)

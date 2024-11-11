@@ -15,7 +15,7 @@ import timber.log.Timber
 class PodcastCacheServiceManagerImpl @Inject constructor(
     private val service: PodcastCacheService,
 ) : PodcastCacheServiceManager {
-    override fun getPodcastResponse(podcastUuid: String): Single<Response<PodcastResponse>> {
+    override suspend fun getPodcastResponse(podcastUuid: String): Response<PodcastResponse> {
         return service.getPodcastAndEpisodesRaw(podcastUuid)
     }
 
