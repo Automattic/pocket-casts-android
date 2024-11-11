@@ -211,9 +211,11 @@ class RefreshPodcastsThread(
 
         val emptyResponse = result == null
         val notificationLastSeen = getNotificationLastSeen(entryPoint.settings())
-        val episodeUuidsAdded = updatePodcasts(result)
+        val addedEpisodes = updatePodcasts(result)
 
         val syncRefreshState = sync()
+
+        addNewEpisodesToUpNext(addedEpisodes.episodesToAddToUpNext)
 
         if (!emptyResponse) {
             var startTime = SystemClock.elapsedRealtime()
@@ -226,7 +228,7 @@ class RefreshPodcastsThread(
             playlistManager.checkForEpisodesToDownload(episodeManager, playbackManager)
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - playlist checkForEpisodesToDownload - ${String.format("%d ms", SystemClock.elapsedRealtime() - startTime)}")
             startTime = SystemClock.elapsedRealtime()
-            podcastManager.checkForEpisodesToDownload(episodeUuidsAdded, downloadManager)
+            podcastManager.checkForEpisodesToDownload(addedEpisodes.episodeUuidsAdded, downloadManager)
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - podcast checkForEpisodesToDownload - ${String.format("%d ms", SystemClock.elapsedRealtime() - startTime)}")
             startTime = SystemClock.elapsedRealtime()
             updateNotifications(notificationLastSeen, settings, podcastManager, episodeManager, notificationHelper, context)
@@ -291,16 +293,15 @@ class RefreshPodcastsThread(
         settings.setRefreshState(settings.getLastSuccessRefreshState() ?: RefreshState.Never)
     }
 
-    private fun updatePodcasts(result: RefreshResponse?): List<String> {
+    private data class AddedEpisodes(val episodeUuidsAdded: List<String>, val episodesToAddToUpNext: MutableList<Pair<AddToUpNext, PodcastEpisode>>)
+    private fun updatePodcasts(result: RefreshResponse?): AddedEpisodes {
         if (result == null) {
-            return emptyList()
+            return AddedEpisodes(emptyList(), mutableListOf())
         }
 
         val entryPoint = getEntryPoint()
         val podcastManager = entryPoint.podcastManager()
-        val playbackManager = entryPoint.playbackManager()
         val episodeManager = entryPoint.episodeManager()
-        val settings = entryPoint.settings()
 
         var newEpisodeCount = 0
 
@@ -347,12 +348,28 @@ class RefreshPodcastsThread(
             newEpisodeCount += episodes.size
         }
 
+        return AddedEpisodes(episodeUuidsAdded, episodesToAddToUpNext)
+    }
+
+    private fun addNewEpisodesToUpNext(episodesToAddToUpNext: MutableList<Pair<AddToUpNext, PodcastEpisode>>) {
+        if (episodesToAddToUpNext.isEmpty()) {
+            return
+        }
+
+        val entryPoint = getEntryPoint()
+        val settings = entryPoint.settings()
+        val playbackManager = entryPoint.playbackManager()
+        val episodeManager = entryPoint.episodeManager()
+
         // Because we may not have refreshed for a while, we collect all the auto add to up next episodes
         // and run through them one by one sorted by their publish date. They are added to up next as if the action
         // was run right as they were published magically
         runBlocking {
             val upNextLimit = settings.autoAddUpNextLimit.value
             episodesToAddToUpNext.sortBy { it.second.publishedDate }
+            episodesToAddToUpNext.removeAll { runBlocking { true == episodeManager.findByUuid(it.second.uuid)?.isFinished ||
+                                                            true == episodeManager.findByUuid(it.second.uuid)?.isArchived ||
+                                                            playbackManager.upNextQueue.contains(it.second.uuid)} }
             episodesToAddToUpNext.forEach {
                 if (playbackManager.upNextQueue.queueEpisodes.size < upNextLimit) {
                     when (it.first) {
@@ -370,8 +387,6 @@ class RefreshPodcastsThread(
                 }
             }
         }
-
-        return episodeUuidsAdded
     }
 
     private fun getNotificationLastSeen(settings: Settings): Date {
