@@ -41,7 +41,6 @@ fun MenuShelfItems(
     isEditable: Boolean,
     normalBackgroundColor: Color = Color.Transparent,
     selectedBackgroundColor: Color = Color.Black,
-    onShelfItemMove: ((List<ShelfRowItem>, from: Int, to: Int) -> List<ShelfRowItem>?)? = null,
     onClick: ((ShelfItem, Boolean) -> Unit)? = null,
 ) {
     val uiState by shelfViewModel.uiState.collectAsStateWithLifecycle(null)
@@ -54,7 +53,7 @@ fun MenuShelfItems(
         isTranscriptAvailable = uiState?.isTranscriptAvailable == true,
         onClick = onClick,
         onMove = { items, from, to ->
-            onShelfItemMove?.invoke(items, from, to)
+            shelfViewModel.onShelfItemMove(items, from, to)
         },
     )
 }
