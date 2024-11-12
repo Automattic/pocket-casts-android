@@ -35,7 +35,6 @@ fun MenuShelfItems(
     onClick: ((ShelfItem, Boolean) -> Unit)? = null,
 ) {
     val uiState by shelfViewModel.uiState.collectAsStateWithLifecycle()
-    if (uiState.episode == null) return
     Content(
         state = uiState,
         selectedBackgroundColor = selectedBackgroundColor,

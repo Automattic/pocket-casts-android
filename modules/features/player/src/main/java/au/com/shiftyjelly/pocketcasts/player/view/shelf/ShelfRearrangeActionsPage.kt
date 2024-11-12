@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -48,8 +49,6 @@ fun ShelfRearrangeActionsPage(
             .distinctUntilChangedBy { it.uuid }
     }.collectAsStateWithLifecycle(null)
 
-    shelfViewModel.setData(shelfItems, episode)
-
     Content(
         backgroundColorInt = backgroundColorInt,
         toolbarColorInt = toolbarColorInt,
@@ -61,6 +60,10 @@ fun ShelfRearrangeActionsPage(
             normalBackgroundColor = Color(AndroidColor.parseColor(ColorUtils.colorIntToHexString(backgroundColorInt))),
             selectedBackgroundColor = Color(AndroidColor.parseColor(ColorUtils.colorIntToHexString(selectedBackgroundInt))),
         )
+    }
+
+    LaunchedEffect(shelfItems, episode) {
+        shelfViewModel.setData(shelfItems, episode)
     }
 
     DisposableEffect(Unit) {
