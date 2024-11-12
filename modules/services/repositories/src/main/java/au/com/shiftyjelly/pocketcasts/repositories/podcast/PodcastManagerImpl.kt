@@ -179,19 +179,6 @@ class PodcastManagerImpl @Inject constructor(
         return podcastDao.findPodcastsAutodownload()
     }
 
-    override fun exists(podcastUuid: String): Boolean {
-        return podcastDao.exists(podcastUuid)
-    }
-
-    override fun observeEpisodeCountByEpisodeUuid(uuid: String): Flow<Int> {
-        return flow {
-            val episode = episodeDao.findByUuid(uuid)
-            if (episode != null) {
-                emitAll(podcastDao.episodeCount(episode.podcastUuid))
-            }
-        }
-    }
-
     override fun observeEpisodeCountByPodcatUuid(uuid: String): Flow<Int> {
         return podcastDao.episodeCount(uuid)
     }
@@ -308,10 +295,6 @@ class PodcastManagerImpl @Inject constructor(
         }
     }
 
-    override fun findByUuids(uuids: Collection<String>): List<Podcast> {
-        return podcastDao.findByUuids(uuids.toTypedArray())
-    }
-
     override suspend fun findPodcastsInFolder(folderUuid: String): List<Podcast> {
         return podcastDao.findPodcastsInFolder(folderUuid)
     }
@@ -383,14 +366,6 @@ class PodcastManagerImpl @Inject constructor(
         return podcastDao.searchByTitle("%$title%")
     }
 
-    override fun markPodcastAsSynced(podcast: Podcast) {
-        updateSyncStatus(podcast.uuid, Podcast.SYNC_STATUS_SYNCED)
-    }
-
-    override fun markPodcastAsNotSynced(podcast: Podcast) {
-        updateSyncStatus(podcast.uuid, Podcast.SYNC_STATUS_NOT_SYNCED)
-    }
-
     override fun markPodcastUuidAsNotSynced(podcastUuid: String) {
         updateSyncStatus(podcastUuid, Podcast.SYNC_STATUS_NOT_SYNCED)
     }
@@ -413,16 +388,6 @@ class PodcastManagerImpl @Inject constructor(
 
     override fun markAllPodcastsSynced() {
         podcastDao.updateAllSyncStatus(Podcast.SYNC_STATUS_SYNCED)
-    }
-
-    override fun markAsSubscribed(podcast: Podcast, subscribed: Boolean) {
-        val podcastUuid = podcast.uuid
-        if (podcastUuid.isBlank()) {
-            return
-        }
-        podcast.isSubscribed = subscribed
-        updateSubscribed(podcast, subscribed)
-        updateSyncStatus(podcast.uuid, Podcast.SYNC_STATUS_NOT_SYNCED)
     }
 
     override fun clearAllDownloadErrors() {
@@ -465,10 +430,6 @@ class PodcastManagerImpl @Inject constructor(
         return podcastDao.countNotificationsOn()
     }
 
-    override fun countNotificationsOnRx(): Single<Int> {
-        return Single.fromCallable { podcastDao.countNotificationsOn() }
-    }
-
     // WARNING: only call this when NEW episodes are added, not old ones
     override fun updatePodcastLatestEpisode(podcast: Podcast) {
         // get the most recent episode details
@@ -478,20 +439,12 @@ class PodcastManagerImpl @Inject constructor(
         podcastDao.updateLatestEpisode(episodeUuid = latestEpisodeUuid, publishedDate = latestEpisodeDate, podcastUuid = podcast.uuid)
     }
 
-    override fun addFolderPodcast(podcast: Podcast) {
-        podcastDao.insert(podcast)
-    }
-
     override suspend fun replaceCuratedPodcasts(podcasts: List<CuratedPodcast>) {
         podcastDao.replaceAllCuratedPodcasts(podcasts)
     }
 
     override fun updatePodcast(podcast: Podcast) {
         podcastDao.update(podcast)
-    }
-
-    override suspend fun updatePodcastSuspend(podcast: Podcast) {
-        podcastDao.updateSuspend(podcast)
     }
 
     override suspend fun updateAllAutoDownloadStatus(autoDownloadStatus: Int) {
@@ -524,11 +477,6 @@ class PodcastManagerImpl @Inject constructor(
         onlyIfValue: Podcast.AutoAddUpNext,
     ) {
         podcastDao.updateAutoAddToUpNextsIf(podcastUuids, newValue.databaseInt, onlyIfValue.databaseInt)
-    }
-
-    override fun updateExcludeFromAutoArchive(podcast: Podcast, excludeFromAutoArchive: Boolean) {
-        podcast.excludeFromAutoArchive = excludeFromAutoArchive
-        podcastDao.updateExcludeFromAutoArchive(excludeFromAutoArchive, podcast.uuid)
     }
 
     override fun updateOverrideGlobalEffects(podcast: Podcast, override: Boolean) {
@@ -569,10 +517,6 @@ class PodcastManagerImpl @Inject constructor(
         podcastDao.updateShowNotifications(show, podcast.uuid)
     }
 
-    override fun updateSubscribed(podcast: Podcast, subscribed: Boolean) {
-        podcastDao.updateSubscribed(subscribed, podcast.uuid)
-    }
-
     override suspend fun updateRefreshAvailable(podcastUuid: String, refreshAvailable: Boolean) {
         podcastDao.updateRefreshAvailable(refreshAvailable, podcastUuid)
     }
@@ -583,18 +527,6 @@ class PodcastManagerImpl @Inject constructor(
 
     override suspend fun updateSkipLastInSec(podcast: Podcast, skipLast: Int) {
         podcastDao.updateSkipLast(skipLast, podcast.uuid)
-    }
-
-    override fun updateColorLastDownloaded(podcast: Podcast, lastDownloaded: Long) {
-        podcastDao.updateColorLastDownloaded(lastDownloaded, podcast.uuid)
-    }
-
-    override fun updateOverrideGobalSettings(podcast: Podcast, override: Boolean) {
-        podcastDao.updateOverrideGobalSettings(override, podcast.uuid)
-    }
-
-    override fun updateEpisodesToKeep(podcast: Podcast, episodeToKeep: Int) {
-        podcastDao.updateEpisodesToKeep(episodeToKeep, podcast.uuid)
     }
 
     override fun updateColors(podcastUuid: String, background: Int, tintForLightBg: Int, tintForDarkBg: Int, fabForLightBg: Int, fabForDarkBg: Int, linkForLightBg: Int, linkForDarkBg: Int, colorLastDownloaded: Long) {

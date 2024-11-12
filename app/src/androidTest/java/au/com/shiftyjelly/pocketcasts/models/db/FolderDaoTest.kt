@@ -50,26 +50,6 @@ class FolderDaoTest {
     }
 
     @Test
-    fun updateFolderShouldModifyTheExistingFolder() = runTest {
-        folderDao.insert(fakeFolder)
-
-        val updatedFolder = fakeFolder.copy(name = "Updated Folder")
-        folderDao.update(updatedFolder)
-
-        val foundFolder = folderDao.findByUuid(updatedFolder.uuid)
-        assertNotNull(foundFolder)
-        assertEquals(updatedFolder.name, foundFolder?.name)
-    }
-
-    @Test
-    fun deleteFolderShouldRemoveItFromTheDatabase() = runTest {
-        folderDao.insert(fakeFolder)
-        folderDao.delete(fakeFolder)
-        val foundFolder = folderDao.findByUuid(fakeFolder.uuid)
-        assertNull(foundFolder)
-    }
-
-    @Test
     fun deleteAllShouldRemoveAllFolders() = runTest {
         folderDao.insert(fakeFolder)
         folderDao.deleteAll()

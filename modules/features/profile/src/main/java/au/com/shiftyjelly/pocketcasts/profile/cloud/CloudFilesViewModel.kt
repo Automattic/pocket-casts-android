@@ -35,7 +35,6 @@ class CloudFilesViewModel @Inject constructor(
 
     val accountUsage = userEpisodeManager.observeAccountUsage().toLiveData()
     val signInState = userManager.getSignInState().toLiveData()
-    val cloudFilesList = cloudFilesManager.sortedCloudFiles
 
     data class UiState(
         val userEpisodes: List<UserEpisode> = emptyList(),
@@ -89,8 +88,6 @@ class CloudFilesViewModel @Inject constructor(
     }
 
     companion object {
-        private const val ACTION_KEY = "action"
-        private const val SOURCE_KEY = "source"
         private const val SORT_BY = "sort_by"
     }
 }

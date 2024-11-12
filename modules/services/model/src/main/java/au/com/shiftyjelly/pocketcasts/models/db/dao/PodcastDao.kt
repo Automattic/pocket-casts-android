@@ -63,16 +63,6 @@ abstract class PodcastDao {
     @Query("SELECT * FROM podcasts WHERE auto_download_status = 1 AND subscribed = 1")
     abstract fun findPodcastsAutodownload(): List<Podcast>
 
-    @Query("SELECT * FROM podcasts WHERE subscribed = 1 ORDER BY added_date ASC")
-    abstract fun observeSubscribedOrderByAddedDateAsc(): Flowable<List<Podcast>>
-
-    @Query("SELECT * FROM podcasts WHERE subscribed = 1 ORDER BY added_date DESC")
-    abstract fun observeSubscribedOrderByAddedDateDesc(): Flowable<List<Podcast>>
-
-    fun observeSubscribedOrderByAddedDate(orderAsc: Boolean): Flowable<List<Podcast>> {
-        return if (orderAsc) observeSubscribedOrderByAddedDateAsc() else observeSubscribedOrderByAddedDateDesc()
-    }
-
     @Query("SELECT * FROM podcasts WHERE subscribed = 1 AND folder_uuid = :folderUuid ORDER BY added_date ASC")
     abstract fun observeFolderOrderByAddedDateAsc(folderUuid: String): Flowable<List<Podcast>>
 
@@ -121,9 +111,6 @@ abstract class PodcastDao {
 
     @Query("SELECT podcasts.* FROM podcasts LEFT JOIN podcast_episodes ON podcasts.uuid = podcast_episodes.podcast_id AND podcast_episodes.uuid = (SELECT podcast_episodes.uuid FROM podcast_episodes WHERE podcast_episodes.podcast_id = podcasts.uuid AND podcast_episodes.playing_status != 2 ORDER BY podcast_episodes.published_date DESC LIMIT 1) WHERE podcasts.subscribed = 1 AND folder_uuid = :folderUuid ORDER BY CASE WHEN podcast_episodes.published_date IS NULL THEN 1 ELSE 0 END, podcast_episodes.published_date DESC, podcasts.latest_episode_date DESC")
     abstract suspend fun findFolderPodcastsOrderByLatestEpisode(folderUuid: String): List<Podcast>
-
-    @Query("SELECT * FROM podcasts WHERE subscribed = 1 ORDER BY sort_order ASC")
-    abstract fun observeSubscribedOrderByUserSort(): Flowable<List<Podcast>>
 
     @Query("SELECT * FROM podcasts WHERE subscribed = 1 AND folder_uuid = :folderUuid ORDER BY sort_order ASC")
     abstract fun observeFolderOrderByUserSort(folderUuid: String): Flowable<List<Podcast>>
@@ -255,10 +242,6 @@ abstract class PodcastDao {
 
     @Query("SELECT COUNT(*) FROM podcast_episodes WHERE podcast_id IS :podcastUuid")
     abstract fun episodeCount(podcastUuid: String): Flow<Int>
-
-    fun existsRx(uuid: String): Single<Boolean> {
-        return Single.fromCallable { exists(uuid) }
-    }
 
     fun isSubscribedToPodcast(uuid: String): Boolean {
         return countSubscribedByUuid(uuid) != 0

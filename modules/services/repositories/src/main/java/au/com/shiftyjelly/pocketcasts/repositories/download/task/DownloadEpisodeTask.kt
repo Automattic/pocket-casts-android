@@ -108,7 +108,6 @@ class DownloadEpisodeTask @AssistedInject constructor(
         const val OUTPUT_ERROR_MESSAGE = "error_message"
         const val OUTPUT_EPISODE_UUID = "episode_uuid"
         const val OUTPUT_CANCELLED = "cancelled"
-        const val FIRE_TOAST = "fire_toast"
     }
 
     private lateinit var episode: BaseEpisode

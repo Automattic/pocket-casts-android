@@ -98,7 +98,7 @@ open class ServiceManager @Inject constructor(
     }
 
     fun exportFeedUrls(uuids: List<String>, callback: ServerCallback<Map<String, String>>): Call? {
-        val uuidsJoined = TextUtils.join(",", uuids)
+        val uuidsJoined = TextUtils.join(LIST_SEPERATOR, uuids)
         return postToMainServer(
             "/import/export_feed_urls",
             Parameters("uuids", uuidsJoined),
@@ -368,7 +368,7 @@ open class ServiceManager @Inject constructor(
 
         operator fun get(key: String) = pairs.associate { (first, _) ->
             first to pairs.filter { it.first == first }.map { it.second }
-        }[key]?.joinToString(",")
+        }[key]?.joinToString(LIST_SEPERATOR)
 
         fun toFormBody(): FormBody {
             val builder = FormBody.Builder()

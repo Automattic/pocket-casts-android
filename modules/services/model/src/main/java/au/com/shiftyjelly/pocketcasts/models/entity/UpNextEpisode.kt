@@ -22,18 +22,7 @@ data class UpNextEpisode(
     @ColumnInfo(name = "publishedDate") var publishedDate: Date? = null,
     @ColumnInfo(name = "downloadUrl") var downloadUrl: String? = null,
     @ColumnInfo(name = "podcastUuid") var podcastUuid: String? = null,
-) : Serializable {
-
-    fun toSimpleEpisode(): PodcastEpisode {
-        return PodcastEpisode(
-            uuid = episodeUuid,
-            podcastUuid = podcastUuid ?: "",
-            title = title,
-            publishedDate = publishedDate ?: Date(),
-            downloadUrl = downloadUrl,
-        )
-    }
-}
+) : Serializable
 
 fun BaseEpisode.toUpNextEpisode(): UpNextEpisode {
     return UpNextEpisode(
