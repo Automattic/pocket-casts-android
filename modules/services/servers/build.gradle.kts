@@ -46,4 +46,5 @@ dependencies {
     testImplementation(libs.coroutines.test)
     testImplementation(libs.junit)
     testImplementation(libs.okHttp.mockwebserver)
+    testImplementation(projects.modules.services.sharedtest)
 }

@@ -5,6 +5,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.BuildConfig
 import au.com.shiftyjelly.pocketcasts.servers.CleanAndRetryInterceptor
 import au.com.shiftyjelly.pocketcasts.servers.OkHttpInterceptor
+import au.com.shiftyjelly.pocketcasts.servers.interceptors.BasicAuthInterceptor
 import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
 import au.com.shiftyjelly.pocketcasts.servers.toClientInterceptor
 import au.com.shiftyjelly.pocketcasts.servers.toNetworkInterceptor
@@ -72,6 +73,8 @@ object InterceptorModule {
             "baggage",
         ),
     ).toClientInterceptor() // Must be client interceptor. Otherwise calls cannot be retried.
+
+    private val basicAuthInterceptor = BasicAuthInterceptor().toClientInterceptor()
 
     @Provides
     @TokenInterceptor
@@ -168,6 +171,7 @@ object InterceptorModule {
         return buildList {
             add(userAgentInterceptor.toClientInterceptor())
             add(crashLoggingInterceptor.toClientInterceptor())
+            add(basicAuthInterceptor)
             add(cleanAndRetryInterceptor)
 
             if (BuildConfig.DEBUG) {
@@ -204,6 +208,7 @@ object InterceptorModule {
         return buildList {
             add(userAgentInterceptor.toClientInterceptor())
             add(crashLoggingInterceptor.toClientInterceptor())
+            add(basicAuthInterceptor)
             add(cleanAndRetryInterceptor)
 
             if (BuildConfig.DEBUG) {
