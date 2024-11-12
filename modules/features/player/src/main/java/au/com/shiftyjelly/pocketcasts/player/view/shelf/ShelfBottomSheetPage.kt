@@ -70,6 +70,7 @@ fun ShelfBottomSheetPage(
                     performClick = performMediaRouteButtonClick,
                     onMediaRouteButtonClick = {
                         shelfViewModel.onMediaRouteButtonClick()
+                        performMediaRouteButtonClick = false
                     },
                 )
             },
