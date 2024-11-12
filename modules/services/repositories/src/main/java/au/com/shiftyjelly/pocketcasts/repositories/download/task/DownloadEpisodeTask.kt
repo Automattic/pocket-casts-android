@@ -29,6 +29,8 @@ import au.com.shiftyjelly.pocketcasts.servers.di.Downloads
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.extensions.anyMessageContains
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -301,7 +303,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
                 .header("User-Agent", "Pocket Casts")
 
             // Basic authentication support
-            if (downloadUrl.username.isNotEmpty() && downloadUrl.password.isNotEmpty()) {
+            if (FeatureFlag.isEnabled(Feature.BASIC_AUTHENTICATION) && downloadUrl.username.isNotEmpty() && downloadUrl.password.isNotEmpty()) {
                 requestBuilder.header("Authorization", Credentials.basic(downloadUrl.username, downloadUrl.password))
             }
 
