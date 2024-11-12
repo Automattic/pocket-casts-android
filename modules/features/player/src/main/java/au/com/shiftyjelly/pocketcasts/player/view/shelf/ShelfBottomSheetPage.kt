@@ -15,10 +15,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -41,6 +39,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.google.android.gms.cast.framework.CastButtonFactory
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -57,7 +56,7 @@ fun ShelfBottomSheetPage(
         playerViewModel.trimmedShelfLive.asFlow()
             .map { it.copy(it.first.drop(4), it.second) }
     }.collectAsStateWithLifecycle(null)
-    var performMediaRouteButtonClick by remember { mutableStateOf(false) }
+    val performMediaRouteClick = remember { MutableSharedFlow<Unit>() }
     val coroutineScope = rememberCoroutineScope()
     trimmedShelf?.let { (shelfItems, episode) ->
         Content(
@@ -67,10 +66,9 @@ fun ShelfBottomSheetPage(
             },
             mediaRouteButton = {
                 MediaRouteButton(
-                    performClick = performMediaRouteButtonClick,
+                    clickTrigger = performMediaRouteClick,
                     onMediaRouteButtonClick = {
                         shelfViewModel.onMediaRouteButtonClick()
-                        performMediaRouteButtonClick = false
                     },
                 )
             },
@@ -80,7 +78,7 @@ fun ShelfBottomSheetPage(
                 onClick = { item, enabled ->
                     coroutineScope.launch {
                         if (item == ShelfItem.Cast) {
-                            performMediaRouteButtonClick = true
+                            performMediaRouteClick.emit(Unit)
                             delay(100) // allow perform action to complete before dismissing the bottom sheet
                         }
                         onShelfItemClick(item, enabled)
@@ -144,9 +142,10 @@ private fun Content(
 
 @Composable
 private fun MediaRouteButton(
-    performClick: Boolean,
+    clickTrigger: MutableSharedFlow<Unit>,
     onMediaRouteButtonClick: () -> Unit,
 ) {
+    val scope = rememberCoroutineScope()
     AndroidView(
         factory = { context ->
             MediaRouteButton(context).apply {
@@ -158,8 +157,8 @@ private fun MediaRouteButton(
             }
         },
         update = { view ->
-            if (performClick) {
-                view.performClick()
+            scope.launch {
+                clickTrigger.collect { view.performClick() }
             }
         },
     )
