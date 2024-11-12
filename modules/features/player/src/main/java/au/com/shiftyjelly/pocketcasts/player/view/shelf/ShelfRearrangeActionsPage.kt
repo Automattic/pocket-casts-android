@@ -37,7 +37,7 @@ fun ShelfRearrangeActionsPage(
     val backgroundColorInt = theme.playerBackground2Color(playerViewModel.podcast)
     val toolbarColorInt = theme.playerBackgroundColor(playerViewModel.podcast)
     val selectedColorInt = theme.playerHighlight7Color(playerViewModel.podcast)
-    val selectedBackgroundInt = remember { ColorUtils.calculateCombinedColor(backgroundColorInt, selectedColorInt) }
+    val selectedBackgroundInt = remember(backgroundColorInt, selectedColorInt) { ColorUtils.calculateCombinedColor(backgroundColorInt, selectedColorInt) }
 
     val shelfItems by remember {
         playerViewModel.shelfLive.asFlow()
