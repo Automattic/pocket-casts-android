@@ -1,7 +1,7 @@
 7.78
 -----
 *   New Features
-   *   Add episode basic authentication support
+    *   Add episode basic authentication support
         ([#3213](https://github.com/Automattic/pocket-casts-android/pull/3213))
 
 7.77
