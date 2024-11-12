@@ -34,17 +34,15 @@ fun MenuShelfItems(
     selectedBackgroundColor: Color = Color.Black,
     onClick: ((ShelfItem, Boolean) -> Unit)? = null,
 ) {
-    val uiState by shelfViewModel.uiState.collectAsStateWithLifecycle(null)
-    uiState?.let { state ->
-        if (state.episode == null) return
-        Content(
-            state = state,
-            selectedBackgroundColor = selectedBackgroundColor,
-            normalBackgroundColor = normalBackgroundColor,
-            onClick = onClick,
-            onMove = { from, to -> shelfViewModel.onShelfItemMove(from, to) },
-        )
-    }
+    val uiState by shelfViewModel.uiState.collectAsStateWithLifecycle()
+    if (uiState.episode == null) return
+    Content(
+        state = uiState,
+        selectedBackgroundColor = selectedBackgroundColor,
+        normalBackgroundColor = normalBackgroundColor,
+        onClick = onClick,
+        onMove = { from, to -> shelfViewModel.onShelfItemMove(from, to) },
+    )
 }
 
 @Composable
