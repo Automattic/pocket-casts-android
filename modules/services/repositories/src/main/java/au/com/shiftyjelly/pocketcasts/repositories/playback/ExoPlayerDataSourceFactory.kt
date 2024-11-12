@@ -30,6 +30,8 @@ import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.time.Duration.Companion.seconds
+import okhttp3.Credentials
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.OkHttpClient
 import timber.log.Timber
 
@@ -51,24 +53,6 @@ class ExoPlayerDataSourceFactory @Inject constructor(
         crashLogging.sendReport(Exception(errorMessage))
         LogBuffer.e(LogBuffer.TAG_PLAYBACK, errorMessage)
     }.getOrNull()
-
-    private val httpFactory = if (FeatureFlag.isEnabled(Feature.EXO_OKHTTP)) {
-        OkHttpDataSource.Factory(client)
-            .setUserAgent(Settings.USER_AGENT_POCKETCASTS_SERVER)
-    } else {
-        DefaultHttpDataSource.Factory()
-            .setUserAgent(Settings.USER_AGENT_POCKETCASTS_SERVER)
-            .setAllowCrossProtocolRedirects(true)
-            .setConnectTimeoutMs(sixtySeconds)
-            .setReadTimeoutMs(sixtySeconds)
-    }
-
-    private val defaultFactory = DefaultDataSource.Factory(context, httpFactory)
-
-    val cacheFactory get() = CacheDataSource.Factory()
-        .setUpstreamDataSourceFactory(defaultFactory)
-        .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
-        .let { if (cache != null) it.setCache(cache) else it }
 
     fun createMediaSource(
         episodeLocation: EpisodeLocation,
@@ -93,7 +77,8 @@ class ExoPlayerDataSourceFactory @Inject constructor(
             extractorsFactory.setMp3ExtractorFlags(Mp3Extractor.FLAG_ENABLE_INDEX_SEEKING)
         }
 
-        val cacheFactory = cacheFactory
+        val defaultFactory = defaultDataSourceFactory(episodeLocation)
+        val cacheFactory = cacheDataSourceFactory(defaultFactory)
             .setCacheWriteDataSinkFactory(null)
             .takeIf { episodeLocation.episode.shouldUseCache() }
 
@@ -104,11 +89,54 @@ class ExoPlayerDataSourceFactory @Inject constructor(
         )
 
         val dataFactory = cacheFactory ?: defaultFactory
+
         return when {
             episodeLocation.episode.isHLS -> HlsMediaSource.Factory(dataFactory)
             (clipRange != null) -> DefaultMediaSourceFactory(dataFactory, extractorsFactory)
             else -> ProgressiveMediaSource.Factory(dataFactory, extractorsFactory)
         }.createMediaSource(mediaItem)
+    }
+
+    fun cacheDataSourceFactoryForStreamingUrl(url: String): CacheDataSource.Factory {
+        return cacheDataSourceFactory(defaultDataSourceFactory(uri = url, downloading = true))
+    }
+
+    private fun cacheDataSourceFactory(defaultFactory: DefaultDataSource.Factory): CacheDataSource.Factory {
+        return CacheDataSource.Factory()
+            .setUpstreamDataSourceFactory(defaultFactory)
+            .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
+            .let { if (cache != null) it.setCache(cache) else it }
+    }
+
+    private fun defaultDataSourceFactory(episodeLocation: EpisodeLocation): DefaultDataSource.Factory {
+        return defaultDataSourceFactory(uri = episodeLocation.uri, downloading = episodeLocation is EpisodeLocation.Stream)
+    }
+
+    private fun defaultDataSourceFactory(uri: String?, downloading: Boolean): DefaultDataSource.Factory {
+        val httpFactory = if (FeatureFlag.isEnabled(Feature.EXO_OKHTTP)) {
+            OkHttpDataSource.Factory(client)
+                .setUserAgent(Settings.USER_AGENT_POCKETCASTS_SERVER)
+                .also {
+                    addBasicAuthIfNeeded(uri = uri, downloading = downloading, it)
+                }
+        } else {
+            DefaultHttpDataSource.Factory()
+                .setUserAgent(Settings.USER_AGENT_POCKETCASTS_SERVER)
+                .setAllowCrossProtocolRedirects(true)
+                .setConnectTimeoutMs(sixtySeconds)
+                .setReadTimeoutMs(sixtySeconds)
+        }
+        return DefaultDataSource.Factory(context, httpFactory)
+    }
+
+    private fun addBasicAuthIfNeeded(uri: String?, downloading: Boolean, okHttpDataSourceFactory: OkHttpDataSource.Factory) {
+        if (!FeatureFlag.isEnabled(Feature.BASIC_AUTHENTICATION) || !downloading) {
+            return
+        }
+        val httpUrl = uri?.toHttpUrlOrNull() ?: return
+        if (httpUrl.username.isNotEmpty() && httpUrl.password.isNotEmpty()) {
+            okHttpDataSourceFactory.setDefaultRequestProperties(mapOf("Authorization" to Credentials.basic(httpUrl.username, httpUrl.password)))
+        }
     }
 
     private fun startCachingEntireEpisodeIfNeeded(
@@ -117,7 +145,7 @@ class ExoPlayerDataSourceFactory @Inject constructor(
         onCachingComplete: (String) -> Unit,
     ) {
         val episodeUri = episodeLocation.uri ?: return
-        val cacheFactory = cacheDataSourceFactory ?: cacheFactory
+        val cacheFactory = cacheDataSourceFactory ?: cacheDataSourceFactory(defaultDataSourceFactory(episodeLocation))
             .setCacheWriteDataSinkFactory(null)
             .takeIf { episodeLocation.episode.shouldUseCache() }
 
@@ -144,7 +172,7 @@ class ExoPlayerDataSourceFactory @Inject constructor(
             onCachingReset(episodeUuid)
 
             startCachingEntireEpisodeIfNeeded(
-                cacheDataSourceFactory = cacheFactory,
+                cacheDataSourceFactory = cacheDataSourceFactory(defaultDataSourceFactory(episodeLocation)),
                 episodeLocation = episodeLocation,
                 onCachingComplete = onCachingComplete,
             )

@@ -179,6 +179,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = false,
     ),
+    BASIC_AUTHENTICATION(
+        key = "basic_authentication",
+        title = "Support basic authentication when downloading or streaming episodes",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    ),
     ;
 
     companion object {

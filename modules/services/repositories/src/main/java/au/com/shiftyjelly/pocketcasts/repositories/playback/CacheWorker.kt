@@ -38,6 +38,7 @@ class CacheWorker @AssistedInject constructor(
 
     override fun doWork(): Result {
         try {
+            val downloadUrl = this.downloadUrl
             if (downloadUrl == null || episodeUuid == null) {
                 Timber.tag(TAG).e("Error: Episode download url or uuid is null, downloadUrl: '$downloadUrl' episodeUuid: '$episodeUuid' worker id: '$id'")
                 return Result.failure()
@@ -46,7 +47,7 @@ class CacheWorker @AssistedInject constructor(
 
             val dataSpec = DataSpec(uri).buildUpon().setKey(episodeUuid).build()
 
-            val cacheDataSourceFactory = sourceFactory.cacheFactory
+            val cacheDataSourceFactory = sourceFactory.cacheDataSourceFactoryForStreamingUrl(downloadUrl)
 
             cacheWriter = CacheWriter(
                 cacheDataSourceFactory.createDataSource(),

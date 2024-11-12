@@ -58,6 +58,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.rx2.await
 import okhttp3.Call
 import okhttp3.Callback
+import okhttp3.Credentials
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.MediaType
 import okhttp3.Request
@@ -298,6 +299,11 @@ class DownloadEpisodeTask @AssistedInject constructor(
             val requestBuilder = requestBuilderProvider.get()
                 .url(downloadUrl)
                 .header("User-Agent", "Pocket Casts")
+
+            // Basic authentication support
+            if (downloadUrl.username.isNotEmpty() && downloadUrl.password.isNotEmpty()) {
+                requestBuilder.header("Authorization", Credentials.basic(downloadUrl.username, downloadUrl.password))
+            }
 
             // check to see if they've tried to download this episode before
             val tempDownloadFile = File(tempDownloadPath)
