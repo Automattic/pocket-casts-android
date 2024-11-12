@@ -49,7 +49,6 @@ class ShelfViewModel @AssistedInject constructor(
                 .collectLatest { transcript ->
                     _uiState.update { it.copy(transcript = transcript) }
                 }
-
         }
     }
 
