@@ -181,7 +181,7 @@ enum class Feature(
     ),
     BASIC_AUTHENTICATION(
         key = "basic_authentication",
-        title = "Support basic authentication when downloading or streaming episodes",
+        title = "Support episode basic authentication",
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
