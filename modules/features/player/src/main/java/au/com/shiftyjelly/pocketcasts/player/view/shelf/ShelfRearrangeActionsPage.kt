@@ -15,7 +15,7 @@ import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel
-import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfRowItem
+import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.ui.helper.ColorUtils
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
@@ -38,7 +38,7 @@ fun ShelfRearrangeActionsPage(
     val selectedBackgroundInt = ColorUtils.calculateCombinedColor(backgroundColorInt, selectedColorInt)
 
     val shelfItems by playerViewModel.shelfLive.asFlow()
-        .collectAsStateWithLifecycle(emptyList<ShelfRowItem>())
+        .collectAsStateWithLifecycle(emptyList<ShelfItem>())
 
     val episode by playerViewModel.playingEpisodeLive.asFlow()
         .map { (episode, _) -> episode }

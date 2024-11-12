@@ -1,7 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.player.viewmodel
 
+import androidx.annotation.OptIn
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.media3.common.util.UnstableApi
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
@@ -54,8 +56,9 @@ class ShelfViewModel @AssistedInject constructor(
         }
     }
 
+    @OptIn(UnstableApi::class)
     fun setData(
-        items: List<ShelfRowItem>,
+        items: List<ShelfItem>,
         episode: BaseEpisode?,
     ) {
         if (items.isEmpty()) return
@@ -63,6 +66,9 @@ class ShelfViewModel @AssistedInject constructor(
             it.copy(
                 isEditable = isEditable,
                 shelfRowItems = if (isEditable) {
+                    if (items.size < MIN_SHELF_ITEMS_SIZE) {
+                        throw IllegalArgumentException(ERROR_MINIMUM_SHELF_ITEMS)
+                    }
                     buildList {
                         addAll(items)
                         add(4, moreActionsTitle)
@@ -81,6 +87,11 @@ class ShelfViewModel @AssistedInject constructor(
         toPosition: Int,
     ) {
         val listData = _uiState.value.shelfRowItems.toMutableList()
+        if (toPosition !in listData.indices || fromPosition !in listData.indices ||
+            listData[fromPosition] is ShelfTitle || listData[toPosition] is ShelfTitle
+        ) {
+            throw IllegalArgumentException("$ERROR_SHELF_ITEM_INVALID_MOVE_POSITION from: $fromPosition to: $toPosition")
+        }
 
         Timber.d("Swapping $fromPosition to $toPosition")
         Timber.d("List: $listData")
@@ -163,6 +174,9 @@ class ShelfViewModel @AssistedInject constructor(
     }
 
     companion object {
+        private const val MIN_SHELF_ITEMS_SIZE = 4
+        const val ERROR_MINIMUM_SHELF_ITEMS = "Minimum 4 shelf items should be present"
+        const val ERROR_SHELF_ITEM_INVALID_MOVE_POSITION = "Shelf item invalid move position"
         val shortcutTitle = ShelfTitle(LR.string.player_rearrange_actions_shown)
         val moreActionsTitle = ShelfTitle(LR.string.player_rearrange_actions_hidden)
 
