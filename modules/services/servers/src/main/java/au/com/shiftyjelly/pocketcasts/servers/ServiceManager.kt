@@ -225,7 +225,6 @@ open class ServiceManager @Inject constructor(
         val formBody = parameters.toFormBody()
         val request = Request.Builder()
             .url(url)
-            .header("User-Agent", Settings.USER_AGENT_POCKETCASTS_SERVER)
             .post(formBody)
             .build()
 
