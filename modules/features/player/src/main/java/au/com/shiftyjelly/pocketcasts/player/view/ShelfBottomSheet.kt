@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
@@ -13,11 +14,11 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.player.view.shelf.ShelfBottomSheetPage
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel.Companion.AnalyticsProp
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.reimagine.ShareDialogFragment
-import au.com.shiftyjelly.pocketcasts.repositories.chromecast.ChromeCastAnalytics
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.extensions.openUrl
@@ -28,20 +29,33 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.applyColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
+import kotlin.getValue
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
 class ShelfBottomSheet : BaseDialogFragment() {
     @Inject lateinit var analyticsTracker: AnalyticsTracker
 
-    @Inject lateinit var chromeCastAnalytics: ChromeCastAnalytics
-
     @Inject lateinit var playbackManager: PlaybackManager
 
     @Inject lateinit var settings: Settings
 
+    private val episodeId: String?
+        get() = arguments?.getString(ARG_EPISODE_ID)
+
     private val playerViewModel: PlayerViewModel by activityViewModels()
+    private val shelfViewModel: ShelfViewModel by viewModels(
+        extrasProducer = {
+            defaultViewModelCreationExtras.withCreationCallback<ShelfViewModel.Factory> { factory ->
+                factory.create(
+                    episodeId = episodeId,
+                    isEditable = false,
+                )
+            }
+        },
+    )
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -53,13 +67,10 @@ class ShelfBottomSheet : BaseDialogFragment() {
         }
         AppTheme(theme.activeTheme) {
             ShelfBottomSheetPage(
+                shelfViewModel = shelfViewModel,
                 playerViewModel = playerViewModel,
-                onMediaRouteButtonClick = {
-                    chromeCastAnalytics.trackChromeCastViewShown()
-                },
                 onEditButtonClick = {
-                    analyticsTracker.track(AnalyticsEvent.PLAYER_SHELF_OVERFLOW_MENU_REARRANGE_STARTED)
-                    (activity as FragmentHostListener).showModal(ShelfFragment())
+                    (activity as FragmentHostListener).showModal(ShelfFragment.newInstance(episodeId))
                     dismiss()
                 },
                 onShelfItemClick = this@ShelfBottomSheet::onClick,
@@ -161,14 +172,11 @@ class ShelfBottomSheet : BaseDialogFragment() {
     }
 
     companion object {
-        private const val ARG_SOURCE = "source"
         private const val ARG_EPISODE_ID = "episode_id"
         fun newInstance(
-            sourceView: SourceView? = null,
             episodeId: String? = null,
         ) = ShelfBottomSheet().apply {
             arguments = bundleOf(
-                ARG_SOURCE to sourceView?.analyticsValue,
                 ARG_EPISODE_ID to episodeId,
             )
         }

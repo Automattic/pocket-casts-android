@@ -4,11 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfRowItem
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfTitle
+import au.com.shiftyjelly.pocketcasts.repositories.chromecast.ChromeCastAnalytics
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptsManager
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
@@ -30,12 +32,12 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @HiltViewModel(assistedFactory = ShelfViewModel.Factory::class)
 class ShelfViewModel @AssistedInject constructor(
     @Assisted private val episodeId: String?,
+    @Assisted private val isEditable: Boolean,
     private val transcriptsManager: TranscriptsManager,
     private val analyticsTracker: AnalyticsTracker,
+    private val chromeCastAnalytics: ChromeCastAnalytics,
     private val settings: Settings,
 ) : ViewModel() {
-    private var items = emptyList<ShelfRowItem>()
-
     private var _uiState: MutableStateFlow<UiState> = MutableStateFlow(UiState())
     val uiState: StateFlow<UiState> = _uiState
 
@@ -48,16 +50,37 @@ class ShelfViewModel @AssistedInject constructor(
                     .collectLatest { transcript ->
                         _uiState.update { it.copy(transcript = transcript) }
                     }
-            } ?: _uiState.update { it.copy(transcript = null) }
+            }
+        }
+    }
+
+    fun setData(
+        items: List<ShelfRowItem>,
+        episode: BaseEpisode?,
+    ) {
+        if (items.isEmpty()) return
+        _uiState.update {
+            it.copy(
+                isEditable = isEditable,
+                shelfRowItems = if (isEditable) {
+                    buildList {
+                        addAll(items)
+                        add(4, moreActionsTitle)
+                        add(0, shortcutTitle)
+                    }
+                } else {
+                    items
+                },
+                episode = episode,
+            )
         }
     }
 
     fun onShelfItemMove(
-        items: List<ShelfRowItem>,
         fromPosition: Int,
         toPosition: Int,
-    ): List<ShelfRowItem> {
-        val listData = items.toMutableList()
+    ) {
+        val listData = _uiState.value.shelfRowItems.toMutableList()
 
         Timber.d("Swapping $fromPosition to $toPosition")
         Timber.d("List: $listData")
@@ -80,10 +103,9 @@ class ShelfViewModel @AssistedInject constructor(
             add(0, shortcutTitle)
         }
 
-        this.items = listData.toList()
+        _uiState.update { it.copy(shelfRowItems = listData.toList()) }
         onDragComplete(fromPosition, toPosition, selectedShelfItem)
         Timber.d("Swapped: $listData")
-        return this.items
     }
 
     private fun onDragComplete(
@@ -92,11 +114,23 @@ class ShelfViewModel @AssistedInject constructor(
         shelfItem: ShelfItem,
     ) {
         trackShelfItemMovedEvent(fromIndex, toIndex, shelfItem)
-        settings.shelfItems.set(items.filterIsInstance<ShelfItem>(), updateModifiedAt = true)
+        settings.shelfItems.set(_uiState.value.shelfRowItems.filterIsInstance<ShelfItem>(), updateModifiedAt = true)
     }
 
     private fun sectionTitleAt(position: Int) =
-        if (position < items.indexOf(moreActionsTitle)) AnalyticsProp.Value.SHELF else AnalyticsProp.Value.OVERFLOW_MENU
+        if (position < _uiState.value.shelfRowItems.indexOf(moreActionsTitle)) AnalyticsProp.Value.SHELF else AnalyticsProp.Value.OVERFLOW_MENU
+
+    fun onEditButtonClick() {
+        analyticsTracker.track(AnalyticsEvent.PLAYER_SHELF_OVERFLOW_MENU_REARRANGE_STARTED)
+    }
+
+    fun onMediaRouteButtonClick() {
+        chromeCastAnalytics.trackChromeCastViewShown()
+    }
+
+    fun onDismiss() {
+        analyticsTracker.track(AnalyticsEvent.PLAYER_SHELF_OVERFLOW_MENU_REARRANGE_FINISHED)
+    }
 
     fun trackShelfItemMovedEvent(fromPosition: Int, toPosition: Int, shelfItem: ShelfItem) {
         val title = shelfItem.analyticsValue
@@ -105,7 +139,7 @@ class ShelfViewModel @AssistedInject constructor(
         val newPosition = if (movedTo == AnalyticsProp.Value.SHELF) {
             toPosition - 1
         } else {
-            toPosition - (items.indexOf(moreActionsTitle) + 1)
+            toPosition - (_uiState.value.shelfRowItems.indexOf(moreActionsTitle) + 1)
         }
         analyticsTracker.track(
             AnalyticsEvent.PLAYER_SHELF_OVERFLOW_MENU_REARRANGE_ACTION_MOVED,
@@ -118,20 +152,20 @@ class ShelfViewModel @AssistedInject constructor(
         )
     }
 
-    fun trackRearrangeFinishedEvent() {
-        analyticsTracker.track(AnalyticsEvent.PLAYER_SHELF_OVERFLOW_MENU_REARRANGE_FINISHED)
-    }
-
     data class UiState(
+        val isEditable: Boolean = false,
+        val shelfRowItems: List<ShelfRowItem> = emptyList(),
+        val episode: BaseEpisode? = null,
         val transcript: Transcript? = null,
     ) {
         val isTranscriptAvailable: Boolean
-            get() = if (FeatureFlag.isEnabled(Feature.TRANSCRIPTS)) { transcript != null } else false
+            get() = FeatureFlag.isEnabled(Feature.TRANSCRIPTS) && transcript != null
     }
 
     companion object {
         val shortcutTitle = ShelfTitle(LR.string.player_rearrange_actions_shown)
         val moreActionsTitle = ShelfTitle(LR.string.player_rearrange_actions_hidden)
+
         object AnalyticsProp {
             object Key {
                 const val FROM = "from"
@@ -142,6 +176,7 @@ class ShelfViewModel @AssistedInject constructor(
                 const val SOURCE = "source"
                 const val EPISODE_UUID = "episode_uuid"
             }
+
             object Value {
                 const val SHELF = "shelf"
                 const val OVERFLOW_MENU = "overflow_menu"
@@ -152,6 +187,9 @@ class ShelfViewModel @AssistedInject constructor(
 
     @AssistedFactory
     interface Factory {
-        fun create(episodeId: String?): ShelfViewModel
+        fun create(
+            episodeId: String?,
+            isEditable: Boolean,
+        ): ShelfViewModel
     }
 }

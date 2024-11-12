@@ -34,13 +34,11 @@ import au.com.shiftyjelly.pocketcasts.compose.bottomsheet.Pill
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.google.android.gms.cast.framework.CastButtonFactory
-import java.util.Date
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -49,38 +47,54 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun ShelfBottomSheetPage(
+    shelfViewModel: ShelfViewModel,
     playerViewModel: PlayerViewModel,
     onEditButtonClick: () -> Unit,
-    onMediaRouteButtonClick: () -> Unit,
     onShelfItemClick: (item: ShelfItem, enabled: Boolean) -> Unit,
-
-    ) {
+) {
     val trimmedShelf by playerViewModel.trimmedShelfLive.asFlow()
         .map { it.copy(it.first.drop(4), it.second) }
         .collectAsStateWithLifecycle(null)
-
+    var performMediaRouteButtonClick by remember { mutableStateOf(false) }
+    val coroutine = rememberCoroutineScope()
     trimmedShelf?.let { (shelfItems, episode) ->
-        if (episode == null) return
+        shelfViewModel.setData(shelfItems, episode)
         Content(
-            shelfItems = shelfItems,
-            episode = episode,
-            onEditButtonClick = onEditButtonClick,
-            onMediaRouteButtonClick = onMediaRouteButtonClick,
-            onShelfItemClick = onShelfItemClick,
-        )
+            onEditButtonClick = {
+                shelfViewModel.onEditButtonClick()
+                onEditButtonClick()
+            },
+            mediaRouteButton = {
+                MediaRouteButton(
+                    performClick = performMediaRouteButtonClick,
+                    onMediaRouteButtonClick = {
+                        shelfViewModel.onMediaRouteButtonClick()
+                    },
+                )
+            },
+        ) {
+            MenuShelfItems(
+                shelfViewModel = shelfViewModel,
+                onClick = { item, enabled ->
+                    coroutine.launch {
+                        if (item == ShelfItem.Cast) {
+                            performMediaRouteButtonClick = true
+                            delay(100) // allow perform action to complete before dismissing the bottom sheet
+                        }
+                        onShelfItemClick(item, enabled)
+                    }
+                },
+            )
+        }
     }
 }
 
 @Composable
 private fun Content(
-    shelfItems: List<ShelfItem>,
-    episode: BaseEpisode,
     onEditButtonClick: () -> Unit,
-    onMediaRouteButtonClick: () -> Unit,
-    onShelfItemClick: (item: ShelfItem, enabled: Boolean) -> Unit,
+    mediaRouteButton: @Composable () -> Unit,
+    menuShelfItems: @Composable () -> Unit,
 ) {
-    var performMediaRouteButtonClick by remember { mutableStateOf(false) }
-    val coroutine = rememberCoroutineScope()
     Column(
         modifier = Modifier
             .fillMaxWidth(),
@@ -90,15 +104,12 @@ private fun Content(
         Pill(
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
-                .background(MaterialTheme.theme.colors.playerContrast01)
+                .background(MaterialTheme.theme.colors.playerContrast01),
         )
 
         Spacer(Modifier.height(8.dp))
 
-        MediaRouteButton(
-            performClick = performMediaRouteButtonClick,
-            onMediaRouteButtonClick = onMediaRouteButtonClick,
-        )
+        mediaRouteButton()
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -122,20 +133,7 @@ private fun Content(
                 )
             }
         }
-        MenuShelfItems(
-            shelfItems = shelfItems,
-            episode = episode,
-            isEditable = false,
-            onClick = { item, enabled ->
-                coroutine.launch {
-                    if (item == ShelfItem.Cast) {
-                        performMediaRouteButtonClick = true
-                        delay(100) // allow perform action to complete before dismissing the bottom sheet
-                    }
-                    onShelfItemClick(item, enabled)
-                }
-            }
-        )
+        menuShelfItems()
     }
 }
 
@@ -158,7 +156,7 @@ private fun MediaRouteButton(
             if (performClick) {
                 view.performClick()
             }
-        }
+        },
     )
 }
 
@@ -169,14 +167,9 @@ private fun ShelfBottomSheetPageContentPreview(
 ) {
     AppTheme(themeType) {
         Content(
-            shelfItems = ShelfItem.entries.toList().take(5),
-            episode = PodcastEpisode("", publishedDate = Date()),
             onEditButtonClick = {},
-            onMediaRouteButtonClick = {},
-            onShelfItemClick = { _, _ -> },
+            mediaRouteButton = {},
+            menuShelfItems = {},
         )
     }
 }
-
-
-

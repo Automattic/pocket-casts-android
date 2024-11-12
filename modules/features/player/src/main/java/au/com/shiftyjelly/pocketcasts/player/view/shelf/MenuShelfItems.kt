@@ -14,17 +14,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
-import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel.Companion.moreActionsTitle
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel.Companion.shortcutTitle
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
-import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfRowItem
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfTitle
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import java.util.Date
@@ -33,46 +31,36 @@ import sh.calvin.reorderable.rememberReorderableLazyListState
 
 @Composable
 fun MenuShelfItems(
-    shelfViewModel: ShelfViewModel = hiltViewModel<ShelfViewModel, ShelfViewModel.Factory> { factory ->
-        factory.create(episode.uuid)
-    },
-    shelfItems: List<ShelfRowItem>,
-    episode: BaseEpisode,
-    isEditable: Boolean,
+    shelfViewModel: ShelfViewModel,
     normalBackgroundColor: Color = Color.Transparent,
     selectedBackgroundColor: Color = Color.Black,
     onClick: ((ShelfItem, Boolean) -> Unit)? = null,
 ) {
     val uiState by shelfViewModel.uiState.collectAsStateWithLifecycle(null)
-    Content(
-        shelfItems = shelfItems,
-        episode = episode,
-        selectedBackgroundColor = selectedBackgroundColor,
-        normalBackgroundColor = normalBackgroundColor,
-        isEditable = isEditable,
-        isTranscriptAvailable = uiState?.isTranscriptAvailable == true,
-        onClick = onClick,
-        onMove = { items, from, to ->
-            shelfViewModel.onShelfItemMove(items, from, to)
-        },
-    )
+    uiState?.let { state ->
+        if (state.episode == null) return
+        Content(
+            state = state,
+            selectedBackgroundColor = selectedBackgroundColor,
+            normalBackgroundColor = normalBackgroundColor,
+            onClick = onClick,
+            onMove = { from, to -> shelfViewModel.onShelfItemMove(from, to) },
+        )
+    }
 }
 
 @Composable
 private fun Content(
-    shelfItems: List<ShelfRowItem>,
-    episode: BaseEpisode,
+    state: UiState,
     selectedBackgroundColor: Color,
     normalBackgroundColor: Color,
-    isEditable: Boolean,
-    isTranscriptAvailable: Boolean,
     onClick: ((ShelfItem, Boolean) -> Unit)? = null,
-    onMove: (List<ShelfRowItem>, from: Int, to: Int) -> List<ShelfRowItem>?,
+    onMove: (from: Int, to: Int) -> Unit,
 ) {
     val lazyListState = rememberLazyListState()
-    var items by rememberUpdatedState(shelfItems) as MutableState
+    var items by rememberUpdatedState(state.shelfRowItems) as MutableState
     val reorderableLazyListState = rememberReorderableLazyListState(lazyListState) { from, to ->
-        onMove(items, from.index, to.index).let { it?.let { items = it } }
+        onMove(from.index, to.index)
     }
 
     LazyColumn(state = lazyListState) {
@@ -83,13 +71,13 @@ private fun Content(
                         ReorderableItem(reorderableLazyListState, key = listItem.id) { isDragging ->
                             val elevation by animateDpAsState(if (isDragging) 4.dp else 0.dp)
                             val color = if (isDragging) selectedBackgroundColor else normalBackgroundColor
-                            val rowDraggableModifier = if (isEditable) Modifier.draggableHandle() else Modifier
+                            val rowDraggableModifier = if (state.isEditable) Modifier.draggableHandle() else Modifier
                             Surface(elevation = elevation, color = color) {
                                 ShelfItemRow(
-                                    episode = episode,
+                                    episode = state.episode,
                                     item = listItem,
-                                    isEditable = isEditable,
-                                    isTranscriptAvailable = isTranscriptAvailable,
+                                    isEditable = state.isEditable,
+                                    isTranscriptAvailable = state.isTranscriptAvailable,
                                     onClick = onClick,
                                     modifier = rowDraggableModifier,
                                 )
@@ -110,22 +98,46 @@ private fun Content(
 
 @Preview
 @Composable
-private fun MenuShelfItemsContentPreview(
+private fun MenuShelfItemsNonEditableContentPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppTheme(themeType) {
         Content(
-            shelfItems = buildList {
-                add(shortcutTitle)
-                addAll(ShelfItem.entries.toList())
-                add(5, moreActionsTitle)
-            },
-            episode = PodcastEpisode("", publishedDate = Date()),
+            state = UiState(
+                shelfRowItems = buildList {
+                    addAll(ShelfItem.entries.toList().take(6))
+                },
+                episode = PodcastEpisode("", publishedDate = Date()),
+                transcript = null,
+                isEditable = false,
+            ),
             selectedBackgroundColor = Color.Transparent,
             normalBackgroundColor = Color.Transparent,
-            isEditable = true,
-            isTranscriptAvailable = true,
-            onMove = { items, from, to -> items },
+            onMove = { from, to -> },
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun MenuShelfItemsEditableContentPreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
+) {
+    AppTheme(themeType) {
+        Content(
+            state = UiState(
+                shelfRowItems = buildList {
+                    add(shortcutTitle)
+                    addAll(ShelfItem.entries.toList())
+                    add(5, moreActionsTitle)
+                },
+                episode = PodcastEpisode("", publishedDate = Date()),
+                transcript = null,
+                isEditable = true,
+            ),
+            selectedBackgroundColor = Color.Transparent,
+            normalBackgroundColor = Color.Transparent,
+            onMove = { from, to -> },
         )
     }
 }

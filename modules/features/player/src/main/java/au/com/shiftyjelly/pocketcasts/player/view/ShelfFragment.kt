@@ -8,7 +8,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.player.view.shelf.ShelfPage
+import au.com.shiftyjelly.pocketcasts.player.view.shelf.ShelfRearrangeActionsPage
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -26,7 +26,10 @@ class ShelfFragment : BaseFragment() {
     private val shelfViewModel: ShelfViewModel by viewModels(
         extrasProducer = {
             defaultViewModelCreationExtras.withCreationCallback<ShelfViewModel.Factory> { factory ->
-                factory.create(episodeId)
+                factory.create(
+                    episodeId = episodeId,
+                    isEditable = true,
+                )
             }
         },
     )
@@ -37,27 +40,21 @@ class ShelfFragment : BaseFragment() {
         savedInstanceState: Bundle?,
     ) = content {
         AppTheme(theme.activeTheme) {
-            ShelfPage(
+            ShelfRearrangeActionsPage(
                 theme = theme,
+                shelfViewModel = shelfViewModel,
                 playerViewModel = playerViewModel,
                 onBackPressed = {
-                    shelfViewModel.trackRearrangeFinishedEvent()
                     (activity as? FragmentHostListener)?.closeModal(this)
                 },
             )
         }
     }
-
-    override fun onBackPressed(): Boolean {
-        shelfViewModel.trackRearrangeFinishedEvent()
-        return super.onBackPressed()
-    }
-
     companion object {
         private const val ARG_EPISODE_ID = "episode_id"
         fun newInstance(
             episodeId: String? = null,
-        ) = ShelfBottomSheet().apply {
+        ) = ShelfFragment().apply {
             arguments = bundleOf(
                 ARG_EPISODE_ID to episodeId,
             )
