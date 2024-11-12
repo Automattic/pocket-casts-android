@@ -5,10 +5,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
@@ -58,7 +56,7 @@ private fun Content(
     onMove: (from: Int, to: Int) -> Unit,
 ) {
     val lazyListState = rememberLazyListState()
-    var items by rememberUpdatedState(state.shelfRowItems) as MutableState
+    val items by rememberUpdatedState(state.shelfRowItems)
     val reorderableLazyListState = rememberReorderableLazyListState(lazyListState) { from, to ->
         onMove(from.index, to.index)
     }
