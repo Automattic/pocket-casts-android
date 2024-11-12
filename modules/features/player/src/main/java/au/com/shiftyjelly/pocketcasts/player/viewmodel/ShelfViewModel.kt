@@ -1,9 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.player.viewmodel
 
-import androidx.annotation.OptIn
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.media3.common.util.UnstableApi
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
@@ -56,7 +54,6 @@ class ShelfViewModel @AssistedInject constructor(
         }
     }
 
-    @OptIn(UnstableApi::class)
     fun setData(
         items: List<ShelfItem>,
         episode: BaseEpisode?,
