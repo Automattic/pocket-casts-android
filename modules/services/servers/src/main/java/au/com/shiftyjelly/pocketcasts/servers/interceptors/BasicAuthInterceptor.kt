@@ -17,7 +17,7 @@ internal class BasicAuthInterceptor : Interceptor {
         }
 
         val header = response.header("WWW-Authenticate")
-        if (header == null || !header.contains("Basic")) {
+        if (header == null || !header.contains("Basic", ignoreCase = true)) {
             return response
         }
 
