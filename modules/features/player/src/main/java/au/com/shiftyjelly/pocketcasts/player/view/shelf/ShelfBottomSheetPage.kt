@@ -56,7 +56,7 @@ fun ShelfBottomSheetPage(
         .map { it.copy(it.first.drop(4), it.second) }
         .collectAsStateWithLifecycle(null)
     var performMediaRouteButtonClick by remember { mutableStateOf(false) }
-    val coroutine = rememberCoroutineScope()
+    val coroutineScope = rememberCoroutineScope()
     trimmedShelf?.let { (shelfItems, episode) ->
         shelfViewModel.setData(shelfItems, episode)
         Content(
@@ -76,7 +76,7 @@ fun ShelfBottomSheetPage(
             MenuShelfItems(
                 shelfViewModel = shelfViewModel,
                 onClick = { item, enabled ->
-                    coroutine.launch {
+                    coroutineScope.launch {
                         if (item == ShelfItem.Cast) {
                             performMediaRouteButtonClick = true
                             delay(100) // allow perform action to complete before dismissing the bottom sheet
