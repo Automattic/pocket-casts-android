@@ -53,7 +53,7 @@ class ShelfFragment : BaseFragment() {
     companion object {
         private const val ARG_EPISODE_ID = "episode_id"
         fun newInstance(
-            episodeId: String? = null,
+            episodeId: String,
         ) = ShelfFragment().apply {
             arguments = bundleOf(
                 ARG_EPISODE_ID to episodeId,
