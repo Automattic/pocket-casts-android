@@ -62,7 +62,7 @@ fun ShelfRearrangeActionsPage(
         )
     }
 
-    LaunchedEffect(shelfItems, episode) {
+    LaunchedEffect(shelfItems, episode?.uuid) {
         shelfViewModel.setData(shelfItems, episode)
     }
 
