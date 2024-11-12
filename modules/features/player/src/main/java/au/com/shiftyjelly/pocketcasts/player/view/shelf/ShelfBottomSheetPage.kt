@@ -52,9 +52,10 @@ fun ShelfBottomSheetPage(
     onEditButtonClick: () -> Unit,
     onShelfItemClick: (item: ShelfItem, enabled: Boolean) -> Unit,
 ) {
-    val trimmedShelf by playerViewModel.trimmedShelfLive.asFlow()
-        .map { it.copy(it.first.drop(4), it.second) }
-        .collectAsStateWithLifecycle(null)
+    val trimmedShelf by remember {
+        playerViewModel.trimmedShelfLive.asFlow()
+            .map { it.copy(it.first.drop(4), it.second) }
+    }.collectAsStateWithLifecycle(null)
     var performMediaRouteButtonClick by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
     trimmedShelf?.let { (shelfItems, episode) ->

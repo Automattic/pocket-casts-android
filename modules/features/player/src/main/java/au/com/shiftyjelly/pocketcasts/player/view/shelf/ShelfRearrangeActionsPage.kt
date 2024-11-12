@@ -6,6 +6,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -35,15 +36,17 @@ fun ShelfRearrangeActionsPage(
     val backgroundColorInt = theme.playerBackground2Color(playerViewModel.podcast)
     val toolbarColorInt = theme.playerBackgroundColor(playerViewModel.podcast)
     val selectedColorInt = theme.playerHighlight7Color(playerViewModel.podcast)
-    val selectedBackgroundInt = ColorUtils.calculateCombinedColor(backgroundColorInt, selectedColorInt)
+    val selectedBackgroundInt = remember { ColorUtils.calculateCombinedColor(backgroundColorInt, selectedColorInt) }
 
-    val shelfItems by playerViewModel.shelfLive.asFlow()
-        .collectAsStateWithLifecycle(emptyList<ShelfItem>())
+    val shelfItems by remember {
+        playerViewModel.shelfLive.asFlow()
+    }.collectAsStateWithLifecycle(emptyList<ShelfItem>())
 
-    val episode by playerViewModel.playingEpisodeLive.asFlow()
-        .map { (episode, _) -> episode }
-        .distinctUntilChangedBy { it.uuid }
-        .collectAsStateWithLifecycle(null)
+    val episode by remember {
+        playerViewModel.playingEpisodeLive.asFlow()
+            .map { (episode, _) -> episode }
+            .distinctUntilChangedBy { it.uuid }
+    }.collectAsStateWithLifecycle(null)
 
     shelfViewModel.setData(shelfItems, episode)
 
