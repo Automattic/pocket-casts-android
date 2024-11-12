@@ -36,10 +36,10 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun ShelfItemRow(
     episode: BaseEpisode?,
     item: ShelfItem,
+    modifier: Modifier = Modifier,
     isEditable: Boolean = true,
     isTranscriptAvailable: Boolean = false,
     onClick: ((ShelfItem, Boolean) -> Unit)? = null,
-    modifier: Modifier = Modifier,
 ) {
     val subtitleResId = item.subtitleId(episode)
     val isEnabled = item != ShelfItem.Transcript || isTranscriptAvailable
