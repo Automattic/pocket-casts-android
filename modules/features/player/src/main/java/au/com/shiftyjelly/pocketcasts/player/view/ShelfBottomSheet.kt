@@ -42,8 +42,8 @@ class ShelfBottomSheet : BaseDialogFragment() {
 
     @Inject lateinit var settings: Settings
 
-    private val episodeId: String?
-        get() = arguments?.getString(ARG_EPISODE_ID)
+    private val episodeId: String
+        get() = requireNotNull(arguments?.getString(ARG_EPISODE_ID))
 
     private val playerViewModel: PlayerViewModel by activityViewModels()
     private val shelfViewModel: ShelfViewModel by viewModels(
@@ -174,7 +174,7 @@ class ShelfBottomSheet : BaseDialogFragment() {
     companion object {
         private const val ARG_EPISODE_ID = "episode_id"
         fun newInstance(
-            episodeId: String? = null,
+            episodeId: String,
         ) = ShelfBottomSheet().apply {
             arguments = bundleOf(
                 ARG_EPISODE_ID to episodeId,

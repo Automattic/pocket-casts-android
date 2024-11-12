@@ -19,8 +19,8 @@ import kotlin.getValue
 
 @AndroidEntryPoint
 class ShelfFragment : BaseFragment() {
-    private val episodeId: String?
-        get() = arguments?.getString(ARG_EPISODE_ID)
+    private val episodeId: String
+        get() = requireNotNull(arguments?.getString(ARG_EPISODE_ID))
 
     private val playerViewModel: PlayerViewModel by activityViewModels()
     private val shelfViewModel: ShelfViewModel by viewModels(

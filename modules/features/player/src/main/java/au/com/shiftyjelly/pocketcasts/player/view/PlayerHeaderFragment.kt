@@ -634,7 +634,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         }
         analyticsTracker.track(AnalyticsEvent.PLAYER_SHELF_OVERFLOW_MENU_SHOWN)
         ShelfBottomSheet.newInstance(
-            episodeId = viewModel.episode?.uuid,
+            episodeId = requireNotNull(viewModel.episode?.uuid),
         ).show(childFragmentManager, "shelf_bottom_sheet")
     }
 

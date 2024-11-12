@@ -31,7 +31,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel(assistedFactory = ShelfViewModel.Factory::class)
 class ShelfViewModel @AssistedInject constructor(
-    @Assisted private val episodeId: String?,
+    @Assisted private val episodeId: String,
     @Assisted private val isEditable: Boolean,
     private val transcriptsManager: TranscriptsManager,
     private val analyticsTracker: AnalyticsTracker,
@@ -43,14 +43,13 @@ class ShelfViewModel @AssistedInject constructor(
 
     init {
         viewModelScope.launch {
-            episodeId?.let {
-                transcriptsManager.observerTranscriptForEpisode(episodeId)
-                    .distinctUntilChangedBy { it?.episodeUuid }
-                    .stateIn(viewModelScope)
-                    .collectLatest { transcript ->
-                        _uiState.update { it.copy(transcript = transcript) }
-                    }
-            }
+            transcriptsManager.observerTranscriptForEpisode(episodeId)
+                .distinctUntilChangedBy { it?.episodeUuid }
+                .stateIn(viewModelScope)
+                .collectLatest { transcript ->
+                    _uiState.update { it.copy(transcript = transcript) }
+                }
+
         }
     }
 
@@ -199,7 +198,7 @@ class ShelfViewModel @AssistedInject constructor(
     @AssistedFactory
     interface Factory {
         fun create(
-            episodeId: String?,
+            episodeId: String,
             isEditable: Boolean,
         ): ShelfViewModel
     }
