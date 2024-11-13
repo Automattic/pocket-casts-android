@@ -7,13 +7,9 @@ import android.animation.PropertyValuesHolder
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.StringRes
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.view.isVisible
-import androidx.core.view.updateLayoutParams
+import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -22,17 +18,19 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
-import au.com.shiftyjelly.pocketcasts.player.R
-import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterShelfItemBinding
-import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterShelfTitleBinding
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentShelfBinding
+import au.com.shiftyjelly.pocketcasts.player.view.shelf.ShelfItemRow
+import au.com.shiftyjelly.pocketcasts.player.view.shelf.ShelfTitleRow
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
+import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfTitle
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.ColorUtils
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -55,7 +53,7 @@ class ShelfFragment : BaseFragment(), ShelfTouchCallback.ItemTouchHelperAdapter 
 
     private lateinit var itemTouchHelper: ItemTouchHelper
     private val playerViewModel: PlayerViewModel by activityViewModels()
-    private val adapter = ShelfAdapter(editable = true, dragListener = this::onShelfItemStartDrag)
+    private val adapter by lazy { ShelfAdapter(theme = theme, editable = true, dragListener = this::onShelfItemStartDrag) }
     private val shortcutTitle = ShelfTitle(LR.string.player_rearrange_actions_shown)
     private val moreActionsTitle = ShelfTitle(LR.string.player_rearrange_actions_hidden)
     private var binding: FragmentShelfBinding? = null
@@ -214,8 +212,6 @@ class ShelfFragment : BaseFragment(), ShelfTouchCallback.ItemTouchHelperAdapter 
     }
 }
 
-data class ShelfTitle(@StringRes val title: Int)
-
 private val SHELF_ITEM_DIFF = object : DiffUtil.ItemCallback<Any>() {
     override fun areItemsTheSame(oldItem: Any, newItem: Any): Boolean {
         return if (oldItem is ShelfItem && newItem is ShelfItem) {
@@ -230,7 +226,7 @@ private val SHELF_ITEM_DIFF = object : DiffUtil.ItemCallback<Any>() {
     }
 }
 
-class ShelfAdapter(val editable: Boolean, val listener: ((ShelfItem, Boolean) -> Unit)? = null, val dragListener: ((ItemViewHolder) -> Unit)?) : ListAdapter<Any, RecyclerView.ViewHolder>(SHELF_ITEM_DIFF) {
+class ShelfAdapter(val theme: Theme, val editable: Boolean, val listener: ((ShelfItem, Boolean) -> Unit)? = null, val dragListener: ((ItemViewHolder) -> Unit)?) : ListAdapter<Any, RecyclerView.ViewHolder>(SHELF_ITEM_DIFF) {
     var episode: BaseEpisode? = null
         set(value) {
             field = value
@@ -245,9 +241,23 @@ class ShelfAdapter(val editable: Boolean, val listener: ((ShelfItem, Boolean) ->
     var normalBackground = Color.TRANSPARENT
     var selectedBackground = Color.BLACK
 
-    class TitleViewHolder(val binding: AdapterShelfTitleBinding) : RecyclerView.ViewHolder(binding.root)
+    inner class TitleViewHolder(
+        val composeView: ComposeView,
+    ) : RecyclerView.ViewHolder(composeView) {
+        fun bind(item: ShelfTitle) {
+            composeView.setContent {
+                AppTheme(theme.activeTheme) {
+                    ShelfTitleRow(
+                        item = item,
+                    )
+                }
+            }
+        }
+    }
 
-    inner class ItemViewHolder(val binding: AdapterShelfItemBinding) : RecyclerView.ViewHolder(binding.root), ShelfTouchCallback.ItemTouchHelperViewHolder {
+    inner class ItemViewHolder(
+        val composeView: ComposeView,
+    ) : RecyclerView.ViewHolder(composeView), ShelfTouchCallback.ItemTouchHelperViewHolder {
 
         override fun onItemDrag() {
             AnimatorSet().apply {
@@ -276,63 +286,50 @@ class ShelfAdapter(val editable: Boolean, val listener: ((ShelfItem, Boolean) ->
                 start()
             }
         }
+
+        fun bind(item: ShelfItem) {
+            composeView.setContent {
+                AppTheme(theme.activeTheme) {
+                    ShelfItemRow(
+                        episode = episode,
+                        item = item,
+                        isEditable = editable,
+                        isTranscriptAvailable = isTranscriptAvailable,
+                        onClick = {
+                            val isEnabled = item != ShelfItem.Transcript || isTranscriptAvailable
+                            listener?.invoke(item, isEnabled)
+                        },
+                        dragListener = { dragListener?.invoke(this) },
+                    )
+                }
+            }
+        }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        val inflater = LayoutInflater.from(parent.context)
-        return when (viewType) {
-            R.layout.adapter_shelf_item -> {
-                val binding = AdapterShelfItemBinding.inflate(inflater, parent, false)
-                ItemViewHolder(binding)
-            }
-            R.layout.adapter_shelf_title -> {
-                val binding = AdapterShelfTitleBinding.inflate(inflater, parent, false)
-                TitleViewHolder(binding)
-            }
-            else -> throw IllegalStateException("Unknown view type in shelf")
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = when (viewType) {
+        ShelfItemRow.VIEW_TYPE_ID -> {
+            ItemViewHolder(composeView = ComposeView(parent.context))
         }
+        ShelfTitleRow.VIEW_TYPE_ID -> {
+            TitleViewHolder(composeView = ComposeView(parent.context))
+        }
+        else -> throw IllegalStateException("Unknown view type in shelf")
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val item = getItem(position)
 
         if (item is ShelfItem && holder is ItemViewHolder) {
-            val binding = holder.binding
-
-            binding.lblTitle.setText(item.titleId(episode))
-            binding.imgIcon.setImageResource(item.iconId(episode))
-
-            val isEnabled = item != ShelfItem.Transcript || isTranscriptAvailable
-            binding.root.alpha = if (isEnabled || editable) 1f else 0.4f
-
-            binding.dragHandle.isVisible = editable
-
-            if (listener != null) {
-                holder.itemView.setOnClickListener { listener.invoke(item, isEnabled) }
-            }
-
-            val subtitle = item.subtitleId(episode)
-            binding.lblSubtitle.isVisible = editable && subtitle != null
-            if (subtitle != null) {
-                binding.lblSubtitle.setText(subtitle)
-            }
-            binding.lblTitle.updateLayoutParams<ConstraintLayout.LayoutParams> { bottomMargin = if (binding.lblSubtitle.isVisible) 0 else 8.dpToPx(binding.lblTitle.context) }
-
-            binding.dragHandle.setOnTouchListener { _, event ->
-                if (event.actionMasked == MotionEvent.ACTION_DOWN) {
-                    dragListener?.invoke(holder)
-                }
-                false
-            }
+            holder.bind(item)
         } else if (item is ShelfTitle && holder is TitleViewHolder) {
-            holder.binding.lblTitle.setText(item.title)
+            holder.bind(item)
         }
     }
 
     override fun getItemViewType(position: Int): Int {
         return when (getItem(position)) {
-            is ShelfTitle -> R.layout.adapter_shelf_title
-            is ShelfItem -> R.layout.adapter_shelf_item
+            is ShelfTitle -> ShelfTitleRow.VIEW_TYPE_ID
+            is ShelfItem -> ShelfItemRow.VIEW_TYPE_ID
             else -> throw IllegalStateException("Unknown item type in shelf")
         }
     }
