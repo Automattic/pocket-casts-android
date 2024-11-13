@@ -3,6 +3,9 @@
 *   New Features
     *   Add episode basic authentication support
         ([#3213](https://github.com/Automattic/pocket-casts-android/pull/3213))
+*   Bug Fixes
+    *   Fix effects being lost when paused
+        ([#3219](https://github.com/Automattic/pocket-casts-android/pull/3219))
 
 7.77
 -----
