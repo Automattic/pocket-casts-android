@@ -383,7 +383,7 @@ subprojects {
         }
 
         // Set Gradle property 'au.com.shiftyjelly.pocketcasts.leakcanary=true' to enable Leak Canary.
-        // You can do this using the local.properties file or any other avaialable Gradle mechanism.
+        // You can do this using the gradle.properties file or any other avaialable Gradle mechanism.
         // See: https://docs.gradle.org/current/userguide/build_environment.html#sec:project_properties
         if (properties["au.com.shiftyjelly.pocketcasts.leakcanary"]?.toString().toBoolean()) {
             dependencies {
