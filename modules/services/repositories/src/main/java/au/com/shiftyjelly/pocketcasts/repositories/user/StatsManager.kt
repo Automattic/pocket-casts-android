@@ -41,9 +41,4 @@ interface StatsManager {
     suspend fun getServerStats(): StatsBundle
     fun mergeStats(statsOne: Map<String, Long>?, statsTwo: Map<String, Long>?): Map<String, Long>
     suspend fun cacheMergedStats()
-
-    interface OnStatsDownloadListener {
-        fun downloaded(stats: Map<String, Long>)
-        fun failed(errorMessage: String)
-    }
 }

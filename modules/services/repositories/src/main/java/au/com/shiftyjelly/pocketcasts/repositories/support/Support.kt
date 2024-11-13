@@ -136,33 +136,6 @@ class Support @Inject constructor(
         return intent
     }
 
-    suspend fun shareWearLogs(logBytes: ByteArray, subject: String, context: Context): Intent =
-        withContext(Dispatchers.IO) {
-            val intent = Intent(Intent.ACTION_SEND)
-            intent.type = "text/html"
-
-            val isPaid = subscriptionManager.getCachedStatus() is SubscriptionStatus.Paid
-            intent.putExtra(
-                Intent.EXTRA_SUBJECT,
-                "$subject v${settings.getVersion()} ${getAccountType(isPaid)}",
-            )
-
-            try {
-                val emailFolder = File(context.filesDir, "email")
-                emailFolder.mkdirs()
-                val debugFile = File(emailFolder, "debug_wear.txt")
-
-                debugFile.writeBytes(logBytes)
-                val fileUri =
-                    FileUtil.createUriWithReadPermissions(context, debugFile, intent)
-                intent.putExtra(Intent.EXTRA_STREAM, fileUri)
-            } catch (e: Exception) {
-                Timber.e(e)
-                intent.putExtra(Intent.EXTRA_TEXT, String(logBytes))
-            }
-            intent
-        }
-
     suspend fun emailWearLogsToSupportIntent(logBytes: ByteArray, context: Context): Intent {
         val subject = "Android wear support"
         val intro = "Hi there, just needed help with something..."

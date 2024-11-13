@@ -142,9 +142,6 @@ data class PodcastEpisode(
     @Ignore
     override var playing: Boolean = false
 
-    @Ignore
-    var hasBookmark: Boolean = false
-
     val playedPercentage: Int
         get() {
             return if (isFinished) {

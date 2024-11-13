@@ -126,9 +126,6 @@ abstract class UserEpisodeDao {
     @Query("UPDATE user_episodes SET upload_error_details = :uploadError WHERE uuid = :uuid")
     abstract suspend fun updateUploadError(uuid: String, uploadError: String?)
 
-    @Query("UPDATE user_episodes SET artwork_url = :artworkUrl WHERE uuid = :uuid")
-    abstract fun updateArtworkUrlRx(uuid: String, artworkUrl: String): Completable
-
     @Query("SELECT * FROM user_episodes WHERE (playing_status_modified IS NOT NULL OR played_up_to_modified IS NOT NULL) AND uuid IS NOT NULL LIMIT 2000")
     abstract fun findUserEpisodesToSync(): List<UserEpisode>
 

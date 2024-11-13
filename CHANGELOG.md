@@ -1,14 +1,23 @@
+7.78
+-----
+*   New Features
+    *   Add episode basic authentication support
+        ([#3213](https://github.com/Automattic/pocket-casts-android/pull/3213))
+*   Bug Fixes
+    *   Fix effects being lost when paused
+        ([#3219](https://github.com/Automattic/pocket-casts-android/pull/3219))
+
 7.77
 -----
 *   New Features
-   *   Add custom playback effects settings for podcast in the player
+    *   Add custom playback effects settings for podcast in the player
         ([#3042](https://github.com/Automattic/pocket-casts-android/issues/3042))
-   *   Add Playback 2024 summary
+    *   Add Playback 2024 summary
         ([#3123](https://github.com/Automattic/pocket-casts-android/pull/3123))
-   *   Add the ability to get notified when device is running on low storage and has downloaded episodes
-       ([#3198](https://github.com/Automattic/pocket-casts-android/pull/3198))
-   *   Add Up Next Shuffle
-       ([#3199](https://github.com/Automattic/pocket-casts-android/pull/3199))
+    *   Add the ability to get notified when device is running on low storage and has downloaded episodes
+        ([#3198](https://github.com/Automattic/pocket-casts-android/pull/3198))
+    *   Add Up Next Shuffle
+        ([#3199](https://github.com/Automattic/pocket-casts-android/pull/3199))
 *   Updates
     *   Renamed the podcast action 'Subscribe' to 'Follow'
         ([#3120](https://github.com/Automattic/pocket-casts-android/pull/3120))

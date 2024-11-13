@@ -20,6 +20,7 @@ import androidx.media3.extractor.DefaultExtractorsFactory
 import androidx.media3.extractor.mp3.Mp3Extractor
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.servers.di.InterceptorModule
 import au.com.shiftyjelly.pocketcasts.servers.di.Player
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
@@ -54,10 +55,9 @@ class ExoPlayerDataSourceFactory @Inject constructor(
 
     private val httpFactory = if (FeatureFlag.isEnabled(Feature.EXO_OKHTTP)) {
         OkHttpDataSource.Factory(client)
-            .setUserAgent(Settings.USER_AGENT_POCKETCASTS_SERVER)
     } else {
         DefaultHttpDataSource.Factory()
-            .setUserAgent(Settings.USER_AGENT_POCKETCASTS_SERVER)
+            .setUserAgent(InterceptorModule.PocketCastsPublicUserAgent)
             .setAllowCrossProtocolRedirects(true)
             .setConnectTimeoutMs(sixtySeconds)
             .setReadTimeoutMs(sixtySeconds)
