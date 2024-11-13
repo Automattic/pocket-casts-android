@@ -48,7 +48,9 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
-import com.gravatar.quickeditor.GravatarQuickEditor
+import com.gravatar.quickeditor.ui.GetQuickEditorResult
+import com.gravatar.quickeditor.ui.GravatarQuickEditorActivity
+import com.gravatar.quickeditor.ui.GravatarQuickEditorResult
 import com.gravatar.quickeditor.ui.editor.AuthenticationMethod
 import com.gravatar.quickeditor.ui.editor.AvatarPickerContentLayout
 import com.gravatar.quickeditor.ui.editor.GravatarQuickEditorParams
@@ -99,8 +101,20 @@ class AccountDetailsFragment : BaseFragment() {
     private val accountViewModel by viewModels<AccountDetailsViewModel>()
     private val upgradeBannerViewModel by viewModels<ProfileUpgradeBannerViewModel>()
 
-    private val gravatarQuickEditorLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { _ ->
-        accountViewModel.gravatarUpdated()
+    private val gravatarExternalQuickEditorLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { _ ->
+            accountViewModel.gravatarUpdated()
+        }
+    private val getQEResult = registerForActivityResult(GetQuickEditorResult()) { quickEditorResult ->
+        when (quickEditorResult) {
+            GravatarQuickEditorResult.AVATAR_SELECTED -> {
+                accountViewModel.gravatarUpdated()
+            }
+
+            else -> {
+                /* Do nothing */
+            }
+        }
     }
 
     override fun onCreateView(
@@ -292,25 +306,22 @@ class AccountDetailsFragment : BaseFragment() {
     private fun openGravatarQuickEditor(email: String) {
         analyticsTracker.track(AnalyticsEvent.ACCOUNT_DETAILS_CHANGE_AVATAR)
         if (FeatureFlag.isEnabled(Feature.GRAVATAR_NATIVE_QUICK_EDITOR)) {
-            GravatarQuickEditor.show(
-                activity = requireActivity(),
-                gravatarQuickEditorParams = GravatarQuickEditorParams {
-                    this.email = Email(email)
-                    avatarPickerContentLayout = AvatarPickerContentLayout.Horizontal
-                },
-                authenticationMethod = AuthenticationMethod.OAuth(
-                    OAuthParams {
-                        clientId = GRAVATAR_APP_ID
-                        redirectUri = Gravatar.GRAVATAR_QE_REDIRECT_URL
+            getQEResult.launch(
+                GravatarQuickEditorActivity.GravatarEditorActivityArguments(
+                    gravatarQuickEditorParams = GravatarQuickEditorParams {
+                        this.email = Email(email)
+                        avatarPickerContentLayout = AvatarPickerContentLayout.Horizontal
                     },
+                    authenticationMethod = AuthenticationMethod.OAuth(
+                        OAuthParams {
+                            clientId = GRAVATAR_APP_ID
+                            redirectUri = Gravatar.GRAVATAR_QE_REDIRECT_URL
+                        },
+                    ),
                 ),
-                onAvatarSelected = {
-                    accountViewModel.gravatarUpdated()
-                },
-                onDismiss = {},
             )
         } else {
-            gravatarQuickEditorLauncher.launch(Intent(Intent.ACTION_VIEW, Uri.parse(Gravatar.getGravatarChangeAvatarUrl(email))))
+            gravatarExternalQuickEditorLauncher.launch(Intent(Intent.ACTION_VIEW, Uri.parse(Gravatar.getGravatarChangeAvatarUrl(email))))
         }
     }
 
