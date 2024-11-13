@@ -66,7 +66,7 @@ private fun Content(
                         ReorderableItem(reorderableLazyListState, key = listItem.id) { isDragging ->
                             val elevation by animateDpAsState(if (isDragging) 4.dp else 0.dp)
                             val color = if (isDragging) selectedBackgroundColor else normalBackgroundColor
-                            val rowDraggableModifier = if (state.isEditable) Modifier.draggableHandle() else Modifier
+                            val rowDraggableModifier = if (state.isEditable) Modifier.longPressDraggableHandle() else Modifier
                             Surface(elevation = elevation, color = color) {
                                 ShelfItemRow(
                                     episode = state.episode,
