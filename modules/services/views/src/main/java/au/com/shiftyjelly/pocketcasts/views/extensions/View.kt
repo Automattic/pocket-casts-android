@@ -4,10 +4,15 @@ import android.graphics.Rect
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.MarginLayoutParams
 import android.view.animation.Animation
 import android.view.animation.Transformation
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
+import androidx.core.view.updatePadding
 import au.com.shiftyjelly.pocketcasts.views.R
 
 fun View.showIf(show: Boolean) {
@@ -107,4 +112,67 @@ fun View.collapse() {
 
     animation.duration = (initialHeight / context.resources.displayMetrics.density).toInt().toLong()
     startAnimation(animation)
+}
+
+fun View.setSystemWindowInsetToMargin(
+    left: Boolean = false,
+    top: Boolean = false,
+    right: Boolean = false,
+    bottom: Boolean = false,
+) {
+    ViewCompat.setOnApplyWindowInsetsListener(this) { view, windowInsets ->
+        val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+
+        val existingParams = layoutParams as MarginLayoutParams
+        view.updateLayoutParams<MarginLayoutParams> {
+            leftMargin = (if (left) insets.left else existingParams.leftMargin)
+            topMargin = (if (top) insets.top else existingParams.leftMargin)
+            rightMargin = (if (right) insets.right else existingParams.rightMargin)
+            bottomMargin = (if (bottom) insets.bottom else existingParams.bottomMargin)
+        }
+
+        WindowInsetsCompat.CONSUMED
+    }
+}
+
+fun View.setSystemWindowInsetToPadding(
+    left: Boolean = false,
+    top: Boolean = false,
+    right: Boolean = false,
+    bottom: Boolean = false,
+) {
+    ViewCompat.setOnApplyWindowInsetsListener(this) { view, windowInsets ->
+        val insets = windowInsets.getInsets(
+            WindowInsetsCompat.Type.systemBars() or
+                WindowInsetsCompat.Type.displayCutout(),
+        )
+
+        view.updatePadding(
+            left = if (left) insets.left else paddingLeft,
+            top = if (top) insets.top else paddingTop,
+            right = if (right) insets.right else paddingRight,
+            bottom = if (bottom) insets.bottom else paddingBottom,
+        )
+
+        WindowInsetsCompat.CONSUMED
+    }
+}
+
+fun View.setSystemWindowInsetToHeight(
+    top: Boolean = false,
+    bottom: Boolean = false,
+) {
+    ViewCompat.setOnApplyWindowInsetsListener(this) { view, windowInsets ->
+        val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+
+        view.updateLayoutParams {
+            height = when {
+                top -> insets.top
+                bottom -> insets.bottom
+                else -> 0
+            }
+        }
+
+        WindowInsetsCompat.CONSUMED
+    }
 }

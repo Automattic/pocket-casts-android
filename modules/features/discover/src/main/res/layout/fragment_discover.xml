@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".discover.view.DiscoverFragment"
+    tools:context="au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment"
     android:background="?attr/primary_ui_02">
 
     <androidx.recyclerview.widget.RecyclerView

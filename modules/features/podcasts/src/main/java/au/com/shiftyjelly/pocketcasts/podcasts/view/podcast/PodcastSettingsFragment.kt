@@ -33,6 +33,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.combineLatest
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.extensions.setInputAsSeconds
+import au.com.shiftyjelly.pocketcasts.views.extensions.setSystemWindowInsetToPadding
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.fragments.BasePreferenceFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.FilterSelectFragment
@@ -130,6 +131,9 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        view.setSystemWindowInsetToPadding(top = true)
+
         showLoading()
 
         view.setBackgroundColor(view.context.getThemeColor(UR.attr.primary_ui_01))

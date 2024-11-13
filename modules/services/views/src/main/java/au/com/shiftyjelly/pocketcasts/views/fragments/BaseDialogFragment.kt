@@ -121,11 +121,9 @@ open class BaseDialogFragment : BottomSheetDialogFragment(), CoroutineScope {
         @ColorInt navigationBar: Int,
     ) {
         requireActivity().window?.let { activityWindow ->
-            activityWindow.statusBarColor = navigationBar
             WindowInsetsControllerCompat(activityWindow, activityWindow.decorView).isAppearanceLightStatusBars = ColorUtils.calculateLuminance(navigationBar) > 0.5f
         }
         requireDialog().window?.let { dialogWindow ->
-            dialogWindow.navigationBarColor = background
             WindowInsetsControllerCompat(dialogWindow, dialogWindow.decorView).isAppearanceLightNavigationBars = ColorUtils.calculateLuminance(background) > 0.5f
         }
         bottomSheetView()?.backgroundTintList = ColorStateList.valueOf(background)

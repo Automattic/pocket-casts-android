@@ -287,11 +287,9 @@ class ShareDialogFragment : BottomSheetDialogFragment() {
     private fun refreshSystemColors(color: Color) {
         val argbColor = color.toArgb()
         requireActivity().window?.let { activityWindow ->
-            activityWindow.statusBarColor = argbColor
             WindowInsetsControllerCompat(activityWindow, activityWindow.decorView).isAppearanceLightStatusBars = color.luminance() > 0.5f
         }
         requireDialog().window?.let { dialogWindow ->
-            dialogWindow.navigationBarColor = argbColor
             WindowInsetsControllerCompat(dialogWindow, dialogWindow.decorView).isAppearanceLightNavigationBars = color.luminance() > 0.5f
         }
         bottomSheet.backgroundTintList = ColorStateList.valueOf(argbColor)

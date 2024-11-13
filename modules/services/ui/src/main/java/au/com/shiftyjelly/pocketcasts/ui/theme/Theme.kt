@@ -13,7 +13,6 @@ import androidx.annotation.StringRes
 import androidx.annotation.StyleRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -371,15 +370,12 @@ class Theme @Inject constructor(private val settings: Settings) {
                 } else {
                     useDarkStatusBarIcons(window)
                 }
-                window.statusBarColor = color.color
             }
             isDarkTheme -> {
                 useLightStatusBarIcons(window)
-                window.statusBarColor = context.getThemeColor(R.attr.secondary_ui_01)
             }
             color is StatusBarColor.Dark -> {
                 useLightStatusBarIcons(window)
-                window.statusBarColor = ContextCompat.getColor(context, R.color.colorStatusBarDarkInLight)
             }
             color is StatusBarColor.Light -> {
                 if (activeTheme.defaultLightIcons) {
@@ -387,7 +383,6 @@ class Theme @Inject constructor(private val settings: Settings) {
                 } else {
                     useDarkStatusBarIcons(window)
                 }
-                window.statusBarColor = getStatusBarColor(context)
             }
         }
     }
@@ -403,7 +398,6 @@ class Theme @Inject constructor(private val settings: Settings) {
     fun setNavigationBarColor(window: Window, isDark: Boolean, color: Int? = null) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
 
-        window.navigationBarColor = color ?: (if (isDark) Color.BLACK else Color.WHITE)
         WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightNavigationBars = !isDark
     }
 

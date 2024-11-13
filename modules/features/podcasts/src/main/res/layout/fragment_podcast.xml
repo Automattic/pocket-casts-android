@@ -7,6 +7,11 @@
     android:orientation="vertical"
     android:background="?attr/primary_ui_02">
 
+    <View
+        android:id="@+id/topSystemBarPadding"
+        android:layout_width="match_parent"
+        android:layout_height="0dp" />
+
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"

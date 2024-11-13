@@ -35,6 +35,7 @@ import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
+import au.com.shiftyjelly.pocketcasts.views.extensions.setSystemWindowInsetToMargin
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -169,7 +170,8 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentDiscoverBinding.inflate(inflater, container, false)
+        val binding = FragmentDiscoverBinding.inflate(inflater, container, false)
+        this.binding = binding
 
         if (viewModel.state.value !is DiscoverState.DataLoaded) {
             viewModel.loadData(resources)
@@ -177,7 +179,9 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
 
         viewModel.onShown()
 
-        return binding?.root
+        binding.recyclerView.setSystemWindowInsetToMargin(top = true)
+
+        return binding.root
     }
 
     override fun onDestroyView() {

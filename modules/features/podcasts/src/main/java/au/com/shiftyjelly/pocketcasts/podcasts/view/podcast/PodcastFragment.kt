@@ -73,6 +73,7 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
+import au.com.shiftyjelly.pocketcasts.views.extensions.setSystemWindowInsetToHeight
 import au.com.shiftyjelly.pocketcasts.views.extensions.setupChromeCastButton
 import au.com.shiftyjelly.pocketcasts.views.extensions.smoothScrollToTop
 import au.com.shiftyjelly.pocketcasts.views.extensions.tintIcons
@@ -604,6 +605,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         val headerColor = context.getThemeColor(UR.attr.support_09)
         binding.headerBackgroundPlaceholder.setBackgroundColor(headerColor)
         binding.toolbar.setBackgroundColor(headerColor)
+        binding.topSystemBarPadding.setBackgroundColor(headerColor)
         statusBarColor = StatusBarColor.Custom(headerColor, true)
         updateStatusBar()
 
@@ -632,6 +634,8 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                 true
             }
         }
+
+        binding.topSystemBarPadding.setSystemWindowInsetToHeight(top = true)
 
         playButtonListener.source = SourceView.PODCAST_SCREEN
         if (adapter == null) {
@@ -835,6 +839,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                 val backgroundColor = ThemeColor.podcastUi03(theme.activeTheme, podcast.backgroundColor)
                 binding?.toolbar?.setBackgroundColor(backgroundColor)
                 binding?.headerBackgroundPlaceholder?.setBackgroundColor(backgroundColor)
+                binding?.topSystemBarPadding?.setBackgroundColor(backgroundColor)
 
                 adapter?.setPodcast(podcast)
 
