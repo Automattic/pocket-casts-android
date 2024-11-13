@@ -70,6 +70,7 @@ dependencies {
     implementation(libs.media3.exoplayer)
     implementation(libs.media3.extractor)
     implementation(libs.play.cast)
+    implementation(libs.reorderable)
     implementation(libs.rx2.android)
     implementation(libs.rx2.kotlin)
     implementation(libs.rx2.relay)

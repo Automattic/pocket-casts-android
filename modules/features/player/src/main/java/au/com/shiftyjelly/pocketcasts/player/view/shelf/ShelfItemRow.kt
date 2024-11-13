@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.player.view.shelf
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,27 +32,23 @@ import java.util.Date
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-object ShelfItemRow {
-    const val VIEW_TYPE_ID = 1
-}
-
 @Composable
 fun ShelfItemRow(
     episode: BaseEpisode?,
     item: ShelfItem,
+    modifier: Modifier = Modifier,
     isEditable: Boolean = true,
     isTranscriptAvailable: Boolean = false,
-    onClick: (() -> Unit)? = null,
-    dragListener: (() -> Unit)? = null,
+    onClick: ((ShelfItem, Boolean) -> Unit)? = null,
 ) {
     val subtitleResId = item.subtitleId(episode)
     val isEnabled = item != ShelfItem.Transcript || isTranscriptAvailable
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .heightIn(min = 64.dp)
             .alpha(if (isEnabled || isEditable) 1f else 0.4f)
-            .clickable { onClick?.invoke() },
+            .clickable { onClick?.invoke(item, isEnabled) },
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
@@ -87,11 +81,6 @@ fun ShelfItemRow(
                 contentDescription = stringResource(LR.string.rearrange_actions),
                 modifier = Modifier
                     .padding(end = 16.dp)
-                    .pointerInput(Unit) {
-                        detectTapGestures(
-                            onPress = { dragListener?.invoke() },
-                        )
-                    }
                     .size(24.dp),
                 tint = MaterialTheme.theme.colors.playerContrast02,
             )
@@ -112,7 +101,7 @@ fun ShelfItemWithoutSubtitlePreview(
                 publishedDate = Date(),
             ),
             item = ShelfItem.Star,
-            onClick = {},
+            onClick = { _, _ -> },
         )
     }
 }
@@ -130,7 +119,7 @@ fun ShelfItemWithSubtitlePreview(
                 publishedDate = Date(),
             ),
             item = ShelfItem.Star,
-            onClick = {},
+            onClick = { _, _ -> },
         )
     }
 }
