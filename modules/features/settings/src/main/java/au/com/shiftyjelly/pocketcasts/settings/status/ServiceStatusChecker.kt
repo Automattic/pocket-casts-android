@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.settings.status
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import au.com.shiftyjelly.pocketcasts.servers.di.NoCache
 import au.com.shiftyjelly.pocketcasts.utils.extensions.await
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.concurrent.TimeUnit
@@ -11,7 +12,10 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 
-class ServiceStatusChecker @Inject constructor(@ApplicationContext val context: Context) {
+class ServiceStatusChecker @Inject constructor(
+    @ApplicationContext private val context: Context,
+    @NoCache private val httpClient: OkHttpClient,
+) {
 
     suspend fun check(check: Check): ServiceStatus {
         return when (check) {
@@ -32,7 +36,8 @@ class ServiceStatusChecker @Inject constructor(@ApplicationContext val context: 
     private suspend fun checkUrl(url: String): ServiceStatus {
         val log = StringBuilder()
 
-        val okHttpClient = OkHttpClient.Builder()
+        val okHttpClient = httpClient
+            .newBuilder()
             .connectTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)

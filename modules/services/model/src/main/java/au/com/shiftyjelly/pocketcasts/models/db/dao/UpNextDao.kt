@@ -1,45 +1,21 @@
 package au.com.shiftyjelly.pocketcasts.models.db.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import androidx.room.Update
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.toUpNextEpisode
-import io.reactivex.Flowable
-import io.reactivex.Maybe
-import io.reactivex.Single
 
 @Dao
 abstract class UpNextDao {
 
     @Query("SELECT * FROM up_next_episodes ORDER BY position ASC")
-    abstract fun allLiveData(): LiveData<List<UpNextEpisode>>
-
-    @Query("SELECT * FROM up_next_episodes ORDER BY position ASC")
-    abstract fun allRx(): Single<List<UpNextEpisode>>
-
-    @Query("SELECT * FROM up_next_episodes ORDER BY position ASC")
-    abstract fun observeAll(): Flowable<List<UpNextEpisode>>
-
-    @Query("SELECT * FROM up_next_episodes ORDER BY position ASC")
     abstract fun all(): List<UpNextEpisode>
-
-    @Query("SELECT * FROM up_next_episodes ORDER BY position ASC LIMIT 50")
-    abstract fun allLimit(): List<UpNextEpisode>
-
-    @Query("SELECT * FROM up_next_episodes WHERE episodeUuid = :uuid")
-    abstract fun findByEpisodeUuid(uuid: String): UpNextEpisode?
-
-    @Query("SELECT * FROM up_next_episodes WHERE episodeUuid = :uuid")
-    abstract fun findByEpisodeUuidRx(uuid: String): Maybe<UpNextEpisode>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insert(episode: UpNextEpisode): Long
@@ -93,23 +69,11 @@ abstract class UpNextDao {
         episodes.forEach { insert(it) }
     }
 
-    @Update
-    abstract fun update(episode: UpNextEpisode)
-
     @Query("UPDATE up_next_episodes SET position = :position WHERE _id = :id")
     abstract fun updatePosition(id: Long, position: Int)
 
-    @Delete
-    abstract fun delete(episode: UpNextEpisode)
-
     @Query("DELETE FROM up_next_episodes")
     abstract fun deleteAll()
-
-    @Query("DELETE FROM up_next_episodes WHERE episodeUuid NOT IN (:uuids)")
-    abstract fun deleteWhereNotUuids(uuids: List<String>)
-
-    @Query("DELETE FROM up_next_episodes WHERE episodeUuid IN (:uuids)")
-    abstract fun deleteWhereUuids(uuids: List<String>)
 
     @Transaction
     open fun deleteAllNotCurrent() {

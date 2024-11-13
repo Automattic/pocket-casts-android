@@ -14,7 +14,4 @@ abstract class TranscriptDao {
 
     @Query("SELECT * FROM episode_transcript WHERE episode_uuid IS :episodeUuid")
     abstract fun observerTranscriptForEpisode(episodeUuid: String): Flow<Transcript?>
-
-    @Query("DELETE FROM episode_transcript WHERE episode_uuid IS :episodeUuid")
-    abstract suspend fun deleteForEpisode(episodeUuid: String)
 }

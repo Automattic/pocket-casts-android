@@ -241,10 +241,10 @@ open class PlaybackManager @Inject constructor(
         // load an initial playback state
         upNextQueue.setup()
         mediaSessionManager.startObserving()
-        updatePausedPlaybackState()
         val playbackManagerNetworkWatcher = playbackManagerNetworkWatcherFactory.create(::onSwitchedToMeteredConnection)
 
         launch {
+            updatePausedPlaybackState()
             castManager.startSessionListener(object : CastManager.SessionListener {
                 override fun sessionStarted() {
                     castConnected()
@@ -389,14 +389,6 @@ open class PlaybackManager @Inject constructor(
     fun isAudioEffectsAvailable(): Boolean {
         val episode = getCurrentEpisode()
         return episode != null
-    }
-
-    fun isTrimSilenceSupported(): Boolean {
-        return player?.supportsTrimSilence() ?: false
-    }
-
-    fun isVolumeBoostSupported(): Boolean {
-        return player?.supportsVolumeBoost() ?: false
     }
 
     private suspend fun onSwitchedToMeteredConnection() {
@@ -724,12 +716,6 @@ open class PlaybackManager @Inject constructor(
             if (wasEmpty) {
                 loadCurrentEpisode(play = false)
             }
-        }
-    }
-
-    fun moveEpisode(fromPosition: Int, toPosition: Int) {
-        launch {
-            upNextQueue.moveEpisode(fromPosition, toPosition)
         }
     }
 
@@ -1820,18 +1806,14 @@ open class PlaybackManager @Inject constructor(
             ) {
                 sendDataWarningNotification(episode)
                 val previousPlaybackState = playbackStateRelay.blockingFirst()
-                val playbackState = PlaybackState(
+                val playbackState = PlaybackState.buildState(
                     state = PlaybackState.State.EMPTY, // Make sure an existing playback notification goes away
-                    isBuffering = false,
-                    isPrepared = true,
-                    isSleepTimerRunning = previousPlaybackState?.isSleepTimerRunning ?: false,
-                    title = episode.title,
-                    durationMs = episode.durationMs,
-                    positionMs = episode.playedUpToMs,
-                    episodeUuid = episode.uuid,
+                    episode = episode,
                     podcast = podcast,
-                    chapters = if (sameEpisode) (previousPlaybackState?.chapters ?: Chapters()) else Chapters(),
-                    lastChangeFrom = LastChangeFrom.OnLoadCurrentEpisodeDataWarning.value,
+                    isPrepared = true,
+                    previousPlaybackState = previousPlaybackState,
+                    lastChangeFrom = LastChangeFrom.OnLoadCurrentEpisodeDataWarning,
+                    settings = settings,
                 )
                 withContext(Dispatchers.Main) {
                     playbackStateRelay.accept(playbackState)
@@ -1933,22 +1915,17 @@ open class PlaybackManager @Inject constructor(
         }
 
         val previousPlaybackState = playbackStateRelay.blockingFirst()
-        val playbackState = PlaybackState(
+
+        val playbackState = PlaybackState.buildState(
             state = if (play) PlaybackState.State.PLAYING else PlaybackState.State.PAUSED,
-            isBuffering = !episode.isDownloaded && play,
-            isPrepared = true,
-            isSleepTimerRunning = previousPlaybackState?.isSleepTimerRunning ?: false,
-            title = episode.title,
-            durationMs = episode.durationMs,
-            positionMs = episode.playedUpToMs,
-            episodeUuid = episode.uuid,
+            episode = episode,
             podcast = podcast,
-            chapters = if (sameEpisode) (previousPlaybackState?.chapters ?: Chapters()) else Chapters(),
-            playbackSpeed = playbackEffects.playbackSpeed,
-            trimMode = playbackEffects.trimMode,
-            isVolumeBoosted = playbackEffects.isVolumeBoosted,
-            lastChangeFrom = LastChangeFrom.OnLoadCurrentEpisode.value,
+            isPrepared = false,
+            previousPlaybackState = previousPlaybackState,
+            lastChangeFrom = LastChangeFrom.OnLoadCurrentEpisode,
+            settings = settings,
         )
+
         withContext(Dispatchers.Main) {
             playbackStateRelay.accept(playbackState)
         }
@@ -2469,11 +2446,7 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
-    fun loadQueueRx(): Completable {
-        return rxCompletable { loadQueue() }
-    }
-
-    private fun updatePausedPlaybackState() {
+    private suspend fun updatePausedPlaybackState() {
         val previousPlaybackState = playbackStateRelay.blockingFirst()
         if (previousPlaybackState != null && previousPlaybackState.isPlaying) {
             return
@@ -2483,19 +2456,19 @@ open class PlaybackManager @Inject constructor(
         val upNextState = upNextQueue.changesObservable.blockingFirst()
         if (upNextState is UpNextQueue.State.Loaded) {
             val episode = upNextState.episode
-            val podcast = upNextState.podcast
-            val sameEpisode = previousPlaybackState != null && episode.uuid == previousPlaybackState.episodeUuid
-            val playbackState = PlaybackState(
+            // reload the podcast in case the playback effects have changed
+            val podcast = upNextState.podcast?.let { podcastManager.findPodcastByUuidSuspend(it.uuid) }
+
+            val playbackState = PlaybackState.buildState(
                 state = PlaybackState.State.PAUSED,
-                isSleepTimerRunning = previousPlaybackState?.isSleepTimerRunning ?: false,
-                title = episode.title,
-                durationMs = episode.durationMs,
-                positionMs = episode.playedUpToMs,
-                episodeUuid = episode.uuid,
+                episode = episode,
                 podcast = podcast,
-                chapters = if (sameEpisode) (previousPlaybackState?.chapters ?: Chapters()) else Chapters(),
-                lastChangeFrom = LastChangeFrom.OnUpdatePausedPlaybackState.value,
+                isPrepared = false,
+                previousPlaybackState = previousPlaybackState,
+                lastChangeFrom = LastChangeFrom.OnUpdatePausedPlaybackState,
+                settings = settings,
             )
+
             playbackStateRelay.accept(playbackState)
         }
     }
