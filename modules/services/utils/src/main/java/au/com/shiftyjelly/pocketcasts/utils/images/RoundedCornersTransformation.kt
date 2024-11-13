@@ -53,7 +53,7 @@ class RoundedCornersTransformation(
         // https://github.com/coil-kt/coil/issues/421#issuecomment-640133205
         val (outputWidth, outputHeight) = input.width to input.height
 
-        val output = createBitmap(outputWidth, outputHeight, input.config)
+        val output = createBitmap(outputWidth, outputHeight, input.config ?: Bitmap.Config.ARGB_8888)
         output.applyCanvas {
             drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
 
