@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
@@ -61,51 +62,51 @@ fun DeveloperPage(
     var openCrashMessageDialog by remember { mutableStateOf(false) }
     var crashMessage by remember { mutableStateOf("Test crash") }
 
-    LazyColumn(
-        modifier = modifier,
-        contentPadding = PaddingValues(bottom = bottomInset),
-    ) {
-        item {
-            ThemedTopAppBar(
-                title = stringResource(LR.string.settings_developer),
-                onNavigationClick = onBackClick,
-            )
-        }
-        item {
-            ShowkaseSetting(onClick = onShowkaseClick)
-        }
-        item {
-            ForceRefreshSetting(onClick = onForceRefreshClick)
-        }
-        item {
-            SendCrashSetting(
-                onClick = { onSendCrash(crashMessage) },
-                onLongClick = { openCrashMessageDialog = true },
-            )
-        }
-        item {
-            TriggerNotificationSetting(onClick = onTriggerNotificationClick)
-        }
-        item {
-            DeleteFirstEpisodeSetting(onClick = onDeleteFirstEpisodeClick)
-        }
-        item {
-            TriggerUpdateEpisodeDetails(onClick = onTriggerUpdateEpisodeDetails)
-        }
-        item {
-            EndOfYear(onClick = onTriggerResetEoYModalProfileBadge)
-        }
-
-        if (openCrashMessageDialog) {
+    Column(Modifier.safeDrawingPadding()) {
+        ThemedTopAppBar(
+            title = stringResource(LR.string.settings_developer),
+            onNavigationClick = onBackClick,
+        )
+        LazyColumn(
+            modifier = modifier,
+            contentPadding = PaddingValues(bottom = bottomInset),
+        ) {
             item {
-                CrashMessageDialog(
-                    initialMessage = crashMessage,
-                    onDismiss = { openCrashMessageDialog = false },
-                    onConfirm = { message ->
-                        openCrashMessageDialog = false
-                        crashMessage = message
-                    },
+                ShowkaseSetting(onClick = onShowkaseClick)
+            }
+            item {
+                ForceRefreshSetting(onClick = onForceRefreshClick)
+            }
+            item {
+                SendCrashSetting(
+                    onClick = { onSendCrash(crashMessage) },
+                    onLongClick = { openCrashMessageDialog = true },
                 )
+            }
+            item {
+                TriggerNotificationSetting(onClick = onTriggerNotificationClick)
+            }
+            item {
+                DeleteFirstEpisodeSetting(onClick = onDeleteFirstEpisodeClick)
+            }
+            item {
+                TriggerUpdateEpisodeDetails(onClick = onTriggerUpdateEpisodeDetails)
+            }
+            item {
+                EndOfYear(onClick = onTriggerResetEoYModalProfileBadge)
+            }
+
+            if (openCrashMessageDialog) {
+                item {
+                    CrashMessageDialog(
+                        initialMessage = crashMessage,
+                        onDismiss = { openCrashMessageDialog = false },
+                        onConfirm = { message ->
+                            openCrashMessageDialog = false
+                            crashMessage = message
+                        },
+                    )
+                }
             }
         }
     }

@@ -3,7 +3,9 @@ package au.com.shiftyjelly.pocketcasts.settings
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.runtime.Composable
@@ -72,29 +74,28 @@ private fun BetaFeaturesPage(
     onBackClick: () -> Unit,
     bottomInset: Dp,
 ) {
-    LazyColumn(
-        contentPadding = PaddingValues(top = 16.dp, bottom = bottomInset + 16.dp),
-    ) {
-        item {
-            ThemedTopAppBar(
-                title = stringResource(R.string.settings_beta_features),
-                onNavigationClick = { onBackClick() },
-            )
-        }
-
-        for (feature in state.featureFlags) {
-            item {
-                SettingRow(
-                    primaryText = feature.featureFlag.title,
-                    toggle = SettingRowToggle.Switch(checked = feature.isEnabled),
-                    modifier = Modifier.toggleable(
-                        value = feature.isEnabled,
-                        role = Role.Switch,
-                    ) {
-                        onFeatureEnabled(feature.featureFlag, it)
-                    },
-                    indent = false,
-                )
+    Column(Modifier.safeDrawingPadding()) {
+        ThemedTopAppBar(
+            title = stringResource(R.string.settings_beta_features),
+            onNavigationClick = { onBackClick() },
+        )
+        LazyColumn(
+            contentPadding = PaddingValues(top = 16.dp, bottom = bottomInset + 16.dp),
+        ) {
+            for (feature in state.featureFlags) {
+                item {
+                    SettingRow(
+                        primaryText = feature.featureFlag.title,
+                        toggle = SettingRowToggle.Switch(checked = feature.isEnabled),
+                        modifier = Modifier.toggleable(
+                            value = feature.isEnabled,
+                            role = Role.Switch,
+                        ) {
+                            onFeatureEnabled(feature.featureFlag, it)
+                        },
+                        indent = false,
+                    )
+                }
             }
         }
     }

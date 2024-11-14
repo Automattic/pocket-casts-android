@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -47,10 +48,9 @@ fun SettingsFragmentPage(
     bottomInset: Dp,
 ) {
     val context = LocalContext.current
-    Column {
+    Column(Modifier.safeDrawingPadding()) {
         ThemedTopAppBar(
             title = stringResource(LR.string.settings),
-            bottomShadow = true,
             onNavigationClick = onBackPressed,
         )
         LazyColumn(

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.MaterialTheme
@@ -123,7 +124,7 @@ private fun Page(
     onClick: () -> Unit,
     openUrl: (String) -> Unit,
 ) {
-    Column {
+    Column(Modifier.safeDrawingPadding()) {
         ThemedTopAppBar(
             title = stringResource(LR.string.settings_battery),
             bottomShadow = true,

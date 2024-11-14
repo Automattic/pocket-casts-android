@@ -4,9 +4,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <FrameLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical"
         android:importantForAccessibility="no">
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/appBarLayout"
@@ -24,10 +25,9 @@
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="?android:actionBarSize"
             android:clipToPadding="false"
             android:paddingBottom="16dp" />
-    </FrameLayout>
+    </LinearLayout>
 
     <FrameLayout
         android:id="@+id/filterFrameChildFragment"
