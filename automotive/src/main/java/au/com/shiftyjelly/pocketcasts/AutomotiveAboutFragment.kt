@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
 import androidx.fragment.compose.content
+import au.com.shiftyjelly.pocketcasts.compose.AutomotiveTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.extensions.openUrl
@@ -49,11 +50,13 @@ class AutomotiveAboutFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = content {
-        AboutPage(
-            onOpenLicenses = { openLicenses() },
-            onOpenLogs = { onOpenLogs() },
-            onOpenUrl = { openUrl(it) },
-        )
+        AutomotiveTheme {
+            AboutPage(
+                onOpenLicenses = { openLicenses() },
+                onOpenLogs = { onOpenLogs() },
+                onOpenUrl = { openUrl(it) },
+            )
+        }
     }
 
     private fun openLicenses() {
