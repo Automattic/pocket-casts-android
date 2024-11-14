@@ -541,19 +541,6 @@ platform :android do
       labels: ['Releases'],
       milestone_title: release_version_next
     )
-  rescue StandardError => e
-    error_message = <<-MESSAGE
-      Error creating backmerge pull request:
-
-      #{e.message}
-
-      If this is not the first time you are running the release task, the backmerge PR for the version `#{version}` might have already been previously created.
-      Please close any previous backmerge PR for `#{version}`, delete the previous merge branch, then run the release task again.
-    MESSAGE
-
-    buildkite_annotate(style: 'error', context: 'error-creating-backmerge', message: error_message) if is_ci
-
-    UI.user_error!(error_message)
   end
 
   #####################################################################################
