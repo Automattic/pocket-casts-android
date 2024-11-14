@@ -43,6 +43,7 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.getColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.hideShadow
 import au.com.shiftyjelly.pocketcasts.views.adapter.PodcastTouchCallback
+import au.com.shiftyjelly.pocketcasts.views.extensions.setSystemWindowInsetToMargin
 import au.com.shiftyjelly.pocketcasts.views.extensions.showIf
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ChromeCastButton.Shown
@@ -110,6 +111,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
             adapter = FolderAdapter(this, settings, context, theme)
         }
 
+        binding.appBarLayout.setSystemWindowInsetToMargin(top = true)
         binding.appBarLayout.hideShadow()
 
         gridOuterPadding = resources.getDimensionPixelSize(VR.dimen.grid_outer_padding)

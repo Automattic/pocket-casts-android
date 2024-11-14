@@ -21,12 +21,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.ContextCompat
+import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commitNow
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -115,7 +115,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelp
 import au.com.shiftyjelly.pocketcasts.repositories.opml.OpmlImportTask
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
-import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
@@ -245,7 +244,6 @@ class MainActivity :
     @Inject lateinit var crashLogging: CrashLogging
 
     private lateinit var bottomNavHideManager: BottomNavHideManager
-    private lateinit var observeUpNext: LiveData<UpNextQueue.State>
 
     private val viewModel: MainActivityViewModel by viewModels()
     private val disposables = CompositeDisposable()
@@ -361,6 +359,13 @@ class MainActivity :
         val view = binding.root
         setContentView(view)
         checkForNotificationPermission()
+
+        // Set the player bottom sheet position to show the mini player above the bottom navigation
+        binding.bottomNavigation.doOnLayout {
+            val miniPlayerHeight = resources.getDimension(R.dimen.miniPlayerHeight).toInt()
+            val bottomSheetBehavior = BottomSheetBehavior.from(binding.playerBottomSheet)
+            bottomSheetBehavior.peekHeight = miniPlayerHeight + binding.bottomNavigation.height
+        }
 
         lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
@@ -944,8 +949,7 @@ class MainActivity :
             }
         }
 
-        bottomNavHideManager =
-            BottomNavHideManager(findViewById(R.id.root), binding.bottomNavigation)
+        bottomNavHideManager = BottomNavHideManager(findViewById(R.id.root), binding.bottomNavigation)
         frameBottomSheetBehavior.setBottomSheetCallback(object :
             BottomSheetBehavior.BottomSheetCallback() {
             override fun onSlide(bottomSheet: View, slideOffset: Float) {}
