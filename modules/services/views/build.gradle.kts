@@ -52,6 +52,7 @@ dependencies {
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.coroutines.core)
+    implementation(libs.fragment.compose)
     implementation(libs.fragment.ktx)
     implementation(libs.lifecycle.reactivestreams.ktx)
     implementation(libs.okhttp)

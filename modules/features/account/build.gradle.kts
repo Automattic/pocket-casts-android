@@ -58,6 +58,7 @@ dependencies {
     implementation(libs.coroutines.core)
     implementation(libs.coroutines.play.services)
     implementation(libs.coroutines.rx2)
+    implementation(libs.fragment.compose)
     implementation(libs.fragment.ktx)
     implementation(libs.hilt.navigation.compose)
     implementation(libs.lifecycle.reactivestreams.ktx)
