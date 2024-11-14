@@ -6,11 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.viewModels
+import androidx.fragment.compose.content
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -61,34 +60,31 @@ class SearchResultsFragment : BaseFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ) = ComposeView(requireContext()).apply {
-        setContent {
-            val bottomInset by settings.bottomInset.collectAsStateWithLifecycle(initialValue = 0)
-            val bottomInsetDp = bottomInset.pxToDp(LocalContext.current).dp
-            AppThemeWithBackground(theme.activeTheme) {
-                setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-                when (type) {
-                    ResultsType.PODCASTS -> {
-                        SearchPodcastResultsPage(
-                            viewModel = viewModel,
-                            onFolderClick = ::onFolderClick,
-                            onPodcastClick = ::onPodcastClick,
-                            onBackClick = ::onBackClick,
-                            bottomInset = bottomInsetDp,
-                        )
-                    }
-
-                    ResultsType.EPISODES -> {
-                        SearchEpisodeResultsPage(
-                            viewModel = viewModel,
-                            onBackClick = ::onBackClick,
-                            onEpisodeClick = ::onEpisodeClick,
-                            bottomInset = bottomInsetDp,
-                        )
-                    }
-
-                    ResultsType.UNKNOWN -> throw IllegalStateException("Unknown search results type")
+    ) = content {
+        val bottomInset by settings.bottomInset.collectAsStateWithLifecycle(initialValue = 0)
+        val bottomInsetDp = bottomInset.pxToDp(LocalContext.current).dp
+        AppThemeWithBackground(theme.activeTheme) {
+            when (type) {
+                ResultsType.PODCASTS -> {
+                    SearchPodcastResultsPage(
+                        viewModel = viewModel,
+                        onFolderClick = ::onFolderClick,
+                        onPodcastClick = ::onPodcastClick,
+                        onBackClick = ::onBackClick,
+                        bottomInset = bottomInsetDp,
+                    )
                 }
+
+                ResultsType.EPISODES -> {
+                    SearchEpisodeResultsPage(
+                        viewModel = viewModel,
+                        onBackClick = ::onBackClick,
+                        onEpisodeClick = ::onEpisodeClick,
+                        bottomInset = bottomInsetDp,
+                    )
+                }
+
+                ResultsType.UNKNOWN -> throw IllegalStateException("Unknown search results type")
             }
         }
     }

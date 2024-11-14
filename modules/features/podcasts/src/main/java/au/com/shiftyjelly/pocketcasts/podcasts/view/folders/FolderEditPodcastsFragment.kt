@@ -3,11 +3,10 @@ package au.com.shiftyjelly.pocketcasts.podcasts.view.folders
 import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import androidx.compose.ui.platform.ComposeView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
+import androidx.fragment.compose.content
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
@@ -17,7 +16,9 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class FolderEditPodcastsFragment : BaseDialogFragment() {
 
-    @Inject lateinit var settings: Settings
+    @Inject
+    lateinit var settings: Settings
+
     private val viewModel: FolderEditViewModel by viewModels()
 
     companion object {
@@ -40,23 +41,23 @@ class FolderEditPodcastsFragment : BaseDialogFragment() {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return ComposeView(requireContext()).apply {
-            setContent {
-                AppThemeWithBackground(theme.activeTheme) {
-                    FolderEditPodcastsPage(
-                        onCloseClick = { dismiss() },
-                        onNextClick = {
-                            viewModel.saveFolderPodcasts {
-                                dismiss()
-                            }
-                        },
-                        viewModel = viewModel,
-                        settings = settings,
-                        fragmentManager = parentFragmentManager,
-                    )
-                }
-            }
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ) = content {
+        AppThemeWithBackground(theme.activeTheme) {
+            FolderEditPodcastsPage(
+                onCloseClick = { dismiss() },
+                onNextClick = {
+                    viewModel.saveFolderPodcasts {
+                        dismiss()
+                    }
+                },
+                viewModel = viewModel,
+                settings = settings,
+                fragmentManager = parentFragmentManager,
+            )
         }
     }
 

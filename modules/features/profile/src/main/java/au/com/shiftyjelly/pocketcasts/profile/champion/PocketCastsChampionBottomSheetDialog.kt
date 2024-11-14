@@ -5,8 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.view.doOnLayout
+import androidx.fragment.compose.content
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -26,22 +27,22 @@ class PocketCastsChampionBottomSheetDialog : BottomSheetDialogFragment() {
 
     @Inject lateinit var analyticsTracker: AnalyticsTracker
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        val context = context ?: throw Exception("Context not found")
-        return ComposeView(context).apply {
-            setContent {
-                AppTheme(theme.activeTheme) {
-                    CallOnce {
-                        analyticsTracker.track(AnalyticsEvent.POCKET_CASTS_CHAMPION_DIALOG_SHOWN)
-                    }
-                    ChampionDialog(
-                        onRateClick = {
-                            analyticsTracker.track(AnalyticsEvent.POCKET_CASTS_CHAMPION_DIALOG_RATE_BUTTON_TAPPED)
-                            rateUs(context)
-                        },
-                    )
-                }
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ) = content {
+        AppTheme(theme.activeTheme) {
+            CallOnce {
+                analyticsTracker.track(AnalyticsEvent.POCKET_CASTS_CHAMPION_DIALOG_SHOWN)
             }
+            val context = LocalContext.current
+            ChampionDialog(
+                onRateClick = {
+                    analyticsTracker.track(AnalyticsEvent.POCKET_CASTS_CHAMPION_DIALOG_RATE_BUTTON_TAPPED)
+                    rateUs(context)
+                },
+            )
         }
     }
 
