@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable
 import android.os.Build
 import android.util.TypedValue
 import android.view.Window
+import androidx.activity.SystemBarStyle
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -343,8 +344,13 @@ class Theme @Inject constructor(private val settings: Settings) {
         return context.getThemeColor(R.attr.secondary_ui_01)
     }
 
-    @ColorInt fun getStatusBarColor(context: Context): Int {
-        return getColorForeground(context)
+    @ColorInt fun getNavigationBackgroundColor(context: Context): Int {
+        return context.getThemeColor(R.attr.primary_ui_03)
+    }
+
+    fun getNavigationBarStyle(context: Context): SystemBarStyle {
+        val navigationBarColor = getNavigationBackgroundColor(context)
+        return if (isDarkTheme) SystemBarStyle.dark(scrim = navigationBarColor) else SystemBarStyle.light(scrim = navigationBarColor, darkScrim = navigationBarColor)
     }
 
     /**

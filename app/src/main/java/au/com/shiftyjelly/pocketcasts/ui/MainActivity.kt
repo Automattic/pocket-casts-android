@@ -351,9 +351,9 @@ class MainActivity :
         Timber.d("Main Activity onCreate")
         // Changing the theme draws the status and navigation bars as black, unless this is manually set
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         theme.setupThemeForConfig(this, resources.configuration)
+        enableEdgeToEdge(navigationBarStyle = theme.getNavigationBarStyle(this))
 
         playbackManager.setNotificationPermissionChecker(this)
 
