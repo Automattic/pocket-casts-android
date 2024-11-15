@@ -19,7 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -35,7 +34,6 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -109,13 +107,13 @@ fun UserImage(
     config: UserImageConfig = UserUiDefaults.imageConfig,
 ) {
     Box(
+        contentAlignment = Alignment.Center,
         modifier = modifier,
     ) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
                 .size(config.size)
-                .padding(subscriptionTier.toUserImagePadding(config))
                 .background(subscriptionTier.toBackgroundBrush(), CircleShape),
         ) {
             Image(
@@ -130,25 +128,22 @@ fun UserImage(
             contentDescription = null,
             modifier = Modifier
                 .size(config.size)
-                .padding(subscriptionTier.toUserImagePadding(config))
                 .clip(CircleShape),
         )
         if (config.borderWidth > Dp.Hairline && subscriptionTier != NONE) {
             val borderColor = subscriptionTier.toDarkColor()
             Canvas(
-                Modifier.size(config.size - config.borderWidth / 2),
+                Modifier
+                    .padding(config.borderWidth / 2)
+                    .size(config.size + config.borderWidth * 2 + config.borderPadding * 2),
             ) {
-                val strokeWidthPx = config.borderWidth.toPx()
+                val borderWidthPx = config.borderWidth.toPx()
                 drawArc(
                     color = borderColor,
                     startAngle = 270f,
                     sweepAngle = 360f * -borderCompletion,
-                    topLeft = Offset(
-                        x = strokeWidthPx / 2,
-                        y = strokeWidthPx / 2,
-                    ),
                     useCenter = false,
-                    style = Stroke(strokeWidthPx),
+                    style = Stroke(borderWidthPx),
                 )
             }
         }
@@ -190,7 +185,7 @@ object UserUiDefaults {
     val imageConfig = UserImageConfig(
         size = 104.dp,
         borderPadding = 2.dp,
-        borderWidth = 1.5.dp,
+        borderWidth = 2.dp,
     )
 
     val badgeConfig = UserBadgeConfig(
@@ -221,11 +216,6 @@ data class UserAvatarConfig(
     val imageConfig: UserImageConfig,
     val badgeConfig: UserBadgeConfig,
 )
-
-private fun SubscriptionTier.toUserImagePadding(config: UserImageConfig) = when (this) {
-    NONE -> PaddingValues()
-    PLUS, PATRON -> PaddingValues(config.borderPadding + config.borderWidth.coerceAtLeast(0.dp))
-}
 
 @Composable
 private fun SubscriptionTier.toLightColor() = when (this) {
