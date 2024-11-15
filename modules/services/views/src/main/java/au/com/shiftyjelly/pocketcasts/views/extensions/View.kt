@@ -66,7 +66,15 @@ fun View.setSystemWindowInsetToPadding(
             bottom = if (bottom) insets.bottom else paddingBottom,
         )
 
-        WindowInsetsCompat.CONSUMED
+        ViewCompat.onApplyWindowInsets(
+            view,
+            windowInsets.inset(
+                if (left) insets.left else 0,
+                if (top) insets.top else 0,
+                if (right) insets.right else 0,
+                if (bottom) insets.bottom else 0,
+            ),
+        )
     }
 }
 
@@ -85,6 +93,14 @@ fun View.setSystemWindowInsetToHeight(
             }
         }
 
-        WindowInsetsCompat.CONSUMED
+        ViewCompat.onApplyWindowInsets(
+            view,
+            windowInsets.inset(
+                0,
+                if (top) insets.top else 0,
+                0,
+                if (bottom) insets.bottom else 0,
+            ),
+        )
     }
 }

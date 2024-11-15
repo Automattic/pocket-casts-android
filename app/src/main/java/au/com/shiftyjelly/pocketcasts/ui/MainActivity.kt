@@ -150,6 +150,7 @@ import au.com.shiftyjelly.pocketcasts.utils.observeOnce
 import au.com.shiftyjelly.pocketcasts.view.BottomNavHideManager
 import au.com.shiftyjelly.pocketcasts.view.LockableBottomSheetBehavior
 import au.com.shiftyjelly.pocketcasts.views.activity.WebViewActivity
+import au.com.shiftyjelly.pocketcasts.views.extensions.setSystemWindowInsetToPadding
 import au.com.shiftyjelly.pocketcasts.views.extensions.showAllowingStateLoss
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
@@ -366,6 +367,8 @@ class MainActivity :
         val view = binding.root
         setContentView(view)
         checkForNotificationPermission()
+
+        binding.root.setSystemWindowInsetToPadding(left = true, right = true)
 
         // Set the player bottom sheet position to show the mini player above the bottom navigation
         binding.bottomNavigation.doOnLayout {
