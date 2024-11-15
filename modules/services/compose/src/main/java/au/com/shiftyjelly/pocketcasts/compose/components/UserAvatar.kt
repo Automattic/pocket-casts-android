@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.res.colorResource
@@ -33,6 +34,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -55,21 +57,33 @@ fun UserAvatar(
     subscriptionTier: SubscriptionTier,
     modifier: Modifier = Modifier,
     borderCompletion: Float = 1f,
+    showPatronBadge: Boolean = true,
     config: UserAvatarConfig = UserUiDefaults.avatarConfig,
 ) {
     SubcomposeLayout(
         modifier = modifier,
     ) { constraints ->
-        val image = subcompose("image") {
-            UserImage(
+        val picture = subcompose("picture") {
+            UserPicture(
                 imageUrl = imageUrl,
                 subscriptionTier = subscriptionTier,
-                borderCompletion = borderCompletion,
                 config = config.imageConfig,
             )
         }[0].measure(constraints)
 
-        val badge = if (subscriptionTier == PATRON) {
+        val border = if (config.imageConfig.borderWidth > Dp.Hairline && subscriptionTier != NONE) {
+            subcompose("border") {
+                UserPictureBorder(
+                    borderCompletion = borderCompletion,
+                    subscriptionTier = subscriptionTier,
+                    config = config.imageConfig,
+                )
+            }[0].measure(constraints)
+        } else {
+            null
+        }
+
+        val badge = if (subscriptionTier == PATRON && showPatronBadge) {
             subcompose("badge") {
                 UserBadge(
                     subscriptionTier = subscriptionTier,
@@ -80,25 +94,31 @@ fun UserAvatar(
             null
         }
 
-        val borderOffset = config.imageConfig.run {
-            if (subscriptionTier == PATRON && borderWidth > Dp.Hairline) {
-                (borderWidth + borderPadding).roundToPx()
-            } else {
-                0
-            }
-        }
-        val width = maxOf(image.width, badge?.width ?: 0)
-        val height = image.height + (badge?.height ?: 0) / 2 - borderOffset
+        val pictureSize = IntSize(picture.width, picture.height)
+        val borderSize = IntSize(border?.width ?: 0, border?.height ?: 0)
+        val badgeSize = IntSize(badge?.width ?: 0, badge?.height ?: 0)
+
+        val outerHeight = maxOf(pictureSize.height, borderSize.height)
+        val badgeOffset = config.imageConfig.borderWidth.roundToPx() * 2
+        val width = maxOf(pictureSize.width, borderSize.width, badgeSize.width)
+        val height = maxOf(outerHeight + badgeSize.height / 2 - badgeOffset, outerHeight)
 
         layout(width, height) {
-            image.place(
-                x = (width - image.width) / 2,
-                y = 0,
+            picture.place(
+                x = (width - picture.width) / 2,
+                y = if (borderSize.height > pictureSize.height) {
+                    (borderSize.height - pictureSize.height) / 2
+                } else {
+                    0
+                },
             )
+            if (border != null) {
+                border.place(0, 0)
+            }
             if (badge != null) {
                 badge.place(
                     x = (width - badge.width) / 2,
-                    y = image.height - badge.height / 2 - borderOffset,
+                    y = outerHeight - badge.height / 2 - badgeOffset,
                 )
             }
         }
@@ -106,11 +126,10 @@ fun UserAvatar(
 }
 
 @Composable
-fun UserImage(
+private fun UserPicture(
     imageUrl: String?,
     subscriptionTier: SubscriptionTier,
     modifier: Modifier = Modifier,
-    borderCompletion: Float = 1f,
     config: UserImageConfig = UserUiDefaults.imageConfig,
 ) {
     Box(
@@ -137,23 +156,30 @@ fun UserImage(
                 .size(config.size)
                 .clip(CircleShape),
         )
-        if (config.borderWidth > Dp.Hairline && subscriptionTier != NONE) {
-            val borderColor = subscriptionTier.toDarkColor()
-            Canvas(
-                Modifier
-                    .padding(config.borderWidth / 2)
-                    .size(config.size + config.borderWidth * 2 + config.borderPadding * 2),
-            ) {
-                val borderWidthPx = config.borderWidth.toPx()
-                drawArc(
-                    color = borderColor,
-                    startAngle = 270f,
-                    sweepAngle = 360f * -borderCompletion,
-                    useCenter = false,
-                    style = Stroke(borderWidthPx),
-                )
-            }
-        }
+    }
+}
+
+@Composable
+private fun UserPictureBorder(
+    borderCompletion: Float,
+    subscriptionTier: SubscriptionTier,
+    modifier: Modifier = Modifier,
+    config: UserImageConfig = UserUiDefaults.imageConfig,
+) {
+    val borderColor = subscriptionTier.toDarkColor()
+    Canvas(
+        modifier
+            .padding(config.borderWidth / 2)
+            .size(config.size + config.borderWidth + config.borderPadding * 2),
+    ) {
+        val borderWidthPx = config.borderWidth.toPx()
+        drawArc(
+            color = borderColor,
+            startAngle = 270f,
+            sweepAngle = 360f * -borderCompletion,
+            useCenter = false,
+            style = Stroke(borderWidthPx, cap = StrokeCap.Round),
+        )
     }
 }
 
@@ -191,7 +217,7 @@ private fun UserBadge(
 object UserUiDefaults {
     val imageConfig = UserImageConfig(
         size = 104.dp,
-        borderPadding = 2.dp,
+        borderPadding = 3.dp,
         borderWidth = 4.dp,
     )
 
