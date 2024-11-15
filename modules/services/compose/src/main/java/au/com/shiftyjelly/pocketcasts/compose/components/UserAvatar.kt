@@ -80,8 +80,15 @@ fun UserAvatar(
             null
         }
 
+        val borderOffset = config.imageConfig.run {
+            if (subscriptionTier == PATRON && borderWidth > Dp.Hairline) {
+                (borderWidth + borderPadding).roundToPx()
+            } else {
+                0
+            }
+        }
         val width = maxOf(image.width, badge?.width ?: 0)
-        val height = image.height + (badge?.height ?: 0) / 2
+        val height = image.height + (badge?.height ?: 0) / 2 - borderOffset
 
         layout(width, height) {
             image.place(
@@ -91,7 +98,7 @@ fun UserAvatar(
             if (badge != null) {
                 badge.place(
                     x = (width - badge.width) / 2,
-                    y = image.height - badge.height / 2,
+                    y = image.height - badge.height / 2 - borderOffset,
                 )
             }
         }
@@ -185,13 +192,13 @@ object UserUiDefaults {
     val imageConfig = UserImageConfig(
         size = 104.dp,
         borderPadding = 2.dp,
-        borderWidth = 2.dp,
+        borderWidth = 4.dp,
     )
 
     val badgeConfig = UserBadgeConfig(
-        iconSize = 14.dp,
-        fontSize = 14.sp,
-        contentPadding = PaddingValues(horizontal = 6.dp, vertical = 2.dp),
+        iconSize = 12.dp,
+        fontSize = 12.sp,
+        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 6.dp),
     )
 
     val avatarConfig = UserAvatarConfig(
