@@ -155,12 +155,6 @@ data class Podcast(
     val isAutoAddToUpNextOff: Boolean
         get() = autoAddToUpNext == AutoAddUpNext.OFF
 
-    val isAutoAddToUpNextPlayLast: Boolean
-        get() = autoAddToUpNext == AutoAddUpNext.PLAY_LAST
-
-    val isAutoAddToUpNextPlayNext: Boolean
-        get() = autoAddToUpNext == AutoAddUpNext.PLAY_NEXT
-
     val adapterId: Long
         get() = UUID.nameUUIDFromBytes(uuid.toByteArray()).mostSignificantBits
 
