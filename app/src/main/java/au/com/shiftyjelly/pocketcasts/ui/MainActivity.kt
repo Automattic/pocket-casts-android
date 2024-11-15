@@ -377,6 +377,7 @@ class MainActivity :
             val bottomSheetBehavior = BottomSheetBehavior.from(binding.playerBottomSheet)
             bottomSheetBehavior.peekHeight = miniPlayerHeight + bottomNavigationHeight
             binding.mainFragment.updatePadding(bottom = bottomNavigationHeight)
+            binding.snackbarFragment.updatePadding(bottom = bottomNavigationHeight)
         }
 
         lifecycleScope.launch {
