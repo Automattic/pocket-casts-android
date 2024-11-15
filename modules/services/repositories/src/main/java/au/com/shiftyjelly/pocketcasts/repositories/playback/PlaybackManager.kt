@@ -7,7 +7,6 @@ import android.content.Intent
 import android.media.MediaPlayer
 import android.net.Uri
 import android.support.v4.media.session.MediaSessionCompat
-import android.util.Pair
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -22,7 +21,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
-import au.com.shiftyjelly.pocketcasts.models.entity.Podcast.AutoAddUpNext
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
@@ -33,7 +31,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.repositories.R
@@ -663,30 +660,6 @@ open class PlaybackManager @Inject constructor(
         } else {
             play(sourceView)
         }
-    }
-
-    suspend fun addEpisodes(episodes: List<Pair<AutoAddUpNext, PodcastEpisode>>) {
-        val upNextLimit = settings.autoAddUpNextLimit.value
-        episodes
-            .filter { !upNextQueue.contains(it.second.uuid) }
-            .sortedBy { it.second.publishedDate }
-            .forEach {
-                if (upNextQueue.queueEpisodes.size < upNextLimit) {
-                    when (it.first) {
-                        AutoAddUpNext.OFF -> {}
-                        AutoAddUpNext.PLAY_LAST -> playLast(it.second, source = SourceView.UNKNOWN, userInitiated = false)
-                        AutoAddUpNext.PLAY_NEXT -> playNext(it.second, source = SourceView.UNKNOWN, userInitiated = false)
-                    }
-                } else if (upNextQueue.queueEpisodes.size >= upNextLimit &&
-                    settings.autoAddUpNextLimitBehaviour.value == AutoAddUpNextLimitBehaviour.ONLY_ADD_TO_TOP &&
-                    it.first == AutoAddUpNext.PLAY_NEXT
-                ) {
-                    playNext(it.second, source = SourceView.UNKNOWN, userInitiated = false)
-                    upNextQueue.queueEpisodes.lastOrNull()?.let { lastEpisode ->
-                        removeEpisode(lastEpisode, source = SourceView.UNKNOWN, userInitiated = false)
-                    }
-                }
-            }
     }
 
     fun playEpisodes(episodes: List<BaseEpisode>, sourceView: SourceView = SourceView.UNKNOWN) {
