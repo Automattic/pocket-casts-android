@@ -3,13 +3,13 @@ package au.com.shiftyjelly.pocketcasts.podcasts.view.components.ratings
 import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.platform.ComposeView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
+import androidx.fragment.compose.content
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.GiveRatingViewModel
@@ -42,50 +42,48 @@ class GiveRatingFragment : BaseDialogFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View = ComposeView(requireContext()).apply {
-        val podcastUuid = arguments?.getString(ARG_PODCAST_UUID)
+    ) = content {
+        val podcastUuid = remember { arguments?.getString(ARG_PODCAST_UUID) }
         if (podcastUuid == null) {
             exitWithError("${this@GiveRatingFragment::class.simpleName} is missing podcastUuid argument")
-            return@apply
+            return@content
         }
 
-        setContent {
-            AppThemeWithBackground(theme.activeTheme) {
-                val coroutineScope = rememberCoroutineScope()
-                val context = requireContext()
+        AppThemeWithBackground(theme.activeTheme) {
+            val coroutineScope = rememberCoroutineScope()
+            val context = requireContext()
 
-                GiveRatingPage(
-                    podcastUuid = podcastUuid,
-                    viewModel = viewModel,
-                    submitRating = {
-                        coroutineScope.launch {
-                            viewModel.submitRating(
-                                podcastUuid = podcastUuid,
-                                context = context,
-                                onSuccess = {
-                                    displayMessage(getString(LR.string.thank_you_for_rating))
-                                    dismiss()
-                                },
-                                onError = {
-                                    displayMessage(getString(LR.string.something_went_wrong_to_rate_this_podcast))
-                                    dismiss()
-                                },
-                            )
-                        }
-                    },
-                    onDismiss = ::dismiss,
-                    onUserSignedOut = {
-                        OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.LoggedOut)
-                        Toast.makeText(context, context.getString(LR.string.podcast_log_in_to_rate), Toast.LENGTH_LONG)
-                            .show()
-                        coroutineScope.launch {
-                            // a short delay prevents the screen from flashing before the onboarding flow is shown
-                            delay(1.seconds)
-                            dismiss()
-                        }
-                    },
-                )
-            }
+            GiveRatingPage(
+                podcastUuid = podcastUuid,
+                viewModel = viewModel,
+                submitRating = {
+                    coroutineScope.launch {
+                        viewModel.submitRating(
+                            podcastUuid = podcastUuid,
+                            context = context,
+                            onSuccess = {
+                                displayMessage(getString(LR.string.thank_you_for_rating))
+                                dismiss()
+                            },
+                            onError = {
+                                displayMessage(getString(LR.string.something_went_wrong_to_rate_this_podcast))
+                                dismiss()
+                            },
+                        )
+                    }
+                },
+                onDismiss = ::dismiss,
+                onUserSignedOut = {
+                    OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.LoggedOut)
+                    Toast.makeText(context, context.getString(LR.string.podcast_log_in_to_rate), Toast.LENGTH_LONG)
+                        .show()
+                    coroutineScope.launch {
+                        // a short delay prevents the screen from flashing before the onboarding flow is shown
+                        delay(1.seconds)
+                        dismiss()
+                    }
+                },
+            )
         }
     }
 

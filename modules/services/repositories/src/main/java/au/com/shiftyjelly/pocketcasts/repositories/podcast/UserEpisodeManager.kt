@@ -63,11 +63,9 @@ import timber.log.Timber
 
 interface UserEpisodeManager {
     suspend fun add(episode: UserEpisode, playbackManager: PlaybackManager)
-    suspend fun addAll(episodes: List<UserEpisode>)
     suspend fun update(episode: UserEpisode)
     suspend fun delete(episode: UserEpisode, playbackManager: PlaybackManager)
     suspend fun deleteAll(episodes: List<UserEpisode>, playbackManager: PlaybackManager)
-    fun observeUserEpisodes(): Flowable<List<UserEpisode>>
     suspend fun findUserEpisodes(): List<UserEpisode>
     fun observeEpisodeRx(uuid: String): Flowable<UserEpisode>
     fun observeEpisode(uuid: String): Flow<UserEpisode>
@@ -97,7 +95,6 @@ interface UserEpisodeManager {
     fun uploadImageToServer(userEpisode: UserEpisode, imageFile: File): Completable
     suspend fun updateFiles(files: List<UserEpisode>)
     suspend fun deleteImageFromServer(userEpisode: UserEpisode)
-    suspend fun updateServerStatus(userEpisode: UserEpisode, serverStatus: UserEpisodeServerStatus)
     fun monitorUploads(context: Context)
     suspend fun removeCloudStatusFromFiles(playbackManager: PlaybackManager)
     suspend fun markAsPlayed(episode: UserEpisode, playbackManager: PlaybackManager)
@@ -185,10 +182,6 @@ class UserEpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override suspend fun addAll(episodes: List<UserEpisode>) {
-        userEpisodeDao.insertAll(episodes)
-    }
-
     override suspend fun update(episode: UserEpisode) {
         userEpisodeDao.update(episode)
     }
@@ -212,10 +205,6 @@ class UserEpisodeManagerImpl @Inject constructor(
             playbackManager.removeEpisode(episodeToRemove = it, source = SourceView.FILES, userInitiated = false)
         }
         userEpisodeDao.deleteAll(episodes)
-    }
-
-    override fun observeUserEpisodes(): Flowable<List<UserEpisode>> {
-        return userEpisodeDao.observeUserEpisodesDesc()
     }
 
     override suspend fun findUserEpisodes(): List<UserEpisode> {
@@ -557,10 +546,6 @@ class UserEpisodeManagerImpl @Inject constructor(
 
     override fun observeAccountUsage(): Flowable<Optional<FileAccount>> {
         return usageRelay.toFlowable(BackpressureStrategy.LATEST)
-    }
-
-    override suspend fun updateServerStatus(userEpisode: UserEpisode, serverStatus: UserEpisodeServerStatus) {
-        userEpisodeDao.updateServerStatusRx(userEpisode.uuid, serverStatus)
     }
 
     override suspend fun deletePlayedEpisodeIfReq(episode: UserEpisode, playbackManager: PlaybackManager) {

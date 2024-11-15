@@ -5,11 +5,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.fragment.compose.content
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.ChangePwdViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.DoneViewModel
@@ -36,32 +36,32 @@ class ChangePwdFragment : BaseFragment() {
     private val doneViewModel: DoneViewModel by activityViewModels()
     private val viewModel: ChangePwdViewModel by viewModels()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return ComposeView(requireContext()).apply {
-            setContent {
-                val bottomOffset by settings.bottomInset.collectAsStateWithLifecycle(initialValue = 0)
-                AppThemeWithBackground(theme.activeTheme) {
-                    ChangePasswordPage(
-                        viewModel = viewModel,
-                        onBackPressed = {
-                            @Suppress("DEPRECATION")
-                            activity?.onBackPressed()
-                        },
-                        changePassword = {
-                            viewModel.changePassword()
-                        },
-                        onSuccess = {
-                            doneViewModel.setChangedPasswordState(detail = getString(LR.string.profile_password_changed_successful))
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ) = content {
+        val bottomOffset by settings.bottomInset.collectAsStateWithLifecycle(initialValue = 0)
+        AppThemeWithBackground(theme.activeTheme) {
+            ChangePasswordPage(
+                viewModel = viewModel,
+                onBackPressed = {
+                    @Suppress("DEPRECATION")
+                    activity?.onBackPressed()
+                },
+                changePassword = {
+                    viewModel.changePassword()
+                },
+                onSuccess = {
+                    doneViewModel.setChangedPasswordState(detail = getString(LR.string.profile_password_changed_successful))
 
-                            doneViewModel.trackShown(AccountActivity.AccountUpdatedSource.CHANGE_PASSWORD)
+                    doneViewModel.trackShown(AccountActivity.AccountUpdatedSource.CHANGE_PASSWORD)
 
-                            val fragment = ChangeDoneFragment.newInstance(closeParent = true)
-                            (activity as FragmentHostListener).addFragment(fragment)
-                        },
-                        bottomOffset = bottomOffset.pxToDp(LocalContext.current).dp,
-                    )
-                }
-            }
+                    val fragment = ChangeDoneFragment.newInstance(closeParent = true)
+                    (activity as FragmentHostListener).addFragment(fragment)
+                },
+                bottomOffset = bottomOffset.pxToDp(LocalContext.current).dp,
+            )
         }
     }
 

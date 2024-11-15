@@ -62,6 +62,7 @@ dependencies {
     implementation(libs.dagger.hilt.android)
     implementation(libs.dagger.hilt.core)
     implementation(libs.encryptedlogging)
+    implementation(libs.fragment.compose)
     implementation(libs.guava)
     implementation(libs.hilt.work)
     implementation(libs.lifecycle.reactivestreams.ktx)

@@ -3,11 +3,10 @@ package au.com.shiftyjelly.pocketcasts.podcasts.view.folders
 import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import androidx.compose.ui.platform.ComposeView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
+import androidx.fragment.compose.content
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -57,57 +56,57 @@ class FolderChooserFragment : BaseDialogFragment() {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return ComposeView(requireContext()).apply {
-            setContent {
-                AppThemeWithBackground(theme.activeTheme) {
-                    navHostController = rememberNavController()
-                    val navController = navHostController ?: return@AppThemeWithBackground
-                    NavHost(navController = navController, startDestination = NavRoutes.folders) {
-                        composable(NavRoutes.folders) {
-                            FolderChooserPage(
-                                podcastUuid = podcastUuid,
-                                onCloseClick = { dismiss() },
-                                onNewFolderClick = {
-                                    val uuid = podcastUuid
-                                    if (uuid != null) {
-                                        viewModel.addPodcast(uuid)
-                                        viewModel.removePodcastFromFolder(uuid)
-                                        navController.navigate(NavRoutes.podcasts)
-                                    }
-                                },
-                                viewModel = viewModel,
-                            )
-                        }
-                        composable(NavRoutes.podcasts) {
-                            FolderEditPodcastsPage(
-                                onCloseClick = { navController.popBackStack() },
-                                navigationButton = NavigationButton.Back,
-                                onNextClick = { navController.navigate(NavRoutes.name) },
-                                viewModel = viewModel,
-                                settings = settings,
-                                fragmentManager = parentFragmentManager,
-                            )
-                        }
-                        composable(NavRoutes.name) {
-                            FolderEditNamePage(
-                                onBackClick = { navController.popBackStack() },
-                                onNextClick = { navController.navigate(NavRoutes.color) },
-                                viewModel = viewModel,
-                            )
-                        }
-                        composable(NavRoutes.color) {
-                            FolderEditColorPage(
-                                onBackClick = { navController.popBackStack() },
-                                onSaveClick = {
-                                    viewModel.saveFolder(resources = resources) {
-                                        dismiss()
-                                    }
-                                },
-                                viewModel = viewModel,
-                            )
-                        }
-                    }
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ) = content {
+        AppThemeWithBackground(theme.activeTheme) {
+            navHostController = rememberNavController()
+            val navController = navHostController ?: return@AppThemeWithBackground
+            NavHost(navController = navController, startDestination = NavRoutes.folders) {
+                composable(NavRoutes.folders) {
+                    FolderChooserPage(
+                        podcastUuid = podcastUuid,
+                        onCloseClick = { dismiss() },
+                        onNewFolderClick = {
+                            val uuid = podcastUuid
+                            if (uuid != null) {
+                                viewModel.addPodcast(uuid)
+                                viewModel.removePodcastFromFolder(uuid)
+                                navController.navigate(NavRoutes.podcasts)
+                            }
+                        },
+                        viewModel = viewModel,
+                    )
+                }
+                composable(NavRoutes.podcasts) {
+                    FolderEditPodcastsPage(
+                        onCloseClick = { navController.popBackStack() },
+                        navigationButton = NavigationButton.Back,
+                        onNextClick = { navController.navigate(NavRoutes.name) },
+                        viewModel = viewModel,
+                        settings = settings,
+                        fragmentManager = parentFragmentManager,
+                    )
+                }
+                composable(NavRoutes.name) {
+                    FolderEditNamePage(
+                        onBackClick = { navController.popBackStack() },
+                        onNextClick = { navController.navigate(NavRoutes.color) },
+                        viewModel = viewModel,
+                    )
+                }
+                composable(NavRoutes.color) {
+                    FolderEditColorPage(
+                        onBackClick = { navController.popBackStack() },
+                        onSaveClick = {
+                            viewModel.saveFolder(resources = resources) {
+                                dismiss()
+                            }
+                        },
+                        viewModel = viewModel,
+                    )
                 }
             }
         }

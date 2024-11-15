@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.servers.server
 
-import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
 import au.com.shiftyjelly.pocketcasts.servers.model.Discover
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.servers.model.ListFeed
@@ -28,11 +27,6 @@ class ListRepository(private val listWebService: ListWebService, private val pla
 
     suspend fun getListFeedSuspend(url: String): ListFeed {
         return listWebService.getListFeedSuspend(url)
-    }
-
-    fun getBundleFeed(uuid: String): Single<ListFeed> {
-        val url = "${BuildConfig.SERVER_LIST_URL}/bundle-$uuid.json"
-        return getListFeed(url)
     }
 
     fun getCategoriesList(url: String): Single<List<DiscoverCategory>> {

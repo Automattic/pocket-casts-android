@@ -34,7 +34,6 @@ import au.com.shiftyjelly.pocketcasts.player.binding.playIfTrue
 import au.com.shiftyjelly.pocketcasts.player.binding.setSeekBarState
 import au.com.shiftyjelly.pocketcasts.player.binding.showIfPresent
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterPlayerHeaderBinding
-import au.com.shiftyjelly.pocketcasts.player.view.ShelfFragment.Companion.AnalyticsProp
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContract
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptPageWrapper
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptSearchViewModel
@@ -42,6 +41,7 @@ import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewMode
 import au.com.shiftyjelly.pocketcasts.player.view.video.VideoActivity
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel.TransitionState
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel.Companion.AnalyticsProp
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.reimagine.ShareDialogFragment
@@ -633,10 +633,11 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             return
         }
         analyticsTracker.track(AnalyticsEvent.PLAYER_SHELF_OVERFLOW_MENU_SHOWN)
-        ShelfBottomSheet.newInstance(
-            sourceView = sourceView,
-            episodeId = viewModel.episode?.uuid,
-        ).show(childFragmentManager, "shelf_bottom_sheet")
+        viewModel.episode?.let {
+            ShelfBottomSheet.newInstance(
+                episodeId = it.uuid,
+            ).show(childFragmentManager, "shelf_bottom_sheet")
+        }
     }
 
     override fun onPlayClicked() {

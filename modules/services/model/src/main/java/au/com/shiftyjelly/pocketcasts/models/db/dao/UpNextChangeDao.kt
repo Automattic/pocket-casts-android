@@ -6,20 +6,12 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextChange
-import io.reactivex.Flowable
-import io.reactivex.Single
 
 @Dao
 abstract class UpNextChangeDao {
 
     @Query("SELECT * FROM up_next_changes")
     abstract fun findAll(): List<UpNextChange>
-
-    @Query("SELECT * FROM up_next_changes")
-    abstract fun findAllRx(): Single<List<UpNextChange>>
-
-    @Query("SELECT * FROM up_next_changes")
-    abstract fun observeAll(): Flowable<List<UpNextChange>>
 
     @Query("DELETE FROM up_next_changes WHERE modified <= :modified")
     abstract suspend fun deleteChangesOlderOrEqualTo(modified: Long)

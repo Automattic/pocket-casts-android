@@ -222,7 +222,6 @@ sealed class OnboardingUpgradeBottomSheetState {
         val mostRecentlySelectedOfferPhase: OfferSubscriptionPricingPhase? = null,
         val purchaseFailed: Boolean = false,
     ) : OnboardingUpgradeBottomSheetState() {
-        val showTrialInfo = selectedSubscription.offerPricingPhase != null
         val upgradeButton = selectedSubscription.toUpgradeButton()
         init {
             if (subscriptions.isEmpty()) {

@@ -11,10 +11,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.ComposeView
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
+import androidx.fragment.compose.content
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.reimagine.ui.ShareColors
@@ -59,23 +59,21 @@ class ShareEpisodeFragment : BaseDialogFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ) = ComposeView(requireActivity()).apply {
-        val platforms = SocialPlatform.getAvailablePlatforms(requireContext())
-        setContent {
-            val assetController = rememberBackgroundAssetControler(shareColors)
-            val listener = remember { shareListenerFactory.create(this@ShareEpisodeFragment, assetController, args.source) }
+    ) = content {
+        val platforms = remember { SocialPlatform.getAvailablePlatforms(requireContext()) }
+        val assetController = rememberBackgroundAssetControler(shareColors)
+        val listener = remember { shareListenerFactory.create(this@ShareEpisodeFragment, assetController, args.source) }
 
-            val uiState by viewModel.uiState.collectAsState()
-            ShareEpisodePage(
-                podcast = uiState.podcast,
-                episode = uiState.episode,
-                useEpisodeArtwork = uiState.useEpisodeArtwork,
-                socialPlatforms = platforms,
-                shareColors = shareColors,
-                assetController = assetController,
-                listener = listener,
-            )
-        }
+        val uiState by viewModel.uiState.collectAsState()
+        ShareEpisodePage(
+            podcast = uiState.podcast,
+            episode = uiState.episode,
+            useEpisodeArtwork = uiState.useEpisodeArtwork,
+            socialPlatforms = platforms,
+            shareColors = shareColors,
+            assetController = assetController,
+            listener = listener,
+        )
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

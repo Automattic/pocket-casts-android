@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.sharing.MediaService
 import au.com.shiftyjelly.pocketcasts.sharing.VisualCardType
 import au.com.shiftyjelly.pocketcasts.utils.toSecondsWithSingleMilli
 import com.arthenica.ffmpegkit.FFmpegKit
+import com.arthenica.ffmpegkit.FFmpegKitConfig
 import com.arthenica.ffmpegkit.FFmpegSession
 import com.arthenica.ffmpegkit.FFmpegSessionCompleteCallback
 import com.arthenica.ffmpegkit.ReturnCode
@@ -150,6 +151,7 @@ internal class FFmpegMediaService(
             command,
             object : FFmpegSessionCompleteCallback {
                 override fun apply(session: FFmpegSession) {
+                    FFmpegKitConfig.clearSessions()
                     when {
                         ReturnCode.isSuccess(session.returnCode) -> {
                             continuation.resume(Result.success(Unit))
@@ -166,7 +168,10 @@ internal class FFmpegMediaService(
                 }
             },
         )
-        continuation.invokeOnCancellation { session.cancel() }
+        continuation.invokeOnCancellation {
+            FFmpegKitConfig.clearSessions()
+            session.cancel()
+        }
     }
 
     private companion object {

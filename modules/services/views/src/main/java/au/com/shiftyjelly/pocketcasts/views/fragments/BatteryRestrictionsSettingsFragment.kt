@@ -4,7 +4,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -26,7 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -36,6 +35,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.fragment.compose.content
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -73,46 +73,44 @@ class BatteryRestrictionsSettingsFragment : BaseFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View =
-        ComposeView(requireContext()).apply {
-            setContent {
-                AppThemeWithBackground(theme.activeTheme) {
-                    var isUnrestricted by remember { mutableStateOf(batteryRestrictions.isUnrestricted()) }
-                    DisposableEffect(this) {
-                        val observer = LifecycleEventObserver { _, event ->
-                            if (event == Lifecycle.Event.ON_RESUME) {
-                                isUnrestricted = batteryRestrictions.isUnrestricted()
-                            }
-                        }
-
-                        lifecycle.addObserver(observer)
-                        onDispose {
-                            lifecycle.removeObserver(observer)
-                        }
+    ) = content {
+        AppThemeWithBackground(theme.activeTheme) {
+            var isUnrestricted by remember { mutableStateOf(batteryRestrictions.isUnrestricted()) }
+            DisposableEffect(this) {
+                val observer = LifecycleEventObserver { _, event ->
+                    if (event == Lifecycle.Event.ON_RESUME) {
+                        isUnrestricted = batteryRestrictions.isUnrestricted()
                     }
+                }
 
-                    val navigationButton = if (arguments?.getBoolean(ARG_CLOSE_BUTTON) == true) {
-                        NavigationButton.Close
-                    } else {
-                        NavigationButton.Back
-                    }
-                    Page(
-                        isUnrestricted = isUnrestricted,
-                        navigationButton = navigationButton,
-                        onBackPressed = {
-                            @Suppress("DEPRECATION")
-                            activity?.onBackPressed()
-                        },
-                        onClick = { batteryRestrictions.promptToUpdateBatteryRestriction(context) },
-                        openUrl = { url ->
-                            startActivity(
-                                Intent(Intent.ACTION_VIEW, Uri.parse(url)),
-                            )
-                        },
-                    )
+                lifecycle.addObserver(observer)
+                onDispose {
+                    lifecycle.removeObserver(observer)
                 }
             }
+
+            val navigationButton = if (arguments?.getBoolean(ARG_CLOSE_BUTTON) == true) {
+                NavigationButton.Close
+            } else {
+                NavigationButton.Back
+            }
+            val context = LocalContext.current
+            Page(
+                isUnrestricted = isUnrestricted,
+                navigationButton = navigationButton,
+                onBackPressed = {
+                    @Suppress("DEPRECATION")
+                    activity?.onBackPressed()
+                },
+                onClick = { batteryRestrictions.promptToUpdateBatteryRestriction(context) },
+                openUrl = { url ->
+                    startActivity(
+                        Intent(Intent.ACTION_VIEW, Uri.parse(url)),
+                    )
+                },
+            )
         }
+    }
 }
 
 @Composable

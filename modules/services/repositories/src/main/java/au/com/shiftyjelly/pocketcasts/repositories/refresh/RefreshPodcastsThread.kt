@@ -325,7 +325,6 @@ class RefreshPodcastsThread(
             if (episodes.isEmpty()) {
                 // the server returned episodes, but none were added to the database. Update the podcast when it doesn't have the latest episode information.
                 if (podcast.latestEpisodeUuid == null) {
-                    podcastManager.updatePodcastLatestEpisode(podcast)
                 }
             } else {
                 // we now have some new episodes, update the latest episode uuid on the podcast row
