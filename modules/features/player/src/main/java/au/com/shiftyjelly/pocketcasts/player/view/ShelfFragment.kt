@@ -10,6 +10,7 @@ import androidx.fragment.compose.content
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.player.view.shelf.ShelfRearrangeActionsPage
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -23,6 +24,7 @@ class ShelfFragment : BaseFragment() {
         get() = requireNotNull(arguments?.getString(ARG_EPISODE_ID))
 
     private val playerViewModel: PlayerViewModel by activityViewModels()
+    private val shelfSharedViewModel: ShelfSharedViewModel by activityViewModels()
     private val shelfViewModel: ShelfViewModel by viewModels(
         extrasProducer = {
             defaultViewModelCreationExtras.withCreationCallback<ShelfViewModel.Factory> { factory ->
@@ -43,6 +45,7 @@ class ShelfFragment : BaseFragment() {
             ShelfRearrangeActionsPage(
                 theme = theme,
                 shelfViewModel = shelfViewModel,
+                shelfSharedViewModel = shelfSharedViewModel,
                 playerViewModel = playerViewModel,
                 onBackPressed = {
                     (activity as? FragmentHostListener)?.closeModal(this)

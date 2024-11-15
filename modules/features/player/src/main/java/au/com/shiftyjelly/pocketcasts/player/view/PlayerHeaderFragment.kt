@@ -41,6 +41,7 @@ import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewMode
 import au.com.shiftyjelly.pocketcasts.player.view.video.VideoActivity
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel.TransitionState
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel.Companion.AnalyticsProp
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
@@ -102,6 +103,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
     private lateinit var imageRequestFactory: PocketCastsImageRequestFactory
     private val viewModel: PlayerViewModel by activityViewModels()
+    private val shelfSharedViewModel: ShelfSharedViewModel by activityViewModels()
     private val transcriptViewModel by viewModels<TranscriptViewModel>({ requireParentFragment() })
     private val transcriptSearchViewModel by viewModels<TranscriptSearchViewModel>({ requireParentFragment() })
     private var binding: AdapterPlayerHeaderBinding? = null
@@ -162,12 +164,16 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             ShelfItem.Download to binding.download,
             ShelfItem.Report to binding.report,
         )
-        viewModel.trimmedShelfLive.observe(viewLifecycleOwner) {
-            binding.shelf.removeAllViews()
-            it.first.subList(0, 4)
-                .mapNotNull(shelfViews::get)
-                .forEach { itemView -> binding.shelf += itemView }
-            binding.shelf.addView(binding.playerActions)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                shelfSharedViewModel.uiState.collect { uiState ->
+                    binding.shelf.removeAllViews()
+                    uiState.shelfItems.take(4)
+                        .mapNotNull(shelfViews::get)
+                        .forEach { itemView -> binding.shelf += itemView }
+                    binding.shelf.addView(binding.playerActions)
+                }
+            }
         }
 
         if (FeatureFlag.isEnabled(Feature.TRANSCRIPTS)) {

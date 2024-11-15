@@ -26,7 +26,6 @@ import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkArguments
 import au.com.shiftyjelly.pocketcasts.player.view.dialog.ClearUpNextDialog
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
-import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
@@ -56,7 +55,6 @@ import io.reactivex.Flowable
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.Flowables
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
@@ -70,9 +68,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx2.asFlowable
 import kotlinx.coroutines.rx2.asObservable
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -206,33 +202,6 @@ class PlayerViewModel @Inject constructor(
             .toLiveData()
 
     private var playbackPositionMs: Int = 0
-
-    private val shelfObservable = settings.shelfItems.flow
-        .map { items ->
-            items.filter { item ->
-                when (item) {
-                    ShelfItem.Report -> FeatureFlag.isEnabled(Feature.REPORT_VIOLATION)
-                    ShelfItem.Transcript -> FeatureFlag.isEnabled(Feature.TRANSCRIPTS)
-                    else -> true
-                }
-            }
-        }.asFlowable(viewModelScope.coroutineContext)
-
-    private val shelfUpNext = upNextStateObservable.distinctUntilChanged { t1, t2 ->
-        val entry1 = t1 as? UpNextQueue.State.Loaded ?: return@distinctUntilChanged false
-        val entry2 = t2 as? UpNextQueue.State.Loaded ?: return@distinctUntilChanged false
-
-        return@distinctUntilChanged (entry1.episode as? PodcastEpisode)?.isStarred == (entry2.episode as? PodcastEpisode)?.isStarred && entry1.episode.episodeStatus == entry2.episode.episodeStatus && entry1.podcast?.isUsingEffects == entry2.podcast?.isUsingEffects
-    }
-
-    private val trimmedShelfObservable = Flowables.combineLatest(shelfUpNext.toFlowable(BackpressureStrategy.LATEST), shelfObservable).map { (upNextState, shelf) ->
-        val episode = (upNextState as? UpNextQueue.State.Loaded)?.episode
-        val trimmedShelf = shelf.filter { it.showIf(episode) }
-        return@map Pair(trimmedShelf, episode)
-    }
-
-    val shelfLive: LiveData<List<ShelfItem>> = shelfObservable.toLiveData()
-    val trimmedShelfLive: LiveData<Pair<List<ShelfItem>, BaseEpisode?>> = trimmedShelfObservable.toLiveData()
 
     val upNextPlusData = upNextStateObservable.map { upNextState ->
         var episodeCount = 0

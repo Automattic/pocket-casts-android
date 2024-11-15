@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.player.view.shelf.ShelfBottomSheetPage
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel.Companion.AnalyticsProp
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -46,6 +47,7 @@ class ShelfBottomSheet : BaseDialogFragment() {
         get() = requireNotNull(arguments?.getString(ARG_EPISODE_ID))
 
     private val playerViewModel: PlayerViewModel by activityViewModels()
+    private val shelfSharedViewModel: ShelfSharedViewModel by activityViewModels()
     private val shelfViewModel: ShelfViewModel by viewModels(
         extrasProducer = {
             defaultViewModelCreationExtras.withCreationCallback<ShelfViewModel.Factory> { factory ->
@@ -68,7 +70,7 @@ class ShelfBottomSheet : BaseDialogFragment() {
         AppTheme(theme.activeTheme) {
             ShelfBottomSheetPage(
                 shelfViewModel = shelfViewModel,
-                playerViewModel = playerViewModel,
+                shelfSharedViewModel = shelfSharedViewModel,
                 onEditButtonClick = {
                     (activity as FragmentHostListener).showModal(ShelfFragment.newInstance(episodeId))
                     dismiss()

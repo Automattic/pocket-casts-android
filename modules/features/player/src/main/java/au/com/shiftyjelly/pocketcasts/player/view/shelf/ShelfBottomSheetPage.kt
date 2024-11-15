@@ -25,7 +25,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.mediarouter.app.MediaRouteButton
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -33,7 +32,8 @@ import au.com.shiftyjelly.pocketcasts.compose.bottomsheet.Pill
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -48,47 +48,44 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun ShelfBottomSheetPage(
     shelfViewModel: ShelfViewModel,
-    playerViewModel: PlayerViewModel,
+    shelfSharedViewModel: ShelfSharedViewModel,
     onEditButtonClick: () -> Unit,
     onShelfItemClick: (item: ShelfItem, enabled: Boolean) -> Unit,
 ) {
-    val trimmedShelf by remember {
-        playerViewModel.trimmedShelfLive.asFlow()
-            .map { it.copy(it.first.drop(4), it.second) }
-    }.collectAsStateWithLifecycle(null)
+    val shelfUiState by shelfSharedViewModel.uiState
+        .map { it.copy(it.shelfItems.drop(4)) }
+        .collectAsStateWithLifecycle(UiState())
     val performMediaRouteClick = remember { MutableSharedFlow<Unit>() }
     val coroutineScope = rememberCoroutineScope()
-    trimmedShelf?.let { (shelfItems, episode) ->
-        Content(
-            onEditButtonClick = {
-                shelfViewModel.onEditButtonClick()
-                onEditButtonClick()
-            },
-            mediaRouteButton = {
-                MediaRouteButton(
-                    clickTrigger = performMediaRouteClick,
-                    onMediaRouteButtonClick = {
-                        shelfViewModel.onMediaRouteButtonClick()
-                    },
-                )
-            },
-        ) {
-            MenuShelfItems(
-                shelfViewModel = shelfViewModel,
-                onClick = { item, enabled ->
-                    coroutineScope.launch {
-                        if (item == ShelfItem.Cast) {
-                            performMediaRouteClick.emit(Unit)
-                            delay(100) // allow perform action to complete before dismissing the bottom sheet
-                        }
-                        onShelfItemClick(item, enabled)
-                    }
+    Content(
+        onEditButtonClick = {
+            shelfViewModel.onEditButtonClick()
+            onEditButtonClick()
+        },
+        mediaRouteButton = {
+            MediaRouteButton(
+                clickTrigger = performMediaRouteClick,
+                onMediaRouteButtonClick = {
+                    shelfViewModel.onMediaRouteButtonClick()
                 },
             )
-        }
-        LaunchedEffect(shelfItems, episode) {
-            shelfViewModel.setData(shelfItems, episode)
-        }
+        },
+    ) {
+        MenuShelfItems(
+            shelfViewModel = shelfViewModel,
+            onClick = { item, enabled ->
+                coroutineScope.launch {
+                    if (item == ShelfItem.Cast) {
+                        performMediaRouteClick.emit(Unit)
+                        delay(100) // allow perform action to complete before dismissing the bottom sheet
+                    }
+                    onShelfItemClick(item, enabled)
+                }
+            },
+        )
+    }
+    LaunchedEffect(shelfUiState) {
+        shelfViewModel.setData(shelfUiState.shelfItems, shelfUiState.episode)
     }
 }
 
