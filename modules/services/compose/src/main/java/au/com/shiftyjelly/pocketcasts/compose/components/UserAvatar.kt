@@ -58,7 +58,7 @@ fun UserAvatar(
     modifier: Modifier = Modifier,
     borderCompletion: Float = 1f,
     showPatronBadge: Boolean = true,
-    config: UserAvatarConfig = UserUiDefaults.avatarConfig,
+    config: UserAvatarConfig = UserAvatarConfig(),
 ) {
     SubcomposeLayout(
         modifier = modifier,
@@ -67,16 +67,16 @@ fun UserAvatar(
             UserPicture(
                 imageUrl = imageUrl,
                 subscriptionTier = subscriptionTier,
-                config = config.imageConfig,
+                config = config,
             )
         }[0].measure(constraints)
 
-        val border = if (config.imageConfig.borderWidth > Dp.Hairline && subscriptionTier != NONE) {
+        val border = if (config.strokeWidth > Dp.Hairline && subscriptionTier != NONE) {
             subcompose("border") {
                 UserPictureBorder(
                     borderCompletion = borderCompletion,
                     subscriptionTier = subscriptionTier,
-                    config = config.imageConfig,
+                    config = config,
                 )
             }[0].measure(constraints)
         } else {
@@ -87,7 +87,7 @@ fun UserAvatar(
             subcompose("badge") {
                 UserBadge(
                     subscriptionTier = subscriptionTier,
-                    config = config.badgeConfig,
+                    config = config,
                 )
             }[0].measure(constraints)
         } else {
@@ -99,7 +99,7 @@ fun UserAvatar(
         val badgeSize = IntSize(badge?.width ?: 0, badge?.height ?: 0)
 
         val outerHeight = maxOf(pictureSize.height, borderSize.height)
-        val badgeOffset = config.imageConfig.borderWidth.roundToPx() * 2
+        val badgeOffset = config.strokeWidth.roundToPx() * 2
         val width = maxOf(pictureSize.width, borderSize.width, badgeSize.width)
         val height = maxOf(outerHeight + badgeSize.height / 2 - badgeOffset, outerHeight)
 
@@ -130,7 +130,7 @@ private fun UserPicture(
     imageUrl: String?,
     subscriptionTier: SubscriptionTier,
     modifier: Modifier = Modifier,
-    config: UserImageConfig = UserUiDefaults.imageConfig,
+    config: UserAvatarConfig = UserAvatarConfig(),
 ) {
     Box(
         contentAlignment = Alignment.Center,
@@ -139,7 +139,7 @@ private fun UserPicture(
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
-                .size(config.size)
+                .size(config.imageSize)
                 .background(subscriptionTier.toBackgroundBrush(), CircleShape),
         ) {
             Image(
@@ -153,7 +153,7 @@ private fun UserPicture(
             model = imageUrl,
             contentDescription = null,
             modifier = Modifier
-                .size(config.size)
+                .size(config.imageSize)
                 .clip(CircleShape),
         )
     }
@@ -162,17 +162,17 @@ private fun UserPicture(
 @Composable
 private fun UserPictureBorder(
     borderCompletion: Float,
+    config: UserAvatarConfig,
     subscriptionTier: SubscriptionTier,
     modifier: Modifier = Modifier,
-    config: UserImageConfig = UserUiDefaults.imageConfig,
 ) {
     val borderColor = subscriptionTier.toDarkColor()
     Canvas(
         modifier
-            .padding(config.borderWidth / 2)
-            .size(config.size + config.borderWidth + config.borderPadding * 2),
+            .padding(config.strokeWidth / 2)
+            .size(config.imageSize + config.strokeWidth + config.imageContentPadding * 2),
     ) {
-        val borderWidthPx = config.borderWidth.toPx()
+        val borderWidthPx = config.strokeWidth.toPx()
         drawArc(
             color = borderColor,
             startAngle = 270f,
@@ -185,22 +185,22 @@ private fun UserPictureBorder(
 
 @Composable
 private fun UserBadge(
+    config: UserAvatarConfig,
     subscriptionTier: SubscriptionTier,
     modifier: Modifier = Modifier,
-    config: UserBadgeConfig = UserUiDefaults.badgeConfig,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start,
         modifier = modifier
             .background(subscriptionTier.toDarkColor(), RoundedCornerShape(50))
-            .padding(config.contentPadding),
+            .padding(config.badgeContentPadding),
     ) {
         Icon(
             painter = painterResource(IR.drawable.ic_patron),
             tint = Color.White,
             contentDescription = null,
-            modifier = Modifier.size(config.iconSize),
+            modifier = Modifier.size(config.badgeIconSize),
         )
         Spacer(
             modifier = Modifier.width(4.dp),
@@ -208,46 +208,19 @@ private fun UserBadge(
         TextH50(
             text = stringResource(LR.string.pocket_casts_patron_short),
             color = Color.White,
-            fontSize = config.fontSize,
-            lineHeight = config.fontSize,
+            fontSize = config.badgeFontSize,
+            lineHeight = config.badgeFontSize,
         )
     }
 }
 
-object UserUiDefaults {
-    val imageConfig = UserImageConfig(
-        size = 104.dp,
-        borderPadding = 3.dp,
-        borderWidth = 4.dp,
-    )
-
-    val badgeConfig = UserBadgeConfig(
-        iconSize = 12.dp,
-        fontSize = 12.sp,
-        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 6.dp),
-    )
-
-    val avatarConfig = UserAvatarConfig(
-        imageConfig = imageConfig,
-        badgeConfig = badgeConfig,
-    )
-}
-
-data class UserImageConfig(
-    val size: Dp,
-    val borderWidth: Dp,
-    val borderPadding: Dp,
-)
-
-data class UserBadgeConfig(
-    val iconSize: Dp,
-    val fontSize: TextUnit,
-    val contentPadding: PaddingValues,
-)
-
 data class UserAvatarConfig(
-    val imageConfig: UserImageConfig,
-    val badgeConfig: UserBadgeConfig,
+    val imageSize: Dp = 104.dp,
+    val imageContentPadding: Dp = 3.dp,
+    val strokeWidth: Dp = 4.dp,
+    val badgeFontSize: TextUnit = 12.sp,
+    val badgeIconSize: Dp = 12.dp,
+    val badgeContentPadding: PaddingValues = PaddingValues(horizontal = 8.dp, vertical = 6.dp),
 )
 
 @Composable
@@ -279,13 +252,12 @@ private fun SubscriptionTier.toIcon() = when (this) {
 @Composable
 private fun SubscriptionTier.toIconTint() = when (this) {
     NONE -> MaterialTheme.theme.colors.primaryUi01
-    PLUS -> Color.Black
-    PATRON -> Color.White
+    PLUS, PATRON -> if (MaterialTheme.theme.isLight) Color.White else Color.Black
 }
 
-private fun SubscriptionTier.toIconSize(config: UserImageConfig) = when (this) {
-    NONE, PATRON -> DpSize(config.size / 3, config.size / 3)
-    PLUS -> DpSize(config.size, config.size / 3)
+private fun SubscriptionTier.toIconSize(config: UserAvatarConfig) = when (this) {
+    NONE, PATRON -> DpSize(config.imageSize / 3, config.imageSize / 3)
+    PLUS -> DpSize(config.imageSize, config.imageSize / 3)
 }
 
 @Preview
