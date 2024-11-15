@@ -14,7 +14,6 @@
             android:id="@+id/mainFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingBottom="@dimen/design_bottom_navigation_height"
             android:clipToPadding="false" />
 
         <!-- Hack: the only way to get the Snackbar in front of the bottom navigation view -->
@@ -59,7 +58,8 @@
             app:behavior_peekHeight="0dp"
             app:layout_behavior="au.com.shiftyjelly.pocketcasts.view.LockableBottomSheetBehavior"
             android:clickable="true"
-            android:translationZ="200dp"/>
+            android:translationZ="200dp"
+            android:visibility="gone" />
 
         <FrameLayout
             android:id="@+id/modalBottomSheet"

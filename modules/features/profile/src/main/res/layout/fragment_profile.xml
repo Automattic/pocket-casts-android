@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <au.com.shiftyjelly.pocketcasts.player.view.StatusBarSpacer
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="?attr/secondary_ui_01" />
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nestedScrollView"
@@ -196,4 +202,4 @@
 
     </androidx.core.widget.NestedScrollView>
 
-</FrameLayout>
+</LinearLayout>

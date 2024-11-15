@@ -11,6 +11,7 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -21,6 +22,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.ContextCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
@@ -182,7 +185,6 @@ import timber.log.Timber
 import android.provider.Settings as AndroidProviderSettings
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
-import com.google.android.material.R as MR
 
 private const val SAVEDSTATE_PLAYER_OPEN = "player_open"
 private const val SAVEDSTATE_MINIPLAYER_SHOWN = "miniplayer_shown"
@@ -346,6 +348,9 @@ class MainActivity :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Timber.d("Main Activity onCreate")
+        // Changing the theme draws the status and navigation bars as black, unless this is manually set
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         theme.setupThemeForConfig(this, resources.configuration)
 
@@ -361,6 +366,15 @@ class MainActivity :
         val view = binding.root
         setContentView(view)
         checkForNotificationPermission()
+
+        // Set the player bottom sheet position to show the mini player above the bottom navigation
+        binding.bottomNavigation.doOnLayout {
+            val miniPlayerHeight = resources.getDimension(R.dimen.miniPlayerHeight).toInt()
+            val bottomNavigationHeight = binding.bottomNavigation.height
+            val bottomSheetBehavior = BottomSheetBehavior.from(binding.playerBottomSheet)
+            bottomSheetBehavior.peekHeight = miniPlayerHeight + bottomNavigationHeight
+            binding.mainFragment.updatePadding(bottom = bottomNavigationHeight)
+        }
 
         lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
@@ -669,7 +683,7 @@ class MainActivity :
         }
 
         if (color != null) {
-            theme.updateWindowStatusBar(window = window, statusBarColor = color, context = this)
+            theme.updateWindowStatusBarIcons(window = window, statusBarColor = color, context = this)
         }
     }
 
@@ -1006,14 +1020,14 @@ class MainActivity :
     }
 
     override fun onMiniPlayerHidden() {
-        val padding = resources.getDimension(MR.dimen.design_bottom_navigation_height).toInt()
+        val padding = binding.bottomNavigation.height
         binding.snackbarFragment.updatePadding(bottom = padding)
         settings.updateBottomInset(0)
     }
 
     override fun onMiniPlayerVisible() {
         val miniPlayerHeight = resources.getDimension(R.dimen.miniPlayerHeight).toInt()
-        val padding = resources.getDimension(MR.dimen.design_bottom_navigation_height).toInt() + miniPlayerHeight
+        val padding = binding.bottomNavigation.height + miniPlayerHeight
         binding.snackbarFragment.updatePadding(bottom = padding)
         settings.updateBottomInset(miniPlayerHeight)
 
