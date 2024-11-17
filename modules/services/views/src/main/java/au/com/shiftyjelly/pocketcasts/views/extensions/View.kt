@@ -52,6 +52,7 @@ fun View.setSystemWindowInsetToPadding(
     top: Boolean = false,
     right: Boolean = false,
     bottom: Boolean = false,
+    consumeInsets: Boolean = true,
 ) {
     ViewCompat.setOnApplyWindowInsetsListener(this) { view, windowInsets ->
         val insets = windowInsets.getInsets(
@@ -66,21 +67,26 @@ fun View.setSystemWindowInsetToPadding(
             bottom = if (bottom) insets.bottom else paddingBottom,
         )
 
-        ViewCompat.onApplyWindowInsets(
-            view,
-            windowInsets.inset(
-                if (left) insets.left else 0,
-                if (top) insets.top else 0,
-                if (right) insets.right else 0,
-                if (bottom) insets.bottom else 0,
-            ),
-        )
+        if (consumeInsets) {
+            ViewCompat.onApplyWindowInsets(
+                view,
+                windowInsets.inset(
+                    if (left) insets.left else 0,
+                    if (top) insets.top else 0,
+                    if (right) insets.right else 0,
+                    if (bottom) insets.bottom else 0,
+                ),
+            )
+        } else {
+            windowInsets
+        }
     }
 }
 
 fun View.setSystemWindowInsetToHeight(
     top: Boolean = false,
     bottom: Boolean = false,
+    consumeInsets: Boolean = true,
 ) {
     ViewCompat.setOnApplyWindowInsetsListener(this) { view, windowInsets ->
         val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -93,14 +99,18 @@ fun View.setSystemWindowInsetToHeight(
             }
         }
 
-        ViewCompat.onApplyWindowInsets(
-            view,
-            windowInsets.inset(
-                0,
-                if (top) insets.top else 0,
-                0,
-                if (bottom) insets.bottom else 0,
-            ),
-        )
+        if (consumeInsets) {
+            ViewCompat.onApplyWindowInsets(
+                view,
+                windowInsets.inset(
+                    0,
+                    if (top) insets.top else 0,
+                    0,
+                    if (bottom) insets.bottom else 0,
+                ),
+            )
+        } else {
+            windowInsets
+        }
     }
 }
