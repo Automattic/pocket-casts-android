@@ -13,6 +13,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -264,19 +265,22 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     }
 
     private fun setupShelfComposeView() {
-        binding?.shelfComposeView?.setContent {
-            AppTheme(theme.activeTheme) {
-                PlayerShelf(
-                    theme = theme,
-                    shelfSharedViewModel = shelfSharedViewModel,
-                    transcriptViewModel = transcriptViewModel,
-                    playerViewModel = viewModel,
-                )
-                LaunchedEffect(Unit) {
-                    observeShelfItemNavigationState()
-                }
-                LaunchedEffect(Unit) {
-                    observeShelfItemSnackbarMessages()
+        binding?.shelfComposeView?.apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                AppTheme(theme.activeTheme) {
+                    PlayerShelf(
+                        theme = theme,
+                        shelfSharedViewModel = shelfSharedViewModel,
+                        transcriptViewModel = transcriptViewModel,
+                        playerViewModel = viewModel,
+                    )
+                    LaunchedEffect(Unit) {
+                        observeShelfItemNavigationState()
+                    }
+                    LaunchedEffect(Unit) {
+                        observeShelfItemSnackbarMessages()
+                    }
                 }
             }
         }
