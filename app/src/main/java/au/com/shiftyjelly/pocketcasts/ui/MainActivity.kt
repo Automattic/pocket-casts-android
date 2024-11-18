@@ -374,13 +374,15 @@ class MainActivity :
 
         binding.root.setSystemWindowInsetToPadding(left = true, right = true)
 
-        // Set the player bottom sheet position to show the mini player above the bottom navigation
         binding.bottomNavigation.doOnLayout {
             val miniPlayerHeight = resources.getDimension(R.dimen.miniPlayerHeight).toInt()
             val bottomNavigationHeight = binding.bottomNavigation.height
             val bottomSheetBehavior = BottomSheetBehavior.from(binding.playerBottomSheet)
+            // Set the player bottom sheet position to show the mini player above the bottom navigation
             bottomSheetBehavior.peekHeight = miniPlayerHeight + bottomNavigationHeight
+            // Add padding to the main content so the end of the page isn't under the bottom navigation
             binding.mainFragment.updatePadding(bottom = bottomNavigationHeight)
+            // Position the snackbar above the bottom navigation or the mini player if it's shown
             updateSnackbarPosition(bottomNavigationHeight)
             setupSnackbarPosition()
         }
