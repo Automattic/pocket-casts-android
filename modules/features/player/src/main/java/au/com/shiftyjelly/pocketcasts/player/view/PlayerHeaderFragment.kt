@@ -265,7 +265,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
     private fun setupShelfComposeView() {
         binding?.shelfComposeView?.setContent {
-            AppTheme(Theme.ThemeType.DARK) {
+            AppTheme(theme.activeTheme) {
                 PlayerShelf(
                     theme = theme,
                     shelfSharedViewModel = shelfSharedViewModel,

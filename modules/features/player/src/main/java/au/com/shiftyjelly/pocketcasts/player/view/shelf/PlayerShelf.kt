@@ -24,12 +24,14 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.map
 import androidx.mediarouter.app.MediaRouteButton
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.player.R
@@ -505,8 +507,10 @@ data class PlayerShelfIconColors(
 
 @Preview
 @Composable
-private fun PlayerShelfPreview() {
-    AppTheme(Theme.ThemeType.DARK) {
+private fun PlayerShelfPreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
+) {
+    AppTheme(themeType) {
         PlayerShelfContent(
             shelfItems = ShelfItem.entries.toList().take(4),
             transcriptUiState = TranscriptViewModel.UiState.Empty(),
