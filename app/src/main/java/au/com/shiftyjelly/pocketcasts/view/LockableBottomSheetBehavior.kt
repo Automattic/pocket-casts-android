@@ -13,7 +13,7 @@ import com.google.android.material.bottomsheet.ViewPager2AwareBottomSheetBehavio
 class LockableBottomSheetBehavior<V : View> : ViewPager2AwareBottomSheetBehavior<V> {
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
 
-    var swipeEnabled = true
+    var swipeEnabled = false
 
     override fun onInterceptTouchEvent(
         parent: CoordinatorLayout,
