@@ -275,15 +275,10 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
         }
     }
 
-    fun openPlayer(sourceView: SourceView? = null) {
+    fun openPlayer() {
         val index = adapter.indexOfPlayer
         if (index == -1) return
         binding?.viewPager?.currentItem = index
-
-        if (sourceView == SourceView.WHATS_NEW) {
-            ((childFragmentManager.fragments.firstOrNull { it is PlayerHeaderFragment }) as? PlayerHeaderFragment)
-                ?.onMoreClicked(sourceView)
-        }
     }
 
     fun openBookmarks() {

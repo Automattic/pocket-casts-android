@@ -633,7 +633,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         viewModel.nextChapter()
     }
 
-    fun onMoreClicked(sourceView: SourceView? = null) {
+    fun onMoreClicked() {
         // stop double taps
         if (childFragmentManager.fragments.firstOrNull() is ShelfBottomSheet) {
             return
