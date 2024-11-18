@@ -159,7 +159,7 @@ private fun HorizontalProfileHeader(
     }
 
     Row(
-        verticalAlignment = Alignment.Top,
+        verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start,
         modifier = modifier.clickable(
             onClickLabel = accountLabel,
