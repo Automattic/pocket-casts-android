@@ -3,8 +3,6 @@ package au.com.shiftyjelly.pocketcasts.player.view
 import android.animation.LayoutTransition
 import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.content.res.ColorStateList
-import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.view.GestureDetector
@@ -14,8 +12,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.activity.result.ActivityResultLauncher
+import androidx.compose.runtime.LaunchedEffect
 import androidx.core.view.isVisible
-import androidx.core.view.plusAssign
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -25,16 +23,16 @@ import androidx.lifecycle.repeatOnLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.player.R
-import au.com.shiftyjelly.pocketcasts.player.binding.playIfTrue
 import au.com.shiftyjelly.pocketcasts.player.binding.setSeekBarState
 import au.com.shiftyjelly.pocketcasts.player.binding.showIfPresent
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterPlayerHeaderBinding
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContract
+import au.com.shiftyjelly.pocketcasts.player.view.shelf.PlayerShelf
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptPageWrapper
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptSearchViewModel
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel
@@ -42,12 +40,10 @@ import au.com.shiftyjelly.pocketcasts.player.view.video.VideoActivity
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.NavigationState
-import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.ShelfItemSource
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.SnackbarMessage
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.TransitionState
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel.Companion.AnalyticsProp
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.reimagine.ShareDialogFragment
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
@@ -60,22 +56,16 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
-import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import au.com.shiftyjelly.pocketcasts.views.component.LockableNestedScrollView
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog.ButtonType.Danger
-import au.com.shiftyjelly.pocketcasts.views.extensions.updateColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
-import com.airbnb.lottie.LottieProperty
-import com.airbnb.lottie.model.KeyPath
-import com.google.android.gms.cast.framework.CastButtonFactory
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -156,117 +146,12 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             }
         }
 
-        val shelfViews = mapOf(
-            ShelfItem.Effects to binding.effects,
-            ShelfItem.Sleep to binding.sleep,
-            ShelfItem.Star to binding.star,
-            ShelfItem.Share to binding.share,
-            ShelfItem.Podcast to binding.podcast,
-            ShelfItem.Cast to binding.cast,
-            ShelfItem.Played to binding.played,
-            ShelfItem.Archive to binding.archive,
-            ShelfItem.Bookmark to binding.bookmark,
-            ShelfItem.Transcript to binding.transcript,
-            ShelfItem.Download to binding.download,
-            ShelfItem.Report to binding.report,
-        )
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                shelfSharedViewModel.uiState.collect { uiState ->
-                    binding.shelf.removeAllViews()
-                    uiState.shelfItems.take(4)
-                        .mapNotNull(shelfViews::get)
-                        .forEach { itemView -> binding.shelf += itemView }
-                    binding.shelf.addView(binding.playerActions)
-                }
-            }
-        }
+        setupShelfComposeView()
 
-        if (FeatureFlag.isEnabled(Feature.TRANSCRIPTS)) {
-            viewLifecycleOwner.lifecycleScope.launch {
-                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    transcriptViewModel.uiState.collect { uiState ->
-                        val transcriptAvailable = uiState !is TranscriptViewModel.UiState.Empty
-                        binding.transcript.alpha = if (transcriptAvailable) 1f else 0.4f
-                        binding.transcript.setOnClickListener {
-                            if (!transcriptAvailable) {
-                                val message = getString(LR.string.transcript_error_not_available)
-                                Snackbar.make(view, message, Snackbar.LENGTH_SHORT)
-                                    .setBackgroundTint(ThemeColor.primaryUi01(Theme.ThemeType.LIGHT))
-                                    .setTextColor(ThemeColor.primaryText01(Theme.ThemeType.LIGHT))
-                                    .show()
-                            } else {
-                                shelfSharedViewModel.openTranscript(ShelfItemSource.Shelf)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        observeShelfItemNavigationState()
-        observeShelfItemSnackbarMessages()
-
-        binding.effects.setOnClickListener {
-            shelfSharedViewModel.onEffectsClick(ShelfItemSource.Shelf)
-        }
         binding.previousChapter.setOnClickListener { onPreviousChapter() }
         binding.nextChapter.setOnClickListener { onNextChapter() }
-        binding.sleep.setOnClickListener {
-            shelfSharedViewModel.onSleepClick(ShelfItemSource.Shelf)
-        }
-        binding.star.setOnClickListener {
-            shelfSharedViewModel.onStarClick(ShelfItemSource.Shelf)
-        }
-        binding.share.setOnClickListener {
-            val podcast = viewModel.podcast ?: return@setOnClickListener
-            val episode = viewModel.episode as? PodcastEpisode ?: return@setOnClickListener
-            shelfSharedViewModel.onShareClick(podcast, episode, ShelfItemSource.Shelf)
-        }
-        binding.playerActions.setOnClickListener { shelfSharedViewModel.onMoreClick() }
-        binding.podcast.setOnClickListener {
-            shelfSharedViewModel.onShowPodcastOrCloudFiles(viewModel.podcast, ShelfItemSource.Shelf)
-        }
-        binding.played.setOnClickListener {
-            shelfSharedViewModel.onPlayedClick(
-                onMarkAsPlayedConfirmed = { episode, shouldShuffleUpNext ->
-                    viewModel.markAsPlayedConfirmed(episode, shouldShuffleUpNext)
-                },
-                source = ShelfItemSource.Shelf,
-            )
-        }
-        binding.archive.setOnClickListener {
-            shelfSharedViewModel.onArchiveClick(
-                onArchiveConfirmed = { viewModel.archiveConfirmed(it) },
-                source = ShelfItemSource.Shelf,
-            )
-        }
-        binding.bookmark.setOnClickListener {
-            shelfSharedViewModel.onAddBookmarkClick(
-                OnboardingUpgradeSource.BOOKMARKS_SHELF_ACTION,
-                ShelfItemSource.Shelf,
-            )
-        }
-        binding.report?.setOnClickListener {
-            shelfSharedViewModel.onReportClick(ShelfItemSource.Shelf)
-        }
-        binding.download.setOnClickListener {
-            viewModel.handleDownloadClickFromPlaybackActions(
-                onDownloadStart = { shelfSharedViewModel.onEpisodeDownloadStart(ShelfItemSource.Shelf) },
-                onDeleteStart = { shelfSharedViewModel.onEpisodeRemoveClick(ShelfItemSource.Shelf) },
-            )
-        }
         binding.videoView.playbackManager = playbackManager
         binding.videoView.setOnClickListener { onFullScreenVideoClick() }
-
-        with(binding.castButton) {
-            CastButtonFactory.setUpMediaRouteButton(binding.root.context, this)
-            visibility = View.VISIBLE
-            updateColor(ThemeColor.playerContrast03(theme.activeTheme))
-            setOnClickListener {
-                shelfSharedViewModel.trackShelfAction(ShelfItem.Cast, ShelfItemSource.Shelf)
-            }
-        }
 
         if (FeatureFlag.isEnabled(Feature.TRANSCRIPTS)) {
             setupTranscriptPage()
@@ -296,34 +181,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
             headerViewModel.episode?.let { episode ->
                 loadArtwork(episode, headerViewModel.useEpisodeArtwork, binding.artwork)
-
-                val isPodcast = episode is PodcastEpisode
-
-                val downloadIcon = when {
-                    isPodcast && (episode.isDownloading || episode.isQueued) -> IR.drawable.ic_download
-                    isPodcast && episode.isDownloaded -> IR.drawable.ic_downloaded_24dp
-                    else -> IR.drawable.ic_download
-                }
-
-                binding.download.apply {
-                    setImageResource(downloadIcon)
-
-                    contentDescription = when {
-                        isPodcast && (episode.isDownloading || episode.isQueued) -> context.getString(LR.string.episode_downloading)
-                        isPodcast && episode.isDownloaded -> context.getString(LR.string.remove_downloaded_file)
-                        else -> context.getString(LR.string.download)
-                    }
-
-                    layoutParams = layoutParams?.apply {
-                        width = 0.dpToPx(context)
-                        height = 48.dpToPx(context)
-                    }
-
-                    scaleType = ImageView.ScaleType.CENTER
-
-                    val padding = 12.dpToPx(context)
-                    setPadding(padding, padding, padding, padding)
-                }
             }
 
             binding.podcastTitle.setOnClickListener {
@@ -345,19 +202,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             binding.videoView.show = headerViewModel.isVideo
             binding.videoView.updatePlayerPrepared(headerViewModel.isPrepared)
 
-            val highlightTint = playerHighlightColor(headerViewModel)
-            val unhighlightTint = ThemeColor.playerContrast03(headerViewModel.theme)
-
-            val effectTint = if (headerViewModel.isEffectsOn) highlightTint else unhighlightTint
-            val effectResource = if (headerViewModel.isEffectsOn) R.drawable.ic_effects_on_32 else R.drawable.ic_effects_off_32
-            binding.effects.setImageResource(effectResource)
-            binding.effects.imageTintList = ColorStateList.valueOf(effectTint)
-
-            val starTint = if (headerViewModel.isStarred) highlightTint else unhighlightTint
-            val starResource = if (headerViewModel.isStarred) R.drawable.ic_star_filled_32 else R.drawable.ic_star_32
-            binding.star.setImageResource(starResource)
-            binding.star.imageTintList = ColorStateList.valueOf(starTint)
-
             if (headerViewModel.isChaptersPresent) {
                 headerViewModel.chapter?.let {
                     binding.episodeTitle.setOnClickListener {
@@ -366,15 +210,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 }
             } else {
                 binding.episodeTitle.setOnClickListener(null)
-            }
-
-            binding.share.isVisible = !headerViewModel.isUserEpisode
-            binding.star.isVisible = !headerViewModel.isUserEpisode
-
-            val sleepTint = if (headerViewModel.isSleepRunning) highlightTint else unhighlightTint
-            binding.sleep.alpha = if (headerViewModel.isSleepRunning) 1F else Color.alpha(sleepTint) / 255F * 2F
-            binding.sleep.post { // this only works the second time it's called unless it's in a post
-                binding.sleep.addValueCallback(KeyPath("**"), LottieProperty.COLOR, { sleepTint })
             }
 
             if (headerViewModel.chapter != null) {
@@ -393,7 +228,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 binding.chapterUrl.setOnClickListener(null)
             }
 
-            binding.archive.setImageResource(if (headerViewModel.isUserEpisode) R.drawable.ic_delete_32 else R.drawable.ic_archive_32)
             binding.chapterProgressCircle.progress = headerViewModel.chapterProgress
             binding.chapterProgressCircle.isVisible = headerViewModel.isChaptersPresent
             binding.chapterTimeRemaining.text = headerViewModel.chapterTimeRemaining
@@ -426,7 +260,25 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 isBuffering = headerViewModel.isBuffering,
                 theme = headerViewModel.theme,
             )
-            binding.sleep.playIfTrue(headerViewModel.isSleepRunning)
+        }
+    }
+
+    private fun setupShelfComposeView() {
+        binding?.shelfComposeView?.setContent {
+            AppTheme(Theme.ThemeType.DARK) {
+                PlayerShelf(
+                    theme = theme,
+                    shelfSharedViewModel = shelfSharedViewModel,
+                    transcriptViewModel = transcriptViewModel,
+                    playerViewModel = viewModel,
+                )
+                LaunchedEffect(Unit) {
+                    observeShelfItemNavigationState()
+                }
+                LaunchedEffect(Unit) {
+                    observeShelfItemSnackbarMessages()
+                }
+            }
         }
     }
 
@@ -556,7 +408,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         updatePlayerViewsAccessibility(enable = false)
         playerGroup.layoutTransition = LayoutTransition()
         transcriptPage.isVisible = true
-        shelf.isVisible = false
+        shelfComposeView.isVisible = false
         val transcriptShowSeekbarAndPlayerControls = resources.getBoolean(R.bool.transcript_show_seekbar_and_player_controls)
         seekBar.isVisible = transcriptShowSeekbarAndPlayerControls
         playerControls.root.isVisible = transcriptShowSeekbarAndPlayerControls
@@ -566,7 +418,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         }
         val containerFragment = parentFragment as? PlayerContainerFragment
         containerFragment?.updateTabsVisibility(false)
-        (root as? LockableNestedScrollView)?.setScrollingEnabled(false)
+        root.setScrollingEnabled(false)
     }
 
     private fun AdapterPlayerHeaderBinding.closeTranscript(
@@ -574,7 +426,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     ) {
         updatePlayerViewsAccessibility(enable = true)
         playerGroup.layoutTransition = if (withTransition) LayoutTransition() else null
-        shelf.isVisible = true
+        shelfComposeView.isVisible = true
         transcriptPage.isVisible = false
         seekBar.isVisible = true
         playerControls.root.isVisible = true
@@ -585,7 +437,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         }
         val containerFragment = parentFragment as? PlayerContainerFragment
         containerFragment?.updateTabsVisibility(true)
-        (root as? LockableNestedScrollView)?.setScrollingEnabled(true)
+        root.setScrollingEnabled(true)
         playerGroup.layoutTransition = null // Reset to null to avoid animation when changing children visibility anytime later
     }
 
@@ -632,14 +484,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 false
             }
         }
-    }
-
-    private fun playerHighlightColor(viewModel: PlayerViewModel.PlayerHeader): Int {
-        if (viewModel.isUserEpisode) {
-            return theme.getUserFilePlayerHighlightColor()
-        }
-
-        return ThemeColor.playerHighlight01(viewModel.theme, viewModel.iconTintColor)
     }
 
     private var lastLoadedBaseEpisodeId: String? = null
