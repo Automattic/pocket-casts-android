@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.compose.bars
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -62,6 +63,7 @@ fun ThemedTopAppBar(
         actions = actions,
         backgroundColor = backgroundColor,
         elevation = 0.dp,
+        windowInsets = AppBarDefaults.topAppBarWindowInsets,
         modifier = if (bottomShadow) {
             modifier
                 .zIndex(1f)

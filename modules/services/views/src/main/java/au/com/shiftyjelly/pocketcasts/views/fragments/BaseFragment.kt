@@ -63,7 +63,7 @@ open class BaseFragment : Fragment(), CoroutineScope, HasBackstack {
         if (activity is FragmentHostListener) {
             activity.updateStatusBar()
         } else {
-            theme.updateWindowStatusBar(window = activity.window, statusBarColor = statusBarColor, context = activity)
+            theme.updateWindowStatusBarIcons(window = activity.window, statusBarColor = statusBarColor, context = activity)
         }
     }
 

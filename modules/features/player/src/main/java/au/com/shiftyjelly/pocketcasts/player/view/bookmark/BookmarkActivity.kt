@@ -16,8 +16,6 @@ class BookmarkActivity : AppCompatActivity() {
 
         val arguments = BookmarkArguments.createFromIntent(intent)
 
-        // tint the status bar color
-        window.statusBarColor = arguments.backgroundColor
         // set the status bar icons to white
         WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = false
 
