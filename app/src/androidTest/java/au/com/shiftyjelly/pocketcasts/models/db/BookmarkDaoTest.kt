@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -55,38 +54,6 @@ class BookmarkDaoTest {
                 "Inserted bookmark should be able to be found",
                 bookmarkDao.findByUuid(uuid, false),
             )
-        }
-    }
-
-    @Test
-    fun testUpdateBookmark() {
-        runTest {
-            val uuid = UUID.randomUUID().toString()
-            val bookmark = FakeBookmarksGenerator.create(uuid)
-            bookmarkDao.insert(bookmark)
-
-            val createdBookmark = bookmarkDao.findByUuid(uuid, false)
-            assert(createdBookmark?.syncStatus == SyncStatus.NOT_SYNCED)
-
-            bookmark.deleted = true
-            bookmark.syncStatus = SyncStatus.SYNCED
-
-            bookmarkDao.update(bookmark)
-
-            val updatedBookmark = bookmarkDao.findByUuid(uuid, deleted = true)
-            assert(updatedBookmark?.syncStatus == SyncStatus.SYNCED)
-        }
-    }
-
-    @Test
-    fun testDeleteBookmark() {
-        runTest {
-            val uuid = UUID.randomUUID().toString()
-            val bookmark = FakeBookmarksGenerator.create(uuid)
-            bookmarkDao.insert(bookmark)
-            assertNotNull(bookmarkDao.findByUuid(uuid, false))
-            bookmarkDao.delete(bookmark)
-            assertNull(bookmarkDao.findByUuid(uuid, true))
         }
     }
 

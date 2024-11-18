@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.settings.status
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,7 +25,6 @@ import androidx.compose.material.icons.filled.Done
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
@@ -35,6 +33,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.viewModels
+import androidx.fragment.compose.content
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
@@ -54,19 +53,19 @@ class StatusFragment : BaseFragment() {
     lateinit var settings: Settings
     private val viewModel: StatusViewModel by viewModels()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return ComposeView(requireContext()).apply {
-            setContent {
-                UiUtil.hideKeyboard(LocalView.current)
-                val bottomInset = settings.bottomInset.collectAsStateWithLifecycle(initialValue = 0)
-                AppThemeWithBackground(theme.activeTheme) {
-                    StatusPage(
-                        viewModel = viewModel,
-                        onBackPressed = { closeFragment() },
-                        bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
-                    )
-                }
-            }
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ) = content {
+        UiUtil.hideKeyboard(LocalView.current)
+        val bottomInset = settings.bottomInset.collectAsStateWithLifecycle(initialValue = 0)
+        AppThemeWithBackground(theme.activeTheme) {
+            StatusPage(
+                viewModel = viewModel,
+                onBackPressed = { closeFragment() },
+                bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
+            )
         }
     }
 

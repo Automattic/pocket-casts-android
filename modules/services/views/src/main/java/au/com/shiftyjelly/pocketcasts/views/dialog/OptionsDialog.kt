@@ -12,8 +12,8 @@ import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.ui.platform.ComposeView
 import androidx.core.view.doOnLayout
+import androidx.fragment.compose.content
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.buttons.ToggleButtonOption
 import au.com.shiftyjelly.pocketcasts.compose.dialogs.OptionsDialogComponent
@@ -93,14 +93,13 @@ class OptionsDialog : BottomSheetDialogFragment() {
         options.add(OptionsDialogOption(titleId = titleId, titleString = titleString, titleColor = titleColor, valueId = valueId, imageId = imageId, imageColor = imageColor, checked = checked, click = closeAndClick, toggleOptions = toggleOptions, onSwitch = onSwitch))
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        val context = if (forceDarkTheme) ContextThemeWrapper(context, UR.style.ThemeDark) else context ?: throw Exception("Context not found")
-        return ComposeView(context).apply {
-            setContent {
-                AppTheme(if (forceDarkTheme) Theme.ThemeType.DARK else theme.activeTheme) {
-                    OptionsDialogComponent(title = title, iconColor = iconColor, options = options)
-                }
-            }
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ) = content {
+        AppTheme(if (forceDarkTheme) Theme.ThemeType.DARK else theme.activeTheme) {
+            OptionsDialogComponent(title = title, iconColor = iconColor, options = options)
         }
     }
 

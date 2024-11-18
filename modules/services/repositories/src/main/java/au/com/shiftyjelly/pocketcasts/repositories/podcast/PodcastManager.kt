@@ -37,7 +37,6 @@ interface PodcastManager {
     fun findSubscribedFlow(): Flow<List<Podcast>>
     suspend fun findSubscribedSorted(): List<Podcast>
     suspend fun findSubscribedNoOrder(): List<Podcast>
-    fun findByUuids(uuids: Collection<String>): List<Podcast>
     suspend fun findPodcastsInFolder(folderUuid: String): List<Podcast>
     fun findPodcastsInFolderSingle(folderUuid: String): Single<List<Podcast>>
     suspend fun findPodcastsNotInFolder(): List<Podcast>
@@ -53,8 +52,6 @@ interface PodcastManager {
 
     fun findPodcastsAutodownload(): List<Podcast>
 
-    fun exists(podcastUuid: String): Boolean
-    fun observeEpisodeCountByEpisodeUuid(uuid: String): Flow<Int>
     fun observeEpisodeCountByPodcatUuid(uuid: String): Flow<Int>
 
     /** Add methods  */
@@ -68,13 +65,10 @@ interface PodcastManager {
     fun isSubscribingToPodcast(podcastUuid: String): Boolean
     fun addPodcast(podcastUuid: String, sync: Boolean, subscribed: Boolean, shouldAutoDownload: Boolean): Single<Podcast>
 
-    fun addFolderPodcast(podcast: Podcast)
-
     suspend fun replaceCuratedPodcasts(podcasts: List<CuratedPodcast>)
 
     /** Update methods  */
     fun updatePodcast(podcast: Podcast)
-    suspend fun updatePodcastSuspend(podcast: Podcast)
 
     suspend fun updateAllAutoDownloadStatus(autoDownloadStatus: Int)
     suspend fun updateAllShowNotifications(showNotifications: Boolean)
@@ -82,7 +76,6 @@ interface PodcastManager {
     suspend fun updateAutoAddToUpNext(podcast: Podcast, autoAddToUpNext: Podcast.AutoAddUpNext)
     suspend fun updateAutoAddToUpNexts(podcastUuids: List<String>, autoAddToUpNext: Podcast.AutoAddUpNext)
     suspend fun updateAutoAddToUpNextsIf(podcastUuids: List<String>, newValue: Podcast.AutoAddUpNext, onlyIfValue: Podcast.AutoAddUpNext)
-    fun updateExcludeFromAutoArchive(podcast: Podcast, excludeFromAutoArchive: Boolean)
     fun updateOverrideGlobalEffects(podcast: Podcast, override: Boolean)
     suspend fun updateTrimMode(podcast: Podcast, trimMode: TrimMode)
     fun updateVolumeBoosted(podcast: Podcast, override: Boolean)
@@ -91,12 +84,8 @@ interface PodcastManager {
     fun updateEpisodesSortType(podcast: Podcast, episodesSortType: EpisodesSortType)
     fun updateShowNotifications(podcast: Podcast, show: Boolean)
     suspend fun updatePodcastPositions(podcasts: List<Podcast>)
-    fun updateSubscribed(podcast: Podcast, subscribed: Boolean)
     suspend fun updateRefreshAvailable(podcastUuid: String, refreshAvailable: Boolean)
     suspend fun updateStartFromInSec(podcast: Podcast, autoStartFrom: Int)
-    fun updateColorLastDownloaded(podcast: Podcast, lastDownloaded: Long)
-    fun updateOverrideGobalSettings(podcast: Podcast, override: Boolean)
-    fun updateEpisodesToKeep(podcast: Podcast, episodeToKeep: Int)
     fun updateColors(podcastUuid: String, background: Int, tintForLightBg: Int, tintForDarkBg: Int, fabForLightBg: Int, fabForDarkBg: Int, linkForLightBg: Int, linkForDarkBg: Int, colorLastDownloaded: Long)
     fun updateLatestEpisode(podcast: Podcast, latestEpisode: PodcastEpisode)
     fun updateGrouping(podcast: Podcast, grouping: PodcastGrouping)
@@ -105,12 +94,9 @@ interface PodcastManager {
     suspend fun updateAllShowArchived(showArchived: Boolean)
     suspend fun updateFolderUuid(folderUuid: String?, podcastUuids: List<String>)
 
-    fun markPodcastAsSynced(podcast: Podcast)
-    fun markPodcastAsNotSynced(podcast: Podcast)
     fun markPodcastUuidAsNotSynced(podcastUuid: String)
     fun markAllPodcastsSynced()
     suspend fun markAllPodcastsUnsynced()
-    fun markAsSubscribed(podcast: Podcast, subscribed: Boolean)
 
     fun clearAllDownloadErrors()
 
@@ -130,7 +116,6 @@ interface PodcastManager {
     suspend fun hasEpisodesWithAutoDownloadStatus(downloadStatus: Int): Boolean
     fun countDownloadStatusRx(downloadStatus: Int): Single<Int>
     fun countNotificationsOn(): Int
-    fun countNotificationsOnRx(): Single<Int>
 
     fun refreshPodcastsIfRequired(fromLog: String)
     fun refreshPodcasts(fromLog: String)

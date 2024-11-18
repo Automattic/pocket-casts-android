@@ -2,10 +2,9 @@ package au.com.shiftyjelly.pocketcasts.podcasts.view.share
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.viewModels
+import androidx.fragment.compose.content
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -29,50 +28,52 @@ class ShareListCreateFragment : BaseFragment() {
         const val failed = "failed"
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View = ComposeView(requireContext()).apply {
-        setContent {
-            AppThemeWithBackground(theme.activeTheme) {
-                navHostController = rememberNavController()
-                val navController = navHostController ?: return@AppThemeWithBackground
-                NavHost(navController = navController, startDestination = NavRoutes.podcasts) {
-                    composable(NavRoutes.podcasts) {
-                        ShareListCreatePodcastsPage(
-                            onCloseClick = { activity?.finish() },
-                            onNextClick = { selectedPodcastsCount ->
-                                viewModel.trackShareEvent(
-                                    AnalyticsEvent.SHARE_PODCASTS_PODCASTS_SELECTED,
-                                    AnalyticsProp.countMap(selectedPodcastsCount),
-                                )
-                                navController.navigate(NavRoutes.title)
-                            },
-                            viewModel = viewModel,
-                        )
-                    }
-                    composable(NavRoutes.title) {
-                        ShareListCreateTitlePage(
-                            onBackClick = { navController.popBackStack() },
-                            onNextClick = { createShareLink(navController) },
-                            viewModel = viewModel,
-                        )
-                    }
-                    composable(NavRoutes.building) {
-                        ShareListCreateBuildingPage(
-                            onCloseClick = { activity?.finish() },
-                            viewModel = viewModel,
-                        )
-                    }
-                    composable(NavRoutes.failed) {
-                        ShareListCreateFailedPage(
-                            onCloseClick = { activity?.finish() },
-                            onRetryClick = { createShareLink(navController) },
-                        )
-                    }
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ) = content {
+        AppThemeWithBackground(theme.activeTheme) {
+            navHostController = rememberNavController()
+            val navController = navHostController ?: return@AppThemeWithBackground
+            NavHost(navController = navController, startDestination = NavRoutes.podcasts) {
+                composable(NavRoutes.podcasts) {
+                    ShareListCreatePodcastsPage(
+                        onCloseClick = { activity?.finish() },
+                        onNextClick = { selectedPodcastsCount ->
+                            viewModel.trackShareEvent(
+                                AnalyticsEvent.SHARE_PODCASTS_PODCASTS_SELECTED,
+                                AnalyticsProp.countMap(selectedPodcastsCount),
+                            )
+                            navController.navigate(NavRoutes.title)
+                        },
+                        viewModel = viewModel,
+                    )
+                }
+                composable(NavRoutes.title) {
+                    ShareListCreateTitlePage(
+                        onBackClick = { navController.popBackStack() },
+                        onNextClick = { createShareLink(navController) },
+                        viewModel = viewModel,
+                    )
+                }
+                composable(NavRoutes.building) {
+                    ShareListCreateBuildingPage(
+                        onCloseClick = { activity?.finish() },
+                        viewModel = viewModel,
+                    )
+                }
+                composable(NavRoutes.failed) {
+                    ShareListCreateFailedPage(
+                        onCloseClick = { activity?.finish() },
+                        onRetryClick = { createShareLink(navController) },
+                    )
                 }
             }
+        }
 
-            if (!viewModel.isFragmentChangingConfigurations) {
-                viewModel.trackShareEvent(AnalyticsEvent.SHARE_PODCASTS_SHOWN)
-            }
+        if (!viewModel.isFragmentChangingConfigurations) {
+            viewModel.trackShareEvent(AnalyticsEvent.SHARE_PODCASTS_SHOWN)
         }
     }
 

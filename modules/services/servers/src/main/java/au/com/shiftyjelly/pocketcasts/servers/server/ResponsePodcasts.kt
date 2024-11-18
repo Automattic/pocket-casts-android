@@ -3,16 +3,9 @@ package au.com.shiftyjelly.pocketcasts.servers.server
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
-import io.reactivex.Single
 
 @JsonClass(generateAdapter = true)
-data class ResponsePodcasts(@field:Json(name = "result") val result: Result?) {
-
-    fun toPodcasts(): Single<List<Podcast>> {
-        val podcasts = result?.podcasts?.map { it.toPodcast() } ?: emptyList()
-        return Single.just(podcasts)
-    }
-}
+data class ResponsePodcasts(@field:Json(name = "result") val result: Result?)
 
 @JsonClass(generateAdapter = true)
 data class Result(@field:Json(name = "podcasts") val podcasts: List<ResultPodcast>?)
