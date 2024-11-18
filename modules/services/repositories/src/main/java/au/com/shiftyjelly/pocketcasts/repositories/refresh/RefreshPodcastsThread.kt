@@ -366,9 +366,13 @@ class RefreshPodcastsThread(
         runBlocking {
             val upNextLimit = settings.autoAddUpNextLimit.value
             episodesToAddToUpNext.sortBy { it.second.publishedDate }
-            episodesToAddToUpNext.removeAll { runBlocking { true == episodeManager.findByUuid(it.second.uuid)?.isFinished ||
-                                                            true == episodeManager.findByUuid(it.second.uuid)?.isArchived ||
-                                                            playbackManager.upNextQueue.contains(it.second.uuid)} }
+            episodesToAddToUpNext.removeAll {
+                runBlocking {
+                    true == episodeManager.findByUuid(it.second.uuid)?.isFinished ||
+                        true == episodeManager.findByUuid(it.second.uuid)?.isArchived ||
+                        playbackManager.upNextQueue.contains(it.second.uuid)
+                }
+            }
             episodesToAddToUpNext.forEach {
                 if (playbackManager.upNextQueue.queueEpisodes.size < upNextLimit) {
                     when (it.first) {
