@@ -345,7 +345,12 @@ class Theme @Inject constructor(private val settings: Settings) {
     }
 
     @ColorInt fun getNavigationBackgroundColor(context: Context): Int {
-        return context.getThemeColor(R.attr.primary_ui_03)
+        // For SDK 24 and 25 the navigation bar icons aren't tinted correctly so always use black
+        return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            Color.BLACK
+        } else {
+            context.getThemeColor(R.attr.primary_ui_03)
+        }
     }
 
     fun getNavigationBarStyle(context: Context): SystemBarStyle {

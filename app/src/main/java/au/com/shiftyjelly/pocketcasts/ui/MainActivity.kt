@@ -382,9 +382,8 @@ class MainActivity :
             bottomSheetBehavior.peekHeight = miniPlayerHeight + bottomNavigationHeight
             binding.mainFragment.updatePadding(bottom = bottomNavigationHeight)
             updateSnackbarPosition(bottomNavigationHeight)
+            setupSnackbarPosition()
         }
-
-        setupSnackbarPosition()
 
         lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
