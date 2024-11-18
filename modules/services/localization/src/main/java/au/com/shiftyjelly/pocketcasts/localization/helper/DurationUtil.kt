@@ -28,6 +28,9 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
  * @param maxUnit the largest unit of time allowed in the formatted output.
  * Units larger than this value are converted to the next allowed unit.
  * For example, with `maxUnit = FriendlyDurationUnit.Minute`, "2 hours" would become "120 minutes".
+ * @param pluralResourceId a function that provides the plural resource ID for a given [FriendlyDurationUnit].
+ * This function is used to retrieve the correct pluralized string resource when formatting the duration.
+ * By default, it uses basic time scale units such as "days", "hours", "minutes", and "seconds".
  * @return A formatted string representing the duration, with units and values up to the specified
  * constraints.
  */
@@ -36,6 +39,7 @@ fun Duration.toFriendlyString(
     maxPartCount: Int = 2,
     minUnit: FriendlyDurationUnit = FriendlyDurationUnit.Second,
     maxUnit: FriendlyDurationUnit = FriendlyDurationUnit.Day,
+    pluralResourceId: (FriendlyDurationUnit) -> Int = { it.resourceId },
 ): String {
     val builder = StringBuilder()
     var usedParts = 0
@@ -45,20 +49,20 @@ fun Duration.toFriendlyString(
     for (unit in units) {
         val wholeUnitDuration = unit.inWholeUnits(timeLeft)
         if (usedParts < maxPartCount && wholeUnitDuration > Duration.ZERO) {
-            unit.append(builder, resources, timeLeft)
+            unit.append(builder, resources, timeLeft, pluralResourceId)
             timeLeft -= wholeUnitDuration
             usedParts++
         }
     }
     if (builder.isEmpty()) {
-        minUnit.append(builder, resources, coerceAtLeast(Duration.ZERO))
+        minUnit.append(builder, resources, coerceAtLeast(Duration.ZERO), pluralResourceId)
     }
     return builder.toString().trimEnd()
 }
 
 enum class FriendlyDurationUnit(
     private val durationUnit: DurationUnit,
-    @PluralsRes private val resourceId: Int,
+    @PluralsRes val resourceId: Int,
 ) {
     Second(
         durationUnit = DurationUnit.SECONDS,
@@ -82,18 +86,19 @@ enum class FriendlyDurationUnit(
         builder: StringBuilder,
         resources: Resources,
         duration: Duration,
+        pluralResourceId: (FriendlyDurationUnit) -> Int,
     ) {
         val unitCount = toUnitCount(duration)
         builder
             .append(unitCount)
             .append(' ')
-            .append(resources.getQuantityString(resourceId, unitCount))
+            .append(resources.getQuantityString(pluralResourceId(this), unitCount))
             .append(' ')
     }
 
     internal fun inWholeUnits(duration: Duration) = toUnitCount(duration).toDuration(durationUnit)
 
-    private fun toUnitCount(duration: Duration) = duration.toInt(durationUnit)
+    internal fun toUnitCount(duration: Duration) = duration.toInt(durationUnit)
 
     internal companion object {
         val reversedEntries = FriendlyDurationUnit.entries.reversed()
