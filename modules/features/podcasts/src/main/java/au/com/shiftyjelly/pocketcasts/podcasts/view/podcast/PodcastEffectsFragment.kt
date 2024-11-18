@@ -101,7 +101,7 @@ class PodcastEffectsFragment : PreferenceFragmentCompat() {
 
             updateTintColor(colors.iconColor)
             toolbar.updateColors(toolbarColors = colors, navigationIcon = NavigationIcon.BackArrow)
-            theme.updateWindowStatusBar(window = requireActivity().window, statusBarColor = StatusBarColor.Custom(colors.backgroundColor, true), context = requireContext())
+            theme.updateWindowStatusBarIcons(window = requireActivity().window, statusBarColor = StatusBarColor.Custom(colors.backgroundColor, true), context = requireContext())
 
             preferenceCustomForPodcast?.isChecked = podcast.overrideGlobalEffects
 
