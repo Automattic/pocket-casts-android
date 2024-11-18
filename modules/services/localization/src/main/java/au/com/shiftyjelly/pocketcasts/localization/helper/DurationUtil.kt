@@ -98,7 +98,7 @@ enum class FriendlyDurationUnit(
 
     internal fun inWholeUnits(duration: Duration) = toUnitCount(duration).toDuration(durationUnit)
 
-    internal fun toUnitCount(duration: Duration) = duration.toInt(durationUnit)
+    private fun toUnitCount(duration: Duration) = duration.toInt(durationUnit)
 
     internal companion object {
         val reversedEntries = FriendlyDurationUnit.entries.reversed()
