@@ -36,7 +36,7 @@ open class BaseAppCompatDialogFragment : AppCompatDialogFragment(), CoroutineSco
         val activity = activity
         val statusBarColor = statusBarColor
         if (activity != null && statusBarColor != null) {
-            theme.updateWindowStatusBar(
+            theme.updateWindowStatusBarIcons(
                 window = activity.window,
                 statusBarColor = statusBarColor,
                 context = activity,

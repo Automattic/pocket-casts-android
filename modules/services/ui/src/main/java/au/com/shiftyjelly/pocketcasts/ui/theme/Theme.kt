@@ -7,13 +7,13 @@ import android.graphics.drawable.Drawable
 import android.os.Build
 import android.util.TypedValue
 import android.view.Window
+import androidx.activity.SystemBarStyle
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.annotation.StyleRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -344,8 +344,18 @@ class Theme @Inject constructor(private val settings: Settings) {
         return context.getThemeColor(R.attr.secondary_ui_01)
     }
 
-    @ColorInt fun getStatusBarColor(context: Context): Int {
-        return getColorForeground(context)
+    @ColorInt fun getNavigationBackgroundColor(context: Context): Int {
+        // For SDK 24 and 25 the navigation bar icons aren't tinted correctly so always use black
+        return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            Color.BLACK
+        } else {
+            context.getThemeColor(R.attr.primary_ui_03)
+        }
+    }
+
+    fun getNavigationBarStyle(context: Context): SystemBarStyle {
+        val navigationBarColor = getNavigationBackgroundColor(context)
+        return if (isDarkTheme) SystemBarStyle.dark(scrim = navigationBarColor) else SystemBarStyle.light(scrim = navigationBarColor, darkScrim = navigationBarColor)
     }
 
     /**
@@ -355,7 +365,7 @@ class Theme @Inject constructor(private val settings: Settings) {
      * StatusBarColor.Light means the background is light and the icons are black
      * StatusBarColor.Dark means the background is dark and the icons are white
      */
-    fun updateWindowStatusBar(window: Window?, statusBarColor: StatusBarColor? = null, context: Context) {
+    fun updateWindowStatusBarIcons(window: Window?, statusBarColor: StatusBarColor? = null, context: Context) {
         window ?: return
 
         // Fixes the issue where the window internal DecorView is null and causes a crash. https://console.firebase.google.com/project/singular-vector-91401/crashlytics/app/android:au.com.shiftyjelly.pocketcasts/issues/d44d873d36442ac43b59f56fe95e311b
@@ -371,15 +381,12 @@ class Theme @Inject constructor(private val settings: Settings) {
                 } else {
                     useDarkStatusBarIcons(window)
                 }
-                window.statusBarColor = color.color
             }
             isDarkTheme -> {
                 useLightStatusBarIcons(window)
-                window.statusBarColor = context.getThemeColor(R.attr.secondary_ui_01)
             }
             color is StatusBarColor.Dark -> {
                 useLightStatusBarIcons(window)
-                window.statusBarColor = ContextCompat.getColor(context, R.color.colorStatusBarDarkInLight)
             }
             color is StatusBarColor.Light -> {
                 if (activeTheme.defaultLightIcons) {
@@ -387,7 +394,6 @@ class Theme @Inject constructor(private val settings: Settings) {
                 } else {
                     useDarkStatusBarIcons(window)
                 }
-                window.statusBarColor = getStatusBarColor(context)
             }
         }
     }
@@ -403,7 +409,6 @@ class Theme @Inject constructor(private val settings: Settings) {
     fun setNavigationBarColor(window: Window, isDark: Boolean, color: Int? = null) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
 
-        window.navigationBarColor = color ?: (if (isDark) Color.BLACK else Color.WHITE)
         WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightNavigationBars = !isDark
     }
 
