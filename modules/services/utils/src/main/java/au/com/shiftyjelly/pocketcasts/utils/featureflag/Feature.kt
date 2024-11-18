@@ -123,14 +123,6 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
-    EXO_OKHTTP(
-        key = "exo_okhttp",
-        title = "Whether OkHttp should be used as an ExoPlayer client",
-        defaultValue = BuildConfig.DEBUG,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
-    ),
     SEARCH_IN_LISTENING_HISTORY(
         key = "search_in_listening_history",
         title = "Search in listening history",
