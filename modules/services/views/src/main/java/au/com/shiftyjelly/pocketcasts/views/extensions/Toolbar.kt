@@ -67,13 +67,13 @@ fun Toolbar.setup(
             true
         }
     }
-    addStatusBar()
+    includeStatusBarPadding()
 }
 
 fun Toolbar.setupChromeCastButton(context: Context?, onClick: () -> Unit) {
     menu.setupChromeCastButton(context, onClick)
 }
 
-fun Toolbar.addStatusBar() {
+fun Toolbar.includeStatusBarPadding() {
     setSystemWindowInsetToPadding(top = true)
 }
