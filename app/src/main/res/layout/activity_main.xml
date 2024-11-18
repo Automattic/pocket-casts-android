@@ -56,9 +56,7 @@
             android:elevation="8dp"
             app:behavior_peekHeight="0dp"
             app:layout_behavior="au.com.shiftyjelly.pocketcasts.view.LockableBottomSheetBehavior"
-            android:clickable="true"
-            android:translationZ="200dp"
-            android:visibility="gone" />
+            android:translationZ="200dp" />
 
         <FrameLayout
             android:id="@+id/modalBottomSheet"

@@ -986,6 +986,7 @@ class MainActivity :
                     }
 
                     binding.playerBottomSheet.isDragEnabled = true
+                    frameBottomSheetBehavior.swipeEnabled = false
 
                     updateNavAndStatusColors(playerOpen = viewModel.isPlayerOpen, viewModel.lastPlaybackState?.podcast)
                 } else {
