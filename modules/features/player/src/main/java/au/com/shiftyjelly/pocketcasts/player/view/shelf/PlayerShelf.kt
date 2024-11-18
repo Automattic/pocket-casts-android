@@ -210,7 +210,7 @@ private fun PlayerShelfContent(
                     onClick = onTranscriptClick,
                 )
                 ShelfItem.Download -> DownloadButton(
-                    isPodcast = !playerShelfData.isUserEpisode,
+                    isPodcastEpisode = !playerShelfData.isUserEpisode,
                     downloadData = playerShelfData.downloadData,
                     iconColors = iconColors,
                     onClick = onDownloadClick,
@@ -432,19 +432,19 @@ fun TranscriptButton(
 
 @Composable
 fun DownloadButton(
-    isPodcast: Boolean,
+    isPodcastEpisode: Boolean,
     downloadData: PlayerShelfData.DownloadData,
     iconColors: PlayerShelfIconColors,
     onClick: () -> Unit,
 ) {
     val downloadIcon = when {
-        isPodcast && (downloadData.isDownloading || downloadData.isQueued) -> IR.drawable.ic_download
-        isPodcast && downloadData.isDownloaded -> IR.drawable.ic_downloaded_24dp
+        isPodcastEpisode && (downloadData.isDownloading || downloadData.isQueued) -> IR.drawable.ic_download
+        isPodcastEpisode && downloadData.isDownloaded -> IR.drawable.ic_downloaded_24dp
         else -> IR.drawable.ic_download
     }
     val contentDescription = when {
-        isPodcast && (downloadData.isDownloading || downloadData.isQueued) -> stringResource(LR.string.episode_downloading)
-        isPodcast && downloadData.isDownloaded -> stringResource(LR.string.remove_downloaded_file)
+        isPodcastEpisode && (downloadData.isDownloading || downloadData.isQueued) -> stringResource(LR.string.episode_downloading)
+        isPodcastEpisode && downloadData.isDownloaded -> stringResource(LR.string.remove_downloaded_file)
         else -> stringResource(LR.string.download)
     }
     IconButton(onClick = onClick) {
