@@ -54,7 +54,7 @@ open class BaseDialogFragment : BottomSheetDialogFragment(), CoroutineScope {
         val activity = activity
         val statusBarColor = statusBarColor
         if (activity != null && statusBarColor != null) {
-            theme.updateWindowStatusBar(window = activity.window, statusBarColor = statusBarColor, context = activity)
+            theme.updateWindowStatusBarIcons(window = activity.window, statusBarColor = statusBarColor, context = activity)
         }
 
         view.doOnLayout {
@@ -121,11 +121,9 @@ open class BaseDialogFragment : BottomSheetDialogFragment(), CoroutineScope {
         @ColorInt navigationBar: Int,
     ) {
         requireActivity().window?.let { activityWindow ->
-            activityWindow.statusBarColor = navigationBar
             WindowInsetsControllerCompat(activityWindow, activityWindow.decorView).isAppearanceLightStatusBars = ColorUtils.calculateLuminance(navigationBar) > 0.5f
         }
         requireDialog().window?.let { dialogWindow ->
-            dialogWindow.navigationBarColor = background
             WindowInsetsControllerCompat(dialogWindow, dialogWindow.decorView).isAppearanceLightNavigationBars = ColorUtils.calculateLuminance(background) > 0.5f
         }
         bottomSheetView()?.backgroundTintList = ColorStateList.valueOf(background)
