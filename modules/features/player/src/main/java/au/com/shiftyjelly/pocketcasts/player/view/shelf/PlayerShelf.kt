@@ -295,7 +295,7 @@ fun SleepButton(
     val dynamicProperties = rememberLottieDynamicProperties(
         rememberLottieDynamicProperty(
             property = LottieProperty.COLOR_FILTER,
-            value = SimpleColorFilter(MaterialTheme.theme.colors.playerContrast03.toArgb()),
+            value = SimpleColorFilter(sleepTint.toArgb()),
             keyPath = arrayOf("**"),
         ),
     )
