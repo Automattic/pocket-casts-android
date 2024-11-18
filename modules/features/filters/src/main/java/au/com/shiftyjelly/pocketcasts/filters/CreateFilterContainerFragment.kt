@@ -111,7 +111,7 @@ class CreateFilterContainerFragment : BaseFragment() {
         val filterUi01 = ThemeColor.filterUi01(theme.activeTheme, tintColor)
         toolbar.setBackgroundColor(filterUi01)
         toolbar.setTitleTextColor(ThemeColor.filterText01(theme.activeTheme, tintColor))
-        theme.updateWindowStatusBar(window = requireActivity().window, statusBarColor = StatusBarColor.Custom(filterUi01, theme.activeTheme.defaultLightIcons), context = requireContext())
+        theme.updateWindowStatusBarIcons(window = requireActivity().window, statusBarColor = StatusBarColor.Custom(filterUi01, theme.activeTheme.defaultLightIcons), context = requireContext())
     }
 
     private fun observeLockedFirstPage(adapter: CreatePagerAdapter) {
