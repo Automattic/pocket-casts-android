@@ -154,7 +154,7 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
             updateTintColor(colors.iconColor)
             toolbar?.setup(title = podcast.title, navigationIcon = BackArrow, toolbarColors = colors, theme = theme, activity = activity)
 
-            theme.updateWindowStatusBar(
+            theme.updateWindowStatusBarIcons(
                 window = requireActivity().window,
                 statusBarColor = StatusBarColor.Custom(colors.backgroundColor, isWhiteIcons = theme.activeTheme.defaultLightIcons),
                 context = context,
@@ -411,7 +411,7 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
 
     private fun setupStatusBar() {
         activity?.let {
-            theme.updateWindowStatusBar(window = it.window, statusBarColor = StatusBarColor.Light, context = it)
+            theme.updateWindowStatusBarIcons(window = it.window, statusBarColor = StatusBarColor.Light, context = it)
         }
     }
 

@@ -132,7 +132,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
 
                     activity?.let {
                         theme.setNavigationBarColor(it.window, true, ThemeColor.primaryUi03(overrideTheme))
-                        theme.updateWindowStatusBar(it.window, StatusBarColor.Custom(ThemeColor.secondaryUi01(overrideTheme), true), it)
+                        theme.updateWindowStatusBarIcons(it.window, StatusBarColor.Custom(ThemeColor.secondaryUi01(overrideTheme), true), it)
                     }
 
                     upNextFragment.onExpanded()

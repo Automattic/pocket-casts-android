@@ -92,7 +92,7 @@ class PodcastAutoArchiveFragment : BaseFragment() {
     }
 
     private fun tintToolbar(color: Int) {
-        theme.updateWindowStatusBar(
+        theme.updateWindowStatusBarIcons(
             window = requireActivity().window,
             statusBarColor = StatusBarColor.Custom(color, isWhiteIcons = ColorUtils.calculateLuminance(color) < 0.5),
             context = requireActivity(),
