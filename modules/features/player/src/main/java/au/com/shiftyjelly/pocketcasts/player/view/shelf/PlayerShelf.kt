@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.player.view.shelf
 import android.view.View
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -177,84 +176,80 @@ private fun PlayerShelfContent(
     onReportClick: () -> Unit,
     onMoreClick: () -> Unit,
 ) {
-    Box(
-        contentAlignment = Alignment.BottomCenter,
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(56.dp)
+            .background(
+                color = MaterialTheme.theme.colors.playerContrast06,
+                shape = RoundedCornerShape(12.dp),
+            ),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-                .background(
-                    color = MaterialTheme.theme.colors.playerContrast06,
-                    shape = RoundedCornerShape(12.dp),
-                ),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            shelfItems.forEach { shelfItem ->
-                when (shelfItem) {
-                    ShelfItem.Effects -> EffectsButton(
-                        isEffectsOn = playerShelfData.isEffectsOn,
-                        iconColors = iconColors,
-                        onClick = onEffectsClick,
-                    )
-                    ShelfItem.Sleep -> SleepButton(
-                        isSleepRunning = playerShelfData.isSleepRunning,
-                        iconColors = iconColors,
-                        onClick = onSleepClick,
-                    )
-                    ShelfItem.Star -> StarButton(
-                        isStarred = playerShelfData.isStarred,
-                        iconColors = iconColors,
-                        onClick = onStarClick,
-                    )
-                    ShelfItem.Transcript -> TranscriptButton(
-                        isTranscriptAvailable = transcriptUiState !is TranscriptViewModel.UiState.Empty,
-                        iconColors = iconColors,
-                        onClick = onTranscriptClick,
-                    )
-                    ShelfItem.Download -> DownloadButton(
-                        isPodcast = !playerShelfData.isUserEpisode,
-                        downloadData = playerShelfData.downloadData,
-                        iconColors = iconColors,
-                        onClick = onDownloadClick,
-                    )
-                    ShelfItem.Share -> ShareButton(
-                        iconColors = iconColors,
-                        onClick = onShareClick,
-                    )
-                    ShelfItem.Podcast -> PodcastButton(
-                        iconColors = iconColors,
-                        onClick = onShowPodcast,
-                    )
-                    ShelfItem.Cast -> CastButton(
-                        iconColors = iconColors,
-                        onClick = onCastClick,
-                    )
-                    ShelfItem.Played -> PlayedButton(
-                        iconColors = iconColors,
-                        onClick = onPlayedClick,
-                    )
-                    ShelfItem.Bookmark -> BookmarkButton(
-                        iconColors = iconColors,
-                        onClick = onAddBookmarkClick,
-                    )
-                    ShelfItem.Archive -> ArchiveButton(
-                        isUserEpisode = playerShelfData.isUserEpisode,
-                        iconColors = iconColors,
-                        onClick = onArchiveClick,
-                    )
-                    ShelfItem.Report -> ReportButton(
-                        iconColors = iconColors,
-                        onClick = onReportClick,
-                    )
-                }
+        shelfItems.forEach { shelfItem ->
+            when (shelfItem) {
+                ShelfItem.Effects -> EffectsButton(
+                    isEffectsOn = playerShelfData.isEffectsOn,
+                    iconColors = iconColors,
+                    onClick = onEffectsClick,
+                )
+                ShelfItem.Sleep -> SleepButton(
+                    isSleepRunning = playerShelfData.isSleepRunning,
+                    iconColors = iconColors,
+                    onClick = onSleepClick,
+                )
+                ShelfItem.Star -> StarButton(
+                    isStarred = playerShelfData.isStarred,
+                    iconColors = iconColors,
+                    onClick = onStarClick,
+                )
+                ShelfItem.Transcript -> TranscriptButton(
+                    isTranscriptAvailable = transcriptUiState !is TranscriptViewModel.UiState.Empty,
+                    iconColors = iconColors,
+                    onClick = onTranscriptClick,
+                )
+                ShelfItem.Download -> DownloadButton(
+                    isPodcast = !playerShelfData.isUserEpisode,
+                    downloadData = playerShelfData.downloadData,
+                    iconColors = iconColors,
+                    onClick = onDownloadClick,
+                )
+                ShelfItem.Share -> ShareButton(
+                    iconColors = iconColors,
+                    onClick = onShareClick,
+                )
+                ShelfItem.Podcast -> PodcastButton(
+                    iconColors = iconColors,
+                    onClick = onShowPodcast,
+                )
+                ShelfItem.Cast -> CastButton(
+                    iconColors = iconColors,
+                    onClick = onCastClick,
+                )
+                ShelfItem.Played -> PlayedButton(
+                    iconColors = iconColors,
+                    onClick = onPlayedClick,
+                )
+                ShelfItem.Bookmark -> BookmarkButton(
+                    iconColors = iconColors,
+                    onClick = onAddBookmarkClick,
+                )
+                ShelfItem.Archive -> ArchiveButton(
+                    isUserEpisode = playerShelfData.isUserEpisode,
+                    iconColors = iconColors,
+                    onClick = onArchiveClick,
+                )
+                ShelfItem.Report -> ReportButton(
+                    iconColors = iconColors,
+                    onClick = onReportClick,
+                )
             }
-            MoreButton(
-                iconColors = iconColors,
-                onClick = onMoreClick,
-            )
         }
+        MoreButton(
+            iconColors = iconColors,
+            onClick = onMoreClick,
+        )
     }
 }
 
