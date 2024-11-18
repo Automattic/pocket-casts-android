@@ -110,14 +110,14 @@ internal fun LowStorageDialog(
         TextH20(
             text = stringResource(LR.string.need_to_free_up_space),
             textAlign = TextAlign.Center,
-            modifier = modifier.padding(bottom = 10.dp, start = 21.dp, end = 21.dp),
+            modifier = Modifier.padding(bottom = 10.dp, start = 21.dp, end = 21.dp),
         )
 
         TextH50(
             text = stringResource(LR.string.save_space_by_managing_downloaded_episodes, formattedTotalDownloadSize),
             fontWeight = FontWeight.W500,
             textAlign = TextAlign.Center,
-            modifier = modifier.padding(bottom = 57.dp, start = 21.dp, end = 21.dp),
+            modifier = Modifier.padding(bottom = 57.dp, start = 21.dp, end = 21.dp),
         )
 
         RowButton(
@@ -128,7 +128,7 @@ internal fun LowStorageDialog(
             colors = ButtonDefaults.buttonColors(
                 backgroundColor = MaterialTheme.theme.colors.primaryInteractive01,
             ),
-            modifier = modifier
+            modifier = Modifier
                 .padding(horizontal = 21.dp)
                 .padding(bottom = 12.dp),
         )
@@ -137,7 +137,7 @@ internal fun LowStorageDialog(
             text = stringResource(LR.string.maybe_later),
             onClick = { onMaybeLaterClick.invoke() },
             includePadding = false,
-            modifier = modifier
+            modifier = Modifier
                 .padding(bottom = 12.dp)
                 .padding(horizontal = 21.dp),
             border = null,

@@ -50,10 +50,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/appBar"
-        android:visibility="gone"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="16dp"
-        />
+        android:visibility="gone" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
