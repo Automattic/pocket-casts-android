@@ -32,6 +32,7 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.combineLatest
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
+import au.com.shiftyjelly.pocketcasts.views.extensions.includeStatusBarPadding
 import au.com.shiftyjelly.pocketcasts.views.extensions.setInputAsSeconds
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.fragments.BasePreferenceFragment
@@ -136,6 +137,7 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
         view.isClickable = true
 
         toolbar = view.findViewById(R.id.toolbar)
+        toolbar?.includeStatusBarPadding()
 
         preferenceAddToUpNextOrder?.isVisible = false
 
@@ -152,7 +154,14 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
             preferencePlaybackEffects?.summary = buildEffectsSummary(podcast)
 
             updateTintColor(colors.iconColor)
-            toolbar?.setup(title = podcast.title, navigationIcon = BackArrow, toolbarColors = colors, theme = theme, activity = activity)
+            toolbar?.setup(
+                title = podcast.title,
+                navigationIcon = BackArrow,
+                toolbarColors = colors,
+                theme = theme,
+                activity = activity,
+                includeStatusBarPadding = false,
+            )
 
             theme.updateWindowStatusBarIcons(
                 window = requireActivity().window,
