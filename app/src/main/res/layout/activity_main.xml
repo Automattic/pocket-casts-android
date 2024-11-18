@@ -16,6 +16,12 @@
             android:layout_height="match_parent"
             android:clipToPadding="false" />
 
+        <!-- Hack: the only way to get the Snackbar in front of the bottom navigation view -->
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:id="@+id/snackbarFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
         <au.com.shiftyjelly.pocketcasts.player.view.PlayerBottomSheet
             android:id="@+id/playerBottomSheet"
             android:layout_width="match_parent"
