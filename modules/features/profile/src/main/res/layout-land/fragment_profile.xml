@@ -17,7 +17,7 @@
             android:background="?attr/primary_ui_02"
             android:focusableInTouchMode="true">
 
-            <au.com.shiftyjelly.pocketcasts.profile.UserView
+            <androidx.compose.ui.platform.ComposeView
                 android:id="@+id/userView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

@@ -18,13 +18,12 @@
             android:background="?attr/primary_ui_02"
             android:focusableInTouchMode="true">
 
-            <au.com.shiftyjelly.pocketcasts.profile.UserView
+            <androidx.compose.ui.platform.ComposeView
                 android:id="@+id/userView"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="18dp"
                 android:layout_marginTop="60dp"
-                android:layout_marginEnd="18dp"
+                android:layout_marginHorizontal="18dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
