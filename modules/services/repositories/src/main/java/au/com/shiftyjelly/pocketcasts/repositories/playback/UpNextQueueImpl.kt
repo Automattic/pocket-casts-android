@@ -205,8 +205,9 @@ class UpNextQueueImpl @Inject constructor(
 
         val mutableList = episodes.toMutableList()
         if (isEmpty) {
-            playNextNow(mutableList.first(), downloadManager, null)
-            mutableList.removeFirst()
+            val firstEpisode = mutableList.first()
+            playNextNow(firstEpisode, downloadManager, null)
+            mutableList.remove(firstEpisode)
         }
 
         mutableList.asReversed().forEach {
