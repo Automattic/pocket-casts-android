@@ -479,7 +479,7 @@ private val step4 = TourStep(
     "More Actions",
     "You can now easily access more actions, as well as customise which actions appear in the player menu.",
     "Finish",
-    TourViewTag.ViewId(R.id.playerActions),
+    TourViewTag.ViewId(R.id.shelfComposeView),
     Gravity.TOP,
 )
 private val tour = listOf(step1, step2, step3, step4)

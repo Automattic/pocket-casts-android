@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
@@ -308,8 +309,26 @@ class ShelfSharedViewModel @Inject constructor(
         val episode: BaseEpisode? = null,
         val reportUrl: String,
     ) {
+        val playerShelfItems: List<ShelfItem>
+            get() = shelfItems.take(MIN_SHELF_ITEMS_SIZE)
         val playerBottomSheetShelfItems: List<ShelfItem>
             get() = shelfItems.drop(MIN_SHELF_ITEMS_SIZE)
+    }
+
+    data class PlayerShelfData(
+        val theme: Theme.ThemeType = Theme.ThemeType.DARK,
+        val iconTintColor: Int = 0xFFFFFFFF.toInt(),
+        val isUserEpisode: Boolean = false,
+        val isSleepRunning: Boolean = false,
+        val isEffectsOn: Boolean = false,
+        val isStarred: Boolean = false,
+        val downloadData: DownloadData = DownloadData(),
+    ) {
+        data class DownloadData(
+            val isDownloading: Boolean = false,
+            val isQueued: Boolean = false,
+            val isDownloaded: Boolean = false,
+        )
     }
 
     sealed interface NavigationState {

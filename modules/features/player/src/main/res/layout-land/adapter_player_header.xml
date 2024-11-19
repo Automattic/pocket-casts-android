@@ -20,7 +20,7 @@
             android:layout_height="0dp"
             android:layout_margin="16dp"
             android:importantForAccessibility="no"
-            app:layout_constraintBottom_toTopOf="@+id/shelf"
+            app:layout_constraintBottom_toTopOf="@+id/shelfComposeView"
             app:layout_constraintDimensionRatio="W,1:1"
             app:layout_constraintHeight_max="192dp"
             app:layout_constraintStart_toStartOf="parent"
@@ -34,7 +34,7 @@
             android:layout_height="0dp"
             android:layout_margin="16dp"
             android:importantForAccessibility="no"
-            app:layout_constraintBottom_toTopOf="@+id/shelf"
+            app:layout_constraintBottom_toTopOf="@+id/shelfComposeView"
             app:layout_constraintDimensionRatio="W,1:1"
             app:layout_constraintHeight_max="192dp"
             app:layout_constraintStart_toStartOf="parent"
@@ -241,134 +241,16 @@
             app:layout_constraintStart_toStartOf="@+id/previousChapter"
             app:layout_constraintTop_toBottomOf="@id/seekBar"/>
 
-        <LinearLayout
-            android:id="@+id/shelf"
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/shelfComposeView"
             android:layout_width="0dp"
-            android:layout_height="56dp"
+            android:layout_height="wrap_content"
             android:layout_margin="16dp"
-            android:background="@drawable/player_shelf"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:paddingHorizontal="8dp"
             android:weightSum="5"
             app:layout_constraintTop_toBottomOf="@+id/playerControls"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
-
-            <ImageButton
-                android:id="@+id/effects"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_marginBottom="2dp"
-                android:layout_weight="1"
-                android:background="?android:attr/actionBarItemBackground"
-                android:contentDescription="@string/player_effects"
-                android:scaleX="1.2"
-                android:scaleY="1.2"
-                app:srcCompat="@drawable/ic_effects_off"
-                app:tint="?attr/player_contrast_03" />
-
-            <com.airbnb.lottie.LottieAnimationView
-                android:id="@+id/sleep"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="?android:attr/actionBarItemBackground"
-                android:clickable="true"
-                android:contentDescription="@string/player_sleep_timer"
-                android:focusable="true"
-                android:scaleType="centerInside"
-                app:lottie_loop="true"
-                app:lottie_progress="0.5"
-                app:lottie_rawRes="@raw/sleep_button" />
-
-            <ImageButton
-                android:id="@+id/star"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:background="?android:attr/actionBarItemBackground"
-                android:contentDescription="@string/player_star"
-                android:scaleX="1.2"
-                android:scaleY="1.2"
-                app:tint="?attr/player_contrast_03" />
-
-            <ImageButton
-                android:id="@+id/transcript"
-                android:contentDescription="@string/transcript"
-                app:srcCompat="@drawable/ic_transcript_24"
-                app:tint="?attr/player_contrast_03"
-                style="@style/shelf_item" />
-
-            <ImageButton
-                android:id="@+id/podcast"
-                android:contentDescription="@string/go_to_podcast"
-                app:srcCompat="@drawable/ic_goto_32"
-                app:tint="?attr/player_contrast_03"
-                style="@style/shelf_item" />
-
-            <ImageButton
-                android:id="@+id/share"
-                android:contentDescription="@string/share_podcast"
-                app:srcCompat="@drawable/ic_share"
-                app:tint="?attr/player_contrast_03"
-                style="@style/shelf_item" />
-
-            <ImageButton
-                android:id="@+id/download"
-                android:contentDescription="@string/download"
-                app:srcCompat="@drawable/auto_filter_downloaded"
-                app:tint="?attr/player_contrast_03"
-                style="@style/shelf_item" />
-
-            <FrameLayout
-                android:id="@+id/cast"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1">
-
-                <androidx.mediarouter.app.MediaRouteButton
-                    android:id="@+id/castButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:mediaRouteTypes="user" />
-            </FrameLayout>
-
-            <ImageButton
-                android:id="@+id/played"
-                android:contentDescription="@string/mark_as_played"
-                app:srcCompat="@drawable/ic_markasplayed"
-                app:tint="?attr/player_contrast_03"
-                style="@style/shelf_item" />
-
-            <ImageButton
-                android:id="@+id/bookmark"
-                android:contentDescription="@string/add_bookmark"
-                app:srcCompat="@drawable/ic_bookmark"
-                app:tint="?attr/player_contrast_03"
-                style="@style/shelf_item" />
-
-            <ImageButton
-                android:id="@+id/archive"
-                android:contentDescription="@string/archive_episode"
-                app:srcCompat="@drawable/ic_archive"
-                app:tint="?attr/player_contrast_03"
-                style="@style/shelf_item" />
-
-            <ImageButton
-                android:id="@+id/playerActions"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:background="?android:attr/actionBarItemBackground"
-                android:contentDescription="@string/more"
-                android:scaleX="1.2"
-                android:scaleY="1.2"
-                app:srcCompat="@drawable/ic_more"
-                app:tint="?attr/player_contrast_03" />
-
-        </LinearLayout>
+            app:layout_constraintStart_toStartOf="parent"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
