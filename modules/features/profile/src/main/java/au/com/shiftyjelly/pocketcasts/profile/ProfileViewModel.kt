@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.profile
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
@@ -18,8 +17,12 @@ import io.reactivex.BackpressureStrategy
 import java.time.Instant
 import javax.inject.Inject
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.toKotlinDuration
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.reactive.asFlow
 import java.time.Duration as JavaDuration
 
@@ -32,9 +35,7 @@ class ProfileViewModel @Inject constructor(
     private val endOfYearManager: EndOfYearManager,
 ) : ViewModel() {
     var isFragmentChangingConfigurations: Boolean = false
-    val podcastCount: LiveData<Int> = podcastManager.observeCountSubscribed().toLiveData()
-    val daysListenedCount: MutableLiveData<Long> = MutableLiveData()
-    val daysSavedCount: MutableLiveData<Long> = MutableLiveData()
+    private val refreshStatsTrigger = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
     val isSignedIn: Boolean
         get() = signInState.value?.isSignedIn ?: false
@@ -63,6 +64,17 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
+    internal val profileStatsState = combine(
+        refreshStatsTrigger.onStart { emit(Unit) },
+        podcastManager.observeCountSubscribed().asFlow(),
+    ) { _, count ->
+        ProfileStatsState(
+            podcastsCount = count,
+            listenedDuration = statsManager.mergedTotalListeningTimeSec.seconds,
+            savedDuration = statsManager.mergedTotalTimeSaved.seconds,
+        )
+    }
+
     val refreshObservable: LiveData<RefreshState> =
         settings.refreshStateObservable
             .toFlowable(BackpressureStrategy.LATEST)
@@ -77,12 +89,8 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    fun updateState() {
-        val timeSaved = statsManager.mergedTotalTimeSaved
-        daysSavedCount.value = timeSaved
-
-        val daysListened = statsManager.mergedTotalListeningTimeSec
-        daysListenedCount.value = daysListened
+    fun refreshStats() {
+        refreshStatsTrigger.tryEmit(Unit)
     }
 
     private fun expiresIn(expiryDate: Instant): Duration {

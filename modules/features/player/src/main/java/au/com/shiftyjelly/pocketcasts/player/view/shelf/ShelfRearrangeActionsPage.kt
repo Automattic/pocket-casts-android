@@ -16,8 +16,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel
-import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.ui.helper.ColorUtils
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
@@ -30,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun ShelfRearrangeActionsPage(
     theme: Theme,
     shelfViewModel: ShelfViewModel,
+    shelfSharedViewModel: ShelfSharedViewModel,
     playerViewModel: PlayerViewModel,
     onBackPressed: () -> Unit,
 ) {
@@ -39,10 +40,7 @@ fun ShelfRearrangeActionsPage(
     val selectedColorInt = theme.playerHighlight7Color(playerViewModel.podcast)
     val selectedBackgroundInt = remember(backgroundColorInt, selectedColorInt) { ColorUtils.calculateCombinedColor(backgroundColorInt, selectedColorInt) }
 
-    val shelfItems by remember {
-        playerViewModel.shelfLive.asFlow()
-    }.collectAsStateWithLifecycle(emptyList<ShelfItem>())
-
+    val shelfItemsState by shelfSharedViewModel.uiState.collectAsStateWithLifecycle()
     val episode by remember {
         playerViewModel.playingEpisodeLive.asFlow()
             .map { (episode, _) -> episode }
@@ -62,8 +60,8 @@ fun ShelfRearrangeActionsPage(
         )
     }
 
-    LaunchedEffect(shelfItems, episode?.uuid) {
-        shelfViewModel.setData(shelfItems, episode)
+    LaunchedEffect(shelfItemsState.shelfItems, episode?.uuid) {
+        shelfViewModel.setData(shelfItemsState.shelfItems, episode)
     }
 
     DisposableEffect(Unit) {

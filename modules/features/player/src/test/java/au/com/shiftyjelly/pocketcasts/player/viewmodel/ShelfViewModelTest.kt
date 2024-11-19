@@ -12,7 +12,6 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfRowItem
-import au.com.shiftyjelly.pocketcasts.repositories.chromecast.ChromeCastAnalytics
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptsManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import kotlin.collections.listOf
@@ -43,9 +42,6 @@ class ShelfViewModelTest {
 
     @Mock
     private lateinit var analyticsTracker: AnalyticsTracker
-
-    @Mock
-    private lateinit var chromeCastAnalytics: ChromeCastAnalytics
 
     @Mock
     private lateinit var settings: Settings
@@ -228,7 +224,6 @@ class ShelfViewModelTest {
             isEditable = isEditable,
             transcriptsManager = transcriptsManager,
             analyticsTracker = analyticsTracker,
-            chromeCastAnalytics = chromeCastAnalytics,
             settings = settings,
         )
     }

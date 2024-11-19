@@ -6,11 +6,11 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.Companion.MIN_SHELF_ITEMS_SIZE
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfRowItem
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfTitle
-import au.com.shiftyjelly.pocketcasts.repositories.chromecast.ChromeCastAnalytics
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptsManager
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
@@ -35,7 +35,6 @@ class ShelfViewModel @AssistedInject constructor(
     @Assisted private val isEditable: Boolean,
     private val transcriptsManager: TranscriptsManager,
     private val analyticsTracker: AnalyticsTracker,
-    private val chromeCastAnalytics: ChromeCastAnalytics,
     private val settings: Settings,
 ) : ViewModel() {
     private var _uiState: MutableStateFlow<UiState> = MutableStateFlow(UiState())
@@ -130,10 +129,6 @@ class ShelfViewModel @AssistedInject constructor(
         analyticsTracker.track(AnalyticsEvent.PLAYER_SHELF_OVERFLOW_MENU_REARRANGE_STARTED)
     }
 
-    fun onMediaRouteButtonClick() {
-        chromeCastAnalytics.trackChromeCastViewShown()
-    }
-
     fun onDismiss() {
         analyticsTracker.track(AnalyticsEvent.PLAYER_SHELF_OVERFLOW_MENU_REARRANGE_FINISHED)
     }
@@ -169,7 +164,6 @@ class ShelfViewModel @AssistedInject constructor(
     }
 
     companion object {
-        private const val MIN_SHELF_ITEMS_SIZE = 4
         const val ERROR_MINIMUM_SHELF_ITEMS = "Minimum 4 shelf items should be present"
         const val ERROR_SHELF_ITEM_INVALID_MOVE_POSITION = "Shelf item invalid move position"
         val shortcutTitle = ShelfTitle(LR.string.player_rearrange_actions_shown)
@@ -177,7 +171,6 @@ class ShelfViewModel @AssistedInject constructor(
 
         object AnalyticsProp {
             object Key {
-                const val FROM = "from"
                 const val ACTION = "action"
                 const val MOVED_FROM = "moved_from"
                 const val MOVED_TO = "moved_to"

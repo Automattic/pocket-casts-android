@@ -85,3 +85,5 @@ object Util {
         return Looper.myLooper() == Looper.getMainLooper()
     }
 }
+
+fun String.titlecaseFirstChar() = replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
