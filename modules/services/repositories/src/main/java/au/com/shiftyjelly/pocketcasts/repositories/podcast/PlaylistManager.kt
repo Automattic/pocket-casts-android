@@ -26,8 +26,6 @@ interface PlaylistManager {
     fun findEpisodes(playlist: Playlist, episodeManager: EpisodeManager, playbackManager: PlaybackManager): List<PodcastEpisode>
     fun observeEpisodes(playlist: Playlist, episodeManager: EpisodeManager, playbackManager: PlaybackManager): Flowable<List<PodcastEpisode>>
 
-    fun count(): Int
-
     fun createPlaylist(name: String, iconId: Int, draft: Boolean): Playlist
 
     fun create(playlist: Playlist): Long
@@ -43,8 +41,6 @@ interface PlaylistManager {
 
     fun countEpisodes(id: Long?, episodeManager: EpisodeManager, playbackManager: PlaybackManager): Int
     fun countEpisodesRx(playlist: Playlist, episodeManager: EpisodeManager, playbackManager: PlaybackManager): Flowable<Int>
-
-    fun savePlaylistsOrder(playlists: List<Playlist>)
 
     fun checkForEpisodesToDownload(episodeManager: EpisodeManager, playbackManager: PlaybackManager)
 

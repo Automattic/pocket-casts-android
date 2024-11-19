@@ -8,6 +8,8 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -104,13 +106,14 @@ class BookmarksFragment : BaseFragment() {
             // Hack to allow nested scrolling inside bottom sheet viewpager
             // https://stackoverflow.com/a/70195667/193545
             Surface(modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection())) {
-                val listData = playerViewModel.listDataLive.asFlow()
-                    // ignore the episode progress
-                    .distinctUntilChanged { t1, t2 ->
-                        t1.podcastHeader.episodeUuid == t2.podcastHeader.episodeUuid &&
-                            t1.podcastHeader.isPlaying == t2.podcastHeader.isPlaying
-                    }
-                    .collectAsState(initial = null)
+                val listData = remember {
+                    playerViewModel.listDataLive.asFlow()
+                        // ignore the episode progress
+                        .distinctUntilChanged { t1, t2 ->
+                            t1.podcastHeader.episodeUuid == t2.podcastHeader.episodeUuid &&
+                                t1.podcastHeader.isPlaying == t2.podcastHeader.isPlaying
+                        }
+                }.collectAsState(initial = null)
 
                 val episodeUuid = episodeUuid(listData)
                 val bottomInset = settings.bottomInset.collectAsStateWithLifecycle(initialValue = 0)

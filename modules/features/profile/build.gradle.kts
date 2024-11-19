@@ -54,6 +54,7 @@ dependencies {
     implementation(libs.coroutines.rx2)
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.config)
+    implementation(libs.fragment.compose)
     implementation(libs.fragment.ktx)
     implementation(libs.lifecycle.reactivestreams.ktx)
     implementation(libs.media3.datasource)

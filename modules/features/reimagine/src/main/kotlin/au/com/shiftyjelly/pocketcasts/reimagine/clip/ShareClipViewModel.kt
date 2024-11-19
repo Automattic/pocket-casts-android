@@ -222,7 +222,7 @@ class ShareClipViewModel @AssistedInject constructor(
                 -> {
                     clipAnalytics.clipShared(clipRange, ClipShareType.Video, cardType)
                     createBackgroundAsset(cardType).map { asset ->
-                        videoClipReequest(podcast, episode, clipRange, platform, cardType, asset, sourceView)
+                        videoClipRequest(podcast, episode, clipRange, platform, cardType, asset, sourceView)
                     }
                 }
             }
@@ -257,7 +257,7 @@ class ShareClipViewModel @AssistedInject constructor(
             .build()
     }
 
-    private fun videoClipReequest(
+    private fun videoClipRequest(
         podcast: Podcast,
         episode: PodcastEpisode,
         clipRange: Clip.Range,

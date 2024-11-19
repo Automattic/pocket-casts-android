@@ -17,87 +17,25 @@
             android:background="?attr/primary_ui_02"
             android:focusableInTouchMode="true">
 
-            <au.com.shiftyjelly.pocketcasts.profile.UserView
+            <androidx.compose.ui.platform.ComposeView
                 android:id="@+id/userView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="18dp"
+                android:layout_marginStart="16dp"
                 android:layout_marginTop="30dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintWidth_percent="0.50" />
 
-            <androidx.constraintlayout.widget.Barrier
-                android:id="@+id/barrier"
-                android:layout_width="wrap_content"
+            <androidx.compose.ui.platform.ComposeView
+                android:id="@+id/statsView"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:barrierDirection="end"
-                app:constraint_referenced_ids="userView" />
-
-            <TextView
-                android:id="@+id/lblPodcastCount"
-                style="@style/label_profile_stats"
-                android:layout_marginStart="16dp"
-                android:text="0"
-                android:textColor="?attr/primary_text_01"
-                app:layout_constraintBottom_toTopOf="@+id/lblPodcastCountLabel"
-                app:layout_constraintEnd_toStartOf="@+id/lblDaysListened"
-                app:layout_constraintStart_toEndOf="@+id/barrier"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_chainStyle="packed"
-                tools:text="999" />
-
-            <TextView
-                android:id="@+id/lblDaysListened"
-                style="@style/label_profile_stats"
-                android:text="0"
-                android:textColor="?attr/primary_text_01"
-                app:layout_constraintEnd_toStartOf="@+id/lblDaysSaved"
-                app:layout_constraintStart_toEndOf="@+id/lblPodcastCount"
-                app:layout_constraintTop_toTopOf="@id/lblPodcastCount"
-                tools:text="99" />
-
-            <TextView
-                android:id="@+id/lblDaysSaved"
-                style="@style/label_profile_stats"
-                android:layout_marginEnd="48dp"
-                android:text="0"
-                android:textColor="?attr/primary_text_01"
+                android:layout_marginTop="30dp"
+                android:layout_marginEnd="16dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/lblDaysListened"
-                app:layout_constraintTop_toTopOf="@id/lblPodcastCount"
-                tools:text="99" />
-
-            <TextView
-                android:id="@+id/lblPodcastCountLabel"
-                style="@style/label_profile_stat_label"
-                android:layout_marginTop="4dp"
-                android:text="@string/profile_stat_podcasts"
-                android:textColor="?attr/primary_text_01"
-                app:layout_constraintBottom_toBottomOf="@id/userView"
-                app:layout_constraintEnd_toEndOf="@+id/lblPodcastCount"
-                app:layout_constraintStart_toStartOf="@+id/lblPodcastCount"
-                app:layout_constraintTop_toBottomOf="@+id/lblPodcastCount" />
-
-            <TextView
-                android:id="@+id/lblDaysListenedLabel"
-                style="@style/label_profile_stat_label"
-                android:layout_marginTop="4dp"
-                android:text="@string/profile_stat_days_listened"
-                android:textColor="?attr/primary_text_01"
-                app:layout_constraintEnd_toEndOf="@+id/lblDaysListened"
-                app:layout_constraintStart_toStartOf="@+id/lblDaysListened"
-                app:layout_constraintTop_toBottomOf="@+id/lblDaysListened" />
-
-            <TextView
-                android:id="@+id/lblDaysSavedLabel"
-                style="@style/label_profile_stat_label"
-                android:layout_marginTop="4dp"
-                android:text="@string/profile_stats_days_saved"
-                android:textColor="?attr/primary_text_01"
-                app:layout_constraintEnd_toEndOf="@+id/lblDaysSaved"
-                app:layout_constraintStart_toStartOf="@+id/lblDaysSaved"
-                app:layout_constraintTop_toBottomOf="@+id/lblDaysSaved" />
+                app:layout_constraintTop_toTopOf="@+id/userView"
+                app:layout_constraintWidth_percent="0.50" />
 
             <androidx.compose.ui.platform.ComposeView
                 android:id="@+id/endOfYearPromptCard"
@@ -112,8 +50,8 @@
             <androidx.compose.ui.platform.ComposeView
                 android:id="@+id/referralsClaimGuestPassBannerCard"
                 android:layout_width="0dp"
-                android:layout_marginTop="8dp"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/endOfYearPromptCard" />
@@ -164,13 +102,13 @@
             <include
                 android:id="@+id/upgradeLayout"
                 layout="@layout/layout_plus_callout"
-                android:layout_height="wrap_content"
                 android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/btnRefresh"
-                app:layout_constraintBottom_toBottomOf="parent"/>
+                app:layout_constraintTop_toBottomOf="@+id/btnRefresh" />
 
             <androidx.compose.ui.platform.ComposeView
                 android:id="@+id/btnGift"

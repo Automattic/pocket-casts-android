@@ -18,83 +18,25 @@
             android:background="?attr/primary_ui_02"
             android:focusableInTouchMode="true">
 
-            <au.com.shiftyjelly.pocketcasts.profile.UserView
+            <androidx.compose.ui.platform.ComposeView
                 android:id="@+id/userView"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="18dp"
+                android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="60dp"
-                android:layout_marginEnd="18dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <androidx.constraintlayout.widget.Barrier
-                android:id="@+id/accountBarrier"
-                android:layout_width="wrap_content"
+            <androidx.compose.ui.platform.ComposeView
+                android:id="@+id/statsView"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:barrierDirection="bottom"
-                app:constraint_referenced_ids="userView" />
-
-            <TextView
-                android:id="@+id/lblPodcastCount"
-                style="@style/label_profile_stats"
+                android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="8dp"
-                android:textColor="?attr/primary_text_01"
-                app:layout_constraintEnd_toStartOf="@+id/lblDaysListened"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/accountBarrier"
-                tools:text="999" />
-
-            <TextView
-                android:id="@+id/lblDaysListened"
-                style="@style/label_profile_stats"
-                android:layout_marginTop="8dp"
-                android:textColor="?attr/primary_text_01"
-                app:layout_constraintEnd_toStartOf="@+id/lblDaysSaved"
-                app:layout_constraintStart_toEndOf="@+id/lblPodcastCount"
-                app:layout_constraintTop_toBottomOf="@+id/accountBarrier"
-                tools:text="99" />
-
-            <TextView
-                android:id="@+id/lblDaysSaved"
-                style="@style/label_profile_stats"
-                android:layout_marginTop="8dp"
-                android:textColor="?attr/primary_text_01"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/lblDaysListened"
-                app:layout_constraintTop_toBottomOf="@+id/accountBarrier"
-                tools:text="99" />
-
-            <TextView
-                android:id="@+id/lblPodcastCountLabel"
-                style="@style/label_profile_stat_label"
-                android:layout_marginTop="4dp"
-                android:text="@string/profile_stat_podcasts"
-                android:textColor="?attr/primary_text_01"
-                app:layout_constraintEnd_toEndOf="@+id/lblPodcastCount"
-                app:layout_constraintStart_toStartOf="@+id/lblPodcastCount"
-                app:layout_constraintTop_toBottomOf="@+id/lblPodcastCount" />
-
-            <TextView
-                android:id="@+id/lblDaysListenedLabel"
-                style="@style/label_profile_stat_label"
-                android:layout_marginTop="4dp"
-                android:text="@string/profile_stat_days_listened"
-                android:textColor="?attr/primary_text_01"
-                app:layout_constraintEnd_toEndOf="@+id/lblDaysListened"
-                app:layout_constraintStart_toStartOf="@+id/lblDaysListened"
-                app:layout_constraintTop_toBottomOf="@+id/lblDaysListened" />
-
-            <TextView
-                android:id="@+id/lblDaysSavedLabel"
-                style="@style/label_profile_stat_label"
-                android:layout_marginTop="4dp"
-                android:text="@string/profile_stats_days_saved"
-                android:textColor="?attr/primary_text_01"
-                app:layout_constraintEnd_toEndOf="@+id/lblDaysSaved"
-                app:layout_constraintStart_toStartOf="@+id/lblDaysSaved"
-                app:layout_constraintTop_toBottomOf="@+id/lblDaysSaved" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/userView" />
 
             <androidx.compose.ui.platform.ComposeView
                 android:id="@+id/endOfYearPromptCard"
@@ -104,13 +46,13 @@
                 android:layout_marginTop="16dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/lblPodcastCountLabel" />
+                app:layout_constraintTop_toBottomOf="@+id/statsView" />
 
             <androidx.compose.ui.platform.ComposeView
                 android:id="@+id/referralsClaimGuestPassBannerCard"
                 android:layout_width="0dp"
-                android:layout_marginTop="8dp"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/endOfYearPromptCard" />

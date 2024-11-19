@@ -5,7 +5,6 @@ import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureTier
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import com.android.billingclient.api.ProductDetails
 
 sealed interface Subscription {
@@ -107,12 +106,6 @@ sealed interface Subscription {
 
             fun fromProductId(productId: String): SubscriptionTier =
                 productIdToTierMap[productId] ?: UNKNOWN
-
-            fun fromUserTier(userTier: UserTier) = when (userTier) {
-                UserTier.Free -> UNKNOWN
-                UserTier.Plus -> PLUS
-                UserTier.Patron -> PATRON
-            }
 
             fun fromFeatureTier(feature: Feature) = when (feature.tier) {
                 FeatureTier.Free -> UNKNOWN

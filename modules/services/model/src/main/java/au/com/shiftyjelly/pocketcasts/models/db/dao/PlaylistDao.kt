@@ -48,9 +48,6 @@ abstract class PlaylistDao {
     @Query("SELECT COUNT(*) FROM filters")
     abstract fun count(): Int
 
-    @Query("SELECT COUNT(*) FROM filter_episodes")
-    abstract fun countEpisodes(): Int
-
     @Update
     abstract fun update(playlist: Playlist)
 
@@ -66,15 +63,6 @@ abstract class PlaylistDao {
     @Query("DELETE FROM filters WHERE deleted = 1")
     abstract fun deleteDeleted()
 
-    @Query("DELETE FROM filter_episodes WHERE episodeUuid = :uuid")
-    abstract fun deleteEpisodeByUuid(uuid: String)
-
-    @Query("DELETE FROM filter_episodes WHERE playlistId = :playlistId")
-    abstract fun deleteEpisodesByPlaylistId(playlistId: Long)
-
-    @Query("DELETE FROM filter_episodes WHERE playlistId = :playlistId AND episodeUuid IN (:uuids)")
-    abstract fun deleteEpisodesByPlaylistIdAndUuid(playlistId: Long, uuids: List<String>)
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insert(playlist: Playlist): Long
 
@@ -86,9 +74,6 @@ abstract class PlaylistDao {
 
     @Query("UPDATE filters SET syncStatus = :syncStatus")
     abstract fun updateAllSyncStatus(syncStatus: Int)
-
-    @Query("UPDATE filter_episodes SET position = :position WHERE _id = :id")
-    abstract fun updateEpisodePosition(position: Int, id: Long)
 
     @Query("SELECT * FROM filters WHERE UPPER(title) = UPPER(:title)")
     abstract fun searchByTitle(title: String): Playlist?

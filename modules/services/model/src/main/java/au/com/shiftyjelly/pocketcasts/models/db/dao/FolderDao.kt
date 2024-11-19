@@ -1,12 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.models.db.dao
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import androidx.room.Update
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import io.reactivex.Flowable
@@ -19,12 +17,6 @@ abstract class FolderDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insert(folder: Folder)
 
-    @Update
-    abstract suspend fun update(folder: Folder)
-
-    @Delete
-    abstract suspend fun delete(folder: Folder)
-
     @Query("DELETE FROM folders")
     abstract suspend fun deleteAll()
 
@@ -33,9 +25,6 @@ abstract class FolderDao {
 
     @Query("SELECT * FROM folders WHERE uuid = :uuid")
     abstract suspend fun findByUuid(uuid: String): Folder?
-
-    @Query("SELECT * FROM folders WHERE uuid = :uuid")
-    abstract fun findByUuidBlocking(uuid: String): Folder?
 
     @Query("SELECT * FROM folders WHERE uuid = :uuid")
     abstract fun findByUuidFlowable(uuid: String): Flowable<List<Folder>>

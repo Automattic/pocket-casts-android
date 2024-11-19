@@ -16,10 +16,6 @@ import java.util.Locale
 sealed interface OfferSubscriptionPricingPhase : SubscriptionPricingPhase {
     val chronoUnit: ChronoUnit
 
-    // i.e., 14 offer
-    fun numPeriodFree(res: Resources): String =
-        res.getString(R.string.profile_amount_free, periodValuePlural(res))
-
     // i.e., 14 day offer
     fun numPeriodOffer(res: Resources, isTrial: Boolean): String =
         if (isTrial) {

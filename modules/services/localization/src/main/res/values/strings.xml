@@ -512,6 +512,10 @@
     <!-- Podcast -->
 
     <string name="podcast">Podcast</string>
+    <plurals name="podcast">
+        <item quantity="one">Podcast</item>
+        <item quantity="other">Podcasts</item>
+    </plurals>
     <string name="podcast_archive_all">Archive all</string>
     <string name="podcast_archive_all_played">Archive all played</string>
     <string name="podcast_archive_played">You should only do this if you don\'t want to see them anymore.</string>
@@ -1010,22 +1014,38 @@
     <string name="profile_sonos_title">Pocket Casts And Sonos</string>
     <string name="profile_stat_days_listened">Days listened</string>
     <string name="profile_stat_podcasts" translatable="false">@string/podcasts</string>
-    <string name="profile_stats_day_saved">Day saved</string>
-    <string name="profile_stats_days_saved">Days saved</string>
-    <string name="profile_stats_hour_saved">Hour saved</string>
-    <string name="profile_stats_hours_saved">Hours saved</string>
-    <string name="profile_stats_minute_saved">Minute saved</string>
-    <string name="profile_stats_minutes_saved">Minutes saved</string>
-    <string name="profile_stats_second_saved">Second saved</string>
-    <string name="profile_stats_seconds_saved">Seconds saved</string>
-    <string name="profile_stats_day_listened">Day listened</string>
-    <string name="profile_stats_days_listened">Days listened</string>
-    <string name="profile_stats_hour_listened">Hour listened</string>
-    <string name="profile_stats_hours_listened">Hours listened</string>
-    <string name="profile_stats_minute_listened">Minute listened</string>
-    <string name="profile_stats_minutes_listened">Minutes listened</string>
-    <string name="profile_stats_second_listened">Second listened</string>
-    <string name="profile_stats_seconds_listened">Seconds listened</string>
+    <plurals name="profile_stats_day_saved">
+        <item quantity="one">Day saved</item>
+        <item quantity="other">Days saved</item>
+    </plurals>
+    <plurals name="profile_stats_hour_saved">
+        <item quantity="one">Hour saved</item>
+        <item quantity="other">Hours saved</item>
+    </plurals>
+    <plurals name="profile_stats_minute_saved">
+        <item quantity="one">Minute saved</item>
+        <item quantity="other">Minutes saved</item>
+    </plurals>
+    <plurals name="profile_stats_second_saved">
+        <item quantity="one">Second saved</item>
+        <item quantity="other">Seconds saved</item>
+    </plurals>
+    <plurals name="profile_stats_day_listened">
+        <item quantity="one">Day listened</item>
+        <item quantity="other">Days listened</item>
+    </plurals>
+    <plurals name="profile_stats_hour_listened">
+        <item quantity="one">Hour listened</item>
+        <item quantity="other">Hours listened</item>
+    </plurals>
+    <plurals name="profile_stats_minute_listened">
+        <item quantity="one">Minute listened</item>
+        <item quantity="other">Minutes listened</item>
+    </plurals>
+    <plurals name="profile_stats_second_listened">
+        <item quantity="one">Second listened</item>
+        <item quantity="other">Seconds listened</item>
+    </plurals>
     <string name="profile_stats_auto_skipping">Auto Skipping</string>
     <string name="profile_stats_listened_for">You\'ve listened for</string>
     <string name="profile_stats_trim_silence">Trim Silence</string>

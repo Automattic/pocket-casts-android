@@ -23,8 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -34,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.viewModels
+import androidx.fragment.compose.content
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.BottomSheetAppBar
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
@@ -69,20 +68,17 @@ class CancelConfirmationFragment : BaseDialogFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ) = ComposeView(requireContext()).apply {
-        setContent {
-            AppThemeWithBackground(theme.activeTheme) {
-                setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-                CancelConfirmationPage(
-                    rows = getRows(),
-                    onStayClicked = {
-                        viewModel.onStayClicked()
-                        closeScreen()
-                    },
-                    onCloseClicked = ::closeScreen,
-                    onCancelClicked = ::onCancelClicked,
-                )
-            }
+    ) = content {
+        AppThemeWithBackground(theme.activeTheme) {
+            CancelConfirmationPage(
+                rows = getRows(),
+                onStayClicked = {
+                    viewModel.onStayClicked()
+                    closeScreen()
+                },
+                onCloseClicked = ::closeScreen,
+                onCancelClicked = ::onCancelClicked,
+            )
         }
     }
 

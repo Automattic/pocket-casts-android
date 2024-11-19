@@ -15,7 +15,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -59,7 +58,8 @@ fun ManageDownloadsCard(
             modifier = Modifier
                 .padding(end = 12.dp)
                 .size(24.dp),
-            tint = Color.Black,
+            // The icon isn't clickable so the design matches the title color
+            tint = MaterialTheme.theme.colors.primaryText01,
         )
 
         Column(

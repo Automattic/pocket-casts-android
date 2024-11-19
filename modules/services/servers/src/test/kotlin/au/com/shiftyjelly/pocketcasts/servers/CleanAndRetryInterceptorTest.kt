@@ -16,7 +16,7 @@ class CleanAndRetryInterceptorTest {
     private val url = server.url("/")
 
     @Test
-    fun `do not remove header from request if response is succssful`() {
+    fun `do not remove header from request if response is successful`() {
         val client = OkHttpClient.Builder()
             .addInterceptor(CleanAndRetryInterceptor(headersToRemove = listOf("x-custom")))
             .build()

@@ -2,17 +2,13 @@ package au.com.shiftyjelly.pocketcasts.settings.whatsnew
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.fragment.compose.content
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -40,56 +36,51 @@ class WhatsNewFragment : BaseFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View =
-        ComposeView(requireContext()).apply {
-            setBackgroundColor(Color.Transparent.toArgb())
-            setContent {
-                AppTheme(theme.activeTheme) {
-                    CallOnce {
-                        analyticsTracker.track(
-                            AnalyticsEvent.WHATSNEW_SHOWN,
-                            mapOf("version" to Settings.WHATS_NEW_VERSION_CODE),
-                        )
-                    }
+    ) = content {
+        AppTheme(theme.activeTheme) {
+            CallOnce {
+                analyticsTracker.track(
+                    AnalyticsEvent.WHATSNEW_SHOWN,
+                    mapOf("version" to Settings.WHATS_NEW_VERSION_CODE),
+                )
+            }
 
-                    setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-                    val onClose: () -> Unit = {
-                        @Suppress("DEPRECATION")
-                        activity?.onBackPressed()
-                    }
-                    var confirmActionClicked: Boolean by remember { mutableStateOf(false) }
-                    WhatsNewPage(
-                        onConfirm = {
-                            analyticsTracker.track(
-                                AnalyticsEvent.WHATSNEW_CONFIRM_BUTTON_TAPPED,
-                                mapOf("version" to Settings.WHATS_NEW_VERSION_CODE),
-                            )
-                            if (it.shouldCloseOnConfirm) {
-                                onClose()
-                            }
-                            performConfirmAction(it)
-                            confirmActionClicked = true
-                        },
-                        onClose = {
-                            analyticsTracker.track(
-                                AnalyticsEvent.WHATSNEW_DISMISSED,
-                                mapOf("version" to Settings.WHATS_NEW_VERSION_CODE),
-                            )
-                            onClose()
-                        },
-
+            val onClose: () -> Unit = {
+                @Suppress("DEPRECATION")
+                activity?.onBackPressed()
+            }
+            var confirmActionClicked: Boolean by remember { mutableStateOf(false) }
+            WhatsNewPage(
+                onConfirm = {
+                    analyticsTracker.track(
+                        AnalyticsEvent.WHATSNEW_CONFIRM_BUTTON_TAPPED,
+                        mapOf("version" to Settings.WHATS_NEW_VERSION_CODE),
                     )
-
-                    DisposableEffect(Unit) {
-                        onDispose {
-                            val fragmentHostListener = activity as? FragmentHostListener
-                                ?: throw IllegalStateException(FRAGMENT_HOST_LISTENER_NOT_IMPLEMENTED)
-                            fragmentHostListener.whatsNewDismissed(fromConfirmAction = confirmActionClicked)
-                        }
+                    if (it.shouldCloseOnConfirm) {
+                        onClose()
                     }
+                    performConfirmAction(it)
+                    confirmActionClicked = true
+                },
+                onClose = {
+                    analyticsTracker.track(
+                        AnalyticsEvent.WHATSNEW_DISMISSED,
+                        mapOf("version" to Settings.WHATS_NEW_VERSION_CODE),
+                    )
+                    onClose()
+                },
+
+            )
+
+            DisposableEffect(Unit) {
+                onDispose {
+                    val fragmentHostListener = activity as? FragmentHostListener
+                        ?: throw IllegalStateException(FRAGMENT_HOST_LISTENER_NOT_IMPLEMENTED)
+                    fragmentHostListener.whatsNewDismissed(fromConfirmAction = confirmActionClicked)
                 }
             }
         }
+    }
 
     private fun performConfirmAction(navigationState: NavigationState) {
         when (navigationState) {
@@ -107,6 +98,7 @@ class WhatsNewFragment : BaseFragment() {
             showPatronOnly = when (source) {
                 OnboardingUpgradeSource.WHATS_NEW_SKIP_CHAPTERS -> FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS) &&
                     Subscription.SubscriptionTier.fromFeatureTier(Feature.DESELECT_CHAPTERS) == Subscription.SubscriptionTier.PATRON
+
                 else -> false
             },
         )

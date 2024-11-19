@@ -17,8 +17,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.addTo
-import io.reactivex.rxkotlin.subscribeBy
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 
@@ -35,7 +33,6 @@ class CreateAccountViewModel
     val subscriptionType = MutableLiveData<SubscriptionType>().apply { value = SubscriptionType.FREE }
     val subscription = MutableLiveData<Subscription?>()
     val newsletter = MutableLiveData<Boolean>().apply { postValue(false) }
-    val termsOfUse = MutableLiveData<Boolean?>()
 
     val createAccountState = MutableLiveData<CreateAccountState>().apply { value = CreateAccountState.CurrentlyValid }
     private val disposables = CompositeDisposable()
@@ -116,15 +113,6 @@ class CreateAccountViewModel
         }
     }
 
-    fun updateSubscriptionType(value: SubscriptionType) {
-        subscriptionType.value = value
-        createAccountState.postValue(CreateAccountState.SubscriptionTypeChosen)
-    }
-
-    fun updateSubscription(value: Subscription) {
-        subscription.value = value
-    }
-
     fun updateEmailRefresh() {
         val addError = !isEmailValid(email.value)
         errorUpdate(CreateAccountError.INVALID_EMAIL, addError)
@@ -159,10 +147,6 @@ class CreateAccountViewModel
         }
     }
 
-    fun updateTermsOfUse(value: Boolean) {
-        termsOfUse.value = value
-    }
-
     fun updateStateToFinished() {
         createAccountState.value = CreateAccountState.Finished
     }
@@ -172,17 +156,10 @@ class CreateAccountViewModel
         subscriptionType.value = defaultSubscriptionType
         subscription.value = null
         newsletter.value = false
-        termsOfUse.value = null
     }
 
     fun clearError(error: CreateAccountError) {
         errorUpdate(error, false)
-    }
-
-    fun clearReadyForUpgrade() {
-        clearValues()
-        upgradeMode.value = true
-        subscriptionType.value = SubscriptionType.PLUS
     }
 
     fun currentStateHasError(error: CreateAccountError): Boolean {
@@ -220,31 +197,6 @@ class CreateAccountViewModel
         }
     }
 
-    fun sendCreateSubscriptions() {
-        subscriptionManager.observePurchaseEvents()
-            .firstOrError()
-            .subscribeBy(
-                onSuccess = { purchaseEvent ->
-                    when (purchaseEvent) {
-                        is PurchaseEvent.Success -> {
-                            createAccountState.postValue(CreateAccountState.SubscriptionCreated)
-                        }
-                        is PurchaseEvent.Cancelled -> {
-                            errorUpdate(CreateAccountError.CANCELLED_CREATE_SUB, true)
-                        }
-                        is PurchaseEvent.Failure -> {
-                            errorUpdate(CreateAccountError.CANNOT_CREATE_SUB, true)
-                        }
-                    }
-                    trackPurchaseEvent(subscription.value, purchaseEvent, analyticsTracker)
-                },
-                onError = {
-                    errorUpdate(CreateAccountError.CANNOT_CREATE_SUB, true)
-                },
-            )
-            .addTo(disposables)
-    }
-
     fun onCloseDoneForm() {
         analyticsTracker.track(AnalyticsEvent.ACCOUNT_UPDATED_DISMISSED)
     }
@@ -261,9 +213,9 @@ enum class NewsletterSource(val analyticsValue: String) {
     WELCOME_NEW_ACCOUNT("welcome_new_account"),
 }
 
-enum class SubscriptionType(val value: String, val trackingLabel: String) {
-    FREE("Free", "free"),
-    PLUS("Pocket Casts Plus", "plus"),
+enum class SubscriptionType(val value: String) {
+    FREE("Free"),
+    PLUS("Pocket Casts Plus"),
 }
 
 enum class CreateAccountError {
