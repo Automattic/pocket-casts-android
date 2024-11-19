@@ -32,6 +32,7 @@ import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersViewModel
 import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersViewModel.Mode.Player
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -68,6 +69,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
 
     private lateinit var adapter: ViewPagerAdapter
     private val viewModel: PlayerViewModel by activityViewModels()
+    private val shelfSharedViewModel: ShelfSharedViewModel by activityViewModels()
     private val chaptersViewModel by viewModels<ChaptersViewModel>(
         extrasProducer = {
             defaultViewModelCreationExtras.withCreationCallback<ChaptersViewModel.Factory> { factory ->
@@ -275,15 +277,10 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
         }
     }
 
-    fun openPlayer(sourceView: SourceView? = null) {
+    fun openPlayer() {
         val index = adapter.indexOfPlayer
         if (index == -1) return
         binding?.viewPager?.currentItem = index
-
-        if (sourceView == SourceView.WHATS_NEW) {
-            ((childFragmentManager.fragments.firstOrNull { it is PlayerHeaderFragment }) as? PlayerHeaderFragment)
-                ?.onMoreClicked(sourceView)
-        }
     }
 
     fun openBookmarks() {
@@ -334,7 +331,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
 
             isTranscriptVisible -> {
                 updateTabsVisibility(true)
-                viewModel.closeTranscript(withTransition = true)
+                shelfSharedViewModel.closeTranscript(viewModel.podcast, viewModel.episode, withTransition = true)
                 true
             }
 

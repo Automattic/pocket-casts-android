@@ -40,7 +40,11 @@ import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptSearchVi
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel
 import au.com.shiftyjelly.pocketcasts.player.view.video.VideoActivity
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
-import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel.TransitionState
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.NavigationState
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.ShelfItemSource
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.SnackbarMessage
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.TransitionState
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel.Companion.AnalyticsProp
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
@@ -62,8 +66,11 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.component.LockableNestedScrollView
+import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
+import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog.ButtonType.Danger
 import au.com.shiftyjelly.pocketcasts.views.extensions.updateColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
+import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
 import com.airbnb.lottie.LottieProperty
@@ -102,6 +109,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
     private lateinit var imageRequestFactory: PocketCastsImageRequestFactory
     private val viewModel: PlayerViewModel by activityViewModels()
+    private val shelfSharedViewModel: ShelfSharedViewModel by activityViewModels()
     private val transcriptViewModel by viewModels<TranscriptViewModel>({ requireParentFragment() })
     private val transcriptSearchViewModel by viewModels<TranscriptSearchViewModel>({ requireParentFragment() })
     private var binding: AdapterPlayerHeaderBinding? = null
@@ -162,12 +170,16 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             ShelfItem.Download to binding.download,
             ShelfItem.Report to binding.report,
         )
-        viewModel.trimmedShelfLive.observe(viewLifecycleOwner) {
-            binding.shelf.removeAllViews()
-            it.first.subList(0, 4)
-                .mapNotNull(shelfViews::get)
-                .forEach { itemView -> binding.shelf += itemView }
-            binding.shelf.addView(binding.playerActions)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                shelfSharedViewModel.uiState.collect { uiState ->
+                    binding.shelf.removeAllViews()
+                    uiState.shelfItems.take(4)
+                        .mapNotNull(shelfViews::get)
+                        .forEach { itemView -> binding.shelf += itemView }
+                    binding.shelf.addView(binding.playerActions)
+                }
+            }
         }
 
         if (FeatureFlag.isEnabled(Feature.TRANSCRIPTS)) {
@@ -184,8 +196,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                                     .setTextColor(ThemeColor.primaryText01(Theme.ThemeType.LIGHT))
                                     .show()
                             } else {
-                                trackShelfAction(ShelfItem.Transcript.analyticsValue)
-                                viewModel.openTranscript()
+                                shelfSharedViewModel.openTranscript(ShelfItemSource.Shelf)
                             }
                         }
                     }
@@ -193,39 +204,56 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             }
         }
 
-        binding.effects.setOnClickListener { onEffectsClick() }
+        observeShelfItemNavigationState()
+        observeShelfItemSnackbarMessages()
+
+        binding.effects.setOnClickListener {
+            shelfSharedViewModel.onEffectsClick(ShelfItemSource.Shelf)
+        }
         binding.previousChapter.setOnClickListener { onPreviousChapter() }
         binding.nextChapter.setOnClickListener { onNextChapter() }
-        binding.sleep.setOnClickListener { onSleepClick() }
-        binding.star.setOnClickListener { onStarClick() }
-        binding.share.setOnClickListener { onShareClick() }
-        binding.playerActions.setOnClickListener { onMoreClicked() }
-        binding.podcast.setOnClickListener { showPodcast() }
+        binding.sleep.setOnClickListener {
+            shelfSharedViewModel.onSleepClick(ShelfItemSource.Shelf)
+        }
+        binding.star.setOnClickListener {
+            shelfSharedViewModel.onStarClick(ShelfItemSource.Shelf)
+        }
+        binding.share.setOnClickListener {
+            val podcast = viewModel.podcast ?: return@setOnClickListener
+            val episode = viewModel.episode as? PodcastEpisode ?: return@setOnClickListener
+            shelfSharedViewModel.onShareClick(podcast, episode, ShelfItemSource.Shelf)
+        }
+        binding.playerActions.setOnClickListener { shelfSharedViewModel.onMoreClick() }
+        binding.podcast.setOnClickListener {
+            shelfSharedViewModel.onShowPodcastOrCloudFiles(viewModel.podcast, ShelfItemSource.Shelf)
+        }
         binding.played.setOnClickListener {
-            trackShelfAction(ShelfItem.Played.analyticsValue)
-            viewModel.markCurrentlyPlayingAsPlayed(requireContext())?.show(childFragmentManager, "mark_as_played")
+            shelfSharedViewModel.onPlayedClick(
+                onMarkAsPlayedConfirmed = { episode, shouldShuffleUpNext ->
+                    viewModel.markAsPlayedConfirmed(episode, shouldShuffleUpNext)
+                },
+                source = ShelfItemSource.Shelf,
+            )
         }
         binding.archive.setOnClickListener {
-            trackShelfAction(ShelfItem.Archive.analyticsValue)
-            viewModel.archiveCurrentlyPlaying(resources)?.show(childFragmentManager, "archive")
+            shelfSharedViewModel.onArchiveClick(
+                onArchiveConfirmed = { viewModel.archiveConfirmed(it) },
+                source = ShelfItemSource.Shelf,
+            )
         }
         binding.bookmark.setOnClickListener {
-            trackShelfAction(ShelfItem.Bookmark.analyticsValue)
-            onAddBookmarkClick(OnboardingUpgradeSource.BOOKMARKS_SHELF_ACTION)
+            shelfSharedViewModel.onAddBookmarkClick(
+                OnboardingUpgradeSource.BOOKMARKS_SHELF_ACTION,
+                ShelfItemSource.Shelf,
+            )
         }
         binding.report?.setOnClickListener {
-            trackShelfAction(ShelfItem.Report.analyticsValue)
-            openUrl(settings.getReportViolationUrl())
+            shelfSharedViewModel.onReportClick(ShelfItemSource.Shelf)
         }
-        binding.download?.setOnClickListener {
-            trackShelfAction(ShelfItem.Download.analyticsValue)
+        binding.download.setOnClickListener {
             viewModel.handleDownloadClickFromPlaybackActions(
-                onDownloadStart = {
-                    showSnackBar(text = getString(LR.string.episode_queued_for_download))
-                },
-                onDeleteStart = {
-                    showSnackBar(text = getString(LR.string.episode_was_removed))
-                },
+                onDownloadStart = { shelfSharedViewModel.onEpisodeDownloadStart(ShelfItemSource.Shelf) },
+                onDeleteStart = { shelfSharedViewModel.onEpisodeRemoveClick(ShelfItemSource.Shelf) },
             )
         }
         binding.videoView.playbackManager = playbackManager
@@ -236,8 +264,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             visibility = View.VISIBLE
             updateColor(ThemeColor.playerContrast03(theme.activeTheme))
             setOnClickListener {
-                trackShelfAction(ShelfItem.Cast.analyticsValue)
-                chromeCastAnalytics.trackChromeCastViewShown()
+                shelfSharedViewModel.trackShelfAction(ShelfItem.Cast, ShelfItemSource.Shelf)
             }
         }
 
@@ -278,7 +305,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                     else -> IR.drawable.ic_download
                 }
 
-                binding.download?.apply {
+                binding.download.apply {
                     setImageResource(downloadIcon)
 
                     contentDescription = when {
@@ -403,10 +430,108 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         }
     }
 
+    private fun observeShelfItemSnackbarMessages() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                shelfSharedViewModel.snackbarMessages.collect { message ->
+                    val text = when (message) {
+                        SnackbarMessage.EpisodeDownloadStarted -> LR.string.episode_queued_for_download
+                        SnackbarMessage.EpisodeRemoved -> LR.string.episode_was_removed
+                        SnackbarMessage.TranscriptNotAvailable -> LR.string.transcript_error_not_available
+                    }
+                    showSnackBar(text = getString(text))
+                }
+            }
+        }
+    }
+
+    private fun observeShelfItemNavigationState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                shelfSharedViewModel.navigationState.collect { navigationState ->
+                    when (navigationState) {
+                        NavigationState.ShowEffectsOption -> {
+                            EffectsFragment().show(parentFragmentManager, "effects")
+                        }
+
+                        NavigationState.ShowSleepTimerOptions -> {
+                            SleepFragment().show(parentFragmentManager, "sleep_sheet")
+                        }
+
+                        is NavigationState.ShowShareDialog -> {
+                            ShareDialogFragment
+                                .newThemedInstance(navigationState.podcast, navigationState.episode, theme, SourceView.PLAYER)
+                                .show(parentFragmentManager, "share_dialog")
+                        }
+
+                        is NavigationState.ShowPodcast -> {
+                            (activity as FragmentHostListener).closePlayer()
+                            (activity as? FragmentHostListener)?.openPodcastPage(navigationState.podcast.uuid, SourceView.PLAYER.analyticsValue)
+                        }
+
+                        is NavigationState.ShowCloudFiles -> {
+                            (activity as FragmentHostListener).closePlayer()
+                            (activity as? FragmentHostListener)?.openCloudFiles()
+                        }
+
+                        is NavigationState.ShowMarkAsPlayedConfirmation -> {
+                            context?.let {
+                                ConfirmationDialog()
+                                    .setForceDarkTheme(true)
+                                    .setSummary(it.getString(LR.string.player_mark_as_played))
+                                    .setIconId(IR.drawable.ic_markasplayed)
+                                    .setButtonType(Danger(it.getString(LR.string.player_mark_as_played_button)))
+                                    .setOnConfirm {
+                                        navigationState.onMarkAsPlayedConfirmed(navigationState.episode)
+                                    }
+                                    .show(childFragmentManager, "mark_as_played")
+                            }
+                        }
+
+                        is NavigationState.ShowPodcastEpisodeArchiveConfirmation -> {
+                            ConfirmationDialog()
+                                .setForceDarkTheme(true)
+                                .setSummary(resources.getString(LR.string.player_archive_summary))
+                                .setIconId(IR.drawable.ic_archive)
+                                .setButtonType(Danger(resources.getString(LR.string.player_archive_title)))
+                                .setOnConfirm { navigationState.onArchiveConfirmed(navigationState.episode) }
+                                .show(childFragmentManager, "archive")
+                        }
+
+                        is NavigationState.ShowUserEpisodeDeleteConfirmation -> {
+                            CloudDeleteHelper.getDeleteDialog(navigationState.episode, navigationState.deleteState, navigationState.deleteFunction, resources)
+                                .show(childFragmentManager, "archive")
+                        }
+
+                        NavigationState.ShowMoreActions -> {
+                            // stop double taps
+                            if (childFragmentManager.fragments.firstOrNull() is ShelfBottomSheet) return@collect
+                            viewModel.episode?.let {
+                                ShelfBottomSheet.newInstance(
+                                    episodeId = it.uuid,
+                                ).show(childFragmentManager, "shelf_bottom_sheet")
+                            }
+                        }
+
+                        NavigationState.ShowAddBookmark -> {
+                            viewModel.buildBookmarkArguments { arguments ->
+                                activityLauncher.launch(arguments.getIntent(requireContext()))
+                            }
+                        }
+
+                        is NavigationState.StartUpsellFlow -> startUpsellFlow(navigationState.source)
+                        is NavigationState.ShowReportViolation -> openUrl(navigationState.reportUrl)
+                    }
+                }
+            }
+        }
+    }
+
     private fun setupTranscriptPage() {
         binding?.transcriptPage?.setContent {
             TranscriptPageWrapper(
                 playerViewModel = viewModel,
+                shelfSharedViewModel = shelfSharedViewModel,
                 transcriptViewModel = transcriptViewModel,
                 searchViewModel = transcriptSearchViewModel,
                 theme = theme,
@@ -417,7 +542,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     private fun observeTranscriptPageTransition() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.transitionState.collect { transitionState ->
+                shelfSharedViewModel.transitionState.collect { transitionState ->
                     when (transitionState) {
                         is TransitionState.OpenTranscript -> binding?.openTranscript()
                         is TransitionState.CloseTranscript -> binding?.closeTranscript(transitionState.withTransition)
@@ -565,56 +690,11 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         LongPressOptionsFragment().show(parentFragmentManager, "longpressoptions")
     }
 
-    override fun onEffectsClick() {
-        trackShelfAction(ShelfItem.Effects.analyticsValue)
-        EffectsFragment().show(parentFragmentManager, "effects_sheet")
-    }
-
-    override fun onSleepClick() {
-        trackShelfAction(ShelfItem.Sleep.analyticsValue)
-        SleepFragment().show(parentFragmentManager, "sleep_sheet")
-    }
-
-    override fun onStarClick() {
-        trackShelfAction(ShelfItem.Star.analyticsValue)
-        viewModel.starToggle()
-    }
-
-    fun onAddBookmarkClick(source: OnboardingUpgradeSource) {
-        if (bookmarkFeature.isAvailable(settings.userTier)) {
-            viewModel.buildBookmarkArguments { arguments ->
-                activityLauncher.launch(arguments.getIntent(requireContext()))
-            }
-        } else {
-            startUpsellFlow(source)
-        }
-    }
-
     private fun startUpsellFlow(source: OnboardingUpgradeSource) {
         val onboardingFlow = OnboardingFlow.Upsell(
             source = source,
         )
         OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
-    }
-
-    override fun onShareClick() {
-        trackShelfAction(ShelfItem.Share.analyticsValue)
-        val podcast = viewModel.podcast ?: return
-        val episode = viewModel.episode as? PodcastEpisode ?: return
-        ShareDialogFragment
-            .newThemedInstance(podcast, episode, theme, SourceView.PLAYER)
-            .show(parentFragmentManager, "share_dialog")
-    }
-
-    private fun showPodcast() {
-        trackShelfAction(ShelfItem.Podcast.analyticsValue)
-        val podcast = viewModel.podcast
-        (activity as FragmentHostListener).closePlayer()
-        if (podcast != null) {
-            (activity as? FragmentHostListener)?.openPodcastPage(podcast.uuid, sourceView.analyticsValue)
-        } else {
-            (activity as? FragmentHostListener)?.openCloudFiles()
-        }
     }
 
     override fun onPreviousChapter() {
@@ -625,19 +705,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     override fun onNextChapter() {
         analyticsTracker.track(AnalyticsEvent.PLAYER_NEXT_CHAPTER_TAPPED)
         viewModel.nextChapter()
-    }
-
-    fun onMoreClicked(sourceView: SourceView? = null) {
-        // stop double taps
-        if (childFragmentManager.fragments.firstOrNull() is ShelfBottomSheet) {
-            return
-        }
-        analyticsTracker.track(AnalyticsEvent.PLAYER_SHELF_OVERFLOW_MENU_SHOWN)
-        viewModel.episode?.let {
-            ShelfBottomSheet.newInstance(
-                episodeId = it.uuid,
-            ).show(childFragmentManager, "shelf_bottom_sheet")
-        }
     }
 
     override fun onPlayClicked() {
@@ -691,13 +758,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
     override fun onHeaderChapterClick(chapter: Chapter) {
         (parentFragment as? PlayerContainerFragment)?.openChaptersAt(chapter)
-    }
-
-    private fun trackShelfAction(analyticsAction: String) {
-        analyticsTracker.track(
-            AnalyticsEvent.PLAYER_SHELF_ACTION_TAPPED,
-            mapOf(AnalyticsProp.Key.FROM to AnalyticsProp.Value.SHELF, AnalyticsProp.Key.ACTION to analyticsAction),
-        )
     }
 
     private fun showViewBookmarksSnackbar(result: BookmarkActivityContract.BookmarkResult?) {

@@ -25,7 +25,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.mediarouter.app.MediaRouteButton
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -33,14 +32,17 @@ import au.com.shiftyjelly.pocketcasts.compose.bottomsheet.Pill
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.ShelfItemSource
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.google.android.gms.cast.framework.CastButtonFactory
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -48,47 +50,85 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun ShelfBottomSheetPage(
     shelfViewModel: ShelfViewModel,
+    shelfSharedViewModel: ShelfSharedViewModel,
     playerViewModel: PlayerViewModel,
     onEditButtonClick: () -> Unit,
-    onShelfItemClick: (item: ShelfItem, enabled: Boolean) -> Unit,
+    onDismiss: () -> Unit,
 ) {
-    val trimmedShelf by remember {
-        playerViewModel.trimmedShelfLive.asFlow()
-            .map { it.copy(it.first.drop(4), it.second) }
-    }.collectAsStateWithLifecycle(null)
+    val shelfUiState by shelfSharedViewModel.uiState.collectAsStateWithLifecycle()
     val performMediaRouteClick = remember { MutableSharedFlow<Unit>() }
     val coroutineScope = rememberCoroutineScope()
-    trimmedShelf?.let { (shelfItems, episode) ->
-        Content(
-            onEditButtonClick = {
-                shelfViewModel.onEditButtonClick()
-                onEditButtonClick()
-            },
-            mediaRouteButton = {
-                MediaRouteButton(
-                    clickTrigger = performMediaRouteClick,
-                    onMediaRouteButtonClick = {
-                        shelfViewModel.onMediaRouteButtonClick()
-                    },
-                )
-            },
-        ) {
-            MenuShelfItems(
-                shelfViewModel = shelfViewModel,
-                onClick = { item, enabled ->
-                    coroutineScope.launch {
-                        if (item == ShelfItem.Cast) {
-                            performMediaRouteClick.emit(Unit)
-                            delay(100) // allow perform action to complete before dismissing the bottom sheet
-                        }
-                        onShelfItemClick(item, enabled)
-                    }
-                },
+    Content(
+        onEditButtonClick = {
+            shelfViewModel.onEditButtonClick()
+            onEditButtonClick()
+        },
+        mediaRouteButton = {
+            MediaRouteButton(
+                clickTrigger = performMediaRouteClick,
             )
-        }
-        LaunchedEffect(shelfItems, episode) {
-            shelfViewModel.setData(shelfItems, episode)
-        }
+        },
+    ) {
+        MenuShelfItems(
+            shelfViewModel = shelfViewModel,
+            onClick = { item, enabled ->
+                when (item) {
+                    ShelfItem.Effects -> shelfSharedViewModel.onEffectsClick(ShelfItemSource.OverflowMenu)
+                    ShelfItem.Sleep -> shelfSharedViewModel.onSleepClick(ShelfItemSource.OverflowMenu)
+                    ShelfItem.Star -> shelfSharedViewModel.onStarClick(ShelfItemSource.OverflowMenu)
+                    ShelfItem.Transcript -> shelfSharedViewModel.onTranscriptClick(enabled, ShelfItemSource.OverflowMenu)
+                    ShelfItem.Share -> {
+                        val podcast = playerViewModel.podcast ?: return@MenuShelfItems
+                        val episode = playerViewModel.episode as? PodcastEpisode ?: return@MenuShelfItems
+                        shelfSharedViewModel.onShareClick(podcast, episode, ShelfItemSource.OverflowMenu)
+                    }
+
+                    ShelfItem.Podcast -> shelfSharedViewModel.onShowPodcastOrCloudFiles(playerViewModel.podcast, ShelfItemSource.OverflowMenu)
+                    ShelfItem.Cast -> {
+                        coroutineScope.launch {
+                            shelfSharedViewModel.trackShelfAction(item, ShelfItemSource.OverflowMenu)
+                            performMediaRouteClick.emit(Unit)
+                            delay(100)
+                            onDismiss()
+                        }
+                    }
+
+                    ShelfItem.Played -> {
+                        shelfSharedViewModel.onPlayedClick(
+                            onMarkAsPlayedConfirmed = { episode, shouldShuffleUpNext ->
+                                playerViewModel.markAsPlayedConfirmed(episode, shouldShuffleUpNext)
+                            },
+                            source = ShelfItemSource.OverflowMenu,
+                        )
+                    }
+
+                    ShelfItem.Archive -> {
+                        shelfSharedViewModel.onArchiveClick(
+                            onArchiveConfirmed = { playerViewModel.archiveConfirmed(it) },
+                            source = ShelfItemSource.OverflowMenu,
+                        )
+                    }
+
+                    ShelfItem.Bookmark -> shelfSharedViewModel.onAddBookmarkClick(
+                        OnboardingUpgradeSource.OVERFLOW_MENU,
+                        ShelfItemSource.OverflowMenu,
+                    )
+                    ShelfItem.Report -> {
+                        shelfSharedViewModel.onReportClick(ShelfItemSource.OverflowMenu)
+                    }
+                    ShelfItem.Download -> {
+                        playerViewModel.handleDownloadClickFromPlaybackActions(
+                            onDownloadStart = { shelfSharedViewModel.onEpisodeDownloadStart(ShelfItemSource.OverflowMenu) },
+                            onDeleteStart = { shelfSharedViewModel.onEpisodeRemoveClick(ShelfItemSource.OverflowMenu) },
+                        )
+                    }
+                }
+                if (item != ShelfItem.Cast) onDismiss()
+            },
+        )
+    }
+    LaunchedEffect(shelfUiState) {
+        shelfViewModel.setData(shelfUiState.playerBottomSheetShelfItems, shelfUiState.episode)
     }
 }
 
@@ -143,16 +183,12 @@ private fun Content(
 @Composable
 private fun MediaRouteButton(
     clickTrigger: MutableSharedFlow<Unit>,
-    onMediaRouteButtonClick: () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     AndroidView(
         factory = { context ->
             MediaRouteButton(context).apply {
                 visibility = View.GONE
-                setOnClickListener {
-                    onMediaRouteButtonClick()
-                }
                 CastButtonFactory.setUpMediaRouteButton(context, this)
             }
         },

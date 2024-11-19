@@ -66,8 +66,8 @@ import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptSearchVi
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.DisplayInfo
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.DisplayItem
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.UiState
-import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
-import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel.TransitionState
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.TransitionState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptFormat
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Util
@@ -81,14 +81,14 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @kotlin.OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun TranscriptPage(
-    playerViewModel: PlayerViewModel,
+    shelfSharedViewModel: ShelfSharedViewModel,
     transcriptViewModel: TranscriptViewModel,
     searchViewModel: TranscriptSearchViewModel,
     theme: Theme,
     modifier: Modifier,
 ) {
     val uiState = transcriptViewModel.uiState.collectAsStateWithLifecycle()
-    val transitionState = playerViewModel.transitionState.collectAsStateWithLifecycle(null)
+    val transitionState = shelfSharedViewModel.transitionState.collectAsStateWithLifecycle(null)
     val searchState = searchViewModel.searchState.collectAsStateWithLifecycle()
     val refreshing = transcriptViewModel.isRefreshing.collectAsStateWithLifecycle()
     val pullRefreshState = rememberPullRefreshState(refreshing.value, {
