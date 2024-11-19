@@ -15,7 +15,7 @@ internal fun ScreenshotDetectedDialog(
 ) {
     DialogFrame(
         onDismissRequest = onNotNow,
-        title = stringResource(LR.string.not_now),
+        title = stringResource(LR.string.end_of_year_share_dialog_title),
         content = {
             DialogText(stringResource(LR.string.end_of_year_share_dialog_message))
         },

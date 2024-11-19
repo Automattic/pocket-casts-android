@@ -9,6 +9,11 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.annotation.OptIn
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isInvisible
@@ -18,6 +23,7 @@ import androidx.core.view.updatePadding
 import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -31,6 +37,7 @@ import au.com.shiftyjelly.pocketcasts.endofyear.StoriesActivity.StoriesSource
 import au.com.shiftyjelly.pocketcasts.endofyear.ui.EndOfYearPromptCard
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralSecondsMinutesHoursDaysOrYears
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksContainerFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListFragment
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -203,8 +210,8 @@ class ProfileFragment : BaseFragment() {
             binding.lblDaysSavedLabel.setText(timeAndUnit.savedStringId)
         }
 
+        binding.setupProfileHeader()
         viewModel.signInState.observe(viewLifecycleOwner) { state ->
-            binding.userView.signedInState = state
             binding.upgradeLayout.root.isInvisible = settings.getUpgradeClosedProfile() || state.isSignedInAsPlusOrPatron
             if (binding.upgradeLayout.root.isInvisible) {
                 // We need this to get the correct padding below refresh
@@ -218,12 +225,6 @@ class ProfileFragment : BaseFragment() {
                     ReferralsIconWithTooltip()
                 }
             }
-        }
-
-        with(binding.userView) {
-            lblUserEmail.setOnClickListener { onProfileAccountButtonClicked() }
-            imgProfilePicture.setOnClickListener { onProfileAccountButtonClicked() }
-            btnAccount?.setOnClickListener { onProfileAccountButtonClicked() }
         }
 
         binding.btnRefresh.setOnClickListener {
@@ -297,6 +298,29 @@ class ProfileFragment : BaseFragment() {
         referralsClaimGuestPassBannerCard.setContent {
             AppTheme(theme.activeTheme) {
                 ReferralsClaimGuestPassBannerCard()
+            }
+        }
+    }
+
+    private fun FragmentProfileBinding.setupProfileHeader() {
+        userView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+        userView.setContent {
+            val headerState by viewModel.profileHeaderState
+                .collectAsStateWithLifecycle(
+                    ProfileHeaderState(
+                        imageUrl = null,
+                        subscriptionTier = SubscriptionTier.NONE,
+                        email = null,
+                        expiresIn = null,
+                    ),
+                )
+
+            AppTheme(remember { theme.activeTheme }) {
+                ProfileHeader(
+                    state = headerState,
+                    onClick = ::onProfileAccountButtonClicked,
+                    modifier = Modifier.fillMaxSize(),
+                )
             }
         }
     }
