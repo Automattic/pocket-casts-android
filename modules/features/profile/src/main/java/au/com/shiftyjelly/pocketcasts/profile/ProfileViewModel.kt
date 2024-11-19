@@ -13,7 +13,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.Gravatar
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.BackpressureStrategy
 import java.time.Instant
 import javax.inject.Inject
 import kotlin.time.Duration
@@ -24,6 +23,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.reactive.asFlow
+import kotlinx.coroutines.rx2.asFlow
 import java.time.Duration as JavaDuration
 
 @HiltViewModel
@@ -75,10 +75,7 @@ class ProfileViewModel @Inject constructor(
         )
     }
 
-    val refreshObservable: LiveData<RefreshState> =
-        settings.refreshStateObservable
-            .toFlowable(BackpressureStrategy.LATEST)
-            .toLiveData()
+    val refreshState = settings.refreshStateObservable.asFlow()
 
     suspend fun isEndOfYearStoriesEligible() = endOfYearManager.isEligibleForEndOfYear()
 

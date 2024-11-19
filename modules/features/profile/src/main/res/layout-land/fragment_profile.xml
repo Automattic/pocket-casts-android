@@ -65,37 +65,15 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/referralsClaimGuestPassBannerCard" />
 
-            <TextView
-                android:id="@+id/lblRefreshStatus"
+            <androidx.compose.ui.platform.ComposeView
+                android:id="@+id/refreshView"
                 style="?attr/textSubtitle2"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:drawablePadding="8dp"
-                android:gravity="center"
-                android:textColor="?attr/primary_text_02"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/sectionsView"
-                tools:text="Last refresh 3 mins ago" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnRefresh"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="16dp"
-                android:letterSpacing="0"
-                android:text="@string/profile_refresh_now"
-                android:textAllCaps="false"
-                android:textColor="?attr/primary_text_02"
-                app:icon="@drawable/ic_retry_small_spinnable"
-                app:iconTint="?attr/primary_text_02"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/lblRefreshStatus"
-                app:strokeColor="?attr/primary_ui_05" />
+                app:layout_constraintTop_toBottomOf="@+id/sectionsView" />
 
             <include
                 android:id="@+id/upgradeLayout"
@@ -106,7 +84,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/btnRefresh" />
+                app:layout_constraintTop_toBottomOf="@+id/refreshView" />
 
             <androidx.compose.ui.platform.ComposeView
                 android:id="@+id/btnGift"
