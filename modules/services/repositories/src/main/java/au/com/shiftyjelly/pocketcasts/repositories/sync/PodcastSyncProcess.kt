@@ -96,7 +96,7 @@ class PodcastSyncProcess(
 
     fun run(): Completable {
         if (!syncManager.isLoggedIn()) {
-            playlistManager.deleteSynced()
+            playlistManager.deleteSyncedBlocking()
 
             Timber.i("SyncProcess: User not logged in")
             return Completable.complete()
@@ -410,7 +410,7 @@ class PodcastSyncProcess(
 
     private fun uploadPlaylistChanges(records: JSONArray) {
         try {
-            val playlists = playlistManager.findPlaylistsToSync()
+            val playlists = playlistManager.findPlaylistsToSyncBlocking()
             for (playlist in playlists) {
                 val fields = JSONObject()
 
@@ -655,7 +655,7 @@ class PodcastSyncProcess(
         return Completable.fromAction {
             podcastManager.markAllPodcastsSynced()
             episodeManager.markAllEpisodesSynced(episodes)
-            playlistManager.markAllSynced()
+            playlistManager.markAllSyncedBlocking()
             folderManager.markAllSynced()
         }
     }
@@ -747,9 +747,9 @@ class PodcastSyncProcess(
                 return@fromCallable null
             }
 
-            var playlist = playlistManager.findByUuidSync(uuid)
+            var playlist = playlistManager.findByUuidBlocking(uuid)
             if (sync.deleted) {
-                playlist?.let { playlistManager.deleteSynced(it) }
+                playlist?.let { playlistManager.deleteSyncedBlocking(it) }
                 return@fromCallable null
             }
 
@@ -781,9 +781,9 @@ class PodcastSyncProcess(
             }
 
             if (playlist.id == null) {
-                playlist.id = playlistManager.create(playlist)
+                playlist.id = playlistManager.createBlocking(playlist)
             } else {
-                playlistManager.update(playlist, userPlaylistUpdate = null)
+                playlistManager.updateBlocking(playlist, userPlaylistUpdate = null)
             }
 
             return@fromCallable playlist

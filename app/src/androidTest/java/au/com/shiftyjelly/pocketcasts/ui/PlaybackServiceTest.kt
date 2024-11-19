@@ -99,9 +99,9 @@ class PlaybackServiceTest {
         }
         service.episodeManager = episodeManager
         val playlistManager = mock<PlaylistManager> {
-            onBlocking { findAllSuspend() }.doReturn(filters)
+            onBlocking { findAll() }.doReturn(filters)
             onBlocking { findByUuid(filter.uuid) }.doReturn(filter)
-            on { findEpisodes(playlist = filters.first(), episodeManager = episodeManager, playbackManager = service.playbackManager) }.doReturn(filterEpisodes)
+            on { findEpisodesBlocking(playlist = filters.first(), episodeManager = episodeManager, playbackManager = service.playbackManager) }.doReturn(filterEpisodes)
         }
         service.playlistManager = playlistManager
 

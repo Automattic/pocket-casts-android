@@ -1362,10 +1362,10 @@ open class PlaybackManager @Inject constructor(
                 episodeSource = "podcast"
                 podcastManager.findPodcastByUuid(autoSource.uuid)
                     ?.let { podcast -> autoPlayOrderForPodcastEpisodes(podcast) }
-                    ?: playlistManager.findByUuidSync(autoSource.uuid)
+                    ?: playlistManager.findByUuidBlocking(autoSource.uuid)
                         ?.let { playlist ->
                             episodeSource = "filter"
-                            playlistManager.findEpisodes(playlist, episodeManager, this)
+                            playlistManager.findEpisodesBlocking(playlist, episodeManager, this)
                         }
             }
             is AutoPlaySource.None -> null

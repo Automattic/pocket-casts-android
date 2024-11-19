@@ -54,12 +54,12 @@ class PodcastSettingsViewModel @Inject constructor(
             .subscribeOn(Schedulers.io())
             .toLiveData()
 
-        val filters = playlistManager.observeAll().map {
+        val filters = playlistManager.findAllRxFlowable().map {
             it.filter { filter -> filter.podcastUuidList.contains(uuid) }
         }
         includedFilters = filters.toLiveData()
 
-        val availablePodcastFilters = playlistManager.observeAll().map {
+        val availablePodcastFilters = playlistManager.findAllRxFlowable().map {
             it.filter { filter -> !filter.allPodcasts }
         }
         availableFilters = availablePodcastFilters.toLiveData()
@@ -128,7 +128,7 @@ class PodcastSettingsViewModel @Inject constructor(
     fun filterSelectionChanged(newSelection: List<String>) {
         launch {
             podcastUuid?.let { podcastUuid ->
-                playlistManager.findAll().forEach { playlist ->
+                playlistManager.findAllBlocking().forEach { playlist ->
                     val currentSelection = playlist.podcastUuidList.toMutableList()
                     val included = newSelection.contains(playlist.uuid)
 
@@ -150,7 +150,7 @@ class PodcastSettingsViewModel @Inject constructor(
                             listOf(PlaylistProperty.Podcasts),
                             PlaylistUpdateSource.PODCAST_SETTINGS,
                         )
-                        playlistManager.update(playlist, userPlaylistUpdate)
+                        playlistManager.updateBlocking(playlist, userPlaylistUpdate)
                     }
                 }
             }

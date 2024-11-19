@@ -88,7 +88,7 @@ class FilterSelectFragment private constructor() : BaseFragment() {
 
         val layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
 
-        playlistManager.observeAll().firstOrError()
+        playlistManager.findAllRxFlowable().firstOrError()
             .zipWith(Single.fromCallable { listener.filterSelectFragmentGetCurrentSelection() })
             .map {
                 val filters = it.first

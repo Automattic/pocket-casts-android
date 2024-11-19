@@ -875,14 +875,14 @@ class MediaSessionManager(
             }
 
             for (option in options) {
-                val playlist = playlistManager.findFirstByTitle(option) ?: continue
+                val playlist = playlistManager.findFirstByTitleBlocking(option) ?: continue
 
                 Timber.i("Playing matched playlist '$option'")
 
-                val episodeCount = playlistManager.countEpisodes(playlist.id, episodeManager, playbackManager)
+                val episodeCount = playlistManager.countEpisodesBlocking(playlist.id, episodeManager, playbackManager)
                 if (episodeCount == 0) return@launch
 
-                val episodesToPlay = playlistManager.findEpisodes(playlist, episodeManager, playbackManager).take(5)
+                val episodesToPlay = playlistManager.findEpisodesBlocking(playlist, episodeManager, playbackManager).take(5)
                 if (episodesToPlay.isEmpty()) return@launch
 
                 playEpisodes(episodesToPlay, sourceView)

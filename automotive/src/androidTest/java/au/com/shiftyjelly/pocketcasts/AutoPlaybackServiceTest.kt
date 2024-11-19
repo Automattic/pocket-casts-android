@@ -70,7 +70,7 @@ class AutoPlaybackServiceTest {
     fun testLoadFilters() {
         runBlocking {
             val playlist = Playlist(uuid = UUID.randomUUID().toString(), title = "Test title", iconId = 0)
-            service.playlistManager = mock { on { findAll() }.doReturn(listOf(playlist)) }
+            service.playlistManager = mock { on { findAllBlocking() }.doReturn(listOf(playlist)) }
 
             val filtersRoot = service.loadFiltersRoot()
             assertTrue("Filters should not be empty", filtersRoot.isNotEmpty())
@@ -102,7 +102,7 @@ class AutoPlaybackServiceTest {
             val podcast = Podcast(UUID.randomUUID().toString(), title = "Test podcast")
             val episode = PodcastEpisode(UUID.randomUUID().toString(), title = "Test episode", publishedDate = Date())
 
-            service.playlistManager = mock { on { findByUuidSync(any()) }.doReturn(null) }
+            service.playlistManager = mock { on { findByUuidBlocking(any()) }.doReturn(null) }
             service.podcastManager = mock { on { runBlocking { findPodcastByUuidSuspend(any()) } }.doReturn(podcast) }
             service.episodeManager = mock { on { findEpisodesByPodcastOrdered(any()) }.doReturn(listOf(episode)) }
 

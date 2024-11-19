@@ -223,7 +223,7 @@ class RefreshPodcastsThread(
             podcastManager.checkForUnusedPodcasts(playbackManager)
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - checkForUnusedPodcasts - ${String.format("%d ms", SystemClock.elapsedRealtime() - startTime)}")
             startTime = SystemClock.elapsedRealtime()
-            playlistManager.checkForEpisodesToDownload(episodeManager, playbackManager)
+            playlistManager.checkForEpisodesToDownloadBlocking(episodeManager, playbackManager)
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - playlist checkForEpisodesToDownload - ${String.format("%d ms", SystemClock.elapsedRealtime() - startTime)}")
             startTime = SystemClock.elapsedRealtime()
             podcastManager.checkForEpisodesToDownload(episodeUuidsAdded, downloadManager)
