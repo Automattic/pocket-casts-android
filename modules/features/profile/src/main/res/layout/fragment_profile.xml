@@ -57,12 +57,10 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/endOfYearPromptCard" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerView"
+            <androidx.compose.ui.platform.ComposeView
+                android:id="@+id/sectionsView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:background="?attr/primary_ui_02"
-                android:clipToPadding="false"
                 android:layout_marginTop="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -81,7 +79,7 @@
                 android:textColor="?attr/primary_text_02"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/recyclerView" />
+                app:layout_constraintTop_toBottomOf="@+id/sectionsView" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnRefresh"
