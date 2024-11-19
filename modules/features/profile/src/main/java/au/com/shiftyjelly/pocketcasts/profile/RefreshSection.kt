@@ -1,16 +1,17 @@
 package au.com.shiftyjelly.pocketcasts.profile
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -18,7 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -26,9 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
-import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
 import au.com.shiftyjelly.pocketcasts.compose.components.DialogButtonState
 import au.com.shiftyjelly.pocketcasts.compose.components.DialogFrame
 import au.com.shiftyjelly.pocketcasts.compose.components.DialogText
@@ -85,19 +84,28 @@ internal fun RefreshSection(
                 color = MaterialTheme.theme.colors.primaryText02,
             )
         }
-        RowOutlinedButton(
-            text = stringResource(LR.string.profile_refresh_now),
-            textIcon = painterResource(IR.drawable.ic_retry),
-            fontSize = 14.sp,
-            textPadding = 2.dp,
-            colors = ButtonDefaults.outlinedButtonColors(
-                contentColor = MaterialTheme.theme.colors.primaryText02,
-                backgroundColor = Color.Transparent,
-            ),
-            border = BorderStroke(1.dp, MaterialTheme.theme.colors.primaryText02),
-            fullWidth = false,
-            onClick = onClick,
+        Spacer(
+            modifier = Modifier.height(12.dp),
         )
+        OutlinedButton(
+            border = ButtonDefaults.outlinedBorder.copy(
+                brush = SolidColor(MaterialTheme.theme.colors.primaryText02),
+            ),
+            onClick = onClick,
+        ) {
+            Icon(
+                painter = painterResource(IR.drawable.ic_retry),
+                contentDescription = null,
+                tint = MaterialTheme.theme.colors.primaryText02,
+            )
+            Spacer(
+                modifier = Modifier.width(4.dp),
+            )
+            TextP50(
+                text = stringResource(LR.string.profile_refresh_now),
+                color = MaterialTheme.theme.colors.primaryText02,
+            )
+        }
     }
 }
 
