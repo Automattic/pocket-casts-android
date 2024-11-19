@@ -1,6 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.share
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
@@ -26,7 +29,7 @@ fun ShareListCreatePodcastsPage(
     modifier: Modifier = Modifier,
 ) {
     val state: ShareListCreateViewModel.State by viewModel.state.collectAsState()
-    Column {
+    Column(modifier = modifier) {
         ThemedTopAppBar(
             title = stringResource(LR.string.podcasts_share_select_podcasts),
             navigationButton = NavigationButton.Close,
@@ -50,7 +53,7 @@ fun ShareListCreatePodcastsPage(
             onPodcastUnselected = { podcast -> viewModel.unselectPodcast(podcast) },
             onSelectAll = { viewModel.selectAll() },
             onSelectNone = { viewModel.selectNone() },
-            modifier = modifier,
+            modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars),
         )
     }
 }
