@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <au.com.shiftyjelly.pocketcasts.player.view.StatusBarSpacer
+    <au.com.shiftyjelly.pocketcasts.views.component.StatusBarSpacer
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:background="?attr/secondary_ui_01" />

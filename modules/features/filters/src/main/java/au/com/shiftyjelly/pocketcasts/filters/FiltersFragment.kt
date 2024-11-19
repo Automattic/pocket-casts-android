@@ -72,8 +72,6 @@ class FiltersFragment : BaseFragment(), CoroutineScope, Toolbar.OnMenuItemClickL
 
         val binding = binding ?: return
 
-        binding.appBarLayout.hideShadow()
-
         setupToolbarAndStatusBar(
             toolbar = binding.toolbar,
             title = getString(LR.string.filters),
