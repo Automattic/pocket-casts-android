@@ -75,16 +75,14 @@
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/sectionsView" />
 
-            <include
-                android:id="@+id/upgradeLayout"
-                layout="@layout/layout_plus_callout"
+            <androidx.compose.ui.platform.ComposeView
+                android:id="@+id/upgradeView"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_width="match_parent"
                 android:layout_marginTop="16dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/refreshView"
-                app:layout_constraintBottom_toBottomOf="parent"/>
+                app:layout_constraintTop_toBottomOf="@+id/refreshView" />
 
             <androidx.compose.ui.platform.ComposeView
                 android:id="@+id/btnGift"
