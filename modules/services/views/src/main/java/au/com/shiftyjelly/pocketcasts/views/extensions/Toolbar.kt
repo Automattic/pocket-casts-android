@@ -30,6 +30,7 @@ fun Toolbar.setup(
     activity: Activity?,
     theme: Theme,
     toolbarColors: ToolbarColors? = ToolbarColors.theme(theme = theme, context = context),
+    includeStatusBarPadding: Boolean = true,
 ) {
     if (title != null) {
         setTitle(title)
@@ -67,7 +68,9 @@ fun Toolbar.setup(
             true
         }
     }
-    includeStatusBarPadding()
+    if (includeStatusBarPadding) {
+        includeStatusBarPadding()
+    }
 }
 
 fun Toolbar.setupChromeCastButton(context: Context?, onClick: () -> Unit) {

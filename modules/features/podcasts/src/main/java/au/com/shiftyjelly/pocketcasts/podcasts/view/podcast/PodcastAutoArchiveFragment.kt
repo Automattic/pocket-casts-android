@@ -124,7 +124,6 @@ class PodcastAutoArchiveFragment : BaseFragment() {
             ThemedTopAppBar(
                 title = stringResource(LR.string.settings_title_auto_archive),
                 onNavigationClick = onBackPressed,
-                bottomShadow = true,
                 iconColor = Color(toolbarColors.iconColor),
                 textColor = Color(toolbarColors.titleColor),
                 backgroundColor = Color(toolbarColors.backgroundColor),
