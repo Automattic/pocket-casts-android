@@ -11,16 +11,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.airbnb.lottie.LottieProperty
+import com.airbnb.lottie.SimpleColorFilter
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieClipSpec
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
+import com.airbnb.lottie.compose.rememberLottieDynamicProperties
+import com.airbnb.lottie.compose.rememberLottieDynamicProperty
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -56,6 +61,14 @@ fun AnimatedPlayPauseButton(
         },
     )
 
+    val dynamicProperties = rememberLottieDynamicProperties(
+        rememberLottieDynamicProperty(
+            property = LottieProperty.COLOR_FILTER,
+            value = SimpleColorFilter(iconTint.toArgb()),
+            keyPath = arrayOf("**"),
+        ),
+    )
+
     Box(
         modifier = modifier
             .size(circleSize)
@@ -72,8 +85,8 @@ fun AnimatedPlayPauseButton(
             progress = { progress },
             modifier = Modifier
                 .size(iconWidth, iconHeight)
-                .align(Alignment.Center)
-                .background(iconTint),
+                .align(Alignment.Center),
+            dynamicProperties = dynamicProperties,
         )
     }
 }
