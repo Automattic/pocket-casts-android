@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.player.view
+package au.com.shiftyjelly.pocketcasts.views.component
 
 import android.content.Context
 import android.util.AttributeSet
