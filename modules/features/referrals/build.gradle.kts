@@ -24,7 +24,7 @@ dependencies {
     api(projects.modules.services.views)
 
     implementation(platform(libs.compose.bom))
-
+    implementation(projects.modules.services.capturable)
     implementation(libs.compose.material)
     implementation(libs.compose.material3.window.size)
     implementation(libs.compose.ui)

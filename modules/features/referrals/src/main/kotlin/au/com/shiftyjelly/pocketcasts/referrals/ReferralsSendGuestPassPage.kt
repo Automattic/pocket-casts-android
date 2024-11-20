@@ -26,7 +26,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -55,6 +57,9 @@ import au.com.shiftyjelly.pocketcasts.referrals.ReferralsSendGuestPassViewModel.
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsSendGuestPassViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
+import dev.shreyaspatil.capturable.capturable
+import java.io.File
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -100,7 +105,7 @@ private fun ReferralsSendGuestPassContent(
     state: UiState,
     onRetry: () -> Unit,
     onDismiss: () -> Unit,
-    onShare: (String) -> Unit,
+    onShare: (String, File?) -> Unit,
 ) {
     BoxWithConstraints(
         contentAlignment = Alignment.Center,
@@ -114,7 +119,7 @@ private fun ReferralsSendGuestPassContent(
             .fillMaxSize(),
     ) {
         val showFullScreen = shouldShowFullScreen(windowWidthSizeClass, windowHeightSizeClass)
-        val pageWidth = if (showFullScreen) maxWidth else (maxWidth.value * pageWidthPercent).dp
+        val pageWidth = if (showFullScreen) this.maxWidth else (this.maxWidth.value * pageWidthPercent).dp
         val pageModifier = if (showFullScreen) {
             Modifier
                 .fillMaxSize()
@@ -145,7 +150,7 @@ private fun ReferralsSendGuestPassContent(
                         windowHeightSizeClass = windowHeightSizeClass,
                         pageWidth = pageWidth,
                         onDismiss = onDismiss,
-                        onShare = { onShare(state.code) },
+                        onShare = { onShare(state.code, it) },
                     )
 
                 is UiState.Error -> {
@@ -162,6 +167,7 @@ private fun ReferralsSendGuestPassContent(
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun SendGuestPassContent(
     state: UiState.Loaded,
@@ -169,8 +175,10 @@ private fun SendGuestPassContent(
     windowHeightSizeClass: WindowHeightSizeClass,
     pageWidth: Dp,
     onDismiss: () -> Unit,
-    onShare: () -> Unit,
+    onShare: (File?) -> Unit,
+    controller: ReferralCaptureController = rememberReferralCaptureController(),
 ) {
+    val scope = rememberCoroutineScope()
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -206,6 +214,7 @@ private fun SendGuestPassContent(
             ReferralsPassCardsStack(
                 state = state,
                 width = pageWidth,
+                modifier = Modifier.capturable(controller.captureController()),
             )
         }
 
@@ -220,7 +229,16 @@ private fun SendGuestPassContent(
             textColor = Color.Black,
             gradientBackgroundColor = plusBackgroundBrush,
             modifier = Modifier.padding(16.dp),
-            onClick = onShare,
+            onClick = {
+                if (windowHeightSizeClass != WindowHeightSizeClass.Compact) {
+                    scope.launch {
+                        val screenshot = controller.capture()
+                        onShare(screenshot)
+                    }
+                } else {
+                    onShare(null)
+                }
+            },
         )
     }
 }
@@ -230,19 +248,21 @@ private fun ReferralsPassCardsStack(
     state: UiState.Loaded,
     cardsCount: Int = 3,
     width: Dp,
+    modifier: Modifier,
 ) {
     BoxWithConstraints(
         contentAlignment = Alignment.TopCenter,
         modifier = Modifier
+            .padding(horizontal = 16.dp)
             .width(width),
     ) {
         (0..<cardsCount).reversed().forEach { index ->
-            val cardWidth = (maxWidth.value * 0.8 * (1 - index * 0.125)).dp
+            val capturableModifier = if (index == cardsCount - 1) modifier else Modifier
+            val cardWidth = (this.maxWidth.value * 0.8 * (1 - index * 0.125)).dp
             val cardHeight = (cardWidth.value * ReferralGuestPassCardDefaults.cardAspectRatio).dp
             val cardOffset = (10 * ((cardsCount - 1) - index)).dp
             ReferralGuestPassCardView(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
+                modifier = capturableModifier
                     .size(cardWidth, cardHeight)
                     .offset(y = cardOffset),
                 source = ReferralGuestPassCardViewSource.Send,
@@ -299,7 +319,7 @@ fun ReferralsSendGuestPassContentPreview(
             windowHeightSizeClass = windowHeightSizeClass,
             state = UiState.Loaded("", ReferralsOfferInfoMock),
             onDismiss = {},
-            onShare = {},
+            onShare = { _, _ -> },
             onRetry = {},
         )
     }

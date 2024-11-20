@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
 import au.com.shiftyjelly.pocketcasts.utils.exception.NoNetworkException
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.io.File
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -82,11 +83,12 @@ class ReferralsSendGuestPassViewModel @Inject constructor(
         getReferralCode()
     }
 
-    fun onShareClick(referralCode: String) {
+    fun onShareClick(referralCode: String, file: File? = null) {
         if (_state.value !is UiState.Loaded) return
         val request = SharingRequest.referralLink(
             referralCode = referralCode,
             referralsOfferInfo = (_state.value as UiState.Loaded).referralsOfferInfo,
+            screenshot = file,
         ).setSourceView(SourceView.REFERRALS)
             .build()
         viewModelScope.launch {

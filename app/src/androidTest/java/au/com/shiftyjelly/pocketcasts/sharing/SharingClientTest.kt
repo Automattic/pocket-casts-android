@@ -677,6 +677,7 @@ class SharingClientTest {
 
     @Test
     fun shareReferralLink() = runTest {
+        val file = File(context.cacheDir, "pocket-casts-plus-guest-pass.png").also { it.writeBytes(Random.nextBytes(8)) }
         val referralCode = "referral-code"
         val referralsOfferInfo = ReferralsOfferInfoMock
         val text = context.getString(LR.string.referrals_share_text, referralsOfferInfo.localizedOfferDurationAdjective.lowercase())
@@ -684,6 +685,7 @@ class SharingClientTest {
         val request = SharingRequest.referralLink(
             referralCode = referralCode,
             referralsOfferInfo = referralsOfferInfo,
+            screenshot = file,
         ).build()
 
         val response = client.share(request)
@@ -693,7 +695,8 @@ class SharingClientTest {
         val intent = shareStarter.requireChooserIntent
 
         assertEquals(ACTION_SEND, intent.action)
-        assertEquals("text/plain", intent.type)
+        assertEquals("image/png", intent.type)
+        assertEquals(FileUtil.getUriForFile(context, file), IntentCompat.getParcelableExtra(intent, EXTRA_STREAM, Uri::class.java))
         assertEquals("$text\n\nhttps://$WEB_BASE_HOST/redeem/$referralCode", intent.getStringExtra(EXTRA_TEXT))
         assertEquals(subject, intent.getStringExtra(EXTRA_SUBJECT))
         assertEquals(FLAG_GRANT_READ_URI_PERMISSION, intent.flags and FLAG_GRANT_READ_URI_PERMISSION)

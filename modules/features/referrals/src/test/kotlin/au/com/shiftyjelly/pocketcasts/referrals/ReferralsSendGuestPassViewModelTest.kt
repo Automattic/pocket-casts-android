@@ -27,6 +27,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.TemporaryFolder
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
@@ -37,6 +38,9 @@ import org.mockito.kotlin.whenever
 class ReferralsSendGuestPassViewModelTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule()
+
+    @get:Rule
+    val tempDir = TemporaryFolder()
 
     private val referralManager = mock<ReferralManager>()
     private val sharingClient = mock<SharingClient>()
@@ -135,7 +139,7 @@ class ReferralsSendGuestPassViewModelTest {
         whenever(referralManager.getReferralCode()).thenReturn(referralCodeSuccessResult)
 
         initViewModel()
-        viewModel.onShareClick(referralCode)
+        viewModel.onShareClick(referralCode, tempDir.newFile())
 
         verify(referralManager).getReferralCode()
         verify(sharingClient).share(requestCaptor.capture())
@@ -144,6 +148,7 @@ class ReferralsSendGuestPassViewModelTest {
             assertEquals(referralCode, (data as SharingRequest.Data.ReferralLink).referralCode)
             assertEquals(SocialPlatform.More, platform)
             assertEquals(AnalyticsEvent.REFERRAL_PASS_SHARED, analyticsEvent)
+            assertTrue(capturedRequest.backgroundImage?.isFile == true)
             assertEquals(
                 mapOf(
                     "code" to referralCode,

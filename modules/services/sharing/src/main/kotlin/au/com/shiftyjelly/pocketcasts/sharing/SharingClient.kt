@@ -136,12 +136,14 @@ class SharingClient(
         is SharingRequest.Data.ReferralLink -> {
             val shareText = "${context.getString(LR.string.referrals_share_text, data.referralsOfferInfo.localizedOfferDurationAdjective.lowercase())}\n\n${data.sharingUrl(webBasedHost)}"
             val shareSubject = context.getString(LR.string.referrals_share_subject, data.referralsOfferInfo.localizedOfferDurationNoun)
+            val screenshot = data.screenshot
             Intent()
                 .setAction(Intent.ACTION_SEND)
-                .setType("text/plain")
+                .setType("image/png")
                 .putExtra(EXTRA_TEXT, shareText)
                 .putExtra(EXTRA_SUBJECT, shareSubject)
                 .addFlags(FLAG_GRANT_READ_URI_PERMISSION)
+                .apply { screenshot?.let { setExtraStream(it) } }
                 .toChooserIntent()
                 .share()
             SharingResponse(
@@ -380,10 +382,12 @@ data class SharingRequest internal constructor(
         fun referralLink(
             referralCode: String,
             referralsOfferInfo: ReferralsOfferInfo,
+            screenshot: File?,
         ) = Builder(
             Data.ReferralLink(
                 referralCode = referralCode,
                 referralsOfferInfo = referralsOfferInfo,
+                screenshot = screenshot,
             ),
         )
             .setAnalyticsEvent(AnalyticsEvent.REFERRAL_PASS_SHARED)
@@ -576,6 +580,7 @@ data class SharingRequest internal constructor(
         class ReferralLink internal constructor(
             val referralCode: String,
             val referralsOfferInfo: ReferralsOfferInfo,
+            val screenshot: File? = null,
         ) : Data {
             override val podcast = null
 
