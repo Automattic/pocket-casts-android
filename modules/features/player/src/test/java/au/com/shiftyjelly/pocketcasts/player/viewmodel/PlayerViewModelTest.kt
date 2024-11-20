@@ -16,7 +16,6 @@ import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel.PlaybackE
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
-import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -175,9 +174,6 @@ class PlayerViewModelTest {
         whenever(settings.skipBackInSecs).thenReturn(userSettingsIntMock)
         whenever(settings.skipForwardInSecs).thenReturn(userSettingsIntMock)
         whenever(settings.artworkConfiguration).thenReturn(userSettingsArtworkConfigurationMock)
-        val userSettingsShelfItemsMock = mock<UserSetting<List<ShelfItem>>>()
-        whenever(userSettingsShelfItemsMock.flow).thenReturn(MutableStateFlow(emptyList()))
-        whenever(settings.shelfItems).thenReturn(userSettingsShelfItemsMock)
         val resourcesMock = mock<Resources>()
         whenever(resourcesMock.getString(anyOrNull(), anyOrNull())).thenReturn("")
         whenever(context.resources).thenReturn(resourcesMock)

@@ -43,6 +43,7 @@ dependencies {
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.compose.ui.util)
     implementation(libs.coroutines.core)
+    implementation(libs.fragment.compose)
     implementation(libs.fragment.ktx)
     implementation(libs.media3.exoplayer)
     implementation(libs.timber)

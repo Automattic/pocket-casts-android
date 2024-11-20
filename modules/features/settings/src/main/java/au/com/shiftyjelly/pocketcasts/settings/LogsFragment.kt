@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.settings
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,7 +22,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
@@ -33,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.fragment.compose.content
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -57,19 +56,20 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 class LogsFragment : BaseFragment() {
     @Inject lateinit var settings: Settings
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
-        ComposeView(requireContext()).apply {
-            setContent {
-                UiUtil.hideKeyboard(LocalView.current)
-                AppThemeWithBackground(theme.activeTheme) {
-                    val bottomInset = settings.bottomInset.collectAsStateWithLifecycle(initialValue = 0)
-                    LogsPage(
-                        onBackPressed = ::closeFragment,
-                        bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
-                    )
-                }
-            }
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ) = content {
+        UiUtil.hideKeyboard(LocalView.current)
+        AppThemeWithBackground(theme.activeTheme) {
+            val bottomInset = settings.bottomInset.collectAsStateWithLifecycle(initialValue = 0)
+            LogsPage(
+                onBackPressed = ::closeFragment,
+                bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
+            )
         }
+    }
 
     private fun closeFragment() {
         (activity as? FragmentHostListener)?.closeModal(this)

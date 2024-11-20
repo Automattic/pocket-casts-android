@@ -8,7 +8,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.annotation.OptIn
-import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isInvisible
@@ -18,6 +22,7 @@ import androidx.core.view.updatePadding
 import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -31,6 +36,7 @@ import au.com.shiftyjelly.pocketcasts.endofyear.StoriesActivity.StoriesSource
 import au.com.shiftyjelly.pocketcasts.endofyear.ui.EndOfYearPromptCard
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralSecondsMinutesHoursDaysOrYears
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksContainerFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListFragment
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -59,6 +65,7 @@ import com.google.android.material.badge.ExperimentalBadgeUtils
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Date
 import javax.inject.Inject
+import kotlin.time.Duration
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -183,28 +190,11 @@ class ProfileFragment : BaseFragment() {
             }
         }
 
+        binding.setupProfileHeader()
+        binding.setupStatsView()
         binding.setupReferralsClaimGuestPassCard()
 
-        viewModel.podcastCount.observe(viewLifecycleOwner) {
-            binding.lblPodcastCount.text = it.toString()
-            // check if the stats have changed, causes the stats to change on first sign in
-            viewModel.updateState()
-        }
-
-        viewModel.daysListenedCount.observe(viewLifecycleOwner) {
-            val timeAndUnit = convertSecsToTimeAndUnit(it)
-            binding.lblDaysListened.text = timeAndUnit.value
-            binding.lblDaysListenedLabel.setText(timeAndUnit.listenedStringId)
-        }
-
-        viewModel.daysSavedCount.observe(viewLifecycleOwner) {
-            val timeAndUnit = convertSecsToTimeAndUnit(it)
-            binding.lblDaysSaved.text = timeAndUnit.value
-            binding.lblDaysSavedLabel.setText(timeAndUnit.savedStringId)
-        }
-
         viewModel.signInState.observe(viewLifecycleOwner) { state ->
-            binding.userView.signedInState = state
             binding.upgradeLayout.root.isInvisible = settings.getUpgradeClosedProfile() || state.isSignedInAsPlusOrPatron
             if (binding.upgradeLayout.root.isInvisible) {
                 // We need this to get the correct padding below refresh
@@ -218,12 +208,6 @@ class ProfileFragment : BaseFragment() {
                     ReferralsIconWithTooltip()
                 }
             }
-        }
-
-        with(binding.userView) {
-            lblUserEmail.setOnClickListener { onProfileAccountButtonClicked() }
-            imgProfilePicture.setOnClickListener { onProfileAccountButtonClicked() }
-            btnAccount?.setOnClickListener { onProfileAccountButtonClicked() }
         }
 
         binding.btnRefresh.setOnClickListener {
@@ -301,6 +285,50 @@ class ProfileFragment : BaseFragment() {
         }
     }
 
+    private fun FragmentProfileBinding.setupProfileHeader() {
+        userView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+        userView.setContent {
+            val headerState by viewModel.profileHeaderState
+                .collectAsStateWithLifecycle(
+                    ProfileHeaderState(
+                        imageUrl = null,
+                        subscriptionTier = SubscriptionTier.NONE,
+                        email = null,
+                        expiresIn = null,
+                    ),
+                )
+
+            AppTheme(remember { theme.activeTheme }) {
+                ProfileHeader(
+                    state = headerState,
+                    onClick = ::onProfileAccountButtonClicked,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
+        }
+    }
+
+    private fun FragmentProfileBinding.setupStatsView() {
+        statsView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+        statsView.setContent {
+            val headerState by viewModel.profileStatsState
+                .collectAsStateWithLifecycle(
+                    ProfileStatsState(
+                        podcastsCount = 0,
+                        listenedDuration = Duration.ZERO,
+                        savedDuration = Duration.ZERO,
+                    ),
+                )
+
+            AppTheme(remember { theme.activeTheme }) {
+                ProfileStats(
+                    state = headerState,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
+        }
+    }
+
     private fun updateRefreshUI(state: RefreshState?) {
         val binding = binding ?: return
         val lblRefreshStatus = binding.lblRefreshStatus
@@ -358,43 +386,7 @@ class ProfileFragment : BaseFragment() {
     }
 
     override fun onBackPressed(): Boolean {
-        viewModel.updateState()
+        viewModel.refreshStats()
         return super.onBackPressed()
     }
-
-    private fun convertSecsToTimeAndUnit(seconds: Long): TimeAndUnit {
-        val days = seconds / 86400
-        val hours = seconds / 3600
-        val mins = seconds / 60
-        val secs = seconds
-
-        if (days > 0) {
-            return TimeAndUnit(
-                value = days.toString(),
-                savedStringId = if (days == 1L) LR.string.profile_stats_day_saved else LR.string.profile_stats_days_saved,
-                listenedStringId = if (days == 1L) LR.string.profile_stats_day_listened else LR.string.profile_stats_days_listened,
-            )
-        }
-        if (hours > 0) {
-            return TimeAndUnit(
-                value = hours.toString(),
-                savedStringId = if (hours == 1L) LR.string.profile_stats_hour_saved else LR.string.profile_stats_hours_saved,
-                listenedStringId = if (hours == 1L) LR.string.profile_stats_hour_listened else LR.string.profile_stats_hours_listened,
-            )
-        }
-        if (mins > 0 && days < 1) {
-            return TimeAndUnit(
-                value = mins.toString(),
-                savedStringId = if (mins == 1L) LR.string.profile_stats_minute_saved else LR.string.profile_stats_minutes_saved,
-                listenedStringId = if (mins == 1L) LR.string.profile_stats_minute_listened else LR.string.profile_stats_minutes_listened,
-            )
-        }
-        return TimeAndUnit(
-            value = secs.toString(),
-            savedStringId = if (secs == 1L) LR.string.profile_stats_second_saved else LR.string.profile_stats_seconds_saved,
-            listenedStringId = if (secs == 1L) LR.string.profile_stats_second_listened else LR.string.profile_stats_seconds_listened,
-        )
-    }
-
-    data class TimeAndUnit(val value: String, @StringRes val savedStringId: Int, @StringRes val listenedStringId: Int)
 }

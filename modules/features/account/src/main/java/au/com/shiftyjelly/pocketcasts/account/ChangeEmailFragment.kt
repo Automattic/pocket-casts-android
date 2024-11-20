@@ -7,10 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.compose.content
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.account.AccountActivity.AccountUpdatedSource
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.ChangeEmailViewModel
@@ -37,45 +37,45 @@ class ChangeEmailFragment : BaseFragment() {
 
     @Inject lateinit var settings: Settings
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return ComposeView(requireContext()).apply {
-            setContent {
-                val email: String by viewModel.email.observeAsState("")
-                val password: String by viewModel.password.observeAsState("")
-                val bottomOffset by settings.bottomInset.collectAsStateWithLifecycle(initialValue = 0)
-                AppThemeWithBackground(theme.activeTheme) {
-                    ChangeEmailFragmentPage(
-                        changeEmailState = viewModel.changeEmailState.value,
-                        email = email,
-                        password = password,
-                        updateEmail = viewModel::updateEmail,
-                        updatePassword = viewModel::updatePassword,
-                        onBackPressed = {
-                            @Suppress("DEPRECATION")
-                            activity?.onBackPressed()
-                        },
-                        changeEmail = viewModel::changeEmail,
-                        clearServerError = viewModel::clearServerError,
-                        onSuccess = {
-                            val second = viewModel.email.value ?: ""
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ) = content {
+        val email: String by viewModel.email.observeAsState("")
+        val password: String by viewModel.password.observeAsState("")
+        val bottomOffset by settings.bottomInset.collectAsStateWithLifecycle(initialValue = 0)
+        AppThemeWithBackground(theme.activeTheme) {
+            ChangeEmailFragmentPage(
+                changeEmailState = viewModel.changeEmailState.value,
+                email = email,
+                password = password,
+                updateEmail = viewModel::updateEmail,
+                updatePassword = viewModel::updatePassword,
+                onBackPressed = {
+                    @Suppress("DEPRECATION")
+                    activity?.onBackPressed()
+                },
+                changeEmail = viewModel::changeEmail,
+                clearServerError = viewModel::clearServerError,
+                onSuccess = {
+                    val second = viewModel.email.value ?: ""
 
-                            doneViewModel.setChangedEmailState(detail = second)
+                    doneViewModel.setChangedEmailState(detail = second)
 
-                            doneViewModel.trackShown(AccountUpdatedSource.CHANGE_EMAIL)
+                    doneViewModel.trackShown(AccountUpdatedSource.CHANGE_EMAIL)
 
-                            val activity = requireActivity()
+                    val activity = requireActivity()
 
-                            @Suppress("DEPRECATION")
-                            activity.onBackPressed() // done fragment needs to back to profile page
+                    @Suppress("DEPRECATION")
+                    activity.onBackPressed() // done fragment needs to back to profile page
 
-                            val fragment = ChangeDoneFragment.newInstance()
-                            (activity as FragmentHostListener).addFragment(fragment)
-                        },
-                        existingEmail = viewModel.existingEmail ?: "",
-                        bottomOffset = bottomOffset.pxToDp(LocalContext.current).dp,
-                    )
-                }
-            }
+                    val fragment = ChangeDoneFragment.newInstance()
+                    (activity as FragmentHostListener).addFragment(fragment)
+                },
+                existingEmail = viewModel.existingEmail ?: "",
+                bottomOffset = bottomOffset.pxToDp(LocalContext.current).dp,
+            )
         }
     }
 

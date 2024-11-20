@@ -1,10 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.servers.di
 
 import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
-import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.BuildConfig
 import au.com.shiftyjelly.pocketcasts.servers.CleanAndRetryInterceptor
 import au.com.shiftyjelly.pocketcasts.servers.OkHttpInterceptor
+import au.com.shiftyjelly.pocketcasts.servers.interceptors.BasicAuthInterceptor
 import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
 import au.com.shiftyjelly.pocketcasts.servers.toClientInterceptor
 import au.com.shiftyjelly.pocketcasts.servers.toNetworkInterceptor
@@ -25,6 +25,9 @@ import okhttp3.logging.HttpLoggingInterceptor
 @InstallIn(SingletonComponent::class)
 @Module
 object InterceptorModule {
+    const val PocketCastsPublicUserAgent = "Pocket Casts"
+    const val PocketCastsInternalUserAgent = "$PocketCastsPublicUserAgent/Android/${BuildConfig.VERSION_NAME}"
+
     private val fiveMinutes = 5.minutes.inWholeSeconds
     private val cacheControlHeader = "Cache-Control"
 
@@ -35,9 +38,15 @@ object InterceptorModule {
             }
         })
 
-    private val userAgentInterceptor = Interceptor { chain ->
+    private val publicUserAgentInterceptor = Interceptor { chain ->
         val request = chain.request().newBuilder()
-        request.header("User-Agent", Settings.USER_AGENT_POCKETCASTS_SERVER)
+        request.header("User-Agent", PocketCastsPublicUserAgent)
+        chain.proceed(request.build())
+    }
+
+    private val internalUserAgentInterceptor = Interceptor { chain ->
+        val request = chain.request().newBuilder()
+        request.header("User-Agent", PocketCastsInternalUserAgent)
         chain.proceed(request.build())
     }
 
@@ -72,6 +81,8 @@ object InterceptorModule {
             "baggage",
         ),
     ).toClientInterceptor() // Must be client interceptor. Otherwise calls cannot be retried.
+
+    private val basicAuthInterceptor = BasicAuthInterceptor().toClientInterceptor()
 
     @Provides
     @TokenInterceptor
@@ -115,7 +126,7 @@ object InterceptorModule {
     fun provideCachedInterceptors(): List<OkHttpInterceptor> {
         return buildList {
             add(cacheControlInterceptor.toClientInterceptor())
-            add(userAgentInterceptor.toClientInterceptor())
+            add(internalUserAgentInterceptor.toClientInterceptor())
             add(crashLoggingInterceptor.toClientInterceptor())
 
             if (BuildConfig.DEBUG) {
@@ -131,7 +142,7 @@ object InterceptorModule {
     @NoCache
     fun provideNoCacheInterceptors(): List<OkHttpInterceptor> {
         return buildList {
-            add(userAgentInterceptor.toClientInterceptor())
+            add(internalUserAgentInterceptor.toClientInterceptor())
             add(crashLoggingInterceptor.toClientInterceptor())
 
             if (BuildConfig.DEBUG) {
@@ -149,7 +160,7 @@ object InterceptorModule {
         @TokenInterceptor interceptor: Interceptor,
     ): List<OkHttpInterceptor> {
         return buildList {
-            add(userAgentInterceptor.toClientInterceptor())
+            add(internalUserAgentInterceptor.toClientInterceptor())
             add(interceptor.toClientInterceptor())
             add(crashLoggingInterceptor.toClientInterceptor())
 
@@ -166,8 +177,9 @@ object InterceptorModule {
     @Downloads
     fun provideDownloadsInterceptors(): List<OkHttpInterceptor> {
         return buildList {
-            add(userAgentInterceptor.toClientInterceptor())
+            add(publicUserAgentInterceptor.toClientInterceptor())
             add(crashLoggingInterceptor.toClientInterceptor())
+            add(basicAuthInterceptor)
             add(cleanAndRetryInterceptor)
 
             if (BuildConfig.DEBUG) {
@@ -183,7 +195,7 @@ object InterceptorModule {
     @Transcripts
     fun provideTranscriptsInterceptors(): List<OkHttpInterceptor> {
         return buildList {
-            add(userAgentInterceptor.toClientInterceptor())
+            add(publicUserAgentInterceptor.toClientInterceptor())
             add(cacheControlTranscriptsInterceptor.toClientInterceptor())
             add(crashLoggingInterceptor.toClientInterceptor())
 
@@ -200,10 +212,11 @@ object InterceptorModule {
 
     @Provides
     @Player
-    fun providePLayerInterceptors(): List<OkHttpInterceptor> {
+    fun providePlayerInterceptors(): List<OkHttpInterceptor> {
         return buildList {
-            add(userAgentInterceptor.toClientInterceptor())
+            add(publicUserAgentInterceptor.toClientInterceptor())
             add(crashLoggingInterceptor.toClientInterceptor())
+            add(basicAuthInterceptor)
             add(cleanAndRetryInterceptor)
 
             if (BuildConfig.DEBUG) {

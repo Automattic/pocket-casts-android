@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -291,19 +292,21 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
 
     private fun FragmentEffectsBinding.setupEffectsSettingsSegmentedTabBar() {
         effectsSettingsSegmentedTabBar.setContent {
-            val podcastHeaderBackgroundColor by viewModel.playingEpisodeLive.asFlow()
-                .map { it.second }
-                .distinctUntilChangedBy { it }
-                .collectAsStateWithLifecycle(null)
+            val podcastHeaderBackgroundColor by remember {
+                viewModel.playingEpisodeLive.asFlow()
+                    .map { it.second }
+                    .distinctUntilChangedBy { it }
+            }.collectAsStateWithLifecycle(null)
 
-            val podcastEffectsData by viewModel.effectsLive.asFlow()
-                .distinctUntilChanged { t1, t2 ->
-                    t1.podcast.uuid == t2.podcast.uuid &&
-                        t1.podcast.playbackEffects.toData() == t2.podcast.playbackEffects.toData() &&
-                        t1.podcast.overrideGlobalEffects == t2.podcast.overrideGlobalEffects &&
-                        t1.podcast.overrideGlobalEffectsModified == t2.podcast.overrideGlobalEffectsModified
-                }
-                .collectAsStateWithLifecycle(null)
+            val podcastEffectsData by remember {
+                viewModel.effectsLive.asFlow()
+                    .distinctUntilChanged { t1, t2 ->
+                        t1.podcast.uuid == t2.podcast.uuid &&
+                            t1.podcast.playbackEffects.toData() == t2.podcast.playbackEffects.toData() &&
+                            t1.podcast.overrideGlobalEffects == t2.podcast.overrideGlobalEffects &&
+                            t1.podcast.overrideGlobalEffectsModified == t2.podcast.overrideGlobalEffectsModified
+                    }
+            }.collectAsStateWithLifecycle(null)
             val podcast = podcastEffectsData?.podcast ?: return@setContent
 
             if (podcastEffectsData?.showCustomEffectsSettings == true) {

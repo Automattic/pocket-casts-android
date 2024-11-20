@@ -8,6 +8,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.MaterialTheme
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
@@ -23,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
+import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
@@ -425,13 +432,19 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
                         CallOnce {
                             analyticsTracker.track(AnalyticsEvent.FREE_UP_SPACE_BANNER_SHOWN)
                         }
-                        ManageDownloadsCard(
-                            totalDownloadSize = downloadedEpisodesSize,
-                            onManageDownloadsClick = {
-                                analyticsTracker.track(AnalyticsEvent.FREE_UP_SPACE_MANAGE_DOWNLOADS_TAPPED, mapOf("source" to SourceView.DOWNLOADS.analyticsValue))
-                                showFragment(ManualCleanupFragment.newInstance())
-                            },
-                        )
+                        Box(
+                            modifier = Modifier
+                                .background(color = MaterialTheme.theme.colors.primaryUi02)
+                                .padding(start = 16.dp, end = 16.dp, top = 16.dp),
+                        ) {
+                            ManageDownloadsCard(
+                                totalDownloadSize = downloadedEpisodesSize,
+                                onManageDownloadsClick = {
+                                    analyticsTracker.track(AnalyticsEvent.FREE_UP_SPACE_MANAGE_DOWNLOADS_TAPPED, mapOf("source" to SourceView.DOWNLOADS.analyticsValue))
+                                    showFragment(ManualCleanupFragment.newInstance())
+                                },
+                            )
+                        }
                     }
                 }
             }

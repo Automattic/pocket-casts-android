@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.settings.privacy
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -13,10 +12,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -24,6 +23,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.viewModels
+import androidx.fragment.compose.content
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
@@ -45,47 +45,48 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @AndroidEntryPoint
 class PrivacyFragment : BaseFragment() {
 
-    @Inject lateinit var analyticsTracker: AnalyticsTracker
+    @Inject
+    lateinit var analyticsTracker: AnalyticsTracker
 
-    @Inject lateinit var settings: Settings
+    @Inject
+    lateinit var settings: Settings
     private val viewModel: PrivacyViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View {
-        if (!viewModel.isFragmentChangingConfigurations) {
-            analyticsTracker.track(AnalyticsEvent.PRIVACY_SHOWN)
-        }
-        return ComposeView(requireContext()).apply {
-            setContent {
-                val bottomInset = settings.bottomInset.collectAsStateWithLifecycle(initialValue = 0)
-                AppThemeWithBackground(theme.activeTheme) {
-                    val state: PrivacyViewModel.UiState by viewModel.uiState.collectAsState()
-                    PrivacySettings(
-                        state = state,
-                        onAnalyticsClick = {
-                            viewModel.updateAnalyticsSetting(it)
-                        },
-                        onCrashReportsClick = {
-                            viewModel.updateCrashReportsSetting(it)
-                        },
-                        onLinkAccountClick = {
-                            viewModel.updateLinkAccountSetting(it)
-                        },
-                        onPrivacyPolicyClick = {
-                            analyticsTracker.track(AnalyticsEvent.SETTINGS_SHOW_PRIVACY_POLICY)
-                            context.startActivityViewUrl(Settings.INFO_PRIVACY_URL)
-                        },
-                        onBackClick = {
-                            @Suppress("DEPRECATION")
-                            activity?.onBackPressed()
-                        },
-                        bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
-                    )
-                }
+    ) = content {
+        LaunchedEffect(Unit) {
+            if (!viewModel.isFragmentChangingConfigurations) {
+                analyticsTracker.track(AnalyticsEvent.PRIVACY_SHOWN)
             }
+        }
+        val bottomInset = settings.bottomInset.collectAsStateWithLifecycle(initialValue = 0)
+        val context = LocalContext.current
+        AppThemeWithBackground(theme.activeTheme) {
+            val state: PrivacyViewModel.UiState by viewModel.uiState.collectAsState()
+            PrivacySettings(
+                state = state,
+                onAnalyticsClick = {
+                    viewModel.updateAnalyticsSetting(it)
+                },
+                onCrashReportsClick = {
+                    viewModel.updateCrashReportsSetting(it)
+                },
+                onLinkAccountClick = {
+                    viewModel.updateLinkAccountSetting(it)
+                },
+                onPrivacyPolicyClick = {
+                    analyticsTracker.track(AnalyticsEvent.SETTINGS_SHOW_PRIVACY_POLICY)
+                    context.startActivityViewUrl(Settings.INFO_PRIVACY_URL)
+                },
+                onBackClick = {
+                    @Suppress("DEPRECATION")
+                    activity?.onBackPressed()
+                },
+                bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
+            )
         }
     }
 

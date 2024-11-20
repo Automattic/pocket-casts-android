@@ -1,10 +1,13 @@
 package au.com.shiftyjelly.pocketcasts.preferences.model
 
+import androidx.annotation.StringRes
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+
+interface ShelfRowItem
 
 enum class ShelfItem(
     val id: String,
@@ -13,7 +16,7 @@ enum class ShelfItem(
     val iconId: (BaseEpisode?) -> Int,
     val showIf: (BaseEpisode?) -> Boolean = { true },
     val analyticsValue: String,
-) {
+) : ShelfRowItem {
     Effects(
         id = "effects",
         titleId = { LR.string.podcast_playback_effects },
@@ -119,3 +122,5 @@ enum class ShelfItem(
         fun fromServerId(id: String) = entries.find { it.serverId == id }
     }
 }
+
+data class ShelfTitle(@StringRes val title: Int) : ShelfRowItem

@@ -470,8 +470,4 @@ class StorageSettingsViewModel
         val message: String? = null,
         val buttons: List<DialogButtonState>,
     )
-
-    private companion object {
-        const val FIX_EPISODES_LIMIT = 10_000
-    }
 }

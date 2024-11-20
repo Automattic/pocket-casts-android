@@ -3,18 +3,27 @@
 *   Updates
     *   Deferred addition to UpNext post update after sync 
         ([#3211](https://github.com/Automattic/pocket-casts-android/pull/312))
+*   New Features
+    *   Add episode basic authentication support
+        ([#3213](https://github.com/Automattic/pocket-casts-android/pull/3213))
+*   Bug Fixes
+    *   Fix effects being lost when paused
+        ([#3219](https://github.com/Automattic/pocket-casts-android/pull/3219))
+*   Updates
+    *   Update profile header UI
+        ([#3235](https://github.com/Automattic/pocket-casts-android/pull/3235))
 
 7.77
 -----
 *   New Features
-   *   Add custom playback effects settings for podcast in the player
+    *   Add custom playback effects settings for podcast in the player
         ([#3042](https://github.com/Automattic/pocket-casts-android/issues/3042))
-   *   Add Playback 2024 summary
+    *   Add Playback 2024 summary
         ([#3123](https://github.com/Automattic/pocket-casts-android/pull/3123))
-   *   Add the ability to get notified when device is running on low storage and has downloaded episodes
-       ([#3198](https://github.com/Automattic/pocket-casts-android/pull/3198))
-   *   Add Up Next Shuffle
-       ([#3199](https://github.com/Automattic/pocket-casts-android/pull/3199))
+    *   Add the ability to get notified when device is running on low storage and has downloaded episodes
+        ([#3198](https://github.com/Automattic/pocket-casts-android/pull/3198))
+    *   Add Up Next Shuffle
+        ([#3199](https://github.com/Automattic/pocket-casts-android/pull/3199))
 *   Updates
     *   Renamed the podcast action 'Subscribe' to 'Follow'
         ([#3120](https://github.com/Automattic/pocket-casts-android/pull/3120))
@@ -27,6 +36,9 @@
 *   Bug Fixes
     *   Use red color for the notification icons
         ([#3154](https://github.com/Automattic/pocket-casts-android/pull/3154))
+    *   Fix effects being lost when paused
+        ([#3219](https://github.com/Automattic/pocket-casts-android/pull/3219))
+
 
 7.76
 -----

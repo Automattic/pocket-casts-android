@@ -118,10 +118,6 @@ class PlaylistManagerImpl @Inject constructor(
         return playlistDao.findAllState()
     }
 
-    override fun count(): Int {
-        return playlistDao.count()
-    }
-
     override fun observeAll(): Flowable<List<Playlist>> {
         return playlistDao.observeAll()
     }
@@ -238,7 +234,6 @@ class PlaylistManagerImpl @Inject constructor(
         attrs["autoDownloadWifiOnly"] = unmeteredOnly
         attrs["autoDownloadPowerOnly"] = powerOnly
         attrs["syncStatus"] = Playlist.SYNC_STATUS_NOT_SYNCED
-//        databaseManager.updateAttributes(playlist, attrs)
     }
 
     override fun rxUpdateAutoDownloadStatus(playlist: Playlist, autoDownloadEnabled: Boolean, unmeteredOnly: Boolean, powerOnly: Boolean): Completable {
@@ -302,20 +297,6 @@ class PlaylistManagerImpl @Inject constructor(
         val playlist = findById(id) ?: return 0
         val where = buildPlaylistWhere(playlist, playbackManager)
         return episodeManager.countEpisodesWhere(where)
-    }
-
-    override fun savePlaylistsOrder(playlists: List<Playlist>) {
-        playlistDao.updateSortPositions(playlists)
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-            PocketCastsShortcuts.update(
-                playlistManager = this,
-                force = true,
-                coroutineScope = applicationScope,
-                context = context,
-                source = PocketCastsShortcuts.Source.SAVE_PLAYLISTS_ORDER,
-            )
-        }
     }
 
     override fun checkForEpisodesToDownload(episodeManager: EpisodeManager, playbackManager: PlaybackManager) {
