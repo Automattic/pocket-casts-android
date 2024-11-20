@@ -4,6 +4,8 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import java.util.Date
@@ -39,6 +41,7 @@ data class PodcastInfo(
     @field:Json(name = "title") val title: String?,
     @field:Json(name = "author") val author: String?,
     @field:Json(name = "description") val description: String?,
+    @field:Json(name = "descriptionHtml") val descriptionHtml: String?,
     @field:Json(name = "show_type") val showType: String?,
     @field:Json(name = "category") val category: String?,
     @field:Json(name = "audio") val audio: Boolean?,
@@ -52,7 +55,11 @@ data class PodcastInfo(
         podcast.title = title ?: ""
         podcast.author = author ?: ""
         podcast.podcastCategory = category ?: ""
-        podcast.podcastDescription = description ?: ""
+        if (FeatureFlag.isEnabled(Feature.PODCAST_HTML_DESCRIPTION)) {
+            podcast.podcastDescription = descriptionHtml.takeUnless { it.isNullOrBlank() } ?: description ?: ""
+        } else {
+            podcast.podcastDescription = description ?: ""
+        }
         podcast.episodesSortType = if (showType == "serial") EpisodesSortType.EPISODES_SORT_BY_DATE_ASC else EpisodesSortType.EPISODES_SORT_BY_DATE_DESC
         episodes?.mapNotNull { it.toEpisode(uuid) }?.let { episodes ->
             podcast.episodes.addAll(episodes)

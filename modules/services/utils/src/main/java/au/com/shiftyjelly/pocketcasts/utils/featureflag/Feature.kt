@@ -179,6 +179,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
+    PODCAST_HTML_DESCRIPTION(
+        key = "podcast_html_description",
+        title = "Use HTML in the podcast description",
+        defaultValue = true,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    ),
     ;
 
     companion object {
