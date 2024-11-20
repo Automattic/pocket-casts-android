@@ -9,6 +9,8 @@
 *   Updates
     *   Update profile header UI
         ([#3235](https://github.com/Automattic/pocket-casts-android/pull/3235))
+    *   Deferred addition to UpNext post update after sync 
+        ([#3211](https://github.com/Automattic/pocket-casts-android/pull/312))
 
 7.77
 -----
