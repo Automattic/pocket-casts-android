@@ -61,8 +61,11 @@ import kotlin.time.toDuration
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asObservable
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -247,6 +250,12 @@ class PlayerViewModel @Inject constructor(
         .observeOn(AndroidSchedulers.mainThread())
     val effectsLive = effectsObservable.toLiveData()
 
+    private val _navigationState: MutableSharedFlow<NavigationState> = MutableSharedFlow()
+    val navigationState = _navigationState.asSharedFlow()
+
+    private val _snackbarMessages = MutableSharedFlow<SnackbarMessage>()
+    val snackbarMessages = _snackbarMessages.asSharedFlow()
+
     var episode: BaseEpisode? = null
     var podcast: Podcast? = null
 
@@ -401,6 +410,34 @@ class PlayerViewModel @Inject constructor(
         )
     }
 
+    fun onPlayPauseClicked() {
+        if (playbackManager.isPlaying()) {
+            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Pause clicked in player")
+            playbackManager.pause(sourceView = source)
+        } else {
+            if (playbackManager.shouldWarnAboutPlayback(playbackManager.upNextQueue.currentEpisode?.uuid)) {
+                viewModelScope.launch(ioDispatcher) {
+                    // show the stream warning if the episode isn't downloaded
+                    playbackManager.getCurrentEpisode()?.let { episode ->
+                        withContext(Dispatchers.Main) {
+                            if (episode.isDownloaded) {
+                                play()
+                                _snackbarMessages.emit(SnackbarMessage.ShowBatteryWarningIfAppropriate)
+                            } else {
+                                _navigationState.emit(NavigationState.ShowStreamingWarningDialog(episode))
+                            }
+                        }
+                    }
+                }
+            } else {
+                play()
+                viewModelScope.launch {
+                    _snackbarMessages.emit(SnackbarMessage.ShowBatteryWarningIfAppropriate)
+                }
+            }
+        }
+    }
+
     fun play() {
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Play clicked in player")
         playbackManager.playQueue(sourceView = source)
@@ -413,12 +450,18 @@ class PlayerViewModel @Inject constructor(
         }
     }
 
-    fun skipBackward() {
-        playbackManager.skipBackward(sourceView = source)
+    fun onSkipBackwardClick() {
+        playbackManager.skipBackward(sourceView = source, jumpAmountSeconds = settings.skipBackInSecs.value)
     }
 
-    fun skipForward() {
-        playbackManager.skipForward(sourceView = source)
+    fun onSkipForwardClick() {
+        playbackManager.skipForward(sourceView = source, jumpAmountSeconds = settings.skipForwardInSecs.value)
+    }
+
+    fun onSkipForwardLongClick() {
+        viewModelScope.launch {
+            _navigationState.emit(NavigationState.ShowSkipForwardLongPressOptionsDialog)
+        }
     }
 
     fun onMarkAsPlayedClick() {
@@ -674,6 +717,15 @@ class PlayerViewModel @Inject constructor(
             },
             sourceView = SourceView.PLAYER_PLAYBACK_EFFECTS,
         )
+    }
+
+    sealed interface NavigationState {
+        data class ShowStreamingWarningDialog(val episode: BaseEpisode) : NavigationState
+        data object ShowSkipForwardLongPressOptionsDialog : NavigationState
+    }
+
+    sealed interface SnackbarMessage {
+        data object ShowBatteryWarningIfAppropriate : SnackbarMessage
     }
 
     private object AnalyticsProp {
