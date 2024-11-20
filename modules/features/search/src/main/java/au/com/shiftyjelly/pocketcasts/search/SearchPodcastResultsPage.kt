@@ -12,6 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastItem
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -33,7 +34,6 @@ fun SearchPodcastResultsPage(
     Column {
         ThemedTopAppBar(
             title = stringResource(LR.string.search_results_all_podcasts),
-            bottomShadow = true,
             onNavigationClick = { onBackClick() },
         )
         SearchPodcastResultsView(
@@ -55,7 +55,7 @@ private fun SearchPodcastResultsView(
     bottomInset: Dp,
 ) {
     LazyColumn(
-        contentPadding = PaddingValues(bottom = bottomInset),
+        contentPadding = PaddingValues(top = 8.dp, bottom = bottomInset + 8.dp),
     ) {
         items(
             items = state.podcasts,
