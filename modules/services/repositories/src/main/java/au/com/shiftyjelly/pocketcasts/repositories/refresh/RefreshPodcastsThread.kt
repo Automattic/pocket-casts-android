@@ -334,7 +334,7 @@ class RefreshPodcastsThread(
                 }
 
                 // prepare to add to up next
-                when(podcast.autoAddToUpNext) {
+                when (podcast.autoAddToUpNext) {
                     AutoAddUpNext.OFF -> {}
                     AutoAddUpNext.PLAY_LAST -> episodesToAddToUpNext.addAll(episodes.map { Pair(AutoAddUpNext.PLAY_LAST, it) })
                     AutoAddUpNext.PLAY_NEXT -> episodesToAddToUpNext.addAll(episodes.map { Pair(AutoAddUpNext.PLAY_NEXT, it) })
@@ -360,14 +360,13 @@ class RefreshPodcastsThread(
         // and run through them one by one sorted by their publish date. They are added to up next as if the action
         // was run right as they were published magically
         runBlocking {
-
             val alreadyProcessedEpisodes = episodeManager.findEpisodesByUuids(episodesToAddToUpNext.map { it.second.uuid })
                 .filter { it.isFinished || it.isArchived }
                 .map { it.uuid }
 
             playbackManager.addEpisodes(
-                episodesToAddToUpNext.filter { !alreadyProcessedEpisodes.contains(it.second.uuid) })
-
+                episodesToAddToUpNext.filter { !alreadyProcessedEpisodes.contains(it.second.uuid) },
+            )
         }
     }
 
