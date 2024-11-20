@@ -73,6 +73,7 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
+import au.com.shiftyjelly.pocketcasts.views.extensions.includeStatusBarPadding
 import au.com.shiftyjelly.pocketcasts.views.extensions.setupChromeCastButton
 import au.com.shiftyjelly.pocketcasts.views.extensions.smoothScrollToTop
 import au.com.shiftyjelly.pocketcasts.views.extensions.tintIcons
@@ -632,6 +633,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                 theme.toggleDarkLightThemeActivity(activity as AppCompatActivity)
                 true
             }
+            it.includeStatusBarPadding()
         }
 
         playButtonListener.source = SourceView.PODCAST_SCREEN
