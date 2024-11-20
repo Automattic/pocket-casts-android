@@ -43,7 +43,7 @@ import kotlin.time.Duration.Companion.seconds
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-fun ProfileStats(
+internal fun ProfileStats(
     state: ProfileStatsState,
     modifier: Modifier = Modifier,
 ) {
@@ -112,7 +112,7 @@ private fun RowScope.StatsColumn(
     }
 }
 
-data class ProfileStatsState(
+internal data class ProfileStatsState(
     val podcastsCount: Int,
     val listenedDuration: Duration,
     val savedDuration: Duration,

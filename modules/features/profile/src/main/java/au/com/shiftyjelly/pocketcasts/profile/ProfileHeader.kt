@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -45,7 +46,7 @@ import kotlin.time.Duration.Companion.minutes
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-fun ProfileHeader(
+internal fun ProfileHeader(
     state: ProfileHeaderState,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -68,14 +69,14 @@ fun ProfileHeader(
     }
 }
 
-data class ProfileHeaderState(
+internal data class ProfileHeaderState(
     val email: String?,
     val imageUrl: String?,
     val subscriptionTier: SubscriptionTier,
     val expiresIn: Duration?,
 )
 
-data class ProfileHeaderConfig(
+internal data class ProfileHeaderConfig(
     val infoFontScale: Float = 1f,
     val avatarConfig: UserAvatarConfig = UserAvatarConfig(),
 )
@@ -118,6 +119,7 @@ private fun VerticalProfileHeader(
                 text = expirationLabel.uppercase(),
                 fontScale = config.infoFontScale,
                 color = MaterialTheme.theme.colors.support05,
+                textAlign = TextAlign.Center,
                 modifier = Modifier.padding(top = 4.dp),
             )
         }
@@ -125,6 +127,7 @@ private fun VerticalProfileHeader(
             TextH50(
                 text = state.email,
                 fontScale = config.infoFontScale,
+                textAlign = TextAlign.Center,
             )
         }
         OutlinedButton(
@@ -186,6 +189,7 @@ private fun HorizontalProfileHeader(
                     text = expirationLabel.uppercase(),
                     fontScale = config.infoFontScale,
                     color = MaterialTheme.theme.colors.support05,
+                    textAlign = TextAlign.Center,
                     modifier = Modifier.padding(top = 4.dp),
                 )
             }
@@ -193,6 +197,7 @@ private fun HorizontalProfileHeader(
                 TextH50(
                     text = state.email,
                     fontScale = config.infoFontScale,
+                    textAlign = TextAlign.Center,
                 )
             }
             OutlinedButton(

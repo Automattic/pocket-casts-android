@@ -9,12 +9,12 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.annotation.OptIn
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
@@ -25,9 +25,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
@@ -48,7 +45,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.settings.HelpFragment
-import au.com.shiftyjelly.pocketcasts.settings.SettingsAdapter
 import au.com.shiftyjelly.pocketcasts.settings.SettingsFragment
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
@@ -67,7 +63,6 @@ import java.util.Date
 import javax.inject.Inject
 import kotlin.time.Duration
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -75,27 +70,21 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 @AndroidEntryPoint
 class ProfileFragment : BaseFragment() {
 
-    @Inject lateinit var podcastManager: PodcastManager
+    @Inject
+    lateinit var podcastManager: PodcastManager
 
-    @Inject lateinit var settings: Settings
+    @Inject
+    lateinit var settings: Settings
 
-    @Inject lateinit var userManager: UserManager
+    @Inject
+    lateinit var userManager: UserManager
 
-    @Inject lateinit var analyticsTracker: AnalyticsTracker
+    @Inject
+    lateinit var analyticsTracker: AnalyticsTracker
 
     private val viewModel: ProfileViewModel by viewModels()
 
     private var binding: FragmentProfileBinding? = null
-    private val sections = arrayListOf(
-        SettingsAdapter.Item(LR.string.profile_navigation_stats, R.drawable.ic_stats, StatsFragment::class.java),
-        SettingsAdapter.Item(LR.string.profile_navigation_downloads, R.drawable.ic_profile_download, ProfileEpisodeListFragment::class.java),
-        SettingsAdapter.Item(LR.string.profile_navigation_files, R.drawable.ic_file, CloudFilesFragment::class.java),
-        SettingsAdapter.Item(LR.string.profile_navigation_starred, R.drawable.ic_starred, ProfileEpisodeListFragment::class.java),
-        SettingsAdapter.Item(LR.string.profile_navigation_listening_history, R.drawable.ic_listen_history, ProfileEpisodeListFragment::class.java),
-        SettingsAdapter.Item(LR.string.settings_title_help, IR.drawable.ic_help, HelpFragment::class.java),
-    ).apply {
-        add(4, SettingsAdapter.Item(LR.string.bookmarks, IR.drawable.ic_bookmark, BookmarksContainerFragment::class.java))
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentProfileBinding.inflate(inflater, container, false)
@@ -128,71 +117,11 @@ class ProfileFragment : BaseFragment() {
             (activity as FragmentHostListener).addFragment(SettingsFragment())
         }
 
-        val linearLayoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
-        val recyclerView = binding.recyclerView
-        recyclerView.layoutManager = linearLayoutManager
-        val divider = DividerItemDecoration(context, linearLayoutManager.orientation)
-        ContextCompat.getDrawable(recyclerView.context, UR.drawable.divider)?.let {
-            divider.setDrawable(it)
-        }
-        recyclerView.addItemDecoration(divider)
-        recyclerView.adapter = SettingsAdapter(sections) { section ->
-            section.fragment?.let { fragmentClass ->
-                when (fragmentClass) {
-                    StatsFragment::class.java -> {
-                        analyticsTracker.track(AnalyticsEvent.STATS_SHOWN)
-                        (activity as? FragmentHostListener)?.addFragment(fragmentClass.getDeclaredConstructor().newInstance())
-                    }
-                    CloudFilesFragment::class.java -> {
-                        analyticsTracker.track(AnalyticsEvent.UPLOADED_FILES_SHOWN)
-                        (activity as? FragmentHostListener)?.addFragment(fragmentClass.getDeclaredConstructor().newInstance())
-                    }
-                    ProfileEpisodeListFragment::class.java -> {
-                        val fragment = when (section.title) {
-                            LR.string.profile_navigation_downloads -> {
-                                analyticsTracker.track(AnalyticsEvent.DOWNLOADS_SHOWN)
-                                ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.Downloaded)
-                            }
-                            LR.string.profile_navigation_starred -> {
-                                analyticsTracker.track(AnalyticsEvent.STARRED_SHOWN)
-                                ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.Starred)
-                            }
-                            LR.string.profile_navigation_listening_history -> {
-                                analyticsTracker.track(AnalyticsEvent.LISTENING_HISTORY_SHOWN)
-                                ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.History)
-                            }
-                            else -> throw IllegalStateException("Unknown row")
-                        }
-                        (activity as? FragmentHostListener)?.addFragment(fragment)
-                    }
-                    BookmarksContainerFragment::class.java -> {
-                        analyticsTracker.track(AnalyticsEvent.PROFILE_BOOKMARKS_SHOWN)
-                        val fragment = BookmarksContainerFragment.newInstance(
-                            sourceView = SourceView.PROFILE,
-                        )
-                        (activity as? FragmentHostListener)?.addFragment(fragment)
-                    }
-                    HelpFragment::class.java -> {
-                        (activity as? FragmentHostListener)?.addFragment(fragmentClass.getDeclaredConstructor().newInstance())
-                    }
-                    else -> Timber.e("Profile section is invalid")
-                }
-            }
-
-            section.action?.invoke()
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                if (viewModel.isEndOfYearStoriesEligible()) {
-                    binding.setupEndOfYearPromptCard()
-                }
-            }
-        }
-
         binding.setupProfileHeader()
         binding.setupStatsView()
         binding.setupReferralsClaimGuestPassCard()
+        binding.setupEndOfYearPromptCard()
+        binding.setupSections()
 
         viewModel.signInState.observe(viewLifecycleOwner) { state ->
             binding.upgradeLayout.root.isInvisible = settings.getUpgradeClosedProfile() || state.isSignedInAsPlusOrPatron
@@ -258,21 +187,27 @@ class ProfileFragment : BaseFragment() {
     }
 
     private fun FragmentProfileBinding.setupEndOfYearPromptCard() {
-        endOfYearPromptCard.setContent {
-            AppTheme(theme.activeTheme) {
-                EndOfYearPromptCard(
-                    onClick = {
-                        analyticsTracker.track(
-                            AnalyticsEvent.END_OF_YEAR_PROFILE_CARD_TAPPED,
-                            mapOf("year" to EndOfYearManager.YEAR_TO_SYNC.value),
-                        )
-                        // once stories prompt card is tapped, we don't want to show stories launch modal if not already shown
-                        if (settings.getEndOfYearShowModal()) {
-                            settings.setEndOfYearShowModal(false)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                if (viewModel.isEndOfYearStoriesEligible()) {
+                    endOfYearPromptCard.setContent {
+                        AppTheme(theme.activeTheme) {
+                            EndOfYearPromptCard(
+                                onClick = {
+                                    analyticsTracker.track(
+                                        AnalyticsEvent.END_OF_YEAR_PROFILE_CARD_TAPPED,
+                                        mapOf("year" to EndOfYearManager.YEAR_TO_SYNC.value),
+                                    )
+                                    // once stories prompt card is tapped, we don't want to show stories launch modal if not already shown
+                                    if (settings.getEndOfYearShowModal()) {
+                                        settings.setEndOfYearShowModal(false)
+                                    }
+                                    (activity as? FragmentHostListener)?.showStoriesOrAccount(StoriesSource.PROFILE.value)
+                                },
+                            )
                         }
-                        (activity as? FragmentHostListener)?.showStoriesOrAccount(StoriesSource.PROFILE.value)
-                    },
-                )
+                    }
+                }
             }
         }
     }
@@ -329,6 +264,53 @@ class ProfileFragment : BaseFragment() {
         }
     }
 
+    private fun FragmentProfileBinding.setupSections() {
+        sectionsView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+        sectionsView.setContent {
+            AppTheme(remember { theme.activeTheme }) {
+                ProfileSections(
+                    sections = ProfileSection.entries,
+                    onClick = ::goToSection,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+        }
+    }
+
+    private fun goToSection(section: ProfileSection) {
+        val fragment = when (section) {
+            ProfileSection.Stats -> {
+                analyticsTracker.track(AnalyticsEvent.STATS_SHOWN)
+                StatsFragment()
+            }
+            ProfileSection.Downloads -> {
+                analyticsTracker.track(AnalyticsEvent.DOWNLOADS_SHOWN)
+                ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.Downloaded)
+            }
+            ProfileSection.CloudFiles -> {
+                analyticsTracker.track(AnalyticsEvent.UPLOADED_FILES_SHOWN)
+                CloudFilesFragment()
+            }
+            ProfileSection.Starred -> {
+                analyticsTracker.track(AnalyticsEvent.STARRED_SHOWN)
+                ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.Starred)
+            }
+            ProfileSection.Bookmarks -> {
+                analyticsTracker.track(AnalyticsEvent.PROFILE_BOOKMARKS_SHOWN)
+                BookmarksContainerFragment.newInstance(sourceView = SourceView.PROFILE)
+            }
+            ProfileSection.ListeningHistory -> {
+                analyticsTracker.track(AnalyticsEvent.LISTENING_HISTORY_SHOWN)
+                ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.History)
+            }
+            ProfileSection.Help -> {
+                analyticsTracker.track(AnalyticsEvent.SETTINGS_HELP_SHOWN)
+                HelpFragment()
+            }
+        }
+        (requireActivity() as? FragmentHostListener)?.addFragment(fragment)
+    }
+
     private fun updateRefreshUI(state: RefreshState?) {
         val binding = binding ?: return
         val lblRefreshStatus = binding.lblRefreshStatus
@@ -338,16 +320,19 @@ class ProfileFragment : BaseFragment() {
                 lblRefreshStatus.setCompoundDrawables(null, null, null, null)
                 lblRefreshStatus.setOnClickListener(null)
             }
+
             is RefreshState.Success -> {
                 updateLastRefreshText(lblRefreshStatus, state.date)
                 lblRefreshStatus.setCompoundDrawables(null, null, null, null)
                 lblRefreshStatus.setOnClickListener(null)
             }
+
             is RefreshState.Refreshing -> {
                 lblRefreshStatus.text = getString(LR.string.profile_refreshing)
                 lblRefreshStatus.setCompoundDrawables(null, null, null, null)
                 lblRefreshStatus.setOnClickListener(null)
             }
+
             is RefreshState.Failed -> {
                 lblRefreshStatus.text = getString(LR.string.profile_refresh_failed)
                 context?.let { context ->
@@ -371,6 +356,7 @@ class ProfileFragment : BaseFragment() {
                     }
                 }
             }
+
             else -> {
                 lblRefreshStatus.setText(LR.string.profile_refresh_status_unknown)
                 lblRefreshStatus.setCompoundDrawables(null, null, null, null)
