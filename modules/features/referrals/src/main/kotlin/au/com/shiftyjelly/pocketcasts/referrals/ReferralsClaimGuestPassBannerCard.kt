@@ -96,9 +96,8 @@ private fun ReferralsClaimGuestPassBannerCard(
     if (state.showProfileBanner) {
         var showPopupToHideBanner by remember { mutableStateOf(false) }
         BoxWithConstraints(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp)
                 .clip(RoundedCornerShape(8.dp))
                 .combinedClickable(
                     onClick = onClick,
@@ -107,14 +106,14 @@ private fun ReferralsClaimGuestPassBannerCard(
                 ),
         ) {
             Row(
-                modifier = modifier
+                modifier = Modifier
                     .background(MaterialTheme.theme.colors.primaryUi01Active, shape = RoundedCornerShape(8.dp))
                     .padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 val guestPassCardWidth = min(this@BoxWithConstraints.maxWidth / 4, 100.dp)
                 Column(
-                    modifier = modifier
+                    modifier = Modifier
                         .weight(1f),
                     verticalArrangement = Arrangement.Center,
                 ) {
@@ -131,7 +130,7 @@ private fun ReferralsClaimGuestPassBannerCard(
                         ),
                     )
 
-                    Spacer(modifier = modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
 
                     TextC70(
                         text = stringResource(LR.string.referrals_claim_guess_pass_banner_card_subtitle),
@@ -139,10 +138,10 @@ private fun ReferralsClaimGuestPassBannerCard(
                     )
                 }
 
-                Spacer(modifier = modifier.width(16.dp))
+                Spacer(modifier = Modifier.width(16.dp))
 
                 ReferralGuestPassCardView(
-                    modifier = modifier
+                    modifier = Modifier
                         .width(guestPassCardWidth)
                         .height(guestPassCardWidth * ReferralGuestPassCardDefaults.cardAspectRatio),
                     source = ReferralGuestPassCardViewSource.ProfileBanner,
