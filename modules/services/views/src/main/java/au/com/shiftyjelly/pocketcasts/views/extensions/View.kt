@@ -52,7 +52,7 @@ fun View.setSystemWindowInsetToPadding(
     top: Boolean = false,
     right: Boolean = false,
     bottom: Boolean = false,
-    consumeInsets: Boolean = true,
+    consumeInsets: Boolean = false,
 ) {
     ViewCompat.setOnApplyWindowInsetsListener(this) { view, windowInsets ->
         val insets = windowInsets.getInsets(
@@ -86,7 +86,7 @@ fun View.setSystemWindowInsetToPadding(
 fun View.setSystemWindowInsetToHeight(
     top: Boolean = false,
     bottom: Boolean = false,
-    consumeInsets: Boolean = true,
+    consumeInsets: Boolean = false,
 ) {
     ViewCompat.setOnApplyWindowInsetsListener(this) { view, windowInsets ->
         val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
