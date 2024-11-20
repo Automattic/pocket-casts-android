@@ -17,6 +17,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -45,11 +48,14 @@ internal fun ProfileSections(
                     .fillMaxWidth()
                     .heightIn(min = 60.dp)
                     .clickable { onClick(section) }
+                    .semantics(mergeDescendants = true) {
+                        role = Role.Button
+                    }
                     .padding(16.dp),
             ) {
                 Icon(
                     painter = painterResource(section.iconId),
-                    contentDescription = stringResource(section.labelId),
+                    contentDescription = null,
                     tint = MaterialTheme.theme.colors.primaryInteractive01,
                 )
                 Spacer(
