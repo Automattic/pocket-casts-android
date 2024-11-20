@@ -11,6 +11,11 @@
         android:background="?attr/primary_ui_01"
         tools:context=".SearchFragment">
 
+        <au.com.shiftyjelly.pocketcasts.views.component.StatusBarSpacer
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="?attr/secondary_ui_01" />
+
         <FrameLayout
             android:id="@+id/floatingLayout"
             android:layout_width="match_parent"
