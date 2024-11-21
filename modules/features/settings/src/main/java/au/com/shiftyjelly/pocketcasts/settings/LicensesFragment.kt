@@ -57,7 +57,6 @@ class LicensesFragment : BaseFragment() {
                     backgroundColor = MaterialTheme.colors.background,
                     contentColor = MaterialTheme.theme.colors.primaryText01,
                 ),
-                itemContentPadding = PaddingValues(horizontal = 32.dp, vertical = 16.dp),
                 librariesBlock = { context ->
                     val libs = Libs.Builder().withContext(context).build()
                     // without displaying the artifact id the libraries seem to appear twice
