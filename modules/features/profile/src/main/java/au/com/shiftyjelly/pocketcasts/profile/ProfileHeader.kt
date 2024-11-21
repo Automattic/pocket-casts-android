@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedButton
@@ -20,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -28,9 +30,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.components.UserAvatar
 import au.com.shiftyjelly.pocketcasts.compose.components.UserAvatarConfig
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -132,13 +136,19 @@ private fun VerticalProfileHeader(
         }
         OutlinedButton(
             border = ButtonDefaults.outlinedBorder.copy(
-                brush = SolidColor(MaterialTheme.theme.colors.secondaryUi02),
+                brush = SolidColor(MaterialTheme.theme.colors.primaryUi05),
+                width = 2.dp,
             ),
+            colors = ButtonDefaults.outlinedButtonColors(
+                backgroundColor = Color.Transparent,
+            ),
+            shape = RoundedCornerShape(10.dp),
             onClick = onClick,
         ) {
-            TextH50(
+            TextP50(
                 text = accountLabel,
                 fontScale = config.infoFontScale,
+                letterSpacing = 0.5.sp,
             )
         }
     }

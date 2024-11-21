@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -34,7 +34,6 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.helper.FriendlyDurationUnit
 import au.com.shiftyjelly.pocketcasts.localization.helper.toFriendlyString
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.titlecaseFirstChar
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -53,7 +52,7 @@ internal fun ProfileStats(
     ) {
         StatsColumn(
             numberText = state.podcastsCount.toString(),
-            labelText = pluralStringResource(LR.plurals.podcast, state.podcastsCount).titlecaseFirstChar(),
+            labelText = pluralStringResource(LR.plurals.podcast, state.podcastsCount).uppercase(),
         )
 
         val resource = LocalContext.current.resources
@@ -63,7 +62,7 @@ internal fun ProfileStats(
                 maxPartCount = 1,
                 pluralResourceId = { it.listenedPlural },
             )
-            text.substringBefore(' ') to text.substringAfter(' ').titlecaseFirstChar()
+            text.substringBefore(' ') to text.substringAfter(' ').uppercase()
         }
         StatsColumn(
             numberText = listenedCount.toString(),
@@ -76,7 +75,7 @@ internal fun ProfileStats(
                 maxPartCount = 1,
                 pluralResourceId = { it.savedPlural },
             )
-            text.substringBefore(' ') to text.substringAfter(' ').titlecaseFirstChar()
+            text.substringBefore(' ') to text.substringAfter(' ').uppercase()
         }
         StatsColumn(
             numberText = savedCount.toString(),
@@ -100,14 +99,14 @@ private fun RowScope.StatsColumn(
         TextP30(
             text = numberText,
             textAlign = TextAlign.Center,
+            fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 4.dp),
-        )
-        Spacer(
-            modifier = Modifier.weight(1f),
         )
         TextP60(
             text = labelText,
             textAlign = TextAlign.Center,
+            color = MaterialTheme.theme.colors.primaryText02,
+            fontWeight = FontWeight.SemiBold,
         )
     }
 }
