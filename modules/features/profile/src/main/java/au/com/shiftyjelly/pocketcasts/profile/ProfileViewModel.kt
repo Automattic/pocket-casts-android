@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.profile
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asFlow
 import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
@@ -76,6 +77,15 @@ class ProfileViewModel @Inject constructor(
     }
 
     val refreshState = settings.refreshStateObservable.asFlow()
+
+    val showUpgradeBanner = combine(
+        settings.upgradeProfileClosed.flow,
+        signInState.asFlow().map { it.isSignedInAsPlusOrPatron },
+    ) { closedClicked, isPlusOrPatron -> !closedClicked && !isPlusOrPatron }
+
+    fun closeUpgradeProfile() {
+        settings.upgradeProfileClosed.set(true, updateModifiedAt = false)
+    }
 
     suspend fun isEndOfYearStoriesEligible() = endOfYearManager.isEligibleForEndOfYear()
 

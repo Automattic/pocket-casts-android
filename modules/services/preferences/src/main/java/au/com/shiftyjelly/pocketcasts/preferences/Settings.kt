@@ -424,8 +424,7 @@ interface Settings {
     val cachedSubscriptionStatus: UserSetting<SubscriptionStatus?>
     val userTier: UserTier
 
-    fun setUpgradeClosedProfile(value: Boolean)
-    fun getUpgradeClosedProfile(): Boolean
+    val upgradeProfileClosed: UserSetting<Boolean>
     fun getUpgradeClosedAddFile(): Boolean
     fun setUpgradeClosedAddFile(value: Boolean)
     fun getUpgradeClosedCloudSettings(): Boolean

@@ -5,8 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.OptIn
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -14,10 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.view.isInvisible
-import androidx.core.view.isVisible
-import androidx.core.view.updateLayoutParams
+import androidx.compose.ui.unit.dp
 import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -28,6 +29,8 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
+import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesActivity.StoriesSource
 import au.com.shiftyjelly.pocketcasts.endofyear.ui.EndOfYearPromptCard
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
@@ -49,7 +52,6 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.settings.stats.StatsFragment
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
-import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -58,7 +60,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlin.time.Duration
 import kotlinx.coroutines.launch
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
 class ProfileFragment : BaseFragment() {
@@ -116,14 +117,7 @@ class ProfileFragment : BaseFragment() {
         binding.setupEndOfYearPromptCard()
         binding.setupSections()
         binding.setupRefresh()
-
-        viewModel.signInState.observe(viewLifecycleOwner) { state ->
-            binding.upgradeLayout.root.isInvisible = settings.getUpgradeClosedProfile() || state.isSignedInAsPlusOrPatron
-            if (binding.upgradeLayout.root.isInvisible) {
-                // We need this to get the correct padding below refresh
-                binding.upgradeLayout.root.updateLayoutParams<ConstraintLayout.LayoutParams> { height = 16.dpToPx(view.context) }
-            }
-        }
+        binding.setupUpgradeProfile()
 
         if (FeatureFlag.isEnabled(Feature.REFERRALS_SEND)) {
             binding.btnGift.setContent {
@@ -131,20 +125,6 @@ class ProfileFragment : BaseFragment() {
                     ReferralsIconWithTooltip()
                 }
             }
-        }
-
-        val upgradeLayout = binding.upgradeLayout
-        upgradeLayout.btnClose.setOnClickListener {
-            settings.setUpgradeClosedProfile(true)
-            upgradeLayout.root.isVisible = false
-        }
-
-        upgradeLayout.lblGetMore.text = getString(LR.string.profile_help_support)
-        upgradeLayout.root.setOnClickListener {
-            OnboardingLauncher.openOnboardingFlow(
-                activity = activity,
-                onboardingFlow = OnboardingFlow.Upsell(OnboardingUpgradeSource.PROFILE),
-            )
         }
 
         if (!viewModel.isFragmentChangingConfigurations) {
@@ -277,6 +257,35 @@ class ProfileFragment : BaseFragment() {
                     },
                     modifier = Modifier.fillMaxWidth(),
                 )
+            }
+        }
+    }
+
+    private fun FragmentProfileBinding.setupUpgradeProfile() {
+        upgradeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+        upgradeView.setContent {
+            AppTheme(remember { theme.activeTheme }) {
+                val showUpgradeBanner by viewModel.showUpgradeBanner.collectAsState(false)
+
+                Column(
+                    modifier = Modifier.background(MaterialTheme.theme.colors.primaryUi03),
+                ) {
+                    HorizontalDivider()
+                    ProfileUpgradeSection(
+                        isVisible = showUpgradeBanner,
+                        contentPadding = PaddingValues(horizontal = 64.dp, vertical = 16.dp),
+                        onClick = {
+                            OnboardingLauncher.openOnboardingFlow(
+                                activity = activity,
+                                onboardingFlow = OnboardingFlow.Upsell(OnboardingUpgradeSource.PROFILE),
+                            )
+                        },
+                        onCloseClick = {
+                            viewModel.closeUpgradeProfile()
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
             }
         }
     }
