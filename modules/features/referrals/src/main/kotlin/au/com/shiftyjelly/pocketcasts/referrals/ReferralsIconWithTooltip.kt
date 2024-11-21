@@ -9,14 +9,11 @@ import androidx.compose.material.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.Devices
@@ -27,35 +24,28 @@ import au.com.shiftyjelly.pocketcasts.compose.components.Tooltip
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfo
 import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfoMock
-import au.com.shiftyjelly.pocketcasts.referrals.ReferralsGuestPassFragment.ReferralsPageType
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsViewModel.UiState
-import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun ReferralsIconWithTooltip(
-    viewModel: ReferralsViewModel = hiltViewModel(),
+    state: ReferralsViewModel.UiState,
+    onIconClick: () -> Unit,
+    onTooltipClick: () -> Unit,
+    onTooltipShown: () -> Unit,
 ) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
-    val activity = LocalContext.current.getActivity()
-
     CallOnce {
-        viewModel.onTooltipShown()
+        onTooltipShown()
     }
 
     when (state) {
-        UiState.Loading -> Unit
+        is UiState.Loading -> Unit
         is UiState.Loaded -> {
             ReferralsIconWithTooltip(
-                state = state as UiState.Loaded,
-                onIconClick = {
-                    viewModel.onIconClick()
-                    val fragment = ReferralsGuestPassFragment.newInstance(ReferralsPageType.Send)
-                    (activity as FragmentHostListener).showBottomSheet(fragment)
-                },
-                onTooltipClick = viewModel::onTooltipClick,
+                state = state,
+                onIconClick = onIconClick,
+                onTooltipClick = onTooltipClick,
             )
         }
     }

@@ -67,7 +67,16 @@ class ProfileViewModel @Inject constructor(
                 expiresIn = null,
             )
         }
-    }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = ProfileHeaderState(
+            imageUrl = null,
+            subscriptionTier = SubscriptionTier.NONE,
+            email = null,
+            expiresIn = null,
+        ),
+    )
 
     internal val profileStatsState = combine(
         refreshStatsTrigger.onStart { emit(Unit) },
@@ -78,9 +87,21 @@ class ProfileViewModel @Inject constructor(
             listenedDuration = statsManager.mergedTotalListeningTimeSec.seconds,
             savedDuration = statsManager.mergedTotalTimeSaved.seconds,
         )
-    }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = ProfileStatsState(
+            podcastsCount = 0,
+            listenedDuration = Duration.ZERO,
+            savedDuration = Duration.ZERO,
+        ),
+    )
 
-    val refreshState = settings.refreshStateObservable.asFlow()
+    val refreshState = settings.refreshStateObservable.asFlow().stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = null,
+    )
 
     val showUpgradeBanner = combine(
         settings.upgradeProfileClosed.flow,
@@ -96,7 +117,11 @@ class ProfileViewModel @Inject constructor(
             emit(endOfYearManager.isEligibleForEndOfYear())
             delay(10_000)
         }
-    }.stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = false)
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = false,
+    )
 
     fun clearFailedRefresh() {
         val lastSuccess = settings.getLastSuccessRefreshState()
