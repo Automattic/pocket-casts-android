@@ -40,7 +40,7 @@ fun EndOfYearPromptCard(
             .padding(start = 24.dp, top = 16.dp, bottom = 16.dp),
     ) {
         Column(
-            modifier = modifier.weight(1.1f),
+            modifier = Modifier.weight(1.1f),
             verticalArrangement = Arrangement.SpaceBetween,
         ) {
             TextH30(
@@ -55,7 +55,7 @@ fun EndOfYearPromptCard(
                 color = Color.White,
                 fontWeight = FontWeight.W600,
                 fontSize = 11.sp,
-                modifier = modifier.alpha(0.7f),
+                modifier = Modifier.alpha(0.7f),
             )
         }
         Box(

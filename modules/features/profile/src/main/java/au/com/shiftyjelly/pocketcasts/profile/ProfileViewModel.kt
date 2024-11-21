@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.toLiveData
+import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
@@ -19,10 +20,14 @@ import javax.inject.Inject
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.toKotlinDuration
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.rx2.asFlow
 import java.time.Duration as JavaDuration
@@ -35,7 +40,6 @@ class ProfileViewModel @Inject constructor(
     val userManager: UserManager,
     private val endOfYearManager: EndOfYearManager,
 ) : ViewModel() {
-    var isFragmentChangingConfigurations: Boolean = false
     private val refreshStatsTrigger = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
     val isSignedIn: Boolean
@@ -87,7 +91,12 @@ class ProfileViewModel @Inject constructor(
         settings.upgradeProfileClosed.set(true, updateModifiedAt = false)
     }
 
-    suspend fun isEndOfYearStoriesEligible() = endOfYearManager.isEligibleForEndOfYear()
+    val isEndOfYearStoriesEligible = flow {
+        while (true) {
+            emit(endOfYearManager.isEligibleForEndOfYear())
+            delay(10_000)
+        }
+    }.stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = false)
 
     fun clearFailedRefresh() {
         val lastSuccess = settings.getLastSuccessRefreshState()
