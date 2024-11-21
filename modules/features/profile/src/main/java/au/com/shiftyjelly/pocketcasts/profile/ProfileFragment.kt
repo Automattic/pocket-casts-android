@@ -1,17 +1,17 @@
 package au.com.shiftyjelly.pocketcasts.profile
 
-import android.app.AlertDialog
-import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.annotation.OptIn
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -19,7 +19,6 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
-import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -31,7 +30,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesActivity.StoriesSource
 import au.com.shiftyjelly.pocketcasts.endofyear.ui.EndOfYearPromptCard
-import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralSecondsMinutesHoursDaysOrYears
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksContainerFragment
@@ -50,8 +48,6 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.settings.stats.StatsFragment
-import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
-import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeTintedDrawable
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -59,13 +55,10 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import com.google.android.material.badge.ExperimentalBadgeUtils
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.Date
 import javax.inject.Inject
 import kotlin.time.Duration
 import kotlinx.coroutines.launch
-import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
 class ProfileFragment : BaseFragment() {
@@ -122,6 +115,7 @@ class ProfileFragment : BaseFragment() {
         binding.setupReferralsClaimGuestPassCard()
         binding.setupEndOfYearPromptCard()
         binding.setupSections()
+        binding.setupRefresh()
 
         viewModel.signInState.observe(viewLifecycleOwner) { state ->
             binding.upgradeLayout.root.isInvisible = settings.getUpgradeClosedProfile() || state.isSignedInAsPlusOrPatron
@@ -139,12 +133,6 @@ class ProfileFragment : BaseFragment() {
             }
         }
 
-        binding.btnRefresh.setOnClickListener {
-            updateRefreshUI(RefreshState.Refreshing)
-            podcastManager.refreshPodcasts("profile")
-            analyticsTracker.track(AnalyticsEvent.PROFILE_REFRESH_BUTTON_TAPPED)
-        }
-
         val upgradeLayout = binding.upgradeLayout
         upgradeLayout.btnClose.setOnClickListener {
             settings.setUpgradeClosedProfile(true)
@@ -157,10 +145,6 @@ class ProfileFragment : BaseFragment() {
                 activity = activity,
                 onboardingFlow = OnboardingFlow.Upsell(OnboardingUpgradeSource.PROFILE),
             )
-        }
-
-        viewModel.refreshObservable.observe(viewLifecycleOwner) { state ->
-            updateRefreshUI(state)
         }
 
         if (!viewModel.isFragmentChangingConfigurations) {
@@ -277,6 +261,26 @@ class ProfileFragment : BaseFragment() {
         }
     }
 
+    private fun FragmentProfileBinding.setupRefresh() {
+        refreshView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+        refreshView.setContent {
+            AppTheme(remember { theme.activeTheme }) {
+                val viewModelState by viewModel.refreshState.collectAsState(null)
+                var state by remember(viewModelState) { mutableStateOf(viewModelState) }
+
+                RefreshSection(
+                    refreshState = state,
+                    onClick = {
+                        state = RefreshState.Refreshing
+                        podcastManager.refreshPodcasts("profile")
+                        analyticsTracker.track(AnalyticsEvent.PROFILE_REFRESH_BUTTON_TAPPED)
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+        }
+    }
+
     private fun goToSection(section: ProfileSection) {
         val fragment = when (section) {
             ProfileSection.Stats -> {
@@ -309,66 +313,6 @@ class ProfileFragment : BaseFragment() {
             }
         }
         (requireActivity() as? FragmentHostListener)?.addFragment(fragment)
-    }
-
-    private fun updateRefreshUI(state: RefreshState?) {
-        val binding = binding ?: return
-        val lblRefreshStatus = binding.lblRefreshStatus
-        when (state) {
-            is RefreshState.Never -> {
-                lblRefreshStatus.text = getString(LR.string.profile_refreshed_never)
-                lblRefreshStatus.setCompoundDrawables(null, null, null, null)
-                lblRefreshStatus.setOnClickListener(null)
-            }
-
-            is RefreshState.Success -> {
-                updateLastRefreshText(lblRefreshStatus, state.date)
-                lblRefreshStatus.setCompoundDrawables(null, null, null, null)
-                lblRefreshStatus.setOnClickListener(null)
-            }
-
-            is RefreshState.Refreshing -> {
-                lblRefreshStatus.text = getString(LR.string.profile_refreshing)
-                lblRefreshStatus.setCompoundDrawables(null, null, null, null)
-                lblRefreshStatus.setOnClickListener(null)
-            }
-
-            is RefreshState.Failed -> {
-                lblRefreshStatus.text = getString(LR.string.profile_refresh_failed)
-                context?.let { context ->
-                    val errorDrawable = context.getThemeTintedDrawable(IR.drawable.ic_alert_small, UR.attr.primary_icon_02)
-                    lblRefreshStatus.setCompoundDrawablesWithIntrinsicBounds(errorDrawable, null, null, null)
-                    lblRefreshStatus.compoundDrawablePadding = 8.dpToPx(context)
-                    TextViewCompat.setCompoundDrawableTintList(
-                        lblRefreshStatus,
-                        ColorStateList.valueOf(
-                            context.getThemeColor(
-                                UR.attr.secondary_icon_01,
-                            ),
-                        ),
-                    )
-                    lblRefreshStatus.setOnClickListener {
-                        AlertDialog.Builder(context)
-                            .setTitle(LR.string.profile_refresh_error)
-                            .setMessage(state.error)
-                            .setPositiveButton(LR.string.ok, null)
-                            .show()
-                    }
-                }
-            }
-
-            else -> {
-                lblRefreshStatus.setText(LR.string.profile_refresh_status_unknown)
-                lblRefreshStatus.setCompoundDrawables(null, null, null, null)
-                lblRefreshStatus.setOnClickListener(null)
-            }
-        }
-    }
-
-    private fun updateLastRefreshText(lblRefreshStatus: TextView, lastRefresh: Date) {
-        val time = Date().time - lastRefresh.time
-        val timeAmount = resources.getStringPluralSecondsMinutesHoursDaysOrYears(time)
-        lblRefreshStatus.text = getString(LR.string.profile_last_refresh, timeAmount)
     }
 
     override fun onBackPressed(): Boolean {
