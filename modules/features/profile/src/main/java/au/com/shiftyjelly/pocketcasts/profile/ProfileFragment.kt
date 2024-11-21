@@ -56,7 +56,6 @@ import au.com.shiftyjelly.pocketcasts.referrals.ReferralsClaimGuestPassBannerCar
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsIconWithTooltip
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.settings.HelpFragment
 import au.com.shiftyjelly.pocketcasts.settings.SettingsFragment
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
@@ -81,9 +80,6 @@ class ProfileFragment : BaseFragment() {
 
     @Inject
     lateinit var settings: Settings
-
-    @Inject
-    lateinit var userManager: UserManager
 
     @Inject
     lateinit var analyticsTracker: AnalyticsTracker
