@@ -94,8 +94,8 @@ class PlaybackServiceTest {
         }
         service.podcastManager = podcastManager
         val episodeManager = mock<EpisodeManager> {
-            on { findEpisodesWhere(any(), any()) }.doReturn(filterEpisodes)
-            onBlocking { findLatestEpisodeToPlay() }.doReturn(latestEpisode)
+            on { findEpisodesWhereBlocking(any(), any()) }.doReturn(filterEpisodes)
+            onBlocking { findLatestEpisodeToPlayBlocking() }.doReturn(latestEpisode)
         }
         service.episodeManager = episodeManager
         val playlistManager = mock<PlaylistManager> {

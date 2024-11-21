@@ -117,7 +117,7 @@ class PodcastManagerTest {
 
     @Test
     fun testSubscribeToExistingPodcast() {
-        podcastDao.insert(Podcast(uuid, isSubscribed = true))
+        podcastDao.insertBlocking(Podcast(uuid, isSubscribed = true))
         podcastManagerSignedOut.subscribeToPodcastRx(uuid, sync = false).blockingGet()
         val subscribedList = podcastManagerSignedOut.getSubscribedPodcastUuids().blockingGet()
         assertTrue("Podcast uuid should be subscribed", subscribedList.contains(uuid))
@@ -133,18 +133,18 @@ class PodcastManagerTest {
     @Test
     fun testUnsubscribeSignedOut() {
         val playbackManager = mock<PlaybackManager> {}
-        podcastDao.insert(Podcast(uuid, isSubscribed = true))
+        podcastDao.insertBlocking(Podcast(uuid, isSubscribed = true))
         podcastManagerSignedOut.unsubscribe(uuid, playbackManager)
-        val daoPodcast = podcastDao.findByUuid(uuid)
+        val daoPodcast = podcastDao.findByUuidBlocking(uuid)
         assertTrue("Podcast should be null", daoPodcast == null)
     }
 
     @Test
     fun testUnsubscribeSignedIn() {
         val playbackManager = mock<PlaybackManager> {}
-        podcastDao.insert(Podcast(uuid, isSubscribed = true))
+        podcastDao.insertBlocking(Podcast(uuid, isSubscribed = true))
         podcastManagerSignedIn.unsubscribe(uuid, playbackManager)
-        val daoPodcast = podcastDao.findByUuid(uuid)
+        val daoPodcast = podcastDao.findByUuidBlocking(uuid)
         assertTrue("Podcast should be unsubscribed", daoPodcast?.isSubscribed == false)
     }
 }

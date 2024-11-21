@@ -125,7 +125,7 @@ class CloudBottomSheetViewModel @Inject constructor(
 
     fun markAsPlayed(episode: UserEpisode) {
         viewModelScope.launch(Dispatchers.Default) {
-            episodeManager.markAsPlayed(episode, playbackManager, podcastManager)
+            episodeManager.markAsPlayedBlocking(episode, playbackManager, podcastManager)
             episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_MARKED_AS_PLAYED, source, episode.uuid)
             trackOptionTapped(MARK_PLAYED)
         }
@@ -133,7 +133,7 @@ class CloudBottomSheetViewModel @Inject constructor(
 
     fun markAsUnplayed(episode: UserEpisode) {
         viewModelScope.launch(Dispatchers.Default) {
-            episodeManager.markAsNotPlayed(episode)
+            episodeManager.markAsNotPlayedBlocking(episode)
             episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_MARKED_AS_UNPLAYED, source, episode.uuid)
             trackOptionTapped(MARK_UNPLAYED)
         }

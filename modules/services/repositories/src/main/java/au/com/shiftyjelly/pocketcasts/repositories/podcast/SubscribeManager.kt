@@ -124,8 +124,8 @@ class SubscribeManager @Inject constructor(
                 settings.setNotificationLastSeenToNow()
 
                 if (canDownloadEpisodesAfterSubscription(subscribed, shouldAutoDownload)) {
-                    podcastDao.findByUuid(podcastUuid)?.let { podcast ->
-                        val episodes = episodeManager.findEpisodesByPodcastOrderedByPublishDate(podcast)
+                    podcastDao.findByUuidBlocking(podcastUuid)?.let { podcast ->
+                        val episodes = episodeManager.findEpisodesByPodcastOrderedByPublishDateBlocking(podcast)
                         val numberOfEpisodes = AutoDownloadLimitSetting.getNumberOfEpisodes(settings.autoDownloadLimit.value)
 
                         episodes.take(numberOfEpisodes).forEach { episode ->
@@ -168,7 +168,7 @@ class SubscribeManager @Inject constructor(
 
     private fun subscribeToExistingOrServerPodcast(podcastUuid: String, sync: Boolean, subscribed: Boolean, shouldAutoDownload: Boolean): Single<Podcast> {
         // check if the podcast exists already
-        val subscribedObservable = podcastDao.isSubscribedToPodcastRx(podcastUuid)
+        val subscribedObservable = podcastDao.isSubscribedToPodcastRxSingle(podcastUuid)
         return subscribedObservable.flatMap { isSubscribed ->
             // download the podcast json and add to the database if it doesn't exist
             if (isSubscribed) {
@@ -181,12 +181,12 @@ class SubscribeManager @Inject constructor(
 
     private fun subscribeToExistingPodcast(podcastUuid: String, sync: Boolean): Single<Podcast> {
         // set subscribed to true and update the sync status
-        val updateObservable = podcastDao.updateSubscribedRx(subscribed = true, uuid = podcastUuid)
-            .andThen(podcastDao.updateSyncStatusRx(syncStatus = if (sync) Podcast.SYNC_STATUS_NOT_SYNCED else Podcast.SYNC_STATUS_SYNCED, uuid = podcastUuid))
-            .andThen(Completable.fromAction { podcastDao.updateGrouping(settings.podcastGroupingDefault.value, podcastUuid) })
+        val updateObservable = podcastDao.updateSubscribedRxCompletable(subscribed = true, uuid = podcastUuid)
+            .andThen(podcastDao.updateSyncStatusRxCompletable(syncStatus = if (sync) Podcast.SYNC_STATUS_NOT_SYNCED else Podcast.SYNC_STATUS_SYNCED, uuid = podcastUuid))
+            .andThen(Completable.fromAction { podcastDao.updateGroupingBlocking(settings.podcastGroupingDefault.value, podcastUuid) })
             .andThen(rxCompletable { podcastDao.updateShowArchived(podcastUuid, settings.showArchivedDefault.value) })
         // return the final podcast
-        val findObservable = podcastDao.findByUuidRx(podcastUuid)
+        val findObservable = podcastDao.findByUuidRxMaybe(podcastUuid)
         return updateObservable.andThen(findObservable.toSingle())
     }
 
@@ -200,7 +200,7 @@ class SubscribeManager @Inject constructor(
                 podcast.grouping = settings.podcastGroupingDefault.value
                 podcast.showArchived = settings.showArchivedDefault.value
                 if (FeatureFlag.isEnabled(Feature.CUSTOM_PLAYBACK_SETTINGS)) {
-                    podcastDao.findByUuid(podcastUuid)?.let { localPodcast ->
+                    podcastDao.findByUuidBlocking(podcastUuid)?.let { localPodcast ->
                         podcast.copyPlaybackEffects(
                             sourcePodcast = localPodcast,
                         )
@@ -213,7 +213,7 @@ class SubscribeManager @Inject constructor(
             }
         // add the podcast
         val insertPodcastObservable = podcastObservable.flatMap { podcast ->
-            podcastDao.insertRx(podcast)
+            podcastDao.insertRxSingle(podcast)
         }
         // insert episodes
         return insertPodcastObservable.flatMap { podcast -> subscribeInsertEpisodes(podcast).toSingle { podcast } }
@@ -248,7 +248,7 @@ class SubscribeManager @Inject constructor(
             .doOnSuccess { Timber.i("Downloaded colors success podcast $podcastUuid") }
             .onErrorReturn { Optional.empty() }
         // find all podcasts from the database
-        val allPodcastsObservable = podcastDao.findSubscribedRx().subscribeOn(Schedulers.io())
+        val allPodcastsObservable = podcastDao.findSubscribedRxSingle().subscribeOn(Schedulers.io())
         // group the server podcast and all the existing podcasts to calculate the new podcast properties
         val cleanPodcastObservable = Single.zip(
             serverPodcastObservable,
@@ -272,7 +272,7 @@ class SubscribeManager @Inject constructor(
         // insert the episodes
         return Completable.fromAction {
             podcast.episodes.chunked(250).forEach { episodes ->
-                episodeDao.insertAll(episodes)
+                episodeDao.insertAllBlocking(episodes)
             }
         }
             // make sure the podcast has the latest episode uuid
@@ -333,8 +333,8 @@ class SubscribeManager @Inject constructor(
 
     // WARNING: only call this when NEW episodes are added, not old ones
     private fun updateLatestEpisodeUuid(podcastUuid: String): Completable {
-        return episodeDao.findLatestRx(podcastUuid)
-            .flatMapCompletable { episode -> podcastDao.updateLatestEpisodeRx(episode.uuid, episode.publishedDate, podcastUuid) }
+        return episodeDao.findLatestRxMaybe(podcastUuid)
+            .flatMapCompletable { episode -> podcastDao.updateLatestEpisodeRxCompletable(episode.uuid, episode.publishedDate, podcastUuid) }
     }
 
     /**

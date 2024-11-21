@@ -114,7 +114,7 @@ class DownloadManagerImpl @Inject constructor(
 
     override fun beginMonitoringWorkManager(context: Context) {
         val workManager = WorkManager.getInstance(context)
-        val episodeFlowable = episodeManager.observeDownloadingEpisodesRx()
+        val episodeFlowable = episodeManager.findDownloadingEpisodesRxFlowable()
             .distinctUntilChanged { t1, t2 -> // We only really need to make sure we have all the downloading episodes available, we don't care when their metadata changes
                 t1.map { it.uuid }.toSet() == t2.map { it.uuid }.toSet()
             }
@@ -269,7 +269,7 @@ class DownloadManagerImpl @Inject constructor(
             downloadingQueue.toList().forEach { stopDownloadingEpisode(it.episodeUUID, "Cancel all") }
         }
         launch {
-            val downloadingEpisodes = episodeManager.findEpisodesDownloading()
+            val downloadingEpisodes = episodeManager.findEpisodesDownloadingBlocking()
             downloadingEpisodes.forEach {
                 stopDownloadingEpisode(it.uuid, "Cancel all")
                 episodeManager.updateEpisodeStatus(it, EpisodeStatusEnum.NOT_DOWNLOADED)
@@ -302,7 +302,7 @@ class DownloadManagerImpl @Inject constructor(
 
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Added episode to downloads. ${episode.uuid} podcast: ${(episode as? PodcastEpisode)?.podcastUuid} from: $from")
                 val networkRequirements = getRequirementsAndSetStatusAsync(episode)
-                episodeManager.updateLastDownloadAttemptDate(episode)
+                episodeManager.updateLastDownloadAttemptDateBlocking(episode)
                 addWorkManagerTask(episode, networkRequirements)
             }
 
@@ -310,9 +310,9 @@ class DownloadManagerImpl @Inject constructor(
 
             // Mark as unplayed, which will also unarchive the episode
             if (episode.playingStatus == EpisodePlayingStatus.COMPLETED) {
-                episodeManager.markAsNotPlayed(episode)
+                episodeManager.markAsNotPlayedBlocking(episode)
             } else {
-                episodeManager.unarchive(episode)
+                episodeManager.unarchiveBlocking(episode)
             }
         }
     }
@@ -443,7 +443,7 @@ class DownloadManagerImpl @Inject constructor(
 
                 RefreshPodcastsThread.updateNotifications(settings.getNotificationLastSeen(), settings, podcastManager, episodeManager, notificationHelper, context)
             } else {
-                episodeManager.setDownloadFailed(episode, result.errorMessage?.split(":")?.last() ?: "Download failed")
+                episodeManager.setDownloadFailedBlocking(episode, result.errorMessage?.split(":")?.last() ?: "Download failed")
                 val error = result.error ?: EpisodeDownloadError(
                     episodeUuid = episode.uuid,
                     podcastUuid = episode.podcastOrSubstituteUuid,

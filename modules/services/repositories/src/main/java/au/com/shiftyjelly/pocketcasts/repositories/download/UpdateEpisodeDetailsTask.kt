@@ -102,7 +102,7 @@ class UpdateEpisodeDetailsTask @AssistedInject constructor(
                     val contentType = response.header("Content-Type")
                     if (!contentType.isNullOrBlank()) {
                         if ((episode.fileType.isNullOrBlank() && (contentType.startsWith("audio") || contentType.startsWith("video"))) || contentType.startsWith("video")) {
-                            episodeManager.updateFileType(episode, contentType)
+                            episodeManager.updateFileTypeBlocking(episode, contentType)
                             episode.fileType = contentType
                         }
                     }
@@ -113,7 +113,7 @@ class UpdateEpisodeDetailsTask @AssistedInject constructor(
                             val contentLength = java.lang.Long.parseLong(contentLengthHeader)
                             val sizeInBytes = episode.sizeInBytes
                             if ((sizeInBytes == 0L || sizeInBytes != contentLength) && contentLength > 153600) {
-                                episodeManager.updateSizeInBytes(episode, contentLength)
+                                episodeManager.updateSizeInBytesBlocking(episode, contentLength)
                                 episode.sizeInBytes = contentLength
                             }
                         } catch (nfe: NumberFormatException) {

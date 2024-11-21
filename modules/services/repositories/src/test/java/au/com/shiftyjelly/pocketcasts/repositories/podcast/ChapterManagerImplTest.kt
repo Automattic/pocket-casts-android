@@ -29,7 +29,7 @@ class ChapterManagerImplTest {
         val episode = PodcastEpisode("id", publishedDate = Date(), duration = 0.001)
 
         whenever(chapterDao.observerChaptersForEpisode("id")).thenReturn(flowOf(emptyList()))
-        whenever(episodeManager.observeEpisodeByUuid("id")).thenReturn(flowOf(episode))
+        whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(flowOf(episode))
 
         chapterManager.observerChaptersForEpisode("id").test {
             assertEquals(Chapters(emptyList()), awaitItem())
@@ -51,7 +51,7 @@ class ChapterManagerImplTest {
         )
 
         whenever(chapterDao.observerChaptersForEpisode("id")).thenReturn(flowOf(listOf(dbChapter)))
-        whenever(episodeManager.observeEpisodeByUuid("id")).thenReturn(flowOf(episode))
+        whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(flowOf(episode))
 
         chapterManager.observerChaptersForEpisode("id").test {
             val expected = Chapter(
@@ -94,7 +94,7 @@ class ChapterManagerImplTest {
         )
 
         whenever(chapterDao.observerChaptersForEpisode("id")).thenReturn(flowOf(dbChapters))
-        whenever(episodeManager.observeEpisodeByUuid("id")).thenReturn(flowOf(episode))
+        whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(flowOf(episode))
 
         chapterManager.observerChaptersForEpisode("id").test {
             val expected = listOf(
@@ -139,7 +139,7 @@ class ChapterManagerImplTest {
         )
 
         whenever(chapterDao.observerChaptersForEpisode("id")).thenReturn(flowOf(listOf(dbChapter)))
-        whenever(episodeManager.observeEpisodeByUuid("id")).thenReturn(flowOf(episode))
+        whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(flowOf(episode))
 
         chapterManager.observerChaptersForEpisode("id").test {
             val expected = Chapter(
@@ -170,7 +170,7 @@ class ChapterManagerImplTest {
         )
 
         whenever(chapterDao.observerChaptersForEpisode("id")).thenReturn(flowOf(listOf(dbChapter)))
-        whenever(episodeManager.observeEpisodeByUuid("id")).thenReturn(flowOf(episode))
+        whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(flowOf(episode))
 
         chapterManager.observerChaptersForEpisode("id").test {
             val expected = Chapter(
@@ -201,7 +201,7 @@ class ChapterManagerImplTest {
         )
 
         whenever(chapterDao.observerChaptersForEpisode("id")).thenReturn(flowOf(listOf(dbChapter)))
-        whenever(episodeManager.observeEpisodeByUuid("id")).thenReturn(flowOf(episode))
+        whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(flowOf(episode))
 
         chapterManager.observerChaptersForEpisode("id").test {
             val expected = Chapter(
@@ -232,7 +232,7 @@ class ChapterManagerImplTest {
         )
 
         whenever(chapterDao.observerChaptersForEpisode("id")).thenReturn(flowOf(listOf(dbChapter)))
-        whenever(episodeManager.observeEpisodeByUuid("id")).thenReturn(flowOf(episode))
+        whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(flowOf(episode))
 
         chapterManager.observerChaptersForEpisode("id").test {
             val expected = Chapter(
@@ -281,7 +281,7 @@ class ChapterManagerImplTest {
         )
 
         whenever(chapterDao.observerChaptersForEpisode("id")).thenReturn(flowOf(dbChapters))
-        whenever(episodeManager.observeEpisodeByUuid("id")).thenReturn(flowOf(episode))
+        whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(flowOf(episode))
 
         chapterManager.observerChaptersForEpisode("id").test {
             val expected = listOf(
@@ -345,7 +345,7 @@ class ChapterManagerImplTest {
         )
 
         whenever(chapterDao.observerChaptersForEpisode("id")).thenReturn(flowOf(dbChapters))
-        whenever(episodeManager.observeEpisodeByUuid("id")).thenReturn(flowOf(episode))
+        whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(flowOf(episode))
 
         chapterManager.observerChaptersForEpisode("id").test {
             val expected = listOf(
@@ -396,7 +396,7 @@ class ChapterManagerImplTest {
         )
 
         whenever(chapterDao.observerChaptersForEpisode("id")).thenReturn(flowOf(dbChapters))
-        whenever(episodeManager.observeEpisodeByUuid("id")).thenReturn(flowOf(episode))
+        whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(flowOf(episode))
 
         chapterManager.observerChaptersForEpisode("id").test {
             val expected = listOf(
@@ -433,7 +433,7 @@ class ChapterManagerImplTest {
         )
 
         whenever(chapterDao.observerChaptersForEpisode("id")).thenReturn(flowOf(listOf(dbChapter)))
-        whenever(episodeManager.observeEpisodeByUuid("id")).thenReturn(episodesFlow)
+        whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(episodesFlow)
 
         chapterManager.observerChaptersForEpisode("id").test {
             val expectedSelected = Chapter(
@@ -473,7 +473,7 @@ class ChapterManagerImplTest {
         )
 
         whenever(chapterDao.observerChaptersForEpisode("id")).thenReturn(flowOf(dbChapters))
-        whenever(episodeManager.observeEpisodeByUuid("id")).thenReturn(flowOf(episode))
+        whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(flowOf(episode))
 
         chapterManager.observerChaptersForEpisode("id").test {
             val expected = listOf(
@@ -517,7 +517,7 @@ class ChapterManagerImplTest {
         )
 
         whenever(chapterDao.observerChaptersForEpisode("id")).thenReturn(flowOf(dbChapters))
-        whenever(episodeManager.observeEpisodeByUuid("id")).thenReturn(flowOf(episode))
+        whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(flowOf(episode))
 
         chapterManager.observerChaptersForEpisode("id").test {
             val expected = listOf(
@@ -579,7 +579,7 @@ class ChapterManagerImplTest {
         )
 
         whenever(chapterDao.observerChaptersForEpisode("id")).thenReturn(flowOf(dbChapters))
-        whenever(episodeManager.observeEpisodeByUuid("id")).thenReturn(flowOf(episode))
+        whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(flowOf(episode))
 
         chapterManager.observerChaptersForEpisode("id").test {
             val expected = listOf(

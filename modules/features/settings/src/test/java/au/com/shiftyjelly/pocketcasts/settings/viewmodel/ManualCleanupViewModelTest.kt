@@ -37,7 +37,7 @@ class ManualCleanupViewModelTest {
     fun setUp() {
         episodeManager = mock()
         playbackManager = mock()
-        whenever(episodeManager.observeDownloadedEpisodes())
+        whenever(episodeManager.findDownloadedEpisodesRxFlowable())
             .thenReturn(Flowable.generate { listOf(episodes) })
         viewModel = ManualCleanupViewModel(episodeManager, playbackManager, AnalyticsTracker.test())
     }
@@ -68,7 +68,7 @@ class ManualCleanupViewModelTest {
 
     @Test
     fun `given episodes selected, when delete button clicked, then delete action invoked`() {
-        whenever(episodeManager.observeDownloadedEpisodes())
+        whenever(episodeManager.findDownloadedEpisodesRxFlowable())
             .thenReturn(Flowable.generate { listOf(episode) })
         val deleteButtonClickAction = mock<() -> Unit>()
         viewModel.setup(deleteButtonClickAction)
@@ -81,7 +81,7 @@ class ManualCleanupViewModelTest {
 
     @Test
     fun `given episodes not selected, when delete button clicked, then episodes are not deleted`() {
-        whenever(episodeManager.observeDownloadedEpisodes())
+        whenever(episodeManager.findDownloadedEpisodesRxFlowable())
             .thenReturn(Flowable.generate { listOf(episode) })
         viewModel.onDiskSpaceCheckedChanged(isChecked = false, diskSpaceView = diskSpaceView)
 

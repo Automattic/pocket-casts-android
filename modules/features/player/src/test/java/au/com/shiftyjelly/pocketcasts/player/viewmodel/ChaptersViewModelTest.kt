@@ -88,7 +88,7 @@ class ChaptersViewModelTest {
     @Before
     fun setup() {
         whenever(playbackManager.playbackStateFlow).thenReturn(playbackStateFlow)
-        whenever(episodeManager.observeEpisodeByUuid("id")).thenReturn(episodeFlow)
+        whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(episodeFlow)
         whenever(chapterManager.observerChaptersForEpisode("id")).thenReturn(chaptersFlow)
         val userSetting = mock<UserSetting<SubscriptionStatus?>>()
         whenever(userSetting.flow).thenReturn(subscriptionStatusFlow)
@@ -274,7 +274,7 @@ class ChaptersViewModelTest {
 
         chaptersViewModel.playChapter(chapter)
 
-        verify(episodeManager, times(1)).updatePlayedUpTo(episode, chapter.startTime.inWholeSeconds.toDouble(), forceUpdate = true)
+        verify(episodeManager, times(1)).updatePlayedUpToBlocking(episode, chapter.startTime.inWholeSeconds.toDouble(), forceUpdate = true)
         verifyBlocking(playbackManager, times(1)) { playNowSuspend(episode) }
     }
 

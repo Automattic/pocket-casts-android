@@ -28,7 +28,7 @@ class ChapterManagerImpl @Inject constructor(
     }
 
     override fun observerChaptersForEpisode(episodeUuid: String) = combine(
-        episodeManager.observeEpisodeByUuid(episodeUuid).distinctUntilChangedBy(BaseEpisode::deselectedChapters),
+        episodeManager.findEpisodeByUuidFlow(episodeUuid).distinctUntilChangedBy(BaseEpisode::deselectedChapters),
         chapterDao.observerChaptersForEpisode(episodeUuid),
     ) { episode, dbChapters -> dbChapters.toChapters(episode) }
 

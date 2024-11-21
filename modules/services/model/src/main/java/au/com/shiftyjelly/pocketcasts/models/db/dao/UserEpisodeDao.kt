@@ -22,7 +22,7 @@ abstract class UserEpisodeDao {
     abstract suspend fun insert(userEpisode: UserEpisode)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insertRx(userEpisode: UserEpisode): Completable
+    abstract fun insertRxCompletable(userEpisode: UserEpisode): Completable
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     abstract suspend fun insertAll(userEpisodes: List<UserEpisode>)
@@ -40,37 +40,37 @@ abstract class UserEpisodeDao {
     abstract suspend fun findAllUuids(): List<String>
 
     @Query("SELECT * FROM user_episodes ORDER BY added_date DESC")
-    abstract fun observeUserEpisodesDesc(): Flowable<List<UserEpisode>>
+    abstract fun findUserEpisodesDescRxFlowable(): Flowable<List<UserEpisode>>
 
     @Query("SELECT * FROM user_episodes ORDER BY added_date DESC")
     abstract suspend fun findUserEpisodesDesc(): List<UserEpisode>
 
     @Query("SELECT * FROM user_episodes ORDER BY added_date ASC")
-    abstract fun observeUserEpisodesAsc(): Flowable<List<UserEpisode>>
+    abstract fun findUserEpisodesAscRxFlowable(): Flowable<List<UserEpisode>>
 
     @Query("SELECT * FROM user_episodes ORDER BY title ASC")
-    abstract fun observeUserEpisodesTitleAsc(): Flowable<List<UserEpisode>>
+    abstract fun findUserEpisodesTitleAscRxFlowable(): Flowable<List<UserEpisode>>
 
     @Query("SELECT * FROM user_episodes ORDER BY title DESC")
-    abstract fun observeUserEpisodesTitleDesc(): Flowable<List<UserEpisode>>
+    abstract fun findUserEpisodesTitleDescRxFlowable(): Flowable<List<UserEpisode>>
 
     @Query("SELECT * FROM user_episodes ORDER BY duration ASC")
-    abstract fun observeUserEpisodesDurationAsc(): Flowable<List<UserEpisode>>
+    abstract fun findUserEpisodesDurationAscRxFlowable(): Flowable<List<UserEpisode>>
 
     @Query("SELECT * FROM user_episodes ORDER BY duration DESC")
-    abstract fun observeUserEpisodesDurationDesc(): Flowable<List<UserEpisode>>
+    abstract fun findUserEpisodesDurationDescRxFlowable(): Flowable<List<UserEpisode>>
 
     @Query("SELECT * FROM user_episodes WHERE download_task_id IS NOT NULL")
-    abstract fun observeDownloadingUserEpisodes(): Flowable<List<UserEpisode>>
+    abstract fun findDownloadingUserEpisodesRxFlowable(): Flowable<List<UserEpisode>>
 
     @Query("SELECT * FROM user_episodes WHERE uuid = :uuid")
-    abstract fun observeEpisodeRx(uuid: String): Flowable<UserEpisode>
+    abstract fun findEpisodeRxFlowable(uuid: String): Flowable<UserEpisode>
 
     @Query("SELECT * FROM user_episodes WHERE uuid = :uuid")
-    abstract fun observeEpisode(uuid: String): Flow<UserEpisode>
+    abstract fun findEpisodeFlow(uuid: String): Flow<UserEpisode>
 
     @Query("SELECT * FROM user_episodes WHERE uuid = :uuid")
-    abstract fun findEpisodeByUuidRx(uuid: String): Maybe<UserEpisode>
+    abstract fun findEpisodeByUuidRxMaybe(uuid: String): Maybe<UserEpisode>
 
     @Query("SELECT * FROM user_episodes WHERE uuid = :uuid")
     abstract suspend fun findEpisodeByUuid(uuid: String): UserEpisode?
@@ -79,22 +79,22 @@ abstract class UserEpisodeDao {
     abstract suspend fun findEpisodesByUuids(episodeUuids: List<String>): List<UserEpisode>
 
     @Query("UPDATE user_episodes SET played_up_to = :playedUpTo, played_up_to_modified = :modified WHERE uuid = :uuid AND (played_up_to IS NULL OR played_up_to < :playedUpToMin OR played_up_to > :playedUpToMax)")
-    abstract fun updatePlayedUpToIfChanged(playedUpTo: Double, playedUpToMin: Double, playedUpToMax: Double, modified: Long, uuid: String)
+    abstract fun updatePlayedUpToIfChangedBlocking(playedUpTo: Double, playedUpToMin: Double, playedUpToMax: Double, modified: Long, uuid: String)
 
     @Query("UPDATE user_episodes SET duration = :duration WHERE uuid = :uuid")
-    abstract fun updateDuration(duration: Double, uuid: String)
+    abstract fun updateDurationBlocking(duration: Double, uuid: String)
 
     @Query("UPDATE user_episodes SET playing_status = :playingStatus, playing_status_modified = :modified WHERE uuid = :uuid")
-    abstract fun updatePlayingStatus(playingStatus: EpisodePlayingStatus, modified: Long, uuid: String)
+    abstract fun updatePlayingStatusBlocking(playingStatus: EpisodePlayingStatus, modified: Long, uuid: String)
 
     @Query("UPDATE user_episodes SET episode_status = :episodeStatus WHERE uuid = :uuid")
-    abstract fun updateEpisodeStatus(uuid: String, episodeStatus: EpisodeStatusEnum)
+    abstract fun updateEpisodeStatusBlocking(uuid: String, episodeStatus: EpisodeStatusEnum)
 
     @Query("UPDATE user_episodes SET auto_download_status = :autoDownloadStatus WHERE uuid = :uuid")
-    abstract fun updateAutoDownloadStatus(autoDownloadStatus: Int, uuid: String)
+    abstract fun updateAutoDownloadStatusBlocking(autoDownloadStatus: Int, uuid: String)
 
     @Query("UPDATE user_episodes SET server_status = :serverStatus WHERE uuid = :uuid")
-    abstract fun updateServerStatusRx(uuid: String, serverStatus: UserEpisodeServerStatus): Completable
+    abstract fun updateServerStatusRxCompletable(uuid: String, serverStatus: UserEpisodeServerStatus): Completable
 
     @Query("UPDATE user_episodes SET server_status = :serverStatus WHERE uuid = :uuid")
     abstract suspend fun updateServerStatus(uuid: String, serverStatus: UserEpisodeServerStatus)
@@ -115,22 +115,22 @@ abstract class UserEpisodeDao {
     abstract suspend fun updateDownloadError(uuid: String, error: String?)
 
     @Query("UPDATE user_episodes SET play_error_details = :error WHERE uuid = :uuid")
-    abstract fun updatePlayError(uuid: String, error: String?)
+    abstract fun updatePlayErrorBlocking(uuid: String, error: String?)
 
     @Query("UPDATE user_episodes SET download_task_id = :taskId WHERE uuid = :uuid")
     abstract suspend fun updateDownloadTaskId(uuid: String, taskId: String?)
 
     @Query("UPDATE user_episodes SET upload_error_details = :uploadError WHERE uuid = :uuid")
-    abstract fun updateUploadErrorRx(uuid: String, uploadError: String?): Completable
+    abstract fun updateUploadErrorRxCompetable(uuid: String, uploadError: String?): Completable
 
     @Query("UPDATE user_episodes SET upload_error_details = :uploadError WHERE uuid = :uuid")
     abstract suspend fun updateUploadError(uuid: String, uploadError: String?)
 
     @Query("SELECT * FROM user_episodes WHERE (playing_status_modified IS NOT NULL OR played_up_to_modified IS NOT NULL) AND uuid IS NOT NULL LIMIT 2000")
-    abstract fun findUserEpisodesToSync(): List<UserEpisode>
+    abstract fun findUserEpisodesToSyncBlocking(): List<UserEpisode>
 
     @Query("UPDATE user_episodes SET played_up_to_modified = NULL, playing_status_modified = NULL")
-    abstract fun markAllSynced()
+    abstract fun markAllSyncedBlocking()
 
     @Query("UPDATE user_episodes SET upload_task_id = :uploadTaskId WHERE uuid = :uuid")
     abstract suspend fun updateUploadTaskId(uuid: String, uploadTaskId: String?)

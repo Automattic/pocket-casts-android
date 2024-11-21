@@ -234,7 +234,7 @@ class MainActivityViewModelTest {
             ),
         )
 
-        whenever(episodeManager.observeDownloadedEpisodes()).thenReturn(Flowable.just(downloadedEpisodes))
+        whenever(episodeManager.findDownloadedEpisodesRxFlowable()).thenReturn(Flowable.just(downloadedEpisodes))
 
         viewModel = MainActivityViewModel(
             episodeManager = episodeManager,

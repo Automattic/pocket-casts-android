@@ -139,7 +139,7 @@ class BookmarkDaoTest {
             bookmarkDao.insert(bookmark2)
 
             val episode = PodcastEpisode(uuid = defaultEpisodeUuid, podcastUuid = "1", isArchived = false, publishedDate = Date())
-            episodeDao.insert(episode)
+            episodeDao.insertBlocking(episode)
 
             val result = bookmarkDao.searchInPodcastByTitle(
                 title = searchTitle,
@@ -166,7 +166,7 @@ class BookmarkDaoTest {
             bookmarkDao.insert(bookmark2)
 
             val episode = PodcastEpisode(uuid = episodeUuid, podcastUuid = podcastUuid, title = searchTitle, isArchived = false, publishedDate = Date())
-            episodeDao.insert(episode)
+            episodeDao.insertBlocking(episode)
 
             val result = bookmarkDao.searchInPodcastByTitle(
                 title = searchTitle,
@@ -191,7 +191,7 @@ class BookmarkDaoTest {
             bookmarkDao.insert(bookmark3)
 
             val episode = PodcastEpisode(uuid = defaultEpisodeUuid, podcastUuid = defaultPodcastUuid, title = "", publishedDate = Date())
-            episodeDao.insert(episode)
+            episodeDao.insertBlocking(episode)
 
             val result = bookmarkDao.findByPodcastOrderCreatedAtFlow(
                 podcastUuid = defaultPodcastUuid,
@@ -216,7 +216,7 @@ class BookmarkDaoTest {
             bookmarkDao.insert(bookmark3)
 
             val episode = PodcastEpisode(uuid = defaultEpisodeUuid, podcastUuid = defaultPodcastUuid, title = "", publishedDate = Date())
-            episodeDao.insert(episode)
+            episodeDao.insertBlocking(episode)
 
             val result = bookmarkDao.findByPodcastOrderCreatedAtFlow(
                 podcastUuid = defaultPodcastUuid,
@@ -244,8 +244,8 @@ class BookmarkDaoTest {
 
             val episode1 = PodcastEpisode(uuid = episodeUuid1, podcastUuid = defaultPodcastUuid, publishedDate = Date(2000))
             val episode2 = PodcastEpisode(uuid = episodeUuid2, podcastUuid = defaultPodcastUuid, publishedDate = Date(1000))
-            episodeDao.insert(episode1)
-            episodeDao.insert(episode2)
+            episodeDao.insertBlocking(episode1)
+            episodeDao.insertBlocking(episode2)
             val result = bookmarkDao.findByPodcastOrderEpisodeAndTimeFlow(
                 podcastUuid = defaultPodcastUuid,
             ).first()

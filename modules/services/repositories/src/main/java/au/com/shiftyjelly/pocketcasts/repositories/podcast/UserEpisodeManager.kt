@@ -213,29 +213,29 @@ class UserEpisodeManagerImpl @Inject constructor(
 
     override fun observeUserEpisodesSorted(sortOrder: Settings.CloudSortOrder): Flowable<List<UserEpisode>> {
         return when (sortOrder) {
-            Settings.CloudSortOrder.NEWEST_OLDEST -> userEpisodeDao.observeUserEpisodesDesc()
-            Settings.CloudSortOrder.OLDEST_NEWEST -> userEpisodeDao.observeUserEpisodesAsc()
-            Settings.CloudSortOrder.A_TO_Z -> userEpisodeDao.observeUserEpisodesTitleAsc()
-            Settings.CloudSortOrder.Z_TO_A -> userEpisodeDao.observeUserEpisodesTitleDesc()
-            Settings.CloudSortOrder.SHORT_LONG -> userEpisodeDao.observeUserEpisodesDurationAsc()
-            Settings.CloudSortOrder.LONG_SHORT -> userEpisodeDao.observeUserEpisodesDurationDesc()
+            Settings.CloudSortOrder.NEWEST_OLDEST -> userEpisodeDao.findUserEpisodesDescRxFlowable()
+            Settings.CloudSortOrder.OLDEST_NEWEST -> userEpisodeDao.findUserEpisodesAscRxFlowable()
+            Settings.CloudSortOrder.A_TO_Z -> userEpisodeDao.findUserEpisodesTitleAscRxFlowable()
+            Settings.CloudSortOrder.Z_TO_A -> userEpisodeDao.findUserEpisodesTitleDescRxFlowable()
+            Settings.CloudSortOrder.SHORT_LONG -> userEpisodeDao.findUserEpisodesDurationAscRxFlowable()
+            Settings.CloudSortOrder.LONG_SHORT -> userEpisodeDao.findUserEpisodesDurationDescRxFlowable()
         }.map { it.filterNot { it.serverStatus == UserEpisodeServerStatus.MISSING } }
     }
 
     override fun observeDownloadUserEpisodes(): Flowable<List<UserEpisode>> {
-        return userEpisodeDao.observeDownloadingUserEpisodes()
+        return userEpisodeDao.findDownloadingUserEpisodesRxFlowable()
     }
 
     override fun observeEpisodeRx(uuid: String): Flowable<UserEpisode> {
-        return userEpisodeDao.observeEpisodeRx(uuid)
+        return userEpisodeDao.findEpisodeRxFlowable(uuid)
     }
 
     override fun observeEpisode(uuid: String): Flow<UserEpisode> {
-        return userEpisodeDao.observeEpisode(uuid)
+        return userEpisodeDao.findEpisodeFlow(uuid)
     }
 
     override fun findEpisodeByUuidRx(uuid: String): Maybe<UserEpisode> {
-        return userEpisodeDao.findEpisodeByUuidRx(uuid)
+        return userEpisodeDao.findEpisodeByUuidRxMaybe(uuid)
     }
 
     override suspend fun findEpisodeByUuid(uuid: String): UserEpisode? {
@@ -248,14 +248,14 @@ class UserEpisodeManagerImpl @Inject constructor(
 
     override fun downloadMissingUserEpisode(uuid: String, placeholderTitle: String?, placeholderPublished: Date?): Maybe<UserEpisode> {
         val missingEpisode = UserEpisode(uuid = uuid, title = placeholderTitle ?: "Unable to find episode", publishedDate = placeholderPublished ?: Date(), serverStatus = UserEpisodeServerStatus.MISSING)
-        val replaceEpisodeWithSubstitute = userEpisodeDao.insertRx(missingEpisode).andThen(userEpisodeDao.findEpisodeByUuidRx(uuid))
+        val replaceEpisodeWithSubstitute = userEpisodeDao.insertRxCompletable(missingEpisode).andThen(userEpisodeDao.findEpisodeByUuidRxMaybe(uuid))
 
         val downloadMissingEpisode = syncManager.getUserEpisode(uuid)
             .flatMap {
-                userEpisodeDao.insertRx(it.toUserEpisode()).andThen(userEpisodeDao.findEpisodeByUuidRx(uuid))
+                userEpisodeDao.insertRxCompletable(it.toUserEpisode()).andThen(userEpisodeDao.findEpisodeByUuidRxMaybe(uuid))
             }.switchIfEmpty(replaceEpisodeWithSubstitute)
 
-        return userEpisodeDao.findEpisodeByUuidRx(uuid)
+        return userEpisodeDao.findEpisodeByUuidRxMaybe(uuid)
             .flatMap {
                 if (it.serverStatus == UserEpisodeServerStatus.MISSING) {
                     Maybe.empty() // We want to attempt to redownload missing files so we mark as not found
@@ -284,14 +284,14 @@ class UserEpisodeManagerImpl @Inject constructor(
     }
 
     override suspend fun syncFiles(playbackManager: PlaybackManager) {
-        val episodesToSync = userEpisodeDao.findUserEpisodesToSync()
+        val episodesToSync = userEpisodeDao.findUserEpisodesToSyncBlocking()
         if (episodesToSync.isNotEmpty()) {
             val response = withContext(Dispatchers.IO) {
                 syncManager.postFiles(episodesToSync.toServerPost()).blockingGet()
             }
             if (response.isSuccessful) {
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Synced cloud files successfully")
-                userEpisodeDao.markAllSynced()
+                userEpisodeDao.markAllSyncedBlocking()
             } else {
                 LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Couldn't sync cloud files")
                 throw HttpException(response)
@@ -386,7 +386,7 @@ class UserEpisodeManagerImpl @Inject constructor(
                 add(newEpisode, playbackManager)
 
                 if (settings.cloudAutoDownload.value && subscriptionManager.getCachedStatus() is SubscriptionStatus.Paid) {
-                    userEpisodeDao.updateAutoDownloadStatus(PodcastEpisode.AUTO_DOWNLOAD_STATUS_AUTO_DOWNLOADED, newEpisode.uuid)
+                    userEpisodeDao.updateAutoDownloadStatusBlocking(PodcastEpisode.AUTO_DOWNLOAD_STATUS_AUTO_DOWNLOADED, newEpisode.uuid)
                     newEpisode.autoDownloadStatus = PodcastEpisode.AUTO_DOWNLOAD_STATUS_AUTO_DOWNLOADED
                     downloadManager.addEpisodeToQueue(newEpisode, "cloud files sync", fireEvent = false, source = SourceView.UNKNOWN)
                 }
@@ -399,7 +399,7 @@ class UserEpisodeManagerImpl @Inject constructor(
             if (episode != null) {
                 if (!episode.isDownloaded) {
                     // Remove file not found on server only if it is not added to up-next to prevent it from being removed from up-next (Github Issue#356)
-                    if (!upNextDao.containsEpisode(episode.uuid)) {
+                    if (!upNextDao.containsEpisodeBlocking(episode.uuid)) {
                         playbackManager.removeEpisode(episode, source = SourceView.UNKNOWN, userInitiated = false)
                         userEpisodeDao.delete(episode)
                     }
@@ -450,11 +450,11 @@ class UserEpisodeManagerImpl @Inject constructor(
             imageUploadTask = Completable.complete()
         }
 
-        return userEpisodeDao.updateServerStatusRx(userEpisode.uuid, UserEpisodeServerStatus.UPLOADING)
-            .andThen(userEpisodeDao.updateUploadErrorRx(userEpisode.uuid, null))
+        return userEpisodeDao.updateServerStatusRxCompletable(userEpisode.uuid, UserEpisodeServerStatus.UPLOADING)
+            .andThen(userEpisodeDao.updateUploadErrorRxCompetable(userEpisode.uuid, null))
             .andThen(syncManager.uploadFileToServer(userEpisode))
             .andThen(
-                userEpisodeDao.updateServerStatusRx(userEpisode.uuid, serverStatus = UserEpisodeServerStatus.UPLOADED),
+                userEpisodeDao.updateServerStatusRxCompletable(userEpisode.uuid, serverStatus = UserEpisodeServerStatus.UPLOADED),
             )
             .andThen(imageUploadTask)
             // let the file upload report to upload to the api server
@@ -469,10 +469,10 @@ class UserEpisodeManagerImpl @Inject constructor(
                     .flatMapCompletable { success ->
                         if (success) {
                             episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_UPLOAD_FINISHED, uuid = userEpisode.uuid)
-                            userEpisodeDao.updateServerStatusRx(userEpisode.uuid, serverStatus = UserEpisodeServerStatus.UPLOADED)
+                            userEpisodeDao.updateServerStatusRxCompletable(userEpisode.uuid, serverStatus = UserEpisodeServerStatus.UPLOADED)
                         } else {
                             episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_UPLOAD_FAILED, uuid = userEpisode.uuid)
-                            userEpisodeDao.updateUploadErrorRx(userEpisode.uuid, "Upload failed")
+                            userEpisodeDao.updateUploadErrorRxCompetable(userEpisode.uuid, "Upload failed")
                         }
                     },
             )
@@ -494,7 +494,7 @@ class UserEpisodeManagerImpl @Inject constructor(
 
     override fun removeFromCloud(userEpisode: UserEpisode) {
         syncManager.deleteFromServer(userEpisode)
-            .flatMapCompletable { userEpisodeDao.updateServerStatusRx(userEpisode.uuid, UserEpisodeServerStatus.LOCAL) }
+            .flatMapCompletable { userEpisodeDao.updateServerStatusRxCompletable(userEpisode.uuid, UserEpisodeServerStatus.LOCAL) }
             .andThen(syncManager.getFileUsage().doOnSuccess { usageRelay.accept(Optional.of(it)) }.ignoreElement())
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -517,7 +517,7 @@ class UserEpisodeManagerImpl @Inject constructor(
     }
 
     override suspend fun updateEpisodeStatus(episode: UserEpisode, status: EpisodeStatusEnum) {
-        userEpisodeDao.updateEpisodeStatus(episode.uuid, status)
+        userEpisodeDao.updateEpisodeStatusBlocking(episode.uuid, status)
     }
 
     override suspend fun updateDownloadedFilePath(episode: UserEpisode, filePath: String) {
@@ -551,7 +551,7 @@ class UserEpisodeManagerImpl @Inject constructor(
     override suspend fun deletePlayedEpisodeIfReq(episode: UserEpisode, playbackManager: PlaybackManager) {
         if (settings.deleteLocalFileAfterPlaying.value) {
             deleteFilesForEpisode(episode)
-            userEpisodeDao.updateEpisodeStatus(episode.uuid, EpisodeStatusEnum.NOT_DOWNLOADED)
+            userEpisodeDao.updateEpisodeStatusBlocking(episode.uuid, EpisodeStatusEnum.NOT_DOWNLOADED)
 
             if (episode.serverStatus == UserEpisodeServerStatus.LOCAL) {
                 userEpisodeDao.delete(episode)
@@ -573,7 +573,7 @@ class UserEpisodeManagerImpl @Inject constructor(
     }
 
     override suspend fun removeCloudStatusFromFiles(playbackManager: PlaybackManager) = withContext(Dispatchers.IO) {
-        userEpisodeDao.observeUserEpisodesDesc().firstElement().awaitSingleOrNull()?.forEach {
+        userEpisodeDao.findUserEpisodesDescRxFlowable().firstElement().awaitSingleOrNull()?.forEach {
             if (!it.isDownloaded) { // Cloud only
                 delete(it, playbackManager)
             } else if (it.isDownloaded && it.serverStatus == UserEpisodeServerStatus.UPLOADED) {

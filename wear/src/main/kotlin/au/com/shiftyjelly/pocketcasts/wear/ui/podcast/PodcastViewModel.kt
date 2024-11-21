@@ -49,7 +49,7 @@ class PodcastViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.Default) {
             val podcast = podcastManager.findPodcastByUuidSuspend(podcastUuid)
             podcast?.let {
-                episodeManager.observeEpisodesByPodcastOrderedRx(it)
+                episodeManager.findEpisodesByPodcastOrderedRxFlowable(it)
                     .asFlow()
                     .map { podcastEpisodes ->
                         val sortFunction = podcast.grouping.sortFunction

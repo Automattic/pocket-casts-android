@@ -100,7 +100,7 @@ class EpisodeFragmentViewModel @Inject constructor(
                 if (episode != null) {
                     Maybe.just(episode)
                 } else {
-                    episodeManager.downloadMissingEpisode(episodeUuid, podcastUuid, PodcastEpisode(uuid = episodeUuid, publishedDate = Date()), podcastManager, downloadMetaData = true, source = source).flatMap { missingEpisode ->
+                    episodeManager.downloadMissingEpisodeRxMaybe(episodeUuid, podcastUuid, PodcastEpisode(uuid = episodeUuid, publishedDate = Date()), podcastManager, downloadMetaData = true, source = source).flatMap { missingEpisode ->
                         if (missingEpisode is PodcastEpisode) {
                             Maybe.just(missingEpisode)
                         } else {
@@ -114,7 +114,7 @@ class EpisodeFragmentViewModel @Inject constructor(
         }
 
         @Suppress("DEPRECATION")
-        val maybeEpisode = episodeManager.findByUuidRx(episodeUuid)
+        val maybeEpisode = episodeManager.findByUuidRxMaybe(episodeUuid)
 
         val stateObservable: Flowable<EpisodeFragmentState> = maybeEpisode
             .switchIfEmpty(onEmptyHandler)
@@ -125,7 +125,7 @@ class EpisodeFragmentViewModel @Inject constructor(
                     EpisodeFragmentState.Loaded(episodeLoaded, podcast, showNotesState, tintColor, podcastColor, downloadProgress)
                 }
                 return@flatMapPublisher Flowable.combineLatest(
-                    episodeManager.observeByUuid(episodeUuid).asFlowable(),
+                    episodeManager.findByUuidFlow(episodeUuid).asFlowable(),
                     podcastManager.findPodcastByUuidRx(episode.podcastUuid).toFlowable(),
                     showNotesManager.loadShowNotesFlow(podcastUuid = episode.podcastUuid, episodeUuid = episode.uuid).asFlowable(),
                     progressUpdatesObservable,
@@ -199,7 +199,7 @@ class EpisodeFragmentViewModel @Inject constructor(
                     downloadManager.addEpisodeToQueue(it, "episode card", fireEvent = true, source = source)
                     analyticsEvent = AnalyticsEvent.EPISODE_DOWNLOAD_QUEUED
                 }
-                episodeManager.clearPlaybackError(episode)
+                episodeManager.clearPlaybackErrorBlocking(episode)
                 analyticsEvent?.let { event ->
                     episodeAnalytics.trackEvent(event, source = source, uuid = it.uuid)
                 }
@@ -213,10 +213,10 @@ class EpisodeFragmentViewModel @Inject constructor(
             episode?.let { episode ->
                 if (isOn) {
                     event = AnalyticsEvent.EPISODE_MARKED_AS_PLAYED
-                    episodeManager.markAsPlayed(episode, playbackManager, podcastManager)
+                    episodeManager.markAsPlayedBlocking(episode, playbackManager, podcastManager)
                 } else {
                     event = AnalyticsEvent.EPISODE_MARKED_AS_UNPLAYED
-                    episodeManager.markAsNotPlayed(episode)
+                    episodeManager.markAsNotPlayedBlocking(episode)
                 }
                 episodeAnalytics.trackEvent(event, source, episode.uuid)
             }
@@ -261,10 +261,10 @@ class EpisodeFragmentViewModel @Inject constructor(
         launch {
             episode?.let { episode ->
                 if (isOn) {
-                    episodeManager.archive(episode, playbackManager)
+                    episodeManager.archiveBlocking(episode, playbackManager)
                     episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ARCHIVED, source, episode.uuid)
                 } else {
-                    episodeManager.unarchive(episode)
+                    episodeManager.unarchiveBlocking(episode)
                     episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_UNARCHIVED, source, episode.uuid)
                 }
             }

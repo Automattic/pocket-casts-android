@@ -422,7 +422,7 @@ class Support @Inject constructor(
                 output.append("Episode Issues").append(eol).append("--------------").append(eol).append(eol)
 
                 try {
-                    val episodes = episodeManager.findEpisodesWhere("downloaded_error_details IS NOT NULL AND LENGTH(downloaded_error_details) > 0 LIMIT 100")
+                    val episodes = episodeManager.findEpisodesWhereBlocking("downloaded_error_details IS NOT NULL AND LENGTH(downloaded_error_details) > 0 LIMIT 100")
                     for (episode in episodes) {
                         output.append("Title: ").append(episode.title).append(eol)
                         output.append("Id: ").append(episode.uuid).append(eol)

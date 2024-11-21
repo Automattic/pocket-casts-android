@@ -447,7 +447,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
         }
         // add the latest episode
         if (episodes.size < NUM_SUGGESTED_ITEMS) {
-            val latestEpisode = episodeManager.findLatestEpisodeToPlay()
+            val latestEpisode = episodeManager.findLatestEpisodeToPlayBlocking()
             if (latestEpisode != null && episodes.none { it.uuid == latestEpisode.uuid }) {
                 episodes.add(latestEpisode)
             }
@@ -545,7 +545,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
         if (playlist != null) {
             val episodeList = if (DOWNLOADS_ROOT == parentId) {
                 autoPlaySource = AutoPlaySource.Downloads
-                episodeManager.observeDownloadedEpisodes().blockingFirst()
+                episodeManager.findDownloadedEpisodesRxFlowable().blockingFirst()
             } else {
                 autoPlaySource = AutoPlaySource.fromId(parentId)
                 playlistManager.findEpisodesBlocking(playlist, episodeManager, playbackManager)
@@ -565,7 +565,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
 
                 val showPlayed = settings.autoShowPlayed.value
                 val episodes = episodeManager
-                    .findEpisodesByPodcastOrdered(podcast)
+                    .findEpisodesByPodcastOrderedBlocking(podcast)
                     .filterNot { !showPlayed && (it.isFinished || it.isArchived) }
                     .take(EPISODE_LIMIT)
                     .toMutableList()

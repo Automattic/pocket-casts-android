@@ -51,18 +51,18 @@ class DeveloperViewModel
                     for (podcast in podcasts) {
                         if (podcast.isShowNotifications) {
                             // find first podcast with more than one episode
-                            val episodes = episodeManager.findEpisodesByPodcastOrderedByPublishDate(podcast)
+                            val episodes = episodeManager.findEpisodesByPodcastOrderedByPublishDateBlocking(podcast)
                             if (episodes.size <= 1) {
                                 continue
                             } else {
                                 val episode = episodes[1]
                                 // link the second oldest to the podcast
-                                episodeManager.markAsNotPlayed(episode)
+                                episodeManager.markAsNotPlayedBlocking(episode)
                                 podcastManager.updateLatestEpisode(podcast, episode)
                                 // remove the latest episode
                                 val episodeToDelete = episodes[0]
                                 Timber.i("Creating a notification for ${podcast.title} - ${episodeToDelete.title}")
-                                episodeManager.deleteEpisodeWithoutSync(episodeToDelete, playbackManager)
+                                episodeManager.deleteEpisodeWithoutSyncBlocking(episodeToDelete, playbackManager)
                                 settings.setNotificationLastSeenToNow()
                                 continue
                             }
@@ -88,7 +88,7 @@ class DeveloperViewModel
                 val podcasts = podcastManager.findSubscribed()
                 for (podcast in podcasts) {
                     // find first podcast with more than one episode
-                    val episodes = episodeManager.findEpisodesByPodcastOrderedByPublishDate(podcast)
+                    val episodes = episodeManager.findEpisodesByPodcastOrderedByPublishDateBlocking(podcast)
                     if (episodes.size <= 1) {
                         continue
                     } else {
@@ -96,7 +96,7 @@ class DeveloperViewModel
                         val episodeToDelete = episodes.first()
                         val newLatest = episodes.getOrNull(1)
                         Timber.i("Deleted episode ${podcast.title} - ${episodeToDelete.title}")
-                        episodeManager.deleteEpisodeWithoutSync(episodeToDelete, playbackManager)
+                        episodeManager.deleteEpisodeWithoutSyncBlocking(episodeToDelete, playbackManager)
 
                         podcast.latestEpisodeUuid = newLatest?.uuid
                         podcast.latestEpisodeDate = newLatest?.publishedDate

@@ -15,43 +15,43 @@ import au.com.shiftyjelly.pocketcasts.models.entity.toUpNextEpisode
 abstract class UpNextDao {
 
     @Query("SELECT * FROM up_next_episodes ORDER BY position ASC")
-    abstract fun all(): List<UpNextEpisode>
+    abstract fun allBlocking(): List<UpNextEpisode>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insert(episode: UpNextEpisode): Long
+    abstract fun insertBlocking(episode: UpNextEpisode): Long
 
     /**
      * Add an episode to the Up Next.
      * position 0: Top 1: Next -1: Last
      */
     @Transaction
-    open fun insertAt(upNextEpisode: UpNextEpisode, position: Int, replaceOneEpisode: Boolean = false) {
+    open fun insertAtBlocking(upNextEpisode: UpNextEpisode, position: Int, replaceOneEpisode: Boolean = false) {
         // remove the episode before we add it to the top
-        deleteByUuid(upNextEpisode.episodeUuid)
+        deleteByUuidBlocking(upNextEpisode.episodeUuid)
         // find all the existing Up Next episodes
-        val upNextEpisodes: List<UpNextEpisode> = all()
+        val upNextEpisodes: List<UpNextEpisode> = allBlocking()
         // update the existing episode positions
-        val newPosition = updatePositions(upNextEpisodes, position, replaceOneEpisode)
+        val newPosition = updatePositionsBlocking(upNextEpisodes, position, replaceOneEpisode)
         upNextEpisode.position = newPosition
         // add the episode
-        insert(upNextEpisode)
+        insertBlocking(upNextEpisode)
     }
 
-    private fun updatePositions(episodes: List<UpNextEpisode>, position: Int, replaceOneEpisode: Boolean): Int {
+    private fun updatePositionsBlocking(episodes: List<UpNextEpisode>, position: Int, replaceOneEpisode: Boolean): Int {
         val addLast = position == -1
         val newPosition = if (addLast) episodes.size else position
 
         if (episodes.isEmpty()) {
             // do nothing
         } else if (replaceOneEpisode && episodes.size == 1) {
-            deleteAll()
+            deleteAllBlocking()
         } else {
-            changeEpisodesPositions(episodes, position)
+            changeEpisodesPositionsBlocking(episodes, position)
         }
         return newPosition
     }
 
-    private fun changeEpisodesPositions(upNextEpisodes: List<UpNextEpisode>, insertPosition: Int) {
+    private fun changeEpisodesPositionsBlocking(upNextEpisodes: List<UpNextEpisode>, insertPosition: Int) {
         // there's more than one thing in our up next queue, so move the requested episode to the top, and the currently playing one down one
         upNextEpisodes.forEachIndexed { index, upNextEpisode ->
             val position = if (insertPosition == 1 && index == 0) {
@@ -60,60 +60,60 @@ abstract class UpNextDao {
             } else {
                 index + 1
             }
-            upNextEpisode.id?.let { id -> updatePosition(id = id, position = position) }
+            upNextEpisode.id?.let { id -> updatePositionBlocking(id = id, position = position) }
         }
     }
 
     @Transaction
-    open fun insertAll(episodes: List<UpNextEpisode>) {
-        episodes.forEach { insert(it) }
+    open fun insertAllBlocking(episodes: List<UpNextEpisode>) {
+        episodes.forEach { insertBlocking(it) }
     }
 
     @Query("UPDATE up_next_episodes SET position = :position WHERE _id = :id")
-    abstract fun updatePosition(id: Long, position: Int)
+    abstract fun updatePositionBlocking(id: Long, position: Int)
 
     @Query("DELETE FROM up_next_episodes")
-    abstract fun deleteAll()
+    abstract fun deleteAllBlocking()
 
     @Transaction
-    open fun deleteAllNotCurrent() {
-        val currentEpisodeUuid = findCurrentUpNextEpisode()?.episodeUuid ?: return
-        deleteAllNotUuid(currentEpisodeUuid)
+    open fun deleteAllNotCurrentBlocking() {
+        val currentEpisodeUuid = findCurrentUpNextEpisodeBlocking()?.episodeUuid ?: return
+        deleteAllNotUuidBlocking(currentEpisodeUuid)
     }
 
     @Query("DELETE FROM up_next_episodes WHERE episodeUuid != :uuid")
-    abstract fun deleteAllNotUuid(uuid: String)
+    abstract fun deleteAllNotUuidBlocking(uuid: String)
 
     @Query("DELETE FROM up_next_episodes WHERE episodeUuid = :uuid")
-    abstract fun deleteByUuid(uuid: String)
+    abstract fun deleteByUuidBlocking(uuid: String)
 
     @Query("SELECT * FROM up_next_episodes ORDER BY position ASC LIMIT 1")
-    abstract fun findCurrentUpNextEpisode(): UpNextEpisode?
+    abstract fun findCurrentUpNextEpisodeBlocking(): UpNextEpisode?
 
     @Query("SELECT podcast_episodes.* FROM up_next_episodes JOIN podcast_episodes ON podcast_episodes.uuid = up_next_episodes.episodeUuid ORDER BY up_next_episodes.position ASC")
-    abstract fun findEpisodes(): List<PodcastEpisode>
+    abstract fun findEpisodesBlocking(): List<PodcastEpisode>
 
     @Query("SELECT user_episodes.* FROM up_next_episodes JOIN user_episodes ON user_episodes.uuid = up_next_episodes.episodeUuid ORDER BY up_next_episodes.position ASC")
-    abstract fun findUserEpisodes(): List<UserEpisode>
+    abstract fun findUserEpisodesBlocking(): List<UserEpisode>
 
     @Query("SELECT episodeUuid FROM up_next_episodes ORDER BY up_next_episodes.position ASC")
-    abstract fun findEpisodeUuids(): List<String>
+    abstract fun findEpisodeUuidsBlocking(): List<String>
 
     @Query("SELECT COUNT(*) FROM up_next_episodes")
-    abstract fun count(): Int
+    abstract fun countBlocking(): Int
 
     @Query("SELECT COUNT(*) FROM up_next_episodes WHERE episodeUuid = :episodeUuid")
-    abstract fun countByEpisode(episodeUuid: String): Int
+    abstract fun countByEpisodeBlocking(episodeUuid: String): Int
 
-    open fun containsEpisode(episodeUuid: String): Boolean {
-        return countByEpisode(episodeUuid) > 0
+    open fun containsEpisodeBlocking(episodeUuid: String): Boolean {
+        return countByEpisodeBlocking(episodeUuid) > 0
     }
 
     @Transaction
-    open fun findAllEpisodesSorted(): List<BaseEpisode> {
-        val episodes = findEpisodes().associateBy { it.uuid }
-        val userEpisodes = findUserEpisodes().associateBy { it.uuid }
-        val orders = findEpisodeUuids()
+    open fun findAllEpisodesSortedBlocking(): List<BaseEpisode> {
+        val episodes = findEpisodesBlocking().associateBy { it.uuid }
+        val userEpisodes = findUserEpisodesBlocking().associateBy { it.uuid }
+        val orders = findEpisodeUuidsBlocking()
 
         return orders.mapNotNull {
             episodes[it] as BaseEpisode? ?: userEpisodes[it] as BaseEpisode?
@@ -121,9 +121,9 @@ abstract class UpNextDao {
     }
 
     @Transaction
-    open fun saveAll(episodes: List<BaseEpisode>) {
+    open fun saveAllBlocking(episodes: List<BaseEpisode>) {
         val newUpNextEpisodes = episodes.map(BaseEpisode::toUpNextEpisode)
-        val databaseUpNextEpisodes = all()
+        val databaseUpNextEpisodes = allBlocking()
         val uuidToId = databaseUpNextEpisodes.associateBy({ it.episodeUuid }, { it.id })
 
         for (i in newUpNextEpisodes.indices) {
@@ -132,15 +132,15 @@ abstract class UpNextDao {
             val id = uuidToId[episode.episodeUuid]
             if (id == null) {
                 episode.position = i
-                insert(episode)
+                insertBlocking(episode)
             } else {
-                updatePosition(id = id, position = i)
+                updatePositionBlocking(id = id, position = i)
             }
         }
         // delete old Up Next episodes if they no longer exist
         val databaseUuids = databaseUpNextEpisodes.map(UpNextEpisode::episodeUuid)
         val newUuids = episodes.map(BaseEpisode::uuid)
-        databaseUuids.minus(newUuids).forEach(this::deleteByUuid)
+        databaseUuids.minus(newUuids).forEach(this::deleteByUuidBlocking)
     }
 
     @Transaction

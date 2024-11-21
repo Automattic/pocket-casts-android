@@ -179,7 +179,7 @@ open class FileStorage @Inject constructor(
                     .updateEpisodesWithNewFilePaths(episodesManager)
 
                 // Move episodes
-                episodesManager.observeDownloadedEpisodes().asFlow().first()
+                episodesManager.findDownloadedEpisodesRxFlowable().asFlow().first()
                     .onEach { episode -> LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Found downloaded episode ${episode.title}") }
                     .matchWithDownloadedFilePaths()
                     .filterNotExistingFiles()
@@ -218,7 +218,7 @@ open class FileStorage @Inject constructor(
     }
 
     private fun List<Pair<File, PodcastEpisode>>.updateEpisodesWithNewFilePaths(episodeManager: EpisodeManager) = forEach { (file, episode) ->
-        episodeManager.updateDownloadFilePath(episode, file.absolutePath, markAsDownloaded = true)
+        episodeManager.updateDownloadFilePathBlocking(episode, file.absolutePath, markAsDownloaded = true)
     }
 
     private fun List<PodcastEpisode>.matchWithDownloadedFilePaths() = mapNotNull { episode ->
@@ -233,7 +233,7 @@ open class FileStorage @Inject constructor(
 
     private fun List<Pair<PodcastEpisode, String>>.moveFilesToEpisodesDirAndUpdatePaths(episodeManager: EpisodeManager, episodesDir: File) = forEach { (episode, path) ->
         moveFileToDir(path, episodesDir)?.let { updatedPath ->
-            episodeManager.updateDownloadFilePath(episode, updatedPath, markAsDownloaded = false)
+            episodeManager.updateDownloadFilePathBlocking(episode, updatedPath, markAsDownloaded = false)
         }
     }
 
@@ -297,7 +297,7 @@ open class FileStorage @Inject constructor(
         // Link to the found episode
         episode.episodeStatus = EpisodeStatusEnum.DOWNLOADED
         episode.downloadedFilePath = file.absolutePath
-        episodeManager.update(episode)
+        episodeManager.updateBlocking(episode)
     }
 
     private companion object {

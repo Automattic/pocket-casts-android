@@ -187,7 +187,7 @@ class PlayerViewModel @Inject constructor(
     val playingEpisodeLive: LiveData<Pair<BaseEpisode, Int>> =
         listDataRx.map { Pair(it.podcastHeader.episodeUuid, it.podcastHeader.backgroundColor) }
             .distinctUntilChanged()
-            .switchMap { pair -> episodeManager.observeEpisodeByUuidRx(pair.first).map { Pair(it, pair.second) } }
+            .switchMap { pair -> episodeManager.findEpisodeByUuidRxFlowable(pair.first).map { Pair(it, pair.second) } }
             .toLiveData()
 
     private var playbackPositionMs: Int = 0
@@ -227,7 +227,7 @@ class PlayerViewModel @Inject constructor(
     val effectsObservable: Flowable<PodcastEffectsData> = playbackStateObservable
         .toFlowable(BackpressureStrategy.LATEST)
         .map { it.episodeUuid }
-        .switchMap { episodeManager.observeEpisodeByUuidRx(it) }
+        .switchMap { episodeManager.findEpisodeByUuidRxFlowable(it) }
         .switchMap {
             if (it is PodcastEpisode) {
                 podcastManager.observePodcastByUuid(it.podcastUuid)
@@ -437,14 +437,14 @@ class PlayerViewModel @Inject constructor(
 
     fun markAsPlayedConfirmed(episode: BaseEpisode, shouldShuffleUpNext: Boolean = false) {
         launch {
-            episodeManager.markAsPlayed(episode, playbackManager, podcastManager, shouldShuffleUpNext)
+            episodeManager.markAsPlayedBlocking(episode, playbackManager, podcastManager, shouldShuffleUpNext)
             episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_MARKED_AS_PLAYED, source, episode.uuid)
         }
     }
 
     fun archiveConfirmed(episode: PodcastEpisode) {
         launch {
-            episodeManager.archive(episode, playbackManager, sync = true, shouldShuffleUpNext = settings.upNextShuffle.value)
+            episodeManager.archiveBlocking(episode, playbackManager, sync = true, shouldShuffleUpNext = settings.upNextShuffle.value)
             episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ARCHIVED, source, episode.uuid)
         }
     }

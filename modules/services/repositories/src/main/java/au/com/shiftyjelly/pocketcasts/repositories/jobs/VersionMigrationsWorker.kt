@@ -198,16 +198,16 @@ class VersionMigrationsWorker @AssistedInject constructor(
     private suspend fun removeCustomEpisodes() {
         val customPodcastUuid = "customFolderPodcast"
         val podcast: Podcast = podcastManager.findPodcastByUuidSuspend(customPodcastUuid) ?: return
-        val episodes: List<PodcastEpisode> = episodeManager.findEpisodesByPodcastOrderedByPublishDate(podcast)
+        val episodes: List<PodcastEpisode> = episodeManager.findEpisodesByPodcastOrderedByPublishDateBlocking(podcast)
         episodes.forEach { episode ->
             playbackManager.removeEpisode(
                 episodeToRemove = episode,
                 source = SourceView.UNKNOWN,
                 userInitiated = false,
             )
-            appDatabase.episodeDao().delete(episode)
+            appDatabase.episodeDao().deleteBlocking(episode)
         }
-        appDatabase.podcastDao().deleteByUuid(customPodcastUuid)
+        appDatabase.podcastDao().deleteByUuidBlocking(customPodcastUuid)
     }
 
     private fun performV7Migration() {

@@ -50,7 +50,7 @@ class ShareClipViewModel @AssistedInject constructor(
     private val sharingState = MutableStateFlow(SharingState(Step.ClipSelection, iSharing = false))
 
     val uiState = combine(
-        episodeManager.observeByUuid(episodeUuid),
+        episodeManager.findByUuidFlow(episodeUuid),
         podcastManager.observePodcastByEpisodeUuid(episodeUuid),
         clipRange,
         settings.artworkConfiguration.flow.map { it.useEpisodeArtwork },

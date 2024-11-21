@@ -80,7 +80,7 @@ class UpdateEpisodeDetailsTest {
             val thirdRequest = server.takeRequest(1, TimeUnit.MILLISECONDS)
             assertNull("There shouldn't be a third request", thirdRequest)
 
-            verify(episodeManager, times(1)).updateSizeInBytes(episode, testFileSize)
+            verify(episodeManager, times(1)).updateSizeInBytesBlocking(episode, testFileSize)
         }
     }
 

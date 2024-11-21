@@ -45,7 +45,7 @@ class ChapterDaoSelectionTest {
 
     @Test
     fun deselectPodcastEpisodeChapter() = runTest {
-        episodeDao.insert(PodcastEpisode(uuid = "id", publishedDate = Date()))
+        episodeDao.insertBlocking(PodcastEpisode(uuid = "id", publishedDate = Date()))
 
         chapterDao.selectChapter("id", 0, select = false)
 
@@ -70,7 +70,7 @@ class ChapterDaoSelectionTest {
 
     @Test
     fun deselectChapterUsingModificationDate() = runTest {
-        episodeDao.insert(PodcastEpisode(uuid = "id", publishedDate = Date()))
+        episodeDao.insertBlocking(PodcastEpisode(uuid = "id", publishedDate = Date()))
 
         val now = Date()
         chapterDao.selectChapter("id", 0, select = false, modifiedAt = now)
@@ -81,7 +81,7 @@ class ChapterDaoSelectionTest {
 
     @Test
     fun selectChapterBack() = runTest {
-        episodeDao.insert(PodcastEpisode(uuid = "id", publishedDate = Date()))
+        episodeDao.insertBlocking(PodcastEpisode(uuid = "id", publishedDate = Date()))
         chapterDao.selectChapter("id", 0, select = false)
 
         chapterDao.selectChapter("id", 0, select = true)
@@ -92,7 +92,7 @@ class ChapterDaoSelectionTest {
 
     @Test
     fun deselectedChapterIsAddedOnlyOnce() = runTest {
-        episodeDao.insert(PodcastEpisode(uuid = "id", publishedDate = Date()))
+        episodeDao.insertBlocking(PodcastEpisode(uuid = "id", publishedDate = Date()))
 
         repeat(10) {
             chapterDao.selectChapter("id", 0, select = false)
@@ -105,7 +105,7 @@ class ChapterDaoSelectionTest {
     @Test
     fun deselectMultipleChapters() = runTest {
         val chapters = List(10) { it }
-        episodeDao.insert(PodcastEpisode(uuid = "id", publishedDate = Date()))
+        episodeDao.insertBlocking(PodcastEpisode(uuid = "id", publishedDate = Date()))
 
         chapters.forEach {
             chapterDao.selectChapter("id", it, select = false)
@@ -118,7 +118,7 @@ class ChapterDaoSelectionTest {
     @Test
     fun selectMultipleChapters() = runTest {
         val chapters = List(10) { it }
-        episodeDao.insert(PodcastEpisode(uuid = "id", publishedDate = Date()))
+        episodeDao.insertBlocking(PodcastEpisode(uuid = "id", publishedDate = Date()))
         chapters.forEach {
             chapterDao.selectChapter("id", it, select = false)
         }

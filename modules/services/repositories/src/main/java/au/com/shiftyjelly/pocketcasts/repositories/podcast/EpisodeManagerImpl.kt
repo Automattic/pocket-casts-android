@@ -98,22 +98,22 @@ class EpisodeManagerImpl @Inject constructor(
         episodeDao.findByUuids(episodeUuids)
 
     @Deprecated("Use findByUuid suspended method instead")
-    override fun findByUuidRx(uuid: String): Maybe<PodcastEpisode> =
-        episodeDao.findByUuidRx(uuid)
+    override fun findByUuidRxMaybe(uuid: String): Maybe<PodcastEpisode> =
+        episodeDao.findByUuidRxMaybe(uuid)
 
-    override fun observeByUuid(uuid: String): Flow<PodcastEpisode> =
-        episodeDao.observeByUuid(uuid).filterNotNull()
+    override fun findByUuidFlow(uuid: String): Flow<PodcastEpisode> =
+        episodeDao.findByUuidFlow(uuid).filterNotNull()
 
-    override fun observeEpisodeByUuidRx(uuid: String): Flowable<BaseEpisode> {
+    override fun findEpisodeByUuidRxFlowable(uuid: String): Flowable<BaseEpisode> {
         @Suppress("DEPRECATION")
-        return findByUuidRx(uuid)
-            .flatMapPublisher<BaseEpisode> { observeByUuid(uuid).asFlowable() }
+        return findByUuidRxMaybe(uuid)
+            .flatMapPublisher<BaseEpisode> { findByUuidFlow(uuid).asFlowable() }
             .switchIfEmpty(userEpisodeManager.observeEpisodeRx(uuid))
     }
 
-    override fun observeEpisodeByUuid(uuid: String): Flow<BaseEpisode> =
+    override fun findEpisodeByUuidFlow(uuid: String): Flow<BaseEpisode> =
         merge(
-            episodeDao.observeByUuid(uuid), // if it is a PodcastEpisode
+            episodeDao.findByUuidFlow(uuid), // if it is a PodcastEpisode
             userEpisodeManager.observeEpisode(uuid), // if it is a UserEpisode
         ).filterNotNull() // because it is not going to be both a PodcastEpisode and a UserEpisode
 
@@ -124,27 +124,38 @@ class EpisodeManagerImpl @Inject constructor(
      * Find a podcast episodes
      */
 
-    override fun findEpisodesByPodcastOrderedByPublishDate(podcast: Podcast): List<PodcastEpisode> {
+    override fun findEpisodesByPodcastOrderedByPublishDateBlocking(podcast: Podcast): List<PodcastEpisode> {
+        return episodeDao.findByPodcastOrderPublishedDateDescBlocking(podcastUuid = podcast.uuid)
+    }
+
+    override suspend fun findEpisodesByPodcastOrderedByPublishDate(podcast: Podcast): List<PodcastEpisode> {
         return episodeDao.findByPodcastOrderPublishedDateDesc(podcastUuid = podcast.uuid)
     }
 
-    override suspend fun findEpisodesByPodcastOrderedByPublishDateSuspend(podcast: Podcast): List<PodcastEpisode> {
-        return episodeDao.findByPodcastOrderPublishedDateDescSuspend(podcastUuid = podcast.uuid)
+    override fun findLatestUnfinishedEpisodeByPodcastBlocking(podcast: Podcast): PodcastEpisode? {
+        return episodeDao.findLatestUnfinishedEpisodeByPodcastBlocking(podcastUuid = podcast.uuid)
     }
 
-    override fun findLatestUnfinishedEpisodeByPodcast(podcast: Podcast): PodcastEpisode? {
-        return episodeDao.findLatestUnfinishedEpisodeByPodcast(podcastUuid = podcast.uuid)
+    override fun findLatestEpisodeToPlayBlocking(): PodcastEpisode? {
+        return episodeDao.findLatestEpisodeToPlayBlocking()
     }
 
-    override fun findLatestEpisodeToPlay(): PodcastEpisode? {
-        return episodeDao.findLatestEpisodeToPlay()
+    override fun findNotificationEpisodesBlocking(date: Date): List<PodcastEpisode> {
+        return episodeDao.findNotificationEpisodesBlocking(date)
     }
 
-    override fun findNotificationEpisodes(date: Date): List<PodcastEpisode> {
-        return episodeDao.findNotificationEpisodes(date)
+    override fun findEpisodesByPodcastOrderedBlocking(podcast: Podcast): List<PodcastEpisode> {
+        return when (podcast.episodesSortType) {
+            EpisodesSortType.EPISODES_SORT_BY_TITLE_ASC -> episodeDao.findByPodcastOrderTitleAscBlocking(podcastUuid = podcast.uuid)
+            EpisodesSortType.EPISODES_SORT_BY_TITLE_DESC -> episodeDao.findByPodcastOrderTitleDescBlocking(podcastUuid = podcast.uuid)
+            EpisodesSortType.EPISODES_SORT_BY_DATE_ASC -> episodeDao.findByPodcastOrderPublishedDateAscBlocking(podcastUuid = podcast.uuid)
+            EpisodesSortType.EPISODES_SORT_BY_LENGTH_ASC -> episodeDao.findByPodcastOrderDurationAscBlocking(podcastUuid = podcast.uuid)
+            EpisodesSortType.EPISODES_SORT_BY_LENGTH_DESC -> episodeDao.findByPodcastOrderDurationDescBlocking(podcastUuid = podcast.uuid)
+            else -> episodeDao.findByPodcastOrderPublishedDateDescBlocking(podcastUuid = podcast.uuid)
+        }
     }
 
-    override fun findEpisodesByPodcastOrdered(podcast: Podcast): List<PodcastEpisode> {
+    override suspend fun findEpisodesByPodcastOrderedSuspend(podcast: Podcast): List<PodcastEpisode> {
         return when (podcast.episodesSortType) {
             EpisodesSortType.EPISODES_SORT_BY_TITLE_ASC -> episodeDao.findByPodcastOrderTitleAsc(podcastUuid = podcast.uuid)
             EpisodesSortType.EPISODES_SORT_BY_TITLE_DESC -> episodeDao.findByPodcastOrderTitleDesc(podcastUuid = podcast.uuid)
@@ -155,63 +166,52 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override suspend fun findEpisodesByPodcastOrderedSuspend(podcast: Podcast): List<PodcastEpisode> {
+    override fun findEpisodesByPodcastOrderedRxFlowable(podcast: Podcast): Flowable<List<PodcastEpisode>> {
         return when (podcast.episodesSortType) {
-            EpisodesSortType.EPISODES_SORT_BY_TITLE_ASC -> episodeDao.findByPodcastOrderTitleAscSuspend(podcastUuid = podcast.uuid)
-            EpisodesSortType.EPISODES_SORT_BY_TITLE_DESC -> episodeDao.findByPodcastOrderTitleDescSuspend(podcastUuid = podcast.uuid)
-            EpisodesSortType.EPISODES_SORT_BY_DATE_ASC -> episodeDao.findByPodcastOrderPublishedDateAscSuspend(podcastUuid = podcast.uuid)
-            EpisodesSortType.EPISODES_SORT_BY_LENGTH_ASC -> episodeDao.findByPodcastOrderDurationAscSuspend(podcastUuid = podcast.uuid)
-            EpisodesSortType.EPISODES_SORT_BY_LENGTH_DESC -> episodeDao.findByPodcastOrderDurationDescSuspend(podcastUuid = podcast.uuid)
-            else -> episodeDao.findByPodcastOrderPublishedDateDescSuspend(podcastUuid = podcast.uuid)
+            EpisodesSortType.EPISODES_SORT_BY_TITLE_ASC -> episodeDao.findByPodcastOrderTitleAscRxFlowable(podcastUuid = podcast.uuid)
+            EpisodesSortType.EPISODES_SORT_BY_TITLE_DESC -> episodeDao.findByPodcastOrderTitleDescRxFlowable(podcastUuid = podcast.uuid)
+            EpisodesSortType.EPISODES_SORT_BY_DATE_ASC -> episodeDao.findByPodcastOrderPublishedDateAscRxFlowable(podcastUuid = podcast.uuid)
+            EpisodesSortType.EPISODES_SORT_BY_LENGTH_ASC -> episodeDao.findByPodcastOrderDurationAscFlowable(podcastUuid = podcast.uuid)
+            EpisodesSortType.EPISODES_SORT_BY_LENGTH_DESC -> episodeDao.findByPodcastOrderDurationDescFlowable(podcastUuid = podcast.uuid)
+            else -> episodeDao.findByPodcastOrderPublishedDateDescFlowable(podcastUuid = podcast.uuid)
         }
     }
 
-    override fun observeEpisodesByPodcastOrderedRx(podcast: Podcast): Flowable<List<PodcastEpisode>> {
-        return when (podcast.episodesSortType) {
-            EpisodesSortType.EPISODES_SORT_BY_TITLE_ASC -> episodeDao.observeByPodcastOrderTitleAsc(podcastUuid = podcast.uuid)
-            EpisodesSortType.EPISODES_SORT_BY_TITLE_DESC -> episodeDao.observeByPodcastOrderTitleDesc(podcastUuid = podcast.uuid)
-            EpisodesSortType.EPISODES_SORT_BY_DATE_ASC -> episodeDao.observeByPodcastOrderPublishedDateAsc(podcastUuid = podcast.uuid)
-            EpisodesSortType.EPISODES_SORT_BY_LENGTH_ASC -> episodeDao.observeByPodcastOrderDurationAsc(podcastUuid = podcast.uuid)
-            EpisodesSortType.EPISODES_SORT_BY_LENGTH_DESC -> episodeDao.observeByPodcastOrderDurationDesc(podcastUuid = podcast.uuid)
-            else -> episodeDao.observeByPodcastOrderPublishedDateDesc(podcastUuid = podcast.uuid)
-        }
-    }
-
-    override fun findEpisodesWhere(queryAfterWhere: String, forSubscribedPodcastsOnly: Boolean): List<PodcastEpisode> {
+    override fun findEpisodesWhereBlocking(queryAfterWhere: String, forSubscribedPodcastsOnly: Boolean): List<PodcastEpisode> {
         var query = "SELECT podcast_episodes.* FROM podcast_episodes JOIN podcasts ON podcast_episodes.podcast_id = podcasts.uuid WHERE "
         if (forSubscribedPodcastsOnly) {
             query += "podcasts.subscribed = 1 AND "
         }
         query += queryAfterWhere
-        return episodeDao.findEpisodes(SimpleSQLiteQuery(query))
+        return episodeDao.findEpisodesBlocking(SimpleSQLiteQuery(query))
     }
 
-    override fun observeEpisodeCount(queryAfterWhere: String): Flowable<Int> {
-        return appDatabase.podcastDao().observeUnsubscribedUuid()
+    override fun episodeCountRxFlowable(queryAfterWhere: String): Flowable<Int> {
+        return appDatabase.podcastDao().findUnsubscribedUuidRxFlowable()
             .switchMap {
                 val podcastList = it.joinToString(separator = "', '", prefix = "podcast_id NOT IN ('", postfix = "')")
                 val query = "SELECT COUNT(*) FROM podcast_episodes WHERE $podcastList AND $queryAfterWhere"
                 return@switchMap Flowable.just(query)
             }
             .switchMap {
-                episodeDao.observeCount(SimpleSQLiteQuery(it))
+                episodeDao.countRxFlowable(SimpleSQLiteQuery(it))
             }
     }
 
-    override fun observeEpisodesWhere(queryAfterWhere: String): Flowable<List<PodcastEpisode>> {
-        return appDatabase.podcastDao().observeUnsubscribedUuid()
+    override fun findEpisodesWhereRxFlowable(queryAfterWhere: String): Flowable<List<PodcastEpisode>> {
+        return appDatabase.podcastDao().findUnsubscribedUuidRxFlowable()
             .switchMap {
                 val podcastList = it.joinToString(separator = "', '", prefix = "podcast_id NOT IN ('", postfix = "')")
                 val query = "SELECT podcast_episodes.* FROM podcast_episodes WHERE $podcastList AND $queryAfterWhere"
                 return@switchMap Flowable.just(query)
             }
             .switchMap {
-                episodeDao.observeEpisodes(SimpleSQLiteQuery(it))
+                episodeDao.findEpisodesRxFlowable(SimpleSQLiteQuery(it))
             }
     }
 
-    override fun observePlaybackHistoryEpisodes(): Flowable<List<PodcastEpisode>> {
-        return episodeDao.observePlaybackHistory()
+    override fun findPlaybackHistoryEpisodesRxFlowable(): Flowable<List<PodcastEpisode>> {
+        return episodeDao.findPlaybackHistoryRxFlowable()
     }
 
     override fun filteredPlaybackHistoryEpisodesFlow(query: String): Flow<List<PodcastEpisode>> {
@@ -223,11 +223,11 @@ class EpisodeManagerImpl @Inject constructor(
     }
 
     @Suppress("USELESS_CAST")
-    override fun observeDownloadingEpisodesRx(): Flowable<List<BaseEpisode>> {
-        return episodeDao.observeDownloadingEpisodesRx().map { it as List<BaseEpisode> }.mergeWith(userEpisodeManager.observeDownloadUserEpisodes())
+    override fun findDownloadingEpisodesRxFlowable(): Flowable<List<BaseEpisode>> {
+        return episodeDao.findDownloadingEpisodesRxFlowable().map { it as List<BaseEpisode> }.mergeWith(userEpisodeManager.observeDownloadUserEpisodes())
     }
 
-    override fun updatePlayedUpTo(episode: BaseEpisode?, playedUpTo: Double, forceUpdate: Boolean) {
+    override fun updatePlayedUpToBlocking(episode: BaseEpisode?, playedUpTo: Double, forceUpdate: Boolean) {
         if (playedUpTo < 0 || episode == null) {
             return
         }
@@ -237,7 +237,7 @@ class EpisodeManagerImpl @Inject constructor(
         val playedUpToMax = if (forceUpdate) playedUpTo else (playedUpTo + 2.0).toInt().toDouble()
 
         if (episode is PodcastEpisode) {
-            episodeDao.updatePlayedUpToIfChanged(
+            episodeDao.updatePlayedUpToIfChangedBlocking(
                 playedUpTo = playedUpTo,
                 playedUpToMin = playedUpToMin,
                 playedUpToMax = playedUpToMax,
@@ -245,7 +245,7 @@ class EpisodeManagerImpl @Inject constructor(
                 uuid = episode.uuid,
             )
         } else {
-            userEpisodeDao.updatePlayedUpToIfChanged(
+            userEpisodeDao.updatePlayedUpToIfChangedBlocking(
                 playedUpTo = playedUpTo,
                 playedUpToMin = playedUpToMin,
                 playedUpToMax = playedUpToMax,
@@ -256,7 +256,7 @@ class EpisodeManagerImpl @Inject constructor(
     }
 
     @Suppress("NAME_SHADOWING")
-    override fun updateDuration(episode: BaseEpisode?, durationInSecs: Double, syncChanges: Boolean) {
+    override fun updateDurationBlocking(episode: BaseEpisode?, durationInSecs: Double, syncChanges: Boolean) {
         var syncChanges = syncChanges
         if (durationInSecs <= 0 || episode == null) {
             return
@@ -280,20 +280,20 @@ class EpisodeManagerImpl @Inject constructor(
 
         if (episode is PodcastEpisode) {
             if (syncChanges) {
-                episodeDao.updateDuration(durationInSecs, System.currentTimeMillis(), episode.uuid)
+                episodeDao.updateDurationBlocking(durationInSecs, System.currentTimeMillis(), episode.uuid)
             } else {
-                episodeDao.updateDurationNoSync(durationInSecs, episode.uuid)
+                episodeDao.updateDurationNoSyncBlocking(durationInSecs, episode.uuid)
             }
         } else {
-            userEpisodeDao.updateDuration(durationInSecs, episode.uuid)
+            userEpisodeDao.updateDurationBlocking(durationInSecs, episode.uuid)
         }
     }
 
-    override fun updateDownloadErrorDetails(episode: BaseEpisode?, message: String?) {
+    override fun updateDownloadErrorDetailsBlocking(episode: BaseEpisode?, message: String?) {
         if (episode == null) return
         episode.downloadErrorDetails = message
         if (episode is PodcastEpisode) {
-            episodeDao.update(episode)
+            episodeDao.updateBlocking(episode)
         } else if (episode is UserEpisode) {
             runBlocking { userEpisodeManager.updateDownloadErrorDetails(episode, message) }
         }
@@ -317,15 +317,15 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override fun updatePlayingStatus(episode: BaseEpisode?, status: EpisodePlayingStatus) {
+    override fun updatePlayingStatusBlocking(episode: BaseEpisode?, status: EpisodePlayingStatus) {
         if (episode == null) {
             return
         }
         episode.playingStatus = status
         if (episode is PodcastEpisode) {
-            episodeDao.updatePlayingStatus(status, System.currentTimeMillis(), episode.uuid)
+            episodeDao.updatePlayingStatusBlocking(status, System.currentTimeMillis(), episode.uuid)
         } else {
-            userEpisodeDao.updatePlayingStatus(status, System.currentTimeMillis(), episode.uuid)
+            userEpisodeDao.updatePlayingStatusBlocking(status, System.currentTimeMillis(), episode.uuid)
         }
     }
 
@@ -339,7 +339,7 @@ class EpisodeManagerImpl @Inject constructor(
         findByUuid(episodeUuid)?.let { episode ->
             if (episode.imageUrl != imageUrl) {
                 episode.imageUrl = imageUrl
-                update(episode)
+                updateBlocking(episode)
             }
         }
     }
@@ -355,8 +355,8 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override fun updateAllEpisodeStatus(episodeStatus: EpisodeStatusEnum) {
-        episodeDao.updateAllEpisodeStatus(episodeStatus)
+    override fun updateAllEpisodeStatusBlocking(episodeStatus: EpisodeStatusEnum) {
+        episodeDao.updateAllEpisodeStatusBlocking(episodeStatus)
     }
 
     override suspend fun updateAutoDownloadStatus(episode: BaseEpisode?, autoDownloadStatus: Int) {
@@ -366,15 +366,15 @@ class EpisodeManagerImpl @Inject constructor(
         if (episode is PodcastEpisode) {
             episodeDao.updateAutoDownloadStatus(autoDownloadStatus, episode.uuid)
         } else {
-            userEpisodeDao.updateAutoDownloadStatus(autoDownloadStatus, episode.uuid)
+            userEpisodeDao.updateAutoDownloadStatusBlocking(autoDownloadStatus, episode.uuid)
         }
     }
 
-    override fun updateDownloadFilePath(episode: BaseEpisode?, filePath: String, markAsDownloaded: Boolean) {
+    override fun updateDownloadFilePathBlocking(episode: BaseEpisode?, filePath: String, markAsDownloaded: Boolean) {
         episode ?: return
         episode.downloadedFilePath = filePath
         if (episode is PodcastEpisode) {
-            episodeDao.updateDownloadedFilePath(filePath, episode.uuid)
+            episodeDao.updateDownloadedFilePathBlocking(filePath, episode.uuid)
         } else if (episode is UserEpisode) {
             runBlocking { userEpisodeManager.updateDownloadedFilePath(episode, filePath) }
         }
@@ -386,32 +386,32 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override fun updateFileType(episode: BaseEpisode?, fileType: String) {
+    override fun updateFileTypeBlocking(episode: BaseEpisode?, fileType: String) {
         episode ?: return
         if (episode is PodcastEpisode) {
-            episodeDao.updateFileType(fileType, episode.uuid)
+            episodeDao.updateFileTypeBlocking(fileType, episode.uuid)
         } else if (episode is UserEpisode) {
             episode.fileType = fileType
             runBlocking { userEpisodeManager.updateFileType(episode, fileType) }
         }
     }
 
-    override fun updateSizeInBytes(episode: BaseEpisode?, sizeInBytes: Long) {
+    override fun updateSizeInBytesBlocking(episode: BaseEpisode?, sizeInBytes: Long) {
         episode ?: return
         if (episode is PodcastEpisode) {
-            episodeDao.updateSizeInBytes(sizeInBytes, episode.uuid)
+            episodeDao.updateSizeInBytesBlocking(sizeInBytes, episode.uuid)
         } else if (episode is UserEpisode) {
             episode.sizeInBytes = sizeInBytes
             runBlocking { userEpisodeManager.updateSizeInBytes(episode, sizeInBytes) }
         }
     }
 
-    override fun updateLastDownloadAttemptDate(episode: BaseEpisode?) {
+    override fun updateLastDownloadAttemptDateBlocking(episode: BaseEpisode?) {
         episode ?: return
         val now = Date()
         episode.lastDownloadAttemptDate = now
         if (episode is PodcastEpisode) {
-            episodeDao.updateLastDownloadAttemptDate(now, episode.uuid)
+            episodeDao.updateLastDownloadAttemptDateBlocking(now, episode.uuid)
         } else if (episode is UserEpisode) {
             runBlocking { userEpisodeManager.updateLastDownloadDate(episode, now) }
         }
@@ -442,11 +442,11 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override fun markAsNotPlayed(episode: BaseEpisode?) {
+    override fun markAsNotPlayedBlocking(episode: BaseEpisode?) {
         episode ?: return
-        updatePlayedUpTo(episode, 0.0, false)
-        updatePlayingStatus(episode, EpisodePlayingStatus.NOT_PLAYED)
-        unarchive(episode)
+        updatePlayedUpToBlocking(episode, 0.0, false)
+        updatePlayingStatusBlocking(episode, EpisodePlayingStatus.NOT_PLAYED)
+        unarchiveBlocking(episode)
     }
 
     private fun downloadEpisodesFileDetails(episodes: List<PodcastEpisode>) {
@@ -469,7 +469,7 @@ class EpisodeManagerImpl @Inject constructor(
             justEpisodes.chunked(500).forEach {
                 episodeDao.markAllUnplayed(it.map { it.uuid }, System.currentTimeMillis())
             }
-            unarchiveAllInList(justEpisodes)
+            unarchiveAllInListBlocking(justEpisodes)
 
             val justUserEpisodes = episodes.filterIsInstance<UserEpisode>()
             userEpisodeManager.markAllAsUnplayed(justUserEpisodes)
@@ -487,11 +487,11 @@ class EpisodeManagerImpl @Inject constructor(
 
     override fun markAsPlayedAsync(episode: BaseEpisode?, playbackManager: PlaybackManager, podcastManager: PodcastManager, shouldShuffleUpNext: Boolean) {
         launch {
-            markAsPlayed(episode, playbackManager, podcastManager, shouldShuffleUpNext)
+            markAsPlayedBlocking(episode, playbackManager, podcastManager, shouldShuffleUpNext)
         }
     }
 
-    override fun markAsPlayed(episode: BaseEpisode?, playbackManager: PlaybackManager, podcastManager: PodcastManager, shouldShuffleUpNext: Boolean) {
+    override fun markAsPlayedBlocking(episode: BaseEpisode?, playbackManager: PlaybackManager, podcastManager: PodcastManager, shouldShuffleUpNext: Boolean) {
         if (episode == null) {
             return
         }
@@ -500,7 +500,7 @@ class EpisodeManagerImpl @Inject constructor(
 
         episode.playingStatus = EpisodePlayingStatus.COMPLETED
 
-        updatePlayingStatus(episode, EpisodePlayingStatus.COMPLETED)
+        updatePlayingStatusBlocking(episode, EpisodePlayingStatus.COMPLETED)
 
         // Auto archive after playing
         archivePlayedEpisode(episode, playbackManager, podcastManager, sync = true)
@@ -512,30 +512,30 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override fun deleteEpisodesWithoutSync(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager) {
+    override fun deleteEpisodesWithoutSyncBlocking(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager) {
         runBlocking {
-            deleteEpisodesWithoutSyncSuspend(episodes, playbackManager)
+            deleteEpisodesWithoutSync(episodes, playbackManager)
         }
     }
 
-    override suspend fun deleteEpisodesWithoutSyncSuspend(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager) {
+    override suspend fun deleteEpisodesWithoutSync(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager) {
         if (episodes.isEmpty()) {
             return
         }
         for (episode in episodes) {
             deleteEpisodeFile(episode, playbackManager, disableAutoDownload = false, updateDatabase = false)
         }
-        episodeDao.deleteAllSuspend(episodes)
+        episodeDao.deleteAll(episodes)
     }
 
-    override fun deleteEpisodeWithoutSync(episode: PodcastEpisode?, playbackManager: PlaybackManager) {
+    override fun deleteEpisodeWithoutSyncBlocking(episode: PodcastEpisode?, playbackManager: PlaybackManager) {
         episode ?: return
 
         runBlocking {
             deleteEpisodeFile(episode, playbackManager, false, false)
         }
 
-        episodeDao.delete(episode)
+        episodeDao.deleteBlocking(episode)
     }
 
     override suspend fun deleteEpisodeFile(episode: BaseEpisode?, playbackManager: PlaybackManager?, disableAutoDownload: Boolean, updateDatabase: Boolean, removeFromUpNext: Boolean, shouldShuffleUpNext: Boolean) {
@@ -585,30 +585,30 @@ class EpisodeManagerImpl @Inject constructor(
         return episodeDao.count()
     }
 
-    override fun countEpisodesWhere(queryAfterWhere: String): Int {
-        return episodeDao.countWhere(queryAfterWhere, appDatabase)
+    override fun countEpisodesWhereBlocking(queryAfterWhere: String): Int {
+        return episodeDao.countWhereBlocking(queryAfterWhere, appDatabase)
     }
 
-    override fun add(episode: PodcastEpisode, downloadMetaData: Boolean): Boolean {
+    override fun addBlocking(episode: PodcastEpisode, downloadMetaData: Boolean): Boolean {
         val episodes = ArrayList<PodcastEpisode>()
         episodes.add(episode)
-        val addedEpisodes = add(episodes, episode.podcastUuid, downloadMetaData)
+        val addedEpisodes = addBlocking(episodes, episode.podcastUuid, downloadMetaData)
         return addedEpisodes.size == 1
     }
 
-    override fun update(episode: PodcastEpisode?) {
+    override fun updateBlocking(episode: PodcastEpisode?) {
+        episode ?: return
+        episodeDao.updateBlocking(episode)
+    }
+
+    override suspend fun update(episode: PodcastEpisode?) {
         episode ?: return
         episodeDao.update(episode)
     }
 
-    override suspend fun updateSuspend(episode: PodcastEpisode?) {
-        episode ?: return
-        episodeDao.updateSuspend(episode)
-    }
-
-    override fun setDownloadFailed(episode: BaseEpisode, errorMessage: String) {
+    override fun setDownloadFailedBlocking(episode: BaseEpisode, errorMessage: String) {
         if (episode is PodcastEpisode) {
-            episodeDao.updateDownloadError(episode.uuid, errorMessage, EpisodeStatusEnum.DOWNLOAD_FAILED)
+            episodeDao.updateDownloadErrorBlocking(episode.uuid, errorMessage, EpisodeStatusEnum.DOWNLOAD_FAILED)
         } else if (episode is UserEpisode) {
             runBlocking {
                 userEpisodeManager.updateDownloadErrorDetails(episode, errorMessage)
@@ -617,16 +617,16 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override fun clearPlaybackError(episode: BaseEpisode?) {
+    override fun clearPlaybackErrorBlocking(episode: BaseEpisode?) {
         if (episode?.playErrorDetails == null) {
             return
         }
-        markAsPlaybackError(episode, null)
+        markAsPlaybackErrorBlocking(episode, null)
     }
 
-    override fun clearDownloadError(episode: PodcastEpisode?) {
+    override fun clearDownloadErrorBlocking(episode: PodcastEpisode?) {
         episode ?: return
-        episodeDao.updateDownloadErrorDetails(null, episode.uuid)
+        episodeDao.updateDownloadErrorDetailsBlocking(null, episode.uuid)
         runBlocking {
             updateEpisodeStatus(episode, EpisodeStatusEnum.NOT_DOWNLOADED)
         }
@@ -643,9 +643,9 @@ class EpisodeManagerImpl @Inject constructor(
 
             if (archiveAfterPlaying == AutoArchiveAfterPlaying.AfterPlaying && (settings.autoArchiveIncludesStarred.value || !episode.isStarred)) {
                 if (sync) {
-                    episodeDao.updateArchived(true, System.currentTimeMillis(), episode.uuid)
+                    episodeDao.updateArchivedBlocking(true, System.currentTimeMillis(), episode.uuid)
                 } else {
-                    episodeDao.updateArchivedNoSync(true, System.currentTimeMillis(), episode.uuid)
+                    episodeDao.updateArchivedNoSyncBlocking(true, System.currentTimeMillis(), episode.uuid)
                 }
                 episode.isArchived = true
                 cleanUpEpisode(episode, playbackManager)
@@ -668,11 +668,11 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override fun archive(episode: PodcastEpisode, playbackManager: PlaybackManager, sync: Boolean, shouldShuffleUpNext: Boolean) {
+    override fun archiveBlocking(episode: PodcastEpisode, playbackManager: PlaybackManager, sync: Boolean, shouldShuffleUpNext: Boolean) {
         if (sync) {
-            episodeDao.updateArchived(true, System.currentTimeMillis(), episode.uuid)
+            episodeDao.updateArchivedBlocking(true, System.currentTimeMillis(), episode.uuid)
         } else {
-            episodeDao.updateArchivedNoSync(true, System.currentTimeMillis(), episode.uuid)
+            episodeDao.updateArchivedNoSyncBlocking(true, System.currentTimeMillis(), episode.uuid)
         }
         episode.isArchived = true
         runBlocking {
@@ -697,39 +697,39 @@ class EpisodeManagerImpl @Inject constructor(
         return episodeDao.findStaleDownloads()
     }
 
-    override fun unarchive(episode: BaseEpisode) {
+    override fun unarchiveBlocking(episode: BaseEpisode) {
         if (!episode.isArchived || episode !is PodcastEpisode) {
             return // Nothing to do
         }
 
-        episodeDao.unarchive(episode.uuid, System.currentTimeMillis())
+        episodeDao.unarchiveBlocking(episode.uuid, System.currentTimeMillis())
     }
 
-    override fun getPodcastUuidToBadgeUnfinished(): Flowable<Map<String, Int>> {
-        return episodeDao.podcastUuidToUnfinishedEpisodeCount()
+    override fun getPodcastUuidToBadgeUnfinishedRxFlowable(): Flowable<Map<String, Int>> {
+        return episodeDao.podcastUuidToUnfinishedEpisodeCountRxFlowable()
     }
 
-    override fun getPodcastUuidToBadgeLatest(): Flowable<Map<String, Int>> {
-        return episodeDao.podcastUuidToLatestEpisodeCount()
+    override fun getPodcastUuidToBadgeLatestRxFlowable(): Flowable<Map<String, Int>> {
+        return episodeDao.podcastUuidToLatestEpisodeCountRxFlowable()
     }
 
-    override fun markAsPlaybackError(episode: BaseEpisode?, errorMessage: String?) {
+    override fun markAsPlaybackErrorBlocking(episode: BaseEpisode?, errorMessage: String?) {
         episode ?: return
         episode.playErrorDetails = errorMessage
 
         when (episode) {
-            is PodcastEpisode -> episodeDao.updatePlayErrorDetails(errorMessage, episode.uuid)
-            is UserEpisode -> userEpisodeDao.updatePlayError(episode.uuid, errorMessage)
+            is PodcastEpisode -> episodeDao.updatePlayErrorDetailsBlocking(errorMessage, episode.uuid)
+            is UserEpisode -> userEpisodeDao.updatePlayErrorBlocking(episode.uuid, errorMessage)
         }
     }
 
     @OptIn(UnstableApi::class)
-    override fun markAsPlaybackError(episode: BaseEpisode?, event: PlayerEvent.PlayerError, isPlaybackRemote: Boolean) {
+    override fun markAsPlaybackErrorBlocking(episode: BaseEpisode?, event: PlayerEvent.PlayerError, isPlaybackRemote: Boolean) {
         episode ?: return
         val messageId: Int
 
         if (event.error == null && !isPlaybackRemote) {
-            markAsPlaybackError(episode, event.message)
+            markAsPlaybackErrorBlocking(episode, event.message)
             return
         } else if (isPlaybackRemote) {
             if (episode is UserEpisode) {
@@ -771,8 +771,8 @@ class EpisodeManagerImpl @Inject constructor(
         val message = context.resources.getString(messageId)
 
         when (episode) {
-            is PodcastEpisode -> episodeDao.updatePlayErrorDetails(message, episode.uuid)
-            is UserEpisode -> userEpisodeDao.updatePlayError(episode.uuid, message)
+            is PodcastEpisode -> episodeDao.updatePlayErrorDetailsBlocking(message, episode.uuid)
+            is UserEpisode -> userEpisodeDao.updatePlayErrorBlocking(episode.uuid, message)
         }
     }
 
@@ -793,26 +793,26 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override fun observeDownloadEpisodes(): Flowable<List<PodcastEpisode>> {
+    override fun findDownloadEpisodesRxFlowable(): Flowable<List<PodcastEpisode>> {
         val failedDownloadCutoff = Date().time - 7.days()
-        return episodeDao.observeDownloadingEpisodesIncludingFailed(failedDownloadCutoff)
+        return episodeDao.findDownloadingEpisodesIncludingFailedRxFlowable(failedDownloadCutoff)
     }
 
-    override fun observeDownloadedEpisodes(): Flowable<List<PodcastEpisode>> {
-        return episodeDao.observeDownloadedEpisodes()
+    override fun findDownloadedEpisodesRxFlowable(): Flowable<List<PodcastEpisode>> {
+        return episodeDao.findDownloadedEpisodesRxFlowable()
     }
 
-    override fun observeStarredEpisodes(): Flowable<List<PodcastEpisode>> {
-        return episodeDao.observeStarredEpisodes()
+    override fun findStarredEpisodesRxFlowable(): Flowable<List<PodcastEpisode>> {
+        return episodeDao.findStarredEpisodesRxFlowable()
     }
 
     override suspend fun findStarredEpisodes(): List<PodcastEpisode> {
         return episodeDao.findStarredEpisodes()
     }
 
-    override fun findEpisodesDownloading(queued: Boolean, waitingForPower: Boolean, waitingForWifi: Boolean, downloading: Boolean): List<PodcastEpisode> {
+    override fun findEpisodesDownloadingBlocking(queued: Boolean, waitingForPower: Boolean, waitingForWifi: Boolean, downloading: Boolean): List<PodcastEpisode> {
         val sql = buildEpisodeStatusWhere(queued, waitingForPower, waitingForWifi, downloading)
-        return findEpisodesWhere(sql)
+        return findEpisodesWhereBlocking(sql)
     }
 
     private fun buildEpisodeStatusWhere(queued: Boolean, waitingForPower: Boolean, waitingForWifi: Boolean, downloading: Boolean): String {
@@ -833,13 +833,13 @@ class EpisodeManagerImpl @Inject constructor(
         return "($statusSql)"
     }
 
-    override fun add(episodes: List<PodcastEpisode>, podcastUuid: String, downloadMetaData: Boolean): List<PodcastEpisode> {
+    override fun addBlocking(episodes: List<PodcastEpisode>, podcastUuid: String, downloadMetaData: Boolean): List<PodcastEpisode> {
         return runBlocking {
-            addSuspend(episodes, podcastUuid, downloadMetaData)
+            add(episodes, podcastUuid, downloadMetaData)
         }
     }
 
-    override suspend fun addSuspend(episodes: List<PodcastEpisode>, podcastUuid: String, downloadMetaData: Boolean): List<PodcastEpisode> {
+    override suspend fun add(episodes: List<PodcastEpisode>, podcastUuid: String, downloadMetaData: Boolean): List<PodcastEpisode> {
         val addedEpisodes = mutableListOf<PodcastEpisode>()
         // add the episodes
         val episodesItr = episodes.iterator()
@@ -854,7 +854,7 @@ class EpisodeManagerImpl @Inject constructor(
         }
         if (addedEpisodes.isNotEmpty()) {
             addedEpisodes.chunked(250).forEach { chunkedEpisodes ->
-                episodeDao.insertAllSuspend(chunkedEpisodes)
+                episodeDao.insertAll(chunkedEpisodes)
             }
         }
 
@@ -865,24 +865,24 @@ class EpisodeManagerImpl @Inject constructor(
         return addedEpisodes
     }
 
-    override fun insert(episodes: List<PodcastEpisode>) {
+    override fun insertBlocking(episodes: List<PodcastEpisode>) {
         if (episodes.isNotEmpty()) {
-            episodeDao.insertAll(episodes)
+            episodeDao.insertAllBlocking(episodes)
         }
     }
 
-    override fun findEpisodesToSync(): List<PodcastEpisode> {
-        return episodeDao.findEpisodesToSync()
+    override fun findEpisodesToSyncBlocking(): List<PodcastEpisode> {
+        return episodeDao.findEpisodesToSyncBlocking()
     }
 
-    override fun findEpisodesForHistorySync(): List<PodcastEpisode> {
-        return episodeDao.findEpisodesForHistorySync()
+    override fun findEpisodesForHistorySyncBlocking(): List<PodcastEpisode> {
+        return episodeDao.findEpisodesForHistorySyncBlocking()
     }
 
-    override fun markAllEpisodesSynced(episodes: List<PodcastEpisode>) {
+    override fun markAllEpisodesSyncedBlocking(episodes: List<PodcastEpisode>) {
         val episodeUuids = episodes.map { it.uuid }
         episodeUuids.chunked(500).forEach { chunked ->
-            episodeDao.markAllSynced(chunked)
+            episodeDao.markAllSyncedBlocking(chunked)
         }
     }
 
@@ -906,26 +906,26 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override fun unarchiveAllInList(episodes: List<PodcastEpisode>) {
+    override fun unarchiveAllInListBlocking(episodes: List<PodcastEpisode>) {
         episodes.filter { it.isArchived }.chunked(500).forEach { chunked ->
-            episodeDao.unarchiveAllInList(chunked.map { it.uuid }, System.currentTimeMillis())
+            episodeDao.unarchiveAllInListBlocking(chunked.map { it.uuid }, System.currentTimeMillis())
         }
     }
 
-    override fun checkForEpisodesToAutoArchive(playbackManager: PlaybackManager?, podcastManager: PodcastManager) {
+    override fun checkForEpisodesToAutoArchiveBlocking(playbackManager: PlaybackManager?, podcastManager: PodcastManager) {
         podcastManager.findSubscribed().forEach { podcast ->
-            checkPodcastForAutoArchive(podcast, playbackManager)
+            checkPodcastForAutoArchiveBlocking(podcast, playbackManager)
         }
     }
 
-    override fun checkPodcastForAutoArchive(podcast: Podcast, playbackManager: PlaybackManager?) {
+    override fun checkPodcastForAutoArchiveBlocking(podcast: Podcast, playbackManager: PlaybackManager?) {
         val now = Date()
 
         val archiveAfterPlaying = podcast.autoArchiveAfterPlaying ?: settings.autoArchiveAfterPlaying.value
         val autoArchiveAfterPlayingTime = archiveAfterPlaying.timeSeconds * 1000L
 
         if (autoArchiveAfterPlayingTime > 0) {
-            val playedEpisodes = episodeDao.findByEpisodePlayingAndArchiveStatus(podcast.uuid, EpisodePlayingStatus.COMPLETED, false)
+            val playedEpisodes = episodeDao.findByEpisodePlayingAndArchiveStatusBlocking(podcast.uuid, EpisodePlayingStatus.COMPLETED, false)
                 .filter { (settings.autoArchiveIncludesStarred.value && it.isStarred) || !it.isStarred }
                 .filter { it.lastPlaybackInteractionDate != null && now.time - it.lastPlaybackInteractionDate!!.time > autoArchiveAfterPlayingTime }
 
@@ -944,7 +944,7 @@ class EpisodeManagerImpl @Inject constructor(
 
         val inactiveTime = autoArchiveInactive.timeSeconds * 1000L
         if (inactiveTime > 0) {
-            val inactiveEpisodes = episodeDao.findInactiveEpisodes(podcast.uuid, Date(now.time - inactiveTime))
+            val inactiveEpisodes = episodeDao.findInactiveEpisodesBlocking(podcast.uuid, Date(now.time - inactiveTime))
                 .filter { settings.autoArchiveIncludesStarred.value || !it.isStarred }
             if (inactiveEpisodes.isNotEmpty()) {
                 runBlocking {
@@ -959,14 +959,14 @@ class EpisodeManagerImpl @Inject constructor(
             }
         }
 
-        checkPodcastForEpisodeLimit(podcast, playbackManager)
+        checkPodcastForEpisodeLimitBlocking(podcast, playbackManager)
     }
 
-    override fun checkPodcastForEpisodeLimit(podcast: Podcast, playbackManager: PlaybackManager?) {
+    override fun checkPodcastForEpisodeLimitBlocking(podcast: Podcast, playbackManager: PlaybackManager?) {
         val episodeLimit = podcast.autoArchiveEpisodeLimit?.value
 
         if (episodeLimit != null) {
-            val allEpisodes = episodeDao.findByPodcastOrderPublishedDateDesc(podcast.uuid).filter { !it.excludeFromEpisodeLimit }
+            val allEpisodes = episodeDao.findByPodcastOrderPublishedDateDescBlocking(podcast.uuid).filter { !it.excludeFromEpisodeLimit }
             if (allEpisodes.isNotEmpty() && episodeLimit < allEpisodes.size) {
                 val episodesToRemove = allEpisodes.drop(episodeLimit)
                     .filter { !it.isArchived }
@@ -1001,8 +1001,8 @@ class EpisodeManagerImpl @Inject constructor(
         return !episode.isStarred && !episode.isDownloaded && !episode.isInProgress && !playbackManager.upNextQueue.contains(episode.uuid)
     }
 
-    override fun clearEpisodePlaybackInteractionDatesBefore(lastCleared: Date) {
-        return episodeDao.clearEpisodePlaybackInteractionDatesBefore(lastCleared)
+    override fun clearEpisodePlaybackInteractionDatesBeforeBlocking(lastCleared: Date) {
+        return episodeDao.clearEpisodePlaybackInteractionDatesBeforeBlocking(lastCleared)
     }
 
     override suspend fun clearAllEpisodeHistory() {
@@ -1010,25 +1010,25 @@ class EpisodeManagerImpl @Inject constructor(
         settings.setClearHistoryTimeNow()
     }
 
-    override fun markPlaybackHistorySynced() {
-        return episodeDao.markPlaybackHistorySynced()
+    override fun markPlaybackHistorySyncedBlocking() {
+        return episodeDao.markPlaybackHistorySyncedBlocking()
     }
 
     /**
      * Try downloading the episode if it is missing. If the server doesn't know about it insert the skeleton episode.
      */
-    override fun downloadMissingEpisode(episodeUuid: String, podcastUuid: String, skeletonEpisode: PodcastEpisode, podcastManager: PodcastManager, downloadMetaData: Boolean, source: SourceView): Maybe<BaseEpisode> {
-        return episodeDao.existsRx(episodeUuid)
+    override fun downloadMissingEpisodeRxMaybe(episodeUuid: String, podcastUuid: String, skeletonEpisode: PodcastEpisode, podcastManager: PodcastManager, downloadMetaData: Boolean, source: SourceView): Maybe<BaseEpisode> {
+        return episodeDao.existsRxSingle(episodeUuid)
             .flatMapMaybe { episodeExists ->
                 if (episodeExists || podcastUuid == Podcast.userPodcast.uuid) {
-                    observeEpisodeByUuidRx(episodeUuid).firstElement()
+                    findEpisodeByUuidRxFlowable(episodeUuid).firstElement()
                 } else {
                     podcastCacheServiceManager.getPodcastAndEpisodeSingle(podcastUuid, episodeUuid).flatMapMaybe { response ->
                         val episode = response.episodes.firstOrNull() ?: skeletonEpisode
-                        add(episode, downloadMetaData = downloadMetaData)
+                        addBlocking(episode, downloadMetaData = downloadMetaData)
 
                         @Suppress("DEPRECATION")
-                        podcastManager.findPodcastByUuidRx(podcastUuid).zipWith(findByUuidRx(episodeUuid))
+                        podcastManager.findPodcastByUuidRx(podcastUuid).zipWith(findByUuidRxMaybe(episodeUuid))
                     }.flatMap { (podcast, episode) ->
                         if (podcast.isAutoDownloadNewEpisodes) {
                             DownloadHelper.addAutoDownloadedEpisodeToQueue(episode, "download missing episode", downloadManager, episodeManager = this, source = source)
@@ -1042,7 +1042,7 @@ class EpisodeManagerImpl @Inject constructor(
     override suspend fun calculatePlayedUptoSumInSecsWithinDays(days: Int): Double {
         val query =
             "last_playback_interaction_date IS NOT NULL AND last_playback_interaction_date > 0 ORDER BY last_playback_interaction_date DESC LIMIT 1000"
-        val last1000EpisodesPlayed = findEpisodesWhere(query, forSubscribedPodcastsOnly = false)
+        val last1000EpisodesPlayed = findEpisodesWhereBlocking(query, forSubscribedPodcastsOnly = false)
         var totalPlaytime = 0.0
         last1000EpisodesPlayed.forEach { episode ->
             episode.lastPlaybackInteractionDate?.let {

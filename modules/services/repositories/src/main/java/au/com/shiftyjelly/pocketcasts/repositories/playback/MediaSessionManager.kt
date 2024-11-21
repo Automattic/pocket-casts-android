@@ -355,7 +355,7 @@ class MediaSessionManager(
                     if (state.isEmpty) {
                         Observable.just(Optional.empty())
                     } else {
-                        episodeManager.observeEpisodeByUuidRx(state.episodeUuid)
+                        episodeManager.findEpisodeByUuidRxFlowable(state.episodeUuid)
                             .distinctUntilChanged(BaseEpisode.isMediaSessionEqual)
                             .map { Optional.of(it) }
                             // if the episode is deleted from the database while playing catch the error and just return an empty state
@@ -744,7 +744,7 @@ class MediaSessionManager(
     private fun markAsPlayed() {
         launch {
             val episode = playbackManager.getCurrentEpisode()
-            episodeManager.markAsPlayed(episode, playbackManager, podcastManager)
+            episodeManager.markAsPlayedBlocking(episode, playbackManager, podcastManager)
             episode?.let {
                 episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_MARKED_AS_PLAYED, source, it.uuid)
             }
@@ -813,7 +813,7 @@ class MediaSessionManager(
             playbackManager.getCurrentEpisode()?.let {
                 if (it is PodcastEpisode) {
                     it.isArchived = true
-                    episodeManager.archive(it, playbackManager)
+                    episodeManager.archiveBlocking(it, playbackManager)
                     episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ARCHIVED, source, it.uuid)
                 }
             }
@@ -921,7 +921,7 @@ class MediaSessionManager(
     }
 
     private suspend fun playPodcast(podcast: Podcast, sourceView: SourceView = SourceView.UNKNOWN) {
-        val latestEpisode = withContext(Dispatchers.Default) { episodeManager.findLatestUnfinishedEpisodeByPodcast(podcast) } ?: return
+        val latestEpisode = withContext(Dispatchers.Default) { episodeManager.findLatestUnfinishedEpisodeByPodcastBlocking(podcast) } ?: return
         playbackManager.playNow(episode = latestEpisode, sourceView = sourceView)
     }
 

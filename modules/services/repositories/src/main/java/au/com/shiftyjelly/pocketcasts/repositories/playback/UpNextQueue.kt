@@ -32,18 +32,18 @@ interface UpNextQueue {
     val allEpisodes get(): List<BaseEpisode> = currentEpisode?.let { listOf(it) + queueEpisodes } ?: queueEpisodes
     fun isCurrentEpisode(episode: BaseEpisode): Boolean
     suspend fun playNow(episode: BaseEpisode, automaticUpNextSource: AutoPlaySource?, onAdd: (() -> Unit)?)
-    suspend fun playNext(episode: BaseEpisode, downloadManager: DownloadManager, onAdd: (() -> Unit)?)
-    suspend fun playLast(episode: BaseEpisode, downloadManager: DownloadManager, onAdd: (() -> Unit)?)
+    suspend fun playNextBlocking(episode: BaseEpisode, downloadManager: DownloadManager, onAdd: (() -> Unit)?)
+    suspend fun playLastBlocking(episode: BaseEpisode, downloadManager: DownloadManager, onAdd: (() -> Unit)?)
     suspend fun playAllNext(episodes: List<BaseEpisode>, downloadManager: DownloadManager)
     suspend fun playAllLast(episodes: List<BaseEpisode>, downloadManager: DownloadManager)
     suspend fun removeEpisode(episode: BaseEpisode, shouldShuffleUpNext: Boolean = false)
-    suspend fun clearAndPlayAll(episodes: List<BaseEpisode>, downloadManager: DownloadManager)
+    suspend fun clearAndPlayAllBlocking(episodes: List<BaseEpisode>, downloadManager: DownloadManager)
     fun moveEpisode(from: Int, to: Int)
     fun changeList(episodes: List<BaseEpisode>)
     fun clearUpNext()
     fun removeAll()
     suspend fun removeAllIncludingChanges()
-    suspend fun importServerChanges(episodes: List<BaseEpisode>, playbackManager: PlaybackManager, downloadManager: DownloadManager)
+    suspend fun importServerChangesBlocking(episodes: List<BaseEpisode>, playbackManager: PlaybackManager, downloadManager: DownloadManager)
     fun contains(uuid: String): Boolean
     fun updateCurrentEpisodeState(state: State)
 
@@ -71,7 +71,7 @@ interface UpNextQueue {
         }
     }
 
-    fun setup()
+    fun setupBlocking()
 
     /**
      * getChangesObservableWithLiveCurrentEpisode(episodeManager: EpisodeManager)
@@ -85,13 +85,13 @@ interface UpNextQueue {
             if (state is State.Loaded) {
                 if (state.podcast != null) {
                     // If we have a podcast we need to observe its effects state as well to ensure it updates when the global override changes
-                    episodeManager.observeEpisodeByUuidRx(state.episode.uuid)
+                    episodeManager.findEpisodeByUuidRxFlowable(state.episode.uuid)
                         .combineLatest(podcastManager.observePodcastByUuid(state.podcast.uuid).distinctUntilChanged { t1, t2 -> t1.isUsingEffects == t2.isUsingEffects })
                         .map<State> { State.Loaded(it.first, it.second, state.queue) }
                         .onErrorReturn { State.Empty }
                         .toObservable()
                 } else {
-                    episodeManager.observeEpisodeByUuidRx(state.episode.uuid)
+                    episodeManager.findEpisodeByUuidRxFlowable(state.episode.uuid)
                         .map<State> { State.Loaded(it, state.podcast, state.queue) }
                         .onErrorReturn { State.Empty }
                         .toObservable()
@@ -107,7 +107,7 @@ interface UpNextQueue {
         return changesObservable.asFlow().debounce(100).flatMapLatest { state ->
             if (state is State.Loaded) {
                 if (state.podcast != null) {
-                    episodeManager.observeEpisodeByUuid(state.episode.uuid)
+                    episodeManager.findEpisodeByUuidFlow(state.episode.uuid)
                         .combine<BaseEpisode, Podcast, State>(
                             podcastManager
                                 .observePodcastByUuidFlow(state.podcast.uuid)
@@ -119,7 +119,7 @@ interface UpNextQueue {
                         }
                         .catch { emit(State.Empty) }
                 } else {
-                    episodeManager.observeEpisodeByUuid(state.episode.uuid)
+                    episodeManager.findEpisodeByUuidFlow(state.episode.uuid)
                         .map<BaseEpisode, State> {
                             val loadedState = State.Loaded(it, state.podcast, state.queue)
                             updateCurrentEpisodeStateIfNeeded(it, loadedState)

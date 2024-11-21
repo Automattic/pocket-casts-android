@@ -6,7 +6,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 
 object QueryHelper {
 
-    fun firstRowArray(query: String, params: Array<String>?, appDatabase: AppDatabase): Array<String?>? {
+    fun firstRowArrayBlocking(query: String, params: Array<String>?, appDatabase: AppDatabase): Array<String?>? {
         appDatabase.query(query, params ?: arrayOf()).use { cursor ->
             if (cursor.moveToNext()) {
                 val result = arrayOfNulls<String>(cursor.columnCount)
@@ -20,7 +20,7 @@ object QueryHelper {
         }
     }
 
-    fun findAll(query: String, params: Array<String>?, db: SQLiteDatabase, rowParser: (Cursor) -> Boolean) {
+    fun findAllBlocking(query: String, params: Array<String>?, db: SQLiteDatabase, rowParser: (Cursor) -> Boolean) {
         db.rawQuery(query, params ?: arrayOf()).use { cursor ->
             if (cursor.moveToFirst()) {
                 var keepGoing: Boolean

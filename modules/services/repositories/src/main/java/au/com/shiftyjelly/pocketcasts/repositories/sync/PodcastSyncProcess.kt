@@ -521,7 +521,7 @@ class PodcastSyncProcess(
 
     private fun uploadEpisodesChanges(records: JSONArray): List<PodcastEpisode> {
         try {
-            val episodes = episodeManager.findEpisodesToSync()
+            val episodes = episodeManager.findEpisodesToSyncBlocking()
             episodes.forEach { episode ->
                 uploadEpisodeChanges(episode, records)
             }
@@ -588,7 +588,7 @@ class PodcastSyncProcess(
 
     private fun uploadBookmarksChanges(records: JSONArray) {
         try {
-            val bookmarks = bookmarkManager.findBookmarksToSync()
+            val bookmarks = bookmarkManager.findBookmarksToSyncBlocking()
             bookmarks.forEach { bookmark ->
                 @Suppress("DEPRECATION")
                 uploadBookmarkChanges(bookmark, records)
@@ -654,7 +654,7 @@ class PodcastSyncProcess(
     private fun markAllLocalItemsSynced(episodes: List<PodcastEpisode>): Completable {
         return Completable.fromAction {
             podcastManager.markAllPodcastsSynced()
-            episodeManager.markAllEpisodesSynced(episodes)
+            episodeManager.markAllEpisodesSyncedBlocking(episodes)
             playlistManager.markAllSyncedBlocking()
             folderManager.markAllSynced()
         }
@@ -887,7 +887,7 @@ class PodcastSyncProcess(
                 } else {
                     episode.archivedModified = null
                     if (newIsArchive) {
-                        episodeManager.archive(episode, playbackManager, sync = false)
+                        episodeManager.archiveBlocking(episode, playbackManager, sync = false)
                     } else {
                         episode.isArchived = false
                         episode.lastArchiveInteraction = Date().time
@@ -946,7 +946,7 @@ class PodcastSyncProcess(
                 episode.deselectedChaptersModified = sync.deselectedChaptersModified?.let(::Date)
             }
 
-            episodeManager.update(episode)
+            episodeManager.updateBlocking(episode)
 
             episode
         }

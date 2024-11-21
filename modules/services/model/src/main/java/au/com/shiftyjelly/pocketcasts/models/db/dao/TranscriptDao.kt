@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 abstract class TranscriptDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insert(transcript: Transcript)
+    abstract fun insertBlocking(transcript: Transcript)
 
     @Query("SELECT * FROM episode_transcript WHERE episode_uuid IS :episodeUuid")
     abstract fun observerTranscriptForEpisode(episodeUuid: String): Flow<Transcript?>

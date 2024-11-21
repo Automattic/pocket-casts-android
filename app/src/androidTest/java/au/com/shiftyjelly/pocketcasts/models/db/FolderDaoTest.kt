@@ -103,7 +103,7 @@ class FolderDaoTest {
     @Test
     fun updateAllSyncedShouldUpdateTheSynModifiedFieldOfAllFolders() = runTest {
         folderDao.insert(fakeFolder)
-        folderDao.updateAllSynced()
+        folderDao.updateAllSyncedBlocking()
         val updatedFolder = folderDao.findFolders()
         assertTrue(updatedFolder.all { it.syncModified == 0L })
     }
