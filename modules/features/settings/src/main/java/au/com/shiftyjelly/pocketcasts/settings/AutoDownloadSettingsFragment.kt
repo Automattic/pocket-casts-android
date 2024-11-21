@@ -337,14 +337,14 @@ class AutoDownloadSettingsFragment :
 
     override fun filterSelectFragmentGetCurrentSelection(): List<String> {
         return runBlocking {
-            val filters = withContext(Dispatchers.Default) { playlistManager.findAll() }.filter { it.autoDownload }
+            val filters = withContext(Dispatchers.Default) { playlistManager.findAllBlocking() }.filter { it.autoDownload }
             filters.map { it.uuid }
         }
     }
 
     override fun filterSelectFragmentSelectionChanged(newSelection: List<String>) {
         lifecycleScope.launch(Dispatchers.Default) {
-            playlistManager.findAll().forEach {
+            playlistManager.findAllBlocking().forEach {
                 val autoDownloadStatus = newSelection.contains(it.uuid)
                 val userChanged = autoDownloadStatus != it.autoDownload
                 it.autoDownload = autoDownloadStatus
@@ -357,7 +357,7 @@ class AutoDownloadSettingsFragment :
                 } else {
                     null
                 }
-                playlistManager.update(it, userPlaylistUpdate)
+                playlistManager.updateBlocking(it, userPlaylistUpdate)
             }
             launch(Dispatchers.Main) { updateFiltersSelectedSummary() }
         }
@@ -365,7 +365,7 @@ class AutoDownloadSettingsFragment :
 
     private fun updateFiltersSelectedSummary() {
         lifecycleScope.launch {
-            val count = withContext(Dispatchers.Default) { playlistManager.findAll() }.filter { it.autoDownload }.count()
+            val count = withContext(Dispatchers.Default) { playlistManager.findAllBlocking() }.filter { it.autoDownload }.count()
             val preference = preferenceManager.findPreference<Preference>(PREFERENCE_CHOOSE_FILTERS)
             preference?.summary = context?.resources?.getStringPlural(count = count, singular = LR.string.filters_chosen_singular, plural = LR.string.filters_chosen_plural)
         }

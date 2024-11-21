@@ -38,7 +38,7 @@ object PocketCastsShortcuts {
         val shortcutManager = context.getSystemService(ShortcutManager::class.java) ?: return
 
         coroutineScope.launch(Dispatchers.Default) {
-            val topPlaylist = playlistManager.findAll().firstOrNull()
+            val topPlaylist = playlistManager.findAllBlocking().firstOrNull()
 
             if (topPlaylist == null) {
                 if (shortcutManager.dynamicShortcuts.size == 1) {

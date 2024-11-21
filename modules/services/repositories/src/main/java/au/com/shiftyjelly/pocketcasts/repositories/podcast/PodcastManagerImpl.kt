@@ -95,7 +95,7 @@ class PodcastManagerImpl @Inject constructor(
                     podcastDao.delete(podcast)
                     episodeDao.deleteAll(episodes)
                 }
-                playlistManager.removePodcastFromPlaylists(podcastUuid)
+                playlistManager.removePodcastFromPlaylistsBlocking(podcastUuid)
 
                 unsubscribeRelay.accept(podcastUuid)
             }

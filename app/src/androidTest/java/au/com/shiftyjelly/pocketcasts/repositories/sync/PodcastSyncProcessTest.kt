@@ -88,7 +88,7 @@ class PodcastSyncProcessTest {
             whenever(episodeManager.findEpisodesToSync()).thenReturn(emptyList())
 
             val playlistManager: PlaylistManager = mock()
-            whenever(playlistManager.findPlaylistsToSync()).thenReturn(emptyList())
+            whenever(playlistManager.findPlaylistsToSyncBlocking()).thenReturn(emptyList())
 
             val folderManager: FolderManager = mock()
             whenever(folderManager.findFoldersToSync()).thenReturn(emptyList())

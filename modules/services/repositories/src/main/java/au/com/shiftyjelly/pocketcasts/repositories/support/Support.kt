@@ -397,7 +397,7 @@ class Support @Inject constructor(
                 output.append("Database").append(eol)
                     .append(" ").append(podcastManager.countPodcasts()).append(" Podcasts ").append(eol)
                     .append(" ").append(episodeManager.countEpisodes()).append(" Episodes ").append(eol)
-                    .append(" ").append(playlistManager.findAll().size).append(" Playlists ").append(eol)
+                    .append(" ").append(playlistManager.findAllBlocking().size).append(" Playlists ").append(eol)
                     .append(" ").append(queue.size).append(" Up Next ").append(eol).append(eol)
 
                 output.append(podcastsOutput.toString())
@@ -405,7 +405,7 @@ class Support @Inject constructor(
                 output.append("Filters").append(eol).append("-------").append(eol).append(eol)
 
                 try {
-                    val playlists = playlistManager.findAll()
+                    val playlists = playlistManager.findAllBlocking()
                     for (playlist in playlists) {
                         output.append(playlist.title).append(eol)
                         output.append("Auto Download? ").append(playlist.autoDownload).append(" Unmetered only? ").append(playlist.autoDownloadUnmeteredOnly).append(" Power only? ").append(playlist.autoDownloadPowerOnly).append(eol)
