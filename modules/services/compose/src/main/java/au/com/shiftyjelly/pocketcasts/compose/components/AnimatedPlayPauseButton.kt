@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,7 +23,7 @@ import com.airbnb.lottie.SimpleColorFilter
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieClipSpec
 import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieAnimatable
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.airbnb.lottie.compose.rememberLottieDynamicProperties
 import com.airbnb.lottie.compose.rememberLottieDynamicProperty
@@ -46,20 +47,12 @@ fun AnimatedPlayPauseButton(
     circleColor: Color = Color.White,
 ) {
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(UR.raw.large_play_button))
-    val progress by animateLottieCompositionAsState(
-        composition = composition,
-        clipSpec = if (isPlaying) {
-            LottieClipSpec.Frame(
-                min = FRAME_PLAY_IMAGE,
-                max = FRAME_MAX,
-            )
-        } else {
-            LottieClipSpec.Frame(
-                min = FRAME_MIN,
-                max = FRAME_PLAY_IMAGE_ANIMATION,
-            )
-        },
-    )
+    val lottieAnimatable = rememberLottieAnimatable()
+    val clipSpec = if (isPlaying) {
+        LottieClipSpec.Frame(FRAME_PLAY_IMAGE, FRAME_MAX)
+    } else {
+        LottieClipSpec.Frame(FRAME_MIN, FRAME_PLAY_IMAGE_ANIMATION)
+    }
 
     val dynamicProperties = rememberLottieDynamicProperties(
         rememberLottieDynamicProperty(
@@ -82,11 +75,18 @@ fun AnimatedPlayPauseButton(
     ) {
         LottieAnimation(
             composition = composition,
-            progress = { progress },
+            progress = { lottieAnimatable.progress },
             modifier = Modifier
                 .size(iconWidth, iconHeight)
                 .align(Alignment.Center),
             dynamicProperties = dynamicProperties,
+        )
+    }
+
+    LaunchedEffect(isPlaying) {
+        lottieAnimatable.animate(
+            composition = composition,
+            clipSpec = clipSpec,
         )
     }
 }
