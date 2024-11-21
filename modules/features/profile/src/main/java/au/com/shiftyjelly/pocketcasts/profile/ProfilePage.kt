@@ -236,6 +236,7 @@ private fun ColumnScope.HeaderWithStats(
         VerticalSpacer()
     } else {
         Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
