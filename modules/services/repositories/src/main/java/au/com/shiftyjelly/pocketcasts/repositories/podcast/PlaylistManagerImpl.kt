@@ -151,7 +151,7 @@ class PlaylistManagerImpl @Inject constructor(
         val where = buildPlaylistWhere(playlist, playbackManager)
         val orderBy = getPlaylistOrderByString(playlist)
         val limit = if (playlist.sortOrder() == Playlist.SortOrder.LAST_DOWNLOAD_ATTEMPT_DATE) 1000 else 500
-        return episodeManager.findEpisodesWhere("$where ORDER BY $orderBy LIMIT $limit")
+        return episodeManager.findEpisodesWhereBlocking("$where ORDER BY $orderBy LIMIT $limit")
     }
 
     private fun getPlaylistQuery(playlist: Playlist, limit: Int?, playbackManager: PlaybackManager): String {
@@ -163,12 +163,12 @@ class PlaylistManagerImpl @Inject constructor(
     override fun observeEpisodesBlocking(playlist: Playlist, episodeManager: EpisodeManager, playbackManager: PlaybackManager): Flowable<List<PodcastEpisode>> {
         val limitCount = if (playlist.sortOrder() == Playlist.SortOrder.LAST_DOWNLOAD_ATTEMPT_DATE) 1000 else 500
         val queryAfterWhere = getPlaylistQuery(playlist, limit = limitCount, playbackManager = playbackManager)
-        return episodeManager.observeEpisodesWhere(queryAfterWhere)
+        return episodeManager.findEpisodesWhereRxFlowable(queryAfterWhere)
     }
 
     override fun observeEpisodesPreviewBlocking(playlist: Playlist, episodeManager: EpisodeManager, playbackManager: PlaybackManager): Flowable<List<PodcastEpisode>> {
         val queryAfterWhere = getPlaylistQuery(playlist, limit = 100, playbackManager = playbackManager)
-        return episodeManager.observeEpisodesWhere(queryAfterWhere)
+        return episodeManager.findEpisodesWhereRxFlowable(queryAfterWhere)
     }
 
     private fun getPlaylistOrderByString(playlist: Playlist): String? = when (playlist.sortOrder()) {
@@ -288,7 +288,7 @@ class PlaylistManagerImpl @Inject constructor(
 
     override fun countEpisodesRxFlowable(playlist: Playlist, episodeManager: EpisodeManager, playbackManager: PlaybackManager): Flowable<Int> {
         val query = getPlaylistQuery(playlist, limit = null, playbackManager = playbackManager)
-        return episodeManager.observeEpisodeCount(query)
+        return episodeManager.episodeCountRxFlowable(query)
     }
 
     override fun countEpisodesBlocking(id: Long?, episodeManager: EpisodeManager, playbackManager: PlaybackManager): Int {
@@ -297,7 +297,7 @@ class PlaylistManagerImpl @Inject constructor(
         }
         val playlist = findByIdBlocking(id) ?: return 0
         val where = buildPlaylistWhere(playlist, playbackManager)
-        return episodeManager.countEpisodesWhere(where)
+        return episodeManager.countEpisodesWhereBlocking(where)
     }
 
     override fun checkForEpisodesToDownloadBlocking(episodeManager: EpisodeManager, playbackManager: PlaybackManager) {

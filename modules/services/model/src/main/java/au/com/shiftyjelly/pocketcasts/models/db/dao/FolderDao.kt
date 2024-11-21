@@ -27,25 +27,25 @@ abstract class FolderDao {
     abstract suspend fun findByUuid(uuid: String): Folder?
 
     @Query("SELECT * FROM folders WHERE uuid = :uuid")
-    abstract fun findByUuidFlowable(uuid: String): Flowable<List<Folder>>
+    abstract fun findByUuidRxFlowable(uuid: String): Flowable<List<Folder>>
 
     @Query("SELECT * FROM folders WHERE uuid = :uuid")
     abstract fun findByUuidFlow(uuid: String): Flow<List<Folder>>
 
     @Query("SELECT * FROM folders WHERE deleted = 0")
-    abstract fun observeFolders(): Flowable<List<Folder>>
+    abstract fun findFoldersRxFlowable(): Flowable<List<Folder>>
 
     @Query("SELECT * FROM folders WHERE deleted = 0")
     abstract fun findFoldersFlow(): Flow<List<Folder>>
 
     @Query("SELECT * FROM folders WHERE deleted = 0")
-    abstract fun findFoldersSingle(): Single<List<Folder>>
+    abstract fun findFoldersRxSingle(): Single<List<Folder>>
 
     @Query("SELECT * FROM folders WHERE deleted = 0")
     abstract suspend fun findFolders(): List<Folder>
 
     @Query("SELECT * FROM folders WHERE sync_modified != 0")
-    abstract fun findNotSynced(): List<Folder>
+    abstract fun findNotSyncedBlocking(): List<Folder>
 
     @Query("UPDATE folders SET color = :color, sync_modified = :syncModified WHERE uuid = :uuid")
     abstract suspend fun updateFolderColor(uuid: String, color: Int, syncModified: Long)
@@ -63,7 +63,7 @@ abstract class FolderDao {
     abstract suspend fun updateSortPosition(sortPosition: Int, uuid: String, syncModified: Long)
 
     @Query("UPDATE folders SET sync_modified = 0")
-    abstract fun updateAllSynced()
+    abstract fun updateAllSyncedBlocking()
 
     @Transaction
     open suspend fun updateSortPositions(folders: List<Folder>, syncModified: Long) {
@@ -73,5 +73,5 @@ abstract class FolderDao {
     }
 
     @Query("SELECT COUNT(*) FROM folders WHERE deleted = 0")
-    abstract fun count(): Int
+    abstract fun countBlocking(): Int
 }

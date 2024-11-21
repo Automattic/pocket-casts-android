@@ -53,7 +53,7 @@ class TranscriptsManagerImpl @Inject constructor(
         }
 
         findBestTranscript(transcripts)?.let { bestTranscript ->
-            transcriptDao.insert(bestTranscript)
+            transcriptDao.insertBlocking(bestTranscript)
 
             if (loadTranscriptSource == LoadTranscriptSource.DOWNLOAD_EPISODE) {
                 loadTranscriptCuesInfo(

@@ -253,8 +253,8 @@ class PodcastViewModel
     fun onUnarchiveClicked() {
         launch {
             val p = podcast.value ?: return@launch
-            val episodes = episodeManager.findEpisodesByPodcastOrdered(p)
-            episodeManager.unarchiveAllInList(episodes)
+            val episodes = episodeManager.findEpisodesByPodcastOrderedBlocking(p)
+            episodeManager.unarchiveAllInListBlocking(episodes)
             trackEpisodeBulkEvent(AnalyticsEvent.EPISODE_BULK_UNARCHIVED, episodes.size)
         }
     }
@@ -351,7 +351,7 @@ class PodcastViewModel
     fun archivePlayed() {
         val podcast = this.podcast.value ?: return
         launch {
-            val episodes = episodeManager.findEpisodesByPodcastOrdered(podcast).filter { it.isFinished }
+            val episodes = episodeManager.findEpisodesByPodcastOrderedBlocking(podcast).filter { it.isFinished }
             episodeManager.archiveAllInList(episodes, playbackManager)
             trackEpisodeBulkEvent(AnalyticsEvent.EPISODE_BULK_ARCHIVED, episodes.size)
         }
@@ -370,7 +370,7 @@ class PodcastViewModel
     fun archiveEpisodeLimit() {
         launch {
             podcast.value?.let {
-                episodeManager.checkPodcastForEpisodeLimit(it, playbackManager)
+                episodeManager.checkPodcastForEpisodeLimitBlocking(it, playbackManager)
             }
         }
     }
@@ -641,7 +641,7 @@ private fun Flowable<CombinedEpisodeAndBookmarkData>.loadEpisodesAndBookmarks(
             "Observing podcast ${podcast.uuid} episode changes",
         )
         Flowable.combineLatest(
-            episodeManager.observeEpisodesByPodcastOrderedRx(podcast)
+            episodeManager.findEpisodesByPodcastOrderedRxFlowable(podcast)
                 .map {
                     val sortFunction = podcast.grouping.sortFunction
                     if (sortFunction != null) {

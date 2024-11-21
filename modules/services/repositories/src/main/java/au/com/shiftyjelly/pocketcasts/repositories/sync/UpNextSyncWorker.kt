@@ -93,7 +93,7 @@ class UpNextSyncWorker @AssistedInject constructor(
 
     private suspend fun performSync() {
         val upNextChangeDao = appDatabase.upNextChangeDao()
-        val changes = upNextChangeDao.findAll()
+        val changes = upNextChangeDao.findAllBlocking()
         val request = buildRequest(changes)
         try {
             val response = syncManager.upNextSync(request)
@@ -189,7 +189,7 @@ class UpNextSyncWorker @AssistedInject constructor(
                         .awaitSingleOrNull()
                 } else {
                     val skeletonEpisode = responseEpisode.toSkeletonEpisode(podcastUuid)
-                    episodeManager.downloadMissingEpisode(episodeUuid, podcastUuid, skeletonEpisode, podcastManager, false, source = SourceView.UP_NEXT)
+                    episodeManager.downloadMissingEpisodeRxMaybe(episodeUuid, podcastUuid, skeletonEpisode, podcastManager, false, source = SourceView.UP_NEXT)
                         .awaitSingleOrNull()
                 }
             } else {
@@ -198,7 +198,7 @@ class UpNextSyncWorker @AssistedInject constructor(
         } ?: emptyList()
 
         // import the server Up Next into the database
-        upNextQueue.importServerChanges(episodes, playbackManager, downloadManager)
+        upNextQueue.importServerChangesBlocking(episodes, playbackManager, downloadManager)
         // check the current episode it correct
         playbackManager.loadQueue()
         // save the server Up Next modified so we only apply changes

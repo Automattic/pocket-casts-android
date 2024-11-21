@@ -55,7 +55,7 @@ class SyncHistoryTask @AssistedInject constructor(
     override suspend fun doWork(): Result {
         LogBuffer.i(TAG, "Sync history running")
 
-        val episodes = episodeManager.findEpisodesForHistorySync()
+        val episodes = episodeManager.findEpisodesForHistorySyncBlocking()
 
         val changes = episodes.mapNotNull { episode ->
             val lastPlaybackInteraction = episode.lastPlaybackInteraction ?: return@mapNotNull null
@@ -103,10 +103,10 @@ class SyncHistoryTask @AssistedInject constructor(
                 // Clear history if they have cleared it on the server
                 if (response.lastCleared > 0) {
                     val lastCleared = Date(response.lastCleared)
-                    episodeManager.clearEpisodePlaybackInteractionDatesBefore(lastCleared)
+                    episodeManager.clearEpisodePlaybackInteractionDatesBeforeBlocking(lastCleared)
                 }
 
-                episodeManager.markPlaybackHistorySynced()
+                episodeManager.markPlaybackHistorySyncedBlocking()
                 if (wasHistoryCleared) {
                     settings.setClearHistoryTime(0L)
                 }

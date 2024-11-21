@@ -104,7 +104,7 @@ class AutoPlaybackServiceTest {
 
             service.playlistManager = mock { on { findByUuidBlocking(any()) }.doReturn(null) }
             service.podcastManager = mock { on { runBlocking { findPodcastByUuidSuspend(any()) } }.doReturn(podcast) }
-            service.episodeManager = mock { on { findEpisodesByPodcastOrdered(any()) }.doReturn(listOf(episode)) }
+            service.episodeManager = mock { on { findEpisodesByPodcastOrderedBlocking(any()) }.doReturn(listOf(episode)) }
 
             val episodes = service.loadEpisodeChildren(podcast.uuid)
             assertTrue("Episodes should have content", episodes.isNotEmpty())

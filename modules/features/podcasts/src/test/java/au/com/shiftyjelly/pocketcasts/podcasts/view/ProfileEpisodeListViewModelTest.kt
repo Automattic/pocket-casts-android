@@ -208,9 +208,9 @@ class ProfileEpisodeListViewModelTest {
         starredEpisodes: List<PodcastEpisode> = starredEpisodesMock,
         listeningHistoryEpisodes: List<PodcastEpisode> = listeningHistoryEpisodesMock,
     ) {
-        whenever(episodeManager.observeDownloadEpisodes()).thenReturn(flowOf(downloadedEpisodes).asFlowable())
-        whenever(episodeManager.observeStarredEpisodes()).thenReturn(flowOf(starredEpisodes).asFlowable())
-        whenever(episodeManager.observePlaybackHistoryEpisodes()).thenReturn(flowOf(listeningHistoryEpisodes).asFlowable())
+        whenever(episodeManager.findDownloadEpisodesRxFlowable()).thenReturn(flowOf(downloadedEpisodes).asFlowable())
+        whenever(episodeManager.findStarredEpisodesRxFlowable()).thenReturn(flowOf(starredEpisodes).asFlowable())
+        whenever(episodeManager.findPlaybackHistoryEpisodesRxFlowable()).thenReturn(flowOf(listeningHistoryEpisodes).asFlowable())
         whenever(episodeManager.filteredPlaybackHistoryEpisodesFlow(anyOrNull())).thenReturn(flowOf(emptyList()))
         doNothing().whenever(analyticsTracker).track(any(), any())
 

@@ -55,7 +55,7 @@ class FixDownloadsWorker @AssistedInject constructor(
         .fold(0) { fixedCount, (episode, _) ->
             val path = findExpectedDownloadPath(episode)
             if (path != null && path != episode.downloadedFilePath) {
-                episodeManager.updateDownloadFilePath(episode, path, markAsDownloaded = true)
+                episodeManager.updateDownloadFilePathBlocking(episode, path, markAsDownloaded = true)
                 fixedCount + 1
             } else {
                 fixedCount

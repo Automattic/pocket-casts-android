@@ -31,7 +31,7 @@ interface BookmarkManager {
     suspend fun deleteToSync(bookmarkUuid: String)
     suspend fun deleteSynced(bookmarkUuid: String)
     suspend fun upsertSynced(bookmark: Bookmark): Bookmark
-    fun findBookmarksToSync(): List<Bookmark>
+    fun findBookmarksToSyncBlocking(): List<Bookmark>
     suspend fun searchInPodcastByTitle(podcastUuid: String, title: String): List<String>
     suspend fun searchByBookmarkOrEpisodeTitle(title: String): List<String>
     fun findUserEpisodesBookmarksFlow(): Flow<List<Bookmark>>

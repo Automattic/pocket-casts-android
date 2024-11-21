@@ -217,7 +217,7 @@ class RefreshPodcastsThread(
 
         if (!emptyResponse) {
             var startTime = SystemClock.elapsedRealtime()
-            episodeManager.checkForEpisodesToAutoArchive(playbackManager, podcastManager)
+            episodeManager.checkForEpisodesToAutoArchiveBlocking(playbackManager, podcastManager)
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - checkForEpisodesToAutoArchive - ${String.format("%d ms", SystemClock.elapsedRealtime() - startTime)}")
             startTime = SystemClock.elapsedRealtime()
             podcastManager.checkForUnusedPodcasts(playbackManager)
@@ -319,7 +319,7 @@ class RefreshPodcastsThread(
             for (episode in episodes) {
                 episode.addedDate = addedDate
             }
-            episodes = episodeManager.add(episodes, podcast.uuid, downloadMetaData)
+            episodes = episodeManager.addBlocking(episodes, podcast.uuid, downloadMetaData)
 
             if (episodes.isEmpty()) {
                 // the server returned episodes, but none were added to the database. Update the podcast when it doesn't have the latest episode information.
@@ -411,7 +411,7 @@ class RefreshPodcastsThread(
             try {
                 val notificationsEpisodeAndPodcast = ArrayList<Pair<PodcastEpisode, Podcast>>()
 
-                val episodes = episodeManager.findNotificationEpisodes(lastSeen)
+                val episodes = episodeManager.findNotificationEpisodesBlocking(lastSeen)
                 for (episode in episodes) {
                     val podcast = podcastManager.findPodcastByUuid(episode.podcastUuid) ?: continue
                     notificationsEpisodeAndPodcast.add(Pair(episode, podcast))

@@ -52,7 +52,7 @@ class BookmarkManagerTest {
         val episodeUuid = UUID.randomUUID().toString()
         val podcastUuid = UUID.randomUUID().toString()
         val episode = PodcastEpisode(uuid = episodeUuid, podcastUuid = podcastUuid, publishedDate = Date())
-        episodeDao.insert(episode)
+        episodeDao.insertBlocking(episode)
 
         runTest {
             val bookmark = bookmarkManager.add(episode = episode, timeSecs = 61, title = "Bookmark Title", BookmarkManager.CreationSource.PLAYER)
@@ -76,7 +76,7 @@ class BookmarkManagerTest {
         val episodeUuid = UUID.randomUUID().toString()
         val podcastUuid = UUID.randomUUID().toString()
         val episode = PodcastEpisode(uuid = episodeUuid, podcastUuid = podcastUuid, publishedDate = Date())
-        episodeDao.insert(episode)
+        episodeDao.insertBlocking(episode)
 
         runTest {
             val bookmarkOne = bookmarkManager.add(episode = episode, timeSecs = 20, title = "", creationSource = BookmarkManager.CreationSource.PLAYER)

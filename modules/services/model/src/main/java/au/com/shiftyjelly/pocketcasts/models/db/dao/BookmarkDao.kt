@@ -181,7 +181,7 @@ abstract class BookmarkDao {
     abstract suspend fun updateTitle(bookmarkUuid: String, title: String, titleModified: Long, syncStatus: SyncStatus)
 
     @Query("SELECT * FROM bookmarks WHERE sync_status = :syncStatus")
-    abstract fun findNotSynced(syncStatus: SyncStatus = SyncStatus.NOT_SYNCED): List<Bookmark>
+    abstract fun findNotSyncedBlocking(syncStatus: SyncStatus = SyncStatus.NOT_SYNCED): List<Bookmark>
 
     @Query(
         """SELECT bookmarks.*

@@ -112,7 +112,7 @@ class FolderManagerImpl @Inject constructor(
     }
 
     override fun observeFolders(): Flowable<List<Folder>> {
-        return folderDao.observeFolders()
+        return folderDao.findFoldersRxFlowable()
     }
 
     override fun findFoldersFlow(): Flow<List<Folder>> {
@@ -120,7 +120,7 @@ class FolderManagerImpl @Inject constructor(
     }
 
     override fun findFoldersSingle(): Single<List<Folder>> {
-        return folderDao.findFoldersSingle()
+        return folderDao.findFoldersRxSingle()
     }
 
     override suspend fun updatePositions(folders: List<Folder>) {
@@ -152,11 +152,11 @@ class FolderManagerImpl @Inject constructor(
     }
 
     override fun findFoldersToSync(): List<Folder> {
-        return folderDao.findNotSynced()
+        return folderDao.findNotSyncedBlocking()
     }
 
     override fun markAllSynced() {
-        folderDao.updateAllSynced()
+        folderDao.updateAllSyncedBlocking()
     }
 
     override suspend fun getHomeFolder(): List<FolderItem> {
@@ -208,5 +208,5 @@ class FolderManagerImpl @Inject constructor(
         return podcasts.sortedWith(folder.podcastsSortType.podcastComparator)
     }
 
-    override fun countFolders() = folderDao.count()
+    override fun countFolders() = folderDao.countBlocking()
 }

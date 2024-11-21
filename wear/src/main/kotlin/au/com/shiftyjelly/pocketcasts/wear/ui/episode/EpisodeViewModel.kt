@@ -137,7 +137,7 @@ class EpisodeViewModel @Inject constructor(
         val episodeUuid = savedStateHandle.get<String>(EpisodeScreenFlow.episodeUuidArgument)
             ?: throw IllegalStateException("EpisodeViewModel must have an episode uuid in the SavedStateHandle")
 
-        val episodeFlow = episodeManager.observeEpisodeByUuid(episodeUuid)
+        val episodeFlow = episodeManager.findEpisodeByUuidFlow(episodeUuid)
 
         val podcastFlow = episodeFlow
             .filterIsInstance<PodcastEpisode>()
@@ -297,9 +297,9 @@ class EpisodeViewModel @Inject constructor(
     private suspend fun clearErrors(episode: BaseEpisode) {
         withContext(Dispatchers.IO) {
             if (episode is PodcastEpisode) {
-                episodeManager.clearDownloadError(episode)
+                episodeManager.clearDownloadErrorBlocking(episode)
             }
-            episodeManager.clearPlaybackError(episode)
+            episodeManager.clearPlaybackErrorBlocking(episode)
         }
     }
 
@@ -424,14 +424,14 @@ class EpisodeViewModel @Inject constructor(
         }
         viewModelScope.launch(Dispatchers.IO) {
             if (episode.isArchived) {
-                episodeManager.unarchive(episode)
+                episodeManager.unarchiveBlocking(episode)
                 episodeAnalytics.trackEvent(
                     AnalyticsEvent.EPISODE_UNARCHIVED,
                     sourceView,
                     episode.uuid,
                 )
             } else {
-                episodeManager.archive(episode, playbackManager)
+                episodeManager.archiveBlocking(episode, playbackManager)
                 episodeAnalytics.trackEvent(
                     AnalyticsEvent.EPISODE_ARCHIVED,
                     sourceView,
@@ -458,10 +458,10 @@ class EpisodeViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             (stateFlow.value as? State.Loaded)?.episode?.let { episode ->
                 val event = if (episode.playingStatus == EpisodePlayingStatus.COMPLETED) {
-                    episodeManager.markAsNotPlayed(episode)
+                    episodeManager.markAsNotPlayedBlocking(episode)
                     AnalyticsEvent.EPISODE_MARKED_AS_UNPLAYED
                 } else {
-                    episodeManager.markAsPlayed(episode, playbackManager, podcastManager)
+                    episodeManager.markAsPlayedBlocking(episode, playbackManager, podcastManager)
                     AnalyticsEvent.EPISODE_MARKED_AS_PLAYED
                 }
                 episodeAnalytics.trackEvent(event, sourceView, episode.uuid)

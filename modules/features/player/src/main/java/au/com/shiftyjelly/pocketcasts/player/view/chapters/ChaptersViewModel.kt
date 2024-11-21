@@ -66,7 +66,7 @@ class ChaptersViewModel @AssistedInject constructor(
 
     private fun createUiStateFlow(episodeId: String) = combine(
         playbackManager.playbackStateFlow,
-        episodeManager.observeEpisodeByUuid(episodeId),
+        episodeManager.findEpisodeByUuidFlow(episodeId),
         chapterManager.observerChaptersForEpisode(episodeId),
         settings.cachedSubscriptionStatus.flow,
         isTogglingChapters,
@@ -99,7 +99,7 @@ class ChaptersViewModel @AssistedInject constructor(
                 playbackState.episodeUuid != episodeId -> {
                     val episode = episodeManager.findEpisodeByUuid(episodeId) ?: return@launch
                     episode.playedUpToMs = chapter.startTime.inWholeMilliseconds.toInt()
-                    episodeManager.updatePlayedUpTo(episode, chapter.startTime.inWholeSeconds.toDouble(), forceUpdate = true)
+                    episodeManager.updatePlayedUpToBlocking(episode, chapter.startTime.inWholeSeconds.toDouble(), forceUpdate = true)
                     playbackManager.playNowSuspend(episode)
                 }
             }

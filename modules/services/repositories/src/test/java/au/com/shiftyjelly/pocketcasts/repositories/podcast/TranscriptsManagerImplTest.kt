@@ -145,7 +145,7 @@ class TranscriptsManagerImplTest {
 
         transcriptsManager.updateTranscripts(podcastId, "1", transcripts, LoadTranscriptSource.DEFAULT)
 
-        verify(transcriptDao).insert(transcripts[0])
+        verify(transcriptDao).insertBlocking(transcripts[0])
     }
 
     @Test
@@ -255,7 +255,7 @@ class TranscriptsManagerImplTest {
 
         transcriptsManager.failedTranscriptFormats.test {
             awaitItem()
-            verify(transcriptDao).insert(alternateTranscript)
+            verify(transcriptDao).insertBlocking(alternateTranscript)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -272,7 +272,7 @@ class TranscriptsManagerImplTest {
 
         transcriptsManager.failedTranscriptFormats.test {
             awaitItem()
-            verify(transcriptDao).insert(alternateTranscript)
+            verify(transcriptDao).insertBlocking(alternateTranscript)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -285,7 +285,7 @@ class TranscriptsManagerImplTest {
 
         transcriptsManager.failedTranscriptFormats.test {
             awaitItem()
-            verify(transcriptDao).insert(alternateTranscript)
+            verify(transcriptDao).insertBlocking(alternateTranscript)
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -298,7 +298,7 @@ class TranscriptsManagerImplTest {
 
         transcriptsManager.failedTranscriptFormats.test {
             awaitItem()
-            verify(transcriptDao).insert(alternateTranscript)
+            verify(transcriptDao).insertBlocking(alternateTranscript)
             cancelAndIgnoreRemainingEvents()
         }
     }

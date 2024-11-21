@@ -92,7 +92,7 @@ class StorageSettingsViewModel
         this.permissionGranted = permissionGranted
         this.sdkVersion = sdkVersion
         viewModelScope.launch {
-            episodeManager.observeDownloadedEpisodes()
+            episodeManager.findDownloadedEpisodesRxFlowable()
                 .collect { downloadedEpisodes ->
                     val downloadSize = downloadedEpisodes.sumOf { it.sizeInBytes }
                     mutableState.value = mutableState.value.copy(

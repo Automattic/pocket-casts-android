@@ -101,7 +101,7 @@ class UpNextEpisodeViewHolder(
         val tintColor = itemView.context.getAttrTextStyleColor(UR.attr.textSubtitle1)
 
         disposable = episodeManager
-            .observeByUuid(episode.uuid)
+            .findByUuidFlow(episode.uuid)
             .asFlowable()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())

@@ -61,20 +61,20 @@ class ExternalDataDaoTest {
 
     @Test
     fun useCorrectReleaseTimestampsForSubscribedPodcasts() = runTest {
-        podcastDao.insert(Podcast(uuid = "id-1", title = "title-1", isSubscribed = true, podcastDescription = "description"))
-        podcastEpisodeDao.insert(PodcastEpisode(uuid = "id-1", publishedDate = Date(0), podcastUuid = "id-1", lastPlaybackInteraction = 10))
-        podcastEpisodeDao.insert(PodcastEpisode(uuid = "id-2", publishedDate = Date(2), podcastUuid = "id-1", lastPlaybackInteraction = null))
-        podcastEpisodeDao.insert(PodcastEpisode(uuid = "id-3", publishedDate = Date(1), podcastUuid = "id-1", lastPlaybackInteraction = 13))
+        podcastDao.insertBlocking(Podcast(uuid = "id-1", title = "title-1", isSubscribed = true, podcastDescription = "description"))
+        podcastEpisodeDao.insertBlocking(PodcastEpisode(uuid = "id-1", publishedDate = Date(0), podcastUuid = "id-1", lastPlaybackInteraction = 10))
+        podcastEpisodeDao.insertBlocking(PodcastEpisode(uuid = "id-2", publishedDate = Date(2), podcastUuid = "id-1", lastPlaybackInteraction = null))
+        podcastEpisodeDao.insertBlocking(PodcastEpisode(uuid = "id-3", publishedDate = Date(1), podcastUuid = "id-1", lastPlaybackInteraction = 13))
 
-        podcastDao.insert(Podcast(uuid = "id-2", title = "title-2", isSubscribed = true))
-        podcastEpisodeDao.insert(PodcastEpisode(uuid = "id-4", publishedDate = Date(5), podcastUuid = "id-2", lastPlaybackInteraction = 0))
-        podcastEpisodeDao.insert(PodcastEpisode(uuid = "id-5", publishedDate = Date(4), podcastUuid = "id-2", lastPlaybackInteraction = 20))
-        podcastEpisodeDao.insert(PodcastEpisode(uuid = "id-6", publishedDate = Date(3), podcastUuid = "id-2", lastPlaybackInteraction = 25))
+        podcastDao.insertBlocking(Podcast(uuid = "id-2", title = "title-2", isSubscribed = true))
+        podcastEpisodeDao.insertBlocking(PodcastEpisode(uuid = "id-4", publishedDate = Date(5), podcastUuid = "id-2", lastPlaybackInteraction = 0))
+        podcastEpisodeDao.insertBlocking(PodcastEpisode(uuid = "id-5", publishedDate = Date(4), podcastUuid = "id-2", lastPlaybackInteraction = 20))
+        podcastEpisodeDao.insertBlocking(PodcastEpisode(uuid = "id-6", publishedDate = Date(3), podcastUuid = "id-2", lastPlaybackInteraction = 25))
 
-        podcastDao.insert(Podcast(uuid = "id-3", title = "title-3", isSubscribed = true))
-        podcastEpisodeDao.insert(PodcastEpisode(uuid = "id-7", publishedDate = Date(12), podcastUuid = "id-3", lastPlaybackInteraction = 0))
+        podcastDao.insertBlocking(Podcast(uuid = "id-3", title = "title-3", isSubscribed = true))
+        podcastEpisodeDao.insertBlocking(PodcastEpisode(uuid = "id-7", publishedDate = Date(12), podcastUuid = "id-3", lastPlaybackInteraction = 0))
 
-        podcastDao.insert(Podcast(uuid = "id-4", title = "title-4", isSubscribed = true))
+        podcastDao.insertBlocking(Podcast(uuid = "id-4", title = "title-4", isSubscribed = true))
 
         val podcasts = externalDataDao.getSubscribedPodcasts(PodcastsSortType.NAME_A_TO_Z, limit = 100)
 
@@ -125,15 +125,15 @@ class ExternalDataDaoTest {
 
     @Test
     fun includeOnlySubscribedPodcastsForSubscribedPodcasts() = runTest {
-        podcastDao.insert(Podcast(uuid = "id-1", title = "title-1", isSubscribed = true))
-        podcastEpisodeDao.insert(PodcastEpisode(uuid = "id-1", publishedDate = Date(0), podcastUuid = "id-1"))
-        podcastEpisodeDao.insert(PodcastEpisode(uuid = "id-2", publishedDate = Date(0), podcastUuid = "id-1"))
-        podcastEpisodeDao.insert(PodcastEpisode(uuid = "id-3", publishedDate = Date(0), podcastUuid = "id-1"))
+        podcastDao.insertBlocking(Podcast(uuid = "id-1", title = "title-1", isSubscribed = true))
+        podcastEpisodeDao.insertBlocking(PodcastEpisode(uuid = "id-1", publishedDate = Date(0), podcastUuid = "id-1"))
+        podcastEpisodeDao.insertBlocking(PodcastEpisode(uuid = "id-2", publishedDate = Date(0), podcastUuid = "id-1"))
+        podcastEpisodeDao.insertBlocking(PodcastEpisode(uuid = "id-3", publishedDate = Date(0), podcastUuid = "id-1"))
 
-        podcastDao.insert(Podcast(uuid = "id-2", title = "title-2", isSubscribed = false))
-        podcastEpisodeDao.insert(PodcastEpisode(uuid = "id-4", publishedDate = Date(0), podcastUuid = "id-2"))
-        podcastEpisodeDao.insert(PodcastEpisode(uuid = "id-5", publishedDate = Date(0), podcastUuid = "id-2"))
-        podcastEpisodeDao.insert(PodcastEpisode(uuid = "id-6", publishedDate = Date(0), podcastUuid = "id-2"))
+        podcastDao.insertBlocking(Podcast(uuid = "id-2", title = "title-2", isSubscribed = false))
+        podcastEpisodeDao.insertBlocking(PodcastEpisode(uuid = "id-4", publishedDate = Date(0), podcastUuid = "id-2"))
+        podcastEpisodeDao.insertBlocking(PodcastEpisode(uuid = "id-5", publishedDate = Date(0), podcastUuid = "id-2"))
+        podcastEpisodeDao.insertBlocking(PodcastEpisode(uuid = "id-6", publishedDate = Date(0), podcastUuid = "id-2"))
 
         val podcasts = externalDataDao.getSubscribedPodcasts(PodcastsSortType.NAME_A_TO_Z, limit = 100)
 
@@ -154,7 +154,7 @@ class ExternalDataDaoTest {
 
     @Test
     fun includeCategoriesForSubscribedPodcasts() = runTest {
-        podcastDao.insert(Podcast(uuid = "id-1", title = "title-1", isSubscribed = true, podcastCategory = "category-1"))
+        podcastDao.insertBlocking(Podcast(uuid = "id-1", title = "title-1", isSubscribed = true, podcastCategory = "category-1"))
 
         val podcasts = externalDataDao.getSubscribedPodcasts(PodcastsSortType.NAME_A_TO_Z, limit = 100)
 
@@ -175,11 +175,11 @@ class ExternalDataDaoTest {
 
     @Test
     fun sortSubscribedPodcastsByAddedDate() = runTest {
-        podcastDao.insert(Podcast(uuid = "id-1", title = "title-1", isSubscribed = true, addedDate = Date(3)))
-        podcastDao.insert(Podcast(uuid = "id-2", title = "title-2", isSubscribed = true, addedDate = Date(4)))
-        podcastDao.insert(Podcast(uuid = "id-3", title = "title-3", isSubscribed = true, addedDate = Date(2)))
-        podcastDao.insert(Podcast(uuid = "id-4", title = "title-4", isSubscribed = true, addedDate = Date(1)))
-        podcastDao.insert(Podcast(uuid = "id-5", title = "title-5", isSubscribed = true, addedDate = null))
+        podcastDao.insertBlocking(Podcast(uuid = "id-1", title = "title-1", isSubscribed = true, addedDate = Date(3)))
+        podcastDao.insertBlocking(Podcast(uuid = "id-2", title = "title-2", isSubscribed = true, addedDate = Date(4)))
+        podcastDao.insertBlocking(Podcast(uuid = "id-3", title = "title-3", isSubscribed = true, addedDate = Date(2)))
+        podcastDao.insertBlocking(Podcast(uuid = "id-4", title = "title-4", isSubscribed = true, addedDate = Date(1)))
+        podcastDao.insertBlocking(Podcast(uuid = "id-5", title = "title-5", isSubscribed = true, addedDate = null))
 
         val podcastIds = externalDataDao.getSubscribedPodcasts(PodcastsSortType.DATE_ADDED_NEWEST_TO_OLDEST, limit = 100).map { it.id }
 
@@ -188,10 +188,10 @@ class ExternalDataDaoTest {
 
     @Test
     fun sortSubscribedPodcastsByTitle() = runTest {
-        podcastDao.insert(Podcast(uuid = "id-1", title = "title-4", isSubscribed = true))
-        podcastDao.insert(Podcast(uuid = "id-2", title = "title-3", isSubscribed = true))
-        podcastDao.insert(Podcast(uuid = "id-3", title = "title-1", isSubscribed = true))
-        podcastDao.insert(Podcast(uuid = "id-4", title = "title-2", isSubscribed = true))
+        podcastDao.insertBlocking(Podcast(uuid = "id-1", title = "title-4", isSubscribed = true))
+        podcastDao.insertBlocking(Podcast(uuid = "id-2", title = "title-3", isSubscribed = true))
+        podcastDao.insertBlocking(Podcast(uuid = "id-3", title = "title-1", isSubscribed = true))
+        podcastDao.insertBlocking(Podcast(uuid = "id-4", title = "title-2", isSubscribed = true))
 
         val podcastIds = externalDataDao.getSubscribedPodcasts(PodcastsSortType.NAME_A_TO_Z, limit = 100).map { it.id }
 
@@ -200,14 +200,14 @@ class ExternalDataDaoTest {
 
     @Test
     fun sortingSubscribedPodcastsByTitleOmitsEnglishArticles() = runTest {
-        podcastDao.insert(Podcast(uuid = "id-1", title = "The 1", isSubscribed = true))
-        podcastDao.insert(Podcast(uuid = "id-2", title = "An 2", isSubscribed = true))
-        podcastDao.insert(Podcast(uuid = "id-3", title = "A 3", isSubscribed = true))
-        podcastDao.insert(Podcast(uuid = "id-4", title = "4", isSubscribed = true))
-        podcastDao.insert(Podcast(uuid = "id-5", title = "the 5", isSubscribed = true))
-        podcastDao.insert(Podcast(uuid = "id-6", title = "an 6", isSubscribed = true))
-        podcastDao.insert(Podcast(uuid = "id-7", title = "a 7", isSubscribed = true))
-        podcastDao.insert(Podcast(uuid = "id-8", title = "8", isSubscribed = true))
+        podcastDao.insertBlocking(Podcast(uuid = "id-1", title = "The 1", isSubscribed = true))
+        podcastDao.insertBlocking(Podcast(uuid = "id-2", title = "An 2", isSubscribed = true))
+        podcastDao.insertBlocking(Podcast(uuid = "id-3", title = "A 3", isSubscribed = true))
+        podcastDao.insertBlocking(Podcast(uuid = "id-4", title = "4", isSubscribed = true))
+        podcastDao.insertBlocking(Podcast(uuid = "id-5", title = "the 5", isSubscribed = true))
+        podcastDao.insertBlocking(Podcast(uuid = "id-6", title = "an 6", isSubscribed = true))
+        podcastDao.insertBlocking(Podcast(uuid = "id-7", title = "a 7", isSubscribed = true))
+        podcastDao.insertBlocking(Podcast(uuid = "id-8", title = "8", isSubscribed = true))
 
         val podcastIds = externalDataDao.getSubscribedPodcasts(PodcastsSortType.NAME_A_TO_Z, limit = 100).map { it.id }
 
@@ -216,16 +216,16 @@ class ExternalDataDaoTest {
 
     @Test
     fun sortSubscribedPodcastsBylatestReleaseTimestamp() = runTest {
-        podcastDao.insert(Podcast(uuid = "id-1", title = "title-1", isSubscribed = true))
-        podcastEpisodeDao.insert(PodcastEpisode(uuid = "id-1", publishedDate = Date(0), podcastUuid = "id-1"))
+        podcastDao.insertBlocking(Podcast(uuid = "id-1", title = "title-1", isSubscribed = true))
+        podcastEpisodeDao.insertBlocking(PodcastEpisode(uuid = "id-1", publishedDate = Date(0), podcastUuid = "id-1"))
 
-        podcastDao.insert(Podcast(uuid = "id-2", title = "title-2", isSubscribed = true))
-        podcastEpisodeDao.insert(PodcastEpisode(uuid = "id-2", publishedDate = Date(100), podcastUuid = "id-2"))
+        podcastDao.insertBlocking(Podcast(uuid = "id-2", title = "title-2", isSubscribed = true))
+        podcastEpisodeDao.insertBlocking(PodcastEpisode(uuid = "id-2", publishedDate = Date(100), podcastUuid = "id-2"))
 
-        podcastDao.insert(Podcast(uuid = "id-3", title = "title-3", isSubscribed = true))
+        podcastDao.insertBlocking(Podcast(uuid = "id-3", title = "title-3", isSubscribed = true))
 
-        podcastDao.insert(Podcast(uuid = "id-4", title = "title-4", isSubscribed = true))
-        podcastEpisodeDao.insert(PodcastEpisode(uuid = "id-3", publishedDate = Date(200), podcastUuid = "id-4"))
+        podcastDao.insertBlocking(Podcast(uuid = "id-4", title = "title-4", isSubscribed = true))
+        podcastEpisodeDao.insertBlocking(PodcastEpisode(uuid = "id-3", publishedDate = Date(200), podcastUuid = "id-4"))
 
         val podcastIds = externalDataDao.getSubscribedPodcasts(PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST, limit = 100).map { it.id }
 
@@ -234,10 +234,10 @@ class ExternalDataDaoTest {
 
     @Test
     fun sortSubscribedPodcastsByCustomSortOrder() = runTest {
-        podcastDao.insert(Podcast(uuid = "id-1", title = "title-1", isSubscribed = true, sortPosition = 3))
-        podcastDao.insert(Podcast(uuid = "id-2", title = "title-2", isSubscribed = true, sortPosition = 1))
-        podcastDao.insert(Podcast(uuid = "id-3", title = "title-3", isSubscribed = true, sortPosition = 2))
-        podcastDao.insert(Podcast(uuid = "id-4", title = "title-4", isSubscribed = true, sortPosition = 4))
+        podcastDao.insertBlocking(Podcast(uuid = "id-1", title = "title-1", isSubscribed = true, sortPosition = 3))
+        podcastDao.insertBlocking(Podcast(uuid = "id-2", title = "title-2", isSubscribed = true, sortPosition = 1))
+        podcastDao.insertBlocking(Podcast(uuid = "id-3", title = "title-3", isSubscribed = true, sortPosition = 2))
+        podcastDao.insertBlocking(Podcast(uuid = "id-4", title = "title-4", isSubscribed = true, sortPosition = 4))
 
         val podcastIds = externalDataDao.getSubscribedPodcasts(PodcastsSortType.DRAG_DROP, limit = 100).map { it.id }
 
@@ -247,7 +247,7 @@ class ExternalDataDaoTest {
     @Test
     fun limitSubscribedPodcasts() = runTest {
         List(250) {
-            podcastDao.insert(Podcast(uuid = "id-$it", isSubscribed = true))
+            podcastDao.insertBlocking(Podcast(uuid = "id-$it", isSubscribed = true))
         }
 
         val podcasts = externalDataDao.getSubscribedPodcasts(PodcastsSortType.NAME_A_TO_Z, limit = 60)
@@ -308,8 +308,8 @@ class ExternalDataDaoTest {
             )
         }
         podcastDao.replaceAllCuratedPodcasts(trendingPodcasts)
-        podcastDao.insert(Podcast("id-0", isSubscribed = true))
-        podcastDao.insert(Podcast("id-1", isSubscribed = false))
+        podcastDao.insertBlocking(Podcast("id-0", isSubscribed = true))
+        podcastDao.insertBlocking(Podcast("id-1", isSubscribed = false))
 
         val podcasts = externalDataDao.getCuratedPodcastGroups(limitPerGroup = 100).trendingGroup()?.podcasts
 
@@ -373,8 +373,8 @@ class ExternalDataDaoTest {
             )
         }
         podcastDao.replaceAllCuratedPodcasts(trendingPodcasts)
-        podcastDao.insert(Podcast("id-0", isSubscribed = true))
-        podcastDao.insert(Podcast("id-1", isSubscribed = false))
+        podcastDao.insertBlocking(Podcast("id-0", isSubscribed = true))
+        podcastDao.insertBlocking(Podcast("id-1", isSubscribed = false))
 
         val podcasts = externalDataDao.getCuratedPodcastGroups(limitPerGroup = 100).featuruedGroup()?.podcasts
 
@@ -446,8 +446,8 @@ class ExternalDataDaoTest {
             )
         }
         podcastDao.replaceAllCuratedPodcasts(trendingPodcasts)
-        podcastDao.insert(Podcast("id-0", isSubscribed = true))
-        podcastDao.insert(Podcast("id-1", isSubscribed = false))
+        podcastDao.insertBlocking(Podcast("id-0", isSubscribed = true))
+        podcastDao.insertBlocking(Podcast("id-1", isSubscribed = false))
 
         val podcasts = externalDataDao.getCuratedPodcastGroups(limitPerGroup = 100).genericGroups()["bork"]?.podcasts
 
@@ -572,18 +572,18 @@ class ExternalDataDaoTest {
         val interactionDate1 = Date.from(Instant.now().minus(1, ChronoUnit.DAYS))
         val interactionDate2 = Date.from(Instant.now().minus(2, ChronoUnit.DAYS))
         val interactionDate3 = Date.from(Instant.now().minus(3, ChronoUnit.DAYS))
-        podcastDao.insert(Podcast(uuid = "id-1", title = "title-1", isSubscribed = true))
-        podcastEpisodeDao.insert(PodcastEpisode(uuid = "id-1", publishedDate = Date(0), podcastUuid = "id-1", lastPlaybackInteraction = interactionDate1.time))
-        podcastEpisodeDao.insert(PodcastEpisode(uuid = "id-2", publishedDate = Date(2), podcastUuid = "id-1", lastPlaybackInteraction = null))
-        podcastEpisodeDao.insert(PodcastEpisode(uuid = "id-3", publishedDate = Date(1), podcastUuid = "id-1", lastPlaybackInteraction = 13000))
+        podcastDao.insertBlocking(Podcast(uuid = "id-1", title = "title-1", isSubscribed = true))
+        podcastEpisodeDao.insertBlocking(PodcastEpisode(uuid = "id-1", publishedDate = Date(0), podcastUuid = "id-1", lastPlaybackInteraction = interactionDate1.time))
+        podcastEpisodeDao.insertBlocking(PodcastEpisode(uuid = "id-2", publishedDate = Date(2), podcastUuid = "id-1", lastPlaybackInteraction = null))
+        podcastEpisodeDao.insertBlocking(PodcastEpisode(uuid = "id-3", publishedDate = Date(1), podcastUuid = "id-1", lastPlaybackInteraction = 13000))
 
-        podcastDao.insert(Podcast(uuid = "id-2", title = "title-2", isSubscribed = false))
-        podcastEpisodeDao.insert(PodcastEpisode(uuid = "id-4", publishedDate = Date(5), podcastUuid = "id-2", lastPlaybackInteraction = 0))
-        podcastEpisodeDao.insert(PodcastEpisode(uuid = "id-5", publishedDate = Date(4), podcastUuid = "id-2", lastPlaybackInteraction = 20))
-        podcastEpisodeDao.insert(PodcastEpisode(uuid = "id-6", publishedDate = Date(3), podcastUuid = "id-2", lastPlaybackInteraction = interactionDate2.time))
+        podcastDao.insertBlocking(Podcast(uuid = "id-2", title = "title-2", isSubscribed = false))
+        podcastEpisodeDao.insertBlocking(PodcastEpisode(uuid = "id-4", publishedDate = Date(5), podcastUuid = "id-2", lastPlaybackInteraction = 0))
+        podcastEpisodeDao.insertBlocking(PodcastEpisode(uuid = "id-5", publishedDate = Date(4), podcastUuid = "id-2", lastPlaybackInteraction = 20))
+        podcastEpisodeDao.insertBlocking(PodcastEpisode(uuid = "id-6", publishedDate = Date(3), podcastUuid = "id-2", lastPlaybackInteraction = interactionDate2.time))
 
-        podcastDao.insert(Podcast(uuid = "id-3", title = "title-3", isSubscribed = true))
-        podcastEpisodeDao.insert(PodcastEpisode(uuid = "id-7", publishedDate = Date(12), podcastUuid = "id-3", lastPlaybackInteraction = interactionDate3.time))
+        podcastDao.insertBlocking(Podcast(uuid = "id-3", title = "title-3", isSubscribed = true))
+        podcastEpisodeDao.insertBlocking(PodcastEpisode(uuid = "id-7", publishedDate = Date(12), podcastUuid = "id-3", lastPlaybackInteraction = interactionDate3.time))
 
         val podcasts = externalDataDao.getRecentlyPlayedPodcasts(limit = 100)
 
@@ -625,13 +625,13 @@ class ExternalDataDaoTest {
     @Test
     fun includeOnlyInteractedWithPodcastsForRecentlyPlayedPodcasts() = runTest {
         val interactionDate = Date()
-        podcastDao.insert(Podcast(uuid = "id-1", title = "title-1"))
-        podcastEpisodeDao.insert(PodcastEpisode(uuid = "id-1", publishedDate = Date(0), podcastUuid = "id-1", lastPlaybackInteraction = interactionDate.time))
+        podcastDao.insertBlocking(Podcast(uuid = "id-1", title = "title-1"))
+        podcastEpisodeDao.insertBlocking(PodcastEpisode(uuid = "id-1", publishedDate = Date(0), podcastUuid = "id-1", lastPlaybackInteraction = interactionDate.time))
 
-        podcastDao.insert(Podcast(uuid = "id-2", title = "title-2"))
-        podcastEpisodeDao.insert(PodcastEpisode(uuid = "id-2", publishedDate = Date(0), podcastUuid = "id-2", lastPlaybackInteraction = null))
+        podcastDao.insertBlocking(Podcast(uuid = "id-2", title = "title-2"))
+        podcastEpisodeDao.insertBlocking(PodcastEpisode(uuid = "id-2", publishedDate = Date(0), podcastUuid = "id-2", lastPlaybackInteraction = null))
 
-        podcastDao.insert(Podcast(uuid = "id-3", title = "title-3"))
+        podcastDao.insertBlocking(Podcast(uuid = "id-3", title = "title-3"))
 
         val podcasts = externalDataDao.getRecentlyPlayedPodcasts(limit = 100)
 
@@ -655,14 +655,14 @@ class ExternalDataDaoTest {
         val interactionDate1 = Date.from(Instant.now().minus(3, ChronoUnit.DAYS))
         val interactionDate2 = Date.from(Instant.now().minus(1, ChronoUnit.DAYS))
         val interactionDate3 = Date.from(Instant.now().minus(2, ChronoUnit.DAYS))
-        podcastDao.insert(Podcast(uuid = "id-1", title = "title-1"))
-        podcastEpisodeDao.insert(PodcastEpisode(uuid = "id-1", publishedDate = Date(0), podcastUuid = "id-1", lastPlaybackInteraction = interactionDate1.time))
+        podcastDao.insertBlocking(Podcast(uuid = "id-1", title = "title-1"))
+        podcastEpisodeDao.insertBlocking(PodcastEpisode(uuid = "id-1", publishedDate = Date(0), podcastUuid = "id-1", lastPlaybackInteraction = interactionDate1.time))
 
-        podcastDao.insert(Podcast(uuid = "id-2", title = "title-2"))
-        podcastEpisodeDao.insert(PodcastEpisode(uuid = "id-2", publishedDate = Date(0), podcastUuid = "id-2", lastPlaybackInteraction = interactionDate2.time))
+        podcastDao.insertBlocking(Podcast(uuid = "id-2", title = "title-2"))
+        podcastEpisodeDao.insertBlocking(PodcastEpisode(uuid = "id-2", publishedDate = Date(0), podcastUuid = "id-2", lastPlaybackInteraction = interactionDate2.time))
 
-        podcastDao.insert(Podcast(uuid = "id-3", title = "title-3"))
-        podcastEpisodeDao.insert(PodcastEpisode(uuid = "id-3", publishedDate = Date(0), podcastUuid = "id-3", lastPlaybackInteraction = interactionDate3.time))
+        podcastDao.insertBlocking(Podcast(uuid = "id-3", title = "title-3"))
+        podcastEpisodeDao.insertBlocking(PodcastEpisode(uuid = "id-3", publishedDate = Date(0), podcastUuid = "id-3", lastPlaybackInteraction = interactionDate3.time))
 
         val podcasts = externalDataDao.getRecentlyPlayedPodcasts(limit = 100)
 
@@ -704,8 +704,8 @@ class ExternalDataDaoTest {
     @Test
     fun limitRecentlyPlayedPodcasts() = runTest {
         List(250) {
-            podcastDao.insert(Podcast(uuid = "id-$it"))
-            podcastEpisodeDao.insert(PodcastEpisode(uuid = "id-$it", podcastUuid = "id-$it", publishedDate = Date(), lastPlaybackInteraction = Date().time))
+            podcastDao.insertBlocking(Podcast(uuid = "id-$it"))
+            podcastEpisodeDao.insertBlocking(PodcastEpisode(uuid = "id-$it", podcastUuid = "id-$it", publishedDate = Date(), lastPlaybackInteraction = Date().time))
         }
 
         val podcasts = externalDataDao.getRecentlyPlayedPodcasts(limit = 100)
@@ -717,11 +717,11 @@ class ExternalDataDaoTest {
     fun ignoreRecentlyPlayedPodcastsThatAreAtLeast60DaysOld() = runTest {
         val interactionDate1 = Date.from(Instant.now().minus(61, ChronoUnit.DAYS))
         val interactionDate2 = Date.from(Instant.now().minus(59, ChronoUnit.DAYS))
-        podcastDao.insert(Podcast(uuid = "id-1", title = "title-1", isSubscribed = true))
-        podcastEpisodeDao.insert(PodcastEpisode(uuid = "id-1", publishedDate = Date(0), podcastUuid = "id-1", lastPlaybackInteraction = interactionDate1.time))
+        podcastDao.insertBlocking(Podcast(uuid = "id-1", title = "title-1", isSubscribed = true))
+        podcastEpisodeDao.insertBlocking(PodcastEpisode(uuid = "id-1", publishedDate = Date(0), podcastUuid = "id-1", lastPlaybackInteraction = interactionDate1.time))
 
-        podcastDao.insert(Podcast(uuid = "id-2", title = "title-2", isSubscribed = false))
-        podcastEpisodeDao.insert(PodcastEpisode(uuid = "id-2", publishedDate = Date(0), podcastUuid = "id-2", lastPlaybackInteraction = interactionDate2.time))
+        podcastDao.insertBlocking(Podcast(uuid = "id-2", title = "title-2", isSubscribed = false))
+        podcastEpisodeDao.insertBlocking(PodcastEpisode(uuid = "id-2", publishedDate = Date(0), podcastUuid = "id-2", lastPlaybackInteraction = interactionDate2.time))
 
         val podcasts = externalDataDao.getRecentlyPlayedPodcasts(limit = 100)
 
@@ -743,8 +743,8 @@ class ExternalDataDaoTest {
     @Test
     fun includeCategoriesForRecentlyPlayedPodcasts() = runTest {
         val interactionDate1 = Date.from(Instant.now().minus(1, ChronoUnit.DAYS))
-        podcastDao.insert(Podcast(uuid = "id-1", title = "title-1", podcastCategory = "category1"))
-        podcastEpisodeDao.insert(PodcastEpisode(uuid = "id-1", publishedDate = Date(0), podcastUuid = "id-1", lastPlaybackInteraction = interactionDate1.time))
+        podcastDao.insertBlocking(Podcast(uuid = "id-1", title = "title-1", podcastCategory = "category1"))
+        podcastEpisodeDao.insertBlocking(PodcastEpisode(uuid = "id-1", publishedDate = Date(0), podcastUuid = "id-1", lastPlaybackInteraction = interactionDate1.time))
 
         val podcasts = externalDataDao.getRecentlyPlayedPodcasts(limit = 100)
 
@@ -806,9 +806,9 @@ class ExternalDataDaoTest {
                 episodeStatus = EpisodeStatusEnum.DOWNLOADED,
             ),
         )
-        podcastEpisodeDao.insertAll(episodes)
-        podcastDao.insert(Podcast(uuid = "p-id-1", title = "p-title-1", isSubscribed = true))
-        podcastDao.insert(Podcast(uuid = "p-id-2", title = "p-title-2", isSubscribed = true))
+        podcastEpisodeDao.insertAllBlocking(episodes)
+        podcastDao.insertBlocking(Podcast(uuid = "p-id-1", title = "p-title-1", isSubscribed = true))
+        podcastDao.insertBlocking(Podcast(uuid = "p-id-2", title = "p-title-2", isSubscribed = true))
 
         val newEpisodes = externalDataDao.getNewEpisodes(limit = 100)
 
@@ -879,8 +879,8 @@ class ExternalDataDaoTest {
                 publishedDate = publishedDate3,
             ),
         )
-        podcastEpisodeDao.insertAll(episodes)
-        podcastDao.insert(Podcast(uuid = "", isSubscribed = true))
+        podcastEpisodeDao.insertAllBlocking(episodes)
+        podcastDao.insertBlocking(Podcast(uuid = "", isSubscribed = true))
 
         val newEpisodes = externalDataDao.getNewEpisodes(limit = 100)
 
@@ -939,8 +939,8 @@ class ExternalDataDaoTest {
                 publishedDate = Date(),
             )
         }
-        podcastEpisodeDao.insertAll(episodes)
-        podcastDao.insert(Podcast(uuid = "", isSubscribed = true))
+        podcastEpisodeDao.insertAllBlocking(episodes)
+        podcastDao.insertBlocking(Podcast(uuid = "", isSubscribed = true))
 
         val newEpisodes = externalDataDao.getNewEpisodes(limit = 75)
 
@@ -962,8 +962,8 @@ class ExternalDataDaoTest {
                 publishedDate = publishedDate,
             ),
         )
-        podcastEpisodeDao.insertAll(episodes)
-        podcastDao.insert(Podcast(uuid = "", isSubscribed = true))
+        podcastEpisodeDao.insertAllBlocking(episodes)
+        podcastDao.insertBlocking(Podcast(uuid = "", isSubscribed = true))
 
         val newEpisodes = externalDataDao.getNewEpisodes(limit = 100)
 
@@ -1006,8 +1006,8 @@ class ExternalDataDaoTest {
                 publishedDate = publishedDate,
             ),
         )
-        podcastEpisodeDao.insertAll(episodes)
-        podcastDao.insert(Podcast(uuid = "", isSubscribed = true))
+        podcastEpisodeDao.insertAllBlocking(episodes)
+        podcastDao.insertBlocking(Podcast(uuid = "", isSubscribed = true))
 
         val newEpisodes = externalDataDao.getNewEpisodes(limit = 100)
 
@@ -1044,8 +1044,8 @@ class ExternalDataDaoTest {
                 publishedDate = publishedDate2,
             ),
         )
-        podcastEpisodeDao.insertAll(episodes)
-        podcastDao.insert(Podcast(uuid = "", isSubscribed = true))
+        podcastEpisodeDao.insertAllBlocking(episodes)
+        podcastDao.insertBlocking(Podcast(uuid = "", isSubscribed = true))
 
         val newEpisodes = externalDataDao.getNewEpisodes(limit = 100)
 
@@ -1083,9 +1083,9 @@ class ExternalDataDaoTest {
                 publishedDate = publishedDate,
             ),
         )
-        podcastEpisodeDao.insertAll(episodes)
-        podcastDao.insert(Podcast(uuid = "p-id-1", isSubscribed = true))
-        podcastDao.insert(Podcast(uuid = "p-id-2", isSubscribed = false))
+        podcastEpisodeDao.insertAllBlocking(episodes)
+        podcastDao.insertBlocking(Podcast(uuid = "p-id-1", isSubscribed = true))
+        podcastDao.insertBlocking(Podcast(uuid = "p-id-2", isSubscribed = false))
 
         val newEpisodes = externalDataDao.getNewEpisodes(limit = 100)
 
@@ -1150,9 +1150,9 @@ class ExternalDataDaoTest {
                 fileType = "video/",
             ),
         )
-        podcastEpisodeDao.insertAll(episodes)
-        podcastDao.insert(Podcast(uuid = "p-id-1", title = "p-title-1"))
-        podcastDao.insert(Podcast(uuid = "p-id-2", title = "p-title-2"))
+        podcastEpisodeDao.insertAllBlocking(episodes)
+        podcastDao.insertBlocking(Podcast(uuid = "p-id-1", title = "p-title-1"))
+        podcastDao.insertBlocking(Podcast(uuid = "p-id-2", title = "p-title-2"))
 
         val inProgressEpisodes = externalDataDao.getInProgressEpisodes(limit = 100, currentTime = 0)
 
@@ -1225,8 +1225,8 @@ class ExternalDataDaoTest {
                 lastPlaybackInteraction = 3,
             ),
         )
-        podcastEpisodeDao.insertAll(episodes)
-        podcastDao.insert(Podcast())
+        podcastEpisodeDao.insertAllBlocking(episodes)
+        podcastDao.insertBlocking(Podcast())
 
         val inProgressEpisodes = externalDataDao.getInProgressEpisodes(limit = 100, currentTime = 0)
 
@@ -1286,8 +1286,8 @@ class ExternalDataDaoTest {
                 playingStatus = EpisodePlayingStatus.IN_PROGRESS,
             )
         }
-        podcastEpisodeDao.insertAll(episodes)
-        podcastDao.insert(Podcast())
+        podcastEpisodeDao.insertAllBlocking(episodes)
+        podcastDao.insertBlocking(Podcast())
 
         val inProgressEpisodes = externalDataDao.getInProgressEpisodes(limit = 20, currentTime = 0)
 
@@ -1310,8 +1310,8 @@ class ExternalDataDaoTest {
                 playingStatus = EpisodePlayingStatus.IN_PROGRESS,
             ),
         )
-        podcastEpisodeDao.insertAll(episodes)
-        podcastDao.insert(Podcast())
+        podcastEpisodeDao.insertAllBlocking(episodes)
+        podcastDao.insertBlocking(Podcast())
 
         val inProgressEpisodes = externalDataDao.getInProgressEpisodes(limit = 100, currentTime = 0)
 
@@ -1353,8 +1353,8 @@ class ExternalDataDaoTest {
                 playingStatus = EpisodePlayingStatus.COMPLETED,
             ),
         )
-        podcastEpisodeDao.insertAll(episodes)
-        podcastDao.insert(Podcast())
+        podcastEpisodeDao.insertAllBlocking(episodes)
+        podcastDao.insertBlocking(Podcast())
 
         val inProgressEpisodes = externalDataDao.getInProgressEpisodes(limit = 100, currentTime = 0)
 
@@ -1392,9 +1392,9 @@ class ExternalDataDaoTest {
             fileType = "video/*",
             episodeStatus = EpisodeStatusEnum.DOWNLOADED,
         )
-        podcastEpisodeDao.insert(podcastEpisode)
-        upNextDao.insert(UpNextEpisode(episodeUuid = "id-1"))
-        podcastDao.insert(Podcast(uuid = "p-id-1", title = "p-title-1", isSubscribed = true))
+        podcastEpisodeDao.insertBlocking(podcastEpisode)
+        upNextDao.insertBlocking(UpNextEpisode(episodeUuid = "id-1"))
+        podcastDao.insertBlocking(Podcast(uuid = "p-id-1", title = "p-title-1", isSubscribed = true))
 
         val episodes = externalDataDao.observeUpNextQueue(limit = 100).first()
 
@@ -1431,7 +1431,7 @@ class ExternalDataDaoTest {
             episodeStatus = EpisodeStatusEnum.DOWNLOADED,
         )
         userEpisodeDao.insert(userEpisode)
-        upNextDao.insert(UpNextEpisode(episodeUuid = "id-1"))
+        upNextDao.insertBlocking(UpNextEpisode(episodeUuid = "id-1"))
 
         val episodes = externalDataDao.observeUpNextQueue(limit = 100).first()
 
@@ -1453,13 +1453,13 @@ class ExternalDataDaoTest {
 
     @Test
     fun getUpNextEpisodesInCorrectOrder() = runTest {
-        podcastEpisodeDao.insert(PodcastEpisode(uuid = "id-1", publishedDate = Date()))
-        podcastEpisodeDao.insert(PodcastEpisode(uuid = "id-2", publishedDate = Date()))
-        podcastEpisodeDao.insert(PodcastEpisode(uuid = "id-3", publishedDate = Date()))
+        podcastEpisodeDao.insertBlocking(PodcastEpisode(uuid = "id-1", publishedDate = Date()))
+        podcastEpisodeDao.insertBlocking(PodcastEpisode(uuid = "id-2", publishedDate = Date()))
+        podcastEpisodeDao.insertBlocking(PodcastEpisode(uuid = "id-3", publishedDate = Date()))
         userEpisodeDao.insert(UserEpisode(uuid = "id-4", publishedDate = Date()))
         userEpisodeDao.insert(UserEpisode(uuid = "id-5", publishedDate = Date()))
-        podcastDao.insert(Podcast())
-        upNextDao.insertAll(
+        podcastDao.insertBlocking(Podcast())
+        upNextDao.insertAllBlocking(
             listOf(
                 UpNextEpisode(episodeUuid = "id-1", position = 0),
                 UpNextEpisode(episodeUuid = "id-2", position = 4),
@@ -1476,11 +1476,11 @@ class ExternalDataDaoTest {
 
     @Test
     fun ignoreUnknnownUpNextEpisodes() = runTest {
-        podcastEpisodeDao.insert(PodcastEpisode(uuid = "id-1", publishedDate = Date()))
-        podcastEpisodeDao.insert(PodcastEpisode(uuid = "id-3", publishedDate = Date()))
+        podcastEpisodeDao.insertBlocking(PodcastEpisode(uuid = "id-1", publishedDate = Date()))
+        podcastEpisodeDao.insertBlocking(PodcastEpisode(uuid = "id-3", publishedDate = Date()))
         userEpisodeDao.insert(UserEpisode(uuid = "id-5", publishedDate = Date()))
-        podcastDao.insert(Podcast())
-        upNextDao.insertAll(
+        podcastDao.insertBlocking(Podcast())
+        upNextDao.insertAllBlocking(
             listOf(
                 UpNextEpisode(episodeUuid = "id-1", position = 0),
                 UpNextEpisode(episodeUuid = "id-2", position = 1),
@@ -1498,9 +1498,9 @@ class ExternalDataDaoTest {
     @Test
     fun limitUpNextEpisodes() = runTest {
         val podcastEpisodes = List(30) { PodcastEpisode(uuid = "id-$it", publishedDate = Date()) }
-        podcastEpisodeDao.insertAll(podcastEpisodes)
-        podcastDao.insert(Podcast())
-        upNextDao.insertAll(podcastEpisodes.mapIndexed { index, episode -> UpNextEpisode(episodeUuid = episode.uuid, position = index) })
+        podcastEpisodeDao.insertAllBlocking(podcastEpisodes)
+        podcastDao.insertBlocking(Podcast())
+        upNextDao.insertAllBlocking(podcastEpisodes.mapIndexed { index, episode -> UpNextEpisode(episodeUuid = episode.uuid, position = index) })
 
         val episodes = externalDataDao.observeUpNextQueue(limit = 8).first()
 

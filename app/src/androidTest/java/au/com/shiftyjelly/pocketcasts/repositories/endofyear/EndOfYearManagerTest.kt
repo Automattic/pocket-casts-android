@@ -94,7 +94,7 @@ class EndOfYearManagerTest {
 
     @Test
     fun getPlayedEpisodeCount() = runTest {
-        episodeDao.insertAll(
+        episodeDao.insertAllBlocking(
             listOf(
                 PodcastEpisode(
                     uuid = "id-1",
@@ -116,7 +116,7 @@ class EndOfYearManagerTest {
 
     @Test
     fun doNotCountOurOfRangeEpisodesForPlayedEpisodeCount() = runTest {
-        episodeDao.insertAll(
+        episodeDao.insertAllBlocking(
             listOf(
                 PodcastEpisode(
                     uuid = "id-1",
@@ -143,7 +143,7 @@ class EndOfYearManagerTest {
 
     @Test
     fun getCompletedEpisodeCount() = runTest {
-        episodeDao.insertAll(
+        episodeDao.insertAllBlocking(
             listOf(
                 PodcastEpisode(
                     uuid = "id-1",
@@ -167,7 +167,7 @@ class EndOfYearManagerTest {
 
     @Test
     fun doNotCountOurOfRangeEpisodesForCompletedEpisodeCount() = runTest {
-        episodeDao.insertAll(
+        episodeDao.insertAllBlocking(
             listOf(
                 PodcastEpisode(
                     uuid = "id-1",
@@ -197,7 +197,7 @@ class EndOfYearManagerTest {
 
     @Test
     fun doNotCountUncompletedEpisodesForCompletedEpisodeCount() = runTest {
-        episodeDao.insertAll(
+        episodeDao.insertAllBlocking(
             listOf(
                 PodcastEpisode(
                     uuid = "id-1",
@@ -221,8 +221,8 @@ class EndOfYearManagerTest {
 
     @Test
     fun getPlayedPodcast() = runTest {
-        podcastDao.insert(Podcast("p-id-1"))
-        episodeDao.insertAll(
+        podcastDao.insertBlocking(Podcast("p-id-1"))
+        episodeDao.insertAllBlocking(
             listOf(
                 PodcastEpisode(
                     uuid = "id-1",
@@ -239,8 +239,8 @@ class EndOfYearManagerTest {
             ),
         )
 
-        podcastDao.insert(Podcast("p-id-2"))
-        episodeDao.insertAll(
+        podcastDao.insertBlocking(Podcast("p-id-2"))
+        episodeDao.insertAllBlocking(
             listOf(
                 PodcastEpisode(
                     uuid = "id-3",
@@ -259,8 +259,8 @@ class EndOfYearManagerTest {
 
     @Test
     fun doNotCountTheSamePodcastTwiceForPlayedPodcastCount() = runTest {
-        podcastDao.insert(Podcast("p-id-1"))
-        episodeDao.insertAll(
+        podcastDao.insertBlocking(Podcast("p-id-1"))
+        episodeDao.insertAllBlocking(
             listOf(
                 PodcastEpisode(
                     uuid = "id-1",
@@ -285,8 +285,8 @@ class EndOfYearManagerTest {
 
     @Test
     fun doNotCountEpisodesOutOfRangeForPlayedPodcastCount() = runBlocking {
-        podcastDao.insert(Podcast("p-id-1"))
-        episodeDao.insertAll(
+        podcastDao.insertBlocking(Podcast("p-id-1"))
+        episodeDao.insertAllBlocking(
             listOf(
                 PodcastEpisode(
                     uuid = "id-1",
@@ -297,8 +297,8 @@ class EndOfYearManagerTest {
             ),
         )
 
-        podcastDao.insert(Podcast("p-id-2"))
-        episodeDao.insertAll(
+        podcastDao.insertBlocking(Podcast("p-id-2"))
+        episodeDao.insertAllBlocking(
             listOf(
                 PodcastEpisode(
                     uuid = "id-2",
@@ -309,8 +309,8 @@ class EndOfYearManagerTest {
             ),
         )
 
-        podcastDao.insert(Podcast("p-id-3"))
-        episodeDao.insertAll(
+        podcastDao.insertBlocking(Podcast("p-id-3"))
+        episodeDao.insertAllBlocking(
             listOf(
                 PodcastEpisode(
                     uuid = "id-3",
@@ -321,7 +321,7 @@ class EndOfYearManagerTest {
             ),
         )
 
-        podcastDao.insert(Podcast("p-id-4"))
+        podcastDao.insertBlocking(Podcast("p-id-4"))
 
         val stats = manager.getStats(year = Year.of(1000))
 
@@ -331,7 +331,7 @@ class EndOfYearManagerTest {
 
     @Test
     fun getThisYearPlaybackTime() = runTest {
-        episodeDao.insertAll(
+        episodeDao.insertAllBlocking(
             listOf(
                 PodcastEpisode(
                     uuid = "id-1",
@@ -355,7 +355,7 @@ class EndOfYearManagerTest {
 
     @Test
     fun doNotCountEpisodesOutOfRangeForThisYearPlaybackTime() = runTest {
-        episodeDao.insertAll(
+        episodeDao.insertAllBlocking(
             listOf(
                 PodcastEpisode(
                     uuid = "id-1",
@@ -385,7 +385,7 @@ class EndOfYearManagerTest {
 
     @Test
     fun getLastYearPlaybackTime() = runTest {
-        episodeDao.insertAll(
+        episodeDao.insertAllBlocking(
             listOf(
                 PodcastEpisode(
                     uuid = "id-1",
@@ -409,7 +409,7 @@ class EndOfYearManagerTest {
 
     @Test
     fun doNotCountEpisodesOutOfRangeForLastYearPlaybackTime() = runTest {
-        episodeDao.insertAll(
+        episodeDao.insertAllBlocking(
             listOf(
                 PodcastEpisode(
                     uuid = "id-1",
@@ -439,8 +439,8 @@ class EndOfYearManagerTest {
 
     @Test
     fun getTopPodcasts() = runTest {
-        podcastDao.insert(Podcast("p-id-1", title = "title-1", author = "author-1"))
-        episodeDao.insert(
+        podcastDao.insertBlocking(Podcast("p-id-1", title = "title-1", author = "author-1"))
+        episodeDao.insertBlocking(
             PodcastEpisode(
                 uuid = "id-1",
                 podcastUuid = "p-id-1",
@@ -450,8 +450,8 @@ class EndOfYearManagerTest {
             ),
         )
 
-        podcastDao.insert(Podcast("p-id-2", title = "title-2", author = "author-2"))
-        episodeDao.insert(
+        podcastDao.insertBlocking(Podcast("p-id-2", title = "title-2", author = "author-2"))
+        episodeDao.insertBlocking(
             PodcastEpisode(
                 uuid = "id-2",
                 podcastUuid = "p-id-2",
@@ -461,8 +461,8 @@ class EndOfYearManagerTest {
             ),
         )
 
-        podcastDao.insert(Podcast("p-id-3", title = "title-3", author = "author-3"))
-        episodeDao.insert(
+        podcastDao.insertBlocking(Podcast("p-id-3", title = "title-3", author = "author-3"))
+        episodeDao.insertBlocking(
             PodcastEpisode(
                 uuid = "id-3",
                 podcastUuid = "p-id-3",
@@ -472,8 +472,8 @@ class EndOfYearManagerTest {
             ),
         )
 
-        podcastDao.insert(Podcast("p-id-4", title = "title-4", author = "author-4"))
-        episodeDao.insert(
+        podcastDao.insertBlocking(Podcast("p-id-4", title = "title-4", author = "author-4"))
+        episodeDao.insertBlocking(
             PodcastEpisode(
                 uuid = "id-4",
                 podcastUuid = "p-id-4",
@@ -483,8 +483,8 @@ class EndOfYearManagerTest {
             ),
         )
 
-        podcastDao.insert(Podcast("p-id-5", title = "title-5", author = "author-5"))
-        episodeDao.insert(
+        podcastDao.insertBlocking(Podcast("p-id-5", title = "title-5", author = "author-5"))
+        episodeDao.insertBlocking(
             PodcastEpisode(
                 uuid = "id-5",
                 podcastUuid = "p-id-5",
@@ -494,8 +494,8 @@ class EndOfYearManagerTest {
             ),
         )
 
-        podcastDao.insert(Podcast("p-id-6", title = "title-6", author = "author-6"))
-        episodeDao.insert(
+        podcastDao.insertBlocking(Podcast("p-id-6", title = "title-6", author = "author-6"))
+        episodeDao.insertBlocking(
             PodcastEpisode(
                 uuid = "id-6",
                 podcastUuid = "p-id-6",
@@ -549,8 +549,8 @@ class EndOfYearManagerTest {
 
     @Test
     fun doNotCountTheSamePodcastTwiceForTopPodcasts() = runTest {
-        podcastDao.insert(Podcast("p-id-1", title = "title-1", author = "author-1"))
-        episodeDao.insertAll(
+        podcastDao.insertBlocking(Podcast("p-id-1", title = "title-1", author = "author-1"))
+        episodeDao.insertAllBlocking(
             listOf(
                 PodcastEpisode(
                     uuid = "id-1",
@@ -576,9 +576,9 @@ class EndOfYearManagerTest {
 
     @Test
     fun sortTopPodcastsByPlaybackTimeAndEpisodeCount() = runTest {
-        podcastDao.insert(Podcast("p-id-1", title = "title-1", author = "author-1"))
+        podcastDao.insertBlocking(Podcast("p-id-1", title = "title-1", author = "author-1"))
         repeat(2) { index ->
-            episodeDao.insert(
+            episodeDao.insertBlocking(
                 PodcastEpisode(
                     uuid = "id-$index-1",
                     podcastUuid = "p-id-1",
@@ -589,9 +589,9 @@ class EndOfYearManagerTest {
             )
         }
 
-        podcastDao.insert(Podcast("p-id-2", title = "title-2", author = "author-2"))
+        podcastDao.insertBlocking(Podcast("p-id-2", title = "title-2", author = "author-2"))
         repeat(4) { index ->
-            episodeDao.insert(
+            episodeDao.insertBlocking(
                 PodcastEpisode(
                     uuid = "id-$index-2",
                     podcastUuid = "p-id-2",
@@ -602,9 +602,9 @@ class EndOfYearManagerTest {
             )
         }
 
-        podcastDao.insert(Podcast("p-id-3", title = "title-3", author = "author-3"))
+        podcastDao.insertBlocking(Podcast("p-id-3", title = "title-3", author = "author-3"))
         repeat(10) { index ->
-            episodeDao.insert(
+            episodeDao.insertBlocking(
                 PodcastEpisode(
                     uuid = "id-$index-3",
                     podcastUuid = "p-id-3",
@@ -645,8 +645,8 @@ class EndOfYearManagerTest {
 
     @Test
     fun doNotCountEpisodesOutOfRangeForTopPodcasts() = runTest {
-        podcastDao.insert(Podcast("p-id-1", title = "title-1", author = "author-1"))
-        episodeDao.insertAll(
+        podcastDao.insertBlocking(Podcast("p-id-1", title = "title-1", author = "author-1"))
+        episodeDao.insertAllBlocking(
             listOf(
                 PodcastEpisode(
                     uuid = "id-1",
@@ -679,8 +679,8 @@ class EndOfYearManagerTest {
 
     @Test
     fun getLongestPlayedEpisode() = runTest {
-        podcastDao.insert(Podcast("p-id-1", title = "p-title-1"))
-        episodeDao.insert(
+        podcastDao.insertBlocking(Podcast("p-id-1", title = "p-title-1"))
+        episodeDao.insertBlocking(
             PodcastEpisode(
                 uuid = "id-1",
                 title = "title-1",
@@ -705,8 +705,8 @@ class EndOfYearManagerTest {
             manager.getStats(year = Year.of(1000)).longestEpisode,
         )
 
-        podcastDao.insert(Podcast("p-id-2", title = "p-title-2"))
-        episodeDao.insertAll(
+        podcastDao.insertBlocking(Podcast("p-id-2", title = "p-title-2"))
+        episodeDao.insertAllBlocking(
             listOf(
                 PodcastEpisode(
                     uuid = "id-2",
@@ -744,8 +744,8 @@ class EndOfYearManagerTest {
 
     @Test
     fun doNotCountEpisodesOutOfRangeForLongestPlayedEpisode() = runTest {
-        podcastDao.insert(Podcast("p-id-1"))
-        episodeDao.insertAll(
+        podcastDao.insertBlocking(Podcast("p-id-1"))
+        episodeDao.insertAllBlocking(
             listOf(
                 PodcastEpisode(
                     uuid = "id-1",
@@ -779,8 +779,8 @@ class EndOfYearManagerTest {
 
     @Test
     fun doNotCountUnplayedEpisodesForLongestPlayedEpisode() = runTest {
-        podcastDao.insert(Podcast("p-id-1"))
-        episodeDao.insertAll(
+        podcastDao.insertBlocking(Podcast("p-id-1"))
+        episodeDao.insertAllBlocking(
             listOf(
                 PodcastEpisode(
                     uuid = "id-1",

@@ -73,7 +73,7 @@ class AppDatabaseTest {
         val migratedDatabase = getMigratedRoomDatabase()
 
         val podcastDao = migratedDatabase.podcastDao()
-        val podcast = podcastDao.findByUuid("c33338e0-ea44-0134-ec45-4114446340cb")
+        val podcast = podcastDao.findByUuidBlocking("c33338e0-ea44-0134-ec45-4114446340cb")
         assertNotNull("Podcast should be found", podcast)
         assertEquals("MaxFun", podcast?.title)
         assertNotNull(podcast?.addedDate)
