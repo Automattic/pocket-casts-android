@@ -48,6 +48,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.fragment.app.Fragment
 import androidx.fragment.compose.content
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
@@ -59,6 +60,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.settings.LicensesFragment
 import au.com.shiftyjelly.pocketcasts.settings.R
 import au.com.shiftyjelly.pocketcasts.settings.components.RowTextButton
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getComposeThemeColor
@@ -93,6 +95,9 @@ class AboutFragment : BaseFragment() {
 
         AppThemeWithBackground(theme.activeTheme) {
             AboutPage(
+                openFragment = { fragment ->
+                    (activity as? FragmentHostListener)?.addFragment(fragment)
+                },
                 onBackPressed = { closeFragment() },
                 bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
             )
@@ -174,6 +179,7 @@ private val icons = listOf(
 private fun AboutPage(
     onBackPressed: () -> Unit,
     bottomInset: Dp,
+    openFragment: (Fragment) -> Unit,
 ) {
     val context = LocalContext.current
     LazyColumn(
@@ -254,7 +260,7 @@ private fun AboutPage(
             HorizontalDivider(modifier = Modifier.padding(bottom = 8.dp))
         }
         item {
-            LegalAndMoreRow()
+            LegalAndMoreRow(openFragment)
         }
         item {
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
@@ -326,7 +332,7 @@ fun AutomatticFamilyRow() {
 }
 
 @Composable
-fun LegalAndMoreRow() {
+fun LegalAndMoreRow(openFragment: (Fragment) -> Unit) {
     val context = LocalContext.current
     var legalExpanded by rememberSaveable { mutableStateOf(false) }
     val target = if (legalExpanded) 360f else 180f
@@ -362,7 +368,7 @@ fun LegalAndMoreRow() {
             )
             RowTextButton(
                 text = stringResource(LR.string.settings_about_acknowledgements),
-                onClick = { openAcknowledgements(context) },
+                onClick = { openFragment(LicensesFragment()) },
             )
         }
     }
@@ -420,5 +426,6 @@ private fun AboutPagePreview() {
     AboutPage(
         onBackPressed = {},
         bottomInset = 0.dp,
+        openFragment = {},
     )
 }
