@@ -9,19 +9,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesActivity.StoriesSource
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksContainerFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListFragment
-import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudFilesFragment
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsGuestPassFragment
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsGuestPassFragment.ReferralsPageType
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsViewModel
-import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.settings.HelpFragment
 import au.com.shiftyjelly.pocketcasts.settings.SettingsFragment
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
@@ -34,20 +30,9 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class ProfileFragment : BaseFragment() {
-
-    @Inject
-    lateinit var podcastManager: PodcastManager
-
-    @Inject
-    lateinit var settings: Settings
-
-    @Inject
-    lateinit var analyticsTracker: AnalyticsTracker
-
     private val profileViewModel by viewModels<ProfileViewModel>()
     private val referralsViewModel by viewModels<ReferralsViewModel>()
 
@@ -56,12 +41,15 @@ class ProfileFragment : BaseFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = content {
+        CallOnce {
+            profileViewModel.onScreenShown()
+        }
         val state = ProfilePageState(
             isSendReferralsEnabled = FeatureFlag.isEnabled(Feature.REFERRALS_SEND),
-            isPlaybackEnabled = profileViewModel.isEndOfYearStoriesEligible.collectAsState().value,
+            isPlaybackEnabled = profileViewModel.isPlaybackAvailable.collectAsState().value,
             isClaimReferralsEnabled = FeatureFlag.isEnabled(Feature.REFERRALS_CLAIM),
             isUpgradeBannerVisible = profileViewModel.showUpgradeBanner.collectAsState(false).value,
-            miniPlayerPadding = settings.bottomInset.collectAsState(0).value.pxToDp(requireContext()).dp,
+            miniPlayerPadding = profileViewModel.miniPlayerInset.collectAsState().value.pxToDp(requireContext()).dp,
             headerState = profileViewModel.profileHeaderState.collectAsState().value,
             statsState = profileViewModel.profileStatsState.collectAsState().value,
             referralsState = referralsViewModel.state.collectAsState().value,
@@ -73,8 +61,7 @@ class ProfileFragment : BaseFragment() {
             themeType = theme.activeTheme,
             onSendReferralsClick = {
                 referralsViewModel.onIconClick()
-                val fragment = ReferralsGuestPassFragment.newInstance(ReferralsPageType.Send)
-                (requireActivity() as FragmentHostListener).showBottomSheet(fragment)
+                fragmentHostListener.showBottomSheet(ReferralsGuestPassFragment.newInstance(ReferralsPageType.Send))
             },
             onReferralsTooltipClick = {
                 referralsViewModel.onTooltipClick()
@@ -83,32 +70,23 @@ class ProfileFragment : BaseFragment() {
                 referralsViewModel.onTooltipShown()
             },
             onSettingsClick = {
-                analyticsTracker.track(AnalyticsEvent.PROFILE_SETTINGS_BUTTON_TAPPED)
-                (requireActivity() as FragmentHostListener).addFragment(SettingsFragment())
+                profileViewModel.onSettingsClick()
+                fragmentHostListener.addFragment(SettingsFragment())
             },
             onHeaderClick = {
-                analyticsTracker.track(AnalyticsEvent.PROFILE_ACCOUNT_BUTTON_TAPPED)
+                profileViewModel.onHeaderClick()
                 if (profileViewModel.isSignedIn) {
-                    val fragment = AccountDetailsFragment.newInstance()
-                    (activity as FragmentHostListener).addFragment(fragment)
+                    fragmentHostListener.addFragment(AccountDetailsFragment.newInstance())
                 } else {
-                    OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.LoggedOut)
+                    OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.LoggedOut)
                 }
             },
             onPlaybackClick = {
-                analyticsTracker.track(
-                    AnalyticsEvent.END_OF_YEAR_PROFILE_CARD_TAPPED,
-                    mapOf("year" to EndOfYearManager.YEAR_TO_SYNC.value),
-                )
-                // once stories prompt card is tapped, we don't want to show stories launch modal if not already shown
-                if (settings.getEndOfYearShowModal()) {
-                    settings.setEndOfYearShowModal(false)
-                }
+                profileViewModel.onPlaybackClick()
                 (activity as? FragmentHostListener)?.showStoriesOrAccount(StoriesSource.PROFILE.value)
             },
             onClaimReferralsClick = {
-                val fragment = ReferralsGuestPassFragment.newInstance(ReferralsPageType.Claim)
-                (requireActivity() as FragmentHostListener).showBottomSheet(fragment)
+                fragmentHostListener.showBottomSheet(ReferralsGuestPassFragment.newInstance(ReferralsPageType.Claim))
             },
             onHideReferralsCardClick = {
                 referralsViewModel.onHideBannerClick()
@@ -117,17 +95,15 @@ class ProfileFragment : BaseFragment() {
                 referralsViewModel.onBannerShown()
             },
             onShowReferralsSheet = {
-                val activity = requireActivity()
-                activity.supportFragmentManager.findFragmentByTag(ReferralsGuestPassFragment::class.java.name)?.let {
-                    (activity as FragmentHostListener).showBottomSheet(it)
-                }
+                requireActivity().supportFragmentManager
+                    .findFragmentByTag(ReferralsGuestPassFragment::class.java.name)
+                    ?.let { fragmentHostListener.showBottomSheet(it) }
             },
             onSectionClick = { section ->
                 goToSection(section)
             },
             onRefreshClick = {
-                podcastManager.refreshPodcasts("profile")
-                analyticsTracker.track(AnalyticsEvent.PROFILE_REFRESH_BUTTON_TAPPED)
+                profileViewModel.refreshProfile()
             },
             onUpgradeProfileClick = {
                 OnboardingLauncher.openOnboardingFlow(
@@ -147,44 +123,20 @@ class ProfileFragment : BaseFragment() {
         profileViewModel.clearFailedRefresh()
     }
 
+    private val fragmentHostListener get() = requireActivity() as FragmentHostListener
+
     private fun goToSection(section: ProfileSection) {
+        profileViewModel.onSectionClick(section)
         val fragment = when (section) {
-            ProfileSection.Stats -> {
-                analyticsTracker.track(AnalyticsEvent.STATS_SHOWN)
-                StatsFragment()
-            }
-
-            ProfileSection.Downloads -> {
-                analyticsTracker.track(AnalyticsEvent.DOWNLOADS_SHOWN)
-                ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.Downloaded)
-            }
-
-            ProfileSection.CloudFiles -> {
-                analyticsTracker.track(AnalyticsEvent.UPLOADED_FILES_SHOWN)
-                CloudFilesFragment()
-            }
-
-            ProfileSection.Starred -> {
-                analyticsTracker.track(AnalyticsEvent.STARRED_SHOWN)
-                ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.Starred)
-            }
-
-            ProfileSection.Bookmarks -> {
-                analyticsTracker.track(AnalyticsEvent.PROFILE_BOOKMARKS_SHOWN)
-                BookmarksContainerFragment.newInstance(sourceView = SourceView.PROFILE)
-            }
-
-            ProfileSection.ListeningHistory -> {
-                analyticsTracker.track(AnalyticsEvent.LISTENING_HISTORY_SHOWN)
-                ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.History)
-            }
-
-            ProfileSection.Help -> {
-                analyticsTracker.track(AnalyticsEvent.SETTINGS_HELP_SHOWN)
-                HelpFragment()
-            }
+            ProfileSection.Stats -> StatsFragment()
+            ProfileSection.Downloads -> ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.Downloaded)
+            ProfileSection.CloudFiles -> CloudFilesFragment()
+            ProfileSection.Starred -> ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.Starred)
+            ProfileSection.Bookmarks -> BookmarksContainerFragment.newInstance(sourceView = SourceView.PROFILE)
+            ProfileSection.ListeningHistory -> ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.History)
+            ProfileSection.Help -> HelpFragment()
         }
-        (requireActivity() as FragmentHostListener).addFragment(fragment)
+        fragmentHostListener.addFragment(fragment)
     }
 
     override fun onBackPressed(): Boolean {

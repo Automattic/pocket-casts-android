@@ -89,7 +89,6 @@ internal fun ProfilePage(
                 statsState = state.statsState,
                 onHeaderClick = onHeaderClick,
             )
-            VerticalSpacer()
             if (state.isPlaybackEnabled) {
                 EndOfYearPromptCard(
                     onClick = onPlaybackClick,
@@ -106,7 +105,7 @@ internal fun ProfilePage(
                     onShowReferralsSheet = onShowReferralsSheet,
                     modifier = Modifier.padding(horizontal = horizontalPadding),
                 )
-                if ((state.referralsState as ReferralsViewModel.UiState.Loaded?)?.showProfileBanner == true) {
+                if ((state.referralsState as? ReferralsViewModel.UiState.Loaded)?.showProfileBanner == true) {
                     VerticalSpacer()
                 }
             }
@@ -227,12 +226,14 @@ private fun ColumnScope.HeaderWithStats(
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
         )
+        VerticalSpacer()
         ProfileStats(
             state = statsState,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
         )
+        VerticalSpacer()
     } else {
         Row(
             modifier = Modifier
@@ -249,6 +250,7 @@ private fun ColumnScope.HeaderWithStats(
                 modifier = Modifier.weight(1f),
             )
         }
+        VerticalSpacer()
     }
 }
 
