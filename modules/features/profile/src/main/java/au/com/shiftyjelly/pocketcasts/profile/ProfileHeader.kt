@@ -212,13 +212,19 @@ private fun HorizontalProfileHeader(
             }
             OutlinedButton(
                 border = ButtonDefaults.outlinedBorder.copy(
-                    brush = SolidColor(MaterialTheme.theme.colors.secondaryUi02),
+                    brush = SolidColor(MaterialTheme.theme.colors.primaryUi05),
+                    width = 2.dp,
                 ),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    backgroundColor = Color.Transparent,
+                ),
+                shape = RoundedCornerShape(10.dp),
                 onClick = onClick,
             ) {
-                TextH50(
+                TextP50(
                     text = accountLabel,
                     fontScale = config.infoFontScale,
+                    letterSpacing = 0.5.sp,
                 )
             }
         }
