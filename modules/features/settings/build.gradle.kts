@@ -68,7 +68,6 @@ dependencies {
     implementation(libs.material.dialogs)
     implementation(libs.okhttp)
     implementation(libs.play.cast)
-    implementation(libs.play.oss.licenses)
     implementation(libs.rx2.android)
     implementation(libs.rx2.java)
     implementation(libs.rx2.kotlin)

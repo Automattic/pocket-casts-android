@@ -69,7 +69,6 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.utils.rateUs
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
-import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import timber.log.Timber
@@ -372,11 +371,6 @@ fun LegalAndMoreRow(openFragment: (Fragment) -> Unit) {
             )
         }
     }
-}
-
-fun openAcknowledgements(context: Context) {
-    OssLicensesMenuActivity.setActivityTitle(context.getString(LR.string.settings_licenses))
-    context.startActivity(Intent(context, OssLicensesMenuActivity::class.java))
 }
 
 private fun shareWithFriends(context: Context) {
