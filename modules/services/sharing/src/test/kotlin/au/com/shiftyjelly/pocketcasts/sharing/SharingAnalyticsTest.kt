@@ -449,7 +449,7 @@ class SharingAnalyticsTest {
     fun `log referral link sharing`() {
         val referralCode = "TEST_CODE"
         val referralsOfferInfo = ReferralsOfferInfoMock
-        val request = SharingRequest.referralLink(referralCode, referralsOfferInfo)
+        val request = SharingRequest.referralLink(referralCode, referralsOfferInfo, tempFolder.newFile())
             .setSourceView(SourceView.REFERRALS)
             .build()
 

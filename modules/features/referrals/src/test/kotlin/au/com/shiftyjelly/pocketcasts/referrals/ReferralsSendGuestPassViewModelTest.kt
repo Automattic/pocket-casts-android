@@ -148,7 +148,6 @@ class ReferralsSendGuestPassViewModelTest {
             assertEquals(referralCode, (data as SharingRequest.Data.ReferralLink).referralCode)
             assertEquals(SocialPlatform.More, platform)
             assertEquals(AnalyticsEvent.REFERRAL_PASS_SHARED, analyticsEvent)
-            assertTrue(capturedRequest.backgroundImage?.isFile == true)
             assertEquals(
                 mapOf(
                     "code" to referralCode,
