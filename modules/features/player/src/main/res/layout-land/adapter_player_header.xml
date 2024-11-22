@@ -233,8 +233,8 @@
             app:layout_constraintStart_toStartOf="@+id/previousChapter"
             app:layout_constraintTop_toBottomOf="@id/secondaryTextBottomBarrier" />
 
-        <include layout="@layout/player_controls"
-            android:id="@+id/playerControls"
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/playerControlsComposeView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="@+id/nextChapter"
@@ -247,7 +247,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
             android:weightSum="5"
-            app:layout_constraintTop_toBottomOf="@+id/playerControls"
+            app:layout_constraintTop_toBottomOf="@+id/playerControlsComposeView"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"/>

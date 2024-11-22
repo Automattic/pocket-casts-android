@@ -33,6 +33,7 @@ import au.com.shiftyjelly.pocketcasts.player.binding.setSeekBarState
 import au.com.shiftyjelly.pocketcasts.player.binding.showIfPresent
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterPlayerHeaderBinding
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContract
+import au.com.shiftyjelly.pocketcasts.player.view.playercontrols.PlayerControls
 import au.com.shiftyjelly.pocketcasts.player.view.shelf.PlayerShelf
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptPageWrapper
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptSearchViewModel
@@ -60,7 +61,6 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
-import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog.ButtonType.Danger
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -74,7 +74,6 @@ import javax.inject.Inject
 import kotlin.math.abs
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -127,13 +126,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
         imageRequestFactory = PocketCastsImageRequestFactory(view.context, cornerRadius = 8).themed().copy(isDarkTheme = true)
 
-        binding.playerControls.initPlayerControls(
-            ::onSkipBack,
-            ::onSkipForward,
-            ::onSkipForwardLongPress,
-            ::onPlayClicked,
-        )
-
         binding.seekBar.changeListener = object : PlayerSeekBar.OnUserSeekListener {
             override fun onSeekPositionChangeStop(progress: Duration, seekComplete: () -> Unit) {
                 val progressMs = progress.inWholeMilliseconds.toInt()
@@ -147,6 +139,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             }
         }
 
+        setupPlayerControlsComposeView()
         setupShelfComposeView()
 
         binding.previousChapter.setOnClickListener { onPreviousChapter() }
@@ -176,7 +169,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 isBuffering = headerViewModel.isBuffering,
                 theme = headerViewModel.theme,
             )
-            binding.playerControls.updatePlayerControls(headerViewModel, playerContrast1)
 
             binding.episodeTitle.setTextColor(playerContrast1)
 
@@ -261,6 +253,46 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 isBuffering = headerViewModel.isBuffering,
                 theme = headerViewModel.theme,
             )
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.snackbarMessages.collect { message ->
+                    if (message == PlayerViewModel.SnackbarMessage.ShowBatteryWarningIfAppropriate) {
+                        warningsHelper.showBatteryWarningSnackbarIfAppropriate(snackbarParentView = view)
+                    }
+                }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.navigationState.collect { navigationState ->
+                    when (navigationState) {
+                        is PlayerViewModel.NavigationState.ShowStreamingWarningDialog -> {
+                            warningsHelper.streamingWarningDialog(episode = navigationState.episode, snackbarParentView = view, sourceView = sourceView)
+                                .show(parentFragmentManager, "streaming dialog")
+                        }
+
+                        PlayerViewModel.NavigationState.ShowSkipForwardLongPressOptionsDialog -> {
+                            LongPressOptionsFragment().show(parentFragmentManager, "longpressoptions")
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun setupPlayerControlsComposeView() {
+        binding?.playerControlsComposeView?.apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                AppTheme(theme.activeTheme) {
+                    PlayerControls(
+                        playerViewModel = viewModel,
+                    )
+                }
+            }
         }
     }
 
@@ -415,8 +447,11 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         shelfComposeView.isVisible = false
         val transcriptShowSeekbarAndPlayerControls = resources.getBoolean(R.bool.transcript_show_seekbar_and_player_controls)
         seekBar.isVisible = transcriptShowSeekbarAndPlayerControls
-        playerControls.root.isVisible = transcriptShowSeekbarAndPlayerControls
-        playerControls.scale(0.6f)
+        with(playerControlsComposeView) {
+            isVisible = transcriptShowSeekbarAndPlayerControls
+            scaleX = 0.6f
+            scaleY = 0.6f
+        }
         if (transcriptShowSeekbarAndPlayerControls) {
             (seekBar.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin = resources.getDimensionPixelSize(R.dimen.seekbar_margin_bottom_transcript)
         }
@@ -433,8 +468,11 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         shelfComposeView.isVisible = true
         transcriptPage.isVisible = false
         seekBar.isVisible = true
-        playerControls.root.isVisible = true
-        playerControls.scale(1f)
+        with(playerControlsComposeView) {
+            isVisible = true
+            scaleX = 1f
+            scaleY = 1f
+        }
         val transcriptShowSeekbarAndPlayerControls = resources.getBoolean(R.bool.transcript_show_seekbar_and_player_controls)
         if (transcriptShowSeekbarAndPlayerControls) {
             (seekBar.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin = resources.getDimensionPixelSize(R.dimen.seekbar_margin_bottom)
@@ -526,18 +564,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         openBottomSheet(fragment)
     }
 
-    override fun onSkipBack() {
-        viewModel.skipBackward()
-    }
-
-    override fun onSkipForward() {
-        viewModel.skipForward()
-    }
-
-    override fun onSkipForwardLongPress() {
-        LongPressOptionsFragment().show(parentFragmentManager, "longpressoptions")
-    }
-
     private fun startUpsellFlow(source: OnboardingUpgradeSource) {
         val onboardingFlow = OnboardingFlow.Upsell(
             source = source,
@@ -553,33 +579,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     override fun onNextChapter() {
         analyticsTracker.track(AnalyticsEvent.PLAYER_NEXT_CHAPTER_TAPPED)
         viewModel.nextChapter()
-    }
-
-    override fun onPlayClicked() {
-        if (playbackManager.isPlaying()) {
-            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Pause clicked in player")
-            playbackManager.pause(sourceView = sourceView)
-        } else {
-            if (playbackManager.shouldWarnAboutPlayback()) {
-                launch {
-                    // show the stream warning if the episode isn't downloaded
-                    playbackManager.getCurrentEpisode()?.let { episode ->
-                        launch(Dispatchers.Main) {
-                            if (episode.isDownloaded) {
-                                viewModel.play()
-                                warningsHelper.showBatteryWarningSnackbarIfAppropriate(snackbarParentView = view)
-                            } else {
-                                warningsHelper.streamingWarningDialog(episode = episode, snackbarParentView = view, sourceView = sourceView)
-                                    .show(parentFragmentManager, "streaming dialog")
-                            }
-                        }
-                    }
-                }
-            } else {
-                viewModel.play()
-                warningsHelper.showBatteryWarningSnackbarIfAppropriate(snackbarParentView = view)
-            }
-        }
     }
 
     override fun onClosePlayer() {

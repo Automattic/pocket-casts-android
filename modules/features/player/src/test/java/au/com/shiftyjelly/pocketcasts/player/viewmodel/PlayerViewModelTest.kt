@@ -7,12 +7,15 @@ import androidx.lifecycle.asFlow
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel.NavigationState
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel.PlaybackEffectsSettingsTab
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel.SnackbarMessage
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
@@ -122,6 +125,88 @@ class PlayerViewModelTest {
     private lateinit var viewModel: PlayerViewModel
 
     @Test
+    fun `given episode playing, when play pause button clicked, then episode is paused`() {
+        whenever(playbackManager.isPlaying()).thenReturn(true)
+        initViewModel()
+
+        viewModel.onPlayPauseClicked()
+
+        verify(playbackManager).pause(sourceView = SourceView.PLAYER)
+    }
+
+    @Test
+    fun `given episode paused and should not warn about playback, when play pause button clicked, then episode is played with battery warning if appropriate`() = runTest {
+        whenever(playbackManager.isPlaying()).thenReturn(false)
+        whenever(playbackManager.shouldWarnAboutPlayback(podcastEpisode.uuid)).thenReturn(false)
+        initViewModel()
+
+        viewModel.onPlayPauseClicked()
+
+        verify(playbackManager).playQueue(sourceView = SourceView.PLAYER)
+        viewModel.snackbarMessages.test {
+            viewModel.onPlayPauseClicked()
+            assertTrue(awaitItem() is SnackbarMessage.ShowBatteryWarningIfAppropriate)
+        }
+    }
+
+    @Test
+    fun `given downloaded episode paused and should warn about playback, when play pause button clicked, then episode is played with battery warning if appropriate`() = runTest {
+        whenever(podcastEpisode.isDownloaded).thenReturn(true)
+        whenever(playbackManager.isPlaying()).thenReturn(false)
+        whenever(playbackManager.shouldWarnAboutPlayback(podcastEpisode.uuid)).thenReturn(true)
+        initViewModel()
+
+        viewModel.onPlayPauseClicked()
+
+        verify(playbackManager).playQueue(sourceView = SourceView.PLAYER)
+        viewModel.snackbarMessages.test {
+            viewModel.onPlayPauseClicked()
+            assertTrue(awaitItem() is SnackbarMessage.ShowBatteryWarningIfAppropriate)
+        }
+    }
+
+    @Test
+    fun `given not downloaded episode paused and should warn about playback, when play pause button clicked, then streaming warning shown`() = runTest {
+        whenever(podcastEpisode.isDownloaded).thenReturn(false)
+        whenever(playbackManager.isPlaying()).thenReturn(false)
+        whenever(playbackManager.shouldWarnAboutPlayback(podcastEpisode.uuid)).thenReturn(true)
+        initViewModel()
+
+        viewModel.navigationState.test {
+            viewModel.onPlayPauseClicked()
+            assertTrue(awaitItem() is NavigationState.ShowStreamingWarningDialog)
+        }
+    }
+
+    @Test
+    fun `when skip back button clicked, then episode is skipped back`() = runTest {
+        initViewModel()
+
+        viewModel.onSkipBackwardClick()
+
+        verify(playbackManager).skipBackward(sourceView = SourceView.PLAYER, jumpAmountSeconds = settings.skipBackInSecs.value)
+    }
+
+    @Test
+    fun `when skip forward button clicked, then episode is skipped forwarded`() = runTest {
+        initViewModel()
+
+        viewModel.onSkipForwardClick()
+
+        verify(playbackManager).skipForward(sourceView = SourceView.PLAYER, jumpAmountSeconds = settings.skipForwardInSecs.value)
+    }
+
+    @Test
+    fun `when skip forward button long clicked, then skip forward long press options dialog is shown`() = runTest {
+        initViewModel()
+
+        viewModel.navigationState.test {
+            viewModel.onSkipForwardLongClick()
+            assertTrue(awaitItem() is NavigationState.ShowSkipForwardLongPressOptionsDialog)
+        }
+    }
+
+    @Test
     fun `does not override global effects when all podcasts effects settings segmented tab selected`() {
         initViewModel()
 
@@ -165,10 +250,12 @@ class PlayerViewModelTest {
         currentEpisode: BaseEpisode = podcastEpisode,
     ) {
         whenever(playbackManager.playbackStateRelay).thenReturn(BehaviorRelay.create<PlaybackState>().toSerialized())
+        whenever(upNextQueue.currentEpisode).thenReturn(currentEpisode)
         whenever(playbackManager.upNextQueue).thenReturn(upNextQueue)
         whenever(upNextQueue.getChangesObservableWithLiveCurrentEpisode(episodeManager, podcastManager)).thenReturn(Observable.just(State.Empty))
         val userSettingsIntMock = mock<UserSetting<Int>>()
         whenever(userSettingsIntMock.flow).thenReturn(MutableStateFlow(0))
+        whenever(userSettingsIntMock.value).thenReturn(0)
         val userSettingsArtworkConfigurationMock = mock<UserSetting<ArtworkConfiguration>>()
         whenever(userSettingsArtworkConfigurationMock.flow).thenReturn(MutableStateFlow(ArtworkConfiguration(false, emptySet())))
         whenever(settings.skipBackInSecs).thenReturn(userSettingsIntMock)

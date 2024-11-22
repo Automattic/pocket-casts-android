@@ -229,19 +229,18 @@ Player controls and seekbar are centered horizontally on this layout, which make
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            app:layout_constraintBottom_toTopOf="@+id/playerControls"
+            app:layout_constraintBottom_toTopOf="@+id/playerControlsComposeView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintWidth_percent="@dimen/seekbar_width_percentage" />
 
-        <include
-            layout="@layout/player_controls"
-            android:id="@+id/playerControls"
-            android:layout_width="match_parent"
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/playerControlsComposeView"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/shelfComposeView" />
+            app:layout_constraintBottom_toTopOf="@+id/shelfComposeView"/>
 
         <androidx.compose.ui.platform.ComposeView
             android:id="@+id/shelfComposeView"
@@ -249,7 +248,7 @@ Player controls and seekbar are centered horizontally on this layout, which make
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
             android:weightSum="5"
-            app:layout_constraintTop_toBottomOf="@+id/playerControls"
+            app:layout_constraintTop_toBottomOf="@+id/playerControlsComposeView"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"/>

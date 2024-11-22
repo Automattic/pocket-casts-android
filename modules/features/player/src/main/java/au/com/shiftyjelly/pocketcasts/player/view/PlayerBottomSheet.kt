@@ -180,18 +180,6 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
             closeInterpolator = OvershootInterpolator(),
             disabled = false,
         )
-        val playButtonScale = BottomSheetAnimation(
-            viewId = R.id.largePlayButton,
-            rootView = rootView,
-            effect = SCALE,
-            slideOffsetFrom = 0.6f,
-            slideOffsetTo = 0.9f,
-            valueFrom = 0.6f,
-            valueTo = SCALE_NORMAL,
-            openStartDelay = 200,
-            openInterpolator = OvershootInterpolator(),
-            disabled = false,
-        )
         val backgroundScale = BottomSheetAnimation(
             viewId = R.id.container,
             rootView = rootView,
@@ -212,7 +200,7 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
             valueTo = 0f,
             disabled = false,
         )
-        animations = arrayOf(miniPlayButtonScale, playButtonScale, backgroundScale, playerTranslateY)
+        animations = arrayOf(miniPlayButtonScale, backgroundScale, playerTranslateY)
 
         return object : BottomSheetBehavior.BottomSheetCallback() {
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
