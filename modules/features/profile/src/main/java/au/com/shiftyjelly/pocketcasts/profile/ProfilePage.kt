@@ -29,11 +29,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.OrientationPreview
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
+import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.endofyear.ui.EndOfYearPromptCard
 import au.com.shiftyjelly.pocketcasts.images.R
@@ -72,7 +74,7 @@ internal fun ProfilePage(
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .background(MaterialTheme.theme.colors.primaryUi03)
+                .background(MaterialTheme.theme.colors.primaryUi01)
                 .verticalScroll(rememberScrollState()),
         ) {
             Toolbar(
@@ -89,6 +91,7 @@ internal fun ProfilePage(
                 statsState = state.statsState,
                 onHeaderClick = onHeaderClick,
             )
+            VerticalSpacer()
             if (state.isPlaybackEnabled) {
                 EndOfYearPromptCard(
                     onClick = onPlaybackClick,
@@ -270,7 +273,9 @@ private fun MiniPlayerPadding(
 
 @OrientationPreview
 @Composable
-private fun ProfilePagePreview() {
+private fun ProfilePagePreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) theme: Theme.ThemeType,
+) {
     ProfilePage(
         state = ProfilePageState(
             isSendReferralsEnabled = true,
@@ -298,7 +303,7 @@ private fun ProfilePagePreview() {
             ),
             refreshState = RefreshState.Success(Date()),
         ),
-        themeType = Theme.ThemeType.ROSE,
+        themeType = theme,
         onClaimReferralsClick = {},
         onReferralsTooltipClick = {},
         onReferralsTooltipShown = {},

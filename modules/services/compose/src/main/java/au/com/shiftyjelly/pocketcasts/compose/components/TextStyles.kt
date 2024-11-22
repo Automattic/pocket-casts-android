@@ -314,6 +314,7 @@ fun TextP60(
     style: TextStyle = TextStyle(),
     disableAutoScale: Boolean = false,
     fontScale: Float = 1f,
+    letterSpacing: TextUnit = 0.sp,
 ) {
     val fontSizeUpdated = fontSize ?: 13.sp
     Text(
@@ -321,7 +322,7 @@ fun TextP60(
         color = color,
         fontSize = (if (disableAutoScale) fontSizeUpdated.value.nonScaledSp else fontSizeUpdated) * fontScale,
         lineHeight = (if (disableAutoScale) 15.nonScaledSp else 15.sp) * fontScale,
-        letterSpacing = 0.sp,
+        letterSpacing = letterSpacing,
         maxLines = maxLines,
         overflow = TextOverflow.Ellipsis,
         textAlign = textAlign,
