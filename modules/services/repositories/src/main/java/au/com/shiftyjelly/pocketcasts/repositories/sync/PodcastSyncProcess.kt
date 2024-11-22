@@ -943,7 +943,7 @@ class PodcastSyncProcess(
 
             sync.deselectedChapters?.let {
                 episode.deselectedChapters = it
-                episode.deselectedChaptersModified = sync.deselectedChaptersModified?.let(::Date)
+                episode.deselectedChaptersModified = null
             }
 
             episodeManager.update(episode)
