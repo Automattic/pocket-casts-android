@@ -1,5 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.compose
 
+import androidx.compose.ui.tooling.preview.Preview
+
 object Devices {
     const val PortraitRegular = "spec:width=800px,height=1600px,dpi=320"
     const val PortraitSmall = "spec:width=720px,height=1280px,dpi=320"
@@ -11,3 +13,7 @@ object Devices {
     const val LandscapeTablet = "$PortraitTablet,orientation=landscape"
     const val LandscapeFoldable = "$PortraitFoldable,orientation=landscape"
 }
+
+@Preview(device = Devices.PortraitRegular)
+@Preview(device = Devices.LandscapeRegular)
+annotation class OrientationPreview
