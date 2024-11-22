@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.aboutlibraries)
 }
 
 android {
@@ -45,6 +46,8 @@ dependencies {
     implementation(platform(libs.compose.bom))
     implementation(platform(libs.firebase.bom))
 
+    implementation(libs.aboutlibraries.compose)
+    implementation(libs.aboutlibraries.core)
     implementation(libs.androidx.core.ktx)
     implementation(libs.compose.animation)
     implementation(libs.compose.material)
@@ -65,7 +68,6 @@ dependencies {
     implementation(libs.material.dialogs)
     implementation(libs.okhttp)
     implementation(libs.play.cast)
-    implementation(libs.play.oss.licenses)
     implementation(libs.rx2.android)
     implementation(libs.rx2.java)
     implementation(libs.rx2.kotlin)

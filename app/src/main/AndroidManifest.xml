@@ -525,11 +525,6 @@
 
         <activity android:name=".profile.sonos.SonosAppLinkActivity" android:label="@string/profile_sonos"/>
 
-        <activity android:name="com.google.android.gms.oss.licenses.OssLicensesMenuActivity"
-            android:theme="@style/Theme.AppCompat.DayNight"/>
-        <activity android:name="com.google.android.gms.oss.licenses.OssLicensesActivity"
-            android:theme="@style/Theme.AppCompat.DayNight"/>
-
         <!-- services which are periodic or trigerred by the app automatically triggered, eg: can run in the background -->
         <service android:name="au.com.shiftyjelly.pocketcasts.repositories.download.UpdateEpisodeDetailsJob"
                  android:permission="android.permission.BIND_JOB_SERVICE"

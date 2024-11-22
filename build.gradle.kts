@@ -17,15 +17,6 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
-buildscript {
-    // Gradle Plugins
-    dependencies {
-        // Open source licenses plugin
-        classpath(libs.osslicenses.plugin)
-    }
-}
-
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.android.library) apply false
