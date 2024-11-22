@@ -108,7 +108,6 @@ class DownloadEpisodeTask @AssistedInject constructor(
         const val OUTPUT_ERROR_MESSAGE = "error_message"
         const val OUTPUT_EPISODE_UUID = "episode_uuid"
         const val OUTPUT_CANCELLED = "cancelled"
-        const val FIRE_TOAST = "fire_toast"
     }
 
     private lateinit var episode: BaseEpisode
@@ -160,7 +159,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
 
             if (!isStopped) {
                 pathToSaveTo?.let {
-                    episodeManager.updateDownloadFilePath(episode, it, false)
+                    episodeManager.updateDownloadFilePathBlocking(episode, it, false)
                     runBlocking {
                         episodeManager.updateEpisodeStatus(episode, EpisodeStatusEnum.DOWNLOADED)
                     }
@@ -228,7 +227,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
             episodeManager.updateEpisodeStatus(episode, EpisodeStatusEnum.DOWNLOAD_FAILED)
         }
         val message = if (downloadMessage.isNullOrBlank()) "Download Failed" else downloadMessage
-        episodeManager.updateDownloadErrorDetails(episode, message)
+        episodeManager.updateDownloadErrorDetailsBlocking(episode, message)
 
         LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Download failed ${episode.title} ${episode.uuid} - $message")
 
@@ -466,7 +465,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
                     tempDownloadFile.delete()
 
                     if (episode.sizeInBytes != fullDownloadFile.length()) {
-                        episodeManager.updateSizeInBytes(episode, fullDownloadFile.length())
+                        episodeManager.updateSizeInBytesBlocking(episode, fullDownloadFile.length())
                     }
 
                     if (!emitter.isDisposed) {
@@ -578,7 +577,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
                 }
 
                 val durationInSecs = (duration / 1000000).toDouble()
-                episodeManager.updateDuration(episode, durationInSecs, true)
+                episodeManager.updateDurationBlocking(episode, durationInSecs, true)
 
                 return
             }
@@ -590,7 +589,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
     private fun fixInvalidContentType(contentType: MediaType?) {
         contentType ?: return
         if ((episode.fileType.isNullOrBlank() && (contentType.type == "audio" || contentType.type == "video")) || contentType.type == "video") {
-            episodeManager.updateFileType(episode, contentType.toString())
+            episodeManager.updateFileTypeBlocking(episode, contentType.toString())
             episode.fileType = contentType.toString()
         }
     }

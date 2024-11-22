@@ -14,6 +14,7 @@ import java.util.Date
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
+import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.Assert.assertNull
@@ -79,13 +80,13 @@ class UpdateEpisodeDetailsTest {
             val thirdRequest = server.takeRequest(1, TimeUnit.MILLISECONDS)
             assertNull("There shouldn't be a third request", thirdRequest)
 
-            verify(episodeManager, times(1)).updateSizeInBytes(episode, testFileSize)
+            verify(episodeManager, times(1)).updateSizeInBytesBlocking(episode, testFileSize)
         }
     }
 
     class TestWorkerFactory(private val episodeManager: EpisodeManager) : WorkerFactory() {
         override fun createWorker(context: Context, workerClassName: String, workerParameters: WorkerParameters): ListenableWorker? {
-            return UpdateEpisodeDetailsTask(context, workerParameters, episodeManager)
+            return UpdateEpisodeDetailsTask(context, workerParameters, episodeManager, OkHttpClient())
         }
     }
 }

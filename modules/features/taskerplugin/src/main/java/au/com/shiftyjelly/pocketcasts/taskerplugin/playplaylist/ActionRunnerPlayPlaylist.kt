@@ -26,9 +26,9 @@ class ActionRunnerPlayPlaylist : TaskerPluginRunnerActionNoOutput<InputPlayPlayl
 
         playbackManager.upNextQueue.removeAll()
 
-        val playlist = playlistManager.findFirstByTitle(title) ?: return TaskerPluginResultError(ERROR_PLAYLIST_NOT_FOUND, context.getString(R.string.filter_x_not_found, title))
+        val playlist = playlistManager.findFirstByTitleBlocking(title) ?: return TaskerPluginResultError(ERROR_PLAYLIST_NOT_FOUND, context.getString(R.string.filter_x_not_found, title))
 
-        val episodes = playlistManager.findEpisodes(playlist, episodeManager, playbackManager)
+        val episodes = playlistManager.findEpisodesBlocking(playlist, episodeManager, playbackManager)
         if (episodes.isEmpty()) return TaskerPluginResultError(ERROR_PLAYLIST_NO_EPISODES, context.getString(R.string.no_episodes_in_filter_x, title))
 
         playbackManager.playEpisodes(episodes, SourceView.TASKER)

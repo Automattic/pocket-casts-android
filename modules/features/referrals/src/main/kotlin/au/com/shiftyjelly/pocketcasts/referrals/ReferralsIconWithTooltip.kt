@@ -68,19 +68,21 @@ private fun ReferralsIconWithTooltip(
     onTooltipClick: () -> Unit,
 ) {
     if (state.showIcon) {
-        Icon(
-            onIconClick = onIconClick,
-            colors = LocalColors.current.colors,
-        )
+        Box {
+            Icon(
+                onIconClick = onIconClick,
+                colors = LocalColors.current.colors,
+            )
 
-        Tooltip(
-            show = state.showTooltip,
-        ) {
-            state.referralsOfferInfo?.let {
-                TooltipContent(
-                    referralsOfferInfo = it,
-                    onClick = onTooltipClick,
-                )
+            Tooltip(
+                show = state.showTooltip,
+            ) {
+                state.referralsOfferInfo?.let {
+                    TooltipContent(
+                        referralsOfferInfo = it,
+                        onClick = onTooltipClick,
+                    )
+                }
             }
         }
     }

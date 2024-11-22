@@ -174,8 +174,8 @@ class PodcastsViewModel
             .toFlowable(BackpressureStrategy.LATEST)
             .switchMap { badgeType ->
                 return@switchMap when (badgeType) {
-                    BadgeType.ALL_UNFINISHED -> episodeManager.getPodcastUuidToBadgeUnfinished()
-                    BadgeType.LATEST_EPISODE -> episodeManager.getPodcastUuidToBadgeLatest()
+                    BadgeType.ALL_UNFINISHED -> episodeManager.getPodcastUuidToBadgeUnfinishedRxFlowable()
+                    BadgeType.LATEST_EPISODE -> episodeManager.getPodcastUuidToBadgeLatestRxFlowable()
                     else -> Flowable.just(emptyMap())
                 }
             }.toLiveData()

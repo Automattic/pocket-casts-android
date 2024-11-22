@@ -31,7 +31,7 @@ class ShareEpisodeViewModel @AssistedInject constructor(
 ) : ViewModel() {
     val uiState = combine(
         podcastManager.observePodcastByEpisodeUuid(episodeUuid),
-        episodeManager.observeByUuid(episodeUuid),
+        episodeManager.findByUuidFlow(episodeUuid),
         settings.artworkConfiguration.flow.map { it.useEpisodeArtwork },
         ::UiState,
     ).stateIn(viewModelScope, started = SharingStarted.Lazily, initialValue = UiState())

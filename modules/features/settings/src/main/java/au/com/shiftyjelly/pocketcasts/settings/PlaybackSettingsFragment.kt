@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.settings
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
@@ -31,7 +30,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -40,6 +38,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.fragment.compose.content
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
@@ -92,22 +91,20 @@ class PlaybackSettingsFragment : BaseFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View = ComposeView(requireContext()).apply {
-        setContent {
-            val scrollToSleepTimer = arguments?.getBoolean(SCROLL_TO_SLEEP_TIMER, false) ?: false
+    ) = content {
+        val scrollToSleepTimer = arguments?.getBoolean(SCROLL_TO_SLEEP_TIMER, false) ?: false
 
-            AppThemeWithBackground(theme.activeTheme) {
-                val bottomInset = settings.bottomInset.collectAsStateWithLifecycle(0)
-                PlaybackSettings(
-                    settings = settings,
-                    onBackClick = {
-                        @Suppress("DEPRECATION")
-                        activity?.onBackPressed()
-                    },
-                    scrollToSleepTimer = scrollToSleepTimer,
-                    bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
-                )
-            }
+        AppThemeWithBackground(theme.activeTheme) {
+            val bottomInset = settings.bottomInset.collectAsStateWithLifecycle(0)
+            PlaybackSettings(
+                settings = settings,
+                onBackClick = {
+                    @Suppress("DEPRECATION")
+                    activity?.onBackPressed()
+                },
+                scrollToSleepTimer = scrollToSleepTimer,
+                bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
+            )
         }
     }
 

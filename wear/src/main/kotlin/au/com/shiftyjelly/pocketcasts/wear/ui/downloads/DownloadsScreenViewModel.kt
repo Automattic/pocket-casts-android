@@ -16,7 +16,7 @@ class DownloadsScreenViewModel @Inject constructor(
     settings: Settings,
 ) : ViewModel() {
 
-    val stateFlow = episodeManager.observeDownloadEpisodes()
+    val stateFlow = episodeManager.findDownloadEpisodesRxFlowable()
         .asFlow()
         .stateIn(viewModelScope, SharingStarted.Lazily, null)
 

@@ -17,8 +17,8 @@ class ActionRunnerQueryFilterEpisodes : TaskerPluginRunnerAction<InputQueryFilte
         val playlistManager = context.playlistManager
         val titleOrId = input.regular.titleOrId.nullIfEmpty ?: return TaskerPluginResultSucess()
 
-        val playlist = playlistManager.findAll().firstOrNull { it.title.lowercase().contains(titleOrId.trim().lowercase()) || it.uuid == titleOrId } ?: return TaskerPluginResultSucess(arrayOf())
-        val episodes = playlistManager.findEpisodes(playlist, context.episodeManager, context.playbackManager).take(50)
+        val playlist = playlistManager.findAllBlocking().firstOrNull { it.title.lowercase().contains(titleOrId.trim().lowercase()) || it.uuid == titleOrId } ?: return TaskerPluginResultSucess(arrayOf())
+        val episodes = playlistManager.findEpisodesBlocking(playlist, context.episodeManager, context.playbackManager).take(50)
         val output = episodes.map { OutputQueryEpisodes(it) }.toTypedArray()
         return TaskerPluginResultSucess(output)
     }

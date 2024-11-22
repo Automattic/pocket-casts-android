@@ -37,10 +37,10 @@ class FiltersFragmentViewModel @Inject constructor(
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
-    val filters: LiveData<List<Playlist>> = playlistManager.observeAll().toLiveData()
+    val filters: LiveData<List<Playlist>> = playlistManager.findAllRxFlowable().toLiveData()
 
     val countGenerator = { playlist: Playlist ->
-        playlistManager.countEpisodesRx(playlist, episodeManager, playbackManager).onErrorReturn { 0 }
+        playlistManager.countEpisodesRxFlowable(playlist, episodeManager, playbackManager).onErrorReturn { 0 }
     }
 
     var adapterState: MutableList<Playlist> = mutableListOf()
@@ -66,7 +66,7 @@ class FiltersFragmentViewModel @Inject constructor(
         }
 
         runBlocking(Dispatchers.Default) {
-            playlistManager.updateAll(playlists)
+            playlistManager.updateAllBlocking(playlists)
             if (moved) {
                 analyticsTracker.track(AnalyticsEvent.FILTER_LIST_REORDERED)
             }

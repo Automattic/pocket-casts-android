@@ -1156,13 +1156,11 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override fun getUpgradeClosedProfile(): Boolean {
-        return getBoolean("upgradeClosedProfile", false)
-    }
-
-    override fun setUpgradeClosedProfile(value: Boolean) {
-        setBoolean("upgradeClosedProfile", value)
-    }
+    override val upgradeProfileClosed = UserSetting.BoolPref(
+        sharedPrefKey = "upgradeClosedProfile",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
 
     override fun getUpgradeClosedAddFile(): Boolean {
         return getBoolean("upgradeClosedAddFile", false)

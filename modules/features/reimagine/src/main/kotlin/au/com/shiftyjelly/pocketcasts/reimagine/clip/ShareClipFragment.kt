@@ -13,10 +13,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.ComposeView
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
+import androidx.fragment.compose.content
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.reimagine.clip.ShareClipViewModel.SnackbarMessage
@@ -91,43 +91,41 @@ class ShareClipFragment : BaseDialogFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ) = ComposeView(requireActivity()).apply {
-        val platforms = SocialPlatform.getAvailablePlatforms(requireContext())
-        val isTalkbackOn = Util.isTalkbackOn(requireContext())
+    ) = content {
+        val platforms = remember { SocialPlatform.getAvailablePlatforms(requireContext()) }
+        val isTalkbackOn = remember { Util.isTalkbackOn(requireContext()) }
 
-        setContent {
-            val assetController = rememberBackgroundAssetControler(shareColors)
-            val listener = remember { ShareClipListener(this@ShareClipFragment, viewModel, assetController, args.source) }
-            val snackbarHostState = remember { SnackbarHostState() }
+        val assetController = rememberBackgroundAssetControler(shareColors)
+        val listener = remember { ShareClipListener(this@ShareClipFragment, viewModel, assetController, args.source) }
+        val snackbarHostState = remember { SnackbarHostState() }
 
-            val uiState by viewModel.uiState.collectAsState()
-            ShareClipPage(
-                episode = uiState.episode,
-                podcast = uiState.podcast,
-                clipRange = uiState.clipRange,
-                playbackProgress = uiState.playbackProgress,
-                isPlaying = uiState.isPlaying,
-                sharingState = uiState.sharingState,
-                useEpisodeArtwork = uiState.useEpisodeArtwork,
-                platforms = platforms,
-                shareColors = shareColors,
-                useKeyboardInput = isTalkbackOn,
-                assetController = assetController,
-                listener = listener,
-                snackbarHostState = snackbarHostState,
-            )
+        val uiState by viewModel.uiState.collectAsState()
+        ShareClipPage(
+            episode = uiState.episode,
+            podcast = uiState.podcast,
+            clipRange = uiState.clipRange,
+            playbackProgress = uiState.playbackProgress,
+            isPlaying = uiState.isPlaying,
+            sharingState = uiState.sharingState,
+            useEpisodeArtwork = uiState.useEpisodeArtwork,
+            platforms = platforms,
+            shareColors = shareColors,
+            useKeyboardInput = isTalkbackOn,
+            assetController = assetController,
+            listener = listener,
+            snackbarHostState = snackbarHostState,
+        )
 
-            LaunchedEffect(Unit) {
-                viewModel.snackbarMessages.collect { message ->
-                    val text = when (message) {
-                        is SnackbarMessage.SharingResponse -> message.message
-                        is SnackbarMessage.PlayerIssue -> getString(LR.string.podcast_episode_playback_error)
-                        is SnackbarMessage.GenericIssue -> getString(LR.string.share_error_message)
-                        is SnackbarMessage.ClipStartAfterEnd -> getString(LR.string.share_invalid_clip_message)
-                        is SnackbarMessage.ClipEndAfterEpisodeDuration -> getString(LR.string.share_clip_too_long_message, message.episodeDuration.toHhMmSs())
-                    }
-                    snackbarHostState.showSnackbar(text)
+        LaunchedEffect(Unit) {
+            viewModel.snackbarMessages.collect { message ->
+                val text = when (message) {
+                    is SnackbarMessage.SharingResponse -> message.message
+                    is SnackbarMessage.PlayerIssue -> getString(LR.string.podcast_episode_playback_error)
+                    is SnackbarMessage.GenericIssue -> getString(LR.string.share_error_message)
+                    is SnackbarMessage.ClipStartAfterEnd -> getString(LR.string.share_invalid_clip_message)
+                    is SnackbarMessage.ClipEndAfterEpisodeDuration -> getString(LR.string.share_clip_too_long_message, message.episodeDuration.toHhMmSs())
                 }
+                snackbarHostState.showSnackbar(text)
             }
         }
     }

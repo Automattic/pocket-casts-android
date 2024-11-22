@@ -12,12 +12,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.core.net.toUri
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
+import androidx.fragment.compose.content
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
@@ -57,45 +57,43 @@ class ChaptersFragment : BaseFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ) = ComposeView(requireContext()).apply {
-        setContent {
-            val state by viewModel.uiState.collectAsState()
+    ) = content {
+        val state by viewModel.uiState.collectAsState()
 
-            AppThemeWithBackground(mode.themeType) {
-                ChaptersTheme(state.podcast) {
-                    val lazyListState = rememberLazyListState()
+        AppThemeWithBackground(mode.themeType) {
+            ChaptersTheme(state.podcast) {
+                val lazyListState = rememberLazyListState()
 
-                    ChaptersPage(
-                        lazyListState = lazyListState,
-                        chapters = state.chapters,
-                        showHeader = state.showHeader,
-                        totalChaptersCount = state.chaptersCount,
-                        isTogglingChapters = state.isTogglingChapters,
-                        showSubscriptionIcon = state.showSubscriptionIcon,
-                        onChapterClick = viewModel::playChapter,
-                        onSkipChaptersClick = viewModel::enableTogglingOrUpsell,
-                        onSelectionChange = viewModel::selectChapter,
-                        onUrlClick = ::openChapterUrl,
-                        modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
-                    )
+                ChaptersPage(
+                    lazyListState = lazyListState,
+                    chapters = state.chapters,
+                    showHeader = state.showHeader,
+                    totalChaptersCount = state.chaptersCount,
+                    isTogglingChapters = state.isTogglingChapters,
+                    showSubscriptionIcon = state.showSubscriptionIcon,
+                    onChapterClick = viewModel::playChapter,
+                    onSkipChaptersClick = viewModel::enableTogglingOrUpsell,
+                    onSelectionChange = viewModel::selectChapter,
+                    onUrlClick = ::openChapterUrl,
+                    modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
+                )
 
-                    LaunchedEffect(Unit) {
-                        viewModel.scrollToChapter.collect {
-                            delay(250)
-                            lazyListState.animateScrollToItem(it.index)
-                        }
+                LaunchedEffect(Unit) {
+                    viewModel.scrollToChapter.collect {
+                        delay(250)
+                        lazyListState.animateScrollToItem(it.index)
                     }
+                }
 
-                    LaunchedEffect(Unit) {
-                        viewModel.showPlayer.collect {
-                            showPlayer()
-                        }
+                LaunchedEffect(Unit) {
+                    viewModel.showPlayer.collect {
+                        showPlayer()
                     }
+                }
 
-                    LaunchedEffect(Unit) {
-                        viewModel.showUpsell.collect {
-                            showUpsell()
-                        }
+                LaunchedEffect(Unit) {
+                    viewModel.showUpsell.collect {
+                        showUpsell()
                     }
                 }
             }

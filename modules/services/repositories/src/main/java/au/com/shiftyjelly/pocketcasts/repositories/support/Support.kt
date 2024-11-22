@@ -136,33 +136,6 @@ class Support @Inject constructor(
         return intent
     }
 
-    suspend fun shareWearLogs(logBytes: ByteArray, subject: String, context: Context): Intent =
-        withContext(Dispatchers.IO) {
-            val intent = Intent(Intent.ACTION_SEND)
-            intent.type = "text/html"
-
-            val isPaid = subscriptionManager.getCachedStatus() is SubscriptionStatus.Paid
-            intent.putExtra(
-                Intent.EXTRA_SUBJECT,
-                "$subject v${settings.getVersion()} ${getAccountType(isPaid)}",
-            )
-
-            try {
-                val emailFolder = File(context.filesDir, "email")
-                emailFolder.mkdirs()
-                val debugFile = File(emailFolder, "debug_wear.txt")
-
-                debugFile.writeBytes(logBytes)
-                val fileUri =
-                    FileUtil.createUriWithReadPermissions(context, debugFile, intent)
-                intent.putExtra(Intent.EXTRA_STREAM, fileUri)
-            } catch (e: Exception) {
-                Timber.e(e)
-                intent.putExtra(Intent.EXTRA_TEXT, String(logBytes))
-            }
-            intent
-        }
-
     suspend fun emailWearLogsToSupportIntent(logBytes: ByteArray, context: Context): Intent {
         val subject = "Android wear support"
         val intro = "Hi there, just needed help with something..."
@@ -424,7 +397,7 @@ class Support @Inject constructor(
                 output.append("Database").append(eol)
                     .append(" ").append(podcastManager.countPodcasts()).append(" Podcasts ").append(eol)
                     .append(" ").append(episodeManager.countEpisodes()).append(" Episodes ").append(eol)
-                    .append(" ").append(playlistManager.findAll().size).append(" Playlists ").append(eol)
+                    .append(" ").append(playlistManager.findAllBlocking().size).append(" Playlists ").append(eol)
                     .append(" ").append(queue.size).append(" Up Next ").append(eol).append(eol)
 
                 output.append(podcastsOutput.toString())
@@ -432,7 +405,7 @@ class Support @Inject constructor(
                 output.append("Filters").append(eol).append("-------").append(eol).append(eol)
 
                 try {
-                    val playlists = playlistManager.findAll()
+                    val playlists = playlistManager.findAllBlocking()
                     for (playlist in playlists) {
                         output.append(playlist.title).append(eol)
                         output.append("Auto Download? ").append(playlist.autoDownload).append(" Unmetered only? ").append(playlist.autoDownloadUnmeteredOnly).append(" Power only? ").append(playlist.autoDownloadPowerOnly).append(eol)
@@ -449,7 +422,7 @@ class Support @Inject constructor(
                 output.append("Episode Issues").append(eol).append("--------------").append(eol).append(eol)
 
                 try {
-                    val episodes = episodeManager.findEpisodesWhere("downloaded_error_details IS NOT NULL AND LENGTH(downloaded_error_details) > 0 LIMIT 100")
+                    val episodes = episodeManager.findEpisodesWhereBlocking("downloaded_error_details IS NOT NULL AND LENGTH(downloaded_error_details) > 0 LIMIT 100")
                     for (episode in episodes) {
                         output.append("Title: ").append(episode.title).append(eol)
                         output.append("Id: ").append(episode.uuid).append(eol)

@@ -49,7 +49,7 @@ class EpisodeDaoTest {
     fun insertAndFindEpisode() = runBlocking {
         val episode = PodcastEpisode(uuid = "id", publishedDate = Date())
 
-        episodeDao.insert(episode)
+        episodeDao.insertBlocking(episode)
 
         assertEquals(episode, episodeDao.findByUuid(episode.uuid))
     }
@@ -61,7 +61,7 @@ class EpisodeDaoTest {
             PodcastEpisode(uuid = "2", publishedDate = Date()),
         )
 
-        episodeDao.insertAll(episodes)
+        episodeDao.insertAllBlocking(episodes)
 
         assertEquals(episodes[0], episodeDao.findByUuid(episodes[0].uuid))
         assertEquals(episodes[1], episodeDao.findByUuid(episodes[1].uuid))
@@ -87,7 +87,7 @@ class EpisodeDaoTest {
             episodeStatus = EpisodeStatusEnum.DOWNLOAD_FAILED,
             lastDownloadAttemptDate = Date.from(Instant.EPOCH),
         )
-        episodeDao.insert(episode)
+        episodeDao.insertBlocking(episode)
 
         val statistics = episodeDao.getFailedDownloadsStatistics()
 
@@ -109,7 +109,7 @@ class EpisodeDaoTest {
                 lastDownloadAttemptDate = Date.from(Instant.EPOCH.plusMillis(index.toLong())),
             )
         }
-        episodeDao.insertAll(episodes)
+        episodeDao.insertAllBlocking(episodes)
 
         val statistics = episodeDao.getFailedDownloadsStatistics()
 
@@ -131,7 +131,7 @@ class EpisodeDaoTest {
                 lastDownloadAttemptDate = null,
             )
         }
-        episodeDao.insertAll(episodes)
+        episodeDao.insertAllBlocking(episodes)
 
         val statistics = episodeDao.getFailedDownloadsStatistics()
 
@@ -153,7 +153,7 @@ class EpisodeDaoTest {
                 lastDownloadAttemptDate = Date.from(Instant.EPOCH.plusMillis(entry.ordinal.toLong())),
             )
         }
-        episodeDao.insertAll(episodes)
+        episodeDao.insertAllBlocking(episodes)
 
         val statistics = episodeDao.getFailedDownloadsStatistics()
 
@@ -170,8 +170,8 @@ class EpisodeDaoTest {
         val query = "test"
         val episodes = listOf(PodcastEpisode(uuid = "1", title = "Test Episode", podcastUuid = "podcast_uuid", publishedDate = Date(), lastPlaybackInteraction = 1000))
         val podcast = Podcast(uuid = "podcast_uuid")
-        episodeDao.insertAll(episodes)
-        podcastDao.insert(podcast)
+        episodeDao.insertAllBlocking(episodes)
+        podcastDao.insertBlocking(podcast)
 
         val result = episodeDao.filteredPlaybackHistoryFlow(query.escapeLike('\\')).first()
         assertEquals(episodes, result)
@@ -182,8 +182,8 @@ class EpisodeDaoTest {
         val query = "test"
         val episodes = listOf(PodcastEpisode(uuid = "1", title = "Episode", podcastUuid = "podcast_uuid", publishedDate = Date(), lastPlaybackInteraction = 1000))
         val podcast = Podcast(uuid = "podcast_uuid", title = "Test Podcast")
-        episodeDao.insertAll(episodes)
-        podcastDao.insert(podcast)
+        episodeDao.insertAllBlocking(episodes)
+        podcastDao.insertBlocking(podcast)
 
         val result = episodeDao.filteredPlaybackHistoryFlow(query.escapeLike('\\')).first()
         assertEquals(episodes, result)
@@ -195,7 +195,7 @@ class EpisodeDaoTest {
         val episode1 = PodcastEpisode(uuid = "1", title = "Test Episode 1", publishedDate = Date(), lastPlaybackInteraction = 1000)
         val episode2 = PodcastEpisode(uuid = "2", title = "Test Episode 2", publishedDate = Date(), lastPlaybackInteraction = 2000)
         val episodes = listOf(episode2, episode1)
-        episodeDao.insertAll(episodes)
+        episodeDao.insertAllBlocking(episodes)
 
         val result = episodeDao.filteredPlaybackHistoryFlow(query.escapeLike('\\')).first()
         assertEquals(episodes, result)
@@ -205,7 +205,7 @@ class EpisodeDaoTest {
     fun getFilteredPlaybackHistoryResultForNoMatch() = runTest {
         val query = "test"
         val episodes = listOf(PodcastEpisode(uuid = "1", title = "Episode", podcastUuid = "podcast_uuid", publishedDate = Date(), lastPlaybackInteraction = 1000))
-        episodeDao.insertAll(episodes)
+        episodeDao.insertAllBlocking(episodes)
 
         val result = episodeDao.filteredPlaybackHistoryFlow(query.escapeLike('\\')).first()
         assertEquals(emptyList<PodcastEpisode>(), result)
@@ -218,7 +218,7 @@ class EpisodeDaoTest {
         val episode1 = PodcastEpisode(uuid = "1", title = "%Test_ Episode", podcastUuid = "podcast_uuid", publishedDate = Date(), lastPlaybackInteraction = 1000)
         val episode2 = PodcastEpisode(uuid = "3", title = "Test Episode", podcastUuid = "podcast_uuid", publishedDate = Date(), lastPlaybackInteraction = 1000)
         val episodes = listOf(episode1, episode2)
-        episodeDao.insertAll(episodes)
+        episodeDao.insertAllBlocking(episodes)
 
         val result = episodeDao.filteredPlaybackHistoryFlow(query.escapeLike('\\')).first()
         assertEquals(listOf(episode1), result)

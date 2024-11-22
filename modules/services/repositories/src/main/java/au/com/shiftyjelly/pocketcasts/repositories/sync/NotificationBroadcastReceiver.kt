@@ -124,7 +124,7 @@ class NotificationBroadcastReceiver : BroadcastReceiver(), CoroutineScope {
     private fun markAsPlayed(episodeUuid: String) {
         launch {
             episodeManager.findEpisodeByUuid(episodeUuid)?.let { episode ->
-                episodeManager.markAsPlayed(episode, playbackManager, podcastManager)
+                episodeManager.markAsPlayedBlocking(episode, playbackManager, podcastManager)
                 episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_MARKED_AS_PLAYED, source, episodeUuid)
             }
         }
@@ -133,7 +133,7 @@ class NotificationBroadcastReceiver : BroadcastReceiver(), CoroutineScope {
     private fun archiveEpisode(episodeUuid: String) {
         launch {
             episodeManager.findByUuid(episodeUuid)?.let { episode ->
-                episodeManager.archive(episode, playbackManager, true)
+                episodeManager.archiveBlocking(episode, playbackManager, true)
                 episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ARCHIVED, source, episodeUuid)
             }
         }

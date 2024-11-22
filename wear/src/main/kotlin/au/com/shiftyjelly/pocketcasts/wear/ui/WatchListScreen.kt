@@ -22,7 +22,6 @@ import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnState
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-import au.com.shiftyjelly.pocketcasts.profile.R as PR
 
 object WatchListScreen {
     const val route = "watch_list_screen"
@@ -96,7 +95,7 @@ fun WatchListScreen(
         item {
             WatchListChip(
                 title = stringResource(LR.string.profile_navigation_files),
-                iconRes = PR.drawable.ic_file,
+                iconRes = IR.drawable.ic_file,
                 onClick = {
                     viewModel.onFilesClicked()
                     navigateToRoute(FilesScreen.route)

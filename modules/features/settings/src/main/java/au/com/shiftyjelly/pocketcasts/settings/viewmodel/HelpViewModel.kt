@@ -2,8 +2,6 @@ package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.repositories.support.DatabaseExportHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.io.File
@@ -14,23 +12,10 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class HelpViewModel @Inject constructor(
-    private val analyticsTracker: AnalyticsTracker,
     private val databaseExportHelper: DatabaseExportHelper,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(UiState())
     val uiState: StateFlow<UiState> = _uiState
-
-    private var isFragmentChangingConfigurations = false
-
-    fun onShown() {
-        if (!isFragmentChangingConfigurations) {
-            analyticsTracker.track(AnalyticsEvent.SETTINGS_HELP_SHOWN)
-        }
-    }
-
-    fun onFragmentPause(isChangingConfigurations: Boolean?) {
-        isFragmentChangingConfigurations = isChangingConfigurations ?: false
-    }
 
     fun onExportDatabaseMenuItemClick(sendIntent: (File) -> Unit) {
         viewModelScope.launch {

@@ -95,7 +95,6 @@ class HelpFragment : BaseFragment(), HasBackstack, Toolbar.OnMenuItemClickListen
         savedInstanceState?.let {
             loadedUrl = savedInstanceState.getString("url")
         }
-        viewModel.onShown()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -175,11 +174,6 @@ class HelpFragment : BaseFragment(), HasBackstack, Toolbar.OnMenuItemClickListen
             }
         }
         return false
-    }
-
-    override fun onPause() {
-        super.onPause()
-        viewModel.onFragmentPause(activity?.isChangingConfigurations)
     }
 
     override fun getBackstackCount(): Int {

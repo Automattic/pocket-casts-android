@@ -3,11 +3,10 @@ package au.com.shiftyjelly.pocketcasts.podcasts.view.folders
 import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import androidx.compose.ui.platform.ComposeView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
+import androidx.fragment.compose.content
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -48,17 +47,17 @@ class FolderEditFragment : BaseDialogFragment() {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return ComposeView(requireContext()).apply {
-            setContent {
-                AppThemeWithBackground(theme.activeTheme) {
-                    FolderEditPage(
-                        viewModel = viewModel,
-                        onDeleteClick = { confirmFolderDelete() },
-                        onBackClick = { dismiss() },
-                    )
-                }
-            }
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ) = content {
+        AppThemeWithBackground(theme.activeTheme) {
+            FolderEditPage(
+                viewModel = viewModel,
+                onDeleteClick = { confirmFolderDelete() },
+                onBackClick = { dismiss() },
+            )
         }
     }
 

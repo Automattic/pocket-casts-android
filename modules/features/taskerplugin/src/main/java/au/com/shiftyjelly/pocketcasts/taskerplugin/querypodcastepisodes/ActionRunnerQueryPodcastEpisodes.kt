@@ -17,7 +17,7 @@ class ActionRunnerQueryPodcastEpisodes : TaskerPluginRunnerAction<InputQueryPodc
         val titleOrId = input.regular.titleOrId.nullIfEmpty ?: return TaskerPluginResultSucess()
 
         val podcast = podcastManager.findSubscribed().firstOrNull { it.title.lowercase().contains(titleOrId.trim().lowercase()) || it.uuid == titleOrId } ?: return TaskerPluginResultSucess(arrayOf())
-        val episodes = context.episodeManager.findEpisodesByPodcastOrdered(podcast).take(50)
+        val episodes = context.episodeManager.findEpisodesByPodcastOrderedBlocking(podcast).take(50)
         val output = episodes.map { OutputQueryEpisodes(it) }.toTypedArray()
         return TaskerPluginResultSucess(output)
     }

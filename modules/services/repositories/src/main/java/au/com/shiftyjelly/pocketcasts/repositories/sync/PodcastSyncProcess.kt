@@ -96,7 +96,7 @@ class PodcastSyncProcess(
 
     fun run(): Completable {
         if (!syncManager.isLoggedIn()) {
-            playlistManager.deleteSynced()
+            playlistManager.deleteSyncedBlocking()
 
             Timber.i("SyncProcess: User not logged in")
             return Completable.complete()
@@ -410,7 +410,7 @@ class PodcastSyncProcess(
 
     private fun uploadPlaylistChanges(records: JSONArray) {
         try {
-            val playlists = playlistManager.findPlaylistsToSync()
+            val playlists = playlistManager.findPlaylistsToSyncBlocking()
             for (playlist in playlists) {
                 val fields = JSONObject()
 
@@ -521,7 +521,7 @@ class PodcastSyncProcess(
 
     private fun uploadEpisodesChanges(records: JSONArray): List<PodcastEpisode> {
         try {
-            val episodes = episodeManager.findEpisodesToSync()
+            val episodes = episodeManager.findEpisodesToSyncBlocking()
             episodes.forEach { episode ->
                 uploadEpisodeChanges(episode, records)
             }
@@ -588,7 +588,7 @@ class PodcastSyncProcess(
 
     private fun uploadBookmarksChanges(records: JSONArray) {
         try {
-            val bookmarks = bookmarkManager.findBookmarksToSync()
+            val bookmarks = bookmarkManager.findBookmarksToSyncBlocking()
             bookmarks.forEach { bookmark ->
                 @Suppress("DEPRECATION")
                 uploadBookmarkChanges(bookmark, records)
@@ -654,8 +654,8 @@ class PodcastSyncProcess(
     private fun markAllLocalItemsSynced(episodes: List<PodcastEpisode>): Completable {
         return Completable.fromAction {
             podcastManager.markAllPodcastsSynced()
-            episodeManager.markAllEpisodesSynced(episodes)
-            playlistManager.markAllSynced()
+            episodeManager.markAllEpisodesSyncedBlocking(episodes)
+            playlistManager.markAllSyncedBlocking()
             folderManager.markAllSynced()
         }
     }
@@ -747,9 +747,9 @@ class PodcastSyncProcess(
                 return@fromCallable null
             }
 
-            var playlist = playlistManager.findByUuidSync(uuid)
+            var playlist = playlistManager.findByUuidBlocking(uuid)
             if (sync.deleted) {
-                playlist?.let { playlistManager.deleteSynced(it) }
+                playlist?.let { playlistManager.deleteSyncedBlocking(it) }
                 return@fromCallable null
             }
 
@@ -781,9 +781,9 @@ class PodcastSyncProcess(
             }
 
             if (playlist.id == null) {
-                playlist.id = playlistManager.create(playlist)
+                playlist.id = playlistManager.createBlocking(playlist)
             } else {
-                playlistManager.update(playlist, userPlaylistUpdate = null)
+                playlistManager.updateBlocking(playlist, userPlaylistUpdate = null)
             }
 
             return@fromCallable playlist
@@ -887,7 +887,7 @@ class PodcastSyncProcess(
                 } else {
                     episode.archivedModified = null
                     if (newIsArchive) {
-                        episodeManager.archive(episode, playbackManager, sync = false)
+                        episodeManager.archiveBlocking(episode, playbackManager, sync = false)
                     } else {
                         episode.isArchived = false
                         episode.lastArchiveInteraction = Date().time
@@ -946,7 +946,7 @@ class PodcastSyncProcess(
                 episode.deselectedChaptersModified = null
             }
 
-            episodeManager.update(episode)
+            episodeManager.updateBlocking(episode)
 
             episode
         }

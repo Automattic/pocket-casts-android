@@ -69,7 +69,7 @@ class PlayButtonListener @Inject constructor(
     override fun onPlayedClicked(episodeUuid: String) {
         launch {
             episodeManager.findEpisodeByUuid(episodeUuid)?.let { episode ->
-                episodeManager.markAsNotPlayed(episode)
+                episodeManager.markAsNotPlayedBlocking(episode)
             }
         }
     }
@@ -117,7 +117,7 @@ class PlayButtonListener @Inject constructor(
                         uuid = episodeUuid,
                     )
                     launch {
-                        episodeManager.unarchive(it)
+                        episodeManager.unarchiveBlocking(it)
                     }
                 }
             }

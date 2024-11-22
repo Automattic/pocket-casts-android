@@ -73,7 +73,7 @@ class StorageSettingsViewModelTest {
         whenever(settings.getStorageChoiceName()).thenReturn("")
         whenever(settings.backgroundRefreshPodcasts).thenReturn(UserSetting.Mock(true, mock()))
         whenever(settings.warnOnMeteredNetwork).thenReturn(UserSetting.Mock(true, mock()))
-        whenever(episodeManager.observeDownloadedEpisodes()).thenReturn(Flowable.empty())
+        whenever(episodeManager.findDownloadedEpisodesRxFlowable()).thenReturn(Flowable.empty())
         viewModel = StorageSettingsViewModel(
             episodeManager,
             fileStorage,
