@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -74,7 +75,7 @@ internal fun ProfilePage(
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .background(MaterialTheme.theme.colors.primaryUi01)
+                .background(MaterialTheme.theme.colors.primaryUi02)
                 .verticalScroll(rememberScrollState()),
         ) {
             Toolbar(
@@ -188,6 +189,7 @@ private fun Toolbar(
         modifier = Modifier
             .fillMaxWidth()
             .height(64.dp)
+            .background(MaterialTheme.theme.colors.secondaryUi01)
             .padding(horizontal = horizontalPadding),
     ) {
         if (showReferralsIcon) {
@@ -209,7 +211,7 @@ private fun Toolbar(
             Icon(
                 painter = painterResource(R.drawable.ic_profile_settings),
                 contentDescription = stringResource(au.com.shiftyjelly.pocketcasts.localization.R.string.settings),
-                tint = MaterialTheme.theme.colors.primaryIcon01,
+                tint = MaterialTheme.theme.colors.secondaryIcon01,
             )
         }
     }
@@ -273,8 +275,21 @@ private fun MiniPlayerPadding(
 
 @OrientationPreview
 @Composable
-private fun ProfilePagePreview(
+private fun ProfilePagePreview() {
+    ProfilePageStub(Theme.ThemeType.ROSE)
+}
+
+@Preview
+@Composable
+private fun ProfilePageThemePreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) theme: Theme.ThemeType,
+) {
+    ProfilePageStub(theme)
+}
+
+@Composable
+private fun ProfilePageStub(
+    theme: Theme.ThemeType,
 ) {
     ProfilePage(
         state = ProfilePageState(
