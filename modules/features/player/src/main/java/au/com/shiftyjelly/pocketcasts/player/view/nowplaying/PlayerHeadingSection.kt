@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
@@ -36,7 +35,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.map
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
@@ -46,7 +44,6 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.player.R
-import au.com.shiftyjelly.pocketcasts.player.view.ChapterProgressCircle
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.TransitionState
@@ -77,7 +74,6 @@ fun PlayerHeadingSection(
             )
         }
         .observeAsState(PlayerHeadingSectionState())
-
     var disableAccessibility by remember { mutableStateOf(false) }
 
     Content(
@@ -87,11 +83,7 @@ fun PlayerHeadingSection(
         onNextChapterClick = { playerViewModel.onNextChapterClick() },
         onChapterTitleClick = { playerViewModel.onChapterTitleClick(it) },
         onPodcastTitleClick = { playerViewModel.onPodcastTitleClick(state.episodeUuid, state.podcastUuid) },
-    ) {
-        ChapterProgressCircle(
-            progress = state.chapterProgress,
-        )
-    }
+    )
 
     LaunchedEffect(Unit) {
         shelfSharedViewModel.transitionState.collect {
@@ -108,7 +100,6 @@ private fun Content(
     onNextChapterClick: () -> Unit,
     onChapterTitleClick: (Chapter) -> Unit,
     onPodcastTitleClick: () -> Unit,
-    chapterProgressCircle: @Composable (() -> Unit),
 ) {
     Column(
         modifier = Modifier
@@ -187,11 +178,11 @@ private fun Content(
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    ChapterNextWithChapterProgressButton(
+                    ChapterNextButtonWithChapterProgressCircle(
                         onClick = onNextChapterClick,
                         enabled = !state.isLastChapter,
                         alpha = if (state.isLastChapter) 0.5f else 1f,
-                        chapterProgressCircle = chapterProgressCircle,
+                        progress = state.chapterProgress,
                     )
 
                     Spacer(modifier = Modifier.height(4.dp))
@@ -206,24 +197,6 @@ private fun Content(
             }
         }
     }
-}
-
-@Composable
-private fun ChapterProgressCircle(
-    progress: Float,
-) {
-    AndroidView(
-        modifier = Modifier
-            .size(30.dp),
-        factory = { context ->
-            ChapterProgressCircle(context).apply {
-                this.progress = progress
-            }
-        },
-        update = { view ->
-            view.progress = progress
-        },
-    )
 }
 
 @Composable
@@ -254,11 +227,11 @@ private fun ChapterPreviousButton(
 }
 
 @Composable
-private fun ChapterNextWithChapterProgressButton(
+private fun ChapterNextButtonWithChapterProgressCircle(
     onClick: () -> Unit,
     enabled: Boolean,
     alpha: Float,
-    chapterProgressCircle: @Composable () -> Unit,
+    progress: Float,
 ) {
     val contentDescription = stringResource(LR.string.player_action_next_chapter)
     IconButton(
@@ -273,7 +246,10 @@ private fun ChapterNextWithChapterProgressButton(
             tint = Color.White,
             contentDescription = null,
         )
-        chapterProgressCircle()
+
+        ChapterProgressCircle(
+            progress = progress,
+        )
     }
 }
 
@@ -316,7 +292,6 @@ private fun PlayerHeadingSectionPreview(
             onNextChapterClick = {},
             onChapterTitleClick = {},
             onPodcastTitleClick = {},
-            chapterProgressCircle = { ChapterProgressCircle(progress = 0.5f) },
         )
     }
 }
@@ -345,7 +320,6 @@ private fun PlayerHeadingSectionWithoutChapterPreview(
             onNextChapterClick = {},
             onChapterTitleClick = {},
             onPodcastTitleClick = {},
-            chapterProgressCircle = { ChapterProgressCircle(progress = 0.5f) },
         )
     }
 }
