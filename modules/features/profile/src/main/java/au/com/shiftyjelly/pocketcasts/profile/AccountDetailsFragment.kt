@@ -108,12 +108,13 @@ class AccountDetailsFragment : BaseFragment(), OnUserViewClickListener {
         super.onViewCreated(view, savedInstanceState)
 
         val binding = binding ?: return
-        val toolbar = binding.toolbar ?: return
-        setupToolbarAndStatusBar(
-            toolbar = toolbar,
-            title = getString(LR.string.profile_pocket_casts_account),
-            navigationIcon = NavigationIcon.BackArrow,
-        )
+        binding.toolbar?.let { toolbar ->
+            setupToolbarAndStatusBar(
+                toolbar = toolbar,
+                title = getString(LR.string.profile_pocket_casts_account),
+                navigationIcon = NavigationIcon.BackArrow,
+            )
+        }
 
         viewModel.signInState.observe(viewLifecycleOwner) { signInState ->
             binding.userView.signedInState = signInState
