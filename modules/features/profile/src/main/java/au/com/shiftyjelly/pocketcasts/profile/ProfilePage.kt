@@ -169,7 +169,7 @@ private val verticalSpacing = 16.dp
 @Composable
 private fun VerticalSpacer() {
     Spacer(
-        modifier = Modifier.height(16.dp),
+        modifier = Modifier.height(verticalSpacing),
     )
 }
 
@@ -227,14 +227,14 @@ private fun ColumnScope.HeaderWithStats(
             onClick = onHeaderClick,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = horizontalPadding),
         )
         VerticalSpacer()
         ProfileStats(
             state = statsState,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = horizontalPadding),
         )
         VerticalSpacer()
     } else {
@@ -242,7 +242,7 @@ private fun ColumnScope.HeaderWithStats(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = horizontalPadding),
         ) {
             ProfileHeader(
                 state = headerState,
