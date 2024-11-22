@@ -31,9 +31,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 private const val FRAME_MIN = 0
-private const val FRAME_MAX = 19
+private const val FRAME_MAX = 20
 private const val FRAME_PLAY_IMAGE = 10
-private const val FRAME_PLAY_IMAGE_ANIMATION = 9
 
 @Composable
 fun AnimatedPlayPauseButton(
@@ -51,7 +50,7 @@ fun AnimatedPlayPauseButton(
     val clipSpec = if (isPlaying) {
         LottieClipSpec.Frame(FRAME_PLAY_IMAGE, FRAME_MAX)
     } else {
-        LottieClipSpec.Frame(FRAME_MIN, FRAME_PLAY_IMAGE_ANIMATION)
+        LottieClipSpec.Frame(FRAME_MIN, FRAME_PLAY_IMAGE)
     }
 
     val dynamicProperties = rememberLottieDynamicProperties(
