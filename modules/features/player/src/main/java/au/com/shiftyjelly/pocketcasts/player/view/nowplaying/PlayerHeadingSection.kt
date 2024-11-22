@@ -16,8 +16,12 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -27,6 +31,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -43,6 +48,8 @@ import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.view.ChapterProgressCircle
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.TransitionState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -50,6 +57,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun PlayerHeadingSection(
     playerViewModel: PlayerViewModel,
+    shelfSharedViewModel: ShelfSharedViewModel,
 ) {
     val state by playerViewModel.listDataLive
         .map {
@@ -70,8 +78,11 @@ fun PlayerHeadingSection(
         }
         .observeAsState(PlayerHeadingSectionState())
 
+    var disableAccessibility by remember { mutableStateOf(false) }
+
     Content(
         state = state,
+        disableAccessibility = disableAccessibility,
         onPreviousChapterClick = { playerViewModel.onPreviousChapterClick() },
         onNextChapterClick = { playerViewModel.onNextChapterClick() },
         onChapterTitleClick = { playerViewModel.onChapterTitleClick(it) },
@@ -81,11 +92,18 @@ fun PlayerHeadingSection(
             progress = state.chapterProgress,
         )
     }
+
+    LaunchedEffect(Unit) {
+        shelfSharedViewModel.transitionState.collect {
+            disableAccessibility = it is TransitionState.OpenTranscript
+        }
+    }
 }
 
 @Composable
 private fun Content(
     state: PlayerHeadingSectionState,
+    disableAccessibility: Boolean,
     onPreviousChapterClick: () -> Unit,
     onNextChapterClick: () -> Unit,
     onChapterTitleClick: (Chapter) -> Unit,
@@ -94,7 +112,16 @@ private fun Content(
 ) {
     Column(
         modifier = Modifier
-            .padding(horizontal = 8.dp),
+            .padding(horizontal = 8.dp)
+            .then(
+                if (disableAccessibility) {
+                    Modifier
+                        .semantics(mergeDescendants = true) {}
+                        .clearAndSetSemantics { contentDescription = "" }
+                } else {
+                    Modifier
+                },
+            ),
     ) {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -284,6 +311,7 @@ private fun PlayerHeadingSectionPreview(
                 isFirstChapter = false,
                 isLastChapter = false,
             ),
+            disableAccessibility = false,
             onPreviousChapterClick = {},
             onNextChapterClick = {},
             onChapterTitleClick = {},
@@ -312,6 +340,7 @@ private fun PlayerHeadingSectionWithoutChapterPreview(
                 isFirstChapter = false,
                 isLastChapter = false,
             ),
+            disableAccessibility = false,
             onPreviousChapterClick = {},
             onNextChapterClick = {},
             onChapterTitleClick = {},

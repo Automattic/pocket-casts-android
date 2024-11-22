@@ -243,6 +243,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 AppTheme(theme.activeTheme) {
                     PlayerHeadingSection(
                         playerViewModel = viewModel,
+                        shelfSharedViewModel = shelfSharedViewModel,
                     )
                 }
             }
@@ -407,7 +408,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     }
 
     private fun AdapterPlayerHeaderBinding.openTranscript() {
-        updatePlayerViewsAccessibility(enable = false)
         playerGroup.layoutTransition = LayoutTransition()
         transcriptPage.isVisible = true
         shelfComposeView.isVisible = false
@@ -429,7 +429,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     private fun AdapterPlayerHeaderBinding.closeTranscript(
         withTransition: Boolean,
     ) {
-        updatePlayerViewsAccessibility(enable = true)
         playerGroup.layoutTransition = if (withTransition) LayoutTransition() else null
         shelfComposeView.isVisible = true
         transcriptPage.isVisible = false
@@ -447,16 +446,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         containerFragment?.updateTabsVisibility(true)
         root.setScrollingEnabled(true)
         playerGroup.layoutTransition = null // Reset to null to avoid animation when changing children visibility anytime later
-    }
-
-    private fun AdapterPlayerHeaderBinding.updatePlayerViewsAccessibility(enable: Boolean) {
-//        val importantForAccessibility = if (enable) View.IMPORTANT_FOR_ACCESSIBILITY_YES else View.IMPORTANT_FOR_ACCESSIBILITY_NO
-//        episodeTitle.importantForAccessibility = importantForAccessibility
-//        chapterTimeRemaining.importantForAccessibility = importantForAccessibility
-//        chapterSummary.importantForAccessibility = importantForAccessibility
-//        nextChapter.importantForAccessibility = importantForAccessibility
-//        previousChapter.importantForAccessibility = importantForAccessibility
-//        podcastTitle.importantForAccessibility = importantForAccessibility
     }
 
     private fun setupUpNextDrag(binding: AdapterPlayerHeaderBinding) {
