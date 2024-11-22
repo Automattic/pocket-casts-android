@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-11-07 09:54:03+0000
+Translation-Revision-Date: 2024-11-12 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="files_plus_prompt">通过 Pocket Casts Plus 上传文件，并享用更多功能</string>
+    <string name="icons_plus_prompt">通过 Pocket Casts Plus 获取独家应用程序图标，并享用更多功能</string>
+    <string name="themes_plus_prompt">通过 Pocket Casts Plus 获取专属主题，并享用更多功能</string>
+    <string name="folders_plus_prompt">通过 Pocket Casts Plus 整理您的播客，并享用更多功能</string>
+    <string name="end_of_year_story_top_podcast_title">这是您在 %1$d 年的热门播客</string>
+    <string name="drag_down_to_dismiss_content_description">向下拖动即可取消</string>
     <string name="maybe_later">稍后再说</string>
+    <string name="need_to_free_up_space">需要释放空间？</string>
     <string name="settings_import_title">导入播客</string>
     <string name="settings_subscribe_to_played">关注已播放的播客</string>
     <string name="settings_export_subscriptions">导出播客</string>
@@ -17,6 +24,7 @@ Language: zh_CN
     <string name="unsubscribe">取消关注</string>
     <string name="subscribe">关注</string>
     <string name="up_next_shuffle_plus_prompt">使用 Pocket Casts Plus 随机排列您的剧集，以及更多内容</string>
+    <string name="manage_downloads">管理下载</string>
     <string name="save_space_by_managing_downloaded_episodes">节省 %1$s – 通过管理下载的剧集。</string>
     <string name="pencil_clean_up_icon_content_description">铅笔清理</string>
     <string name="podcast_this">此播客</string>
@@ -491,7 +499,6 @@ Language: zh_CN
     <string name="search_results_all_episodes">所有剧集</string>
     <string name="search_history_row_type_episode_subtitle">剧集 \u2022 %1$s \u2022 %2$s</string>
     <string name="search_show_all">显示所有</string>
-    <string name="podcast">播客</string>
     <string name="search_history_row_type_podcast_subtitle">播客 \u2022 %s</string>
     <string name="search_history_row_type_folder_subtitle">文件夹 \u2022 %s</string>
     <string name="search_history_recent_searches">最近搜索</string>
@@ -621,6 +628,7 @@ Language: zh_CN
     <string name="end_of_year_story_top_podcasts_list_title">我的 %1$d 年热门播客</string>
     <string name="end_of_year_story_top_podcasts_share_text">我的年度热门播客！ %1$s</string>
     <string name="end_of_year_story_top_podcast_share_text">%1$d 年我最喜欢的播客！ %2$s</string>
+    <string name="end_of_year_story_top_podcast_subtitle">您收听了 %1$d 集“%3$s”节目，总时长为 %2$s</string>
     <string name="end_of_year_story_listened_to_numbers_share_text">我在 %3$d 年收听了 %1$d 个不同的播客和 %2$d 部剧集</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">但还有一个您经常收听的播客…</string>
     <string name="end_of_year_story_listened_to_numbers">您总共收听了 %1$d 个不同的节目和 %2$d 部剧集</string>
@@ -804,20 +812,6 @@ Language: zh_CN
     <string name="share">共享</string>
     <string name="filters_update_filter">更新过滤器</string>
     <string name="filters_chip_episode_status">剧集状态</string>
-    <string name="profile_stats_day_listened">已收听的天数</string>
-    <string name="profile_stats_seconds_listened">已收听的秒数</string>
-    <string name="profile_stats_second_listened">已收听的秒数</string>
-    <string name="profile_stats_minutes_listened">已收听的分钟数</string>
-    <string name="profile_stats_minute_listened">已收听的分钟数</string>
-    <string name="profile_stats_hours_listened">已收听的小时数</string>
-    <string name="profile_stats_hour_listened">已收听的小时数</string>
-    <string name="profile_stats_seconds_saved">已保存的秒数</string>
-    <string name="profile_stats_second_saved">已保存的秒数</string>
-    <string name="profile_stats_minutes_saved">已保存的分钟数</string>
-    <string name="profile_stats_minute_saved">已保存的分钟数</string>
-    <string name="profile_stats_hours_saved">已保存的小时数</string>
-    <string name="profile_stats_hour_saved">已保存的小时数</string>
-    <string name="profile_stats_day_saved">已保存的天数</string>
     <string name="filters_download_options">下载选项</string>
     <string name="filters_release_date">发布日期</string>
     <string name="filters_duration">持续周期</string>
@@ -1252,9 +1246,7 @@ Language: zh_CN
     <string name="profile_stats_share_to">共享至..</string>
     <string name="profile_stats_trim_silence">剪裁静音</string>
     <string name="profile_stats_listened_for">您已收听</string>
-    <string name="profile_stats_days_saved">已保存的天数</string>
     <string name="profile_stats_auto_skipping">自动跳过</string>
-    <string name="profile_stats_days_listened">已收听的天数</string>
     <string name="profile_stat_days_listened">已收听的天数</string>
     <string name="profile_sonos_title">Pocket Casts 和 Sonos</string>
     <string name="profile_sonos_setup_account">设置账户</string>
@@ -1846,16 +1838,55 @@ Language: zh_CN
     <string name="unarchive">取消存档</string>
     <string name="archive">存档</string>
     <string name="add_to_up_next">添加到“接下来播放”</string>
+    <plurals name="day">
+        <item quantity="other">天</item>
+    </plurals>
     <plurals name="episode_count">
         <item quantity="other">%d 集</item>
     </plurals>
+    <plurals name="hour">
+        <item quantity="other">小时</item>
+    </plurals>
+    <plurals name="minute">
+        <item quantity="other">分钟</item>
+    </plurals>
     <plurals name="player_up_next_header_title">
         <item quantity="other" formatted="true">%1$d 集 — 剩余 %2$s</item>
+    </plurals>
+    <plurals name="podcast">
+        <item quantity="other">播客</item>
     </plurals>
     <plurals name="podcast_share_end_handle_description">
         <item quantity="other">结尾片段控标：%d 秒</item>
     </plurals>
     <plurals name="podcast_share_start_handle_description">
         <item quantity="other">开头片段控标：%d 秒</item>
+    </plurals>
+    <plurals name="profile_stats_day_listened">
+        <item quantity="other">已收听的天数</item>
+    </plurals>
+    <plurals name="profile_stats_day_saved">
+        <item quantity="other">已保存的天数</item>
+    </plurals>
+    <plurals name="profile_stats_hour_listened">
+        <item quantity="other">已收听的小时数</item>
+    </plurals>
+    <plurals name="profile_stats_hour_saved">
+        <item quantity="other">已保存的小时数</item>
+    </plurals>
+    <plurals name="profile_stats_minute_listened">
+        <item quantity="other">已收听的分钟数</item>
+    </plurals>
+    <plurals name="profile_stats_minute_saved">
+        <item quantity="other">已保存的分钟数</item>
+    </plurals>
+    <plurals name="profile_stats_second_listened">
+        <item quantity="other">已收听的秒数</item>
+    </plurals>
+    <plurals name="profile_stats_second_saved">
+        <item quantity="other">已保存的秒数</item>
+    </plurals>
+    <plurals name="second">
+        <item quantity="other">秒</item>
     </plurals>
 </resources>

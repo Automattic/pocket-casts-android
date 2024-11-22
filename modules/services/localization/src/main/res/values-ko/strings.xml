@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-11-06 09:54:13+0000
+Translation-Revision-Date: 2024-11-12 09:54:04+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="files_plus_prompt">Pocket Casts Plus로 파일을 업로드하고 더 많은 혜택을 누리세요</string>
+    <string name="icons_plus_prompt">Pocket Casts Plus로 독점 앱 아이콘을 받고 더 많은 혜택을 누리세요</string>
+    <string name="themes_plus_prompt">Pocket Casts Plus로 독점 테마를 받고 더 많은 혜택을 누리세요</string>
+    <string name="folders_plus_prompt">Pocket Casts Plus로 팟캐스트를 구성하고 더 많은 혜택을 누리세요</string>
+    <string name="end_of_year_story_top_podcast_title">%1$d 회원님의 상위 팟캐스트입니다</string>
+    <string name="drag_down_to_dismiss_content_description">해제하려면 아래로 끌어오세요</string>
     <string name="maybe_later">나중에</string>
+    <string name="need_to_free_up_space">용량이 모자라시나요?</string>
     <string name="settings_import_title">팟캐스트 가져오기</string>
     <string name="settings_subscribe_to_played">재생한 팟캐스트 팔로우하기</string>
     <string name="settings_export_subscriptions">팟캐스트 내보내기</string>
@@ -17,6 +24,7 @@ Language: ko_KR
     <string name="unsubscribe">팔로우 취소</string>
     <string name="subscribe">팔로우하기</string>
     <string name="up_next_shuffle_plus_prompt">Pocket Casts Plus 등에서 에피소드 순서 섞기</string>
+    <string name="manage_downloads">다운로드 관리</string>
     <string name="save_space_by_managing_downloaded_episodes">다운로드한 에피소드를 관리하여 %1$s을(를) 저장하세요.</string>
     <string name="pencil_clean_up_icon_content_description">연필 정리</string>
     <string name="podcast_this">이 팟캐스트</string>
@@ -491,7 +499,6 @@ Language: ko_KR
     <string name="search_results_all_episodes">모든 에피소드</string>
     <string name="search_history_row_type_episode_subtitle">에피소드 \u2022 %1$s \u2022 %2$s</string>
     <string name="search_show_all">모두 보기</string>
-    <string name="podcast">팟캐스트</string>
     <string name="search_history_row_type_podcast_subtitle">팟캐스트 \u2022 %s</string>
     <string name="search_history_row_type_folder_subtitle">폴더 \u2022 %s</string>
     <string name="search_history_recent_searches">최근 검색 항목</string>
@@ -621,6 +628,7 @@ Language: ko_KR
     <string name="end_of_year_story_top_podcasts_list_title">나의 %1$d년 상위 팟캐스트</string>
     <string name="end_of_year_story_top_podcasts_share_text">나의 올해 상위 팟캐스트입니다! %1$s</string>
     <string name="end_of_year_story_top_podcast_share_text">내가 즐겨찾는 %1$d년 팟캐스트입니다! %2$s</string>
+    <string name="end_of_year_story_top_podcast_subtitle">\"%3$s\"의 총 %2$s개 에피소드 중 %1$d개를 청취하셨습니다.</string>
     <string name="end_of_year_story_listened_to_numbers_share_text">내가 %3$d년에 청취한 팟캐스트는 %1$d가지, 에피소드는 %2$d개</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">그러나 반복 청취한 것이 있었습니다…</string>
     <string name="end_of_year_story_listened_to_numbers">청취하신 총 프로그램 %1$d개, 에피소드 %2$d개</string>
@@ -804,20 +812,6 @@ Language: ko_KR
     <string name="share">공유</string>
     <string name="filters_update_filter">필터 업데이트</string>
     <string name="filters_chip_episode_status">에피소드 상태</string>
-    <string name="profile_stats_day_listened">청취한 기간(일)</string>
-    <string name="profile_stats_seconds_listened">청취한 기간(초)</string>
-    <string name="profile_stats_second_listened">청취한 기간(초)</string>
-    <string name="profile_stats_minutes_listened">청취한 기간(분)</string>
-    <string name="profile_stats_minute_listened">청취한 기간(분)</string>
-    <string name="profile_stats_hours_listened">청취한 기간(시간)</string>
-    <string name="profile_stats_hour_listened">청취한 기간(시간)</string>
-    <string name="profile_stats_seconds_saved">저장한 기간(초)</string>
-    <string name="profile_stats_second_saved">저장한 기간(초)</string>
-    <string name="profile_stats_minutes_saved">저장한 기간(분)</string>
-    <string name="profile_stats_minute_saved">저장한 기간(분)</string>
-    <string name="profile_stats_hours_saved">저장한 기간(시간)</string>
-    <string name="profile_stats_hour_saved">저장한 기간(시간)</string>
-    <string name="profile_stats_day_saved">저장한 기간(일)</string>
     <string name="filters_download_options">다운로드 옵션</string>
     <string name="filters_release_date">릴리스 날짜</string>
     <string name="filters_duration">지속시간</string>
@@ -1252,9 +1246,7 @@ Language: ko_KR
     <string name="profile_stats_share_to">공유 대상…</string>
     <string name="profile_stats_trim_silence">Trim Silence</string>
     <string name="profile_stats_listened_for">청취한 기간</string>
-    <string name="profile_stats_days_saved">저장한 기간(일)</string>
     <string name="profile_stats_auto_skipping">자동 건너뛰기</string>
-    <string name="profile_stats_days_listened">청취한 기간(일)</string>
     <string name="profile_stat_days_listened">청취한 기간(일)</string>
     <string name="profile_sonos_title">Pocket Casts와 Sonos</string>
     <string name="profile_sonos_setup_account">계정 설정</string>
@@ -1846,16 +1838,55 @@ Language: ko_KR
     <string name="unarchive">아카이빙 취소</string>
     <string name="archive">아카이빙</string>
     <string name="add_to_up_next">다음 차례에 추가</string>
+    <plurals name="day">
+        <item quantity="other">일</item>
+    </plurals>
     <plurals name="episode_count">
         <item quantity="other">에피소드 %d개</item>
     </plurals>
+    <plurals name="hour">
+        <item quantity="other">시간</item>
+    </plurals>
+    <plurals name="minute">
+        <item quantity="other">분</item>
+    </plurals>
     <plurals name="player_up_next_header_title">
         <item quantity="other" formatted="true">%1$d 에피소드 - %2$s 남음</item>
+    </plurals>
+    <plurals name="podcast">
+        <item quantity="other">팟캐스트</item>
     </plurals>
     <plurals name="podcast_share_end_handle_description">
         <item quantity="other">종료 클립 핸들: %d초</item>
     </plurals>
     <plurals name="podcast_share_start_handle_description">
         <item quantity="other">시작 클립 핸들: %d초</item>
+    </plurals>
+    <plurals name="profile_stats_day_listened">
+        <item quantity="other">청취한 기간(일)</item>
+    </plurals>
+    <plurals name="profile_stats_day_saved">
+        <item quantity="other">저장한 기간(일)</item>
+    </plurals>
+    <plurals name="profile_stats_hour_listened">
+        <item quantity="other">청취한 기간(시간)</item>
+    </plurals>
+    <plurals name="profile_stats_hour_saved">
+        <item quantity="other">저장한 기간(시간)</item>
+    </plurals>
+    <plurals name="profile_stats_minute_listened">
+        <item quantity="other">청취한 기간(분)</item>
+    </plurals>
+    <plurals name="profile_stats_minute_saved">
+        <item quantity="other">저장한 기간(분)</item>
+    </plurals>
+    <plurals name="profile_stats_second_listened">
+        <item quantity="other">청취한 기간(초)</item>
+    </plurals>
+    <plurals name="profile_stats_second_saved">
+        <item quantity="other">저장한 기간(초)</item>
+    </plurals>
+    <plurals name="second">
+        <item quantity="other">초</item>
     </plurals>
 </resources>

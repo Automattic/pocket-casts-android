@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-11-07 13:54:11+0000
+Translation-Revision-Date: 2024-11-12 13:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="files_plus_prompt">Ladda upp dina filer och mer därtill med Pocket Casts Plus</string>
+    <string name="icons_plus_prompt">Få exklusiva appikoner och mer därtill med Pocket Casts Plus</string>
+    <string name="themes_plus_prompt">Få exklusiva teman och mer därtill med Pocket Casts Plus</string>
+    <string name="folders_plus_prompt">Organisera dina podcasts och mer därtill med Pocket Casts Plus</string>
+    <string name="end_of_year_story_top_podcast_title">Det här var din favoritpodcast under %1$d</string>
+    <string name="drag_down_to_dismiss_content_description">Dra ner för att avfärda</string>
     <string name="maybe_later">Kanske senare</string>
+    <string name="need_to_free_up_space">Behöver du frigöra utrymme?</string>
     <string name="settings_import_title">Importera podcasts</string>
     <string name="settings_subscribe_to_played">Följ uppspelade podcasts</string>
     <string name="settings_export_subscriptions">Exportera podcasts</string>
@@ -16,6 +23,8 @@ Language: sv_SE
     <string name="podcasts_no_subscriptions">Inga podcasts hittades</string>
     <string name="unsubscribe">Sluta följa</string>
     <string name="subscribe">Följ</string>
+    <string name="up_next_shuffle_plus_prompt">Spela upp dina avsnitt slumpvis och mer därtill med Pocket Cast Plus</string>
+    <string name="manage_downloads">Hantera nedladdningar</string>
     <string name="save_space_by_managing_downloaded_episodes">Spara %1$s – genom att hantera nedladdade avsnitt.</string>
     <string name="pencil_clean_up_icon_content_description">Pennikon för rensning</string>
     <string name="podcast_this">Den här podcasten</string>
@@ -490,7 +499,6 @@ Language: sv_SE
     <string name="search_results_all_episodes">Alla avsnitt</string>
     <string name="search_history_row_type_episode_subtitle">Avsnitt \u2022 %1$s \u2022 %2$s</string>
     <string name="search_show_all">Visa alla</string>
-    <string name="podcast">Podcast</string>
     <string name="search_history_row_type_podcast_subtitle">Podcast \u2022 %s</string>
     <string name="search_history_row_type_folder_subtitle">Mapp \u2022 %s</string>
     <string name="search_history_recent_searches">Senaste sökningar</string>
@@ -620,6 +628,7 @@ Language: sv_SE
     <string name="end_of_year_story_top_podcasts_list_title">Mina favoritpodcasts %1$d</string>
     <string name="end_of_year_story_top_podcasts_share_text">Mina favoritpodcasts för året. %1$s</string>
     <string name="end_of_year_story_top_podcast_share_text">Min favoritpodcast %1$d! %2$s</string>
+    <string name="end_of_year_story_top_podcast_subtitle">Du lyssnade på %1$d avsnitt i sammanlagt %2$s av \"%3$s\"</string>
     <string name="end_of_year_story_listened_to_numbers_share_text">Jag lyssnade på %1$d olika podcasts och %2$d avsnitt under %3$d</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">Det fanns dock ett avsnitt som du fortsatte att komma tillbaka till …</string>
     <string name="end_of_year_story_listened_to_numbers">Du lyssnade sammanlagt på %1$d olika podcasts och %2$d avsnitt</string>
@@ -803,20 +812,6 @@ Language: sv_SE
     <string name="share">Dela</string>
     <string name="filters_update_filter">Uppdatera filter</string>
     <string name="filters_chip_episode_status">Avsnittsstatus</string>
-    <string name="profile_stats_day_listened">Lyssnad dag</string>
-    <string name="profile_stats_seconds_listened">Lyssnade sekunder</string>
-    <string name="profile_stats_second_listened">Lyssnad sekund</string>
-    <string name="profile_stats_minutes_listened">Lyssnade minuter</string>
-    <string name="profile_stats_minute_listened">Lyssnad minut</string>
-    <string name="profile_stats_hours_listened">Lyssnade timmar</string>
-    <string name="profile_stats_hour_listened">Lyssnad timme</string>
-    <string name="profile_stats_seconds_saved">Sekunder sparade</string>
-    <string name="profile_stats_second_saved">Sekund sparad</string>
-    <string name="profile_stats_minutes_saved">Minuter sparade</string>
-    <string name="profile_stats_minute_saved">Minut sparad</string>
-    <string name="profile_stats_hours_saved">Timmar sparade</string>
-    <string name="profile_stats_hour_saved">Timme sparad</string>
-    <string name="profile_stats_day_saved">Dag sparad</string>
     <string name="filters_download_options">Nedladdningsalternativ</string>
     <string name="filters_release_date">Utgivningsdatum</string>
     <string name="filters_duration">Varaktighet</string>
@@ -1251,9 +1246,7 @@ Language: sv_SE
     <string name="profile_stats_share_to">Dela till…</string>
     <string name="profile_stats_trim_silence">Trimma tystnad</string>
     <string name="profile_stats_listened_for">Du har lyssnat i</string>
-    <string name="profile_stats_days_saved">Dagar sparade</string>
     <string name="profile_stats_auto_skipping">Hoppa över automatiskt</string>
-    <string name="profile_stats_days_listened">Dagar lyssnade</string>
     <string name="profile_stat_days_listened">Dagar lyssnade</string>
     <string name="profile_sonos_title">Pocket Casts och Sonos</string>
     <string name="profile_sonos_setup_account">Konfigurera konto</string>
@@ -1845,13 +1838,29 @@ Language: sv_SE
     <string name="unarchive">Avarkivera</string>
     <string name="archive">Arkiv</string>
     <string name="add_to_up_next">Lägg till i Nästa</string>
+    <plurals name="day">
+        <item quantity="one">dag</item>
+        <item quantity="other">dagar</item>
+    </plurals>
     <plurals name="episode_count">
         <item quantity="one">%d avsnitt</item>
         <item quantity="other">%d avsnitt</item>
     </plurals>
+    <plurals name="hour">
+        <item quantity="one">timme</item>
+        <item quantity="other">timmar</item>
+    </plurals>
+    <plurals name="minute">
+        <item quantity="one">minut</item>
+        <item quantity="other">minuter</item>
+    </plurals>
     <plurals name="player_up_next_header_title">
         <item quantity="one" formatted="true">%1$d avsnitt - %2$s kvar</item>
         <item quantity="other" formatted="true">%1$d avsnitt - %2$s kvar</item>
+    </plurals>
+    <plurals name="podcast">
+        <item quantity="one">Podcast</item>
+        <item quantity="other"/>
     </plurals>
     <plurals name="podcast_share_end_handle_description">
         <item quantity="one">Handtag för slutklipp: %d sekund</item>
@@ -1860,5 +1869,41 @@ Language: sv_SE
     <plurals name="podcast_share_start_handle_description">
         <item quantity="one">Handtag för startklipp: %d sekund</item>
         <item quantity="other">Handtag för startklipp: %d sekunder</item>
+    </plurals>
+    <plurals name="profile_stats_day_listened">
+        <item quantity="one">Lyssnad dag</item>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="profile_stats_day_saved">
+        <item quantity="one">Dag sparad</item>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="profile_stats_hour_listened">
+        <item quantity="one">Lyssnad timme</item>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="profile_stats_hour_saved">
+        <item quantity="one">Timme sparad</item>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="profile_stats_minute_listened">
+        <item quantity="one">Lyssnad minut</item>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="profile_stats_minute_saved">
+        <item quantity="one">Minut sparad</item>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="profile_stats_second_listened">
+        <item quantity="one">Lyssnad sekund</item>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="profile_stats_second_saved">
+        <item quantity="one">Sekund sparad</item>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="second">
+        <item quantity="one">sekund</item>
+        <item quantity="other">sekunder</item>
     </plurals>
 </resources>

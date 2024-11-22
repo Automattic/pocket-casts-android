@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-11-07 11:54:03+0000
+Translation-Revision-Date: 2024-11-12 11:54:08+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="files_plus_prompt">Upload je bestanden met Pocket Casts Plus, en meer</string>
+    <string name="icons_plus_prompt">Krijg exclusief toegang tot app-iconen met Pocket Casts Plus, en meer</string>
+    <string name="themes_plus_prompt">Krijg exclusief toegang tot themas met Pocket Casts Plus, en meer</string>
+    <string name="folders_plus_prompt">Organiseer je podcasts met Pocket Casts Plus, en meer</string>
+    <string name="end_of_year_story_top_podcast_title">Dit was je favoriete podcast in %1$d</string>
+    <string name="drag_down_to_dismiss_content_description">Sleep naar beneden om te negeren</string>
     <string name="maybe_later">Misschien later</string>
+    <string name="need_to_free_up_space">Wil je ruimte vrijmaken?</string>
     <string name="settings_import_title">Podcasts importeren</string>
     <string name="settings_subscribe_to_played">Op afgespeelde podcasts abonneren</string>
     <string name="settings_export_subscriptions">Podcasts exporteren</string>
@@ -16,6 +23,8 @@ Language: nl
     <string name="podcasts_no_subscriptions">Geen podcasts gevonden</string>
     <string name="unsubscribe">Niet meer volgen</string>
     <string name="subscribe">Volgen</string>
+    <string name="up_next_shuffle_plus_prompt">Speel afleveringen op willekeurige volgorde af met Pocket Casts Plus, en meer</string>
+    <string name="manage_downloads">Downloads beheren</string>
     <string name="save_space_by_managing_downloaded_episodes">Bewaar %1$s – door gedownloade afleveringen te beheren.</string>
     <string name="pencil_clean_up_icon_content_description">Potlood opschonen</string>
     <string name="podcast_this">Deze podcast</string>
@@ -490,7 +499,6 @@ Language: nl
     <string name="search_results_all_episodes">Alle afleveringen</string>
     <string name="search_history_row_type_episode_subtitle">Aflevering \u2022 %1$s \u2022 %2$s</string>
     <string name="search_show_all">Alles tonen</string>
-    <string name="podcast">Podcast</string>
     <string name="search_history_row_type_podcast_subtitle">Podcast \u2022 %s</string>
     <string name="search_history_row_type_folder_subtitle">Folder \u2022 %s</string>
     <string name="search_history_recent_searches">Recente zoekopdrachten</string>
@@ -620,6 +628,7 @@ Language: nl
     <string name="end_of_year_story_top_podcasts_list_title">Mijn beste podcasts van %1$d</string>
     <string name="end_of_year_story_top_podcasts_share_text">Mijn beste podcasts van het jaar! %1$s</string>
     <string name="end_of_year_story_top_podcast_share_text">Mijn favoriete podcast van %1$d! %2$s</string>
+    <string name="end_of_year_story_top_podcast_subtitle">Je hebt in totaal %2$s geluisterd naar %1$d afleveringen van \'%3$s\'</string>
     <string name="end_of_year_story_listened_to_numbers_share_text">Ik heb in %3$d naar %1$d verschillende podcasts en %2$d afleveringen geluisterd</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">Maar er was er één waar je steeds maar weer naar terugkeerde …</string>
     <string name="end_of_year_story_listened_to_numbers">Je hebt naar %1$d verschillende shows en %2$d afleveringen geluisterd</string>
@@ -803,20 +812,6 @@ Language: nl
     <string name="share">Delen</string>
     <string name="filters_update_filter">Filter bijwerken</string>
     <string name="filters_chip_episode_status">Status van aflevering</string>
-    <string name="profile_stats_day_listened">Dagen geluisterd</string>
-    <string name="profile_stats_seconds_listened">Seconden geluisterd</string>
-    <string name="profile_stats_second_listened">Seconde geluisterd</string>
-    <string name="profile_stats_minutes_listened">Minuten geluisterd</string>
-    <string name="profile_stats_minute_listened">Minuut geluisterd</string>
-    <string name="profile_stats_hours_listened">Uren geluisterd</string>
-    <string name="profile_stats_hour_listened">Uur geluisterd</string>
-    <string name="profile_stats_seconds_saved">Seconden opgeslagen</string>
-    <string name="profile_stats_second_saved">Seconde opgeslagen</string>
-    <string name="profile_stats_minutes_saved">Minuten opgeslagen</string>
-    <string name="profile_stats_minute_saved">Minuut opgeslagen</string>
-    <string name="profile_stats_hours_saved">Uren opgeslagen</string>
-    <string name="profile_stats_hour_saved">Uur opgeslagen</string>
-    <string name="profile_stats_day_saved">Dagen opgeslagen</string>
     <string name="filters_download_options">Downlaodopties</string>
     <string name="filters_release_date">Uitgavedatum</string>
     <string name="filters_duration">Duur</string>
@@ -1251,9 +1246,7 @@ Language: nl
     <string name="profile_stats_share_to">Deel naar…</string>
     <string name="profile_stats_trim_silence">Stiltes wegfilteren</string>
     <string name="profile_stats_listened_for">Je hebt geluisterd gedurende</string>
-    <string name="profile_stats_days_saved">Dagen opgeslagen</string>
     <string name="profile_stats_auto_skipping">Automatisch overslaan</string>
-    <string name="profile_stats_days_listened">Dagen geluisterd</string>
     <string name="profile_stat_days_listened">Dagen geluisterd</string>
     <string name="profile_sonos_title">Pocket Casts en Sonos</string>
     <string name="profile_sonos_setup_account">Account instellen</string>
@@ -1845,13 +1838,29 @@ Language: nl
     <string name="unarchive">Dearchiveren</string>
     <string name="archive">Archiveren</string>
     <string name="add_to_up_next">Toevoegen aan Hierna</string>
+    <plurals name="day">
+        <item quantity="one">dag</item>
+        <item quantity="other">dagen</item>
+    </plurals>
     <plurals name="episode_count">
         <item quantity="one">%d aflevering</item>
         <item quantity="other">%d afleveringen</item>
     </plurals>
+    <plurals name="hour">
+        <item quantity="one">uur</item>
+        <item quantity="other">uur</item>
+    </plurals>
+    <plurals name="minute">
+        <item quantity="one">minuut</item>
+        <item quantity="other">minuten</item>
+    </plurals>
     <plurals name="player_up_next_header_title">
         <item quantity="one" formatted="true">%1$d aflevering - nog %2$s</item>
         <item quantity="other" formatted="true">%1$d afleveringen - nog %2$s</item>
+    </plurals>
+    <plurals name="podcast">
+        <item quantity="one">Podcast</item>
+        <item quantity="other"/>
     </plurals>
     <plurals name="podcast_share_end_handle_description">
         <item quantity="one">Handle einde clip: %d seconde</item>
@@ -1860,5 +1869,41 @@ Language: nl
     <plurals name="podcast_share_start_handle_description">
         <item quantity="one">Handle begin clip: %d seconde</item>
         <item quantity="other">Handle begin clip: %d seconden</item>
+    </plurals>
+    <plurals name="profile_stats_day_listened">
+        <item quantity="one">Dagen geluisterd</item>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="profile_stats_day_saved">
+        <item quantity="one">Dagen opgeslagen</item>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="profile_stats_hour_listened">
+        <item quantity="one">Uur geluisterd</item>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="profile_stats_hour_saved">
+        <item quantity="one">Uur opgeslagen</item>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="profile_stats_minute_listened">
+        <item quantity="one">Minuut geluisterd</item>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="profile_stats_minute_saved">
+        <item quantity="one">Minuut opgeslagen</item>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="profile_stats_second_listened">
+        <item quantity="one">Seconde geluisterd</item>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="profile_stats_second_saved">
+        <item quantity="one">Seconde opgeslagen</item>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="second">
+        <item quantity="one">seconde</item>
+        <item quantity="other">seconden</item>
     </plurals>
 </resources>

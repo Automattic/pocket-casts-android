@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-11-06 09:54:05+0000
+Translation-Revision-Date: 2024-11-14 09:54:02+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="files_plus_prompt">Lade deine Dateien mit Pocket Casts Plus hoch und vieles mehr</string>
+    <string name="icons_plus_prompt">Hol dir exklusive App-Icons mit Pocket Casts Plus und vieles mehr</string>
+    <string name="themes_plus_prompt">Hol dir exklusive Themes mit Pocket Casts Plus und vieles mehr</string>
+    <string name="folders_plus_prompt">Organisiere deine Podcasts mit Pocket Casts Plus und vieles mehr</string>
+    <string name="end_of_year_story_top_podcast_title">Dies war dein Top-Podcast in %1$d</string>
+    <string name="drag_down_to_dismiss_content_description">Zum Verwerfen nach unten ziehen</string>
     <string name="maybe_later">Vielleicht später</string>
+    <string name="need_to_free_up_space">Du benötigst mehr Speicherplatz?</string>
     <string name="settings_import_title">Podcasts importieren</string>
     <string name="settings_subscribe_to_played">Wiedergegebene Podcasts abonnieren</string>
     <string name="settings_export_subscriptions">Podcasts exportieren</string>
@@ -17,6 +24,7 @@ Language: de
     <string name="unsubscribe">Nicht mehr abonnieren</string>
     <string name="subscribe">Abonnieren</string>
     <string name="up_next_shuffle_plus_prompt">Mit Pocket Casts Plus kannst du deine Folgen in einer zufälligen Reihenfolge hören und vieles mehr</string>
+    <string name="manage_downloads">Downloads verwalten</string>
     <string name="save_space_by_managing_downloaded_episodes">Spare %1$s Speicherplatz, indem du die heruntergeladenen Folgen verwaltest.</string>
     <string name="pencil_clean_up_icon_content_description">Stift zum Bereinigen</string>
     <string name="podcast_this">Dieser Podcast</string>
@@ -491,7 +499,6 @@ Language: de
     <string name="search_results_all_episodes">Alle Folgen</string>
     <string name="search_history_row_type_episode_subtitle">Folge \u2022 %1$s \u2022 %2$s</string>
     <string name="search_show_all">Alle zeigen</string>
-    <string name="podcast">Podcast</string>
     <string name="search_history_row_type_podcast_subtitle">Podcast \u2022 %s</string>
     <string name="search_history_row_type_folder_subtitle">Ordner \u2022 %s</string>
     <string name="search_history_recent_searches">Aktuelle Suchen</string>
@@ -621,6 +628,7 @@ Language: de
     <string name="end_of_year_story_top_podcasts_list_title">Meine Top-Podcasts %1$d</string>
     <string name="end_of_year_story_top_podcasts_share_text">Meine Top-Podcasts des Jahres! %1$s</string>
     <string name="end_of_year_story_top_podcast_share_text">Mein Lieblings-Podcast %1$d! %2$s</string>
+    <string name="end_of_year_story_top_podcast_subtitle">Du hast dir %1$d Folgen mit einer Gesamtdauer von %2$s von „%3$s“ angehört</string>
     <string name="end_of_year_story_listened_to_numbers_share_text">Ich habe mir %3$d %1$d verschiedene Podcasts und %2$d Folgen angehört</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">Aber es gab eine, die dir besonders gut gefallen hat …</string>
     <string name="end_of_year_story_listened_to_numbers">Du hast dir insgesamt %1$d verschiedene Shows und %2$d Folgen angehört</string>
@@ -804,20 +812,6 @@ Language: de
     <string name="share">Teilen</string>
     <string name="filters_update_filter">Filter aktualisieren</string>
     <string name="filters_chip_episode_status">Status der Folge</string>
-    <string name="profile_stats_day_listened">Tag angehört</string>
-    <string name="profile_stats_seconds_listened">Sekunden angehört</string>
-    <string name="profile_stats_second_listened">Sekunde angehört</string>
-    <string name="profile_stats_minutes_listened">Minuten angehört</string>
-    <string name="profile_stats_minute_listened">Minute angehört</string>
-    <string name="profile_stats_hours_listened">Stunden angehört</string>
-    <string name="profile_stats_hour_listened">Stunde angehört</string>
-    <string name="profile_stats_seconds_saved">Sekunden gespart</string>
-    <string name="profile_stats_second_saved">Sekunde gespart</string>
-    <string name="profile_stats_minutes_saved">Minuten gespart</string>
-    <string name="profile_stats_minute_saved">Minute gespart</string>
-    <string name="profile_stats_hours_saved">Stunden gespart</string>
-    <string name="profile_stats_hour_saved">Stunde gespart</string>
-    <string name="profile_stats_day_saved">Tag gespart</string>
     <string name="filters_download_options">Download-Status</string>
     <string name="filters_release_date">Erscheinungsdatum</string>
     <string name="filters_duration">Dauer</string>
@@ -1252,9 +1246,7 @@ Language: de
     <string name="profile_stats_share_to">Teilen auf …</string>
     <string name="profile_stats_trim_silence">Stille kürzen</string>
     <string name="profile_stats_listened_for">Bis jetzt hast du angehört:</string>
-    <string name="profile_stats_days_saved">Tage gespart</string>
     <string name="profile_stats_auto_skipping">Automatisch Überspringen</string>
-    <string name="profile_stats_days_listened">Tage angehört</string>
     <string name="profile_stat_days_listened">Tage angehört</string>
     <string name="profile_sonos_title">Pocket Casts und Sonos</string>
     <string name="profile_sonos_setup_account">Konto einrichten</string>
@@ -1846,13 +1838,29 @@ Language: de
     <string name="unarchive">Wiederherstellen</string>
     <string name="archive">Archivieren</string>
     <string name="add_to_up_next">Zur Warteschlange hinzufügen</string>
+    <plurals name="day">
+        <item quantity="one">Tag</item>
+        <item quantity="other">Tage</item>
+    </plurals>
     <plurals name="episode_count">
         <item quantity="one">%d Folge</item>
         <item quantity="other">%d Folgen</item>
     </plurals>
+    <plurals name="hour">
+        <item quantity="one">Stunde</item>
+        <item quantity="other">Stunden</item>
+    </plurals>
+    <plurals name="minute">
+        <item quantity="one">Minute</item>
+        <item quantity="other">Minuten</item>
+    </plurals>
     <plurals name="player_up_next_header_title">
         <item quantity="one" formatted="true">%1$d Folge - %2$s verbleibend</item>
         <item quantity="other" formatted="true">%1$d Folgen - %2$s verbleibend</item>
+    </plurals>
+    <plurals name="podcast">
+        <item quantity="one">Podcast</item>
+        <item quantity="other"/>
     </plurals>
     <plurals name="podcast_share_end_handle_description">
         <item quantity="one">Handle für Clip-Ende: %d Sekunde</item>
@@ -1861,5 +1869,41 @@ Language: de
     <plurals name="podcast_share_start_handle_description">
         <item quantity="one">Handle für Clip-Anfang: %d Sekunde</item>
         <item quantity="other">Handle für Clip-Anfang: %d Sekunden</item>
+    </plurals>
+    <plurals name="profile_stats_day_listened">
+        <item quantity="one">Tag angehört</item>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="profile_stats_day_saved">
+        <item quantity="one">Tag gespart</item>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="profile_stats_hour_listened">
+        <item quantity="one">Stunde angehört</item>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="profile_stats_hour_saved">
+        <item quantity="one">Stunde gespart</item>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="profile_stats_minute_listened">
+        <item quantity="one">Minute angehört</item>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="profile_stats_minute_saved">
+        <item quantity="one">Minute gespart</item>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="profile_stats_second_listened">
+        <item quantity="one">Sekunde angehört</item>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="profile_stats_second_saved">
+        <item quantity="one">Sekunde gespart</item>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="second">
+        <item quantity="one">Sekunde</item>
+        <item quantity="other">Sekunden</item>
     </plurals>
 </resources>

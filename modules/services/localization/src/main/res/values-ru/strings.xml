@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-11-07 09:54:03+0000
+Translation-Revision-Date: 2024-11-12 15:54:03+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="files_plus_prompt">Загружайте свои файлы с Pocket Casts Plus и многое другое</string>
+    <string name="icons_plus_prompt">Получайте эксклюзивные значки приложений с Pocket Casts Plus и многое другое</string>
+    <string name="themes_plus_prompt">Получайте эксклюзивные темы с Pocket Casts Plus и многое другое</string>
+    <string name="folders_plus_prompt">Упорядочивайте ваши подкасты с Pocket Casts Plus и многое другое</string>
+    <string name="end_of_year_story_top_podcast_title">Это был ваш лучший подкаст в %1$d году</string>
+    <string name="drag_down_to_dismiss_content_description">Перетащите вниз, чтобы закрыть</string>
     <string name="maybe_later">Возможно, позже</string>
+    <string name="need_to_free_up_space">Необходимо освободить место?</string>
     <string name="settings_import_title">Импортировать подкасты</string>
     <string name="settings_subscribe_to_played">Подписаться на прослушанные подкасты</string>
     <string name="settings_export_subscriptions">Экспорт подкастов</string>
@@ -17,6 +24,7 @@ Language: ru
     <string name="unsubscribe">Отменить подписку</string>
     <string name="subscribe">Подписаться</string>
     <string name="up_next_shuffle_plus_prompt">При помощи Pocket Casts Plus можно воспроизводить выпуски в случайном порядке и делать ещё много интересного.</string>
+    <string name="manage_downloads">Управлять скачиваниями</string>
     <string name="save_space_by_managing_downloaded_episodes">Сохраняйте %1$s — управляйте скачанными выпусками.</string>
     <string name="pencil_clean_up_icon_content_description">Значок «Очистить» в виде карандаша</string>
     <string name="podcast_this">Этот подкаст</string>
@@ -491,7 +499,6 @@ Language: ru
     <string name="search_results_all_episodes">Все выпуски</string>
     <string name="search_history_row_type_episode_subtitle">Выпуск \u2022 %1$s \u2022 %2$s</string>
     <string name="search_show_all">Показать всё</string>
-    <string name="podcast">Подкаст</string>
     <string name="search_history_row_type_podcast_subtitle">Подкаст \u2022 %s</string>
     <string name="search_history_row_type_folder_subtitle">Папка \u2022 %s</string>
     <string name="search_history_recent_searches">Последний поиск</string>
@@ -621,6 +628,7 @@ Language: ru
     <string name="end_of_year_story_top_podcasts_list_title">Мои любимые подкасты в %1$d году</string>
     <string name="end_of_year_story_top_podcasts_share_text">Мои любимые подкасты этого года! %1$s</string>
     <string name="end_of_year_story_top_podcast_share_text">Мой любимый подкаст в %1$d году! %2$s</string>
+    <string name="end_of_year_story_top_podcast_subtitle">Вы прослушали %1$d эпизодов «%3$s» общей продолжительностью %2$s</string>
     <string name="end_of_year_story_listened_to_numbers_share_text">Я прослушал(а) %1$d подкастов(а) и %2$d выпусков(а) в %3$d году</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">Но было одно шоу, которое вы слушали снова и снова…</string>
     <string name="end_of_year_story_listened_to_numbers">Вы прослушали %1$d шоу и %2$d выпусков</string>
@@ -804,20 +812,6 @@ Language: ru
     <string name="share">Поделиться</string>
     <string name="filters_update_filter">Обновить фильтр</string>
     <string name="filters_chip_episode_status">Статус выпуска</string>
-    <string name="profile_stats_day_listened">день прослушан</string>
-    <string name="profile_stats_seconds_listened">секунд прослушано</string>
-    <string name="profile_stats_second_listened">секунда прослушана</string>
-    <string name="profile_stats_minutes_listened">минут прослушано</string>
-    <string name="profile_stats_minute_listened">минута прослушана</string>
-    <string name="profile_stats_hours_listened">часов прослушано</string>
-    <string name="profile_stats_hour_listened">час прослушан</string>
-    <string name="profile_stats_seconds_saved">секунд сохранено</string>
-    <string name="profile_stats_second_saved">секунда сохранена</string>
-    <string name="profile_stats_minutes_saved">минут сохранено</string>
-    <string name="profile_stats_minute_saved">минута сохранена</string>
-    <string name="profile_stats_hours_saved">часов сохранено</string>
-    <string name="profile_stats_hour_saved">час сохранен</string>
-    <string name="profile_stats_day_saved">день сохранен</string>
     <string name="filters_download_options">Параметры загрузки</string>
     <string name="filters_release_date">Сбросить дату</string>
     <string name="filters_duration">Продолжительность</string>
@@ -1252,9 +1246,7 @@ Language: ru
     <string name="profile_stats_share_to">Поделиться с…</string>
     <string name="profile_stats_trim_silence">Удалить паузы</string>
     <string name="profile_stats_listened_for">Вы прослушали</string>
-    <string name="profile_stats_days_saved">дней сохранено</string>
     <string name="profile_stats_auto_skipping">Автоматический пропуск</string>
-    <string name="profile_stats_days_listened">дней прослушано</string>
     <string name="profile_stat_days_listened">дней прослушано</string>
     <string name="profile_sonos_title">Pocket Casts и Sonos</string>
     <string name="profile_sonos_setup_account">Настройка учётной записи</string>
@@ -1846,15 +1838,35 @@ Language: ru
     <string name="unarchive">Из архива</string>
     <string name="archive">Архив</string>
     <string name="add_to_up_next">Добавить в «Следующие»</string>
+    <plurals name="day">
+        <item quantity="one">д</item>
+        <item quantity="few">дн.</item>
+        <item quantity="many">дн</item>
+    </plurals>
     <plurals name="episode_count">
         <item quantity="one">%d вып.</item>
         <item quantity="few">%d вып.</item>
         <item quantity="many">%d вып.</item>
     </plurals>
+    <plurals name="hour">
+        <item quantity="one">час</item>
+        <item quantity="few">ч.</item>
+        <item quantity="many">ч.</item>
+    </plurals>
+    <plurals name="minute">
+        <item quantity="one">мин</item>
+        <item quantity="few">мин</item>
+        <item quantity="many">мин</item>
+    </plurals>
     <plurals name="player_up_next_header_title">
         <item quantity="one" formatted="true">%1$d выпуск — %2$s осталось</item>
         <item quantity="few">%1$d вып. — %2$s осталось</item>
         <item quantity="many">%1$d вып. — %2$s осталось</item>
+    </plurals>
+    <plurals name="podcast">
+        <item quantity="one">Подкаст</item>
+        <item quantity="few"/>
+        <item quantity="many"/>
     </plurals>
     <plurals name="podcast_share_end_handle_description">
         <item quantity="one">Дескриптор конца клипа: %d сек</item>
@@ -1865,5 +1877,50 @@ Language: ru
         <item quantity="one">Дескриптор начала клипа: %d сек</item>
         <item quantity="few">Дескриптор начала клипа: %d сек</item>
         <item quantity="many">Дескриптор начала клипа: %d сек</item>
+    </plurals>
+    <plurals name="profile_stats_day_listened">
+        <item quantity="one">день прослушан</item>
+        <item quantity="few"/>
+        <item quantity="many"/>
+    </plurals>
+    <plurals name="profile_stats_day_saved">
+        <item quantity="one">день сохранен</item>
+        <item quantity="few"/>
+        <item quantity="many"/>
+    </plurals>
+    <plurals name="profile_stats_hour_listened">
+        <item quantity="one">час прослушан</item>
+        <item quantity="few"/>
+        <item quantity="many"/>
+    </plurals>
+    <plurals name="profile_stats_hour_saved">
+        <item quantity="one">час сохранен</item>
+        <item quantity="few"/>
+        <item quantity="many"/>
+    </plurals>
+    <plurals name="profile_stats_minute_listened">
+        <item quantity="one">минута прослушана</item>
+        <item quantity="few"/>
+        <item quantity="many"/>
+    </plurals>
+    <plurals name="profile_stats_minute_saved">
+        <item quantity="one">минута сохранена</item>
+        <item quantity="few"/>
+        <item quantity="many"/>
+    </plurals>
+    <plurals name="profile_stats_second_listened">
+        <item quantity="one">секунда прослушана</item>
+        <item quantity="few"/>
+        <item quantity="many"/>
+    </plurals>
+    <plurals name="profile_stats_second_saved">
+        <item quantity="one">секунда сохранена</item>
+        <item quantity="few"/>
+        <item quantity="many"/>
+    </plurals>
+    <plurals name="second">
+        <item quantity="one">сек</item>
+        <item quantity="few">сек</item>
+        <item quantity="many">сек</item>
     </plurals>
 </resources>
