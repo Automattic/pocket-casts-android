@@ -108,111 +108,14 @@
 
         </FrameLayout>
 
-        <TextView
-            android:id="@+id/episodeTitle"
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/playerHeadingSectionComposeView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginHorizontal="16dp"
-            android:ellipsize="end"
-            android:gravity="center"
-            android:lineSpacingMultiplier="1.2"
-            android:maxLines="1"
-            android:textColor="#FFFFFFFF"
-            android:textSize="18sp"
-            app:layout_constraintEnd_toStartOf="@+id/nextChapter"
-            app:layout_constraintStart_toEndOf="@+id/previousChapter"
-            app:layout_constraintTop_toTopOf="@id/artworkTopBarrier"
-            tools:text="@tools:sample/lorem" />
-
-        <ImageButton
-            android:id="@+id/previousChapter"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
-            android:layout_marginStart="8dp"
-            android:background="?android:attr/actionBarItemBackground"
-            android:contentDescription="@string/player_action_previous_chapter"
-            android:src="@drawable/ic_chapter_skipbackwards"
-            app:layout_constraintBottom_toBottomOf="@+id/episodeTitle"
             app:layout_constraintStart_toEndOf="@id/artworkEndBarrier"
-            app:layout_constraintTop_toTopOf="@+id/episodeTitle" />
-
-        <ImageButton
-            android:id="@+id/nextChapter"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
-            android:layout_marginEnd="8dp"
-            android:background="?android:attr/actionBarItemBackground"
-            android:contentDescription="@string/player_action_next_chapter"
-            android:src="@drawable/ic_chapter_skipforward"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/previousChapter" />
-
-        <au.com.shiftyjelly.pocketcasts.player.view.ChapterProgressCircle
-            android:id="@+id/chapterProgressCircle"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            app:layout_constraintBottom_toBottomOf="@+id/nextChapter"
-            app:layout_constraintEnd_toEndOf="@+id/nextChapter"
-            app:layout_constraintStart_toStartOf="@+id/nextChapter"
-            app:layout_constraintTop_toTopOf="@+id/nextChapter" />
-
-        <TextView
-            android:id="@+id/chapterTimeRemaining"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:alpha="0.4"
-            android:textAppearance="@style/H70"
-            android:textColor="@color/white"
-            app:layout_constraintEnd_toEndOf="@+id/nextChapter"
-            app:layout_constraintStart_toStartOf="@+id/nextChapter"
-            app:layout_constraintTop_toBottomOf="@+id/nextChapter"
-            tools:text="9m" />
-
-        <TextView
-            android:id="@+id/podcastTitle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:ellipsize="end"
-            android:gravity="center"
-            android:maxLines="1"
-            android:textColor="?attr/player_contrast_02"
-            android:textSize="14sp"
-            app:layout_constraintEnd_toEndOf="@id/episodeTitle"
-            app:layout_constraintStart_toStartOf="@id/episodeTitle"
-            app:layout_constraintTop_toBottomOf="@id/episodeTitle"
-            tools:text="@tools:sample/lorem" />
-
-        <TextView
-            android:id="@+id/chapterSummary"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:gravity="center"
-            android:maxLines="1"
-            android:textAppearance="?attr/textCaption"
-            app:layout_constraintEnd_toEndOf="@id/episodeTitle"
-            app:layout_constraintStart_toStartOf="@id/episodeTitle"
-            app:layout_constraintTop_toBottomOf="@id/episodeTitle"
-            tools:text="@tools:sample/lorem" />
-
-        <androidx.constraintlayout.widget.Barrier
-            android:id="@+id/secondaryTextTopBarrier"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:barrierAllowsGoneWidgets="true"
-            app:barrierDirection="top"
-            app:constraint_referenced_ids="podcastTitle,chapterSummary" />
-
-        <androidx.constraintlayout.widget.Barrier
-            android:id="@+id/secondaryTextBottomBarrier"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:barrierAllowsGoneWidgets="true"
-            app:barrierDirection="bottom"
-            app:constraint_referenced_ids="podcastTitle,chapterSummary" />
+            app:layout_constraintTop_toTopOf="@id/artworkTopBarrier"
+            app:layout_constraintBottom_toTopOf="@id/seekBar"/>
 
         <androidx.compose.ui.platform.ComposeView
             android:id="@+id/transcriptPage"
@@ -229,22 +132,22 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            app:layout_constraintEnd_toEndOf="@+id/nextChapter"
-            app:layout_constraintStart_toStartOf="@+id/previousChapter"
-            app:layout_constraintTop_toBottomOf="@id/secondaryTextBottomBarrier" />
+            app:layout_constraintEnd_toEndOf="@+id/playerHeadingSectionComposeView"
+            app:layout_constraintStart_toStartOf="@+id/playerHeadingSectionComposeView"
+            app:layout_constraintBottom_toTopOf="@+id/playerControlsComposeView" />
 
         <androidx.compose.ui.platform.ComposeView
             android:id="@+id/playerControlsComposeView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="@+id/nextChapter"
-            app:layout_constraintStart_toStartOf="@+id/previousChapter"
+            app:layout_constraintEnd_toEndOf="@+id/playerHeadingSectionComposeView"
+            app:layout_constraintStart_toStartOf="@+id/playerHeadingSectionComposeView"
             app:layout_constraintTop_toBottomOf="@id/seekBar"/>
 
         <androidx.compose.ui.platform.ComposeView
             android:id="@+id/shelfComposeView"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="56dp"
             android:layout_margin="16dp"
             android:weightSum="5"
             app:layout_constraintTop_toBottomOf="@+id/playerControlsComposeView"
