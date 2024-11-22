@@ -166,7 +166,6 @@ Language: ar
     <string name="search_history_recent_searches">آخر عمليات بحث</string>
     <string name="search_history_row_type_folder_subtitle">المجلد \u2022 %s</string>
     <string name="search_history_row_type_podcast_subtitle">حلقة البودكاست \u2022 %s</string>
-    <string name="podcast">البودكاست</string>
     <string name="error_opening_links_activity_not_found">يبدو أنه ليس لديك تطبيق قادر على عرض هذا المحتوى.</string>
     <string name="notifications_blocked_warning">تم حظر التنبيهات يمكنك تحديث الصلاحية من خلال الإعدادات.</string>
     <string name="settings_media_actions_prioritize_title">منح الأولوية إلى إجراءات الوسائط المخصصة الخاصة بك</string>
@@ -461,20 +460,6 @@ Language: ar
     <string name="share">شارك</string>
     <string name="filters_update_filter">تحديث عامل التصفية</string>
     <string name="filters_chip_episode_status">حالة الحلقة</string>
-    <string name="profile_stats_day_listened">اليوم الذي تم الاستماع فيه</string>
-    <string name="profile_stats_seconds_listened">الثواني التي تم الاستماع فيها</string>
-    <string name="profile_stats_second_listened">الثانية التي تم الاستماع فيها</string>
-    <string name="profile_stats_minutes_listened">الدقائق التي تم الاستماع فيها</string>
-    <string name="profile_stats_minute_listened">الدقيقة التي تم الاستماع فيها</string>
-    <string name="profile_stats_hours_listened">الساعات التي تم الاستماع فيها</string>
-    <string name="profile_stats_hour_listened">الساعة التي تم الاستماع فيها</string>
-    <string name="profile_stats_seconds_saved">الثواني التي تم توفيرها</string>
-    <string name="profile_stats_second_saved">الثانية التي تم توفيرها</string>
-    <string name="profile_stats_minutes_saved">الدقائق التي تم توفيرها</string>
-    <string name="profile_stats_minute_saved">الدقيقة التي تم توفيرها</string>
-    <string name="profile_stats_hours_saved">الساعات التي تم توفيرها</string>
-    <string name="profile_stats_hour_saved">الساعة التي تم توفيرها</string>
-    <string name="profile_stats_day_saved">اليوم الذي تم توفيره</string>
     <string name="filters_download_options">خيارات التنزيل</string>
     <string name="filters_release_date">تاريخ الإصدار</string>
     <string name="filters_duration">المدة</string>
@@ -598,8 +583,8 @@ Language: ar
     <string name="error_webview_not_installed">يتعذر تحميل ملحوظات العرض بسبب عدم تثبيت أي WebView على النظام.</string>
     <string name="settings_status_service_support_summary">يمكنك الوصول إلى دعم الأسئلة المتداولة والاتصال بنا.</string>
     <string name="settings_status_service_support">الدعم</string>
-    <string name="settings_status_service_hosts_help">يتمثَّل السبب الأكثر شيوعًا في أن لديك مانع إعلانات تم تكوينه على هاتفك أو شبكتك. سيتعيَّن عليك فتح هذا النطاق لتنزيل البث الصوتي. يرجى ملاحظة أن Pocket Casts لا يقوم بالاستضافة أو يختار مكان استضافة البث الصوتي، ويرجع هذا الأمر إلى مؤلف العرض وهو خارج عن سيطرتنا.</string>
     <string name="settings_status_service_hosts_summary">يستضيف مؤلفو البث الصوتي ملفات الحلقات في مزوِّدي استضافة متنوعين غير خاضعين لإدارة Pocket Casts.</string>
+    <string name="settings_status_service_hosts_help">يتمثَّل السبب الأكثر شيوعًا في أن لديك مانع إعلانات تم تكوينه على هاتفك أو شبكتك. سيتعيَّن عليك فتح هذا النطاق لتنزيل البث الصوتي. يرجى ملاحظة أن Pocket Casts لا يقوم بالاستضافة أو يختار مكان استضافة البث الصوتي، ويرجع هذا الأمر إلى مؤلف العرض وهو خارج عن سيطرتنا.</string>
     <string name="settings_status_service_hosts">مضيفو البث الصوتي الشائعون</string>
     <string name="settings_status_service_ad_blocker_help_plural">يتمثَّل السبب الأكثر شيوعًا في أن لديك مانع إعلانات تم تكوينه على هاتفك أو شبكتك. سيتعيَّن عليك فتح النطاقات %s</string>
     <string name="settings_status_service_ad_blocker_help_singular">يتمثَّل السبب الأكثر شيوعًا في أن لديك مانع إعلانات تم تكوينه على هاتفك أو شبكتك. سيتعيَّن عليك فتح النطاق %s</string>
@@ -900,9 +885,7 @@ Language: ar
     <string name="profile_stats_share_to">المشاركة على..</string>
     <string name="profile_stats_trim_silence">إزالة السكوت</string>
     <string name="profile_stats_listened_for">الذي استمعت إليه</string>
-    <string name="profile_stats_days_saved">الأيام التي تم توفيرها</string>
     <string name="profile_stats_auto_skipping">التخطي التلقائي</string>
-    <string name="profile_stats_days_listened">الأيام التي تم الاستماع فيها</string>
     <string name="profile_stat_days_listened">الأيام التي تم الاستماع فيها</string>
     <string name="profile_sonos_title">Pocket Casts وSonos</string>
     <string name="profile_sonos_setup_account">إعداد حساب</string>
@@ -1488,4 +1471,76 @@ Language: ar
     <string name="archive">أرشيف</string>
     <string name="add_to_up_next">إضافة إلى التالي</string>
     <string name="in_progress">قيد التقدم</string>
+    <plurals name="podcast">
+        <item quantity="zero">البودكاست</item>
+        <item quantity="one"/>
+        <item quantity="two"/>
+        <item quantity="few"/>
+        <item quantity="many"/>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="profile_stats_day_listened">
+        <item quantity="zero">اليوم الذي تم الاستماع فيه</item>
+        <item quantity="one"/>
+        <item quantity="two"/>
+        <item quantity="few"/>
+        <item quantity="many"/>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="profile_stats_day_saved">
+        <item quantity="zero">اليوم الذي تم توفيره</item>
+        <item quantity="one"/>
+        <item quantity="two"/>
+        <item quantity="few"/>
+        <item quantity="many"/>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="profile_stats_hour_listened">
+        <item quantity="zero">الساعة التي تم الاستماع فيها</item>
+        <item quantity="one"/>
+        <item quantity="two"/>
+        <item quantity="few"/>
+        <item quantity="many"/>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="profile_stats_hour_saved">
+        <item quantity="zero">الساعة التي تم توفيرها</item>
+        <item quantity="one"/>
+        <item quantity="two"/>
+        <item quantity="few"/>
+        <item quantity="many"/>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="profile_stats_minute_listened">
+        <item quantity="zero">الدقيقة التي تم الاستماع فيها</item>
+        <item quantity="one"/>
+        <item quantity="two"/>
+        <item quantity="few"/>
+        <item quantity="many"/>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="profile_stats_minute_saved">
+        <item quantity="zero">الدقيقة التي تم توفيرها</item>
+        <item quantity="one"/>
+        <item quantity="two"/>
+        <item quantity="few"/>
+        <item quantity="many"/>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="profile_stats_second_listened">
+        <item quantity="zero">الثانية التي تم الاستماع فيها</item>
+        <item quantity="one"/>
+        <item quantity="two"/>
+        <item quantity="few"/>
+        <item quantity="many"/>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="profile_stats_second_saved">
+        <item quantity="zero">الثانية التي تم توفيرها</item>
+        <item quantity="one"/>
+        <item quantity="two"/>
+        <item quantity="few"/>
+        <item quantity="many"/>
+        <item quantity="other"/>
+    </plurals>
 </resources>

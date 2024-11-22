@@ -100,8 +100,7 @@ abstract class EndOfYearDao {
           episode.last_playback_interaction_date IS NOT NULL
           AND episode.last_playback_interaction_date >= :fromEpochMs
           AND episode.last_playback_interaction_date < :toEpochMs
-          AND episode.playing_status IN (1, 2)
-        ORDER BY episode.duration DESC
+        ORDER BY episode.played_up_to DESC
         LIMIT 1
         """,
     )

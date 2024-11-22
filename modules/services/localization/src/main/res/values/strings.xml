@@ -2223,9 +2223,9 @@
     <string name="referrals_send_guest_pass_title">Gift %1$s of Pocket&#160;Casts&#160;Plus</string>
     <string name="referrals_share_guest_pass">Share Guest Pass</string>
     <!-- Referrals share subject, `%1$s' is a placeholder for the offer duration on the Plus subscription -->
-    <string name="referrals_share_subject">%1$s Guest Pass for Pocket&#160;Casts</string>
+    <string name="referrals_share_subject">%1$s Guest Pass for Pocket&#160;Casts&#160;Plus!</string>
     <!-- Referrals share text, `%1$s' is a placeholder for the offer duration on the Plus subscription -->
-    <string name="referrals_share_text">Hey! Use the link below to claim your %1$s guest pass for Pocket&#160;Casts&#160;Plus and enjoy podcasts across all your devices!</string>
+    <string name="referrals_share_text">Hi there!\n\nHere\'s a %1$s guest pass for Pocket&#160;Casts&#160;Plus–my favorite podcast player. It\'s packed with unique features like bookmarks, folders and more that you won\'t find anywhere else. I think you\'ll love it too!</string>
     <!-- Referrals tooltip message, `%1$s' is a placeholder for the offer duration on the Plus subscription -->
     <string name="referrals_tooltip_message">Gift %1$s of Pocket&#160;Casts&#160;Plus!</string>
     <string name="referrals_create_subscription_failed">Could not create subscription. Please try again later.</string>

@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-11-06 09:54:04+0000
+Translation-Revision-Date: 2024-11-12 09:54:04+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="files_plus_prompt">Pocket Casts Plus でファイルのアップロードなどを利用しましょう</string>
+    <string name="icons_plus_prompt">Pocket Casts Plus で専用アプリアイコンの取得などを利用しましょう</string>
+    <string name="themes_plus_prompt">Pocket Casts Plus で専用テーマの取得などを利用しましょう</string>
+    <string name="folders_plus_prompt">Pocket Casts Plus でポッドキャストの整理などを利用しましょう</string>
+    <string name="end_of_year_story_top_podcast_title">こちらが%1$dにあなたが一番再生したポッドキャストです</string>
+    <string name="drag_down_to_dismiss_content_description">下にドラッグして閉じる</string>
     <string name="maybe_later">後で</string>
+    <string name="need_to_free_up_space">容量を空ける必要がありますか ?</string>
     <string name="settings_import_title">ポッドキャストをインポート</string>
     <string name="settings_subscribe_to_played">再生したポッドキャストをフォロー</string>
     <string name="settings_export_subscriptions">ポッドキャストをエクスポート</string>
@@ -17,6 +24,7 @@ Language: ja_JP
     <string name="unsubscribe">フォロー解除</string>
     <string name="subscribe">フォロー</string>
     <string name="up_next_shuffle_plus_prompt">Pocket Casts Plus でエピソードをシャッフル、など</string>
+    <string name="manage_downloads">ダウンロードを管理</string>
     <string name="save_space_by_managing_downloaded_episodes">ダウンロード済みエピソードを管理して %1$s を保存します。</string>
     <string name="pencil_clean_up_icon_content_description">鉛筆のクリーンアップ</string>
     <string name="podcast_this">このポッドキャスト</string>
@@ -491,7 +499,6 @@ Language: ja_JP
     <string name="search_results_all_episodes">すべてのエピソード</string>
     <string name="search_history_row_type_episode_subtitle">エピソード \u2022%1$s \u2022%2$s</string>
     <string name="search_show_all">すべて表示</string>
-    <string name="podcast">ポッドキャスト</string>
     <string name="search_history_row_type_podcast_subtitle">ポッドキャスト \u2022 %s</string>
     <string name="search_history_row_type_folder_subtitle">フォルダー \u2022 %s</string>
     <string name="search_history_recent_searches">最近の検索</string>
@@ -621,6 +628,7 @@ Language: ja_JP
     <string name="end_of_year_story_top_podcasts_list_title">%1$dに再生数が多かったポッドキャスト</string>
     <string name="end_of_year_story_top_podcasts_share_text">今年再生数が多かったポッドキャストはこちら ! %1$s</string>
     <string name="end_of_year_story_top_podcast_share_text">%1$dのお気に入りのポッドキャストはこちら ! %2$s</string>
+    <string name="end_of_year_story_top_podcast_subtitle">「%3$s」の全%2$s話のエピソードで合計%1$d話を聴きました</string>
     <string name="end_of_year_story_listened_to_numbers_share_text">%3$dは%1$d個のポッドキャストで%2$d話のエピソードを聴きました</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">何度も聴いたエピソードもありました…</string>
     <string name="end_of_year_story_listened_to_numbers">%1$d個のショーで合計%2$d話のエピソードを聴きました</string>
@@ -804,20 +812,6 @@ Language: ja_JP
     <string name="share">共有</string>
     <string name="filters_update_filter">フィルターを更新</string>
     <string name="filters_chip_episode_status">エピソードのステータス</string>
-    <string name="profile_stats_day_listened">聴取日数</string>
-    <string name="profile_stats_seconds_listened">聴取秒数</string>
-    <string name="profile_stats_second_listened">聴取秒数</string>
-    <string name="profile_stats_minutes_listened">聴取分数</string>
-    <string name="profile_stats_minute_listened">聴取分数</string>
-    <string name="profile_stats_hours_listened">聴取時間数</string>
-    <string name="profile_stats_hour_listened">聴取時間数</string>
-    <string name="profile_stats_seconds_saved">節約秒数</string>
-    <string name="profile_stats_second_saved">節約秒数</string>
-    <string name="profile_stats_minutes_saved">節約分数</string>
-    <string name="profile_stats_minute_saved">節約分数</string>
-    <string name="profile_stats_hours_saved">節約時間数</string>
-    <string name="profile_stats_hour_saved">節約時間数</string>
-    <string name="profile_stats_day_saved">節約日数</string>
     <string name="filters_download_options">ダウンロードオプション</string>
     <string name="filters_release_date">リリース日</string>
     <string name="filters_duration">期間</string>
@@ -1252,9 +1246,7 @@ Language: ja_JP
     <string name="profile_stats_share_to">以下と共有..</string>
     <string name="profile_stats_trim_silence">無音時間をカット</string>
     <string name="profile_stats_listened_for">聴取時間</string>
-    <string name="profile_stats_days_saved">節約日数</string>
     <string name="profile_stats_auto_skipping">自動スキップ</string>
-    <string name="profile_stats_days_listened">聴取日数</string>
     <string name="profile_stat_days_listened">聴取日数</string>
     <string name="profile_sonos_title">Pocket Casts と Sonos</string>
     <string name="profile_sonos_setup_account">アカウントの設定</string>
@@ -1846,16 +1838,55 @@ Language: ja_JP
     <string name="unarchive">アーカイブを解除</string>
     <string name="archive">アーカイブ</string>
     <string name="add_to_up_next">次のエピソードに追加</string>
+    <plurals name="day">
+        <item quantity="other">日</item>
+    </plurals>
     <plurals name="episode_count">
         <item quantity="other">%d件のエピソード</item>
     </plurals>
+    <plurals name="hour">
+        <item quantity="other">時間</item>
+    </plurals>
+    <plurals name="minute">
+        <item quantity="other">分</item>
+    </plurals>
     <plurals name="player_up_next_header_title">
         <item quantity="other" formatted="true">%1$d件のエピソード - 残り%2$s</item>
+    </plurals>
+    <plurals name="podcast">
+        <item quantity="other">ポッドキャスト</item>
     </plurals>
     <plurals name="podcast_share_end_handle_description">
         <item quantity="other">クリップハンドルを終了: %d秒</item>
     </plurals>
     <plurals name="podcast_share_start_handle_description">
         <item quantity="other">クリップハンドルを開始: %d秒</item>
+    </plurals>
+    <plurals name="profile_stats_day_listened">
+        <item quantity="other">聴取日数</item>
+    </plurals>
+    <plurals name="profile_stats_day_saved">
+        <item quantity="other">節約日数</item>
+    </plurals>
+    <plurals name="profile_stats_hour_listened">
+        <item quantity="other">聴取時間数</item>
+    </plurals>
+    <plurals name="profile_stats_hour_saved">
+        <item quantity="other">節約時間数</item>
+    </plurals>
+    <plurals name="profile_stats_minute_listened">
+        <item quantity="other">聴取分数</item>
+    </plurals>
+    <plurals name="profile_stats_minute_saved">
+        <item quantity="other">節約分数</item>
+    </plurals>
+    <plurals name="profile_stats_second_listened">
+        <item quantity="other">聴取秒数</item>
+    </plurals>
+    <plurals name="profile_stats_second_saved">
+        <item quantity="other">節約秒数</item>
+    </plurals>
+    <plurals name="second">
+        <item quantity="other">秒</item>
     </plurals>
 </resources>

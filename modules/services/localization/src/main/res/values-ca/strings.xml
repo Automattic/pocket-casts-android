@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-11-02 23:25:25+0000
+Translation-Revision-Date: 2024-11-21 23:38:20+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: ca
 -->
 <resources>
+    <string name="files_plus_prompt">Carrega els teus arxius amb Pocket Casts Plus, i més</string>
+    <string name="icons_plus_prompt">Aconsegueix icones de l\'app exclusives amb Pocket Casts Plus, i més</string>
+    <string name="themes_plus_prompt">Aconsegueix temes exclusius amb Pocket Casts Plus, i més</string>
+    <string name="folders_plus_prompt">Organitza els teus pòdcasts amb Pocket Casts Plus, i més</string>
+    <string name="end_of_year_story_top_podcast_title">Aquest va ser el teu pòdcast més escoltat en %1$d</string>
+    <string name="drag_down_to_dismiss_content_description">Arrossega cap avall per a descartar</string>
+    <string name="maybe_later">Potser més tard</string>
+    <string name="need_to_free_up_space">Necessites alliberar espai?</string>
     <string name="settings_import_title">Importar pòdcasts</string>
     <string name="settings_subscribe_to_played">Segueix els pòdcasts reproduïts</string>
     <string name="settings_export_subscriptions">Exportar pòdcasts</string>
@@ -407,6 +415,7 @@ Language: ca
     <string name="settings_help_contact_support_no_phone_connection">Emparella el teu rellotge amb un telèfon que tingui Pocket Casts instal·lat per veure els teus registres o contactar amb el suport</string>
     <string name="settings_help_contact_support_email_sent_to_phone">Si el telèfon està actualment emparellat, mostrarà una finestra emergent per enviar un correu electrònic al suport tècnic amb els teus registres adjunts</string>
     <string name="podcast_loading">Carregant els teus pòdcasts</string>
+    <string name="podcasts_subscribe_on_phone">Subscriu-te a pòdcasts al teu mòbil i apareixeran aquí.</string>
     <string name="settings_could_not_open_on_phone">No es pot obrir al telèfon</string>
     <string name="settings_open_on_phone">Obre al telèfon</string>
     <string name="settings_about_privacy_policy_available_at">Pots consultar la nostra política de privadesa a %s</string>
@@ -490,7 +499,6 @@ Language: ca
     <string name="search_results_all_episodes">Tots els episodis</string>
     <string name="search_history_row_type_episode_subtitle">Episodi \u2022 %1$s \u2022 %2$s</string>
     <string name="search_show_all">Mostra-ho tot</string>
-    <string name="podcast">Pòdcast</string>
     <string name="search_history_row_type_podcast_subtitle">Pòdcast \u2022 %s</string>
     <string name="search_history_row_type_folder_subtitle">Carpeta \u2022 %s</string>
     <string name="search_history_recent_searches">Darreres cerques</string>
@@ -620,6 +628,7 @@ Language: ca
     <string name="end_of_year_story_top_podcasts_list_title">Els meus pòdcasts preferits de %1$d</string>
     <string name="end_of_year_story_top_podcasts_share_text">Els meus pòdcasts preferits de l\'any! %1$s</string>
     <string name="end_of_year_story_top_podcast_share_text">El meu pòdcast favorit de %1$d! %2$s</string>
+    <string name="end_of_year_story_top_podcast_subtitle">Has escoltat %1$d episodis durant un total de %2$s de \"%3$s\"</string>
     <string name="end_of_year_story_listened_to_numbers_share_text">He escoltat %1$d pòdcasts diferents i %2$d episodis en %3$d.</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">Però n\'hi havia un al que tornaves…</string>
     <string name="end_of_year_story_listened_to_numbers">Has escoltat %1$d programes diferents i %2$d episodis en total</string>
@@ -803,20 +812,6 @@ Language: ca
     <string name="share">Compartir</string>
     <string name="filters_update_filter">Actualitzar el filtre</string>
     <string name="filters_chip_episode_status">Estat de l\'episodi</string>
-    <string name="profile_stats_day_listened">Dies escoltats</string>
-    <string name="profile_stats_seconds_listened">Segons escoltats</string>
-    <string name="profile_stats_second_listened">Segons escoltats</string>
-    <string name="profile_stats_minutes_listened">Minuts escoltats</string>
-    <string name="profile_stats_minute_listened">Minuts escoltats</string>
-    <string name="profile_stats_hours_listened">Hores escoltades</string>
-    <string name="profile_stats_hour_listened">Hores escoltades</string>
-    <string name="profile_stats_seconds_saved">Segons estalviats</string>
-    <string name="profile_stats_second_saved">Segons estalviats</string>
-    <string name="profile_stats_minutes_saved">Minuts escoltats</string>
-    <string name="profile_stats_minute_saved">Minuts estalviats</string>
-    <string name="profile_stats_hours_saved">Hores estalviades</string>
-    <string name="profile_stats_hour_saved">Hores estalviades</string>
-    <string name="profile_stats_day_saved">Dies estalviats</string>
     <string name="filters_download_options">Opcions de descàrrega</string>
     <string name="filters_release_date">Data de publicació</string>
     <string name="filters_duration">Durada</string>
@@ -947,6 +942,7 @@ Language: ca
     <string name="settings_status_service_ad_blocker_help_singular">La causa més comuna és que tens un bloquejador de publicitat configurat al teu telèfon o xarxa. Haureu de desbloquejar el domini %s</string>
     <string name="settings_status_service_discover_summary">La secció Descobrir l\'aplicació i la cerca de pòdcast.</string>
     <string name="settings_status_service_discover">Descobrir i cercar</string>
+    <string name="settings_status_service_account_summary">El servei es fa servir per emmagatzemar el progrés dels episodis, les subscripcions, els filtres, etc.</string>
     <string name="settings_status_service_account">Servei del compte</string>
     <string name="settings_status_service_refresh_summary">Aquest servei s\'empra per cercar episodis nous.</string>
     <string name="settings_status_service_refresh">Servei d\'actualizació</string>
@@ -1074,6 +1070,8 @@ Language: ca
     <string name="settings_skip_back_time">Saltar temps cap enrere</string>
     <string name="settings_show_artwork_details">També es mostraran les caràtules als dispositius connectats per Bluetooth, rellotges, etc.</string>
     <string name="settings_show_artwork">Mostrar caràtules a la pantalla de bloqueig</string>
+    <string name="settings_show_archived_summary_show">Els nous pòdcasts als quals us subscriviu mostraran els episodis arxivats.</string>
+    <string name="settings_show_archived_summary_hide">Els nous pòdcasts als quals us subscriviu no mostraran els episodis arxivats.</string>
     <string name="settings_show_archived_action_show">Mostrar</string>
     <string name="settings_show_archived_action_hide">Amagar</string>
     <string name="settings_row_action_summary">Per als episodis que encara no s\'han descarregat, les llistes mostraran botons %s.</string>
@@ -1087,6 +1085,8 @@ Language: ca
     <string name="settings_podcasts_selected_all">Tots els pòdcasts</string>
     <string name="settings_podcast_episode_grouping_title_season">Temporada</string>
     <string name="settings_podcast_episode_grouping_title_none">Cap</string>
+    <string name="settings_podcast_episode_grouping_summary_none">Els pòdcasts nous als quals us subscriviu no agruparan els seus episodis.</string>
+    <string name="settings_podcast_episode_grouping_summary">Els nous pòdcasts als quals et subscriguis agruparan els episodis per %s.</string>
     <string name="settings_podcast_episode_grouping">Agrupació d\'episodis de pòdcast</string>
     <string name="settings_podcast_custom">Personalitzat per a aquest pòdcast</string>
     <string name="settings_podcast_artwork">Caràtules del pòdcast</string>
@@ -1122,6 +1122,7 @@ Language: ca
     <string name="settings_import_opml_title">Importar OPML</string>
     <string name="settings_import_opml_stop">Aturar</string>
     <string name="settings_import_opml_progress">%1$d de %2$d pòdcasts</string>
+    <string name="settings_import_file_summary">Si tens subscripcions de pòdcast en una altra app o servei, Pocket Casts les pot importar des d\'un fitxer OPML.</string>
     <string name="settings_import_file">Seleccionar fitxer</string>
     <string name="settings_import_choose_file">Tria un fitxer OPML.</string>
     <string name="settings_help_contact_support">Contacta amb el suport</string>
@@ -1129,6 +1130,7 @@ Language: ca
     <string name="settings_get_plus_and_more">Aconsegueix Pocket Casts Plus per desbloquejar aquesta funció i moltes més!</string>
     <string name="settings_general_player">Reproductor</string>
     <string name="settings_general_defaults">Per defecte</string>
+    <string name="settings_export_send_email_summary">Exporta les teves subscripcions en el format OPML super geek (però àmpliament compatible).</string>
     <string name="settings_export_send_email">Enviar correu electrònic</string>
     <string name="settings_export_save_file_summary">Exportar el fitxer OPML al teu emmagatzematge.</string>
     <string name="settings_export_save_file">Desar fitxer</string>
@@ -1244,9 +1246,7 @@ Language: ca
     <string name="profile_stats_share_to">Compartir amb…</string>
     <string name="profile_stats_trim_silence">Retallar silencis</string>
     <string name="profile_stats_listened_for">Has escoltat durant</string>
-    <string name="profile_stats_days_saved">Dies estalviats</string>
     <string name="profile_stats_auto_skipping">Salt automàtic</string>
-    <string name="profile_stats_days_listened">Dies escoltats</string>
     <string name="profile_stat_days_listened">Dies escoltats</string>
     <string name="profile_sonos_title">Pocket Casts i Sonos</string>
     <string name="profile_sonos_setup_account">Configurar el compte</string>
@@ -1515,6 +1515,7 @@ Language: ca
     <string name="podcast_effects_summary_speed">Velocitat %s×</string>
     <string name="podcast_included_in_filters">Inclòs a %s</string>
     <string name="podcast_not_in_filters">No inclòs a cap filtre</string>
+    <string name="podcast_unsubscribe_warning">Si deixes de seguir aquest pòdcast, s\'esborraran tots els arxius descarregats.</string>
     <string name="podcast_unsubscribe_downloaded_file_plural">%d Arxius descarregats</string>
     <string name="podcast_unsubscribe_downloaded_file_singular">1 arxiu descarregat</string>
     <string name="podcast_share_open_fail">No es poden carregar els detalls del pòdcast compartit. Si aquest problema persisteix, per què no et poses en contacte amb la persona que t\'ho va compartir i li preguntes què passa?</string>
@@ -1837,13 +1838,29 @@ Language: ca
     <string name="unarchive">Desarxivar</string>
     <string name="archive">Arxivar</string>
     <string name="add_to_up_next">Afegir a la llista \'Tot seguit\'</string>
+    <plurals name="day">
+        <item quantity="one">dia</item>
+        <item quantity="other">dies</item>
+    </plurals>
     <plurals name="episode_count">
         <item quantity="one">%d episodi</item>
         <item quantity="other">%d episodis</item>
     </plurals>
+    <plurals name="hour">
+        <item quantity="one">hora</item>
+        <item quantity="other">hores</item>
+    </plurals>
+    <plurals name="minute">
+        <item quantity="one">minut</item>
+        <item quantity="other">minuts</item>
+    </plurals>
     <plurals name="player_up_next_header_title">
         <item quantity="one" formatted="true">%1$d episodi - queden %2$s</item>
         <item quantity="other" formatted="true">%1$d episodis - queden %2$s</item>
+    </plurals>
+    <plurals name="podcast">
+        <item quantity="one">Pòdcast</item>
+        <item quantity="other"/>
     </plurals>
     <plurals name="podcast_share_end_handle_description">
         <item quantity="one">Control del clip final: %d segon</item>
@@ -1852,5 +1869,41 @@ Language: ca
     <plurals name="podcast_share_start_handle_description">
         <item quantity="one">Control del clip inicial: %d segon</item>
         <item quantity="other">Control del clip inicial: %d segons</item>
+    </plurals>
+    <plurals name="profile_stats_day_listened">
+        <item quantity="one">Dies escoltats</item>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="profile_stats_day_saved">
+        <item quantity="one">Dies estalviats</item>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="profile_stats_hour_listened">
+        <item quantity="one">Hores escoltades</item>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="profile_stats_hour_saved">
+        <item quantity="one">Hores estalviades</item>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="profile_stats_minute_listened">
+        <item quantity="one">Minuts escoltats</item>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="profile_stats_minute_saved">
+        <item quantity="one">Minuts estalviats</item>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="profile_stats_second_listened">
+        <item quantity="one">Segons escoltats</item>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="profile_stats_second_saved">
+        <item quantity="one">Segons estalviats</item>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="second">
+        <item quantity="one">segon</item>
+        <item quantity="other">segons</item>
     </plurals>
 </resources>

@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-11-06 13:54:03+0000
+Translation-Revision-Date: 2024-11-14 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="files_plus_prompt">運用 Pocket Casts Plus 上傳檔案和其他內容</string>
+    <string name="icons_plus_prompt">Pocket Casts Plus 帶給你專屬應用程式圖示和更多內容</string>
+    <string name="themes_plus_prompt">Pocket Casts Plus 帶給你專屬佈景主題和更多內容</string>
+    <string name="folders_plus_prompt">運用 Pocket Casts Plus 打理 Podcast 和更多內容</string>
+    <string name="end_of_year_story_top_podcast_title">你在 %1$d 年最常聽的 Podcast</string>
+    <string name="drag_down_to_dismiss_content_description">向下拖曳即可關閉</string>
     <string name="maybe_later">稍後再說</string>
+    <string name="need_to_free_up_space">需要騰出更多空間？</string>
     <string name="settings_import_title">匯入 Podcast 節目</string>
     <string name="settings_subscribe_to_played">追蹤播放過的 Podcast 節目</string>
     <string name="settings_export_subscriptions">匯出 Podcast 節目</string>
@@ -17,6 +24,7 @@ Language: zh_TW
     <string name="unsubscribe">停止追蹤</string>
     <string name="subscribe">追蹤</string>
     <string name="up_next_shuffle_plus_prompt">運用 Pocket Casts Plus 隨機播放單集並享有更多功能</string>
+    <string name="manage_downloads">管理下載項目</string>
     <string name="save_space_by_managing_downloaded_episodes">整理已下載的單集，就能省下 %1$s 的空間。</string>
     <string name="pencil_clean_up_icon_content_description">鉛筆清除</string>
     <string name="podcast_this">這個 Podcast</string>
@@ -491,7 +499,6 @@ Language: zh_TW
     <string name="search_results_all_episodes">所有單集</string>
     <string name="search_history_row_type_episode_subtitle">單集 \u2022 %1$s \u2022 %2$s</string>
     <string name="search_show_all">顯示全部</string>
-    <string name="podcast">Podcast</string>
     <string name="search_history_row_type_podcast_subtitle">Podcast \u2022 %s</string>
     <string name="search_history_row_type_folder_subtitle">資料夾 \u2022 %s</string>
     <string name="search_history_recent_searches">最近搜尋的內容</string>
@@ -621,6 +628,7 @@ Language: zh_TW
     <string name="end_of_year_story_top_podcasts_list_title">%1$d 年我最常聽的 Podcast</string>
     <string name="end_of_year_story_top_podcasts_share_text">本年度我最愛的 Podcast！ %1$s</string>
     <string name="end_of_year_story_top_podcast_share_text">%1$d 年我最愛的 Podcast！ %2$s</string>
+    <string name="end_of_year_story_top_podcast_subtitle">你收聽了 %1$d 集的「%3$s」，總共 %2$s</string>
     <string name="end_of_year_story_listened_to_numbers_share_text">我在 %3$d 年收聽了 %1$d 個不同的 Podcast，總共 %2$d 集</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">但有個節目你已成為忠實聽眾了…</string>
     <string name="end_of_year_story_listened_to_numbers">你一共收聽了 %1$d 個不同節目和 %2$d 集內容</string>
@@ -804,20 +812,6 @@ Language: zh_TW
     <string name="share">分享</string>
     <string name="filters_update_filter">更新篩選器</string>
     <string name="filters_chip_episode_status">本集狀態</string>
-    <string name="profile_stats_day_listened">天 (收聽時間)</string>
-    <string name="profile_stats_seconds_listened">秒 (收聽時間)</string>
-    <string name="profile_stats_second_listened">秒 (收聽時間)</string>
-    <string name="profile_stats_minutes_listened">分鐘 (收聽時間)</string>
-    <string name="profile_stats_minute_listened">分鐘 (收聽時間)</string>
-    <string name="profile_stats_hours_listened">小時 (收聽時間)</string>
-    <string name="profile_stats_hour_listened">小時 (收聽時間)</string>
-    <string name="profile_stats_seconds_saved">秒 (已省下)</string>
-    <string name="profile_stats_second_saved">秒 (已省下)</string>
-    <string name="profile_stats_minutes_saved">分鐘 (已省下)</string>
-    <string name="profile_stats_minute_saved">分鐘 (已省下)</string>
-    <string name="profile_stats_hours_saved">小時 (已省下)</string>
-    <string name="profile_stats_hour_saved">小時 (已省下)</string>
-    <string name="profile_stats_day_saved">天 (已省下)</string>
     <string name="filters_download_options">下載選項</string>
     <string name="filters_release_date">發佈日期</string>
     <string name="filters_duration">時間長度</string>
@@ -1252,9 +1246,7 @@ Language: zh_TW
     <string name="profile_stats_share_to">分享至…</string>
     <string name="profile_stats_trim_silence">無聲剪輯</string>
     <string name="profile_stats_listened_for">你已收聽</string>
-    <string name="profile_stats_days_saved">省下的天數</string>
     <string name="profile_stats_auto_skipping">自動跳過</string>
-    <string name="profile_stats_days_listened">天 (已省下)</string>
     <string name="profile_stat_days_listened">已收聽的天數</string>
     <string name="profile_sonos_title">Pocket Casts 和 Sonos</string>
     <string name="profile_sonos_setup_account">設定帳號</string>
@@ -1846,16 +1838,55 @@ Language: zh_TW
     <string name="unarchive">取消封存</string>
     <string name="archive">封存</string>
     <string name="add_to_up_next">新增到「接下來播放」</string>
+    <plurals name="day">
+        <item quantity="other">天</item>
+    </plurals>
     <plurals name="episode_count">
         <item quantity="other">%d 集</item>
     </plurals>
+    <plurals name="hour">
+        <item quantity="other">小時</item>
+    </plurals>
+    <plurals name="minute">
+        <item quantity="other">分</item>
+    </plurals>
     <plurals name="player_up_next_header_title">
         <item quantity="other" formatted="true">%1$d 集單集 - 剩餘 %2$s</item>
+    </plurals>
+    <plurals name="podcast">
+        <item quantity="other">Podcast</item>
     </plurals>
     <plurals name="podcast_share_end_handle_description">
         <item quantity="other">結尾片段控點：%d 秒</item>
     </plurals>
     <plurals name="podcast_share_start_handle_description">
         <item quantity="other">開頭片段控點：%d 秒</item>
+    </plurals>
+    <plurals name="profile_stats_day_listened">
+        <item quantity="other">天 (收聽時間)</item>
+    </plurals>
+    <plurals name="profile_stats_day_saved">
+        <item quantity="other">天 (已省下)</item>
+    </plurals>
+    <plurals name="profile_stats_hour_listened">
+        <item quantity="other">小時 (收聽時間)</item>
+    </plurals>
+    <plurals name="profile_stats_hour_saved">
+        <item quantity="other">小時 (已省下)</item>
+    </plurals>
+    <plurals name="profile_stats_minute_listened">
+        <item quantity="other">分鐘 (收聽時間)</item>
+    </plurals>
+    <plurals name="profile_stats_minute_saved">
+        <item quantity="other">分鐘 (已省下)</item>
+    </plurals>
+    <plurals name="profile_stats_second_listened">
+        <item quantity="other">秒 (收聽時間)</item>
+    </plurals>
+    <plurals name="profile_stats_second_saved">
+        <item quantity="other">秒 (已省下)</item>
+    </plurals>
+    <plurals name="second">
+        <item quantity="other">秒</item>
     </plurals>
 </resources>

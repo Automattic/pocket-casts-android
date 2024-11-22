@@ -156,7 +156,6 @@ Language: nb_NO
     <string name="podcasts_all">Alle podcaster</string>
     <string name="search_history_row_type_episode_subtitle">Episode \u2022 %1$s \u2022 %2$s</string>
     <string name="search_show_all">Vis alle</string>
-    <string name="podcast">Podcast</string>
     <string name="search_podcasts_or_add_url">Søk etter podcaster eller legg til RSS URL</string>
     <string name="search_history_clear_all_confirm_button_title">Tøm søkehistorikk</string>
     <string name="search_history_clear_all_confirmation_message">Er du sikker på at du vil tømme søkehistorikken?</string>
@@ -457,13 +456,6 @@ Language: nb_NO
     <string name="share">Del</string>
     <string name="filters_update_filter">Oppdater filter</string>
     <string name="filters_chip_episode_status">Episodestatus</string>
-    <string name="profile_stats_day_listened">Dag lyttet</string>
-    <string name="profile_stats_seconds_listened">Sekunder lyttet</string>
-    <string name="profile_stats_second_listened">Sekund lyttet</string>
-    <string name="profile_stats_minutes_listened">Minutter lyttet</string>
-    <string name="profile_stats_minute_listened">Minutt lyttet</string>
-    <string name="profile_stats_hours_listened">Timer lyttet</string>
-    <string name="profile_stats_hour_listened">Time lyttet</string>
     <string name="filters_download_options">Nedlastingsalternativer</string>
     <string name="filters_release_date">Lanseringsdato</string>
     <string name="filters_duration">Varighet</string>
@@ -473,13 +465,6 @@ Language: nb_NO
     <string name="not_downloaded">Ikke nedlastet</string>
     <string name="downloaded">Nedlastet</string>
     <string name="all">Alle</string>
-    <string name="profile_stats_seconds_saved">Sekunder spart</string>
-    <string name="profile_stats_second_saved">Sekund spart</string>
-    <string name="profile_stats_minute_saved">Minutt spart</string>
-    <string name="profile_stats_hour_saved">Time spart</string>
-    <string name="profile_stats_day_saved">Dag spart</string>
-    <string name="profile_stats_hours_saved">Timer spart</string>
-    <string name="profile_stats_minutes_saved">Minutter spart</string>
     <string name="profile_cloud_edit_file">Rediger fil</string>
     <string name="profile_cloud_add_file">Legg til fil</string>
     <string name="profile_cloud_settings_title">Innstillinger for filer</string>
@@ -897,7 +882,6 @@ Language: nb_NO
     <string name="profile_stats_trim_silence">Kutt av stillhet</string>
     <string name="profile_stats_listened_for">Du har lyttet for</string>
     <string name="profile_stats_auto_skipping">Hopp over automatisk</string>
-    <string name="profile_stats_days_listened">Dager lyttet</string>
     <string name="profile_stat_days_listened">Dager lyttet</string>
     <string name="profile_sonos_title">Pocket Casts og Sonos</string>
     <string name="profile_sonos_setup_account">Konfigurer konto</string>
@@ -973,8 +957,8 @@ Language: nb_NO
     <string name="profile_files_add_filename">Navn</string>
     <string name="profile_files_add_custom_image">Legg til egendefinert bilde</string>
     <string name="profile_file_locked">låst</string>
-    <string name="profile_license_agreement">Pocket Casts respekterer personvernet ditt. Disse retningslinjene for personvern forklarer hvilke opplysninger vi samler inn om deg og hvorfor, hva vi gjør med disse opplysningene, og hvordan vi behandler dem. De gjelder for Pocket Casts-apper for iOS og Android og Pocket Casts-webtjenesten med tilknyttede macOS- og Windows-apper (kalt for \"tjenesten\", både samlet sett og i flertall). Ved å bruke tjenesten godtar du disse retningslinjene for personvern. Hvis du slår på push-varslinger i appen, lagrer vi push-tokenet som Apple leverer til oss, for å levere disse push-varslingene til enheten din. Hvis du kjøper webappen, lagrer vi en transaksjons-ID for kjøpet. Hvis du velger ikke å opprette en konto, og hvis du ikke bruker push-varslinger, blir ingen data om deg lagret på serverne våre. Pocket Casts-webtjenesten bruker også informasjonskapsler og lignende teknologi til å holde deg innlogget. Hvis du velger å generere en støtteforespørsel fra selve tjenesten, kan vi generere et vedlegg som inneholder flere data for hjelp til håndtering av støtteforespørselen, som du kan se på før den blir sendt inn.</string>
     <string name="profile_file">Fil</string>
+    <string name="profile_license_agreement">Pocket Casts respekterer personvernet ditt. Disse retningslinjene for personvern forklarer hvilke opplysninger vi samler inn om deg og hvorfor, hva vi gjør med disse opplysningene, og hvordan vi behandler dem. De gjelder for Pocket Casts-apper for iOS og Android og Pocket Casts-webtjenesten med tilknyttede macOS- og Windows-apper (kalt for \"tjenesten\", både samlet sett og i flertall). Ved å bruke tjenesten godtar du disse retningslinjene for personvern. Hvis du slår på push-varslinger i appen, lagrer vi push-tokenet som Apple leverer til oss, for å levere disse push-varslingene til enheten din. Hvis du kjøper webappen, lagrer vi en transaksjons-ID for kjøpet. Hvis du velger ikke å opprette en konto, og hvis du ikke bruker push-varslinger, blir ingen data om deg lagret på serverne våre. Pocket Casts-webtjenesten bruker også informasjonskapsler og lignende teknologi til å holde deg innlogget. Hvis du velger å generere en støtteforespørsel fra selve tjenesten, kan vi generere et vedlegg som inneholder flere data for hjelp til håndtering av støtteforespørselen, som du kan se på før den blir sendt inn.</string>
     <string name="profile_feature_requires">Denne funksjonen krever\nPocket Casts Plus</string>
     <string name="profile_ends">Avsluttes %s</string>
     <string name="profile_ended">Avsluttet %s</string>
@@ -1111,7 +1095,6 @@ Language: nb_NO
     <string name="filters_choose_podcasts">Velg podcaster</string>
     <string name="filters_chip_media_type">Medietype</string>
     <string name="filters_chip_download_status">Nedlastingsstatus</string>
-    <string name="profile_stats_days_saved">Dager spart</string>
     <string name="filters_chip_all_your_podcasts">Alle podcastene dine</string>
     <string name="filters_all_your_podcasts">Alle podcastene dine</string>
     <string name="episode_filters">Episodefiltre</string>
@@ -1484,4 +1467,40 @@ Language: nb_NO
     <string name="archive">Arkiver</string>
     <string name="add_to_up_next">Legg til i Neste</string>
     <string name="in_progress">Pågår</string>
+    <plurals name="podcast">
+        <item quantity="one">Podcast</item>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="profile_stats_day_listened">
+        <item quantity="one">Dag lyttet</item>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="profile_stats_day_saved">
+        <item quantity="one">Dag spart</item>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="profile_stats_hour_listened">
+        <item quantity="one">Time lyttet</item>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="profile_stats_hour_saved">
+        <item quantity="one">Time spart</item>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="profile_stats_minute_listened">
+        <item quantity="one">Minutt lyttet</item>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="profile_stats_minute_saved">
+        <item quantity="one">Minutt spart</item>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="profile_stats_second_listened">
+        <item quantity="one">Sekund lyttet</item>
+        <item quantity="other"/>
+    </plurals>
+    <plurals name="profile_stats_second_saved">
+        <item quantity="one">Sekund spart</item>
+        <item quantity="other"/>
+    </plurals>
 </resources>

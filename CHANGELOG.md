@@ -33,6 +33,8 @@
     *   Add new podcast subscriptions to the top instead of bottom for Data Added podcast sort order 
         ([#3192](https://github.com/Automattic/pocket-casts-android/pull/3192)) 
 *   Bug Fixes
+    *   Improve syncing of deselected chapters
+        ([#3256](https://github.com/Automattic/pocket-casts-android/pull/3256))
     *   Use red color for the notification icons
         ([#3154](https://github.com/Automattic/pocket-casts-android/pull/3154))
     *   Fix effects being lost when paused

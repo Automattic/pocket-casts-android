@@ -690,6 +690,7 @@ class EndOfYearManagerTest {
                 playingStatus = EpisodePlayingStatus.COMPLETED,
                 duration = 20.0,
                 imageUrl = "image-url-1",
+                playedUpTo = 20.0,
             ),
         )
 
@@ -716,6 +717,7 @@ class EndOfYearManagerTest {
                     lastPlaybackInteraction = Year.of(1000).toEpochMillis(zone),
                     playingStatus = EpisodePlayingStatus.COMPLETED,
                     duration = 40.0,
+                    playedUpTo = 35.0,
                 ),
                 PodcastEpisode(
                     uuid = "id-3",
@@ -725,17 +727,18 @@ class EndOfYearManagerTest {
                     lastPlaybackInteraction = Year.of(1001).toEpochMillis(zone) - 1,
                     playingStatus = EpisodePlayingStatus.IN_PROGRESS,
                     duration = 80.0,
+                    playedUpTo = 30.0,
                 ),
             ),
         )
 
         assertEquals(
             LongestEpisode(
-                episodeId = "id-3",
-                episodeTitle = "title-3",
+                episodeId = "id-2",
+                episodeTitle = "title-2",
                 podcastId = "p-id-2",
                 podcastTitle = "p-title-2",
-                durationSeconds = 80.0,
+                durationSeconds = 40.0,
                 coverUrl = null,
             ),
             manager.getStats(year = Year.of(1000)).longestEpisode,
@@ -754,6 +757,7 @@ class EndOfYearManagerTest {
                     lastPlaybackInteraction = Year.of(1000).toEpochMillis(zone) - 1,
                     playingStatus = EpisodePlayingStatus.COMPLETED,
                     duration = 10.0,
+                    playedUpTo = 5.0,
                 ),
                 PodcastEpisode(
                     uuid = "id-2",
@@ -762,6 +766,7 @@ class EndOfYearManagerTest {
                     lastPlaybackInteraction = Year.of(1001).toEpochMillis(zone),
                     playingStatus = EpisodePlayingStatus.COMPLETED,
                     duration = 10.0,
+                    playedUpTo = 5.0,
                 ),
                 PodcastEpisode(
                     uuid = "id-3",
@@ -770,25 +775,7 @@ class EndOfYearManagerTest {
                     lastPlaybackInteraction = null,
                     playingStatus = EpisodePlayingStatus.COMPLETED,
                     duration = 10.0,
-                ),
-            ),
-        )
-
-        assertNull(manager.getStats(year = Year.of(1000)).longestEpisode)
-    }
-
-    @Test
-    fun doNotCountUnplayedEpisodesForLongestPlayedEpisode() = runTest {
-        podcastDao.insertBlocking(Podcast("p-id-1"))
-        episodeDao.insertAllBlocking(
-            listOf(
-                PodcastEpisode(
-                    uuid = "id-1",
-                    podcastUuid = "p-id-1",
-                    publishedDate = Date(),
-                    lastPlaybackInteraction = Year.of(1000).toEpochMillis(zone),
-                    playingStatus = EpisodePlayingStatus.NOT_PLAYED,
-                    duration = 10.0,
+                    playedUpTo = 5.0,
                 ),
             ),
         )
