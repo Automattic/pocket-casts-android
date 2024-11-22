@@ -188,7 +188,7 @@ private fun Toolbar(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .height(64.dp)
+            .height(56.dp)
             .background(MaterialTheme.theme.colors.secondaryUi01)
             .padding(horizontal = horizontalPadding),
     ) {
