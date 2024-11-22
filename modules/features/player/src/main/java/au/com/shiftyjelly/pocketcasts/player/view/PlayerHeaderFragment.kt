@@ -277,6 +277,17 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                         PlayerViewModel.NavigationState.ShowSkipForwardLongPressOptionsDialog -> {
                             LongPressOptionsFragment().show(parentFragmentManager, "longpressoptions")
                         }
+
+                        is PlayerViewModel.NavigationState.OpenChapterAt -> {
+                            (parentFragment as? PlayerContainerFragment)?.openChaptersAt(navigationState.chapter)
+                        }
+
+                        is PlayerViewModel.NavigationState.OpenPodcastPage -> {
+                            (activity as? FragmentHostListener)?.let { listener ->
+                                listener.closePlayer()
+                                listener.openPodcastPage(navigationState.podcastUuid, navigationState.source.analyticsValue)
+                            }
+                        }
                     }
                 }
             }
@@ -572,13 +583,11 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     }
 
     override fun onPreviousChapter() {
-        analyticsTracker.track(AnalyticsEvent.PLAYER_PREVIOUS_CHAPTER_TAPPED)
-        viewModel.previousChapter()
+        viewModel.onPreviousChapterClick()
     }
 
     override fun onNextChapter() {
-        analyticsTracker.track(AnalyticsEvent.PLAYER_NEXT_CHAPTER_TAPPED)
-        viewModel.nextChapter()
+        viewModel.onNextChapterClick()
     }
 
     override fun onClosePlayer() {
