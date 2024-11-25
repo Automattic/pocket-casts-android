@@ -1858,10 +1858,6 @@ Language: es
         <item quantity="one" formatted="true">%1$d episodio - quedan %2$s</item>
         <item quantity="other" formatted="true">%1$d episodios - quedan %2$s</item>
     </plurals>
-    <plurals name="podcast">
-        <item quantity="one">Pódcast</item>
-        <item quantity="other"/>
-    </plurals>
     <plurals name="podcast_share_end_handle_description">
         <item quantity="one">Control de clip final: %d segundo</item>
         <item quantity="other">Control de clip final: %d segundos</item>
@@ -1869,38 +1865,6 @@ Language: es
     <plurals name="podcast_share_start_handle_description">
         <item quantity="one">Control de clip inicial: %d segundo</item>
         <item quantity="other">Control de clip inicial: %d segundos</item>
-    </plurals>
-    <plurals name="profile_stats_day_listened">
-        <item quantity="one">Día escuchado</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_day_saved">
-        <item quantity="one">Día ahorrado</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_hour_listened">
-        <item quantity="one">Hora escuchada</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_hour_saved">
-        <item quantity="one">Hora ahorrada</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_minute_listened">
-        <item quantity="one">Minuto escuchado</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_minute_saved">
-        <item quantity="one">Minuto ahorrado</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_second_listened">
-        <item quantity="one">Segundo escuchado</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_second_saved">
-        <item quantity="one">Segundo ahorrado</item>
-        <item quantity="other"/>
     </plurals>
     <plurals name="second">
         <item quantity="one">segundo</item>

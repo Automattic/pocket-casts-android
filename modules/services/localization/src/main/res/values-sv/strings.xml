@@ -1858,10 +1858,6 @@ Language: sv_SE
         <item quantity="one" formatted="true">%1$d avsnitt - %2$s kvar</item>
         <item quantity="other" formatted="true">%1$d avsnitt - %2$s kvar</item>
     </plurals>
-    <plurals name="podcast">
-        <item quantity="one">Podcast</item>
-        <item quantity="other"/>
-    </plurals>
     <plurals name="podcast_share_end_handle_description">
         <item quantity="one">Handtag för slutklipp: %d sekund</item>
         <item quantity="other">Handtag för slutklipp: %d sekunder</item>
@@ -1869,38 +1865,6 @@ Language: sv_SE
     <plurals name="podcast_share_start_handle_description">
         <item quantity="one">Handtag för startklipp: %d sekund</item>
         <item quantity="other">Handtag för startklipp: %d sekunder</item>
-    </plurals>
-    <plurals name="profile_stats_day_listened">
-        <item quantity="one">Lyssnad dag</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_day_saved">
-        <item quantity="one">Dag sparad</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_hour_listened">
-        <item quantity="one">Lyssnad timme</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_hour_saved">
-        <item quantity="one">Timme sparad</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_minute_listened">
-        <item quantity="one">Lyssnad minut</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_minute_saved">
-        <item quantity="one">Minut sparad</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_second_listened">
-        <item quantity="one">Lyssnad sekund</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_second_saved">
-        <item quantity="one">Sekund sparad</item>
-        <item quantity="other"/>
     </plurals>
     <plurals name="second">
         <item quantity="one">sekund</item>
