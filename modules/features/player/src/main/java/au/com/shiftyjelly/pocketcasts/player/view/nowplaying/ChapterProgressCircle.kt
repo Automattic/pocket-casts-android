@@ -38,8 +38,8 @@ fun ChapterProgressCircle(
 @Composable
 private fun Content(
     progress: Float,
-    config: ChapterProgressConfig = ChapterProgressConfig(),
     modifier: Modifier = Modifier,
+    config: ChapterProgressConfig = ChapterProgressConfig(),
 ) {
     Canvas(
         modifier
