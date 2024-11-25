@@ -13,7 +13,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -23,6 +22,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.player.R
@@ -237,49 +237,40 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     }
 
     private fun setupPlayerHeadingSectionComposeView() {
-        binding?.playerHeadingSectionComposeView?.apply {
-            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-            setContent {
-                AppTheme(theme.activeTheme) {
-                    PlayerHeadingSection(
-                        playerViewModel = viewModel,
-                        shelfSharedViewModel = shelfSharedViewModel,
-                    )
-                }
+        binding?.playerHeadingSectionComposeView?.setContentWithViewCompositionStrategy() {
+            AppTheme(theme.activeTheme) {
+                PlayerHeadingSection(
+                    playerViewModel = viewModel,
+                    shelfSharedViewModel = shelfSharedViewModel,
+                )
             }
         }
     }
 
     private fun setupPlayerControlsComposeView() {
-        binding?.playerControlsComposeView?.apply {
-            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-            setContent {
-                AppTheme(theme.activeTheme) {
-                    PlayerControls(
-                        playerViewModel = viewModel,
-                    )
-                }
+        binding?.playerControlsComposeView?.setContentWithViewCompositionStrategy {
+            AppTheme(theme.activeTheme) {
+                PlayerControls(
+                    playerViewModel = viewModel,
+                )
             }
         }
     }
 
     private fun setupShelfComposeView() {
-        binding?.shelfComposeView?.apply {
-            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-            setContent {
-                AppTheme(theme.activeTheme) {
-                    PlayerShelf(
-                        theme = theme,
-                        shelfSharedViewModel = shelfSharedViewModel,
-                        transcriptViewModel = transcriptViewModel,
-                        playerViewModel = viewModel,
-                    )
-                    LaunchedEffect(Unit) {
-                        observeShelfItemNavigationState()
-                    }
-                    LaunchedEffect(Unit) {
-                        observeShelfItemSnackbarMessages()
-                    }
+        binding?.shelfComposeView?.setContentWithViewCompositionStrategy {
+            AppTheme(theme.activeTheme) {
+                PlayerShelf(
+                    theme = theme,
+                    shelfSharedViewModel = shelfSharedViewModel,
+                    transcriptViewModel = transcriptViewModel,
+                    playerViewModel = viewModel,
+                )
+                LaunchedEffect(Unit) {
+                    observeShelfItemNavigationState()
+                }
+                LaunchedEffect(Unit) {
+                    observeShelfItemSnackbarMessages()
                 }
             }
         }
