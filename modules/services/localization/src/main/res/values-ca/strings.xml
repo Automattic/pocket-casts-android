@@ -1858,10 +1858,6 @@ Language: ca
         <item quantity="one" formatted="true">%1$d episodi - queden %2$s</item>
         <item quantity="other" formatted="true">%1$d episodis - queden %2$s</item>
     </plurals>
-    <plurals name="podcast">
-        <item quantity="one">Pòdcast</item>
-        <item quantity="other"/>
-    </plurals>
     <plurals name="podcast_share_end_handle_description">
         <item quantity="one">Control del clip final: %d segon</item>
         <item quantity="other">Control del clip final: %d segons</item>
@@ -1869,38 +1865,6 @@ Language: ca
     <plurals name="podcast_share_start_handle_description">
         <item quantity="one">Control del clip inicial: %d segon</item>
         <item quantity="other">Control del clip inicial: %d segons</item>
-    </plurals>
-    <plurals name="profile_stats_day_listened">
-        <item quantity="one">Dies escoltats</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_day_saved">
-        <item quantity="one">Dies estalviats</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_hour_listened">
-        <item quantity="one">Hores escoltades</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_hour_saved">
-        <item quantity="one">Hores estalviades</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_minute_listened">
-        <item quantity="one">Minuts escoltats</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_minute_saved">
-        <item quantity="one">Minuts estalviats</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_second_listened">
-        <item quantity="one">Segons escoltats</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_second_saved">
-        <item quantity="one">Segons estalviats</item>
-        <item quantity="other"/>
     </plurals>
     <plurals name="second">
         <item quantity="one">segon</item>

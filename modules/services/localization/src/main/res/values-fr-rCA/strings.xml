@@ -1858,10 +1858,6 @@ Language: fr
         <item quantity="one" formatted="true">%1$d épisode - %2$s restant</item>
         <item quantity="other" formatted="true">%1$d épisodes - %2$s restant(s)</item>
     </plurals>
-    <plurals name="podcast">
-        <item quantity="one">Podcast</item>
-        <item quantity="other"/>
-    </plurals>
     <plurals name="podcast_share_end_handle_description">
         <item quantity="one">Fin de la gestion du clip : %d seconde</item>
         <item quantity="other">Fin de la gestion du clip : %d secondes</item>
@@ -1869,38 +1865,6 @@ Language: fr
     <plurals name="podcast_share_start_handle_description">
         <item quantity="one">Début de la gestion du clip : %d seconde</item>
         <item quantity="other">Début de la gestion du clip : %d secondes</item>
-    </plurals>
-    <plurals name="profile_stats_day_listened">
-        <item quantity="one">Jour écouté</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_day_saved">
-        <item quantity="one">Jour économisé</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_hour_listened">
-        <item quantity="one">Heure écoutée</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_hour_saved">
-        <item quantity="one">Heure économisée</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_minute_listened">
-        <item quantity="one">Minute écoutée</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_minute_saved">
-        <item quantity="one">Minute économisée</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_second_listened">
-        <item quantity="one">Seconde écoutée</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_second_saved">
-        <item quantity="one">Seconde économisée</item>
-        <item quantity="other"/>
     </plurals>
     <plurals name="second">
         <item quantity="one">seconde</item>

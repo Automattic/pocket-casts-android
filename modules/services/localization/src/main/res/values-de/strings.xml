@@ -1858,10 +1858,6 @@ Language: de
         <item quantity="one" formatted="true">%1$d Folge - %2$s verbleibend</item>
         <item quantity="other" formatted="true">%1$d Folgen - %2$s verbleibend</item>
     </plurals>
-    <plurals name="podcast">
-        <item quantity="one">Podcast</item>
-        <item quantity="other"/>
-    </plurals>
     <plurals name="podcast_share_end_handle_description">
         <item quantity="one">Handle für Clip-Ende: %d Sekunde</item>
         <item quantity="other">Handle für Clip-Ende: %d Sekunden</item>
@@ -1869,38 +1865,6 @@ Language: de
     <plurals name="podcast_share_start_handle_description">
         <item quantity="one">Handle für Clip-Anfang: %d Sekunde</item>
         <item quantity="other">Handle für Clip-Anfang: %d Sekunden</item>
-    </plurals>
-    <plurals name="profile_stats_day_listened">
-        <item quantity="one">Tag angehört</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_day_saved">
-        <item quantity="one">Tag gespart</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_hour_listened">
-        <item quantity="one">Stunde angehört</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_hour_saved">
-        <item quantity="one">Stunde gespart</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_minute_listened">
-        <item quantity="one">Minute angehört</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_minute_saved">
-        <item quantity="one">Minute gespart</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_second_listened">
-        <item quantity="one">Sekunde angehört</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_second_saved">
-        <item quantity="one">Sekunde gespart</item>
-        <item quantity="other"/>
     </plurals>
     <plurals name="second">
         <item quantity="one">Sekunde</item>

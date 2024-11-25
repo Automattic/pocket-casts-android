@@ -1858,10 +1858,6 @@ Language: nl
         <item quantity="one" formatted="true">%1$d aflevering - nog %2$s</item>
         <item quantity="other" formatted="true">%1$d afleveringen - nog %2$s</item>
     </plurals>
-    <plurals name="podcast">
-        <item quantity="one">Podcast</item>
-        <item quantity="other"/>
-    </plurals>
     <plurals name="podcast_share_end_handle_description">
         <item quantity="one">Handle einde clip: %d seconde</item>
         <item quantity="other">Handle einde clip: %d seconden</item>
@@ -1869,38 +1865,6 @@ Language: nl
     <plurals name="podcast_share_start_handle_description">
         <item quantity="one">Handle begin clip: %d seconde</item>
         <item quantity="other">Handle begin clip: %d seconden</item>
-    </plurals>
-    <plurals name="profile_stats_day_listened">
-        <item quantity="one">Dagen geluisterd</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_day_saved">
-        <item quantity="one">Dagen opgeslagen</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_hour_listened">
-        <item quantity="one">Uur geluisterd</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_hour_saved">
-        <item quantity="one">Uur opgeslagen</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_minute_listened">
-        <item quantity="one">Minuut geluisterd</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_minute_saved">
-        <item quantity="one">Minuut opgeslagen</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_second_listened">
-        <item quantity="one">Seconde geluisterd</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_second_saved">
-        <item quantity="one">Seconde opgeslagen</item>
-        <item quantity="other"/>
     </plurals>
     <plurals name="second">
         <item quantity="one">seconde</item>
