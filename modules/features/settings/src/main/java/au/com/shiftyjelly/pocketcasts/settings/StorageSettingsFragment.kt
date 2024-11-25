@@ -26,13 +26,14 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.utils.isDeviceRunningOnLowStorage
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
+import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import au.com.shiftyjelly.pocketcasts.views.lowstorage.LowStorageBottomSheetListener
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class StorageSettingsFragment : BaseFragment() {
+class StorageSettingsFragment : BaseFragment(), HasBackstack {
     private val viewModel: StorageSettingsViewModel by viewModels()
 
     private val requestPermissionLauncher = registerForActivityResult(
@@ -99,6 +100,15 @@ class StorageSettingsFragment : BaseFragment() {
     override fun onResume() {
         super.onResume()
         viewModel.onFragmentResume()
+    }
+
+    override fun onBackPressed(): Boolean {
+        if (lowStorageListener?.isModalVisible() == true) {
+            lowStorageListener?.closeModal()
+            return true
+        } else {
+            return super.onBackPressed()
+        }
     }
 
     private fun getFileLocations() = StorageOptions().getFolderLocations(requireActivity())

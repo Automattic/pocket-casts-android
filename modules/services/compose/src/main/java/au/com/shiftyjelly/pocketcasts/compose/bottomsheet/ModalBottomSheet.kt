@@ -79,6 +79,7 @@ fun ModalBottomSheet(
 fun ModalBottomSheet(
     parent: ViewGroup,
     onExpanded: () -> Unit,
+    onDismissed: () -> Unit,
     shouldShow: Boolean,
     customSheetState: ModalBottomSheetState? = null,
     customContent: @Composable () -> Unit,
@@ -114,6 +115,7 @@ fun ModalBottomSheet(
                         /* Remove bottom sheet from parent view when bottom sheet is hidden
                         on dismiss or back action for talkback to function properly. */
                         parent.removeAllViews()
+                        onDismissed.invoke()
                     } else {
                         if (!sheetState.isVisible && shouldShow) {
                             /* Show bottom sheet when it is hidden on initial set up */

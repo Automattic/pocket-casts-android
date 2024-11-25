@@ -47,6 +47,7 @@ fun LowStorageLaunchBottomSheet(
     onManageDownloadsClick: () -> Unit,
     onMaybeLaterClick: () -> Unit,
     onExpanded: () -> Unit,
+    onDismissed: () -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
@@ -59,6 +60,7 @@ fun LowStorageLaunchBottomSheet(
         shouldShow = shouldShow,
         customSheetState = sheetState,
         onExpanded = onExpanded,
+        onDismissed = onDismissed,
         customContent = {
             LowStorageDialog(
                 modifier = modifier,
@@ -160,4 +162,6 @@ fun PreviewLowStorageDialog(@PreviewParameter(ThemePreviewParameterProvider::cla
 
 interface LowStorageBottomSheetListener {
     fun showModal(sourceView: SourceView)
+    fun closeModal()
+    fun isModalVisible(): Boolean
 }

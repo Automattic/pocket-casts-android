@@ -307,6 +307,8 @@ class MainActivity :
 
     private val deepLinkFactory = DeepLinkFactory()
 
+    private var isLowStorageModalVisible: Boolean = false
+
     @SuppressLint("WrongConstant") // for custom snackbar duration constant
     private fun checkForNotificationPermission(onPermissionGranted: () -> Unit = {}) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -759,11 +761,15 @@ class MainActivity :
                                 addFragment(ManualCleanupFragment.newInstance())
                             },
                             onExpanded = {
+                                isLowStorageModalVisible = true
                                 analyticsTracker.track(AnalyticsEvent.FREE_UP_SPACE_MODAL_SHOWN, mapOf("source" to sourceView.analyticsValue))
                             },
                             onMaybeLaterClick = {
                                 analyticsTracker.track(AnalyticsEvent.FREE_UP_SPACE_MAYBE_LATER_TAPPED, mapOf("source" to sourceView.analyticsValue))
                                 settings.setDismissLowStorageModalTime(System.currentTimeMillis())
+                            },
+                            onDismissed = {
+                                isLowStorageModalVisible = false
                             },
                             totalDownloadSize = downloadedEpisodesState.downloadedEpisodes,
                         )
@@ -1656,4 +1662,11 @@ class MainActivity :
             setupLowStorageLaunchBottomSheet(sourceView)
         }
     }
+
+    override fun closeModal() {
+        isLowStorageModalVisible = false
+        binding.modalBottomSheet.removeAllViews()
+    }
+
+    override fun isModalVisible(): Boolean = isLowStorageModalVisible
 }
