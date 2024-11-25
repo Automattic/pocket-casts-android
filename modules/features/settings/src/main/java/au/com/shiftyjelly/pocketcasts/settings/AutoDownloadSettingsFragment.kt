@@ -440,8 +440,10 @@ class AutoDownloadSettingsFragment :
             childFragmentManager.popBackStack()
             toolbar?.title = getString(LR.string.settings_title_auto_download)
             return true
+        } else if (lowStorageListener?.isModalVisible() == true) {
+            lowStorageListener?.closeModal()
+            return true
         }
-
         return false
     }
 
