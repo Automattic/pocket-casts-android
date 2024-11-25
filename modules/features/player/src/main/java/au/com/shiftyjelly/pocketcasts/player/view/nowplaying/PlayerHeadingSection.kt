@@ -11,10 +11,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.LocalRippleConfiguration
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.RippleConfiguration
+import androidx.compose.material.RippleDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -91,6 +96,7 @@ fun PlayerHeadingSection(
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun Content(
     state: PlayerHeadingSectionState,
@@ -100,97 +106,101 @@ private fun Content(
     onChapterTitleClick: (Chapter) -> Unit,
     onPodcastTitleClick: () -> Unit,
 ) {
-    Column(
-        modifier = Modifier
-            .padding(horizontal = 8.dp)
-            .then(
-                if (disableAccessibility) {
-                    Modifier
-                        .semantics(mergeDescendants = true) {}
-                        .clearAndSetSemantics { contentDescription = "" }
-                } else {
-                    Modifier
-                },
-            ),
+    CompositionLocalProvider(
+        LocalRippleConfiguration provides RippleConfiguration(Color.White, RippleDefaults.rippleAlpha(Color.White, true)),
     ) {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
+        Column(
             modifier = Modifier
-                .fillMaxWidth(),
+                .padding(horizontal = 8.dp)
+                .then(
+                    if (disableAccessibility) {
+                        Modifier
+                            .semantics(mergeDescendants = true) {}
+                            .clearAndSetSemantics { contentDescription = "" }
+                    } else {
+                        Modifier
+                    },
+                ),
         ) {
-            if (state.isChaptersPresent) {
-                ChapterPreviousButton(
-                    onClick = onPreviousChapterClick,
-                    enabled = !state.isFirstChapter,
-                    alpha = if (state.isFirstChapter) 0.5f else 1f,
-                )
-            }
-
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier
-                    .padding(top = 8.dp)
-                    .padding(horizontal = 16.dp)
-                    .weight(1f),
+                    .fillMaxWidth(),
             ) {
-                TextH30(
-                    text = state.title,
-                    color = Color(ThemeColor.playerContrast01(state.theme)),
-                    textAlign = TextAlign.Center,
-                    maxLines = 2,
+                if (state.isChaptersPresent) {
+                    ChapterPreviousButton(
+                        onClick = onPreviousChapterClick,
+                        enabled = !state.isFirstChapter,
+                        alpha = if (state.isFirstChapter) 0.5f else 1f,
+                    )
+                }
+
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
-                        .then(if (state.isChaptersPresent) Modifier.clickable { state.chapter?.let { onChapterTitleClick(it) } } else Modifier),
-                )
+                        .padding(top = 8.dp)
+                        .padding(horizontal = 16.dp)
+                        .weight(1f),
+                ) {
+                    TextH30(
+                        text = state.title,
+                        color = Color(ThemeColor.playerContrast01(state.theme)),
+                        textAlign = TextAlign.Center,
+                        maxLines = 2,
+                        modifier = Modifier
+                            .then(if (state.isChaptersPresent) Modifier.clickable { state.chapter?.let { onChapterTitleClick(it) } } else Modifier),
+                    )
 
-                if (!state.isChaptersPresent) {
-                    state.podcastTitle?.takeIf { it.isNotBlank() }?.let {
-                        Spacer(
-                            modifier = Modifier.height(4.dp),
-                        )
+                    if (!state.isChaptersPresent) {
+                        state.podcastTitle?.takeIf { it.isNotBlank() }?.let {
+                            Spacer(
+                                modifier = Modifier.height(4.dp),
+                            )
 
-                        TextH50(
-                            text = state.podcastTitle,
-                            color = MaterialTheme.theme.colors.playerContrast02,
-                            maxLines = 1,
-                            modifier = Modifier
-                                .clickable { onPodcastTitleClick() },
-                        )
+                            TextH50(
+                                text = state.podcastTitle,
+                                color = MaterialTheme.theme.colors.playerContrast02,
+                                maxLines = 1,
+                                modifier = Modifier
+                                    .clickable { onPodcastTitleClick() },
+                            )
+                        }
+                    }
+
+                    if (state.isChaptersPresent) {
+                        state.chapterSummary.takeIf { it.isNotBlank() }?.let {
+                            Spacer(
+                                modifier = Modifier.height(4.dp),
+                            )
+
+                            TextH70(
+                                text = it,
+                                maxLines = 1,
+                                color = Color.White.copy(alpha = 0.7f),
+                            )
+                        }
                     }
                 }
 
                 if (state.isChaptersPresent) {
-                    state.chapterSummary.takeIf { it.isNotBlank() }?.let {
-                        Spacer(
-                            modifier = Modifier.height(4.dp),
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        ChapterNextButtonWithChapterProgressCircle(
+                            onClick = onNextChapterClick,
+                            enabled = !state.isLastChapter,
+                            alpha = if (state.isLastChapter) 0.5f else 1f,
                         )
+
+                        Spacer(modifier = Modifier.height(4.dp))
 
                         TextH70(
-                            text = it,
-                            maxLines = 1,
-                            color = Color.White.copy(alpha = 0.7f),
+                            text = state.chapterTimeRemaining,
+                            color = Color.White,
+                            modifier = Modifier
+                                .alpha(0.4f),
                         )
                     }
-                }
-            }
-
-            if (state.isChaptersPresent) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    ChapterNextButtonWithChapterProgressCircle(
-                        onClick = onNextChapterClick,
-                        enabled = !state.isLastChapter,
-                        alpha = if (state.isLastChapter) 0.5f else 1f,
-                    )
-
-                    Spacer(modifier = Modifier.height(4.dp))
-
-                    TextH70(
-                        text = state.chapterTimeRemaining,
-                        color = Color.White,
-                        modifier = Modifier
-                            .alpha(0.4f),
-                    )
                 }
             }
         }
