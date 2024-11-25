@@ -237,7 +237,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     }
 
     private fun setupPlayerHeadingSectionComposeView() {
-        binding?.playerHeadingSectionComposeView?.setContentWithViewCompositionStrategy() {
+        binding?.playerHeadingSectionComposeView?.setContentWithViewCompositionStrategy {
             AppTheme(theme.activeTheme) {
                 PlayerHeadingSection(
                     playerViewModel = viewModel,
