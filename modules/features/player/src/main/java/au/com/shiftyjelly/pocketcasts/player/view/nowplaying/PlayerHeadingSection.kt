@@ -66,7 +66,6 @@ fun PlayerHeadingSection(
                 podcastTitle = it.podcastHeader.podcastTitle,
                 chapter = it.podcastHeader.chapter,
                 chapterSummary = it.podcastHeader.chapterSummary,
-                chapterProgress = it.podcastHeader.chapterProgress,
                 chapterTimeRemaining = it.podcastHeader.chapterTimeRemaining,
                 isChaptersPresent = it.podcastHeader.isChaptersPresent,
                 isFirstChapter = it.podcastHeader.isFirstChapter,
@@ -182,7 +181,6 @@ private fun Content(
                         onClick = onNextChapterClick,
                         enabled = !state.isLastChapter,
                         alpha = if (state.isLastChapter) 0.5f else 1f,
-                        progress = state.chapterProgress,
                     )
 
                     Spacer(modifier = Modifier.height(4.dp))
@@ -231,7 +229,6 @@ private fun ChapterNextButtonWithChapterProgressCircle(
     onClick: () -> Unit,
     enabled: Boolean,
     alpha: Float,
-    progress: Float,
 ) {
     val contentDescription = stringResource(LR.string.player_action_next_chapter)
     IconButton(
@@ -247,9 +244,7 @@ private fun ChapterNextButtonWithChapterProgressCircle(
             contentDescription = null,
         )
 
-        ChapterProgressCircle(
-            progress = progress,
-        )
+        ChapterProgressCircle()
     }
 }
 
@@ -261,7 +256,6 @@ data class PlayerHeadingSectionState(
     val podcastTitle: String? = null,
     val chapter: Chapter? = null,
     val chapterSummary: String = "",
-    val chapterProgress: Float = 0f,
     val chapterTimeRemaining: String = "",
     val isChaptersPresent: Boolean = false,
     val isFirstChapter: Boolean = false,
@@ -281,7 +275,6 @@ private fun PlayerHeadingSectionPreview(
                 episodeUuid = "Episode UUID",
                 podcastTitle = "Podcast Title",
                 chapterSummary = "Chapter Summary",
-                chapterProgress = 0.5f,
                 chapterTimeRemaining = "1:23",
                 isChaptersPresent = true,
                 isFirstChapter = false,
@@ -309,7 +302,6 @@ private fun PlayerHeadingSectionWithoutChapterPreview(
                 episodeUuid = "Episode UUID",
                 podcastTitle = "Podcast Title",
                 chapterSummary = "Chapter Summary",
-                chapterProgress = 0.5f,
                 chapterTimeRemaining = "1:23",
                 isChaptersPresent = false,
                 isFirstChapter = false,
