@@ -83,11 +83,7 @@ fun ArtworkSection(
     Content(
         state = state,
         heightSizeClass = windowSize.heightSizeClass,
-        onChapterUrlClick = {
-            state.chapter?.url?.let {
-                playerViewModel.onChapterUrlClick(it.toString())
-            }
-        },
+        onChapterUrlClick = { playerViewModel.onChapterUrlClick(it) },
     )
 }
 
@@ -97,7 +93,7 @@ private fun Content(
     state: ArtworkSectionState,
     heightSizeClass: WindowHeightSizeClass,
     config: ArtworkConfig = ArtworkConfig(),
-    onChapterUrlClick: () -> Unit,
+    onChapterUrlClick: (String) -> Unit,
 ) {
     val isPhoneLandscape = heightSizeClass == WindowHeightSizeClass.Compact
     Box(
@@ -139,7 +135,7 @@ private fun Content(
                 LocalRippleConfiguration provides RippleConfiguration(Color.White, RippleDefaults.rippleAlpha(Color.White, true)),
             ) {
                 IconButton(
-                    onClick = onChapterUrlClick,
+                    onClick = { onChapterUrlClick(it.toString()) },
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .padding(top = 8.dp, end = 8.dp)
