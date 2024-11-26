@@ -1,9 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.endofyear
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
-import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.os.Bundle
 import android.view.WindowManager
@@ -108,8 +106,6 @@ class StoriesActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (!isTablet) {
-            @SuppressLint("SourceLockedOrientationActivity")
-            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
             enableEdgeToEdge(SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT))
             hideSystemBars()
         }
