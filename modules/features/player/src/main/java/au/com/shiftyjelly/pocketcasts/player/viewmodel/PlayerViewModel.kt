@@ -68,6 +68,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asObservable
 import kotlinx.coroutines.withContext
+import okhttp3.HttpUrl
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -692,9 +693,9 @@ class PlayerViewModel @Inject constructor(
         return dialog
     }
 
-    fun onChapterUrlClick(chapterUrl: String) {
+    fun onChapterUrlClick(chapterUrl: HttpUrl) {
         viewModelScope.launch {
-            _navigationState.emit(NavigationState.OpenChapterUrl(chapterUrl))
+            _navigationState.emit(NavigationState.OpenChapterUrl(chapterUrl.toString()))
         }
     }
 

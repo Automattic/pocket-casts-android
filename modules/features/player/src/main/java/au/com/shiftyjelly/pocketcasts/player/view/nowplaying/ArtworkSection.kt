@@ -51,6 +51,7 @@ import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -93,7 +94,7 @@ private fun Content(
     state: ArtworkSectionState,
     heightSizeClass: WindowHeightSizeClass,
     config: ArtworkConfig = ArtworkConfig(),
-    onChapterUrlClick: (String) -> Unit,
+    onChapterUrlClick: (HttpUrl) -> Unit,
 ) {
     val isPhoneLandscape = heightSizeClass == WindowHeightSizeClass.Compact
     Box(
@@ -135,7 +136,7 @@ private fun Content(
                 LocalRippleConfiguration provides RippleConfiguration(Color.White, RippleDefaults.rippleAlpha(Color.White, true)),
             ) {
                 IconButton(
-                    onClick = { onChapterUrlClick(it.toString()) },
+                    onClick = { onChapterUrlClick(it) },
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .padding(top = 8.dp, end = 8.dp)
