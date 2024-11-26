@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.settings
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.FrameLayout
@@ -20,6 +19,7 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreference
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralPodcastsSelected
@@ -33,18 +33,18 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistUpdateSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserPlaylistUpdate
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.AutoDownloadSettingsViewModel
+import au.com.shiftyjelly.pocketcasts.settings.viewmodel.ManualCleanupViewModel
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.toAutoDownloadStatus
+import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
-import au.com.shiftyjelly.pocketcasts.utils.isDeviceRunningOnLowStorage
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.fragments.FilterSelectFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.PodcastSelectFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.PodcastSelectFragmentSource
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
-import au.com.shiftyjelly.pocketcasts.views.lowstorage.LowStorageBottomSheetListener
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -101,11 +101,12 @@ class AutoDownloadSettingsFragment :
 
     @Inject lateinit var settings: Settings
 
+    @Inject lateinit var analyticsTracker: AnalyticsTracker
+
     @Inject lateinit var theme: Theme
 
     private val viewModel: AutoDownloadSettingsViewModel by viewModels()
-
-    private var lowStorageListener: LowStorageBottomSheetListener? = null
+    private val cleanUpViewModel: ManualCleanupViewModel by viewModels()
 
     private var podcastsCategory: PreferenceCategory? = null
     private lateinit var upNextPreference: SwitchPreference
@@ -172,7 +173,19 @@ class AutoDownloadSettingsFragment :
                         onNewEpisodesToggleChange(newValue.toAutoDownloadStatus())
 
                         viewLifecycleOwner.lifecycleScope.launch {
-                            if (newValue && isDeviceRunningOnLowStorage()) lowStorageListener?.showModal(SourceView.AUTO_DOWNLOAD)
+                            val lowStorageDialog = LowStorageDialog(requireContext(), analyticsTracker, settings)
+
+                            val downloadedFiles = cleanUpViewModel.state.value.diskSpaceViews.sumOf { it.episodesBytesSize }
+
+                            if (newValue && lowStorageDialog.shouldShow(downloadedFiles)) {
+                                lowStorageDialog.show(
+                                    totalDownloadSize = downloadedFiles,
+                                    sourceView = SourceView.AUTO_DOWNLOAD,
+                                    onManageDownloadsClick = {
+                                        (activity as? FragmentHostListener)?.addFragment(ManualCleanupFragment.newInstance())
+                                    },
+                                ).show(parentFragmentManager, "low_storage_dialog")
+                            }
                         }
                     }
                     true
@@ -250,16 +263,6 @@ class AutoDownloadSettingsFragment :
 
         setupAutoDownloadLimitOptions()
         updateView()
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        lowStorageListener = context as? LowStorageBottomSheetListener
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-        lowStorageListener = null
     }
 
     private fun onNewEpisodesToggleChange(status: Int) {
@@ -439,9 +442,6 @@ class AutoDownloadSettingsFragment :
         if (childFragmentManager.backStackEntryCount > 0) {
             childFragmentManager.popBackStack()
             toolbar?.title = getString(LR.string.settings_title_auto_download)
-            return true
-        } else if (lowStorageListener?.isModalVisible() == true) {
-            lowStorageListener?.closeModal()
             return true
         }
         return false

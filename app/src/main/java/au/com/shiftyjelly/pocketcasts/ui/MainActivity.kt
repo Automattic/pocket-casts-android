@@ -129,7 +129,6 @@ import au.com.shiftyjelly.pocketcasts.search.SearchFragment
 import au.com.shiftyjelly.pocketcasts.servers.ServerCallback
 import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.discover.PodcastSearch
-import au.com.shiftyjelly.pocketcasts.settings.ManualCleanupFragment
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
@@ -152,8 +151,6 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
-import au.com.shiftyjelly.pocketcasts.views.lowstorage.LowStorageBottomSheetListener
-import au.com.shiftyjelly.pocketcasts.views.lowstorage.LowStorageLaunchBottomSheet
 import com.automattic.android.tracks.crashlogging.CrashLogging
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
@@ -194,7 +191,6 @@ class MainActivity :
     FragmentHostListener,
     PlayerBottomSheet.PlayerBottomSheetListener,
     SearchFragment.Listener,
-    LowStorageBottomSheetListener,
     OnboardingLauncher,
     CoroutineScope,
     NotificationPermissionChecker {
@@ -306,8 +302,6 @@ class MainActivity :
     ) {}
 
     private val deepLinkFactory = DeepLinkFactory()
-
-    private var isLowStorageModalVisible: Boolean = false
 
     @SuppressLint("WrongConstant") // for custom snackbar duration constant
     private fun checkForNotificationPermission(onPermissionGranted: () -> Unit = {}) {
@@ -733,45 +727,6 @@ class MainActivity :
                                 settings.setEndOfYearShowModal(false)
                                 viewModel.updateStoriesModalShowState(false)
                             },
-                        )
-                    }
-                }
-            },
-        )
-    }
-
-    private fun setupLowStorageLaunchBottomSheet(sourceView: SourceView) {
-        val viewGroup = binding.modalBottomSheet
-        viewGroup.removeAllViews()
-        viewGroup.addView(
-            ComposeView(viewGroup.context).apply {
-                setContent {
-                    val downloadedEpisodesState by viewModel.downloadedEpisodeState.collectAsState()
-
-                    val shouldShow = downloadedEpisodesState.downloadedEpisodes != 0L &&
-                        settings.shouldShowLowStorageModalAfterSnooze() &&
-                        FeatureFlag.isEnabled(Feature.MANAGE_DOWNLOADED_EPISODES)
-
-                    AppTheme(theme.activeTheme) {
-                        LowStorageLaunchBottomSheet(
-                            parent = viewGroup,
-                            shouldShow = shouldShow,
-                            onManageDownloadsClick = {
-                                analyticsTracker.track(AnalyticsEvent.FREE_UP_SPACE_MANAGE_DOWNLOADS_TAPPED, mapOf("source" to sourceView.analyticsValue))
-                                addFragment(ManualCleanupFragment.newInstance())
-                            },
-                            onExpanded = {
-                                isLowStorageModalVisible = true
-                                analyticsTracker.track(AnalyticsEvent.FREE_UP_SPACE_MODAL_SHOWN, mapOf("source" to sourceView.analyticsValue))
-                            },
-                            onMaybeLaterClick = {
-                                analyticsTracker.track(AnalyticsEvent.FREE_UP_SPACE_MAYBE_LATER_TAPPED, mapOf("source" to sourceView.analyticsValue))
-                                settings.setDismissLowStorageModalTime(System.currentTimeMillis())
-                            },
-                            onDismissed = {
-                                isLowStorageModalVisible = false
-                            },
-                            totalDownloadSize = downloadedEpisodesState.downloadedEpisodes,
                         )
                     }
                 }
@@ -1656,17 +1611,4 @@ class MainActivity :
             .setTextColor(ThemeColor.primaryText01(Theme.ThemeType.DARK))
             .show()
     }
-
-    override fun showModal(sourceView: SourceView) {
-        launch(Dispatchers.Main) {
-            setupLowStorageLaunchBottomSheet(sourceView)
-        }
-    }
-
-    override fun closeModal() {
-        isLowStorageModalVisible = false
-        binding.modalBottomSheet.removeAllViews()
-    }
-
-    override fun isModalVisible(): Boolean = isLowStorageModalVisible
 }
