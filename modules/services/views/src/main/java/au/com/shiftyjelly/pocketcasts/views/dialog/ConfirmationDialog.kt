@@ -47,6 +47,7 @@ open class ConfirmationDialog : BottomSheetDialogFragment() {
     private var onSecondary: (() -> Unit)? = null
     private var onDismiss: (() -> Unit)? = null
     private var forceDarkTheme: Boolean = false
+    private var displayConfirmButtonFirst: Boolean = false
     private var binding: FragmentConfirmationBinding? = null
 
     @Inject lateinit var theme: Theme
@@ -119,7 +120,23 @@ open class ConfirmationDialog : BottomSheetDialogFragment() {
         binding.lblSummary.text = summary
         binding.imgIcon.setImageResource(iconId)
         iconTintAttr?.let { binding.imgIcon.imageTintList = ColorStateList.valueOf(context.getThemeColor(it)) }
+
+        val layout = binding.root as ViewGroup
         val btnConfirm = binding.btnConfirm
+        val btnSecondary = binding.btnSecondary
+
+        if (displayConfirmButtonFirst) {
+            layout.removeView(btnConfirm)
+            layout.removeView(btnSecondary)
+            layout.addView(btnConfirm)
+            layout.addView(btnSecondary)
+        } else {
+            layout.removeView(btnSecondary)
+            layout.removeView(btnConfirm)
+            layout.addView(btnSecondary)
+            layout.addView(btnConfirm)
+        }
+
         btnConfirm.text = buttonType.text
         btnConfirm.setOnClickListener {
             onConfirm?.invoke()
@@ -133,7 +150,7 @@ open class ConfirmationDialog : BottomSheetDialogFragment() {
         btnConfirm.backgroundTintList = ColorStateList.valueOf(buttonColor)
 
         val secondaryButtonColor = if (secondaryType is ButtonType.Danger) dangerColor else defaultColor
-        val btnSecondary = binding.btnSecondary
+
         btnSecondary.strokeColor = ColorStateList.valueOf(secondaryButtonColor)
         btnSecondary.strokeWidth = 2.dpToPx(context)
         btnSecondary.setTextColor(btnSecondary.strokeColor)
@@ -192,6 +209,11 @@ open class ConfirmationDialog : BottomSheetDialogFragment() {
 
     fun setOnDismiss(onDismiss: (() -> Unit)?): ConfirmationDialog {
         this.onDismiss = onDismiss
+        return this
+    }
+
+    fun setDisplayConfirmButtonFirst(displayConfirmButtonFirst: Boolean): ConfirmationDialog {
+        this.displayConfirmButtonFirst = displayConfirmButtonFirst
         return this
     }
 
