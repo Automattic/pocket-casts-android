@@ -75,59 +75,6 @@ fun ModalBottomSheet(
     }
 }
 
-@Composable
-fun ModalBottomSheet(
-    parent: ViewGroup,
-    onExpanded: () -> Unit,
-    onDismissed: () -> Unit,
-    shouldShow: Boolean,
-    customSheetState: ModalBottomSheetState? = null,
-    customContent: @Composable () -> Unit,
-) {
-    val sheetState = customSheetState ?: rememberModalBottomSheetState(
-        initialValue = ModalBottomSheetValue.Hidden,
-        skipHalfExpanded = true,
-    )
-    val coroutineScope = rememberCoroutineScope()
-    var isSheetShown by remember { mutableStateOf(false) }
-
-    BackHandler(sheetState.isVisible) {
-        hideBottomSheet(coroutineScope, sheetState)
-    }
-
-    ModalBottomSheetLayout(
-        sheetState = sheetState,
-        sheetContent = {
-            customContent()
-        },
-        sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
-        scrimColor = Color.Black.copy(alpha = .25f),
-        content = {},
-    )
-
-    LaunchedEffect(Unit) {
-        snapshotFlow { sheetState.currentValue }
-            .collect {
-                if (sheetState.currentValue == ModalBottomSheetValue.Expanded) {
-                    onExpanded.invoke()
-                } else if (sheetState.currentValue == ModalBottomSheetValue.Hidden) {
-                    if (isSheetShown) {
-                        /* Remove bottom sheet from parent view when bottom sheet is hidden
-                        on dismiss or back action for talkback to function properly. */
-                        parent.removeAllViews()
-                        onDismissed.invoke()
-                    } else {
-                        if (!sheetState.isVisible && shouldShow) {
-                            /* Show bottom sheet when it is hidden on initial set up */
-                            displayBottomSheet(coroutineScope, sheetState)
-                            isSheetShown = true
-                        }
-                    }
-                }
-            }
-    }
-}
-
 private fun hideBottomSheet(coroutineScope: CoroutineScope, sheetState: ModalBottomSheetState) {
     coroutineScope.launch {
         sheetState.hide()

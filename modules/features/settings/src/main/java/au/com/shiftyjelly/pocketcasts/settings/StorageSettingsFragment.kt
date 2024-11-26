@@ -25,13 +25,12 @@ import au.com.shiftyjelly.pocketcasts.settings.viewmodel.StorageSettingsViewMode
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
-import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class StorageSettingsFragment : BaseFragment(), HasBackstack {
+class StorageSettingsFragment : BaseFragment() {
     private val viewModel: StorageSettingsViewModel by viewModels()
 
     private val requestPermissionLauncher = registerForActivityResult(
