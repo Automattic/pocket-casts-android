@@ -51,6 +51,7 @@ open class ConfirmationDialog : BottomSheetDialogFragment() {
     private var onDismiss: (() -> Unit)? = null
     private var forceDarkTheme: Boolean = false
     private var displayConfirmButtonFirst: Boolean = false
+    private var removeSecondaryButtonBorder: Boolean = false
     private var binding: FragmentConfirmationBinding? = null
 
     @Inject lateinit var theme: Theme
@@ -155,9 +156,15 @@ open class ConfirmationDialog : BottomSheetDialogFragment() {
         val secondaryButtonColor =
             secondaryTextColorAttr?.let { context.getThemeColor(it) } ?: if (secondaryType is ButtonType.Danger) dangerColor else defaultColor
 
-        btnSecondary.strokeColor = ColorStateList.valueOf(secondaryButtonColor)
-        btnSecondary.strokeWidth = 2.dpToPx(context)
-        btnSecondary.setTextColor(btnSecondary.strokeColor)
+        if (removeSecondaryButtonBorder) {
+            btnSecondary.strokeColor = null
+            btnSecondary.strokeWidth = 0
+        } else {
+            btnSecondary.strokeColor = ColorStateList.valueOf(secondaryButtonColor)
+            btnSecondary.strokeWidth = 2.dpToPx(context)
+        }
+
+        btnSecondary.setTextColor(secondaryButtonColor)
         btnSecondary.isVisible = secondaryType != null
         btnSecondary.text = secondaryType?.text
         btnSecondary.setOnClickListener {
@@ -223,6 +230,11 @@ open class ConfirmationDialog : BottomSheetDialogFragment() {
 
     fun setSecondaryTextColor(@AttrRes colorAttr: Int?): ConfirmationDialog {
         this.secondaryTextColorAttr = colorAttr
+        return this
+    }
+
+    fun setRemoveSecondaryButtonBorder(removeSecondaryButtonBorder: Boolean): ConfirmationDialog {
+        this.removeSecondaryButtonBorder = removeSecondaryButtonBorder
         return this
     }
 
