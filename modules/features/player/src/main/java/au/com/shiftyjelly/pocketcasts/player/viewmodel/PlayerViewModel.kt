@@ -692,6 +692,12 @@ class PlayerViewModel @Inject constructor(
         return dialog
     }
 
+    fun onChapterUrlClick(chapterUrl: String) {
+        viewModelScope.launch {
+            _navigationState.emit(NavigationState.OpenChapterUrl(chapterUrl))
+        }
+    }
+
     fun onNextChapterClick() {
         analyticsTracker.track(AnalyticsEvent.PLAYER_NEXT_CHAPTER_TAPPED)
         playbackManager.skipToNextSelectedOrLastChapter()
@@ -748,6 +754,7 @@ class PlayerViewModel @Inject constructor(
         data object ShowSkipForwardLongPressOptionsDialog : NavigationState
         data class OpenChapterAt(val chapter: Chapter) : NavigationState
         data class OpenPodcastPage(val podcastUuid: String, val source: SourceView) : NavigationState
+        data class OpenChapterUrl(val chapterUrl: String) : NavigationState
     }
 
     sealed interface SnackbarMessage {
