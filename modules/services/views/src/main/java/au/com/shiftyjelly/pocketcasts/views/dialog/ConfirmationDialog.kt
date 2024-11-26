@@ -43,6 +43,9 @@ open class ConfirmationDialog : BottomSheetDialogFragment() {
     var secondaryType: ButtonType? = null
 
     @AttrRes private var iconTintAttr: Int? = UR.attr.primary_icon_01
+
+    @AttrRes private var secondaryTextColorAttr: Int? = null
+
     private var onConfirm: (() -> Unit)? = null
     private var onSecondary: (() -> Unit)? = null
     private var onDismiss: (() -> Unit)? = null
@@ -149,7 +152,8 @@ open class ConfirmationDialog : BottomSheetDialogFragment() {
         val buttonColor = if (buttonType is ButtonType.Danger) dangerColor else defaultColor
         btnConfirm.backgroundTintList = ColorStateList.valueOf(buttonColor)
 
-        val secondaryButtonColor = if (secondaryType is ButtonType.Danger) dangerColor else defaultColor
+        val secondaryButtonColor =
+            secondaryTextColorAttr?.let { context.getThemeColor(it) } ?: if (secondaryType is ButtonType.Danger) dangerColor else defaultColor
 
         btnSecondary.strokeColor = ColorStateList.valueOf(secondaryButtonColor)
         btnSecondary.strokeWidth = 2.dpToPx(context)
@@ -214,6 +218,11 @@ open class ConfirmationDialog : BottomSheetDialogFragment() {
 
     fun setDisplayConfirmButtonFirst(displayConfirmButtonFirst: Boolean): ConfirmationDialog {
         this.displayConfirmButtonFirst = displayConfirmButtonFirst
+        return this
+    }
+
+    fun setSecondaryTextColor(@AttrRes colorAttr: Int?): ConfirmationDialog {
+        this.secondaryTextColorAttr = colorAttr
         return this
     }
 
