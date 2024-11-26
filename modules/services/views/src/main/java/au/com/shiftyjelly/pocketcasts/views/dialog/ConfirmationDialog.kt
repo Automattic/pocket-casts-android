@@ -46,6 +46,8 @@ open class ConfirmationDialog : BottomSheetDialogFragment() {
 
     @AttrRes private var secondaryTextColorAttr: Int? = null
 
+    @AttrRes private var summaryTextColorAttr: Int? = null
+
     private var onConfirm: (() -> Unit)? = null
     private var onSecondary: (() -> Unit)? = null
     private var onDismiss: (() -> Unit)? = null
@@ -122,6 +124,7 @@ open class ConfirmationDialog : BottomSheetDialogFragment() {
         binding.lblTitle.text = title
         binding.lblSummary.isVisible = summary != null
         binding.lblSummary.text = summary
+        summaryTextColorAttr?.let { binding.lblSummary.setTextColor(context.getThemeColor(it)) }
         binding.imgIcon.setImageResource(iconId)
         iconTintAttr?.let { binding.imgIcon.imageTintList = ColorStateList.valueOf(context.getThemeColor(it)) }
 
@@ -230,6 +233,11 @@ open class ConfirmationDialog : BottomSheetDialogFragment() {
 
     fun setSecondaryTextColor(@AttrRes colorAttr: Int?): ConfirmationDialog {
         this.secondaryTextColorAttr = colorAttr
+        return this
+    }
+
+    fun setSummaryTextColor(@AttrRes colorAttr: Int?): ConfirmationDialog {
+        this.summaryTextColorAttr = colorAttr
         return this
     }
 
