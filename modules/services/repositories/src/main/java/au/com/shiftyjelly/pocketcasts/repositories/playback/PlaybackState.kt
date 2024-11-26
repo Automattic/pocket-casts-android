@@ -66,6 +66,7 @@ data class PlaybackState(
             }
 
             return PlaybackState(
+                state = state,
                 isBuffering = !episode.isDownloaded && state == State.PLAYING,
                 isPrepared = isPrepared,
                 isSleepTimerRunning = previousPlaybackState?.isSleepTimerRunning ?: false,
