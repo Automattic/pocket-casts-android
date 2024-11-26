@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
+import au.com.shiftyjelly.pocketcasts.models.to.ChapterSummaryData
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
@@ -129,7 +130,7 @@ class PlayerViewModel @Inject constructor(
             playbackSpeed = playbackEffects.playbackSpeed,
             adjustRemainingTimeDuration = adjustRemainingTimeDuration,
         ) ?: ""
-        val chapterSummary: String = chapters.getChapterSummary(positionMs.milliseconds)
+        val chapterSummary: ChapterSummaryData = chapters.getChapterSummary(positionMs.milliseconds)
         val isFirstChapter: Boolean = chapters.isFirstChapter(positionMs.milliseconds)
         val isLastChapter: Boolean = chapters.isLastChapter(positionMs.milliseconds)
         val isChapterImagePresent = chapter?.isImagePresent ?: false

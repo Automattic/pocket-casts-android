@@ -32,6 +32,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
@@ -48,6 +49,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
+import au.com.shiftyjelly.pocketcasts.models.to.ChapterSummaryData
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel
@@ -168,15 +170,20 @@ private fun Content(
                     }
 
                     if (state.isChaptersPresent) {
-                        state.chapterSummary.takeIf { it.isNotBlank() }?.let {
+                        state.chapterSummary.takeIf { it.currentIndex != -1 && it.size > 0 }?.let {
+                            val chapterSummary = stringResource(LR.string.chapter_count_summary, state.chapterSummary.currentIndex, state.chapterSummary.size)
+                            val contentDescription = "$chapterSummary ${pluralStringResource(id = LR.plurals.chapter, count = state.chapterSummary.size)}"
+
                             Spacer(
                                 modifier = Modifier.height(4.dp),
                             )
 
                             TextH70(
-                                text = it,
+                                text = chapterSummary,
                                 maxLines = 1,
                                 color = Color.White.copy(alpha = 0.7f),
+                                modifier = Modifier
+                                    .semantics { this.contentDescription = contentDescription },
                             )
                         }
                     }
@@ -265,7 +272,7 @@ data class PlayerHeadingSectionState(
     val podcastUuid: String? = null,
     val podcastTitle: String? = null,
     val chapter: Chapter? = null,
-    val chapterSummary: String = "",
+    val chapterSummary: ChapterSummaryData = ChapterSummaryData(),
     val chapterTimeRemaining: String = "",
     val isChaptersPresent: Boolean = false,
     val isFirstChapter: Boolean = false,
@@ -284,7 +291,7 @@ private fun PlayerHeadingSectionPreview(
                 title = "A very looooooooooooong episode title",
                 episodeUuid = "Episode UUID",
                 podcastTitle = "Podcast Title",
-                chapterSummary = "Chapter Summary",
+                chapterSummary = ChapterSummaryData(1, 5),
                 chapterTimeRemaining = "1:23",
                 isChaptersPresent = true,
                 isFirstChapter = false,
@@ -311,7 +318,7 @@ private fun PlayerHeadingSectionWithoutChapterPreview(
                 title = "Episode title",
                 episodeUuid = "Episode UUID",
                 podcastTitle = "Podcast Title",
-                chapterSummary = "Chapter Summary",
+                chapterSummary = ChapterSummaryData(1, 5),
                 chapterTimeRemaining = "1:23",
                 isChaptersPresent = false,
                 isFirstChapter = false,
