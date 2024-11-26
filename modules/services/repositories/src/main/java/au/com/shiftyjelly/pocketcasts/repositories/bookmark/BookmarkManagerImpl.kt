@@ -208,8 +208,8 @@ class BookmarkManagerImpl @Inject constructor(
     /**
      * Find all bookmarks that need to be synced.
      */
-    override fun findBookmarksToSync(): List<Bookmark> {
-        return bookmarkDao.findNotSynced()
+    override fun findBookmarksToSyncBlocking(): List<Bookmark> {
+        return bookmarkDao.findNotSyncedBlocking()
     }
 
     /**

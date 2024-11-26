@@ -6,61 +6,53 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextChange
-import io.reactivex.Flowable
-import io.reactivex.Single
 
 @Dao
 abstract class UpNextChangeDao {
 
     @Query("SELECT * FROM up_next_changes")
-    abstract fun findAll(): List<UpNextChange>
-
-    @Query("SELECT * FROM up_next_changes")
-    abstract fun findAllRx(): Single<List<UpNextChange>>
-
-    @Query("SELECT * FROM up_next_changes")
-    abstract fun observeAll(): Flowable<List<UpNextChange>>
+    abstract fun findAllBlocking(): List<UpNextChange>
 
     @Query("DELETE FROM up_next_changes WHERE modified <= :modified")
     abstract suspend fun deleteChangesOlderOrEqualTo(modified: Long)
 
     @Query("DELETE FROM up_next_changes WHERE uuid = :uuid")
-    abstract fun deleteByUuid(uuid: String)
+    abstract fun deleteByUuidBlocking(uuid: String)
 
     @Query("DELETE FROM up_next_changes")
-    abstract fun deleteAll()
+    abstract fun deleteAllBlocking()
 
-    fun savePlayNow(episode: BaseEpisode) {
-        saveUpdate(episode, UpNextChange.ACTION_PLAY_NOW)
+    fun savePlayNowBlocking(episode: BaseEpisode) {
+        saveUpdateBlocking(episode, UpNextChange.ACTION_PLAY_NOW)
     }
 
-    fun savePlayNext(episode: BaseEpisode) {
-        saveUpdate(episode, UpNextChange.ACTION_PLAY_NEXT)
+    fun savePlayNextBlocking(episode: BaseEpisode) {
+        saveUpdateBlocking(episode, UpNextChange.ACTION_PLAY_NEXT)
     }
 
-    fun savePlayLast(episode: BaseEpisode) {
-        saveUpdate(episode, UpNextChange.ACTION_PLAY_LAST)
+    fun savePlayLastBlocking(episode: BaseEpisode) {
+        saveUpdateBlocking(episode, UpNextChange.ACTION_PLAY_LAST)
     }
 
-    fun saveRemove(episode: BaseEpisode) {
-        saveUpdate(episode, UpNextChange.ACTION_REMOVE)
+    fun saveRemoveBlocking(episode: BaseEpisode) {
+        saveUpdateBlocking(episode, UpNextChange.ACTION_REMOVE)
     }
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insert(upNextChange: UpNextChange)
+    abstract fun insertBlocking(upNextChange: UpNextChange)
 
-    private fun saveUpdate(episode: BaseEpisode, action: Int) {
+    private fun saveUpdateBlocking(episode: BaseEpisode, action: Int) {
         val change = UpNextChange(type = action, uuid = episode.uuid, modified = System.currentTimeMillis())
         // an update replaces any other update that is for the same episode, so delete any that might exist
-        deleteByUuid(episode.uuid)
-        insert(change)
+        deleteByUuidBlocking(episode.uuid)
+        insertBlocking(change)
     }
 
     fun saveReplace(episodeUuids: List<String>) {
         val episodeUuidsString = episodeUuids.joinToString(separator = ",")
         val change = UpNextChange(type = UpNextChange.ACTION_REPLACE, uuids = episodeUuidsString, modified = System.currentTimeMillis())
         // a replace literally replaces everything that came before it, so empty the table out
-        deleteAll()
-        insert(change)
+        deleteAllBlocking()
+        insertBlocking(change)
     }
 }

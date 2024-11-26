@@ -44,7 +44,7 @@ class ShareViewModel @AssistedInject constructor(
     } else {
         combine(
             podcastManager.observePodcastByUuidFlow(initialPodcast.uuid),
-            episodeManager.observeEpisodeByUuid(initialEpisode.uuid),
+            episodeManager.findEpisodeByUuidFlow(initialEpisode.uuid),
             ::UiState,
         )
     }.stateIn(viewModelScope, started = SharingStarted.Lazily, initialValue = UiState(initialPodcast, initialEpisode))

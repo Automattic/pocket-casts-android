@@ -223,6 +223,7 @@ fun TextP50(
     textAlign: TextAlign? = null,
     fontWeight: FontWeight? = null,
     lineHeight: TextUnit? = null,
+    letterSpacing: TextUnit? = null,
     disableAutoScale: Boolean = false,
     fontScale: Float = 1f,
 ) {
@@ -236,6 +237,7 @@ fun TextP50(
         fontWeight = fontWeight,
         disableAutoScale = disableAutoScale,
         lineHeight = lineHeight,
+        letterSpacing = letterSpacing,
         fontScale = fontScale,
     )
 }
@@ -250,17 +252,20 @@ fun TextP50(
     textAlign: TextAlign? = null,
     fontWeight: FontWeight? = null,
     lineHeight: TextUnit? = null,
+    letterSpacing: TextUnit? = null,
     disableAutoScale: Boolean = false,
     fontScale: Float = 1f,
 ) {
     val fontSize = 14.sp
     val lineHeightUpdated = lineHeight ?: 20.sp
+    val letterSpacingUpdated = letterSpacing ?: 0.sp
 
     Text(
         text = text,
         color = color ?: MaterialTheme.theme.colors.primaryText01,
         fontSize = (if (disableAutoScale) fontSize.value.nonScaledSp else fontSize) * fontScale,
         lineHeight = (if (disableAutoScale) lineHeightUpdated.value.nonScaledSp else lineHeightUpdated.value.sp) * fontScale,
+        letterSpacing = (if (disableAutoScale) letterSpacingUpdated.value.nonScaledSp else letterSpacingUpdated.value.sp) * fontScale,
         maxLines = maxLines ?: Int.MAX_VALUE,
         overflow = TextOverflow.Ellipsis,
         style = style ?: LocalTextStyle.current,
@@ -309,6 +314,7 @@ fun TextP60(
     style: TextStyle = TextStyle(),
     disableAutoScale: Boolean = false,
     fontScale: Float = 1f,
+    letterSpacing: TextUnit = 0.sp,
 ) {
     val fontSizeUpdated = fontSize ?: 13.sp
     Text(
@@ -316,7 +322,7 @@ fun TextP60(
         color = color,
         fontSize = (if (disableAutoScale) fontSizeUpdated.value.nonScaledSp else fontSizeUpdated) * fontScale,
         lineHeight = (if (disableAutoScale) 15.nonScaledSp else 15.sp) * fontScale,
-        letterSpacing = 0.sp,
+        letterSpacing = letterSpacing,
         maxLines = maxLines,
         overflow = TextOverflow.Ellipsis,
         textAlign = textAlign,

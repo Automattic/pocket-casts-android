@@ -71,7 +71,7 @@ class AutoDownloadFiltersFragment : androidx.fragment.app.Fragment(), FilterAuto
     }
 
     private fun loadFilters() {
-        playlistManager.observeAll()
+        playlistManager.findAllRxFlowable()
             .firstOrError()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -89,7 +89,7 @@ class AutoDownloadFiltersFragment : androidx.fragment.app.Fragment(), FilterAuto
     }
 
     override fun onAutoDownloadChanged(filter: Playlist, on: Boolean) {
-        playlistManager.rxUpdateAutoDownloadStatus(filter, on, true, false)
+        playlistManager.updateAutoDownloadStatusRxCompletable(filter, on, true, false)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeWith(object : DisposableCompletableObserver() {

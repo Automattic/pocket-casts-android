@@ -6323,6 +6323,17 @@
     </issue>
 
     <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.divider` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="../modules/services/ui/src/main/res/drawable/divider.xml"
+            line="2"
+            column="1"/>
+    </issue>
+
+    <issue
         id="UnusedIds"
         message="The resource `R.id.account_container` appears to be unused"
         errorLine1="    android:id=&quot;@+id/account_container&quot;"

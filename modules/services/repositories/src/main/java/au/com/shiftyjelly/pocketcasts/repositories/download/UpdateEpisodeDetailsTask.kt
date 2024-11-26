@@ -13,13 +13,13 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.servers.di.Downloads
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.await
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import java.io.IOException
-import java.util.concurrent.TimeUnit
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -27,14 +27,14 @@ import timber.log.Timber
 
 @HiltWorker
 class UpdateEpisodeDetailsTask @AssistedInject constructor(
-    @Assisted val context: Context,
-    @Assisted val params: WorkerParameters,
-    var episodeManager: EpisodeManager,
+    @Assisted context: Context,
+    @Assisted params: WorkerParameters,
+    private val episodeManager: EpisodeManager,
+    @Downloads private val httpClient: OkHttpClient,
 ) : CoroutineWorker(context, params) {
     companion object {
         private const val TASK_NAME = "UpdateEpisodeDetailsTask"
         const val INPUT_EPISODE_UUIDS = "episode_uuids"
-        private const val REQUEST_TIMEOUT_SECS = 20L
         private const val MAX_RETRIES = 3
 
         fun enqueue(episodes: List<PodcastEpisode>, context: Context) {
@@ -80,8 +80,6 @@ class UpdateEpisodeDetailsTask @AssistedInject constructor(
         info("Worker started - episodes: ${episodeUuids.joinToString()}}")
 
         try {
-            val client = OkHttpClient.Builder().callTimeout(REQUEST_TIMEOUT_SECS, TimeUnit.SECONDS).build()
-
             for (episodeUuid in episodeUuids) {
                 val episode = episodeManager.findByUuid(episodeUuid) ?: continue
                 if (ignoreEpisode(episode)) {
@@ -91,7 +89,6 @@ class UpdateEpisodeDetailsTask @AssistedInject constructor(
                 val downloadUrl = episode.downloadUrl?.toHttpUrlOrNull() ?: continue
                 val request = Request.Builder()
                     .url(downloadUrl)
-                    .addHeader("User-Agent", "Pocket Casts")
                     .head()
                     .build()
 
@@ -100,12 +97,12 @@ class UpdateEpisodeDetailsTask @AssistedInject constructor(
                 }
 
                 try {
-                    val response = client.newCall(request).await()
+                    val response = httpClient.newCall(request).await()
 
                     val contentType = response.header("Content-Type")
                     if (!contentType.isNullOrBlank()) {
                         if ((episode.fileType.isNullOrBlank() && (contentType.startsWith("audio") || contentType.startsWith("video"))) || contentType.startsWith("video")) {
-                            episodeManager.updateFileType(episode, contentType)
+                            episodeManager.updateFileTypeBlocking(episode, contentType)
                             episode.fileType = contentType
                         }
                     }
@@ -116,7 +113,7 @@ class UpdateEpisodeDetailsTask @AssistedInject constructor(
                             val contentLength = java.lang.Long.parseLong(contentLengthHeader)
                             val sizeInBytes = episode.sizeInBytes
                             if ((sizeInBytes == 0L || sizeInBytes != contentLength) && contentLength > 153600) {
-                                episodeManager.updateSizeInBytes(episode, contentLength)
+                                episodeManager.updateSizeInBytesBlocking(episode, contentLength)
                                 episode.sizeInBytes = contentLength
                             }
                         } catch (nfe: NumberFormatException) {

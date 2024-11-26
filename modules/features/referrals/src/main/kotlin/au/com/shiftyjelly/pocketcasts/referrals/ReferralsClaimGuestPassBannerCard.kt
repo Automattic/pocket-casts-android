@@ -26,7 +26,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,8 +33,6 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.components.TextC70
@@ -43,44 +40,35 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfoMock
-import au.com.shiftyjelly.pocketcasts.referrals.ReferralsGuestPassFragment.ReferralsPageType
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsViewModel.UiState
-import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun ReferralsClaimGuestPassBannerCard(
+    state: UiState,
+    onClick: () -> Unit,
+    onHideBannerClick: () -> Unit,
+    onBannerShown: () -> Unit,
+    onShowReferralsSheet: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: ReferralsViewModel = hiltViewModel(),
 ) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
-    val activity = LocalContext.current.getActivity()
-
     CallOnce {
-        viewModel.onBannerShown()
+        onBannerShown()
+    }
+    LaunchedEffect(Unit) {
+        onShowReferralsSheet()
     }
 
     when (state) {
-        UiState.Loading -> Unit
+        is UiState.Loading -> Unit
         is UiState.Loaded -> {
-            val loadedState = state as UiState.Loaded
             ReferralsClaimGuestPassBannerCard(
-                state = loadedState,
+                state = state,
                 modifier = modifier,
-                onClick = {
-                    val fragment = ReferralsGuestPassFragment.newInstance(ReferralsPageType.Claim)
-                    (activity as FragmentHostListener).showBottomSheet(fragment)
-                },
-                onHideBannerClick = viewModel::onHideBannerClick,
+                onClick = onClick,
+                onHideBannerClick = onHideBannerClick,
             )
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        activity?.supportFragmentManager?.findFragmentByTag(ReferralsGuestPassFragment::class.java.name)?.let {
-            (activity as FragmentHostListener).showBottomSheet(it)
         }
     }
 }
@@ -89,16 +77,15 @@ fun ReferralsClaimGuestPassBannerCard(
 @Composable
 private fun ReferralsClaimGuestPassBannerCard(
     state: UiState.Loaded,
-    modifier: Modifier = Modifier,
     onClick: () -> Unit,
     onHideBannerClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     if (state.showProfileBanner) {
         var showPopupToHideBanner by remember { mutableStateOf(false) }
         BoxWithConstraints(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp)
                 .clip(RoundedCornerShape(8.dp))
                 .combinedClickable(
                     onClick = onClick,
@@ -107,14 +94,14 @@ private fun ReferralsClaimGuestPassBannerCard(
                 ),
         ) {
             Row(
-                modifier = modifier
+                modifier = Modifier
                     .background(MaterialTheme.theme.colors.primaryUi01Active, shape = RoundedCornerShape(8.dp))
                     .padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 val guestPassCardWidth = min(this@BoxWithConstraints.maxWidth / 4, 100.dp)
                 Column(
-                    modifier = modifier
+                    modifier = Modifier
                         .weight(1f),
                     verticalArrangement = Arrangement.Center,
                 ) {
@@ -131,7 +118,7 @@ private fun ReferralsClaimGuestPassBannerCard(
                         ),
                     )
 
-                    Spacer(modifier = modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
 
                     TextC70(
                         text = stringResource(LR.string.referrals_claim_guess_pass_banner_card_subtitle),
@@ -139,10 +126,10 @@ private fun ReferralsClaimGuestPassBannerCard(
                     )
                 }
 
-                Spacer(modifier = modifier.width(16.dp))
+                Spacer(modifier = Modifier.width(16.dp))
 
                 ReferralGuestPassCardView(
-                    modifier = modifier
+                    modifier = Modifier
                         .width(guestPassCardWidth)
                         .height(guestPassCardWidth * ReferralGuestPassCardDefaults.cardAspectRatio),
                     source = ReferralGuestPassCardViewSource.ProfileBanner,
@@ -181,6 +168,8 @@ private fun ReferralsClaimGuestPassBannerCardPreview(
             ),
             onClick = {},
             onHideBannerClick = {},
+            onBannerShown = {},
+            onShowReferralsSheet = {},
         )
     }
 }

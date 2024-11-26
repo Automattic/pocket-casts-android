@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.settings.stats
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -30,7 +29,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -44,6 +42,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.viewModels
+import androidx.fragment.compose.content
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
@@ -70,27 +69,31 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
 class StatsFragment : BaseFragment() {
-    @Inject lateinit var analyticsTracker: AnalyticsTracker
+    @Inject
+    lateinit var analyticsTracker: AnalyticsTracker
 
-    @Inject lateinit var settings: Settings
+    @Inject
+    lateinit var settings: Settings
     private val viewModel: StatsViewModel by viewModels()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View = ComposeView(requireContext()).apply {
-        setContent {
-            val bottomInset = settings.bottomInset.collectAsStateWithLifecycle(0)
-            AppThemeWithBackground(theme.activeTheme) {
-                val state: StatsViewModel.State by viewModel.state.collectAsState()
-                StatsPage(
-                    state = state,
-                    onBackClick = {
-                        @Suppress("DEPRECATION")
-                        activity?.onBackPressed()
-                    },
-                    onRetryClick = { viewModel.loadStats() },
-                    launchReviewDialog = { viewModel.launchAppReviewDialog(it) },
-                    bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
-                )
-            }
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ) = content {
+        val bottomInset = settings.bottomInset.collectAsStateWithLifecycle(0)
+        AppThemeWithBackground(theme.activeTheme) {
+            val state: StatsViewModel.State by viewModel.state.collectAsState()
+            StatsPage(
+                state = state,
+                onBackClick = {
+                    @Suppress("DEPRECATION")
+                    activity?.onBackPressed()
+                },
+                onRetryClick = { viewModel.loadStats() },
+                launchReviewDialog = { viewModel.launchAppReviewDialog(it) },
+                bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
+            )
         }
     }
 

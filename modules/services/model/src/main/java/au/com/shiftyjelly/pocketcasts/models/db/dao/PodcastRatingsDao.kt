@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.models.db.dao
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy.Companion.REPLACE
 import androidx.room.Query
@@ -13,13 +12,10 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 abstract class PodcastRatingsDao {
     @Query("SELECT * FROM podcast_ratings WHERE podcast_uuid = :podcastUuid")
-    abstract fun podcastRatings(podcastUuid: String): Flow<List<PodcastRatings>>
+    abstract fun podcastRatingsFlow(podcastUuid: String): Flow<List<PodcastRatings>>
 
     @Insert(onConflict = REPLACE)
     abstract suspend fun insert(ratings: PodcastRatings)
-
-    @Delete
-    abstract fun delete(ratings: PodcastRatings)
 
     @Query("SELECT * FROM user_podcast_ratings")
     abstract suspend fun getAllUserRatings(): List<UserPodcastRating>

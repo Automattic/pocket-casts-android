@@ -49,7 +49,7 @@ class PodcastRefresherImpl @Inject constructor(
             existingPodcast.estimatedNextEpisode = updatedPodcast.estimatedNextEpisode
             existingPodcast.episodeFrequency = updatedPodcast.episodeFrequency
             existingPodcast.refreshAvailable = updatedPodcast.refreshAvailable
-            val existingEpisodes = episodeManager.findEpisodesByPodcastOrderedByPublishDateSuspend(existingPodcast)
+            val existingEpisodes = episodeManager.findEpisodesByPodcastOrderedByPublishDate(existingPodcast)
             val mostRecentEpisode = existingEpisodes.firstOrNull()
             val insertEpisodes = mutableListOf<PodcastEpisode>()
             updatedPodcast.episodes.map { newEpisode ->
@@ -74,7 +74,7 @@ class PodcastRefresherImpl @Inject constructor(
                     existingEpisode.type = newEpisode.type
                     // only update the db if the fields have changed
                     if (originalEpisode != existingEpisode) {
-                        episodeManager.updateSuspend(existingEpisode)
+                        episodeManager.update(existingEpisode)
                     }
                 } else {
                     // don't add anything newer than the latest episode so it runs through the refresh logic (auto download, auto add to Up Next etc
@@ -101,7 +101,7 @@ class PodcastRefresherImpl @Inject constructor(
                 }
             }
             if (insertEpisodes.isNotEmpty()) {
-                episodeManager.addSuspend(
+                episodeManager.add(
                     episodes = insertEpisodes,
                     podcastUuid = existingPodcast.uuid,
                     downloadMetaData = false,
@@ -118,7 +118,7 @@ class PodcastRefresherImpl @Inject constructor(
                         it.addedDate.before(twoWeeksAgo) && episodeManager.episodeCanBeCleanedUp(it, playbackManager)
                     }
             if (episodesToDelete.isNotEmpty()) {
-                episodeManager.deleteEpisodesWithoutSyncSuspend(episodesToDelete, playbackManager)
+                episodeManager.deleteEpisodesWithoutSync(episodesToDelete, playbackManager)
             }
 
             if (originalPodcast != existingPodcast) {

@@ -6,7 +6,6 @@ import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
-import au.com.shiftyjelly.pocketcasts.repositories.download.UpdateEpisodeDetailsTask
 import au.com.shiftyjelly.pocketcasts.repositories.download.task.DownloadEpisodeTask
 import au.com.shiftyjelly.pocketcasts.repositories.download.task.UploadEpisodeTask
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
@@ -61,9 +60,6 @@ class CastsWorkerFactory @Inject constructor(
                 instance.podcastManager = podcastManager
                 instance.refreshServiceManager = refreshServiceManager
                 instance.notificationHelper = notificationHelper
-            }
-            is UpdateEpisodeDetailsTask -> {
-                instance.episodeManager = episodeManager
             }
         }
 

@@ -56,6 +56,7 @@ dependencies {
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.coroutines.core)
     implementation(libs.coroutines.rx2)
+    implementation(libs.fragment.compose)
     implementation(libs.fragment.ktx)
     implementation(libs.hilt.navigation.compose)
     implementation(libs.lifecycle.reactivestreams.ktx)

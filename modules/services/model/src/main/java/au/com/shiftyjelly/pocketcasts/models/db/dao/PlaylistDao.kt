@@ -16,95 +16,80 @@ import kotlinx.coroutines.flow.Flow
 abstract class PlaylistDao {
 
     @Query("SELECT * FROM filters WHERE _id = :id")
-    abstract fun findById(id: Long): Playlist?
+    abstract fun findByIdBlocking(id: Long): Playlist?
 
     @Query("SELECT * FROM filters WHERE manual = 0 AND deleted = 0 AND draft = 0 ORDER BY sortPosition ASC")
-    abstract fun findAll(): List<Playlist>
+    abstract fun findAllBlocking(): List<Playlist>
 
     @Query("SELECT * FROM filters WHERE manual = 0 AND deleted = 0 AND draft = 0 ORDER BY sortPosition ASC")
-    abstract suspend fun findAllSuspend(): List<Playlist>
+    abstract suspend fun findAll(): List<Playlist>
 
     @Query("SELECT * FROM filters WHERE manual = 0 AND deleted = 0 AND draft = 0 ORDER BY sortPosition ASC")
-    abstract fun findAllState(): Flow<List<Playlist>>
+    abstract fun findAllFlow(): Flow<List<Playlist>>
 
     @Query("SELECT * FROM filters WHERE manual = 0 AND deleted = 0 AND draft = 0 ORDER BY sortPosition ASC")
-    abstract fun observeAll(): Flowable<List<Playlist>>
+    abstract fun findAllRxFlowable(): Flowable<List<Playlist>>
 
     @Query("SELECT * FROM filters WHERE uuid = :uuid LIMIT 1")
-    abstract fun findByUuidSync(uuid: String): Playlist?
+    abstract fun findByUuidBlocking(uuid: String): Playlist?
 
     @Query("SELECT * FROM filters WHERE uuid = :uuid LIMIT 1")
     abstract suspend fun findByUuid(uuid: String): Playlist?
 
     @Query("SELECT * FROM filters WHERE uuid = :uuid LIMIT 1")
-    abstract fun findByUUIDRx(uuid: String): Maybe<Playlist>
+    abstract fun findByUuidRxMaybe(uuid: String): Maybe<Playlist>
 
     @Query("SELECT * FROM filters WHERE uuid = :uuid LIMIT 1")
-    abstract fun observeByUUID(uuid: String): Flowable<Playlist>
+    abstract fun findByUuidRxFlowable(uuid: String): Flowable<Playlist>
 
     @Query("SELECT * FROM filters WHERE uuid = :uuid")
-    abstract fun observeByUUIDAsList(uuid: String): Flowable<List<Playlist>>
+    abstract fun findByUuidAsListRxFlowable(uuid: String): Flowable<List<Playlist>>
 
     @Query("SELECT COUNT(*) FROM filters")
-    abstract fun count(): Int
-
-    @Query("SELECT COUNT(*) FROM filter_episodes")
-    abstract fun countEpisodes(): Int
+    abstract fun countBlocking(): Int
 
     @Update
-    abstract fun update(playlist: Playlist)
+    abstract fun updateBlocking(playlist: Playlist)
 
     @Update
-    abstract fun updateAll(playlists: List<Playlist>)
+    abstract fun updateAllBlocking(playlists: List<Playlist>)
 
     @Delete
-    abstract fun delete(playlist: Playlist)
+    abstract fun deleteBlocking(playlist: Playlist)
 
     @Query("DELETE FROM filters")
     abstract suspend fun deleteAll()
 
     @Query("DELETE FROM filters WHERE deleted = 1")
-    abstract fun deleteDeleted()
-
-    @Query("DELETE FROM filter_episodes WHERE episodeUuid = :uuid")
-    abstract fun deleteEpisodeByUuid(uuid: String)
-
-    @Query("DELETE FROM filter_episodes WHERE playlistId = :playlistId")
-    abstract fun deleteEpisodesByPlaylistId(playlistId: Long)
-
-    @Query("DELETE FROM filter_episodes WHERE playlistId = :playlistId AND episodeUuid IN (:uuids)")
-    abstract fun deleteEpisodesByPlaylistIdAndUuid(playlistId: Long, uuids: List<String>)
+    abstract fun deleteDeletedBlocking()
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insert(playlist: Playlist): Long
+    abstract fun insertBlocking(playlist: Playlist): Long
 
     @Query("UPDATE filters SET sortPosition = :position WHERE uuid = :uuid")
-    abstract fun updateSortPosition(position: Int, uuid: String)
+    abstract fun updateSortPositionBlocking(position: Int, uuid: String)
 
     @Query("UPDATE filters SET syncStatus = :syncStatus WHERE uuid = :uuid")
-    abstract fun updateSyncStatus(syncStatus: Int, uuid: String)
+    abstract fun updateSyncStatusBlocking(syncStatus: Int, uuid: String)
 
     @Query("UPDATE filters SET syncStatus = :syncStatus")
-    abstract fun updateAllSyncStatus(syncStatus: Int)
-
-    @Query("UPDATE filter_episodes SET position = :position WHERE _id = :id")
-    abstract fun updateEpisodePosition(position: Int, id: Long)
+    abstract fun updateAllSyncStatusBlocking(syncStatus: Int)
 
     @Query("SELECT * FROM filters WHERE UPPER(title) = UPPER(:title)")
-    abstract fun searchByTitle(title: String): Playlist?
+    abstract fun searchByTitleBlocking(title: String): Playlist?
 
     @Query("SELECT * FROM filters WHERE manual = 0 AND draft = 0 AND syncStatus = " + Playlist.SYNC_STATUS_NOT_SYNCED)
-    abstract fun findNotSynced(): List<Playlist>
+    abstract fun findNotSyncedBlocking(): List<Playlist>
 
     @Transaction
-    open fun updateSortPositions(playlists: List<Playlist>) {
+    open fun updateSortPositionsBlocking(playlists: List<Playlist>) {
         for (index in playlists.indices) {
             val playlist = playlists[index]
             val position = index + 1
             playlist.sortPosition = position
             playlist.syncStatus = Playlist.SYNC_STATUS_NOT_SYNCED
-            updateSortPosition(position, playlist.uuid)
-            updateSyncStatus(Playlist.SYNC_STATUS_NOT_SYNCED, playlist.uuid)
+            updateSortPositionBlocking(position, playlist.uuid)
+            updateSyncStatusBlocking(Playlist.SYNC_STATUS_NOT_SYNCED, playlist.uuid)
         }
     }
 }

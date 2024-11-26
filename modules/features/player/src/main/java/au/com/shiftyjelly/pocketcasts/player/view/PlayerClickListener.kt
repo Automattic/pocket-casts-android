@@ -5,15 +5,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 
 interface PlayerClickListener {
     fun onShowNotesClick(episodeUuid: String)
-    fun onSkipBack()
-    fun onSkipForward()
-    fun onPlayClicked()
-    fun onSkipForwardLongPress()
     fun onClosePlayer()
-    fun onEffectsClick()
-    fun onSleepClick()
-    fun onStarClick()
-    fun onShareClick()
     fun onNextChapter()
     fun onPreviousChapter()
     fun onHeaderChapterClick(chapter: Chapter)

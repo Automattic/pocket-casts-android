@@ -59,7 +59,8 @@ import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults.TranscriptColors
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptSearchViewModel.SearchUiState
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
-import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel.TransitionState
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.TransitionState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -72,12 +73,13 @@ private val SearchBarPlaceholderColor = SearchBarIconColor
 @Composable
 fun TranscriptPageWrapper(
     playerViewModel: PlayerViewModel,
+    shelfSharedViewModel: ShelfSharedViewModel,
     transcriptViewModel: TranscriptViewModel,
     searchViewModel: TranscriptSearchViewModel,
     theme: Theme,
 ) {
     AppTheme(Theme.ThemeType.DARK) {
-        val transitionState = playerViewModel.transitionState.collectAsStateWithLifecycle(null)
+        val transitionState = shelfSharedViewModel.transitionState.collectAsStateWithLifecycle(null)
         val transcriptUiState = transcriptViewModel.uiState.collectAsStateWithLifecycle()
         val searchState = searchViewModel.searchState.collectAsStateWithLifecycle()
         val searchQueryFlow = searchViewModel.searchQueryFlow.collectAsStateWithLifecycle()
@@ -102,7 +104,7 @@ fun TranscriptPageWrapper(
                 .fillMaxSize(),
         ) {
             TranscriptPage(
-                playerViewModel = playerViewModel,
+                shelfSharedViewModel = shelfSharedViewModel,
                 transcriptViewModel = transcriptViewModel,
                 searchViewModel = searchViewModel,
                 theme = theme,
@@ -112,7 +114,11 @@ fun TranscriptPageWrapper(
 
             TranscriptToolbar(
                 onCloseClick = {
-                    playerViewModel.closeTranscript(withTransition = true)
+                    shelfSharedViewModel.closeTranscript(
+                        playerViewModel.podcast,
+                        playerViewModel.episode,
+                        withTransition = true,
+                    )
                 },
                 showSearch = showSearch,
                 onSearchDoneClicked = {

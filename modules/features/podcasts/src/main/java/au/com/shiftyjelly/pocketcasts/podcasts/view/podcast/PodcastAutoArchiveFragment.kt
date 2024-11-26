@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.podcasts.view.podcast
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,13 +20,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.core.graphics.ColorUtils
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
+import androidx.fragment.compose.content
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingInfoRow
@@ -61,26 +60,25 @@ class PodcastAutoArchiveFragment : BaseFragment() {
     private var podcastTint: PodcastTint? = null
     private val fallbackToolbarColors get() = podcastTint?.let { ToolbarColors.podcast(it.lightTint, it.darkTint, theme) } ?: args.toolbarColors
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        podcastTint = savedInstanceState?.let { BundleCompat.getParcelable(it, PODCAST_TINT_KEY, PodcastTint::class.java) }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View {
-        podcastTint = savedInstanceState?.let { BundleCompat.getParcelable(it, PODCAST_TINT_KEY, PodcastTint::class.java) }
-        return ComposeView(requireContext()).apply {
-            setContent {
-                val state by viewModel.state.collectAsState(PodcastAutoArchiveViewModel.State())
-
-                AppThemeWithBackground(themeType = theme.activeTheme) {
-                    AutoArchiveSettings(
-                        state = state,
-                        onBackPressed = {
-                            @Suppress("DEPRECATION")
-                            activity?.onBackPressed()
-                        },
-                    )
-                }
-            }
+    ) = content {
+        val state by viewModel.state.collectAsState(PodcastAutoArchiveViewModel.State())
+        AppThemeWithBackground(themeType = theme.activeTheme) {
+            AutoArchiveSettings(
+                state = state,
+                onBackPressed = {
+                    @Suppress("DEPRECATION")
+                    activity?.onBackPressed()
+                },
+            )
         }
     }
 

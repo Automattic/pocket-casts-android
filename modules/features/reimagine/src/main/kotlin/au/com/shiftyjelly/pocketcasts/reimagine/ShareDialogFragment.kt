@@ -22,13 +22,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.doOnLayout
 import androidx.fragment.app.viewModels
+import androidx.fragment.compose.content
 import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -90,41 +90,39 @@ class ShareDialogFragment : BottomSheetDialogFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ) = ComposeView(requireActivity()).apply {
+    ) = content {
         val usePodcastColors = args.backgroundColor != null
-        setContent {
-            val state by viewModel.uiState.collectAsState()
-            val podcast = state.podcast
-            val episode = state.episode
+        val state by viewModel.uiState.collectAsState()
+        val podcast = state.podcast
+        val episode = state.episode
 
-            // Dismiss dialog as this is a user episode
-            if (podcast == null || episode !is PodcastEpisode) {
-                LaunchedEffect(Unit) { dismiss() }
-                return@setContent
+        // Dismiss dialog as this is a user episode
+        if (podcast == null || episode !is PodcastEpisode) {
+            LaunchedEffect(Unit) { dismiss() }
+            return@content
+        }
+
+        if (usePodcastColors) {
+            val backgroundColor = Color(theme.playerBackgroundColor(podcast))
+            val textColor = Color(ThemeColor.playerContrast01(theme.activeTheme))
+            val dividerColor = textColor.copy(alpha = 0.4f)
+
+            Box(modifier = Modifier.background(backgroundColor)) {
+                ShareDialog(
+                    options = createShareOptions(podcast, episode, backgroundColor, textColor),
+                    handleColor = Color(ThemeColor.primaryIcon02(theme.activeTheme)),
+                    dividerColor = dividerColor,
+                )
             }
-
-            if (usePodcastColors) {
-                val backgroundColor = Color(theme.playerBackgroundColor(podcast))
-                val textColor = Color(ThemeColor.playerContrast01(theme.activeTheme))
-                val dividerColor = textColor.copy(alpha = 0.4f)
-
-                Box(modifier = Modifier.background(backgroundColor)) {
-                    ShareDialog(
-                        options = createShareOptions(podcast, episode, backgroundColor, textColor),
-                        handleColor = Color(ThemeColor.primaryIcon02(theme.activeTheme)),
-                        dividerColor = dividerColor,
-                    )
-                }
-                LaunchedEffect(backgroundColor) {
-                    refreshSystemColors(backgroundColor)
-                }
-            } else {
-                AppTheme(theme.activeTheme) {
-                    ShareDialog(
-                        options = createShareOptions(podcast, episode),
-                        handleColor = Color(ThemeColor.primaryIcon02(theme.activeTheme)),
-                    )
-                }
+            LaunchedEffect(backgroundColor) {
+                refreshSystemColors(backgroundColor)
+            }
+        } else {
+            AppTheme(theme.activeTheme) {
+                ShareDialog(
+                    options = createShareOptions(podcast, episode),
+                    handleColor = Color(ThemeColor.primaryIcon02(theme.activeTheme)),
+                )
             }
         }
     }
@@ -317,21 +315,23 @@ class ShareDialogFragment : BottomSheetDialogFragment() {
         val source: SourceView,
         val observePlayback: Boolean,
     ) : Parcelable {
-        val podcast get() = Podcast(
-            uuid = podcastUuid,
-            title = podcastTitle,
-        )
+        val podcast
+            get() = Podcast(
+                uuid = podcastUuid,
+                title = podcastTitle,
+            )
 
-        val episode get() = PodcastEpisode(
-            uuid = episodeUuid,
-            title = episodeTitle,
-            playedUpTo = episodePlayedUpTo.toDouble(DurationUnit.SECONDS),
-            fileType = episodeFileType,
-            episodeStatus = episodeDownloadStatus,
-            downloadedFilePath = episodeFilePath,
-            podcastUuid = podcastUuid,
-            publishedDate = Date(0), // Dummy date, not imporatant for sharing,
-        )
+        val episode
+            get() = PodcastEpisode(
+                uuid = episodeUuid,
+                title = episodeTitle,
+                playedUpTo = episodePlayedUpTo.toDouble(DurationUnit.SECONDS),
+                fileType = episodeFileType,
+                episodeStatus = episodeDownloadStatus,
+                downloadedFilePath = episodeFilePath,
+                podcastUuid = podcastUuid,
+                publishedDate = Date(0), // Dummy date, not imporatant for sharing,
+            )
     }
 
     companion object {

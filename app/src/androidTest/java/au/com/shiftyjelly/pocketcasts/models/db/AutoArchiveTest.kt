@@ -120,9 +120,9 @@ class AutoArchiveTest {
         val podcast = Podcast(UUID.randomUUID().toString())
         val podcastManager = podcastManagerThatReturns(podcast)
         val episode = PodcastEpisode(uuid = uuid, podcastUuid = podcast.uuid, isArchived = false, publishedDate = Date())
-        episodeDao.insert(episode)
+        episodeDao.insertBlocking(episode)
         assertTrue("Episode should not be archived before running", !episode.isArchived)
-        episodeManager.checkForEpisodesToAutoArchive(null, podcastManager)
+        episodeManager.checkForEpisodesToAutoArchiveBlocking(null, podcastManager)
 
         val updatedEpisode = episodeDao.findByUuid(uuid)!!
         assertTrue("Episode should not be archived after running", !updatedEpisode.isArchived)
@@ -141,11 +141,11 @@ class AutoArchiveTest {
         val episode = PodcastEpisode(uuid = uuid, isArchived = false, publishedDate = date, podcastUuid = podcastUUID, addedDate = date)
         val newUUID = UUID.randomUUID().toString()
         val newEpisode = PodcastEpisode(uuid = newUUID, podcastUuid = podcastUUID, addedDate = Date(), publishedDate = Date(), isArchived = false)
-        testDb.podcastDao().insert(podcast)
-        episodeDao.insert(episode)
-        episodeDao.insert(newEpisode)
+        testDb.podcastDao().insertBlocking(podcast)
+        episodeDao.insertBlocking(episode)
+        episodeDao.insertBlocking(newEpisode)
         assertTrue("Episode should not be archived before running", !episode.isArchived)
-        episodeManager.checkForEpisodesToAutoArchive(null, podcastManager)
+        episodeManager.checkForEpisodesToAutoArchiveBlocking(null, podcastManager)
 
         val updatedEpisode = episodeDao.findByUuid(uuid)!!
         assertTrue("Episode should be archived as it is older than 30 days", updatedEpisode.isArchived)
@@ -166,10 +166,10 @@ class AutoArchiveTest {
         val uuid = UUID.randomUUID().toString()
         val episode = PodcastEpisode(uuid = uuid, isArchived = false, publishedDate = date, podcastUuid = podcastUUID, addedDate = date, lastPlaybackInteraction = Date().time)
 
-        testDb.podcastDao().insert(podcast)
-        episodeDao.insert(episode)
+        testDb.podcastDao().insertBlocking(podcast)
+        episodeDao.insertBlocking(episode)
         assertTrue("Episode should not be archived before running", !episode.isArchived)
-        episodeManager.checkForEpisodesToAutoArchive(null, podcastManager)
+        episodeManager.checkForEpisodesToAutoArchiveBlocking(null, podcastManager)
 
         val updatedEpisode = episodeDao.findByUuid(uuid)!!
         assertTrue("Episode should be not be archived as it has been played recently", !updatedEpisode.isArchived)
@@ -187,10 +187,10 @@ class AutoArchiveTest {
         val uuid = UUID.randomUUID().toString()
         val episode = PodcastEpisode(uuid = uuid, isArchived = false, publishedDate = date, podcastUuid = podcastUUID, addedDate = date, lastDownloadAttemptDate = Date())
 
-        testDb.podcastDao().insert(podcast)
-        episodeDao.insert(episode)
+        testDb.podcastDao().insertBlocking(podcast)
+        episodeDao.insertBlocking(episode)
         assertTrue("Episode should not be archived before running", !episode.isArchived)
-        episodeManager.checkForEpisodesToAutoArchive(null, podcastManager)
+        episodeManager.checkForEpisodesToAutoArchiveBlocking(null, podcastManager)
 
         val updatedEpisode = episodeDao.findByUuid(uuid)!!
         assertTrue("Episode should be not be archived as it has been downloaded recently", !updatedEpisode.isArchived)
@@ -209,11 +209,11 @@ class AutoArchiveTest {
         val playedEpisode = PodcastEpisode(uuid = playedUuid, podcastUuid = podcast.uuid, isArchived = false, publishedDate = date, playingStatus = EpisodePlayingStatus.COMPLETED, lastPlaybackInteraction = date.time)
         val unplayedEpisode = PodcastEpisode(uuid = unplayedUuid, podcastUuid = podcast.uuid, isArchived = false, publishedDate = Date(), playingStatus = EpisodePlayingStatus.NOT_PLAYED)
 
-        episodeDao.insert(playedEpisode)
-        episodeDao.insert(unplayedEpisode)
+        episodeDao.insertBlocking(playedEpisode)
+        episodeDao.insertBlocking(unplayedEpisode)
 
         assertTrue("Episode should not be archived before running", !playedEpisode.isArchived)
-        episodeManager.checkForEpisodesToAutoArchive(null, podcastManager)
+        episodeManager.checkForEpisodesToAutoArchiveBlocking(null, podcastManager)
 
         val updatedPlayedEpisode = episodeDao.findByUuid(playedUuid)!!
         assertTrue("Episode should be archived as it was played 2 days ago", updatedPlayedEpisode.isArchived)
@@ -234,11 +234,11 @@ class AutoArchiveTest {
         val playedEpisode = PodcastEpisode(uuid = playedUuid, podcastUuid = podcast.uuid, isArchived = false, publishedDate = date, playingStatus = EpisodePlayingStatus.COMPLETED, lastPlaybackInteraction = date.time, isStarred = true)
         val unplayedEpisode = PodcastEpisode(uuid = unplayedUuid, podcastUuid = podcast.uuid, isArchived = false, publishedDate = Date(), playingStatus = EpisodePlayingStatus.NOT_PLAYED)
 
-        episodeDao.insert(playedEpisode)
-        episodeDao.insert(unplayedEpisode)
+        episodeDao.insertBlocking(playedEpisode)
+        episodeDao.insertBlocking(unplayedEpisode)
 
         assertTrue("Episode should not be archived before running", !playedEpisode.isArchived)
-        episodeManager.checkForEpisodesToAutoArchive(null, podcastManager)
+        episodeManager.checkForEpisodesToAutoArchiveBlocking(null, podcastManager)
 
         val updatedPlayedEpisode = episodeDao.findByUuid(playedUuid)!!
         assertTrue("Episode should not be archived as it is starred", !updatedPlayedEpisode.isArchived)
@@ -259,11 +259,11 @@ class AutoArchiveTest {
         val playedEpisode = PodcastEpisode(uuid = playedUuid, podcastUuid = podcast.uuid, isArchived = false, publishedDate = date, playingStatus = EpisodePlayingStatus.COMPLETED, lastPlaybackInteraction = date.time, isStarred = true)
         val unplayedEpisode = PodcastEpisode(uuid = unplayedUuid, podcastUuid = podcast.uuid, isArchived = false, publishedDate = Date(), playingStatus = EpisodePlayingStatus.NOT_PLAYED)
 
-        episodeDao.insert(playedEpisode)
-        episodeDao.insert(unplayedEpisode)
+        episodeDao.insertBlocking(playedEpisode)
+        episodeDao.insertBlocking(unplayedEpisode)
 
         assertTrue("Episode should not be archived before running", !playedEpisode.isArchived)
-        episodeManager.checkForEpisodesToAutoArchive(null, podcastManager)
+        episodeManager.checkForEpisodesToAutoArchiveBlocking(null, podcastManager)
 
         val updatedPlayedEpisode = episodeDao.findByUuid(playedUuid)!!
         assertTrue("Episode should be archived as it is starred and include starred is on", updatedPlayedEpisode.isArchived)
@@ -284,11 +284,11 @@ class AutoArchiveTest {
         val episode = PodcastEpisode(uuid = uuid, isArchived = false, publishedDate = date, podcastUuid = podcastUUID, addedDate = date, isStarred = true)
         val newUUID = UUID.randomUUID().toString()
         val newEpisode = PodcastEpisode(uuid = newUUID, podcastUuid = podcastUUID, addedDate = Date(), publishedDate = Date(), isArchived = false)
-        testDb.podcastDao().insert(podcast)
-        episodeDao.insert(episode)
-        episodeDao.insert(newEpisode)
+        testDb.podcastDao().insertBlocking(podcast)
+        episodeDao.insertBlocking(episode)
+        episodeDao.insertBlocking(newEpisode)
         assertTrue("Episode should not be archived before running", !episode.isArchived)
-        episodeManager.checkForEpisodesToAutoArchive(null, podcastManager)
+        episodeManager.checkForEpisodesToAutoArchiveBlocking(null, podcastManager)
 
         val updatedEpisode = episodeDao.findByUuid(uuid)!!
         assertTrue("Episode should not be archived as it is starred", !updatedEpisode.isArchived)
@@ -311,11 +311,11 @@ class AutoArchiveTest {
         val episode = PodcastEpisode(uuid = uuid, isArchived = false, publishedDate = date, podcastUuid = podcastUUID, addedDate = date, isStarred = true)
         val newUUID = UUID.randomUUID().toString()
         val newEpisode = PodcastEpisode(uuid = newUUID, podcastUuid = podcastUUID, addedDate = Date(), publishedDate = Date(), isArchived = false)
-        testDb.podcastDao().insert(podcast)
-        episodeDao.insert(episode)
-        episodeDao.insert(newEpisode)
+        testDb.podcastDao().insertBlocking(podcast)
+        episodeDao.insertBlocking(episode)
+        episodeDao.insertBlocking(newEpisode)
         assertTrue("Episode should not be archived before running", !episode.isArchived)
-        episodeManager.checkForEpisodesToAutoArchive(null, podcastManager)
+        episodeManager.checkForEpisodesToAutoArchiveBlocking(null, podcastManager)
 
         val updatedEpisode = episodeDao.findByUuid(uuid)!!
         assertTrue("Episode should be archived as it is starred and starred is included", updatedEpisode.isArchived)
@@ -347,12 +347,12 @@ class AutoArchiveTest {
         val newUUID = UUID.randomUUID().toString()
         val newEpisode = PodcastEpisode(uuid = newUUID, isArchived = false, publishedDate = date, podcastUuid = podcastUUID, addedDate = date, lastArchiveInteraction = time8Day)
 
-        testDb.podcastDao().insert(podcast)
-        episodeDao.insert(episode)
-        episodeDao.insert(newEpisode)
+        testDb.podcastDao().insertBlocking(podcast)
+        episodeDao.insertBlocking(episode)
+        episodeDao.insertBlocking(newEpisode)
 
         assertTrue("Episode should not be archived before running", !episode.isArchived || !newEpisode.isArchived)
-        episodeManager.checkForEpisodesToAutoArchive(null, podcastManager)
+        episodeManager.checkForEpisodesToAutoArchiveBlocking(null, podcastManager)
 
         val updatedEpisode = episodeDao.findByUuid(uuid)!!
         assertTrue("Episode should not be archived as it was archive modified 6 days ago (inactive setting = 7d)", !updatedEpisode.isArchived)
@@ -374,11 +374,11 @@ class AutoArchiveTest {
         val playedEpisode = PodcastEpisode(uuid = playedUuid, podcastUuid = podcast.uuid, isArchived = false, publishedDate = date, playingStatus = EpisodePlayingStatus.COMPLETED, lastPlaybackInteraction = date.time)
         val unplayedEpisode = PodcastEpisode(uuid = unplayedUuid, podcastUuid = podcast.uuid, isArchived = false, publishedDate = Date(), playingStatus = EpisodePlayingStatus.NOT_PLAYED)
 
-        episodeDao.insert(playedEpisode)
-        episodeDao.insert(unplayedEpisode)
+        episodeDao.insertBlocking(playedEpisode)
+        episodeDao.insertBlocking(unplayedEpisode)
 
         assertTrue("Episode should not be archived before running", !playedEpisode.isArchived)
-        episodeManager.checkForEpisodesToAutoArchive(null, podcastManager)
+        episodeManager.checkForEpisodesToAutoArchiveBlocking(null, podcastManager)
 
         val updatedPlayedEpisode = episodeDao.findByUuid(playedUuid)!!
         assertTrue("Episode should be archived as it was played 2 days ago and podcast settings are on override", updatedPlayedEpisode.isArchived)
@@ -399,11 +399,11 @@ class AutoArchiveTest {
         val episode = PodcastEpisode(uuid = uuid, isArchived = false, publishedDate = date, podcastUuid = podcastUUID, addedDate = date)
         val newUUID = UUID.randomUUID().toString()
         val newEpisode = PodcastEpisode(uuid = newUUID, podcastUuid = podcastUUID, addedDate = Date(), publishedDate = Date(), isArchived = false)
-        testDb.podcastDao().insert(podcast)
-        episodeDao.insert(episode)
-        episodeDao.insert(newEpisode)
+        testDb.podcastDao().insertBlocking(podcast)
+        episodeDao.insertBlocking(episode)
+        episodeDao.insertBlocking(newEpisode)
         assertTrue("Episode should not be archived before running", !episode.isArchived)
-        episodeManager.checkForEpisodesToAutoArchive(null, podcastManager)
+        episodeManager.checkForEpisodesToAutoArchiveBlocking(null, podcastManager)
 
         val updatedEpisode = episodeDao.findByUuid(uuid)!!
         assertTrue("Episode should be archived as it is older than 30 days and podcast is overriding global", updatedEpisode.isArchived)
@@ -425,11 +425,11 @@ class AutoArchiveTest {
         val episode = PodcastEpisode(uuid = uuid, isArchived = false, publishedDate = date, podcastUuid = podcastUUID, addedDate = date)
         val newUUID = UUID.randomUUID().toString()
         val newEpisode = PodcastEpisode(uuid = newUUID, podcastUuid = podcastUUID, addedDate = Date(), publishedDate = date, isArchived = false)
-        testDb.podcastDao().insert(podcast)
-        episodeDao.insert(episode)
-        episodeDao.insert(newEpisode)
+        testDb.podcastDao().insertBlocking(podcast)
+        episodeDao.insertBlocking(episode)
+        episodeDao.insertBlocking(newEpisode)
         assertTrue("Episode should not be archived before running", !episode.isArchived)
-        episodeManager.checkForEpisodesToAutoArchive(null, podcastManager)
+        episodeManager.checkForEpisodesToAutoArchiveBlocking(null, podcastManager)
 
         val updatedEpisode = episodeDao.findByUuid(uuid)!!
         assertTrue("Episode should be archived as it is older than 24 hours and podcast is overriding global", updatedEpisode.isArchived)
@@ -451,11 +451,11 @@ class AutoArchiveTest {
         val episode = PodcastEpisode(uuid = uuid, isArchived = false, publishedDate = date, podcastUuid = podcastUUID, addedDate = date, lastPlaybackInteraction = null, lastDownloadAttemptDate = null)
         val newUUID = UUID.randomUUID().toString()
         val newEpisode = PodcastEpisode(uuid = newUUID, podcastUuid = podcastUUID, addedDate = Date(), publishedDate = date, isArchived = false)
-        testDb.podcastDao().insert(podcast)
-        episodeDao.insert(episode)
-        episodeDao.insert(newEpisode)
+        testDb.podcastDao().insertBlocking(podcast)
+        episodeDao.insertBlocking(episode)
+        episodeDao.insertBlocking(newEpisode)
         assertTrue("Episode should not be archived before running", !episode.isArchived)
-        episodeManager.checkForEpisodesToAutoArchive(null, podcastManager)
+        episodeManager.checkForEpisodesToAutoArchiveBlocking(null, podcastManager)
 
         val updatedEpisode = episodeDao.findByUuid(uuid)!!
         assertTrue("Episode should be archived as it is older than 2 days and podcast is overriding global", updatedEpisode.isArchived)
@@ -477,11 +477,11 @@ class AutoArchiveTest {
         val oldestEpisode = PodcastEpisode(title = "Oldest", uuid = oldestUuid, podcastUuid = podcast.uuid, isArchived = false, publishedDate = date, playingStatus = EpisodePlayingStatus.COMPLETED, lastPlaybackInteraction = date.time)
         val unplayedEpisode = PodcastEpisode(title = "Newest", uuid = unplayedUuid, podcastUuid = podcast.uuid, isArchived = false, publishedDate = Date(), playingStatus = EpisodePlayingStatus.NOT_PLAYED)
 
-        episodeDao.insert(oldestEpisode)
-        episodeDao.insert(unplayedEpisode)
+        episodeDao.insertBlocking(oldestEpisode)
+        episodeDao.insertBlocking(unplayedEpisode)
 
         assertTrue("Episode should not be archived before running", !oldestEpisode.isArchived)
-        episodeManager.checkForEpisodesToAutoArchive(null, podcastManager)
+        episodeManager.checkForEpisodesToAutoArchiveBlocking(null, podcastManager)
 
         val updatedOldestEpisode = episodeDao.findByUuid(oldestUuid)!!
         assertTrue("Episode should be archived as it was the oldest", updatedOldestEpisode.isArchived)
@@ -500,10 +500,10 @@ class AutoArchiveTest {
         val oldestUuid = UUID.randomUUID().toString()
         val oldestEpisode = PodcastEpisode(title = "Oldest", uuid = oldestUuid, podcastUuid = podcast.uuid, isArchived = false, excludeFromEpisodeLimit = true, publishedDate = date, playingStatus = EpisodePlayingStatus.COMPLETED, lastPlaybackInteraction = date.time)
 
-        episodeDao.insert(oldestEpisode)
+        episodeDao.insertBlocking(oldestEpisode)
 
         assertTrue("Episode should not be archived before running", !oldestEpisode.isArchived)
-        episodeManager.checkForEpisodesToAutoArchive(null, podcastManager)
+        episodeManager.checkForEpisodesToAutoArchiveBlocking(null, podcastManager)
 
         val updatedOldestEpisode = episodeDao.findByUuid(oldestUuid)!!
         assertTrue("Episode should not be archived as global is off", !updatedOldestEpisode.isArchived)
@@ -530,21 +530,21 @@ class AutoArchiveTest {
         val newUUID = UUID.randomUUID().toString()
         val newEpisode = PodcastEpisode(uuid = newUUID, isArchived = false, publishedDate = date, podcastUuid = podcastUUID, addedDate = date, archivedModified = time8Day)
 
-        testDb.podcastDao().insert(podcast)
-        episodeDao.insert(newEpisode)
+        testDb.podcastDao().insertBlocking(podcast)
+        episodeDao.insertBlocking(newEpisode)
 
         assertTrue("Episode should not be archived before running", !newEpisode.isArchived)
-        episodeManager.checkForEpisodesToAutoArchive(null, podcastManager)
+        episodeManager.checkForEpisodesToAutoArchiveBlocking(null, podcastManager)
 
         val updatedNewEpisode = episodeDao.findByUuid(newUUID)!!
         assertTrue("Episode should be archived as it was archive modified 8 day ago (inactive setting = 7d)", updatedNewEpisode.isArchived)
 
-        runBlocking { upNext.playLast(updatedNewEpisode, downloadManager, null) }
+        runBlocking { upNext.playLastBlocking(updatedNewEpisode, downloadManager, null) }
 
         val updatedNewEpisodeInUpNext = episodeDao.findByUuid(newUUID)!!
         assertTrue("Episode should not be archived as it was added to up next", !updatedNewEpisodeInUpNext.isArchived)
 
-        episodeManager.checkForEpisodesToAutoArchive(null, podcastManager)
+        episodeManager.checkForEpisodesToAutoArchiveBlocking(null, podcastManager)
 
         val updatedNewEpisodeInUpNextAfterInactive = episodeDao.findByUuid(newUUID)!!
         assertTrue("Episode should not be archived as it was added to up next after being inactive", !updatedNewEpisodeInUpNextAfterInactive.isArchived)

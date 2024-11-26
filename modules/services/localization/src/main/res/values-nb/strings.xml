@@ -1467,40 +1467,4 @@ Language: nb_NO
     <string name="archive">Arkiver</string>
     <string name="add_to_up_next">Legg til i Neste</string>
     <string name="in_progress">Pågår</string>
-    <plurals name="podcast">
-        <item quantity="one">Podcast</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_day_listened">
-        <item quantity="one">Dag lyttet</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_day_saved">
-        <item quantity="one">Dag spart</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_hour_listened">
-        <item quantity="one">Time lyttet</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_hour_saved">
-        <item quantity="one">Time spart</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_minute_listened">
-        <item quantity="one">Minutt lyttet</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_minute_saved">
-        <item quantity="one">Minutt spart</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_second_listened">
-        <item quantity="one">Sekund lyttet</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="profile_stats_second_saved">
-        <item quantity="one">Sekund spart</item>
-        <item quantity="other"/>
-    </plurals>
 </resources>

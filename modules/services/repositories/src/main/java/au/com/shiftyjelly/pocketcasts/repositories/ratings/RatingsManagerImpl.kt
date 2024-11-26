@@ -26,7 +26,7 @@ class RatingsManagerImpl @Inject constructor(
         get() = Dispatchers.Default
 
     override fun podcastRatings(podcastUuid: String) =
-        podcastRatingsDao.podcastRatings(podcastUuid)
+        podcastRatingsDao.podcastRatingsFlow(podcastUuid)
             .map { it.firstOrNull() ?: noRatings(podcastUuid) }
 
     override suspend fun refreshPodcastRatings(podcastUuid: String, useCache: Boolean) {

@@ -141,7 +141,7 @@ class PodcastOptionsFragment : BaseFragment(), PodcastSelectFragment.Listener, C
                     } else {
                         null
                     }
-                    playlistManager.update(playlist, userPlaylistUpdate)
+                    playlistManager.updateBlocking(playlist, userPlaylistUpdate)
 
                     launch(Dispatchers.Main) { (activity as? FragmentHostListener)?.closeModal(this@PodcastOptionsFragment) }
                 }

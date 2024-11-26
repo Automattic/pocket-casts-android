@@ -122,7 +122,7 @@ class SwipeButtonLayoutViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.Default) {
             if (!episode.isArchived) {
                 trackSwipeAction(swipeSource, EpisodeItemTouchHelper.SwipeAction.ARCHIVE)
-                episodeManager.archive(episode, playbackManager)
+                episodeManager.archiveBlocking(episode, playbackManager)
                 episodeAnalytics.trackEvent(
                     event = AnalyticsEvent.EPISODE_ARCHIVED,
                     source = swipeSourceToSourceView(swipeSource),
@@ -130,7 +130,7 @@ class SwipeButtonLayoutViewModel @Inject constructor(
                 )
             } else {
                 trackSwipeAction(swipeSource, EpisodeItemTouchHelper.SwipeAction.UNARCHIVE)
-                episodeManager.unarchive(episode)
+                episodeManager.unarchiveBlocking(episode)
                 episodeAnalytics.trackEvent(
                     event = AnalyticsEvent.EPISODE_UNARCHIVED,
                     source = swipeSourceToSourceView(swipeSource),

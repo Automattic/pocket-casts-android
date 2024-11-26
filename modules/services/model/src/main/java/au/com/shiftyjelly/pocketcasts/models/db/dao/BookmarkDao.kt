@@ -1,11 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.models.db.dao
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Update
 import au.com.shiftyjelly.pocketcasts.models.db.helper.PodcastBookmark
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ProfileBookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
@@ -17,12 +15,6 @@ abstract class BookmarkDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insert(bookmark: Bookmark)
-
-    @Update
-    abstract suspend fun update(bookmark: Bookmark)
-
-    @Delete
-    abstract suspend fun delete(bookmark: Bookmark)
 
     @Query("DELETE FROM bookmarks WHERE uuid = :uuid")
     abstract suspend fun deleteByUuid(uuid: String)
@@ -87,13 +79,6 @@ abstract class BookmarkDao {
         podcastUuid: String,
         deleted: Boolean = false,
     ): Flow<List<PodcastBookmark>>
-
-    @Query(
-        """SELECT *
-            FROM bookmarks
-            WHERE deleted = :deleted""",
-    )
-    abstract fun findBookmarksFlow(deleted: Boolean = false): Flow<List<Bookmark>>
 
     @Query(
         """SELECT *
@@ -196,7 +181,7 @@ abstract class BookmarkDao {
     abstract suspend fun updateTitle(bookmarkUuid: String, title: String, titleModified: Long, syncStatus: SyncStatus)
 
     @Query("SELECT * FROM bookmarks WHERE sync_status = :syncStatus")
-    abstract fun findNotSynced(syncStatus: SyncStatus = SyncStatus.NOT_SYNCED): List<Bookmark>
+    abstract fun findNotSyncedBlocking(syncStatus: SyncStatus = SyncStatus.NOT_SYNCED): List<Bookmark>
 
     @Query(
         """SELECT bookmarks.*

@@ -121,7 +121,7 @@ class WarningsHelper @Inject constructor(
                     }
                     downloadManager.addEpisodeToQueue(it, from, fireEvent = true, source = SourceView.UNKNOWN)
                     launch {
-                        episodeManager.unarchive(it)
+                        episodeManager.unarchiveBlocking(it)
                     }
                 }
             }

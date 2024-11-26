@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -55,38 +54,6 @@ class BookmarkDaoTest {
                 "Inserted bookmark should be able to be found",
                 bookmarkDao.findByUuid(uuid, false),
             )
-        }
-    }
-
-    @Test
-    fun testUpdateBookmark() {
-        runTest {
-            val uuid = UUID.randomUUID().toString()
-            val bookmark = FakeBookmarksGenerator.create(uuid)
-            bookmarkDao.insert(bookmark)
-
-            val createdBookmark = bookmarkDao.findByUuid(uuid, false)
-            assert(createdBookmark?.syncStatus == SyncStatus.NOT_SYNCED)
-
-            bookmark.deleted = true
-            bookmark.syncStatus = SyncStatus.SYNCED
-
-            bookmarkDao.update(bookmark)
-
-            val updatedBookmark = bookmarkDao.findByUuid(uuid, deleted = true)
-            assert(updatedBookmark?.syncStatus == SyncStatus.SYNCED)
-        }
-    }
-
-    @Test
-    fun testDeleteBookmark() {
-        runTest {
-            val uuid = UUID.randomUUID().toString()
-            val bookmark = FakeBookmarksGenerator.create(uuid)
-            bookmarkDao.insert(bookmark)
-            assertNotNull(bookmarkDao.findByUuid(uuid, false))
-            bookmarkDao.delete(bookmark)
-            assertNull(bookmarkDao.findByUuid(uuid, true))
         }
     }
 
@@ -172,7 +139,7 @@ class BookmarkDaoTest {
             bookmarkDao.insert(bookmark2)
 
             val episode = PodcastEpisode(uuid = defaultEpisodeUuid, podcastUuid = "1", isArchived = false, publishedDate = Date())
-            episodeDao.insert(episode)
+            episodeDao.insertBlocking(episode)
 
             val result = bookmarkDao.searchInPodcastByTitle(
                 title = searchTitle,
@@ -199,7 +166,7 @@ class BookmarkDaoTest {
             bookmarkDao.insert(bookmark2)
 
             val episode = PodcastEpisode(uuid = episodeUuid, podcastUuid = podcastUuid, title = searchTitle, isArchived = false, publishedDate = Date())
-            episodeDao.insert(episode)
+            episodeDao.insertBlocking(episode)
 
             val result = bookmarkDao.searchInPodcastByTitle(
                 title = searchTitle,
@@ -224,7 +191,7 @@ class BookmarkDaoTest {
             bookmarkDao.insert(bookmark3)
 
             val episode = PodcastEpisode(uuid = defaultEpisodeUuid, podcastUuid = defaultPodcastUuid, title = "", publishedDate = Date())
-            episodeDao.insert(episode)
+            episodeDao.insertBlocking(episode)
 
             val result = bookmarkDao.findByPodcastOrderCreatedAtFlow(
                 podcastUuid = defaultPodcastUuid,
@@ -249,7 +216,7 @@ class BookmarkDaoTest {
             bookmarkDao.insert(bookmark3)
 
             val episode = PodcastEpisode(uuid = defaultEpisodeUuid, podcastUuid = defaultPodcastUuid, title = "", publishedDate = Date())
-            episodeDao.insert(episode)
+            episodeDao.insertBlocking(episode)
 
             val result = bookmarkDao.findByPodcastOrderCreatedAtFlow(
                 podcastUuid = defaultPodcastUuid,
@@ -277,8 +244,8 @@ class BookmarkDaoTest {
 
             val episode1 = PodcastEpisode(uuid = episodeUuid1, podcastUuid = defaultPodcastUuid, publishedDate = Date(2000))
             val episode2 = PodcastEpisode(uuid = episodeUuid2, podcastUuid = defaultPodcastUuid, publishedDate = Date(1000))
-            episodeDao.insert(episode1)
-            episodeDao.insert(episode2)
+            episodeDao.insertBlocking(episode1)
+            episodeDao.insertBlocking(episode2)
             val result = bookmarkDao.findByPodcastOrderEpisodeAndTimeFlow(
                 podcastUuid = defaultPodcastUuid,
             ).first()

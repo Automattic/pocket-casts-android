@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.player.viewmodel
 
 import android.content.Context
-import android.content.res.Resources
 import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -20,13 +19,11 @@ import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
-import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.view.UpNextPlaying
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkArguments
 import au.com.shiftyjelly.pocketcasts.player.view.dialog.ClearUpNextDialog
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
-import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
@@ -45,9 +42,6 @@ import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
-import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
-import au.com.shiftyjelly.pocketcasts.views.helper.DeleteState
 import com.jakewharton.rxrelay2.BehaviorRelay
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -56,7 +50,6 @@ import io.reactivex.Flowable
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.Flowables
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
@@ -70,12 +63,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx2.asFlowable
 import kotlinx.coroutines.rx2.asObservable
+import kotlinx.coroutines.withContext
 import timber.log.Timber
-import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
@@ -174,9 +165,6 @@ class PlayerViewModel @Inject constructor(
 
     private val disposables = CompositeDisposable()
 
-    private val _transitionState = MutableSharedFlow<TransitionState>()
-    val transitionState = _transitionState.asSharedFlow()
-
     private val playbackStateObservable: Observable<PlaybackState> = playbackManager.playbackStateRelay
         .observeOn(Schedulers.io())
     private val upNextStateObservable: Observable<UpNextQueue.State> = playbackManager.upNextQueue.getChangesObservableWithLiveCurrentEpisode(episodeManager, podcastManager)
@@ -202,37 +190,10 @@ class PlayerViewModel @Inject constructor(
     val playingEpisodeLive: LiveData<Pair<BaseEpisode, Int>> =
         listDataRx.map { Pair(it.podcastHeader.episodeUuid, it.podcastHeader.backgroundColor) }
             .distinctUntilChanged()
-            .switchMap { pair -> episodeManager.observeEpisodeByUuidRx(pair.first).map { Pair(it, pair.second) } }
+            .switchMap { pair -> episodeManager.findEpisodeByUuidRxFlowable(pair.first).map { Pair(it, pair.second) } }
             .toLiveData()
 
     private var playbackPositionMs: Int = 0
-
-    private val shelfObservable = settings.shelfItems.flow
-        .map { items ->
-            items.filter { item ->
-                when (item) {
-                    ShelfItem.Report -> FeatureFlag.isEnabled(Feature.REPORT_VIOLATION)
-                    ShelfItem.Transcript -> FeatureFlag.isEnabled(Feature.TRANSCRIPTS)
-                    else -> true
-                }
-            }
-        }.asFlowable(viewModelScope.coroutineContext)
-
-    private val shelfUpNext = upNextStateObservable.distinctUntilChanged { t1, t2 ->
-        val entry1 = t1 as? UpNextQueue.State.Loaded ?: return@distinctUntilChanged false
-        val entry2 = t2 as? UpNextQueue.State.Loaded ?: return@distinctUntilChanged false
-
-        return@distinctUntilChanged (entry1.episode as? PodcastEpisode)?.isStarred == (entry2.episode as? PodcastEpisode)?.isStarred && entry1.episode.episodeStatus == entry2.episode.episodeStatus && entry1.podcast?.isUsingEffects == entry2.podcast?.isUsingEffects
-    }
-
-    private val trimmedShelfObservable = Flowables.combineLatest(shelfUpNext.toFlowable(BackpressureStrategy.LATEST), shelfObservable).map { (upNextState, shelf) ->
-        val episode = (upNextState as? UpNextQueue.State.Loaded)?.episode
-        val trimmedShelf = shelf.filter { it.showIf(episode) }
-        return@map Pair(trimmedShelf, episode)
-    }
-
-    val shelfLive: LiveData<List<ShelfItem>> = shelfObservable.toLiveData()
-    val trimmedShelfLive: LiveData<Pair<List<ShelfItem>, BaseEpisode?>> = trimmedShelfObservable.toLiveData()
 
     val upNextPlusData = upNextStateObservable.map { upNextState ->
         var episodeCount = 0
@@ -269,7 +230,7 @@ class PlayerViewModel @Inject constructor(
     val effectsObservable: Flowable<PodcastEffectsData> = playbackStateObservable
         .toFlowable(BackpressureStrategy.LATEST)
         .map { it.episodeUuid }
-        .switchMap { episodeManager.observeEpisodeByUuidRx(it) }
+        .switchMap { episodeManager.findEpisodeByUuidRxFlowable(it) }
         .switchMap {
             if (it is PodcastEpisode) {
                 podcastManager.observePodcastByUuid(it.podcastUuid)
@@ -288,6 +249,12 @@ class PlayerViewModel @Inject constructor(
         .doOnNext { Timber.i("Effects: Podcast: ${it.podcast.overrideGlobalEffects} ${it.effects}") }
         .observeOn(AndroidSchedulers.mainThread())
     val effectsLive = effectsObservable.toLiveData()
+
+    private val _navigationState: MutableSharedFlow<NavigationState> = MutableSharedFlow()
+    val navigationState = _navigationState.asSharedFlow()
+
+    private val _snackbarMessages = MutableSharedFlow<SnackbarMessage>()
+    val snackbarMessages = _snackbarMessages.asSharedFlow()
 
     var episode: BaseEpisode? = null
     var podcast: Podcast? = null
@@ -443,6 +410,34 @@ class PlayerViewModel @Inject constructor(
         )
     }
 
+    fun onPlayPauseClicked() {
+        if (playbackManager.isPlaying()) {
+            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Pause clicked in player")
+            playbackManager.pause(sourceView = source)
+        } else {
+            if (playbackManager.shouldWarnAboutPlayback(playbackManager.upNextQueue.currentEpisode?.uuid)) {
+                viewModelScope.launch(ioDispatcher) {
+                    // show the stream warning if the episode isn't downloaded
+                    playbackManager.getCurrentEpisode()?.let { episode ->
+                        withContext(Dispatchers.Main) {
+                            if (episode.isDownloaded) {
+                                play()
+                                _snackbarMessages.emit(SnackbarMessage.ShowBatteryWarningIfAppropriate)
+                            } else {
+                                _navigationState.emit(NavigationState.ShowStreamingWarningDialog(episode))
+                            }
+                        }
+                    }
+                }
+            } else {
+                play()
+                viewModelScope.launch {
+                    _snackbarMessages.emit(SnackbarMessage.ShowBatteryWarningIfAppropriate)
+                }
+            }
+        }
+    }
+
     fun play() {
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Play clicked in player")
         playbackManager.playQueue(sourceView = source)
@@ -455,12 +450,18 @@ class PlayerViewModel @Inject constructor(
         }
     }
 
-    fun skipBackward() {
-        playbackManager.skipBackward(sourceView = source)
+    fun onSkipBackwardClick() {
+        playbackManager.skipBackward(sourceView = source, jumpAmountSeconds = settings.skipBackInSecs.value)
     }
 
-    fun skipForward() {
-        playbackManager.skipForward(sourceView = source)
+    fun onSkipForwardClick() {
+        playbackManager.skipForward(sourceView = source, jumpAmountSeconds = settings.skipForwardInSecs.value)
+    }
+
+    fun onSkipForwardLongClick() {
+        viewModelScope.launch {
+            _navigationState.emit(NavigationState.ShowSkipForwardLongPressOptionsDialog)
+        }
     }
 
     fun onMarkAsPlayedClick() {
@@ -477,55 +478,18 @@ class PlayerViewModel @Inject constructor(
         playbackManager.playNextInQueue(sourceView = source)
     }
 
-    private fun markAsPlayedConfirmed(episode: BaseEpisode, shouldShuffleUpNext: Boolean = false) {
+    fun markAsPlayedConfirmed(episode: BaseEpisode, shouldShuffleUpNext: Boolean = false) {
         launch {
-            episodeManager.markAsPlayed(episode, playbackManager, podcastManager, shouldShuffleUpNext)
+            episodeManager.markAsPlayedBlocking(episode, playbackManager, podcastManager, shouldShuffleUpNext)
             episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_MARKED_AS_PLAYED, source, episode.uuid)
         }
     }
 
-    fun markCurrentlyPlayingAsPlayed(context: Context): ConfirmationDialog? {
-        val episode = playbackManager.upNextQueue.currentEpisode ?: return null
-        return ConfirmationDialog()
-            .setForceDarkTheme(true)
-            .setSummary(context.getString(LR.string.player_mark_as_played))
-            .setIconId(R.drawable.ic_markasplayed)
-            .setButtonType(ConfirmationDialog.ButtonType.Danger(context.getString(LR.string.player_mark_as_played_button)))
-            .setOnConfirm { markAsPlayedConfirmed(episode, shouldShuffleUpNext = settings.upNextShuffle.value) }
-    }
-
-    private fun archiveConfirmed(episode: PodcastEpisode) {
+    fun archiveConfirmed(episode: PodcastEpisode) {
         launch {
-            episodeManager.archive(episode, playbackManager, sync = true, shouldShuffleUpNext = settings.upNextShuffle.value)
+            episodeManager.archiveBlocking(episode, playbackManager, sync = true, shouldShuffleUpNext = settings.upNextShuffle.value)
             episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ARCHIVED, source, episode.uuid)
         }
-    }
-
-    fun archiveCurrentlyPlaying(resources: Resources): ConfirmationDialog? {
-        val episode = playbackManager.upNextQueue.currentEpisode ?: return null
-        if (episode is PodcastEpisode) {
-            return ConfirmationDialog()
-                .setForceDarkTheme(true)
-                .setSummary(resources.getString(LR.string.player_archive_summary))
-                .setIconId(IR.drawable.ic_archive)
-                .setButtonType(ConfirmationDialog.ButtonType.Danger(resources.getString(LR.string.player_archive_title)))
-                .setOnConfirm { archiveConfirmed(episode) }
-        } else if (episode is UserEpisode) {
-            val deleteState = CloudDeleteHelper.getDeleteState(episode)
-            val deleteFunction: (UserEpisode, DeleteState) -> Unit = { ep, delState ->
-                CloudDeleteHelper.deleteEpisode(
-                    episode = ep,
-                    deleteState = delState,
-                    playbackManager = playbackManager,
-                    episodeManager = episodeManager,
-                    userEpisodeManager = userEpisodeManager,
-                    applicationScope = applicationScope,
-                )
-            }
-            return CloudDeleteHelper.getDeleteDialog(episode, deleteState, deleteFunction, resources)
-        }
-
-        return null
     }
 
     fun buildBookmarkArguments(onSuccess: (BookmarkArguments) -> Unit) {
@@ -676,16 +640,6 @@ class PlayerViewModel @Inject constructor(
         updateSleepTimer()
     }
 
-    fun starToggle() {
-        playbackManager.upNextQueue.currentEpisode?.let {
-            if (it is PodcastEpisode) {
-                viewModelScope.launch {
-                    episodeManager.toggleStarEpisode(episode = it, source)
-                }
-            }
-        }
-    }
-
     fun changeUpNextEpisodes(episodes: List<BaseEpisode>) {
         playbackManager.changeUpNext(episodes)
     }
@@ -744,25 +698,6 @@ class PlayerViewModel @Inject constructor(
         playbackManager.skipToPreviousSelectedOrLastChapter()
     }
 
-    fun openTranscript() {
-        viewModelScope.launch {
-            _transitionState.emit(TransitionState.OpenTranscript)
-        }
-    }
-
-    fun closeTranscript(withTransition: Boolean = false) {
-        viewModelScope.launch {
-            _transitionState.emit(TransitionState.CloseTranscript(withTransition))
-            analyticsTracker.track(
-                AnalyticsEvent.TRANSCRIPT_DISMISSED,
-                AnalyticsProp.transcriptDismissed(
-                    episodeId = episode?.uuid.orEmpty(),
-                    podcastId = podcast?.uuid.orEmpty(),
-                ),
-            )
-        }
-    }
-
     fun trackPlaybackEffectsEvent(
         event: AnalyticsEvent,
         properties: Map<String, Any> = emptyMap(),
@@ -784,16 +719,17 @@ class PlayerViewModel @Inject constructor(
         )
     }
 
-    sealed class TransitionState {
-        data object OpenTranscript : TransitionState()
-        data class CloseTranscript(val withTransition: Boolean) : TransitionState()
+    sealed interface NavigationState {
+        data class ShowStreamingWarningDialog(val episode: BaseEpisode) : NavigationState
+        data object ShowSkipForwardLongPressOptionsDialog : NavigationState
+    }
+
+    sealed interface SnackbarMessage {
+        data object ShowBatteryWarningIfAppropriate : SnackbarMessage
     }
 
     private object AnalyticsProp {
-        private const val EPISODE_UUID = "episode_uuid"
-        private const val PODCAST_UUID = "podcast_uuid"
         const val SETTINGS = "settings"
-        fun transcriptDismissed(episodeId: String, podcastId: String) = mapOf(episodeId to EPISODE_UUID, podcastId to PODCAST_UUID)
     }
 
     enum class PlaybackEffectsSettingsTab(@StringRes val labelResId: Int, val analyticsValue: String) {

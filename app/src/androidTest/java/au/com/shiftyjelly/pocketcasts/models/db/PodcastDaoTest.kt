@@ -44,59 +44,59 @@ class PodcastDaoTest {
     @Test
     fun testInsertPodcast() {
         val uuid = UUID.randomUUID().toString()
-        podcastDao.insert(Podcast(uuid = uuid, isSubscribed = true))
-        assertNotNull("Inserted podcast should be able to be found", podcastDao.findByUuid(uuid))
+        podcastDao.insertBlocking(Podcast(uuid = uuid, isSubscribed = true))
+        assertNotNull("Inserted podcast should be able to be found", podcastDao.findByUuidBlocking(uuid))
     }
 
     @Test
     fun testInsertPodcastRx() {
         val uuid = UUID.randomUUID().toString()
-        podcastDao.insertRx(Podcast(uuid = uuid)).blockingGet()
-        assertNotNull("Inserted podcast should be able to be found", podcastDao.findByUuid(uuid))
+        podcastDao.insertRxSingle(Podcast(uuid = uuid)).blockingGet()
+        assertNotNull("Inserted podcast should be able to be found", podcastDao.findByUuidBlocking(uuid))
     }
 
     @Test
     fun testInsertMultiple() {
         val uuid = UUID.randomUUID().toString()
         val podcast = Podcast(uuid = uuid, isSubscribed = false)
-        podcastDao.insert(podcast)
+        podcastDao.insertBlocking(podcast)
         val podcast2 = Podcast(uuid = uuid, isSubscribed = true)
-        podcastDao.insert(podcast2)
+        podcastDao.insertBlocking(podcast2)
 
-        assertEquals("Insert should replace, count should be 1", 1, podcastDao.countByUuid(uuid))
-        assertEquals("Podcast should be replaced, should be subscribed", true, podcastDao.findByUuid(uuid)?.isSubscribed)
+        assertEquals("Insert should replace, count should be 1", 1, podcastDao.countByUuidBlocking(uuid))
+        assertEquals("Podcast should be replaced, should be subscribed", true, podcastDao.findByUuidBlocking(uuid)?.isSubscribed)
     }
 
     @Test
     fun testUpdatePodcast() {
         val uuid = UUID.randomUUID().toString()
         val podcast = Podcast(uuid = uuid, isSubscribed = false)
-        podcastDao.insert(podcast)
-        assert(podcastDao.findByUuid(uuid)?.isSubscribed == false)
+        podcastDao.insertBlocking(podcast)
+        assert(podcastDao.findByUuidBlocking(uuid)?.isSubscribed == false)
         podcast.isSubscribed = true
-        podcastDao.update(podcast)
-        assertTrue("Podcast should be updated to subscribed", podcastDao.findByUuid(uuid)?.isSubscribed == true)
+        podcastDao.updateBlocking(podcast)
+        assertTrue("Podcast should be updated to subscribed", podcastDao.findByUuidBlocking(uuid)?.isSubscribed == true)
     }
 
     @Test
     fun testUpdatePodcastRx() {
         val uuid = UUID.randomUUID().toString()
         val podcast = Podcast(uuid = uuid, isSubscribed = false)
-        podcastDao.insert(podcast)
-        assert(podcastDao.findByUuid(uuid)?.isSubscribed == false)
+        podcastDao.insertBlocking(podcast)
+        assert(podcastDao.findByUuidBlocking(uuid)?.isSubscribed == false)
         podcast.isSubscribed = true
-        podcastDao.updateRx(podcast).blockingAwait()
-        assertTrue("Podcast should be updated to subscribed", podcastDao.findByUuid(uuid)?.isSubscribed == true)
+        podcastDao.updateRxCompletable(podcast).blockingAwait()
+        assertTrue("Podcast should be updated to subscribed", podcastDao.findByUuidBlocking(uuid)?.isSubscribed == true)
     }
 
     @Test
     fun testFindSubscribed() {
         val subscribed = Podcast(uuid = UUID.randomUUID().toString(), isSubscribed = true)
         val unsubscribed = Podcast(uuid = UUID.randomUUID().toString(), isSubscribed = false)
-        podcastDao.insert(subscribed)
-        podcastDao.insert(unsubscribed)
+        podcastDao.insertBlocking(subscribed)
+        podcastDao.insertBlocking(unsubscribed)
 
-        val subscribedList = podcastDao.findSubscribed()
+        val subscribedList = podcastDao.findSubscribedBlocking()
         assertEquals("Should only be 1 result", 1, subscribedList.count())
         assertEquals("Should only find the subscribed podcast", subscribed.uuid, subscribedList.first().uuid)
     }
@@ -105,10 +105,10 @@ class PodcastDaoTest {
     fun testFindSubscribedRx() {
         val subscribed = Podcast(uuid = UUID.randomUUID().toString(), isSubscribed = true)
         val unsubscribed = Podcast(uuid = UUID.randomUUID().toString(), isSubscribed = false)
-        podcastDao.insert(subscribed)
-        podcastDao.insert(unsubscribed)
+        podcastDao.insertBlocking(subscribed)
+        podcastDao.insertBlocking(unsubscribed)
 
-        val subscribedList = podcastDao.findSubscribedRx().blockingGet()
+        val subscribedList = podcastDao.findSubscribedRxSingle().blockingGet()
         assertEquals("Should only be 1 result", 1, subscribedList.count())
         assertEquals("Should only find the subscribed podcast", subscribed.uuid, subscribedList.first().uuid)
     }

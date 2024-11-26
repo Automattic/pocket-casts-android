@@ -76,7 +76,7 @@ class HistoryManager @Inject constructor(
                     if ((episode.lastPlaybackInteraction ?: 0) < interactionDate) {
                         episode.lastPlaybackInteraction = interactionDate
                         episode.lastPlaybackInteractionSyncStatus = PodcastEpisode.LAST_PLAYBACK_INTERACTION_SYNCED
-                        episodeManager.update(episode)
+                        episodeManager.updateBlocking(episode)
                     }
                 } else if (podcastUuid != null) {
                     Timber.i("Listening history episode no longer exists. Episode: $episodeUuid podcast: $podcastUuid")
@@ -85,12 +85,12 @@ class HistoryManager @Inject constructor(
                 if (episode != null) {
                     episode.lastPlaybackInteraction = 0
                     episode.lastPlaybackInteractionSyncStatus = 1
-                    episodeManager.update(episode)
+                    episodeManager.updateBlocking(episode)
                 }
             }
         }
 
-        episodeManager.insert(skeletonEpisodes)
+        episodeManager.insertBlocking(skeletonEpisodes)
 
         if (updateServerModified) {
             settings.setHistoryServerModified(response.serverModified)

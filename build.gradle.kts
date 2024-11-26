@@ -17,15 +17,6 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
-buildscript {
-    // Gradle Plugins
-    dependencies {
-        // Open source licenses plugin
-        classpath(libs.osslicenses.plugin)
-    }
-}
-
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.android.library) apply false
@@ -383,7 +374,7 @@ subprojects {
         }
 
         // Set Gradle property 'au.com.shiftyjelly.pocketcasts.leakcanary=true' to enable Leak Canary.
-        // You can do this using the local.properties file or any other avaialable Gradle mechanism.
+        // You can do this using the gradle.properties file or any other available Gradle mechanism.
         // See: https://docs.gradle.org/current/userguide/build_environment.html#sec:project_properties
         if (properties["au.com.shiftyjelly.pocketcasts.leakcanary"]?.toString().toBoolean()) {
             dependencies {

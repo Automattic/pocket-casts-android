@@ -7,7 +7,6 @@ import androidx.media3.common.MediaItem.ClippingConfiguration
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.database.StandaloneDatabaseProvider
 import androidx.media3.datasource.DefaultDataSource
-import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor
 import androidx.media3.datasource.cache.SimpleCache
@@ -29,7 +28,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.time.Duration.Companion.seconds
 import okhttp3.OkHttpClient
 import timber.log.Timber
 
@@ -52,18 +50,7 @@ class ExoPlayerDataSourceFactory @Inject constructor(
         LogBuffer.e(LogBuffer.TAG_PLAYBACK, errorMessage)
     }.getOrNull()
 
-    private val httpFactory = if (FeatureFlag.isEnabled(Feature.EXO_OKHTTP)) {
-        OkHttpDataSource.Factory(client)
-            .setUserAgent(Settings.USER_AGENT_POCKETCASTS_SERVER)
-    } else {
-        DefaultHttpDataSource.Factory()
-            .setUserAgent(Settings.USER_AGENT_POCKETCASTS_SERVER)
-            .setAllowCrossProtocolRedirects(true)
-            .setConnectTimeoutMs(sixtySeconds)
-            .setReadTimeoutMs(sixtySeconds)
-    }
-
-    private val defaultFactory = DefaultDataSource.Factory(context, httpFactory)
+    private val defaultFactory = DefaultDataSource.Factory(context, OkHttpDataSource.Factory(client))
 
     val cacheFactory get() = CacheDataSource.Factory()
         .setUpstreamDataSourceFactory(defaultFactory)
@@ -166,6 +153,5 @@ class ExoPlayerDataSourceFactory @Inject constructor(
 
     private companion object {
         const val CACHE_DIR_NAME = "pocketcasts-exoplayer-cache"
-        val sixtySeconds = 60.seconds.inWholeMilliseconds.toInt()
     }
 }

@@ -40,11 +40,11 @@ class FilterViewModel @Inject constructor(
         ) : UiState()
     }
 
-    val uiState = playlistManager.observeByUuidAsList(filterUuid)
+    val uiState = playlistManager.findByUuidAsListRxFlowable(filterUuid)
         .switchMap { filters ->
             val filter = filters.firstOrNull()
             if (filter != null) {
-                playlistManager.observeEpisodes(filter, episodeManager, playbackManager)
+                playlistManager.observeEpisodesBlocking(filter, episodeManager, playbackManager)
                     .map {
                         if (it.isEmpty()) UiState.Empty(filter) else UiState.Loaded(filter = filter, episodes = it)
                     }

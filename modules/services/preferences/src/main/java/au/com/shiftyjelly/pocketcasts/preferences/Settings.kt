@@ -60,8 +60,6 @@ interface Settings {
         const val INFO_CANCEL_URL = "https://support.pocketcasts.com/knowledge-base/how-to-cancel-a-subscription/"
         const val INFO_FAQ_URL = "https://support.pocketcasts.com/android/?device=android"
 
-        const val USER_AGENT_POCKETCASTS_SERVER = "Pocket Casts/Android/" + BuildConfig.VERSION_NAME
-
         const val CHROME_CAST_APP_ID = "2FA4D21B"
 
         const val WHATS_NEW_VERSION_CODE = 9257
@@ -426,8 +424,7 @@ interface Settings {
     val cachedSubscriptionStatus: UserSetting<SubscriptionStatus?>
     val userTier: UserTier
 
-    fun setUpgradeClosedProfile(value: Boolean)
-    fun getUpgradeClosedProfile(): Boolean
+    val upgradeProfileClosed: UserSetting<Boolean>
     fun getUpgradeClosedAddFile(): Boolean
     fun setUpgradeClosedAddFile(value: Boolean)
     fun getUpgradeClosedCloudSettings(): Boolean

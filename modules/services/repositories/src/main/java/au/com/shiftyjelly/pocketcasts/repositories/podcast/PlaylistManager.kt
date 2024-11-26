@@ -9,51 +9,47 @@ import io.reactivex.Maybe
 import kotlinx.coroutines.flow.Flow
 
 interface PlaylistManager {
-    fun findAll(): List<Playlist>
-    suspend fun findAllSuspend(): List<Playlist>
+    fun findAllBlocking(): List<Playlist>
+    suspend fun findAll(): List<Playlist>
     fun findAllFlow(): Flow<List<Playlist>>
-    fun observeAll(): Flowable<List<Playlist>>
+    fun findAllRxFlowable(): Flowable<List<Playlist>>
 
-    fun findById(id: Long): Playlist?
+    fun findByIdBlocking(id: Long): Playlist?
     suspend fun findByUuid(playlistUuid: String): Playlist?
-    fun findByUuidSync(playlistUuid: String): Playlist?
-    fun findByUuidRx(playlistUuid: String): Maybe<Playlist>
-    fun observeByUuid(playlistUuid: String): Flowable<Playlist>
-    fun observeByUuidAsList(playlistUuid: String): Flowable<List<Playlist>>
+    fun findByUuidBlocking(playlistUuid: String): Playlist?
+    fun findByUuidRxMaybe(playlistUuid: String): Maybe<Playlist>
+    fun findByUuidRxFlowable(playlistUuid: String): Flowable<Playlist>
+    fun findByUuidAsListRxFlowable(playlistUuid: String): Flowable<List<Playlist>>
 
-    fun findFirstByTitle(title: String): Playlist?
-    fun findPlaylistsToSync(): List<Playlist>
-    fun findEpisodes(playlist: Playlist, episodeManager: EpisodeManager, playbackManager: PlaybackManager): List<PodcastEpisode>
-    fun observeEpisodes(playlist: Playlist, episodeManager: EpisodeManager, playbackManager: PlaybackManager): Flowable<List<PodcastEpisode>>
+    fun findFirstByTitleBlocking(title: String): Playlist?
+    fun findPlaylistsToSyncBlocking(): List<Playlist>
+    fun findEpisodesBlocking(playlist: Playlist, episodeManager: EpisodeManager, playbackManager: PlaybackManager): List<PodcastEpisode>
+    fun observeEpisodesBlocking(playlist: Playlist, episodeManager: EpisodeManager, playbackManager: PlaybackManager): Flowable<List<PodcastEpisode>>
 
-    fun count(): Int
+    fun createPlaylistBlocking(name: String, iconId: Int, draft: Boolean): Playlist
 
-    fun createPlaylist(name: String, iconId: Int, draft: Boolean): Playlist
-
-    fun create(playlist: Playlist): Long
-    fun update(playlist: Playlist, userPlaylistUpdate: UserPlaylistUpdate?, isCreatingFilter: Boolean = false)
+    fun createBlocking(playlist: Playlist): Long
+    fun updateBlocking(playlist: Playlist, userPlaylistUpdate: UserPlaylistUpdate?, isCreatingFilter: Boolean = false)
 
     fun updateAutoDownloadStatus(playlist: Playlist, autoDownloadEnabled: Boolean, unmeteredOnly: Boolean, powerOnly: Boolean)
-    fun rxUpdateAutoDownloadStatus(playlist: Playlist, autoDownloadEnabled: Boolean, unmeteredOnly: Boolean, powerOnly: Boolean): Completable
+    fun updateAutoDownloadStatusRxCompletable(playlist: Playlist, autoDownloadEnabled: Boolean, unmeteredOnly: Boolean, powerOnly: Boolean): Completable
 
-    fun delete(playlist: Playlist)
+    fun deleteBlocking(playlist: Playlist)
     suspend fun resetDb()
-    fun deleteSynced()
-    fun deleteSynced(playlist: Playlist)
+    fun deleteSyncedBlocking()
+    fun deleteSyncedBlocking(playlist: Playlist)
 
-    fun countEpisodes(id: Long?, episodeManager: EpisodeManager, playbackManager: PlaybackManager): Int
-    fun countEpisodesRx(playlist: Playlist, episodeManager: EpisodeManager, playbackManager: PlaybackManager): Flowable<Int>
+    fun countEpisodesBlocking(id: Long?, episodeManager: EpisodeManager, playbackManager: PlaybackManager): Int
+    fun countEpisodesRxFlowable(playlist: Playlist, episodeManager: EpisodeManager, playbackManager: PlaybackManager): Flowable<Int>
 
-    fun savePlaylistsOrder(playlists: List<Playlist>)
+    fun checkForEpisodesToDownloadBlocking(episodeManager: EpisodeManager, playbackManager: PlaybackManager)
 
-    fun checkForEpisodesToDownload(episodeManager: EpisodeManager, playbackManager: PlaybackManager)
-
-    fun removePodcastFromPlaylists(podcastUuid: String)
+    fun removePodcastFromPlaylistsBlocking(podcastUuid: String)
 
     fun getSystemDownloadsFilter(): Playlist
 
-    fun markAllSynced()
+    fun markAllSyncedBlocking()
 
-    fun updateAll(playlists: List<Playlist>)
-    fun observeEpisodesPreview(playlist: Playlist, episodeManager: EpisodeManager, playbackManager: PlaybackManager): Flowable<List<PodcastEpisode>>
+    fun updateAllBlocking(playlists: List<Playlist>)
+    fun observeEpisodesPreviewBlocking(playlist: Playlist, episodeManager: EpisodeManager, playbackManager: PlaybackManager): Flowable<List<PodcastEpisode>>
 }

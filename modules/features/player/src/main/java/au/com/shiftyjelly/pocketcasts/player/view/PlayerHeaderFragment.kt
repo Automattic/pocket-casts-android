@@ -3,8 +3,6 @@ package au.com.shiftyjelly.pocketcasts.player.view
 import android.animation.LayoutTransition
 import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.content.res.ColorStateList
-import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.view.GestureDetector
@@ -14,8 +12,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.activity.result.ActivityResultLauncher
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.view.isVisible
-import androidx.core.view.plusAssign
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -25,25 +24,28 @@ import androidx.lifecycle.repeatOnLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.player.R
-import au.com.shiftyjelly.pocketcasts.player.binding.playIfTrue
 import au.com.shiftyjelly.pocketcasts.player.binding.setSeekBarState
 import au.com.shiftyjelly.pocketcasts.player.binding.showIfPresent
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterPlayerHeaderBinding
-import au.com.shiftyjelly.pocketcasts.player.view.ShelfFragment.Companion.AnalyticsProp
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContract
+import au.com.shiftyjelly.pocketcasts.player.view.playercontrols.PlayerControls
+import au.com.shiftyjelly.pocketcasts.player.view.shelf.PlayerShelf
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptPageWrapper
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptSearchViewModel
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel
 import au.com.shiftyjelly.pocketcasts.player.view.video.VideoActivity
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
-import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel.TransitionState
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.NavigationState
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.SnackbarMessage
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.TransitionState
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel.Companion.AnalyticsProp
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.reimagine.ShareDialogFragment
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
@@ -56,19 +58,15 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
-import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
-import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import au.com.shiftyjelly.pocketcasts.views.component.LockableNestedScrollView
-import au.com.shiftyjelly.pocketcasts.views.extensions.updateColor
+import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
+import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog.ButtonType.Danger
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
+import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
-import com.airbnb.lottie.LottieProperty
-import com.airbnb.lottie.model.KeyPath
-import com.google.android.gms.cast.framework.CastButtonFactory
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -76,7 +74,6 @@ import javax.inject.Inject
 import kotlin.math.abs
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -102,6 +99,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
     private lateinit var imageRequestFactory: PocketCastsImageRequestFactory
     private val viewModel: PlayerViewModel by activityViewModels()
+    private val shelfSharedViewModel: ShelfSharedViewModel by activityViewModels()
     private val transcriptViewModel by viewModels<TranscriptViewModel>({ requireParentFragment() })
     private val transcriptSearchViewModel by viewModels<TranscriptSearchViewModel>({ requireParentFragment() })
     private var binding: AdapterPlayerHeaderBinding? = null
@@ -128,13 +126,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
         imageRequestFactory = PocketCastsImageRequestFactory(view.context, cornerRadius = 8).themed().copy(isDarkTheme = true)
 
-        binding.playerControls.initPlayerControls(
-            ::onSkipBack,
-            ::onSkipForward,
-            ::onSkipForwardLongPress,
-            ::onPlayClicked,
-        )
-
         binding.seekBar.changeListener = object : PlayerSeekBar.OnUserSeekListener {
             override fun onSeekPositionChangeStop(progress: Duration, seekComplete: () -> Unit) {
                 val progressMs = progress.inWholeMilliseconds.toInt()
@@ -148,98 +139,13 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             }
         }
 
-        val shelfViews = mapOf(
-            ShelfItem.Effects to binding.effects,
-            ShelfItem.Sleep to binding.sleep,
-            ShelfItem.Star to binding.star,
-            ShelfItem.Share to binding.share,
-            ShelfItem.Podcast to binding.podcast,
-            ShelfItem.Cast to binding.cast,
-            ShelfItem.Played to binding.played,
-            ShelfItem.Archive to binding.archive,
-            ShelfItem.Bookmark to binding.bookmark,
-            ShelfItem.Transcript to binding.transcript,
-            ShelfItem.Download to binding.download,
-            ShelfItem.Report to binding.report,
-        )
-        viewModel.trimmedShelfLive.observe(viewLifecycleOwner) {
-            binding.shelf.removeAllViews()
-            it.first.subList(0, 4)
-                .mapNotNull(shelfViews::get)
-                .forEach { itemView -> binding.shelf += itemView }
-            binding.shelf.addView(binding.playerActions)
-        }
+        setupPlayerControlsComposeView()
+        setupShelfComposeView()
 
-        if (FeatureFlag.isEnabled(Feature.TRANSCRIPTS)) {
-            viewLifecycleOwner.lifecycleScope.launch {
-                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    transcriptViewModel.uiState.collect { uiState ->
-                        val transcriptAvailable = uiState !is TranscriptViewModel.UiState.Empty
-                        binding.transcript.alpha = if (transcriptAvailable) 1f else 0.4f
-                        binding.transcript.setOnClickListener {
-                            if (!transcriptAvailable) {
-                                val message = getString(LR.string.transcript_error_not_available)
-                                Snackbar.make(view, message, Snackbar.LENGTH_SHORT)
-                                    .setBackgroundTint(ThemeColor.primaryUi01(Theme.ThemeType.LIGHT))
-                                    .setTextColor(ThemeColor.primaryText01(Theme.ThemeType.LIGHT))
-                                    .show()
-                            } else {
-                                trackShelfAction(ShelfItem.Transcript.analyticsValue)
-                                viewModel.openTranscript()
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        binding.effects.setOnClickListener { onEffectsClick() }
         binding.previousChapter.setOnClickListener { onPreviousChapter() }
         binding.nextChapter.setOnClickListener { onNextChapter() }
-        binding.sleep.setOnClickListener { onSleepClick() }
-        binding.star.setOnClickListener { onStarClick() }
-        binding.share.setOnClickListener { onShareClick() }
-        binding.playerActions.setOnClickListener { onMoreClicked() }
-        binding.podcast.setOnClickListener { showPodcast() }
-        binding.played.setOnClickListener {
-            trackShelfAction(ShelfItem.Played.analyticsValue)
-            viewModel.markCurrentlyPlayingAsPlayed(requireContext())?.show(childFragmentManager, "mark_as_played")
-        }
-        binding.archive.setOnClickListener {
-            trackShelfAction(ShelfItem.Archive.analyticsValue)
-            viewModel.archiveCurrentlyPlaying(resources)?.show(childFragmentManager, "archive")
-        }
-        binding.bookmark.setOnClickListener {
-            trackShelfAction(ShelfItem.Bookmark.analyticsValue)
-            onAddBookmarkClick(OnboardingUpgradeSource.BOOKMARKS_SHELF_ACTION)
-        }
-        binding.report?.setOnClickListener {
-            trackShelfAction(ShelfItem.Report.analyticsValue)
-            openUrl(settings.getReportViolationUrl())
-        }
-        binding.download?.setOnClickListener {
-            trackShelfAction(ShelfItem.Download.analyticsValue)
-            viewModel.handleDownloadClickFromPlaybackActions(
-                onDownloadStart = {
-                    showSnackBar(text = getString(LR.string.episode_queued_for_download))
-                },
-                onDeleteStart = {
-                    showSnackBar(text = getString(LR.string.episode_was_removed))
-                },
-            )
-        }
         binding.videoView.playbackManager = playbackManager
         binding.videoView.setOnClickListener { onFullScreenVideoClick() }
-
-        with(binding.castButton) {
-            CastButtonFactory.setUpMediaRouteButton(binding.root.context, this)
-            visibility = View.VISIBLE
-            updateColor(ThemeColor.playerContrast03(theme.activeTheme))
-            setOnClickListener {
-                trackShelfAction(ShelfItem.Cast.analyticsValue)
-                chromeCastAnalytics.trackChromeCastViewShown()
-            }
-        }
 
         if (FeatureFlag.isEnabled(Feature.TRANSCRIPTS)) {
             setupTranscriptPage()
@@ -263,40 +169,11 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 isBuffering = headerViewModel.isBuffering,
                 theme = headerViewModel.theme,
             )
-            binding.playerControls.updatePlayerControls(headerViewModel, playerContrast1)
 
             binding.episodeTitle.setTextColor(playerContrast1)
 
             headerViewModel.episode?.let { episode ->
                 loadArtwork(episode, headerViewModel.useEpisodeArtwork, binding.artwork)
-
-                val isPodcast = episode is PodcastEpisode
-
-                val downloadIcon = when {
-                    isPodcast && (episode.isDownloading || episode.isQueued) -> IR.drawable.ic_download
-                    isPodcast && episode.isDownloaded -> IR.drawable.ic_downloaded_24dp
-                    else -> IR.drawable.ic_download
-                }
-
-                binding.download?.apply {
-                    setImageResource(downloadIcon)
-
-                    contentDescription = when {
-                        isPodcast && (episode.isDownloading || episode.isQueued) -> context.getString(LR.string.episode_downloading)
-                        isPodcast && episode.isDownloaded -> context.getString(LR.string.remove_downloaded_file)
-                        else -> context.getString(LR.string.download)
-                    }
-
-                    layoutParams = layoutParams?.apply {
-                        width = 0.dpToPx(context)
-                        height = 48.dpToPx(context)
-                    }
-
-                    scaleType = ImageView.ScaleType.CENTER
-
-                    val padding = 12.dpToPx(context)
-                    setPadding(padding, padding, padding, padding)
-                }
             }
 
             binding.podcastTitle.setOnClickListener {
@@ -318,19 +195,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             binding.videoView.show = headerViewModel.isVideo
             binding.videoView.updatePlayerPrepared(headerViewModel.isPrepared)
 
-            val highlightTint = playerHighlightColor(headerViewModel)
-            val unhighlightTint = ThemeColor.playerContrast03(headerViewModel.theme)
-
-            val effectTint = if (headerViewModel.isEffectsOn) highlightTint else unhighlightTint
-            val effectResource = if (headerViewModel.isEffectsOn) R.drawable.ic_effects_on_32 else R.drawable.ic_effects_off_32
-            binding.effects.setImageResource(effectResource)
-            binding.effects.imageTintList = ColorStateList.valueOf(effectTint)
-
-            val starTint = if (headerViewModel.isStarred) highlightTint else unhighlightTint
-            val starResource = if (headerViewModel.isStarred) R.drawable.ic_star_filled_32 else R.drawable.ic_star_32
-            binding.star.setImageResource(starResource)
-            binding.star.imageTintList = ColorStateList.valueOf(starTint)
-
             if (headerViewModel.isChaptersPresent) {
                 headerViewModel.chapter?.let {
                     binding.episodeTitle.setOnClickListener {
@@ -339,15 +203,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 }
             } else {
                 binding.episodeTitle.setOnClickListener(null)
-            }
-
-            binding.share.isVisible = !headerViewModel.isUserEpisode
-            binding.star.isVisible = !headerViewModel.isUserEpisode
-
-            val sleepTint = if (headerViewModel.isSleepRunning) highlightTint else unhighlightTint
-            binding.sleep.alpha = if (headerViewModel.isSleepRunning) 1F else Color.alpha(sleepTint) / 255F * 2F
-            binding.sleep.post { // this only works the second time it's called unless it's in a post
-                binding.sleep.addValueCallback(KeyPath("**"), LottieProperty.COLOR, { sleepTint })
             }
 
             if (headerViewModel.chapter != null) {
@@ -366,7 +221,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 binding.chapterUrl.setOnClickListener(null)
             }
 
-            binding.archive.setImageResource(if (headerViewModel.isUserEpisode) R.drawable.ic_delete_32 else R.drawable.ic_archive_32)
             binding.chapterProgressCircle.progress = headerViewModel.chapterProgress
             binding.chapterProgressCircle.isVisible = headerViewModel.isChaptersPresent
             binding.chapterTimeRemaining.text = headerViewModel.chapterTimeRemaining
@@ -399,7 +253,165 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 isBuffering = headerViewModel.isBuffering,
                 theme = headerViewModel.theme,
             )
-            binding.sleep.playIfTrue(headerViewModel.isSleepRunning)
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.snackbarMessages.collect { message ->
+                    if (message == PlayerViewModel.SnackbarMessage.ShowBatteryWarningIfAppropriate) {
+                        warningsHelper.showBatteryWarningSnackbarIfAppropriate(snackbarParentView = view)
+                    }
+                }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.navigationState.collect { navigationState ->
+                    when (navigationState) {
+                        is PlayerViewModel.NavigationState.ShowStreamingWarningDialog -> {
+                            warningsHelper.streamingWarningDialog(episode = navigationState.episode, snackbarParentView = view, sourceView = sourceView)
+                                .show(parentFragmentManager, "streaming dialog")
+                        }
+
+                        PlayerViewModel.NavigationState.ShowSkipForwardLongPressOptionsDialog -> {
+                            LongPressOptionsFragment().show(parentFragmentManager, "longpressoptions")
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun setupPlayerControlsComposeView() {
+        binding?.playerControlsComposeView?.apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                AppTheme(theme.activeTheme) {
+                    PlayerControls(
+                        playerViewModel = viewModel,
+                    )
+                }
+            }
+        }
+    }
+
+    private fun setupShelfComposeView() {
+        binding?.shelfComposeView?.apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                AppTheme(theme.activeTheme) {
+                    PlayerShelf(
+                        theme = theme,
+                        shelfSharedViewModel = shelfSharedViewModel,
+                        transcriptViewModel = transcriptViewModel,
+                        playerViewModel = viewModel,
+                    )
+                    LaunchedEffect(Unit) {
+                        observeShelfItemNavigationState()
+                    }
+                    LaunchedEffect(Unit) {
+                        observeShelfItemSnackbarMessages()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun observeShelfItemSnackbarMessages() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                shelfSharedViewModel.snackbarMessages.collect { message ->
+                    val text = when (message) {
+                        SnackbarMessage.EpisodeDownloadStarted -> LR.string.episode_queued_for_download
+                        SnackbarMessage.EpisodeRemoved -> LR.string.episode_was_removed
+                        SnackbarMessage.TranscriptNotAvailable -> LR.string.transcript_error_not_available
+                    }
+                    showSnackBar(text = getString(text))
+                }
+            }
+        }
+    }
+
+    private fun observeShelfItemNavigationState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                shelfSharedViewModel.navigationState.collect { navigationState ->
+                    when (navigationState) {
+                        NavigationState.ShowEffectsOption -> {
+                            EffectsFragment().show(parentFragmentManager, "effects")
+                        }
+
+                        NavigationState.ShowSleepTimerOptions -> {
+                            SleepFragment().show(parentFragmentManager, "sleep_sheet")
+                        }
+
+                        is NavigationState.ShowShareDialog -> {
+                            ShareDialogFragment
+                                .newThemedInstance(navigationState.podcast, navigationState.episode, theme, SourceView.PLAYER)
+                                .show(parentFragmentManager, "share_dialog")
+                        }
+
+                        is NavigationState.ShowPodcast -> {
+                            (activity as FragmentHostListener).closePlayer()
+                            (activity as? FragmentHostListener)?.openPodcastPage(navigationState.podcast.uuid, SourceView.PLAYER.analyticsValue)
+                        }
+
+                        is NavigationState.ShowCloudFiles -> {
+                            (activity as FragmentHostListener).closePlayer()
+                            (activity as? FragmentHostListener)?.openCloudFiles()
+                        }
+
+                        is NavigationState.ShowMarkAsPlayedConfirmation -> {
+                            context?.let {
+                                ConfirmationDialog()
+                                    .setForceDarkTheme(true)
+                                    .setSummary(it.getString(LR.string.player_mark_as_played))
+                                    .setIconId(IR.drawable.ic_markasplayed)
+                                    .setButtonType(Danger(it.getString(LR.string.player_mark_as_played_button)))
+                                    .setOnConfirm {
+                                        navigationState.onMarkAsPlayedConfirmed(navigationState.episode)
+                                    }
+                                    .show(childFragmentManager, "mark_as_played")
+                            }
+                        }
+
+                        is NavigationState.ShowPodcastEpisodeArchiveConfirmation -> {
+                            ConfirmationDialog()
+                                .setForceDarkTheme(true)
+                                .setSummary(resources.getString(LR.string.player_archive_summary))
+                                .setIconId(IR.drawable.ic_archive)
+                                .setButtonType(Danger(resources.getString(LR.string.player_archive_title)))
+                                .setOnConfirm { navigationState.onArchiveConfirmed(navigationState.episode) }
+                                .show(childFragmentManager, "archive")
+                        }
+
+                        is NavigationState.ShowUserEpisodeDeleteConfirmation -> {
+                            CloudDeleteHelper.getDeleteDialog(navigationState.episode, navigationState.deleteState, navigationState.deleteFunction, resources)
+                                .show(childFragmentManager, "archive")
+                        }
+
+                        NavigationState.ShowMoreActions -> {
+                            // stop double taps
+                            if (childFragmentManager.fragments.firstOrNull() is ShelfBottomSheet) return@collect
+                            viewModel.episode?.let {
+                                ShelfBottomSheet.newInstance(
+                                    episodeId = it.uuid,
+                                ).show(childFragmentManager, "shelf_bottom_sheet")
+                            }
+                        }
+
+                        NavigationState.ShowAddBookmark -> {
+                            viewModel.buildBookmarkArguments { arguments ->
+                                activityLauncher.launch(arguments.getIntent(requireContext()))
+                            }
+                        }
+
+                        is NavigationState.StartUpsellFlow -> startUpsellFlow(navigationState.source)
+                        is NavigationState.ShowReportViolation -> openUrl(navigationState.reportUrl)
+                    }
+                }
+            }
         }
     }
 
@@ -407,6 +419,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         binding?.transcriptPage?.setContent {
             TranscriptPageWrapper(
                 playerViewModel = viewModel,
+                shelfSharedViewModel = shelfSharedViewModel,
                 transcriptViewModel = transcriptViewModel,
                 searchViewModel = transcriptSearchViewModel,
                 theme = theme,
@@ -417,7 +430,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     private fun observeTranscriptPageTransition() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.transitionState.collect { transitionState ->
+                shelfSharedViewModel.transitionState.collect { transitionState ->
                     when (transitionState) {
                         is TransitionState.OpenTranscript -> binding?.openTranscript()
                         is TransitionState.CloseTranscript -> binding?.closeTranscript(transitionState.withTransition)
@@ -431,17 +444,20 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         updatePlayerViewsAccessibility(enable = false)
         playerGroup.layoutTransition = LayoutTransition()
         transcriptPage.isVisible = true
-        shelf.isVisible = false
+        shelfComposeView.isVisible = false
         val transcriptShowSeekbarAndPlayerControls = resources.getBoolean(R.bool.transcript_show_seekbar_and_player_controls)
         seekBar.isVisible = transcriptShowSeekbarAndPlayerControls
-        playerControls.root.isVisible = transcriptShowSeekbarAndPlayerControls
-        playerControls.scale(0.6f)
+        with(playerControlsComposeView) {
+            isVisible = transcriptShowSeekbarAndPlayerControls
+            scaleX = 0.6f
+            scaleY = 0.6f
+        }
         if (transcriptShowSeekbarAndPlayerControls) {
             (seekBar.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin = resources.getDimensionPixelSize(R.dimen.seekbar_margin_bottom_transcript)
         }
         val containerFragment = parentFragment as? PlayerContainerFragment
         containerFragment?.updateTabsVisibility(false)
-        (root as? LockableNestedScrollView)?.setScrollingEnabled(false)
+        root.setScrollingEnabled(false)
     }
 
     private fun AdapterPlayerHeaderBinding.closeTranscript(
@@ -449,18 +465,21 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     ) {
         updatePlayerViewsAccessibility(enable = true)
         playerGroup.layoutTransition = if (withTransition) LayoutTransition() else null
-        shelf.isVisible = true
+        shelfComposeView.isVisible = true
         transcriptPage.isVisible = false
         seekBar.isVisible = true
-        playerControls.root.isVisible = true
-        playerControls.scale(1f)
+        with(playerControlsComposeView) {
+            isVisible = true
+            scaleX = 1f
+            scaleY = 1f
+        }
         val transcriptShowSeekbarAndPlayerControls = resources.getBoolean(R.bool.transcript_show_seekbar_and_player_controls)
         if (transcriptShowSeekbarAndPlayerControls) {
             (seekBar.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin = resources.getDimensionPixelSize(R.dimen.seekbar_margin_bottom)
         }
         val containerFragment = parentFragment as? PlayerContainerFragment
         containerFragment?.updateTabsVisibility(true)
-        (root as? LockableNestedScrollView)?.setScrollingEnabled(true)
+        root.setScrollingEnabled(true)
         playerGroup.layoutTransition = null // Reset to null to avoid animation when changing children visibility anytime later
     }
 
@@ -509,14 +528,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         }
     }
 
-    private fun playerHighlightColor(viewModel: PlayerViewModel.PlayerHeader): Int {
-        if (viewModel.isUserEpisode) {
-            return theme.getUserFilePlayerHighlightColor()
-        }
-
-        return ThemeColor.playerHighlight01(viewModel.theme, viewModel.iconTintColor)
-    }
-
     private var lastLoadedBaseEpisodeId: String? = null
     private var lastUseEpisodeArtwork: Boolean? = null
     private var lastLoadedChapterPath: String? = null
@@ -553,68 +564,11 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         openBottomSheet(fragment)
     }
 
-    override fun onSkipBack() {
-        viewModel.skipBackward()
-    }
-
-    override fun onSkipForward() {
-        viewModel.skipForward()
-    }
-
-    override fun onSkipForwardLongPress() {
-        LongPressOptionsFragment().show(parentFragmentManager, "longpressoptions")
-    }
-
-    override fun onEffectsClick() {
-        trackShelfAction(ShelfItem.Effects.analyticsValue)
-        EffectsFragment().show(parentFragmentManager, "effects_sheet")
-    }
-
-    override fun onSleepClick() {
-        trackShelfAction(ShelfItem.Sleep.analyticsValue)
-        SleepFragment().show(parentFragmentManager, "sleep_sheet")
-    }
-
-    override fun onStarClick() {
-        trackShelfAction(ShelfItem.Star.analyticsValue)
-        viewModel.starToggle()
-    }
-
-    fun onAddBookmarkClick(source: OnboardingUpgradeSource) {
-        if (bookmarkFeature.isAvailable(settings.userTier)) {
-            viewModel.buildBookmarkArguments { arguments ->
-                activityLauncher.launch(arguments.getIntent(requireContext()))
-            }
-        } else {
-            startUpsellFlow(source)
-        }
-    }
-
     private fun startUpsellFlow(source: OnboardingUpgradeSource) {
         val onboardingFlow = OnboardingFlow.Upsell(
             source = source,
         )
         OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
-    }
-
-    override fun onShareClick() {
-        trackShelfAction(ShelfItem.Share.analyticsValue)
-        val podcast = viewModel.podcast ?: return
-        val episode = viewModel.episode as? PodcastEpisode ?: return
-        ShareDialogFragment
-            .newThemedInstance(podcast, episode, theme, SourceView.PLAYER)
-            .show(parentFragmentManager, "share_dialog")
-    }
-
-    private fun showPodcast() {
-        trackShelfAction(ShelfItem.Podcast.analyticsValue)
-        val podcast = viewModel.podcast
-        (activity as FragmentHostListener).closePlayer()
-        if (podcast != null) {
-            (activity as? FragmentHostListener)?.openPodcastPage(podcast.uuid, sourceView.analyticsValue)
-        } else {
-            (activity as? FragmentHostListener)?.openCloudFiles()
-        }
     }
 
     override fun onPreviousChapter() {
@@ -625,45 +579,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     override fun onNextChapter() {
         analyticsTracker.track(AnalyticsEvent.PLAYER_NEXT_CHAPTER_TAPPED)
         viewModel.nextChapter()
-    }
-
-    fun onMoreClicked(sourceView: SourceView? = null) {
-        // stop double taps
-        if (childFragmentManager.fragments.firstOrNull() is ShelfBottomSheet) {
-            return
-        }
-        analyticsTracker.track(AnalyticsEvent.PLAYER_SHELF_OVERFLOW_MENU_SHOWN)
-        ShelfBottomSheet.newInstance(
-            sourceView = sourceView,
-            episodeId = viewModel.episode?.uuid,
-        ).show(childFragmentManager, "shelf_bottom_sheet")
-    }
-
-    override fun onPlayClicked() {
-        if (playbackManager.isPlaying()) {
-            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Pause clicked in player")
-            playbackManager.pause(sourceView = sourceView)
-        } else {
-            if (playbackManager.shouldWarnAboutPlayback()) {
-                launch {
-                    // show the stream warning if the episode isn't downloaded
-                    playbackManager.getCurrentEpisode()?.let { episode ->
-                        launch(Dispatchers.Main) {
-                            if (episode.isDownloaded) {
-                                viewModel.play()
-                                warningsHelper.showBatteryWarningSnackbarIfAppropriate(snackbarParentView = view)
-                            } else {
-                                warningsHelper.streamingWarningDialog(episode = episode, snackbarParentView = view, sourceView = sourceView)
-                                    .show(parentFragmentManager, "streaming dialog")
-                            }
-                        }
-                    }
-                }
-            } else {
-                viewModel.play()
-                warningsHelper.showBatteryWarningSnackbarIfAppropriate(snackbarParentView = view)
-            }
-        }
     }
 
     override fun onClosePlayer() {
@@ -690,13 +605,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
     override fun onHeaderChapterClick(chapter: Chapter) {
         (parentFragment as? PlayerContainerFragment)?.openChaptersAt(chapter)
-    }
-
-    private fun trackShelfAction(analyticsAction: String) {
-        analyticsTracker.track(
-            AnalyticsEvent.PLAYER_SHELF_ACTION_TAPPED,
-            mapOf(AnalyticsProp.Key.FROM to AnalyticsProp.Value.SHELF, AnalyticsProp.Key.ACTION to analyticsAction),
-        )
     }
 
     private fun showViewBookmarksSnackbar(result: BookmarkActivityContract.BookmarkResult?) {

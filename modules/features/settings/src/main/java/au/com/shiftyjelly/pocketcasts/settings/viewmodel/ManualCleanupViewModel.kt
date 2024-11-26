@@ -71,7 +71,7 @@ class ManualCleanupViewModel
 
     init {
         viewModelScope.launch {
-            episodeManager.observeDownloadedEpisodes()
+            episodeManager.findDownloadedEpisodesRxFlowable()
                 .combineLatest(switchState.toFlowable(BackpressureStrategy.LATEST))
                 .collect { result ->
                     val (downloadedEpisodes, isStarredSwitchChecked) = result

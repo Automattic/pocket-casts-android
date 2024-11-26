@@ -92,7 +92,7 @@ class StorageSettingsViewModel
         this.permissionGranted = permissionGranted
         this.sdkVersion = sdkVersion
         viewModelScope.launch {
-            episodeManager.observeDownloadedEpisodes()
+            episodeManager.findDownloadedEpisodesRxFlowable()
                 .collect { downloadedEpisodes ->
                     val downloadSize = downloadedEpisodes.sumOf { it.sizeInBytes }
                     mutableState.value = mutableState.value.copy(
@@ -470,8 +470,4 @@ class StorageSettingsViewModel
         val message: String? = null,
         val buttons: List<DialogButtonState>,
     )
-
-    private companion object {
-        const val FIX_EPISODES_LIMIT = 10_000
-    }
 }

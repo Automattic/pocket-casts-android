@@ -67,13 +67,13 @@ class FilterEpisodeListViewModel @Inject constructor(
             settings.streamingMode.flow.asObservable(coroutineContext),
         )
             .toFlowable(BackpressureStrategy.LATEST)
-            .switchMap { playlistManager.observeByUuidAsList(playlistUUID) }
+            .switchMap { playlistManager.findByUuidAsListRxFlowable(playlistUUID) }
             .switchMap { playlists ->
                 Timber.d("Loading playlist $playlist")
                 val playlist = playlists.firstOrNull() // We observe as a list to get notified on delete
                 if (playlist != null) {
                     this.playlist.postValue(playlist)
-                    playlistManager.observeEpisodes(playlist, episodeManager, playbackManager)
+                    playlistManager.observeEpisodesBlocking(playlist, episodeManager, playbackManager)
                 } else {
                     this.playlistDeleted.postValue(true)
                     Flowable.just(emptyList())
@@ -92,7 +92,7 @@ class FilterEpisodeListViewModel @Inject constructor(
     fun deletePlaylist() {
         launch {
             playlistManager.findByUuid(playlistUUID)?.let { playlist ->
-                playlistManager.delete(playlist)
+                playlistManager.deleteBlocking(playlist)
                 analyticsTracker.track(AnalyticsEvent.FILTER_DELETED)
             }
         }
@@ -119,7 +119,7 @@ class FilterEpisodeListViewModel @Inject constructor(
                     listOf(PlaylistProperty.Sort(sortOrder)),
                     PlaylistUpdateSource.FILTER_EPISODE_LIST,
                 )
-                playlistManager.update(playlist, userPlaylistUpdate)
+                playlistManager.updateBlocking(playlist, userPlaylistUpdate)
             }
         }
     }
@@ -133,7 +133,7 @@ class FilterEpisodeListViewModel @Inject constructor(
                     listOf(PlaylistProperty.Starred),
                     PlaylistUpdateSource.FILTER_EPISODE_LIST,
                 )
-                playlistManager.update(playlist, userPlaylistUpdate)
+                playlistManager.updateBlocking(playlist, userPlaylistUpdate)
             }
         }
     }

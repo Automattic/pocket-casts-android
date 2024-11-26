@@ -80,7 +80,7 @@ class MainActivityViewModel
         }
 
         viewModelScope.launch {
-            episodeManager.observeDownloadedEpisodes()
+            episodeManager.findDownloadedEpisodesRxFlowable()
                 .collect { result ->
                     _downloadedEpisodeState.update { state -> state.copy(downloadedEpisodes = result.sumOf { it.sizeInBytes }) }
                 }

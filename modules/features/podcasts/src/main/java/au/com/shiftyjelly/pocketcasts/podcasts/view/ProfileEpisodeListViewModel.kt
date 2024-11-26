@@ -49,9 +49,9 @@ class ProfileEpisodeListViewModel @Inject constructor(
     fun setup(mode: Mode) {
         this.mode = mode
         val episodeListFlowable = when (mode) {
-            is Mode.Downloaded -> episodeManager.observeDownloadEpisodes()
-            is Mode.Starred -> episodeManager.observeStarredEpisodes()
-            is Mode.History -> episodeManager.observePlaybackHistoryEpisodes()
+            is Mode.Downloaded -> episodeManager.findDownloadEpisodesRxFlowable()
+            is Mode.Starred -> episodeManager.findStarredEpisodesRxFlowable()
+            is Mode.History -> episodeManager.findPlaybackHistoryEpisodesRxFlowable()
         }
         viewModelScope.launch {
             val searchResultsFlow = _searchQueryFlow
