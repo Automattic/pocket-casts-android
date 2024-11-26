@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.player.view.nowplaying
 
+import android.content.res.Resources
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -31,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -48,6 +50,8 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralMinutes
+import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralSeconds
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.to.ChapterSummaryData
 import au.com.shiftyjelly.pocketcasts.player.R
@@ -56,6 +60,8 @@ import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.TransitionState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
+import kotlin.time.Duration
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -190,6 +196,10 @@ private fun Content(
                 }
 
                 if (state.isChaptersPresent) {
+                    val timeRemainingContentDescription = stringResource(
+                        LR.string.chapter_time_remaining_content_description,
+                        formatTimeRemainingContentDescription(state.chapterTimeRemaining, LocalContext.current.resources),
+                    )
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
@@ -205,6 +215,7 @@ private fun Content(
                             text = state.chapterTimeRemaining,
                             color = Color.White,
                             modifier = Modifier
+                                .semantics { this.contentDescription = timeRemainingContentDescription }
                                 .alpha(0.4f),
                         )
                     }
@@ -212,6 +223,22 @@ private fun Content(
             }
         }
     }
+}
+
+@Composable
+private fun formatTimeRemainingContentDescription(
+    chapterTimeRemaining: String,
+    resources: Resources,
+) = try {
+    val duration = Duration.parse(chapterTimeRemaining)
+    when {
+        duration.inWholeMinutes > 0 -> resources.getStringPluralMinutes(duration.inWholeMinutes.toInt())
+        duration.inWholeSeconds > 0 -> resources.getStringPluralSeconds(duration.inWholeSeconds.toInt())
+        else -> chapterTimeRemaining
+    }
+} catch (e: IllegalArgumentException) {
+    Timber.e(e)
+    chapterTimeRemaining
 }
 
 @Composable

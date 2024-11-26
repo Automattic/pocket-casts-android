@@ -420,6 +420,8 @@
         <item quantity="one">chapter</item>
         <item quantity="other">chapters</item>
     </plurals>
+    !-- %s is time remaining in the chapter. -->
+    <string name="chapter_time_remaining_content_description">%s left in the chapter</string>
 
     <!-- Podcasts -->
 
