@@ -13,7 +13,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
@@ -520,21 +519,19 @@ data class FreeTrial(
 private fun SubscriptionStatusResponse.toStatus(): SubscriptionStatus {
     val originalPlatform = SubscriptionPlatform.entries.getOrNull(platform) ?: SubscriptionPlatform.NONE
 
-    val subs = subscriptions?.map { it.toSubscription() } ?: emptyList()
-    subs.getOrNull(index)?.isPrimarySubscription = true // Mark the subscription that the server says is the main one
     return if (paid == 0) {
-        SubscriptionStatus.Free(expiryDate, giftDays, originalPlatform, subs)
+        SubscriptionStatus.Free(expiryDate, giftDays, originalPlatform)
     } else {
+        val subs = subscriptions?.map { it.toSubscription() } ?: emptyList()
+        subs.getOrNull(index)?.isPrimarySubscription = true // Mark the subscription that the server says is the main one
         val freq = SubscriptionFrequency.entries.getOrNull(frequency) ?: SubscriptionFrequency.NONE
-        val enumType = SubscriptionType.entries.getOrNull(type) ?: SubscriptionType.NONE
-        val enumTier = SubscriptionTier.fromString(tier, enumType)
-        SubscriptionStatus.Paid(expiryDate ?: Date(), autoRenewing, giftDays, freq, originalPlatform, subs, enumType, enumTier, index)
+        val enumTier = SubscriptionTier.fromString(tier)
+        SubscriptionStatus.Paid(expiryDate ?: Date(), autoRenewing, giftDays, freq, originalPlatform, subs, enumTier, index)
     }
 }
 
 private fun SubscriptionResponse.toSubscription(): SubscriptionStatus.Subscription {
-    val enumType = SubscriptionType.entries.getOrNull(type) ?: SubscriptionType.NONE
-    val enumTier = SubscriptionTier.fromString(tier, enumType)
+    val enumTier = SubscriptionTier.fromString(tier)
     val freq = SubscriptionFrequency.entries.getOrNull(frequency) ?: SubscriptionFrequency.NONE
-    return SubscriptionStatus.Subscription(enumType, enumTier, freq, expiryDate, autoRenewing, updateUrl)
+    return SubscriptionStatus.Subscription(enumTier, freq, expiryDate, autoRenewing, updateUrl)
 }

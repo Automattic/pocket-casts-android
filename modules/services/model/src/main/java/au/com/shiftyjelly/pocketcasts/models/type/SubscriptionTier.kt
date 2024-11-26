@@ -31,8 +31,6 @@ enum class SubscriptionTier(
         }
 
     companion object {
-        // Till subscriptionTier is not supported, subscriptionType is used as a fallback to determine subscriptionTier
-        fun fromString(string: String?, subscriptionType: SubscriptionType) =
-            SubscriptionTier.values().find { it.label == string?.lowercase() } ?: if (subscriptionType == SubscriptionType.PLUS) PLUS else NONE
+        fun fromString(string: String?) = SubscriptionTier.entries.find { it.label.equals(string, ignoreCase = true) } ?: NONE
     }
 }
