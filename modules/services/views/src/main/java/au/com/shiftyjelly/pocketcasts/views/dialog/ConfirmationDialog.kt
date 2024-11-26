@@ -5,6 +5,7 @@ import android.content.DialogInterface
 import android.content.res.ColorStateList
 import android.content.res.Resources
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
@@ -54,6 +55,7 @@ open class ConfirmationDialog : BottomSheetDialogFragment() {
     private var forceDarkTheme: Boolean = false
     private var displayConfirmButtonFirst: Boolean = false
     private var removeSecondaryButtonBorder: Boolean = false
+    private var summaryTextSize: Float? = null
     private var binding: FragmentConfirmationBinding? = null
 
     @Inject lateinit var theme: Theme
@@ -125,6 +127,7 @@ open class ConfirmationDialog : BottomSheetDialogFragment() {
         binding.lblSummary.isVisible = summary != null
         binding.lblSummary.text = summary
         summaryTextColorAttr?.let { binding.lblSummary.setTextColor(context.getThemeColor(it)) }
+        summaryTextSize?.let { binding.lblSummary.setTextSize(TypedValue.COMPLEX_UNIT_SP, it) }
         binding.imgIcon.setImageResource(iconId)
         iconTintAttr?.let { binding.imgIcon.imageTintList = ColorStateList.valueOf(context.getThemeColor(it)) }
 
@@ -243,6 +246,11 @@ open class ConfirmationDialog : BottomSheetDialogFragment() {
 
     fun setRemoveSecondaryButtonBorder(removeSecondaryButtonBorder: Boolean): ConfirmationDialog {
         this.removeSecondaryButtonBorder = removeSecondaryButtonBorder
+        return this
+    }
+
+    fun setSummaryTextSize(size: Float): ConfirmationDialog {
+        this.summaryTextSize = size
         return this
     }
 

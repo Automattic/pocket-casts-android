@@ -38,6 +38,7 @@ class LowStorageDialog(
             .setTitle(context.getString(LR.string.need_to_free_up_space))
             .setSummary(context.getString(LR.string.save_space_by_managing_downloaded_episodes, formattedTotalDownloadSize))
             .setSummaryTextColor(UR.attr.primary_text_01)
+            .setSummaryTextSize(14f)
             .setButtonType(ConfirmationDialog.ButtonType.Normal(context.getString(LR.string.manage_downloads)))
             .setSecondaryButtonType(ConfirmationDialog.ButtonType.Normal(context.getString(LR.string.maybe_later)))
             .setSecondaryTextColor(UR.attr.primary_text_01)
