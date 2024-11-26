@@ -246,7 +246,7 @@ private fun ChapterNextButtonWithChapterProgressCircle(
         enabled = enabled,
         modifier = Modifier
             .alpha(alpha)
-            .clearAndSetSemantics { this.contentDescription = contentDescription },
+            .semantics { this.contentDescription = contentDescription },
     ) {
         Icon(
             painterResource(R.drawable.ic_chapter_skipforward),
