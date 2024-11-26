@@ -3,17 +3,11 @@ package au.com.shiftyjelly.pocketcasts.compose.components
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -28,7 +22,6 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
@@ -48,7 +41,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier.PLUS
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import coil.compose.AsyncImage
 import au.com.shiftyjelly.pocketcasts.images.R as IR
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @Composable
@@ -85,9 +77,14 @@ fun UserAvatar(
 
         val badge = if (subscriptionTier == PATRON && showPatronBadge) {
             subcompose("badge") {
-                UserBadge(
-                    subscriptionTier = subscriptionTier,
-                    config = config,
+                SubscriptionBadge(
+                    subscriptionTier = PATRON,
+                    backgroundColor = subscriptionTier.toDarkColor(),
+                    fontSize = config.badgeFontSize,
+                    fontColor = Color.White,
+                    iconSize = config.badgeIconSize,
+                    iconColor = Color.White,
+                    contentPadding = config.badgeContentPadding,
                 )
             }[0].measure(constraints)
         } else {
@@ -179,37 +176,6 @@ private fun UserPictureBorder(
             sweepAngle = 360f * -borderCompletion,
             useCenter = false,
             style = Stroke(borderWidthPx, cap = StrokeCap.Round),
-        )
-    }
-}
-
-@Composable
-private fun UserBadge(
-    config: UserAvatarConfig,
-    subscriptionTier: SubscriptionTier,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start,
-        modifier = modifier
-            .background(subscriptionTier.toDarkColor(), RoundedCornerShape(50))
-            .padding(config.badgeContentPadding),
-    ) {
-        Icon(
-            painter = painterResource(IR.drawable.ic_patron),
-            tint = Color.White,
-            contentDescription = null,
-            modifier = Modifier.size(config.badgeIconSize),
-        )
-        Spacer(
-            modifier = Modifier.width(4.dp),
-        )
-        TextH50(
-            text = stringResource(LR.string.pocket_casts_patron_short),
-            color = Color.White,
-            fontSize = config.badgeFontSize,
-            lineHeight = config.badgeFontSize,
         )
     }
 }
