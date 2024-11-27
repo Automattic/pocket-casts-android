@@ -22,7 +22,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
@@ -36,9 +35,9 @@ import au.com.shiftyjelly.pocketcasts.compose.buttons.RowTextButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewViewModel.WhatsNewFeature
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun WhatsNewPage(
@@ -116,7 +115,7 @@ private fun WhatsNewPageLoaded(
                     modifier = Modifier.align(Alignment.Start),
                 ) {
                     RowTextButton(
-                        text = stringResource(R.string.cancel),
+                        text = stringResource(LR.string.cancel),
                         fontSize = 15.sp,
                         onClick = performClose,
                         fullWidth = false,
@@ -130,12 +129,7 @@ private fun WhatsNewPageLoaded(
                 if (state.fullModel) {
                     Spacer(modifier = Modifier.weight(0.2f))
                 }
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier.weight(1f),
-                ) {
-                    header()
-                }
+                header()
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -147,7 +141,7 @@ private fun WhatsNewPageLoaded(
                 modifier = Modifier.padding(horizontal = 32.dp),
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             TextP40(
                 text = stringResource(state.feature.message),
@@ -156,7 +150,11 @@ private fun WhatsNewPageLoaded(
                 modifier = Modifier.padding(horizontal = 32.dp),
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            if (state.fullModel) {
+                Spacer(modifier = Modifier.weight(0.5f))
+            } else {
+                Spacer(modifier = Modifier.height(32.dp))
+            }
 
             RowButton(
                 text = stringResource(state.feature.confirmButtonTitle),
