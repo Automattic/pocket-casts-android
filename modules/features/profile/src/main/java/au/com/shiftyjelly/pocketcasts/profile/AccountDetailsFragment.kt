@@ -9,9 +9,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
@@ -24,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.ProfileUpgradeB
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.components.UserAvatarConfig
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
@@ -60,7 +65,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
 
 @AndroidEntryPoint
-class AccountDetailsFragment : BaseFragment(), OnUserViewClickListener {
+class AccountDetailsFragment : BaseFragment() {
     companion object {
         fun newInstance(): AccountDetailsFragment {
             return AccountDetailsFragment()
@@ -115,9 +120,9 @@ class AccountDetailsFragment : BaseFragment(), OnUserViewClickListener {
                 navigationIcon = NavigationIcon.BackArrow,
             )
         }
+        binding.setupHeaderView()
 
-        viewModel.signInState.observe(viewLifecycleOwner) { signInState ->
-            binding.userView.signedInState = signInState
+        viewModel.signInStateLiveData.observe(viewLifecycleOwner) { signInState ->
             binding.changeAvatarGroup?.isVisible = signInState is SignInState.SignedIn
 
             if (signInState is SignInState.SignedIn) {
@@ -126,10 +131,6 @@ class AccountDetailsFragment : BaseFragment(), OnUserViewClickListener {
                     Gravatar.refreshGravatarTimestamp()
                     context?.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Gravatar.getGravatarChangeAvatarUrl(signInState.email))))
                 }
-            }
-
-            if (signInState.isPocketCastsChampion) {
-                binding.userView.setOnUserViewClick(this)
             }
         }
 
@@ -164,10 +165,6 @@ class AccountDetailsFragment : BaseFragment(), OnUserViewClickListener {
             }
 
             updateDeleteAccountState(deleteAccountState)
-        }
-
-        viewModel.accountStartDate.observe(viewLifecycleOwner) { accountStartDate ->
-            binding.userView.accountStartDate = accountStartDate
         }
 
         viewModel.marketingOptInState.observe(viewLifecycleOwner) { marketingOptIn ->
@@ -235,8 +232,42 @@ class AccountDetailsFragment : BaseFragment(), OnUserViewClickListener {
         }
     }
 
-    override fun onPocketCastsChampionClick() {
-        PocketCastsChampionBottomSheetDialog().show(childFragmentManager, "pocket_casts_champion_dialog")
+    private fun FragmentAccountDetailsBinding.setupHeaderView() {
+        val config = if (Util.isAutomotive(requireContext())) {
+            AccountHeaderConfig(
+                avatarConfig = UserAvatarConfig(
+                    imageSize = 104.dp,
+                    strokeWidth = 4.dp,
+                    imageContentPadding = 4.dp,
+                    badgeFontSize = 18.sp,
+                    badgeIconSize = 18.dp,
+                    badgeContentPadding = 6.dp,
+                ),
+                infoFontScale = 1.6f,
+            )
+        } else {
+            AccountHeaderConfig(
+                avatarConfig = UserAvatarConfig(
+                    imageSize = 64.dp,
+                    strokeWidth = 3.dp,
+                ),
+            )
+        }
+        headerView.setContentWithViewCompositionStrategy {
+            val state by viewModel.headerState.collectAsState()
+            AppTheme(theme.activeTheme) {
+                AccountHeader(
+                    state = state,
+                    onClick = {
+                        if (state.subscription.isChampion) {
+                            PocketCastsChampionBottomSheetDialog().show(childFragmentManager, "pocket_casts_champion_dialog")
+                        }
+                    },
+                    config = config,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+        }
     }
 
     private fun signOut() {
