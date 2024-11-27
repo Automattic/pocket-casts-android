@@ -92,10 +92,16 @@ private fun WhatsNewPageLoaded(
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .background(Color.Black.copy(alpha = scrimAlpha))
-            .clickable(
-                indication = null,
-                interactionSource = remember { MutableInteractionSource() },
-                onClick = { if (!state.fullModel) performClose() },
+            .then(
+                if (!state.fullModel) {
+                    Modifier.clickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() },
+                        onClick = { performClose() },
+                    )
+                } else {
+                    Modifier
+                },
             )
             .padding(if (state.fullModel) 0.dp else 16.dp)
             .fillMaxSize(),
