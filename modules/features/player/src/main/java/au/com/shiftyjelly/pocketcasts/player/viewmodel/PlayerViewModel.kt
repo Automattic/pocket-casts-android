@@ -16,9 +16,11 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
+import au.com.shiftyjelly.pocketcasts.models.to.ChapterSummaryData
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.player.view.UpNextPlaying
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkArguments
 import au.com.shiftyjelly.pocketcasts.player.view.dialog.ClearUpNextDialog
@@ -128,7 +130,7 @@ class PlayerViewModel @Inject constructor(
             playbackSpeed = playbackEffects.playbackSpeed,
             adjustRemainingTimeDuration = adjustRemainingTimeDuration,
         ) ?: ""
-        val chapterSummary: String = chapters.getChapterSummary(positionMs.milliseconds)
+        val chapterSummary: ChapterSummaryData = chapters.getChapterSummary(positionMs.milliseconds)
         val isFirstChapter: Boolean = chapters.isFirstChapter(positionMs.milliseconds)
         val isLastChapter: Boolean = chapters.isLastChapter(positionMs.milliseconds)
         val isChapterImagePresent = chapter?.isImagePresent ?: false
@@ -690,12 +692,34 @@ class PlayerViewModel @Inject constructor(
         return dialog
     }
 
-    fun nextChapter() {
+    fun onNextChapterClick() {
+        analyticsTracker.track(AnalyticsEvent.PLAYER_NEXT_CHAPTER_TAPPED)
         playbackManager.skipToNextSelectedOrLastChapter()
     }
 
-    fun previousChapter() {
+    fun onPreviousChapterClick() {
+        analyticsTracker.track(AnalyticsEvent.PLAYER_PREVIOUS_CHAPTER_TAPPED)
         playbackManager.skipToPreviousSelectedOrLastChapter()
+    }
+
+    fun onChapterTitleClick(chapter: Chapter) {
+        viewModelScope.launch {
+            _navigationState.emit(NavigationState.OpenChapterAt(chapter))
+        }
+    }
+
+    fun onPodcastTitleClick(episodeUuid: String, podcastUuid: String?) {
+        if (podcastUuid == null) return
+        analyticsTracker.track(
+            AnalyticsEvent.EPISODE_DETAIL_PODCAST_NAME_TAPPED,
+            mapOf(
+                ShelfViewModel.Companion.AnalyticsProp.Key.EPISODE_UUID to episodeUuid,
+                ShelfViewModel.Companion.AnalyticsProp.Key.SOURCE to EpisodeViewSource.NOW_PLAYING.value,
+            ),
+        )
+        viewModelScope.launch {
+            _navigationState.emit(NavigationState.OpenPodcastPage(podcastUuid, source))
+        }
     }
 
     fun trackPlaybackEffectsEvent(
@@ -722,6 +746,8 @@ class PlayerViewModel @Inject constructor(
     sealed interface NavigationState {
         data class ShowStreamingWarningDialog(val episode: BaseEpisode) : NavigationState
         data object ShowSkipForwardLongPressOptionsDialog : NavigationState
+        data class OpenChapterAt(val chapter: Chapter) : NavigationState
+        data class OpenPodcastPage(val podcastUuid: String, val source: SourceView) : NavigationState
     }
 
     sealed interface SnackbarMessage {

@@ -6,9 +6,6 @@ import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 interface PlayerClickListener {
     fun onShowNotesClick(episodeUuid: String)
     fun onClosePlayer()
-    fun onNextChapter()
-    fun onPreviousChapter()
-    fun onHeaderChapterClick(chapter: Chapter)
     fun onPictureInPictureClick()
     fun onFullScreenVideoClick()
     fun onSeekPositionChangeStop(progress: Int, seekComplete: () -> Unit)

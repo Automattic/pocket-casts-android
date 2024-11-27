@@ -67,10 +67,10 @@ data class Chapters(
         return items
     }
 
-    fun getChapterSummary(time: Duration): String {
+    fun getChapterSummary(time: Duration): ChapterSummaryData {
         val chapterSize = items.size
         val chapterIndex = getChapterIndex(time)
-        return if (chapterIndex == -1) "" else "${chapterIndex + 1} of $chapterSize"
+        return ChapterSummaryData(chapterIndex + 1, chapterSize)
     }
 
     fun isFirstChapter(time: Duration): Boolean {
@@ -112,3 +112,8 @@ data class Chapters(
         )
     }
 }
+
+data class ChapterSummaryData(
+    val currentIndex: Int = -1,
+    val size: Int = 0,
+)
