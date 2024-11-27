@@ -110,9 +110,9 @@ open class UserView @JvmOverloads constructor(
     private fun daysLeft(signInState: SignInState.SignedIn, maxDays: Int): Int? {
         val timeInXDays = Date(Date().time + maxDays.days())
         val paidStatus = signInState.subscriptionStatus as? SubscriptionStatus.Paid
-        if (paidStatus != null && paidStatus.expiry.before(timeInXDays)) {
+        if (paidStatus != null && paidStatus.expiryDate.before(timeInXDays)) {
             // probably shouldn't be do straight millisecond maths because of day light savings
-            return ((paidStatus.expiry.time - Date().time) / TimeConstants.MILLISECONDS_IN_ONE_DAY).toInt()
+            return ((paidStatus.expiryDate.time - Date().time) / TimeConstants.MILLISECONDS_IN_ONE_DAY).toInt()
         }
         return null
     }
@@ -123,7 +123,7 @@ open class UserView @JvmOverloads constructor(
             return
         }
 
-        val timeLeftMs = status.expiry.time - Date().time
+        val timeLeftMs = status.expiryDate.time - Date().time
         if (timeLeftMs <= 0) {
             return
         }
@@ -245,7 +245,7 @@ class ExpandedUserView @JvmOverloads constructor(
         if (status.autoRenew) {
             val strMonthly = context.getString(LR.string.profile_monthly)
             val strYearly = context.getString(LR.string.profile_yearly)
-            lblPaymentStatus.text = context.getString(LR.string.profile_next_payment, status.expiry.toLocalizedFormatLongStyle())
+            lblPaymentStatus.text = context.getString(LR.string.profile_next_payment, status.expiryDate.toLocalizedFormatLongStyle())
             lblSignInStatus?.text = when (status.frequency) {
                 SubscriptionFrequency.MONTHLY -> strMonthly
                 SubscriptionFrequency.YEARLY -> strYearly
@@ -271,7 +271,7 @@ class ExpandedUserView @JvmOverloads constructor(
                     onUserViewClickListener?.onPocketCastsChampionClick()
                 }
             } else {
-                lblSignInStatus?.text = context.getString(LR.string.profile_plus_expires, status.expiry.toLocalizedFormatLongStyle())
+                lblSignInStatus?.text = context.getString(LR.string.profile_plus_expires, status.expiryDate.toLocalizedFormatLongStyle())
                 lblSignInStatus?.setTextColor(lblSignInStatus.context.getThemeColor(UR.attr.primary_text_02))
             }
         }
