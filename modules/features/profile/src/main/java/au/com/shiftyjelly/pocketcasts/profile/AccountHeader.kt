@@ -277,7 +277,7 @@ private data class Label(
 
 @Preview
 @Composable
-private fun ProfileHeaderUnsignedPreview(
+private fun AccountHeaderPreview(
     @PreviewParameter(AccountHeaderStateParameterProvider::class) state: AccountHeaderState,
 ) {
     AppTheme(Theme.ThemeType.ELECTRIC) {
