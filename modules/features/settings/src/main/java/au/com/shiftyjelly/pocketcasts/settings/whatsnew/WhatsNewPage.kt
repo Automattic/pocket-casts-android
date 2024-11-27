@@ -55,7 +55,7 @@ fun WhatsNewPage(
                 state = uiState,
                 header = {
                     when (uiState.feature) {
-                        is WhatsNewFeature.ReimagineSharing -> SharingHeader()
+                        is WhatsNewFeature.Shuffle -> ShuffleHeader()
                     }
                 },
                 onConfirm = { viewModel.onConfirm() },
