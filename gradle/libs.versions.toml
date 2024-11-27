@@ -74,7 +74,7 @@ coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 compose-activity = "androidx.activity:activity-compose:1.9.3"
 compose-animation = { module = "androidx.compose.animation:animation" }
 compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose" }
-compose-constraintlayout = "androidx.constraintlayout:constraintlayout-compose:1.1.0"
+compose-constraintlayout = "androidx.constraintlayout:constraintlayout-compose:1.0.1"
 compose-foundation = { module = "androidx.compose.foundation:foundation" }
 compose-livedata = { module = "androidx.compose.runtime:runtime-livedata" }
 compose-material = { module = "androidx.compose.material:material" }
@@ -123,9 +123,6 @@ fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragm
 # Glance
 glance-appwidget = { module = "androidx.glance:glance-appwidget", version.ref = "glance" }
 glance-material3 = { module = "androidx.glance:glance-material3", version.ref = "glance" }
-
-# Google Play Services OSS Licenses - (The following line is still needed as there is no plugin marker available as of yet)
-osslicenses-plugin = "com.google.android.gms:oss-licenses-plugin:0.10.6"
 
 # Horologist
 horologist-audio-ui = { module = "com.google.android.horologist:horologist-audio-ui", version.ref = "horologist" }
@@ -283,9 +280,8 @@ material-dialogs = "com.afollestad.material-dialogs:core:3.3.0"
 material-progressbar = "me.zhanghai.android.materialprogressbar:library:1.6.1"
 play-auth = "com.google.android.gms:play-services-auth:20.4.0"
 play-cast = "com.google.android.gms:play-services-cast-framework:22.0.0"
-play-oss-licenses = "com.google.android.gms:play-services-oss-licenses:17.0.1"
 play-review = "com.google.android.play:review-ktx:2.0.2"
-play-wearable = "com.google.android.gms:play-services-wearable:18.0.0"
+play-wearable = "com.google.android.gms:play-services-wearable:19.0.0"
 reorderable = "sh.calvin.reorderable:reorderable:2.4.0"
 security-lint = { module = "com.android.security.lint:lint", version.ref = "security-lint" }
 timber = "com.jakewharton.timber:timber:5.0.1"

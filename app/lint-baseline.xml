@@ -134,28 +134,6 @@
     </issue>
 
     <issue
-        id="MissingClass"
-        message="Class referenced in the manifest, `com.google.android.gms.oss.licenses.OssLicensesMenuActivity`, was not found in the project or the libraries"
-        errorLine1="        &lt;activity android:name=&quot;com.google.android.gms.oss.licenses.OssLicensesMenuActivity&quot;"
-        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="528"
-            column="33"/>
-    </issue>
-
-    <issue
-        id="MissingClass"
-        message="Class referenced in the manifest, `com.google.android.gms.oss.licenses.OssLicensesActivity`, was not found in the project or the libraries"
-        errorLine1="        &lt;activity android:name=&quot;com.google.android.gms.oss.licenses.OssLicensesActivity&quot;"
-        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="530"
-            column="33"/>
-    </issue>
-
-    <issue
         id="NotSibling"
         message="`btnFav` is not a sibling in the same `ConstraintLayout`"
         errorLine1="            app:constraint_referenced_ids=&quot;lblDate,lblTimeLeft,btnDownload, btnShare, btnFav, btnAddToUpNext, btnArchive, btnPlay, btnPlayed&quot;"

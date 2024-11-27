@@ -8,8 +8,6 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
-apply(plugin = "com.google.android.gms.oss-licenses-plugin")
-
 android {
     namespace = "au.com.shiftyjelly.pocketcasts"
 
