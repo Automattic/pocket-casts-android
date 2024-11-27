@@ -599,10 +599,15 @@ class MediaSessionManager(
                             override fun run() {
                                 logEvent("play from headset hook", inSessionCallback = false)
 
-                                when (buttonPressSuccessions) {
-                                    1 -> playbackManager.playPause(sourceView = source)
-                                    2 -> playbackManager.skipForward(sourceView = source)
-                                    3 -> playbackManager.skipBackward(sourceView = source)
+                                when {
+                                    buttonPressSuccessions == 2 && playbackManager.isPlaying() ->
+                                        playbackManager.skipForward(sourceView = source)
+
+                                    buttonPressSuccessions == 3 && playbackManager.isPlaying() ->
+                                        playbackManager.skipBackward(sourceView = source)
+
+                                    else ->
+                                        playbackManager.playPause(sourceView = source)
                                 }
 
                                 // Invalidate timer and reset the number of button press quick successions
