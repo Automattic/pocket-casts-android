@@ -11,8 +11,8 @@ import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.AutoDownloadLimitSetting
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.preferences.model.AppIconSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
@@ -488,8 +488,8 @@ interface Settings {
     fun isNotificationsDisabledMessageShown(): Boolean
     fun setNotificationsDisabledMessageShown(value: Boolean)
 
-    fun setLastSelectedSubscriptionTier(tier: Subscription.SubscriptionTier)
-    fun getLastSelectedSubscriptionTier(): Subscription.SubscriptionTier?
+    fun setLastSelectedSubscriptionTier(tier: SubscriptionTier)
+    fun getLastSelectedSubscriptionTier(): SubscriptionTier?
 
     fun setLastSelectedSubscriptionFrequency(frequency: SubscriptionFrequency)
     fun getLastSelectedSubscriptionFrequency(): SubscriptionFrequency?

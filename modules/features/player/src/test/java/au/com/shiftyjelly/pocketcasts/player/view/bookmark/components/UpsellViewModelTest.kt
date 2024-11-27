@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.player.view.bookmark.components
 
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.FreeTrial
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
@@ -29,8 +29,8 @@ class UpsellViewModelTest {
 
     @Test
     fun `given a trial for subscription PLUS, early access message not shown`() {
-        whenever(subscriptionManager.freeTrialForSubscriptionTierFlow(Subscription.SubscriptionTier.PLUS))
-            .thenReturn(flowOf(FreeTrial(subscriptionTier = Subscription.SubscriptionTier.PLUS)))
+        whenever(subscriptionManager.freeTrialForSubscriptionTierFlow(SubscriptionTier.PLUS))
+            .thenReturn(flowOf(FreeTrial(subscriptionTier = SubscriptionTier.PLUS)))
 
         upsellViewModel = UpsellViewModel(
             analyticsTracker = AnalyticsTracker.test(),
@@ -40,6 +40,6 @@ class UpsellViewModelTest {
         val state = upsellViewModel.state.value as UpsellViewModel.UiState.Loaded
 
         assertFalse(state.showEarlyAccessMessage)
-        assertEquals(Subscription.SubscriptionTier.PLUS, state.freeTrial.subscriptionTier)
+        assertEquals(SubscriptionTier.PLUS, state.freeTrial.subscriptionTier)
     }
 }

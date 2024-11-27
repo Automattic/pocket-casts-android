@@ -4,8 +4,8 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import au.com.shiftyjelly.pocketcasts.account.R
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
@@ -96,7 +96,7 @@ data class FeatureCardsState(
     val currentFrequency: SubscriptionFrequency,
 ) {
     val featureCards = SubscriptionTier.entries
-        .filter { tier -> tier != SubscriptionTier.UNKNOWN && tier in subscriptions.map { it.tier } }
+        .filter { tier -> tier != SubscriptionTier.NONE && tier in subscriptions.map { it.tier } }
         .map { it.toUpgradeFeatureCard() }
 
     val showPageIndicator = featureCards.size > 1
@@ -105,5 +105,5 @@ data class FeatureCardsState(
 fun SubscriptionTier.toUpgradeFeatureCard() = when (this) {
     SubscriptionTier.PLUS -> UpgradeFeatureCard.PLUS
     SubscriptionTier.PATRON -> UpgradeFeatureCard.PATRON
-    SubscriptionTier.UNKNOWN -> throw IllegalStateException("Unknown subscription tier")
+    SubscriptionTier.NONE -> throw IllegalStateException("Unknown subscription tier")
 }

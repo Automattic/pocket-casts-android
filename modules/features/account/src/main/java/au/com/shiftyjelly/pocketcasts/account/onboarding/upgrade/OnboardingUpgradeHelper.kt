@@ -55,7 +55,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.ClickableTextHelper
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.extensions.brush
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -247,12 +247,12 @@ object OnboardingUpgradeHelper {
         val brush = when (subscriptionTier) {
             SubscriptionTier.PLUS -> plusGradientBrush
             SubscriptionTier.PATRON -> patronGradientBrush
-            SubscriptionTier.UNKNOWN -> throw IllegalStateException("Unknown subscription tier")
+            SubscriptionTier.NONE -> throw IllegalStateException("Unknown subscription tier")
         }
         val textColor = when (subscriptionTier) {
             SubscriptionTier.PLUS -> Color.Black
             SubscriptionTier.PATRON -> Color.White
-            SubscriptionTier.UNKNOWN -> throw IllegalStateException("Unknown subscription tier")
+            SubscriptionTier.NONE -> throw IllegalStateException("Unknown subscription tier")
         }
         Box(
             modifier = if (selected) {
@@ -317,7 +317,7 @@ object OnboardingUpgradeHelper {
                 when (tier) {
                     SubscriptionTier.PLUS -> PlusBlurredCanvasBackground()
                     SubscriptionTier.PATRON -> PatronBlurredCanvasBackground()
-                    SubscriptionTier.UNKNOWN -> throw IllegalStateException("Unknown tier")
+                    SubscriptionTier.NONE -> throw IllegalStateException("Unknown tier")
                 }
             } else {
                 ImageBackground(backgroundGlowsRes)

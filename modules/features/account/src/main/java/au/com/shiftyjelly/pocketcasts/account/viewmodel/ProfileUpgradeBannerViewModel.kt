@@ -57,7 +57,7 @@ class ProfileUpgradeBannerViewModel @Inject constructor(
                             subscriptionMapper.mapFromProductDetails(
                                 productDetails = details,
                                 isOfferEligible = subscriptionManager.isOfferEligible(
-                                    Subscription.SubscriptionTier.fromProductId(details.productId),
+                                    SubscriptionTier.fromProductId(details.productId),
                                 ),
                             )
                         } ?: emptyList()
@@ -70,7 +70,7 @@ class ProfileUpgradeBannerViewModel @Inject constructor(
                     // If the user is a patron, only show the patron subscription
                     val cachedTier = (cachedSubscriptionStatus as? SubscriptionStatus.Paid)?.tier
                     val filteredSubscriptions = if (cachedTier == SubscriptionTier.PATRON) {
-                        filteredOffer.filter { it.tier == Subscription.SubscriptionTier.PATRON }
+                        filteredOffer.filter { it.tier == SubscriptionTier.PATRON }
                     } else {
                         filteredOffer
                     }
@@ -96,7 +96,7 @@ class ProfileUpgradeBannerViewModel @Inject constructor(
                                 )
                             }
 
-                        val currentTier = Subscription.SubscriptionTier
+                        val currentTier = SubscriptionTier
                             .fromProductId(defaultSubscription.productDetails.productId)
 
                         _state.value = State.Loaded(
@@ -126,12 +126,12 @@ class ProfileUpgradeBannerViewModel @Inject constructor(
     ) = subscriptionManager.getDefaultSubscription(
         subscriptions = filteredSubscriptions,
         tier = when (cachedTier) {
-            SubscriptionTier.PATRON -> Subscription.SubscriptionTier.PATRON
+            SubscriptionTier.PATRON -> SubscriptionTier.PATRON
 
             null,
             SubscriptionTier.NONE,
             SubscriptionTier.PLUS,
-            -> Subscription.SubscriptionTier.PLUS
+            -> SubscriptionTier.PLUS
         },
         frequency = getSubscriptionFrequency(cachedSubscriptionStatus),
     )
@@ -152,7 +152,7 @@ class ProfileUpgradeBannerViewModel @Inject constructor(
         }
 
     private fun getPlanType(
-        productTier: Subscription.SubscriptionTier,
+        productTier: SubscriptionTier,
         cachedTier: SubscriptionTier?,
         cachedSubscriptionStatus: SubscriptionStatus?,
     ): PlanType {
@@ -164,7 +164,7 @@ class ProfileUpgradeBannerViewModel @Inject constructor(
             isExpiring -> PlanType.RENEW
             cachedSubscriptionStatus is SubscriptionStatus.Paid &&
                 cachedTier == SubscriptionTier.PLUS &&
-                productTier == Subscription.SubscriptionTier.PATRON -> PlanType.UPGRADE
+                productTier == SubscriptionTier.PATRON -> PlanType.UPGRADE
             else -> PlanType.SUBSCRIBE
         }
     }
