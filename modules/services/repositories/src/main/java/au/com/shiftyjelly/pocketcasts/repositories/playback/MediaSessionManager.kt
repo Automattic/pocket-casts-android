@@ -549,12 +549,12 @@ class MediaSessionManager(
                             return true
                         }
                         KeyEvent.KEYCODE_MEDIA_NEXT -> {
-                            // Not called on some USB-C earbuds. Use KEYCODE_MEDIA_PLAY_PAUSE or KEYCODE_HEADSETHOOK timeout workarounds
+                            // Not sent on some devices. Use KEYCODE_MEDIA_PLAY_PAUSE or KEYCODE_HEADSETHOOK timeout workarounds
                             handleMediaButtonDoubleTap()
                             return true
                         }
                         KeyEvent.KEYCODE_MEDIA_PREVIOUS -> {
-                            // Not called on some USB-C earbuds. Use KEYCODE_MEDIA_PLAY_PAUSE or KEYCODE_HEADSETHOOK timeout workarounds
+                            // Not sent on some devices. Use KEYCODE_MEDIA_PLAY_PAUSE or KEYCODE_HEADSETHOOK timeout workarounds
                             handleMediaButtonTripleTap()
                             return true
                         }
