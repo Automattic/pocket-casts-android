@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.player.view.nowplaying
 
-import android.app.Activity
+import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,17 +26,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import au.com.shiftyjelly.pocketcasts.compose.Devices
+import au.com.shiftyjelly.pocketcasts.compose.OrientationPreview
 import au.com.shiftyjelly.pocketcasts.compose.components.ChapterImage
 import au.com.shiftyjelly.pocketcasts.compose.components.EpisodeImage
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
@@ -46,13 +46,13 @@ import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory.PlaceholderType
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
-import java.util.Date
-import kotlin.time.DurationUnit
-import kotlin.time.toDuration
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
+import java.util.Date
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
@@ -60,7 +60,6 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun ArtworkSection(
     playerViewModel: PlayerViewModel,
 ) {
-    val context = LocalContext.current
     val state by remember {
         playerViewModel.listDataLive.asFlow()
             .distinctUntilChanged { old, new ->
@@ -80,30 +79,45 @@ fun ArtworkSection(
     }
         .collectAsStateWithLifecycle(initialValue = ArtworkSectionState())
 
-    val windowSize = calculateWindowSizeClass(context.getActivity() as Activity)
     Content(
         state = state,
-        heightSizeClass = windowSize.heightSizeClass,
         onChapterUrlClick = { playerViewModel.onChapterUrlClick(it) },
     )
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 private fun Content(
     state: ArtworkSectionState,
-    heightSizeClass: WindowHeightSizeClass,
     config: ArtworkConfig = ArtworkConfig(),
     onChapterUrlClick: (HttpUrl) -> Unit,
 ) {
+    val activity = LocalContext.current.getActivity()
+    val windowSize = activity?.let { calculateWindowSizeClass(it) }
+    val heightSizeClass = if (LocalInspectionMode.current) {
+        val orientation = LocalConfiguration.current.orientation
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) WindowHeightSizeClass.Compact else WindowHeightSizeClass.Medium
+    } else {
+        windowSize?.heightSizeClass ?: return
+    }
     val isPhoneLandscape = heightSizeClass == WindowHeightSizeClass.Compact
+
     Box(
         modifier = Modifier
             .padding(16.dp),
         contentAlignment = if (isPhoneLandscape) Alignment.CenterStart else Alignment.Center,
     ) {
         val artworkModifier = Modifier
-            .then(if (isPhoneLandscape) Modifier.sizeIn(maxWidth = config.landscapeImageMaxSize, maxHeight = config.landscapeImageMaxSize) else Modifier.fillMaxSize())
+            .then(
+                if (isPhoneLandscape) {
+                    Modifier.sizeIn(
+                        maxWidth = config.landscapeImageMaxSize,
+                        maxHeight = config.landscapeImageMaxSize,
+                    )
+                } else {
+                    Modifier.fillMaxSize()
+                },
+            )
             .clearAndSetSemantics {}
 
         when {
@@ -133,7 +147,10 @@ private fun Content(
         }
         state.chapter?.url?.let {
             CompositionLocalProvider(
-                LocalRippleConfiguration provides RippleConfiguration(Color.White, RippleDefaults.rippleAlpha(Color.White, true)),
+                LocalRippleConfiguration provides RippleConfiguration(
+                    Color.White,
+                    RippleDefaults.rippleAlpha(Color.White, true),
+                ),
             ) {
                 IconButton(
                     onClick = { onChapterUrlClick(it) },
@@ -174,7 +191,7 @@ data class ArtworkSectionState(
     val isChapterArtworkVisible: Boolean = false,
 )
 
-@Preview(device = Devices.PortraitRegular)
+@OrientationPreview
 @Composable
 private fun ArtworkSectionEpisodePreview() {
     Content(
@@ -183,26 +200,11 @@ private fun ArtworkSectionEpisodePreview() {
             useEpisodeArtwork = true,
             isEpisodeArtworkVisible = true,
         ),
-        heightSizeClass = WindowHeightSizeClass.Medium,
         onChapterUrlClick = {},
     )
 }
 
-@Preview(device = Devices.LandscapeRegular)
-@Composable
-private fun ArtworkSectionEpisodePhoneLandscapePreview() {
-    Content(
-        state = ArtworkSectionState(
-            episode = PodcastEpisode("", publishedDate = Date()),
-            useEpisodeArtwork = true,
-            isEpisodeArtworkVisible = true,
-        ),
-        heightSizeClass = WindowHeightSizeClass.Compact,
-        onChapterUrlClick = {},
-    )
-}
-
-@Preview(device = Devices.PortraitRegular)
+@OrientationPreview
 @Composable
 private fun ArtworkSectionChapterPreview() {
     Content(
@@ -216,7 +218,6 @@ private fun ArtworkSectionChapterPreview() {
             ),
             isChapterArtworkVisible = true,
         ),
-        heightSizeClass = WindowHeightSizeClass.Medium,
         onChapterUrlClick = {},
     )
 }
