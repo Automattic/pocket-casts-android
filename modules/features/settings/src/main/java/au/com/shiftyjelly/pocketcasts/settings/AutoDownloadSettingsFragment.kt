@@ -173,12 +173,12 @@ class AutoDownloadSettingsFragment :
                         onNewEpisodesToggleChange(newValue.toAutoDownloadStatus())
 
                         viewLifecycleOwner.lifecycleScope.launch {
-                            val lowStorageDialog = LowStorageDialog(requireContext(), analyticsTracker, settings)
+                            val lowStorageDialogPresenter = LowStorageDialogPresenter(requireContext(), analyticsTracker, settings)
 
                             val downloadedFiles = cleanUpViewModel.state.value.diskSpaceViews.sumOf { it.episodesBytesSize }
 
-                            if (newValue && lowStorageDialog.shouldShow(downloadedFiles)) {
-                                lowStorageDialog.show(
+                            if (newValue && lowStorageDialogPresenter.shouldShow(downloadedFiles)) {
+                                lowStorageDialogPresenter.getDialog(
                                     totalDownloadSize = downloadedFiles,
                                     sourceView = SourceView.AUTO_DOWNLOAD,
                                     onManageDownloadsClick = {

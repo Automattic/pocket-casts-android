@@ -14,7 +14,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
-class LowStorageDialog(
+class LowStorageDialogPresenter(
     val context: Context,
     val analyticsTracker: AnalyticsTracker,
     val settings: Settings,
@@ -25,7 +25,7 @@ class LowStorageDialog(
         settings.shouldShowLowStorageModalAfterSnooze() &&
         FeatureFlag.isEnabled(Feature.MANAGE_DOWNLOADED_EPISODES)
 
-    fun show(
+    fun getDialog(
         totalDownloadSize: Long,
         sourceView: SourceView,
         onManageDownloadsClick: () -> Unit,

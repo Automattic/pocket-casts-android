@@ -69,10 +69,10 @@ class StorageSettingsFragment : BaseFragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.state.collect { state ->
-                    val lowStorageDialog = LowStorageDialog(requireContext(), analyticsTracker, settings)
+                    val lowStorageDialogPresenter = LowStorageDialogPresenter(requireContext(), analyticsTracker, settings)
 
-                    if (lowStorageDialog.shouldShow(state.downloadedFilesState.size)) {
-                        lowStorageDialog.show(
+                    if (lowStorageDialogPresenter.shouldShow(state.downloadedFilesState.size)) {
+                        lowStorageDialogPresenter.getDialog(
                             totalDownloadSize = state.downloadedFilesState.size,
                             sourceView = SourceView.STORAGE_AND_DATA_USAGE,
                             onManageDownloadsClick = {
