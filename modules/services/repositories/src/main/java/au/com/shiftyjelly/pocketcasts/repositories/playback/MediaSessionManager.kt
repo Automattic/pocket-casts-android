@@ -531,6 +531,7 @@ class MediaSessionManager(
 
         private var playPauseTimer: Timer? = null
         private var playFromSearchDisposable: Disposable? = null
+        private var buttonPressSuccessions: Int = 0
 
         override fun onMediaButtonEvent(mediaButtonEvent: Intent): Boolean {
             if (Intent.ACTION_MEDIA_BUTTON == mediaButtonEvent.action) {
@@ -538,15 +539,22 @@ class MediaSessionManager(
                     ?: return false
                 if (keyEvent.action == KeyEvent.ACTION_DOWN) {
                     when (keyEvent.keyCode) {
+                        // Some wired headphones do not respect KeyEvent.KEYCODE_HEADSETHOOK. May also need to add an event trigger for KEYCODE_MEDIA_PLAY in the future
+                        KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE -> {
+                            handleMediaButtonSingleTap()
+                            return true
+                        }
                         KeyEvent.KEYCODE_HEADSETHOOK -> {
                             handleMediaButtonSingleTap()
                             return true
                         }
                         KeyEvent.KEYCODE_MEDIA_NEXT -> {
+                            // Not called on some USB-C earbuds. Use KEYCODE_MEDIA_PLAY_PAUSE or KEYCODE_HEADSETHOOK timeout workarounds
                             handleMediaButtonDoubleTap()
                             return true
                         }
                         KeyEvent.KEYCODE_MEDIA_PREVIOUS -> {
+                            // Not called on some USB-C earbuds. Use KEYCODE_MEDIA_PLAY_PAUSE or KEYCODE_HEADSETHOOK timeout workarounds
                             handleMediaButtonTripleTap()
                             return true
                         }
@@ -580,26 +588,32 @@ class MediaSessionManager(
         }
 
         private fun handleMediaButtonSingleTap() {
-            // this code allows the user to double tap their play pause button to skip ahead. Basically it allows them 600ms to press it again to cause a skip instead of a play/pause
-            if (playPauseTimer == null) {
+            // this code allows the user to double tap or triple tap their play pause button to skip ahead.
+            // Basically it allows them 600ms to press it again (or a third time) to cause a skip forward/backward instead of a play/pause
+            buttonPressSuccessions++
+
+            if (buttonPressSuccessions == 1) {
                 playPauseTimer = Timer().apply {
                     schedule(
                         object : TimerTask() {
                             override fun run() {
                                 logEvent("play from headset hook", inSessionCallback = false)
-                                playbackManager.playPause(sourceView = source)
+
+                                when (buttonPressSuccessions) {
+                                    1 -> playbackManager.playPause(sourceView = source)
+                                    2 -> playbackManager.skipForward(sourceView = source)
+                                    3 -> playbackManager.skipBackward(sourceView = source)
+                                }
+
+                                // Invalidate timer and reset the number of button press quick successions
+                                playPauseTimer?.cancel()
                                 playPauseTimer = null
+                                buttonPressSuccessions = 0
                             }
                         },
                         600,
                     )
                 }
-            } else {
-                // timer is not null, which means they pressed play pause in the last 300ms, fire a next instead
-                playPauseTimer?.cancel()
-                playPauseTimer = null
-
-                playbackManager.skipForward(sourceView = source)
             }
         }
 
