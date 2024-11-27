@@ -30,13 +30,11 @@ import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.images.R
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-
-private val pillCornerRadiusInDp = 800.dp
 
 @Composable
 fun SubscriptionBadge(
@@ -52,18 +50,12 @@ fun SubscriptionBadge(
 ) {
     val background = backgroundColor ?: Color.Black
 
-    Card(
-        shape = RoundedCornerShape(pillCornerRadiusInDp),
+    Box(
         modifier = modifier
-            .background(Color.Transparent),
+            .background(background, RoundedCornerShape(percent = 50))
+            .padding(horizontal = padding * 2, vertical = padding),
     ) {
-        Box(
-            modifier = Modifier
-                .background(background)
-                .padding(horizontal = padding * 2, vertical = padding),
-        ) {
-            SubscriptionBadgeContent(iconRes, iconSize, iconColor, shortNameRes, textColor, fontSize, padding)
-        }
+        SubscriptionBadgeContent(iconRes, iconSize, iconColor, shortNameRes, textColor, fontSize, padding)
     }
 }
 
@@ -79,18 +71,12 @@ fun SubscriptionBadge(
     padding: Dp = 4.dp,
     textColor: Color? = null,
 ) {
-    Card(
-        shape = RoundedCornerShape(pillCornerRadiusInDp),
+    Box(
         modifier = modifier
-            .background(Color.Transparent),
+            .background(backgroundBrush, RoundedCornerShape(percent = 50))
+            .padding(horizontal = padding * 2, vertical = padding),
     ) {
-        Box(
-            modifier = Modifier
-                .background(backgroundBrush)
-                .padding(horizontal = padding * 2, vertical = padding),
-        ) {
-            SubscriptionBadgeContent(iconRes, iconSize, iconColor, shortNameRes, textColor, fontSize, padding)
-        }
+        SubscriptionBadgeContent(iconRes, iconSize, iconColor, shortNameRes, textColor, fontSize, padding)
     }
 }
 
@@ -131,7 +117,9 @@ private fun SubscriptionBadgeContent(
 fun SubscriptionBadgeForTier(
     tier: SubscriptionTier,
     displayMode: SubscriptionBadgeDisplayMode,
+    modifier: Modifier = Modifier,
     fontSize: TextUnit = 14.sp,
+    iconSize: Dp = 14.dp,
     padding: Dp = 4.dp,
 ) {
     when (tier) {
@@ -159,6 +147,8 @@ fun SubscriptionBadgeForTier(
                 SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground -> Color.White
                 SubscriptionBadgeDisplayMode.ColoredWithBlackForeground -> Color.Black
             },
+            iconSize = iconSize,
+            modifier = modifier,
         )
 
         SubscriptionTier.PATRON -> SubscriptionBadge(
@@ -187,9 +177,11 @@ fun SubscriptionBadgeForTier(
                 -> Color.White
                 SubscriptionBadgeDisplayMode.ColoredWithBlackForeground -> Color.Black
             },
+            iconSize = iconSize,
+            modifier = modifier,
         )
 
-        SubscriptionTier.UNKNOWN -> Unit
+        SubscriptionTier.NONE -> Unit
     }
 }
 
@@ -219,7 +211,7 @@ fun SubscriptionIconForTier(
                 .size(iconSize),
         )
 
-        SubscriptionTier.UNKNOWN -> Unit
+        SubscriptionTier.NONE -> Unit
     }
 }
 
@@ -233,7 +225,7 @@ fun OfferBadge(
     textColor: Int,
 ) {
     Card(
-        shape = RoundedCornerShape(pillCornerRadiusInDp),
+        shape = RoundedCornerShape(percent = 50),
         backgroundColor = colorResource(id = backgroundColor),
         modifier = modifier,
     ) {

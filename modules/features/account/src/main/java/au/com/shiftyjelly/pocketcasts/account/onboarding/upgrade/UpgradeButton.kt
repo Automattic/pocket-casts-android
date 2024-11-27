@@ -6,6 +6,7 @@ import androidx.compose.ui.graphics.Brush
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.patronGradientBrush
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.plusGradientBrush
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -47,7 +48,7 @@ sealed class UpgradeButton(
 fun Subscription.toUpgradeButton(
     planType: UpgradeButton.PlanType = UpgradeButton.PlanType.SUBSCRIBE,
 ) = when (this.tier) {
-    Subscription.SubscriptionTier.PLUS -> UpgradeButton.Plus(this, planType)
-    Subscription.SubscriptionTier.PATRON -> UpgradeButton.Patron(this, planType)
-    Subscription.SubscriptionTier.UNKNOWN -> throw IllegalStateException("Unknown subscription tier")
+    SubscriptionTier.PLUS -> UpgradeButton.Plus(this, planType)
+    SubscriptionTier.PATRON -> UpgradeButton.Patron(this, planType)
+    SubscriptionTier.NONE -> throw IllegalStateException("Unknown subscription tier")
 }

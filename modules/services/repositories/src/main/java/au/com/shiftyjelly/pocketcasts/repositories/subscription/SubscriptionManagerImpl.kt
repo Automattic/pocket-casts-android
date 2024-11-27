@@ -88,7 +88,7 @@ class SubscriptionManagerImpl @Inject constructor(
     private val productDetails = BehaviorRelay.create<ProductDetailsState>()
     private val purchaseEvents = PublishRelay.create<PurchaseEvent>()
     private val subscriptionChangedEvents = PublishRelay.create<SubscriptionChangedEvent>()
-    private var hasOfferEligible = HashMap<Subscription.SubscriptionTier, Boolean>()
+    private var hasOfferEligible = HashMap<SubscriptionTier, Boolean>()
 
     override fun signOut() {
         clearCachedStatus()
@@ -282,7 +282,7 @@ class SubscriptionManagerImpl @Inject constructor(
                         billingClient.acknowledgePurchase(acknowledgePurchaseParams, this@SubscriptionManagerImpl)
                     }
                     purchase.products.map {
-                        Subscription.SubscriptionTier.fromProductId(it.toString())
+                        SubscriptionTier.fromProductId(it.toString())
                     }.distinct().forEach {
                         updateOfferEligible(it, false)
                     }
@@ -332,7 +332,7 @@ class SubscriptionManagerImpl @Inject constructor(
         val result = billingClient.queryPurchaseHistory(queryPurchaseHistoryParams)
         result.purchaseHistoryRecordList?.forEach {
             it.products.map { productId ->
-                Subscription.SubscriptionTier.fromProductId(productId)
+                SubscriptionTier.fromProductId(productId)
             }.distinct().forEach { tier ->
                 updateOfferEligible(tier, false)
             }
@@ -400,16 +400,16 @@ class SubscriptionManagerImpl @Inject constructor(
         cachedSubscriptionStatus = null
         subscriptionStatus.accept(Optional.empty())
     }
-    override fun isOfferEligible(tier: Subscription.SubscriptionTier): Boolean = (hasOfferEligible[tier] ?: true)
-    override fun updateOfferEligible(tier: Subscription.SubscriptionTier, eligible: Boolean) {
+    override fun isOfferEligible(tier: SubscriptionTier): Boolean = (hasOfferEligible[tier] ?: true)
+    override fun updateOfferEligible(tier: SubscriptionTier, eligible: Boolean) {
         hasOfferEligible[tier] = eligible
     }
     override fun getDefaultSubscription(
         subscriptions: List<Subscription>,
-        tier: Subscription.SubscriptionTier?,
+        tier: SubscriptionTier?,
         frequency: SubscriptionFrequency?,
     ): Subscription? {
-        val subscriptionTier = tier ?: Subscription.SubscriptionTier.PLUS
+        val subscriptionTier = tier ?: SubscriptionTier.PLUS
         val subscriptionFrequency = frequency ?: SubscriptionFrequency.YEARLY
 
         val tierSubscriptions = subscriptions.filter { it.tier == subscriptionTier }
@@ -427,7 +427,7 @@ class SubscriptionManagerImpl @Inject constructor(
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override fun freeTrialForSubscriptionTierFlow(subscriptionTier: Subscription.SubscriptionTier) = this
+    override fun freeTrialForSubscriptionTierFlow(subscriptionTier: SubscriptionTier) = this
         .observeProductDetails()
         .asFlow()
         .transformLatest { productDetails ->
@@ -437,7 +437,7 @@ class SubscriptionManagerImpl @Inject constructor(
                     subscriptionMapper.mapFromProductDetails(
                         productDetails = productDetailsState,
                         isOfferEligible = isOfferEligible(
-                            Subscription.SubscriptionTier.fromProductId(productDetailsState.productId),
+                            SubscriptionTier.fromProductId(productDetailsState.productId),
                         ),
                     )
                 }
@@ -512,7 +512,7 @@ sealed class SubscriptionChangedEvent {
 }
 
 data class FreeTrial(
-    val subscriptionTier: Subscription.SubscriptionTier,
+    val subscriptionTier: SubscriptionTier,
     val exists: Boolean = false,
 )
 

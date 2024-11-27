@@ -47,7 +47,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.type.OfferSubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.models.type.RecurringSubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import java.util.Locale
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -262,7 +262,7 @@ private fun recurringAfterIntroString(
 fun SubscriptionTier.toSubscribeTitle() = when (this) {
     SubscriptionTier.PLUS -> R.string.onboarding_subscribe_to_plus
     SubscriptionTier.PATRON -> R.string.onboarding_patron_subscribe
-    SubscriptionTier.UNKNOWN -> throw IllegalStateException(UNKNOWN_TIER)
+    SubscriptionTier.NONE -> throw IllegalStateException(UNKNOWN_TIER)
 }
 fun SubscriptionTier.toSubscribeButton(res: Resources) =
     res.getString(
@@ -270,11 +270,11 @@ fun SubscriptionTier.toSubscribeButton(res: Resources) =
         when (this) {
             SubscriptionTier.PATRON -> res.getString(LR.string.pocket_casts_patron_short)
             SubscriptionTier.PLUS -> res.getString(LR.string.pocket_casts_plus_short)
-            SubscriptionTier.UNKNOWN -> res.getString(LR.string.pocket_casts_plus_short)
+            SubscriptionTier.NONE -> res.getString(LR.string.pocket_casts_plus_short)
         },
     )
 fun SubscriptionTier.toOutlinedButtonBrush() = when (this) {
     SubscriptionTier.PLUS -> OnboardingUpgradeHelper.plusGradientBrush
     SubscriptionTier.PATRON -> OnboardingUpgradeHelper.patronGradientBrush
-    SubscriptionTier.UNKNOWN -> throw IllegalStateException(UNKNOWN_TIER)
+    SubscriptionTier.NONE -> throw IllegalStateException(UNKNOWN_TIER)
 }

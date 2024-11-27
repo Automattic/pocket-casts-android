@@ -18,9 +18,9 @@ import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.PaywallABTestCustomTreatment
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.Variation
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchaseEvent
@@ -91,14 +91,14 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
         val fromLogin = source == OnboardingUpgradeSource.LOGIN
         val updatedSubscriptions =
             if (showPatronOnly) {
-                subscriptions.filter { it.tier == Subscription.SubscriptionTier.PATRON }
+                subscriptions.filter { it.tier == SubscriptionTier.PATRON }
             } else {
                 subscriptions
             }
 
         val selectedSubscription = subscriptionManager.getDefaultSubscription(
             subscriptions = updatedSubscriptions,
-            tier = if (showPatronOnly) Subscription.SubscriptionTier.PATRON else { if (fromLogin) lastSelectedTier else null },
+            tier = if (showPatronOnly) SubscriptionTier.PATRON else { if (fromLogin) lastSelectedTier else null },
             frequency = if (fromLogin) lastSelectedFrequency else null,
         )
 
