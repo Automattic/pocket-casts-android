@@ -68,6 +68,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asObservable
 import kotlinx.coroutines.withContext
+import okhttp3.HttpUrl
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -692,6 +693,12 @@ class PlayerViewModel @Inject constructor(
         return dialog
     }
 
+    fun onChapterUrlClick(chapterUrl: HttpUrl) {
+        viewModelScope.launch {
+            _navigationState.emit(NavigationState.OpenChapterUrl(chapterUrl.toString()))
+        }
+    }
+
     fun onNextChapterClick() {
         analyticsTracker.track(AnalyticsEvent.PLAYER_NEXT_CHAPTER_TAPPED)
         playbackManager.skipToNextSelectedOrLastChapter()
@@ -748,6 +755,7 @@ class PlayerViewModel @Inject constructor(
         data object ShowSkipForwardLongPressOptionsDialog : NavigationState
         data class OpenChapterAt(val chapter: Chapter) : NavigationState
         data class OpenPodcastPage(val podcastUuid: String, val source: SourceView) : NavigationState
+        data class OpenChapterUrl(val chapterUrl: String) : NavigationState
     }
 
     sealed interface SnackbarMessage {

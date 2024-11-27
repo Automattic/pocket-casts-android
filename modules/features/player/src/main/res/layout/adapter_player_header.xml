@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <au.com.shiftyjelly.pocketcasts.views.component.LockableNestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:importantForAccessibility="no"
@@ -15,80 +14,14 @@
         android:clipToPadding="false"
         android:theme="@style/PlayerTheme">
 
-        <ImageView
-            android:id="@+id/artwork"
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/artworkSectionComposeView"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
-            android:importantForAccessibility="no"
-            android:clickable="true"
-            android:scaleType="fitCenter"
             app:layout_constraintBottom_toTopOf="@+id/playerHeadingSectionComposeView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:src="@tools:sample/avatars" />
-
-        <ImageView
-            android:id="@+id/chapterArtwork"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
-            android:importantForAccessibility="no"
-            android:clickable="true"
-            app:layout_constraintBottom_toTopOf="@+id/playerHeadingSectionComposeView"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:src="@tools:sample/avatars" />
-
-        <androidx.constraintlayout.widget.Barrier
-            android:id="@+id/artworkTopBarrier"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            app:barrierAllowsGoneWidgets="true"
-            app:barrierDirection="top"
-            app:constraint_referenced_ids="artwork,chapterArtwork" />
-
-        <androidx.constraintlayout.widget.Barrier
-            android:id="@+id/artworkEndBarrier"
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
-            app:barrierAllowsGoneWidgets="true"
-            app:barrierDirection="end"
-            app:constraint_referenced_ids="artwork,chapterArtwork" />
-
-        <ImageView
-            android:id="@+id/chapterUrl"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:background="?android:attr/actionBarItemBackground"
-            android:clickable="true"
-            android:contentDescription="@string/player_chapter_url"
-            android:focusable="true"
-            android:scaleType="fitCenter"
-            android:src="@drawable/ic_link_back"
-            app:layout_constraintEnd_toEndOf="@+id/artworkEndBarrier"
-            app:layout_constraintTop_toTopOf="@+id/artworkTopBarrier" />
-
-        <ImageView
-            android:id="@+id/chapterUrlFront"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/ic_link"
-            app:layout_constraintBottom_toBottomOf="@+id/chapterUrl"
-            app:layout_constraintEnd_toEndOf="@+id/chapterUrl"
-            app:layout_constraintStart_toStartOf="@+id/chapterUrl"
-            app:layout_constraintTop_toTopOf="@+id/chapterUrl" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <au.com.shiftyjelly.pocketcasts.player.view.video.VideoView
             android:id="@+id/videoView"

@@ -6,18 +6,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
-import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory.PlaceholderType
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-fun EpisodeImage(
-    episode: BaseEpisode,
-    useEpisodeArtwork: Boolean,
+fun ChapterImage(
+    chapterImagePath: String,
     modifier: Modifier = Modifier,
     placeholderType: PlaceholderType = PlaceholderType.Large,
     aspectRatio: Float = 1f,
@@ -26,14 +22,13 @@ fun EpisodeImage(
     contentScale: ContentScale = ContentScale.Crop,
 ) {
     val context = LocalContext.current
-
-    val imageRequest = remember(episode.uuid, useEpisodeArtwork) {
-        PocketCastsImageRequestFactory(context, cornerRadius = corners?.value?.toInt() ?: 0, placeholderType = placeholderType).themed().create(episode, useEpisodeArtwork)
+    val imageRequest = remember(chapterImagePath) {
+        PocketCastsImageRequestFactory(context, cornerRadius = corners?.value?.toInt() ?: 0, placeholderType = placeholderType).themed().createForFileOrUrl(chapterImagePath)
     }
 
     CoilImage(
         imageRequest = imageRequest,
-        title = stringResource(id = LR.string.episode_cover_description, episode.title),
+        title = "",
         showTitle = false,
         contentScale = contentScale,
         modifier = modifier
