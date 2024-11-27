@@ -10,7 +10,6 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.runtime.LaunchedEffect
 import androidx.core.view.isVisible
@@ -23,13 +22,11 @@ import androidx.lifecycle.repeatOnLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
-import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
-import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.binding.setSeekBarState
-import au.com.shiftyjelly.pocketcasts.player.binding.showIfPresent
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterPlayerHeaderBinding
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContract
+import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.ArtworkSection
 import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.PlayerControls
 import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.PlayerHeadingSection
 import au.com.shiftyjelly.pocketcasts.player.view.shelf.PlayerShelf
@@ -43,14 +40,11 @@ import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.Navi
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.SnackbarMessage
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.TransitionState
 import au.com.shiftyjelly.pocketcasts.reimagine.ShareDialogFragment
-import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
-import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.extensions.openUrl
-import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
@@ -70,6 +64,7 @@ import kotlin.math.abs
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -83,7 +78,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     @Inject
     lateinit var warningsHelper: WarningsHelper
 
-    private lateinit var imageRequestFactory: PocketCastsImageRequestFactory
     private val viewModel: PlayerViewModel by activityViewModels()
     private val shelfSharedViewModel: ShelfSharedViewModel by activityViewModels()
     private val transcriptViewModel by viewModels<TranscriptViewModel>({ requireParentFragment() })
@@ -110,8 +104,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
         val binding = binding ?: return
 
-        imageRequestFactory = PocketCastsImageRequestFactory(view.context, cornerRadius = 8).themed().copy(isDarkTheme = true)
-
         binding.seekBar.changeListener = object : PlayerSeekBar.OnUserSeekListener {
             override fun onSeekPositionChangeStop(progress: Duration, seekComplete: () -> Unit) {
                 val progressMs = progress.inWholeMilliseconds.toInt()
@@ -125,6 +117,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             }
         }
 
+        setupArtworkSectionComposeView()
         setupPlayerHeadingSectionComposeView()
         setupPlayerControlsComposeView()
         setupShelfComposeView()
@@ -154,35 +147,10 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 theme = headerViewModel.theme,
             )
 
-            headerViewModel.episode?.let { episode ->
-                loadArtwork(episode, headerViewModel.useEpisodeArtwork, binding.artwork)
-            }
-
-            loadChapterArtwork(headerViewModel.chapter, binding.chapterArtwork)
             binding.videoView.show = headerViewModel.isVideo
             binding.videoView.updatePlayerPrepared(headerViewModel.isPrepared)
 
-            if (headerViewModel.chapter != null) {
-                binding.chapterUrl.setOnClickListener {
-                    headerViewModel.chapter.url?.let {
-                        val intent = Intent(Intent.ACTION_VIEW)
-                        intent.data = Uri.parse(it.toString())
-                        try {
-                            startActivity(intent)
-                        } catch (e: ActivityNotFoundException) {
-                            UiUtil.displayAlertError(requireContext(), getString(LR.string.player_open_url_failed, it), null)
-                        }
-                    }
-                }
-            } else {
-                binding.chapterUrl.setOnClickListener(null)
-            }
-
             binding.playerGroup.setBackgroundColor(headerViewModel.backgroundColor)
-            binding.artwork.isVisible = headerViewModel.isPodcastArtworkVisible()
-            binding.chapterArtwork.isVisible = headerViewModel.isChapterArtworkVisible()
-            binding.chapterUrl.showIfPresent(headerViewModel.chapter?.url)
-            binding.chapterUrlFront?.showIfPresent(headerViewModel.chapter?.url)
             binding.videoView.isVisible = headerViewModel.isVideoVisible()
             binding.seekBar.setSeekBarState(
                 duration = headerViewModel.durationMs.milliseconds,
@@ -230,8 +198,30 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                                 listener.openPodcastPage(navigationState.podcastUuid, navigationState.source.analyticsValue)
                             }
                         }
+
+                        is PlayerViewModel.NavigationState.OpenChapterUrl -> {
+                            val chapterUrl = navigationState.chapterUrl
+                            val intent = Intent(Intent.ACTION_VIEW)
+                            intent.data = Uri.parse(chapterUrl)
+                            try {
+                                startActivity(intent)
+                            } catch (e: ActivityNotFoundException) {
+                                Timber.e(e)
+                                UiUtil.displayAlertError(requireContext(), getString(LR.string.player_open_url_failed, chapterUrl), null)
+                            }
+                        }
                     }
                 }
+            }
+        }
+    }
+
+    private fun setupArtworkSectionComposeView() {
+        binding?.artworkSectionComposeView?.setContentWithViewCompositionStrategy {
+            AppTheme(theme.activeTheme) {
+                ArtworkSection(
+                    playerViewModel = viewModel,
+                )
             }
         }
     }
@@ -471,37 +461,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             } else {
                 false
             }
-        }
-    }
-
-    private var lastLoadedBaseEpisodeId: String? = null
-    private var lastUseEpisodeArtwork: Boolean? = null
-    private var lastLoadedChapterPath: String? = null
-
-    private fun loadArtwork(
-        baseEpisode: BaseEpisode,
-        useEpisodeArtwork: Boolean,
-        imageView: ImageView,
-    ) {
-        if (lastLoadedBaseEpisodeId == baseEpisode.uuid && lastUseEpisodeArtwork == useEpisodeArtwork) {
-            return
-        }
-
-        lastLoadedBaseEpisodeId = baseEpisode.uuid
-        lastUseEpisodeArtwork = useEpisodeArtwork
-        imageRequestFactory.create(baseEpisode, useEpisodeArtwork).loadInto(imageView)
-    }
-
-    private fun loadChapterArtwork(chapter: Chapter?, imageView: ImageView) {
-        if (lastLoadedChapterPath == chapter?.imagePath) {
-            return
-        }
-
-        lastLoadedChapterPath = chapter?.imagePath
-        chapter?.imagePath?.let { pathOrUrl ->
-            imageRequestFactory.createForFileOrUrl(pathOrUrl).loadInto(imageView)
-        } ?: run {
-            imageView.setImageDrawable(null)
         }
     }
 
