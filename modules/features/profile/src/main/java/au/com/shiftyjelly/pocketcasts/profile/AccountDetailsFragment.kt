@@ -9,14 +9,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -28,10 +29,9 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.ProfileUpgradeB
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.compose.components.UserAvatarConfig
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
-import au.com.shiftyjelly.pocketcasts.models.to.SignInState
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.profile.champion.PocketCastsChampionBottomSheetDialog
 import au.com.shiftyjelly.pocketcasts.profile.databinding.FragmentAccountDetailsBinding
@@ -121,59 +121,8 @@ class AccountDetailsFragment : BaseFragment() {
             )
         }
         binding.setupHeaderView()
-
-        viewModel.signInStateLiveData.observe(viewLifecycleOwner) { signInState ->
-            binding.changeAvatarGroup?.isVisible = signInState is SignInState.SignedIn
-
-            if (signInState is SignInState.SignedIn) {
-                binding.btnChangeAvatar?.setOnClickListener {
-                    analyticsTracker.track(AnalyticsEvent.ACCOUNT_DETAILS_CHANGE_AVATAR)
-                    Gravatar.refreshGravatarTimestamp()
-                    context?.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Gravatar.getGravatarChangeAvatarUrl(signInState.email))))
-                }
-            }
-        }
-
-        viewModel.viewState.observe(viewLifecycleOwner) { (signInState, subscription, deleteAccountState) ->
-            var giftExpiring = false
-            (signInState as? SignInState.SignedIn)?.subscriptionStatus?.let { status ->
-                val subscriptionStatus = status as? SubscriptionStatus.Paid ?: return@let
-                giftExpiring = subscriptionStatus.isExpiring
-            }
-
-            binding.cancelViewGroup?.isVisible = signInState.isSignedInAsPaid
-            binding.btnCancelSub?.isVisible = signInState.isSignedInAsPaid
-            binding.upgradeAccountGroup?.isVisible = signInState.isSignedInAsPlus &&
-                !giftExpiring
-
-            binding.userUpgradeComposeView?.setContentWithViewCompositionStrategy {
-                AppTheme(theme.activeTheme) {
-                    val showUpgradeBanner = subscription != null && (signInState.isSignedInAsFree || giftExpiring)
-                    binding.dividerView15?.isVisible = showUpgradeBanner
-                    if (showUpgradeBanner) {
-                        ProfileUpgradeBanner(
-                            onClick = {
-                                analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_UPGRADE_BUTTON_TAPPED)
-                                val source = OnboardingUpgradeSource.PROFILE
-                                val onboardingFlow = OnboardingFlow.PlusAccountUpgrade(source)
-                                OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
-                            },
-                            modifier = Modifier.padding(top = 16.dp),
-                        )
-                    }
-                }
-            }
-
-            updateDeleteAccountState(deleteAccountState)
-        }
-
-        viewModel.marketingOptInState.observe(viewLifecycleOwner) { marketingOptIn ->
-            binding.swtNewsletter?.isChecked = marketingOptIn
-            binding.swtNewsletter?.setOnCheckedChangeListener { _, isChecked ->
-                viewModel.updateNewsletter(isChecked)
-            }
-        }
-
+        binding.setupUpsellView()
+        binding.setupSectionsView()
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 settings.bottomInset.collect { bottomInset ->
@@ -181,54 +130,12 @@ class AccountDetailsFragment : BaseFragment() {
                 }
             }
         }
-
-        binding.btnChangeEmail?.setOnClickListener {
-            val fragment = ChangeEmailFragment.newInstance()
-            (activity as FragmentHostListener).addFragment(fragment)
-        }
-
-        val showChangeButtons = !syncManager.isGoogleLogin()
-        binding.changeEmailPasswordGroup?.isVisible = showChangeButtons
-
-        binding.btnChangePwd?.setOnClickListener {
-            val fragment = ChangePwdFragment.newInstance()
-            (this.activity as FragmentHostListener).addFragment(fragment)
-        }
-
-        binding.btnUpgradeAccount?.setOnClickListener {
-            val source = OnboardingUpgradeSource.ACCOUNT_DETAILS
-            val onboardingFlow = OnboardingFlow.PatronAccountUpgrade(source)
-            OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
-        }
-
-        binding.btnCancelSub?.setOnClickListener {
-            analyticsTracker.track(AnalyticsEvent.ACCOUNT_DETAILS_CANCEL_TAPPED)
-            CancelConfirmationFragment.newInstance()
-                .show(childFragmentManager, "cancel_subscription_confirmation_dialog")
-        }
-
-        binding.btnSignOut.setOnClickListener {
-            signOut()
-        }
-
-        binding.btnDeleteAccount?.setOnClickListener {
-            deleteAccount()
-        }
-
-        binding.btnNewsletter?.setOnClickListener {
-            binding.swtNewsletter?.let {
-                it.isChecked = !it.isChecked
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.deleteAccountState.collect {
+                    updateDeleteAccountState(it)
+                }
             }
-        }
-
-        binding.btnPrivacyPolicy?.setOnClickListener {
-            analyticsTracker.track(AnalyticsEvent.ACCOUNT_DETAILS_SHOW_PRIVACY_POLICY)
-            context?.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Settings.INFO_PRIVACY_URL)))
-        }
-
-        binding.btnTermsOfUse?.setOnClickListener {
-            analyticsTracker.track(AnalyticsEvent.ACCOUNT_DETAILS_SHOW_TOS)
-            context?.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Settings.INFO_TOS_URL)))
         }
     }
 
@@ -264,6 +171,93 @@ class AccountDetailsFragment : BaseFragment() {
                         }
                     },
                     config = config,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+        }
+    }
+
+    private fun FragmentAccountDetailsBinding.setupUpsellView() {
+        userUpgradeComposeView?.setContentWithViewCompositionStrategy {
+            val showBanner by viewModel.showUpgradeBanner.collectAsState()
+            AppTheme(theme.activeTheme) {
+                if (showBanner) {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        HorizontalDivider()
+                        ProfileUpgradeBanner(
+                            onClick = {
+                                analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_UPGRADE_BUTTON_TAPPED)
+                                val source = OnboardingUpgradeSource.PROFILE
+                                val onboardingFlow = OnboardingFlow.PlusAccountUpgrade(source)
+                                OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
+                            },
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun FragmentAccountDetailsBinding.setupSectionsView() {
+        val isAutomotive = Util.isAutomotive(requireContext())
+        val config = if (isAutomotive) {
+            AccountSectionsConfig(
+                iconSize = 48.dp,
+                fontScale = 2f,
+            )
+        } else {
+            AccountSectionsConfig()
+        }
+        sectionsView.setContentWithViewCompositionStrategy {
+            AppTheme(theme.activeTheme) {
+                val state by if (isAutomotive) {
+                    viewModel.automotiveSectionsState.collectAsState()
+                } else {
+                    viewModel.sectionsState.collectAsState()
+                }
+
+                AccountSections(
+                    state = state,
+                    config = config,
+                    onChangeAvatar = { email ->
+                        analyticsTracker.track(AnalyticsEvent.ACCOUNT_DETAILS_CHANGE_AVATAR)
+                        Gravatar.refreshGravatarTimestamp()
+                        requireActivity().startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Gravatar.getGravatarChangeAvatarUrl(email))))
+                    },
+                    onChangeEmail = {
+                        (requireActivity() as FragmentHostListener).addFragment(ChangeEmailFragment.newInstance())
+                    },
+                    onChangePassword = {
+                        (requireActivity() as FragmentHostListener).addFragment(ChangePwdFragment.newInstance())
+                    },
+                    onUpgradeToPatron = {
+                        val source = OnboardingUpgradeSource.ACCOUNT_DETAILS
+                        val onboardingFlow = OnboardingFlow.PatronAccountUpgrade(source)
+                        OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
+                    },
+                    onCancelSubscription = {
+                        analyticsTracker.track(AnalyticsEvent.ACCOUNT_DETAILS_CANCEL_TAPPED)
+                        CancelConfirmationFragment
+                            .newInstance()
+                            .show(childFragmentManager, "cancel_subscription_confirmation_dialog")
+                    },
+                    onChangeNewsletterSubscription = { isChecked ->
+                        viewModel.updateNewsletter(isChecked)
+                    },
+                    onShowPrivacyPolicy = {
+                        analyticsTracker.track(AnalyticsEvent.ACCOUNT_DETAILS_SHOW_PRIVACY_POLICY)
+                        requireActivity().startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Settings.INFO_PRIVACY_URL)))
+                    },
+                    onShowTermsOfUse = {
+                        analyticsTracker.track(AnalyticsEvent.ACCOUNT_DETAILS_SHOW_TOS)
+                        requireActivity().startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Settings.INFO_TOS_URL)))
+                    },
+                    onSignOut = { signOut() },
+                    onDeleteAccount = { deleteAccount() },
                     modifier = Modifier.fillMaxWidth(),
                 )
             }

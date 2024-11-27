@@ -5,6 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -15,6 +18,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.Date
 import javax.inject.Inject
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.reactive.collect
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
@@ -43,11 +48,14 @@ class SubCancelledFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        viewModel.viewState.observe(viewLifecycleOwner) { (signInState, _) ->
-            val expiryDate = ((signInState as? SignInState.SignedIn)?.subscriptionStatus as? SubscriptionStatus.Paid)?.expiryDate ?: Date()
-            val endDate = dateFormatter.format(expiryDate)
-            binding?.txtHint0?.text = getString(LR.string.profile_sub_cancel_hint0) + " " + endDate
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.signInState.collect { signInState ->
+                    val expiryDate = ((signInState as? SignInState.SignedIn)?.subscriptionStatus as? SubscriptionStatus.Paid)?.expiryDate ?: Date()
+                    val endDate = dateFormatter.format(expiryDate)
+                    binding?.txtHint0?.text = getString(LR.string.profile_sub_cancel_hint0) + " " + endDate
+                }
+            }
         }
 
         binding?.btnDone?.setOnClickListener {
