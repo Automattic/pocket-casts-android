@@ -48,7 +48,7 @@ class ProfileViewModel @Inject constructor(
 
     internal val isSignedIn get() = signInState.value.isSignedIn
 
-    internal val profileHeaderState = signInState.map { state ->
+    internal val profileHeaderState = combine(signInState, Gravatar.lastTimeStamp) { state, _ ->
         when (state) {
             is SignInState.SignedIn -> ProfileHeaderState(
                 imageUrl = Gravatar.getUrl(state.email),
