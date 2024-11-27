@@ -4,7 +4,6 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -32,6 +31,8 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeDisplayMode
+import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeForTier
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
@@ -77,14 +78,12 @@ fun UserAvatar(
 
         val badge = if (subscriptionTier == PATRON && showPatronBadge) {
             subcompose("badge") {
-                SubscriptionBadge(
-                    subscriptionTier = PATRON,
-                    backgroundColor = subscriptionTier.toDarkColor(),
+                SubscriptionBadgeForTier(
+                    tier = PATRON,
+                    displayMode = SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground,
                     fontSize = config.badgeFontSize,
-                    fontColor = Color.White,
                     iconSize = config.badgeIconSize,
-                    iconColor = Color.White,
-                    contentPadding = config.badgeContentPadding,
+                    padding = config.badgeContentPadding,
                 )
             }[0].measure(constraints)
         } else {
@@ -186,7 +185,7 @@ data class UserAvatarConfig(
     val strokeWidth: Dp = 4.dp,
     val badgeFontSize: TextUnit = 12.sp,
     val badgeIconSize: Dp = 12.dp,
-    val badgeContentPadding: PaddingValues = PaddingValues(horizontal = 8.dp, vertical = 6.dp),
+    val badgeContentPadding: Dp = 4.dp,
 )
 
 @Composable
