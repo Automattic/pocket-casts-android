@@ -17,13 +17,10 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.Gravatar
 import au.com.shiftyjelly.pocketcasts.utils.Optional
+import au.com.shiftyjelly.pocketcasts.utils.toDurationFromNow
 import com.automattic.android.tracks.crashlogging.CrashLogging
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.time.Instant
-import java.util.Date
 import javax.inject.Inject
-import kotlin.time.Duration
-import kotlin.time.toKotlinDuration
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -35,7 +32,6 @@ import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.time.Duration as JavaDuration
 
 @HiltViewModel
 class AccountDetailsViewModel
@@ -85,13 +81,13 @@ class AccountDetailsViewModel
                                 if (status.autoRenew) {
                                     SubscriptionHeaderState.PaidRenew(
                                         tier = status.tier,
-                                        expiresIn = status.expiryDate.toExpiresInDuration(),
+                                        expiresIn = status.expiryDate.toDurationFromNow(),
                                         frequency = status.frequency,
                                     )
                                 } else {
                                     SubscriptionHeaderState.PaidCancel(
                                         tier = status.tier,
-                                        expiresIn = status.expiryDate.toExpiresInDuration(),
+                                        expiresIn = status.expiryDate.toDurationFromNow(),
                                         isChampion = status.isPocketCastsChampion,
                                         platform = status.platform,
                                         giftDaysLeft = status.giftDays,
@@ -100,12 +96,12 @@ class AccountDetailsViewModel
                             } else if (activeSubscription.autoRenewing) {
                                 SubscriptionHeaderState.SupporterRenew(
                                     tier = activeSubscription.tier,
-                                    expiresIn = activeSubscription.expiryDate?.toExpiresInDuration(),
+                                    expiresIn = activeSubscription.expiryDate?.toDurationFromNow(),
                                 )
                             } else {
                                 SubscriptionHeaderState.SupporterCancel(
                                     tier = activeSubscription.tier,
-                                    expiresIn = activeSubscription.expiryDate?.toExpiresInDuration(),
+                                    expiresIn = activeSubscription.expiryDate?.toDurationFromNow(),
                                 )
                             }
                         }
@@ -187,12 +183,6 @@ class AccountDetailsViewModel
             mapOf(SOURCE_KEY to NewsletterSource.PROFILE.analyticsValue, ENABLED_KEY to isChecked),
         )
         settings.marketingOptIn.set(isChecked, updateModifiedAt = true)
-    }
-
-    private fun Date.toExpiresInDuration(): Duration {
-        return JavaDuration.between(Instant.now(), toInstant())
-            .toKotlinDuration()
-            .coerceAtLeast(Duration.ZERO)
     }
 
     companion object {
