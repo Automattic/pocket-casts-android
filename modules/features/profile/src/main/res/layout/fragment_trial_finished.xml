@@ -21,7 +21,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
             <au.com.shiftyjelly.pocketcasts.views.component.GradientIcon
-                android:id="@+id/imgSub"
                 android:layout_width="140dp"
                 android:layout_height="140dp"
                 android:layout_marginStart="16dp"

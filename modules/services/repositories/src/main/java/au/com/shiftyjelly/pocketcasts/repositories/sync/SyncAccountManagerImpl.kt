@@ -4,6 +4,7 @@ import android.accounts.Account
 import android.accounts.AccountManager
 import android.accounts.AccountManagerFuture
 import android.accounts.NetworkErrorException
+import android.accounts.OnAccountsUpdateListener
 import android.content.Intent
 import android.os.Bundle
 import androidx.core.os.BundleCompat
@@ -18,6 +19,8 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.withContext
 
 @Singleton
@@ -25,7 +28,6 @@ open class SyncAccountManagerImpl @Inject constructor(
     private val tokenErrorNotification: TokenErrorNotification,
     private val accountManager: AccountManager,
 ) : TokenHandler, SyncAccountManager {
-
     override fun getAccount(): Account? {
         return accountManager.getAccountsByType(AccountConstants.ACCOUNT_TYPE).firstOrNull()
     }
@@ -36,6 +38,20 @@ open class SyncAccountManagerImpl @Inject constructor(
 
     override fun getEmail(): String? {
         return getAccount()?.name
+    }
+
+    override fun observeEmail() = callbackFlow<String?> {
+        val listener = object : OnAccountsUpdateListener {
+            override fun onAccountsUpdated(accounts: Array<out Account>?) {
+                val email = accounts?.find { it.type == AccountConstants.ACCOUNT_TYPE }?.name
+                trySend(email)
+            }
+        }
+        trySend(getEmail())
+        accountManager.addOnAccountsUpdatedListener(listener, null, true)
+        awaitClose {
+            accountManager.removeOnAccountsUpdatedListener(listener)
+        }
     }
 
     override fun getUuid(): String? =

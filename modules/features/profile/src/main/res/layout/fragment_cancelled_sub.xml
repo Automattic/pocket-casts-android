@@ -20,7 +20,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
             <ImageView
-                android:id="@+id/imgSub"
                 android:layout_width="140dp"
                 android:layout_height="140dp"
                 android:layout_marginStart="16dp"

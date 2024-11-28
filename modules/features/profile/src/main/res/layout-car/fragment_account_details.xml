@@ -13,7 +13,8 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/mainConstraintView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:background="?attr/primary_ui_02">
 
             <androidx.compose.ui.platform.ComposeView
                 android:id="@+id/headerView"
@@ -22,79 +23,18 @@
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="16dp"
                 android:paddingBottom="8dp"
-                app:layout_constraintBottom_toTopOf="@id/dividerViewTop"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <View
-                android:id="@+id/dividerViewTop"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/divider_height"
-                android:background="?attr/primary_ui_05"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/headerView"
-                app:layout_constraintBottom_toTopOf="@+id/imgSignOut" />
-
-            <ImageView
-                android:id="@+id/imgSignOut"
-                android:layout_width="@dimen/auto_profile_icon_size"
-                android:layout_height="@dimen/auto_profile_icon_size"
-                android:layout_marginStart="16dp"
-                app:tint="?attr/support_05"
-                app:layout_constraintStart_toStartOf="@id/btnSignOut"
-                app:layout_constraintEnd_toStartOf="@+id/lblSignOut"
-                app:layout_constraintTop_toTopOf="@id/btnSignOut"
-                app:layout_constraintBottom_toBottomOf="@id/btnSignOut"
-                app:srcCompat="@drawable/ic_signout" />
-
-            <TextView
-                android:id="@+id/lblSignOut"
+            <androidx.compose.ui.platform.ComposeView
+                android:id="@+id/sectionsView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:text="@string/profile_sign_out"
-                android:textAppearance="@style/TextAppearance.Car.Body1"
-                android:textColor="?attr/support_05"
-                android:importantForAccessibility="no"
-                app:layout_constraintStart_toEndOf="@id/imgSignOut"
-                app:layout_constraintEnd_toEndOf="@id/btnSignOut"
-                app:layout_constraintTop_toTopOf="@+id/btnSignOut"
-                app:layout_constraintBottom_toBottomOf="@+id/btnSignOut" />
-
-            <View
-                android:id="@+id/btnSignOut"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/automotive_profile_row_height"
-                android:background="?attr/selectableItemBackground"
-                android:paddingTop="16dp"
-                android:paddingBottom="16dp"
-                android:contentDescription="@string/profile_sign_out"
-                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginTop="16dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/dividerViewTop"
-                app:layout_constraintBottom_toTopOf="@+id/dividerViewBottom"/>
-
-            <View
-                android:id="@+id/dividerViewBottom"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/divider_height"
-                android:background="?attr/primary_ui_05"
-                android:paddingTop="8dp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/btnSignOut"
-                app:layout_constraintBottom_toTopOf="@+id/page_bottom_padding" />
-
-            <View
-                android:id="@+id/page_bottom_padding"
-                android:layout_width="0dp"
-                android:layout_height="32dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/dividerViewBottom"
-                app:layout_constraintBottom_toBottomOf="parent"/>
+                app:layout_constraintTop_toBottomOf="@+id/headerView" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
