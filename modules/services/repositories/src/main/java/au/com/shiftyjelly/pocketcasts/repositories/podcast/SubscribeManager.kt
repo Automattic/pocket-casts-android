@@ -11,7 +11,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.AutoDownloadLimitSetting
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.GLOBAL_AUTO_DOWNLOAD_NONE
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
@@ -305,7 +304,7 @@ class SubscribeManager @Inject constructor(
         podcast.autoDownloadStatus = if (foundEpisodes && allAutoDownloading) Podcast.AUTO_DOWNLOAD_NEW_EPISODES else Podcast.AUTO_DOWNLOAD_OFF
         podcast.isShowNotifications = foundEpisodes && allSendingNotifications
         podcast.sortPosition = count
-        podcast.episodesSortType = if (podcast.episodesSortType.ordinal == 0) EpisodesSortType.EPISODES_SORT_BY_DATE_DESC else podcast.episodesSortType
+        podcast.episodesSortType = podcast.episodesSortType
         podcast.episodes.firstOrNull()?.let { episode ->
             podcast.latestEpisodeUuid = episode.uuid
             podcast.latestEpisodeDate = episode.publishedDate
