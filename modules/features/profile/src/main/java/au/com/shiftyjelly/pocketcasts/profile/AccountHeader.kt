@@ -250,7 +250,7 @@ private fun SubscriptionHeaderState.labels(): Labels {
 
             is SubscriptionHeaderState.SupporterCancel -> {
                 val expiryDate = expiresIn?.inWholeMilliseconds?.let { Date(Date().time + it) }
-                val expiryString = expiryDate?.let { it.toLocalizedFormatLongStyle() } ?: context.getString(LR.string.profile_expiry_date_unknown)
+                val expiryString = expiryDate?.toLocalizedFormatLongStyle() ?: context.getString(LR.string.profile_expiry_date_unknown)
                 Labels(
                     start = Label(
                         text = context.getString(LR.string.supporter_payment_cancelled),
