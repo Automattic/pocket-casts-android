@@ -5,6 +5,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -130,36 +131,32 @@ private fun WhatsNewPageLoaded(
                 }
             }
 
-            // Hide the header graphic if the phone is in landscape mode so there is room for the text
-            if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {
-                if (state.fullModel) {
-                    Spacer(modifier = Modifier.weight(0.2f))
-                }
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .then(if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) Modifier.weight(1f) else Modifier),
+            ) {
                 header()
-            }
 
-            Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-            TextH10(
-                text = stringResource(id = state.feature.title),
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.theme.colors.primaryText01,
-                modifier = Modifier.padding(horizontal = 32.dp),
-            )
+                TextH10(
+                    text = stringResource(id = state.feature.title),
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.theme.colors.primaryText01,
+                    modifier = Modifier.padding(horizontal = 32.dp),
+                )
 
-            Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-            TextP40(
-                text = stringResource(state.feature.message),
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.theme.colors.primaryText01,
-                modifier = Modifier.padding(horizontal = 32.dp),
-            )
-
-            if (state.fullModel) {
-                Spacer(modifier = Modifier.weight(0.5f))
-            } else {
-                Spacer(modifier = Modifier.height(32.dp))
+                TextP40(
+                    text = stringResource(state.feature.message),
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.theme.colors.primaryText01,
+                    modifier = Modifier.padding(horizontal = 32.dp).padding(bottom = 8.dp),
+                )
             }
 
             RowButton(
