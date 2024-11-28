@@ -4,17 +4,17 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -39,23 +39,17 @@ private object NotesCardTheme {
 internal fun TrialFinishedNotesCard(
     modifier: Modifier = Modifier,
 ) {
-    Box(
+    Card(
+        shape = DefaultCardShape,
+        elevation = 8.dp,
+        backgroundColor = NotesCardTheme.backgroundColor,
         modifier = modifier
-            .fillMaxWidth(),
-        contentAlignment = Alignment.TopCenter,
+            .fillMaxWidth()
+            .border(width = 2.dp, color = NotesCardTheme.borderColor, shape = DefaultCardShape),
     ) {
-        Card(
-            shape = DefaultCardShape,
-            elevation = 8.dp,
-            backgroundColor = NotesCardTheme.backgroundColor,
-            modifier = Modifier
-                .fillMaxWidth()
-                .border(width = 2.dp, color = NotesCardTheme.borderColor, shape = DefaultCardShape),
-        ) {
-            Column(modifier = Modifier.padding(bottom = 20.dp)) {
-                TrialFinishedNotesItem.entries.forEach {
-                    NotesItemRow(item = it)
-                }
+        Column(modifier = Modifier.padding(bottom = 20.dp)) {
+            TrialFinishedNotesItem.entries.forEach {
+                NotesItemRow(item = it)
             }
         }
     }
@@ -70,20 +64,19 @@ private fun NotesItemRow(
         horizontalArrangement = Arrangement.Center,
         modifier = modifier
             .fillMaxWidth()
-            .padding(top = 20.dp),
+            .padding(top = 20.dp, start = 32.dp, end = 16.dp),
     ) {
         GradientIcon(
             painter = painterResource(item.icon),
             gradientBrush = plusGradientBrush,
-            modifier = Modifier
-                .padding(start = 32.dp)
-                .size(24.dp),
+            modifier = Modifier.size(24.dp),
         )
+
+        Spacer(Modifier.width(16.dp))
 
         TextH50(
             text = stringResource(item.text),
             color = MaterialTheme.theme.colors.primaryText02,
-            modifier = Modifier.padding(horizontal = 16.dp),
         )
     }
 }
@@ -96,32 +89,25 @@ fun NotesCardPreview() {
 
 internal enum class TrialFinishedNotesItem(
     override val icon: Int,
-    override val iconContentDescription: Int,
     override val text: Int,
 ) : NotesItem {
     LOCK_FEATURE(
         text = LR.string.plus_trial_finished_locked,
         icon = PR.drawable.ic_locked_large,
-        iconContentDescription = LR.string.profile_plus,
     ),
     FILES_REMOVED(
         text = LR.string.plus_trial_finished_files_removed,
         icon = IR.drawable.ic_cloud,
-        iconContentDescription = LR.string.profile_plus,
     ),
     UPGRADE_ACCOUNT(
         text = LR.string.plus_trial_finished_continue,
         icon = IR.drawable.ic_plus,
-        iconContentDescription = LR.string.profile_plus,
     ),
 }
 
 interface NotesItem {
     @get:DrawableRes
     val icon: Int
-
-    @get:StringRes
-    val iconContentDescription: Int
 
     @get:StringRes
     val text: Int

@@ -120,7 +120,6 @@ fun TrialFinishedFooter(
                 text = stringResource(LR.string.plus_upgrade_to_pocket_casts_plus),
                 onClick = { onUpgradeClick.invoke() },
                 includePadding = false,
-                fontSize = 16.sp,
                 textPadding = 0.dp,
                 fontWeight = FontWeight.W500,
                 border = null,
@@ -136,6 +135,7 @@ fun TrialFinishedFooter(
                 text = stringResource(LR.string.done),
                 onClick = { onDoneClick.invoke() },
                 includePadding = false,
+                fontSize = 18.sp,
                 textColor = MaterialTheme.theme.colors.primaryInteractive02,
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = MaterialTheme.theme.colors.primaryInteractive01,
