@@ -142,7 +142,7 @@ fun SubscriptionBadgeForTier(
                 -> SubscriptionTierColor.plusGold
             },
             textColor = when (displayMode) {
-                SubscriptionBadgeDisplayMode.Black -> SubscriptionTierColor.plusGold
+                SubscriptionBadgeDisplayMode.Black -> Color.White
                 SubscriptionBadgeDisplayMode.Colored -> MaterialTheme.theme.colors.primaryUi01
                 SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground -> Color.White
                 SubscriptionBadgeDisplayMode.ColoredWithBlackForeground -> Color.Black

@@ -50,7 +50,7 @@ fun UserAvatar(
     subscriptionTier: SubscriptionTier,
     modifier: Modifier = Modifier,
     borderCompletion: Float = 1f,
-    showPatronBadge: Boolean = true,
+    showBadge: Boolean = subscriptionTier == PATRON,
     config: UserAvatarConfig = UserAvatarConfig(),
 ) {
     SubcomposeLayout(
@@ -76,11 +76,11 @@ fun UserAvatar(
             null
         }
 
-        val badge = if (subscriptionTier == PATRON && showPatronBadge) {
+        val badge = if (showBadge) {
             subcompose("badge") {
                 SubscriptionBadgeForTier(
-                    tier = PATRON,
-                    displayMode = SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground,
+                    tier = subscriptionTier,
+                    displayMode = SubscriptionBadgeDisplayMode.Colored,
                     fontSize = config.badgeFontSize,
                     iconSize = config.badgeIconSize,
                     padding = config.badgeContentPadding,
