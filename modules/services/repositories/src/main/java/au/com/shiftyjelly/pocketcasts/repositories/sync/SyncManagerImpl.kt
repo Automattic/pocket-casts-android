@@ -60,6 +60,7 @@ import java.net.HttpURLConnection
 import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.rx2.rxSingle
 import retrofit2.HttpException
 import retrofit2.Response
@@ -129,7 +130,7 @@ class SyncManagerImpl @Inject constructor(
     override fun getEmail(): String? =
         syncAccountManager.getEmail()
 
-    override fun observeEmail() = syncAccountManager.observeEmail()
+    override fun observeEmail() = syncAccountManager.observeEmail().distinctUntilChanged()
 
     override suspend fun getAccessToken(account: Account): AccessToken =
         syncAccountManager.peekAccessToken(account)
