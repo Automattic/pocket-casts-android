@@ -5,6 +5,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -22,7 +23,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
@@ -36,9 +36,9 @@ import au.com.shiftyjelly.pocketcasts.compose.buttons.RowTextButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewViewModel.WhatsNewFeature
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun WhatsNewPage(
@@ -55,7 +55,7 @@ fun WhatsNewPage(
                 state = uiState,
                 header = {
                     when (uiState.feature) {
-                        is WhatsNewFeature.ReimagineSharing -> SharingHeader()
+                        is WhatsNewFeature.Shuffle -> ShuffleHeader()
                     }
                 },
                 onConfirm = { viewModel.onConfirm() },
@@ -93,10 +93,16 @@ private fun WhatsNewPageLoaded(
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .background(Color.Black.copy(alpha = scrimAlpha))
-            .clickable(
-                indication = null,
-                interactionSource = remember { MutableInteractionSource() },
-                onClick = { if (!state.fullModel) performClose() },
+            .then(
+                if (!state.fullModel) {
+                    Modifier.clickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() },
+                        onClick = { performClose() },
+                    )
+                } else {
+                    Modifier
+                },
             )
             .padding(if (state.fullModel) 0.dp else 16.dp)
             .fillMaxSize(),
@@ -116,7 +122,7 @@ private fun WhatsNewPageLoaded(
                     modifier = Modifier.align(Alignment.Start),
                 ) {
                     RowTextButton(
-                        text = stringResource(R.string.cancel),
+                        text = stringResource(LR.string.cancel),
                         fontSize = 15.sp,
                         onClick = performClose,
                         fullWidth = false,
@@ -125,38 +131,33 @@ private fun WhatsNewPageLoaded(
                 }
             }
 
-            // Hide the header graphic if the phone is in landscape mode so there is room for the text
-            if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {
-                if (state.fullModel) {
-                    Spacer(modifier = Modifier.weight(0.2f))
-                }
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier.weight(1f),
-                ) {
-                    header()
-                }
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .then(if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) Modifier.weight(1f) else Modifier),
+            ) {
+                header()
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                TextH10(
+                    text = stringResource(id = state.feature.title),
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.theme.colors.primaryText01,
+                    modifier = Modifier.padding(horizontal = 32.dp),
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                TextP40(
+                    text = stringResource(state.feature.message),
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.theme.colors.primaryText01,
+                    modifier = Modifier.padding(horizontal = 32.dp).padding(bottom = 8.dp),
+                )
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            TextH10(
-                text = stringResource(id = state.feature.title),
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.theme.colors.primaryText01,
-                modifier = Modifier.padding(horizontal = 32.dp),
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            TextP40(
-                text = stringResource(state.feature.message),
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.theme.colors.primaryText01,
-                modifier = Modifier.padding(horizontal = 32.dp),
-            )
-
-            Spacer(modifier = Modifier.height(32.dp))
 
             RowButton(
                 text = stringResource(state.feature.confirmButtonTitle),
