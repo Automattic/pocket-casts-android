@@ -285,7 +285,6 @@ class AutoDownloadSettingsFragment :
 
     private fun updateNewEpisodesPreferencesVisibility(status: Int) {
         val podcastsPreference = podcastsPreference ?: return
-        val podcastsLimitPreference = podcastsAutoDownloadLimitPreference ?: return
         val podcastsCategory = podcastsCategory ?: return
 
         val isAutoDownloadEnabled = if (status == GLOBAL_AUTO_DOWNLOAD_NONE) {
@@ -296,10 +295,8 @@ class AutoDownloadSettingsFragment :
 
         if (isAutoDownloadEnabled) {
             podcastsCategory.addPreference(podcastsPreference)
-            podcastsCategory.addPreference(podcastsLimitPreference)
         } else {
             podcastsCategory.removePreference(podcastsPreference)
-            podcastsCategory.removePreference(podcastsLimitPreference)
         }
     }
 
