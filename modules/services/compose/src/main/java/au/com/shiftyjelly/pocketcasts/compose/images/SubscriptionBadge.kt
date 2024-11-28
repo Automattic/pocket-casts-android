@@ -27,8 +27,13 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
-import au.com.shiftyjelly.pocketcasts.compose.PocketCastsColors
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
+import au.com.shiftyjelly.pocketcasts.compose.patronPurple
+import au.com.shiftyjelly.pocketcasts.compose.patronPurpleDark
+import au.com.shiftyjelly.pocketcasts.compose.patronPurpleLight
+import au.com.shiftyjelly.pocketcasts.compose.plusGold
+import au.com.shiftyjelly.pocketcasts.compose.plusGoldDark
+import au.com.shiftyjelly.pocketcasts.compose.plusGoldLight
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -129,7 +134,7 @@ fun SubscriptionBadgeForTier(
             iconRes = IR.drawable.ic_plus,
             shortNameRes = LR.string.pocket_casts_plus_short,
             iconColor = when (displayMode) {
-                SubscriptionBadgeDisplayMode.Black -> PocketCastsColors.plusGold
+                SubscriptionBadgeDisplayMode.Black -> Color.plusGold
                 SubscriptionBadgeDisplayMode.Colored,
                 SubscriptionBadgeDisplayMode.ColoredDark,
                 -> MaterialTheme.theme.colors.primaryUi01
@@ -138,11 +143,11 @@ fun SubscriptionBadgeForTier(
             },
             backgroundColor = when (displayMode) {
                 SubscriptionBadgeDisplayMode.Black -> Color.Black
-                SubscriptionBadgeDisplayMode.ColoredDark -> PocketCastsColors.plusGoldDark
+                SubscriptionBadgeDisplayMode.ColoredDark -> Color.plusGoldDark
                 SubscriptionBadgeDisplayMode.Colored,
                 SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground,
                 SubscriptionBadgeDisplayMode.ColoredWithBlackForeground,
-                -> PocketCastsColors.plusGold
+                -> Color.plusGold
             },
             textColor = when (displayMode) {
                 SubscriptionBadgeDisplayMode.Black -> Color.White
@@ -162,7 +167,7 @@ fun SubscriptionBadgeForTier(
             iconRes = IR.drawable.ic_patron,
             shortNameRes = LR.string.pocket_casts_patron_short,
             iconColor = when (displayMode) {
-                SubscriptionBadgeDisplayMode.Black -> PocketCastsColors.patronPurpleLight
+                SubscriptionBadgeDisplayMode.Black -> Color.patronPurpleLight
                 SubscriptionBadgeDisplayMode.Colored,
                 SubscriptionBadgeDisplayMode.ColoredDark,
                 SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground,
@@ -171,11 +176,11 @@ fun SubscriptionBadgeForTier(
             },
             backgroundColor = when (displayMode) {
                 SubscriptionBadgeDisplayMode.Black -> Color.Black
-                SubscriptionBadgeDisplayMode.ColoredDark -> PocketCastsColors.patronPurpleDark
+                SubscriptionBadgeDisplayMode.ColoredDark -> Color.patronPurpleDark
                 SubscriptionBadgeDisplayMode.Colored,
                 SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground,
                 SubscriptionBadgeDisplayMode.ColoredWithBlackForeground,
-                -> PocketCastsColors.patronPurple
+                -> Color.patronPurple
             },
             textColor = when (displayMode) {
                 SubscriptionBadgeDisplayMode.Black -> Color.White
@@ -202,7 +207,7 @@ fun SubscriptionIconForTier(
         SubscriptionTier.PLUS -> Icon(
             painter = painterResource(IR.drawable.ic_plus),
             contentDescription = stringResource(LR.string.pocket_casts_plus_short),
-            tint = PocketCastsColors.plusGold,
+            tint = Color.plusGold,
             modifier = Modifier
                 .size(iconSize),
         )
@@ -211,9 +216,9 @@ fun SubscriptionIconForTier(
             painter = painterResource(IR.drawable.ic_patron),
             contentDescription = stringResource(LR.string.pocket_casts_patron_short),
             tint = if (MaterialTheme.theme.isLight) {
-                PocketCastsColors.patronPurple
+                Color.patronPurple
             } else {
-                PocketCastsColors.patronPurpleLight
+                Color.patronPurpleLight
             },
             modifier = Modifier
                 .size(iconSize),
@@ -431,8 +436,8 @@ fun SubscriptionBadgePlusWithGradientBackgroundPreview() {
         shortNameRes = LR.string.pocket_casts_plus_short,
         iconColor = Color.Black,
         backgroundBrush = Brush.horizontalGradient(
-            0f to PocketCastsColors.plusGoldLight,
-            1f to PocketCastsColors.plusGoldDark,
+            0f to Color.plusGoldLight,
+            1f to Color.plusGoldDark,
         ),
         textColor = Color.Black,
     )

@@ -3,7 +3,8 @@ package au.com.shiftyjelly.pocketcasts.compose.extensions
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import au.com.shiftyjelly.pocketcasts.compose.PocketCastsColors
+import au.com.shiftyjelly.pocketcasts.compose.plusGoldDark
+import au.com.shiftyjelly.pocketcasts.compose.plusGoldLight
 
 fun rainbowBrush(
     start: Offset = Offset.Zero,
@@ -20,6 +21,6 @@ fun rainbowBrush(
 
 val plusBackgroundBrush =
     Brush.horizontalGradient(
-        0f to PocketCastsColors.plusGoldLight,
-        1f to PocketCastsColors.plusGoldDark,
+        0f to Color.plusGoldLight,
+        1f to Color.plusGoldDark,
     )

@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.compose.PocketCastsColors
+import au.com.shiftyjelly.pocketcasts.compose.plusGold
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -44,8 +44,8 @@ class HeadphoneControlsSettingsPageViewModel @Inject constructor(
                             isAddBookmarkEnabled = isAddBookmarkEnabled,
                             addBookmarkIconId = R.drawable.ic_plus
                                 .takeIf { !isAddBookmarkEnabled },
-                            addBookmarkIconColor = PocketCastsColors.plusGold
-                                .takeIf { !isAddBookmarkEnabled } ?: PocketCastsColors.plusGold,
+                            addBookmarkIconColor = Color.plusGold
+                                .takeIf { !isAddBookmarkEnabled } ?: Color.plusGold,
                         )
                     }
 
@@ -128,7 +128,7 @@ class HeadphoneControlsSettingsPageViewModel @Inject constructor(
         val isAddBookmarkEnabled: Boolean = false,
         val startUpsellFromSource: UpsellSourceAction? = null,
         val addBookmarkIconId: Int? = null,
-        val addBookmarkIconColor: Color = PocketCastsColors.plusGold,
+        val addBookmarkIconColor: Color = Color.plusGold,
     )
 
     enum class UpsellSourceAction {

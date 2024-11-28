@@ -30,9 +30,12 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.compose.PocketCastsColors
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeDisplayMode
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeForTier
+import au.com.shiftyjelly.pocketcasts.compose.patronPurpleDark
+import au.com.shiftyjelly.pocketcasts.compose.patronPurpleLight
+import au.com.shiftyjelly.pocketcasts.compose.plusGoldDark
+import au.com.shiftyjelly.pocketcasts.compose.plusGoldLight
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
@@ -189,14 +192,14 @@ data class UserAvatarConfig(
 
 private fun SubscriptionTier.toLightColor() = when (this) {
     NONE -> Color.Transparent
-    PLUS -> PocketCastsColors.plusGoldLight
-    PATRON -> PocketCastsColors.patronPurpleLight
+    PLUS -> Color.plusGoldLight
+    PATRON -> Color.patronPurpleLight
 }
 
 private fun SubscriptionTier.toDarkColor() = when (this) {
     NONE -> Color.Transparent
-    PLUS -> PocketCastsColors.plusGoldDark
-    PATRON -> PocketCastsColors.patronPurpleDark
+    PLUS -> Color.plusGoldDark
+    PATRON -> Color.patronPurpleDark
 }
 
 @Composable
