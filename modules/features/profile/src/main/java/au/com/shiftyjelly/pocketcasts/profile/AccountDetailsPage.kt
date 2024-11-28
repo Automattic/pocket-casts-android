@@ -123,7 +123,7 @@ internal fun AccountDetailsPage(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
-                    .then(if (state.isAutomotive) Modifier.padding(top = 16.dp) else Modifier),
+                    .then(if (state.isAutomotive) Modifier.padding(top = 32.dp) else Modifier),
             )
             if (bannerState is UpgradeBannerState.Loaded) {
                 Divider()
