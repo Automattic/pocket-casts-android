@@ -49,6 +49,7 @@ fun TrialFinishedPage(
     ) {
         Column(
             modifier = Modifier
+                .padding(horizontal = 16.dp)
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
                 .weight(1f),
@@ -59,9 +60,8 @@ fun TrialFinishedPage(
                 contentDescription = stringResource(LR.string.plus_subscription_finished),
                 gradientBrush = plusGradientBrush,
                 modifier = Modifier
-                    .size(140.dp)
-                    .padding(horizontal = 16.dp)
-                    .padding(top = 24.dp),
+                    .padding(top = 24.dp)
+                    .size(140.dp),
             )
 
             TextH20(
@@ -70,7 +70,7 @@ fun TrialFinishedPage(
                 disableAutoScale = true,
                 color = MaterialTheme.theme.colors.primaryText01,
                 modifier = Modifier
-                    .padding(horizontal = 32.dp)
+                    .padding(horizontal = 16.dp)
                     .padding(top = 24.dp),
             )
 
@@ -81,13 +81,12 @@ fun TrialFinishedPage(
                 fontWeight = FontWeight.W400,
                 color = MaterialTheme.theme.colors.primaryText02,
                 modifier = Modifier
-                    .padding(horizontal = 32.dp)
+                    .padding(horizontal = 16.dp)
                     .padding(top = 8.dp, bottom = 32.dp),
             )
 
             TrialFinishedNotesCard(
                 modifier = Modifier
-                    .padding(horizontal = 16.dp)
                     .padding(bottom = 32.dp),
             )
         }
@@ -115,7 +114,7 @@ fun TrialFinishedFooter(
                 .background(MaterialTheme.theme.colors.primaryUi01)
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 8.dp)
-                .padding(bottom = 16.dp),
+                .padding(bottom = 8.dp),
         ) {
             RowOutlinedButton(
                 text = stringResource(LR.string.plus_upgrade_to_pocket_casts_plus),
