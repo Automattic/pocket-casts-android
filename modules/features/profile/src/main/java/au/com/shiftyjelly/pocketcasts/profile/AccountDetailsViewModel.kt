@@ -149,23 +149,10 @@ class AccountDetailsViewModel
         ),
     )
 
-    internal val automotiveSectionsState = combine(
-        signInState.asFlow(),
-        marketingOptIn,
-    ) { signInState, marketingOptIn ->
-        AccountSectionsState(
-            isSubscribedToNewsLetter = marketingOptIn,
-            email = (signInState as? SignInState.SignedIn)?.email,
-            availableSections = listOf(AccountSection.SignOut),
-        )
-    }.stateIn(
+    internal val miniPlayerInset = settings.bottomInset.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.Lazily,
-        initialValue = AccountSectionsState(
-            isSubscribedToNewsLetter = false,
-            email = null,
-            availableSections = listOf(AccountSection.SignOut),
-        ),
+        started = SharingStarted.Eagerly,
+        initialValue = 0,
     )
 
     fun deleteAccount() {
