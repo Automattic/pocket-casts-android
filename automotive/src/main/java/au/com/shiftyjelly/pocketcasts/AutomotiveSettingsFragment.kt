@@ -104,7 +104,7 @@ class AutomotiveSettingsFragment : BaseFragment() {
     private fun FragmentAutomotiveSettingsBinding.setupuserView() {
         val config = ProfileHeaderConfig(
             avatarConfig = UserAvatarConfig(
-                imageSize = 104.dp,
+                imageSize = 144.dp,
                 strokeWidth = 4.dp,
                 imageContentPadding = 4.dp,
                 badgeFontSize = 18.sp,
