@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import au.com.shiftyjelly.pocketcasts.analytics.AppLifecycleAnalytics
-import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
@@ -40,8 +39,6 @@ class AppLifecycleObserverTest {
 
     @Mock private lateinit var autoPlayNextEpisodeSetting: UserSetting<Boolean>
 
-    @Mock private lateinit var autoDownloadNewEpisodesSetting: UserSetting<Int>
-
     @Mock private lateinit var useUpNextDarkThemeSetting: UserSetting<Boolean>
 
     @Mock private lateinit var autoDownloadOnFollowPodcastSetting: UserSetting<Boolean>
@@ -65,7 +62,6 @@ class AppLifecycleObserverTest {
     @Before
     fun setUp() {
         whenever(settings.autoPlayNextEpisodeOnEmpty).thenReturn(autoPlayNextEpisodeSetting)
-        whenever(settings.autoDownloadNewEpisodes).thenReturn(autoDownloadNewEpisodesSetting)
         whenever(settings.autoDownloadOnFollowPodcast).thenReturn(autoDownloadOnFollowPodcastSetting)
         whenever(settings.useDarkUpNextTheme).thenReturn(useUpNextDarkThemeSetting)
 
@@ -99,7 +95,6 @@ class AppLifecycleObserverTest {
         verify(appLifecycleAnalytics).onNewApplicationInstall()
         verify(autoPlayNextEpisodeSetting).set(true, updateModifiedAt = false)
         verify(autoDownloadOnFollowPodcastSetting).set(true, updateModifiedAt = false)
-        verify(autoDownloadNewEpisodesSetting).set(Podcast.AUTO_DOWNLOAD_NEW_EPISODES, updateModifiedAt = false)
         verify(useUpNextDarkThemeSetting).set(false, updateModifiedAt = false)
 
         verify(appLifecycleAnalytics, never()).onApplicationUpgrade(any())
@@ -117,7 +112,6 @@ class AppLifecycleObserverTest {
         verify(appLifecycleAnalytics).onNewApplicationInstall()
 
         verify(autoPlayNextEpisodeSetting, never()).set(any(), any(), any(), any())
-        verify(autoDownloadNewEpisodesSetting, never()).set(any(), any(), any(), any())
         verify(autoDownloadOnFollowPodcastSetting, never()).set(any(), any(), any(), any())
         verify(useUpNextDarkThemeSetting).set(false, updateModifiedAt = false)
         verify(appLifecycleAnalytics, never()).onApplicationUpgrade(any())
@@ -135,7 +129,6 @@ class AppLifecycleObserverTest {
         verify(appLifecycleAnalytics).onNewApplicationInstall()
 
         verify(autoPlayNextEpisodeSetting, never()).set(any(), any(), any(), any())
-        verify(autoDownloadNewEpisodesSetting, never()).set(any(), any(), any(), any())
         verify(autoDownloadOnFollowPodcastSetting, never()).set(any(), any(), any(), any())
         verify(useUpNextDarkThemeSetting).set(false, updateModifiedAt = false)
         verify(appLifecycleAnalytics, never()).onApplicationUpgrade(any())
@@ -153,7 +146,6 @@ class AppLifecycleObserverTest {
 
         verify(appLifecycleAnalytics, never()).onNewApplicationInstall()
         verify(autoPlayNextEpisodeSetting, never()).set(any(), any(), any(), any())
-        verify(autoDownloadNewEpisodesSetting, never()).set(any(), any(), any(), any())
         verify(autoDownloadOnFollowPodcastSetting, never()).set(any(), any(), any(), any())
         verify(useUpNextDarkThemeSetting, never()).set(any(), any(), any(), any())
     }
