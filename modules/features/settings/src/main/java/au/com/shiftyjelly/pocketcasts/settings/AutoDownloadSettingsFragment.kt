@@ -76,6 +76,7 @@ class AutoDownloadSettingsFragment :
     companion object {
         const val PREFERENCE_PODCASTS_CATEGORY = "podcasts_category"
         const val PREFERENCE_NEW_EPISODES = "autoDownloadNewEpisodes"
+        const val PREFERENCE_ON_FOLLOW_PODCASTS = "onFollowPodcast"
         const val PREFERENCE_CHOOSE_PODCASTS = "autoDownloadPodcastsPreference"
         const val PREFERENCE_AUTO_DOWNLOAD_PODCAST_LIMIT = "autoDownloadPodcastsLimit"
         const val PREFERENCE_CHOOSE_FILTERS = "autoDownloadPlaylists"
@@ -110,6 +111,7 @@ class AutoDownloadSettingsFragment :
     private var podcastsCategory: PreferenceCategory? = null
     private lateinit var upNextPreference: SwitchPreference
     private var newEpisodesPreference: SwitchPreference? = null
+    private var onFollowPodcastPreference: SwitchPreference? = null
     private var podcastsPreference: Preference? = null
     private var podcastsAutoDownloadLimitPreference: ListPreference? = null
     private var filtersPreference: Preference? = null
@@ -174,6 +176,15 @@ class AutoDownloadSettingsFragment :
                         viewLifecycleOwner.lifecycleScope.launch {
                             if (newValue && isDeviceRunningOnLowStorage()) lowStorageListener?.showModal(SourceView.AUTO_DOWNLOAD)
                         }
+                    }
+                    true
+                }
+            }
+        onFollowPodcastPreference = preferenceManager.findPreference<SwitchPreference>(PREFERENCE_ON_FOLLOW_PODCASTS)
+            ?.apply {
+                setOnPreferenceChangeListener { _, newValue ->
+                    if (newValue is Boolean) {
+                        viewModel.onOnFollowPodcastChange(newValue)
                     }
                     true
                 }
@@ -377,6 +388,7 @@ class AutoDownloadSettingsFragment :
 
         upNextPreference.isChecked = viewModel.getAutoDownloadUpNext()
         setupNewEpisodesToggleStatusCheck()
+        setupOnFollowPodcastToggleStatusCheck()
         autoDownloadOnlyDownloadOnWifi.isChecked = viewModel.getAutoDownloadUnmeteredOnly()
         autoDownloadOnlyWhenCharging.isChecked = viewModel.getAutoDownloadOnlyWhenCharging()
         if (FeatureFlag.isEnabled(Feature.AUTO_DOWNLOAD)) {
@@ -433,6 +445,10 @@ class AutoDownloadSettingsFragment :
                 newEpisodesPreference?.isChecked = viewModel.hasEpisodesWithAutoDownloadEnabled.value
             }
         }
+    }
+
+    private fun setupOnFollowPodcastToggleStatusCheck() {
+        onFollowPodcastPreference?.isChecked = viewModel.isAutoDownloadOnFollowPodcastEnabled()
     }
 
     override fun onBackPressed(): Boolean {

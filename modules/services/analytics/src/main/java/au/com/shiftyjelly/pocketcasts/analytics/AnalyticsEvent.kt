@@ -477,6 +477,7 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_AUTO_DOWNLOAD_SHOWN("settings_auto_download_shown"),
     SETTINGS_AUTO_DOWNLOAD_UP_NEXT_TOGGLED("settings_auto_download_up_next_toggled"),
     SETTINGS_AUTO_DOWNLOAD_NEW_EPISODES_TOGGLED("settings_auto_download_new_episodes_toggled"),
+    SETTINGS_AUTO_DOWNLOAD_ON_FOLLOW_PODCAST_TOGGLED("settings_auto_download_on_follow_podcast_toggled"),
     SETTINGS_AUTO_DOWNLOAD_LIMIT_DOWNLOADS_CHANGED("settings_auto_download_limit_downloads_changed"),
     SETTINGS_AUTO_DOWNLOAD_PODCASTS_CHANGED("settings_auto_download_podcasts_changed"),
     SETTINGS_AUTO_DOWNLOAD_FILTERS_CHANGED("settings_auto_download_filters_changed"),

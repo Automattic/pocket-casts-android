@@ -59,11 +59,22 @@ class AutoDownloadSettingsViewModel @Inject constructor(
 
     fun getAutoDownloadNewEpisodes() = settings.autoDownloadNewEpisodes.value
 
+    fun isAutoDownloadOnFollowPodcastEnabled() = settings.autoDownloadOnFollowPodcast.value
+
     fun onNewEpisodesChange(newValue: Boolean) {
         settings.autoDownloadNewEpisodes.set(newValue.toAutoDownloadStatus(), updateModifiedAt = true)
 
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_AUTO_DOWNLOAD_NEW_EPISODES_TOGGLED,
+            mapOf("enabled" to newValue),
+        )
+    }
+
+    fun onOnFollowPodcastChange(newValue: Boolean) {
+        settings.autoDownloadOnFollowPodcast.set(newValue, updateModifiedAt = true)
+
+        analyticsTracker.track(
+            AnalyticsEvent.SETTINGS_AUTO_DOWNLOAD_ON_FOLLOW_PODCAST_TOGGLED,
             mapOf("enabled" to newValue),
         )
     }
