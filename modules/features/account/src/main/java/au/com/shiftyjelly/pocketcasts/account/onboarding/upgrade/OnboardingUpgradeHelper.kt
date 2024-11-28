@@ -48,6 +48,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintLayoutScope
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UpgradeRowButton
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.plusGradientBrush
+import au.com.shiftyjelly.pocketcasts.compose.PocketCastsColors
 import au.com.shiftyjelly.pocketcasts.compose.buttons.GradientRowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.AutoResizeText
 import au.com.shiftyjelly.pocketcasts.compose.components.Clickable
@@ -63,12 +64,12 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 object OnboardingUpgradeHelper {
     val plusGradientBrush = Brush.horizontalGradient(
-        0f to Color(0xFFFED745),
-        1f to Color(0xFFFEB525),
+        0f to PocketCastsColors.plusGoldLight,
+        1f to PocketCastsColors.plusGoldDark,
     )
     val patronGradientBrush = Brush.horizontalGradient(
-        0f to Color(0xFFAFA2fA),
-        1f to Color(0xFFAFA2fA),
+        0f to PocketCastsColors.patronPurpleLight,
+        1f to PocketCastsColors.patronPurpleDark,
     )
 
     private val unselectedColor = Color(0xFF666666)

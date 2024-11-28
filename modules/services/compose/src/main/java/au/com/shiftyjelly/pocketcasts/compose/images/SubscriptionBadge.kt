@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.PocketCastsColors
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.images.R
@@ -129,21 +130,26 @@ fun SubscriptionBadgeForTier(
             iconRes = IR.drawable.ic_plus,
             shortNameRes = LR.string.pocket_casts_plus_short,
             iconColor = when (displayMode) {
-                SubscriptionBadgeDisplayMode.Black -> SubscriptionTierColor.plusGold
-                SubscriptionBadgeDisplayMode.Colored -> MaterialTheme.theme.colors.primaryUi01
+                SubscriptionBadgeDisplayMode.Black -> PocketCastsColors.plusGold
+                SubscriptionBadgeDisplayMode.Colored,
+                SubscriptionBadgeDisplayMode.ColoredDark,
+                -> MaterialTheme.theme.colors.primaryUi01
                 SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground -> Color.White
                 SubscriptionBadgeDisplayMode.ColoredWithBlackForeground -> Color.Black
             },
             backgroundColor = when (displayMode) {
                 SubscriptionBadgeDisplayMode.Black -> Color.Black
+                SubscriptionBadgeDisplayMode.ColoredDark -> PocketCastsColors.plusGoldDark
                 SubscriptionBadgeDisplayMode.Colored,
                 SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground,
                 SubscriptionBadgeDisplayMode.ColoredWithBlackForeground,
-                -> SubscriptionTierColor.plusGold
+                -> PocketCastsColors.plusGold
             },
             textColor = when (displayMode) {
                 SubscriptionBadgeDisplayMode.Black -> Color.White
-                SubscriptionBadgeDisplayMode.Colored -> MaterialTheme.theme.colors.primaryUi01
+                SubscriptionBadgeDisplayMode.Colored,
+                SubscriptionBadgeDisplayMode.ColoredDark,
+                -> MaterialTheme.theme.colors.primaryUi01
                 SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground -> Color.White
                 SubscriptionBadgeDisplayMode.ColoredWithBlackForeground -> Color.Black
             },
@@ -157,24 +163,27 @@ fun SubscriptionBadgeForTier(
             iconRes = IR.drawable.ic_patron,
             shortNameRes = LR.string.pocket_casts_patron_short,
             iconColor = when (displayMode) {
-                SubscriptionBadgeDisplayMode.Black -> SubscriptionTierColor.patronPurpleLight
+                SubscriptionBadgeDisplayMode.Black -> PocketCastsColors.patronPurpleLight
                 SubscriptionBadgeDisplayMode.Colored,
-                SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground,
-                -> Color.White
+                SubscriptionBadgeDisplayMode.ColoredDark,
+                -> MaterialTheme.theme.colors.primaryUi01
+                SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground -> Color.White
                 SubscriptionBadgeDisplayMode.ColoredWithBlackForeground -> Color.Black
             },
             backgroundColor = when (displayMode) {
                 SubscriptionBadgeDisplayMode.Black -> Color.Black
+                SubscriptionBadgeDisplayMode.ColoredDark -> PocketCastsColors.patronPurpleDark
                 SubscriptionBadgeDisplayMode.Colored,
                 SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground,
                 SubscriptionBadgeDisplayMode.ColoredWithBlackForeground,
-                -> SubscriptionTierColor.patronPurple
+                -> PocketCastsColors.patronPurple
             },
             textColor = when (displayMode) {
                 SubscriptionBadgeDisplayMode.Black -> Color.White
                 SubscriptionBadgeDisplayMode.Colored,
-                SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground,
-                -> Color.White
+                SubscriptionBadgeDisplayMode.ColoredDark,
+                -> MaterialTheme.theme.colors.primaryUi01
+                SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground -> Color.White
                 SubscriptionBadgeDisplayMode.ColoredWithBlackForeground -> Color.Black
             },
             iconSize = iconSize,
@@ -194,7 +203,7 @@ fun SubscriptionIconForTier(
         SubscriptionTier.PLUS -> Icon(
             painter = painterResource(IR.drawable.ic_plus),
             contentDescription = stringResource(LR.string.pocket_casts_plus_short),
-            tint = SubscriptionTierColor.plusGold,
+            tint = PocketCastsColors.plusGold,
             modifier = Modifier
                 .size(iconSize),
         )
@@ -203,9 +212,9 @@ fun SubscriptionIconForTier(
             painter = painterResource(IR.drawable.ic_patron),
             contentDescription = stringResource(LR.string.pocket_casts_patron_short),
             tint = if (MaterialTheme.theme.isLight) {
-                SubscriptionTierColor.patronPurple
+                PocketCastsColors.patronPurple
             } else {
-                SubscriptionTierColor.patronPurpleLight
+                PocketCastsColors.patronPurpleLight
             },
             modifier = Modifier
                 .size(iconSize),
@@ -251,14 +260,9 @@ fun OfferBadge(
 enum class SubscriptionBadgeDisplayMode {
     Black,
     Colored,
+    ColoredDark,
     ColoredWithWhiteForeground,
     ColoredWithBlackForeground,
-}
-
-object SubscriptionTierColor {
-    val plusGold = Color(0xFFFFD846)
-    val patronPurple = Color(0xFF6046F5)
-    val patronPurpleLight = Color(0xFFAFA2FA)
 }
 
 @ShowkaseComposable(name = "SubscriptionBadge", group = "Images", styleName = "Plus - Colored on light theme", defaultStyle = true)
@@ -356,8 +360,8 @@ fun SubscriptionBadgeWithGradientBackgroundPreview() {
         shortNameRes = LR.string.pocket_casts_plus_short,
         iconColor = Color.Black,
         backgroundBrush = Brush.horizontalGradient(
-            0f to Color(0xFFFED745),
-            1f to Color(0xFFFEB525),
+            0f to PocketCastsColors.plusGoldLight,
+            1f to PocketCastsColors.plusGoldDark,
         ),
         textColor = Color.Black,
     )

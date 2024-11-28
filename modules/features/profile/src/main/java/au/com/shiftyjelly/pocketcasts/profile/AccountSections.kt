@@ -35,6 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.PocketCastsColors
 import au.com.shiftyjelly.pocketcasts.compose.ThemeColors
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
@@ -211,8 +212,8 @@ internal enum class AccountSection(
     UpgradeToPatron(
         iconId = IR.drawable.ic_patron,
         titleId = LR.string.profile_upgrade_to_patron,
-        iconTint = { Color(0xFF6046F5) },
-        titleColor = { Color(0xFF6046F5) },
+        iconTint = { PocketCastsColors.patronPurple },
+        titleColor = { PocketCastsColors.patronPurple },
     ),
     CancelSubscription(
         iconId = IR.drawable.ic_subscription_cancel,

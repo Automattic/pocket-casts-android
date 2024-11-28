@@ -19,7 +19,6 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.SubcomposeLayout
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -31,6 +30,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.PocketCastsColors
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeDisplayMode
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeForTier
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
@@ -42,7 +42,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier.PLUS
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import coil.compose.AsyncImage
 import au.com.shiftyjelly.pocketcasts.images.R as IR
-import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @Composable
 fun UserAvatar(
@@ -80,7 +79,7 @@ fun UserAvatar(
             subcompose("badge") {
                 SubscriptionBadgeForTier(
                     tier = subscriptionTier,
-                    displayMode = SubscriptionBadgeDisplayMode.Colored,
+                    displayMode = SubscriptionBadgeDisplayMode.ColoredDark,
                     fontSize = config.badgeFontSize,
                     iconSize = config.badgeIconSize,
                     padding = config.badgeContentPadding,
@@ -188,18 +187,16 @@ data class UserAvatarConfig(
     val badgeContentPadding: Dp = 4.dp,
 )
 
-@Composable
 private fun SubscriptionTier.toLightColor() = when (this) {
     NONE -> Color.Transparent
-    PLUS -> colorResource(UR.color.plus_gold_light)
-    PATRON -> colorResource(UR.color.patron_purple_light)
+    PLUS -> PocketCastsColors.plusGoldLight
+    PATRON -> PocketCastsColors.patronPurpleLight
 }
 
-@Composable
 private fun SubscriptionTier.toDarkColor() = when (this) {
     NONE -> Color.Transparent
-    PLUS -> colorResource(UR.color.plus_gold_dark)
-    PATRON -> colorResource(UR.color.patron_purple)
+    PLUS -> PocketCastsColors.plusGoldDark
+    PATRON -> PocketCastsColors.patronPurpleDark
 }
 
 @Composable

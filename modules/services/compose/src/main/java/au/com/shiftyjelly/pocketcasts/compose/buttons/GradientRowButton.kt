@@ -18,13 +18,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import au.com.shiftyjelly.pocketcasts.compose.PocketCastsColors
 import au.com.shiftyjelly.pocketcasts.compose.components.AutoResizeText
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
 
 private val plusBackgroundBrush = Brush.horizontalGradient(
-    0f to Color(0xFFFED745),
-    1f to Color(0xFFFEB525),
+    0f to PocketCastsColors.plusGoldLight,
+    1f to PocketCastsColors.plusGoldDark,
 )
 
 @Composable
