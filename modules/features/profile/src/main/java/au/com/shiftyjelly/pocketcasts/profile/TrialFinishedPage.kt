@@ -78,6 +78,7 @@ fun TrialFinishedPage(
                 text = stringResource(LR.string.plus_trial_finished_detail),
                 disableAutoScale = true,
                 textAlign = TextAlign.Center,
+                fontWeight = FontWeight.W400,
                 color = MaterialTheme.theme.colors.primaryText02,
                 modifier = Modifier
                     .padding(horizontal = 32.dp)
