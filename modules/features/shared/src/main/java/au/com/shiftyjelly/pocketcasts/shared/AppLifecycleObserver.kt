@@ -117,6 +117,9 @@ class AppLifecycleObserver constructor(
 
                     // For new users we want to auto download new episodes by default
                     settings.autoDownloadNewEpisodes.set(AUTO_DOWNLOAD_NEW_EPISODES, updateModifiedAt = false)
+
+                    // For new users we want to auto download on follow podcast by default
+                    settings.autoDownloadOnFollowPodcast.set(true, updateModifiedAt = false)
                 }
             }
         } else if (previousVersionCode < versionCode) {
