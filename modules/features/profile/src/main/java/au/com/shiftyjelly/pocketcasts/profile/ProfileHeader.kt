@@ -50,7 +50,7 @@ import kotlin.time.Duration.Companion.minutes
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-internal fun ProfileHeader(
+fun ProfileHeader(
     state: ProfileHeaderState,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -73,14 +73,14 @@ internal fun ProfileHeader(
     }
 }
 
-internal data class ProfileHeaderState(
+data class ProfileHeaderState(
     val email: String?,
     val imageUrl: String?,
     val subscriptionTier: SubscriptionTier,
     val expiresIn: Duration?,
 )
 
-internal data class ProfileHeaderConfig(
+data class ProfileHeaderConfig(
     val infoFontScale: Float = 1f,
     val avatarConfig: UserAvatarConfig = UserAvatarConfig(),
 )
