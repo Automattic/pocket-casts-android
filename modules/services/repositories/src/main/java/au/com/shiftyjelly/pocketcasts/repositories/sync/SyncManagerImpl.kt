@@ -129,6 +129,8 @@ class SyncManagerImpl @Inject constructor(
     override fun getEmail(): String? =
         syncAccountManager.getEmail()
 
+    override fun observeEmail() = syncAccountManager.observeEmail()
+
     override suspend fun getAccessToken(account: Account): AccessToken =
         syncAccountManager.peekAccessToken(account)
             ?: fetchAccessToken(account)
