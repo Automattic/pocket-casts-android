@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.compose.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -19,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 @Composable
 fun GradientIcon(
@@ -54,6 +56,43 @@ fun GradientIcon(
                 }
             },
     )
+}
+
+@Composable
+fun GradientIcon(
+    painter: Painter,
+    gradientBrush: Brush,
+    contentDescription: String? = null,
+    blendMode: BlendMode = BlendMode.SrcAtop,
+    modifier: Modifier = Modifier,
+) {
+    Icon(
+        modifier = modifier
+            .graphicsLayer(alpha = 0.99f)
+            .drawWithCache {
+                onDrawWithContent {
+                    drawContent()
+                    drawRect(gradientBrush, blendMode = blendMode)
+                }
+            },
+        painter = painter,
+        contentDescription = contentDescription,
+    )
+}
+
+@Preview
+@Composable
+fun GradientIconWithBrushPreview() {
+    AppThemeWithBackground(Theme.ThemeType.LIGHT) {
+        GradientIcon(
+            painter = painterResource(IR.drawable.ic_plus),
+            contentDescription = "",
+            gradientBrush = Brush.horizontalGradient(
+                0f to Color(0xFFFED745),
+                1f to Color(0xFFFEB525),
+            ),
+        )
+    }
 }
 
 @ShowkaseComposable(name = "GradientIcon", group = "Images", styleName = "Light", defaultStyle = true)
