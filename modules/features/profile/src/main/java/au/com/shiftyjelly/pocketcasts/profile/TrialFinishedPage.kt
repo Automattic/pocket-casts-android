@@ -114,7 +114,7 @@ fun TrialFinishedFooter(
                 .background(MaterialTheme.theme.colors.primaryUi01)
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 8.dp)
-                .padding(bottom = 24.dp),
+                .padding(bottom = 16.dp),
         ) {
             RowOutlinedButton(
                 text = stringResource(LR.string.plus_upgrade_to_pocket_casts_plus),
@@ -128,7 +128,7 @@ fun TrialFinishedFooter(
                     backgroundColor = Color.Transparent,
                     contentColor = MaterialTheme.theme.colors.primaryInteractive01,
                 ),
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                modifier = Modifier.padding(vertical = 8.dp),
             )
 
             RowButton(
@@ -140,7 +140,7 @@ fun TrialFinishedFooter(
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = MaterialTheme.theme.colors.primaryInteractive01,
                 ),
-                modifier = Modifier.padding(horizontal = 16.dp),
+                modifier = Modifier.padding(top = 16.dp),
             )
         }
     }
