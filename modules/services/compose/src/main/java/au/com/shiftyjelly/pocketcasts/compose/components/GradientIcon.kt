@@ -7,6 +7,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -16,6 +17,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.plusGradientBrush
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -69,11 +71,9 @@ fun GradientIcon(
     Icon(
         modifier = modifier
             .graphicsLayer(alpha = 0.99f)
-            .drawWithCache {
-                onDrawWithContent {
-                    drawContent()
-                    drawRect(gradientBrush, blendMode = blendMode)
-                }
+            .drawWithContent {
+                drawContent()
+                drawRect(gradientBrush, blendMode = blendMode)
             },
         painter = painter,
         contentDescription = contentDescription,
@@ -87,10 +87,7 @@ fun GradientIconWithBrushPreview() {
         GradientIcon(
             painter = painterResource(IR.drawable.ic_plus),
             contentDescription = "",
-            gradientBrush = Brush.horizontalGradient(
-                0f to Color(0xFFFED745),
-                1f to Color(0xFFFEB525),
-            ),
+            gradientBrush = Brush.plusGradientBrush,
         )
     }
 }
