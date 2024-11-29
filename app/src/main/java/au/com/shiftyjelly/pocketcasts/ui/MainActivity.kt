@@ -84,7 +84,6 @@ import au.com.shiftyjelly.pocketcasts.endofyear.StoriesActivity.StoriesSource
 import au.com.shiftyjelly.pocketcasts.endofyear.ui.EndOfYearLaunchBottomSheet
 import au.com.shiftyjelly.pocketcasts.filters.FiltersFragment
 import au.com.shiftyjelly.pocketcasts.localization.helper.LocaliseHelper
-import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
@@ -457,7 +456,7 @@ class MainActivity :
         }
         navigator.infoStream()
             .doOnNext {
-                updateStatusBar()
+                updateSystemColors()
                 if (it is NavigatorAction.TabSwitched) {
                     val currentTab = navigator.currentTab()
                     if (settings.selectedTab() != currentTab) {
@@ -693,16 +692,11 @@ class MainActivity :
         }
     }
 
-    private fun updateNavAndStatusColors(playerOpen: Boolean, playingPodcast: Podcast?) {
+    private fun updateNavAndStatusColors(playerOpen: Boolean) {
         if (playerOpen) {
-            val playerBgColor = theme.playerBackgroundColor(playingPodcast)
-            theme.setNavigationBarColor(window, true, playerBgColor)
+            theme.setNavigationBarIconColor(window = window, isDark = true)
         } else {
-            theme.setNavigationBarColor(
-                window,
-                theme.isDarkTheme,
-                ThemeColor.primaryUi03(theme.activeTheme),
-            )
+            theme.setNavigationBarIconColor(window = window, isDark = theme.isDarkTheme)
         }
 
         updateStatusBar()
@@ -803,7 +797,7 @@ class MainActivity :
                     }
 
                     if (viewModel.isPlayerOpen && isEpisodeChanged) {
-                        updateNavAndStatusColors(true, state.podcast)
+                        updateNavAndStatusColors(true)
                     }
 
                     if (lastPlaybackState != null && (isEpisodeChanged || isPlaybackChanged) && settings.openPlayerAutomatically.value) {
@@ -948,7 +942,7 @@ class MainActivity :
                     binding.playerBottomSheet.isDragEnabled = true
                     frameBottomSheetBehavior.swipeEnabled = false
 
-                    updateNavAndStatusColors(playerOpen = viewModel.isPlayerOpen, viewModel.lastPlaybackState?.podcast)
+                    updateNavAndStatusColors(playerOpen = viewModel.isPlayerOpen)
                 } else {
                     binding.playerBottomSheet.isDragEnabled = false
                 }
@@ -1021,7 +1015,7 @@ class MainActivity :
     }
 
     override fun updateSystemColors() {
-        updateNavAndStatusColors(viewModel.isPlayerOpen, viewModel.lastPlaybackState?.podcast)
+        updateNavAndStatusColors(viewModel.isPlayerOpen)
     }
 
     override fun onPlayerOpen() {
@@ -1032,7 +1026,7 @@ class MainActivity :
             }
         }
 
-        updateNavAndStatusColors(true, viewModel.lastPlaybackState?.podcast)
+        updateNavAndStatusColors(true)
         UiUtil.hideKeyboard(binding.root)
 
         viewModel.isPlayerOpen = true
@@ -1043,7 +1037,7 @@ class MainActivity :
     }
 
     override fun onPlayerClosed() {
-        updateNavAndStatusColors(false, null)
+        updateNavAndStatusColors(false)
 
         viewModel.isPlayerOpen = false
         viewModel.closeMultiSelect()
