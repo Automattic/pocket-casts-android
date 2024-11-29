@@ -100,7 +100,7 @@ internal fun AccountHeader(
                 )
             }
             Spacer(
-                modifier = Modifier.width(8.dp),
+                modifier = Modifier.width(16.dp),
             )
             if (labels.end != null) {
                 TextH50(
