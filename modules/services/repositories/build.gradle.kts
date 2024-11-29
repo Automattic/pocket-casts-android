@@ -49,7 +49,7 @@ dependencies {
     implementation(libs.device.names)
     implementation(libs.guava)
     implementation(libs.gravatar)
-    implementation(libs.gravatar.qe)
+    implementation(libs.gravatar.quickeditor)
     implementation(libs.lifecycle.process)
     implementation(libs.lifecycle.reactivestreams.ktx)
     implementation(libs.material)

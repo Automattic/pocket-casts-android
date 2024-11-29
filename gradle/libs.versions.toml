@@ -127,7 +127,7 @@ glance-material3 = { module = "androidx.glance:glance-material3", version.ref = 
 
 # Gravatar
 gravatar = { module = "com.gravatar:gravatar", version.ref = "gravatar" }
-gravatar-qe = { module = "com.gravatar:gravatar-quickeditor", version.ref = "gravatar" }
+gravatar-quickeditor = { module = "com.gravatar:gravatar-quickeditor", version.ref = "gravatar" }
 
 # Horologist
 horologist-audio-ui = { module = "com.google.android.horologist:horologist-audio-ui", version.ref = "horologist" }

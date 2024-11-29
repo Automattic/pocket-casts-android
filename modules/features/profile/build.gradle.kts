@@ -57,7 +57,7 @@ dependencies {
     implementation(libs.fragment.compose)
     implementation(libs.fragment.ktx)
     implementation(libs.gravatar)
-    implementation(libs.gravatar.qe)
+    implementation(libs.gravatar.quickeditor)
     implementation(libs.lifecycle.reactivestreams.ktx)
     implementation(libs.media3.datasource)
     implementation(libs.media3.extractor)
