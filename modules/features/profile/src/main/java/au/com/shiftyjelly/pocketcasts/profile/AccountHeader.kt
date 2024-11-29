@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -95,10 +96,11 @@ internal fun AccountHeader(
                     fontScale = config.infoFontScale,
                     color = labels.start.color(MaterialTheme.theme.colors),
                     textAlign = TextAlign.Start,
+                    modifier = Modifier.weight(1f),
                 )
             }
             Spacer(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.width(8.dp),
             )
             if (labels.end != null) {
                 TextH50(
@@ -106,6 +108,7 @@ internal fun AccountHeader(
                     fontScale = config.infoFontScale,
                     color = labels.end.color(MaterialTheme.theme.colors),
                     textAlign = TextAlign.End,
+                    modifier = Modifier.weight(1f),
                 )
             }
         }
@@ -286,6 +289,40 @@ private fun AccountHeaderPreview(
         ) {
             AccountHeader(
                 state = state,
+                config = AccountHeaderConfig(
+                    avatarConfig = UserAvatarConfig(
+                        imageSize = 66.dp,
+                        strokeWidth = 3.dp,
+                    ),
+                ),
+                onClick = {},
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+            )
+        }
+    }
+}
+
+@Preview(fontScale = 2f)
+@Composable
+private fun AccountHeaderFontSizePreview() {
+    AppTheme(Theme.ThemeType.ELECTRIC) {
+        Box(
+            modifier = Modifier.background(MaterialTheme.theme.colors.primaryUi02),
+        ) {
+            AccountHeader(
+                state = AccountHeaderState(
+                    email = "noreply@pocketcasts.com",
+                    imageUrl = null,
+                    subscription = SubscriptionHeaderState.PaidCancel(
+                        tier = SubscriptionTier.PLUS,
+                        expiresIn = 10.days,
+                        isChampion = true,
+                        platform = SubscriptionPlatform.ANDROID,
+                        giftDaysLeft = 0,
+                    ),
+                ),
                 config = AccountHeaderConfig(
                     avatarConfig = UserAvatarConfig(
                         imageSize = 66.dp,
