@@ -91,7 +91,9 @@ before_all do |_lane|
 end
 
 platform :android do
-  lane :code_freeze do |options|
+  # @param skip_confirm [Boolean] If true, avoids any interactive prompt
+  #
+  lane :code_freeze do |skip_confirm: false|
     ensure_git_status_clean
     Fastlane::Helper::GitHelper.checkout_and_pull(DEFAULT_BRANCH)
     ensure_git_branch(branch: DEFAULT_BRANCH)
@@ -106,7 +108,7 @@ platform :android do
     MESSAGE
 
     UI.important(confirmation_message)
-    unless options[:skip_confirm] || UI.confirm('Do you want to continue?')
+    unless skip_confirm || UI.confirm('Do you want to continue?')
       UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.")
     end
 
@@ -148,12 +150,13 @@ platform :android do
     set_milestone_frozen_marker(repository: GH_REPOSITORY, milestone: new_version)
   end
 
-  # @option [String] base_version The "x.y" version number to create a beta from. Defaults to the current version as defined in the version file of `main` branch
-  # @option [Integer] version_code The versionCode to use for the new beta. Defaults to one more than the versionCode defined in the version file of the `release/<base_version>` branch
-  lane :new_beta_release do |options|
+  # @param base_version [String] The "x.y" version number to create a beta from. Defaults to the current version as defined in the version file of `main` branch
+  # @param version_code [Integer] The versionCode to use for the new beta. Defaults to one more than the versionCode defined in the version file of the `release/<base_version>` branch
+  # @param skip_confirm [Boolean] If true, avoids any interactive prompt
+  #
+  lane :new_beta_release do |base_version: nil, version_code: nil, skip_confirm: false|
     ensure_git_status_clean
 
-    base_version = options[:base_version]
     if base_version.nil?
       # If no base_version provided, read it from the version file from `main`
       Fastlane::Helper::GitHelper.checkout_and_pull(DEFAULT_BRANCH)
@@ -167,18 +170,19 @@ platform :android do
     UI.user_error!("Release branch for version #{base_version} doesn't exist.") unless checkout_success
 
     # Check versions
+    version_code ||= build_code_next # Only compute this version_code fallback _after_ the checkout of the release branch
     message = <<-MESSAGE
 
       Current beta version: #{beta_version_current}
       New beta version: #{beta_version_next}
 
       Current build code: #{build_code_current}
-      New build code: #{options[:version_code] || build_code_next}
+      New build code: #{version_code}
 
     MESSAGE
 
     UI.important(message)
-    unless options[:skip_confirm] || UI.confirm('Do you want to continue?')
+    unless skip_confirm || UI.confirm('Do you want to continue?')
       UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.")
     end
 
@@ -187,7 +191,7 @@ platform :android do
     ensure_git_branch(branch: '^release/') # Match branch names that begin with `release/`
     VERSION_FILE.write_version(
       version_name: beta_version_next,
-      version_code: options[:version_code] || build_code_next
+      version_code: version_code
     )
     commit_version_bump
     UI.success("Done! New Beta Version: #{beta_version_current}. New Build Code: #{build_code_current}")
@@ -203,14 +207,15 @@ platform :android do
   # - Cuts a new `release/x.y.z` branch from the tag from the latest (`x.y`) version
   # - Bumps the app version numbers appropriately
   #
-  # @option [Boolean] skip_confirm (default: false) If true, avoids any interactive prompt
-  # @option [String] version_name (required) The version name to use for the hotfix (`"x.y.z"`)
-  # @option [String] version_code (required) The version code to use for the hotfix (`"x.y.z"`)
+  # @param version_name [String] The version name to use for the hotfix (`"x.y.z"`)
+  # @param version_code [String] The version code to use for the hotfix (`"x.y.z"`)
+  # @param skip_confirm [Boolean] If true, avoids any interactive prompt
   #
-  # Note that the version_code needs to be higher than any of the existing version_codes in Play Store
-  lane :new_hotfix_release do |options|
-    new_version = options[:version_name] || UI.input('Version number for the new hotfix?')
-    new_version_code = options[:version_code] || UI.input('Version code for the new hotfix?')
+  # @note the version_code needs to be higher than any of the existing version_codes in Play Store
+  #
+  lane :new_hotfix_release do |version_name: nil, version_code: nil, skip_confirm: false|
+    new_version = version_name || UI.input('Version number for the new hotfix?')
+    new_version_code = version_code || UI.input('Version code for the new hotfix?')
 
     ensure_git_status_clean
 
@@ -231,7 +236,7 @@ platform :android do
     MESSAGE
 
     UI.important(message)
-    unless options[:skip_confirm] || UI.confirm('Do you want to continue?')
+    unless skip_confirm || UI.confirm('Do you want to continue?')
       UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.")
     end
 
@@ -254,14 +259,16 @@ platform :android do
     UI.success("Done! New Release Version: #{release_version_current}. New Build Code: #{build_code_current}")
   end
 
-  lane :finalize_hotfix_release do |options|
+  # @param skip_confirm [Boolean] If true, avoids any interactive prompt
+  #
+  lane :finalize_hotfix_release do |skip_confirm: false|
     ensure_git_branch(branch: '^release/') # Match branch names that begin with `release/`
     ensure_git_status_clean
 
     version = release_version_current
 
     UI.important("Triggering hotfix build for version: #{version}")
-    unless options[:skip_confirm] || UI.confirm('Do you want to continue?')
+    unless skip_confirm || UI.confirm('Do you want to continue?')
       UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.")
     end
 
@@ -269,36 +276,38 @@ platform :android do
     create_backmerge_pr
   end
 
-  # @param [String] branch_to_build (default: current git branch) The branch to build
-  lane :trigger_release_build do |options|
+  # @param branch_to_build [String] The branch to build. Defaults to the current git branch.
+  #
+  lane :trigger_release_build do |branch_to_build: git_branch|
     buildkite_trigger_build(
       buildkite_organization: 'automattic',
       buildkite_pipeline: 'pocket-casts-android',
-      branch: options[:branch_to_build] || git_branch,
+      branch: branch_to_build,
       pipeline_file: 'release-builds.yml'
     )
   end
 
+  # Builds and uploads a new build to Google Play (without releasing it)
+  #
   # - Uses the current version to decide if this is a beta or production build
   # - Builds the apps for external distribution
   # - Uploads the builds to 'beta' or 'production' Play Store channel (but does not release it)
   # - Creates draft Github release
   #
-  # @option [Boolean] skip_confirm (default: false) If true, avoids any interactive prompt
-  # @option [Boolean] skip_prechecks (default: false) If true, skips android_build_preflight
-  # @option [Boolean] create_gh_release (default: false) If true, creates a draft GitHub release
+  # @param skip_confirm [Boolean] If true, avoids any interactive prompt
+  # @param skip_prechecks [Boolean] If true, skips android_build_preflight
+  # @param create_gh_release [Boolean] If true, creates a draft GitHub release
   #
-  desc 'Builds and uploads a new build to Google Play (without releasing it)'
-  lane :build_and_upload_to_play_store do |options|
+  lane :build_and_upload_to_play_store do |skip_prechecks: false, skip_confirm: false, create_gh_release: false|
     version = version_name_current
     build_code = build_code_current
     is_beta = beta_version?(version)
-    unless options[:skip_prechecks]
+    unless skip_prechecks
       # Match branch names that begin with `release/`
       ensure_git_branch(branch: '^release/') unless is_ci
 
       UI.important("Building version #{version_name_current} (#{build_code_current}) for upload to Google Play Console")
-      unless options[:skip_confirm] || UI.confirm('Do you want to continue?')
+      unless skip_confirm || UI.confirm('Do you want to continue?')
         UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.")
       end
 
@@ -335,12 +344,12 @@ platform :android do
       release_assets << signed_apk_artifact_path
     end
 
-    create_gh_release(version: version, prerelease: is_beta, release_assets: release_assets.compact) if options[:create_gh_release]
+    create_gh_release(version: version, prerelease: is_beta, release_assets: release_assets.compact) if create_gh_release
   end
 
   # Update the rollout of all 3 variants (app, automotive, wear) of the current version to the given value
   #
-  # @param [Float] percent the rollout percentage, between 0 and 1
+  # @param percent [Float] The rollout percentage, between 0 and 1
   #
   lane :update_rollouts do |percent:|
     version = version_name_current
@@ -371,13 +380,15 @@ platform :android do
     UI.user_error!('None of the 3 app variants were found in Google Play Console. We expected at least one') if not_found_variants.count == APPS.count
   end
 
-  lane :finalize_release do |options|
+  # @param skip_confirm [Boolean] If true, avoids any interactive prompt
+  #
+  lane :finalize_release do |skip_confirm: false|
     UI.user_error!('Please use `finalize_hotfix_release` lane for hotfixes') if release_is_hotfix?
     ensure_git_branch(branch: '^release/') # Match branch names that begin with `release/`
     ensure_git_status_clean
 
     UI.important("Finalizing release: #{release_version_current}")
-    unless options[:skip_confirm] || UI.confirm('Do you want to continue?')
+    unless skip_confirm || UI.confirm('Do you want to continue?')
       UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.")
     end
 
@@ -413,14 +424,12 @@ platform :android do
     create_backmerge_pr
   end
 
-  # @param [String] version The version to create
-  # @param [String] build_code The build code to create
-  # @param [String] app The Android app to build (i.e 'app', 'automotive', or 'wear')
-  desc 'Builds and bundles the given app'
-  lane :build_bundle do |options|
-    version = options[:version]
-    build_code = options[:build_code]
-    app = options[:app]
+  # Builds and bundles the given app
+  #
+  # @param version [String] The version to create
+  # @param build_code [String] The build code to create
+  # @param app [String] The Android app to build (i.e 'app', 'automotive', or 'wear')
+  lane :build_bundle do |version:, build_code:, app:|
     aab_artifact_path = aab_artifact_path(app, version)
     build_dir = 'artifacts/'
 
@@ -443,9 +452,9 @@ platform :android do
     end
   end
 
-  # Run instrumented tests in Google Firebase Test Lab
-  desc 'Build the application and instrumented tests, then run the tests in Firebase Test Lab'
-  lane :build_and_instrumented_test do |_options|
+  # Build the application and instrumented tests, then run the tests in Firebase Test Lab
+  #
+  lane :build_and_instrumented_test do
     gradle(tasks: %w[assembleDebug assembleDebugAndroidTest])
 
     # Run the instrumented tests in Firebase Test Lab
@@ -466,7 +475,8 @@ platform :android do
     )
   end
 
-  desc 'Builds a prototype build and uploads it to S3'
+  # Builds a prototype build and uploads it to S3
+  #
   lane :build_and_upload_prototype_build do
     UI.user_error!("'BUILDKITE_ARTIFACTS_S3_BUCKET' must be defined as an environment variable.") unless ENV['BUILDKITE_ARTIFACTS_S3_BUCKET']
 
@@ -547,8 +557,8 @@ platform :android do
 
   # Creates a new GitHub Release for the given version
   #
-  # @param [Hash<String>] version The version to create. Expects keys "name" and "code"
-  # @param [Bool] prerelease If true, the GitHub Release will have the prerelease flag
+  # @param version [Hash<String>] The version to create. Expects keys "name" and "code"
+  # @param prerelease [Bool] If true, the GitHub Release will have the prerelease flag
   #
   private_lane :create_gh_release do |version:, prerelease: false, release_assets: []|
     create_github_release(
