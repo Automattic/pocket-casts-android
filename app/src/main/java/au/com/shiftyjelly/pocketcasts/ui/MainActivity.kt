@@ -23,9 +23,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
@@ -146,6 +144,7 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Network
+import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -322,7 +321,7 @@ class MainActivity :
                 shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) -> {
                     if (settings.isNotificationsDisabledMessageShown()) return
                     Snackbar.make(
-                        findViewById(R.id.root),
+                        snackBarView(),
                         getString(LR.string.notifications_blocked_warning),
                         EXTRA_LONG_SNACKBAR_DURATION_MS,
                     ).setAction(
@@ -369,6 +368,7 @@ class MainActivity :
         checkForNotificationPermission()
 
         binding.root.setSystemWindowInsetToPadding(left = true, right = true)
+        binding.snackbarFragment.setSystemWindowInsetToPadding(bottom = true)
 
         binding.bottomNavigation.doOnLayout {
             val miniPlayerHeight = resources.getDimension(R.dimen.miniPlayerHeight).toInt()
@@ -379,8 +379,7 @@ class MainActivity :
             // Add padding to the main content so the end of the page isn't under the bottom navigation
             binding.mainFragment.updatePadding(bottom = bottomNavigationHeight)
             // Position the snackbar above the bottom navigation or the mini player if it's shown
-            updateSnackbarPosition(bottomNavigationHeight)
-            setupSnackbarPosition()
+            updateSnackbarPosition(0)
         }
 
         lifecycleScope.launch {
@@ -994,27 +993,19 @@ class MainActivity :
 
     override fun onMiniPlayerHidden() {
         val padding = binding.bottomNavigation.height
-        updateSnackbarPosition(padding)
+        updateSnackbarPosition(0)
         settings.updateBottomInset(0)
     }
 
     private fun updateSnackbarPosition(bottomPadding: Int) {
         binding.snackbarFragment.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-            bottomMargin = bottomPadding
-        }
-    }
-
-    private fun setupSnackbarPosition() {
-        // we manually position the snackbar to account for the mini player and bottom navigation, consume the insets so extra padding isn't added to the snackbar
-        ViewCompat.setOnApplyWindowInsetsListener(binding.snackbarFragment) { _, _ ->
-            WindowInsetsCompat.CONSUMED
+            bottomMargin = bottomPadding + 16.dpToPx(binding.snackbarFragment.context)
         }
     }
 
     override fun onMiniPlayerVisible() {
         val miniPlayerHeight = resources.getDimension(R.dimen.miniPlayerHeight).toInt()
-        val padding = binding.bottomNavigation.height + miniPlayerHeight
-        updateSnackbarPosition(padding)
+        updateSnackbarPosition(miniPlayerHeight)
         settings.updateBottomInset(miniPlayerHeight)
 
         // Handle up next shortcut
