@@ -123,18 +123,7 @@ class UserManagerImpl @Inject constructor(
         if (wasInitiatedByUser || !settings.getFullySignedOut()) {
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Signing out")
 
-            // Logout from Gravatar
-            if (FeatureFlag.isEnabled(Feature.GRAVATAR_NATIVE_QUICK_EDITOR)) {
-                (getSignInState().blockingFirst() as? SignInState.SignedIn)?.email?.let { email ->
-                    applicationScope.launch {
-                        GravatarQuickEditor.logout(
-                            email = Email(
-                                email,
-                            ),
-                        )
-                    }
-                }
-            }
+            logoutFromGravatar()
 
             subscriptionManager.clearCachedStatus()
             syncManager.signOut {
@@ -162,6 +151,20 @@ class UserManagerImpl @Inject constructor(
             }
         }
         settings.setFullySignedOut(true)
+    }
+
+    private fun logoutFromGravatar() {
+        if (FeatureFlag.isEnabled(Feature.GRAVATAR_NATIVE_QUICK_EDITOR)) {
+            syncManager.getEmail()?.let { email ->
+                applicationScope.launch {
+                    GravatarQuickEditor.logout(
+                        email = Email(
+                            email,
+                        ),
+                    )
+                }
+            }
+        }
     }
 
     override fun signOutAndClearData(
