@@ -24,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
@@ -43,6 +44,7 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeBottomS
 import au.com.shiftyjelly.pocketcasts.compose.bottomsheet.Pill
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
+import au.com.shiftyjelly.pocketcasts.compose.plusGradientBrush
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.type.OfferSubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.models.type.RecurringSubscriptionPricingPhase
@@ -274,7 +276,7 @@ fun SubscriptionTier.toSubscribeButton(res: Resources) =
         },
     )
 fun SubscriptionTier.toOutlinedButtonBrush() = when (this) {
-    SubscriptionTier.PLUS -> OnboardingUpgradeHelper.plusGradientBrush
+    SubscriptionTier.PLUS -> Brush.plusGradientBrush
     SubscriptionTier.PATRON -> OnboardingUpgradeHelper.patronGradientBrush
     SubscriptionTier.NONE -> throw IllegalStateException(UNKNOWN_TIER)
 }

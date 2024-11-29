@@ -4,7 +4,7 @@ import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.Brush
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.patronGradientBrush
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.plusGradientBrush
+import au.com.shiftyjelly.pocketcasts.compose.plusGradientBrush
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -27,7 +27,7 @@ sealed class UpgradeButton(
         textColorRes = UR.color.black,
         subscription = subscription,
         planType = planType,
-        gradientBackgroundColor = plusGradientBrush,
+        gradientBackgroundColor = Brush.plusGradientBrush,
     )
 
     data class Patron(
