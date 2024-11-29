@@ -33,6 +33,7 @@ import au.com.shiftyjelly.pocketcasts.views.adapter.ColorAdapter
 import au.com.shiftyjelly.pocketcasts.views.adapter.IconView
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.extensions.addAfterTextChanged
+import au.com.shiftyjelly.pocketcasts.views.extensions.includeStatusBarPadding
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
@@ -175,7 +176,7 @@ class CreateFilterFragment : BaseFragment(), CoroutineScope {
         observePlaylist()
 
         if (isCreate) {
-            binding.toolbarLayout.isVisible = false
+            binding.toolbar.isVisible = false
         } else {
             binding.toolbar.setNavigationOnClickListener {
                 @Suppress("DEPRECATION")
@@ -257,6 +258,7 @@ class CreateFilterFragment : BaseFragment(), CoroutineScope {
         toolbar.setTitleTextColor(titleColor)
         toolbar.navigationIcon?.setTintList(iconColorStateList)
         toolbar.setBackgroundColor(backgroundColor)
+        toolbar.includeStatusBarPadding()
     }
 
     private fun setupIconView(view: IconView, selected: Boolean) {
