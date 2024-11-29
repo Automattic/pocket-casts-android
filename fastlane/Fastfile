@@ -69,6 +69,15 @@ APPS_WEAR = 'wear'
 APPS = [APPS_APP, APPS_AUTOMOTIVE, APPS_WEAR].freeze
 
 UPLOAD_TO_PLAY_STORE_JSON_KEY = File.join(PROJECT_ROOT_FOLDER, 'google-upload-credentials.json')
+UPLOAD_TO_PLAY_STORE_COMMON_OPTIONS = {
+  package_name: APP_PACKAGE_NAME,
+  skip_upload_apk: true,
+  skip_upload_metadata: true,
+  skip_upload_changelogs: true,
+  skip_upload_images: true,
+  skip_upload_screenshots: true,
+  json_key: UPLOAD_TO_PLAY_STORE_JSON_KEY
+}.freeze
 
 before_all do |_lane|
   # Ensure we use the latest version of the toolkit
@@ -307,33 +316,19 @@ platform :android do
       aab_artifact_path = aab_artifact_path(app, version)
       UI.error("Unable to find a build artifact at #{aab_artifact_path}") unless File.exist? aab_artifact_path
 
-      track = case app
-              when APPS_AUTOMOTIVE
-                is_beta ? PLAY_STORE_TRACK_AUTOMOTIVE_BETA : PLAY_STORE_TRACK_AUTOMOTIVE_PRODUCTION
-              when APPS_WEAR
-                is_beta ? PLAY_STORE_TRACK_WEAR_BETA : PLAY_STORE_TRACK_WEAR_PRODUCTION
-              else
-                is_beta ? PLAY_STORE_TRACK_BETA : PLAY_STORE_TRACK_PRODUCTION
-              end
-
+      track = play_store_track(app: app, is_beta: is_beta)
       upload_to_play_store(
-        package_name: APP_PACKAGE_NAME,
+        **UPLOAD_TO_PLAY_STORE_COMMON_OPTIONS,
         aab: aab_artifact_path,
         track: track,
-        release_status: 'draft',
-        skip_upload_apk: true,
-        skip_upload_metadata: true,
-        skip_upload_changelogs: true,
-        skip_upload_images: true,
-        skip_upload_screenshots: true,
-        json_key: UPLOAD_TO_PLAY_STORE_JSON_KEY
+        release_status: 'draft'
       )
       release_assets << aab_artifact_path
 
       signed_apk_artifact_path = signed_apk_artifact_path(app, version)
       download_universal_apk_from_google_play(
         package_name: APP_PACKAGE_NAME,
-        version_code: version_code_for_app(build_code, app),
+        version_code: version_code_for_app(app: app, version_code: build_code),
         destination: signed_apk_artifact_path,
         json_key: UPLOAD_TO_PLAY_STORE_JSON_KEY
       )
@@ -341,6 +336,39 @@ platform :android do
     end
 
     create_gh_release(version: version, prerelease: is_beta, release_assets: release_assets.compact) if options[:create_gh_release]
+  end
+
+  # Update the rollout of all 3 variants (app, automotive, wear) of the current version to the given value
+  #
+  # @param [Float] percent the rollout percentage, between 0 and 1
+  #
+  lane :update_rollouts do |percent:|
+    version = version_name_current
+    build_code = build_code_current
+    is_beta = beta_version?(version)
+
+    not_found_variants = []
+    APPS.each do |app|
+      track = play_store_track(app: app, is_beta: is_beta)
+      version_code = version_code_for_app(app: app, version_code: build_code)
+      upload_to_play_store(
+        **UPLOAD_TO_PLAY_STORE_COMMON_OPTIONS,
+        skip_upload_aab: true,
+        track: track,
+        version_code: version_code,
+        release_status: percent.to_f < 1.0 ? 'inProgress' : 'completed',
+        rollout: percent.to_s
+      )
+    rescue FastlaneCore::Interface::FastlaneError => e
+      raise unless e.message =~ /Unable to find the requested release on track/
+
+      not_found_variants << app
+    end
+
+    not_found_variants.each do |app|
+      UI.important("'#{app}' variant for `#{version}` was not found in Google Play Console")
+    end
+    UI.user_error!('None of the 3 app variants were found in Google Play Console. We expected at least one') if not_found_variants.count == APPS.count
   end
 
   lane :finalize_release do |options|
@@ -670,14 +698,31 @@ platform :android do
   #
   # See also `dependencies.gradle.kts` and its `versionCodeDifferenceBetweenAppAnd*` constants where those offsets are defined
   #
-  def version_code_for_app(build_code, app)
+  def version_code_for_app(app:, version_code:)
     case app
     when APPS_AUTOMOTIVE
-      (build_code.to_i + 50_000).to_s
+      (version_code.to_i + 50_000).to_s
     when APPS_WEAR
-      (build_code.to_i + 100_000).to_s
+      (version_code.to_i + 100_000).to_s
     else
-      build_code
+      version_code
+    end
+  end
+
+  # Returns the Play Store track for a given app, for Open Testing or Production
+  #
+  # @param app [String] The type of app. One of `APPS_APP`, `APPS_AUTOMOTIVE`, `APPS_WEAR`
+  # @param is_beta [Boolean] If we want the track for Open Testing. Otherwise, returns the track for Production
+  # @return [String] The Play Store track to use in the `upload_to_play_store(track: …)` action call
+  #
+  def play_store_track(app:, is_beta:)
+    case app
+    when APPS_AUTOMOTIVE
+      is_beta ? PLAY_STORE_TRACK_AUTOMOTIVE_BETA : PLAY_STORE_TRACK_AUTOMOTIVE_PRODUCTION
+    when APPS_WEAR
+      is_beta ? PLAY_STORE_TRACK_WEAR_BETA : PLAY_STORE_TRACK_WEAR_PRODUCTION
+    else
+      is_beta ? PLAY_STORE_TRACK_BETA : PLAY_STORE_TRACK_PRODUCTION
     end
   end
 end
