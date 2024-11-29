@@ -20,6 +20,6 @@ fun BottomSheetDialogFragment.applyColor(theme: Theme, @ColorInt color: Int) {
     view?.setBackgroundColor(color)
 
     dialog?.window?.let { window ->
-        theme.setNavigationBarColor(window, true, color)
+        theme.setNavigationBarIconColor(window = window, isDark = true)
     }
 }
