@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
@@ -23,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeBottomS
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeBottomSheetViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesViewModel
 import au.com.shiftyjelly.pocketcasts.compose.bars.SystemBarsStyles
+import au.com.shiftyjelly.pocketcasts.compose.plusGradientBrush
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
@@ -32,7 +34,6 @@ import kotlinx.coroutines.launch
 
 private const val NULL_ACTIVITY_ERROR = "Activity is null when attempting subscription"
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun OnboardingUpgradeFlow(
     flow: OnboardingFlow,
@@ -173,7 +174,7 @@ private fun OutlinedButtonPreview() {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         OutlinedRowButton(
             text = "one this is way too long | | | | | | | | | | |",
-            brush = OnboardingUpgradeHelper.plusGradientBrush,
+            brush = Brush.plusGradientBrush,
             selectedCheckMark = true,
             subscriptionTier = SubscriptionTier.PLUS,
             onClick = {},
@@ -181,7 +182,7 @@ private fun OutlinedButtonPreview() {
         OutlinedRowButton(
             text = "two",
             topText = "woohoo!",
-            brush = OnboardingUpgradeHelper.plusGradientBrush,
+            brush = Brush.plusGradientBrush,
             subscriptionTier = SubscriptionTier.PLUS,
             selectedCheckMark = true,
             onClick = {},

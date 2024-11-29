@@ -30,7 +30,6 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
@@ -48,7 +47,6 @@ import androidx.constraintlayout.compose.ConstrainedLayoutReference
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintLayoutScope
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UpgradeRowButton
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.plusGradientBrush
 import au.com.shiftyjelly.pocketcasts.compose.buttons.GradientRowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.AutoResizeText
 import au.com.shiftyjelly.pocketcasts.compose.components.Clickable
@@ -56,9 +54,8 @@ import au.com.shiftyjelly.pocketcasts.compose.components.ClickableTextHelper
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.extensions.brush
-import au.com.shiftyjelly.pocketcasts.compose.patronPurpleLight
-import au.com.shiftyjelly.pocketcasts.compose.plusGoldDark
-import au.com.shiftyjelly.pocketcasts.compose.plusGoldLight
+import au.com.shiftyjelly.pocketcasts.compose.patronGradientBrush
+import au.com.shiftyjelly.pocketcasts.compose.plusGradientBrush
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -66,11 +63,6 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 object OnboardingUpgradeHelper {
-    val plusGradientBrush = Brush.horizontalGradient(
-        0f to Color.plusGoldLight,
-        1f to Color.plusGoldDark,
-    )
-    val patronGradientBrush = SolidColor(Color.patronPurpleLight)
 
     private val unselectedColor = Color(0xFF666666)
 
@@ -246,8 +238,8 @@ object OnboardingUpgradeHelper {
         selected: Boolean = true,
     ) {
         val brush = when (subscriptionTier) {
-            SubscriptionTier.PLUS -> plusGradientBrush
-            SubscriptionTier.PATRON -> patronGradientBrush
+            SubscriptionTier.PLUS -> Brush.plusGradientBrush
+            SubscriptionTier.PATRON -> Brush.patronGradientBrush
             SubscriptionTier.NONE -> throw IllegalStateException("Unknown subscription tier")
         }
         val textColor = when (subscriptionTier) {
@@ -432,7 +424,7 @@ fun UpgradeRowButtonWithGradientBackgroundPreview() {
         primaryText = "Upgrade Now",
         textColor = Color.Black,
         onClick = {},
-        gradientBackgroundColor = plusGradientBrush,
+        gradientBackgroundColor = Brush.plusGradientBrush,
     )
 }
 
