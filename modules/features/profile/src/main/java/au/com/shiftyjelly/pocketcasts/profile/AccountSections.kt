@@ -39,6 +39,7 @@ import au.com.shiftyjelly.pocketcasts.compose.ThemeColors
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
+import au.com.shiftyjelly.pocketcasts.compose.patronPurple
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -211,8 +212,8 @@ internal enum class AccountSection(
     UpgradeToPatron(
         iconId = IR.drawable.ic_patron,
         titleId = LR.string.profile_upgrade_to_patron,
-        iconTint = { Color(0xFF6046F5) },
-        titleColor = { Color(0xFF6046F5) },
+        iconTint = { Color.patronPurple },
+        titleColor = { Color.patronPurple },
     ),
     CancelSubscription(
         iconId = IR.drawable.ic_subscription_cancel,
