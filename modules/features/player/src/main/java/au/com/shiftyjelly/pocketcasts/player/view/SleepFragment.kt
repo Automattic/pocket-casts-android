@@ -78,9 +78,7 @@ class SleepFragment : BaseDialogFragment() {
         binding.buttonMins30.setOnClickListener { startTimer(mins = 30) }
         binding.buttonOneHour.setOnClickListener { startTimer(mins = 60) }
         binding.endOfEpisodeMinusButton.setOnClickListener { minusEndOfEpisodeButtonClicked() }
-        binding.endOfChapterMinusButton.setOnClickListener { minusEndOfChapterButtonClicked() }
         binding.endOfEpisodePlusButton.setOnClickListener { plusEndOfEpisodeButtonClicked() }
-        binding.endOfChapterPlusButton.setOnClickListener { plusEndOfChapterButtonClicked() }
         binding.buttonCustom.setOnClickListener { startCustomTimer() }
         binding.buttonEndOfEpisode.setOnClickListener {
             val episodes = viewModel.getSleepEndOfEpisodes()
@@ -124,6 +122,21 @@ class SleepFragment : BaseDialogFragment() {
                     },
                     onPlusClick = {
                         plusButtonClicked()
+                    },
+                    minusContentDescription = LR.string.player_sleep_custom_minus,
+                    plusContentDescription = LR.string.player_sleep_custom_plus,
+                )
+            }
+        }
+
+        binding.endOfChapterStepperComposeView.setContentWithViewCompositionStrategy {
+            AppTheme(theme.activeTheme) {
+                NumberStepper(
+                    onMinusClick = {
+                        minusEndOfChapterButtonClicked()
+                    },
+                    onPlusClick = {
+                        plusEndOfChapterButtonClicked()
                     },
                     minusContentDescription = LR.string.player_sleep_custom_minus,
                     plusContentDescription = LR.string.player_sleep_custom_plus,
