@@ -82,7 +82,7 @@ class ReferralsGuestPassFragment : BaseFragment() {
 
     private fun updateStatusAndNavColors() {
         activity?.let {
-            theme.setNavigationBarColor(it.window, true, Color.BLACK)
+            theme.setNavigationBarIconColor(window = it.window, isDark = true)
             theme.updateWindowStatusBarIcons(
                 it.window,
                 StatusBarColor.Custom(Color.BLACK, true),

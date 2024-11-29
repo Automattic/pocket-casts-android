@@ -133,7 +133,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
                     analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHOWN, mapOf(SOURCE_KEY to UpNextSource.NOW_PLAYING.analyticsValue))
 
                     activity?.let {
-                        theme.setNavigationBarColor(it.window, true, ThemeColor.primaryUi03(overrideTheme))
+                        theme.setNavigationBarIconColor(window = it.window, isDark = true)
                         theme.updateWindowStatusBarIcons(it.window, StatusBarColor.Custom(ThemeColor.secondaryUi01(overrideTheme), true), it)
                     }
 
