@@ -1,6 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.utils.extensions
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.combine as kotlinCombine
 
 inline fun <T1, T2, T3, T4, T5, T6, R> combine(
@@ -43,4 +45,21 @@ inline fun <T1, T2, T3, T4, T5, T6, T7, R> combine(
         array[5] as T6,
         array[6] as T7,
     )
+}
+
+fun <T> Flow<T>.windowed(size: Int) = flow {
+    check(size > 0) { "Window size must be positive: $size" }
+    val queue = ArrayDeque<T>(size)
+    collect { item ->
+        if (queue.size < size) {
+            queue.addLast(item)
+            if (queue.size == size) {
+                emit(queue.toList())
+            }
+        } else {
+            queue.removeFirst()
+            queue.addLast(item)
+            emit(queue.toList())
+        }
+    }
 }
