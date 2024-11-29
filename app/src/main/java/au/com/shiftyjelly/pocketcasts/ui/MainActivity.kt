@@ -23,9 +23,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
@@ -86,7 +84,6 @@ import au.com.shiftyjelly.pocketcasts.endofyear.StoriesActivity.StoriesSource
 import au.com.shiftyjelly.pocketcasts.endofyear.ui.EndOfYearLaunchBottomSheet
 import au.com.shiftyjelly.pocketcasts.filters.FiltersFragment
 import au.com.shiftyjelly.pocketcasts.localization.helper.LocaliseHelper
-import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
@@ -328,7 +325,7 @@ class MainActivity :
                 shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) -> {
                     if (settings.isNotificationsDisabledMessageShown()) return
                     Snackbar.make(
-                        findViewById(R.id.root),
+                        snackBarView(),
                         getString(LR.string.notifications_blocked_warning),
                         EXTRA_LONG_SNACKBAR_DURATION_MS,
                     ).setAction(
@@ -377,7 +374,7 @@ class MainActivity :
         binding.root.setSystemWindowInsetToPadding(left = true, right = true)
 
         binding.bottomNavigation.doOnLayout {
-            val miniPlayerHeight = resources.getDimension(R.dimen.miniPlayerHeight).toInt()
+            val miniPlayerHeight = miniPlayerHeight
             val bottomNavigationHeight = binding.bottomNavigation.height
             val bottomSheetBehavior = BottomSheetBehavior.from(binding.playerBottomSheet)
             // Set the player bottom sheet position to show the mini player above the bottom navigation
@@ -385,8 +382,7 @@ class MainActivity :
             // Add padding to the main content so the end of the page isn't under the bottom navigation
             binding.mainFragment.updatePadding(bottom = bottomNavigationHeight)
             // Position the snackbar above the bottom navigation or the mini player if it's shown
-            updateSnackbarPosition(bottomNavigationHeight)
-            setupSnackbarPosition()
+            updateSnackbarPosition(miniPlayerOpen = false)
         }
 
         lifecycleScope.launch {
@@ -464,7 +460,7 @@ class MainActivity :
         }
         navigator.infoStream()
             .doOnNext {
-                updateStatusBar()
+                updateSystemColors()
                 if (it is NavigatorAction.TabSwitched) {
                     val currentTab = navigator.currentTab()
                     if (settings.selectedTab() != currentTab) {
@@ -700,16 +696,11 @@ class MainActivity :
         }
     }
 
-    private fun updateNavAndStatusColors(playerOpen: Boolean, playingPodcast: Podcast?) {
+    private fun updateNavAndStatusColors(playerOpen: Boolean) {
         if (playerOpen) {
-            val playerBgColor = theme.playerBackgroundColor(playingPodcast)
-            theme.setNavigationBarColor(window, true, playerBgColor)
+            theme.setNavigationBarIconColor(window = window, isDark = true)
         } else {
-            theme.setNavigationBarColor(
-                window,
-                theme.isDarkTheme,
-                ThemeColor.primaryUi03(theme.activeTheme),
-            )
+            theme.setNavigationBarIconColor(window = window, isDark = theme.isDarkTheme)
         }
 
         updateStatusBar()
@@ -810,7 +801,7 @@ class MainActivity :
                     }
 
                     if (viewModel.isPlayerOpen && isEpisodeChanged) {
-                        updateNavAndStatusColors(true, state.podcast)
+                        updateNavAndStatusColors(true)
                     }
 
                     if (lastPlaybackState != null && (isEpisodeChanged || isPlaybackChanged) && settings.openPlayerAutomatically.value) {
@@ -955,7 +946,7 @@ class MainActivity :
                     binding.playerBottomSheet.isDragEnabled = true
                     frameBottomSheetBehavior.swipeEnabled = false
 
-                    updateNavAndStatusColors(playerOpen = viewModel.isPlayerOpen, viewModel.lastPlaybackState?.podcast)
+                    updateNavAndStatusColors(playerOpen = viewModel.isPlayerOpen)
                 } else {
                     binding.playerBottomSheet.isDragEnabled = false
                 }
@@ -999,28 +990,18 @@ class MainActivity :
     }
 
     override fun onMiniPlayerHidden() {
-        val padding = binding.bottomNavigation.height
-        updateSnackbarPosition(padding)
+        updateSnackbarPosition(miniPlayerOpen = false)
         settings.updateBottomInset(0)
     }
 
-    private fun updateSnackbarPosition(bottomPadding: Int) {
+    private fun updateSnackbarPosition(miniPlayerOpen: Boolean) {
         binding.snackbarFragment.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-            bottomMargin = bottomPadding
-        }
-    }
-
-    private fun setupSnackbarPosition() {
-        // we manually position the snackbar to account for the mini player and bottom navigation, consume the insets so extra padding isn't added to the snackbar
-        ViewCompat.setOnApplyWindowInsetsListener(binding.snackbarFragment) { _, _ ->
-            WindowInsetsCompat.CONSUMED
+            bottomMargin = (if (miniPlayerOpen) miniPlayerHeight else 0) + bottomNavigationHeight
         }
     }
 
     override fun onMiniPlayerVisible() {
-        val miniPlayerHeight = resources.getDimension(R.dimen.miniPlayerHeight).toInt()
-        val padding = binding.bottomNavigation.height + miniPlayerHeight
-        updateSnackbarPosition(padding)
+        updateSnackbarPosition(miniPlayerOpen = true)
         settings.updateBottomInset(miniPlayerHeight)
 
         // Handle up next shortcut
@@ -1036,7 +1017,7 @@ class MainActivity :
     }
 
     override fun updateSystemColors() {
-        updateNavAndStatusColors(viewModel.isPlayerOpen, viewModel.lastPlaybackState?.podcast)
+        updateNavAndStatusColors(viewModel.isPlayerOpen)
     }
 
     override fun onPlayerOpen() {
@@ -1047,7 +1028,7 @@ class MainActivity :
             }
         }
 
-        updateNavAndStatusColors(true, viewModel.lastPlaybackState?.podcast)
+        updateNavAndStatusColors(true)
         UiUtil.hideKeyboard(binding.root)
 
         viewModel.isPlayerOpen = true
@@ -1058,7 +1039,7 @@ class MainActivity :
     }
 
     override fun onPlayerClosed() {
-        updateNavAndStatusColors(false, null)
+        updateNavAndStatusColors(false)
 
         viewModel.isPlayerOpen = false
         viewModel.closeMultiSelect()
