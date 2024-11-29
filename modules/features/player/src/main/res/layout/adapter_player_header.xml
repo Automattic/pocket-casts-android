@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <au.com.shiftyjelly.pocketcasts.views.component.LockableNestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:importantForAccessibility="no"
@@ -15,80 +14,14 @@
         android:clipToPadding="false"
         android:theme="@style/PlayerTheme">
 
-        <ImageView
-            android:id="@+id/artwork"
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/artworkSectionComposeView"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
-            android:importantForAccessibility="no"
-            android:clickable="true"
-            android:scaleType="fitCenter"
-            app:layout_constraintBottom_toTopOf="@+id/episodeTitle"
+            app:layout_constraintBottom_toTopOf="@+id/playerHeadingSectionComposeView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:src="@tools:sample/avatars" />
-
-        <ImageView
-            android:id="@+id/chapterArtwork"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
-            android:importantForAccessibility="no"
-            android:clickable="true"
-            app:layout_constraintBottom_toTopOf="@+id/episodeTitle"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:src="@tools:sample/avatars" />
-
-        <androidx.constraintlayout.widget.Barrier
-            android:id="@+id/artworkTopBarrier"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            app:barrierAllowsGoneWidgets="true"
-            app:barrierDirection="top"
-            app:constraint_referenced_ids="artwork,chapterArtwork" />
-
-        <androidx.constraintlayout.widget.Barrier
-            android:id="@+id/artworkEndBarrier"
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
-            app:barrierAllowsGoneWidgets="true"
-            app:barrierDirection="end"
-            app:constraint_referenced_ids="artwork,chapterArtwork" />
-
-        <ImageView
-            android:id="@+id/chapterUrl"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:background="?android:attr/actionBarItemBackground"
-            android:clickable="true"
-            android:contentDescription="@string/player_chapter_url"
-            android:focusable="true"
-            android:scaleType="fitCenter"
-            android:src="@drawable/ic_link_back"
-            app:layout_constraintEnd_toEndOf="@+id/artworkEndBarrier"
-            app:layout_constraintTop_toTopOf="@+id/artworkTopBarrier" />
-
-        <ImageView
-            android:id="@+id/chapterUrlFront"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/ic_link"
-            app:layout_constraintBottom_toBottomOf="@+id/chapterUrl"
-            app:layout_constraintEnd_toEndOf="@+id/chapterUrl"
-            app:layout_constraintStart_toStartOf="@+id/chapterUrl"
-            app:layout_constraintTop_toTopOf="@+id/chapterUrl" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <au.com.shiftyjelly.pocketcasts.player.view.video.VideoView
             android:id="@+id/videoView"
@@ -98,120 +31,18 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
-            app:layout_constraintBottom_toTopOf="@+id/episodeTitle"
+            app:layout_constraintBottom_toTopOf="@+id/playerHeadingSectionComposeView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/episodeTitle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="4dp"
-            android:ellipsize="end"
-            android:fontFamily="sans-serif-medium"
-            android:gravity="center"
-            android:includeFontPadding="false"
-            android:lineSpacingMultiplier="1.2"
-            android:maxLines="2"
-            android:textColor="#FFFFFFFF"
-            android:textSize="18sp"
-            app:layout_constraintBottom_toTopOf="@+id/subtitleBarrier"
-            app:layout_constraintEnd_toStartOf="@+id/nextChapter"
-            app:layout_constraintStart_toEndOf="@+id/previousChapter"
-            tools:text="@tools:sample/lorem" />
-
-        <androidx.constraintlayout.widget.Barrier
-            android:id="@+id/subtitleBarrier"
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
-            app:barrierAllowsGoneWidgets="true"
-            app:barrierDirection="top"
-            app:constraint_referenced_ids="podcastTitle,chapterSummary" />
-
-        <TextView
-            android:id="@+id/podcastTitle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
-            android:ellipsize="end"
-            android:fontFamily="sans-serif-medium"
-            android:gravity="center"
-            android:includeFontPadding="false"
-            android:maxLines="1"
-            android:textColor="?attr/player_contrast_02"
-            android:textSize="14sp"
-            app:layout_constraintBottom_toTopOf="@+id/chapterSummary"
-            app:layout_constraintEnd_toStartOf="@+id/nextChapter"
-            app:layout_constraintStart_toEndOf="@+id/previousChapter"
-            tools:text="Invisibilia" />
-
-        <TextView
-            android:id="@+id/chapterSummary"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
-            android:gravity="center"
-            android:textAppearance="?attr/textCaption"
-            app:layout_constraintBottom_toTopOf="@+id/seekBar"
-            app:layout_constraintEnd_toStartOf="@+id/nextChapter"
-            app:layout_constraintStart_toEndOf="@+id/previousChapter"
-            tools:text="@tools:sample/lorem" />
-
-        <ImageButton
-            android:id="@+id/previousChapter"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
-            android:layout_marginStart="8dp"
-            android:background="?android:attr/actionBarItemBackground"
-            android:contentDescription="@string/player_action_previous_chapter"
-            android:src="@drawable/ic_chapter_skipbackwards"
-            app:layout_constraintBottom_toBottomOf="@+id/episodeTitle"
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/playerHeadingSectionComposeView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/episodeTitle" />
-
-        <ImageButton
-            android:id="@+id/nextChapter"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
-            android:layout_marginEnd="8dp"
-            android:background="?android:attr/actionBarItemBackground"
-            android:contentDescription="@string/player_action_next_chapter"
-            android:src="@drawable/ic_chapter_skipforward"
-            app:layout_constraintBottom_toBottomOf="@+id/episodeTitle"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/episodeTitle" />
-
-        <au.com.shiftyjelly.pocketcasts.player.view.ChapterProgressCircle
-            android:id="@+id/chapterProgressCircle"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            app:layout_constraintBottom_toBottomOf="@+id/nextChapter"
-            app:layout_constraintEnd_toEndOf="@+id/nextChapter"
-            app:layout_constraintStart_toStartOf="@+id/nextChapter"
-            app:layout_constraintTop_toTopOf="@+id/nextChapter" />
-
-        <TextView
-            android:id="@+id/chapterTimeRemaining"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:alpha="0.4"
-            android:textAppearance="@style/H70"
-            android:textColor="@color/white"
-            app:layout_constraintEnd_toEndOf="@+id/nextChapter"
-            app:layout_constraintStart_toStartOf="@+id/nextChapter"
-            app:layout_constraintTop_toBottomOf="@+id/nextChapter"
-            tools:text="9m" />
+            app:layout_constraintBottom_toTopOf="@+id/seekBar" />
 
         <androidx.compose.ui.platform.ComposeView
             android:id="@+id/transcriptPage"

@@ -10,7 +10,6 @@ import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionType
 import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersViewModel
 import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersViewModel.Mode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -74,12 +73,11 @@ class ChaptersViewModelTest {
     private val chaptersFlow = MutableStateFlow(chapters)
     private val subscriptionStatusFlow = MutableStateFlow<SubscriptionStatus?>(
         SubscriptionStatus.Paid(
-            expiry = Date(),
+            expiryDate = Date(),
             autoRenew = false,
             index = 0,
             platform = SubscriptionPlatform.GIFT,
             tier = SubscriptionTier.PATRON,
-            type = SubscriptionType.PLUS,
         ),
     )
 

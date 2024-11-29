@@ -50,7 +50,7 @@ import kotlin.time.Duration.Companion.minutes
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-internal fun ProfileHeader(
+fun ProfileHeader(
     state: ProfileHeaderState,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -73,20 +73,21 @@ internal fun ProfileHeader(
     }
 }
 
-internal data class ProfileHeaderState(
+data class ProfileHeaderState(
     val email: String?,
     val imageUrl: String?,
     val subscriptionTier: SubscriptionTier,
     val expiresIn: Duration?,
 )
 
-internal data class ProfileHeaderConfig(
+data class ProfileHeaderConfig(
     val infoFontScale: Float = 1f,
+    val spacingScale: Float = 1f,
     val avatarConfig: UserAvatarConfig = UserAvatarConfig(),
 )
 
 @Composable
-private fun VerticalProfileHeader(
+fun VerticalProfileHeader(
     state: ProfileHeaderState,
     config: ProfileHeaderConfig,
     modifier: Modifier = Modifier,
@@ -103,7 +104,7 @@ private fun VerticalProfileHeader(
     }
 
     Column(
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp * config.spacingScale),
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier.clickable(
             onClickLabel = accountLabel,
@@ -124,7 +125,7 @@ private fun VerticalProfileHeader(
                 fontScale = config.infoFontScale,
                 color = MaterialTheme.theme.colors.support05,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(top = 4.dp),
+                modifier = Modifier.padding(top = 4.dp * config.spacingScale),
             )
         }
         if (state.email != null) {
@@ -155,7 +156,7 @@ private fun VerticalProfileHeader(
 }
 
 @Composable
-private fun HorizontalProfileHeader(
+fun HorizontalProfileHeader(
     state: ProfileHeaderState,
     config: ProfileHeaderConfig,
     modifier: Modifier = Modifier,
@@ -188,10 +189,10 @@ private fun HorizontalProfileHeader(
             config = config.avatarConfig,
         )
         Spacer(
-            modifier = Modifier.width(16.dp),
+            modifier = Modifier.width(16.dp * config.spacingScale),
         )
         Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp * config.spacingScale),
             horizontalAlignment = Alignment.Start,
         ) {
             if (expirationLabel != null) {
@@ -200,7 +201,7 @@ private fun HorizontalProfileHeader(
                     fontScale = config.infoFontScale,
                     color = MaterialTheme.theme.colors.support05,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(top = 4.dp),
+                    modifier = Modifier.padding(top = 4.dp * config.spacingScale),
                 )
             }
             if (state.email != null) {

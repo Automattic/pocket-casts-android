@@ -247,7 +247,7 @@ enum class Feature(
     }
 }
 
-// It would be nice to be able to use Subscription.SubscriptionTier here, but that's in the
+// It would be nice to be able to use SubscriptionTier here, but that's in the
 // models module, which already depends on this featureflag module, so we can't depend on it
 enum class UserTier {
     Patron,

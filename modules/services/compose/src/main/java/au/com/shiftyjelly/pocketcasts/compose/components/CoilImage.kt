@@ -23,11 +23,12 @@ internal fun CoilImage(
     title: String,
     showTitle: Boolean,
     modifier: Modifier = Modifier,
+    contentScale: ContentScale = ContentScale.Crop,
     corners: Dp? = null,
 ) {
     val painter = rememberAsyncImagePainter(
         model = imageRequest,
-        contentScale = ContentScale.Crop,
+        contentScale = contentScale,
     )
 
     Box(contentAlignment = Alignment.Center) {

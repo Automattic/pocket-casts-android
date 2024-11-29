@@ -7,6 +7,7 @@ import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import com.automattic.android.measure.reporters.InternalA8cCiReporter
 import com.automattic.android.measure.reporters.SlowSlowTasksMetricsReporter
+import com.diffplug.gradle.spotless.SpotlessTask
 import com.google.devtools.ksp.gradle.KspExtension
 import com.google.devtools.ksp.gradle.KspGradleSubplugin
 import io.sentry.android.gradle.extensions.InstrumentationFeature
@@ -115,6 +116,10 @@ spotless {
         target("*.kts")
         ktlint(ktlintVersion)
     }
+}
+
+tasks.withType(SpotlessTask::class.java).configureEach {
+    notCompatibleWithConfigurationCache("https://github.com/diffplug/spotless/issues/987")
 }
 
 val javaTarget = JvmTarget.fromTarget(libs.versions.java.get())

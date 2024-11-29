@@ -5,6 +5,7 @@ import android.content.DialogInterface
 import android.content.res.ColorStateList
 import android.content.res.Resources
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
@@ -43,10 +44,18 @@ open class ConfirmationDialog : BottomSheetDialogFragment() {
     var secondaryType: ButtonType? = null
 
     @AttrRes private var iconTintAttr: Int? = UR.attr.primary_icon_01
+
+    @AttrRes private var secondaryTextColorAttr: Int? = null
+
+    @AttrRes private var summaryTextColorAttr: Int? = null
+
     private var onConfirm: (() -> Unit)? = null
     private var onSecondary: (() -> Unit)? = null
     private var onDismiss: (() -> Unit)? = null
     private var forceDarkTheme: Boolean = false
+    private var displayConfirmButtonFirst: Boolean = false
+    private var removeSecondaryButtonBorder: Boolean = false
+    private var summaryTextSize: Float? = null
     private var binding: FragmentConfirmationBinding? = null
 
     @Inject lateinit var theme: Theme
@@ -117,9 +126,27 @@ open class ConfirmationDialog : BottomSheetDialogFragment() {
         binding.lblTitle.text = title
         binding.lblSummary.isVisible = summary != null
         binding.lblSummary.text = summary
+        summaryTextColorAttr?.let { binding.lblSummary.setTextColor(context.getThemeColor(it)) }
+        summaryTextSize?.let { binding.lblSummary.setTextSize(TypedValue.COMPLEX_UNIT_SP, it) }
         binding.imgIcon.setImageResource(iconId)
         iconTintAttr?.let { binding.imgIcon.imageTintList = ColorStateList.valueOf(context.getThemeColor(it)) }
+
+        val layout = binding.root as ViewGroup
         val btnConfirm = binding.btnConfirm
+        val btnSecondary = binding.btnSecondary
+
+        if (displayConfirmButtonFirst) {
+            layout.removeView(btnConfirm)
+            layout.removeView(btnSecondary)
+            layout.addView(btnConfirm)
+            layout.addView(btnSecondary)
+        } else {
+            layout.removeView(btnSecondary)
+            layout.removeView(btnConfirm)
+            layout.addView(btnSecondary)
+            layout.addView(btnConfirm)
+        }
+
         btnConfirm.text = buttonType.text
         btnConfirm.setOnClickListener {
             onConfirm?.invoke()
@@ -132,11 +159,18 @@ open class ConfirmationDialog : BottomSheetDialogFragment() {
         val buttonColor = if (buttonType is ButtonType.Danger) dangerColor else defaultColor
         btnConfirm.backgroundTintList = ColorStateList.valueOf(buttonColor)
 
-        val secondaryButtonColor = if (secondaryType is ButtonType.Danger) dangerColor else defaultColor
-        val btnSecondary = binding.btnSecondary
-        btnSecondary.strokeColor = ColorStateList.valueOf(secondaryButtonColor)
-        btnSecondary.strokeWidth = 2.dpToPx(context)
-        btnSecondary.setTextColor(btnSecondary.strokeColor)
+        val secondaryButtonColor =
+            secondaryTextColorAttr?.let { context.getThemeColor(it) } ?: if (secondaryType is ButtonType.Danger) dangerColor else defaultColor
+
+        if (removeSecondaryButtonBorder) {
+            btnSecondary.strokeColor = null
+            btnSecondary.strokeWidth = 0
+        } else {
+            btnSecondary.strokeColor = ColorStateList.valueOf(secondaryButtonColor)
+            btnSecondary.strokeWidth = 2.dpToPx(context)
+        }
+
+        btnSecondary.setTextColor(secondaryButtonColor)
         btnSecondary.isVisible = secondaryType != null
         btnSecondary.text = secondaryType?.text
         btnSecondary.setOnClickListener {
@@ -192,6 +226,31 @@ open class ConfirmationDialog : BottomSheetDialogFragment() {
 
     fun setOnDismiss(onDismiss: (() -> Unit)?): ConfirmationDialog {
         this.onDismiss = onDismiss
+        return this
+    }
+
+    fun setDisplayConfirmButtonFirst(displayConfirmButtonFirst: Boolean): ConfirmationDialog {
+        this.displayConfirmButtonFirst = displayConfirmButtonFirst
+        return this
+    }
+
+    fun setSecondaryTextColor(@AttrRes colorAttr: Int?): ConfirmationDialog {
+        this.secondaryTextColorAttr = colorAttr
+        return this
+    }
+
+    fun setSummaryTextColor(@AttrRes colorAttr: Int?): ConfirmationDialog {
+        this.summaryTextColorAttr = colorAttr
+        return this
+    }
+
+    fun setRemoveSecondaryButtonBorder(removeSecondaryButtonBorder: Boolean): ConfirmationDialog {
+        this.removeSecondaryButtonBorder = removeSecondaryButtonBorder
+        return this
+    }
+
+    fun setSummaryTextSize(size: Float): ConfirmationDialog {
+        this.summaryTextSize = size
         return this
     }
 

@@ -38,6 +38,7 @@ import io.reactivex.Maybe
 import io.reactivex.Single
 import java.io.File
 import java.time.Instant
+import kotlinx.coroutines.flow.Flow
 import retrofit2.Response
 
 interface SyncManager : NamedSettingsCaller {
@@ -48,6 +49,7 @@ interface SyncManager : NamedSettingsCaller {
     fun isLoggedIn(): Boolean
     fun getLoginIdentity(): LoginIdentity?
     fun getEmail(): String?
+    fun observeEmail(): Flow<String?>
     fun signOut(action: () -> Unit = {})
     suspend fun loginWithGoogle(idToken: String, signInSource: SignInSource): LoginResult
     suspend fun loginWithEmailAndPassword(email: String, password: String, signInSource: SignInSource): LoginResult
