@@ -46,113 +46,128 @@
                 android:visibility="gone"/>
         </com.google.android.material.appbar.AppBarLayout>
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/filterOptionsFrame"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardElevation="2dp"
-            android:animateLayoutChanges="true">
-            <HorizontalScrollView
-                android:id="@+id/layoutFilterOptions"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clipToPadding="false"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:scrollbars="none">
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="62dp">
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chipPodcasts"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginRight="8dp" />
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chipEpisodes"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginRight="8dp" />
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chipTime"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginRight="8dp" />
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chipDuration"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginRight="8dp" />
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chipDownload"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginRight="8dp" />
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chipAudioVideo"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginRight="8dp" />
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chipStarred"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginRight="8dp" />
-                </LinearLayout>
-            </HorizontalScrollView>
-        </androidx.cardview.widget.CardView>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerView"
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:clipToPadding="false"
-            android:paddingBottom="16dp" />
-    </LinearLayout>
+            android:orientation="vertical">
 
-    <LinearLayout
-        android:id="@+id/emptyLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="150dp"
-        android:orientation="vertical"
-        android:visibility="gone"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/lblEmptyTitle"
-            style="?attr/textH2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:gravity="center"
-            android:text="@string/filters_no_episodes" />
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/filterOptionsFrame"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardElevation="2dp"
+                    android:animateLayoutChanges="true">
+                    <HorizontalScrollView
+                        android:id="@+id/layoutFilterOptions"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clipToPadding="false"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:scrollbars="none">
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="62dp">
 
-        <TextView
-            android:id="@+id/lblEmptySummary"
-            style="?attr/textSubtitle2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:lineSpacingMultiplier="1.1"
-            android:textColor="?attr/primary_text_02"
-            android:text="@string/filters_see_more_episodes" />
+                            <com.google.android.material.chip.Chip
+                                android:id="@+id/chipPodcasts"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical"
+                                android:layout_marginRight="8dp" />
+
+                            <com.google.android.material.chip.Chip
+                                android:id="@+id/chipEpisodes"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical"
+                                android:layout_marginRight="8dp" />
+
+                            <com.google.android.material.chip.Chip
+                                android:id="@+id/chipTime"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical"
+                                android:layout_marginRight="8dp" />
+
+                            <com.google.android.material.chip.Chip
+                                android:id="@+id/chipDuration"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical"
+                                android:layout_marginRight="8dp" />
+
+                            <com.google.android.material.chip.Chip
+                                android:id="@+id/chipDownload"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical"
+                                android:layout_marginRight="8dp" />
+
+                            <com.google.android.material.chip.Chip
+                                android:id="@+id/chipAudioVideo"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical"
+                                android:layout_marginRight="8dp" />
+
+                            <com.google.android.material.chip.Chip
+                                android:id="@+id/chipStarred"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical"
+                                android:layout_marginRight="8dp" />
+                        </LinearLayout>
+                    </HorizontalScrollView>
+                </androidx.cardview.widget.CardView>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clipToPadding="false"
+                    android:paddingBottom="16dp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/emptyLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="80dp"
+                android:visibility="gone"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp">
+
+                <TextView
+                    android:id="@+id/lblEmptyTitle"
+                    style="?attr/textH2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:gravity="center"
+                    android:text="@string/filters_no_episodes" />
+
+                <TextView
+                    android:id="@+id/lblEmptySummary"
+                    style="?attr/textSubtitle2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:lineSpacingMultiplier="1.1"
+                    android:textColor="?attr/primary_text_02"
+                    android:text="@string/filters_see_more_episodes" />
+            </LinearLayout>
+
+        </FrameLayout>
+
     </LinearLayout>
 
 </FrameLayout>

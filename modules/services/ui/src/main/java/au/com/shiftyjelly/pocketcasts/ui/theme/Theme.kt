@@ -406,7 +406,7 @@ class Theme @Inject constructor(private val settings: Settings) {
         WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = false
     }
 
-    fun setNavigationBarColor(window: Window, isDark: Boolean, color: Int? = null) {
+    fun setNavigationBarIconColor(window: Window, isDark: Boolean) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
 
         WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightNavigationBars = !isDark
