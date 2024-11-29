@@ -11,6 +11,9 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.components.NumberStepper
+import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentSleepBinding
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.settings.PlaybackSettingsFragment
@@ -35,6 +38,7 @@ import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import timber.log.Timber
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
 
 @AndroidEntryPoint
@@ -73,10 +77,8 @@ class SleepFragment : BaseDialogFragment() {
         binding.buttonMins15.setOnClickListener { startTimer(mins = 15) }
         binding.buttonMins30.setOnClickListener { startTimer(mins = 30) }
         binding.buttonOneHour.setOnClickListener { startTimer(mins = 60) }
-        binding.customMinusButton.setOnClickListener { minusButtonClicked() }
         binding.endOfEpisodeMinusButton.setOnClickListener { minusEndOfEpisodeButtonClicked() }
         binding.endOfChapterMinusButton.setOnClickListener { minusEndOfChapterButtonClicked() }
-        binding.customPlusButton.setOnClickListener { plusButtonClicked() }
         binding.endOfEpisodePlusButton.setOnClickListener { plusEndOfEpisodeButtonClicked() }
         binding.endOfChapterPlusButton.setOnClickListener { plusEndOfChapterButtonClicked() }
         binding.buttonCustom.setOnClickListener { startCustomTimer() }
@@ -111,6 +113,21 @@ class SleepFragment : BaseDialogFragment() {
                 openTab(VR.id.navigation_profile)
                 addFragment(SettingsFragment())
                 addFragment(fragment)
+            }
+        }
+
+        binding.customStepperComposeView.setContentWithViewCompositionStrategy {
+            AppTheme(theme.activeTheme) {
+                NumberStepper(
+                    onMinusClick = {
+                        minusButtonClicked()
+                    },
+                    onPlusClick = {
+                        plusButtonClicked()
+                    },
+                    minusContentDescription = LR.string.player_sleep_custom_minus,
+                    plusContentDescription = LR.string.player_sleep_custom_plus,
+                )
             }
         }
 
