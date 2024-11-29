@@ -108,9 +108,7 @@ platform :android do
     MESSAGE
 
     UI.important(confirmation_message)
-    unless skip_confirm || UI.confirm('Do you want to continue?')
-      UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.")
-    end
+    UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.") unless skip_confirm || UI.confirm('Do you want to continue?')
 
     # Create the release branch
     UI.message('Creating release branch...')
@@ -182,9 +180,7 @@ platform :android do
     MESSAGE
 
     UI.important(message)
-    unless skip_confirm || UI.confirm('Do you want to continue?')
-      UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.")
-    end
+    UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.") unless skip_confirm || UI.confirm('Do you want to continue?')
 
     # Bump the release version and build code
     UI.message('Bumping beta version and build code...')
@@ -236,9 +232,7 @@ platform :android do
     MESSAGE
 
     UI.important(message)
-    unless skip_confirm || UI.confirm('Do you want to continue?')
-      UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.")
-    end
+    UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.") unless skip_confirm || UI.confirm('Do you want to continue?')
 
     # Check tags
     UI.user_error!("The version `#{new_version}` tag already exists!") if git_tag_exists(tag: new_version)
@@ -268,9 +262,7 @@ platform :android do
     version = release_version_current
 
     UI.important("Triggering hotfix build for version: #{version}")
-    unless skip_confirm || UI.confirm('Do you want to continue?')
-      UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.")
-    end
+    UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.") unless skip_confirm || UI.confirm('Do you want to continue?')
 
     trigger_release_build(branch_to_build: "release/#{version}")
     create_backmerge_pr
@@ -307,9 +299,7 @@ platform :android do
       ensure_git_branch(branch: '^release/') unless is_ci
 
       UI.important("Building version #{version_name_current} (#{build_code_current}) for upload to Google Play Console")
-      unless skip_confirm || UI.confirm('Do you want to continue?')
-        UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.")
-      end
+      UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.") unless skip_confirm || UI.confirm('Do you want to continue?')
 
       # Check local repo status
       ensure_git_status_clean unless is_ci
@@ -388,9 +378,7 @@ platform :android do
     ensure_git_status_clean
 
     UI.important("Finalizing release: #{release_version_current}")
-    unless skip_confirm || UI.confirm('Do you want to continue?')
-      UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.")
-    end
+    UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.") unless skip_confirm || UI.confirm('Do you want to continue?')
 
     configure_apply(force: is_ci)
 
