@@ -58,7 +58,7 @@ internal fun TrialFinishedNotesCard(
 
 @Composable
 private fun NotesItemRow(
-    item: NotesItem,
+    item: TrialFinishedNotesItem,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -89,10 +89,10 @@ fun NotesCardPreview() {
     TrialFinishedNotesCard()
 }
 
-internal enum class TrialFinishedNotesItem(
-    override val icon: Int,
-    override val text: Int,
-) : NotesItem {
+private enum class TrialFinishedNotesItem(
+    @DrawableRes val icon: Int,
+    @StringRes val text: Int,
+) {
     LOCK_FEATURE(
         text = LR.string.plus_trial_finished_locked,
         icon = PR.drawable.ic_locked_large,
@@ -105,12 +105,4 @@ internal enum class TrialFinishedNotesItem(
         text = LR.string.plus_trial_finished_continue,
         icon = IR.drawable.ic_plus,
     ),
-}
-
-interface NotesItem {
-    @get:DrawableRes
-    val icon: Int
-
-    @get:StringRes
-    val text: Int
 }

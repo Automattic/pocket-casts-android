@@ -67,7 +67,6 @@ fun TrialFinishedPage(
             TextH20(
                 text = stringResource(LR.string.plus_trial_finished),
                 textAlign = TextAlign.Center,
-                disableAutoScale = true,
                 color = MaterialTheme.theme.colors.primaryText01,
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
@@ -76,7 +75,6 @@ fun TrialFinishedPage(
 
             TextP30(
                 text = stringResource(LR.string.plus_trial_finished_detail),
-                disableAutoScale = true,
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.W400,
                 color = MaterialTheme.theme.colors.primaryText02,
@@ -99,7 +97,7 @@ fun TrialFinishedPage(
 }
 
 @Composable
-fun TrialFinishedFooter(
+private fun TrialFinishedFooter(
     onUpgradeClick: () -> Unit = {},
     onDoneClick: () -> Unit = {},
     modifier: Modifier = Modifier,
