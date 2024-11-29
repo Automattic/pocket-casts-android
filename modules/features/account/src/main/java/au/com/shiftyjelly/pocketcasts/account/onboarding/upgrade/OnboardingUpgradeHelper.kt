@@ -30,7 +30,6 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
@@ -55,7 +54,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.ClickableTextHelper
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.extensions.brush
-import au.com.shiftyjelly.pocketcasts.compose.patronPurpleLight
+import au.com.shiftyjelly.pocketcasts.compose.patronGradientBrush
 import au.com.shiftyjelly.pocketcasts.compose.plusGradientBrush
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -64,7 +63,6 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 object OnboardingUpgradeHelper {
-    val patronGradientBrush = SolidColor(Color.patronPurpleLight)
 
     private val unselectedColor = Color(0xFF666666)
 
@@ -241,7 +239,7 @@ object OnboardingUpgradeHelper {
     ) {
         val brush = when (subscriptionTier) {
             SubscriptionTier.PLUS -> Brush.plusGradientBrush
-            SubscriptionTier.PATRON -> patronGradientBrush
+            SubscriptionTier.PATRON -> Brush.patronGradientBrush
             SubscriptionTier.NONE -> throw IllegalStateException("Unknown subscription tier")
         }
         val textColor = when (subscriptionTier) {

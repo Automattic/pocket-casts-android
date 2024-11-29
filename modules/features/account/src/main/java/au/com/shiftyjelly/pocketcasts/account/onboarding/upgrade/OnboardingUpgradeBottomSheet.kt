@@ -44,6 +44,7 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeBottomS
 import au.com.shiftyjelly.pocketcasts.compose.bottomsheet.Pill
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
+import au.com.shiftyjelly.pocketcasts.compose.patronGradientBrush
 import au.com.shiftyjelly.pocketcasts.compose.plusGradientBrush
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.type.OfferSubscriptionPricingPhase
@@ -277,6 +278,6 @@ fun SubscriptionTier.toSubscribeButton(res: Resources) =
     )
 fun SubscriptionTier.toOutlinedButtonBrush() = when (this) {
     SubscriptionTier.PLUS -> Brush.plusGradientBrush
-    SubscriptionTier.PATRON -> OnboardingUpgradeHelper.patronGradientBrush
+    SubscriptionTier.PATRON -> Brush.patronGradientBrush
     SubscriptionTier.NONE -> throw IllegalStateException(UNKNOWN_TIER)
 }
