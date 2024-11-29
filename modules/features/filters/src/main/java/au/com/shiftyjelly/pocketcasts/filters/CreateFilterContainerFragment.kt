@@ -25,6 +25,8 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.ColorUtils
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
+import au.com.shiftyjelly.pocketcasts.views.extensions.includeStatusBarPadding
+import au.com.shiftyjelly.pocketcasts.views.extensions.setSystemWindowInsetToPadding
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -47,6 +49,7 @@ class CreateFilterContainerFragment : BaseFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentCreateContainerBinding.inflate(inflater, container, false)
+        binding.root.setSystemWindowInsetToPadding(bottom = true)
         return binding.root
     }
 
@@ -79,6 +82,7 @@ class CreateFilterContainerFragment : BaseFragment() {
             }
         })
         binding.viewPager.isUserInputEnabled = false
+        binding.toolbar.includeStatusBarPadding()
 
         binding.btnCreate.setOnClickListener {
             if (binding.viewPager.currentItem == 0) {
