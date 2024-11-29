@@ -110,8 +110,9 @@ class AccountDetailsFragment : BaseFragment() {
             GravatarQuickEditorResult.AVATAR_SELECTED -> {
                 accountViewModel.gravatarUpdated()
             }
-
-            else -> {
+            GravatarQuickEditorResult.DISMISSED,
+            null,
+            -> {
                 /* Do nothing */
             }
         }
