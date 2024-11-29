@@ -143,7 +143,6 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Network
-import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -265,6 +264,12 @@ class MainActivity :
     private val frameBottomSheetBehavior: LockableBottomSheetBehavior<View>
         get() = getBottomSheetBehavior()
 
+    private val miniPlayerHeight: Int
+        get() = resources.getDimension(R.dimen.miniPlayerHeight).toInt()
+
+    private val bottomNavigationHeight: Int
+        get() = binding.bottomNavigation.height - binding.bottomNavigation.paddingBottom
+
     private var bottomSheetTag: String? = null
     private val bottomSheetQueue: MutableList<(() -> Unit)?> = mutableListOf()
 
@@ -367,10 +372,9 @@ class MainActivity :
         checkForNotificationPermission()
 
         binding.root.setSystemWindowInsetToPadding(left = true, right = true)
-        binding.snackbarFragment.setSystemWindowInsetToPadding(bottom = true)
 
         binding.bottomNavigation.doOnLayout {
-            val miniPlayerHeight = resources.getDimension(R.dimen.miniPlayerHeight).toInt()
+            val miniPlayerHeight = miniPlayerHeight
             val bottomNavigationHeight = binding.bottomNavigation.height
             val bottomSheetBehavior = BottomSheetBehavior.from(binding.playerBottomSheet)
             // Set the player bottom sheet position to show the mini player above the bottom navigation
@@ -378,7 +382,7 @@ class MainActivity :
             // Add padding to the main content so the end of the page isn't under the bottom navigation
             binding.mainFragment.updatePadding(bottom = bottomNavigationHeight)
             // Position the snackbar above the bottom navigation or the mini player if it's shown
-            updateSnackbarPosition(0)
+            updateSnackbarPosition(miniPlayerOpen = false)
         }
 
         lifecycleScope.launch {
@@ -437,7 +441,7 @@ class MainActivity :
 
         val showMiniPlayerImmediately = savedInstanceState?.getBoolean(SAVEDSTATE_MINIPLAYER_SHOWN, false) ?: false
         binding.playerBottomSheet.isVisible = showMiniPlayerImmediately
-        settings.updateBottomInset(if (showMiniPlayerImmediately) resources.getDimension(R.dimen.miniPlayerHeight).toInt() else 0)
+        settings.updateBottomInset(if (showMiniPlayerImmediately) miniPlayerHeight else 0)
 
         setupPlayerViews(showMiniPlayerImmediately)
 
@@ -986,20 +990,18 @@ class MainActivity :
     }
 
     override fun onMiniPlayerHidden() {
-        val padding = binding.bottomNavigation.height
-        updateSnackbarPosition(0)
+        updateSnackbarPosition(miniPlayerOpen = false)
         settings.updateBottomInset(0)
     }
 
-    private fun updateSnackbarPosition(bottomPadding: Int) {
+    private fun updateSnackbarPosition(miniPlayerOpen: Boolean) {
         binding.snackbarFragment.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-            bottomMargin = bottomPadding + 16.dpToPx(binding.snackbarFragment.context)
+            bottomMargin = (if (miniPlayerOpen) miniPlayerHeight else 0) + bottomNavigationHeight
         }
     }
 
     override fun onMiniPlayerVisible() {
-        val miniPlayerHeight = resources.getDimension(R.dimen.miniPlayerHeight).toInt()
-        updateSnackbarPosition(miniPlayerHeight)
+        updateSnackbarPosition(miniPlayerOpen = true)
         settings.updateBottomInset(miniPlayerHeight)
 
         // Handle up next shortcut
