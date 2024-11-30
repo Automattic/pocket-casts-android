@@ -34,7 +34,6 @@ class WhatsNewFragment : BaseFragment() {
     lateinit var analyticsTracker: AnalyticsTracker
 
     override var statusBarIconColor: StatusBarIconColor = StatusBarIconColor.ThemeNoToolbar
-    override var backgroundTransparent: Boolean = true
 
     override fun onCreateView(
         inflater: LayoutInflater,
