@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts.settings.whatsnew
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,9 +25,9 @@ class WhatsNewViewModel @Inject constructor() : ViewModel() {
 
     init {
         _state.value = UiState.Loaded(
-            feature = WhatsNewFeature.ReimagineSharing,
+            feature = WhatsNewFeature.Shuffle,
             fullModel = true,
-            tier = UserTier.Free,
+            tier = UserTier.Plus,
         )
     }
 
@@ -58,13 +58,13 @@ class WhatsNewViewModel @Inject constructor() : ViewModel() {
         val isUserEntitled: Boolean
         val subscriptionTier: SubscriptionTier? // To show subscription when user is not entitled to the feature
 
-        data object ReimagineSharing : WhatsNewFeature {
-            override val title = LR.string.share_whats_new_title
-            override val message = LR.string.share_whats_new_message
+        data object Shuffle : WhatsNewFeature {
+            override val title = LR.string.shuffle_whats_new_title
+            override val message = LR.string.shuffle_whats_new_message
             override val confirmButtonTitle = LR.string.got_it
             override val hasOffer = false
             override val isUserEntitled = true
-            override val subscriptionTier = null
+            override val subscriptionTier = SubscriptionTier.PLUS
         }
     }
 

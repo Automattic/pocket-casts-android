@@ -4,7 +4,6 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -20,7 +19,6 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.SubcomposeLayout
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -32,6 +30,12 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeDisplayMode
+import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeForTier
+import au.com.shiftyjelly.pocketcasts.compose.patronPurpleDark
+import au.com.shiftyjelly.pocketcasts.compose.patronPurpleLight
+import au.com.shiftyjelly.pocketcasts.compose.plusGoldDark
+import au.com.shiftyjelly.pocketcasts.compose.plusGoldLight
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
@@ -41,7 +45,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier.PLUS
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import coil.compose.AsyncImage
 import au.com.shiftyjelly.pocketcasts.images.R as IR
-import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @Composable
 fun UserAvatar(
@@ -49,7 +52,7 @@ fun UserAvatar(
     subscriptionTier: SubscriptionTier,
     modifier: Modifier = Modifier,
     borderCompletion: Float = 1f,
-    showPatronBadge: Boolean = true,
+    showBadge: Boolean = subscriptionTier == PATRON,
     config: UserAvatarConfig = UserAvatarConfig(),
 ) {
     SubcomposeLayout(
@@ -75,16 +78,14 @@ fun UserAvatar(
             null
         }
 
-        val badge = if (subscriptionTier == PATRON && showPatronBadge) {
+        val badge = if (showBadge) {
             subcompose("badge") {
-                SubscriptionBadge(
-                    subscriptionTier = PATRON,
-                    backgroundColor = subscriptionTier.toDarkColor(),
+                SubscriptionBadgeForTier(
+                    tier = subscriptionTier,
+                    displayMode = SubscriptionBadgeDisplayMode.ColoredDark,
                     fontSize = config.badgeFontSize,
-                    fontColor = Color.White,
                     iconSize = config.badgeIconSize,
-                    iconColor = Color.White,
-                    contentPadding = config.badgeContentPadding,
+                    padding = config.badgeContentPadding,
                 )
             }[0].measure(constraints)
         } else {
@@ -186,21 +187,19 @@ data class UserAvatarConfig(
     val strokeWidth: Dp = 4.dp,
     val badgeFontSize: TextUnit = 12.sp,
     val badgeIconSize: Dp = 12.dp,
-    val badgeContentPadding: PaddingValues = PaddingValues(horizontal = 8.dp, vertical = 6.dp),
+    val badgeContentPadding: Dp = 4.dp,
 )
 
-@Composable
 private fun SubscriptionTier.toLightColor() = when (this) {
     NONE -> Color.Transparent
-    PLUS -> colorResource(UR.color.plus_gold_light)
-    PATRON -> colorResource(UR.color.patron_purple_light)
+    PLUS -> Color.plusGoldLight
+    PATRON -> Color.patronPurpleLight
 }
 
-@Composable
 private fun SubscriptionTier.toDarkColor() = when (this) {
     NONE -> Color.Transparent
-    PLUS -> colorResource(UR.color.plus_gold_dark)
-    PATRON -> colorResource(UR.color.patron_purple)
+    PLUS -> Color.plusGoldDark
+    PATRON -> Color.patronPurpleDark
 }
 
 @Composable

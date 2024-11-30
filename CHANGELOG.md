@@ -3,6 +3,9 @@
 *   Bug Fixes
     *   Fix issue where seeking forward or backwards on hardware controls was not working on some headsets
         ([#3292](https://github.com/Automattic/pocket-casts-android/pull/3297))
+*   Updates
+    *   Update account details header UI
+        ([#3294](https://github.com/Automattic/pocket-casts-android/pull/3294))
 
 7.78
 -----

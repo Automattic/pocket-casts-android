@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade
 
-import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,19 +11,19 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradeFeatureItem
-import au.com.shiftyjelly.pocketcasts.account.viewmodel.ProfileUpgradeBannerViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.ProfileUpgradeBannerViewModel.State
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalPagerWrapper
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.images.OfferBadge
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -34,57 +34,45 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun ProfileUpgradeBanner(
+    state: State.Loaded,
+    onFeatureCardChanged: (UpgradeFeatureCard) -> Unit,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val viewModel = hiltViewModel<ProfileUpgradeBannerViewModel>()
-    val state by viewModel.state.collectAsState()
-
-    when (state) {
-        is State.Loaded -> {
-            val loadedState = state as State.Loaded
-            ProfileUpgradeBannerView(
-                state = loadedState,
+    // Due to dependency on the billing classes in loaded state
+    // the banner is not previawable as we cannot
+    // instantiate the state ourselves.
+    if (LocalInspectionMode.current) {
+        TextH20(
+            text = "Dummy upgrade banner for preview",
+            textAlign = TextAlign.Center,
+            modifier = modifier
+                .background(MaterialTheme.theme.colors.primaryText01.copy(alpha = 0.1f))
+                .padding(32.dp),
+        )
+    } else {
+        val featureCardsState = state.featureCardsState
+        HorizontalPagerWrapper(
+            pageCount = featureCardsState.featureCards.size,
+            initialPage = featureCardsState.featureCards.indexOf(state.featureCardsState.currentFeatureCard),
+            onPageChanged = { onFeatureCardChanged(state.featureCardsState.featureCards[it]) },
+            showPageIndicator = featureCardsState.showPageIndicator,
+            pageIndicatorColor = MaterialTheme.theme.colors.primaryText01,
+            modifier = modifier,
+        ) { index, pagerHeight ->
+            val currentTier = featureCardsState.featureCards[index].subscriptionTier
+            FeatureCard(
+                card = featureCardsState.featureCards[index],
+                button = requireNotNull(state.upgradeButtons.find { it.subscription.tier == currentTier }),
                 onClick = onClick,
-                onFeatureCardChanged = {
-                    viewModel.onFeatureCardChanged(loadedState.featureCardsState.featureCards[it])
+                subscriptionFrequency = state.featureCardsState.currentFrequency,
+                modifier = if (pagerHeight > 0) {
+                    Modifier.height(pagerHeight.pxToDp(LocalContext.current).dp)
+                } else {
+                    Modifier
                 },
-                modifier = modifier,
             )
         }
-        is State.Loading -> Unit // Do nothing
-    }
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun ProfileUpgradeBannerView(
-    state: State.Loaded,
-    onFeatureCardChanged: (Int) -> Unit,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val featureCardsState = state.featureCardsState
-    HorizontalPagerWrapper(
-        pageCount = featureCardsState.featureCards.size,
-        initialPage = featureCardsState.featureCards.indexOf(state.featureCardsState.currentFeatureCard),
-        onPageChanged = onFeatureCardChanged,
-        showPageIndicator = featureCardsState.showPageIndicator,
-        pageIndicatorColor = MaterialTheme.theme.colors.primaryText01,
-        modifier = modifier,
-    ) { index, pagerHeight ->
-        val currentTier = featureCardsState.featureCards[index].subscriptionTier
-        FeatureCard(
-            card = featureCardsState.featureCards[index],
-            button = requireNotNull(state.upgradeButtons.find { it.subscription.tier == currentTier }),
-            onClick = onClick,
-            subscriptionFrequency = state.featureCardsState.currentFrequency,
-            modifier = if (pagerHeight > 0) {
-                Modifier.height(pagerHeight.pxToDp(LocalContext.current).dp)
-            } else {
-                Modifier
-            },
-        )
     }
 }
 

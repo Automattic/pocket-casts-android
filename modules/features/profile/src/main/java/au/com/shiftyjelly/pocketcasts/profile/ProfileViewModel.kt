@@ -13,12 +13,11 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.Gravatar
+import au.com.shiftyjelly.pocketcasts.utils.toDurationFromNow
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.time.Instant
 import javax.inject.Inject
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
-import kotlin.time.toKotlinDuration
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -29,7 +28,6 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.rx2.asFlow
-import java.time.Duration as JavaDuration
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
@@ -60,7 +58,7 @@ class ProfileViewModel @Inject constructor(
                     else -> SubscriptionTier.NONE
                 },
                 email = state.email,
-                expiresIn = state.subscriptionStatus.expiryDate?.let { expiryDate -> expiresIn(expiryDate.toInstant()) },
+                expiresIn = state.subscriptionStatus.expiryDate?.toDurationFromNow(),
             )
 
             is SignInState.SignedOut -> ProfileHeaderState(
@@ -182,11 +180,5 @@ class ProfileViewModel @Inject constructor(
 
     internal fun closeUpgradeProfile() {
         settings.upgradeProfileClosed.set(true, updateModifiedAt = false)
-    }
-
-    private fun expiresIn(expiryDate: Instant): Duration {
-        return JavaDuration.between(Instant.now(), expiryDate)
-            .toKotlinDuration()
-            .coerceAtLeast(Duration.ZERO)
     }
 }

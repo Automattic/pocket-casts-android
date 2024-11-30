@@ -9,27 +9,21 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.compose.foundation.layout.padding
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.dp
-import androidx.core.view.isVisible
-import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
+import androidx.fragment.compose.content
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import au.com.shiftyjelly.pocketcasts.account.ChangeEmailFragment
 import au.com.shiftyjelly.pocketcasts.account.ChangePwdFragment
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.ProfileUpgradeBanner
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.ProfileUpgradeBannerViewModel
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
-import au.com.shiftyjelly.pocketcasts.models.to.SignInState
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.profile.champion.PocketCastsChampionBottomSheetDialog
-import au.com.shiftyjelly.pocketcasts.profile.databinding.FragmentAccountDetailsBinding
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -46,12 +40,13 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSourc
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.Gravatar
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
-import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.cartheme.R as CR
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -60,7 +55,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
 
 @AndroidEntryPoint
-class AccountDetailsFragment : BaseFragment(), OnUserViewClickListener {
+class AccountDetailsFragment : BaseFragment() {
     companion object {
         fun newInstance(): AccountDetailsFragment {
             return AccountDetailsFragment()
@@ -91,152 +86,96 @@ class AccountDetailsFragment : BaseFragment(), OnUserViewClickListener {
 
     @Inject lateinit var syncManager: SyncManager
 
-    private val viewModel: AccountDetailsViewModel by viewModels()
-    private var binding: FragmentAccountDetailsBinding? = null
+    private val accountViewModel by viewModels<AccountDetailsViewModel>()
+    private val upgradeBannerViewModel by viewModels<ProfileUpgradeBannerViewModel>()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentAccountDetailsBinding.inflate(inflater, container, false)
-        return binding?.root
-    }
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ) = content {
+        val upgradeBannerState = remember {
+            combine(
+                accountViewModel.showUpgradeBanner,
+                upgradeBannerViewModel.state,
+            ) { showBanner, state -> state.takeIf { showBanner } }
+        }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        binding = null
+        val state = AccountDetailsPageState(
+            isAutomotive = remember { Util.isAutomotive(requireContext()) },
+            miniPlayerPadding = accountViewModel.miniPlayerInset.collectAsState().value.pxToDp(requireContext()).dp,
+            headerState = accountViewModel.headerState.collectAsState().value,
+            upgradeBannerState = upgradeBannerState.collectAsState(null).value,
+            sectionsState = accountViewModel.sectionsState.collectAsState().value,
+        )
+        AccountDetailsPage(
+            state = state,
+            theme = theme.activeTheme,
+            onNavigateBack = {
+                @Suppress("DEPRECATION")
+                requireActivity().onBackPressed()
+            },
+            onClickHeader = {
+                if (state.headerState.subscription.isChampion) {
+                    PocketCastsChampionBottomSheetDialog().show(childFragmentManager, "pocket_casts_champion_dialog")
+                }
+            },
+            onClickUpgradeBanner = {
+                analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_UPGRADE_BUTTON_TAPPED)
+                val source = OnboardingUpgradeSource.PROFILE
+                val onboardingFlow = OnboardingFlow.PlusAccountUpgrade(source)
+                OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
+            },
+            onFeatureCardChanged = { featureCard ->
+                upgradeBannerViewModel.onFeatureCardChanged(featureCard)
+            },
+            onChangeAvatar = { email ->
+                analyticsTracker.track(AnalyticsEvent.ACCOUNT_DETAILS_CHANGE_AVATAR)
+                Gravatar.refreshGravatarTimestamp()
+                requireActivity().startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Gravatar.getGravatarChangeAvatarUrl(email))))
+            },
+            onChangeEmail = {
+                (requireActivity() as FragmentHostListener).addFragment(ChangeEmailFragment.newInstance())
+            },
+            onChangePassword = {
+                (requireActivity() as FragmentHostListener).addFragment(ChangePwdFragment.newInstance())
+            },
+            onUpgradeToPatron = {
+                val source = OnboardingUpgradeSource.ACCOUNT_DETAILS
+                val onboardingFlow = OnboardingFlow.PatronAccountUpgrade(source)
+                OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
+            },
+            onCancelSubscription = {
+                analyticsTracker.track(AnalyticsEvent.ACCOUNT_DETAILS_CANCEL_TAPPED)
+                CancelConfirmationFragment
+                    .newInstance()
+                    .show(childFragmentManager, "cancel_subscription_confirmation_dialog")
+            },
+            onChangeNewsletterSubscription = { isChecked ->
+                accountViewModel.updateNewsletter(isChecked)
+            },
+            onShowPrivacyPolicy = {
+                analyticsTracker.track(AnalyticsEvent.ACCOUNT_DETAILS_SHOW_PRIVACY_POLICY)
+                requireActivity().startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Settings.INFO_PRIVACY_URL)))
+            },
+            onShowTermsOfUse = {
+                analyticsTracker.track(AnalyticsEvent.ACCOUNT_DETAILS_SHOW_TOS)
+                requireActivity().startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Settings.INFO_TOS_URL)))
+            },
+            onSignOut = { signOut() },
+            onDeleteAccount = { deleteAccount() },
+        )
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val binding = binding ?: return
-        binding.toolbar?.let { toolbar ->
-            setupToolbarAndStatusBar(
-                toolbar = toolbar,
-                title = getString(LR.string.profile_pocket_casts_account),
-                navigationIcon = NavigationIcon.BackArrow,
-            )
-        }
-
-        viewModel.signInState.observe(viewLifecycleOwner) { signInState ->
-            binding.userView.signedInState = signInState
-            binding.changeAvatarGroup?.isVisible = signInState is SignInState.SignedIn
-
-            if (signInState is SignInState.SignedIn) {
-                binding.btnChangeAvatar?.setOnClickListener {
-                    analyticsTracker.track(AnalyticsEvent.ACCOUNT_DETAILS_CHANGE_AVATAR)
-                    Gravatar.refreshGravatarTimestamp()
-                    context?.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Gravatar.getGravatarChangeAvatarUrl(signInState.email))))
-                }
-            }
-
-            if (signInState.isPocketCastsChampion) {
-                binding.userView.setOnUserViewClick(this)
-            }
-        }
-
-        viewModel.viewState.observe(viewLifecycleOwner) { (signInState, subscription, deleteAccountState) ->
-            var giftExpiring = false
-            (signInState as? SignInState.SignedIn)?.subscriptionStatus?.let { status ->
-                val subscriptionStatus = status as? SubscriptionStatus.Paid ?: return@let
-                giftExpiring = subscriptionStatus.isExpiring
-            }
-
-            binding.cancelViewGroup?.isVisible = signInState.isSignedInAsPaid
-            binding.btnCancelSub?.isVisible = signInState.isSignedInAsPaid
-            binding.upgradeAccountGroup?.isVisible = signInState.isSignedInAsPlus &&
-                !giftExpiring
-
-            binding.userUpgradeComposeView?.setContentWithViewCompositionStrategy {
-                AppTheme(theme.activeTheme) {
-                    val showUpgradeBanner = subscription != null && (signInState.isSignedInAsFree || giftExpiring)
-                    binding.dividerView15?.isVisible = showUpgradeBanner
-                    if (showUpgradeBanner) {
-                        ProfileUpgradeBanner(
-                            onClick = {
-                                analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_UPGRADE_BUTTON_TAPPED)
-                                val source = OnboardingUpgradeSource.PROFILE
-                                val onboardingFlow = OnboardingFlow.PlusAccountUpgrade(source)
-                                OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
-                            },
-                            modifier = Modifier.padding(top = 16.dp),
-                        )
-                    }
-                }
-            }
-
-            updateDeleteAccountState(deleteAccountState)
-        }
-
-        viewModel.accountStartDate.observe(viewLifecycleOwner) { accountStartDate ->
-            binding.userView.accountStartDate = accountStartDate
-        }
-
-        viewModel.marketingOptInState.observe(viewLifecycleOwner) { marketingOptIn ->
-            binding.swtNewsletter?.isChecked = marketingOptIn
-            binding.swtNewsletter?.setOnCheckedChangeListener { _, isChecked ->
-                viewModel.updateNewsletter(isChecked)
-            }
-        }
-
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                settings.bottomInset.collect { bottomInset ->
-                    binding.mainScrollView.updatePadding(bottom = bottomInset)
+                accountViewModel.deleteAccountState.collect {
+                    updateDeleteAccountState(it)
                 }
             }
         }
-
-        binding.btnChangeEmail?.setOnClickListener {
-            val fragment = ChangeEmailFragment.newInstance()
-            (activity as FragmentHostListener).addFragment(fragment)
-        }
-
-        val showChangeButtons = !syncManager.isGoogleLogin()
-        binding.changeEmailPasswordGroup?.isVisible = showChangeButtons
-
-        binding.btnChangePwd?.setOnClickListener {
-            val fragment = ChangePwdFragment.newInstance()
-            (this.activity as FragmentHostListener).addFragment(fragment)
-        }
-
-        binding.btnUpgradeAccount?.setOnClickListener {
-            val source = OnboardingUpgradeSource.ACCOUNT_DETAILS
-            val onboardingFlow = OnboardingFlow.PatronAccountUpgrade(source)
-            OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
-        }
-
-        binding.btnCancelSub?.setOnClickListener {
-            analyticsTracker.track(AnalyticsEvent.ACCOUNT_DETAILS_CANCEL_TAPPED)
-            CancelConfirmationFragment.newInstance()
-                .show(childFragmentManager, "cancel_subscription_confirmation_dialog")
-        }
-
-        binding.btnSignOut.setOnClickListener {
-            signOut()
-        }
-
-        binding.btnDeleteAccount?.setOnClickListener {
-            deleteAccount()
-        }
-
-        binding.btnNewsletter?.setOnClickListener {
-            binding.swtNewsletter?.let {
-                it.isChecked = !it.isChecked
-            }
-        }
-
-        binding.btnPrivacyPolicy?.setOnClickListener {
-            analyticsTracker.track(AnalyticsEvent.ACCOUNT_DETAILS_SHOW_PRIVACY_POLICY)
-            context?.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Settings.INFO_PRIVACY_URL)))
-        }
-
-        binding.btnTermsOfUse?.setOnClickListener {
-            analyticsTracker.track(AnalyticsEvent.ACCOUNT_DETAILS_SHOW_TOS)
-            context?.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Settings.INFO_TOS_URL)))
-        }
-    }
-
-    override fun onPocketCastsChampionClick() {
-        PocketCastsChampionBottomSheetDialog().show(childFragmentManager, "pocket_casts_champion_dialog")
     }
 
     private fun signOut() {
@@ -281,11 +220,11 @@ class AccountDetailsFragment : BaseFragment(), OnUserViewClickListener {
     private fun updateDeleteAccountState(state: DeleteAccountState) {
         when (state) {
             is DeleteAccountState.Success -> {
-                viewModel.clearDeleteAccountState()
+                accountViewModel.clearDeleteAccountState()
                 performSignOut()
             }
             is DeleteAccountState.Failure -> {
-                viewModel.clearDeleteAccountState()
+                accountViewModel.clearDeleteAccountState()
                 AlertDialog.Builder(requireContext())
                     .setTitle(getString(LR.string.profile_delete_account_failed_title))
                     .setMessage(state.message ?: getString(LR.string.profile_delete_account_failed_message))
@@ -297,7 +236,7 @@ class AccountDetailsFragment : BaseFragment(), OnUserViewClickListener {
     }
 
     private fun performDeleteAccount() {
-        viewModel.deleteAccount()
+        accountViewModel.deleteAccount()
         Toast.makeText(requireContext(), LR.string.profile_deleting_account, Toast.LENGTH_LONG).show()
     }
 

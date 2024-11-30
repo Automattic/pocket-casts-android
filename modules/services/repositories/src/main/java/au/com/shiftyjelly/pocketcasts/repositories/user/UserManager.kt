@@ -23,18 +23,22 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.android.tracks.crashlogging.CrashLogging
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.Single
+import io.reactivex.rxkotlin.combineLatest
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.rx2.asFlowable
 import timber.log.Timber
 
 interface UserManager {
@@ -96,9 +100,10 @@ class UserManagerImpl @Inject constructor(
                                 subscriptionManager.getSubscriptionStatus(allowCache = false)
                             }
                         }
-                        .map {
+                        .combineLatest(syncManager.observeEmail().map { Optional.of(it) }.asFlowable())
+                        .map { (status, maybeEmail) ->
                             analyticsTracker.refreshMetadata()
-                            SignInState.SignedIn(email = syncManager.getEmail() ?: "", subscriptionStatus = it)
+                            SignInState.SignedIn(email = maybeEmail.get() ?: "", subscriptionStatus = status)
                         }
                         .onErrorReturn {
                             Timber.e(it, "Error getting subscription state")
