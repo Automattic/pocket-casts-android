@@ -34,7 +34,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
-import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
+import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.hideShadow
@@ -250,11 +250,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
     private fun updateStatusAndNavColors() {
         activity?.let {
             theme.setNavigationBarIconColor(window = it.window, isDark = true)
-            theme.updateWindowStatusBarIcons(
-                it.window,
-                StatusBarColor.Custom(ThemeColor.secondaryUi01(overrideTheme), overrideTheme.darkTheme),
-                it,
-            )
+            theme.updateWindowStatusBarIcons(window = it.window, statusBarIconColor = StatusBarIconColor.Theme)
         }
     }
 

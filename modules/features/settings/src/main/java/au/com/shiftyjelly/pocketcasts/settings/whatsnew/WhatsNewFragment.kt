@@ -20,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewViewModel.NavigationState
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
+import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -31,6 +32,8 @@ class WhatsNewFragment : BaseFragment() {
 
     @Inject
     lateinit var analyticsTracker: AnalyticsTracker
+
+    override var statusBarIconColor: StatusBarIconColor = StatusBarIconColor.ThemeNoToolbar
 
     override fun onCreateView(
         inflater: LayoutInflater,

@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.settings.whatsnew
 
 import android.content.res.Configuration
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -12,7 +11,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -23,14 +24,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import au.com.shiftyjelly.pocketcasts.compose.bottomsheet.Pill
+import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
+import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowTextButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
@@ -38,7 +39,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewViewModel.WhatsNewFeature
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun WhatsNewPage(
@@ -79,12 +79,6 @@ private fun WhatsNewPageLoaded(
     onClose: () -> Unit,
 ) {
     var closing by remember { mutableStateOf(false) }
-    val targetAlpha = if (closing) 0f else 0.66f
-    val scrimAlpha: Float by animateFloatAsState(
-        targetValue = targetAlpha,
-        finishedListener = { onClose() },
-    )
-
     val performClose = {
         closing = true
     }
@@ -92,7 +86,8 @@ private fun WhatsNewPageLoaded(
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
-            .background(Color.Black.copy(alpha = scrimAlpha))
+            .statusBarsPadding()
+            .navigationBarsPadding()
             .then(
                 if (!state.fullModel) {
                     Modifier.clickable(
@@ -114,21 +109,11 @@ private fun WhatsNewPageLoaded(
                 .then(if (state.fullModel) Modifier.fillMaxSize() else Modifier),
         ) {
             if (state.fullModel) {
-                Spacer(Modifier.height(8.dp))
-
-                Pill()
-
-                Box(
-                    modifier = Modifier.align(Alignment.Start),
-                ) {
-                    RowTextButton(
-                        text = stringResource(LR.string.cancel),
-                        fontSize = 15.sp,
-                        onClick = performClose,
-                        fullWidth = false,
-                        includePadding = false,
-                    )
-                }
+                ThemedTopAppBar(
+                    navigationButton = NavigationButton.Close,
+                    onNavigationClick = performClose,
+                    style = ThemedTopAppBar.Style.Immersive,
+                )
             }
 
             Column(

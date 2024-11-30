@@ -28,7 +28,7 @@ import au.com.shiftyjelly.pocketcasts.settings.AutoAddSettingsFragment
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getTintedDrawable
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
-import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
+import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.combineLatest
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
@@ -165,8 +165,7 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
 
             theme.updateWindowStatusBarIcons(
                 window = requireActivity().window,
-                statusBarColor = StatusBarColor.Custom(colors.backgroundColor, isWhiteIcons = theme.activeTheme.defaultLightIcons),
-                context = context,
+                statusBarIconColor = StatusBarIconColor.Theme,
             )
 
             preferenceNotifications?.isChecked = podcast.isShowNotifications
@@ -420,7 +419,7 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
 
     private fun setupStatusBar() {
         activity?.let {
-            theme.updateWindowStatusBarIcons(window = it.window, statusBarColor = StatusBarColor.Light, context = it)
+            theme.updateWindowStatusBarIcons(window = it.window, statusBarIconColor = StatusBarIconColor.Theme)
         }
     }
 

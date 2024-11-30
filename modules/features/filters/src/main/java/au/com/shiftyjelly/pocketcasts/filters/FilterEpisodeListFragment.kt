@@ -45,7 +45,6 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.getColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getStringForDuration
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
-import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
@@ -199,10 +198,7 @@ class FilterEpisodeListFragment : BaseFragment() {
 
         binding = null
 
-        activity?.let {
-            statusBarColor = StatusBarColor.Light
-            updateStatusBar()
-        }
+        updateStatusBar()
     }
 
     private fun onRowClick(episode: BaseEpisode) {
