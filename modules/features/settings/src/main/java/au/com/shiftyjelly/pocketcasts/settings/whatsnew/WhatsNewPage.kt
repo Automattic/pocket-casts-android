@@ -19,7 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -78,11 +77,6 @@ private fun WhatsNewPageLoaded(
     onConfirm: () -> Unit,
     onClose: () -> Unit,
 ) {
-    var closing by remember { mutableStateOf(false) }
-    val performClose = {
-        closing = true
-    }
-
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
@@ -93,7 +87,7 @@ private fun WhatsNewPageLoaded(
                     Modifier.clickable(
                         indication = null,
                         interactionSource = remember { MutableInteractionSource() },
-                        onClick = { performClose() },
+                        onClick = { onClose() },
                     )
                 } else {
                     Modifier
@@ -111,7 +105,7 @@ private fun WhatsNewPageLoaded(
             if (state.fullModel) {
                 ThemedTopAppBar(
                     navigationButton = NavigationButton.Close,
-                    onNavigationClick = performClose,
+                    onNavigationClick = onClose,
                     style = ThemedTopAppBar.Style.Immersive,
                 )
             }
@@ -159,7 +153,7 @@ private fun WhatsNewPageLoaded(
                 RowTextButton(
                     text = stringResource(it),
                     fontSize = 15.sp,
-                    onClick = performClose,
+                    onClick = onClose,
                 )
             }
 
