@@ -212,6 +212,7 @@ class AutoDownloadSettingsFragment :
                     viewModel.onLimitDownloadsChange(autoDownloadLimitSetting)
 
                     updateLimitDownloadsSummary()
+                    updateOnFollowSummary()
                     true
                 }
             }
@@ -481,9 +482,26 @@ class AutoDownloadSettingsFragment :
             value = settings.autoDownloadLimit.value.id.toString()
         }
         updateLimitDownloadsSummary()
+        updateOnFollowSummary()
     }
 
     private fun updateLimitDownloadsSummary() {
         podcastsAutoDownloadLimitPreference?.summary = getString(settings.autoDownloadLimit.value.titleRes)
+    }
+
+    private fun updateOnFollowSummary() {
+        val limitDownloads = AutoDownloadLimitSetting.getNumberOfEpisodes(viewModel.getLimitDownload())
+
+        val localizedLimitDownloads = when (limitDownloads) {
+            2 -> resources.getString(LR.string.number_two)
+            3 -> resources.getString(LR.string.number_three)
+            5 -> resources.getString(LR.string.number_five)
+            10 -> resources.getString(LR.string.number_ten)
+            else -> limitDownloads.toString()
+        }
+
+        onFollowPodcastPreference?.summary = resources.getQuantityString(
+            LR.plurals.settings_auto_download_on_follow_podcast_description, limitDownloads, localizedLimitDownloads,
+        )
     }
 }

@@ -59,6 +59,8 @@ class AutoDownloadSettingsViewModel @Inject constructor(
 
     fun getAutoDownloadNewEpisodes() = settings.autoDownloadNewEpisodes.value
 
+    fun getLimitDownload() = settings.autoDownloadLimit.value
+
     fun isAutoDownloadOnFollowPodcastEnabled() = settings.autoDownloadOnFollowPodcast.value
 
     fun onNewEpisodesChange(newValue: Boolean) {
@@ -79,12 +81,8 @@ class AutoDownloadSettingsViewModel @Inject constructor(
         )
     }
 
-    fun setLimitDownloads(value: AutoDownloadLimitSetting) {
-        settings.autoDownloadLimit.set(value, updateModifiedAt = true)
-    }
-
     fun onLimitDownloadsChange(value: AutoDownloadLimitSetting) {
-        setLimitDownloads(value)
+        settings.autoDownloadLimit.set(value, updateModifiedAt = true)
 
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_AUTO_DOWNLOAD_LIMIT_DOWNLOADS_CHANGED,
