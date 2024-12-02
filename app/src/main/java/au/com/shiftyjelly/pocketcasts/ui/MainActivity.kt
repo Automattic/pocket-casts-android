@@ -681,7 +681,7 @@ class MainActivity :
     }
 
     override fun updateStatusBar() {
-        val topFragment = supportFragmentManager.fragments.last()
+        val topFragment = supportFragmentManager.fragments.lastOrNull()
         val color = if (binding.playerBottomSheet.isPlayerOpen) {
             StatusBarIconColor.Light
         } else if (topFragment is BaseFragment) {
