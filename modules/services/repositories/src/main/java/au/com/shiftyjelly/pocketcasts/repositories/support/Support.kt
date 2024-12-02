@@ -255,7 +255,7 @@ class Support @Inject constructor(
             val autoDownloadOn = booleanArrayOf(false)
             val uuidToPodcast = HashMap<String, Podcast>()
             try {
-                val podcasts = podcastManager.findSubscribed()
+                val podcasts = podcastManager.findSubscribedBlocking()
                 for (podcast in podcasts) {
                     if (podcast.isAutoDownloadNewEpisodes) {
                         autoDownloadOn[0] = true
@@ -395,7 +395,7 @@ class Support @Inject constructor(
                     .append(" Volume boost: ").append(if (effects.isVolumeBoosted) "on" else "off").append(eol).append(eol)
 
                 output.append("Database").append(eol)
-                    .append(" ").append(podcastManager.countPodcasts()).append(" Podcasts ").append(eol)
+                    .append(" ").append(podcastManager.countPodcastsBlocking()).append(" Podcasts ").append(eol)
                     .append(" ").append(episodeManager.countEpisodes()).append(" Episodes ").append(eol)
                     .append(" ").append(playlistManager.findAllBlocking().size).append(" Playlists ").append(eol)
                     .append(" ").append(queue.size).append(" Up Next ").append(eol).append(eol)

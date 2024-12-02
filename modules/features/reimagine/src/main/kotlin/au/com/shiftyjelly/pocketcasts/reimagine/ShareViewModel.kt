@@ -43,7 +43,7 @@ class ShareViewModel @AssistedInject constructor(
         }
     } else {
         combine(
-            podcastManager.observePodcastByUuidFlow(initialPodcast.uuid),
+            podcastManager.podcastByUuidFlow(initialPodcast.uuid),
             episodeManager.findEpisodeByUuidFlow(initialEpisode.uuid),
             ::UiState,
         )

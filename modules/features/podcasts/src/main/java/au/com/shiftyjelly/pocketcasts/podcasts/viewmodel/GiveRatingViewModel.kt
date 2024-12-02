@@ -100,7 +100,7 @@ class GiveRatingViewModel @Inject constructor(
         viewModelScope.launch {
             _state.value = State.Loading
 
-            val podcast = podcastManager.findPodcastByUuidSuspend(podcastUuid)
+            val podcast = podcastManager.findPodcastByUuid(podcastUuid)
 
             if (podcast == null) {
                 _state.value = State.ErrorWhenLoadingPodcast

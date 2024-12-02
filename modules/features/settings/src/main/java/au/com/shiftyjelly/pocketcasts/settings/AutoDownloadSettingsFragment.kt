@@ -306,9 +306,9 @@ class AutoDownloadSettingsFragment :
 
     override fun podcastSelectFragmentSelectionChanged(newSelection: List<String>) {
         lifecycleScope.launch(Dispatchers.Default) {
-            podcastManager.findSubscribed().forEach {
+            podcastManager.findSubscribedBlocking().forEach {
                 val autodownloadStatus = if (newSelection.contains(it.uuid)) Podcast.AUTO_DOWNLOAD_NEW_EPISODES else Podcast.AUTO_DOWNLOAD_OFF
-                podcastManager.updateAutoDownloadStatus(it, autodownloadStatus)
+                podcastManager.updateAutoDownloadStatusBlocking(it, autodownloadStatus)
             }
             launch(Dispatchers.Main) { updatePodcastsSelectedSummary() }
         }
@@ -316,14 +316,14 @@ class AutoDownloadSettingsFragment :
 
     override fun podcastSelectFragmentGetCurrentSelection(): List<String> {
         return runBlocking {
-            val podcasts = async(Dispatchers.Default) { podcastManager.findPodcastsAutodownload() }.await()
+            val podcasts = async(Dispatchers.Default) { podcastManager.findPodcastsAutodownloadBlocking() }.await()
             podcasts.map { it.uuid }
         }
     }
 
     private fun updatePodcastsSelectedSummary() {
         lifecycleScope.launch {
-            val count = async(Dispatchers.Default) { podcastManager.findPodcastsAutodownload() }.await().count()
+            val count = async(Dispatchers.Default) { podcastManager.findPodcastsAutodownloadBlocking() }.await().count()
             val preference = preferenceManager.findPreference<Preference>(PREFERENCE_CHOOSE_PODCASTS)
             preference?.summary = context?.resources?.getStringPluralPodcastsSelected(count)
         }
@@ -389,13 +389,13 @@ class AutoDownloadSettingsFragment :
     }
 
     private fun countPodcastsAutoDownloading(): Single<Int> {
-        return podcastManager.countDownloadStatusRx(Podcast.AUTO_DOWNLOAD_NEW_EPISODES)
+        return podcastManager.countDownloadStatusRxSingle(Podcast.AUTO_DOWNLOAD_NEW_EPISODES)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
     }
 
     private fun countPodcasts(): Single<Int> {
-        return podcastManager.countSubscribedRx()
+        return podcastManager.countSubscribedRxSingle()
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
     }

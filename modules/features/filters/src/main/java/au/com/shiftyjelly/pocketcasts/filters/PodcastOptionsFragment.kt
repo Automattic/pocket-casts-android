@@ -79,7 +79,7 @@ class PodcastOptionsFragment : BaseFragment(), PodcastSelectFragment.Listener, C
         val btnClose = binding.btnClose
 
         launch {
-            val subscribedPodcasts = withContext(Dispatchers.Default) { podcastManager.findSubscribed() }.map { it.uuid }
+            val subscribedPodcasts = withContext(Dispatchers.Default) { podcastManager.findSubscribedBlocking() }.map { it.uuid }
             val playlistUuid = requireArguments().getString(ARG_PLAYLIST_UUID) ?: return@launch
             val playlist = playlistManager.findByUuid(playlistUuid) ?: return@launch
             this@PodcastOptionsFragment.playlist = playlist

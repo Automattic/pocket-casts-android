@@ -40,7 +40,7 @@ class PodcastEffectsViewModel
 
     fun loadPodcast(uuid: String) {
         podcast = podcastManager
-            .observePodcastByUuid(uuid)
+            .podcastByUuidRxFlowable(uuid)
             .subscribeOn(Schedulers.io())
             .toLiveData()
     }
@@ -48,7 +48,7 @@ class PodcastEffectsViewModel
     fun updateOverrideGlobalEffects(override: Boolean) {
         val podcast = this.podcast.value ?: return
         launch {
-            podcastManager.updateOverrideGlobalEffects(podcast, override)
+            podcastManager.updateOverrideGlobalEffectsBlocking(podcast, override)
             if (shouldUpdatePlaybackManager()) {
                 val effects = if (override) podcast.playbackEffects else settings.globalPlaybackEffects.value
                 playbackManager.updatePlayerEffects(effects)
@@ -59,7 +59,7 @@ class PodcastEffectsViewModel
     fun updateTrimSilence(trimMode: TrimMode) {
         val podcast = this.podcast.value ?: return
         launch {
-            podcastManager.updateTrimMode(podcast, trimMode)
+            podcastManager.updateTrimModeBlocking(podcast, trimMode)
             if (shouldUpdatePlaybackManager()) {
                 playbackManager.updatePlayerEffects(podcast.playbackEffects)
             }
@@ -69,7 +69,7 @@ class PodcastEffectsViewModel
     fun updateBoostVolume(boostVolume: Boolean) {
         val podcast = this.podcast.value ?: return
         launch {
-            podcastManager.updateVolumeBoosted(podcast, boostVolume)
+            podcastManager.updateVolumeBoostedBlocking(podcast, boostVolume)
             if (shouldUpdatePlaybackManager()) {
                 playbackManager.updatePlayerEffects(podcast.playbackEffects)
             }
@@ -93,7 +93,7 @@ class PodcastEffectsViewModel
     private fun changePlaybackSpeed(speed: Double) {
         val podcast = this.podcast.value ?: return
         val roundedSpeed = speed.roundedSpeed()
-        podcastManager.updatePlaybackSpeed(podcast, roundedSpeed)
+        podcastManager.updatePlaybackSpeedBlocking(podcast, roundedSpeed)
         if (shouldUpdatePlaybackManager()) {
             playbackManager.updatePlayerEffects(podcast.playbackEffects)
         }

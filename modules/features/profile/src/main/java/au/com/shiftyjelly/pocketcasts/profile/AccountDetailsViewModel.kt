@@ -154,7 +154,7 @@ class AccountDetailsViewModel
     fun deleteAccount() {
         viewModelScope.launch {
             try {
-                val response = withContext(Dispatchers.IO) { syncManager.deleteAccount().await() }
+                val response = withContext(Dispatchers.IO) { syncManager.deleteAccountRxSingle().await() }
                 val success = response.success ?: false
                 deleteAccountState.value = if (success) {
                     DeleteAccountState.Success("OK")

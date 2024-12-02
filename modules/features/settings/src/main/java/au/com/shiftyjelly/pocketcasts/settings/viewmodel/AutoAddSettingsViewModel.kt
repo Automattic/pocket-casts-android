@@ -39,7 +39,7 @@ class AutoAddSettingsViewModel @Inject constructor(
     }
 
     val autoAddPodcasts =
-        podcastManager.observeAutoAddToUpNextPodcasts()
+        podcastManager.autoAddToUpNextPodcastsRxFlowable()
             .combineLatest(
                 settings.autoAddUpNextLimit.flow
                     .asObservable(viewModelScope.coroutineContext)

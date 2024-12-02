@@ -176,7 +176,7 @@ class UpNextSyncWorker @AssistedInject constructor(
         // import missing podcasts
         val podcastUuids: List<String> = response.episodes?.mapNotNull { it.podcast }?.filter { it != Podcast.userPodcast.uuid } ?: emptyList()
         podcastUuids.forEach { podcastUuid ->
-            podcastManager.findOrDownloadPodcastRx(podcastUuid).await()
+            podcastManager.findOrDownloadPodcastRxSingle(podcastUuid).await()
         }
 
         // import missing episodes
@@ -185,7 +185,7 @@ class UpNextSyncWorker @AssistedInject constructor(
             val podcastUuid = responseEpisode.podcast
             if (podcastUuid != null) {
                 if (podcastUuid == Podcast.userPodcast.uuid) {
-                    userEpisodeManager.downloadMissingUserEpisode(episodeUuid, placeholderTitle = responseEpisode.title, placeholderPublished = responseEpisode.published?.parseIsoDate())
+                    userEpisodeManager.downloadMissingUserEpisodeRxMaybe(episodeUuid, placeholderTitle = responseEpisode.title, placeholderPublished = responseEpisode.published?.parseIsoDate())
                         .awaitSingleOrNull()
                 } else {
                     val skeletonEpisode = responseEpisode.toSkeletonEpisode(podcastUuid)

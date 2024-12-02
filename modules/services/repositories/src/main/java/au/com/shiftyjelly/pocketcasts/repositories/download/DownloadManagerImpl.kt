@@ -548,7 +548,7 @@ class DownloadManagerImpl @Inject constructor(
             }
 
             val episodeOne: PodcastEpisode = episodeManager.findByUuid(firstUuid) ?: return@launch
-            val podcastOneName = podcastManager.findPodcastByUuid(episodeOne.podcastUuid)?.title
+            val podcastOneName = podcastManager.findPodcastByUuidBlocking(episodeOne.podcastUuid)?.title
                 ?: ""
 
             val title: String
