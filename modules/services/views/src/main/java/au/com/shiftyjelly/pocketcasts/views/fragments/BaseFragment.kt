@@ -29,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 open class BaseFragment : Fragment(), CoroutineScope, HasBackstack {
 
     open var statusBarIconColor: StatusBarIconColor = StatusBarIconColor.Theme
+    open var backgroundTransparent: Boolean = false
 
     @Inject lateinit var theme: Theme
 
@@ -39,7 +40,7 @@ open class BaseFragment : Fragment(), CoroutineScope, HasBackstack {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if (view.background == null) {
+        if (view.background == null && !backgroundTransparent) {
             view.setBackgroundColor(view.context.getThemeColor(UR.attr.primary_ui_01))
         }
         view.isClickable = true

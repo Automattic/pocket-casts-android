@@ -26,7 +26,6 @@ class WhatsNewViewModel @Inject constructor() : ViewModel() {
     init {
         _state.value = UiState.Loaded(
             feature = WhatsNewFeature.Shuffle,
-            fullModel = true,
             tier = UserTier.Plus,
         )
     }
@@ -42,7 +41,6 @@ class WhatsNewViewModel @Inject constructor() : ViewModel() {
         data class Loaded(
             val feature: WhatsNewFeature,
             val tier: UserTier,
-            val fullModel: Boolean = false,
         ) : UiState()
     }
 
