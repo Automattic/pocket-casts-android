@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.settings.whatsnew
 
 import android.content.res.Configuration
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -20,10 +21,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -78,6 +81,17 @@ private fun WhatsNewPageLoaded(
     onConfirm: () -> Unit,
     onClose: () -> Unit,
 ) {
+    var closing by remember { mutableStateOf(false) }
+    val targetAlpha = if (closing) 0f else 0.66f
+    val scrimAlpha: Float by animateFloatAsState(
+        targetValue = targetAlpha,
+        finishedListener = { onClose() },
+    )
+
+    val performClose = {
+        closing = true
+    }
+
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier.clickable(
@@ -151,7 +165,7 @@ private fun WhatsNewPageLoaded(
                 RowTextButton(
                     text = stringResource(it),
                     fontSize = 15.sp,
-                    onClick = onClose,
+                    onClick = performClose,
                 )
             }
 
