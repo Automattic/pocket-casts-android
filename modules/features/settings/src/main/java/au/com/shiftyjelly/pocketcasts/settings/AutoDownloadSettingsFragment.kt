@@ -130,7 +130,13 @@ class AutoDownloadSettingsFragment :
         toolbar?.setup(title = getString(LR.string.settings_title_auto_download), navigationIcon = BackArrow, activity = activity, theme = theme)
         toolbar?.isVisible = showToolbar
 
-        podcastsAutoDownloadLimitPreference?.isVisible = FeatureFlag.isEnabled(Feature.AUTO_DOWNLOAD)
+        if (FeatureFlag.isEnabled(Feature.AUTO_DOWNLOAD)) {
+            onFollowPodcastPreference?.let { podcastsCategory?.addPreference(it) }
+            podcastsAutoDownloadLimitPreference?.let { podcastsCategory?.addPreference(it) }
+        } else {
+            onFollowPodcastPreference?.let { podcastsCategory?.removePreference(it) }
+            podcastsAutoDownloadLimitPreference?.let { podcastsCategory?.removePreference(it) }
+        }
 
         if (!showToolbar) {
             val listContainer = view.findViewById<View>(android.R.id.list_container)
