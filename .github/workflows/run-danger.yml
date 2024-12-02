@@ -7,7 +7,7 @@ on:
 jobs:
   dangermattic:
     if: ${{ (github.event.pull_request.draft == false) }}
-    uses: Automattic/dangermattic/.github/workflows/reusable-retry-buildkite-step-on-events.yml@1.2.1
+    uses: Automattic/dangermattic/.github/workflows/reusable-retry-buildkite-step-on-events.yml@1.2.2
     with:
       org-slug: "automattic"
       pipeline-slug: "pocket-casts-android"
