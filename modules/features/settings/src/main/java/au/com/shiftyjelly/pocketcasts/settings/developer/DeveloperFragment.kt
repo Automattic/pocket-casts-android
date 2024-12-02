@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.viewModels
@@ -46,6 +47,8 @@ class DeveloperFragment : BaseFragment() {
                 onShowWhatsNewClick = ::onShowWhatsNewClick,
             )
         }
+    }.apply {
+        consumeWindowInsets = false
     }
 
     @Suppress("DEPRECATION")
