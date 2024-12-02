@@ -49,7 +49,7 @@ class SwipeButtonLayoutViewModel @Inject constructor(
                 swipeAction = EpisodeItemTouchHelper.SwipeAction.SHARE,
             )
 
-            val podcast = podcastManager.findPodcastByUuidSuspend(episode.podcastUuid) ?: return@launch
+            val podcast = podcastManager.findPodcastByUuid(episode.podcastUuid) ?: return@launch
 
             shareDialogFactory
                 .shareEpisode(podcast, episode, SourceView.EPISODE_SWIPE_ACTION)

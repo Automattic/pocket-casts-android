@@ -39,9 +39,9 @@ class UploadEpisodeTask @AssistedInject constructor(
             return Single.just(Result.failure(outputData.build()))
         }
 
-        return userEpisodeManager.findEpisodeByUuidRx(episodeUUID)
+        return userEpisodeManager.findEpisodeByUuidRxMaybe(episodeUUID)
             .flatMapCompletable { userEpisode ->
-                userEpisodeManager.performUploadToServer(userEpisode, playbackManager)
+                userEpisodeManager.performUploadToServerRxCompletable(userEpisode, playbackManager)
             }
             .andThen(Single.just(Result.success(outputData.build())))
             .onErrorReturn {

@@ -100,7 +100,7 @@ class UserManagerImpl @Inject constructor(
                                 subscriptionManager.getSubscriptionStatus(allowCache = false)
                             }
                         }
-                        .combineLatest(syncManager.observeEmail().map { Optional.of(it) }.asFlowable())
+                        .combineLatest(syncManager.emailFlow().map { Optional.of(it) }.asFlowable())
                         .map { (status, maybeEmail) ->
                             analyticsTracker.refreshMetadata()
                             SignInState.SignedIn(email = maybeEmail.get() ?: "", subscriptionStatus = status)

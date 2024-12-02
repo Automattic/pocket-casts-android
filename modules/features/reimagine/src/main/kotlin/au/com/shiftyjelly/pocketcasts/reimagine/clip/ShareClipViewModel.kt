@@ -51,7 +51,7 @@ class ShareClipViewModel @AssistedInject constructor(
 
     val uiState = combine(
         episodeManager.findByUuidFlow(episodeUuid),
-        podcastManager.observePodcastByEpisodeUuid(episodeUuid),
+        podcastManager.podcastByEpisodeUuidFlow(episodeUuid),
         clipRange,
         settings.artworkConfiguration.flow.map { it.useEpisodeArtwork },
         clipPlayer.playbackProgress,

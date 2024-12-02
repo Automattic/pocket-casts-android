@@ -81,7 +81,7 @@ class ProfileViewModel @Inject constructor(
 
     internal val profileStatsState = combine(
         refreshStatsTrigger.onStart { emit(Unit) },
-        podcastManager.observeCountSubscribed().asFlow(),
+        podcastManager.countSubscribedRxFlowable().asFlow(),
     ) { _, count ->
         ProfileStatsState(
             podcastsCount = count,

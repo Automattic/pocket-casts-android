@@ -23,8 +23,8 @@ class SharePodcastViewModel @AssistedInject constructor(
     private val tracker: AnalyticsTracker,
 ) : ViewModel() {
     val uiState = combine(
-        podcastManager.observePodcastByUuidFlow(podcastUuid),
-        podcastManager.observeEpisodeCountByPodcatUuid(podcastUuid),
+        podcastManager.podcastByUuidFlow(podcastUuid),
+        podcastManager.episodeCountByPodcatUuidFlow(podcastUuid),
         ::UiState,
     ).stateIn(viewModelScope, started = SharingStarted.Lazily, initialValue = UiState())
 

@@ -82,7 +82,7 @@ class PodcastSyncProcessTest {
             val context = InstrumentationRegistry.getInstrumentation().targetContext
 
             val podcastManager: PodcastManager = mock()
-            whenever(podcastManager.findPodcastsToSync()).thenReturn(emptyList())
+            whenever(podcastManager.findPodcastsToSyncBlocking()).thenReturn(emptyList())
 
             val episodeManager: EpisodeManager = mock()
             whenever(episodeManager.findEpisodesToSyncBlocking()).thenReturn(emptyList())

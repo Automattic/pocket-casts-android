@@ -270,7 +270,7 @@ open class PlaybackManager @Inject constructor(
 
     fun getCurrentPodcast(): Podcast? {
         val currentEpisode = getCurrentEpisode() as? PodcastEpisode ?: return null
-        return currentEpisode.podcastUuid.let { podcastManager.findPodcastByUuid(it) }
+        return currentEpisode.podcastUuid.let { podcastManager.findPodcastByUuidBlocking(it) }
     }
 
     private suspend fun autoLoadEpisode(autoPlay: Boolean): BaseEpisode? {
@@ -352,7 +352,7 @@ open class PlaybackManager @Inject constructor(
                 playbackState.durationMs / 1000L,
                 EpisodeSyncRequest.STATUS_IN_PROGRESS,
             )
-            return syncManager.episodeSync(request)
+            return syncManager.episodeSyncRxCompletable(request)
         } else if (episode is UserEpisode && episode.isUploaded) {
             rxCompletable {
                 episode.playedUpToMs = playbackState.positionMs
@@ -1074,7 +1074,7 @@ open class PlaybackManager @Inject constructor(
 
     private suspend fun onRemoteMetaDataNotMatched(episodeUuid: String) {
         val episode = episodeManager.findEpisodeByUuid(episodeUuid) ?: return
-        val podcast = if (episode is PodcastEpisode) podcastManager.findPodcastByUuid(episode.podcastUuid) else null
+        val podcast = if (episode is PodcastEpisode) podcastManager.findPodcastByUuidBlocking(episode.podcastUuid) else null
 
         if (player?.isRemote == true && player?.isPlaying() == false) {
             if (castManager.isPlaying()) {
@@ -1239,7 +1239,7 @@ open class PlaybackManager @Inject constructor(
         launch {
             val playingPodcastUuid = playbackStateRelay.blockingFirst().podcast?.uuid
             if (podcastUuid == playingPodcastUuid) {
-                val updatedPodcast = withContext(Dispatchers.Default) { podcastManager.findPodcastByUuid(playingPodcastUuid) }
+                val updatedPodcast = withContext(Dispatchers.Default) { podcastManager.findPodcastByUuidBlocking(playingPodcastUuid) }
                 playbackStateRelay.blockingFirst().let { state ->
                     if (updatedPodcast != null && updatedPodcast.uuid == state.podcast?.uuid) { // Make sure it hasn't changed while loaded the updated version
                         playbackStateRelay.accept(state.copy(podcast = updatedPodcast, lastChangeFrom = LastChangeFrom.OnMarkPodcastNeedsUpdating.value))
@@ -1336,7 +1336,7 @@ open class PlaybackManager @Inject constructor(
                             episode.durationMs.toLong() / 1000,
                             EpisodeSyncRequest.STATUS_COMPLETE,
                         )
-                    syncManager.episodeSync(syncRequest)
+                    syncManager.episodeSyncRxCompletable(syncRequest)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .doOnComplete { Timber.d("Synced episode completion") }
@@ -1345,7 +1345,7 @@ open class PlaybackManager @Inject constructor(
                         .subscribe()
                 } else if (episode is UserEpisode) {
                     userEpisodeManager.findEpisodeByUuid(episode.uuid)?.let { userEpisode ->
-                        syncManager.postFiles(listOf(userEpisode.toServerPostFile()))
+                        syncManager.postFilesRxSingle(listOf(userEpisode.toServerPostFile()))
                             .ignoreElement()
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
@@ -1386,7 +1386,7 @@ open class PlaybackManager @Inject constructor(
             // First check if it is a podcast uuid, then check if it is from a filter
             is AutoPlaySource.PodcastOrFilter -> {
                 episodeSource = "podcast"
-                podcastManager.findPodcastByUuid(autoSource.uuid)
+                podcastManager.findPodcastByUuidBlocking(autoSource.uuid)
                     ?.let { podcast -> autoPlayOrderForPodcastEpisodes(podcast) }
                     ?: playlistManager.findByUuidBlocking(autoSource.uuid)
                         ?.let { playlist ->
@@ -1753,10 +1753,10 @@ open class PlaybackManager @Inject constructor(
             is PodcastEpisode -> episodeManager.findByUuid(currentUpNextEpisode.uuid)
 
             is UserEpisode -> {
-                userEpisodeManager.findEpisodeByUuidRx(currentUpNextEpisode.uuid)
+                userEpisodeManager.findEpisodeByUuidRxMaybe(currentUpNextEpisode.uuid)
                     .flatMap {
                         if (it.serverStatus == UserEpisodeServerStatus.MISSING) {
-                            userEpisodeManager.downloadMissingUserEpisode(currentUpNextEpisode.uuid, placeholderTitle = currentUpNextEpisode.title, placeholderPublished = null)
+                            userEpisodeManager.downloadMissingUserEpisodeRxMaybe(currentUpNextEpisode.uuid, placeholderTitle = currentUpNextEpisode.title, placeholderPublished = null)
                         } else {
                             Maybe.just(it)
                         }
@@ -1804,7 +1804,7 @@ open class PlaybackManager @Inject constructor(
             is UserEpisode -> {
                 if (episode.serverStatus == UserEpisodeServerStatus.UPLOADED) {
                     try {
-                        val newDownloadUrl = userEpisodeManager.getPlaybackUrl(episode).await()
+                        val newDownloadUrl = userEpisodeManager.getPlaybackUrlRxSingle(episode).await()
                         episode.downloadUrl = newDownloadUrl
                     } catch (e: Exception) {
                         onPlayerError(PlayerEvent.PlayerError("Could not load cloud file ${e.message}"))
@@ -1851,7 +1851,7 @@ open class PlaybackManager @Inject constructor(
                         .asFlowable()
                         .cast(BaseEpisode::class.java)
                 } else if (episode is UserEpisode) {
-                    userEpisodeManager.observeEpisodeRx(episode.uuid).cast(BaseEpisode::class.java)
+                    userEpisodeManager.episodeRxFlowable(episode.uuid).cast(BaseEpisode::class.java)
                 } else {
                     null
                 }
@@ -1986,7 +1986,7 @@ open class PlaybackManager @Inject constructor(
 
     private fun findPodcastByEpisode(episode: BaseEpisode): Podcast? {
         return when (episode) {
-            is PodcastEpisode -> podcastManager.findPodcastByUuid(episode.podcastUuid)
+            is PodcastEpisode -> podcastManager.findPodcastByUuidBlocking(episode.podcastUuid)
             is UserEpisode -> podcastManager.buildUserEpisodePodcast(episode)
             else -> null
         }
@@ -2483,7 +2483,7 @@ open class PlaybackManager @Inject constructor(
         if (upNextState is UpNextQueue.State.Loaded) {
             val episode = upNextState.episode
             // reload the podcast in case the playback effects have changed
-            val podcast = upNextState.podcast?.let { podcastManager.findPodcastByUuidSuspend(it.uuid) }
+            val podcast = upNextState.podcast?.let { podcastManager.findPodcastByUuid(it.uuid) }
 
             val playbackState = PlaybackState.buildState(
                 state = PlaybackState.State.PAUSED,

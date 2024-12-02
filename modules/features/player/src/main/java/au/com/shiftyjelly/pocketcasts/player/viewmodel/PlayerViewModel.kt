@@ -236,7 +236,7 @@ class PlayerViewModel @Inject constructor(
         .switchMap { episodeManager.findEpisodeByUuidRxFlowable(it) }
         .switchMap {
             if (it is PodcastEpisode) {
-                podcastManager.observePodcastByUuid(it.podcastUuid)
+                podcastManager.podcastByUuidRxFlowable(it.podcastUuid)
             } else {
                 Flowable.just(Podcast.userPodcast.copy(overrideGlobalEffects = false))
             }
@@ -650,7 +650,7 @@ class PlayerViewModel @Inject constructor(
     fun saveEffects(effects: PlaybackEffects, podcast: Podcast) {
         launch {
             if (podcast.overrideGlobalEffects) {
-                podcastManager.updateEffects(podcast, effects)
+                podcastManager.updateEffectsBlocking(podcast, effects)
             } else {
                 settings.globalPlaybackEffects.set(effects, updateModifiedAt = true)
             }
@@ -664,7 +664,7 @@ class PlayerViewModel @Inject constructor(
         if (!isCurrentPodcast) return
         viewModelScope.launch(ioDispatcher) {
             val override = selectedTab == PlaybackEffectsSettingsTab.ThisPodcast
-            podcastManager.updateOverrideGlobalEffects(podcast, override)
+            podcastManager.updateOverrideGlobalEffectsBlocking(podcast, override)
 
             val effects = if (override) podcast.playbackEffects else settings.globalPlaybackEffects.value
             podcast.overrideGlobalEffects = override
@@ -675,7 +675,7 @@ class PlayerViewModel @Inject constructor(
 
     fun clearPodcastEffects(podcast: Podcast) {
         launch {
-            podcastManager.updateOverrideGlobalEffects(podcast, false)
+            podcastManager.updateOverrideGlobalEffectsBlocking(podcast, false)
             playbackManager.updatePlayerEffects(settings.globalPlaybackEffects.value)
         }
     }

@@ -96,7 +96,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
             val sectionsFlow = MutableStateFlow<List<SectionInternal>>(emptyList())
             launch {
                 val subscriptionsFlow = podcastManager
-                    .observeSubscribed()
+                    .subscribedRxFlowable()
                     .asFlow()
                     .map { subscribed ->
                         subscribed.map { it.uuid }

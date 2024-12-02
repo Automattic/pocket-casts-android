@@ -310,7 +310,7 @@ class MediaSessionManager(
 
                 val items = upNext.queue.map { episode ->
                     val podcastUuid = if (episode is PodcastEpisode) episode.podcastUuid else null
-                    val podcast = podcastUuid?.let { podcastManager.findPodcastByUuid(it) }
+                    val podcast = podcastUuid?.let { podcastManager.findPodcastByUuidBlocking(it) }
                     val podcastTitle = episode.displaySubtitle(podcast)
                     val localUri = AutoConverter.getPodcastArtworkUri(podcast, episode, context, settings.artworkConfiguration.value.useEpisodeArtwork)
                     val description = MediaDescriptionCompat.Builder()
@@ -392,7 +392,7 @@ class MediaSessionManager(
         }
 
         val podcastUuid = if (episode is PodcastEpisode) episode.podcastUuid else null
-        val podcast = podcastUuid?.let { podcastManager.findPodcastByUuid(it) }
+        val podcast = podcastUuid?.let { podcastManager.findPodcastByUuidBlocking(it) }
 
         val podcastTitle = episode.displaySubtitle(podcast)
         val safeCharacterPodcastTitle = podcastTitle.replace("%", "pct")
@@ -792,10 +792,10 @@ class MediaSessionManager(
             val episode = playbackManager.getCurrentEpisode() ?: return@launch
             if (episode is PodcastEpisode) {
                 // update per podcast playback speed
-                val podcast = podcastManager.findPodcastByUuidSuspend(episode.podcastUuid)
+                val podcast = podcastManager.findPodcastByUuid(episode.podcastUuid)
                 if (podcast != null && podcast.overrideGlobalEffects) {
                     podcast.playbackSpeed = newSpeed
-                    podcastManager.updatePlaybackSpeed(podcast = podcast, speed = newSpeed)
+                    podcastManager.updatePlaybackSpeedBlocking(podcast = podcast, speed = newSpeed)
                     playbackManager.updatePlayerEffects(effects = podcast.playbackEffects)
                     return@launch
                 }
@@ -859,7 +859,7 @@ class MediaSessionManager(
 
             val options = calculateSearchQueryOptions(query)
             for (option in options) {
-                val matchingPodcast: Podcast? = podcastManager.searchPodcastByTitle(option)
+                val matchingPodcast: Podcast? = podcastManager.searchPodcastByTitleBlocking(option)
                 if (matchingPodcast != null) {
                     LogBuffer.i(LogBuffer.TAG_PLAYBACK, "User played podcast from search %s.", option)
                     playPodcast(podcast = matchingPodcast, sourceView = sourceView)

@@ -282,7 +282,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
         try {
             var downloadUrl = episode.downloadUrl?.toHttpUrlOrNull()
             if (downloadUrl == null && episode is UserEpisode) {
-                downloadUrl = runBlocking { userEpisodeManager.getPlaybackUrl(episode).await()?.toHttpUrlOrNull() }
+                downloadUrl = runBlocking { userEpisodeManager.getPlaybackUrlRxSingle(episode).await()?.toHttpUrlOrNull() }
             }
 
             if (downloadUrl == null) {

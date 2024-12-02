@@ -100,7 +100,7 @@ class NotificationDrawerImpl @Inject constructor(
 
     private fun getNotificationData(episodeUuid: String?, useEpisodeArtwork: Boolean): NotificationData {
         val episode: BaseEpisode? = if (episodeUuid == null) null else runBlocking { episodeManager.findEpisodeByUuid(episodeUuid) }
-        val podcast: Podcast? = if (episode == null || episode !is PodcastEpisode) null else podcastManager.findPodcastByUuid(episode.podcastUuid)
+        val podcast: Podcast? = if (episode == null || episode !is PodcastEpisode) null else podcastManager.findPodcastByUuidBlocking(episode.podcastUuid)
 
         if (episodeUuid == null || episode == null) {
             return NotificationData()

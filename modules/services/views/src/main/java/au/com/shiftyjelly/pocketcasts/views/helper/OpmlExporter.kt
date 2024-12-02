@@ -55,7 +55,7 @@ class OpmlExporter(
         showProgressDialog()
 
         applicationScope.launch(Dispatchers.IO) {
-            val uuidToTitle = podcastManager.findSubscribed().associateBy({ it.uuid }, { it.title })
+            val uuidToTitle = podcastManager.findSubscribedBlocking().associateBy({ it.uuid }, { it.title })
             val uuids = uuidToTitle.keys.toList()
 
             serviceTask = serviceManager.exportFeedUrls(

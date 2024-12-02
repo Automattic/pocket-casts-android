@@ -165,7 +165,7 @@ class FolderManagerImpl @Inject constructor(
         val podcasts = if (sortType == EPISODE_DATE_NEWEST_TO_OLDEST) {
             podcastManager.findPodcastsOrderByLatestEpisode(orderAsc = false)
         } else {
-            podcastManager.findSubscribed()
+            podcastManager.findSubscribedBlocking()
         }
         val folders = folderDao.findFolders()
         val folderItems = combineFoldersPodcasts(folders, podcasts)

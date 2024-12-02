@@ -100,7 +100,7 @@ class SyncManagerImpl @Inject constructor(
         return result
     }
 
-    override fun deleteAccount(): Single<UserChangeResponse> =
+    override fun deleteAccountRxSingle(): Single<UserChangeResponse> =
         getCacheTokenOrLoginRxSingle { token ->
             syncServiceManager.deleteAccount(token)
         }.doOnSuccess {
@@ -130,7 +130,7 @@ class SyncManagerImpl @Inject constructor(
     override fun getEmail(): String? =
         syncAccountManager.getEmail()
 
-    override fun observeEmail() = syncAccountManager.observeEmail().distinctUntilChanged()
+    override fun emailFlow() = syncAccountManager.observeEmail().distinctUntilChanged()
 
     override suspend fun getAccessToken(account: Account): AccessToken =
         syncAccountManager.peekAccessToken(account)
@@ -244,27 +244,27 @@ class SyncManagerImpl @Inject constructor(
 
 // User Episodes / Files
 
-    override fun getFiles(): Single<Response<FilesResponse>> =
+    override fun getFilesRxSingle(): Single<Response<FilesResponse>> =
         getCacheTokenOrLoginRxSingle { token ->
             syncServiceManager.getFiles(token)
         }
 
-    override fun getFileUsage(): Single<FileAccount> =
+    override fun getFileUsageRxSingle(): Single<FileAccount> =
         getCacheTokenOrLoginRxSingle { token ->
             syncServiceManager.getFileUsage(token)
         }
 
-    override fun postFiles(files: List<FilePost>): Single<Response<Void>> =
+    override fun postFilesRxSingle(files: List<FilePost>): Single<Response<Void>> =
         getCacheTokenOrLoginRxSingle { token ->
             syncServiceManager.postFiles(files, token)
         }
 
-    override fun getFileUploadStatus(episodeUuid: String): Single<Boolean> =
+    override fun getFileUploadStatusRxSingle(episodeUuid: String): Single<Boolean> =
         getCacheTokenOrLoginRxSingle { token ->
             syncServiceManager.getFileUploadStatus(episodeUuid, token)
         }
 
-    override fun uploadFileToServer(episode: UserEpisode): Completable =
+    override fun uploadFileToServerRxCompletable(episode: UserEpisode): Completable =
         getCacheTokenOrLoginRxSingle { token ->
             syncServiceManager.getFileUploadUrl(episode.toUploadData(), token)
         }.flatMapCompletable { url ->
@@ -279,7 +279,7 @@ class SyncManagerImpl @Inject constructor(
                 .ignoreElements()
         }
 
-    override fun uploadImageToServer(
+    override fun uploadImageToServerRxCompletable(
         episode: UserEpisode,
         imageFile: File,
     ): Completable =
@@ -291,22 +291,22 @@ class SyncManagerImpl @Inject constructor(
                 .ignoreElement()
         }
 
-    override fun deleteImageFromServer(episode: UserEpisode): Single<Response<Void>> =
+    override fun deleteImageFromServerRxSingle(episode: UserEpisode): Single<Response<Void>> =
         getCacheTokenOrLoginRxSingle { token ->
             syncServiceManager.deleteImageFromServer(episode, token)
         }
 
-    override fun deleteFromServer(episode: UserEpisode): Single<Response<Void>> =
+    override fun deleteFromServerRxSingle(episode: UserEpisode): Single<Response<Void>> =
         getCacheTokenOrLoginRxSingle { token ->
             syncServiceManager.deleteFromServer(episode, token)
         }
 
-    override fun getPlaybackUrl(episode: UserEpisode): Single<String> =
+    override fun getPlaybackUrlRxSingle(episode: UserEpisode): Single<String> =
         getCacheTokenOrLoginRxSingle { token ->
             syncServiceManager.getPlaybackUrl(episode, token)
         }
 
-    override fun getUserEpisode(uuid: String): Maybe<ServerFile> =
+    override fun getUserEpisodeRxMaybe(uuid: String): Maybe<ServerFile> =
         getCacheTokenOrLoginRxSingle { token ->
             syncServiceManager.getUserEpisode(uuid, token)
         }.flatMapMaybe {
@@ -321,7 +321,7 @@ class SyncManagerImpl @Inject constructor(
 
 // History
 
-    override fun historySync(request: HistorySyncRequest): Single<HistorySyncResponse> =
+    override fun historySyncRxSingle(request: HistorySyncRequest): Single<HistorySyncResponse> =
         getCacheTokenOrLoginRxSingle { token ->
             syncServiceManager.historySync(request, token)
         }
@@ -333,22 +333,22 @@ class SyncManagerImpl @Inject constructor(
 
 // Subscription
 
-    override fun subscriptionStatus(): Single<SubscriptionStatusResponse> =
+    override fun subscriptionStatusRxSingle(): Single<SubscriptionStatusResponse> =
         getCacheTokenOrLoginRxSingle { token ->
             syncServiceManager.subscriptionStatus(token)
         }
 
-    override fun subscriptionPurchase(request: SubscriptionPurchaseRequest): Single<SubscriptionStatusResponse> =
+    override fun subscriptionPurchaseRxSingle(request: SubscriptionPurchaseRequest): Single<SubscriptionStatusResponse> =
         getCacheTokenOrLoginRxSingle { token ->
             syncServiceManager.subscriptionPurchase(request, token)
         }
 
-    override fun redeemPromoCode(code: String): Single<PromoCodeResponse> =
+    override fun redeemPromoCodeRxSingle(code: String): Single<PromoCodeResponse> =
         getCacheTokenOrLoginRxSingle { token ->
             syncServiceManager.redeemPromoCode(code, token)
         }
 
-    override fun validatePromoCode(code: String): Single<PromoCodeResponse> =
+    override fun validatePromoCodeRxSingle(code: String): Single<PromoCodeResponse> =
         syncServiceManager.validatePromoCode(code)
 
 // Sync
@@ -360,7 +360,7 @@ class SyncManagerImpl @Inject constructor(
             }
         } ?: throw Exception("Not logged in")
 
-    override fun getLastSyncAt(): Single<String> =
+    override fun getLastSyncAtRxSingle(): Single<String> =
         getCacheTokenOrLoginRxSingle { token ->
             syncServiceManager.getLastSyncAt(token)
         }
@@ -370,12 +370,12 @@ class SyncManagerImpl @Inject constructor(
             syncServiceManager.getHomeFolder(token)
         }
 
-    override fun getPodcastEpisodes(podcastUuid: String): Single<PodcastEpisodesResponse> =
+    override fun getPodcastEpisodesRxSingle(podcastUuid: String): Single<PodcastEpisodesResponse> =
         getCacheTokenOrLoginRxSingle { token ->
             syncServiceManager.getPodcastEpisodes(podcastUuid, token)
         }
 
-    override fun episodeSync(request: EpisodeSyncRequest): Completable =
+    override fun episodeSyncRxCompletable(request: EpisodeSyncRequest): Completable =
         getCacheTokenOrLoginRxCompletable { token ->
             syncServiceManager.episodeSync(request, token)
         }
@@ -404,7 +404,7 @@ class SyncManagerImpl @Inject constructor(
             syncServiceManager.exchangeSonos(token)
         }
 
-    override fun getFilters(): Single<List<Playlist>> =
+    override fun getFiltersRxSingle(): Single<List<Playlist>> =
         getCacheTokenOrLoginRxSingle { token ->
             syncServiceManager.getFilters(token)
         }
@@ -587,7 +587,7 @@ class SyncManagerImpl @Inject constructor(
                 // refresh invalid
                 .onErrorResumeNext { throwable ->
                     return@onErrorResumeNext if (isHttpUnauthorized(throwable)) {
-                        refreshToken().flatMap { token -> serverCall(token) }
+                        refreshTokenRxSingle().flatMap { token -> serverCall(token) }
                     }
                     // re-throw this error because it's not recoverable from here
                     else {
@@ -595,7 +595,7 @@ class SyncManagerImpl @Inject constructor(
                     }
                 }
         } else {
-            return refreshToken().flatMap { token -> serverCall(token) }
+            return refreshTokenRxSingle().flatMap { token -> serverCall(token) }
         }
     }
 
@@ -605,7 +605,7 @@ class SyncManagerImpl @Inject constructor(
         }.ignoreElement()
     }
 
-    private fun refreshToken(): Single<AccessToken> {
+    private fun refreshTokenRxSingle(): Single<AccessToken> {
         syncAccountManager.invalidateAccessToken()
         return rxSingle {
             syncAccountManager.getAccessToken() ?: throw RuntimeException("Failed to get token")

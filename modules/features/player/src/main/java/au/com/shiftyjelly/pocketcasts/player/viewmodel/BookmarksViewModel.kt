@@ -268,7 +268,7 @@ class BookmarksViewModel
     suspend fun getSharedBookmark(): Triple<Podcast, PodcastEpisode, Bookmark>? {
         return (_uiState.value as? UiState.Loaded)?.let {
             val bookmark = it.bookmarks.firstOrNull { bookmark -> multiSelectHelper.isSelected(bookmark) } ?: return null
-            val podcast = podcastManager.findPodcastByUuidSuspend(bookmark.podcastUuid) ?: return null
+            val podcast = podcastManager.findPodcastByUuid(bookmark.podcastUuid) ?: return null
             val episode = episodeManager.findEpisodeByUuid(bookmark.episodeUuid) as? PodcastEpisode ?: return null
             Triple(podcast, episode, bookmark)
         }
@@ -324,7 +324,7 @@ class BookmarksViewModel
             bookmark?.let {
                 val episodeUuid = bookmark.episodeUuid
                 viewModelScope.launch(ioDispatcher) {
-                    val podcast = podcastManager.findPodcastByUuidSuspend(bookmark.podcastUuid)
+                    val podcast = podcastManager.findPodcastByUuid(bookmark.podcastUuid)
                     val backgroundColor =
                         if (podcast == null) 0xFF000000.toInt() else theme.playerBackgroundColor(podcast)
                     val tintColor =

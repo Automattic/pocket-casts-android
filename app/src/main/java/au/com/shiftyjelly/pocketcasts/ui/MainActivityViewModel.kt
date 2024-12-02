@@ -152,7 +152,7 @@ class MainActivityViewModel
             val timeInSecs = bookmark?.timeSecs ?: currentEpisode?.let { playbackManager.getCurrentTimeMs(currentEpisode) / 1000 } ?: 0
 
             val podcast =
-                bookmark?.let { podcastManager.findPodcastByUuidSuspend(bookmark.podcastUuid) }
+                bookmark?.let { podcastManager.findPodcastByUuid(bookmark.podcastUuid) }
             val backgroundColor =
                 if (podcast == null) 0xFF000000.toInt() else theme.playerBackgroundColor(podcast)
             val tintColor =
