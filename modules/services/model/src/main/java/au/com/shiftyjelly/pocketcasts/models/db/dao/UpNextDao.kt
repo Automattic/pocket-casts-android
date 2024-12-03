@@ -33,6 +33,7 @@ abstract class UpNextDao {
         // update the existing episode positions
         val newPosition = updatePositionsBlocking(upNextEpisodes, position, replaceOneEpisode)
         upNextEpisode.position = newPosition
+        upNextEpisode.addedToQueueAt = System.currentTimeMillis()
         // add the episode
         insertBlocking(upNextEpisode)
     }
