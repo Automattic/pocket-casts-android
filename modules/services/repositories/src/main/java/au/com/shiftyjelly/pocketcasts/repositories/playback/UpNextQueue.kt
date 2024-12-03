@@ -46,6 +46,7 @@ interface UpNextQueue {
     suspend fun importServerChangesBlocking(episodes: List<BaseEpisode>, playbackManager: PlaybackManager, downloadManager: DownloadManager)
     fun contains(uuid: String): Boolean
     fun updateCurrentEpisodeState(state: State)
+    suspend fun sortUpNextBy(sortType: UpNextSortType)
 
     sealed class State {
         object Empty : State()
@@ -156,6 +157,12 @@ enum class UpNextSource(val analyticsValue: String) {
     companion object {
         fun fromString(string: String) = UpNextSource.values().find { it.analyticsValue == string } ?: UNKNOWN
     }
+}
+
+enum class UpNextSortType {
+    ADDED_TO_UP_NEXT,
+    NEWEST_TO_OLDEST,
+    OLDEST_TO_NEWEST,
 }
 
 fun Observable<UpNextQueue.State>.containsUuid(uuid: String): Observable<Boolean> {

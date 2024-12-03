@@ -7,6 +7,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.SortType
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.toUpNextEpisode
@@ -80,6 +81,26 @@ abstract class UpNextDao {
     open fun deleteAllNotCurrentBlocking() {
         val currentEpisodeUuid = findCurrentUpNextEpisodeBlocking()?.episodeUuid ?: return
         deleteAllNotUuidBlocking(currentEpisodeUuid)
+    }
+
+    @Transaction
+    open fun sortEpisodesBlocking(sortType: SortType) {
+        val allEpisodes = allBlocking()
+        if (allEpisodes.isEmpty()) return
+
+        val restEpisodes = allEpisodes.drop(1) // This ignores the first episode so we don't sort the current playing one
+
+        val sortedEpisodes = when (sortType) {
+            SortType.ADDED_TO_UP_NEXT -> restEpisodes.sortedBy { it.addedToQueueAt }
+            SortType.NEWEST_TO_OLDEST -> restEpisodes.sortedByDescending { it.publishedDate }
+            SortType.OLDEST_TO_NEWEST -> restEpisodes.sortedBy { it.publishedDate }
+        }
+
+        sortedEpisodes.forEachIndexed { index, episode ->
+            episode.id?.let { id ->
+                updatePositionBlocking(id = id, position = index + 1)
+            }
+        }
     }
 
     @Query("DELETE FROM up_next_episodes WHERE episodeUuid != :uuid")

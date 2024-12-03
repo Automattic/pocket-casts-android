@@ -34,3 +34,9 @@ fun BaseEpisode.toUpNextEpisode(): UpNextEpisode {
         publishedDate = publishedDate,
     )
 }
+
+enum class SortType {
+    ADDED_TO_UP_NEXT,
+    NEWEST_TO_OLDEST,
+    OLDEST_TO_NEWEST,
+}

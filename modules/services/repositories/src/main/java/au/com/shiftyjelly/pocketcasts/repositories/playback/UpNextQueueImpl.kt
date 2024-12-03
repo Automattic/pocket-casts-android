@@ -6,6 +6,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.SortType
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextChange
 import au.com.shiftyjelly.pocketcasts.models.entity.toUpNextEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -75,6 +76,7 @@ class UpNextQueueImpl @Inject constructor(
         data class Remove(val episode: BaseEpisode, val onAdd: (() -> Unit)? = null) : UpNextAction(onAdd)
         data class RemoveAndShuffle(val episode: BaseEpisode, val onAdd: (() -> Unit)? = null) : UpNextAction(onAdd)
         data class Import(val episodes: List<BaseEpisode>, val onAdd: (() -> Unit)? = null) : UpNextAction(onAdd)
+        data class Sort(val sortType: UpNextSortType, val onAdd: (() -> Unit)? = null) : UpNextAction(onAdd)
         object ClearAll : UpNextAction(null)
         object ClearAllIncludingChanges : UpNextAction(null)
         object ClearUpNext : UpNextAction(null)
@@ -131,6 +133,7 @@ class UpNextQueueImpl @Inject constructor(
             is UpNextAction.Import -> upNextDao.saveAllBlocking(episodes = action.episodes)
             is UpNextAction.ClearUpNext -> upNextDao.deleteAllNotCurrentBlocking()
             is UpNextAction.ClearAll -> upNextDao.deleteAllBlocking()
+            is UpNextAction.Sort -> upNextDao.sortEpisodesBlocking(action.sortType.toDatabaseSortType())
             is UpNextAction.ClearAllIncludingChanges -> {
                 upNextDao.deleteAllBlocking()
                 upNextChangeDao.deleteAllBlocking()
@@ -312,6 +315,10 @@ class UpNextQueueImpl @Inject constructor(
         }
     }
 
+    override suspend fun sortUpNextBy(sortType: UpNextSortType) = withContext(Dispatchers.IO) {
+        saveChangesBlocking(UpNextAction.Sort(sortType))
+    }
+
     private fun insertUpNextEpisodeBlocking(episode: BaseEpisode, position: Int) {
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Inserting ${episode.title} in to up next at $position")
         upNextDao.insertAtBlocking(upNextEpisode = episode.toUpNextEpisode(), position = position, replaceOneEpisode = false)
@@ -339,5 +346,11 @@ class UpNextQueueImpl @Inject constructor(
             return
         }
         UpNextSyncWorker.enqueue(syncManager, application)
+    }
+
+    private fun UpNextSortType.toDatabaseSortType(): SortType = when (this) {
+        UpNextSortType.ADDED_TO_UP_NEXT -> SortType.ADDED_TO_UP_NEXT
+        UpNextSortType.NEWEST_TO_OLDEST -> SortType.NEWEST_TO_OLDEST
+        UpNextSortType.OLDEST_TO_NEWEST -> SortType.OLDEST_TO_NEWEST
     }
 }

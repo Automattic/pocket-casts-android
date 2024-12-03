@@ -402,6 +402,10 @@
     <string name="player_time_remaining">Time remaining %s</string>
     <string name="drag_down_to_dismiss_content_description">Drag down to dismiss</string>
 
+    <string name="up_next_sort_added_to_up_next">Added to Up Next</string>
+    <string name="up_next_sort_newest_to_oldest" translatable="false">@string/sort_newest_to_oldest</string>
+    <string name="up_next_sort_oldest_to_newest" translatable="false">@string/sort_oldest_to_newest</string>
+
     <!-- Chapters -->
 
     <!-- Label that toggles the option for the user to choose which chapters of the podcast they want to preselect (to be played) -->
