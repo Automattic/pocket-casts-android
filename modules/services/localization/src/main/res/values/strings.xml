@@ -365,6 +365,7 @@
     <string name="player_trim_silence_detail">Reduces the length of an episode by trimming silence in conversations.</string>
     <string name="player_up_next" translatable="false">@string/up_next</string>
     <string name="player_up_next_clear_queue">Clear Queue</string>
+    <string name="player_up_next_sort_queue">Sort Queue</string>
     <string name="player_up_next_clear_queue_summary">Are you sure you want to clear your Up Next queue?</string>
     <string name="player_up_next_clear_episodes_plural">Clear %1$d episodes</string>
     <string name="player_up_next_clear_queue_button">Clear Up Next</string>

@@ -3,6 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/sort_up_next"
+        android:title="@string/player_up_next_sort_queue"
+        android:icon="@drawable/ic_sort"
+        app:showAsAction="ifRoom" />
+
+    <item
         android:id="@+id/clear_up_next"
         android:title="@string/player_up_next_clear_queue"
         android:icon="@drawable/ic_delete"

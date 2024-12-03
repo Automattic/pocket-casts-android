@@ -293,6 +293,10 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
                     onClearUpNext()
                     true
                 }
+                R.id.sort_up_next -> {
+                    onSortQueue()
+                    true
+                }
                 else -> false
             }
         }
@@ -311,6 +315,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
             adapter.updateUpNextEmptyState(it.upNextEpisodes.isNotEmpty())
             toolbar.menu.findItem(R.id.menu_select)?.isVisible = it.upNextEpisodes.isNotEmpty()
             toolbar.menu.findItem(R.id.clear_up_next)?.isVisible = it.upNextEpisodes.isNotEmpty()
+            toolbar.menu.findItem(R.id.sort_up_next)?.isVisible = it.upNextEpisodes.isNotEmpty()
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -516,6 +521,9 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         properties[SOURCE_KEY] = upNextSource.analyticsValue
         properties.putAll(props)
         analyticsTracker.track(event, properties)
+    }
+
+    private fun onSortQueue() {
     }
 }
 
