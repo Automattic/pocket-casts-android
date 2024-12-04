@@ -1358,6 +1358,13 @@ open class PlaybackManager @Inject constructor(
             }
         }
 
+        if (settings.upNextEpisodeManually.value) {
+            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Playback paused as 'Play Next Manually' setting is enabled")
+            stop()
+            shutdown()
+            return
+        }
+
         // Auto play if it had sleep time enabled for end of episodes and still has episodes set on sleep time
         // or if it did not have sleep time end of episode configured
         // and it was playing episode
