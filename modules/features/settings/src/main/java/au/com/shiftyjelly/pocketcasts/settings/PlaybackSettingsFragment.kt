@@ -392,6 +392,19 @@ class PlaybackSettingsFragment : BaseFragment() {
                             )
                         }
 
+                        SettingsItems.SETTINGS_PLAY_UP_NEXT_EPISODE_MANUALLY -> {
+                            PlayUpNextEpisodeManually(
+                                saved = settings.upNextEpisodeManually.flow.collectAsState().value,
+                                onSave = {
+                                    analyticsTracker.track(
+                                        AnalyticsEvent.SETTINGS_GENERAL_PLAY_UP_NEXT_EPISODE_MANUALLY_TOGGLED,
+                                        mapOf("enabled" to it),
+                                    )
+                                    settings.upNextEpisodeManually.set(it, updateModifiedAt = true)
+                                },
+                            )
+                        }
+
                         SettingsItems.SETTINGS_GENERAL_AUTOPLAY -> {
                             AutoPlayNextOnEmpty(
                                 saved = settings.autoPlayNextEpisodeOnEmpty.flow.collectAsState().value,
@@ -647,6 +660,16 @@ class PlaybackSettingsFragment : BaseFragment() {
         )
 
     @Composable
+    private fun PlayUpNextEpisodeManually(saved: Boolean, onSave: (Boolean) -> Unit) =
+        SettingRow(
+            primaryText = stringResource(LR.string.settings_up_next_episode_manually),
+            secondaryText = stringResource(LR.string.settings_up_next_episode_manually_summary),
+            toggle = SettingRowToggle.Switch(checked = saved),
+            modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) },
+            indent = false,
+        )
+
+    @Composable
     private fun ShakeToResetSleepTimer(saved: Boolean, onSave: (Boolean) -> Unit) =
         SettingRow(
             primaryText = stringResource(LR.string.settings_sleep_timer_shake_to_reset),
@@ -745,6 +768,7 @@ private enum class SettingsItems {
     SETTINGS_HEADER_UP_NEXT,
     SETTINGS_UP_NEXT_SWIPE,
     SETTINGS_PLAY_UP_NEXT_EPISODE,
+    SETTINGS_PLAY_UP_NEXT_EPISODE_MANUALLY,
 
     // The [scrollToAutoPlay] fragment argument handling depends on this item being last
     // in the list. If it's position is changed, make sure you update the handling when

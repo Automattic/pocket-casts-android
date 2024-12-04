@@ -390,6 +390,7 @@ interface Settings {
 
     val upNextSwipe: UserSetting<UpNextAction>
     val tapOnUpNextShouldPlay: UserSetting<Boolean>
+    val upNextEpisodeManually: UserSetting<Boolean>
 
     val headphoneControlsNextAction: UserSetting<HeadphoneAction>
     val headphoneControlsPreviousAction: UserSetting<HeadphoneAction>

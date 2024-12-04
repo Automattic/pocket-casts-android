@@ -1417,6 +1417,8 @@
     <string name="settings_sleep_timer_shake_to_reset_summary">If on, the sleep timer will restart when you shake your phone.</string>
     <string name="settings_sleep_timer_auto_restart">Auto Restart Sleep Timer</string>
     <string name="settings_sleep_timer_auto_restart_summary">If on, the sleep timer will restart automatically if you play an episode within 5 minutes after the last pause.</string>
+    <string name="settings_up_next_episode_manually">Play Up Next Episode Manually</string>
+    <string name="settings_up_next_episode_manually_summary">Allows you to control playback by preventing the next episode in the Up Next queue from playing automatically</string>
     <string name="settings_up_next_tap">Play Up Next episode on tap</string>
     <string name="settings_up_next_tap_summary">If on, tapping on an item in your Up Next queue will play it. Long pressing will show the episode options.</string>
     <string name="settings_real_time_playback">Adjust remaining time</string>
