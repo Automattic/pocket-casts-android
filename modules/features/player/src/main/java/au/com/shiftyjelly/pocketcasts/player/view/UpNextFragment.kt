@@ -118,13 +118,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         get() = arguments?.getString(ARG_SOURCE)?.let { UpNextSource.fromString(it) } ?: UpNextSource.UNKNOWN
 
     val overrideTheme: Theme.ThemeType
-        get() = if (settings.useDarkUpNextTheme.value &&
-            upNextSource != UpNextSource.UP_NEXT_TAB
-        ) {
-            Theme.ThemeType.DARK
-        } else {
-            theme.activeTheme
-        }
+        get() = theme.getUpNextTheme(isFullScreen = upNextSource != UpNextSource.UP_NEXT_TAB)
 
     val multiSelectListener = object : MultiSelectHelper.Listener<BaseEpisode> {
         override fun multiSelectSelectAll() {

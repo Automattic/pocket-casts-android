@@ -132,8 +132,9 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
                     analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHOWN, mapOf(SOURCE_KEY to UpNextSource.NOW_PLAYING.analyticsValue))
 
                     activity?.let {
-                        theme.setNavigationBarIconColor(window = it.window, isDark = true)
-                        theme.updateWindowStatusBarIcons(it.window, StatusBarIconColor.Light)
+                        val upNextTheme = theme.getUpNextTheme(isFullScreen = true)
+                        theme.setNavigationBarColor(window = it.window, lightIcons = upNextTheme.backgroundLightIcons)
+                        theme.updateWindowStatusBarIcons(it.window, if (upNextTheme.toolbarLightIcons) StatusBarIconColor.Light else StatusBarIconColor.Dark)
                     }
 
                     upNextFragment.onExpanded()

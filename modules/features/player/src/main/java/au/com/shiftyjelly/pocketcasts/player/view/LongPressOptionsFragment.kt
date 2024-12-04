@@ -18,7 +18,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class LongPressOptionsFragment : BaseDialogFragment() {
 
-    override val statusBarIconColor: StatusBarIconColor? = null
+    override val statusBarIconColor = StatusBarIconColor.Dark
 
     private val viewModel: PlayerViewModel by activityViewModels()
     private var binding: FragmentLongPressOptionsBinding? = null
