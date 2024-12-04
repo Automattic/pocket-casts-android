@@ -137,8 +137,8 @@ class SleepFragment : BaseDialogFragment() {
                     onPlusClick = {
                         plusEndOfChapterButtonClicked()
                     },
-                    minusContentDescription = LR.string.player_sleep_custom_minus,
-                    plusContentDescription = LR.string.player_sleep_custom_plus,
+                    minusContentDescription = LR.string.player_sleep_chapter_minus,
+                    plusContentDescription = LR.string.player_sleep_chapter_plus,
                 )
             }
         }
@@ -152,8 +152,8 @@ class SleepFragment : BaseDialogFragment() {
                     onPlusClick = {
                         plusEndOfEpisodeButtonClicked()
                     },
-                    minusContentDescription = LR.string.player_sleep_custom_minus,
-                    plusContentDescription = LR.string.player_sleep_custom_plus,
+                    minusContentDescription = LR.string.player_sleep_episode_minus,
+                    plusContentDescription = LR.string.player_sleep_episode_plus,
                 )
             }
         }
