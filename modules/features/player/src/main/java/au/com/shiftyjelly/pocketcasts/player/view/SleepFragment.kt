@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.settings.PlaybackSettingsFragment.Companio
 import au.com.shiftyjelly.pocketcasts.settings.SettingsFragment
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.combineLatest
 import au.com.shiftyjelly.pocketcasts.utils.minutes
 import au.com.shiftyjelly.pocketcasts.views.extensions.applyColor
@@ -113,7 +114,7 @@ class SleepFragment : BaseDialogFragment() {
         }
 
         binding.customStepperComposeView.setContentWithViewCompositionStrategy {
-            AppTheme(theme.activeTheme) {
+            AppTheme(Theme.ThemeType.DARK) {
                 NumberStepper(
                     onMinusClick = {
                         minusButtonClicked()
@@ -128,7 +129,7 @@ class SleepFragment : BaseDialogFragment() {
         }
 
         binding.endOfChapterStepperComposeView.setContentWithViewCompositionStrategy {
-            AppTheme(theme.activeTheme) {
+            AppTheme(Theme.ThemeType.DARK) {
                 NumberStepper(
                     onMinusClick = {
                         minusEndOfChapterButtonClicked()
@@ -143,7 +144,7 @@ class SleepFragment : BaseDialogFragment() {
         }
 
         binding.endOfEpisodeStepperComposeView.setContentWithViewCompositionStrategy {
-            AppTheme(theme.activeTheme) {
+            AppTheme(Theme.ThemeType.DARK) {
                 NumberStepper(
                     onMinusClick = {
                         minusEndOfEpisodeButtonClicked()
