@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.compose.components
 
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -29,12 +30,12 @@ fun NumberStepper(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier,
+        modifier = modifier.padding(4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         IconButton(
             onClick = onMinusClick,
-            modifier = Modifier.size(size),
+            modifier = Modifier.size(size).padding(2.dp),
         ) {
             Icon(
                 painter = painterResource(id = IR.drawable.ic_minus),
@@ -45,7 +46,7 @@ fun NumberStepper(
 
         IconButton(
             onClick = onPlusClick,
-            modifier = Modifier.size(size),
+            modifier = Modifier.size(size).padding(2.dp),
         ) {
             Icon(
                 painter = painterResource(id = IR.drawable.ic_effects_plus),
