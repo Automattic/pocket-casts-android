@@ -41,7 +41,7 @@ data class PodcastInfo(
     @field:Json(name = "title") val title: String?,
     @field:Json(name = "author") val author: String?,
     @field:Json(name = "description") val description: String?,
-    @field:Json(name = "descriptionHtml") val descriptionHtml: String?,
+    @field:Json(name = "description_html") val descriptionHtml: String?,
     @field:Json(name = "show_type") val showType: String?,
     @field:Json(name = "category") val category: String?,
     @field:Json(name = "audio") val audio: Boolean?,
