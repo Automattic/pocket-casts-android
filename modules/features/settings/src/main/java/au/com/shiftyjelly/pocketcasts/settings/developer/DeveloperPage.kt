@@ -23,6 +23,7 @@ import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Downloading
 import androidx.compose.material.icons.outlined.EditCalendar
 import androidx.compose.material.icons.outlined.HomeRepairService
+import androidx.compose.material.icons.outlined.NewReleases
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -57,6 +58,7 @@ fun DeveloperPage(
     onTriggerResetEoYModalProfileBadge: () -> Unit,
     bottomInset: Dp,
     onSendCrash: (String) -> Unit,
+    onShowWhatsNewClick: () -> Unit,
 ) {
     var openCrashMessageDialog by remember { mutableStateOf(false) }
     var crashMessage by remember { mutableStateOf("Test crash") }
@@ -94,6 +96,9 @@ fun DeveloperPage(
         }
         item {
             EndOfYear(onClick = onTriggerResetEoYModalProfileBadge)
+        }
+        item {
+            ShowWhatsNew(onClick = onShowWhatsNewClick)
         }
 
         if (openCrashMessageDialog) {
@@ -262,6 +267,19 @@ private fun EndOfYear(
     )
 }
 
+@Composable
+private fun ShowWhatsNew(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingRow(
+        primaryText = "Show What's New",
+        secondaryText = "Open the What's New page",
+        icon = rememberVectorPainter(Icons.Outlined.NewReleases),
+        modifier = modifier.clickable { onClick() },
+    )
+}
+
 @Preview(name = "Light")
 @Composable
 private fun DeveloperPageLightPreview() {
@@ -290,6 +308,7 @@ private fun DeveloperPagePreview() {
         onTriggerResetEoYModalProfileBadge = {},
         bottomInset = 0.dp,
         onSendCrash = {},
+        onShowWhatsNewClick = {},
     )
 }
 
