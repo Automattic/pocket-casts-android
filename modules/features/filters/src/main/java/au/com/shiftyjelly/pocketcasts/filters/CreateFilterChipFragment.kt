@@ -196,6 +196,17 @@ class CreateFilterChipFragment : BaseFragment(), CoroutineScope {
                 scrollToChip = it
             }
 
+            if (playlist.excludeFromUpNext) {
+                binding.chipUpNext.setActiveColors(theme.activeTheme, color)
+            } else {
+                binding.chipUpNext.setInactiveColors(theme.activeTheme, color)
+            }
+
+            binding.chipUpNext.setOnClickListener {
+                viewModel.excludeUpNextChipTapped(isCreatingFilter = true)
+                scrollToChip = it
+            }
+
             if (!playlist.isAllEpisodes) {
                 val chipBox = binding.chipBox
                 if (chipBox.childCount != 0) {

@@ -118,6 +118,14 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginRight="8dp" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipUpNext"
+                android:text="@string/filters_chip_exclude_from_up_next"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="8dp" />
         </com.google.android.flexbox.FlexboxLayout>
 
         <TextView

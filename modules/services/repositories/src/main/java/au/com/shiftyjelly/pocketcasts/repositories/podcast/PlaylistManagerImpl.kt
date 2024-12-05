@@ -160,24 +160,39 @@ class PlaylistManagerImpl @Inject constructor(
         return "$where ORDER BY $orderBy" + if (limit != null) " LIMIT $limit" else ""
     }
 
-    override fun observeEpisodesBlocking(playlist: Playlist, episodeManager: EpisodeManager, playbackManager: PlaybackManager): Flowable<List<PodcastEpisode>> {
+    override fun observeEpisodesBlocking(
+        playlist: Playlist,
+        episodeManager: EpisodeManager,
+        playbackManager: PlaybackManager,
+    ): Flowable<List<PodcastEpisode>> {
         val limitCount = if (playlist.sortOrder() == Playlist.SortOrder.LAST_DOWNLOAD_ATTEMPT_DATE) 1000 else 500
-        val queryAfterWhere = getPlaylistQuery(playlist, limit = limitCount, playbackManager = playbackManager)
-        val episodes = episodeManager.findEpisodesWhereRxFlowable(queryAfterWhere)
-
-        if (playlist.excludeFromUpNext) {
-            val upNextEpisodeUuids = playbackManager.upNextQueue.allEpisodes.map { it.uuid }.toSet()
-
-            return episodes.map { allEpisodes ->
-                allEpisodes.filterNot { upNextEpisodeUuids.contains(it.uuid) }
-            }
-        }
-        return episodes
+        return observeEpisodes(playlist, episodeManager, playbackManager, limitCount)
     }
 
-    override fun observeEpisodesPreviewBlocking(playlist: Playlist, episodeManager: EpisodeManager, playbackManager: PlaybackManager): Flowable<List<PodcastEpisode>> {
-        val queryAfterWhere = getPlaylistQuery(playlist, limit = 100, playbackManager = playbackManager)
-        return episodeManager.findEpisodesWhereRxFlowable(queryAfterWhere)
+    override fun observeEpisodesPreviewBlocking(
+        playlist: Playlist,
+        episodeManager: EpisodeManager,
+        playbackManager: PlaybackManager,
+    ): Flowable<List<PodcastEpisode>> = observeEpisodes(playlist, episodeManager, playbackManager, limit = 100)
+
+    private fun observeEpisodes(
+        playlist: Playlist,
+        episodeManager: EpisodeManager,
+        playbackManager: PlaybackManager,
+        limit: Int,
+    ): Flowable<List<PodcastEpisode>> {
+        val queryAfterWhere = getPlaylistQuery(playlist, limit = limit, playbackManager = playbackManager)
+        val episodes = episodeManager.findEpisodesWhereRxFlowable(queryAfterWhere)
+
+        return if (playlist.excludeFromUpNext) {
+            val upNextEpisodeUuids = playbackManager.upNextQueue.allEpisodes.map { it.uuid }.toSet()
+
+            episodes.map { allEpisodes ->
+                allEpisodes.filterNot { upNextEpisodeUuids.contains(it.uuid) }
+            }
+        } else {
+            episodes
+        }
     }
 
     private fun getPlaylistOrderByString(playlist: Playlist): String? = when (playlist.sortOrder()) {

@@ -213,6 +213,27 @@ class CreateFilterViewModel @Inject constructor(
         }
     }
 
+    fun excludeUpNextChipTapped(isCreatingFilter: Boolean) {
+        _lockedToFirstPage.value = false
+        launch {
+            playlist?.value?.let { playlist ->
+                playlist.excludeFromUpNext = !playlist.excludeFromUpNext
+
+                // Only indicate user is updating the excludeFromUpNext property if this is not
+                // the filter creation flow
+                val userPlaylistUpdate = if (!isCreatingFilter) {
+                    UserPlaylistUpdate(
+                        listOf(PlaylistProperty.ExcludeFromUpNext),
+                        PlaylistUpdateSource.FILTER_EPISODE_LIST,
+                    )
+                } else {
+                    null
+                }
+                playlistManager.updateBlocking(playlist, userPlaylistUpdate)
+            }
+        }
+    }
+
     fun userChangedFilterName() {
         userChangedFilterName.recordUserChange()
     }
