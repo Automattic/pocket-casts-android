@@ -48,6 +48,8 @@ dependencies {
     implementation(libs.coroutines.rx2)
     implementation(libs.device.names)
     implementation(libs.guava)
+    implementation(libs.gravatar)
+    implementation(libs.gravatar.quickeditor)
     implementation(libs.lifecycle.process)
     implementation(libs.lifecycle.reactivestreams.ktx)
     implementation(libs.material)
