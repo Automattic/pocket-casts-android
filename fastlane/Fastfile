@@ -343,7 +343,7 @@ platform :android do
         aab: aab_artifact_path,
         track: track,
         release_status: 'inProgress',
-        rollout: is_beta ? '0.20' : '0.10' # Start at 20% for betas, 10% for Production
+        rollout: is_beta ? '0.20' : '0.01' # Start at 20% for betas, 1% for Production
       )
       release_assets << aab_artifact_path
 
