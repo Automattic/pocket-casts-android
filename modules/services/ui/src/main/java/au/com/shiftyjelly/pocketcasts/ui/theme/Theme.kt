@@ -26,7 +26,6 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import javax.inject.Inject
 import javax.inject.Singleton
-import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -464,14 +463,11 @@ class Theme @Inject constructor(private val settings: Settings) {
     }
 
     private fun useDarkStatusBarIcons(window: Window) {
-        Timber.i("*** useDarkStatusBarIcons")
-        Thread.dumpStack()
         WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = true
     }
 
     private fun useLightStatusBarIcons(window: Window) {
         WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = false
-        Timber.i("*** useLightStatusBarIcons")
     }
 
     fun verticalPlusLogo(context: Context?): Drawable? {
