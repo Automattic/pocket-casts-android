@@ -36,9 +36,8 @@ import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
-import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
+import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -134,7 +133,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
 
                     activity?.let {
                         theme.setNavigationBarIconColor(window = it.window, isDark = true)
-                        theme.updateWindowStatusBarIcons(it.window, StatusBarColor.Custom(ThemeColor.secondaryUi01(overrideTheme), true), it)
+                        theme.updateWindowStatusBarIcons(it.window, StatusBarIconColor.Light)
                     }
 
                     upNextFragment.onExpanded()

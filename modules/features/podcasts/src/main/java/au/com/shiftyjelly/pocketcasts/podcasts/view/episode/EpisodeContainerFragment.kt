@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.podcasts.view.episode
 import android.app.Dialog
 import android.content.res.ColorStateList
 import android.content.res.Resources
-import android.graphics.Color
 import android.os.Bundle
 import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
@@ -33,8 +32,7 @@ import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersViewModel.Mod
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.FragmentEpisodeContainerBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeFragment.EpisodeFragmentArgs
-import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
-import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
+import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
@@ -103,12 +101,8 @@ class EpisodeContainerFragment :
             bundle?.let { BundleCompat.getParcelable(it, NEW_INSTANCE_ARG, EpisodeFragmentArgs::class.java) }
     }
 
-    override val statusBarColor: StatusBarColor
-        get() = StatusBarColor.Custom(
-            context?.getThemeColor(UR.attr.primary_ui_01)
-                ?: Color.WHITE,
-            theme.isDarkTheme,
-        )
+    override val statusBarIconColor: StatusBarIconColor
+        get() = StatusBarIconColor.Light
 
     var binding: FragmentEpisodeContainerBinding? = null
 
