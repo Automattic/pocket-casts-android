@@ -337,8 +337,12 @@
     <string name="player_sleep_add_5_minutes">+ 5 minutes</string>
     <string name="player_sleep_add_1_minute">+ 1 minute</string>
     <string name="player_sleep_cancel_timer">Cancel timer</string>
-    <string name="player_sleep_custom_minus">Custom minus</string>
-    <string name="player_sleep_custom_plus">Custom plus</string>
+    <string name="player_sleep_custom_minus">Decrease custom duration</string>
+    <string name="player_sleep_custom_plus">Increase custom duration</string>
+    <string name="player_sleep_chapter_minus">Decrease chapter count</string>
+    <string name="player_sleep_chapter_plus">Increase chapter count</string>
+    <string name="player_sleep_episode_minus">Decrease episode count</string>
+    <string name="player_sleep_episode_plus">Increase episode count</string>
     <string name="player_sleep_end_of_episode">End of episode</string>
     <string name="player_sleep_timer_in_episode">In 1 episode</string>
     <string name="player_sleep_timer_in_episode_plural">In %d episodes</string>
@@ -516,6 +520,8 @@
     <string name="remove_from_folder">Remove from folder</string>
     <string name="change_folder">Change folder</string>
     <string name="go_to_folder">Go to folder</string>
+    <string name="number_stepper_plus_content_description">Plus</string>
+    <string name="number_stepper_minus_content_description">Minus</string>
 
     <!-- Podcast -->
 
