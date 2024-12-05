@@ -20,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.settings.PlaybackSettingsFragment
 import au.com.shiftyjelly.pocketcasts.settings.PlaybackSettingsFragment.Companion.SCROLL_TO_SLEEP_TIMER
 import au.com.shiftyjelly.pocketcasts.settings.SettingsFragment
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
+import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.combineLatest
 import au.com.shiftyjelly.pocketcasts.utils.minutes
