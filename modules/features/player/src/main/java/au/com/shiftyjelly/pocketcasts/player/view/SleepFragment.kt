@@ -47,7 +47,7 @@ class SleepFragment : BaseDialogFragment() {
 
     @Inject lateinit var analyticsTracker: AnalyticsTracker
 
-    override val statusBarIconColor = StatusBarIconColor.Dark
+    override val statusBarIconColor = StatusBarIconColor.Light
 
     private val viewModel: PlayerViewModel by activityViewModels()
     private var binding: FragmentSleepBinding? = null

@@ -807,7 +807,7 @@ class MainActivity :
                     }
 
                     if (viewModel.isPlayerOpen && isEpisodeChanged) {
-                        updateNavAndStatusColors(true, state.podcast)
+                        updateNavAndStatusColors(playerOpen = true, playingPodcast = state.podcast)
                     }
 
                     if (lastPlaybackState != null && (isEpisodeChanged || isPlaybackChanged) && settings.openPlayerAutomatically.value) {
@@ -1034,7 +1034,7 @@ class MainActivity :
             }
         }
 
-        updateNavAndStatusColors(true, viewModel.lastPlaybackState?.podcast)
+        updateNavAndStatusColors(playerOpen = true, playingPodcast = viewModel.lastPlaybackState?.podcast)
         UiUtil.hideKeyboard(binding.root)
 
         viewModel.isPlayerOpen = true
@@ -1045,7 +1045,7 @@ class MainActivity :
     }
 
     override fun onPlayerClosed() {
-        updateNavAndStatusColors(false, null)
+        updateNavAndStatusColors(playerOpen = false, playingPodcast = null)
 
         viewModel.isPlayerOpen = false
         viewModel.closeMultiSelect()
