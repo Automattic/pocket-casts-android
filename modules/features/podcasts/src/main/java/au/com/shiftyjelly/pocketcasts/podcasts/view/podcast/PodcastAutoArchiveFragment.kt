@@ -38,7 +38,7 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveLimit
-import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
+import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
 import dagger.hilt.android.AndroidEntryPoint
@@ -94,8 +94,7 @@ class PodcastAutoArchiveFragment : BaseFragment() {
     private fun tintToolbar(color: Int) {
         theme.updateWindowStatusBarIcons(
             window = requireActivity().window,
-            statusBarColor = StatusBarColor.Custom(color, isWhiteIcons = ColorUtils.calculateLuminance(color) < 0.5),
-            context = requireActivity(),
+            statusBarIconColor = if (ColorUtils.calculateLuminance(color) < 0.5) StatusBarIconColor.Light else StatusBarIconColor.Dark,
         )
     }
 

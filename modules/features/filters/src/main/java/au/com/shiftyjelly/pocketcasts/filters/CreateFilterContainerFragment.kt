@@ -23,7 +23,7 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.setupKeyboardModeResize
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themeColors
 import au.com.shiftyjelly.pocketcasts.ui.helper.ColorUtils
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
-import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
+import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.views.extensions.includeStatusBarPadding
 import au.com.shiftyjelly.pocketcasts.views.extensions.setSystemWindowInsetToPadding
@@ -115,7 +115,7 @@ class CreateFilterContainerFragment : BaseFragment() {
         val filterUi01 = ThemeColor.filterUi01(theme.activeTheme, tintColor)
         toolbar.setBackgroundColor(filterUi01)
         toolbar.setTitleTextColor(ThemeColor.filterText01(theme.activeTheme, tintColor))
-        theme.updateWindowStatusBarIcons(window = requireActivity().window, statusBarColor = StatusBarColor.Custom(filterUi01, theme.activeTheme.defaultLightIcons), context = requireContext())
+        theme.updateWindowStatusBarIcons(window = requireActivity().window, statusBarIconColor = StatusBarIconColor.Theme)
     }
 
     private fun observeLockedFirstPage(adapter: CreatePagerAdapter) {

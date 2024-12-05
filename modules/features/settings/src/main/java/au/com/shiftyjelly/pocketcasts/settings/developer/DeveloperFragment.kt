@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.viewModels
@@ -11,6 +12,8 @@ import androidx.fragment.compose.content
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewFragment
+import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import com.airbnb.android.showkase.ui.ShowkaseBrowserActivity
@@ -41,8 +44,11 @@ class DeveloperFragment : BaseFragment() {
                 onTriggerResetEoYModalProfileBadge = viewModel::resetEoYModalProfileBadge,
                 bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
                 onSendCrash = viewModel::onSendCrash,
+                onShowWhatsNewClick = ::onShowWhatsNewClick,
             )
         }
+    }.apply {
+        consumeWindowInsets = false
     }
 
     @Suppress("DEPRECATION")
@@ -55,5 +61,9 @@ class DeveloperFragment : BaseFragment() {
             putExtra("SHOWKASE_ROOT_MODULE", "au.com.shiftyjelly.pocketcasts.showkase.AppShowkaseRootModule")
         }
         startActivity(intent)
+    }
+
+    private fun onShowWhatsNewClick() {
+        (activity as? FragmentHostListener)?.showBottomSheet(fragment = WhatsNewFragment())
     }
 }
