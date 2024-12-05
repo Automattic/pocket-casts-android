@@ -746,6 +746,7 @@
     <string name="filters_chip_all_your_podcasts">All Your Podcasts</string>
     <string name="filters_chip_download_status">Download Status</string>
     <string name="filters_chip_media_type">Media Type</string>
+    <string name="filters_chip_exclude_from_up_next">Exclude From Up Next</string>
     <string name="filters_chip_starred" translatable="false">@string/starred</string>
     <string name="filters_choose_podcasts">Choose podcasts</string>
     <string name="filters_chosen_none">None selected</string>

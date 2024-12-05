@@ -438,6 +438,14 @@ class FilterEpisodeListFragment : BaseFragment() {
                 chipStarred.setInactiveColors(theme.activeTheme, color)
             }
             chipStarred.setOnClickListener { viewModel.starredChipTapped() }
+
+            if (playlist.excludeFromUpNext) {
+                binding.chipUpNext.setActiveColors(theme.activeTheme, color)
+            } else {
+                binding.chipUpNext.setInactiveColors(theme.activeTheme, color)
+            }
+
+            binding.chipUpNext.setOnClickListener { viewModel.excludeFromUpNextChipTapped() }
         }
 
         val layoutFilterOptions = binding.layoutFilterOptions
