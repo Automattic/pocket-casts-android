@@ -163,7 +163,16 @@ class PlaylistManagerImpl @Inject constructor(
     override fun observeEpisodesBlocking(playlist: Playlist, episodeManager: EpisodeManager, playbackManager: PlaybackManager): Flowable<List<PodcastEpisode>> {
         val limitCount = if (playlist.sortOrder() == Playlist.SortOrder.LAST_DOWNLOAD_ATTEMPT_DATE) 1000 else 500
         val queryAfterWhere = getPlaylistQuery(playlist, limit = limitCount, playbackManager = playbackManager)
-        return episodeManager.findEpisodesWhereRxFlowable(queryAfterWhere)
+        val episodes = episodeManager.findEpisodesWhereRxFlowable(queryAfterWhere)
+
+        if (playlist.excludeFromUpNext) {
+            val upNextEpisodeUuids = playbackManager.upNextQueue.allEpisodes.map { it.uuid }.toSet()
+
+            return episodes.map { allEpisodes ->
+                allEpisodes.filterNot { upNextEpisodeUuids.contains(it.uuid) }
+            }
+        }
+        return episodes
     }
 
     override fun observeEpisodesPreviewBlocking(playlist: Playlist, episodeManager: EpisodeManager, playbackManager: PlaybackManager): Flowable<List<PodcastEpisode>> {
