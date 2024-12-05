@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.referrals
 
 import android.app.Activity
-import android.graphics.Color
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.LayoutInflater
@@ -20,7 +19,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
-import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
+import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil.setBackgroundColor
@@ -83,11 +82,7 @@ class ReferralsGuestPassFragment : BaseFragment() {
     private fun updateStatusAndNavColors() {
         activity?.let {
             theme.setNavigationBarIconColor(window = it.window, isDark = true)
-            theme.updateWindowStatusBarIcons(
-                it.window,
-                StatusBarColor.Custom(Color.BLACK, true),
-                it,
-            )
+            theme.updateWindowStatusBarIcons(window = it.window, statusBarIconColor = StatusBarIconColor.Dark)
         }
     }
 

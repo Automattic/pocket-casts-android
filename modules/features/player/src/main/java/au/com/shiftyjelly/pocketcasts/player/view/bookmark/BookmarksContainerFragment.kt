@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.player.view.bookmark
 
 import android.content.res.Resources
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,7 +16,7 @@ import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentBookmarksContai
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeTintedDrawable
-import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
+import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
@@ -50,15 +49,11 @@ class BookmarksContainerFragment :
     private val sourceView: SourceView
         get() = SourceView.fromString(arguments?.getString(ARG_SOURCE_VIEW))
 
-    override val statusBarColor: StatusBarColor
+    override val statusBarIconColor: StatusBarIconColor
         get() = if (sourceView == SourceView.PROFILE) {
-            StatusBarColor.Light
+            StatusBarIconColor.Theme
         } else {
-            StatusBarColor.Custom(
-                context?.getThemeColor(UR.attr.primary_ui_01)
-                    ?: Color.WHITE,
-                theme.isDarkTheme,
-            )
+            StatusBarIconColor.Dark
         }
 
     var binding: FragmentBookmarksContainerBinding? = null

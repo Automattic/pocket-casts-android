@@ -190,9 +190,9 @@ private fun Toolbar(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
+            .background(MaterialTheme.theme.colors.secondaryUi01)
             .windowInsetsPadding(AppBarDefaults.topAppBarWindowInsets)
             .height(56.dp)
-            .background(MaterialTheme.theme.colors.secondaryUi01)
             .padding(horizontal = horizontalPadding),
     ) {
         if (showReferralsIcon) {
