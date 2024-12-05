@@ -46,7 +46,7 @@ import au.com.shiftyjelly.pocketcasts.views.R as VR
 class SleepFragment : BaseDialogFragment() {
 
     @Inject lateinit var analyticsTracker: AnalyticsTracker
-    override val statusBarColor: StatusBarColor? = null
+    override val statusBarIconColor: StatusBarIconColor? = null
 
     private val viewModel: PlayerViewModel by activityViewModels()
     private var binding: FragmentSleepBinding? = null

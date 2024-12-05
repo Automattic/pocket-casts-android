@@ -21,7 +21,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
 import au.com.shiftyjelly.pocketcasts.ui.BuildConfig
 import au.com.shiftyjelly.pocketcasts.ui.R
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
-import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
+import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -70,7 +70,8 @@ class Theme @Inject constructor(private val settings: Settings) {
         @StringRes val labelId: Int,
         @StyleRes val resourceId: Int,
         @DrawableRes val iconResourceId: Int,
-        val defaultLightIcons: Boolean,
+        val toolbarLightIcons: Boolean,
+        val backgroundLightIcons: Boolean,
         val darkTheme: Boolean,
         val isPlus: Boolean,
     ) {
@@ -79,7 +80,8 @@ class Theme @Inject constructor(private val settings: Settings) {
             labelId = LR.string.settings_theme_light,
             resourceId = R.style.ThemeLight,
             iconResourceId = IR.drawable.ic_apptheme0,
-            defaultLightIcons = false,
+            toolbarLightIcons = false,
+            backgroundLightIcons = false,
             darkTheme = false,
             isPlus = false,
         ),
@@ -88,7 +90,8 @@ class Theme @Inject constructor(private val settings: Settings) {
             labelId = LR.string.settings_theme_dark,
             resourceId = R.style.ThemeDark,
             iconResourceId = IR.drawable.ic_apptheme1,
-            defaultLightIcons = true,
+            toolbarLightIcons = true,
+            backgroundLightIcons = true,
             darkTheme = true,
             isPlus = false,
         ),
@@ -97,7 +100,8 @@ class Theme @Inject constructor(private val settings: Settings) {
             labelId = LR.string.settings_theme_rose,
             resourceId = R.style.Rose,
             iconResourceId = IR.drawable.ic_theme_rose,
-            defaultLightIcons = false,
+            toolbarLightIcons = false,
+            backgroundLightIcons = false,
             darkTheme = false,
             isPlus = false,
         ),
@@ -106,7 +110,8 @@ class Theme @Inject constructor(private val settings: Settings) {
             labelId = LR.string.settings_theme_indigo,
             resourceId = R.style.Indigo,
             iconResourceId = IR.drawable.ic_indigo,
-            defaultLightIcons = true,
+            toolbarLightIcons = true,
+            backgroundLightIcons = false,
             darkTheme = false,
             isPlus = false,
         ),
@@ -115,7 +120,8 @@ class Theme @Inject constructor(private val settings: Settings) {
             labelId = LR.string.settings_theme_extra_dark,
             resourceId = R.style.ExtraThemeDark,
             iconResourceId = IR.drawable.ic_apptheme2,
-            defaultLightIcons = true,
+            toolbarLightIcons = true,
+            backgroundLightIcons = true,
             darkTheme = true,
             isPlus = false,
         ),
@@ -124,7 +130,8 @@ class Theme @Inject constructor(private val settings: Settings) {
             labelId = LR.string.settings_theme_dark_contrast,
             resourceId = R.style.DarkContrast,
             iconResourceId = IR.drawable.ic_apptheme6,
-            defaultLightIcons = true,
+            toolbarLightIcons = true,
+            backgroundLightIcons = true,
             darkTheme = true,
             isPlus = false,
         ),
@@ -133,7 +140,8 @@ class Theme @Inject constructor(private val settings: Settings) {
             labelId = LR.string.settings_theme_light_contrast,
             resourceId = R.style.LightContrast,
             iconResourceId = IR.drawable.ic_apptheme7,
-            defaultLightIcons = false,
+            toolbarLightIcons = false,
+            backgroundLightIcons = false,
             darkTheme = false,
             isPlus = false,
         ),
@@ -142,7 +150,8 @@ class Theme @Inject constructor(private val settings: Settings) {
             labelId = LR.string.settings_theme_electricity,
             resourceId = R.style.Electric,
             iconResourceId = IR.drawable.ic_apptheme5,
-            defaultLightIcons = true,
+            toolbarLightIcons = true,
+            backgroundLightIcons = true,
             darkTheme = true,
             isPlus = true,
         ),
@@ -151,7 +160,8 @@ class Theme @Inject constructor(private val settings: Settings) {
             labelId = LR.string.settings_theme_classic, // "Classic Light"
             resourceId = R.style.ClassicLight,
             iconResourceId = IR.drawable.ic_apptheme3,
-            defaultLightIcons = true,
+            toolbarLightIcons = true,
+            backgroundLightIcons = false,
             darkTheme = false,
             isPlus = true,
         ),
@@ -160,7 +170,8 @@ class Theme @Inject constructor(private val settings: Settings) {
             labelId = LR.string.settings_theme_radioactivity,
             resourceId = R.style.Radioactive,
             iconResourceId = IR.drawable.ic_theme_radioactive,
-            defaultLightIcons = true,
+            toolbarLightIcons = true,
+            backgroundLightIcons = true,
             darkTheme = true,
             isPlus = true,
         ),
@@ -365,7 +376,7 @@ class Theme @Inject constructor(private val settings: Settings) {
      * StatusBarColor.Light means the background is light and the icons are black
      * StatusBarColor.Dark means the background is dark and the icons are white
      */
-    fun updateWindowStatusBarIcons(window: Window?, statusBarColor: StatusBarColor? = null, context: Context) {
+    fun updateWindowStatusBarIcons(window: Window?, statusBarIconColor: StatusBarIconColor? = null) {
         window ?: return
 
         // Fixes the issue where the window internal DecorView is null and causes a crash. https://console.firebase.google.com/project/singular-vector-91401/crashlytics/app/android:au.com.shiftyjelly.pocketcasts/issues/d44d873d36442ac43b59f56fe95e311b
@@ -373,28 +384,24 @@ class Theme @Inject constructor(private val settings: Settings) {
             return
         }
 
-        val color = statusBarColor ?: (if (isDarkTheme) StatusBarColor.Dark else StatusBarColor.Light)
-        when {
-            color is StatusBarColor.Custom -> {
-                if (color.isWhiteIcons) {
+        val color = statusBarIconColor ?: (if (isDarkTheme) StatusBarIconColor.Dark else StatusBarIconColor.Light)
+        when (color) {
+            StatusBarIconColor.Theme -> {
+                if (activeTheme.toolbarLightIcons) {
                     useLightStatusBarIcons(window)
                 } else {
                     useDarkStatusBarIcons(window)
                 }
             }
-            isDarkTheme -> {
-                useLightStatusBarIcons(window)
-            }
-            color is StatusBarColor.Dark -> {
-                useLightStatusBarIcons(window)
-            }
-            color is StatusBarColor.Light -> {
-                if (activeTheme.defaultLightIcons) {
+            StatusBarIconColor.ThemeNoToolbar -> {
+                if (activeTheme.backgroundLightIcons) {
                     useLightStatusBarIcons(window)
                 } else {
                     useDarkStatusBarIcons(window)
                 }
             }
+            StatusBarIconColor.Dark -> useDarkStatusBarIcons(window)
+            StatusBarIconColor.Light -> useLightStatusBarIcons(window)
         }
     }
 

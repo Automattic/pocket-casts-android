@@ -42,7 +42,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.helper.ColorUtils
-import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
+import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Debouncer
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
@@ -70,7 +70,7 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
 
     @Inject lateinit var playbackManager: PlaybackManager
 
-    override val statusBarColor: StatusBarColor? = null
+    override val statusBarIconColor: StatusBarIconColor? = null
 
     private val viewModel: PlayerViewModel by activityViewModels()
     private lateinit var imageRequestFactory: PocketCastsImageRequestFactory
