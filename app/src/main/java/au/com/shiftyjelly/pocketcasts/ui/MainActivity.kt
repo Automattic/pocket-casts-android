@@ -140,6 +140,7 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSourc
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewFragment
 import au.com.shiftyjelly.pocketcasts.ui.MainActivityViewModel.NavigationState
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
+import au.com.shiftyjelly.pocketcasts.ui.helper.NavigationBarColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
@@ -697,12 +698,16 @@ class MainActivity :
     }
 
     private fun updateNavAndStatusColors(playerOpen: Boolean, playingPodcast: Podcast?) {
-        if (playerOpen) {
-            val playerBgColor = theme.playerBackgroundColor(playingPodcast)
-            theme.setNavigationBarColor(window = window, lightIcons = true, color = playerBgColor)
+        val navigationBarColor = if (playerOpen) {
+            NavigationBarColor.Player(playingPodcast)
         } else {
-            theme.setNavigationBarColor(window = window)
+            NavigationBarColor.Theme
         }
+
+        theme.updateWindowNavigationBarColor(window = window, navigationBarColor = navigationBarColor)
+
+        // Color the side bars of the screen if there is inset for areas such as cameras
+        binding.root.setBackgroundColor(theme.getNavigationBarColor(navigationBarColor))
 
         updateStatusBar()
     }

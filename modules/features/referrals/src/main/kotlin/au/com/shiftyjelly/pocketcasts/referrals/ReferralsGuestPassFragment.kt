@@ -21,6 +21,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
+import au.com.shiftyjelly.pocketcasts.ui.helper.NavigationBarColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -85,7 +86,7 @@ class ReferralsGuestPassFragment : BaseFragment() {
 
     private fun updateStatusAndNavColors() {
         activity?.let {
-            theme.setNavigationBarColor(window = it.window, lightIcons = true, Color.BLACK)
+            theme.updateWindowNavigationBarColor(window = it.window, navigationBarColor = NavigationBarColor.Color(color = Color.BLACK, lightIcons = true))
             theme.updateWindowStatusBarIcons(window = it.window, statusBarIconColor = StatusBarIconColor.Dark)
         }
     }

@@ -21,7 +21,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
 import au.com.shiftyjelly.pocketcasts.ui.BuildConfig
 import au.com.shiftyjelly.pocketcasts.ui.R
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
-import au.com.shiftyjelly.pocketcasts.ui.helper.NavigationBarIconColor
+import au.com.shiftyjelly.pocketcasts.ui.helper.NavigationBarColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import javax.inject.Inject
@@ -420,16 +420,45 @@ class Theme @Inject constructor(private val settings: Settings) {
             }
             StatusBarIconColor.Dark -> useDarkStatusBarIcons(window)
             StatusBarIconColor.Light -> useLightStatusBarIcons(window)
+            is StatusBarIconColor.UpNext -> {
+                if (getUpNextTheme(isFullScreen = color.isFullScreen).toolbarLightIcons) {
+                    useLightStatusBarIcons(window)
+                } else {
+                    useDarkStatusBarIcons(window)
+                }
+            }
         }
     }
 
-    fun updateWindowNavigationBarIcons(window: Window?, navigationBarIconColor: NavigationBarIconColor) {
+    @Suppress("DEPRECATION")
+    fun updateWindowNavigationBarColor(window: Window?, navigationBarColor: NavigationBarColor) {
         window?.peekDecorView() ?: return
 
-        when (navigationBarIconColor) {
-            NavigationBarIconColor.Theme -> setNavigationBarColor(window = window, lightIcons = activeTheme.backgroundLightIcons)
-            NavigationBarIconColor.Dark -> setNavigationBarColor(window = window, lightIcons = false)
-            NavigationBarIconColor.Light -> setNavigationBarColor(window = window, lightIcons = true)
+        // This is required to color the navigation bar on SDK lower than 35
+        window.navigationBarColor = getNavigationBarColor(navigationBarColor)
+        // setting to true makes the icons dark, false makes them light
+        WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightNavigationBars = !getNavigationBarLightIcons(navigationBarColor)
+    }
+
+    fun getNavigationBarColor(navigationBarColor: NavigationBarColor): Int {
+        return when (navigationBarColor) {
+            NavigationBarColor.Theme -> getNavigationBackgroundColor(activeTheme)
+            NavigationBarColor.Dark -> getNavigationBackgroundColor(ThemeType.DARK)
+            NavigationBarColor.Light -> getNavigationBackgroundColor(ThemeType.LIGHT)
+            is NavigationBarColor.Player -> playerBackgroundColor(navigationBarColor.podcast)
+            is NavigationBarColor.UpNext -> getNavigationBackgroundColor(getUpNextTheme(isFullScreen = navigationBarColor.isFullScreen))
+            is NavigationBarColor.Color -> navigationBarColor.color
+        }
+    }
+
+    fun getNavigationBarLightIcons(navigationBarColor: NavigationBarColor): Boolean {
+        return when (navigationBarColor) {
+            NavigationBarColor.Theme -> activeTheme.backgroundLightIcons
+            NavigationBarColor.Dark -> true
+            NavigationBarColor.Light -> false
+            is NavigationBarColor.Player -> true
+            is NavigationBarColor.UpNext -> getUpNextTheme(isFullScreen = navigationBarColor.isFullScreen).backgroundLightIcons
+            is NavigationBarColor.Color -> navigationBarColor.lightIcons
         }
     }
 
@@ -441,17 +470,17 @@ class Theme @Inject constructor(private val settings: Settings) {
         WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = false
     }
 
-    @Suppress("DEPRECATION")
-    fun setNavigationBarColor(
-        window: Window,
-        lightIcons: Boolean = activeTheme.backgroundLightIcons,
-        color: Int = getNavigationBackgroundColor(window.context),
-    ) {
-        // This is required to color the navigation bar on SDK lower than 35
-        window.navigationBarColor = color
-        // setting to true makes the icons dark, false makes them light
-        WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightNavigationBars = !lightIcons
-    }
+//    @Suppress("DEPRECATION")
+//    private fun setNavigationBarColor(
+//        window: Window,
+//        lightIcons: Boolean = activeTheme.backgroundLightIcons,
+//        color: Int = getNavigationBackgroundColor(window.context),
+//    ) {
+//        // This is required to color the navigation bar on SDK lower than 35
+//        window.navigationBarColor = color
+//        // setting to true makes the icons dark, false makes them light
+//        WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightNavigationBars = !lightIcons
+//    }
 
     fun verticalPlusLogo(context: Context?): Drawable? {
         return context?.let {

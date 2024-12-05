@@ -13,7 +13,7 @@ import androidx.core.view.doOnLayout
 import androidx.navigation.NavHostController
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
-import au.com.shiftyjelly.pocketcasts.ui.helper.NavigationBarIconColor
+import au.com.shiftyjelly.pocketcasts.ui.helper.NavigationBarColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -30,7 +30,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 open class BaseDialogFragment : BottomSheetDialogFragment(), CoroutineScope {
 
     open val statusBarIconColor: StatusBarIconColor = StatusBarIconColor.Theme
-    open val navigationBarIconColor: NavigationBarIconColor = NavigationBarIconColor.Theme
+    open val navigationBarColor: NavigationBarColor = NavigationBarColor.Theme
 
     private var isBeingDragged = false
     private val dismissCallback = object : BottomSheetBehavior.BottomSheetCallback() {
@@ -55,7 +55,7 @@ open class BaseDialogFragment : BottomSheetDialogFragment(), CoroutineScope {
 
         dialog?.window?.let { window ->
             theme.updateWindowStatusBarIcons(window = window, statusBarIconColor = statusBarIconColor)
-            theme.updateWindowNavigationBarIcons(window = window, navigationBarIconColor = navigationBarIconColor)
+            theme.updateWindowNavigationBarColor(window = window, navigationBarColor = navigationBarColor)
         }
 
         view.doOnLayout {
