@@ -17,7 +17,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastEffectsViewModel
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getTintedDrawable
-import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
+import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.extensions.includeStatusBarPadding
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
@@ -110,8 +110,7 @@ class PodcastEffectsFragment : PreferenceFragmentCompat() {
 
             theme.updateWindowStatusBarIcons(
                 window = requireActivity().window,
-                statusBarColor = StatusBarColor.Custom(colors.backgroundColor, isWhiteIcons = theme.activeTheme.defaultLightIcons),
-                context = context,
+                statusBarIconColor = StatusBarIconColor.Theme,
             )
 
             preferenceCustomForPodcast?.isChecked = podcast.overrideGlobalEffects
