@@ -64,7 +64,7 @@ import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.openUrl
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
-import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
+import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.images.CoilManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
@@ -179,7 +179,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         }
     }
 
-    override var statusBarColor: StatusBarColor = StatusBarColor.Custom(color = 0xFF1E1F1E.toInt(), isWhiteIcons = true)
+    override var statusBarIconColor: StatusBarIconColor = StatusBarIconColor.Light
 
     private val onHeaderSummaryToggled: (
         expanded: Boolean,
@@ -606,7 +606,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         val headerColor = context.getThemeColor(UR.attr.support_09)
         binding.headerBackgroundPlaceholder.setBackgroundColor(headerColor)
         binding.toolbar.setBackgroundColor(headerColor)
-        statusBarColor = StatusBarColor.Custom(headerColor, true)
+        statusBarIconColor = StatusBarIconColor.Light
         updateStatusBar()
 
         loadData()
@@ -847,7 +847,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
                 viewModel.archiveEpisodeLimit()
 
-                statusBarColor = StatusBarColor.Custom(backgroundColor, true)
+                statusBarIconColor = StatusBarIconColor.Light
                 updateStatusBar()
             },
         )
