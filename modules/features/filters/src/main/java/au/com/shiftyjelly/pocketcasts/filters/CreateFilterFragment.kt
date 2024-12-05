@@ -26,7 +26,6 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.getColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getColors
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themeColors
-import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.adapter.ColorAdapter
@@ -69,7 +68,6 @@ class CreateFilterFragment : BaseFragment(), CoroutineScope {
         }
     }
 
-    override var statusBarColor: StatusBarColor = StatusBarColor.Light
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main
 

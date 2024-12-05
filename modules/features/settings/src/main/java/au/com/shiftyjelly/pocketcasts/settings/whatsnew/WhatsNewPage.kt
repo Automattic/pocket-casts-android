@@ -12,7 +12,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -30,7 +33,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import au.com.shiftyjelly.pocketcasts.compose.bottomsheet.Pill
+import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
+import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowTextButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
@@ -38,7 +42,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewViewModel.WhatsNewFeature
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun WhatsNewPage(
@@ -91,45 +94,28 @@ private fun WhatsNewPageLoaded(
 
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier
-            .background(Color.Black.copy(alpha = scrimAlpha))
-            .then(
-                if (!state.fullModel) {
-                    Modifier.clickable(
-                        indication = null,
-                        interactionSource = remember { MutableInteractionSource() },
-                        onClick = { performClose() },
-                    )
-                } else {
-                    Modifier
-                },
-            )
-            .padding(if (state.fullModel) 0.dp else 16.dp)
+        modifier = Modifier.clickable(
+            indication = null,
+            interactionSource = remember { MutableInteractionSource() },
+            onClick = performClose,
+        )
+            // when the device width is wider than the popup add an alpha scrim to the background
+            .background(if (LocalConfiguration.current.screenWidthDp > 500) Color.Black.copy(alpha = scrimAlpha) else MaterialTheme.theme.colors.primaryUi01)
+            .statusBarsPadding()
+            .navigationBarsPadding()
             .fillMaxSize(),
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
-                .background(MaterialTheme.theme.colors.primaryUi01)
-                .then(if (state.fullModel) Modifier.fillMaxSize() else Modifier),
+                .widthIn(max = 500.dp)
+                .background(MaterialTheme.theme.colors.primaryUi01),
         ) {
-            if (state.fullModel) {
-                Spacer(Modifier.height(8.dp))
-
-                Pill()
-
-                Box(
-                    modifier = Modifier.align(Alignment.Start),
-                ) {
-                    RowTextButton(
-                        text = stringResource(LR.string.cancel),
-                        fontSize = 15.sp,
-                        onClick = performClose,
-                        fullWidth = false,
-                        includePadding = false,
-                    )
-                }
-            }
+            ThemedTopAppBar(
+                navigationButton = NavigationButton.Close,
+                onNavigationClick = performClose,
+                style = ThemedTopAppBar.Style.Immersive,
+            )
 
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -157,11 +143,16 @@ private fun WhatsNewPageLoaded(
                     color = MaterialTheme.theme.colors.primaryText01,
                     modifier = Modifier.padding(horizontal = 32.dp).padding(bottom = 8.dp),
                 )
+
+                Spacer(modifier = Modifier.height(16.dp))
             }
 
             RowButton(
                 text = stringResource(state.feature.confirmButtonTitle),
-                onClick = onConfirm,
+                onClick = {
+                    performClose()
+                    onConfirm()
+                },
                 includePadding = false,
                 modifier = Modifier
                     .fillMaxWidth()

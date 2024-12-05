@@ -139,7 +139,7 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSourc
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewFragment
 import au.com.shiftyjelly.pocketcasts.ui.MainActivityViewModel.NavigationState
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
-import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
+import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Network
@@ -683,18 +683,17 @@ class MainActivity :
     }
 
     override fun updateStatusBar() {
-        val topFragment = navigator.currentFragment()
+        val topFragment = supportFragmentManager.fragments.lastOrNull()
         val color = if (binding.playerBottomSheet.isPlayerOpen) {
-            val playerBgColor = theme.playerBackgroundColor(viewModel.lastPlaybackState?.podcast)
-            StatusBarColor.Custom(playerBgColor, true)
+            StatusBarIconColor.Light
         } else if (topFragment is BaseFragment) {
-            topFragment.statusBarColor
+            topFragment.statusBarIconColor
         } else {
             null
         }
 
         if (color != null) {
-            theme.updateWindowStatusBarIcons(window = window, statusBarColor = color, context = this)
+            theme.updateWindowStatusBarIcons(window = window, statusBarIconColor = color)
         }
     }
 

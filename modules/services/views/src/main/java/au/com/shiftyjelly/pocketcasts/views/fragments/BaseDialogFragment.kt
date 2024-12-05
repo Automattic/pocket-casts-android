@@ -13,7 +13,7 @@ import androidx.core.view.doOnLayout
 import androidx.navigation.NavHostController
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
-import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
+import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -28,7 +28,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 @AndroidEntryPoint
 open class BaseDialogFragment : BottomSheetDialogFragment(), CoroutineScope {
 
-    open val statusBarColor: StatusBarColor? = StatusBarColor.Light
+    open val statusBarIconColor: StatusBarIconColor? = StatusBarIconColor.Theme
 
     private var isBeingDragged = false
     private val dismissCallback = object : BottomSheetBehavior.BottomSheetCallback() {
@@ -52,9 +52,9 @@ open class BaseDialogFragment : BottomSheetDialogFragment(), CoroutineScope {
         view.isClickable = true
 
         val activity = activity
-        val statusBarColor = statusBarColor
-        if (activity != null && statusBarColor != null) {
-            theme.updateWindowStatusBarIcons(window = activity.window, statusBarColor = statusBarColor, context = activity)
+        val statusBarIconColor = statusBarIconColor
+        if (activity != null && statusBarIconColor != null) {
+            theme.updateWindowStatusBarIcons(window = activity.window, statusBarIconColor = statusBarIconColor)
         }
 
         view.doOnLayout {
