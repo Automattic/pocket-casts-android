@@ -22,6 +22,7 @@ data class FilterResponse(
     @field:Json(name = "partiallyPlayed") val partiallyPlayed: Boolean?,
     @field:Json(name = "unplayed") val unplayed: Boolean?,
     @field:Json(name = "starred") val starred: Boolean?,
+    @field:Json(name = "excludeFromUpNext") val excludeFromUpNext: Boolean?,
     @field:Json(name = "manual") val manual: Boolean?,
     @field:Json(name = "sortPosition") val sortPosition: Int?,
     @field:Json(name = "sortType") val sortType: Int?,
@@ -56,6 +57,7 @@ data class FilterResponse(
         iconId?.let { filter.iconId = it }
         filterHours?.let { filter.filterHours = it }
         starred?.let { filter.starred = it }
+        excludeFromUpNext?.let { filter.excludeFromUpNext = it }
         deleted?.let { filter.deleted = it }
         filterDuration?.let { filter.filterDuration = it }
         longerThan?.let { filter.longerThan = it }

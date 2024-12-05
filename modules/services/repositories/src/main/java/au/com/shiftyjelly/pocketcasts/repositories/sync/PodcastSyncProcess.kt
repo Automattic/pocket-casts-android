@@ -433,6 +433,7 @@ class PodcastSyncProcess(
                     fields.put("partially_played", if (playlist.partiallyPlayed) "1" else "0")
                     fields.put("unplayed", if (playlist.unplayed) "1" else "0")
                     fields.put("starred", if (playlist.starred) "1" else "0")
+                    fields.put("excludeFromUpNext", if (playlist.excludeFromUpNext) "1" else "0")
                     fields.put("manual", "0")
                     fields.put("sort_position", playlist.sortPosition)
                     fields.put("sort_type", playlist.sortId)
@@ -767,6 +768,7 @@ class PodcastSyncProcess(
                 partiallyPlayed = sync.partiallyPlayed
                 unplayed = sync.unplayed
                 starred = sync.starred
+                excludeFromUpNext = sync.excludeFromUpNext
                 manual = sync.manual
                 sortPosition = sync.sortPosition
                 sortId = sync.sortId

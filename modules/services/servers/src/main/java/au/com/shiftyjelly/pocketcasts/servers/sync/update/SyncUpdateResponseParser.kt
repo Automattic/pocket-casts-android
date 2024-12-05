@@ -176,6 +176,7 @@ class SyncUpdateResponseParser : JsonAdapter<SyncUpdateResponse>() {
                 "partially_played" -> playlist.partiallyPlayed = reader.nextBooleanOrDefault(false)
                 "unplayed" -> playlist.unplayed = reader.nextBooleanOrDefault(false)
                 "starred" -> playlist.starred = reader.nextBooleanOrDefault(false)
+                "excludeFromUpNext" -> playlist.excludeFromUpNext = reader.nextBooleanOrDefault(false)
                 "manual" -> playlist.manual = reader.nextBooleanOrDefault(false)
                 "episode_uuids" -> playlist.episodeUuids = reader.nextStringOrNull()
                 "sort_position" -> playlist.sortPosition = reader.nextIntOrDefault(0)
