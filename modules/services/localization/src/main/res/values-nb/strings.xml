@@ -945,6 +945,7 @@ Language: nb_NO
     <string name="profile_navigation_listening_history">Lyttehistorikk</string>
     <string name="profile_navigation_files">Filer</string>
     <string name="profile_monthly">Månedlig</string>
+    <string name="profile_license_agreement">Pocket Casts respekterer personvernet ditt. Disse retningslinjene for personvern forklarer hvilke opplysninger vi samler inn om deg og hvorfor, hva vi gjør med disse opplysningene, og hvordan vi behandler dem. De gjelder for Pocket Casts-apper for iOS og Android og Pocket Casts-webtjenesten med tilknyttede macOS- og Windows-apper (kalt for \"tjenesten\", både samlet sett og i flertall). Ved å bruke tjenesten godtar du disse retningslinjene for personvern. Hvis du slår på push-varslinger i appen, lagrer vi push-tokenet som Apple leverer til oss, for å levere disse push-varslingene til enheten din. Hvis du kjøper webappen, lagrer vi en transaksjons-ID for kjøpet. Hvis du velger ikke å opprette en konto, og hvis du ikke bruker push-varslinger, blir ingen data om deg lagret på serverne våre. Pocket Casts-webtjenesten bruker også informasjonskapsler og lignende teknologi til å holde deg innlogget. Hvis du velger å generere en støtteforespørsel fra selve tjenesten, kan vi generere et vedlegg som inneholder flere data for hjelp til håndtering av støtteforespørselen, som du kan se på før den blir sendt inn.</string>
     <string name="profile_last_refresh">Siste oppdatering: %s siden</string>
     <string name="profile_joined">Ble med:</string>
     <string name="profile_get_plus">Skaff deg Pocket Casts Plus for å frigjøre denne funksjonen og mye mer!</string>
@@ -958,7 +959,6 @@ Language: nb_NO
     <string name="profile_files_add_custom_image">Legg til egendefinert bilde</string>
     <string name="profile_file_locked">låst</string>
     <string name="profile_file">Fil</string>
-    <string name="profile_license_agreement">Pocket Casts respekterer personvernet ditt. Disse retningslinjene for personvern forklarer hvilke opplysninger vi samler inn om deg og hvorfor, hva vi gjør med disse opplysningene, og hvordan vi behandler dem. De gjelder for Pocket Casts-apper for iOS og Android og Pocket Casts-webtjenesten med tilknyttede macOS- og Windows-apper (kalt for \"tjenesten\", både samlet sett og i flertall). Ved å bruke tjenesten godtar du disse retningslinjene for personvern. Hvis du slår på push-varslinger i appen, lagrer vi push-tokenet som Apple leverer til oss, for å levere disse push-varslingene til enheten din. Hvis du kjøper webappen, lagrer vi en transaksjons-ID for kjøpet. Hvis du velger ikke å opprette en konto, og hvis du ikke bruker push-varslinger, blir ingen data om deg lagret på serverne våre. Pocket Casts-webtjenesten bruker også informasjonskapsler og lignende teknologi til å holde deg innlogget. Hvis du velger å generere en støtteforespørsel fra selve tjenesten, kan vi generere et vedlegg som inneholder flere data for hjelp til håndtering av støtteforespørselen, som du kan se på før den blir sendt inn.</string>
     <string name="profile_feature_requires">Denne funksjonen krever\nPocket Casts Plus</string>
     <string name="profile_ends">Avsluttes %s</string>
     <string name="profile_ended">Avsluttet %s</string>
@@ -1302,8 +1302,6 @@ Language: nb_NO
     <string name="player_sleep_timer">Tidtaker for dvalemodus</string>
     <string name="player_sleep_timer_title">Tidtaker for dvalemodus</string>
     <string name="player_sleep_end_of_episode">Slutt på episode</string>
-    <string name="player_sleep_custom_plus">Egendefinert pluss</string>
-    <string name="player_sleep_custom_minus">Egendefinert minus</string>
     <string name="player_sleep_cancel_timer">Avbryt tidtaker</string>
     <string name="player_sleep_add_5_minutes">+ 5 minutter</string>
     <string name="player_sleep_60_minutes">60 minutter</string>

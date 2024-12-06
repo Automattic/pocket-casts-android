@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-11-12 11:54:08+0000
+Translation-Revision-Date: 2024-12-04 11:54:04+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="plus_subscription_finished">Abonnement afgerond</string>
+    <string name="shuffle_whats_new_message">Speel eenvoudig een willekeurige aflevering af zonder de volgorde van je wachtrij te veranderen.</string>
+    <string name="shuffle_whats_new_title">Maak kennis met shuffle</string>
+    <string name="chapter_time_remaining_content_description">nog %s te gaan in het hoofdstuk</string>
+    <string name="chapter_count_summary">%1$d van %2$d</string>
+    <string name="referrals_share_text">Hallo!\n\nHier is een %1$s gastenpas voor Pocket Casts Plus, mijn favoriete podcastspeler. Het zit vol met unieke functies die je nergens anders vindt, zoals bladwijzers, mappen en meer. Jij zal er vast ook dol op zijn!</string>
     <string name="files_plus_prompt">Upload je bestanden met Pocket Casts Plus, en meer</string>
     <string name="icons_plus_prompt">Krijg exclusief toegang tot app-iconen met Pocket Casts Plus, en meer</string>
     <string name="themes_plus_prompt">Krijg exclusief toegang tot themas met Pocket Casts Plus, en meer</string>
@@ -71,8 +77,7 @@ Language: nl
     <string name="profile_cloud_add_invalid_file">Het geselecteerde bestand kon niet geladen worden. Probeer het later opnieuw of kies een ander bestand.</string>
     <string name="error_generic_message">Er is iets fout gegaan. Probeer het later opnieuw.</string>
     <string name="player_sleep_timer_settings">Instellingen slaaptimer</string>
-    <string name="referrals_share_text">Hallo! Gebruik de onderstaande link om je gastenpas van %1$s voor Pocket Casts Plus te claimen en op al je devices naar podcasts te luisteren!</string>
-    <string name="referrals_share_subject">Gastenpas van %1$s voor Pocket Casts</string>
+    <string name="referrals_share_subject">%1$s Gastenpas voor Pocket Casts Plus!</string>
     <string name="referrals_invalid_offer_title">Deze aanbieding is niet geldig</string>
     <string name="referrals_invalid_offer_description">Deze gastenpas kan eenmalig worden ingewisseld en is beschikbaar voor iedereen zonder een actief Plus- of Patron-abonnement. Bedankt voor het luisteren!</string>
     <string name="referrals_claim_guest_pass_title">Claim je gastenpas van %1$s voor Plus</string>
@@ -113,8 +118,6 @@ Language: nl
     <string name="paywall_layout_reviews_title">\"Simpelweg de beste manier om naar podcasts te luisteren\"</string>
     <string name="onboarding_plus_feature_dream_with_slumber_studios">&lt;a href=\"https://slumberstudios.com/\"&gt;Droom met content van Slumber Studios&lt;/a&gt;</string>
     <string name="gift">Cadeau</string>
-    <string name="share_whats_new_message">Je kan nu clips van je favoriete stukjes uit een aflevering delen. We hebben het ook eenvoudiger gemaakt om content te delen op elke socialmedia-app.</string>
-    <string name="share_whats_new_title">Nu mogelijk: clips delen!</string>
     <string name="got_it">Duidelijk</string>
     <string name="transcript_search">Transcriptie zoeken</string>
     <string name="transcript_close">Transcriptie sluiten</string>
@@ -1673,8 +1676,6 @@ Language: nl
     <string name="player_sleep_timer">Slaaptimer</string>
     <string name="player_sleep_timer_title">Slaaptimer</string>
     <string name="player_sleep_end_of_episode">Einde van de aflevering</string>
-    <string name="player_sleep_custom_plus">Custom plus</string>
-    <string name="player_sleep_custom_minus">Custom minus</string>
     <string name="player_sleep_cancel_timer">Timer annuleren</string>
     <string name="player_sleep_add_5_minutes">+ 5 minuten</string>
     <string name="player_sleep_60_minutes">60 minuten</string>
@@ -1838,6 +1839,10 @@ Language: nl
     <string name="unarchive">Dearchiveren</string>
     <string name="archive">Archiveren</string>
     <string name="add_to_up_next">Toevoegen aan Hierna</string>
+    <plurals name="chapter">
+        <item quantity="one">hoofdstuk</item>
+        <item quantity="other">hoofdstukken</item>
+    </plurals>
     <plurals name="day">
         <item quantity="one">dag</item>
         <item quantity="other">dagen</item>
@@ -1858,6 +1863,10 @@ Language: nl
         <item quantity="one" formatted="true">%1$d aflevering - nog %2$s</item>
         <item quantity="other" formatted="true">%1$d afleveringen - nog %2$s</item>
     </plurals>
+    <plurals name="podcast">
+        <item quantity="one">Podcast</item>
+        <item quantity="other">Podcasts</item>
+    </plurals>
     <plurals name="podcast_share_end_handle_description">
         <item quantity="one">Handle einde clip: %d seconde</item>
         <item quantity="other">Handle einde clip: %d seconden</item>
@@ -1865,6 +1874,38 @@ Language: nl
     <plurals name="podcast_share_start_handle_description">
         <item quantity="one">Handle begin clip: %d seconde</item>
         <item quantity="other">Handle begin clip: %d seconden</item>
+    </plurals>
+    <plurals name="profile_stats_day_listened">
+        <item quantity="one">Dag geluisterd</item>
+        <item quantity="other">Dagen geluisterd</item>
+    </plurals>
+    <plurals name="profile_stats_day_saved">
+        <item quantity="one">Dag opgeslagen</item>
+        <item quantity="other">Dagen opgeslagen</item>
+    </plurals>
+    <plurals name="profile_stats_hour_listened">
+        <item quantity="one">Uur geluisterd</item>
+        <item quantity="other">Uren geluisterd</item>
+    </plurals>
+    <plurals name="profile_stats_hour_saved">
+        <item quantity="one">Uur opgeslagen</item>
+        <item quantity="other">Uren opgeslagen</item>
+    </plurals>
+    <plurals name="profile_stats_minute_listened">
+        <item quantity="one">Minuut geluisterd</item>
+        <item quantity="other">Minuten geluisterd</item>
+    </plurals>
+    <plurals name="profile_stats_minute_saved">
+        <item quantity="one">Minuut opgeslagen</item>
+        <item quantity="other">Minuten opgeslagen</item>
+    </plurals>
+    <plurals name="profile_stats_second_listened">
+        <item quantity="one">Seconde geluisterd</item>
+        <item quantity="other">Seconden geluisterd</item>
+    </plurals>
+    <plurals name="profile_stats_second_saved">
+        <item quantity="one">Seconde opgeslagen</item>
+        <item quantity="other">Seconden opgeslagen</item>
     </plurals>
     <plurals name="second">
         <item quantity="one">seconde</item>

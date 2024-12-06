@@ -1,11 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-11-21 23:38:20+0000
+Translation-Revision-Date: 2024-12-05 23:54:14+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: ca
 -->
 <resources>
+    <string name="number_stepper_minus_content_description">Menys</string>
+    <string name="number_stepper_plus_content_description">Més</string>
+    <string name="player_sleep_episode_plus">Augmentar el nombre d\'episodis</string>
+    <string name="player_sleep_episode_minus">Disminueix el nombre d\'episodis</string>
+    <string name="player_sleep_chapter_plus">Augmentar el nombre de capítols</string>
+    <string name="player_sleep_chapter_minus">Disminueix el nombre de capítols</string>
+    <string name="player_sleep_custom_plus">Augmentar la durada personalitzada</string>
+    <string name="player_sleep_custom_minus">Disminueix la durada personalitzada</string>
+    <string name="plus_subscription_finished">Subscripció finalitzada</string>
+    <string name="shuffle_whats_new_message">Reprodueix fàcilment un episodi aleatori sense canviar l\'ordre de la cua.</string>
+    <string name="shuffle_whats_new_title">Presentem la reproducció aleatòria</string>
+    <string name="chapter_time_remaining_content_description">%s queden al capítol</string>
+    <string name="chapter_count_summary">%1$d de %2$d</string>
+    <string name="referrals_share_text">Ep!\n\nAquí tens  %1$s  invitacions per a Pocket Casts Plus, el meu reproductor de pòdcasts favorit. Està ple de funcions úniques com ara marcadors, carpetes i més, que no trobaràs enlloc més. Crec que també t\'encantarà!</string>
     <string name="files_plus_prompt">Carrega els teus arxius amb Pocket Casts Plus, i més</string>
     <string name="icons_plus_prompt">Aconsegueix icones de l\'app exclusives amb Pocket Casts Plus, i més</string>
     <string name="themes_plus_prompt">Aconsegueix temes exclusius amb Pocket Casts Plus, i més</string>
@@ -71,7 +85,6 @@ Language: ca
     <string name="profile_cloud_add_invalid_file">No es pot carregar el fitxer seleccionat. Torna-ho a intentar o tria un fitxer diferent.</string>
     <string name="error_generic_message">Alguna cosa ha anat malament. Torneu-ho a provar més tard.</string>
     <string name="player_sleep_timer_settings">Configuració del temporitzador de son</string>
-    <string name="referrals_share_text">Ei! Utilitza l\'enllaç a continuació per reclamar el teu %1$s accés de convidat per a Pocket Casts Plus i gaudeix de pòdcasts a tots els teus dispositius!</string>
     <string name="referrals_share_subject">%1$s accés de convidat a Pocket Casts</string>
     <string name="referrals_invalid_offer_title">Aquesta oferta no està disponible</string>
     <string name="referrals_invalid_offer_description">La invitació només es bescanviar una vegada i està disponible per a aquells sense una subscripció Plus o Patron activa. Gràcies per escoltar!</string>
@@ -113,8 +126,6 @@ Language: ca
     <string name="paywall_layout_reviews_title">Simplement la millor manera d\'escoltar pòdcasts</string>
     <string name="onboarding_plus_feature_dream_with_slumber_studios">&lt;a href=\"https://slumberstudios.com/\"&gt;Somnia amb el contingut de Slumber Studios&lt;/a&gt;</string>
     <string name="gift">Regal</string>
-    <string name="share_whats_new_message">Ja pots compartir clips dels teus moments preferits de qualsevol episodi. També hem facilitat compartir qualsevol contingut a totes les aplicacions de xarxes socials.</string>
-    <string name="share_whats_new_title">Ja pots compartir clips!</string>
     <string name="got_it">Som-hi</string>
     <string name="transcript_search">Cercar transcripció</string>
     <string name="transcript_close">Tancar la transcripció</string>
@@ -1673,8 +1684,6 @@ Language: ca
     <string name="player_sleep_timer">Temporitzador</string>
     <string name="player_sleep_timer_title">Temporitzador</string>
     <string name="player_sleep_end_of_episode">Final de l\'episodi</string>
-    <string name="player_sleep_custom_plus">Augmentar temps</string>
-    <string name="player_sleep_custom_minus">Reduir temps</string>
     <string name="player_sleep_cancel_timer">Cancel·lar el temporitzador</string>
     <string name="player_sleep_add_5_minutes">+ 5 minuts</string>
     <string name="player_sleep_60_minutes">60 minuts</string>
@@ -1838,6 +1847,10 @@ Language: ca
     <string name="unarchive">Desarxivar</string>
     <string name="archive">Arxivar</string>
     <string name="add_to_up_next">Afegir a la llista \'Tot seguit\'</string>
+    <plurals name="chapter">
+        <item quantity="one">capítol</item>
+        <item quantity="other">capítols</item>
+    </plurals>
     <plurals name="day">
         <item quantity="one">dia</item>
         <item quantity="other">dies</item>
@@ -1858,6 +1871,10 @@ Language: ca
         <item quantity="one" formatted="true">%1$d episodi - queden %2$s</item>
         <item quantity="other" formatted="true">%1$d episodis - queden %2$s</item>
     </plurals>
+    <plurals name="podcast">
+        <item quantity="one">Pòdcast</item>
+        <item quantity="other">Pòdcasts</item>
+    </plurals>
     <plurals name="podcast_share_end_handle_description">
         <item quantity="one">Control del clip final: %d segon</item>
         <item quantity="other">Control del clip final: %d segons</item>
@@ -1865,6 +1882,38 @@ Language: ca
     <plurals name="podcast_share_start_handle_description">
         <item quantity="one">Control del clip inicial: %d segon</item>
         <item quantity="other">Control del clip inicial: %d segons</item>
+    </plurals>
+    <plurals name="profile_stats_day_listened">
+        <item quantity="one">Dia escoltat</item>
+        <item quantity="other">Dies escoltats</item>
+    </plurals>
+    <plurals name="profile_stats_day_saved">
+        <item quantity="one">Dia estalviat</item>
+        <item quantity="other">Dies estalviats</item>
+    </plurals>
+    <plurals name="profile_stats_hour_listened">
+        <item quantity="one">Hora escoltada</item>
+        <item quantity="other">Hores escoltades</item>
+    </plurals>
+    <plurals name="profile_stats_hour_saved">
+        <item quantity="one">Hora estalviada</item>
+        <item quantity="other">Hores estalviades</item>
+    </plurals>
+    <plurals name="profile_stats_minute_listened">
+        <item quantity="one">Minut escoltat</item>
+        <item quantity="other">Minuts escoltats</item>
+    </plurals>
+    <plurals name="profile_stats_minute_saved">
+        <item quantity="one">Minut estalviat</item>
+        <item quantity="other">Minuts estalviats</item>
+    </plurals>
+    <plurals name="profile_stats_second_listened">
+        <item quantity="one">Segon escoltat</item>
+        <item quantity="other">Segons escoltats</item>
+    </plurals>
+    <plurals name="profile_stats_second_saved">
+        <item quantity="one">Segon estalviat</item>
+        <item quantity="other">Segons estalviats</item>
     </plurals>
     <plurals name="second">
         <item quantity="one">segon</item>

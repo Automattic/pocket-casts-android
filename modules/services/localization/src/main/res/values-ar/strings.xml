@@ -584,13 +584,13 @@ Language: ar
     <string name="settings_status_service_support_summary">يمكنك الوصول إلى دعم الأسئلة المتداولة والاتصال بنا.</string>
     <string name="settings_status_service_support">الدعم</string>
     <string name="settings_status_service_hosts_summary">يستضيف مؤلفو البث الصوتي ملفات الحلقات في مزوِّدي استضافة متنوعين غير خاضعين لإدارة Pocket Casts.</string>
-    <string name="settings_status_service_hosts_help">يتمثَّل السبب الأكثر شيوعًا في أن لديك مانع إعلانات تم تكوينه على هاتفك أو شبكتك. سيتعيَّن عليك فتح هذا النطاق لتنزيل البث الصوتي. يرجى ملاحظة أن Pocket Casts لا يقوم بالاستضافة أو يختار مكان استضافة البث الصوتي، ويرجع هذا الأمر إلى مؤلف العرض وهو خارج عن سيطرتنا.</string>
     <string name="settings_status_service_hosts">مضيفو البث الصوتي الشائعون</string>
     <string name="settings_status_service_ad_blocker_help_plural">يتمثَّل السبب الأكثر شيوعًا في أن لديك مانع إعلانات تم تكوينه على هاتفك أو شبكتك. سيتعيَّن عليك فتح النطاقات %s</string>
     <string name="settings_status_service_ad_blocker_help_singular">يتمثَّل السبب الأكثر شيوعًا في أن لديك مانع إعلانات تم تكوينه على هاتفك أو شبكتك. سيتعيَّن عليك فتح النطاق %s</string>
     <string name="settings_status_service_discover_summary">قسم الاكتشاف في التطبيق، بما في ذلك البحث عن بث صوتي.</string>
     <string name="settings_status_service_discover">الاكتشاف والبحث</string>
     <string name="settings_status_service_account">خدمة الحساب</string>
+    <string name="settings_status_service_hosts_help">يتمثَّل السبب الأكثر شيوعًا في أن لديك مانع إعلانات تم تكوينه على هاتفك أو شبكتك. سيتعيَّن عليك فتح هذا النطاق لتنزيل البث الصوتي. يرجى ملاحظة أن Pocket Casts لا يقوم بالاستضافة أو يختار مكان استضافة البث الصوتي، ويرجع هذا الأمر إلى مؤلف العرض وهو خارج عن سيطرتنا.</string>
     <string name="settings_status_service_refresh_summary">الخدمة المُستخدمة للعثور على حلقات جديدة.</string>
     <string name="settings_status_service_refresh">تحديث الخدمة</string>
     <string name="settings_status_service_internet_help">يتعذر الاتصال بالإنترنت. حاول الاتصال على شبكة مختلفة (على سبيل المثال، بيانات هاتف).</string>
@@ -949,10 +949,10 @@ Language: ar
     <string name="profile_navigation_listening_history">تاريخ الاستماع</string>
     <string name="profile_navigation_files">الملفات</string>
     <string name="profile_monthly">شهريًا</string>
-    <string name="profile_license_agreement">يُقدِّر Pocket Casts خصوصيتك. توضِّح سياسة الخصوصية هذه المعلومات التي نجمعها عنك والسبب وراء هذا، وما قد نفعله بتلك المعلومات وكيف نتعامل معها. تنطبق على تطبيقات Pocket Casts لنظام تشغيل iOS وAndroid وخدمة الويب Pocket Casts مع تطبيقات نظام تشغيل macOS وWindows المرتبطة (الخدمة مشتركة ومنفردة). باستخدام الخدمة، يعني أنك توافق على سياسة الخصوصية هذه. إذا قمت بتشغيل التنبيهات المنبثقة في التطبيق، فسنقوم بتخزين رمز الدفع المميز الذي توفره لنا Apple لتوصيل التنبيهات المنبثقة إلى جهازك. إذا اشتريت تطبيق الويب، فسنقوم بتخزين مُعرِّف المعاملة الخاصة بعملية الشراء الخاصة بك. إذا اخترت عدم إنشاء حساب ولم تستخدم التنبيهات المنبثقة، فلن يتم تخزين أي بيانات حولك على خوادمنا. تستخدم كذلك خدمة الويب Pocket Casts الكوكيز والتقنيات المشابهة للحفاظ على تسجيل دخولك. إذا اخترت إنشاء طلب دعم من داخل الخدمة، فقد نقوم بإنشاء مرفق يحتوي على بيانات إضافية للمساعدة على معالجة طلب الدعم الخاص بك الذي يرحب بك لعرضه قبل الإرسال.</string>
     <string name="profile_last_refresh">آخر تحديث: منذ %s</string>
     <string name="profile_joined">تم الانضمام:</string>
     <string name="profile_get_plus">قم بتنزيل Pocket Casts Plus لفتح هذه الميزة، بالإضافة إلى المزيد!</string>
+    <string name="profile_license_agreement">يُقدِّر Pocket Casts خصوصيتك. توضِّح سياسة الخصوصية هذه المعلومات التي نجمعها عنك والسبب وراء هذا، وما قد نفعله بتلك المعلومات وكيف نتعامل معها. تنطبق على تطبيقات Pocket Casts لنظام تشغيل iOS وAndroid وخدمة الويب Pocket Casts مع تطبيقات نظام تشغيل macOS وWindows المرتبطة (الخدمة مشتركة ومنفردة). باستخدام الخدمة، يعني أنك توافق على سياسة الخصوصية هذه. إذا قمت بتشغيل التنبيهات المنبثقة في التطبيق، فسنقوم بتخزين رمز الدفع المميز الذي توفره لنا Apple لتوصيل التنبيهات المنبثقة إلى جهازك. إذا اشتريت تطبيق الويب، فسنقوم بتخزين مُعرِّف المعاملة الخاصة بعملية الشراء الخاصة بك. إذا اخترت عدم إنشاء حساب ولم تستخدم التنبيهات المنبثقة، فلن يتم تخزين أي بيانات حولك على خوادمنا. تستخدم كذلك خدمة الويب Pocket Casts الكوكيز والتقنيات المشابهة للحفاظ على تسجيل دخولك. إذا اخترت إنشاء طلب دعم من داخل الخدمة، فقد نقوم بإنشاء مرفق يحتوي على بيانات إضافية للمساعدة على معالجة طلب الدعم الخاص بك الذي يرحب بك لعرضه قبل الإرسال.</string>
     <string name="profile_free_account">حساب مجاني</string>
     <string name="profile_forgot_your_password">نسيتُ كلمة المرور الخاصة بي</string>
     <string name="profile_files_remove_image">استبدال صورة</string>
@@ -1306,8 +1306,6 @@ Language: ar
     <string name="player_sleep_timer">مؤقت الإيقاف</string>
     <string name="player_sleep_timer_title">مؤقت الإيقاف</string>
     <string name="player_sleep_end_of_episode">نهاية الحلقة</string>
-    <string name="player_sleep_custom_plus">تزويد مخصص</string>
-    <string name="player_sleep_custom_minus">تقليل مخصص</string>
     <string name="player_sleep_cancel_timer">إلغاء المؤقت</string>
     <string name="player_sleep_add_5_minutes">أكثر من 5 دقائق</string>
     <string name="player_sleep_60_minutes">60 دقيقة</string>
