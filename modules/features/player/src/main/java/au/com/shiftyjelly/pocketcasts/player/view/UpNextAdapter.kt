@@ -37,6 +37,7 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
+import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
@@ -51,6 +52,7 @@ import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.SimpleColorFilter
 import com.airbnb.lottie.model.KeyPath
 import com.airbnb.lottie.value.LottieValueCallback
+import com.google.android.material.snackbar.Snackbar
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -192,6 +194,12 @@ class UpNextAdapter(
                     if (isSignedInAsPaidUser) {
                         val newValue = !settings.upNextShuffle.value
                         analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHUFFLE_ENABLED, mapOf("value" to newValue, SOURCE_KEY to upNextSource.analyticsValue))
+
+                        if (newValue) {
+                            (root.context.getActivity() as? FragmentHostListener)?.snackBarView()?.let { snackBarView ->
+                                Snackbar.make(snackBarView, root.resources.getString(LR.string.up_next_shuffle_enable_confirmation_message), Snackbar.LENGTH_LONG).show()
+                            }
+                        }
 
                         settings.upNextShuffle.set(newValue, updateModifiedAt = false)
                     } else {

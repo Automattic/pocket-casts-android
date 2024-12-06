@@ -2256,5 +2256,6 @@
     <!-- Up Next Shuffle -->
     <string name="up_next_shuffle_button_content_description">Up next shuffle</string>
     <string name="up_next_shuffle_disable_button_content_description">Up next shuffle disable</string>
+    <string name="up_next_shuffle_enable_confirmation_message">Shuffle is on. Episodes will play in random order.</string>
 
 </resources>
