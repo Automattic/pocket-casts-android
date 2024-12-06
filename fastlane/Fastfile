@@ -69,6 +69,15 @@ APPS_WEAR = 'wear'
 APPS = [APPS_APP, APPS_AUTOMOTIVE, APPS_WEAR].freeze
 
 UPLOAD_TO_PLAY_STORE_JSON_KEY = File.join(PROJECT_ROOT_FOLDER, 'google-upload-credentials.json')
+UPLOAD_TO_PLAY_STORE_COMMON_OPTIONS = {
+  package_name: APP_PACKAGE_NAME,
+  skip_upload_apk: true,
+  skip_upload_metadata: true,
+  skip_upload_changelogs: true,
+  skip_upload_images: true,
+  skip_upload_screenshots: true,
+  json_key: UPLOAD_TO_PLAY_STORE_JSON_KEY
+}.freeze
 
 before_all do |_lane|
   # Ensure we use the latest version of the toolkit
@@ -82,7 +91,9 @@ before_all do |_lane|
 end
 
 platform :android do
-  lane :code_freeze do |options|
+  # @param skip_confirm [Boolean] If true, avoids any interactive prompt
+  #
+  lane :code_freeze do |skip_confirm: false|
     ensure_git_status_clean
     Fastlane::Helper::GitHelper.checkout_and_pull(DEFAULT_BRANCH)
     ensure_git_branch(branch: DEFAULT_BRANCH)
@@ -97,9 +108,7 @@ platform :android do
     MESSAGE
 
     UI.important(confirmation_message)
-    unless options[:skip_confirm] || UI.confirm('Do you want to continue?')
-      UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.")
-    end
+    UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.") unless skip_confirm || UI.confirm('Do you want to continue?')
 
     # Create the release branch
     UI.message('Creating release branch...')
@@ -139,12 +148,13 @@ platform :android do
     set_milestone_frozen_marker(repository: GH_REPOSITORY, milestone: new_version)
   end
 
-  # @option [String] base_version The "x.y" version number to create a beta from. Defaults to the current version as defined in the version file of `main` branch
-  # @option [Integer] version_code The versionCode to use for the new beta. Defaults to one more than the versionCode defined in the version file of the `release/<base_version>` branch
-  lane :new_beta_release do |options|
+  # @param base_version [String] The "x.y" version number to create a beta from. Defaults to the current version as defined in the version file of `main` branch
+  # @param version_code [Integer] The versionCode to use for the new beta. Defaults to one more than the versionCode defined in the version file of the `release/<base_version>` branch
+  # @param skip_confirm [Boolean] If true, avoids any interactive prompt
+  #
+  lane :new_beta_release do |base_version: nil, version_code: nil, skip_confirm: false|
     ensure_git_status_clean
 
-    base_version = options[:base_version]
     if base_version.nil?
       # If no base_version provided, read it from the version file from `main`
       Fastlane::Helper::GitHelper.checkout_and_pull(DEFAULT_BRANCH)
@@ -158,27 +168,26 @@ platform :android do
     UI.user_error!("Release branch for version #{base_version} doesn't exist.") unless checkout_success
 
     # Check versions
+    version_code ||= build_code_next # Only compute this version_code fallback _after_ the checkout of the release branch
     message = <<-MESSAGE
 
       Current beta version: #{beta_version_current}
       New beta version: #{beta_version_next}
 
       Current build code: #{build_code_current}
-      New build code: #{options[:version_code] || build_code_next}
+      New build code: #{version_code}
 
     MESSAGE
 
     UI.important(message)
-    unless options[:skip_confirm] || UI.confirm('Do you want to continue?')
-      UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.")
-    end
+    UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.") unless skip_confirm || UI.confirm('Do you want to continue?')
 
     # Bump the release version and build code
     UI.message('Bumping beta version and build code...')
     ensure_git_branch(branch: '^release/') # Match branch names that begin with `release/`
     VERSION_FILE.write_version(
       version_name: beta_version_next,
-      version_code: options[:version_code] || build_code_next
+      version_code: version_code
     )
     commit_version_bump
     UI.success("Done! New Beta Version: #{beta_version_current}. New Build Code: #{build_code_current}")
@@ -194,14 +203,15 @@ platform :android do
   # - Cuts a new `release/x.y.z` branch from the tag from the latest (`x.y`) version
   # - Bumps the app version numbers appropriately
   #
-  # @option [Boolean] skip_confirm (default: false) If true, avoids any interactive prompt
-  # @option [String] version_name (required) The version name to use for the hotfix (`"x.y.z"`)
-  # @option [String] version_code (required) The version code to use for the hotfix (`"x.y.z"`)
+  # @param version_name [String] The version name to use for the hotfix (`"x.y.z"`)
+  # @param version_code [String] The version code to use for the hotfix (`"x.y.z"`)
+  # @param skip_confirm [Boolean] If true, avoids any interactive prompt
   #
-  # Note that the version_code needs to be higher than any of the existing version_codes in Play Store
-  lane :new_hotfix_release do |options|
-    new_version = options[:version_name] || UI.input('Version number for the new hotfix?')
-    new_version_code = options[:version_code] || UI.input('Version code for the new hotfix?')
+  # @note the version_code needs to be higher than any of the existing version_codes in Play Store
+  #
+  lane :new_hotfix_release do |version_name: nil, version_code: nil, skip_confirm: false|
+    new_version = version_name || UI.input('Version number for the new hotfix?')
+    new_version_code = version_code || UI.input('Version code for the new hotfix?')
 
     ensure_git_status_clean
 
@@ -222,9 +232,7 @@ platform :android do
     MESSAGE
 
     UI.important(message)
-    unless options[:skip_confirm] || UI.confirm('Do you want to continue?')
-      UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.")
-    end
+    UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.") unless skip_confirm || UI.confirm('Do you want to continue?')
 
     # Check tags
     UI.user_error!("The version `#{new_version}` tag already exists!") if git_tag_exists(tag: new_version)
@@ -245,53 +253,53 @@ platform :android do
     UI.success("Done! New Release Version: #{release_version_current}. New Build Code: #{build_code_current}")
   end
 
-  lane :finalize_hotfix_release do |options|
+  # @param skip_confirm [Boolean] If true, avoids any interactive prompt
+  #
+  lane :finalize_hotfix_release do |skip_confirm: false|
     ensure_git_branch(branch: '^release/') # Match branch names that begin with `release/`
     ensure_git_status_clean
 
     version = release_version_current
 
     UI.important("Triggering hotfix build for version: #{version}")
-    unless options[:skip_confirm] || UI.confirm('Do you want to continue?')
-      UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.")
-    end
+    UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.") unless skip_confirm || UI.confirm('Do you want to continue?')
 
     trigger_release_build(branch_to_build: "release/#{version}")
     create_backmerge_pr
   end
 
-  # @param [String] branch_to_build (default: current git branch) The branch to build
-  lane :trigger_release_build do |options|
+  # @param branch_to_build [String] The branch to build. Defaults to the current git branch.
+  #
+  lane :trigger_release_build do |branch_to_build: git_branch|
     buildkite_trigger_build(
       buildkite_organization: 'automattic',
       buildkite_pipeline: 'pocket-casts-android',
-      branch: options[:branch_to_build] || git_branch,
+      branch: branch_to_build,
       pipeline_file: 'release-builds.yml'
     )
   end
 
+  # Builds and uploads a new build to Google Play (without releasing it)
+  #
   # - Uses the current version to decide if this is a beta or production build
   # - Builds the apps for external distribution
   # - Uploads the builds to 'beta' or 'production' Play Store channel (but does not release it)
   # - Creates draft Github release
   #
-  # @option [Boolean] skip_confirm (default: false) If true, avoids any interactive prompt
-  # @option [Boolean] skip_prechecks (default: false) If true, skips android_build_preflight
-  # @option [Boolean] create_gh_release (default: false) If true, creates a draft GitHub release
+  # @param skip_confirm [Boolean] If true, avoids any interactive prompt
+  # @param skip_prechecks [Boolean] If true, skips android_build_preflight
+  # @param create_gh_release [Boolean] If true, creates a draft GitHub release
   #
-  desc 'Builds and uploads a new build to Google Play (without releasing it)'
-  lane :build_and_upload_to_play_store do |options|
+  lane :build_and_upload_to_play_store do |skip_prechecks: false, skip_confirm: false, create_gh_release: false|
     version = version_name_current
     build_code = build_code_current
     is_beta = beta_version?(version)
-    unless options[:skip_prechecks]
+    unless skip_prechecks
       # Match branch names that begin with `release/`
       ensure_git_branch(branch: '^release/') unless is_ci
 
       UI.important("Building version #{version_name_current} (#{build_code_current}) for upload to Google Play Console")
-      unless options[:skip_confirm] || UI.confirm('Do you want to continue?')
-        UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.")
-      end
+      UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.") unless skip_confirm || UI.confirm('Do you want to continue?')
 
       # Check local repo status
       ensure_git_status_clean unless is_ci
@@ -307,51 +315,70 @@ platform :android do
       aab_artifact_path = aab_artifact_path(app, version)
       UI.error("Unable to find a build artifact at #{aab_artifact_path}") unless File.exist? aab_artifact_path
 
-      track = case app
-              when APPS_AUTOMOTIVE
-                is_beta ? PLAY_STORE_TRACK_AUTOMOTIVE_BETA : PLAY_STORE_TRACK_AUTOMOTIVE_PRODUCTION
-              when APPS_WEAR
-                is_beta ? PLAY_STORE_TRACK_WEAR_BETA : PLAY_STORE_TRACK_WEAR_PRODUCTION
-              else
-                is_beta ? PLAY_STORE_TRACK_BETA : PLAY_STORE_TRACK_PRODUCTION
-              end
-
+      track = play_store_track(app: app, is_beta: is_beta)
       upload_to_play_store(
-        package_name: APP_PACKAGE_NAME,
+        **UPLOAD_TO_PLAY_STORE_COMMON_OPTIONS,
         aab: aab_artifact_path,
         track: track,
-        release_status: 'draft',
-        skip_upload_apk: true,
-        skip_upload_metadata: true,
-        skip_upload_changelogs: true,
-        skip_upload_images: true,
-        skip_upload_screenshots: true,
-        json_key: UPLOAD_TO_PLAY_STORE_JSON_KEY
+        release_status: 'draft'
       )
       release_assets << aab_artifact_path
 
       signed_apk_artifact_path = signed_apk_artifact_path(app, version)
       download_universal_apk_from_google_play(
         package_name: APP_PACKAGE_NAME,
-        version_code: version_code_for_app(build_code, app),
+        version_code: version_code_for_app(app: app, version_code: build_code),
         destination: signed_apk_artifact_path,
         json_key: UPLOAD_TO_PLAY_STORE_JSON_KEY
       )
       release_assets << signed_apk_artifact_path
     end
 
-    create_gh_release(version: version, prerelease: is_beta, release_assets: release_assets.compact) if options[:create_gh_release]
+    create_gh_release(version: version, prerelease: is_beta, release_assets: release_assets.compact) if create_gh_release
   end
 
-  lane :finalize_release do |options|
+  # Update the rollout of all 3 variants (app, automotive, wear) of the current version to the given value
+  #
+  # @param percent [Float] The rollout percentage, between 0 and 1
+  #
+  lane :update_rollouts do |percent:|
+    version = version_name_current
+    build_code = build_code_current
+    is_beta = beta_version?(version)
+
+    not_found_variants = []
+    APPS.each do |app|
+      track = play_store_track(app: app, is_beta: is_beta)
+      version_code = version_code_for_app(app: app, version_code: build_code)
+      upload_to_play_store(
+        **UPLOAD_TO_PLAY_STORE_COMMON_OPTIONS,
+        skip_upload_aab: true,
+        track: track,
+        version_code: version_code,
+        release_status: percent.to_f < 1.0 ? 'inProgress' : 'completed',
+        rollout: percent.to_s
+      )
+    rescue FastlaneCore::Interface::FastlaneError => e
+      raise unless e.message =~ /Unable to find the requested release on track/
+
+      not_found_variants << app
+    end
+
+    not_found_variants.each do |app|
+      UI.important("'#{app}' variant for `#{version}` was not found in Google Play Console")
+    end
+    UI.user_error!('None of the 3 app variants were found in Google Play Console. We expected at least one') if not_found_variants.count == APPS.count
+  end
+
+  # @param skip_confirm [Boolean] If true, avoids any interactive prompt
+  #
+  lane :finalize_release do |skip_confirm: false|
     UI.user_error!('Please use `finalize_hotfix_release` lane for hotfixes') if release_is_hotfix?
     ensure_git_branch(branch: '^release/') # Match branch names that begin with `release/`
     ensure_git_status_clean
 
     UI.important("Finalizing release: #{release_version_current}")
-    unless options[:skip_confirm] || UI.confirm('Do you want to continue?')
-      UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.")
-    end
+    UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.") unless skip_confirm || UI.confirm('Do you want to continue?')
 
     configure_apply(force: is_ci)
 
@@ -385,14 +412,12 @@ platform :android do
     create_backmerge_pr
   end
 
-  # @param [String] version The version to create
-  # @param [String] build_code The build code to create
-  # @param [String] app The Android app to build (i.e 'app', 'automotive', or 'wear')
-  desc 'Builds and bundles the given app'
-  lane :build_bundle do |options|
-    version = options[:version]
-    build_code = options[:build_code]
-    app = options[:app]
+  # Builds and bundles the given app
+  #
+  # @param version [String] The version to create
+  # @param build_code [String] The build code to create
+  # @param app [String] The Android app to build (i.e 'app', 'automotive', or 'wear')
+  lane :build_bundle do |version:, build_code:, app:|
     aab_artifact_path = aab_artifact_path(app, version)
     build_dir = 'artifacts/'
 
@@ -415,9 +440,9 @@ platform :android do
     end
   end
 
-  # Run instrumented tests in Google Firebase Test Lab
-  desc 'Build the application and instrumented tests, then run the tests in Firebase Test Lab'
-  lane :build_and_instrumented_test do |_options|
+  # Build the application and instrumented tests, then run the tests in Firebase Test Lab
+  #
+  lane :build_and_instrumented_test do
     gradle(tasks: %w[assembleDebug assembleDebugAndroidTest])
 
     # Run the instrumented tests in Firebase Test Lab
@@ -438,7 +463,8 @@ platform :android do
     )
   end
 
-  desc 'Builds a prototype build and uploads it to S3'
+  # Builds a prototype build and uploads it to S3
+  #
   lane :build_and_upload_prototype_build do
     UI.user_error!("'BUILDKITE_ARTIFACTS_S3_BUCKET' must be defined as an environment variable.") unless ENV['BUILDKITE_ARTIFACTS_S3_BUCKET']
 
@@ -519,8 +545,8 @@ platform :android do
 
   # Creates a new GitHub Release for the given version
   #
-  # @param [Hash<String>] version The version to create. Expects keys "name" and "code"
-  # @param [Bool] prerelease If true, the GitHub Release will have the prerelease flag
+  # @param version [Hash<String>] The version to create. Expects keys "name" and "code"
+  # @param prerelease [Bool] If true, the GitHub Release will have the prerelease flag
   #
   private_lane :create_gh_release do |version:, prerelease: false, release_assets: []|
     create_github_release(
@@ -670,14 +696,31 @@ platform :android do
   #
   # See also `dependencies.gradle.kts` and its `versionCodeDifferenceBetweenAppAnd*` constants where those offsets are defined
   #
-  def version_code_for_app(build_code, app)
+  def version_code_for_app(app:, version_code:)
     case app
     when APPS_AUTOMOTIVE
-      (build_code.to_i + 50_000).to_s
+      (version_code.to_i + 50_000).to_s
     when APPS_WEAR
-      (build_code.to_i + 100_000).to_s
+      (version_code.to_i + 100_000).to_s
     else
-      build_code
+      version_code
+    end
+  end
+
+  # Returns the Play Store track for a given app, for Open Testing or Production
+  #
+  # @param app [String] The type of app. One of `APPS_APP`, `APPS_AUTOMOTIVE`, `APPS_WEAR`
+  # @param is_beta [Boolean] If we want the track for Open Testing. Otherwise, returns the track for Production
+  # @return [String] The Play Store track to use in the `upload_to_play_store(track: …)` action call
+  #
+  def play_store_track(app:, is_beta:)
+    case app
+    when APPS_AUTOMOTIVE
+      is_beta ? PLAY_STORE_TRACK_AUTOMOTIVE_BETA : PLAY_STORE_TRACK_AUTOMOTIVE_PRODUCTION
+    when APPS_WEAR
+      is_beta ? PLAY_STORE_TRACK_WEAR_BETA : PLAY_STORE_TRACK_WEAR_PRODUCTION
+    else
+      is_beta ? PLAY_STORE_TRACK_BETA : PLAY_STORE_TRACK_PRODUCTION
     end
   end
 end

@@ -336,6 +336,7 @@ interface Settings {
     val autoDownloadUnmeteredOnly: UserSetting<Boolean>
     val autoDownloadOnlyWhenCharging: UserSetting<Boolean>
     val autoDownloadUpNext: UserSetting<Boolean>
+    val autoDownloadOnFollowPodcast: UserSetting<Boolean>
     val autoDownloadNewEpisodes: UserSetting<Int>
 
     val artworkConfiguration: UserSetting<ArtworkConfiguration>

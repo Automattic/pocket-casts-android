@@ -569,6 +569,12 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
+    override val autoDownloadOnFollowPodcast = UserSetting.BoolPref(
+        sharedPrefKey = "autoDownloadOnFollowPodcast",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
+
     override val autoDownloadNewEpisodes = UserSetting.IntPref(
         sharedPrefKey = "globalAutoDownloadNewEpisodes",
         defaultValue = GLOBAL_AUTO_DOWNLOAD_NONE,

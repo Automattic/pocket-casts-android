@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-11-12 09:54:04+0000
+Translation-Revision-Date: 2024-12-03 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="plus_subscription_finished">サブスクリプションが終了しました</string>
+    <string name="shuffle_whats_new_message">キューの順序を変更せずに、ランダムなエピソードを簡単に再生できます。</string>
+    <string name="shuffle_whats_new_title">シャッフルの紹介</string>
+    <string name="chapter_time_remaining_content_description">チャプターの残り%s</string>
+    <string name="chapter_count_summary">%1$d/%2$d</string>
+    <string name="referrals_share_text">こんにちは。\n\nこちらは、私のお気に入りのポッドキャストプレイヤー、Pocket Casts Plus を利用できる%1$sのゲストパスです。 ブックマークやフォルダーなど、他にはないユニークな機能が満載です。 きっと気に入ってもらえると思います。</string>
     <string name="files_plus_prompt">Pocket Casts Plus でファイルのアップロードなどを利用しましょう</string>
     <string name="icons_plus_prompt">Pocket Casts Plus で専用アプリアイコンの取得などを利用しましょう</string>
     <string name="themes_plus_prompt">Pocket Casts Plus で専用テーマの取得などを利用しましょう</string>
@@ -71,8 +77,7 @@ Language: ja_JP
     <string name="profile_cloud_add_invalid_file">選択したファイルを読み込めません。 もう一度試すか、別のファイルを選択してください。</string>
     <string name="error_generic_message">問題が発生しました。 後でもう一度お試しください。</string>
     <string name="player_sleep_timer_settings">スリープタイマー設定</string>
-    <string name="referrals_share_text">こんにちは。 以下のリンクを使用して Pocket Casts Plus の%1$sのゲストパスを取得し、お使いの全端末でポッドキャストをお楽しみください !</string>
-    <string name="referrals_share_subject">Pocket Casts の%1$sのゲストパス</string>
+    <string name="referrals_share_subject">Pocket Casts Plus の%1$sのゲストパス !</string>
     <string name="referrals_invalid_offer_title">このオファーは利用できません</string>
     <string name="referrals_invalid_offer_description">このゲストパスは Plus または Patron のサブスクリプションがアクティブでないユーザーが対象で、1回に限りご利用いただけます。 お聴きいただきありがとうございます !</string>
     <string name="referrals_claim_guest_pass_title">%1$sのゲストパスを取得しましょう</string>
@@ -113,8 +118,6 @@ Language: ja_JP
     <string name="paywall_layout_reviews_title">「ポッドキャストを聴くのにまさに最適な方法」</string>
     <string name="onboarding_plus_feature_dream_with_slumber_studios">&lt;a href=\"https://slumberstudios.com/\"&gt;「Slumber Studios でぐっすり眠る」のコンテンツ&lt;/a&gt;</string>
     <string name="gift">ギフト</string>
-    <string name="share_whats_new_message">どのエピソードからでも、お気に入りの部分のクリップを共有できるようになりました。 また、すべてのソーシャルメディアアプリにコンテンツを簡単に共有できるようになりました。</string>
-    <string name="share_whats_new_title">クリップの共有が利用できるようになりました !</string>
     <string name="got_it">OK</string>
     <string name="transcript_search">トランスクリプトを検索</string>
     <string name="transcript_close">トランスクリプトを閉じる</string>
@@ -1673,8 +1676,6 @@ Language: ja_JP
     <string name="player_sleep_timer">スリープタイマー</string>
     <string name="player_sleep_timer_title">スリープタイマー</string>
     <string name="player_sleep_end_of_episode">エピソード終了時</string>
-    <string name="player_sleep_custom_plus">カスタムプラス</string>
-    <string name="player_sleep_custom_minus">カスタムマイナス</string>
     <string name="player_sleep_cancel_timer">タイマーをキャンセル</string>
     <string name="player_sleep_add_5_minutes">+ 5分</string>
     <string name="player_sleep_60_minutes">60分</string>
@@ -1838,6 +1839,9 @@ Language: ja_JP
     <string name="unarchive">アーカイブを解除</string>
     <string name="archive">アーカイブ</string>
     <string name="add_to_up_next">次のエピソードに追加</string>
+    <plurals name="chapter">
+        <item quantity="other">チャプター</item>
+    </plurals>
     <plurals name="day">
         <item quantity="other">日</item>
     </plurals>

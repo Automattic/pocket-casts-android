@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-11-12 15:54:03+0000
+Translation-Revision-Date: 2024-12-04 15:54:03+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="plus_subscription_finished">Подписка оформлена</string>
+    <string name="shuffle_whats_new_message">Воспроизводите любой выпуск, не меняя очередности в списке.</string>
+    <string name="shuffle_whats_new_title">Представляем режим случайного воспроизведения</string>
+    <string name="chapter_time_remaining_content_description">%s до конца главы</string>
+    <string name="chapter_count_summary">%1$d из %2$d</string>
+    <string name="referrals_share_text">Здравствуйте!\n\nЭто %1$s гостевой пропуск в Pocket Casts Plus — мой любимый плеер подкастов. В нём есть множество уникальных функций, которых больше нет нигде: закладки, папки и многое другое. Надеюсь, вам он тоже понравится!</string>
     <string name="files_plus_prompt">Загружайте свои файлы с Pocket Casts Plus и многое другое</string>
     <string name="icons_plus_prompt">Получайте эксклюзивные значки приложений с Pocket Casts Plus и многое другое</string>
     <string name="themes_plus_prompt">Получайте эксклюзивные темы с Pocket Casts Plus и многое другое</string>
@@ -71,8 +77,7 @@ Language: ru
     <string name="profile_cloud_add_invalid_file">Не удалось загрузить выбранный файл. Повторите попытку позже или выберите другой файл.</string>
     <string name="error_generic_message">Что-то пошло не так. Повторите попытку позже.</string>
     <string name="player_sleep_timer_settings">Настройки таймера сна</string>
-    <string name="referrals_share_text">Привет! По ссылке ниже лежит ваш гостевой пропуск в Pocket Casts Plus сроком на %1$s. Воспользуйтесь им и слушайте подкасты на любом из ваших устройств!</string>
-    <string name="referrals_share_subject">Гостевой пропуск Pocket Casts на %1$s</string>
+    <string name="referrals_share_subject">%1$s Гостевой пропуск Pocket Casts Plus!</string>
     <string name="referrals_invalid_offer_title">Это предложение недействительно</string>
     <string name="referrals_invalid_offer_description">Этим предложением могут воспользоваться только те, у кого нет подписки Plus или Patron, и только один раз. Благодарим за прослушивание!</string>
     <string name="referrals_claim_guest_pass_title">Получите бесплатный гостевой пропуск на %1$s</string>
@@ -113,8 +118,6 @@ Language: ru
     <string name="paywall_layout_reviews_title">«Просто это лучший способ слушать подкасты»</string>
     <string name="onboarding_plus_feature_dream_with_slumber_studios">&lt;a href=\"https://slumberstudios.com/\"&gt;Содержание: Slumber Studios — мы помогаем вам мечтать&lt;/a&gt;</string>
     <string name="gift">Подарок</string>
-    <string name="share_whats_new_message">Теперь вы можете публиковать клипы из ваших любимых фрагментов любого выпуска. Мы также упростили публикацию контента во всех социальных сетях.</string>
-    <string name="share_whats_new_title">Теперь можно делиться клипами!</string>
     <string name="got_it">Понятно</string>
     <string name="transcript_search">Поиск расшифровки</string>
     <string name="transcript_close">Закрыть расшифровку</string>
@@ -1673,8 +1676,6 @@ Language: ru
     <string name="player_sleep_timer">Таймер сна</string>
     <string name="player_sleep_timer_title">Таймер сна</string>
     <string name="player_sleep_end_of_episode">Конец выпуска</string>
-    <string name="player_sleep_custom_plus">Настроить плюс</string>
-    <string name="player_sleep_custom_minus">Настроить минус</string>
     <string name="player_sleep_cancel_timer">Отменить таймер</string>
     <string name="player_sleep_add_5_minutes">+ 5 минут</string>
     <string name="player_sleep_60_minutes">1 час</string>
@@ -1838,6 +1839,11 @@ Language: ru
     <string name="unarchive">Из архива</string>
     <string name="archive">Архив</string>
     <string name="add_to_up_next">Добавить в «Следующие»</string>
+    <plurals name="chapter">
+        <item quantity="one">глава</item>
+        <item quantity="few">главы</item>
+        <item quantity="many">главы</item>
+    </plurals>
     <plurals name="day">
         <item quantity="one">д</item>
         <item quantity="few">дн.</item>
@@ -1865,8 +1871,8 @@ Language: ru
     </plurals>
     <plurals name="podcast">
         <item quantity="one">Подкаст</item>
-        <item quantity="few"/>
-        <item quantity="many"/>
+        <item quantity="few">Подкасты</item>
+        <item quantity="many">Подкасты</item>
     </plurals>
     <plurals name="podcast_share_end_handle_description">
         <item quantity="one">Дескриптор конца клипа: %d сек</item>
@@ -1879,44 +1885,44 @@ Language: ru
         <item quantity="many">Дескриптор начала клипа: %d сек</item>
     </plurals>
     <plurals name="profile_stats_day_listened">
-        <item quantity="one">день прослушан</item>
-        <item quantity="few"/>
-        <item quantity="many"/>
+        <item quantity="one">дн. прослушано</item>
+        <item quantity="few">дн. прослушано</item>
+        <item quantity="many">дн. прослушано</item>
     </plurals>
     <plurals name="profile_stats_day_saved">
-        <item quantity="one">день сохранен</item>
-        <item quantity="few"/>
-        <item quantity="many"/>
+        <item quantity="one">дн. сохранено</item>
+        <item quantity="few">дн. сохранено</item>
+        <item quantity="many">дн. сохранено</item>
     </plurals>
     <plurals name="profile_stats_hour_listened">
-        <item quantity="one">час прослушан</item>
-        <item quantity="few"/>
-        <item quantity="many"/>
+        <item quantity="one">ч прослушано</item>
+        <item quantity="few">ч прослушано</item>
+        <item quantity="many">ч прослушано</item>
     </plurals>
     <plurals name="profile_stats_hour_saved">
-        <item quantity="one">час сохранен</item>
-        <item quantity="few"/>
-        <item quantity="many"/>
+        <item quantity="one">ч сохранено</item>
+        <item quantity="few">ч сохранено</item>
+        <item quantity="many">ч сохранено</item>
     </plurals>
     <plurals name="profile_stats_minute_listened">
-        <item quantity="one">минута прослушана</item>
-        <item quantity="few"/>
-        <item quantity="many"/>
+        <item quantity="one">мин прослушано</item>
+        <item quantity="few">мин прослушано</item>
+        <item quantity="many">мин прослушано</item>
     </plurals>
     <plurals name="profile_stats_minute_saved">
-        <item quantity="one">минута сохранена</item>
-        <item quantity="few"/>
-        <item quantity="many"/>
+        <item quantity="one">мин сохранено</item>
+        <item quantity="few">мин сохранено</item>
+        <item quantity="many">мин сохранено</item>
     </plurals>
     <plurals name="profile_stats_second_listened">
-        <item quantity="one">секунда прослушана</item>
-        <item quantity="few"/>
-        <item quantity="many"/>
+        <item quantity="one">сек прослушано</item>
+        <item quantity="few">сек прослушано</item>
+        <item quantity="many">сек прослушано</item>
     </plurals>
     <plurals name="profile_stats_second_saved">
-        <item quantity="one">секунда сохранена</item>
-        <item quantity="few"/>
-        <item quantity="many"/>
+        <item quantity="one">сек сохранено</item>
+        <item quantity="few">сек сохранено</item>
+        <item quantity="many">сек сохранено</item>
     </plurals>
     <plurals name="second">
         <item quantity="one">сек</item>
