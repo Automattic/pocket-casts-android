@@ -342,8 +342,7 @@ platform :android do
         **UPLOAD_TO_PLAY_STORE_COMMON_OPTIONS,
         aab: aab_artifact_path,
         track: track,
-        release_status: 'inProgress',
-        rollout: is_beta ? '0.20' : '0.01' # Start at 20% for betas, 1% for Production
+        release_status: 'draft'
       )
       release_assets << aab_artifact_path
 
