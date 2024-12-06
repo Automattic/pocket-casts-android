@@ -6,6 +6,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.AccountConstants
 import au.com.shiftyjelly.pocketcasts.preferences.RefreshToken
 import au.com.shiftyjelly.pocketcasts.servers.sync.LoginIdentity
 import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
+import kotlinx.coroutines.flow.Flow
 
 /**
  * The only class that should use this class is the
@@ -16,6 +17,7 @@ interface SyncAccountManager : TokenHandler {
     fun addAccount(email: String, uuid: String, refreshToken: RefreshToken, accessToken: AccessToken, loginIdentity: LoginIdentity)
     fun getAccount(): Account?
     fun getEmail(): String?
+    fun observeEmail(): Flow<String?>
     fun getLoginIdentity(): LoginIdentity?
     fun getRefreshToken(account: Account? = null): RefreshToken?
     fun getSignInType(account: Account): AccountConstants.SignInType

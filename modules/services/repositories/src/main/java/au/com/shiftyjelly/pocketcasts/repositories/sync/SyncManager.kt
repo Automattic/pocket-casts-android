@@ -38,6 +38,7 @@ import io.reactivex.Maybe
 import io.reactivex.Single
 import java.io.File
 import java.time.Instant
+import kotlinx.coroutines.flow.Flow
 import retrofit2.Response
 
 interface SyncManager : NamedSettingsCaller {
@@ -48,6 +49,7 @@ interface SyncManager : NamedSettingsCaller {
     fun isLoggedIn(): Boolean
     fun getLoginIdentity(): LoginIdentity?
     fun getEmail(): String?
+    fun emailFlow(): Flow<String?>
     fun signOut(action: () -> Unit = {})
     suspend fun loginWithGoogle(idToken: String, signInSource: SignInSource): LoginResult
     suspend fun loginWithEmailAndPassword(email: String, password: String, signInSource: SignInSource): LoginResult
@@ -57,39 +59,39 @@ interface SyncManager : NamedSettingsCaller {
     suspend fun getAccessToken(account: Account): AccessToken
     fun getRefreshToken(): RefreshToken?
     suspend fun emailChange(newEmail: String, password: String): UserChangeResponse
-    fun deleteAccount(): Single<UserChangeResponse>
+    fun deleteAccountRxSingle(): Single<UserChangeResponse>
     suspend fun updatePassword(newPassword: String, oldPassword: String)
 
     // User Episodes / Files
-    fun getFiles(): Single<Response<FilesResponse>>
-    fun getFileUploadStatus(episodeUuid: String): Single<Boolean>
-    fun uploadFileToServer(episode: UserEpisode): Completable
-    fun uploadImageToServer(episode: UserEpisode, imageFile: File): Completable
-    fun postFiles(files: List<FilePost>): Single<Response<Void>>
-    fun getUserEpisode(uuid: String): Maybe<ServerFile>
-    fun getFileUsage(): Single<FileAccount>
-    fun deleteImageFromServer(episode: UserEpisode): Single<Response<Void>>
-    fun deleteFromServer(episode: UserEpisode): Single<Response<Void>>
-    fun getPlaybackUrl(episode: UserEpisode): Single<String>
+    fun getFilesRxSingle(): Single<Response<FilesResponse>>
+    fun getFileUploadStatusRxSingle(episodeUuid: String): Single<Boolean>
+    fun uploadFileToServerRxCompletable(episode: UserEpisode): Completable
+    fun uploadImageToServerRxCompletable(episode: UserEpisode, imageFile: File): Completable
+    fun postFilesRxSingle(files: List<FilePost>): Single<Response<Void>>
+    fun getUserEpisodeRxMaybe(uuid: String): Maybe<ServerFile>
+    fun getFileUsageRxSingle(): Single<FileAccount>
+    fun deleteImageFromServerRxSingle(episode: UserEpisode): Single<Response<Void>>
+    fun deleteFromServerRxSingle(episode: UserEpisode): Single<Response<Void>>
+    fun getPlaybackUrlRxSingle(episode: UserEpisode): Single<String>
 
     // History
-    fun historySync(request: HistorySyncRequest): Single<HistorySyncResponse>
+    fun historySyncRxSingle(request: HistorySyncRequest): Single<HistorySyncResponse>
     suspend fun historyYear(year: Int, count: Boolean): HistoryYearResponse
 
     // Subscription
-    fun subscriptionStatus(): Single<SubscriptionStatusResponse>
-    fun subscriptionPurchase(request: SubscriptionPurchaseRequest): Single<SubscriptionStatusResponse>
-    fun redeemPromoCode(code: String): Single<PromoCodeResponse>
-    fun validatePromoCode(code: String): Single<PromoCodeResponse>
+    fun subscriptionStatusRxSingle(): Single<SubscriptionStatusResponse>
+    fun subscriptionPurchaseRxSingle(request: SubscriptionPurchaseRequest): Single<SubscriptionStatusResponse>
+    fun redeemPromoCodeRxSingle(code: String): Single<PromoCodeResponse>
+    fun validatePromoCodeRxSingle(code: String): Single<PromoCodeResponse>
 
     // Sync
-    fun getLastSyncAt(): Single<String>
+    fun getLastSyncAtRxSingle(): Single<String>
     suspend fun getHomeFolder(): UserPodcastListResponse
-    fun getPodcastEpisodes(podcastUuid: String): Single<PodcastEpisodesResponse>
+    fun getPodcastEpisodesRxSingle(podcastUuid: String): Single<PodcastEpisodesResponse>
 
     suspend fun syncUpdate(data: String, lastSyncTime: Instant): SyncUpdateResponse
 
-    fun episodeSync(request: EpisodeSyncRequest): Completable
+    fun episodeSyncRxCompletable(request: EpisodeSyncRequest): Completable
 
     // Rating
     suspend fun addPodcastRating(podcastUuid: String, rate: Int): PodcastRatingResponse
@@ -98,7 +100,7 @@ interface SyncManager : NamedSettingsCaller {
 
     // Other
     suspend fun exchangeSonos(): ExchangeSonosResponse
-    fun getFilters(): Single<List<Playlist>>
+    fun getFiltersRxSingle(): Single<List<Playlist>>
     suspend fun loadStats(): StatsBundle
     suspend fun upNextSync(request: UpNextSyncRequest): UpNextSyncResponse
     suspend fun getBookmarks(): List<Bookmark>

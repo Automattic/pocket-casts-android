@@ -109,7 +109,7 @@ class WidgetManagerImpl @Inject constructor(
 
     private fun findPodcastByEpisode(episode: BaseEpisode): Podcast? {
         return when (episode) {
-            is PodcastEpisode -> podcastManager.findPodcastByUuid(episode.podcastUuid)
+            is PodcastEpisode -> podcastManager.findPodcastByUuidBlocking(episode.podcastUuid)
             is UserEpisode -> podcastManager.buildUserEpisodePodcast(episode)
             else -> null
         }

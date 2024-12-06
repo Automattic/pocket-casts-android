@@ -73,7 +73,7 @@ class SubscribeManager @Inject constructor(
             .flatMap({ info ->
                 // shouldAutoDownload = true because the user manually subscribed to the podcast,
                 // so we want to automatically download episodes at this moment.
-                addPodcast(info.podcastUuid, sync = info.sync, subscribed = true, shouldAutoDownload = info.shouldAutoDownload).toObservable()
+                addPodcastRxSingle(info.podcastUuid, sync = info.sync, subscribed = true, shouldAutoDownload = info.shouldAutoDownload).toObservable()
             }, true, 5)
             .doOnError { throwable -> LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "Could not subscribe to podcast") }
             .subscribeBy(
@@ -100,11 +100,11 @@ class SubscribeManager @Inject constructor(
     /**
      * Subscribe to a podcast and wait.
      */
-    fun addPodcast(podcastUuid: String, sync: Boolean = false, subscribed: Boolean = false, shouldAutoDownload: Boolean): Single<Podcast> {
-        return subscribeToExistingOrServerPodcast(podcastUuid, sync, subscribed, shouldAutoDownload)
+    fun addPodcastRxSingle(podcastUuid: String, sync: Boolean = false, subscribed: Boolean = false, shouldAutoDownload: Boolean): Single<Podcast> {
+        return subscribeToExistingOrServerPodcastRxSingle(podcastUuid, sync, subscribed, shouldAutoDownload)
             .flatMap {
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Adding podcast $podcastUuid to database")
-                cacheArtwork(it).toSingleDefault(it)
+                cacheArtworkRxCompletable(it).toSingleDefault(it)
             }
             .doOnSuccess {
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Added podcast $podcastUuid to database")
@@ -136,7 +136,7 @@ class SubscribeManager @Inject constructor(
             }
     }
 
-    private fun cacheArtwork(podcast: Podcast): Completable {
+    private fun cacheArtworkRxCompletable(podcast: Podcast): Completable {
         return Completable.fromAction {
             val request = imageRequestFactory.create(podcast)
                 .newBuilder()
@@ -154,20 +154,20 @@ class SubscribeManager @Inject constructor(
         return uuidsInQueue
     }
 
-    private fun subscribeToExistingOrServerPodcast(podcastUuid: String, sync: Boolean, subscribed: Boolean, shouldAutoDownload: Boolean): Single<Podcast> {
+    private fun subscribeToExistingOrServerPodcastRxSingle(podcastUuid: String, sync: Boolean, subscribed: Boolean, shouldAutoDownload: Boolean): Single<Podcast> {
         // check if the podcast exists already
         val subscribedObservable = podcastDao.isSubscribedToPodcastRxSingle(podcastUuid)
         return subscribedObservable.flatMap { isSubscribed ->
             // download the podcast json and add to the database if it doesn't exist
             if (isSubscribed) {
-                subscribeToExistingPodcast(podcastUuid, sync)
+                subscribeToExistingPodcastRxSingle(podcastUuid, sync)
             } else {
-                subscribeToServerPodcast(podcastUuid, sync, subscribed, shouldAutoDownload)
+                subscribeToServerPodcastRxSingle(podcastUuid, sync, subscribed, shouldAutoDownload)
             }
         }
     }
 
-    private fun subscribeToExistingPodcast(podcastUuid: String, sync: Boolean): Single<Podcast> {
+    private fun subscribeToExistingPodcastRxSingle(podcastUuid: String, sync: Boolean): Single<Podcast> {
         // set subscribed to true and update the sync status
         val updateObservable = podcastDao.updateSubscribedRxCompletable(subscribed = true, uuid = podcastUuid)
             .andThen(podcastDao.updateSyncStatusRxCompletable(syncStatus = if (sync) Podcast.SYNC_STATUS_NOT_SYNCED else Podcast.SYNC_STATUS_SYNCED, uuid = podcastUuid))
@@ -178,9 +178,9 @@ class SubscribeManager @Inject constructor(
         return updateObservable.andThen(findObservable.toSingle())
     }
 
-    private fun subscribeToServerPodcast(podcastUuid: String, sync: Boolean, subscribed: Boolean, shouldAutoDownload: Boolean): Single<Podcast> {
+    private fun subscribeToServerPodcastRxSingle(podcastUuid: String, sync: Boolean, subscribed: Boolean, shouldAutoDownload: Boolean): Single<Podcast> {
         // download the podcast
-        val podcastObservable = downloadPodcast(podcastUuid)
+        val podcastObservable = downloadPodcastRxSingle(podcastUuid)
             .doOnSuccess { podcast ->
                 // mark sync status
                 podcast.syncStatus = if (sync) Podcast.SYNC_STATUS_NOT_SYNCED else Podcast.SYNC_STATUS_SYNCED
@@ -204,7 +204,7 @@ class SubscribeManager @Inject constructor(
             podcastDao.insertRxSingle(podcast)
         }
         // insert episodes
-        return insertPodcastObservable.flatMap { podcast -> subscribeInsertEpisodes(podcast).toSingle { podcast } }
+        return insertPodcastObservable.flatMap { podcast -> subscribeInsertEpisodesRxCompletable(podcast).toSingle { podcast } }
     }
 
     private fun canDownloadEpisodesAfterFollowPodcast(
@@ -215,7 +215,7 @@ class SubscribeManager @Inject constructor(
         shouldAutoDownload &&
         FeatureFlag.isEnabled(Feature.AUTO_DOWNLOAD)
 
-    private fun downloadPodcast(podcastUuid: String): Single<Podcast> {
+    private fun downloadPodcastRxSingle(podcastUuid: String): Single<Podcast> {
         // download the podcast
         val serverPodcastObservable = podcastCacheServiceManager.getPodcast(podcastUuid)
             .subscribeOn(Schedulers.io())
@@ -238,7 +238,7 @@ class SubscribeManager @Inject constructor(
         )
         // add sync information
         if (syncManager.isLoggedIn()) {
-            val syncPodcastObservable = syncManager.getPodcastEpisodes(podcastUuid).subscribeOn(Schedulers.io())
+            val syncPodcastObservable = syncManager.getPodcastEpisodesRxSingle(podcastUuid).subscribeOn(Schedulers.io())
             return Single.zip(cleanPodcastObservable, syncPodcastObservable, BiFunction<Podcast, PodcastEpisodesResponse, Podcast>(this::mergeSyncPodcast))
                 .onErrorResumeNext(cleanPodcastObservable)
         } else {
@@ -246,7 +246,7 @@ class SubscribeManager @Inject constructor(
         }
     }
 
-    private fun subscribeInsertEpisodes(podcast: Podcast): Completable {
+    private fun subscribeInsertEpisodesRxCompletable(podcast: Podcast): Completable {
         // insert the episodes
         return Completable.fromAction {
             podcast.episodes.chunked(250).forEach { episodes ->
@@ -254,7 +254,7 @@ class SubscribeManager @Inject constructor(
             }
         }
             // make sure the podcast has the latest episode uuid
-            .andThen(updateLatestEpisodeUuid(podcast.uuid))
+            .andThen(updateLatestEpisodeUuidRxCompletable(podcast.uuid))
     }
 
     private fun cleanPodcast(podcast: Podcast, colors: Optional<ArtworkColors>, allPodcasts: List<Podcast>): Podcast {
@@ -310,7 +310,7 @@ class SubscribeManager @Inject constructor(
     }
 
     // WARNING: only call this when NEW episodes are added, not old ones
-    private fun updateLatestEpisodeUuid(podcastUuid: String): Completable {
+    private fun updateLatestEpisodeUuidRxCompletable(podcastUuid: String): Completable {
         return episodeDao.findLatestRxMaybe(podcastUuid)
             .flatMapCompletable { episode -> podcastDao.updateLatestEpisodeRxCompletable(episode.uuid, episode.publishedDate, podcastUuid) }
     }

@@ -68,7 +68,7 @@ class SearchHandler @Inject constructor(
                             .filter { it.name.contains(query, ignoreCase = true) }
                             .switchMapSingle { folder ->
                                 podcastManager
-                                    .findPodcastsInFolderSingle(folderUuid = folder.uuid)
+                                    .findPodcastsInFolderRxSingle(folderUuid = folder.uuid)
                                     .map { podcasts -> FolderItem.Folder(folder = folder, podcasts = podcasts) }
                             }
                             .toList()
@@ -77,7 +77,7 @@ class SearchHandler @Inject constructor(
                     }
 
                 // search podcasts
-                val podcastSearch = podcastManager.findSubscribedRx()
+                val podcastSearch = podcastManager.findSubscribedRxSingle()
                     .subscribeOn(Schedulers.io())
                     .flatMapObservable { Observable.fromIterable(it) }
                     .filter { it.title.contains(query, ignoreCase = true) || it.author.contains(query, ignoreCase = true) }
@@ -96,7 +96,7 @@ class SearchHandler @Inject constructor(
         }
 
     private val subscribedPodcastUuids = podcastManager
-        .findSubscribedRx()
+        .findSubscribedRxSingle()
         .subscribeOn(Schedulers.io())
         .toObservable()
         .map { podcasts -> podcasts.map(Podcast::uuid).toHashSet() }

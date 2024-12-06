@@ -212,7 +212,7 @@ class PlayerViewModelTest {
 
         viewModel.onEffectsSettingsSegmentedTabSelected(podcast, PlaybackEffectsSettingsTab.AllPodcasts)
 
-        verify(podcastManager).updateOverrideGlobalEffects(podcast, false)
+        verify(podcastManager).updateOverrideGlobalEffectsBlocking(podcast, false)
     }
 
     @Test
@@ -221,7 +221,7 @@ class PlayerViewModelTest {
 
         viewModel.onEffectsSettingsSegmentedTabSelected(podcast, PlaybackEffectsSettingsTab.ThisPodcast)
 
-        verify(podcastManager).updateOverrideGlobalEffects(podcast, true)
+        verify(podcastManager).updateOverrideGlobalEffectsBlocking(podcast, true)
     }
 
     @Test
@@ -271,7 +271,7 @@ class PlayerViewModelTest {
         whenever(playbackManager.getCurrentEpisode()).thenReturn(currentEpisode)
         whenever(episodeManager.findEpisodeByUuidRxFlowable(anyOrNull())).thenReturn(Flowable.just(currentEpisode))
         whenever(podcast.playbackEffects).thenReturn(podcastPlaybackEffects)
-        whenever(podcastManager.observePodcastByUuid(anyOrNull())).thenReturn(Flowable.just(podcast))
+        whenever(podcastManager.podcastByUuidRxFlowable(anyOrNull())).thenReturn(Flowable.just(podcast))
         val useRealTimeForPlaybackRemainingTimeMock = mock<UserSetting<Boolean>>()
         whenever(useRealTimeForPlaybackRemainingTimeMock.flow).thenReturn(MutableStateFlow(false))
         whenever(settings.useRealTimeForPlaybackRemaingTime).thenReturn(useRealTimeForPlaybackRemainingTimeMock)

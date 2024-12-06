@@ -1,10 +1,14 @@
 package au.com.shiftyjelly.pocketcasts.utils
 
+import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Date
 import kotlin.math.roundToInt
+import kotlin.time.Duration
+import kotlin.time.toKotlinDuration
+import java.time.Duration as JavaDuration
 
 object DateUtil {
 
@@ -46,4 +50,10 @@ object DateUtil {
 
 fun Date.timeIntervalSinceNow(): Long {
     return Date().time - this.time
+}
+
+fun Date.toDurationFromNow(): Duration {
+    return JavaDuration.between(Instant.now(), toInstant())
+        .toKotlinDuration()
+        .coerceAtLeast(Duration.ZERO)
 }

@@ -1,6 +1,8 @@
 7.79
 -----
-
+*   Updates
+    *   Update account details header UI
+        ([#3294](https://github.com/Automattic/pocket-casts-android/pull/3294))
 
 7.78
 -----

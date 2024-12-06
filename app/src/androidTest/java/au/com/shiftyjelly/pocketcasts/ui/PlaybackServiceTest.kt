@@ -89,8 +89,8 @@ class PlaybackServiceTest {
         }
         service.upNextQueue = upNextQueue
         val podcastManager = mock<PodcastManager> {
-            onBlocking { findPodcastByUuidSuspend(podcastOne.uuid) }.doReturn(podcastOne)
-            onBlocking { findPodcastByUuidSuspend(podcastTwo.uuid) }.doReturn(podcastTwo)
+            onBlocking { findPodcastByUuid(podcastOne.uuid) }.doReturn(podcastOne)
+            onBlocking { findPodcastByUuid(podcastTwo.uuid) }.doReturn(podcastTwo)
         }
         service.podcastManager = podcastManager
         val episodeManager = mock<EpisodeManager> {

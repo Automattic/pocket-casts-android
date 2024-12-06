@@ -29,10 +29,10 @@ class ShareListIncomingViewModel
     var isFragmentChangingConfigurations: Boolean = false
     val share = MutableLiveData<ShareState>()
     val subscribedUuids =
-        podcastManager.getSubscribedPodcastUuids()
+        podcastManager.getSubscribedPodcastUuidsRxSingle()
             .subscribeOn(Schedulers.io())
             .toFlowable()
-            .mergeWith(podcastManager.observePodcastSubscriptions())
+            .mergeWith(podcastManager.podcastSubscriptionsRxFlowable())
             .toLiveData()
 
     override val coroutineContext: CoroutineContext
@@ -53,7 +53,7 @@ class ShareListIncomingViewModel
 
     fun subscribeToPodcast(uuid: String) {
         launch {
-            val podcast = podcastManager.findPodcastByUuid(uuid)
+            val podcast = podcastManager.findPodcastByUuidBlocking(uuid)
             if (podcast == null || !podcast.isSubscribed) {
                 podcastManager.subscribeToPodcast(uuid, true)
             }

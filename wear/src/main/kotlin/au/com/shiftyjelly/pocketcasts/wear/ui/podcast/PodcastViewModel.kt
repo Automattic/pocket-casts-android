@@ -47,7 +47,7 @@ class PodcastViewModel @Inject constructor(
 
     init {
         viewModelScope.launch(Dispatchers.Default) {
-            val podcast = podcastManager.findPodcastByUuidSuspend(podcastUuid)
+            val podcast = podcastManager.findPodcastByUuid(podcastUuid)
             podcast?.let {
                 episodeManager.findEpisodesByPodcastOrderedRxFlowable(it)
                     .asFlow()

@@ -37,7 +37,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradeFeatureItem
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.plusGradientBrush
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.PlusUpgradeLayoutReviewsItem
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.SubscribeButton
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
@@ -49,6 +48,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
+import au.com.shiftyjelly.pocketcasts.compose.plusGradientBrush
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.rateUs
@@ -197,7 +197,7 @@ private fun PlusBenefits(
                 .padding(top = 16.dp)
                 .border(
                     width = 3.dp,
-                    brush = plusGradientBrush,
+                    brush = Brush.plusGradientBrush,
                     shape = RoundedCornerShape(10.dp),
                 ),
         ) {
@@ -221,7 +221,7 @@ private fun PlusBenefits(
                 iconRes = IR.drawable.ic_plus,
                 shortNameRes = LR.string.pocket_casts_plus_short,
                 iconColor = Color.Black,
-                backgroundBrush = plusGradientBrush,
+                backgroundBrush = Brush.plusGradientBrush,
                 textColor = Color.Black,
             )
         }

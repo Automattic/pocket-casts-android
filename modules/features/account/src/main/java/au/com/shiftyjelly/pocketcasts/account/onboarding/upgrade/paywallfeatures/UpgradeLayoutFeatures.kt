@@ -21,6 +21,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
@@ -28,7 +29,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.plusGradientBrush
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.SubscribeButton
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.calculateMinimumHeightWithInsets
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
@@ -36,6 +36,7 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowTextButton
 import au.com.shiftyjelly.pocketcasts.compose.components.AutoResizeText
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
+import au.com.shiftyjelly.pocketcasts.compose.plusGradientBrush
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -131,7 +132,7 @@ private fun Content(
                 iconRes = IR.drawable.ic_plus,
                 shortNameRes = LR.string.pocket_casts_plus_short,
                 iconColor = Color.Black,
-                backgroundBrush = plusGradientBrush,
+                backgroundBrush = Brush.plusGradientBrush,
                 textColor = Color.Black,
             )
         }
@@ -201,7 +202,7 @@ private fun SmallDeviceContent(
                 iconRes = IR.drawable.ic_plus,
                 shortNameRes = LR.string.pocket_casts_plus_short,
                 iconColor = Color.Black,
-                backgroundBrush = plusGradientBrush,
+                backgroundBrush = Brush.plusGradientBrush,
                 textColor = Color.Black,
             )
         }

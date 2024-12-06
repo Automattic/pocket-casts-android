@@ -173,7 +173,7 @@ class RefreshPodcastsThread(
         val entryPoint = getEntryPoint()
         val podcastManager = entryPoint.podcastManager()
         val serviceManager = entryPoint.serviceManager()
-        val podcasts = podcastManager.findSubscribed()
+        val podcasts = podcastManager.findSubscribedBlocking()
         val startTime = SystemClock.elapsedRealtime()
         runBlocking { serviceManager.refreshPodcastsSync(podcasts) }
             .onSuccess { response ->
@@ -220,13 +220,13 @@ class RefreshPodcastsThread(
             episodeManager.checkForEpisodesToAutoArchiveBlocking(playbackManager, podcastManager)
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - checkForEpisodesToAutoArchive - ${String.format("%d ms", SystemClock.elapsedRealtime() - startTime)}")
             startTime = SystemClock.elapsedRealtime()
-            podcastManager.checkForUnusedPodcasts(playbackManager)
+            podcastManager.checkForUnusedPodcastsBlocking(playbackManager)
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - checkForUnusedPodcasts - ${String.format("%d ms", SystemClock.elapsedRealtime() - startTime)}")
             startTime = SystemClock.elapsedRealtime()
             playlistManager.checkForEpisodesToDownloadBlocking(episodeManager, playbackManager)
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - playlist checkForEpisodesToDownload - ${String.format("%d ms", SystemClock.elapsedRealtime() - startTime)}")
             startTime = SystemClock.elapsedRealtime()
-            podcastManager.checkForEpisodesToDownload(addedEpisodes.episodeUuidsAdded, downloadManager)
+            podcastManager.checkForEpisodesToDownloadBlocking(addedEpisodes.episodeUuidsAdded, downloadManager)
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - podcast checkForEpisodesToDownload - ${String.format("%d ms", SystemClock.elapsedRealtime() - startTime)}")
             startTime = SystemClock.elapsedRealtime()
             updateNotifications(notificationLastSeen, settings, podcastManager, episodeManager, notificationHelper, context)
@@ -307,7 +307,7 @@ class RefreshPodcastsThread(
         val episodeUuidsAdded = ArrayList<String>()
 
         for (podcastUuid in result.getPodcastsWithUpdates()) {
-            val podcast = podcastManager.findPodcastByUuid(podcastUuid) ?: continue
+            val podcast = podcastManager.findPodcastByUuidBlocking(podcastUuid) ?: continue
             var episodes = result.getUpdatesForPodcast(podcastUuid)
             if (episodes == null || episodes.isEmpty()) {
                 continue // no updates
@@ -324,11 +324,11 @@ class RefreshPodcastsThread(
             if (episodes.isEmpty()) {
                 // the server returned episodes, but none were added to the database. Update the podcast when it doesn't have the latest episode information.
                 if (podcast.latestEpisodeUuid == null) {
-                    podcastManager.updatePodcastLatestEpisode(podcast)
+                    podcastManager.updatePodcastLatestEpisodeBlocking(podcast)
                 }
             } else {
                 // we now have some new episodes, update the latest episode uuid on the podcast row
-                podcastManager.updateLatestEpisode(podcast, episodes[0])
+                podcastManager.updateLatestEpisodeBlocking(podcast, episodes[0])
                 for ((uuid) in episodes) {
                     episodeUuidsAdded.add(uuid)
                 }
@@ -401,7 +401,7 @@ class RefreshPodcastsThread(
 
             settings.setNotificationLastSeenToNow()
 
-            val podcastsShowingNotifications = podcastManager.countNotificationsOn()
+            val podcastsShowingNotifications = podcastManager.countNotificationsOnBlocking()
             if (podcastsShowingNotifications == 0) {
                 return
             }
@@ -413,7 +413,7 @@ class RefreshPodcastsThread(
 
                 val episodes = episodeManager.findNotificationEpisodesBlocking(lastSeen)
                 for (episode in episodes) {
-                    val podcast = podcastManager.findPodcastByUuid(episode.podcastUuid) ?: continue
+                    val podcast = podcastManager.findPodcastByUuidBlocking(episode.podcastUuid) ?: continue
                     notificationsEpisodeAndPodcast.add(Pair(episode, podcast))
                 }
 
@@ -664,7 +664,7 @@ class RefreshPodcastsThread(
             if (uuid == null) {
                 return null
             }
-            val podcast = podcastManager.findPodcastByUuid(uuid) ?: return null
+            val podcast = podcastManager.findPodcastByUuidBlocking(uuid) ?: return null
 
             val imageRequest = PocketCastsImageRequestFactory(context, isDarkTheme = true, size = 400).create(podcast)
             return context.imageLoader.executeBlocking(imageRequest).drawable?.toBitmap()
@@ -674,7 +674,7 @@ class RefreshPodcastsThread(
             if (uuid == null) {
                 return null
             }
-            val podcast = podcastManager.findPodcastByUuid(uuid) ?: return null
+            val podcast = podcastManager.findPodcastByUuidBlocking(uuid) ?: return null
 
             val resources = context.resources
             val width = resources.getDimension(android.R.dimen.notification_large_icon_width).toInt()

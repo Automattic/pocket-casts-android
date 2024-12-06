@@ -84,7 +84,7 @@ class ActionRunnerControlPlayback : TaskerPluginRunnerActionNoOutput<InputContro
         }
         playbackEffects.updater()
         if (overrideGlobalEffects) {
-            podcastManager.updateEffects(currentPodcast, playbackEffects)
+            podcastManager.updateEffectsBlocking(currentPodcast, playbackEffects)
         } else {
             settings.globalPlaybackEffects.set(playbackEffects, updateModifiedAt = true)
         }

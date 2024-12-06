@@ -99,8 +99,8 @@ class AutoArchiveTest {
 
     private fun podcastManagerThatReturns(podcast: Podcast): PodcastManager {
         return mock {
-            on { findPodcastByUuid(any()) } doReturn podcast
-            on { findSubscribed() } doReturn listOf(podcast)
+            on { findPodcastByUuidBlocking(any()) } doReturn podcast
+            on { findSubscribedBlocking() } doReturn listOf(podcast)
         }
     }
 

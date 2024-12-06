@@ -34,8 +34,8 @@ class SharePodcastViewModelTest {
 
     @Before
     fun setUp() {
-        whenever(podcastManager.observePodcastByUuidFlow("podcast-id")).thenReturn(flowOf(podcast))
-        whenever(podcastManager.observeEpisodeCountByPodcatUuid("podcast-id")).thenReturn(flowOf(50))
+        whenever(podcastManager.podcastByUuidFlow("podcast-id")).thenReturn(flowOf(podcast))
+        whenever(podcastManager.episodeCountByPodcatUuidFlow("podcast-id")).thenReturn(flowOf(50))
 
         viewModel = SharePodcastViewModel(
             podcast.uuid,

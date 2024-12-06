@@ -119,7 +119,7 @@ abstract class PodcastDao {
     abstract fun findByUuidBlocking(uuid: String): Podcast?
 
     @Query("SELECT * FROM podcasts WHERE uuid = :uuid")
-    abstract suspend fun findPodcastByUuidSuspend(uuid: String): Podcast?
+    abstract suspend fun findPodcastByUuid(uuid: String): Podcast?
 
     @Query("SELECT * FROM podcasts WHERE uuid = :uuid")
     abstract fun findByUuidRxFlowable(uuid: String): Flowable<Podcast>

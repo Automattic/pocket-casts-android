@@ -433,7 +433,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
         }
 
         launch {
-            val podcast = podcastManager.findPodcastByUuidSuspend(episode.podcastUuid) ?: run {
+            val podcast = podcastManager.findPodcastByUuid(episode.podcastUuid) ?: run {
                 LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Share failed because unable to find podcast from uuid")
                 return@launch
             }

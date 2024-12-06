@@ -162,7 +162,7 @@ class PodcastSyncProcess(
 
     private fun performFullSync(): Completable {
         // grab the last sync date before we begin
-        return syncManager.getLastSyncAt()
+        return syncManager.getLastSyncAtRxSingle()
             .flatMapCompletable { lastSyncAt ->
                 cacheStats()
                     .andThen(downloadAndImportHomeFolder())
@@ -174,7 +174,7 @@ class PodcastSyncProcess(
 
     private fun downloadAndImportHomeFolder(): Completable {
         // get all the current podcasts and folder uuids before the sync
-        val localPodcasts = podcastManager.findSubscribedRx()
+        val localPodcasts = podcastManager.findSubscribedRxSingle()
         val localFolderUuids = folderManager.findFoldersSingle().map { it.map { folder -> folder.uuid } }
         // get all the users podcast uuids from the server
         val serverHomeFolder = rxSingle { syncManager.getHomeFolder() }
@@ -203,7 +203,7 @@ class PodcastSyncProcess(
         val serverPodcastsMap = serverPodcasts.associateBy { it.uuid }
         // mark the podcasts missing from the server as not synced
         val serverMissingUuids = localUuids - serverUuids
-        val markMissingNotSynced = Observable.fromIterable(serverMissingUuids).flatMapCompletable { uuid -> Completable.fromAction { podcastManager.markPodcastUuidAsNotSynced(uuid) } }
+        val markMissingNotSynced = Observable.fromIterable(serverMissingUuids).flatMapCompletable { uuid -> Completable.fromAction { podcastManager.markPodcastUuidAsNotSyncedBlocking(uuid) } }
         // subscribe to each podcast
         val localMissingUuids = serverUuids - localUuids
         val subscribeToPodcasts = Observable
@@ -265,7 +265,7 @@ class PodcastSyncProcess(
     }
 
     private fun downloadAndImportFilters(): Completable {
-        return syncManager.getFilters()
+        return syncManager.getFiltersRxSingle()
             .flatMapCompletable { filters -> importFilters(filters) }
     }
 
@@ -276,7 +276,7 @@ class PodcastSyncProcess(
 
     private fun importPodcast(podcastResponse: UserPodcastResponse?): Maybe<Podcast> {
         val podcastUuid = podcastResponse?.uuid ?: return Maybe.empty()
-        return podcastManager.subscribeToPodcastRx(podcastUuid = podcastUuid, sync = false, shouldAutoDownload = false)
+        return podcastManager.subscribeToPodcastRxSingle(podcastUuid = podcastUuid, sync = false, shouldAutoDownload = false)
             .flatMap { podcast -> updatePodcastSyncValues(podcast, podcastResponse).toSingleDefault(podcast) }
             .toMaybe()
             .doOnError { LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, it, "Could not import server podcast %s", podcastUuid) }
@@ -301,7 +301,7 @@ class PodcastSyncProcess(
             addedDate = resolvedAddedDate
         }
 
-        podcastManager.updatePodcast(podcast)
+        podcastManager.updatePodcastBlocking(podcast)
     }
 
     private fun syncUpNext() = Completable.create { emitter ->
@@ -491,7 +491,7 @@ class PodcastSyncProcess(
 
     private fun uploadPodcastChanges(records: JSONArray) {
         try {
-            val podcasts = podcastManager.findPodcastsToSync()
+            val podcasts = podcastManager.findPodcastsToSyncBlocking()
             for (podcast in podcasts) {
                 try {
                     val fields = JSONObject().apply {
@@ -653,7 +653,7 @@ class PodcastSyncProcess(
 
     private fun markAllLocalItemsSynced(episodes: List<PodcastEpisode>): Completable {
         return Completable.fromAction {
-            podcastManager.markAllPodcastsSynced()
+            podcastManager.markAllPodcastsSyncedBlocking()
             episodeManager.markAllEpisodesSyncedBlocking(episodes)
             playlistManager.markAllSyncedBlocking()
             folderManager.markAllSynced()
@@ -796,7 +796,7 @@ class PodcastSyncProcess(
             return Maybe.empty()
         }
 
-        val podcast = podcastManager.findPodcastByUuid(uuid)
+        val podcast = podcastManager.findPodcastByUuidBlocking(uuid)
         return if (podcast == null) {
             importServerPodcast(sync)
         } else {
@@ -809,10 +809,10 @@ class PodcastSyncProcess(
         val isSubscribed = podcastSync.subscribed
         val podcastUuid = podcastSync.uuid
         if (podcastSync.subscribed && isSubscribed && podcastUuid != null) {
-            return podcastManager.subscribeToPodcastRx(podcastUuid, sync = false, shouldAutoDownload = false)
+            return podcastManager.subscribeToPodcastRxSingle(podcastUuid, sync = false, shouldAutoDownload = false)
                 .doOnSuccess { podcast ->
                     applyPodcastSyncUpdatesToPodcast(podcast, podcastSync)
-                    podcastManager.updatePodcast(podcast)
+                    podcastManager.updatePodcastBlocking(podcast)
                 }
                 .toMaybe()
                 .doOnError { LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, it, "Could not import server podcast  %s", podcastUuid) }
@@ -828,10 +828,10 @@ class PodcastSyncProcess(
             podcast.isSubscribed = true
             applyPodcastSyncUpdatesToPodcast(podcast, podcastSync)
 
-            podcastManager.updatePodcast(podcast)
+            podcastManager.updatePodcastBlocking(podcast)
         } else if (podcast.isSubscribed && !podcastSync.subscribed) { // Unsubscribed on the server but subscribed on device
             Timber.d("Unsubscribing from podcast $podcast during sync")
-            podcastManager.unsubscribe(podcast.uuid, playbackManager)
+            podcastManager.unsubscribeBlocking(podcast.uuid, playbackManager)
         }
         return Maybe.just(podcast)
     }

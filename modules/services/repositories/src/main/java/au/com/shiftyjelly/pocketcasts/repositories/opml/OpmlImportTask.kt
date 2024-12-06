@@ -242,7 +242,7 @@ class OpmlImportTask @AssistedInject constructor(
 
     private suspend fun processUrls(urls: List<String>) {
         val podcastCount = urls.size
-        val initialDatabaseCount = podcastManager.countPodcasts()
+        val initialDatabaseCount = podcastManager.countPodcastsBlocking()
 
         // keep the job running the in foreground with a notification
         setForeground(createForegroundInfo(0, podcastCount))
@@ -296,7 +296,7 @@ class OpmlImportTask @AssistedInject constructor(
     }
 
     private fun updateNotification(initialDatabaseCount: Int, podcastCount: Int) {
-        val databaseCount = podcastManager.countPodcasts()
+        val databaseCount = podcastManager.countPodcastsBlocking()
         val progress = (databaseCount - initialDatabaseCount).coerceIn(0, podcastCount)
         notificationManager.notify(Settings.NotificationId.OPML.value, buildNotification(progress, podcastCount))
     }

@@ -50,7 +50,7 @@ class PodcastSettingsViewModel @Inject constructor(
     fun loadPodcast(uuid: String) {
         this.podcastUuid = uuid
         podcast = podcastManager
-            .observePodcastByUuid(uuid)
+            .podcastByUuidRxFlowable(uuid)
             .subscribeOn(Schedulers.io())
             .toLiveData()
 
@@ -88,14 +88,14 @@ class PodcastSettingsViewModel @Inject constructor(
         val podcast = this.podcast.value ?: return
         launch {
             val autoDownloadStatus = if (download) Podcast.AUTO_DOWNLOAD_NEW_EPISODES else Podcast.AUTO_DOWNLOAD_OFF
-            podcastManager.updateAutoDownloadStatus(podcast, autoDownloadStatus)
+            podcastManager.updateAutoDownloadStatusBlocking(podcast, autoDownloadStatus)
         }
     }
 
     fun showNotifications(show: Boolean) {
         val podcast = this.podcast.value ?: return
         launch {
-            podcastManager.updateShowNotifications(podcast, show)
+            podcastManager.updateShowNotificationsBlocking(podcast, show)
         }
     }
 
@@ -117,7 +117,7 @@ class PodcastSettingsViewModel @Inject constructor(
     fun unsubscribe() {
         val podcast = this.podcast.value ?: return
         launch {
-            podcastManager.unsubscribe(podcast.uuid, playbackManager)
+            podcastManager.unsubscribeBlocking(podcast.uuid, playbackManager)
             analyticsTracker.track(
                 AnalyticsEvent.PODCAST_UNSUBSCRIBED,
                 AnalyticsProp.podcastUnsubscribed(SourceView.PODCAST_SETTINGS, podcast.uuid),
