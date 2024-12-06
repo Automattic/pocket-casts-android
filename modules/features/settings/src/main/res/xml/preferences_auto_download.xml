@@ -25,6 +25,11 @@
             android:summary="@string/settings_podcasts_selected_zero"
             android:persistent="false" />
 
+        <SwitchPreference
+            android:key="onFollowPodcast"
+            android:title="@string/settings_auto_download_on_follow_podcast"
+            android:persistent="false" />
+
         <ListPreference
             android:key="autoDownloadPodcastsLimit"
             android:dialogTitle="@string/settings_auto_download_limit_auto_downloads"

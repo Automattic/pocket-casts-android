@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-11-12 13:54:03+0000
+Translation-Revision-Date: 2024-12-04 13:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="plus_subscription_finished">Prenumerationen har löpt ut</string>
+    <string name="shuffle_whats_new_message">Spela enkelt upp ett slumpmässigt avsnitt utan att ändra ordningen på din kö.</string>
+    <string name="shuffle_whats_new_title">Vi introducerar slumpmässig uppspelning</string>
+    <string name="chapter_time_remaining_content_description">%s återstår av kapitlet</string>
+    <string name="chapter_count_summary">%1$d av %2$d</string>
+    <string name="referrals_share_text">Hej där!\n\nHär är ett %1$s gästpass för Pocket Casts Plus – min favoritpodcastspelare. Den är fullspäckad med unika funktioner som bokmärken, mappar och annat som du inte hittar någon annanstans. Jag tror att du också kommer att älska den!</string>
     <string name="files_plus_prompt">Ladda upp dina filer och mer därtill med Pocket Casts Plus</string>
     <string name="icons_plus_prompt">Få exklusiva appikoner och mer därtill med Pocket Casts Plus</string>
     <string name="themes_plus_prompt">Få exklusiva teman och mer därtill med Pocket Casts Plus</string>
@@ -71,8 +77,7 @@ Language: sv_SE
     <string name="profile_cloud_add_invalid_file">Det gick inte att läsa in den valda filen. Försök igen eller välj en annan fil.</string>
     <string name="error_generic_message">Något gick fel. Försök igen senare.</string>
     <string name="player_sleep_timer_settings">Inställningar för sovtimer</string>
-    <string name="referrals_share_text">Hej! Använd länken nedan för att göra anspråk på ditt %1$s gästpass för Pocket Casts Plus och ta del av podcasts på alla dina enheter.</string>
-    <string name="referrals_share_subject">%1$s gästpass för Pocket Casts</string>
+    <string name="referrals_share_subject">%1$s gästpass för Pocket Casts Plus!</string>
     <string name="referrals_invalid_offer_title">Detta erbjudande är inte tillgängligt</string>
     <string name="referrals_invalid_offer_description">Detta gästpass kan endast lösas in en gång och är tillgängligt för användare utan en aktiv Plus- eller Patron-prenumeration. Tack för att du lyssnar.</string>
     <string name="referrals_claim_guest_pass_title">Gör anspråk på ditt gästpass för %1$s</string>
@@ -113,8 +118,6 @@ Language: sv_SE
     <string name="paywall_layout_reviews_title">\"Helt enkelt det bästa sättet att lyssna på podcaster\"</string>
     <string name="onboarding_plus_feature_dream_with_slumber_studios">&lt;a href=\"https://slumberstudios.com/\"&gt;Dröm med Slumber Studios-innehåll&lt;/a&gt;</string>
     <string name="gift">Gåva</string>
-    <string name="share_whats_new_message">Nu kan du dela med dig av dina favoritsekvenser från vilket avsnitt som helst. Vi har även gjort det enklare att dela innehåll till alla appar för sociala medier.</string>
-    <string name="share_whats_new_title">Delning av klipp tillgängligt nu!</string>
     <string name="got_it">Uppfattat</string>
     <string name="transcript_search">Sök kopia</string>
     <string name="transcript_close">Stäng kopia</string>
@@ -1673,8 +1676,6 @@ Language: sv_SE
     <string name="player_sleep_timer">Sömntimer</string>
     <string name="player_sleep_timer_title">Sömntimer</string>
     <string name="player_sleep_end_of_episode">Avsnittets slut</string>
-    <string name="player_sleep_custom_plus">Anpassat plus</string>
-    <string name="player_sleep_custom_minus">Anpassat minus</string>
     <string name="player_sleep_cancel_timer">Avbryt timer</string>
     <string name="player_sleep_add_5_minutes">+ 5 minuter</string>
     <string name="player_sleep_60_minutes">60 minuter</string>
@@ -1838,6 +1839,10 @@ Language: sv_SE
     <string name="unarchive">Avarkivera</string>
     <string name="archive">Arkiv</string>
     <string name="add_to_up_next">Lägg till i Nästa</string>
+    <plurals name="chapter">
+        <item quantity="one">kapitel</item>
+        <item quantity="other">kapitel</item>
+    </plurals>
     <plurals name="day">
         <item quantity="one">dag</item>
         <item quantity="other">dagar</item>
@@ -1858,6 +1863,10 @@ Language: sv_SE
         <item quantity="one" formatted="true">%1$d avsnitt - %2$s kvar</item>
         <item quantity="other" formatted="true">%1$d avsnitt - %2$s kvar</item>
     </plurals>
+    <plurals name="podcast">
+        <item quantity="one">Podcast</item>
+        <item quantity="other">Podcasts</item>
+    </plurals>
     <plurals name="podcast_share_end_handle_description">
         <item quantity="one">Handtag för slutklipp: %d sekund</item>
         <item quantity="other">Handtag för slutklipp: %d sekunder</item>
@@ -1865,6 +1874,38 @@ Language: sv_SE
     <plurals name="podcast_share_start_handle_description">
         <item quantity="one">Handtag för startklipp: %d sekund</item>
         <item quantity="other">Handtag för startklipp: %d sekunder</item>
+    </plurals>
+    <plurals name="profile_stats_day_listened">
+        <item quantity="one">Lyssnad dag</item>
+        <item quantity="other">Lyssnade dagar</item>
+    </plurals>
+    <plurals name="profile_stats_day_saved">
+        <item quantity="one">Dag sparad</item>
+        <item quantity="other">Dagar sparade</item>
+    </plurals>
+    <plurals name="profile_stats_hour_listened">
+        <item quantity="one">Lyssnad timme</item>
+        <item quantity="other">Lyssnade timmar</item>
+    </plurals>
+    <plurals name="profile_stats_hour_saved">
+        <item quantity="one">Timme sparad</item>
+        <item quantity="other">Timmar sparade</item>
+    </plurals>
+    <plurals name="profile_stats_minute_listened">
+        <item quantity="one">Lyssnad minut</item>
+        <item quantity="other">Lyssnade minuter</item>
+    </plurals>
+    <plurals name="profile_stats_minute_saved">
+        <item quantity="one">Minut sparad</item>
+        <item quantity="other">Minuter sparade</item>
+    </plurals>
+    <plurals name="profile_stats_second_listened">
+        <item quantity="one">Lyssnad sekund</item>
+        <item quantity="other">Lyssnade sekunder</item>
+    </plurals>
+    <plurals name="profile_stats_second_saved">
+        <item quantity="one">Sekund sparad</item>
+        <item quantity="other">Sekunder sparade</item>
     </plurals>
     <plurals name="second">
         <item quantity="one">sekund</item>

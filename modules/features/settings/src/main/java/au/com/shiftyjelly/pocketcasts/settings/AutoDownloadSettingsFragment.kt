@@ -76,6 +76,7 @@ class AutoDownloadSettingsFragment :
     companion object {
         const val PREFERENCE_PODCASTS_CATEGORY = "podcasts_category"
         const val PREFERENCE_NEW_EPISODES = "autoDownloadNewEpisodes"
+        const val PREFERENCE_ON_FOLLOW_PODCASTS = "onFollowPodcast"
         const val PREFERENCE_CHOOSE_PODCASTS = "autoDownloadPodcastsPreference"
         const val PREFERENCE_AUTO_DOWNLOAD_PODCAST_LIMIT = "autoDownloadPodcastsLimit"
         const val PREFERENCE_CHOOSE_FILTERS = "autoDownloadPlaylists"
@@ -111,6 +112,7 @@ class AutoDownloadSettingsFragment :
     private var podcastsCategory: PreferenceCategory? = null
     private lateinit var upNextPreference: SwitchPreference
     private var newEpisodesPreference: SwitchPreference? = null
+    private var onFollowPodcastPreference: SwitchPreference? = null
     private var podcastsPreference: Preference? = null
     private var podcastsAutoDownloadLimitPreference: ListPreference? = null
     private var filtersPreference: Preference? = null
@@ -129,7 +131,13 @@ class AutoDownloadSettingsFragment :
         toolbar?.setup(title = getString(LR.string.settings_title_auto_download), navigationIcon = BackArrow, activity = activity, theme = theme)
         toolbar?.isVisible = showToolbar
 
-        podcastsAutoDownloadLimitPreference?.isVisible = FeatureFlag.isEnabled(Feature.AUTO_DOWNLOAD)
+        if (FeatureFlag.isEnabled(Feature.AUTO_DOWNLOAD)) {
+            onFollowPodcastPreference?.let { podcastsCategory?.addPreference(it) }
+            podcastsAutoDownloadLimitPreference?.let { podcastsCategory?.addPreference(it) }
+        } else {
+            onFollowPodcastPreference?.let { podcastsCategory?.removePreference(it) }
+            podcastsAutoDownloadLimitPreference?.let { podcastsCategory?.removePreference(it) }
+        }
 
         if (!showToolbar) {
             val listContainer = view.findViewById<View>(android.R.id.list_container)
@@ -191,6 +199,15 @@ class AutoDownloadSettingsFragment :
                     true
                 }
             }
+        onFollowPodcastPreference = preferenceManager.findPreference<SwitchPreference>(PREFERENCE_ON_FOLLOW_PODCASTS)
+            ?.apply {
+                setOnPreferenceChangeListener { _, newValue ->
+                    if (newValue is Boolean) {
+                        viewModel.onOnFollowPodcastChange(newValue)
+                    }
+                    true
+                }
+            }
         podcastsPreference = preferenceManager.findPreference<Preference>(PREFERENCE_CHOOSE_PODCASTS)
             ?.apply {
                 setOnPreferenceClickListener {
@@ -208,6 +225,7 @@ class AutoDownloadSettingsFragment :
                     viewModel.onLimitDownloadsChange(autoDownloadLimitSetting)
 
                     updateLimitDownloadsSummary()
+                    updateOnFollowSummary()
                     true
                 }
             }
@@ -277,7 +295,6 @@ class AutoDownloadSettingsFragment :
 
     private fun updateNewEpisodesPreferencesVisibility(status: Int) {
         val podcastsPreference = podcastsPreference ?: return
-        val podcastsLimitPreference = podcastsAutoDownloadLimitPreference ?: return
         val podcastsCategory = podcastsCategory ?: return
 
         val isAutoDownloadEnabled = if (status == GLOBAL_AUTO_DOWNLOAD_NONE) {
@@ -288,10 +305,8 @@ class AutoDownloadSettingsFragment :
 
         if (isAutoDownloadEnabled) {
             podcastsCategory.addPreference(podcastsPreference)
-            podcastsCategory.addPreference(podcastsLimitPreference)
         } else {
             podcastsCategory.removePreference(podcastsPreference)
-            podcastsCategory.removePreference(podcastsLimitPreference)
         }
     }
 
@@ -380,6 +395,7 @@ class AutoDownloadSettingsFragment :
 
         upNextPreference.isChecked = viewModel.getAutoDownloadUpNext()
         setupNewEpisodesToggleStatusCheck()
+        setupOnFollowPodcastToggleStatusCheck()
         autoDownloadOnlyDownloadOnWifi.isChecked = viewModel.getAutoDownloadUnmeteredOnly()
         autoDownloadOnlyWhenCharging.isChecked = viewModel.getAutoDownloadOnlyWhenCharging()
         if (FeatureFlag.isEnabled(Feature.AUTO_DOWNLOAD)) {
@@ -438,6 +454,10 @@ class AutoDownloadSettingsFragment :
         }
     }
 
+    private fun setupOnFollowPodcastToggleStatusCheck() {
+        onFollowPodcastPreference?.isChecked = viewModel.isAutoDownloadOnFollowPodcastEnabled()
+    }
+
     override fun onBackPressed(): Boolean {
         if (childFragmentManager.backStackEntryCount > 0) {
             childFragmentManager.popBackStack()
@@ -464,9 +484,26 @@ class AutoDownloadSettingsFragment :
             value = settings.autoDownloadLimit.value.id.toString()
         }
         updateLimitDownloadsSummary()
+        updateOnFollowSummary()
     }
 
     private fun updateLimitDownloadsSummary() {
         podcastsAutoDownloadLimitPreference?.summary = getString(settings.autoDownloadLimit.value.titleRes)
+    }
+
+    private fun updateOnFollowSummary() {
+        val limitDownloads = AutoDownloadLimitSetting.getNumberOfEpisodes(viewModel.getLimitDownload())
+
+        val localizedLimitDownloads = when (limitDownloads) {
+            2 -> resources.getString(LR.string.number_two)
+            3 -> resources.getString(LR.string.number_three)
+            5 -> resources.getString(LR.string.number_five)
+            10 -> resources.getString(LR.string.number_ten)
+            else -> limitDownloads.toString()
+        }
+
+        onFollowPodcastPreference?.summary = resources.getQuantityString(
+            LR.plurals.settings_auto_download_on_follow_podcast_description, limitDownloads, localizedLimitDownloads,
+        )
     }
 }

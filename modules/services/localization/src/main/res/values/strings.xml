@@ -1202,6 +1202,18 @@
     <string name="settings_auto_download_filters">Auto download filters</string>
     <string name="settings_auto_download_filters_episodes">All filter episodes</string>
     <string name="settings_auto_download_new_episodes">New episodes</string>
+    <string name="settings_auto_download_on_follow_podcast">On Follow</string>
+
+    <plurals name="settings_auto_download_on_follow_podcast_description">
+        <item quantity="one">Automatically download the latest episode from new shows you follow.</item>
+        <item quantity="other">Automatically download the latest %s episodes from new shows you follow.</item>
+    </plurals>
+
+    <string name="number_two">two</string>
+    <string name="number_three">three</string>
+    <string name="number_five">five</string>
+    <string name="number_ten">ten</string>
+
     <string name="settings_auto_download_podcasts">Auto download podcasts</string>
     <string name="settings_auto_download_new_episodes_description">Download new episodes as they’re released, and manage your storage by setting a limit on how many episodes are saved.</string>
     <string name="settings_auto_download_limit">Limit downloads</string>
@@ -2256,5 +2268,6 @@
     <!-- Up Next Shuffle -->
     <string name="up_next_shuffle_button_content_description">Up next shuffle</string>
     <string name="up_next_shuffle_disable_button_content_description">Up next shuffle disable</string>
+    <string name="up_next_shuffle_enable_confirmation_message">Shuffle is on. Episodes will play in random order.</string>
 
 </resources>

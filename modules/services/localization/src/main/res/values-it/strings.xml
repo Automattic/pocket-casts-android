@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-11-13 16:54:03+0000
+Translation-Revision-Date: 2024-12-02 21:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
+    <string name="plus_subscription_finished">Abbonamento terminato</string>
+    <string name="shuffle_whats_new_message">Riproduci facilmente un episodio casuale senza cambiare l\'ordine della coda.</string>
+    <string name="shuffle_whats_new_title">Introduzione a Shuffle</string>
+    <string name="chapter_time_remaining_content_description">%s rimanente nel capitolo</string>
+    <string name="chapter_count_summary">%1$d di %2$d</string>
+    <string name="referrals_share_text">Ciao!\n\nQuesto è un %1$s pass per ospiti per Pocket Casts Plus, il mio podcast player preferito. È ricco di funzionalità uniche come segnalibri, cartelle e molto altro che non troverai da nessun\'altra parte. Penso che piacerà anche a te.</string>
     <string name="files_plus_prompt">Carica i tuoi file con Pocket Casts Plus e molto altro ancora</string>
     <string name="icons_plus_prompt">Ottieni icone di app esclusive con Pocket Casts Plus e molto altro ancora</string>
     <string name="themes_plus_prompt">Ottieni temi esclusivi con Pocket Casts Plus e molto altro ancora</string>
@@ -71,8 +77,7 @@ Language: it
     <string name="profile_cloud_add_invalid_file">Impossibile caricare il file selezionato. Riprova o scegli un file differente.</string>
     <string name="error_generic_message">Si è verificato un problema. Riprova più tardi.</string>
     <string name="player_sleep_timer_settings">Impostazioni autospegnimento</string>
-    <string name="referrals_share_text">Ciao! Utilizza il seguente link per ottenere il tuo pass per ospiti %1$s per Pocket Casts Plus e goditi i podcast in tutti i tuoi dispositivi!</string>
-    <string name="referrals_share_subject">Pass per ospiti %1$s per Pocket Casts</string>
+    <string name="referrals_share_subject">%1$s Pass per ospiti per Pocket Casts Plus.</string>
     <string name="referrals_invalid_offer_title">Questa offerta non è disponibile</string>
     <string name="referrals_invalid_offer_description">Questo pass per ospiti può essere riscattato solo una volta ed è disponibile per chi non ha un abbonamento Plus o Patron attivo. Grazie per l\'ascolto!</string>
     <string name="referrals_claim_guest_pass_title">Riscatta il tuo pass per ospiti %1$s</string>
@@ -113,8 +118,6 @@ Language: it
     <string name="paywall_layout_reviews_title">\"È semplicemente il modo migliore per ascoltare podcast\"</string>
     <string name="onboarding_plus_feature_dream_with_slumber_studios">&lt;a href=\"https://slumberstudios.com/\"&gt;Sogna con i contenuti di Slumber Studios&lt;/a&gt;</string>
     <string name="gift">Regalo</string>
-    <string name="share_whats_new_message">Ora puoi condividere clip dei tuoi passaggi preferiti di ogni episodio. Abbiamo anche semplificato la condivisione di qualsiasi contenuto su tutte le app dei social media.</string>
-    <string name="share_whats_new_title">Ora disponibile la condivisione di clip.</string>
     <string name="got_it">Fatto</string>
     <string name="transcript_search">Cerca trascrizione</string>
     <string name="transcript_close">Chiudi trascrizione</string>
@@ -1673,8 +1676,6 @@ Language: it
     <string name="player_sleep_timer">Autospegnimento</string>
     <string name="player_sleep_timer_title">Autospegnimento</string>
     <string name="player_sleep_end_of_episode">Fine dell\'episodio</string>
-    <string name="player_sleep_custom_plus">Personalizza più</string>
-    <string name="player_sleep_custom_minus">Personalizza meno</string>
     <string name="player_sleep_cancel_timer">Annulla timer</string>
     <string name="player_sleep_add_5_minutes">+ 5 minuti</string>
     <string name="player_sleep_60_minutes">60 minuti</string>
@@ -1838,6 +1839,10 @@ Language: it
     <string name="unarchive">Annulla archiviazione</string>
     <string name="archive">Archivia</string>
     <string name="add_to_up_next">Aggiungi a Prossimo</string>
+    <plurals name="chapter">
+        <item quantity="one">capitolo</item>
+        <item quantity="other">capitoli</item>
+    </plurals>
     <plurals name="day">
         <item quantity="one">giorno</item>
         <item quantity="other">giorni</item>
@@ -1858,6 +1863,10 @@ Language: it
         <item quantity="one" formatted="true">%1$d episodio - %2$s rimanente</item>
         <item quantity="other" formatted="true">%1$d episodi - %2$s rimanenti</item>
     </plurals>
+    <plurals name="podcast">
+        <item quantity="one">Podcast</item>
+        <item quantity="other">Podcast</item>
+    </plurals>
     <plurals name="podcast_share_end_handle_description">
         <item quantity="one">Fine maniglia della clip: %d secondo</item>
         <item quantity="other">Fine maniglia della clip: %d secondi</item>
@@ -1865,6 +1874,38 @@ Language: it
     <plurals name="podcast_share_start_handle_description">
         <item quantity="one">Inizio maniglia della clip: %d secondo</item>
         <item quantity="other">Inizio maniglia della clip: %d secondi</item>
+    </plurals>
+    <plurals name="profile_stats_day_listened">
+        <item quantity="one">Giorno di ascolto</item>
+        <item quantity="other">Giorni di ascolto</item>
+    </plurals>
+    <plurals name="profile_stats_day_saved">
+        <item quantity="one">Giorno risparmiato</item>
+        <item quantity="other">Giorni risparmiati</item>
+    </plurals>
+    <plurals name="profile_stats_hour_listened">
+        <item quantity="one">Ore ascoltate</item>
+        <item quantity="other">Ore di ascolto</item>
+    </plurals>
+    <plurals name="profile_stats_hour_saved">
+        <item quantity="one">Ora risparmiata</item>
+        <item quantity="other">Ore risparmiate</item>
+    </plurals>
+    <plurals name="profile_stats_minute_listened">
+        <item quantity="one">Minuto di ascolto</item>
+        <item quantity="other">Minuti di ascolto</item>
+    </plurals>
+    <plurals name="profile_stats_minute_saved">
+        <item quantity="one">Minuto risparmiato</item>
+        <item quantity="other">Minuti risparmiati</item>
+    </plurals>
+    <plurals name="profile_stats_second_listened">
+        <item quantity="one">Secondo di ascolto</item>
+        <item quantity="other">Secondi ascoltati</item>
+    </plurals>
+    <plurals name="profile_stats_second_saved">
+        <item quantity="one">Secondo risparmiato</item>
+        <item quantity="other">Secondi risparmiati</item>
     </plurals>
     <plurals name="second">
         <item quantity="one">secondo</item>
