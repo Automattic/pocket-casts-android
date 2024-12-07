@@ -3,6 +3,8 @@
 *   Updates
     *   Update account details header UI
         ([#3294](https://github.com/Automattic/pocket-casts-android/pull/3294))
+    *   Improve the Up Next clear all button
+        ([#3334](https://github.com/Automattic/pocket-casts-android/pull/3334))
 
 7.78
 -----
