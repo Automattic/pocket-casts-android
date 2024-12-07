@@ -13,11 +13,11 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.view.doOnLayout
-import androidx.fragment.compose.content
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.buttons.ToggleButtonOption
 import au.com.shiftyjelly.pocketcasts.compose.dialogs.OptionsDialogComponent
 import au.com.shiftyjelly.pocketcasts.compose.dialogs.OptionsDialogOption
+import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -97,7 +97,7 @@ class OptionsDialog : BottomSheetDialogFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ) = content {
+    ) = contentWithoutConsumedInsets {
         AppTheme(if (forceDarkTheme) Theme.ThemeType.DARK else theme.activeTheme) {
             OptionsDialogComponent(title = title, iconColor = iconColor, options = options)
         }
