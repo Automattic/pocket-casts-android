@@ -14,8 +14,8 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
-import androidx.fragment.compose.content
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.reimagine.ui.ShareColors
 import au.com.shiftyjelly.pocketcasts.reimagine.ui.rememberBackgroundAssetControler
@@ -64,7 +64,7 @@ class ShareEpisodeTimestampFragment : BaseDialogFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ) = content {
+    ) = contentWithoutConsumedInsets {
         val platforms = remember { SocialPlatform.getAvailablePlatforms(requireContext()) }
         val assetController = rememberBackgroundAssetControler(shareColors)
         val listener = remember { shareListenerFactory.create(this@ShareEpisodeTimestampFragment, assetController, args.timestampType, args.source) }
