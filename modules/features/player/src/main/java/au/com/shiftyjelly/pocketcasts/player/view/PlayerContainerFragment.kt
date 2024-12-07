@@ -36,8 +36,8 @@ import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
+import au.com.shiftyjelly.pocketcasts.ui.helper.NavigationBarColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -77,9 +77,6 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
         },
     )
     private var binding: FragmentPlayerContainerBinding? = null
-
-    val overrideTheme: Theme.ThemeType
-        get() = if (settings.useDarkUpNextTheme.value) Theme.ThemeType.DARK else theme.activeTheme
 
     private val closeUpNextCallback = object : BottomSheetBehavior.BottomSheetCallback() {
         override fun onStateChanged(bottomSheet: View, newState: Int) {
@@ -132,8 +129,8 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
                     analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHOWN, mapOf(SOURCE_KEY to UpNextSource.NOW_PLAYING.analyticsValue))
 
                     activity?.let {
-                        theme.setNavigationBarIconColor(window = it.window, isDark = true)
-                        theme.updateWindowStatusBarIcons(it.window, StatusBarIconColor.Light)
+                        theme.updateWindowNavigationBarColor(window = it.window, navigationBarColor = NavigationBarColor.UpNext(isFullScreen = true))
+                        theme.updateWindowStatusBarIcons(it.window, StatusBarIconColor.UpNext(isFullScreen = true))
                     }
 
                     upNextFragment.onExpanded()

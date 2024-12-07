@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
@@ -41,7 +42,7 @@ class ShelfFragment : BaseFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = content {
-        AppTheme(theme.activeTheme) {
+        AppTheme(Theme.ThemeType.DARK) {
             ShelfRearrangeActionsPage(
                 theme = theme,
                 shelfViewModel = shelfViewModel,

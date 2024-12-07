@@ -1,10 +1,12 @@
 package au.com.shiftyjelly.pocketcasts.referrals
 
 import android.app.Activity
+import android.graphics.Color
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
@@ -19,6 +21,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
+import au.com.shiftyjelly.pocketcasts.ui.helper.NavigationBarColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -77,11 +80,13 @@ class ReferralsGuestPassFragment : BaseFragment() {
                 }
             }
         }
+    }.apply {
+        consumeWindowInsets = false
     }
 
     private fun updateStatusAndNavColors() {
         activity?.let {
-            theme.setNavigationBarIconColor(window = it.window, isDark = true)
+            theme.updateWindowNavigationBarColor(window = it.window, navigationBarColor = NavigationBarColor.Color(color = Color.BLACK, lightIcons = true))
             theme.updateWindowStatusBarIcons(window = it.window, statusBarIconColor = StatusBarIconColor.Dark)
         }
     }
