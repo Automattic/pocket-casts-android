@@ -539,11 +539,18 @@ class MediaSessionManager(
                     ?: return false
                 if (keyEvent.action == KeyEvent.ACTION_DOWN) {
                     when (keyEvent.keyCode) {
-                        // Some wired headphones do not respect KeyEvent.KEYCODE_HEADSETHOOK. May also need to add an event trigger for KEYCODE_MEDIA_PLAY in the future
+                        // When the phone is in sleep mode, and the audio player doesn't have focus, KEYCODE_MEDIA_PLAY is
+                        // called instead of KEYCODE_MEDIA_PLAY_PAUSE or KEYCODE_HEADSETHOOK
+                        KeyEvent.KEYCODE_MEDIA_PLAY -> {
+                            handleMediaButtonSingleTap()
+                            return true
+                        }
+                        // Some wired headphones, such as the Apple USB-C headphones do not invoke KeyEvent.KEYCODE_HEADSETHOOK.
                         KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE -> {
                             handleMediaButtonSingleTap()
                             return true
                         }
+                        // This should be called on most wired headsets.
                         KeyEvent.KEYCODE_HEADSETHOOK -> {
                             handleMediaButtonSingleTap()
                             return true
