@@ -70,7 +70,7 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
 
     @Inject lateinit var playbackManager: PlaybackManager
 
-    override val statusBarIconColor: StatusBarIconColor? = null
+    override val statusBarIconColor = StatusBarIconColor.Light
 
     private val viewModel: PlayerViewModel by activityViewModels()
     private lateinit var imageRequestFactory: PocketCastsImageRequestFactory
