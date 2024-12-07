@@ -11,7 +11,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
-import androidx.fragment.compose.content
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -19,6 +18,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.file.StorageOptions
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.StorageSettingsViewModel
@@ -48,7 +48,7 @@ class StorageSettingsFragment : BaseFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ) = content {
+    ) = contentWithoutConsumedInsets {
         AppThemeWithBackground(theme.activeTheme) {
             val bottomInset = settings.bottomInset.collectAsStateWithLifecycle(0)
             StorageSettingsPage(

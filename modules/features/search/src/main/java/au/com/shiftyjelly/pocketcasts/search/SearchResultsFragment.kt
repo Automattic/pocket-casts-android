@@ -9,10 +9,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.viewModels
-import androidx.fragment.compose.content
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeItem
@@ -60,7 +60,7 @@ class SearchResultsFragment : BaseFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ) = content {
+    ) = contentWithoutConsumedInsets {
         val bottomInset by settings.bottomInset.collectAsStateWithLifecycle(initialValue = 0)
         val bottomInsetDp = bottomInset.pxToDp(LocalContext.current).dp
         AppThemeWithBackground(theme.activeTheme) {

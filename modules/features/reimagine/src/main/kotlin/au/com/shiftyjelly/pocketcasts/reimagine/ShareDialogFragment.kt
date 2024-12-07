@@ -28,12 +28,12 @@ import androidx.core.os.bundleOf
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.doOnLayout
 import androidx.fragment.app.viewModels
-import androidx.fragment.compose.content
 import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.dialogs.OptionsDialogComponent
 import au.com.shiftyjelly.pocketcasts.compose.dialogs.OptionsDialogOption
+import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
@@ -90,7 +90,7 @@ class ShareDialogFragment : BottomSheetDialogFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ) = content {
+    ) = contentWithoutConsumedInsets {
         val usePodcastColors = args.backgroundColor != null
         val state by viewModel.uiState.collectAsState()
         val podcast = state.podcast
@@ -99,7 +99,7 @@ class ShareDialogFragment : BottomSheetDialogFragment() {
         // Dismiss dialog as this is a user episode
         if (podcast == null || episode !is PodcastEpisode) {
             LaunchedEffect(Unit) { dismiss() }
-            return@content
+            return@contentWithoutConsumedInsets
         }
 
         if (usePodcastColors) {

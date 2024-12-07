@@ -34,6 +34,7 @@ dependencies {
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.compose.ui.util)
+    implementation(libs.fragment.compose)
     implementation(libs.lottie)
     implementation(libs.lottie.compose)
     implementation(libs.reorderable)

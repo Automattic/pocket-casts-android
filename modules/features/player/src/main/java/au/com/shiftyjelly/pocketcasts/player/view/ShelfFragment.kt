@@ -6,8 +6,8 @@ import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.fragment.compose.content
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.player.view.shelf.ShelfRearrangeActionsPage
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel
@@ -41,7 +41,7 @@ class ShelfFragment : BaseFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ) = content {
+    ) = contentWithoutConsumedInsets {
         AppTheme(Theme.ThemeType.DARK) {
             ShelfRearrangeActionsPage(
                 theme = theme,
