@@ -74,7 +74,7 @@ coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 compose-activity = "androidx.activity:activity-compose:1.9.3"
 compose-animation = { module = "androidx.compose.animation:animation" }
 compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose" }
-compose-constraintlayout = "androidx.constraintlayout:constraintlayout-compose:1.0.1"
+compose-constraintlayout = "androidx.constraintlayout:constraintlayout-compose:1.1.0"
 compose-foundation = { module = "androidx.compose.foundation:foundation" }
 compose-livedata = { module = "androidx.compose.runtime:runtime-livedata" }
 compose-material = { module = "androidx.compose.material:material" }
