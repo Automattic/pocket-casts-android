@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.player.view.shelf
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -83,7 +84,8 @@ private fun Content(
 ) {
     Column(
         modifier = Modifier
-            .background(Color(AndroidColor.parseColor(ColorUtils.colorIntToHexString(backgroundColorInt)))),
+            .background(Color(AndroidColor.parseColor(ColorUtils.colorIntToHexString(backgroundColorInt))))
+            .navigationBarsPadding(),
     ) {
         ThemedTopAppBar(
             title = stringResource(LR.string.rearrange_actions),
