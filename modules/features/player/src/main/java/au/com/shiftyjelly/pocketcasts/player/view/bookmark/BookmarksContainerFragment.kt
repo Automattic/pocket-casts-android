@@ -53,7 +53,7 @@ class BookmarksContainerFragment :
         get() = if (sourceView == SourceView.PROFILE) {
             StatusBarIconColor.Theme
         } else {
-            StatusBarIconColor.Dark
+            StatusBarIconColor.Light
         }
 
     var binding: FragmentBookmarksContainerBinding? = null
