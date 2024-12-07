@@ -20,6 +20,7 @@ import androidx.fragment.compose.content
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.reimagine.clip.ShareClipViewModel.SnackbarMessage
 import au.com.shiftyjelly.pocketcasts.reimagine.ui.ShareColors
@@ -96,7 +97,7 @@ class ShareClipFragment : BaseDialogFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ) = content {
+    ) = contentWithoutConsumedInsets {
         val platforms = remember {
             SocialPlatform.getAvailablePlatforms(
                 requireContext(),
