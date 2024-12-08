@@ -47,4 +47,8 @@ sealed class PlaylistProperty {
     object Starred : PlaylistProperty(), FilterUpdatedEvent {
         override val groupValue = "starred"
     }
+
+    object ExcludeFromUpNext : PlaylistProperty(), FilterUpdatedEvent {
+        override val groupValue = "excludeFromUpNext"
+    }
 }

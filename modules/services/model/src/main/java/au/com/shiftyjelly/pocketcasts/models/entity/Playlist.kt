@@ -44,6 +44,7 @@ data class Playlist(
     @ColumnInfo(name = "longerThan") var longerThan: Int = 20,
     @ColumnInfo(name = "shorterThan") var shorterThan: Int = 40,
     @ColumnInfo(name = "draft") var draft: Boolean = false, // Used when creating a new filter
+    @ColumnInfo(name = "excludeFromUpNext") var excludeFromUpNext: Boolean = false,
 ) : Serializable {
 
     constructor() : this(uuid = "")

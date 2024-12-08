@@ -138,6 +138,20 @@ class FilterEpisodeListViewModel @Inject constructor(
         }
     }
 
+    fun excludeFromUpNextChipTapped() {
+        launch {
+            playlist.value?.let { playlist ->
+                playlist.excludeFromUpNext = !playlist.excludeFromUpNext
+
+                val userPlaylistUpdate = UserPlaylistUpdate(
+                    listOf(PlaylistProperty.ExcludeFromUpNext),
+                    PlaylistUpdateSource.FILTER_EPISODE_LIST,
+                )
+                playlistManager.updateBlocking(playlist, userPlaylistUpdate)
+            }
+        }
+    }
+
     fun downloadAll() {
         val episodes = (episodesList.value ?: emptyList())
         val trimmedList = episodes.subList(0, min(MAX_DOWNLOAD_ALL, episodes.count()))

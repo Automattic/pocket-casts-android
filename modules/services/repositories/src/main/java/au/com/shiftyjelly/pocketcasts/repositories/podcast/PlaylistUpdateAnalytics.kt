@@ -46,6 +46,7 @@ class PlaylistUpdateAnalytics @Inject constructor(
                 put(Key.MEDIA_TYPE, it)
             }
             put(Key.STARRED, playlist.starred)
+            put(Key.EXCLUDE_FROM_UP_NEXT, playlist.excludeFromUpNext)
             releaseDateAnalyticsValue(playlist)?.let {
                 put(Key.RELEASE_DATE, it)
             }
@@ -171,6 +172,7 @@ class PlaylistUpdateAnalytics @Inject constructor(
             const val SORT_ORDER = "sort_order"
             const val SOURCE = "source"
             const val STARRED = "starred"
+            const val EXCLUDE_FROM_UP_NEXT = "excludeFromUpNext"
         }
 
         private object Value {
