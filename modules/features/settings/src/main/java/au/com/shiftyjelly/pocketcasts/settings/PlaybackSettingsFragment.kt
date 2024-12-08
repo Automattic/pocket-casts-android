@@ -171,24 +171,6 @@ class PlaybackSettingsFragment : BaseFragment() {
                             )
                         }
 
-                        SettingsItems.SETTINGS_UP_NEXT_SWIPE -> {
-                            UpNextSwipe(
-                                saved = settings.upNextSwipe.flow.collectAsState().value,
-                                onSave = {
-                                    analyticsTracker.track(
-                                        AnalyticsEvent.SETTINGS_GENERAL_UP_NEXT_SWIPE_CHANGED,
-                                        mapOf(
-                                            "value" to when (it) {
-                                                Settings.UpNextAction.PLAY_NEXT -> "play_next"
-                                                Settings.UpNextAction.PLAY_LAST -> "play_last"
-                                            },
-                                        ),
-                                    )
-                                    settings.upNextSwipe.set(it, updateModifiedAt = true)
-                                },
-                            )
-                        }
-
                         SettingsItems.SETTINGS_EPISODE_GROUPING -> {
                             PodcastEpisodeGrouping(
                                 saved = settings.podcastGroupingDefault.flow.collectAsState().value,
@@ -320,19 +302,6 @@ class PlaybackSettingsFragment : BaseFragment() {
                             )
                         }
 
-                        SettingsItems.SETTINGS_PLAY_UP_NEXT_EPISODE -> {
-                            PlayUpNextOnTap(
-                                saved = settings.tapOnUpNextShouldPlay.flow.collectAsState().value,
-                                onSave = {
-                                    analyticsTracker.track(
-                                        AnalyticsEvent.SETTINGS_GENERAL_PLAY_UP_NEXT_ON_TAP_TOGGLED,
-                                        mapOf("enabled" to it),
-                                    )
-                                    settings.tapOnUpNextShouldPlay.set(it, updateModifiedAt = true)
-                                },
-                            )
-                        }
-
                         SettingsItems.SETTINGS_ADJUST_REMAINING_TIME -> {
                             UseRealTimeForPlaybackRemainingTime(
                                 saved = settings.useRealTimeForPlaybackRemaingTime.flow.collectAsState().value,
@@ -378,6 +347,60 @@ class PlaybackSettingsFragment : BaseFragment() {
                                         mapOf("enabled" to it),
                                     )
                                     settings.shakeToResetSleepTimer.set(it, updateModifiedAt = true)
+                                },
+                            )
+                        }
+
+                        SettingsItems.SETTINGS_HEADER_UP_NEXT -> {
+                            Column {
+                                Spacer(modifier = Modifier.height(SettingsSection.verticalPadding))
+                                SettingSectionHeader(
+                                    text = stringResource(LR.string.settings_general_up_next),
+                                    indent = false,
+                                )
+                            }
+                        }
+
+                        SettingsItems.SETTINGS_UP_NEXT_SWIPE -> {
+                            UpNextSwipe(
+                                saved = settings.upNextSwipe.flow.collectAsState().value,
+                                onSave = {
+                                    analyticsTracker.track(
+                                        AnalyticsEvent.SETTINGS_GENERAL_UP_NEXT_SWIPE_CHANGED,
+                                        mapOf(
+                                            "value" to when (it) {
+                                                Settings.UpNextAction.PLAY_NEXT -> "play_next"
+                                                Settings.UpNextAction.PLAY_LAST -> "play_last"
+                                            },
+                                        ),
+                                    )
+                                    settings.upNextSwipe.set(it, updateModifiedAt = true)
+                                },
+                            )
+                        }
+
+                        SettingsItems.SETTINGS_PLAY_UP_NEXT_EPISODE -> {
+                            PlayUpNextOnTap(
+                                saved = settings.tapOnUpNextShouldPlay.flow.collectAsState().value,
+                                onSave = {
+                                    analyticsTracker.track(
+                                        AnalyticsEvent.SETTINGS_GENERAL_PLAY_UP_NEXT_ON_TAP_TOGGLED,
+                                        mapOf("enabled" to it),
+                                    )
+                                    settings.tapOnUpNextShouldPlay.set(it, updateModifiedAt = true)
+                                },
+                            )
+                        }
+
+                        SettingsItems.SETTINGS_PLAY_UP_NEXT_EPISODE_MANUALLY -> {
+                            PlayUpNextEpisodeManually(
+                                saved = settings.upNextEpisodeManually.flow.collectAsState().value,
+                                onSave = {
+                                    analyticsTracker.track(
+                                        AnalyticsEvent.SETTINGS_GENERAL_PLAY_UP_NEXT_EPISODE_MANUALLY_TOGGLED,
+                                        mapOf("enabled" to it),
+                                    )
+                                    settings.upNextEpisodeManually.set(it, updateModifiedAt = true)
                                 },
                             )
                         }
@@ -637,6 +660,16 @@ class PlaybackSettingsFragment : BaseFragment() {
         )
 
     @Composable
+    private fun PlayUpNextEpisodeManually(saved: Boolean, onSave: (Boolean) -> Unit) =
+        SettingRow(
+            primaryText = stringResource(LR.string.settings_up_next_episode_manually),
+            secondaryText = stringResource(LR.string.settings_up_next_episode_manually_summary),
+            toggle = SettingRowToggle.Switch(checked = saved),
+            modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) },
+            indent = false,
+        )
+
+    @Composable
     private fun ShakeToResetSleepTimer(saved: Boolean, onSave: (Boolean) -> Unit) =
         SettingRow(
             primaryText = stringResource(LR.string.settings_sleep_timer_shake_to_reset),
@@ -719,7 +752,6 @@ class PlaybackSettingsFragment : BaseFragment() {
 private enum class SettingsItems {
     SETTINGS_HEADER_DEFAULTS,
     SETTINGS_ROW_ACTION,
-    SETTINGS_UP_NEXT_SWIPE,
     SETTINGS_EPISODE_GROUPING,
     SETTINGS_ARCHIVED_EPISODES,
     SETTINGS_MEDIA_NOTIFICATION_CONTROLS,
@@ -729,11 +761,14 @@ private enum class SettingsItems {
     SETTINGS_KEEP_SCREEN_AWAKE,
     SETTINGS_OPEN_PLAYER_AUTOMATICALLY,
     SETTINGS_INTELLIGENT_PLAYBACK,
-    SETTINGS_PLAY_UP_NEXT_EPISODE,
     SETTINGS_ADJUST_REMAINING_TIME,
     SETTINGS_HEADER_SLEEP_TIMER,
     SETTINGS_SLEEP_TIMER_RESTART,
     SETTINGS_SLEEP_TIMER_SHAKE,
+    SETTINGS_HEADER_UP_NEXT,
+    SETTINGS_UP_NEXT_SWIPE,
+    SETTINGS_PLAY_UP_NEXT_EPISODE,
+    SETTINGS_PLAY_UP_NEXT_EPISODE_MANUALLY,
 
     // The [scrollToAutoPlay] fragment argument handling depends on this item being last
     // in the list. If it's position is changed, make sure you update the handling when

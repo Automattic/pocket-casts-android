@@ -1025,6 +1025,12 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
+    override val upNextEpisodeManually = UserSetting.BoolPref(
+        sharedPrefKey = "up_next_episode_manually",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
+
     override val cachedSubscriptionStatus = UserSetting.PrefFromString<SubscriptionStatus?>(
         sharedPrefKey = "accountstatus",
         defaultValue = null,
