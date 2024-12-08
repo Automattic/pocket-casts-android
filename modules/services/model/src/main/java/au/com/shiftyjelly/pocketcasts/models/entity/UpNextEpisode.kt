@@ -20,6 +20,7 @@ data class UpNextEpisode(
     @ColumnInfo(name = "playlistId") var playlistId: Long? = null,
     @ColumnInfo(name = "title") var title: String = "",
     @ColumnInfo(name = "publishedDate") var publishedDate: Date? = null,
+    @ColumnInfo(name = "addedToQueueAt") var addedToQueueAt: Long? = null,
     @ColumnInfo(name = "downloadUrl") var downloadUrl: String? = null,
     @ColumnInfo(name = "podcastUuid") var podcastUuid: String? = null,
 ) : Serializable
@@ -32,4 +33,10 @@ fun BaseEpisode.toUpNextEpisode(): UpNextEpisode {
         downloadUrl = downloadUrl,
         publishedDate = publishedDate,
     )
+}
+
+enum class SortType {
+    ADDED_TO_UP_NEXT,
+    NEWEST_TO_OLDEST,
+    OLDEST_TO_NEWEST,
 }

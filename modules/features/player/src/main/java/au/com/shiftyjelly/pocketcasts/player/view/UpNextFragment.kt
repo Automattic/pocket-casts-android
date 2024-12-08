@@ -31,6 +31,7 @@ import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.UpNextViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSortType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -38,6 +39,7 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.hideShadow
+import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.extensions.tintIcons
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ChromeCastButton
@@ -293,6 +295,10 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
                     onClearUpNext()
                     true
                 }
+                R.id.sort_up_next -> {
+                    onSortUpNext()
+                    true
+                }
                 else -> false
             }
         }
@@ -311,6 +317,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
             adapter.updateUpNextEmptyState(it.upNextEpisodes.isNotEmpty())
             toolbar.menu.findItem(R.id.menu_select)?.isVisible = it.upNextEpisodes.isNotEmpty()
             toolbar.menu.findItem(R.id.clear_up_next)?.isVisible = it.upNextEpisodes.isNotEmpty()
+            toolbar.menu.findItem(R.id.sort_up_next)?.isVisible = it.upNextEpisodes.isNotEmpty()
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -516,6 +523,36 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         properties[SOURCE_KEY] = upNextSource.analyticsValue
         properties.putAll(props)
         analyticsTracker.track(event, properties)
+    }
+
+    override fun onSortUpNext() {
+        val dialog = OptionsDialog()
+            .setTitle(getString(LR.string.sort_by))
+            .addTextOption(
+                titleId = LR.string.up_next_sort_added_to_up_next,
+                click = {
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        playbackManager.upNextQueue.sortUpNextBy(UpNextSortType.ADDED_TO_UP_NEXT)
+                    }
+                },
+            )
+            .addTextOption(
+                titleId = LR.string.up_next_sort_newest_to_oldest,
+                click = {
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        playbackManager.upNextQueue.sortUpNextBy(UpNextSortType.NEWEST_TO_OLDEST)
+                    }
+                },
+            )
+            .addTextOption(
+                titleId = LR.string.up_next_sort_oldest_to_newest,
+                click = {
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        playbackManager.upNextQueue.sortUpNextBy(UpNextSortType.OLDEST_TO_NEWEST)
+                    }
+                },
+            )
+        dialog.show(parentFragmentManager, "up_next_sort_options")
     }
 }
 

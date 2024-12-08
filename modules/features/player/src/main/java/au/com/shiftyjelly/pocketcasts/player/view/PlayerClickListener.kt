@@ -18,6 +18,7 @@ interface ChapterListener {
 
 interface UpNextListener {
     fun onClearUpNext()
+    fun onSortUpNext()
     fun onUpNextEpisodeStartDrag(viewHolder: RecyclerView.ViewHolder)
     fun onEpisodeActionsClick(episodeUuid: String, podcastUuid: String?)
     fun onEpisodeActionsLongPress(episodeUuid: String, podcastUuid: String?)

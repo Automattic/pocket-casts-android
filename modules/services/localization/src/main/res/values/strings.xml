@@ -369,6 +369,7 @@
     <string name="player_trim_silence_detail">Reduces the length of an episode by trimming silence in conversations.</string>
     <string name="player_up_next" translatable="false">@string/up_next</string>
     <string name="player_up_next_clear_queue">Clear Queue</string>
+    <string name="player_up_next_sort_queue">Sort Queue</string>
     <string name="player_up_next_clear_queue_summary">Are you sure you want to clear your Up Next queue?</string>
     <string name="player_up_next_clear_episodes_plural">Clear %1$d episodes</string>
     <string name="player_up_next_clear_queue_button">Clear Up Next</string>
@@ -404,6 +405,10 @@
     <string name="player_played_up_to">Played up to %s</string>
     <string name="player_time_remaining">Time remaining %s</string>
     <string name="drag_down_to_dismiss_content_description">Drag down to dismiss</string>
+
+    <string name="up_next_sort_added_to_up_next">Added to Up Next</string>
+    <string name="up_next_sort_newest_to_oldest" translatable="false">@string/sort_newest_to_oldest</string>
+    <string name="up_next_sort_oldest_to_newest" translatable="false">@string/sort_oldest_to_newest</string>
 
     <!-- Chapters -->
 
