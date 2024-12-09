@@ -154,10 +154,6 @@ class AutoDownloadSettingsFragment :
                 settings.bottomInset.collect {
                     view.updatePadding(bottom = it)
                 }
-                viewModel.hasEpisodesWithAutoDownloadEnabled.collect {
-                    setupNewEpisodesToggleStatusCheck()
-                    onNewEpisodesToggleChange(viewModel.getAutoDownloadNewEpisodes())
-                }
             }
         }
     }
@@ -401,7 +397,6 @@ class AutoDownloadSettingsFragment :
         if (FeatureFlag.isEnabled(Feature.AUTO_DOWNLOAD)) {
             newEpisodesPreference?.summary = getString(LR.string.settings_auto_download_new_episodes_description)
         }
-        onNewEpisodesToggleChange(viewModel.getAutoDownloadNewEpisodes())
     }
 
     private fun countPodcastsAutoDownloading(): Single<Int> {
@@ -434,24 +429,17 @@ class AutoDownloadSettingsFragment :
             )
     }
 
+    @SuppressLint("CheckResult")
     private fun setupNewEpisodesToggleStatusCheck() {
-        val value = viewModel.getAutoDownloadNewEpisodes()
-        when (value) {
-            Podcast.AUTO_DOWNLOAD_OFF -> {
-                newEpisodesPreference?.isChecked = false
-            }
-
-            Podcast.AUTO_DOWNLOAD_NEW_EPISODES -> {
-                newEpisodesPreference?.isChecked = true
-            }
-
-            else -> {
-                // This is the case where users have not set this toggle yet.
-                // In this case, we check if the user has auto download enabled for any podcast
-                // so we can enable the global auto-download status.
-                newEpisodesPreference?.isChecked = viewModel.hasEpisodesWithAutoDownloadEnabled.value
-            }
-        }
+        countPodcastsAutoDownloading()
+            .map { it > 0 }
+            .subscribeBy(
+                onError = { Timber.e(it) },
+                onSuccess = { on ->
+                    onNewEpisodesToggleChange(on.toAutoDownloadStatus())
+                    newEpisodesPreference?.isChecked = on
+                },
+            )
     }
 
     private fun setupOnFollowPodcastToggleStatusCheck() {

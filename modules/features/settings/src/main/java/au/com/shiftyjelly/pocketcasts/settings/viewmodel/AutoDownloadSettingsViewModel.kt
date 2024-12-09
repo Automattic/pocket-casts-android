@@ -57,8 +57,6 @@ class AutoDownloadSettingsViewModel @Inject constructor(
 
     fun getAutoDownloadUpNext() = settings.autoDownloadUpNext.value
 
-    fun getAutoDownloadNewEpisodes() = settings.autoDownloadNewEpisodes.value
-
     fun getLimitDownload() = settings.autoDownloadLimit.value
 
     fun isAutoDownloadOnFollowPodcastEnabled() = settings.autoDownloadOnFollowPodcast.value
