@@ -10,6 +10,9 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -123,6 +126,13 @@ class AutoDownloadSettingsViewModel @Inject constructor(
     suspend fun updateAllAutoDownloadStatus(status: Int) {
         podcastManager.updateAllAutoDownloadStatus(status)
     }
+
+    fun countPodcastsAutoDownloading(): Single<Int> = podcastManager.countDownloadStatusRxSingle(Podcast.AUTO_DOWNLOAD_NEW_EPISODES)
+        .subscribeOn(Schedulers.io())
+
+    fun countPodcasts(): Single<Int> = podcastManager.countSubscribedRxSingle()
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribeOn(Schedulers.io())
 }
 
 fun Boolean.toAutoDownloadStatus(): Int = when (this) {

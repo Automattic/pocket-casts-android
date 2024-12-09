@@ -46,11 +46,8 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.PodcastSelectFragmentSourc
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.rxkotlin.zipWith
-import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
@@ -399,21 +396,9 @@ class AutoDownloadSettingsFragment :
         }
     }
 
-    private fun countPodcastsAutoDownloading(): Single<Int> {
-        return podcastManager.countDownloadStatusRxSingle(Podcast.AUTO_DOWNLOAD_NEW_EPISODES)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-    }
-
-    private fun countPodcasts(): Single<Int> {
-        return podcastManager.countSubscribedRxSingle()
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeOn(Schedulers.io())
-    }
-
     @SuppressLint("CheckResult")
     private fun updatePodcastsSummary() {
-        countPodcastsAutoDownloading().zipWith(countPodcasts())
+        viewModel.countPodcastsAutoDownloading().zipWith(viewModel.countPodcasts())
             .subscribeBy(
                 onError = { Timber.e(it) },
                 onSuccess = { (autoDownloadingCount, allCount) ->
@@ -431,7 +416,7 @@ class AutoDownloadSettingsFragment :
 
     @SuppressLint("CheckResult")
     private fun setupNewEpisodesToggleStatusCheck() {
-        countPodcastsAutoDownloading()
+        viewModel.countPodcastsAutoDownloading()
             .map { it > 0 }
             .subscribeBy(
                 onError = { Timber.e(it) },
