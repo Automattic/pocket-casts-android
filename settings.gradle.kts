@@ -64,7 +64,6 @@ include(":modules:features:widgets")
 
 // services
 include(":modules:services:analytics")
-include(":modules:services:capturable")
 include(":modules:services:compose")
 include(":modules:services:crashlogging")
 include(":modules:services:deeplink")
