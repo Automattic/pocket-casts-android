@@ -78,6 +78,12 @@ enum class ShelfItem(
         iconId = { IR.drawable.ic_arrow_goto },
         analyticsValue = "go_to_podcast",
     ),
+    Bookmark(
+        id = "bookmark",
+        titleId = { LR.string.add_bookmark },
+        iconId = { IR.drawable.ic_bookmark },
+        analyticsValue = "add_bookmark",
+    ),
     Cast(
         id = "cast",
         titleId = { LR.string.chromecast },
@@ -89,12 +95,6 @@ enum class ShelfItem(
         titleId = { LR.string.mark_as_played },
         iconId = { IR.drawable.ic_markasplayed },
         analyticsValue = "mark_as_played",
-    ),
-    Bookmark(
-        id = "bookmark",
-        titleId = { LR.string.add_bookmark },
-        iconId = { IR.drawable.ic_bookmark },
-        analyticsValue = "add_bookmark",
     ),
     Archive(
         id = "archive",
