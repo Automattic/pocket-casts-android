@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -16,8 +15,6 @@ import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -31,14 +28,7 @@ class AutoDownloadSettingsViewModel @Inject constructor(
     override val coroutineContext = Dispatchers.Default
     private var isFragmentChangingConfigurations: Boolean = false
 
-    private var _hasEpisodesWithAutoDownloadEnabled: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    val hasEpisodesWithAutoDownloadEnabled: StateFlow<Boolean> = _hasEpisodesWithAutoDownloadEnabled
-
-    init {
-        viewModelScope.launch(Dispatchers.IO) {
-            _hasEpisodesWithAutoDownloadEnabled.value = podcastManager.hasEpisodesWithAutoDownloadStatus(Podcast.AUTO_DOWNLOAD_NEW_EPISODES)
-        }
-    }
+    suspend fun hasEpisodesWithAutoDownloadEnabled() = podcastManager.hasEpisodesWithAutoDownloadStatus(Podcast.AUTO_DOWNLOAD_NEW_EPISODES)
 
     fun onShown() {
         if (!isFragmentChangingConfigurations) {
