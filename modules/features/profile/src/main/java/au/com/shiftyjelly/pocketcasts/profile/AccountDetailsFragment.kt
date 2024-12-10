@@ -54,6 +54,7 @@ import com.gravatar.quickeditor.ui.GravatarQuickEditorResult
 import com.gravatar.quickeditor.ui.editor.AuthenticationMethod
 import com.gravatar.quickeditor.ui.editor.AvatarPickerContentLayout
 import com.gravatar.quickeditor.ui.editor.GravatarQuickEditorParams
+import com.gravatar.quickeditor.ui.editor.GravatarUiMode
 import com.gravatar.quickeditor.ui.oauth.OAuthParams
 import com.gravatar.types.Email
 import dagger.hilt.android.AndroidEntryPoint
@@ -312,6 +313,7 @@ class AccountDetailsFragment : BaseFragment() {
                     gravatarQuickEditorParams = GravatarQuickEditorParams {
                         this.email = Email(email)
                         avatarPickerContentLayout = AvatarPickerContentLayout.Horizontal
+                        uiMode = if (theme.isLightTheme) GravatarUiMode.LIGHT else GravatarUiMode.DARK
                     },
                     authenticationMethod = AuthenticationMethod.OAuth(
                         OAuthParams {
