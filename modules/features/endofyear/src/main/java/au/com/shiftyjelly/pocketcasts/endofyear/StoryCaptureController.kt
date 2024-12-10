@@ -12,10 +12,12 @@ import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.graphics.applyCanvas
+import androidx.core.graphics.createBitmap
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.scale
 import au.com.shiftyjelly.pocketcasts.endofyear.ui.backgroundColor
 import au.com.shiftyjelly.pocketcasts.models.to.Story
+import au.com.shiftyjelly.pocketcasts.utils.fitToAspectRatio
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer.TAG_CRASH
 import dev.shreyaspatil.capturable.controller.CaptureController
@@ -77,7 +79,7 @@ internal fun rememberStoryCaptureController(): StoryCaptureController {
                 delay(50) // A small delay to settle stories animations before capturing a screenshot
                 val controller = captureController(story)
                 val file = runCatching {
-                    val bitmap: Bitmap = withContext(Dispatchers.Default) {
+                    val bitmap = withContext(Dispatchers.Default) {
                         val background = controller.captureAsync().await()
                             .asAndroidBitmap()
                             .copy(Bitmap.Config.ARGB_8888, false)
@@ -88,7 +90,7 @@ internal fun rememberStoryCaptureController(): StoryCaptureController {
                             .toBitmap()
                             .scale(width = logoWidth, height = logoHeight)
 
-                        Bitmap.createBitmap(background.width, background.height, Bitmap.Config.ARGB_8888).applyCanvas {
+                        createBitmap(background.width, background.height).applyCanvas {
                             // Draw captured bitmap
                             drawBitmap(background, 0f, 0f, null)
                             // Hide bottom button behind an empty rect
@@ -110,7 +112,7 @@ internal fun rememberStoryCaptureController(): StoryCaptureController {
                                 (height - buttonHeightPx + (buttonHeightPx - pcLogo.height) / 2).toFloat(),
                                 null,
                             )
-                        }
+                        }.fitToAspectRatio(9f / 16)
                     }
                     withContext(Dispatchers.IO) {
                         val file = File(context.cacheDir, "pocket-casts-playback-screenshot.png")
