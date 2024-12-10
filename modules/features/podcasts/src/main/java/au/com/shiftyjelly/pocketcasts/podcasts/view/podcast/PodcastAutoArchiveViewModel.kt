@@ -27,7 +27,7 @@ class PodcastAutoArchiveViewModel @AssistedInject constructor(
     private val analyticsTracker: AnalyticsTracker,
 ) : ViewModel() {
     val state = combine(
-        podcastManager.observePodcastByUuidFlow(podcastUuid),
+        podcastManager.podcastByUuidFlow(podcastUuid),
         settings.autoArchiveAfterPlaying.flow,
         settings.autoArchiveInactive.flow,
     ) { podcast, archiveAfterPlaying, archiveInactive ->

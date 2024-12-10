@@ -12,5 +12,5 @@ class CloudFilesManager @Inject constructor(
     private val userEpisodeManager: UserEpisodeManager,
 ) {
     @OptIn(ExperimentalCoroutinesApi::class)
-    val sortedCloudFiles = settings.cloudSortOrder.flow.flatMapLatest { userEpisodeManager.observeUserEpisodesSorted(it).asFlow() }
+    val sortedCloudFiles = settings.cloudSortOrder.flow.flatMapLatest { userEpisodeManager.userEpisodesSortedRxFlowable(it).asFlow() }
 }

@@ -63,7 +63,7 @@ class NotesViewModel
     private suspend fun loadPodcastAndShowNotes(episode: PodcastEpisode) {
         try {
             val podcastUuid = episode.podcastUuid
-            val podcast = podcastManager.findPodcastByUuidSuspend(podcastUuid)
+            val podcast = podcastManager.findPodcastByUuid(podcastUuid)
             if (podcast == null) {
                 showNotes.postValue(ShowNotesState.NotFound)
                 return

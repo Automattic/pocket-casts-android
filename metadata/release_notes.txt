@@ -1,12 +1,8 @@
-*   New Features
-    *   Add episode basic authentication support
-        ([#3213](https://github.com/Automattic/pocket-casts-android/pull/3213))
-*   Bug Fixes
-    *   Fix account details not working in Automotive app
-        ([#3266](https://github.com/Automattic/pocket-casts-android/pull/3266))
 *   Updates
-    *   Update profile header UI
-        ([#3235](https://github.com/Automattic/pocket-casts-android/pull/3235))
-    *   Deferred addition to UpNext post update after sync
-        ([#3211](https://github.com/Automattic/pocket-casts-android/pull/312))
+    *   Improve log sharing
+        ([#3336](https://github.com/Automattic/pocket-casts-android/pull/3336))
+    *   Update account details header UI
+        ([#3294](https://github.com/Automattic/pocket-casts-android/pull/3294))
+    *   Improve the Up Next clear all button
+        ([#3334](https://github.com/Automattic/pocket-casts-android/pull/3334))
 

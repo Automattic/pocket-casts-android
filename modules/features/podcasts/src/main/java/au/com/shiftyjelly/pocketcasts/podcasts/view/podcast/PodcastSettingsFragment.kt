@@ -370,7 +370,7 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
         preferenceUnsubscribe?.setOnPreferenceClickListener {
             lifecycleScope.launch {
                 val resources = context?.resources ?: return@launch
-                val downloaded = withContext(Dispatchers.Default) { podcastManager.countEpisodesInPodcastWithStatus(podcastUuid, EpisodeStatusEnum.DOWNLOADED) }
+                val downloaded = withContext(Dispatchers.Default) { podcastManager.countEpisodesInPodcastWithStatusBlocking(podcastUuid, EpisodeStatusEnum.DOWNLOADED) }
                 val title = when (downloaded) {
                     0 -> resources.getString(LR.string.are_you_sure)
                     1 -> resources.getString(LR.string.podcast_unsubscribe_downloaded_file_singular)

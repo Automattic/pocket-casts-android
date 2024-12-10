@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.models.to
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionType
 import java.util.Date
 import org.junit.Test
 
@@ -13,13 +12,12 @@ class SignInStateTest {
     fun isSignedInAsPlusPaid() {
         val email = "support@pocketcasts.com"
         val statusAndroidPaidSubscription = SubscriptionStatus.Paid(
-            expiry = Date(),
+            expiryDate = Date(),
             autoRenew = true,
             giftDays = 0,
             frequency = SubscriptionFrequency.MONTHLY,
             platform = SubscriptionPlatform.ANDROID,
-            subscriptionList = emptyList(),
-            type = SubscriptionType.PLUS,
+            subscriptions = emptyList(),
             tier = SubscriptionTier.PLUS,
             index = 0,
         )

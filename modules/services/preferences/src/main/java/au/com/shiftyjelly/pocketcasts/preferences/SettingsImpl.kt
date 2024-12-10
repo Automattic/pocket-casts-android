@@ -15,8 +15,8 @@ import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.AutoDownloadLimitSetting
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.DEFAULT_MAX_AUTO_ADD_LIMIT
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.GLOBAL_AUTO_DOWNLOAD_NONE
@@ -1348,13 +1348,13 @@ class SettingsImpl @Inject constructor(
         setBoolean(NOTIFICATIONS_DISABLED_MESSAGE_SHOWN, value)
     }
 
-    override fun setLastSelectedSubscriptionTier(tier: Subscription.SubscriptionTier) {
-        setString(LAST_SELECTED_SUBSCRIPTION_TIER_KEY, tier.name)
+    override fun setLastSelectedSubscriptionTier(tier: SubscriptionTier) {
+        setString(LAST_SELECTED_SUBSCRIPTION_TIER_KEY, tier.label)
     }
 
     override fun getLastSelectedSubscriptionTier() =
         getString(LAST_SELECTED_SUBSCRIPTION_TIER_KEY)?.let {
-            Subscription.SubscriptionTier.valueOf(it)
+            SubscriptionTier.fromString(it)
         }
 
     override fun setLastSelectedSubscriptionFrequency(frequency: SubscriptionFrequency) {

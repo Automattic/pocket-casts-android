@@ -20,6 +20,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.compose.images.CountBadge
 import au.com.shiftyjelly.pocketcasts.compose.images.CountBadgeStyle
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -216,8 +217,7 @@ class FolderAdapter(
             count: Int,
             badgeType: BadgeType,
         ) {
-            setContent {
-                setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindow)
+            setContentWithViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindow) {
                 AppTheme(theme.activeTheme) {
                     CountBadge(
                         count = count,

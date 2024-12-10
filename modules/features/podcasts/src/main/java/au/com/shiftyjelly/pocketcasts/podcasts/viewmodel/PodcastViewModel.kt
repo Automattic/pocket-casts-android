@@ -122,7 +122,7 @@ class PodcastViewModel
         val bookmarkSearchResults = bookmarkSearchHandler.getSearchResultsObservable(uuid)
 
         disposables.clear()
-        podcastManager.findPodcastByUuidRx(uuid)
+        podcastManager.findPodcastByUuidRxMaybe(uuid)
             .subscribeOn(Schedulers.io())
             .flatMap {
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Loaded podcast $uuid from database")
@@ -131,7 +131,7 @@ class PodcastViewModel
                     updatePodcast(it)
                     return@flatMap Maybe.just(it)
                 } else {
-                    val wasDeleted = podcastManager.deletePodcastIfUnused(it, playbackManager)
+                    val wasDeleted = podcastManager.deletePodcastIfUnusedBlocking(it, playbackManager)
                     if (wasDeleted) {
                         LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Podcast $uuid was old and deleted")
                         return@flatMap Maybe.empty<Podcast>()
@@ -147,7 +147,7 @@ class PodcastViewModel
             .switchMap {
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Creating observer for podcast $uuid changes")
                 // We have already loaded the podcast so fire that first and then observe changes from then on
-                Flowable.just(it).concatWith(podcastManager.observePodcastByUuid(it.uuid).skip(1))
+                Flowable.just(it).concatWith(podcastManager.podcastByUuidRxFlowable(it.uuid).skip(1))
             }
             .observeOn(AndroidSchedulers.mainThread())
             .doOnNext { newPodcast: Podcast ->
@@ -284,7 +284,7 @@ class PodcastViewModel
     fun updateEpisodesSortType(episodesSortType: EpisodesSortType) {
         launch {
             podcast.value?.let {
-                podcastManager.updateEpisodesSortType(it, episodesSortType)
+                podcastManager.updateEpisodesSortTypeBlocking(it, episodesSortType)
                 analyticsTracker.track(
                     AnalyticsEvent.PODCASTS_SCREEN_SORT_ORDER_CHANGED,
                     mapOf(
@@ -305,7 +305,7 @@ class PodcastViewModel
     fun updatePodcastGrouping(grouping: PodcastGrouping) {
         launch {
             podcast.value?.let {
-                podcastManager.updateGrouping(it, grouping)
+                podcastManager.updateGroupingBlocking(it, grouping)
                 analyticsTracker.track(
                     AnalyticsEvent.PODCASTS_SCREEN_EPISODE_GROUPING_CHANGED,
                     mapOf(
@@ -328,7 +328,7 @@ class PodcastViewModel
         analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_NOTIFICATIONS_TAPPED, AnalyticsProp.notificationEnabled(showNotifications))
         Toast.makeText(context, if (showNotifications) LR.string.podcast_notifications_on else LR.string.podcast_notifications_off, Toast.LENGTH_SHORT).show()
         launch {
-            podcastManager.updateShowNotifications(podcast, showNotifications)
+            podcastManager.updateShowNotificationsBlocking(podcast, showNotifications)
         }
     }
 
@@ -425,7 +425,7 @@ class PodcastViewModel
 
     suspend fun getSharedBookmark(): Triple<Podcast, PodcastEpisode, Bookmark>? {
         return multiSelectBookmarksHelper.selectedListLive.value?.firstOrNull()?.let { bookmark ->
-            val podcast = podcastManager.findPodcastByUuidSuspend(bookmark.podcastUuid) ?: return null
+            val podcast = podcastManager.findPodcastByUuid(bookmark.podcastUuid) ?: return null
             val episode = episodeManager.findEpisodeByUuid(bookmark.episodeUuid) as? PodcastEpisode ?: return null
             Triple(podcast, episode, bookmark)
         }
@@ -435,7 +435,7 @@ class PodcastViewModel
         multiSelectBookmarksHelper.selectedListLive.value?.firstOrNull()?.let { bookmark ->
             val episodeUuid = bookmark.episodeUuid
             viewModelScope.launch(ioDispatcher) {
-                val podcast = podcastManager.findPodcastByUuidSuspend(bookmark.podcastUuid)
+                val podcast = podcastManager.findPodcastByUuid(bookmark.podcastUuid)
                 val backgroundColor =
                     if (podcast == null) 0xFF000000.toInt() else theme.playerBackgroundColor(podcast)
                 val tintColor =
@@ -727,7 +727,7 @@ private fun Maybe<Podcast>.downloadMissingPodcast(uuid: String, podcastManager: 
     return this.switchIfEmpty(
         Single.defer {
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Podcast $uuid not found in database")
-            podcastManager.findOrDownloadPodcastRx(uuid)
+            podcastManager.findOrDownloadPodcastRxSingle(uuid)
         },
     )
 }

@@ -108,13 +108,13 @@ class EpisodeManagerImpl @Inject constructor(
         @Suppress("DEPRECATION")
         return findByUuidRxMaybe(uuid)
             .flatMapPublisher<BaseEpisode> { findByUuidFlow(uuid).asFlowable() }
-            .switchIfEmpty(userEpisodeManager.observeEpisodeRx(uuid))
+            .switchIfEmpty(userEpisodeManager.episodeRxFlowable(uuid))
     }
 
     override fun findEpisodeByUuidFlow(uuid: String): Flow<BaseEpisode> =
         merge(
             episodeDao.findByUuidFlow(uuid), // if it is a PodcastEpisode
-            userEpisodeManager.observeEpisode(uuid), // if it is a UserEpisode
+            userEpisodeManager.episodeFlow(uuid), // if it is a UserEpisode
         ).filterNotNull() // because it is not going to be both a PodcastEpisode and a UserEpisode
 
     override suspend fun findFirstBySearchQuery(query: String): PodcastEpisode? =
@@ -224,7 +224,7 @@ class EpisodeManagerImpl @Inject constructor(
 
     @Suppress("USELESS_CAST")
     override fun findDownloadingEpisodesRxFlowable(): Flowable<List<BaseEpisode>> {
-        return episodeDao.findDownloadingEpisodesRxFlowable().map { it as List<BaseEpisode> }.mergeWith(userEpisodeManager.observeDownloadUserEpisodes())
+        return episodeDao.findDownloadingEpisodesRxFlowable().map { it as List<BaseEpisode> }.mergeWith(userEpisodeManager.downloadUserEpisodesRxFlowable())
     }
 
     override fun updatePlayedUpToBlocking(episode: BaseEpisode?, playedUpTo: Double, forceUpdate: Boolean) {
@@ -638,7 +638,7 @@ class EpisodeManagerImpl @Inject constructor(
         launch {
             if (episode !is PodcastEpisode) return@launch
             // check if we are meant to archive after episode is played
-            val podcast = podcastManager.findPodcastByUuid(episode.podcastUuid) ?: return@launch
+            val podcast = podcastManager.findPodcastByUuidBlocking(episode.podcastUuid) ?: return@launch
             val archiveAfterPlaying = podcast.autoArchiveAfterPlaying ?: settings.autoArchiveAfterPlaying.value
 
             if (archiveAfterPlaying == AutoArchiveAfterPlaying.AfterPlaying && (settings.autoArchiveIncludesStarred.value || !episode.isStarred)) {
@@ -659,7 +659,7 @@ class EpisodeManagerImpl @Inject constructor(
         val episodesByPodcast = episodesWithoutStarred.groupBy { it.podcastUuid }.toMutableMap() // Sort in to podcasts
 
         for ((podcastUuid, episodes) in episodesByPodcast) {
-            val podcast = podcastManager.findPodcastByUuid(podcastUuid) ?: continue
+            val podcast = podcastManager.findPodcastByUuidBlocking(podcastUuid) ?: continue
             val archiveAfterPlaying = podcast.autoArchiveAfterPlaying ?: settings.autoArchiveAfterPlaying.value
 
             if (archiveAfterPlaying == AutoArchiveAfterPlaying.AfterPlaying) {
@@ -913,7 +913,7 @@ class EpisodeManagerImpl @Inject constructor(
     }
 
     override fun checkForEpisodesToAutoArchiveBlocking(playbackManager: PlaybackManager?, podcastManager: PodcastManager) {
-        podcastManager.findSubscribed().forEach { podcast ->
+        podcastManager.findSubscribedBlocking().forEach { podcast ->
             checkPodcastForAutoArchiveBlocking(podcast, playbackManager)
         }
     }
@@ -1028,7 +1028,7 @@ class EpisodeManagerImpl @Inject constructor(
                         addBlocking(episode, downloadMetaData = downloadMetaData)
 
                         @Suppress("DEPRECATION")
-                        podcastManager.findPodcastByUuidRx(podcastUuid).zipWith(findByUuidRxMaybe(episodeUuid))
+                        podcastManager.findPodcastByUuidRxMaybe(podcastUuid).zipWith(findByUuidRxMaybe(episodeUuid))
                     }.flatMap { (podcast, episode) ->
                         if (podcast.isAutoDownloadNewEpisodes) {
                             DownloadHelper.addAutoDownloadedEpisodeToQueue(episode, "download missing episode", downloadManager, episodeManager = this, source = source)

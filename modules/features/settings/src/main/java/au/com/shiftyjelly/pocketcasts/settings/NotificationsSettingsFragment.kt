@@ -183,8 +183,8 @@ class NotificationsSettingsFragment :
 
     override fun podcastSelectFragmentSelectionChanged(newSelection: List<String>) {
         launch(Dispatchers.Default) {
-            podcastManager.findSubscribed().forEach {
-                podcastManager.updateShowNotifications(it, newSelection.contains(it.uuid))
+            podcastManager.findSubscribedBlocking().forEach {
+                podcastManager.updateShowNotificationsBlocking(it, newSelection.contains(it.uuid))
             }
         }
     }
@@ -192,7 +192,7 @@ class NotificationsSettingsFragment :
     override fun podcastSelectFragmentGetCurrentSelection(): List<String> {
         return runBlocking {
             async(Dispatchers.Default) {
-                val uuids = podcastManager.findSubscribed().filter { it.isShowNotifications }.map { it.uuid }
+                val uuids = podcastManager.findSubscribedBlocking().filter { it.isShowNotifications }.map { it.uuid }
                 uuids
             }.await()
         }

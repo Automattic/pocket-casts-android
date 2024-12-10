@@ -337,8 +337,12 @@
     <string name="player_sleep_add_5_minutes">+ 5 minutes</string>
     <string name="player_sleep_add_1_minute">+ 1 minute</string>
     <string name="player_sleep_cancel_timer">Cancel timer</string>
-    <string name="player_sleep_custom_minus">Custom minus</string>
-    <string name="player_sleep_custom_plus">Custom plus</string>
+    <string name="player_sleep_custom_minus">Decrease custom duration</string>
+    <string name="player_sleep_custom_plus">Increase custom duration</string>
+    <string name="player_sleep_chapter_minus">Decrease chapter count</string>
+    <string name="player_sleep_chapter_plus">Increase chapter count</string>
+    <string name="player_sleep_episode_minus">Decrease episode count</string>
+    <string name="player_sleep_episode_plus">Increase episode count</string>
     <string name="player_sleep_end_of_episode">End of episode</string>
     <string name="player_sleep_timer_in_episode">In 1 episode</string>
     <string name="player_sleep_timer_in_episode_plural">In %d episodes</string>
@@ -414,6 +418,14 @@
     <string name="number_of_chapters_summary_singular">1 chapter &#x2022; %d hidden</string>
     <string name="skip_chapters_plus_prompt">Preselect chapters and more with Pocket Casts Plus</string>
     <string name="skip_chapters_patron_prompt">Preselect chapters and more with Pocket Casts Patron</string>
+    <!-- %1$d is the current selected chapter. %2$d is the total number of chapters. -->
+    <string name="chapter_count_summary">%1$d of %2$d</string>
+    <plurals name="chapter">
+        <item quantity="one">chapter</item>
+        <item quantity="other">chapters</item>
+    </plurals>
+    !-- %s is time remaining in the chapter. -->
+    <string name="chapter_time_remaining_content_description">%s left in the chapter</string>
 
     <!-- Podcasts -->
 
@@ -508,6 +520,8 @@
     <string name="remove_from_folder">Remove from folder</string>
     <string name="change_folder">Change folder</string>
     <string name="go_to_folder">Go to folder</string>
+    <string name="number_stepper_plus_content_description">Plus</string>
+    <string name="number_stepper_minus_content_description">Minus</string>
 
     <!-- Podcast -->
 
@@ -1121,6 +1135,7 @@
     <string name="plus_trial_finished_files_removed">Files uploaded to your account will be removed after a week</string>
     <string name="plus_trial_finished_locked">Access to Pocket Casts Plus features will be locked</string>
     <string name="plus_upgrade_to_pocket_casts_plus">Upgrade to Pocket Casts Plus</string>
+    <string name="plus_subscription_finished">Subscription Finished</string>
     <string name="plus_month_year_price">%1$s per month / %2$s per year</string>
     <string name="plus_select_payment_frequency">Select Payment Frequency</string>
     <string name="plus_best_value">BEST VALUE</string>
@@ -2251,7 +2266,8 @@
     <string name="maybe_later">Maybe Later</string>
 
     <!-- Up Next Shuffle -->
-    <string name="up_next_shuffle_button_content_description">Up next shuffle</string>
-    <string name="up_next_shuffle_disable_button_content_description">Up next shuffle disable</string>
+    <string name="up_next_shuffle_button_content_description">Up Next shuffle</string>
+    <string name="up_next_shuffle_disable_button_content_description">Up Next shuffle disable</string>
+    <string name="up_next_shuffle_enable_confirmation_message">Shuffle is on. Episodes will play in random order.</string>
 
 </resources>

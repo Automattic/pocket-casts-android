@@ -37,7 +37,7 @@ class PromoCodeViewModel @Inject constructor(
     val state: MutableLiveData<ViewState> = MutableLiveData(ViewState.Loading)
 
     fun setup(code: String, context: Context) {
-        val signedInFlow = Single.defer<ViewState> { syncManager.redeemPromoCode(code).map { ViewState.Success(it) } }
+        val signedInFlow = Single.defer<ViewState> { syncManager.redeemPromoCodeRxSingle(code).map { ViewState.Success(it) } }
             .flatMap { viewState ->
                 subscriptionManager.getSubscriptionStatus(allowCache = false).map { viewState } // Force reloading of the new subscription status
             }
@@ -45,7 +45,7 @@ class PromoCodeViewModel @Inject constructor(
             .onErrorReturn(errorHandler(isSignedIn = true, resources = context.resources))
             .toFlowable()
 
-        val signedOutFlow = syncManager.validatePromoCode(code)
+        val signedOutFlow = syncManager.validatePromoCodeRxSingle(code)
             .observeOn(AndroidSchedulers.mainThread())
             .map<ViewState> { ViewState.NotSignedIn(it) }
             .onErrorReturn(errorHandler(isSignedIn = false, resources = context.resources))

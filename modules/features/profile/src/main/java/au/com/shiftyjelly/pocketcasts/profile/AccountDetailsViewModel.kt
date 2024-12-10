@@ -1,36 +1,36 @@
 package au.com.shiftyjelly.pocketcasts.profile
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.map
-import androidx.lifecycle.toLiveData
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.NewsletterSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
+import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
-import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.utils.Gravatar
 import au.com.shiftyjelly.pocketcasts.utils.Optional
-import au.com.shiftyjelly.pocketcasts.utils.combineLatest
+import au.com.shiftyjelly.pocketcasts.utils.toDurationFromNow
 import com.automattic.android.tracks.crashlogging.CrashLogging
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.addTo
-import io.reactivex.rxkotlin.combineLatest
-import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
-import java.util.Date
 import javax.inject.Inject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.reactive.asFlow
+import kotlinx.coroutines.rx2.await
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 @HiltViewModel
@@ -38,17 +38,15 @@ class AccountDetailsViewModel
 @Inject constructor(
     subscriptionManager: SubscriptionManager,
     userManager: UserManager,
-    statsManager: StatsManager,
     private val settings: Settings,
     private val syncManager: SyncManager,
     private val analyticsTracker: AnalyticsTracker,
     private val crashLogging: CrashLogging,
     private val subscriptionMapper: SubscriptionMapper,
 ) : ViewModel() {
-
-    private val disposables = CompositeDisposable()
-    private val deleteAccountState = MutableLiveData<DeleteAccountState>().apply { value = DeleteAccountState.Empty }
-
+    internal val deleteAccountState = MutableStateFlow<DeleteAccountState>(DeleteAccountState.Empty)
+    internal val signInState = userManager.getSignInState()
+    internal val marketingOptIn = settings.marketingOptIn.flow
     private val subscription = subscriptionManager.observeProductDetails().map { state ->
         if (state is ProductDetailsState.Loaded) {
             val subscriptions = state.productDetails
@@ -66,38 +64,111 @@ class AccountDetailsViewModel
             Optional.empty()
         }
     }
-    val signInState = userManager.getSignInState().toLiveData()
-    val viewState: LiveData<Triple<SignInState, Subscription?, DeleteAccountState>> =
-        userManager.getSignInState()
-            .combineLatest(subscription)
-            .toLiveData()
-            .combineLatest(deleteAccountState)
-            .map { Triple(it.first.first, it.first.second.get(), it.second) }
 
-    val accountStartDate: LiveData<Date> = MutableLiveData<Date>().apply { value = Date(statsManager.statsStartTime) }
+    internal val headerState = signInState.asFlow().map { state ->
+        when (state) {
+            is SignInState.SignedOut -> AccountHeaderState.empty()
+            is SignInState.SignedIn -> {
+                val status = state.subscriptionStatus
+                AccountHeaderState(
+                    email = state.email,
+                    imageUrl = Gravatar.getUrl(state.email),
+                    subscription = when (status) {
+                        is SubscriptionStatus.Free -> SubscriptionHeaderState.Free
+                        is SubscriptionStatus.Paid -> {
+                            val activeSubscription = status.subscriptions.getOrNull(status.index)
+                            if (activeSubscription == null || activeSubscription.tier in paidTiers) {
+                                if (status.autoRenew) {
+                                    SubscriptionHeaderState.PaidRenew(
+                                        tier = status.tier,
+                                        expiresIn = status.expiryDate.toDurationFromNow(),
+                                        frequency = status.frequency,
+                                    )
+                                } else {
+                                    SubscriptionHeaderState.PaidCancel(
+                                        tier = status.tier,
+                                        expiresIn = status.expiryDate.toDurationFromNow(),
+                                        isChampion = status.isPocketCastsChampion,
+                                        platform = status.platform,
+                                        giftDaysLeft = status.giftDays,
+                                    )
+                                }
+                            } else if (activeSubscription.autoRenewing) {
+                                SubscriptionHeaderState.SupporterRenew(
+                                    tier = activeSubscription.tier,
+                                    expiresIn = activeSubscription.expiryDate?.toDurationFromNow(),
+                                )
+                            } else {
+                                SubscriptionHeaderState.SupporterCancel(
+                                    tier = activeSubscription.tier,
+                                    expiresIn = activeSubscription.expiryDate?.toDurationFromNow(),
+                                )
+                            }
+                        }
+                    },
+                )
+            }
+        }
+    }.stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = AccountHeaderState.empty())
 
-    val marketingOptInState: LiveData<Boolean> =
-        settings.marketingOptIn
-            .flow
-            .asLiveData(viewModelScope.coroutineContext)
+    internal val showUpgradeBanner = combine(
+        signInState.asFlow(),
+        subscription.asFlow(),
+    ) { signInState, subscription ->
+        val signedInState = signInState as? SignInState.SignedIn
+        val isGiftExpiring = (signedInState?.subscriptionStatus as? SubscriptionStatus.Paid)?.isExpiring == true
+        subscription != null && (signInState.isSignedInAsFree || isGiftExpiring)
+    }.stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = false)
+
+    internal val sectionsState = combine(
+        signInState.asFlow(),
+        marketingOptIn,
+    ) { signInState, marketingOptIn ->
+        val signedInState = signInState as? SignInState.SignedIn
+        val isGiftExpiring = (signedInState?.subscriptionStatus as? SubscriptionStatus.Paid)?.isExpiring == true
+        AccountSectionsState(
+            isSubscribedToNewsLetter = marketingOptIn,
+            email = signedInState?.email,
+            canChangeCredentials = !syncManager.isGoogleLogin(),
+            canUpgradeAccount = signedInState?.isSignedInAsPlus == true && isGiftExpiring,
+            canCancelSubscription = signedInState?.isSignedInAsPaid == true,
+        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Lazily,
+        initialValue = AccountSectionsState(
+            isSubscribedToNewsLetter = false,
+            email = null,
+            canChangeCredentials = false,
+            canUpgradeAccount = false,
+            canCancelSubscription = false,
+        ),
+    )
+
+    internal val miniPlayerInset = settings.bottomInset.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = 0,
+    )
 
     fun deleteAccount() {
-        syncManager.deleteAccount()
-            .subscribeOn(Schedulers.io())
-            .doOnSuccess { response ->
+        viewModelScope.launch {
+            try {
+                val response = withContext(Dispatchers.IO) { syncManager.deleteAccountRxSingle().await() }
                 val success = response.success ?: false
-                if (success) {
-                    deleteAccountState.postValue(DeleteAccountState.Success("OK"))
+                deleteAccountState.value = if (success) {
+                    DeleteAccountState.Success("OK")
                 } else {
-                    deleteAccountState.postValue(DeleteAccountState.Failure(response.message))
+                    DeleteAccountState.Failure(response.message)
                 }
+            } catch (e: Throwable) {
+                deleteAccountError(e)
             }
-            .subscribeBy(onError = { throwable -> deleteAccountError(throwable) })
-            .addTo(disposables)
+        }
     }
 
     private fun deleteAccountError(throwable: Throwable) {
-        deleteAccountState.postValue(DeleteAccountState.Failure(message = null))
+        deleteAccountState.value = DeleteAccountState.Failure(message = null)
         Timber.e(throwable)
         crashLogging.sendReport(throwable, message = "Delete account failed")
     }
@@ -114,14 +185,11 @@ class AccountDetailsViewModel
         settings.marketingOptIn.set(isChecked, updateModifiedAt = true)
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        disposables.clear()
-    }
-
     companion object {
         private const val SOURCE_KEY = "source"
         private const val ENABLED_KEY = "enabled"
+
+        private val paidTiers = listOf(SubscriptionTier.PLUS, SubscriptionTier.PATRON)
     }
 }
 

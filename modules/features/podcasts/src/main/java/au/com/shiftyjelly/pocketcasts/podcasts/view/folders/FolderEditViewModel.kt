@@ -91,9 +91,9 @@ class FolderEditViewModel
                     .toFlowable(BackpressureStrategy.LATEST)
                     .switchMap { podcastSortOrder ->
                         if (podcastSortOrder == PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST) {
-                            podcastManager.observePodcastsOrderByLatestEpisode()
+                            podcastManager.podcastsOrderByLatestEpisodeRxFlowable()
                         } else {
-                            podcastManager.observeSubscribed()
+                            podcastManager.subscribedRxFlowable()
                         }
                     }
                     .asFlow<List<Podcast>>(),
@@ -288,7 +288,7 @@ class FolderEditViewModel
 
     fun loadFolderForPodcast(podcastUuid: String) {
         viewModelScope.launch {
-            folderUuid.value = Optional.ofNullable(podcastManager.findPodcastByUuidSuspend(podcastUuid)?.folderUuid)
+            folderUuid.value = Optional.ofNullable(podcastManager.findPodcastByUuid(podcastUuid)?.folderUuid)
         }
     }
 

@@ -30,7 +30,7 @@ class ShareEpisodeViewModel @AssistedInject constructor(
     private val tracker: AnalyticsTracker,
 ) : ViewModel() {
     val uiState = combine(
-        podcastManager.observePodcastByEpisodeUuid(episodeUuid),
+        podcastManager.podcastByEpisodeUuidFlow(episodeUuid),
         episodeManager.findByUuidFlow(episodeUuid),
         settings.artworkConfiguration.flow.map { it.useEpisodeArtwork },
         ::UiState,

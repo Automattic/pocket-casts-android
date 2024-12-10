@@ -6,7 +6,6 @@ import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionType
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import io.reactivex.Flowable
@@ -34,13 +33,12 @@ class SearchHistoryViewModelTest {
     private lateinit var searchHistoryManager: SearchHistoryManager
 
     private val subscriptionStatusPaid = SubscriptionStatus.Paid(
-        expiry = Date(),
+        expiryDate = Date(),
         autoRenew = true,
         giftDays = 0,
         frequency = SubscriptionFrequency.MONTHLY,
         platform = SubscriptionPlatform.ANDROID,
-        subscriptionList = emptyList(),
-        type = SubscriptionType.PLUS,
+        subscriptions = emptyList(),
         tier = SubscriptionTier.PLUS,
         index = 0,
     )

@@ -95,7 +95,7 @@ class EpisodeFragmentViewModel @Inject constructor(
         // If we can't find it in the database and we know the podcast uuid we can try load it
         // from the server
         val onEmptyHandler = if (podcastUuid != null) {
-            podcastManager.findOrDownloadPodcastRx(podcastUuid).flatMapMaybe {
+            podcastManager.findOrDownloadPodcastRxSingle(podcastUuid).flatMapMaybe {
                 val episode = it.episodes.find { episode -> episode.uuid == episodeUuid }
                 if (episode != null) {
                     Maybe.just(episode)
@@ -126,7 +126,7 @@ class EpisodeFragmentViewModel @Inject constructor(
                 }
                 return@flatMapPublisher Flowable.combineLatest(
                     episodeManager.findByUuidFlow(episodeUuid).asFlowable(),
-                    podcastManager.findPodcastByUuidRx(episode.podcastUuid).toFlowable(),
+                    podcastManager.findPodcastByUuidRxMaybe(episode.podcastUuid).toFlowable(),
                     showNotesManager.loadShowNotesFlow(podcastUuid = episode.podcastUuid, episodeUuid = episode.uuid).asFlowable(),
                     progressUpdatesObservable,
                     zipper,

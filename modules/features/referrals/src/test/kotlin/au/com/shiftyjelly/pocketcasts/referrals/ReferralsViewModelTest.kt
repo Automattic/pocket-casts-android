@@ -10,7 +10,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsViewModel.UiState
@@ -50,13 +49,12 @@ class ReferralsViewModelTest {
     private val email = "support@pocketcasts.com"
     private val referralClaimCode = "referral_code"
     private val statusAndroidPaidSubscription = SubscriptionStatus.Paid(
-        expiry = Date(),
+        expiryDate = Date(),
         autoRenew = true,
         giftDays = 0,
         frequency = SubscriptionFrequency.MONTHLY,
         platform = SubscriptionPlatform.ANDROID,
-        subscriptionList = emptyList(),
-        type = SubscriptionType.PLUS,
+        subscriptions = emptyList(),
         tier = SubscriptionTier.PLUS,
         index = 0,
     )

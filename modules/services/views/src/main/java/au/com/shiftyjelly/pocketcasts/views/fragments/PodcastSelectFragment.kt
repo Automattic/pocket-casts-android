@@ -113,7 +113,7 @@ class PodcastSelectFragment : BaseFragment() {
         if (args.tintColor != null) {
             binding.btnSelect.setTextColor(args.tintColor)
         }
-        podcastManager.findSubscribedRx()
+        podcastManager.findSubscribedRxSingle()
             .zipWith(Single.fromCallable { listener.podcastSelectFragmentGetCurrentSelection() })
             .map { pair ->
                 val podcasts = pair.first

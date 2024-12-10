@@ -22,7 +22,7 @@ import au.com.shiftyjelly.pocketcasts.compose.images.HorizontalLogoText
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeDisplayMode
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeForTier
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.UpsellViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.FreeTrial
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -93,7 +93,7 @@ private fun UpsellViewContent(
 private fun SubscriptionTier.getContentDescription() = when (this) {
     SubscriptionTier.PATRON -> LR.string.pocket_casts_patron
     SubscriptionTier.PLUS -> LR.string.pocket_casts_plus
-    SubscriptionTier.UNKNOWN -> throw IllegalStateException("Unknown subscription tier")
+    SubscriptionTier.NONE -> throw IllegalStateException("Unknown subscription tier")
 }
 
 @Composable

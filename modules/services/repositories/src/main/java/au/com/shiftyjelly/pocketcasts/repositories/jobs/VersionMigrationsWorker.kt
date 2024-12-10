@@ -197,7 +197,7 @@ class VersionMigrationsWorker @AssistedInject constructor(
 
     private suspend fun removeCustomEpisodes() {
         val customPodcastUuid = "customFolderPodcast"
-        val podcast: Podcast = podcastManager.findPodcastByUuidSuspend(customPodcastUuid) ?: return
+        val podcast: Podcast = podcastManager.findPodcastByUuid(customPodcastUuid) ?: return
         val episodes: List<PodcastEpisode> = episodeManager.findEpisodesByPodcastOrderedByPublishDateBlocking(podcast)
         episodes.forEach { episode ->
             playbackManager.removeEpisode(
@@ -247,10 +247,10 @@ class VersionMigrationsWorker @AssistedInject constructor(
 
     private suspend fun upgradeTrimSilenceMode() {
         try {
-            val podcasts = podcastManager.findSubscribed()
+            val podcasts = podcastManager.findSubscribedBlocking()
             podcasts.forEach { podcast ->
                 if (podcast.isSilenceRemoved && podcast.trimMode == TrimMode.OFF) {
-                    podcastManager.updateTrimMode(podcast, TrimMode.LOW)
+                    podcastManager.updateTrimModeBlocking(podcast, TrimMode.LOW)
                 }
             }
         } catch (e: Exception) {

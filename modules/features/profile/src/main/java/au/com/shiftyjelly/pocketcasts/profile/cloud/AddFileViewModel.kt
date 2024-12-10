@@ -23,7 +23,7 @@ class AddFileViewModel @Inject constructor(
     val signInState: LiveData<SignInState> = userManager.getSignInState().toLiveData()
 
     suspend fun updateImageOnServer(userEpisode: UserEpisode, imageFile: File) = withContext(Dispatchers.IO) {
-        userEpisodeManager.uploadImageToServer(userEpisode, imageFile).await()
+        userEpisodeManager.uploadImageToServerRxCompletable(userEpisode, imageFile).await()
     }
 
     suspend fun updateFileMetadataOnServer(userEpisode: UserEpisode) {
