@@ -3,7 +3,9 @@ package au.com.shiftyjelly.pocketcasts.di
 import android.content.Context
 import android.net.ConnectivityManager
 import androidx.core.content.getSystemService
+import au.com.shiftyjelly.pocketcasts.GravatarSdkService
 import au.com.shiftyjelly.pocketcasts.servers.di.Downloads
+import au.com.shiftyjelly.pocketcasts.utils.gravatar.GravatarService
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -28,6 +30,9 @@ abstract class AppModule {
         @Downloads
         fun downloadRequestBuilder(): Request.Builder = Request.Builder()
     }
+
+    @Binds
+    abstract fun gravatarService(factory: GravatarSdkService.Factory): GravatarService.Factory
 
     @Binds
     @Downloads
