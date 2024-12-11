@@ -4,8 +4,6 @@ import android.animation.AnimatorSet
 import android.animation.ArgbEvaluator
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
-import android.transition.AutoTransition
-import android.transition.TransitionManager
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
@@ -98,8 +96,6 @@ class UpNextEpisodeViewHolder(
         isMultiSelecting: Boolean,
         isSelected: Boolean,
     ) {
-        val tintColor = itemView.context.getAttrTextStyleColor(UR.attr.textSubtitle1)
-
         disposable = episodeManager
             .findByUuidFlow(episode.uuid)
             .asFlowable()
@@ -113,7 +109,7 @@ class UpNextEpisodeViewHolder(
         swipeButtonLayout = swipeButtonLayoutFactory.forEpisode(episode)
 
         bindEpisode(episode)
-        binding.date.text = episode.getSummaryText(dateFormatter = dateFormatter, tintColor = tintColor, showDuration = false, context = binding.date.context)
+        binding.date.text = episode.getSummaryText(dateFormatter = dateFormatter, tintColor = itemView.context.getAttrTextStyleColor(UR.attr.textSubtitle1), showDuration = false, context = binding.date.context)
         binding.reorder.setOnTouchListener { _, event ->
             if (event.actionMasked == MotionEvent.ACTION_DOWN) {
                 listener?.onUpNextEpisodeStartDrag(this)
@@ -124,9 +120,6 @@ class UpNextEpisodeViewHolder(
         imageRequestFactory.create(episode, settings.artworkConfiguration.value.useEpisodeArtwork(Element.UpNext)).loadInto(binding.image)
 
         val context = binding.itemContainer.context
-        val transition = AutoTransition()
-        transition.duration = 100
-        TransitionManager.beginDelayedTransition(binding.itemContainer, transition)
         binding.checkbox.isVisible = isMultiSelecting
         binding.checkbox.isChecked = isSelected
         binding.checkbox.setOnClickListener { binding.itemContainer.performClick() }
