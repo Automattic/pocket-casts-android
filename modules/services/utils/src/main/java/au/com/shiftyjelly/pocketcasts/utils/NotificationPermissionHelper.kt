@@ -14,6 +14,7 @@ object NotificationPermissionHelper {
         launcher: ActivityResultLauncher<String>,
         onShowRequestPermissionRationale: () -> Unit = {},
         onPermissionGranted: () -> Unit = {},
+        onPermissionHandlingNotRequired: () -> Unit = {},
     ) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             when {
@@ -32,7 +33,7 @@ object NotificationPermissionHelper {
                 }
             }
         } else {
-            onPermissionGranted()
+            onPermissionHandlingNotRequired()
         }
     }
 }

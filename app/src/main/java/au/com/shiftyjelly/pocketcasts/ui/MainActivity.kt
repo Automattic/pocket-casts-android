@@ -1580,6 +1580,7 @@ class MainActivity :
                 settings.setNotificationsDisabledMessageShown(true)
             },
             onPermissionGranted = onPermissionGranted,
+            onPermissionHandlingNotRequired = {},
         )
     }
 

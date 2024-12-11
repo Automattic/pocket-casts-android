@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.podcasts.view.podcast
 
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.LayoutInflater
@@ -500,31 +499,28 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
     private val onNotificationsClicked: () -> Unit = {
         context?.let { context ->
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                NotificationPermissionHelper.checkForNotificationPermission(
-                    requireActivity(),
-                    launcher = notificationPermissionLauncher,
-                    onShowRequestPermissionRationale = {
-                        (activity as? FragmentHostListener)?.snackBarView()?.let { snackBarView ->
-                            Snackbar.make(snackBarView, getString(LR.string.notifications_blocked_warning), Snackbar.LENGTH_LONG)
-                                .setAction(
-                                    getString(LR.string.notifications_blocked_warning_snackbar_action)
-                                        .uppercase(Locale.getDefault()),
-                                ) {
-                                    // Open app settings for the user to enable permissions
-                                    val intent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                    val uri: Uri = Uri.fromParts("package", requireContext().packageName, null)
-                                    intent.data = uri
-                                    startActivity(intent)
-                                }.show()
-                        }
-                    },
-                    onPermissionGranted = { viewModel.toggleNotifications(context) },
-                )
-            } else {
-                viewModel.toggleNotifications(context)
-            }
+            NotificationPermissionHelper.checkForNotificationPermission(
+                requireActivity(),
+                launcher = notificationPermissionLauncher,
+                onShowRequestPermissionRationale = {
+                    (activity as? FragmentHostListener)?.snackBarView()?.let { snackBarView ->
+                        Snackbar.make(snackBarView, getString(LR.string.notifications_blocked_warning), Snackbar.LENGTH_LONG)
+                            .setAction(
+                                getString(LR.string.notifications_blocked_warning_snackbar_action)
+                                    .uppercase(Locale.getDefault()),
+                            ) {
+                                // Open app settings for the user to enable permissions
+                                val intent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                val uri: Uri = Uri.fromParts("package", requireContext().packageName, null)
+                                intent.data = uri
+                                startActivity(intent)
+                            }.show()
+                    }
+                },
+                onPermissionGranted = { viewModel.toggleNotifications(context) },
+                onPermissionHandlingNotRequired = { viewModel.toggleNotifications(context) },
+            )
         }
     }
 
