@@ -26,10 +26,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.gravatar.GravatarService
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.android.tracks.crashlogging.CrashLogging
-import com.gravatar.quickeditor.GravatarQuickEditor
-import com.gravatar.types.Email
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
@@ -65,6 +64,7 @@ class UserManagerImpl @Inject constructor(
     private val crashLogging: CrashLogging,
     private val experimentProvider: ExperimentProvider,
     private val endOfYearSync: EndOfYearSync,
+    private val gravatarServiceFactory: GravatarService.Factory,
 ) : UserManager, CoroutineScope {
 
     companion object {
@@ -157,11 +157,7 @@ class UserManagerImpl @Inject constructor(
         if (FeatureFlag.isEnabled(Feature.GRAVATAR_NATIVE_QUICK_EDITOR)) {
             syncManager.getEmail()?.let { email ->
                 applicationScope.launch {
-                    GravatarQuickEditor.logout(
-                        email = Email(
-                            email,
-                        ),
-                    )
+                    gravatarServiceFactory.create().logout(email)
                 }
             }
         }
