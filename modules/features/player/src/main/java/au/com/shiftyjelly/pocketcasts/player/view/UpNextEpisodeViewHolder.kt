@@ -57,6 +57,10 @@ class UpNextEpisodeViewHolder(
     private val elevatedBackground = ContextCompat.getColor(binding.root.context, R.color.elevatedBackground)
     private val selectedBackground = ContextCompat.getColor(binding.root.context, R.color.selectedBackground)
 
+    private val selectedColor by lazy { itemView.context.getThemeColor(UR.attr.primary_ui_02_selected) }
+    private val unselectedColor by lazy { itemView.context.getThemeColor(UR.attr.primary_ui_01) }
+    private val tintColor by lazy { itemView.context.getAttrTextStyleColor(UR.attr.textSubtitle1) }
+
     private var episodeInstance: BaseEpisode? = null
 
     override lateinit var swipeButtonLayout: SwipeButtonLayout
@@ -109,7 +113,7 @@ class UpNextEpisodeViewHolder(
         swipeButtonLayout = swipeButtonLayoutFactory.forEpisode(episode)
 
         bindEpisode(episode)
-        binding.date.text = episode.getSummaryText(dateFormatter = dateFormatter, tintColor = itemView.context.getAttrTextStyleColor(UR.attr.textSubtitle1), showDuration = false, context = binding.date.context)
+        binding.date.text = episode.getSummaryText(dateFormatter = dateFormatter, tintColor = tintColor, showDuration = false, context = binding.date.context)
         binding.reorder.setOnTouchListener { _, event ->
             if (event.actionMasked == MotionEvent.ACTION_DOWN) {
                 listener?.onUpNextEpisodeStartDrag(this)
@@ -119,13 +123,10 @@ class UpNextEpisodeViewHolder(
 
         imageRequestFactory.create(episode, settings.artworkConfiguration.value.useEpisodeArtwork(Element.UpNext)).loadInto(binding.image)
 
-        val context = binding.itemContainer.context
         binding.checkbox.isVisible = isMultiSelecting
         binding.checkbox.isChecked = isSelected
         binding.checkbox.setOnClickListener { binding.itemContainer.performClick() }
 
-        val selectedColor = context.getThemeColor(UR.attr.primary_ui_02_selected)
-        val unselectedColor = context.getThemeColor(UR.attr.primary_ui_01)
         binding.checkbox.setOnCheckedChangeListener { _, isChecked ->
             binding.itemContainer.setBackgroundColor(if (isMultiSelecting && isChecked) selectedColor else unselectedColor)
         }
