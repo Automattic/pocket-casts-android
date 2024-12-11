@@ -7,15 +7,20 @@ import android.database.Cursor
 import android.net.Uri
 import android.os.ParcelFileDescriptor
 import au.com.shiftyjelly.pocketcasts.servers.di.Downloads
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
 import java.io.File
-import java.io.IOException
+import okhttp3.HttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.Response
+import okio.buffer
 import okio.sink
+import okio.use
 import timber.log.Timber
 
 class AlbumArtContentProvider : ContentProvider() {
@@ -29,35 +34,63 @@ class AlbumArtContentProvider : ContentProvider() {
     override fun onCreate() = true
 
     override fun openFile(uri: Uri, mode: String): ParcelFileDescriptor? {
-        val context = this.context ?: return null
-        Timber.tag("AlbumArtProvider").d("Content uri received ${uri.lastPathSegment}")
+        val result = runCatching {
+            Timber.tag("AlbumArtProvider").d("Content uri received ${uri.lastPathSegment}")
 
-        // Extract the image uri e.g. https://static.pocketcasts.net/discover/images/webp/480/220e7cc0-d53e-0133-2e9f-6dc413d6d41d.webp
-        val imageUri = Uri.parse(uri.lastPathSegment)
-        // Create the cache file name e.g. static.pocketcasts.net:discover:images:webp:480:220e7cc0-d53e-0133-2e9f-6dc413d6d41d.webp
-        val cachePath = "${imageUri.host}${imageUri.encodedPath}".replace(oldChar = '/', newChar = ':')
-        // Create the cache file path e.g. /data/user/0/au.com.shiftyjelly.pocketcasts.debug/cache/static.pocketcasts.net:discover:images:webp:480:220e7cc0-d53e-0133-2e9f-6dc413d6d41d.webp
-        val file = File(context.cacheDir, cachePath)
-        // Cache the image
-        if (!file.exists()) {
-            Timber.tag("AlbumArtProvider").d("Executing call for $imageUri")
-            val appContext = context.applicationContext
-            val entryPoint = EntryPointAccessors.fromApplication(appContext, AlbumArtEntryPoint::class.java)
-            val client = entryPoint.okHttpClient()
-            val request = Request.Builder().url(imageUri.toString()).build()
-            try {
-                client.newCall(request).execute().use { response ->
-                    if (response.isSuccessful) {
-                        file.sink().use { sink ->
-                            response.body?.source()?.readAll(sink)
-                        }
-                    }
+            val applicationContext = context?.applicationContext ?: return@runCatching null
+            val entryPoint = getEntryPoint(applicationContext)
+
+            val imageUrl = uri.toImageUrl()
+            val artworkFile = if (imageUrl != null) {
+                val cacheFile = imageUrl.toCachedArtworkFile(applicationContext)
+                if (cacheFile.exists()) {
+                    cacheFile
+                } else {
+                    entryPoint.okHttpClient().fetchAndSaveArtwork(imageUrl, cacheFile)
                 }
-            } catch (e: IOException) {
-                Timber.tag("AlbumArtProvider").d(e, "Failed to load image $imageUri")
+            } else {
+                uri.path?.let(::File)
             }
+
+            artworkFile?.let { ParcelFileDescriptor.open(it, ParcelFileDescriptor.MODE_READ_ONLY) }
         }
-        return ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
+        return result
+            .onFailure { exception ->
+                val message = "Failed to provide artwork file descriptor for $uri"
+                Timber.tag("AlbumArtProvider").e(exception, message)
+                LogBuffer.e("AlbumArtProvider", exception, message)
+            }
+            .getOrNull()
+    }
+
+    private fun getEntryPoint(context: Context): AlbumArtEntryPoint {
+        return EntryPointAccessors.fromApplication(context, AlbumArtEntryPoint::class.java)
+    }
+
+    private fun Uri.toImageUrl() = lastPathSegment?.toHttpUrlOrNull()
+
+    private fun HttpUrl.toCachedArtworkFile(context: Context): File {
+        val fileName = "${host}$encodedPath".replace(oldChar = '/', newChar = ':')
+        return context.cacheDir.resolve(fileName)
+    }
+
+    private fun OkHttpClient.fetchAndSaveArtwork(imageUrl: HttpUrl, file: File): File? {
+        Timber.tag("AlbumArtProvider").d("Executing call for $imageUrl")
+        val request = Request.Builder().url(imageUrl).build()
+        val response = newCall(request).execute()
+        return response.use { it.writeSuccessBody(file) }
+    }
+
+    private fun Response.writeSuccessBody(file: File): File? {
+        val responseBody = body
+        return if (isSuccessful && responseBody != null) {
+            file.sink().buffer().use { sink ->
+                sink.writeAll(responseBody.source())
+            }
+            file
+        } else {
+            null
+        }
     }
 
     override fun insert(uri: Uri, values: ContentValues?): Uri? = null
