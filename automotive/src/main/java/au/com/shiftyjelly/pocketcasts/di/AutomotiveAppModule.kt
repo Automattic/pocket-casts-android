@@ -1,6 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.di
 
+import au.com.shiftyjelly.pocketcasts.NoOpGravatarSdkService
 import au.com.shiftyjelly.pocketcasts.servers.di.Downloads
+import au.com.shiftyjelly.pocketcasts.utils.gravatar.GravatarService
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -23,4 +25,7 @@ abstract class AutomotiveAppModule {
     @Binds
     @Downloads
     abstract fun downloadsCallFactory(@Downloads client: OkHttpClient): Call.Factory
+
+    @Binds
+    abstract fun gravatarService(factory: NoOpGravatarSdkService.Factory): GravatarService.Factory
 }

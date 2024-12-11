@@ -89,6 +89,7 @@ dependencies {
     implementation(projects.modules.services.analytics)
     implementation(projects.modules.services.compose)
     implementation(projects.modules.services.crashlogging)
+    implementation(projects.modules.services.gravatarNoop)
     implementation(projects.modules.services.localization)
     implementation(projects.modules.services.mediaNoop)
     implementation(projects.modules.services.model)
