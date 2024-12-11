@@ -46,11 +46,8 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.PodcastSelectFragmentSourc
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.rxkotlin.zipWith
-import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
@@ -154,10 +151,6 @@ class AutoDownloadSettingsFragment :
                 settings.bottomInset.collect {
                     view.updatePadding(bottom = it)
                 }
-                viewModel.hasEpisodesWithAutoDownloadEnabled.collect {
-                    setupNewEpisodesToggleStatusCheck()
-                    onNewEpisodesToggleChange(viewModel.getAutoDownloadNewEpisodes())
-                }
             }
         }
     }
@@ -178,7 +171,7 @@ class AutoDownloadSettingsFragment :
                 setOnPreferenceChangeListener { _, newValue ->
                     if (newValue is Boolean) {
                         viewModel.onNewEpisodesChange(newValue)
-                        onNewEpisodesToggleChange(newValue.toAutoDownloadStatus())
+                        onNewEpisodesToggleChange(newValue.toAutoDownloadStatus(), isUserChange = true)
 
                         viewLifecycleOwner.lifecycleScope.launch {
                             val lowStorageDialogPresenter = LowStorageDialogPresenter(requireContext(), analyticsTracker, settings)
@@ -283,9 +276,12 @@ class AutoDownloadSettingsFragment :
         updateView()
     }
 
-    private fun onNewEpisodesToggleChange(status: Int) {
+    // The isUserChange parameter is used to identify when the user manually updates
+    // the global auto-download toggle. This ensures that we will toggle off all podcasts
+    // only when the user toggles the global auto-download toggle off.
+    private fun onNewEpisodesToggleChange(status: Int, isUserChange: Boolean = false) {
         lifecycleScope.launch {
-            if (status == Podcast.AUTO_DOWNLOAD_OFF) {
+            if (status == Podcast.AUTO_DOWNLOAD_OFF && isUserChange) {
                 viewModel.updateAllAutoDownloadStatus(Podcast.AUTO_DOWNLOAD_OFF)
             }
             updateNewEpisodesPreferencesVisibility(status)
@@ -297,16 +293,18 @@ class AutoDownloadSettingsFragment :
         val podcastsPreference = podcastsPreference ?: return
         val podcastsCategory = podcastsCategory ?: return
 
-        val isAutoDownloadEnabled = if (status == GLOBAL_AUTO_DOWNLOAD_NONE) {
-            viewModel.hasEpisodesWithAutoDownloadEnabled.value
-        } else {
-            status == Podcast.AUTO_DOWNLOAD_NEW_EPISODES
-        }
+        lifecycleScope.launch {
+            val isAutoDownloadEnabled = if (status == GLOBAL_AUTO_DOWNLOAD_NONE) {
+                viewModel.hasEpisodesWithAutoDownloadEnabled()
+            } else {
+                status == Podcast.AUTO_DOWNLOAD_NEW_EPISODES
+            }
 
-        if (isAutoDownloadEnabled) {
-            podcastsCategory.addPreference(podcastsPreference)
-        } else {
-            podcastsCategory.removePreference(podcastsPreference)
+            if (isAutoDownloadEnabled) {
+                podcastsCategory.addPreference(podcastsPreference)
+            } else {
+                podcastsCategory.removePreference(podcastsPreference)
+            }
         }
     }
 
@@ -401,24 +399,11 @@ class AutoDownloadSettingsFragment :
         if (FeatureFlag.isEnabled(Feature.AUTO_DOWNLOAD)) {
             newEpisodesPreference?.summary = getString(LR.string.settings_auto_download_new_episodes_description)
         }
-        onNewEpisodesToggleChange(viewModel.getAutoDownloadNewEpisodes())
-    }
-
-    private fun countPodcastsAutoDownloading(): Single<Int> {
-        return podcastManager.countDownloadStatusRxSingle(Podcast.AUTO_DOWNLOAD_NEW_EPISODES)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-    }
-
-    private fun countPodcasts(): Single<Int> {
-        return podcastManager.countSubscribedRxSingle()
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeOn(Schedulers.io())
     }
 
     @SuppressLint("CheckResult")
     private fun updatePodcastsSummary() {
-        countPodcastsAutoDownloading().zipWith(countPodcasts())
+        viewModel.countPodcastsAutoDownloading().zipWith(viewModel.countPodcasts())
             .subscribeBy(
                 onError = { Timber.e(it) },
                 onSuccess = { (autoDownloadingCount, allCount) ->
@@ -435,22 +420,10 @@ class AutoDownloadSettingsFragment :
     }
 
     private fun setupNewEpisodesToggleStatusCheck() {
-        val value = viewModel.getAutoDownloadNewEpisodes()
-        when (value) {
-            Podcast.AUTO_DOWNLOAD_OFF -> {
-                newEpisodesPreference?.isChecked = false
-            }
-
-            Podcast.AUTO_DOWNLOAD_NEW_EPISODES -> {
-                newEpisodesPreference?.isChecked = true
-            }
-
-            else -> {
-                // This is the case where users have not set this toggle yet.
-                // In this case, we check if the user has auto download enabled for any podcast
-                // so we can enable the global auto-download status.
-                newEpisodesPreference?.isChecked = viewModel.hasEpisodesWithAutoDownloadEnabled.value
-            }
+        lifecycleScope.launch {
+            val newValue = viewModel.hasEpisodesWithAutoDownloadEnabled()
+            newEpisodesPreference?.isChecked = newValue
+            onNewEpisodesToggleChange(newValue.toAutoDownloadStatus())
         }
     }
 
