@@ -1,11 +1,15 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.podcast
 
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.os.BundleCompat
@@ -67,6 +71,7 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.images.CoilManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
+import au.com.shiftyjelly.pocketcasts.utils.NotificationPermissionHelper
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
@@ -84,7 +89,9 @@ import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper.NavigationState
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectToolbar
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.Locale
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.Dispatchers
@@ -165,6 +172,14 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     private var itemTouchHelper: EpisodeItemTouchHelper? = null
 
     private var listState: Parcelable? = null
+
+    private val notificationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { isGranted ->
+        if (isGranted) {
+            viewModel.toggleNotifications(requireContext())
+        }
+    }
 
     private val onScrollListener = object : RecyclerView.OnScrollListener() {
         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {}
@@ -484,8 +499,32 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     }
 
     private val onNotificationsClicked: () -> Unit = {
-        context?.let {
-            viewModel.toggleNotifications(it)
+        context?.let { context ->
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                NotificationPermissionHelper.checkForNotificationPermission(
+                    requireActivity(),
+                    launcher = notificationPermissionLauncher,
+                    onShowRequestPermissionRationale = {
+                        (activity as? FragmentHostListener)?.snackBarView()?.let { snackBarView ->
+                            Snackbar.make(snackBarView, getString(LR.string.notifications_blocked_warning), Snackbar.LENGTH_LONG)
+                                .setAction(
+                                    getString(LR.string.notifications_blocked_warning_snackbar_action)
+                                        .uppercase(Locale.getDefault()),
+                                ) {
+                                    // Open app settings for the user to enable permissions
+                                    val intent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                    val uri: Uri = Uri.fromParts("package", requireContext().packageName, null)
+                                    intent.data = uri
+                                    startActivity(intent)
+                                }.show()
+                        }
+                    },
+                    onPermissionGranted = { viewModel.toggleNotifications(context) },
+                )
+            } else {
+                viewModel.toggleNotifications(context)
+            }
         }
     }
 
