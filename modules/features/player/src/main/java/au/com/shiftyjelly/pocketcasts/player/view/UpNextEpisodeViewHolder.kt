@@ -33,12 +33,6 @@ import au.com.shiftyjelly.pocketcasts.views.helper.RowSwipeable
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayout
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
 import au.com.shiftyjelly.pocketcasts.views.helper.setEpisodeTimeLeft
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
-import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.rx2.asFlowable
-import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 class UpNextEpisodeViewHolder(
@@ -64,12 +58,6 @@ class UpNextEpisodeViewHolder(
     private var episodeInstance: BaseEpisode? = null
 
     override lateinit var swipeButtonLayout: SwipeButtonLayout
-
-    var disposable: Disposable? = null
-        set(value) {
-            field?.dispose()
-            field = value
-        }
 
     override fun onItemDrag() {
         AnimatorSet().apply {
@@ -100,16 +88,6 @@ class UpNextEpisodeViewHolder(
         isMultiSelecting: Boolean,
         isSelected: Boolean,
     ) {
-        disposable = episodeManager
-            .findByUuidFlow(episode.uuid)
-            .asFlowable()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnNext {
-                bindEpisode(it)
-            }
-            .subscribeBy(onError = { Timber.e(it) })
-
         swipeButtonLayout = swipeButtonLayoutFactory.forEpisode(episode)
 
         bindEpisode(episode)
@@ -146,10 +124,6 @@ class UpNextEpisodeViewHolder(
         binding.title.text = episode.title
         binding.downloaded.isVisible = episode.isDownloaded
         binding.info.setEpisodeTimeLeft(episode)
-    }
-
-    fun clearDisposable() {
-        disposable?.dispose()
     }
 
     override val episodeRow: ViewGroup

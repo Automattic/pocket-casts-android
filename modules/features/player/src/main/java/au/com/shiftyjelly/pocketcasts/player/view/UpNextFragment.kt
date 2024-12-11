@@ -204,6 +204,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         multiSelectHelper.context = null
         multiSelectHelper.listener = null
         realBinding = null
+        adapter.clearDisposables()
     }
 
     override fun onAttach(context: Context) {

@@ -53,6 +53,11 @@ import com.airbnb.lottie.SimpleColorFilter
 import com.airbnb.lottie.model.KeyPath
 import com.airbnb.lottie.value.LottieValueCallback
 import com.google.android.material.snackbar.Snackbar
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
+import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.rx2.asFlowable
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -90,6 +95,8 @@ class UpNextAdapter(
     private var isSignedInAsPaidUser: Boolean = false
     private var isUpNextNotEmpty: Boolean = false
 
+    private val disposables = mutableMapOf<String, Disposable>()
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
@@ -110,7 +117,10 @@ class UpNextAdapter(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (val item = getItem(position)) {
-            is BaseEpisode -> bindEpisodeRow(holder as UpNextEpisodeViewHolder, item)
+            is BaseEpisode -> {
+                bindEpisodeRow(holder as UpNextEpisodeViewHolder, item)
+                observeEpisodeChanges(item, holder)
+            }
             is PlayerViewModel.UpNextSummary -> (holder as HeaderViewHolder).bind(item)
             is UpNextPlaying -> (holder as PlayingViewHolder).bind(item)
         }
@@ -124,6 +134,30 @@ class UpNextAdapter(
             is PlayerViewModel.UpNextSummary -> R.layout.adapter_up_next_footer
             else -> throw IllegalStateException("Unknown item type in up next")
         }
+    }
+
+    private fun observeEpisodeChanges(episode: BaseEpisode, holder: UpNextEpisodeViewHolder) {
+        disposables[episode.uuid]?.dispose()
+
+        val disposable = episodeManager.findByUuidFlow(episode.uuid)
+            .asFlowable()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onNext = { updatedEpisode ->
+                    if (holder.bindingAdapterPosition != RecyclerView.NO_POSITION) {
+                        holder.bind(updatedEpisode, multiSelectHelper.isMultiSelecting, multiSelectHelper.isSelected(updatedEpisode))
+                    }
+                },
+                onError = { Timber.e(it) },
+            )
+
+        disposables[episode.uuid] = disposable
+    }
+
+    fun clearDisposables() {
+        disposables.values.forEach { it.dispose() }
+        disposables.clear()
     }
 
     private fun bindEpisodeRow(holder: UpNextEpisodeViewHolder, episode: BaseEpisode) {
@@ -158,12 +192,12 @@ class UpNextAdapter(
 
     override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
         super.onViewRecycled(holder)
-        (holder as? UpNextEpisodeViewHolder)?.clearDisposable()
-    }
+        if (holder is UpNextEpisodeViewHolder) {
+            val episodeUuid = holder.episode?.uuid ?: return
 
-    override fun onViewDetachedFromWindow(holder: RecyclerView.ViewHolder) {
-        super.onViewDetachedFromWindow(holder)
-        (holder as? UpNextEpisodeViewHolder)?.clearDisposable()
+            disposables[episodeUuid]?.dispose()
+            disposables.remove(episodeUuid)
+        }
     }
 
     fun updateUserSignInState(isSignedInAsPaidUser: Boolean) {
