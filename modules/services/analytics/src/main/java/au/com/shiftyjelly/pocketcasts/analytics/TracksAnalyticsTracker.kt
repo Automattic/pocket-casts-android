@@ -68,8 +68,6 @@ class TracksAnalyticsTracker @Inject constructor(
         val hasSubscription = paidSubscription != null
         val isPocketCastsChampion = paidSubscription?.isPocketCastsChampion
             ?: false
-        val subscriptionType = paidSubscription?.type?.toString()
-            ?: INVALID_OR_NULL_VALUE
         val subscriptionTier = paidSubscription?.tier?.toString()
             ?: INVALID_OR_NULL_VALUE
         val subscriptionPlatform = paidSubscription?.platform?.toString()
@@ -82,7 +80,6 @@ class TracksAnalyticsTracker @Inject constructor(
             PredefinedEventProperty.USER_IS_LOGGED_IN to isLoggedIn,
             PredefinedEventProperty.PLUS_HAS_SUBSCRIPTION to hasSubscription,
             PredefinedEventProperty.PLUS_HAS_LIFETIME to isPocketCastsChampion,
-            PredefinedEventProperty.PLUS_SUBSCRIPTION_TYPE to subscriptionType,
             PredefinedEventProperty.PLUS_SUBSCRIPTION_TIER to subscriptionTier,
             PredefinedEventProperty.PLUS_SUBSCRIPTION_PLATFORM to subscriptionPlatform,
             PredefinedEventProperty.PLUS_SUBSCRIPTION_FREQUENCY to subscriptionFrequency,
@@ -128,7 +125,6 @@ class TracksAnalyticsTracker @Inject constructor(
         USER_IS_LOGGED_IN("user_is_logged_in"),
         PLUS_HAS_SUBSCRIPTION("plus_has_subscription"),
         PLUS_HAS_LIFETIME("plus_has_lifetime"),
-        PLUS_SUBSCRIPTION_TYPE("plus_subscription_type"),
         PLUS_SUBSCRIPTION_TIER("plus_subscription_tier"),
         PLUS_SUBSCRIPTION_PLATFORM("plus_subscription_platform"),
         PLUS_SUBSCRIPTION_FREQUENCY("plus_subscription_frequency"),

@@ -51,7 +51,7 @@ class ColorManager @Inject constructor(
 
         try {
             val colors = staticServiceManager.getColors(podcast.uuid) ?: return
-            podcastManager.updateColors(
+            podcastManager.updateColorsBlocking(
                 podcast.uuid,
                 colors.background,
                 colors.tintForLightBg,

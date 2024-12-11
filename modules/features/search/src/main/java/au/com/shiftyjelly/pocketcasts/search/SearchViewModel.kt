@@ -59,7 +59,7 @@ class SearchViewModel @Inject constructor(
 
         viewModelScope.launch {
             val subscribedUuidFlow = podcastManager
-                .observeSubscribed()
+                .subscribedRxFlowable()
                 .asFlow()
                 .map { ls ->
                     ls.map { it.uuid }

@@ -112,8 +112,8 @@ class PodcastListViewModel @Inject constructor(
     }
 
     private fun addSubscriptionStateToFeed(feed: ListFeed): Flowable<ListFeed> {
-        return podcastManager.getSubscribedPodcastUuids().toFlowable() // Get the current subscribed list
-            .mergeWith(podcastManager.observePodcastSubscriptions()) // Get updated when it changes
+        return podcastManager.getSubscribedPodcastUuidsRxSingle().toFlowable() // Get the current subscribed list
+            .mergeWith(podcastManager.podcastSubscriptionsRxFlowable()) // Get updated when it changes
             .flatMap { subscribedList ->
                 val newPodcastList = feed.podcasts?.map { podcast ->
                     podcast.updateIsSubscribed(subscribedList.contains(podcast.uuid))
@@ -134,7 +134,7 @@ class PodcastListViewModel @Inject constructor(
     }
 
     fun findOrDownloadEpisode(discoverEpisode: DiscoverEpisode, success: (episode: PodcastEpisode) -> Unit) {
-        podcastManager.findOrDownloadPodcastRx(discoverEpisode.podcast_uuid)
+        podcastManager.findOrDownloadPodcastRxSingle(discoverEpisode.podcast_uuid)
             .flatMapMaybe {
                 rxMaybe {
                     episodeManager.findByUuid(discoverEpisode.uuid)

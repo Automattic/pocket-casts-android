@@ -223,8 +223,8 @@ class DiscoverViewModel @Inject constructor(
     )
 
     private fun addSubscriptionStateToPodcasts(list: PodcastList): Flowable<PodcastList> {
-        return podcastManager.getSubscribedPodcastUuids().toFlowable() // Get the current subscribed list
-            .mergeWith(podcastManager.observePodcastSubscriptions()) // Get updated when it changes
+        return podcastManager.getSubscribedPodcastUuidsRxSingle().toFlowable() // Get the current subscribed list
+            .mergeWith(podcastManager.podcastSubscriptionsRxFlowable()) // Get updated when it changes
             .map { subscribedList ->
                 val updatedPodcasts = list.podcasts.map { podcast ->
                     val isSubscribed = subscribedList.contains(podcast.uuid)
@@ -276,7 +276,7 @@ class DiscoverViewModel @Inject constructor(
     }
 
     fun findOrDownloadEpisode(discoverEpisode: DiscoverEpisode, success: (episode: PodcastEpisode) -> Unit) {
-        podcastManager.findOrDownloadPodcastRx(discoverEpisode.podcast_uuid)
+        podcastManager.findOrDownloadPodcastRxSingle(discoverEpisode.podcast_uuid)
             .flatMapMaybe {
                 @Suppress("DEPRECATION")
                 episodeManager.findByUuidRxMaybe(discoverEpisode.uuid)

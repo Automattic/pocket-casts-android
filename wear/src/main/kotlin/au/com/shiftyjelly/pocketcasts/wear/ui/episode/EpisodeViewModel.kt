@@ -141,7 +141,7 @@ class EpisodeViewModel @Inject constructor(
 
         val podcastFlow = episodeFlow
             .filterIsInstance<PodcastEpisode>()
-            .map { podcastManager.findPodcastByUuidSuspend(it.podcastUuid) }
+            .map { podcastManager.findPodcastByUuid(it.podcastUuid) }
 
         val isPlayingEpisodeFlow = playbackManager.playbackStateRelay.asFlow()
             .filter { it.episodeUuid == episodeUuid }

@@ -41,7 +41,7 @@ class DeveloperViewModel
     fun triggerNotification() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val podcasts = podcastManager.findSubscribed()
+                val podcasts = podcastManager.findSubscribedBlocking()
                 val countNotificationsOn = podcasts.count { it.isShowNotifications }
                 if (countNotificationsOn == 0) {
                     withContext(Dispatchers.Main) {
@@ -58,7 +58,7 @@ class DeveloperViewModel
                                 val episode = episodes[1]
                                 // link the second oldest to the podcast
                                 episodeManager.markAsNotPlayedBlocking(episode)
-                                podcastManager.updateLatestEpisode(podcast, episode)
+                                podcastManager.updateLatestEpisodeBlocking(podcast, episode)
                                 // remove the latest episode
                                 val episodeToDelete = episodes[0]
                                 Timber.i("Creating a notification for ${podcast.title} - ${episodeToDelete.title}")
@@ -85,7 +85,7 @@ class DeveloperViewModel
     fun deleteFirstEpisode() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val podcasts = podcastManager.findSubscribed()
+                val podcasts = podcastManager.findSubscribedBlocking()
                 for (podcast in podcasts) {
                     // find first podcast with more than one episode
                     val episodes = episodeManager.findEpisodesByPodcastOrderedByPublishDateBlocking(podcast)
@@ -100,7 +100,7 @@ class DeveloperViewModel
 
                         podcast.latestEpisodeUuid = newLatest?.uuid
                         podcast.latestEpisodeDate = newLatest?.publishedDate
-                        podcastManager.updatePodcast(podcast)
+                        podcastManager.updatePodcastBlocking(podcast)
 
                         continue
                     }

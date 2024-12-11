@@ -4,7 +4,6 @@ import android.content.res.Resources
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureTier
 import com.android.billingclient.api.ProductDetails
 
 sealed interface Subscription {
@@ -90,28 +89,6 @@ sealed interface Subscription {
 
         override fun tryFreeThenPricePerPeriod(res: Resources): String {
             return "TODO"
-        }
-    }
-
-    enum class SubscriptionTier(val supportedProductIds: List<String>) {
-        PLUS(listOf(PLUS_MONTHLY_PRODUCT_ID, PLUS_YEARLY_PRODUCT_ID)),
-        PATRON(listOf(PATRON_MONTHLY_PRODUCT_ID, PATRON_YEARLY_PRODUCT_ID)),
-        UNKNOWN(emptyList()),
-        ;
-
-        companion object {
-            private val productIdToTierMap: Map<String, SubscriptionTier> = entries.flatMap { entry ->
-                entry.supportedProductIds.map { productId -> productId to entry }
-            }.toMap()
-
-            fun fromProductId(productId: String): SubscriptionTier =
-                productIdToTierMap[productId] ?: UNKNOWN
-
-            fun fromFeatureTier(feature: Feature) = when (feature.tier) {
-                FeatureTier.Free -> UNKNOWN
-                is FeatureTier.Plus -> if (feature.isCurrentlyExclusiveToPatron()) PATRON else PLUS
-                FeatureTier.Patron -> PATRON
-            }
         }
     }
 

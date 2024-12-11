@@ -31,7 +31,8 @@
         android:layout_height="match_parent"
         android:layout_marginTop="?android:actionBarSize"
         android:background="?attr/primary_ui_03"
-        android:fillViewport="true">
+        android:fillViewport="true"
+        tools:ignore="UnusedIds">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/mainConstraintView"

@@ -145,7 +145,29 @@ platform :android do
     # restrictions we have in `main`, and the release managers wouldn't be able to push due to permissions.
     # This should be changed only when we have PC Android releases done on CI, when the CI bot is the one running `git push`.
     set_branch_protection(repository: GH_REPOSITORY, branch: "release/#{new_version}")
-    set_milestone_frozen_marker(repository: GH_REPOSITORY, milestone: new_version)
+
+    begin
+      # Move PRs to next milestone
+      moved_prs = update_assigned_milestone(
+        repository: GH_REPOSITORY,
+        from_milestone: new_version,
+        to_milestone: release_version_next,
+        comment: "Version `#{new_version}` has now entered code-freeze, so the milestone of this PR has been updated to `#{release_version_next}`."
+      )
+      UI.message("Moved the following PRs to milestone #{release_version_next}: #{moved_prs.join(', ')}")
+
+      # Add ❄️ marker to milestone title to indicate we entered code-freeze
+      set_milestone_frozen_marker(
+        repository: GH_REPOSITORY,
+        milestone: new_version
+      )
+    rescue StandardError => e
+      UI.error <<~MESSAGE
+        Error moving PRs to next milestone or freezing the current `#{new_version}` milestone: #{e.message}.
+        Please manually check that the PRs which were targeting milestone `#{new_version}` have been moved to the next one
+        and that the milestone `#{new_version}` that just entered code-freeze had the "❄️" marker added to its title.
+      MESSAGE
+    end
   end
 
   # @param base_version [String] The "x.y" version number to create a beta from. Defaults to the current version as defined in the version file of `main` branch

@@ -2,10 +2,12 @@ package au.com.shiftyjelly.pocketcasts.compose.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -15,10 +17,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.plusGradientBrush
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 @Composable
 fun GradientIcon(
@@ -54,6 +58,38 @@ fun GradientIcon(
                 }
             },
     )
+}
+
+@Composable
+fun GradientIcon(
+    painter: Painter,
+    gradientBrush: Brush,
+    contentDescription: String? = null,
+    blendMode: BlendMode = BlendMode.SrcAtop,
+    modifier: Modifier = Modifier,
+) {
+    Icon(
+        modifier = modifier
+            .graphicsLayer(alpha = 0.99f)
+            .drawWithContent {
+                drawContent()
+                drawRect(gradientBrush, blendMode = blendMode)
+            },
+        painter = painter,
+        contentDescription = contentDescription,
+    )
+}
+
+@Preview
+@Composable
+fun GradientIconWithBrushPreview() {
+    AppThemeWithBackground(Theme.ThemeType.LIGHT) {
+        GradientIcon(
+            painter = painterResource(IR.drawable.ic_plus),
+            contentDescription = "",
+            gradientBrush = Brush.plusGradientBrush,
+        )
+    }
 }
 
 @ShowkaseComposable(name = "GradientIcon", group = "Images", styleName = "Light", defaultStyle = true)

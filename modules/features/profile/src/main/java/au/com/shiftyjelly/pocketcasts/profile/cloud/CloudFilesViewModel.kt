@@ -33,7 +33,7 @@ class CloudFilesViewModel @Inject constructor(
     private val bookmarkManager: BookmarkManager,
 ) : ViewModel() {
 
-    val accountUsage = userEpisodeManager.observeAccountUsage().toLiveData()
+    val accountUsage = userEpisodeManager.accountUsageRxFlowable().toLiveData()
     val signInState = userManager.getSignInState().toLiveData()
 
     data class UiState(

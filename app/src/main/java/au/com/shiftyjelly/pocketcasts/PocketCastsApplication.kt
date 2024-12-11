@@ -224,7 +224,7 @@ class PocketCastsApplication : Application(), Configuration.Provider {
 
                 // after the app is installed check it
                 if (isRestoreFromBackup) {
-                    val podcasts = podcastManager.findSubscribed()
+                    val podcasts = podcastManager.findSubscribedBlocking()
                     val restoredFromBackup = podcasts.isNotEmpty()
                     if (restoredFromBackup) {
                         // check to see if the episode files already exist

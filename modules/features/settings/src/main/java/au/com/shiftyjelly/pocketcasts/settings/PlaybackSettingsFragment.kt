@@ -694,7 +694,7 @@ class PlaybackSettingsFragment : BaseFragment() {
             .setIconId(R.drawable.ic_podcasts)
             .setOnConfirm {
                 applicationScope.launch {
-                    podcastManager.updateGroupingForAll(grouping)
+                    podcastManager.updateGroupingForAllBlocking(grouping)
                 }
             }
             .show(parentFragmentManager, "podcast_grouping_set_all_warning")

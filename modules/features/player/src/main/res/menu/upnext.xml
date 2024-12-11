@@ -5,7 +5,7 @@
     <item
         android:id="@+id/clear_up_next"
         android:title="@string/player_up_next_clear_queue"
-        android:icon="@drawable/ic_delete"
+        android:icon="@drawable/ic_upnext_remove"
         app:showAsAction="ifRoom" />
 
     <item

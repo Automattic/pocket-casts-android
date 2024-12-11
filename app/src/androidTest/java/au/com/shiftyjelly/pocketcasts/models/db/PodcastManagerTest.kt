@@ -119,15 +119,15 @@ class PodcastManagerTest {
     @Test
     fun testSubscribeToExistingPodcast() {
         podcastDao.insertBlocking(Podcast(uuid, isSubscribed = true))
-        podcastManagerSignedOut.subscribeToPodcastRx(uuid, sync = false).blockingGet()
-        val subscribedList = podcastManagerSignedOut.getSubscribedPodcastUuids().blockingGet()
+        podcastManagerSignedOut.subscribeToPodcastRxSingle(uuid, sync = false).blockingGet()
+        val subscribedList = podcastManagerSignedOut.getSubscribedPodcastUuidsRxSingle().blockingGet()
         assertTrue("Podcast uuid should be subscribed", subscribedList.contains(uuid))
     }
 
     @Test
     fun testSubscribeToServerPodcast() {
-        podcastManagerSignedOut.subscribeToPodcastRx(uuid, sync = false).blockingGet()
-        val subscribedList = podcastManagerSignedOut.getSubscribedPodcastUuids().blockingGet()
+        podcastManagerSignedOut.subscribeToPodcastRxSingle(uuid, sync = false).blockingGet()
+        val subscribedList = podcastManagerSignedOut.getSubscribedPodcastUuidsRxSingle().blockingGet()
         assertTrue("Podcast uuid should be subscribed", subscribedList.contains(uuid))
     }
 
@@ -135,7 +135,7 @@ class PodcastManagerTest {
     fun testUnsubscribeSignedOut() {
         val playbackManager = mock<PlaybackManager> {}
         podcastDao.insertBlocking(Podcast(uuid, isSubscribed = true))
-        podcastManagerSignedOut.unsubscribe(uuid, playbackManager)
+        podcastManagerSignedOut.unsubscribeBlocking(uuid, playbackManager)
         val daoPodcast = podcastDao.findByUuidBlocking(uuid)
         assertTrue("Podcast should be null", daoPodcast == null)
     }
@@ -144,7 +144,7 @@ class PodcastManagerTest {
     fun testUnsubscribeSignedIn() {
         val playbackManager = mock<PlaybackManager> {}
         podcastDao.insertBlocking(Podcast(uuid, isSubscribed = true))
-        podcastManagerSignedIn.unsubscribe(uuid, playbackManager)
+        podcastManagerSignedIn.unsubscribeBlocking(uuid, playbackManager)
         val daoPodcast = podcastDao.findByUuidBlocking(uuid)
         assertTrue("Podcast should be unsubscribed", daoPodcast?.isSubscribed == false)
     }

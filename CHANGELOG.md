@@ -1,6 +1,16 @@
-7.79
+7.80
 -----
 
+
+7.79
+-----
+*   Updates
+    *   Improve log sharing
+        ([#3336](https://github.com/Automattic/pocket-casts-android/pull/3336))
+    *   Update account details header UI
+        ([#3294](https://github.com/Automattic/pocket-casts-android/pull/3294))
+    *   Improve the Up Next clear all button
+        ([#3334](https://github.com/Automattic/pocket-casts-android/pull/3334))
 
 7.78
 -----

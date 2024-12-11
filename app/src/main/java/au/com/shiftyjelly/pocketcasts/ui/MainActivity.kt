@@ -10,6 +10,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -21,7 +22,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.ContextCompat
+import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commitNow
@@ -129,7 +132,6 @@ import au.com.shiftyjelly.pocketcasts.search.SearchFragment
 import au.com.shiftyjelly.pocketcasts.servers.ServerCallback
 import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.discover.PodcastSearch
-import au.com.shiftyjelly.pocketcasts.settings.ManualCleanupFragment
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
@@ -152,8 +154,6 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
-import au.com.shiftyjelly.pocketcasts.views.lowstorage.LowStorageBottomSheetListener
-import au.com.shiftyjelly.pocketcasts.views.lowstorage.LowStorageLaunchBottomSheet
 import com.automattic.android.tracks.crashlogging.CrashLogging
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
@@ -182,7 +182,6 @@ import timber.log.Timber
 import android.provider.Settings as AndroidProviderSettings
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
-import com.google.android.material.R as MR
 
 private const val SAVEDSTATE_PLAYER_OPEN = "player_open"
 private const val SAVEDSTATE_MINIPLAYER_SHOWN = "miniplayer_shown"
@@ -194,7 +193,6 @@ class MainActivity :
     FragmentHostListener,
     PlayerBottomSheet.PlayerBottomSheetListener,
     SearchFragment.Listener,
-    LowStorageBottomSheetListener,
     OnboardingLauncher,
     CoroutineScope,
     NotificationPermissionChecker {
@@ -263,6 +261,12 @@ class MainActivity :
 
     private val frameBottomSheetBehavior: LockableBottomSheetBehavior<View>
         get() = getBottomSheetBehavior()
+
+    private val miniPlayerHeight: Int
+        get() = resources.getDimension(R.dimen.miniPlayerHeight).toInt()
+
+    private val bottomNavigationHeight: Int
+        get() = binding.bottomNavigation.height - binding.bottomNavigation.paddingBottom
 
     private var bottomSheetTag: String? = null
     private val bottomSheetQueue: MutableList<(() -> Unit)?> = mutableListOf()
@@ -362,6 +366,18 @@ class MainActivity :
         setContentView(view)
         checkForNotificationPermission()
 
+        binding.bottomNavigation.doOnLayout {
+            val miniPlayerHeight = miniPlayerHeight
+            val bottomNavigationHeight = binding.bottomNavigation.height
+            val bottomSheetBehavior = BottomSheetBehavior.from(binding.playerBottomSheet)
+            // Set the player bottom sheet position to show the mini player above the bottom navigation
+            bottomSheetBehavior.peekHeight = miniPlayerHeight + bottomNavigationHeight
+            // Add padding to the main content so the end of the page isn't under the bottom navigation
+            binding.mainFragment.updatePadding(bottom = bottomNavigationHeight)
+            // Position the snackbar above the bottom navigation or the mini player if it's shown
+            updateSnackbarPosition(miniPlayerOpen = false)
+        }
+
         lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
                 val isEligible = viewModel.isEndOfYearStoriesEligible()
@@ -418,7 +434,7 @@ class MainActivity :
 
         val showMiniPlayerImmediately = savedInstanceState?.getBoolean(SAVEDSTATE_MINIPLAYER_SHOWN, false) ?: false
         binding.playerBottomSheet.isVisible = showMiniPlayerImmediately
-        settings.updateBottomInset(if (showMiniPlayerImmediately) resources.getDimension(R.dimen.miniPlayerHeight).toInt() else 0)
+        settings.updateBottomInset(if (showMiniPlayerImmediately) miniPlayerHeight else 0)
 
         setupPlayerViews(showMiniPlayerImmediately)
 
@@ -738,41 +754,6 @@ class MainActivity :
         )
     }
 
-    private fun setupLowStorageLaunchBottomSheet(sourceView: SourceView) {
-        val viewGroup = binding.modalBottomSheet
-        viewGroup.removeAllViews()
-        viewGroup.addView(
-            ComposeView(viewGroup.context).apply {
-                setContent {
-                    val downloadedEpisodesState by viewModel.downloadedEpisodeState.collectAsState()
-
-                    val shouldShow = downloadedEpisodesState.downloadedEpisodes != 0L &&
-                        settings.shouldShowLowStorageModalAfterSnooze() &&
-                        FeatureFlag.isEnabled(Feature.MANAGE_DOWNLOADED_EPISODES)
-
-                    AppTheme(theme.activeTheme) {
-                        LowStorageLaunchBottomSheet(
-                            parent = viewGroup,
-                            shouldShow = shouldShow,
-                            onManageDownloadsClick = {
-                                analyticsTracker.track(AnalyticsEvent.FREE_UP_SPACE_MANAGE_DOWNLOADS_TAPPED, mapOf("source" to sourceView.analyticsValue))
-                                addFragment(ManualCleanupFragment.newInstance())
-                            },
-                            onExpanded = {
-                                analyticsTracker.track(AnalyticsEvent.FREE_UP_SPACE_MODAL_SHOWN, mapOf("source" to sourceView.analyticsValue))
-                            },
-                            onMaybeLaterClick = {
-                                analyticsTracker.track(AnalyticsEvent.FREE_UP_SPACE_MAYBE_LATER_TAPPED, mapOf("source" to sourceView.analyticsValue))
-                                settings.setDismissLowStorageModalTime(System.currentTimeMillis())
-                            },
-                            totalDownloadSize = downloadedEpisodesState.downloadedEpisodes,
-                        )
-                    }
-                }
-            },
-        )
-    }
-
     private fun showEndOfYearModal() {
         viewModel.updateStoriesModalShowState(true)
         launch(Dispatchers.Main) {
@@ -1006,15 +987,19 @@ class MainActivity :
     }
 
     override fun onMiniPlayerHidden() {
-        val padding = resources.getDimension(MR.dimen.design_bottom_navigation_height).toInt()
-        binding.snackbarFragment.updatePadding(bottom = padding)
+        updateSnackbarPosition(miniPlayerOpen = false)
         settings.updateBottomInset(0)
     }
 
+    private fun updateSnackbarPosition(miniPlayerOpen: Boolean) {
+        binding.snackbarFragment.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+            bottomMargin = (if (miniPlayerOpen) miniPlayerHeight else 0) + bottomNavigationHeight
+        }
+    }
+
     override fun onMiniPlayerVisible() {
-        val miniPlayerHeight = resources.getDimension(R.dimen.miniPlayerHeight).toInt()
-        val padding = resources.getDimension(MR.dimen.design_bottom_navigation_height).toInt() + miniPlayerHeight
-        binding.snackbarFragment.updatePadding(bottom = padding)
+        updateSnackbarPosition(miniPlayerOpen = true)
+
         settings.updateBottomInset(miniPlayerHeight)
 
         // Handle up next shortcut
@@ -1649,11 +1634,5 @@ class MainActivity :
             .setBackgroundTint(ThemeColor.primaryUi01(Theme.ThemeType.DARK))
             .setTextColor(ThemeColor.primaryText01(Theme.ThemeType.DARK))
             .show()
-    }
-
-    override fun showModal(sourceView: SourceView) {
-        launch(Dispatchers.Main) {
-            setupLowStorageLaunchBottomSheet(sourceView)
-        }
     }
 }

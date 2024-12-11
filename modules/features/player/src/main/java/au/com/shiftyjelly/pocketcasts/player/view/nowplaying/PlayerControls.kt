@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.player.view.playercontrols
+package au.com.shiftyjelly.pocketcasts.player.view.nowplaying
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable

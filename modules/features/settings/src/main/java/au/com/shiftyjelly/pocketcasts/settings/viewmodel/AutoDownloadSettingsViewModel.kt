@@ -97,7 +97,7 @@ class AutoDownloadSettingsViewModel @Inject constructor(
 
     fun clearDownloadErrors() {
         launch {
-            podcastManager.clearAllDownloadErrors()
+            podcastManager.clearAllDownloadErrorsBlocking()
         }
         analyticsTracker.track(AnalyticsEvent.SETTINGS_AUTO_DOWNLOAD_CLEAR_DOWNLOAD_ERRORS)
     }

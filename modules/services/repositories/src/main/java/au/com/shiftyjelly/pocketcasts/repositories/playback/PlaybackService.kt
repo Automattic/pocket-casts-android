@@ -464,7 +464,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
     private suspend fun convertEpisodesToMediaItems(episodes: List<BaseEpisode>): List<MediaBrowserCompat.MediaItem> {
         return episodes.mapNotNull { episode ->
             // find the podcast
-            val podcast = if (episode is PodcastEpisode) podcastManager.findPodcastByUuidSuspend(episode.podcastUuid) else Podcast.userPodcast
+            val podcast = if (episode is PodcastEpisode) podcastManager.findPodcastByUuid(episode.podcastUuid) else Podcast.userPodcast
             // convert to a media item
             if (podcast == null) null else AutoConverter.convertEpisodeToMediaItem(context = this, episode = episode, parentPodcast = podcast, useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork)
         }
@@ -553,14 +553,14 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
             val topEpisodes = episodeList.take(EPISODE_LIMIT)
             if (topEpisodes.isNotEmpty()) {
                 for (episode in topEpisodes) {
-                    podcastManager.findPodcastByUuidSuspend(episode.podcastUuid)?.let { parentPodcast ->
+                    podcastManager.findPodcastByUuid(episode.podcastUuid)?.let { parentPodcast ->
                         episodeItems.add(AutoConverter.convertEpisodeToMediaItem(this, episode, parentPodcast, sourceId = playlist.uuid, useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork))
                     }
                 }
             }
         } else {
             autoPlaySource = AutoPlaySource.fromId(parentId)
-            val podcastFound = podcastManager.findPodcastByUuidSuspend(parentId) ?: podcastManager.findOrDownloadPodcastRx(parentId).toMaybe().onErrorComplete().awaitSingleOrNull()
+            val podcastFound = podcastManager.findPodcastByUuid(parentId) ?: podcastManager.findOrDownloadPodcastRxSingle(parentId).toMaybe().onErrorComplete().awaitSingleOrNull()
             podcastFound?.let { podcast ->
 
                 val showPlayed = settings.autoShowPlayed.value
@@ -597,7 +597,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
     protected suspend fun loadStarredChildren(): List<MediaBrowserCompat.MediaItem> {
         setAutoPlaySource(AutoPlaySource.Starred)
         return episodeManager.findStarredEpisodes().take(EPISODE_LIMIT).mapNotNull { episode ->
-            podcastManager.findPodcastByUuid(episode.podcastUuid)?.let { podcast ->
+            podcastManager.findPodcastByUuidBlocking(episode.podcastUuid)?.let { podcast ->
                 AutoConverter.convertEpisodeToMediaItem(context = this, episode = episode, parentPodcast = podcast, useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork)
             }
         }
@@ -606,7 +606,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
     protected suspend fun loadListeningHistoryChildren(): List<MediaBrowserCompat.MediaItem> {
         return episodeManager.findPlaybackHistoryEpisodes().take(EPISODE_LIMIT).mapNotNull { episode ->
             setAutoPlaySource(AutoPlaySource.fromId(episode.podcastUuid))
-            podcastManager.findPodcastByUuid(episode.podcastUuid)?.let { podcast ->
+            podcastManager.findPodcastByUuidBlocking(episode.podcastUuid)?.let { podcast ->
                 AutoConverter.convertEpisodeToMediaItem(context = this, episode = episode, parentPodcast = podcast, useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork)
             }
         }

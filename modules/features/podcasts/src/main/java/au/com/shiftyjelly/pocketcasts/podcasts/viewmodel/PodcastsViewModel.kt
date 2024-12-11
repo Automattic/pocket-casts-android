@@ -60,7 +60,7 @@ class PodcastsViewModel
 
     val folderState: LiveData<FolderState> = combineLatest(
         // monitor all subscribed podcasts, get the podcast in 'Episode release date' as the rest can be done in memory
-        podcastManager.observePodcastsOrderByLatestEpisode(),
+        podcastManager.podcastsOrderByLatestEpisodeRxFlowable(),
         // monitor all the folders
         folderManager.observeFolders()
             .switchMap { folders ->
@@ -70,7 +70,7 @@ class PodcastsViewModel
                     // monitor the folder podcasts
                     val observeFolderPodcasts = folders.map { folder ->
                         podcastManager
-                            .observePodcastsInFolderOrderByUserChoice(folder)
+                            .podcastsInFolderOrderByUserChoiceRxFlowable(folder)
                             .map { podcasts ->
                                 FolderItem.Folder(
                                     folder = folder,
