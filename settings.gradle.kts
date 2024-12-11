@@ -28,6 +28,7 @@ dependencyResolutionManagement {
             content {
                 includeGroup("com.automattic")
                 includeGroup("com.automattic.tracks")
+                includeGroup("com.gravatar")
                 includeGroupByRegex("org.wordpress.*")
             }
         }
@@ -82,3 +83,5 @@ include(":modules:services:ui")
 include(":modules:services:utils")
 include(":modules:services:views")
 include(":modules:services:sharedtest")
+include(":modules:services:gravatar")
+include(":modules:services:gravatar-noop")

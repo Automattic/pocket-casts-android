@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.ui
 
-import android.Manifest
 import android.os.SystemClock
 import android.view.InputDevice
 import android.view.MotionEvent
@@ -29,7 +28,6 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
-import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
@@ -57,9 +55,8 @@ class MainActivityTest {
 
     @get:Rule var activityRule: ActivityScenarioRule<MainActivity> = ActivityScenarioRule(MainActivity::class.java)
 
-    @get:Rule val composeTestRule = createAndroidComposeRule<MainActivity>()
-
-    @get:Rule var permissionRule = GrantPermissionRule.grant(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    @get:Rule
+    val composeTestRule = createAndroidComposeRule<MainActivity>()
 
     lateinit var device: UiDevice
 

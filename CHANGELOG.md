@@ -3,6 +3,9 @@
 *   Bug Fixes
     *   Fix global auto download setting was incorrectly overriding the podcast auto download setting
         ([#3342](https://github.com/Automattic/pocket-casts-android/pull/3342))
+*   New Features
+    *   Modify avatar will use Gravatar native Quick Editor
+        ([#3055](https://github.com/Automattic/pocket-casts-android/pull/3055))
 
 7.79
 -----

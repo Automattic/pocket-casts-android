@@ -65,6 +65,7 @@ dependencies {
 
     implementation(projects.modules.services.deeplink)
     implementation(projects.modules.services.images)
+    implementation(projects.modules.services.utils)
 
     testImplementation(libs.coroutines.test)
     testImplementation(libs.junit)

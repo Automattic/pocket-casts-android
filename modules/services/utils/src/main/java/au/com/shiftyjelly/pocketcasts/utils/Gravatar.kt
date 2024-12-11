@@ -2,8 +2,12 @@ package au.com.shiftyjelly.pocketcasts.utils
 
 import au.com.shiftyjelly.pocketcasts.utils.extensions.sha256
 import java.net.URLEncoder
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 object Gravatar {
+
+    const val GRAVATAR_QE_REDIRECT_URL = "https://pocketcasts.com/gravatar/oauth"
 
     fun getGravatarChangeAvatarUrl(email: String): String =
         "https://gravatar.com/profile?is_quick_editor=true&email=${URLEncoder.encode(email, "UTF-8")}&scope=avatars&is_app_origin=true"
@@ -13,7 +17,8 @@ object Gravatar {
      * When a user updates their avatar, it takes a few seconds to be updated everywhere, so if we reload the same previous URL,
      * we'll get the old avatar. We'll get the recently uploaded avatar using the cache buster (which can be any random string).
      */
-    private var lastTimeStamp = System.currentTimeMillis()
+    private val _lastTimeStamp = MutableStateFlow(System.currentTimeMillis())
+    val lastTimeStamp = _lastTimeStamp.asStateFlow()
 
     /**
      * d=404: display no image if there is not one associated with the requested email hash
@@ -23,10 +28,10 @@ object Gravatar {
      */
     fun getUrl(email: String): String? =
         email.sha256()?.let { sha256Email ->
-            "https://www.gravatar.com/avatar/$sha256Email?d=404&s=400&_=$lastTimeStamp"
+            "https://www.gravatar.com/avatar/$sha256Email?d=404&s=400&_=${lastTimeStamp.value}"
         }
 
     fun refreshGravatarTimestamp() {
-        lastTimeStamp = System.currentTimeMillis()
+        _lastTimeStamp.tryEmit(System.currentTimeMillis())
     }
 }

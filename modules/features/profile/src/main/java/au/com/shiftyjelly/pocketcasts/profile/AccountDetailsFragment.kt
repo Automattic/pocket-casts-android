@@ -38,9 +38,11 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
-import au.com.shiftyjelly.pocketcasts.utils.Gravatar
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.gravatar.GravatarService
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -86,8 +88,18 @@ class AccountDetailsFragment : BaseFragment() {
 
     @Inject lateinit var syncManager: SyncManager
 
+    @Inject lateinit var gravatarServiceFactory: GravatarService.Factory
+
     private val accountViewModel by viewModels<AccountDetailsViewModel>()
     private val upgradeBannerViewModel by viewModels<ProfileUpgradeBannerViewModel>()
+
+    private lateinit var gravatarService: GravatarService
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        gravatarService = gravatarServiceFactory.create(this) { accountViewModel.gravatarUpdated() }
+
+        super.onCreate(savedInstanceState)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -130,9 +142,7 @@ class AccountDetailsFragment : BaseFragment() {
                 upgradeBannerViewModel.onFeatureCardChanged(featureCard)
             },
             onChangeAvatar = { email ->
-                analyticsTracker.track(AnalyticsEvent.ACCOUNT_DETAILS_CHANGE_AVATAR)
-                Gravatar.refreshGravatarTimestamp()
-                requireActivity().startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Gravatar.getGravatarChangeAvatarUrl(email))))
+                openGravatarQuickEditor(email)
             },
             onChangeEmail = {
                 (requireActivity() as FragmentHostListener).addFragment(ChangeEmailFragment.newInstance())
@@ -275,6 +285,15 @@ class AccountDetailsFragment : BaseFragment() {
             wasInitiatedByUser = true,
         )
         activity?.finish()
+    }
+
+    private fun openGravatarQuickEditor(email: String) {
+        analyticsTracker.track(AnalyticsEvent.ACCOUNT_DETAILS_CHANGE_AVATAR)
+        if (FeatureFlag.isEnabled(Feature.GRAVATAR_NATIVE_QUICK_EDITOR)) {
+            gravatarService.launchQuickEditor(theme.isLightTheme, email)
+        } else {
+            gravatarService.launchExternalQuickEditor(email)
+        }
     }
 
     private fun performSignOut() {

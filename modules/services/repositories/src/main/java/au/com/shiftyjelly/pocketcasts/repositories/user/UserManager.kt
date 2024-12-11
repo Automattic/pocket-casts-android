@@ -24,6 +24,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryMa
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.utils.Optional
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.gravatar.GravatarService
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.android.tracks.crashlogging.CrashLogging
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -61,6 +64,7 @@ class UserManagerImpl @Inject constructor(
     private val crashLogging: CrashLogging,
     private val experimentProvider: ExperimentProvider,
     private val endOfYearSync: EndOfYearSync,
+    private val gravatarServiceFactory: GravatarService.Factory,
 ) : UserManager, CoroutineScope {
 
     companion object {
@@ -118,6 +122,9 @@ class UserManagerImpl @Inject constructor(
     override fun signOut(playbackManager: PlaybackManager, wasInitiatedByUser: Boolean) {
         if (wasInitiatedByUser || !settings.getFullySignedOut()) {
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Signing out")
+
+            logoutFromGravatar()
+
             subscriptionManager.clearCachedStatus()
             syncManager.signOut {
                 applicationScope.launch {
@@ -144,6 +151,16 @@ class UserManagerImpl @Inject constructor(
             }
         }
         settings.setFullySignedOut(true)
+    }
+
+    private fun logoutFromGravatar() {
+        if (FeatureFlag.isEnabled(Feature.GRAVATAR_NATIVE_QUICK_EDITOR)) {
+            syncManager.getEmail()?.let { email ->
+                applicationScope.launch {
+                    gravatarServiceFactory.create().logout(email)
+                }
+            }
+        }
     }
 
     override fun signOutAndClearData(
