@@ -1,10 +1,12 @@
 package au.com.shiftyjelly.pocketcasts.settings
 
+import android.content.Intent
 import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.IntentCompat.getParcelableExtra
 import androidx.core.view.updatePadding
@@ -26,7 +28,10 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetti
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.NotificationPermissionHelper
+import au.com.shiftyjelly.pocketcasts.utils.NotificationPermissionHelper.hasNotificationPermissionGranted
 import au.com.shiftyjelly.pocketcasts.views.extensions.findToolbar
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.fragments.PodcastSelectFragment
@@ -37,7 +42,9 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.list.MultiChoiceListener
 import com.afollestad.materialdialogs.list.listItemsMultiChoice
 import com.afollestad.materialdialogs.list.updateListItemsMultiChoice
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.Locale
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
@@ -82,6 +89,16 @@ class NotificationsSettingsFragment :
 
     private val toolbar
         get() = view?.findViewById<Toolbar>(R.id.toolbar)
+
+    private var pendingNotificationValue: Boolean = false
+
+    private val notificationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { granted ->
+        if (granted) {
+            updateNotificationToggle(pendingNotificationValue)
+        }
+    }
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -425,31 +442,36 @@ class NotificationsSettingsFragment :
     private fun setupEnabledNotifications() {
         launch(Dispatchers.Default) {
             val enabled = settings.notifyRefreshPodcast.flow.value
+            val hasPermissionGranted = hasNotificationPermissionGranted(requireContext())
 
             launch(Dispatchers.Main) {
-                enabledPreference?.isChecked = enabled
-                enabledPreferences(enabled)
+                updateNotificationToggle(enabled && hasPermissionGranted)
+                enabledPreferences(enabled && hasPermissionGranted)
 
                 enabledPreference?.setOnPreferenceChangeListener { _, newValue ->
-                    val checked = newValue as Boolean
-                    settings.notifyRefreshPodcast.set(checked, updateModifiedAt = true)
+                    pendingNotificationValue = newValue as Boolean
 
-                    analyticsTracker.track(
-                        AnalyticsEvent.SETTINGS_NOTIFICATIONS_NEW_EPISODES_TOGGLED,
-                        mapOf("enabled" to checked),
-                    )
-
-                    lifecycleScope.launch {
-                        podcastManager.updateAllShowNotifications(checked)
-                        // Don't change the podcasts summary until after the podcasts have been updated
-                        changePodcastsSummary()
+                    if (!pendingNotificationValue || hasNotificationPermissionGranted(requireContext())) {
+                        onNotifyNotificationsChange(pendingNotificationValue)
+                        true
+                    } else {
+                        context?.let {
+                            NotificationPermissionHelper.checkForNotificationPermission(
+                                requireActivity(),
+                                launcher = notificationPermissionLauncher,
+                                onShowRequestPermissionRationale = {
+                                    showSnackbarPermissionBlocked()
+                                },
+                                onPermissionGranted = {
+                                    updateNotificationToggle(pendingNotificationValue)
+                                },
+                                onPermissionHandlingNotRequired = {
+                                    updateNotificationToggle(pendingNotificationValue)
+                                },
+                            )
+                        }
+                        false
                     }
-                    if (checked) {
-                        settings.setNotificationLastSeenToNow()
-                    }
-                    enabledPreferences(checked)
-
-                    true
                 }
 
                 notificationPodcasts?.setOnPreferenceClickListener {
@@ -463,6 +485,46 @@ class NotificationsSettingsFragment :
                 setupActions()
             }
         }
+    }
+
+    private fun showSnackbarPermissionBlocked() {
+        (activity as? FragmentHostListener)?.snackBarView()?.let { snackBarView ->
+            Snackbar.make(snackBarView, getString(LR.string.notifications_blocked_warning), Snackbar.LENGTH_LONG)
+                .setAction(
+                    getString(LR.string.notifications_blocked_warning_snackbar_action)
+                        .uppercase(Locale.getDefault()),
+                ) {
+                    val intent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    val uri: Uri = Uri.fromParts("package", requireContext().packageName, null)
+                    intent.data = uri
+                    startActivity(intent)
+                }.show()
+        }
+    }
+
+    private fun onNotifyNotificationsChange(newValue: Boolean) {
+        settings.notifyRefreshPodcast.set(newValue, updateModifiedAt = true)
+
+        analyticsTracker.track(
+            AnalyticsEvent.SETTINGS_NOTIFICATIONS_NEW_EPISODES_TOGGLED,
+            mapOf("enabled" to newValue),
+        )
+
+        lifecycleScope.launch {
+            podcastManager.updateAllShowNotifications(newValue)
+            // Don't change the podcasts summary until after the podcasts have been updated
+            changePodcastsSummary()
+        }
+        if (newValue) {
+            settings.setNotificationLastSeenToNow()
+        }
+        enabledPreferences(newValue)
+    }
+
+    private fun updateNotificationToggle(newValue: Boolean) {
+        enabledPreference?.isChecked = newValue
+        onNotifyNotificationsChange(newValue)
     }
 
     private fun setupNotificationVibrate() {
