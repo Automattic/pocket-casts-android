@@ -164,105 +164,103 @@ internal sealed interface SubscriptionHeaderState {
     data class SupporterRenew(
         override val tier: SubscriptionTier,
         override val expiresIn: Duration?,
-    ) : SubscriptionHeaderState {
-        override val isChampion = false
-    }
+        override val isChampion: Boolean,
+    ) : SubscriptionHeaderState
 
     data class SupporterCancel(
         override val tier: SubscriptionTier,
         override val expiresIn: Duration?,
-    ) : SubscriptionHeaderState {
-        override val isChampion = false
-    }
+        override val isChampion: Boolean,
+    ) : SubscriptionHeaderState
 }
 
 @Composable
 private fun SubscriptionHeaderState.labels(): Labels {
     val context = LocalContext.current
     return remember(this) {
-        when (this) {
-            is SubscriptionHeaderState.Free -> {
-                Labels(
-                    start = Label(
-                        text = context.getString(LR.string.profile_free_account),
-                    ),
-                )
-            }
+        if (isChampion) {
+            Labels(
+                start = Label(
+                    text = context.getString(LR.string.plus_thanks_for_your_support_bang),
+                ),
+                end = Label(
+                    text = context.getString(LR.string.pocket_casts_champion),
+                    color = { support02 },
+                ),
+            )
+        } else {
+            when (this) {
+                is SubscriptionHeaderState.Free -> {
+                    Labels(
+                        start = Label(
+                            text = context.getString(LR.string.profile_free_account),
+                        ),
+                    )
+                }
 
-            is SubscriptionHeaderState.PaidRenew -> {
-                val expiryDate = Date(Date().time + expiresIn.inWholeMilliseconds)
-                Labels(
-                    start = Label(
-                        text = context.getString(LR.string.profile_next_payment, expiryDate.toLocalizedFormatLongStyle()),
-                    ),
-                    end = Label(
-                        text = when (frequency) {
-                            SubscriptionFrequency.MONTHLY -> context.getString(LR.string.profile_monthly)
-                            SubscriptionFrequency.YEARLY -> context.getString(LR.string.profile_yearly)
-                            SubscriptionFrequency.NONE -> ""
-                        },
-                    ),
-                )
-            }
+                is SubscriptionHeaderState.PaidRenew -> {
+                    val expiryDate = Date(Date().time + expiresIn.inWholeMilliseconds)
+                    Labels(
+                        start = Label(
+                            text = context.getString(LR.string.profile_next_payment, expiryDate.toLocalizedFormatLongStyle()),
+                        ),
+                        end = Label(
+                            text = when (frequency) {
+                                SubscriptionFrequency.MONTHLY -> context.getString(LR.string.profile_monthly)
+                                SubscriptionFrequency.YEARLY -> context.getString(LR.string.profile_yearly)
+                                SubscriptionFrequency.NONE -> ""
+                            },
+                        ),
+                    )
+                }
 
-            is SubscriptionHeaderState.PaidCancel -> {
-                Labels(
-                    start = Label(
-                        text = when {
-                            isChampion -> {
-                                context.getString(LR.string.plus_thanks_for_your_support_bang)
-                            }
-                            platform == SubscriptionPlatform.GIFT -> {
-                                val daysString = context.resources.getStringPluralDaysMonthsOrYears(giftDaysLeft)
-                                context.getString(LR.string.profile_time_free, daysString)
-                            }
-                            else -> {
-                                context.getString(LR.string.profile_payment_cancelled)
-                            }
-                        },
-                    ),
-                    end = Label(
-                        text = if (isChampion) {
-                            context.getString(LR.string.pocket_casts_champion)
-                        } else {
-                            val expiryDate = Date(Date().time + expiresIn.inWholeMilliseconds)
-                            context.getString(LR.string.profile_plus_expires, expiryDate.toLocalizedFormatLongStyle())
-                        },
-                        color = {
-                            if (isChampion) {
-                                support02
-                            } else {
-                                primaryText02
-                            }
-                        },
-                    ),
-                )
-            }
+                is SubscriptionHeaderState.PaidCancel -> {
+                    Labels(
+                        start = Label(
+                            text = when {
+                                platform == SubscriptionPlatform.GIFT -> {
+                                    val daysString = context.resources.getStringPluralDaysMonthsOrYears(giftDaysLeft)
+                                    context.getString(LR.string.profile_time_free, daysString)
+                                }
+                                else -> {
+                                    context.getString(LR.string.profile_payment_cancelled)
+                                }
+                            },
+                        ),
+                        end = Label(
+                            text = run {
+                                val expiryDate = Date(Date().time + expiresIn.inWholeMilliseconds)
+                                context.getString(LR.string.profile_plus_expires, expiryDate.toLocalizedFormatLongStyle())
+                            },
+                        ),
+                    )
+                }
 
-            is SubscriptionHeaderState.SupporterRenew -> {
-                Labels(
-                    start = Label(
-                        text = context.getString(LR.string.supporter),
-                        color = { support02 },
-                    ),
-                    end = Label(
-                        text = context.getString(LR.string.supporter_check_contributions),
-                    ),
-                )
-            }
+                is SubscriptionHeaderState.SupporterRenew -> {
+                    Labels(
+                        start = Label(
+                            text = context.getString(LR.string.supporter),
+                            color = { support02 },
+                        ),
+                        end = Label(
+                            text = context.getString(LR.string.supporter_check_contributions),
+                        ),
+                    )
+                }
 
-            is SubscriptionHeaderState.SupporterCancel -> {
-                val expiryDate = expiresIn?.inWholeMilliseconds?.let { Date(Date().time + it) }
-                val expiryString = expiryDate?.toLocalizedFormatLongStyle() ?: context.getString(LR.string.profile_expiry_date_unknown)
-                Labels(
-                    start = Label(
-                        text = context.getString(LR.string.supporter_payment_cancelled),
-                        color = { support05 },
-                    ),
-                    end = Label(
-                        text = context.getString(LR.string.supporter_subscription_ends, expiryString),
-                    ),
-                )
+                is SubscriptionHeaderState.SupporterCancel -> {
+                    val expiryDate = expiresIn?.inWholeMilliseconds?.let { Date(Date().time + it) }
+                    val expiryString = expiryDate?.toLocalizedFormatLongStyle() ?: context.getString(LR.string.profile_expiry_date_unknown)
+                    Labels(
+                        start = Label(
+                            text = context.getString(LR.string.supporter_payment_cancelled),
+                            color = { support05 },
+                        ),
+                        end = Label(
+                            text = context.getString(LR.string.supporter_subscription_ends, expiryString),
+                        ),
+                    )
+                }
             }
         }
     }
@@ -431,6 +429,16 @@ private class AccountHeaderStateParameterProvider : PreviewParameterProvider<Acc
             subscription = SubscriptionHeaderState.SupporterRenew(
                 tier = SubscriptionTier.PLUS,
                 expiresIn = null,
+                isChampion = false,
+            ),
+        ),
+        AccountHeaderState(
+            email = "noreply@pocketcasts.com",
+            imageUrl = null,
+            subscription = SubscriptionHeaderState.SupporterRenew(
+                tier = SubscriptionTier.PLUS,
+                expiresIn = null,
+                isChampion = true,
             ),
         ),
         AccountHeaderState(
@@ -439,6 +447,16 @@ private class AccountHeaderStateParameterProvider : PreviewParameterProvider<Acc
             subscription = SubscriptionHeaderState.SupporterCancel(
                 tier = SubscriptionTier.PLUS,
                 expiresIn = 10.days,
+                isChampion = false,
+            ),
+        ),
+        AccountHeaderState(
+            email = "noreply@pocketcasts.com",
+            imageUrl = null,
+            subscription = SubscriptionHeaderState.SupporterCancel(
+                tier = SubscriptionTier.PLUS,
+                expiresIn = 10.days,
+                isChampion = true,
             ),
         ),
         AccountHeaderState(
@@ -447,6 +465,7 @@ private class AccountHeaderStateParameterProvider : PreviewParameterProvider<Acc
             subscription = SubscriptionHeaderState.SupporterCancel(
                 tier = SubscriptionTier.PLUS,
                 expiresIn = null,
+                isChampion = false,
             ),
         ),
     )
