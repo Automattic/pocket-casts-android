@@ -5,6 +5,9 @@
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"
+        tools:ignore="ProtectedPermissions" />
+
     <application android:usesCleartextTraffic="true">
         <provider
             android:name="au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AlbumArtContentProvider"

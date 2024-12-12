@@ -4,7 +4,10 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Build
+import android.provider.Settings
 import android.text.format.DateUtils
+import androidx.annotation.RequiresApi
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent.PLAYER_SLEEP_TIMER_RESTARTED
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -38,9 +41,9 @@ class SleepTimer @Inject constructor(
     private var lastEpisodeUuidAutomaticEnded: String? = null
 
     fun sleepAfter(duration: Duration, onSuccess: () -> Unit) {
-        val sleepAt = System.currentTimeMillis().milliseconds + duration
+        val sleepAt = System.currentTimeMillis() + duration.inWholeMilliseconds
 
-        if (createAlarm(sleepAt.inWholeMilliseconds)) {
+        if (createAlarm(sleepAt)) {
             lastSleepAfterTime = duration
             cancelAutomaticSleepOnEpisodeEndRestart()
             cancelAutomaticSleepOnChapterEndRestart()
@@ -126,13 +129,28 @@ class SleepTimer @Inject constructor(
 
     private fun shouldRestartSleepEndOfChapter(diffTime: Duration, isSleepEndOfChapterRunning: Boolean) = diffTime < MIN_TIME_TO_RESTART_SLEEP_TIMER_IN_MINUTES && !isSleepEndOfChapterRunning && lastSleepAfterEndOfChapterTime != null
 
+    @RequiresApi(Build.VERSION_CODES.S)
+    private fun requestExactAlarmPermissionIfNeeded(context: Context) {
+        val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        context.startActivity(intent)
+    }
+
     private fun createAlarm(timeMs: Long): Boolean {
         val sleepIntent = getSleepIntent()
         val alarmManager = getAlarmManager()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
+            LogBuffer.e(TAG, "Cannot schedule exact alarms. Permission not granted.")
+            requestExactAlarmPermissionIfNeeded(context)
+            return false
+        }
+
         alarmManager.cancel(sleepIntent)
+
         return try {
             LogBuffer.i(TAG, "Starting...")
-            alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, timeMs, sleepIntent)
+            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, timeMs, sleepIntent)
             sleepTimeMs = timeMs
             lastTimeSleepTimeHasFinished = timeMs.milliseconds
             true
