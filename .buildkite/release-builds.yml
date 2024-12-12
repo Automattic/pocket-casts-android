@@ -8,11 +8,13 @@ agents:
   queue: "android"
 
 steps:
-  - label: "Gradle Wrapper Validation"
-    command: |
-      validate_gradle_wrapper
+  # NOTE: once this pipeline is called inline from another pipeline via ReleasesV2,
+  # we may need to use another agent to checkout the release branch before the Gradle Wrapper Validation
+  - label: Gradle Wrapper Validation
+    command: validate_gradle_wrapper
     priority: 1
-    plugins: [$CI_TOOLKIT]
+    agents:
+      queue: linter
 
   # Wait for Gradle Wrapper to be validated before running any other jobs
   - wait
