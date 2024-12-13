@@ -5,7 +5,7 @@ GEM
       base64
       nkf
       rexml
-    activesupport (8.0.0)
+    activesupport (8.0.0.1)
       base64
       benchmark (>= 0.3)
       bigdecimal
@@ -165,7 +165,7 @@ GEM
       xcodeproj (>= 1.13.0, < 2.0.0)
       xcpretty (~> 0.4.0)
       xcpretty-travis-formatter (>= 0.0.3, < 2.0.0)
-    fastlane-plugin-wpmreleasetoolkit (12.3.4)
+    fastlane-plugin-wpmreleasetoolkit (12.4.0)
       activesupport (>= 6.1.7.1)
       buildkit (~> 1.5)
       chroma (= 0.2.0)
@@ -240,7 +240,7 @@ GEM
     kramdown-parser-gfm (1.1.0)
       kramdown (~> 2.0)
     language_server-protocol (3.17.0.3)
-    logger (1.6.2)
+    logger (1.6.3)
     mini_magick (4.13.2)
     mini_mime (1.1.5)
     mini_portile2 (2.8.8)
@@ -251,12 +251,12 @@ GEM
     nap (1.1.0)
     naturally (2.2.1)
     nkf (0.2.0)
-    nokogiri (1.16.8)
+    nokogiri (1.17.2)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
-    nokogiri (1.16.8-arm64-darwin)
+    nokogiri (1.17.2-arm64-darwin)
       racc (~> 1.4)
-    nokogiri (1.16.8-x86_64-darwin)
+    nokogiri (1.17.2-x86_64-darwin)
       racc (~> 1.4)
     octokit (6.1.1)
       faraday (>= 1, < 3)
