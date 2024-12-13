@@ -400,9 +400,9 @@ platform :android do
     # At this point, an intermediate branch has been created by creating a backmerge PR to a hotfix or the next version release branch.
     # This allows us to safely delete the `release/*` remote branch.
     remove_branch_protection(repository: GITHUB_REPO, branch: current_branch)
-    Fastlane::Helper::GitHelper::delete_remote_branch_if_exists!(current_branch)
-    Fastlane::Helper::GitHelper::checkout_and_pull(DEFAULT_BRANCH)
-    Fastlane::Helper::GitHelper::delete_local_branch_if_exists!(current_branch)
+    Fastlane::Helper::GitHelper.delete_remote_branch_if_exists!(current_branch)
+    Fastlane::Helper::GitHelper.checkout_and_pull(DEFAULT_BRANCH)
+    Fastlane::Helper::GitHelper.delete_local_branch_if_exists!(current_branch)
   end
 
   # @param branch_to_build [String] The branch to build. Defaults to the current git branch.
