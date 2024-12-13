@@ -357,7 +357,7 @@ class PlayerViewModel @Inject constructor(
         if (episode == null) {
             podcastHeader = PlayerHeader()
         } else {
-            isSleepRunning.postValue(playbackState.isSleepTimerRunning)
+            isSleepRunning.postValue(playbackState.sleepTimerState.isSleepTimerRunning)
             val playerBackground = theme.playerBackgroundColor(podcast)
             val iconTintColor = theme.playerHighlightColor(podcast)
 
@@ -374,7 +374,7 @@ class PlayerViewModel @Inject constructor(
                 podcastTitle = if (playbackState.chapters.isEmpty) podcast?.title else null,
                 skipBackwardInSecs = skipBackwardInSecs,
                 skipForwardInSecs = skipForwardInSecs,
-                isSleepRunning = playbackState.isSleepTimerRunning,
+                isSleepRunning = playbackState.sleepTimerState.isSleepTimerRunning,
                 isEffectsOn = !effects.usingDefaultValues,
                 playbackEffects = effects,
                 adjustRemainingTimeDuration = adjustRemainingTimeDuration,
@@ -595,11 +595,11 @@ class PlayerViewModel @Inject constructor(
         if ((sleepTimer.isSleepAfterTimerRunning && timeLeft != null && timeLeft.toInt() > 0) || playbackManager.isSleepAfterEpisodeEnabled()) {
             isSleepAtEndOfEpisodeOrChapter.postValue(playbackManager.isSleepAfterEpisodeEnabled())
             sleepTimeLeftText.postValue(if (timeLeft != null && timeLeft > 0) Util.formattedSeconds(timeLeft.toDouble()) else "")
-            setSleepEndOfEpisodes(playbackManager.episodesUntilSleep, shouldCallUpdateTimer = false)
+            setSleepEndOfEpisodes(getSleepTimerEndOfEpisodesLeft(), shouldCallUpdateTimer = false)
             sleepingInText.postValue(calcSleepingInEpisodesText())
         } else if (playbackManager.isSleepAfterChapterEnabled()) {
             isSleepAtEndOfEpisodeOrChapter.postValue(playbackManager.isSleepAfterChapterEnabled())
-            setSleepEndOfChapters(playbackManager.chaptersUntilSleep, shouldCallUpdateTimer = false)
+            setSleepEndOfChapters(getSleepTimerEndOfChaptersLeft(), shouldCallUpdateTimer = false)
             sleepingInText.postValue(calcSleepingInChaptersText())
         } else {
             isSleepAtEndOfEpisodeOrChapter.postValue(false)
@@ -749,6 +749,10 @@ class PlayerViewModel @Inject constructor(
             sourceView = SourceView.PLAYER_PLAYBACK_EFFECTS,
         )
     }
+
+    private fun getSleepTimerEndOfEpisodesLeft() = playbackManager.playbackStateRelay.blockingFirst().sleepTimerState.numberOfEpisodesLeft
+
+    private fun getSleepTimerEndOfChaptersLeft() = playbackManager.playbackStateRelay.blockingFirst().sleepTimerState.numberOfChaptersLeft
 
     sealed interface NavigationState {
         data class ShowStreamingWarningDialog(val episode: BaseEpisode) : NavigationState
