@@ -290,75 +290,6 @@ platform :android do
     create_backmerge_pr
   end
 
-  # @param branch_to_build [String] The branch to build. Defaults to the current git branch.
-  #
-  lane :trigger_release_build do |branch_to_build: git_branch|
-    buildkite_trigger_build(
-      buildkite_organization: 'automattic',
-      buildkite_pipeline: 'pocket-casts-android',
-      branch: branch_to_build,
-      pipeline_file: 'release-builds.yml'
-    )
-  end
-
-  # Builds and uploads a new build to Google Play (without releasing it)
-  #
-  # - Uses the current version to decide if this is a beta or production build
-  # - Builds the apps for external distribution
-  # - Uploads the builds to 'beta' or 'production' Play Store channel (but does not release it)
-  # - Creates draft Github release
-  #
-  # @param skip_confirm [Boolean] If true, avoids any interactive prompt
-  # @param skip_prechecks [Boolean] If true, skips android_build_preflight
-  # @param create_gh_release [Boolean] If true, creates a draft GitHub release
-  #
-  lane :build_and_upload_to_play_store do |skip_prechecks: false, skip_confirm: false, create_gh_release: false|
-    version = version_name_current
-    build_code = build_code_current
-    is_beta = beta_version?(version)
-    unless skip_prechecks
-      # Match branch names that begin with `release/`
-      ensure_git_branch(branch: '^release/') unless is_ci
-
-      UI.important("Building version #{version_name_current} (#{build_code_current}) for upload to Google Play Console")
-      UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.") unless skip_confirm || UI.confirm('Do you want to continue?')
-
-      # Check local repo status
-      ensure_git_status_clean unless is_ci
-
-      android_build_preflight
-    end
-
-    release_assets = []
-
-    APPS.each do |app|
-      build_bundle(app: app, version: version, build_code: build_code)
-
-      aab_artifact_path = aab_artifact_path(app, version)
-      UI.error("Unable to find a build artifact at #{aab_artifact_path}") unless File.exist? aab_artifact_path
-
-      track = play_store_track(app: app, is_beta: is_beta)
-      upload_to_play_store(
-        **UPLOAD_TO_PLAY_STORE_COMMON_OPTIONS,
-        aab: aab_artifact_path,
-        track: track,
-        release_status: 'draft'
-      )
-      release_assets << aab_artifact_path
-
-      signed_apk_artifact_path = signed_apk_artifact_path(app, version)
-      download_universal_apk_from_google_play(
-        package_name: APP_PACKAGE_NAME,
-        version_code: version_code_for_app(app: app, version_code: build_code),
-        destination: signed_apk_artifact_path,
-        json_key: UPLOAD_TO_PLAY_STORE_JSON_KEY
-      )
-      release_assets << signed_apk_artifact_path
-    end
-
-    create_gh_release(version: version, prerelease: is_beta, release_assets: release_assets.compact) if create_gh_release
-  end
-
   # Update the rollout of all 3 variants (app, automotive, wear) of the current version to the given value
   #
   # @param percent [Float] The rollout percentage, between 0 and 1
@@ -432,6 +363,75 @@ platform :android do
     push_to_git_remote(tags: false)
     trigger_release_build(branch_to_build: "release/#{version}")
     create_backmerge_pr
+  end
+
+  # @param branch_to_build [String] The branch to build. Defaults to the current git branch.
+  #
+  lane :trigger_release_build do |branch_to_build: git_branch|
+    buildkite_trigger_build(
+      buildkite_organization: 'automattic',
+      buildkite_pipeline: 'pocket-casts-android',
+      branch: branch_to_build,
+      pipeline_file: 'release-builds.yml'
+    )
+  end
+
+  # Builds and uploads a new build to Google Play (without releasing it)
+  #
+  # - Uses the current version to decide if this is a beta or production build
+  # - Builds the apps for external distribution
+  # - Uploads the builds to 'beta' or 'production' Play Store channel (but does not release it)
+  # - Creates draft Github release
+  #
+  # @param skip_confirm [Boolean] If true, avoids any interactive prompt
+  # @param skip_prechecks [Boolean] If true, skips android_build_preflight
+  # @param create_gh_release [Boolean] If true, creates a draft GitHub release
+  #
+  lane :build_and_upload_to_play_store do |skip_prechecks: false, skip_confirm: false, create_gh_release: false|
+    version = version_name_current
+    build_code = build_code_current
+    is_beta = beta_version?(version)
+    unless skip_prechecks
+      # Match branch names that begin with `release/`
+      ensure_git_branch(branch: '^release/') unless is_ci
+
+      UI.important("Building version #{version_name_current} (#{build_code_current}) for upload to Google Play Console")
+      UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.") unless skip_confirm || UI.confirm('Do you want to continue?')
+
+      # Check local repo status
+      ensure_git_status_clean unless is_ci
+
+      android_build_preflight
+    end
+
+    release_assets = []
+
+    APPS.each do |app|
+      build_bundle(app: app, version: version, build_code: build_code)
+
+      aab_artifact_path = aab_artifact_path(app, version)
+      UI.error("Unable to find a build artifact at #{aab_artifact_path}") unless File.exist? aab_artifact_path
+
+      track = play_store_track(app: app, is_beta: is_beta)
+      upload_to_play_store(
+        **UPLOAD_TO_PLAY_STORE_COMMON_OPTIONS,
+        aab: aab_artifact_path,
+        track: track,
+        release_status: 'draft'
+      )
+      release_assets << aab_artifact_path
+
+      signed_apk_artifact_path = signed_apk_artifact_path(app, version)
+      download_universal_apk_from_google_play(
+        package_name: APP_PACKAGE_NAME,
+        version_code: version_code_for_app(app: app, version_code: build_code),
+        destination: signed_apk_artifact_path,
+        json_key: UPLOAD_TO_PLAY_STORE_JSON_KEY
+      )
+      release_assets << signed_apk_artifact_path
+    end
+
+    create_gh_release(version: version, prerelease: is_beta, release_assets: release_assets.compact) if create_gh_release
   end
 
   # Builds and bundles the given app
