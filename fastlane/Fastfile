@@ -365,6 +365,46 @@ platform :android do
     create_backmerge_pr
   end
 
+  # This lane publishes a release on GitHub and creates a PR to backmerge the current release branch into the next release/ branch
+  #
+  # @param [Boolean] skip_confirm (default: false) If set, will skip the confirmation prompt before running the rest of the lane
+  #
+  lane :publish_release do |skip_confirm: false|
+    ensure_git_status_clean
+    ensure_git_branch(branch: '^release/')
+
+    version_number = release_version_current
+
+    current_branch = "release/#{version_number}"
+    next_release_branch = "release/#{release_version_next}"
+
+    UI.important <<~PROMPT
+      Publish the #{version_number} release. This will:
+      - Publish the existing draft `#{version_number}` release on GitHub
+      - Which will also have GitHub create the associated git tag, pointing to the tip of the branch
+      - If the release branch for the next version `#{next_release_branch}` already exists, backmerge `#{current_branch}` into it
+      - If needed, backmerge `#{current_branch}` back into `#{DEFAULT_BRANCH}`
+      - Delete the `#{current_branch}` branch
+    PROMPT
+    UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.") unless skip_confirm || UI.confirm('Do you want to continue?')
+
+    UI.important "Publishing release #{version_number} on GitHub"
+
+    publish_github_release(
+      repository: GH_REPOSITORY,
+      name: version_number
+    )
+
+    create_backmerge_pr
+
+    # At this point, an intermediate branch has been created by creating a backmerge PR to a hotfix or the next version release branch.
+    # This allows us to safely delete the `release/*` remote branch.
+    remove_branch_protection(repository: GH_REPOSITORY, branch: current_branch)
+    Fastlane::Helper::GitHelper::delete_remote_branch_if_exists!(current_branch)
+    Fastlane::Helper::GitHelper::checkout_and_pull(DEFAULT_BRANCH)
+    Fastlane::Helper::GitHelper::delete_local_branch_if_exists!(current_branch)
+  end
+
   # @param branch_to_build [String] The branch to build. Defaults to the current git branch.
   #
   lane :trigger_release_build do |branch_to_build: git_branch|
