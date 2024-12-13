@@ -62,7 +62,7 @@ SUPPORTED_LOCALES = [
 Dotenv.load(USER_ENV_FILE_PATH)
 DEFAULT_BRANCH = 'main'
 ENV['SUPPLY_UPLOAD_MAX_RETRIES'] = '5'
-GH_REPOSITORY = 'automattic/pocket-casts-android'
+GITHUB_REPO = 'automattic/pocket-casts-android'
 APPS_APP = 'app'
 APPS_AUTOMOTIVE = 'automotive'
 APPS_WEAR = 'wear'
@@ -144,12 +144,12 @@ platform :android do
     # We cannot use the `copy_branch_protection` action here as it would create a branch protection rule with the same
     # restrictions we have in `main`, and the release managers wouldn't be able to push due to permissions.
     # This should be changed only when we have PC Android releases done on CI, when the CI bot is the one running `git push`.
-    set_branch_protection(repository: GH_REPOSITORY, branch: "release/#{new_version}")
+    set_branch_protection(repository: GITHUB_REPO, branch: "release/#{new_version}")
 
     begin
       # Move PRs to next milestone
       moved_prs = update_assigned_milestone(
-        repository: GH_REPOSITORY,
+        repository: GITHUB_REPO,
         from_milestone: new_version,
         to_milestone: release_version_next,
         comment: "Version `#{new_version}` has now entered code-freeze, so the milestone of this PR has been updated to `#{release_version_next}`."
@@ -158,7 +158,7 @@ platform :android do
 
       # Add ❄️ marker to milestone title to indicate we entered code-freeze
       set_milestone_frozen_marker(
-        repository: GH_REPOSITORY,
+        repository: GITHUB_REPO,
         milestone: new_version
       )
     rescue StandardError => e
@@ -355,10 +355,10 @@ platform :android do
     version = release_version_current
 
     # Wrap up
-    remove_branch_protection(repository: GH_REPOSITORY, branch: "release/#{version}")
-    set_milestone_frozen_marker(repository: GH_REPOSITORY, milestone: version, freeze: false)
-    create_new_milestone(repository: GH_REPOSITORY, need_appstore_submission: true)
-    close_milestone(repository: GH_REPOSITORY, milestone: version)
+    remove_branch_protection(repository: GITHUB_REPO, branch: "release/#{version}")
+    set_milestone_frozen_marker(repository: GITHUB_REPO, milestone: version, freeze: false)
+    create_new_milestone(repository: GITHUB_REPO, need_appstore_submission: true)
+    close_milestone(repository: GITHUB_REPO, milestone: version)
 
     push_to_git_remote(tags: false)
     trigger_release_build(branch_to_build: "release/#{version}")
@@ -391,7 +391,7 @@ platform :android do
     UI.important "Publishing release #{version_number} on GitHub"
 
     publish_github_release(
-      repository: GH_REPOSITORY,
+      repository: GITHUB_REPO,
       name: version_number
     )
 
@@ -399,7 +399,7 @@ platform :android do
 
     # At this point, an intermediate branch has been created by creating a backmerge PR to a hotfix or the next version release branch.
     # This allows us to safely delete the `release/*` remote branch.
-    remove_branch_protection(repository: GH_REPOSITORY, branch: current_branch)
+    remove_branch_protection(repository: GITHUB_REPO, branch: current_branch)
     Fastlane::Helper::GitHelper::delete_remote_branch_if_exists!(current_branch)
     Fastlane::Helper::GitHelper::checkout_and_pull(DEFAULT_BRANCH)
     Fastlane::Helper::GitHelper::delete_local_branch_if_exists!(current_branch)
@@ -612,7 +612,7 @@ platform :android do
   #
   private_lane :create_gh_release do |version:, prerelease: false, release_assets: []|
     create_github_release(
-      repository: GH_REPOSITORY,
+      repository: GITHUB_REPO,
       version: version,
       release_notes_file_path: EXTRACTED_RELEASE_NOTES_PATH,
       prerelease: prerelease,
@@ -623,7 +623,7 @@ platform :android do
 
   lane :create_backmerge_pr do |version: release_version_current|
     create_release_backmerge_pull_request(
-      repository: GH_REPOSITORY,
+      repository: GITHUB_REPO,
       source_branch: "release/#{version}",
       default_branch: DEFAULT_BRANCH,
       labels: ['Releases'],
