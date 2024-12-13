@@ -220,11 +220,6 @@ open class PlaybackManager @Inject constructor(
         bookmarkFeature = bookmarkFeature,
     )
 
-    private val lastListenedForEndOfChapter = mutableMapOf<String, String?>(
-        "chapterUuid" to null,
-        "episodeUuid" to null,
-    )
-
     var player: Player? = null
 
     val mediaSession: MediaSessionCompat
@@ -2356,35 +2351,65 @@ open class PlaybackManager @Inject constructor(
         val currentEpisodeUui = getCurrentEpisode()?.uuid
 
         if (!isSleepAfterChapterEnabled()) {
-            lastListenedForEndOfChapter.setlastListenedChapterUuid(null)
-            lastListenedForEndOfChapter.setlastListenedEpisodeUuid(null)
+            updateLastListenedState(episodeUuid = null, chapterUuid = null)
             return
         }
 
-        if (lastListenedForEndOfChapter.getlastListenedChapterUuid().isNullOrEmpty()) {
-            lastListenedForEndOfChapter.setlastListenedChapterUuid(currentChapterUuid)
+        val lastListenedState = playbackState.lastListenedState
+        if (lastListenedState.chapterUuid.isNullOrEmpty()) {
+            updateLastListenedStateChapter(currentChapterUuid)
         }
 
-        if (lastListenedForEndOfChapter.getlastListenedEpisodeUuid().isNullOrEmpty()) {
-            lastListenedForEndOfChapter.setlastListenedEpisodeUuid(currentEpisodeUui)
+        if (lastListenedState.episodeUuid.isNullOrEmpty()) {
+            updateLastListenedStateEpisode(currentEpisodeUui)
         }
 
         // When we switch from a episode that contains chapters to another one that does not have chapters
         // the current chapter is null, so for this case we would need to verify if the episode changed to update the sleep timer counter for end of chapter
-        if (currentChapterUuid == null && !lastListenedForEndOfChapter.getlastListenedEpisodeUuid().isNullOrEmpty() && lastListenedForEndOfChapter.getlastListenedEpisodeUuid() != currentEpisodeUui) {
+        if (currentChapterUuid.isNullOrEmpty() && !lastListenedState.episodeUuid.isNullOrEmpty() && lastListenedState.episodeUuid != currentEpisodeUui) {
             applicationScope.launch {
-                lastListenedForEndOfChapter.setlastListenedChapterUuid(null)
-                lastListenedForEndOfChapter.setlastListenedEpisodeUuid(currentEpisodeUui)
+                updateLastListenedStateEpisode(currentEpisodeUui)
                 sleepEndOfChapter()
             }
-        } else if (lastListenedForEndOfChapter.getlastListenedChapterUuid() == currentChapterUuid) { // Same chapter
+        } else if (lastListenedState.chapterUuid == currentChapterUuid) { // Same chapter
             return
         } else { // Changed chapter
             applicationScope.launch {
-                lastListenedForEndOfChapter.setlastListenedChapterUuid(currentChapterUuid)
-                lastListenedForEndOfChapter.setlastListenedEpisodeUuid(getCurrentEpisode()?.uuid)
+                updateLastListenedState(currentChapterUuid, getCurrentEpisode()?.uuid)
                 sleepEndOfChapter()
             }
+        }
+    }
+
+    private fun updateLastListenedState(chapterUuid: String?, episodeUuid: String?) {
+        updateLastListenedState {
+            copy(
+                chapterUuid = chapterUuid,
+                episodeUuid = episodeUuid,
+            )
+        }
+    }
+
+    private fun updateLastListenedStateChapter(chapterUuid: String?) {
+        updateLastListenedState {
+            copy(chapterUuid = chapterUuid)
+        }
+    }
+
+    private fun updateLastListenedStateEpisode(episodeUuid: String?) {
+        updateLastListenedState {
+            copy(episodeUuid = episodeUuid)
+        }
+    }
+
+    private fun updateLastListenedState(update: PlaybackState.LastListenedState.() -> PlaybackState.LastListenedState) {
+        playbackStateRelay.blockingFirst().let { currentState ->
+            val updatedLastListenedState = currentState.lastListenedState.update()
+            playbackStateRelay.accept(
+                currentState.copy(
+                    lastListenedState = updatedLastListenedState,
+                ),
+            )
         }
     }
 
@@ -2597,22 +2622,6 @@ open class PlaybackManager @Inject constructor(
         val currentChapter = playbackState.chapters.getChapter(playbackState.positionMs.milliseconds)
 
         return currentChapter?.let { it.title + it.startTime }
-    }
-
-    private fun MutableMap<String, String?>.getlastListenedEpisodeUuid(): String? {
-        return this["episodeUuid"]
-    }
-
-    private fun MutableMap<String, String?>.getlastListenedChapterUuid(): String? {
-        return this["chapterUuid"]
-    }
-
-    private fun MutableMap<String, String?>.setlastListenedEpisodeUuid(value: String?) {
-        this["episodeUuid"] = value
-    }
-
-    private fun MutableMap<String, String?>.setlastListenedChapterUuid(value: String?) {
-        this["chapterUuid"] = value
     }
 
     enum class ContentType(val analyticsValue: String) {
