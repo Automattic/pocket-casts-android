@@ -97,11 +97,13 @@ class AccountDetailsViewModel
                                 SubscriptionHeaderState.SupporterRenew(
                                     tier = activeSubscription.tier,
                                     expiresIn = activeSubscription.expiryDate?.toDurationFromNow(),
+                                    isChampion = status.isPocketCastsChampion,
                                 )
                             } else {
                                 SubscriptionHeaderState.SupporterCancel(
                                     tier = activeSubscription.tier,
                                     expiresIn = activeSubscription.expiryDate?.toDurationFromNow(),
+                                    isChampion = status.isPocketCastsChampion,
                                 )
                             }
                         }
