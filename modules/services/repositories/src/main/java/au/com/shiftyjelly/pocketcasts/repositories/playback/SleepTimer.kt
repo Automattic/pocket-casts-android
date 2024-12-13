@@ -7,6 +7,7 @@ import android.content.Intent
 import android.text.format.DateUtils
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent.PLAYER_SLEEP_TIMER_RESTARTED
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.Calendar
@@ -18,6 +19,7 @@ import kotlin.time.Duration.Companion.minutes
 
 @Singleton
 class SleepTimer @Inject constructor(
+    private val settings: Settings,
     private val analyticsTracker: AnalyticsTracker,
     @ApplicationContext private val context: Context,
 ) {
@@ -85,10 +87,10 @@ class SleepTimer @Inject constructor(
 
             if (shouldRestartSleepEndOfChapter(diffTime, timerState.isSleepEndOfChapterRunning)) {
                 onRestartSleepOnChapterEnd()
-                analyticsTracker.track(PLAYER_SLEEP_TIMER_RESTARTED, mapOf(TIME_KEY to END_OF_CHAPTER_VALUE, NUMBER_OF_CHAPTERS_KEY to timerState.numberOfChapters))
+                analyticsTracker.track(PLAYER_SLEEP_TIMER_RESTARTED, mapOf(TIME_KEY to END_OF_CHAPTER_VALUE, NUMBER_OF_CHAPTERS_KEY to settings.getlastSleepEndOfChapter()))
             } else if (shouldRestartSleepEndOfEpisode(diffTime, currentEpisodeUuid, timerState.isSleepEndOfEpisodeRunning)) {
                 onRestartSleepOnEpisodeEnd()
-                analyticsTracker.track(PLAYER_SLEEP_TIMER_RESTARTED, mapOf(TIME_KEY to END_OF_EPISODE_VALUE, NUMBER_OF_EPISODES_KEY to timerState.numberOfEpisodes))
+                analyticsTracker.track(PLAYER_SLEEP_TIMER_RESTARTED, mapOf(TIME_KEY to END_OF_EPISODE_VALUE, NUMBER_OF_EPISODES_KEY to settings.getlastSleepEndOfEpisodes()))
             } else if (shouldRestartSleepAfterTime(diffTime, timerState.isSleepTimerRunning)) {
                 lastSleepAfterTime?.let {
                     analyticsTracker.track(PLAYER_SLEEP_TIMER_RESTARTED, mapOf(TIME_KEY to it.inWholeSeconds))
@@ -190,12 +192,4 @@ class SleepTimer @Inject constructor(
     private fun cancelAutomaticSleepOnChapterEndRestart() {
         lastSleepAfterEndOfChapterTime = null
     }
-
-    data class SleepTimerState(
-        val isSleepTimerRunning: Boolean,
-        val isSleepEndOfEpisodeRunning: Boolean,
-        val isSleepEndOfChapterRunning: Boolean,
-        val numberOfEpisodes: Int,
-        val numberOfChapters: Int,
-    )
 }
