@@ -621,15 +621,15 @@ class PlayerViewModel @Inject constructor(
     fun sleepTimerAfterEpisode(episodes: Int = 1) {
         LogBuffer.i(SleepTimer.TAG, "Sleep after $episodes episodes configured")
         settings.setlastSleepEndOfEpisodes(episodes)
-        sleepTimer.updateSleepTimerStatus(sleepTimeRunning = true, sleepAfterEpisodes = episodes)
         sleepTimer.cancelTimer()
+        sleepTimer.updateSleepTimerStatus(sleepTimeRunning = true, sleepAfterEpisodes = episodes)
     }
 
     fun sleepTimerAfterChapter(chapters: Int = 1) {
         LogBuffer.i(SleepTimer.TAG, "Sleep after $chapters chapters configured")
         settings.setlastSleepEndOfChapters(chapters)
-        sleepTimer.updateSleepTimerStatus(sleepTimeRunning = true, sleepAfterChapters = chapters)
         sleepTimer.cancelTimer()
+        sleepTimer.updateSleepTimerStatus(sleepTimeRunning = true, sleepAfterChapters = chapters)
     }
 
     fun cancelSleepTimer() {
