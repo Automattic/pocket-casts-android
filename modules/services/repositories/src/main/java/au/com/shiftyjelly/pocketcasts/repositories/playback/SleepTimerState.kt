@@ -14,3 +14,10 @@ data class SleepTimerState(
     val isSleepEndOfChapterRunning: Boolean
         get() = numberOfChaptersLeft != 0
 }
+
+data class SleepTimerHistory(
+    val lastSleepAfterTime: Duration? = null,
+    val lastSleepAfterEndOfChapterTime: Duration? = null,
+    val lastTimeSleepTimeHasFinished: Duration? = null,
+    val lastEpisodeUuidAutomaticEnded: String? = null,
+)
