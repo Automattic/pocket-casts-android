@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.playback
 
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent.PLAYER_SLEEP_TIMER_RESTARTED
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import javax.inject.Inject
@@ -134,7 +135,22 @@ class SleepTimer @Inject constructor(
         }
     }
 
-    fun setEndOfEpisodeUuid(uuid: String) {
+    suspend fun sleepEndOfEpisode(episode: BaseEpisode, onSleepEndOfEpisode: suspend () -> Unit) {
+        if (getState().isSleepEndOfEpisodeRunning) {
+            setEndOfEpisodeUuid(episode.uuid)
+            updateSleepTimerEndOfEpisodes(getState().numberOfEpisodesLeft - 1)
+        }
+
+        if (getState().isSleepEndOfEpisodeRunning) return
+
+        updateSleepTimerStatus(sleepTimeRunning = false)
+
+        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Sleeping playback for end of episode")
+
+        onSleepEndOfEpisode()
+    }
+
+    private fun setEndOfEpisodeUuid(uuid: String) {
         LogBuffer.i(TAG, "Episode $uuid was marked as end of episode")
         sleepTimerHistory = sleepTimerHistory.copy(
             lastEpisodeUuidAutomaticEnded = uuid,
@@ -144,7 +160,22 @@ class SleepTimer @Inject constructor(
         cancelAutomaticSleepOnChapterEndRestart()
     }
 
-    fun setEndOfChapter() {
+    suspend fun sleepEndOfChapter(onSleepEndOfChapter: suspend () -> Unit) {
+        if (getState().isSleepEndOfChapterRunning) {
+            updateSleepTimerEndOfChapters(getState().numberOfChaptersLeft - 1)
+            setEndOfChapter()
+        }
+
+        if (getState().isSleepEndOfChapterRunning) return
+
+        updateSleepTimerStatus(sleepTimeRunning = false)
+
+        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Sleeping playback for end of chapters")
+
+        onSleepEndOfChapter()
+    }
+
+    private fun setEndOfChapter() {
         LogBuffer.i(TAG, "End of chapter was reached")
         val time = System.currentTimeMillis().milliseconds
         sleepTimerHistory = sleepTimerHistory.copy(

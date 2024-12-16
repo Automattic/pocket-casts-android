@@ -1446,58 +1446,42 @@ open class PlaybackManager @Inject constructor(
     }
 
     private suspend fun sleepEndOfEpisode(episode: BaseEpisode?) {
-        if (isSleepAfterEpisodeEnabled()) {
-            episode?.uuid?.let { sleepTimer.setEndOfEpisodeUuid(it) }
-            sleepTimer.updateSleepTimerEndOfEpisodes(sleepTimer.getState().numberOfEpisodesLeft - 1)
-        }
+        if (episode == null) return
 
-        if (isSleepAfterEpisodeEnabled()) return
+        sleepTimer.sleepEndOfEpisode(episode) {
+            showToast(application.getString(LR.string.player_sleep_time_fired))
 
-        sleepTimer.updateSleepTimerStatus(sleepTimeRunning = false)
-
-        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Sleeping playback for end of episode")
-
-        showToast(application.getString(LR.string.player_sleep_time_fired))
-
-        val podcast = playbackStateRelay.blockingFirst().podcast
-        if (podcast != null && podcast.skipLastSecs > 0) {
-            pause(sourceView = SourceView.AUTO_PAUSE)
-        }
-        onPlayerPaused()
-
-        // jump back 5 seconds from the current time so when the player opens it doesn't complete before giving the user a chance to skip back
-        player?.let {
-            val currentTimeMs = it.getCurrentPositionMs() - 5000
-            if (currentTimeMs > 0) {
-                val currentTimeSecs = currentTimeMs.toDouble() / 1000.0
-                episodeManager.updatePlayedUpToBlocking(episode, currentTimeSecs, false)
+            val podcast = playbackStateRelay.blockingFirst().podcast
+            if (podcast != null && podcast.skipLastSecs > 0) {
+                pause(sourceView = SourceView.AUTO_PAUSE)
             }
-        }
+            onPlayerPaused()
 
-        stop()
+            // jump back 5 seconds from the current time so when the player opens it doesn't complete before giving the user a chance to skip back
+            player?.let {
+                val currentTimeMs = it.getCurrentPositionMs() - 5000
+                if (currentTimeMs > 0) {
+                    val currentTimeSecs = currentTimeMs.toDouble() / 1000.0
+                    episodeManager.updatePlayedUpToBlocking(episode, currentTimeSecs, false)
+                }
+            }
+
+            stop()
+        }
     }
 
     private suspend fun sleepEndOfChapter() {
-        if (isSleepAfterChapterEnabled()) {
-            sleepTimer.updateSleepTimerEndOfChapters(sleepTimer.getState().numberOfChaptersLeft - 1)
-            sleepTimer.setEndOfChapter()
+        sleepTimer.sleepEndOfChapter {
+            showToast(application.getString(LR.string.player_sleep_time_fired_end_of_chapter))
+
+            val podcast = playbackStateRelay.blockingFirst().podcast
+            if (podcast != null && podcast.skipLastSecs > 0) {
+                pause(sourceView = SourceView.AUTO_PAUSE)
+            }
+            onPlayerPaused()
+
+            stop()
         }
-
-        if (isSleepAfterChapterEnabled()) return
-
-        sleepTimer.updateSleepTimerStatus(sleepTimeRunning = false)
-
-        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Sleeping playback for end of chapters")
-
-        showToast(application.getString(LR.string.player_sleep_time_fired_end_of_chapter))
-
-        val podcast = playbackStateRelay.blockingFirst().podcast
-        if (podcast != null && podcast.skipLastSecs > 0) {
-            pause(sourceView = SourceView.AUTO_PAUSE)
-        }
-        onPlayerPaused()
-
-        stop()
     }
 
     private suspend fun showToast(message: String) {
