@@ -7,11 +7,11 @@ on:
 jobs:
   dangermattic:
     if: ${{ (github.event.pull_request.draft == false) }}
-    uses: Automattic/dangermattic/.github/workflows/reusable-retry-buildkite-step-on-events.yml@1.2.2
+    uses: Automattic/dangermattic/.github/workflows/reusable-retry-buildkite-step-on-events.yml@v1
     with:
-      org-slug: "automattic"
-      pipeline-slug: "pocket-casts-android"
-      retry-step-key: "danger"
-      build-commit-sha: "${{ github.event.pull_request.head.sha }}"
+      org-slug: automattic
+      pipeline-slug: pocket-casts-android
+      retry-step-key: danger
+      build-commit-sha: ${{ github.event.pull_request.head.sha }}
     secrets:
       buildkite-api-token: ${{ secrets.TRIGGER_BK_BUILD_TOKEN }}
