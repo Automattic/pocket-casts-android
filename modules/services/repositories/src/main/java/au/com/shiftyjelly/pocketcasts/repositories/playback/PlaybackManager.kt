@@ -2111,24 +2111,7 @@ open class PlaybackManager @Inject constructor(
 
         player?.play(currentTimeMs)
 
-        sleepTimer.restartSleepTimerIfApplies(
-            autoSleepTimerEnabled = settings.autoSleepTimerRestart.value,
-            currentEpisodeUuid = episode.uuid,
-            timerState = sleepTimer.getState(),
-            onRestartSleepAfterTime = {
-                sleepTimer.updateSleepTimerStatus(sleepTimeRunning = true)
-            },
-            onRestartSleepOnEpisodeEnd = {
-                val episodes = settings.getlastSleepEndOfEpisodes()
-                LogBuffer.i(SleepTimer.TAG, "Sleep timer was restarted with end of $episodes episodes set")
-                sleepTimer.updateSleepTimerStatus(sleepTimeRunning = true, sleepAfterEpisodes = episodes)
-            },
-            onRestartSleepOnChapterEnd = {
-                val chapter = settings.getlastSleepEndOfChapter()
-                LogBuffer.i(SleepTimer.TAG, "Sleep timer was restarted with end of $chapter chapter set")
-                sleepTimer.updateSleepTimerStatus(sleepTimeRunning = true, sleepAfterChapters = chapter)
-            },
-        )
+        sleepTimer.restartSleepTimerIfApplies(currentEpisodeUuid = episode.uuid)
 
         trackPlayback(AnalyticsEvent.PLAYBACK_PLAY, sourceView)
     }
