@@ -69,6 +69,12 @@ import kotlin.time.Duration.Companion.ZERO
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asObservable
 import kotlinx.coroutines.rx2.awaitSingleOrNull
@@ -138,6 +144,8 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
     @Inject lateinit var podcastCacheServiceManager: PodcastCacheServiceManager
 
     @Inject lateinit var analyticsTracker: AnalyticsTracker
+
+    @Inject lateinit var sleepTimer: SleepTimer
 
     var mediaController: MediaControllerCompat? = null
         set(value) {
@@ -668,19 +676,22 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
     }
 
     private fun observePlaybackState() {
-        playbackManager.playbackStateRelay
-            .map { it.sleepTimerState.timeLeft }
+        sleepTimer.stateFlow
+            .map { it }
             .distinctUntilChanged()
-            .observeOn(Schedulers.io())
-            .subscribe(
-                { state -> onSleepTimerStateChange(state) },
-                { error -> Timber.e(error, "Error observing PlaybackState") },
-            ).addTo(disposables)
+            .flowOn(Dispatchers.IO)
+            .onEach { state ->
+                onSleepTimerStateChange(state)
+            }
+            .catch { throwable ->
+                Timber.e(throwable, "Error observing SleepTimer state")
+            }
+            .launchIn(this)
     }
 
-    private fun onSleepTimerStateChange(timeLeft: Duration) {
-        if (timeLeft != ZERO) {
-            startOrUpdateSleepTimer(timeLeft)
+    private fun onSleepTimerStateChange(state: SleepTimerState) {
+        if (state.isSleepTimerRunning && state.timeLeft != ZERO) {
+            startOrUpdateSleepTimer(state.timeLeft)
         } else {
             cancelSleepTimer()
         }
@@ -699,7 +710,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
                 .doOnNext {
                     playbackManager.setupFadeOutWhenFinishingSleepTimer()
                     currentTimeLeft = currentTimeLeft.minus(1.seconds)
-                    playbackManager.updateSleepTimerStatus(sleepTimeRunning = currentTimeLeft != ZERO, timeLeft = currentTimeLeft)
+                    sleepTimer.updateSleepTimerStatus(sleepTimeRunning = currentTimeLeft != ZERO, timeLeft = currentTimeLeft)
 
                     if (currentTimeLeft <= ZERO) {
                         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Paused from sleep timer.")
@@ -708,7 +719,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
                             playbackManager.restorePlayerVolume()
                         }
                         playbackManager.pause(sourceView = SourceView.AUTO_PAUSE)
-                        playbackManager.updateSleepTimerStatus(sleepTimeRunning = false)
+                        sleepTimer.updateSleepTimerStatus(sleepTimeRunning = false)
                         cancelSleepTimer()
                     }
                 }
