@@ -1447,12 +1447,13 @@ open class PlaybackManager @Inject constructor(
 
     // Sleep Timer
 
-    fun updateSleepTimerStatus(sleepTimeRunning: Boolean, sleepAfterEpisodes: Int = 0, sleepAfterChapters: Int = 0) {
+    fun updateSleepTimerStatus(sleepTimeRunning: Boolean, sleepAfterEpisodes: Int = 0, sleepAfterChapters: Int = 0, timeLeft: Duration? = null) {
         updateSleepTimer {
             copy(
                 isSleepTimerRunning = sleepTimeRunning,
                 numberOfEpisodesLeft = sleepAfterEpisodes,
                 numberOfChaptersLeft = sleepAfterChapters,
+                timeLeft = if (!sleepTimeRunning || sleepAfterEpisodes != 0 || sleepAfterChapters != 0) Duration.ZERO else timeLeft ?: this.timeLeft,
             )
         }
     }
@@ -2336,9 +2337,6 @@ open class PlaybackManager @Inject constructor(
                 if (isPlaying()) {
                     statsManager.addTotalListeningTime(UPDATE_TIMER_POLL_TIME)
                 }
-                if (playbackStateRelay.blockingFirst().sleepTimerState.isSleepTimerRunning && !isSleepAfterEpisodeEnabled()) { // Does not apply to end of episode sleep time
-                    setupFadeOutWhenFinishingSleepTimer()
-                }
                 verifySleepTimeForEndOfChapter()
             }
             .switchMapCompletable { updateCurrentPositionRx() }
@@ -2413,21 +2411,21 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
-    private fun setupFadeOutWhenFinishingSleepTimer() {
+    fun setupFadeOutWhenFinishingSleepTimer() {
+        if (isSleepAfterEpisodeEnabled() || isSleepAfterChapterEnabled()) return
+
         // it needs to run in the main thread because of player getVolume
         applicationScope.launch(Dispatchers.Main) {
-            val timeLeft = sleepTimer.timeLeftInSecs()
-            timeLeft?.let {
-                val fadeDuration = 5
-                val startVolume = (player as? SimplePlayer)?.getVolume() ?: 1.0f
+            val timeLeft = playbackStateRelay.blockingFirst().sleepTimerState.timeLeft.inWholeSeconds
+            val fadeDuration = 5
+            val startVolume = (player as? SimplePlayer)?.getVolume() ?: 1.0f
 
-                if (timeLeft <= fadeDuration) {
-                    val fraction = timeLeft.toFloat() / fadeDuration
-                    val newVolume = startVolume * fraction
-                    player?.setVolume(newVolume)
-                } else {
-                    player?.setVolume(startVolume)
-                }
+            if (timeLeft <= fadeDuration) {
+                val fraction = timeLeft.toFloat() / fadeDuration
+                val newVolume = startVolume * fraction
+                player?.setVolume(newVolume)
+            } else {
+                player?.setVolume(startVolume)
             }
         }
     }

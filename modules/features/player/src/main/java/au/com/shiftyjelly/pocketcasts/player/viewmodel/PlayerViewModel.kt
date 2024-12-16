@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.player.viewmodel
 
 import android.content.Context
+import android.text.format.DateUtils
 import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -591,10 +592,10 @@ class PlayerViewModel @Inject constructor(
     }
 
     fun updateSleepTimer() {
-        val timeLeft = sleepTimer.timeLeftInSecs()
-        if ((sleepTimer.isSleepAfterTimerRunning && timeLeft != null && timeLeft.toInt() > 0) || playbackManager.isSleepAfterEpisodeEnabled()) {
+        val timeLeft = timeLeftInSeconds()
+        if ((playbackManager.playbackStateRelay.blockingFirst().sleepTimerState.isSleepTimerRunning && timeLeft > 0) || playbackManager.isSleepAfterEpisodeEnabled()) {
             isSleepAtEndOfEpisodeOrChapter.postValue(playbackManager.isSleepAfterEpisodeEnabled())
-            sleepTimeLeftText.postValue(if (timeLeft != null && timeLeft > 0) Util.formattedSeconds(timeLeft.toDouble()) else "")
+            sleepTimeLeftText.postValue(if (timeLeft > 0) Util.formattedSeconds(timeLeft.toDouble()) else "")
             setSleepEndOfEpisodes(getSleepTimerEndOfEpisodesLeft(), shouldCallUpdateTimer = false)
             sleepingInText.postValue(calcSleepingInEpisodesText())
         } else if (playbackManager.isSleepAfterChapterEnabled()) {
@@ -607,15 +608,13 @@ class PlayerViewModel @Inject constructor(
         }
     }
 
-    fun timeLeftInSeconds(): Int? {
-        return sleepTimer.timeLeftInSecs()
+    fun timeLeftInSeconds(): Int {
+        return (playbackManager.playbackStateRelay.blockingFirst().sleepTimerState.timeLeft.inWholeMilliseconds / DateUtils.SECOND_IN_MILLIS).toInt()
     }
 
     fun sleepTimerAfter(mins: Int) {
         LogBuffer.i(SleepTimer.TAG, "Sleep after $mins minutes configured")
-        sleepTimer.sleepAfter(duration = mins.toDuration(DurationUnit.MINUTES)) {
-            playbackManager.updateSleepTimerStatus(sleepTimeRunning = true)
-        }
+        playbackManager.updateSleepTimerStatus(sleepTimeRunning = true, timeLeft = mins.toDuration(DurationUnit.MINUTES))
     }
 
     fun sleepTimerAfterEpisode(episodes: Int = 1) {

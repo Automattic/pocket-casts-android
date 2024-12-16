@@ -4,7 +4,6 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.text.format.DateUtils
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent.PLAYER_SLEEP_TIMER_RESTARTED
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -155,18 +154,6 @@ class SleepTimer @Inject constructor(
 
     val isSleepAfterTimerRunning: Boolean
         get() = System.currentTimeMillis() < (sleepTimeMs ?: -1)
-
-    fun timeLeftInSecs(): Int? {
-        val sleepTimeMs = sleepTimeMs ?: return null
-
-        val timeLeft = sleepTimeMs - System.currentTimeMillis()
-        if (timeLeft < 0) {
-            LogBuffer.i(TAG, "Cancelled because time is up")
-            cancelSleepTime()
-            return null
-        }
-        return (timeLeft / DateUtils.SECOND_IN_MILLIS).toInt()
-    }
 
     private fun getSleepIntent(): PendingIntent {
         val intent = Intent(context, SleepTimerReceiver::class.java)

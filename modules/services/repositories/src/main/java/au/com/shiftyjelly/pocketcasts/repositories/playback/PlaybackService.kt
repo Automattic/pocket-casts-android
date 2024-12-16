@@ -15,10 +15,13 @@ import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import android.widget.Toast
 import androidx.media.MediaBrowserServiceCompat
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
+import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -49,14 +52,21 @@ import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jakewharton.rxrelay2.BehaviorRelay
 import dagger.hilt.android.AndroidEntryPoint
+import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.schedulers.Schedulers
 import java.util.Timer
 import java.util.TimerTask
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.ZERO
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -144,6 +154,9 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
 
     private val disposables = CompositeDisposable()
 
+    private var timerDisposable: Disposable? = null
+    private var currentTimeLeft: Duration = ZERO
+
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
@@ -162,6 +175,8 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
 
         mediaController = MediaControllerCompat(this, mediaSession)
         notificationManager = PlayerNotificationManagerImpl(this)
+
+        observePlaybackState()
     }
 
     override fun onDestroy() {
@@ -650,5 +665,62 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
         val podcasts = (localPodcasts + serverPodcasts).distinctBy { it.uuid }
         // convert podcasts to the media browser format
         return podcasts.mapNotNull { podcast -> convertPodcastToMediaItem(context = this, podcast = podcast, useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork) }
+    }
+
+    private fun observePlaybackState() {
+        playbackManager.playbackStateRelay
+            .map { it.sleepTimerState.timeLeft }
+            .distinctUntilChanged()
+            .observeOn(Schedulers.io())
+            .subscribe(
+                { state -> onSleepTimerStateChange(state) },
+                { error -> Timber.e(error, "Error observing PlaybackState") },
+            ).addTo(disposables)
+    }
+
+    private fun onSleepTimerStateChange(timeLeft: Duration) {
+        if (timeLeft != ZERO) {
+            startOrUpdateSleepTimer(timeLeft)
+        } else {
+            cancelSleepTimer()
+        }
+    }
+
+    private fun startOrUpdateSleepTimer(newTimeLeft: Duration) {
+        if (newTimeLeft == ZERO || newTimeLeft.isNegative()) {
+            return
+        }
+
+        if (timerDisposable == null || timerDisposable!!.isDisposed) {
+            currentTimeLeft = newTimeLeft
+
+            timerDisposable = Observable.interval(1, TimeUnit.SECONDS, Schedulers.computation())
+                .takeWhile { currentTimeLeft > ZERO }
+                .doOnNext {
+                    playbackManager.setupFadeOutWhenFinishingSleepTimer()
+                    currentTimeLeft = currentTimeLeft.minus(1.seconds)
+                    playbackManager.updateSleepTimerStatus(sleepTimeRunning = currentTimeLeft != ZERO, timeLeft = currentTimeLeft)
+
+                    if (currentTimeLeft <= ZERO) {
+                        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Paused from sleep timer.")
+                        CoroutineScope(Dispatchers.Main).launch {
+                            Toast.makeText(applicationContext, applicationContext.getString(R.string.player_sleep_timer_stopped_your_podcast), Toast.LENGTH_LONG).show()
+                            playbackManager.restorePlayerVolume()
+                        }
+                        playbackManager.pause(sourceView = SourceView.AUTO_PAUSE)
+                        playbackManager.updateSleepTimerStatus(sleepTimeRunning = false)
+                        cancelSleepTimer()
+                    }
+                }
+                .subscribe()
+        } else {
+            currentTimeLeft = newTimeLeft
+        }
+    }
+
+    private fun cancelSleepTimer() {
+        timerDisposable?.dispose()
+        timerDisposable = null
+        currentTimeLeft = ZERO
     }
 }
