@@ -106,29 +106,29 @@ class SleepTimer @Inject constructor(
     }
 
     fun restartSleepTimerIfApplies(
-        autoSleepTimerEnabled: Boolean,
         currentEpisodeUuid: String,
-        timerState: SleepTimerState,
-        onRestartSleepAfterTime: () -> Unit,
-        onRestartSleepOnEpisodeEnd: () -> Unit,
-        onRestartSleepOnChapterEnd: () -> Unit,
     ) {
-        if (!autoSleepTimerEnabled) return
+        if (!settings.autoSleepTimerRestart.value) return
 
         sleepTimerHistory.lastTimeSleepTimeHasFinished?.let { lastTimeHasFinished ->
             val diffTime = System.currentTimeMillis().milliseconds - lastTimeHasFinished
 
-            if (shouldRestartSleepEndOfChapter(diffTime, timerState.isSleepEndOfChapterRunning)) {
-                onRestartSleepOnChapterEnd()
+            if (shouldRestartSleepEndOfChapter(diffTime, getState().isSleepEndOfChapterRunning)) {
+                val chapter = settings.getlastSleepEndOfChapter()
+                LogBuffer.i(TAG, "Sleep timer was restarted with end of $chapter chapter set")
+                updateSleepTimerStatus(sleepTimeRunning = true, sleepAfterChapters = chapter)
                 analyticsTracker.track(PLAYER_SLEEP_TIMER_RESTARTED, mapOf(TIME_KEY to END_OF_CHAPTER_VALUE, NUMBER_OF_CHAPTERS_KEY to settings.getlastSleepEndOfChapter()))
-            } else if (shouldRestartSleepEndOfEpisode(diffTime, currentEpisodeUuid, timerState.isSleepEndOfEpisodeRunning)) {
-                onRestartSleepOnEpisodeEnd()
+            } else if (shouldRestartSleepEndOfEpisode(diffTime, currentEpisodeUuid, getState().isSleepEndOfEpisodeRunning)) {
+                val episodes = settings.getlastSleepEndOfEpisodes()
+                LogBuffer.i(TAG, "Sleep timer was restarted with end of $episodes episodes set")
+                updateSleepTimerStatus(sleepTimeRunning = true, sleepAfterEpisodes = episodes)
                 analyticsTracker.track(PLAYER_SLEEP_TIMER_RESTARTED, mapOf(TIME_KEY to END_OF_EPISODE_VALUE, NUMBER_OF_EPISODES_KEY to settings.getlastSleepEndOfEpisodes()))
-            } else if (shouldRestartSleepAfterTime(diffTime, timerState.isSleepTimerRunning)) {
+            } else if (shouldRestartSleepAfterTime(diffTime, getState().isSleepTimerRunning)) {
                 sleepTimerHistory.lastSleepAfterTime?.let {
-                    analyticsTracker.track(PLAYER_SLEEP_TIMER_RESTARTED, mapOf(TIME_KEY to it.inWholeSeconds))
-                    LogBuffer.i(TAG, "Was restarted with ${it.inWholeMinutes} minutes set")
-                    sleepAfter(it, onRestartSleepAfterTime)
+                    sleepAfter(it) {
+                        analyticsTracker.track(PLAYER_SLEEP_TIMER_RESTARTED, mapOf(TIME_KEY to it.inWholeSeconds))
+                        LogBuffer.i(TAG, "Was restarted with ${it.inWholeMinutes} minutes set")
+                    }
                 }
             }
         }
