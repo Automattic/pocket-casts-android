@@ -70,6 +70,7 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.extensions.hide
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
 import au.com.shiftyjelly.pocketcasts.views.extensions.toggleVisibility
+import au.com.shiftyjelly.pocketcasts.views.extensions.trimPadding
 import au.com.shiftyjelly.pocketcasts.views.helper.AnimatorUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
 import au.com.shiftyjelly.pocketcasts.views.helper.toCircle
@@ -306,12 +307,13 @@ class PodcastAdapter(
             text = podcast.displayableNextEpisodeDate(context)
         }
         holder.binding.bottom.description.text = if (FeatureFlag.isEnabled(Feature.PODCAST_HTML_DESCRIPTION)) {
-            Html.fromHtml(podcast.podcastDescription, Html.FROM_HTML_MODE_COMPACT)
+            Html.fromHtml(podcast.podcastDescription, Html.FROM_HTML_MODE_COMPACT).trimPadding()
         } else {
             podcast.podcastDescription
         }
         holder.binding.bottom.description.setLinkTextColor(tintColor)
         holder.binding.bottom.description.readMore(3)
+        holder.binding.bottom.description.setPadding(0, 0, 0, 0)
         holder.binding.bottom.authorText.text = podcast.author
         holder.binding.bottom.authorText.isVisible = podcast.author.isNotBlank()
         holder.binding.bottom.authorImage.isVisible = podcast.author.isNotBlank()
