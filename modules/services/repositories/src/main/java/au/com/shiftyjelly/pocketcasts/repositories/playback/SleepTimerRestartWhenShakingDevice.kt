@@ -65,7 +65,7 @@ class SleepTimerRestartWhenShakingDevice @Inject constructor(
     private fun onDeviceShaken() {
         if (settings.shakeToResetSleepTimer.value) {
             val time = sleepTimer.restartTimerIfIsRunning onSuccess@{
-                playbackManager.updateSleepTimerStatus(sleepTimeRunning = true)
+                sleepTimer.updateSleepTimerStatus(sleepTimeRunning = true)
                 playbackManager.restorePlayerVolume()
 
                 if (context.isAppForeground()) {

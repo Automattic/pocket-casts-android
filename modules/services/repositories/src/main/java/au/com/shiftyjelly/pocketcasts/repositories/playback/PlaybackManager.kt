@@ -1445,52 +1445,15 @@ open class PlaybackManager @Inject constructor(
             .flatten()
     }
 
-    // Sleep Timer
-
-    fun updateSleepTimerStatus(sleepTimeRunning: Boolean, sleepAfterEpisodes: Int = 0, sleepAfterChapters: Int = 0, timeLeft: Duration? = null) {
-        updateSleepTimer {
-            copy(
-                isSleepTimerRunning = sleepTimeRunning,
-                numberOfEpisodesLeft = sleepAfterEpisodes,
-                numberOfChaptersLeft = sleepAfterChapters,
-                timeLeft = if (!sleepTimeRunning || sleepAfterEpisodes != 0 || sleepAfterChapters != 0) Duration.ZERO else timeLeft ?: this.timeLeft,
-            )
-        }
-    }
-
-    private fun updateSleepTimer(update: SleepTimerState.() -> SleepTimerState) {
-        playbackStateRelay.blockingFirst().let { currentState ->
-            val updatedSleepTimerState = currentState.sleepTimerState.update()
-            playbackStateRelay.accept(
-                currentState.copy(
-                    sleepTimerState = updatedSleepTimerState,
-                    lastChangeFrom = LastChangeFrom.OnUpdateSleepTimerStatus.value,
-                ),
-            )
-        }
-    }
-
-    private fun updateSleepTimerEndOfEpisodes(sleepAfterEpisodes: Int) {
-        updateSleepTimer {
-            copy(numberOfEpisodesLeft = sleepAfterEpisodes)
-        }
-    }
-
-    private fun updateSleepTimerEndOfChapters(sleepAfterChapters: Int) {
-        updateSleepTimer {
-            copy(numberOfChaptersLeft = sleepAfterChapters)
-        }
-    }
-
     private suspend fun sleepEndOfEpisode(episode: BaseEpisode?) {
         if (isSleepAfterEpisodeEnabled()) {
             episode?.uuid?.let { sleepTimer.setEndOfEpisodeUuid(it) }
-            updateSleepTimerEndOfEpisodes(playbackStateRelay.blockingFirst().sleepTimerState.numberOfEpisodesLeft - 1)
+            sleepTimer.updateSleepTimerEndOfEpisodes(sleepTimer.getState().numberOfEpisodesLeft - 1)
         }
 
         if (isSleepAfterEpisodeEnabled()) return
 
-        updateSleepTimerStatus(sleepTimeRunning = false)
+        sleepTimer.updateSleepTimerStatus(sleepTimeRunning = false)
 
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Sleeping playback for end of episode")
 
@@ -1516,13 +1479,13 @@ open class PlaybackManager @Inject constructor(
 
     private suspend fun sleepEndOfChapter() {
         if (isSleepAfterChapterEnabled()) {
-            updateSleepTimerEndOfChapters(playbackStateRelay.blockingFirst().sleepTimerState.numberOfChaptersLeft - 1)
+            sleepTimer.updateSleepTimerEndOfChapters(sleepTimer.getState().numberOfChaptersLeft - 1)
             sleepTimer.setEndOfChapter()
         }
 
         if (isSleepAfterChapterEnabled()) return
 
-        updateSleepTimerStatus(sleepTimeRunning = false)
+        sleepTimer.updateSleepTimerStatus(sleepTimeRunning = false)
 
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Sleeping playback for end of chapters")
 
@@ -2151,19 +2114,19 @@ open class PlaybackManager @Inject constructor(
         sleepTimer.restartSleepTimerIfApplies(
             autoSleepTimerEnabled = settings.autoSleepTimerRestart.value,
             currentEpisodeUuid = episode.uuid,
-            timerState = playbackStateRelay.blockingFirst().sleepTimerState,
+            timerState = sleepTimer.getState(),
             onRestartSleepAfterTime = {
-                updateSleepTimerStatus(sleepTimeRunning = true)
+                sleepTimer.updateSleepTimerStatus(sleepTimeRunning = true)
             },
             onRestartSleepOnEpisodeEnd = {
                 val episodes = settings.getlastSleepEndOfEpisodes()
                 LogBuffer.i(SleepTimer.TAG, "Sleep timer was restarted with end of $episodes episodes set")
-                updateSleepTimerStatus(sleepTimeRunning = true, sleepAfterEpisodes = episodes)
+                sleepTimer.updateSleepTimerStatus(sleepTimeRunning = true, sleepAfterEpisodes = episodes)
             },
             onRestartSleepOnChapterEnd = {
                 val chapter = settings.getlastSleepEndOfChapter()
                 LogBuffer.i(SleepTimer.TAG, "Sleep timer was restarted with end of $chapter chapter set")
-                updateSleepTimerStatus(sleepTimeRunning = true, sleepAfterChapters = chapter)
+                sleepTimer.updateSleepTimerStatus(sleepTimeRunning = true, sleepAfterChapters = chapter)
             },
         )
 
@@ -2416,7 +2379,7 @@ open class PlaybackManager @Inject constructor(
 
         // it needs to run in the main thread because of player getVolume
         applicationScope.launch(Dispatchers.Main) {
-            val timeLeft = playbackStateRelay.blockingFirst().sleepTimerState.timeLeft.inWholeSeconds
+            val timeLeft = sleepTimer.getState().timeLeft.inWholeSeconds
             val fadeDuration = 5
             val startVolume = (player as? SimplePlayer)?.getVolume() ?: 1.0f
 
@@ -2608,9 +2571,9 @@ open class PlaybackManager @Inject constructor(
         this.notificationPermissionChecker = notificationPermissionChecker
     }
 
-    fun isSleepAfterEpisodeEnabled(): Boolean = playbackStateRelay.blockingFirst().sleepTimerState.isSleepEndOfEpisodeRunning
+    fun isSleepAfterEpisodeEnabled(): Boolean = sleepTimer.getState().isSleepEndOfEpisodeRunning
 
-    fun isSleepAfterChapterEnabled(): Boolean = playbackStateRelay.blockingFirst().sleepTimerState.isSleepEndOfChapterRunning
+    fun isSleepAfterChapterEnabled(): Boolean = sleepTimer.getState().isSleepEndOfChapterRunning
 
     fun restorePlayerVolume() {
         (player as? SimplePlayer)?.restoreVolume()
