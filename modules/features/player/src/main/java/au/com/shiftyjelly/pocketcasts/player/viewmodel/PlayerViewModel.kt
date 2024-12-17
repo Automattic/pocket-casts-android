@@ -35,6 +35,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepTimer
+import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepTimerState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -186,6 +187,7 @@ class PlayerViewModel @Inject constructor(
         chaptersExpandedObservable,
         settings.useRealTimeForPlaybackRemaingTime.flow.asObservable(coroutineContext),
         settings.artworkConfiguration.flow.asObservable(coroutineContext),
+        sleepTimer.stateFlow.asObservable(coroutineContext),
         this::mergeListData,
     )
         .distinctUntilChanged()
@@ -341,6 +343,7 @@ class PlayerViewModel @Inject constructor(
         chaptersExpanded: Boolean,
         adjustRemainingTimeDuration: Boolean,
         artworkConfiguration: ArtworkConfiguration,
+        sleepTimerState: SleepTimerState,
     ): ListData {
         val podcast: Podcast? = (upNextState as? UpNextQueue.State.Loaded)?.podcast
         val episode = (upNextState as? UpNextQueue.State.Loaded)?.episode
@@ -358,7 +361,7 @@ class PlayerViewModel @Inject constructor(
         if (episode == null) {
             podcastHeader = PlayerHeader()
         } else {
-            isSleepRunning.postValue(sleepTimer.getState().isSleepTimerRunning)
+            isSleepRunning.postValue(sleepTimerState.isSleepTimerRunning)
             val playerBackground = theme.playerBackgroundColor(podcast)
             val iconTintColor = theme.playerHighlightColor(podcast)
 
@@ -375,7 +378,7 @@ class PlayerViewModel @Inject constructor(
                 podcastTitle = if (playbackState.chapters.isEmpty) podcast?.title else null,
                 skipBackwardInSecs = skipBackwardInSecs,
                 skipForwardInSecs = skipForwardInSecs,
-                isSleepRunning = sleepTimer.getState().isSleepTimerRunning,
+                isSleepRunning = sleepTimerState.isSleepTimerRunning,
                 isEffectsOn = !effects.usingDefaultValues,
                 playbackEffects = effects,
                 adjustRemainingTimeDuration = adjustRemainingTimeDuration,
