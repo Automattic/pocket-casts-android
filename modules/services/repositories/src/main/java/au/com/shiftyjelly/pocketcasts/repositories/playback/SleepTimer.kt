@@ -57,18 +57,6 @@ class SleepTimer @Inject constructor(
         }
     }
 
-    fun updateSleepTimerEndOfEpisodes(sleepAfterEpisodes: Int) {
-        updateSleepTimer {
-            copy(numberOfEpisodesLeft = sleepAfterEpisodes)
-        }
-    }
-
-    fun updateSleepTimerEndOfChapters(sleepAfterChapters: Int) {
-        updateSleepTimer {
-            copy(numberOfChaptersLeft = sleepAfterChapters)
-        }
-    }
-
     fun sleepAfter(duration: Duration, onSuccess: () -> Unit) {
         updateSleepTimerStatus(sleepTimeRunning = true, timeLeft = duration)
 
@@ -138,7 +126,9 @@ class SleepTimer @Inject constructor(
     suspend fun sleepEndOfEpisode(episode: BaseEpisode, onSleepEndOfEpisode: suspend () -> Unit) {
         if (getState().isSleepEndOfEpisodeRunning) {
             setEndOfEpisodeUuid(episode.uuid)
-            updateSleepTimerEndOfEpisodes(getState().numberOfEpisodesLeft - 1)
+            updateSleepTimer {
+                copy(numberOfEpisodesLeft = getState().numberOfEpisodesLeft - 1)
+            }
         }
 
         if (getState().isSleepEndOfEpisodeRunning) return
@@ -150,19 +140,11 @@ class SleepTimer @Inject constructor(
         onSleepEndOfEpisode()
     }
 
-    private fun setEndOfEpisodeUuid(uuid: String) {
-        LogBuffer.i(TAG, "Episode $uuid was marked as end of episode")
-        sleepTimerHistory = sleepTimerHistory.copy(
-            lastEpisodeUuidAutomaticEnded = uuid,
-            lastTimeSleepTimeHasFinished = System.currentTimeMillis().milliseconds,
-        )
-        cancelAutomaticSleepAfterTimeRestart()
-        cancelAutomaticSleepOnChapterEndRestart()
-    }
-
     suspend fun sleepEndOfChapter(onSleepEndOfChapter: suspend () -> Unit) {
         if (getState().isSleepEndOfChapterRunning) {
-            updateSleepTimerEndOfChapters(getState().numberOfChaptersLeft - 1)
+            updateSleepTimer {
+                copy(numberOfChaptersLeft = getState().numberOfChaptersLeft - 1)
+            }
             setEndOfChapter()
         }
 
@@ -173,6 +155,24 @@ class SleepTimer @Inject constructor(
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Sleeping playback for end of chapters")
 
         onSleepEndOfChapter()
+    }
+
+    fun cancelTimer() {
+        LogBuffer.i(TAG, "Cleaning automatic sleep timer feature...")
+        updateSleepTimerStatus(sleepTimeRunning = false, sleepAfterChapters = 0, sleepAfterEpisodes = 0)
+        cancelAutomaticSleepAfterTimeRestart()
+        cancelAutomaticSleepOnEpisodeEndRestart()
+        cancelAutomaticSleepOnChapterEndRestart()
+    }
+
+    private fun setEndOfEpisodeUuid(uuid: String) {
+        LogBuffer.i(TAG, "Episode $uuid was marked as end of episode")
+        sleepTimerHistory = sleepTimerHistory.copy(
+            lastEpisodeUuidAutomaticEnded = uuid,
+            lastTimeSleepTimeHasFinished = System.currentTimeMillis().milliseconds,
+        )
+        cancelAutomaticSleepAfterTimeRestart()
+        cancelAutomaticSleepOnChapterEndRestart()
     }
 
     private fun setEndOfChapter() {
@@ -195,14 +195,6 @@ class SleepTimer @Inject constructor(
     ) = diffTime < MIN_TIME_TO_RESTART_SLEEP_TIMER_IN_MINUTES && !sleepTimerHistory.lastEpisodeUuidAutomaticEnded.isNullOrEmpty() && currentEpisodeUuid != sleepTimerHistory.lastEpisodeUuidAutomaticEnded && !isSleepEndOfEpisodeRunning
 
     private fun shouldRestartSleepEndOfChapter(diffTime: Duration, isSleepEndOfChapterRunning: Boolean) = diffTime < MIN_TIME_TO_RESTART_SLEEP_TIMER_IN_MINUTES && !isSleepEndOfChapterRunning && sleepTimerHistory.lastSleepAfterEndOfChapterTime != null
-
-    fun cancelTimer() {
-        LogBuffer.i(TAG, "Cleaning automatic sleep timer feature...")
-        updateSleepTimerStatus(sleepTimeRunning = false, sleepAfterChapters = 0, sleepAfterEpisodes = 0)
-        cancelAutomaticSleepAfterTimeRestart()
-        cancelAutomaticSleepOnEpisodeEndRestart()
-        cancelAutomaticSleepOnChapterEndRestart()
-    }
 
     private fun updateSleepTimer(update: SleepTimerState.() -> SleepTimerState) {
         _stateFlow.update { currentState -> currentState.update() }

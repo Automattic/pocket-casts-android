@@ -2279,54 +2279,33 @@ open class PlaybackManager @Inject constructor(
         val currentEpisodeUui = getCurrentEpisode()?.uuid
 
         if (!isSleepAfterChapterEnabled()) {
-            updateLastListenedState(episodeUuid = null, chapterUuid = null)
+            updateLastListenedState { copy(chapterUuid = null, episodeUuid = null) }
             return
         }
 
         val lastListenedState = playbackState.lastListenedState
         if (lastListenedState.chapterUuid.isNullOrEmpty()) {
-            updateLastListenedStateChapter(currentChapterUuid)
+            updateLastListenedState { copy(chapterUuid = currentChapterUuid) }
         }
 
         if (lastListenedState.episodeUuid.isNullOrEmpty()) {
-            updateLastListenedStateEpisode(currentEpisodeUui)
+            updateLastListenedState { copy(episodeUuid = currentEpisodeUui) }
         }
 
         // When we switch from a episode that contains chapters to another one that does not have chapters
         // the current chapter is null, so for this case we would need to verify if the episode changed to update the sleep timer counter for end of chapter
         if (currentChapterUuid.isNullOrEmpty() && !lastListenedState.episodeUuid.isNullOrEmpty() && lastListenedState.episodeUuid != currentEpisodeUui) {
             applicationScope.launch {
-                updateLastListenedStateEpisode(currentEpisodeUui)
+                updateLastListenedState { copy(episodeUuid = currentEpisodeUui) }
                 sleepEndOfChapter()
             }
         } else if (lastListenedState.chapterUuid == currentChapterUuid) { // Same chapter
             return
         } else { // Changed chapter
             applicationScope.launch {
-                updateLastListenedState(currentChapterUuid, getCurrentEpisode()?.uuid)
+                updateLastListenedState { copy(chapterUuid = currentChapterUuid, episodeUuid = getCurrentEpisode()?.uuid) }
                 sleepEndOfChapter()
             }
-        }
-    }
-
-    private fun updateLastListenedState(chapterUuid: String?, episodeUuid: String?) {
-        updateLastListenedState {
-            copy(
-                chapterUuid = chapterUuid,
-                episodeUuid = episodeUuid,
-            )
-        }
-    }
-
-    private fun updateLastListenedStateChapter(chapterUuid: String?) {
-        updateLastListenedState {
-            copy(chapterUuid = chapterUuid)
-        }
-    }
-
-    private fun updateLastListenedStateEpisode(episodeUuid: String?) {
-        updateLastListenedState {
-            copy(episodeUuid = episodeUuid)
         }
     }
 
