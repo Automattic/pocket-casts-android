@@ -162,7 +162,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
 
     private val disposables = CompositeDisposable()
 
-    private var timerDisposable: Disposable? = null
+    private var sleepTimerDisposable: Disposable? = null
     private var currentTimeLeft: Duration = ZERO
 
     override val coroutineContext: CoroutineContext
@@ -191,6 +191,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
         super.onDestroy()
 
         disposables.clear()
+        sleepTimerDisposable?.dispose()
 
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Playback service destroyed")
     }
@@ -702,15 +703,18 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
             return
         }
 
-        if (timerDisposable == null || timerDisposable!!.isDisposed) {
+        if (sleepTimerDisposable == null || sleepTimerDisposable!!.isDisposed) {
             currentTimeLeft = newTimeLeft
 
-            timerDisposable = Observable.interval(1, TimeUnit.SECONDS, Schedulers.computation())
+            sleepTimerDisposable = Observable.interval(1, TimeUnit.SECONDS, Schedulers.computation())
                 .takeWhile { currentTimeLeft > ZERO }
                 .doOnNext {
-                    playbackManager.setupFadeOutWhenFinishingSleepTimer()
                     currentTimeLeft = currentTimeLeft.minus(1.seconds)
                     sleepTimer.updateSleepTimerStatus(sleepTimeRunning = currentTimeLeft != ZERO, timeLeft = currentTimeLeft)
+
+                    if (currentTimeLeft == 5.seconds) {
+                        playbackManager.performVolumeFadeOut(5.0)
+                    }
 
                     if (currentTimeLeft <= ZERO) {
                         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Paused from sleep timer.")
@@ -730,8 +734,8 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
     }
 
     private fun cancelSleepTimer() {
-        timerDisposable?.dispose()
-        timerDisposable = null
+        sleepTimerDisposable?.dispose()
+        sleepTimerDisposable = null
         currentTimeLeft = ZERO
     }
 }

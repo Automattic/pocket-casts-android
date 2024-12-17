@@ -2320,22 +2320,9 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
-    fun setupFadeOutWhenFinishingSleepTimer() {
-        if (isSleepAfterEpisodeEnabled() || isSleepAfterChapterEnabled()) return
-
-        // it needs to run in the main thread because of player getVolume
-        applicationScope.launch(Dispatchers.Main) {
-            val timeLeft = sleepTimer.getState().timeLeft.inWholeSeconds
-            val fadeDuration = 5
-            val startVolume = (player as? SimplePlayer)?.getVolume() ?: 1.0f
-
-            if (timeLeft <= fadeDuration) {
-                val fraction = timeLeft.toFloat() / fadeDuration
-                val newVolume = startVolume * fraction
-                player?.setVolume(newVolume)
-            } else {
-                player?.setVolume(startVolume)
-            }
+    fun performVolumeFadeOut(duration: Double) {
+        player?.let {
+            PlayerVolumeFadeOut(it, applicationScope).performFadeOut(duration, onStopPlaying = { restorePlayerVolume() })
         }
     }
 
