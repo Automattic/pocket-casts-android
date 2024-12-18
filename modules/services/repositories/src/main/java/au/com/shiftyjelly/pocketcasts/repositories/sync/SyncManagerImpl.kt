@@ -42,6 +42,7 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.login.ExchangeSonosResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.parseErrorResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
+import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.pocketcasts.service.api.PodcastRatingResponse
@@ -53,6 +54,7 @@ import com.pocketcasts.service.api.UserPodcastListResponse
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.Completable
+import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
 import java.io.File
@@ -130,7 +132,9 @@ class SyncManagerImpl @Inject constructor(
     override fun getEmail(): String? =
         syncAccountManager.getEmail()
 
-    override fun emailFlow() = syncAccountManager.observeEmail().distinctUntilChanged()
+    override fun emailFlow() = syncAccountManager.emailFlow().distinctUntilChanged()
+
+    override fun emailFlowable(): Flowable<Optional<String>> = syncAccountManager.emailFlowable().distinctUntilChanged()
 
     override suspend fun getAccessToken(account: Account): AccessToken =
         syncAccountManager.peekAccessToken(account)
