@@ -1,6 +1,8 @@
 7.80
 -----
-
+*   Bug Fixes
+    *   Fix global auto download setting was incorrectly overriding the podcast auto download setting
+        ([#3342](https://github.com/Automattic/pocket-casts-android/pull/3342))
 
 7.79
 -----

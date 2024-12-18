@@ -292,6 +292,7 @@ class Support @Inject constructor(
             output.append("Auto downloads").append(eol)
             output.append("  Any podcast? ").append(yesNoString(autoDownloadOn[0])).append(eol)
             output.append("  New Episodes? ").append(yesNoString(settings.autoDownloadNewEpisodes.value == AUTO_DOWNLOAD_NEW_EPISODES)).append(eol)
+            output.append("  On Follow? ").append(yesNoString(settings.autoDownloadOnFollowPodcast.value)).append(eol)
             output.append("  Limit Downloads ").append(settings.autoDownloadLimit.value).append(eol)
             output.append("  Up Next? ").append(yesNoString(settings.autoDownloadUpNext.value)).append(eol)
             output.append("  Only on unmetered WiFi? ").append(yesNoString(settings.autoDownloadUnmeteredOnly.value)).append(eol)
