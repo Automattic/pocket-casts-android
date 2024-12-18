@@ -225,7 +225,7 @@ class MainActivityViewModelTest {
             whenever(settings.getWhatsNewVersionCode()).thenReturn(Settings.WHATS_NEW_VERSION_CODE)
         }
 
-        whenever(userManager.getSignInStateFlowable()).thenReturn(
+        whenever(userManager.getSignInState()).thenReturn(
             Flowable.just(
                 SignInState.SignedIn(
                     email = "",
