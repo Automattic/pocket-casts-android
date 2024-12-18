@@ -2274,8 +2274,7 @@ open class PlaybackManager @Inject constructor(
     }
 
     private fun verifySleepTimeForEndOfChapter() {
-        val playbackState = playbackStateRelay.blockingFirst()
-        val currentChapterUuid = getCurrentChapterUuidForSleepTime(playbackState)
+        val currentChapterUuid = getCurrentChapterUuid()
         val currentEpisodeUui = getCurrentEpisode()?.uuid
 
         if (!isSleepAfterChapterEnabled()) {
@@ -2283,23 +2282,22 @@ open class PlaybackManager @Inject constructor(
             return
         }
 
-        val lastListenedState = playbackState.lastListenedState
-        if (lastListenedState.chapterUuid.isNullOrEmpty()) {
+        if (playbackStateRelay.blockingFirst().lastListenedState.chapterUuid.isNullOrEmpty()) {
             updateLastListenedState { copy(chapterUuid = currentChapterUuid) }
         }
 
-        if (lastListenedState.episodeUuid.isNullOrEmpty()) {
+        if (playbackStateRelay.blockingFirst().lastListenedState.episodeUuid.isNullOrEmpty()) {
             updateLastListenedState { copy(episodeUuid = currentEpisodeUui) }
         }
 
         // When we switch from a episode that contains chapters to another one that does not have chapters
         // the current chapter is null, so for this case we would need to verify if the episode changed to update the sleep timer counter for end of chapter
-        if (currentChapterUuid.isNullOrEmpty() && !lastListenedState.episodeUuid.isNullOrEmpty() && lastListenedState.episodeUuid != currentEpisodeUui) {
+        if (currentChapterUuid.isNullOrEmpty() && !playbackStateRelay.blockingFirst().lastListenedState.episodeUuid.isNullOrEmpty() && playbackStateRelay.blockingFirst().lastListenedState.episodeUuid != currentEpisodeUui) {
             applicationScope.launch {
                 updateLastListenedState { copy(episodeUuid = currentEpisodeUui) }
                 sleepEndOfChapter()
             }
-        } else if (lastListenedState.chapterUuid == currentChapterUuid) { // Same chapter
+        } else if (playbackStateRelay.blockingFirst().lastListenedState.chapterUuid == currentChapterUuid) { // Same chapter
             return
         } else { // Changed chapter
             applicationScope.launch {
@@ -2512,7 +2510,8 @@ open class PlaybackManager @Inject constructor(
         (player as? SimplePlayer)?.restoreVolume()
     }
 
-    private fun getCurrentChapterUuidForSleepTime(playbackState: PlaybackState): String? {
+    private fun getCurrentChapterUuid(): String? {
+        val playbackState = playbackStateRelay.blockingFirst()
         val currentChapter = playbackState.chapters.getChapter(playbackState.positionMs.milliseconds)
 
         return currentChapter?.let { it.title + it.startTime }
