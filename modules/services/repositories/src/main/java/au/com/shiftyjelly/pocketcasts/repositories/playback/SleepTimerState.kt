@@ -15,9 +15,25 @@ data class SleepTimerState(
         get() = numberOfChaptersLeft != 0
 }
 
-data class SleepTimerHistory(
-    val lastSleepAfterTime: Duration? = null,
-    val lastSleepAfterEndOfChapterTime: Duration? = null,
-    val lastTimeSleepTimeHasFinished: Duration? = null,
-    val lastEpisodeUuidAutomaticEnded: String? = null,
-)
+sealed interface SleepTimerHistory {
+    val lastTimeSleepTimeHasFinished: Duration?
+
+    data class AfterTime(
+        val lastSleepAfterTime: Duration,
+        override val lastTimeSleepTimeHasFinished: Duration,
+    ) : SleepTimerHistory
+
+    data class AfterChapter(
+        val lastSleepAfterEndOfChapterTime: Duration,
+        override val lastTimeSleepTimeHasFinished: Duration,
+    ) : SleepTimerHistory
+
+    data class AfterEpisode(
+        val lastEpisodeUuidAutomaticEnded: String,
+        override val lastTimeSleepTimeHasFinished: Duration,
+    ) : SleepTimerHistory
+
+    data object None : SleepTimerHistory {
+        override val lastTimeSleepTimeHasFinished: Duration? = null
+    }
+}
