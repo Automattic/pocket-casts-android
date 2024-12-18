@@ -986,6 +986,7 @@ class MainActivity :
         return binding.snackbarFragment
     }
 
+    @SuppressLint("PrivateResource")
     override fun onMiniPlayerHidden() {
         updateSnackbarPosition(miniPlayerOpen = false)
         settings.updateBottomInset(0)
@@ -997,6 +998,7 @@ class MainActivity :
         }
     }
 
+    @SuppressLint("PrivateResource")
     override fun onMiniPlayerVisible() {
         updateSnackbarPosition(miniPlayerOpen = true)
 
