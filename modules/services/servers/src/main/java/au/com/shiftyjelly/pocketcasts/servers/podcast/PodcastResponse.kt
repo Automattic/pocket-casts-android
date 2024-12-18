@@ -56,10 +56,9 @@ data class PodcastInfo(
         podcast.author = author ?: ""
         podcast.podcastCategory = category ?: ""
         if (FeatureFlag.isEnabled(Feature.PODCAST_HTML_DESCRIPTION)) {
-            podcast.podcastDescription = descriptionHtml.takeUnless { it.isNullOrBlank() } ?: description ?: ""
-        } else {
-            podcast.podcastDescription = description ?: ""
+            podcast.podcastHtmlDescription = descriptionHtml ?: ""
         }
+        podcast.podcastDescription = description ?: ""
         podcast.episodesSortType = if (showType == "serial") EpisodesSortType.EPISODES_SORT_BY_DATE_ASC else EpisodesSortType.EPISODES_SORT_BY_DATE_DESC
         episodes?.mapNotNull { it.toEpisode(uuid) }?.let { episodes ->
             podcast.episodes.addAll(episodes)

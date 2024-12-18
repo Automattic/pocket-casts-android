@@ -306,11 +306,17 @@ class PodcastAdapter(
         with(holder.binding.bottom.nextText) {
             text = podcast.displayableNextEpisodeDate(context)
         }
-        holder.binding.bottom.description.text = if (FeatureFlag.isEnabled(Feature.PODCAST_HTML_DESCRIPTION)) {
-            Html.fromHtml(podcast.podcastDescription, Html.FROM_HTML_MODE_COMPACT).trimPadding()
-        } else {
-            podcast.podcastDescription
-        }
+        holder.binding.bottom.description.text =
+            if (FeatureFlag.isEnabled(Feature.PODCAST_HTML_DESCRIPTION) && podcast.podcastHtmlDescription.isNotEmpty()) {
+                // keep the extra line break from paragraphs as it looks better
+                Html.fromHtml(
+                    podcast.podcastHtmlDescription,
+                    Html.FROM_HTML_MODE_COMPACT and
+                        Html.FROM_HTML_SEPARATOR_LINE_BREAK_PARAGRAPH.inv(),
+                ).trimPadding()
+            } else {
+                podcast.podcastDescription
+            }
         holder.binding.bottom.description.setLinkTextColor(tintColor)
         holder.binding.bottom.description.readMore(3)
         holder.binding.bottom.authorText.text = podcast.author
