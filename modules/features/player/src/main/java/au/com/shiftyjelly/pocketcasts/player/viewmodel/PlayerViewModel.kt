@@ -616,9 +616,8 @@ class PlayerViewModel @Inject constructor(
     }
 
     fun sleepTimerAfter(mins: Int) {
-        sleepTimer.sleepAfter(mins.toDuration(DurationUnit.MINUTES)) {
-            LogBuffer.i(SleepTimer.TAG, "Sleep after $mins minutes configured")
-        }
+        sleepTimer.sleepAfter(mins.toDuration(DurationUnit.MINUTES))
+        LogBuffer.i(SleepTimer.TAG, "Sleep after $mins minutes configured")
     }
 
     fun sleepTimerAfterEpisode(episodes: Int = 1) {

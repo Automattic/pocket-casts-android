@@ -58,7 +58,7 @@ class SleepTimer @Inject constructor(
         }
     }
 
-    fun sleepAfter(duration: Duration, onSuccess: () -> Unit) {
+    fun sleepAfter(duration: Duration) {
         updateSleepTimerStatus(sleepTimeRunning = true, timeLeft = duration)
 
         cancelAutomaticSleepOnEpisodeEndRestart()
@@ -68,8 +68,6 @@ class SleepTimer @Inject constructor(
             lastSleepAfterTime = duration,
             lastTimeSleepTimeHasFinished = System.currentTimeMillis().milliseconds + duration,
         )
-
-        onSuccess()
     }
 
     fun addExtraTime(duration: Duration) {
@@ -86,9 +84,13 @@ class SleepTimer @Inject constructor(
         LogBuffer.i(TAG, "Added extra time: $newTimeLeft")
     }
 
-    fun restartTimerIfIsRunning(onSuccess: () -> Unit): Duration? {
+    /*
+     * This restart only applies if the sleep timer is set to "sleep in x minutes".
+     * Other options like "end of chapter" and "end of episode" do not apply.
+     * */
+    fun restartTimerForSleepAfterTime(): Duration? {
         return if (state.timeLeft != ZERO) {
-            sleepTimerHistory.lastSleepAfterTime?.let { sleepAfter(it, onSuccess) }
+            sleepTimerHistory.lastSleepAfterTime?.let { sleepAfter(it) }
             sleepTimerHistory.lastSleepAfterTime
         } else {
             null
@@ -115,10 +117,9 @@ class SleepTimer @Inject constructor(
                 analyticsTracker.track(PLAYER_SLEEP_TIMER_RESTARTED, mapOf(TIME_KEY to END_OF_EPISODE_VALUE, NUMBER_OF_EPISODES_KEY to settings.getlastSleepEndOfEpisodes()))
             } else if (shouldRestartSleepAfterTime(diffTime, state.isSleepTimerRunning)) {
                 sleepTimerHistory.lastSleepAfterTime?.let {
-                    sleepAfter(it) {
-                        analyticsTracker.track(PLAYER_SLEEP_TIMER_RESTARTED, mapOf(TIME_KEY to it.inWholeSeconds))
-                        LogBuffer.i(TAG, "Was restarted with ${it.inWholeMinutes} minutes set")
-                    }
+                    sleepAfter(it)
+                    analyticsTracker.track(PLAYER_SLEEP_TIMER_RESTARTED, mapOf(TIME_KEY to it.inWholeSeconds))
+                    LogBuffer.i(TAG, "Was restarted with ${it.inWholeMinutes} minutes set")
                 }
             }
         }
