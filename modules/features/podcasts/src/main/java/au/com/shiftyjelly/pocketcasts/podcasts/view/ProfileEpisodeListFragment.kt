@@ -443,6 +443,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
                                     analyticsTracker.track(AnalyticsEvent.FREE_UP_SPACE_MANAGE_DOWNLOADS_TAPPED, mapOf("source" to SourceView.DOWNLOADS.analyticsValue))
                                     showFragment(ManualCleanupFragment.newInstance())
                                 },
+                                onMoreOptionsClick = {},
                             )
                         }
                     }
