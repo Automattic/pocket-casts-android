@@ -596,14 +596,14 @@ class PlayerViewModel @Inject constructor(
 
     fun updateSleepTimer() {
         val timeLeft = timeLeftInSeconds()
-        if ((sleepTimer.getState().isSleepTimerRunning && timeLeft > 0) || playbackManager.isSleepAfterEpisodeEnabled()) {
+        if ((sleepTimer.state.isSleepTimerRunning && timeLeft > 0) || playbackManager.isSleepAfterEpisodeEnabled()) {
             isSleepAtEndOfEpisodeOrChapter.postValue(playbackManager.isSleepAfterEpisodeEnabled())
             sleepTimeLeftText.postValue(if (timeLeft > 0) Util.formattedSeconds(timeLeft.toDouble()) else "")
-            setSleepEndOfEpisodes(sleepTimer.getState().numberOfEpisodesLeft, shouldCallUpdateTimer = false)
+            setSleepEndOfEpisodes(sleepTimer.state.numberOfEpisodesLeft, shouldCallUpdateTimer = false)
             sleepingInText.postValue(calcSleepingInEpisodesText())
         } else if (playbackManager.isSleepAfterChapterEnabled()) {
             isSleepAtEndOfEpisodeOrChapter.postValue(playbackManager.isSleepAfterChapterEnabled())
-            setSleepEndOfChapters(sleepTimer.getState().numberOfChaptersLeft, shouldCallUpdateTimer = false)
+            setSleepEndOfChapters(sleepTimer.state.numberOfChaptersLeft, shouldCallUpdateTimer = false)
             sleepingInText.postValue(calcSleepingInChaptersText())
         } else {
             isSleepAtEndOfEpisodeOrChapter.postValue(false)
@@ -612,7 +612,7 @@ class PlayerViewModel @Inject constructor(
     }
 
     fun timeLeftInSeconds(): Int {
-        return (sleepTimer.getState().timeLeft.inWholeMilliseconds / DateUtils.SECOND_IN_MILLIS).toInt()
+        return (sleepTimer.state.timeLeft.inWholeMilliseconds / DateUtils.SECOND_IN_MILLIS).toInt()
     }
 
     fun sleepTimerAfter(mins: Int) {

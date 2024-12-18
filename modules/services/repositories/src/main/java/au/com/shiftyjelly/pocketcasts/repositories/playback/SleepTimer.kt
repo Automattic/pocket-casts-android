@@ -35,7 +35,8 @@ class SleepTimer @Inject constructor(
     private val _stateFlow: MutableStateFlow<SleepTimerState> = MutableStateFlow(SleepTimerState())
     val stateFlow: StateFlow<SleepTimerState> = _stateFlow
 
-    fun getState(): SleepTimerState = _stateFlow.value
+    val state: SleepTimerState
+        get() = _stateFlow.value
 
     fun updateSleepTimerStatus(
         sleepTimeRunning: Boolean,
@@ -72,7 +73,7 @@ class SleepTimer @Inject constructor(
     }
 
     fun addExtraTime(duration: Duration) {
-        val currentTimeLeft: Duration = getState().timeLeft
+        val currentTimeLeft: Duration = state.timeLeft
         if (currentTimeLeft < ZERO) {
             return
         }
@@ -86,7 +87,7 @@ class SleepTimer @Inject constructor(
     }
 
     fun restartTimerIfIsRunning(onSuccess: () -> Unit): Duration? {
-        return if (getState().timeLeft != ZERO) {
+        return if (state.timeLeft != ZERO) {
             sleepTimerHistory.lastSleepAfterTime?.let { sleepAfter(it, onSuccess) }
             sleepTimerHistory.lastSleepAfterTime
         } else {
@@ -102,17 +103,17 @@ class SleepTimer @Inject constructor(
         sleepTimerHistory.lastTimeSleepTimeHasFinished?.let { lastTimeHasFinished ->
             val diffTime = System.currentTimeMillis().milliseconds - lastTimeHasFinished
 
-            if (shouldRestartSleepEndOfChapter(diffTime, getState().isSleepEndOfChapterRunning)) {
+            if (shouldRestartSleepEndOfChapter(diffTime, state.isSleepEndOfChapterRunning)) {
                 val chapter = settings.getlastSleepEndOfChapter()
                 LogBuffer.i(TAG, "Sleep timer was restarted with end of $chapter chapter set")
                 updateSleepTimerStatus(sleepTimeRunning = true, sleepAfterChapters = chapter)
                 analyticsTracker.track(PLAYER_SLEEP_TIMER_RESTARTED, mapOf(TIME_KEY to END_OF_CHAPTER_VALUE, NUMBER_OF_CHAPTERS_KEY to settings.getlastSleepEndOfChapter()))
-            } else if (shouldRestartSleepEndOfEpisode(diffTime, currentEpisodeUuid, getState().isSleepEndOfEpisodeRunning)) {
+            } else if (shouldRestartSleepEndOfEpisode(diffTime, currentEpisodeUuid, state.isSleepEndOfEpisodeRunning)) {
                 val episodes = settings.getlastSleepEndOfEpisodes()
                 LogBuffer.i(TAG, "Sleep timer was restarted with end of $episodes episodes set")
                 updateSleepTimerStatus(sleepTimeRunning = true, sleepAfterEpisodes = episodes)
                 analyticsTracker.track(PLAYER_SLEEP_TIMER_RESTARTED, mapOf(TIME_KEY to END_OF_EPISODE_VALUE, NUMBER_OF_EPISODES_KEY to settings.getlastSleepEndOfEpisodes()))
-            } else if (shouldRestartSleepAfterTime(diffTime, getState().isSleepTimerRunning)) {
+            } else if (shouldRestartSleepAfterTime(diffTime, state.isSleepTimerRunning)) {
                 sleepTimerHistory.lastSleepAfterTime?.let {
                     sleepAfter(it) {
                         analyticsTracker.track(PLAYER_SLEEP_TIMER_RESTARTED, mapOf(TIME_KEY to it.inWholeSeconds))
@@ -124,14 +125,14 @@ class SleepTimer @Inject constructor(
     }
 
     suspend fun sleepEndOfEpisode(episode: BaseEpisode, onSleepEndOfEpisode: suspend () -> Unit) {
-        if (getState().isSleepEndOfEpisodeRunning) {
+        if (state.isSleepEndOfEpisodeRunning) {
             setEndOfEpisodeUuid(episode.uuid)
             updateSleepTimer {
-                copy(numberOfEpisodesLeft = getState().numberOfEpisodesLeft - 1)
+                copy(numberOfEpisodesLeft = state.numberOfEpisodesLeft - 1)
             }
         }
 
-        if (getState().isSleepEndOfEpisodeRunning) return
+        if (state.isSleepEndOfEpisodeRunning) return
 
         updateSleepTimerStatus(sleepTimeRunning = false)
 
@@ -141,14 +142,14 @@ class SleepTimer @Inject constructor(
     }
 
     suspend fun sleepEndOfChapter(onSleepEndOfChapter: suspend () -> Unit) {
-        if (getState().isSleepEndOfChapterRunning) {
+        if (state.isSleepEndOfChapterRunning) {
             updateSleepTimer {
-                copy(numberOfChaptersLeft = getState().numberOfChaptersLeft - 1)
+                copy(numberOfChaptersLeft = state.numberOfChaptersLeft - 1)
             }
             setEndOfChapter()
         }
 
-        if (getState().isSleepEndOfChapterRunning) return
+        if (state.isSleepEndOfChapterRunning) return
 
         updateSleepTimerStatus(sleepTimeRunning = false)
 

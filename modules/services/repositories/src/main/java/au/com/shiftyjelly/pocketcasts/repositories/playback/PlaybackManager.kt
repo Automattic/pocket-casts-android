@@ -2504,9 +2504,9 @@ open class PlaybackManager @Inject constructor(
         this.notificationPermissionChecker = notificationPermissionChecker
     }
 
-    fun isSleepAfterEpisodeEnabled(): Boolean = sleepTimer.getState().isSleepEndOfEpisodeRunning
+    fun isSleepAfterEpisodeEnabled(): Boolean = sleepTimer.state.isSleepEndOfEpisodeRunning
 
-    fun isSleepAfterChapterEnabled(): Boolean = sleepTimer.getState().isSleepEndOfChapterRunning
+    fun isSleepAfterChapterEnabled(): Boolean = sleepTimer.state.isSleepEndOfChapterRunning
 
     fun restorePlayerVolume() {
         (player as? SimplePlayer)?.restoreVolume()
