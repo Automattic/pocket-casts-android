@@ -1,5 +1,8 @@
 7.80
 -----
+*   New Features
+    *   Add support for podcast descriptions with HTML formatting 
+        ([#3249](https://github.com/Automattic/pocket-casts-android/pull/3249))
 *   Bug Fixes
     *   Fix global auto download setting was incorrectly overriding the podcast auto download setting
         ([#3342](https://github.com/Automattic/pocket-casts-android/pull/3342))

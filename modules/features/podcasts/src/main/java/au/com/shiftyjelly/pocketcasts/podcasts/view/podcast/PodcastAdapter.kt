@@ -9,6 +9,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import android.text.Html
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
@@ -64,9 +65,12 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.extensions.hide
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
 import au.com.shiftyjelly.pocketcasts.views.extensions.toggleVisibility
+import au.com.shiftyjelly.pocketcasts.views.extensions.trimPadding
 import au.com.shiftyjelly.pocketcasts.views.helper.AnimatorUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
 import au.com.shiftyjelly.pocketcasts.views.helper.toCircle
@@ -302,7 +306,17 @@ class PodcastAdapter(
         with(holder.binding.bottom.nextText) {
             text = podcast.displayableNextEpisodeDate(context)
         }
-        holder.binding.bottom.description.text = podcast.podcastDescription
+        holder.binding.bottom.description.text =
+            if (FeatureFlag.isEnabled(Feature.PODCAST_HTML_DESCRIPTION) && podcast.podcastHtmlDescription.isNotEmpty()) {
+                // keep the extra line break from paragraphs as it looks better
+                Html.fromHtml(
+                    podcast.podcastHtmlDescription,
+                    Html.FROM_HTML_MODE_COMPACT and
+                        Html.FROM_HTML_SEPARATOR_LINE_BREAK_PARAGRAPH.inv(),
+                ).trimPadding()
+            } else {
+                podcast.podcastDescription
+            }
         holder.binding.bottom.description.setLinkTextColor(tintColor)
         holder.binding.bottom.description.readMore(3)
         holder.binding.bottom.authorText.text = podcast.author
