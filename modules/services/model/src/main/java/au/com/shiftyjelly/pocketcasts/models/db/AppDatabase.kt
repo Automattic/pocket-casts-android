@@ -873,7 +873,7 @@ abstract class AppDatabase : RoomDatabase() {
         }
 
         val MIGRATION_104_105 = addMigration(104, 105) { database ->
-            database.execSQL("ALTER TABLE podcast ADD COLUMN podcast_html_description TEXT NOT NULL DEFAULT ''")
+            database.execSQL("ALTER TABLE podcasts ADD COLUMN podcast_html_description TEXT NOT NULL DEFAULT ''")
         }
 
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
