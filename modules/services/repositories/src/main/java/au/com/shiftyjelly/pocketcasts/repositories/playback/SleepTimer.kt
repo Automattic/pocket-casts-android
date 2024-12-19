@@ -63,7 +63,7 @@ class SleepTimer @Inject constructor(
 
         sleepTimerHistory = SleepTimerHistory.AfterTime(
             lastSleepAfterTime = duration,
-            lastTimeSleepTimeHasFinished = System.currentTimeMillis().milliseconds + duration,
+            lastFinishedTime = System.currentTimeMillis().milliseconds + duration,
         )
     }
 
@@ -99,7 +99,7 @@ class SleepTimer @Inject constructor(
         currentEpisodeUuid: String,
     ) {
         if (!settings.autoSleepTimerRestart.value || sleepTimerHistory is SleepTimerHistory.None) return
-        val lastTimeHasFinished = sleepTimerHistory.lastTimeSleepTimeHasFinished ?: return
+        val lastTimeHasFinished = sleepTimerHistory.lastFinishedTime ?: return
 
         val diffTime = System.currentTimeMillis().milliseconds - lastTimeHasFinished
 
@@ -178,7 +178,7 @@ class SleepTimer @Inject constructor(
         LogBuffer.i(TAG, "Episode $uuid was marked as end of episode")
         sleepTimerHistory = SleepTimerHistory.AfterEpisode(
             lastEpisodeUuidAutomaticEnded = uuid,
-            lastTimeSleepTimeHasFinished = System.currentTimeMillis().milliseconds,
+            lastFinishedTime = System.currentTimeMillis().milliseconds,
         )
     }
 
@@ -187,7 +187,7 @@ class SleepTimer @Inject constructor(
         val time = System.currentTimeMillis().milliseconds
         sleepTimerHistory = SleepTimerHistory.AfterChapter(
             lastSleepAfterEndOfChapterTime = time,
-            lastTimeSleepTimeHasFinished = time,
+            lastFinishedTime = time,
         )
     }
 

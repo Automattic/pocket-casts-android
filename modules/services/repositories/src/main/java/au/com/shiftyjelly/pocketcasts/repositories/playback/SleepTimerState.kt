@@ -16,24 +16,24 @@ data class SleepTimerState(
 }
 
 sealed interface SleepTimerHistory {
-    val lastTimeSleepTimeHasFinished: Duration?
+    val lastFinishedTime: Duration?
 
     data class AfterTime(
         val lastSleepAfterTime: Duration,
-        override val lastTimeSleepTimeHasFinished: Duration,
+        override val lastFinishedTime: Duration,
     ) : SleepTimerHistory
 
     data class AfterChapter(
         val lastSleepAfterEndOfChapterTime: Duration,
-        override val lastTimeSleepTimeHasFinished: Duration,
+        override val lastFinishedTime: Duration,
     ) : SleepTimerHistory
 
     data class AfterEpisode(
         val lastEpisodeUuidAutomaticEnded: String,
-        override val lastTimeSleepTimeHasFinished: Duration,
+        override val lastFinishedTime: Duration,
     ) : SleepTimerHistory
 
     data object None : SleepTimerHistory {
-        override val lastTimeSleepTimeHasFinished: Duration? = null
+        override val lastFinishedTime: Duration? = null
     }
 }
