@@ -383,8 +383,8 @@ class PodcastManagerImpl @Inject constructor(
         podcastDao.updateAllSubscribedSyncStatus(Podcast.SYNC_STATUS_NOT_SYNCED)
     }
 
-    override fun markAllPodcastsSyncedBlocking() {
-        podcastDao.updateAllSyncStatusBlocking(Podcast.SYNC_STATUS_SYNCED)
+    override suspend fun markAllPodcastsSynced() {
+        podcastDao.updateAllSyncStatus(Podcast.SYNC_STATUS_SYNCED)
     }
 
     override fun clearAllDownloadErrorsBlocking() {

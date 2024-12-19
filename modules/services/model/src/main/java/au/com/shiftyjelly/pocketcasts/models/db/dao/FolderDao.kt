@@ -63,7 +63,7 @@ abstract class FolderDao {
     abstract suspend fun updateSortPosition(sortPosition: Int, uuid: String, syncModified: Long)
 
     @Query("UPDATE folders SET sync_modified = 0")
-    abstract fun updateAllSyncedBlocking()
+    abstract suspend fun updateAllSynced()
 
     @Transaction
     open suspend fun updateSortPositions(folders: List<Folder>, syncModified: Long) {
@@ -73,5 +73,5 @@ abstract class FolderDao {
     }
 
     @Query("SELECT COUNT(*) FROM folders WHERE deleted = 0")
-    abstract fun countBlocking(): Int
+    abstract suspend fun count(): Int
 }
