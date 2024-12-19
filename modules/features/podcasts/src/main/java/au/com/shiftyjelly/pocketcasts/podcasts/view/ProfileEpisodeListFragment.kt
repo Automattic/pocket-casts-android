@@ -425,7 +425,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
 
     private suspend fun updateManageDownloadsCard(downloadedEpisodesSize: Long) {
         binding?.manageDownloadsCard?.apply {
-            isVisible = downloadedEpisodesSize != 0L && isDeviceRunningOnLowStorage()
+            isVisible = downloadedEpisodesSize != 0L && isDeviceRunningOnLowStorage() && settings.shouldShowLowStorageBannerAfterSnooze()
             if (isVisible) {
                 setContent {
                     AppTheme(theme.activeTheme) {
@@ -462,6 +462,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
     }
 
     private fun onDismissManageDownloadTapped() {
+        settings.setDismissLowStorageBannerTime(System.currentTimeMillis())
     }
 
     override fun onMenuItemClick(item: MenuItem): Boolean {
