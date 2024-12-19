@@ -64,8 +64,9 @@ class SleepTimerRestartWhenShakingDevice @Inject constructor(
 
     private fun onDeviceShaken() {
         if (settings.shakeToResetSleepTimer.value) {
-            val time = sleepTimer.restartTimerIfIsRunning onSuccess@{
-                playbackManager.updateSleepTimerStatus(sleepTimeRunning = true)
+            val restartedTime = sleepTimer.restartTimerForSleepAfterTime()
+
+            if (restartedTime != null) {
                 playbackManager.restorePlayerVolume()
 
                 if (context.isAppForeground()) {
@@ -77,10 +78,9 @@ class SleepTimerRestartWhenShakingDevice @Inject constructor(
                 } else {
                     playbackManager.playSleepTimeTone()
                 }
-            }
-            time?.let {
-                LogBuffer.i(SleepTimer.TAG, "Restarted with ${time.inWholeMinutes} minutes set after shaking device")
-                trackSleepTimeRestart(it)
+
+                LogBuffer.i(SleepTimer.TAG, "Restarted with ${restartedTime.inWholeMinutes} minutes set after shaking device")
+                trackSleepTimeRestart(restartedTime)
             }
         }
     }

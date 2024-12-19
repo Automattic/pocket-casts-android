@@ -7,22 +7,20 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.UserPodcastRating
-import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.GiveRatingViewModel.State.Loaded.Stars
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.ratings.PodcastRatingResult
 import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.Date
 import javax.inject.Inject
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
@@ -31,6 +29,7 @@ class GiveRatingViewModel @Inject constructor(
     private val userManager: UserManager,
     private val ratingManager: RatingsManager,
     private val analyticsTracker: AnalyticsTracker,
+    private val syncManager: SyncManager,
 ) : ViewModel() {
 
     private var shouldTrackDismissedEvent = false
@@ -73,25 +72,22 @@ class GiveRatingViewModel @Inject constructor(
     ) {
         _state.value = State.Loading
 
-        viewModelScope.launch {
-            val signInState = userManager.getSignInState().blockingFirst()
-            if (signInState == SignInState.SignedOut) {
-                onUserSignedOut()
-            } else if (signInState is SignInState.SignedIn) {
-                withContext(Dispatchers.IO) {
-                    val countPlayedEpisodes = podcastManager.countPlayedEpisodes(podcastUuid)
+        if (syncManager.isLoggedIn().not()) {
+            onUserSignedOut()
+            return
+        }
 
-                    if (countPlayedEpisodes < NUMBER_OF_EPISODES_LISTENED_REQUIRED_TO_RATE) {
-                        val episodes = podcastManager.countEpisodesByPodcast(podcastUuid)
-                        if (episodes == 1 && countPlayedEpisodes == 1) {
-                            onSuccess() // This is the case an user wants to rate a podcast that has only one episode.
-                        } else {
-                            _state.value = State.NotAllowedToRate(podcastUuid)
-                        }
-                    } else {
-                        onSuccess()
-                    }
+        viewModelScope.launch {
+            val countPlayedEpisodes = podcastManager.countPlayedEpisodes(podcastUuid)
+            if (countPlayedEpisodes < NUMBER_OF_EPISODES_LISTENED_REQUIRED_TO_RATE) {
+                val episodes = podcastManager.countEpisodesByPodcast(podcastUuid)
+                if (episodes == 1 && countPlayedEpisodes == 1) {
+                    onSuccess() // This is the case an user wants to rate a podcast that has only one episode.
+                } else {
+                    _state.value = State.NotAllowedToRate(podcastUuid)
                 }
+            } else {
+                onSuccess()
             }
         }
     }

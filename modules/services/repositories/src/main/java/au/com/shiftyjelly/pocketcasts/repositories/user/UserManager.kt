@@ -23,7 +23,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
-import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.android.tracks.crashlogging.CrashLogging
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -35,10 +34,8 @@ import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.rx2.asFlowable
 import timber.log.Timber
 
 interface UserManager {
@@ -100,7 +97,7 @@ class UserManagerImpl @Inject constructor(
                                 subscriptionManager.getSubscriptionStatus(allowCache = false)
                             }
                         }
-                        .combineLatest(syncManager.emailFlow().map { Optional.of(it) }.asFlowable())
+                        .combineLatest(syncManager.emailFlowable())
                         .map { (status, maybeEmail) ->
                             analyticsTracker.refreshMetadata()
                             SignInState.SignedIn(email = maybeEmail.get() ?: "", subscriptionStatus = status)

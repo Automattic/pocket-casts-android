@@ -3,6 +3,8 @@
 *   Bug Fixes
     *   Fix global auto download setting was incorrectly overriding the podcast auto download setting
         ([#3342](https://github.com/Automattic/pocket-casts-android/pull/3342))
+    *   Fix sleep timer was not stopping as expected
+        ([#3377](https://github.com/Automattic/pocket-casts-android/pull/3377))
 *   Updates
     *   Add the ability to dismiss the low storage banner in download screen
         ([#3385](https://github.com/Automattic/pocket-casts-android/pull/3385))
@@ -16,6 +18,9 @@
         ([#3294](https://github.com/Automattic/pocket-casts-android/pull/3294))
     *   Improve the Up Next clear all button
         ([#3334](https://github.com/Automattic/pocket-casts-android/pull/3334))
+*   Bug Fixes
+    *   Fix podcast ratings not loading
+        ([#3378](https://github.com/Automattic/pocket-casts-android/pull/3378))
 
 7.78
 -----
