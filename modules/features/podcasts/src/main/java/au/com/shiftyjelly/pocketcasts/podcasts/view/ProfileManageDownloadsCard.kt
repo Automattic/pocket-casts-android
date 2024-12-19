@@ -93,7 +93,7 @@ fun ManageDownloadsCard(
         ) {
             Icon(
                 imageVector = Icons.Default.MoreVert,
-                contentDescription = stringResource(LR.string.more_options),
+                contentDescription = stringResource(LR.string.manage_download_more_options_content_description),
                 tint = MaterialTheme.theme.colors.primaryIcon02,
             )
         }
