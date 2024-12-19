@@ -10,7 +10,6 @@ data class PlaybackState(
     val state: State = State.EMPTY,
     val isBuffering: Boolean = false,
     val isPrepared: Boolean = false,
-    val isSleepTimerRunning: Boolean = false,
     val title: String = "",
     val durationMs: Int = -1,
     val positionMs: Int = 0,
@@ -27,7 +26,13 @@ data class PlaybackState(
     val isVolumeBoosted: Boolean = false,
     // when transientLoss is true the foreground service won't be stopped
     val transientLoss: Boolean = false,
+    val lastListenedState: LastListenedState = LastListenedState(),
 ) {
+
+    data class LastListenedState(
+        val chapterUuid: String? = null,
+        val episodeUuid: String? = null,
+    )
 
     enum class State {
         EMPTY, PAUSED, PLAYING, STOPPED, ERROR
@@ -69,7 +74,6 @@ data class PlaybackState(
                 state = state,
                 isBuffering = !episode.isDownloaded && state == State.PLAYING,
                 isPrepared = isPrepared,
-                isSleepTimerRunning = previousPlaybackState?.isSleepTimerRunning ?: false,
                 title = episode.title,
                 durationMs = episode.durationMs,
                 positionMs = episode.playedUpToMs,
@@ -80,6 +84,7 @@ data class PlaybackState(
                 trimMode = playbackEffects.trimMode,
                 isVolumeBoosted = playbackEffects.isVolumeBoosted,
                 lastChangeFrom = lastChangeFrom.value,
+                lastListenedState = previousPlaybackState?.lastListenedState ?: LastListenedState(),
             )
         }
     }

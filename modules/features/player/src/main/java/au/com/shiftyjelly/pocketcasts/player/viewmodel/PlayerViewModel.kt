@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.player.viewmodel
 
 import android.content.Context
+import android.text.format.DateUtils
 import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -34,6 +35,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepTimer
+import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepTimerState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -185,6 +187,7 @@ class PlayerViewModel @Inject constructor(
         chaptersExpandedObservable,
         settings.useRealTimeForPlaybackRemaingTime.flow.asObservable(coroutineContext),
         settings.artworkConfiguration.flow.asObservable(coroutineContext),
+        sleepTimer.stateFlow.asObservable(coroutineContext),
         this::mergeListData,
     )
         .distinctUntilChanged()
@@ -340,6 +343,7 @@ class PlayerViewModel @Inject constructor(
         chaptersExpanded: Boolean,
         adjustRemainingTimeDuration: Boolean,
         artworkConfiguration: ArtworkConfiguration,
+        sleepTimerState: SleepTimerState,
     ): ListData {
         val podcast: Podcast? = (upNextState as? UpNextQueue.State.Loaded)?.podcast
         val episode = (upNextState as? UpNextQueue.State.Loaded)?.episode
@@ -357,7 +361,7 @@ class PlayerViewModel @Inject constructor(
         if (episode == null) {
             podcastHeader = PlayerHeader()
         } else {
-            isSleepRunning.postValue(playbackState.isSleepTimerRunning)
+            isSleepRunning.postValue(sleepTimerState.isSleepTimerRunning)
             val playerBackground = theme.playerBackgroundColor(podcast)
             val iconTintColor = theme.playerHighlightColor(podcast)
 
@@ -374,7 +378,7 @@ class PlayerViewModel @Inject constructor(
                 podcastTitle = if (playbackState.chapters.isEmpty) podcast?.title else null,
                 skipBackwardInSecs = skipBackwardInSecs,
                 skipForwardInSecs = skipForwardInSecs,
-                isSleepRunning = playbackState.isSleepTimerRunning,
+                isSleepRunning = sleepTimerState.isSleepTimerRunning,
                 isEffectsOn = !effects.usingDefaultValues,
                 playbackEffects = effects,
                 adjustRemainingTimeDuration = adjustRemainingTimeDuration,
@@ -591,55 +595,53 @@ class PlayerViewModel @Inject constructor(
     }
 
     fun updateSleepTimer() {
-        val timeLeft = sleepTimer.timeLeftInSecs()
-        if ((sleepTimer.isSleepAfterTimerRunning && timeLeft != null && timeLeft.toInt() > 0) || playbackManager.isSleepAfterEpisodeEnabled()) {
+        val timeLeft = timeLeftInSeconds()
+        if ((sleepTimer.state.isSleepTimerRunning && timeLeft > 0) || playbackManager.isSleepAfterEpisodeEnabled()) {
             isSleepAtEndOfEpisodeOrChapter.postValue(playbackManager.isSleepAfterEpisodeEnabled())
-            sleepTimeLeftText.postValue(if (timeLeft != null && timeLeft > 0) Util.formattedSeconds(timeLeft.toDouble()) else "")
-            setSleepEndOfEpisodes(playbackManager.episodesUntilSleep, shouldCallUpdateTimer = false)
+            sleepTimeLeftText.postValue(if (timeLeft > 0) Util.formattedSeconds(timeLeft.toDouble()) else "")
+            setSleepEndOfEpisodes(sleepTimer.state.numberOfEpisodesLeft, shouldCallUpdateTimer = false)
             sleepingInText.postValue(calcSleepingInEpisodesText())
         } else if (playbackManager.isSleepAfterChapterEnabled()) {
             isSleepAtEndOfEpisodeOrChapter.postValue(playbackManager.isSleepAfterChapterEnabled())
-            setSleepEndOfChapters(playbackManager.chaptersUntilSleep, shouldCallUpdateTimer = false)
+            setSleepEndOfChapters(sleepTimer.state.numberOfChaptersLeft, shouldCallUpdateTimer = false)
             sleepingInText.postValue(calcSleepingInChaptersText())
         } else {
             isSleepAtEndOfEpisodeOrChapter.postValue(false)
-            playbackManager.updateSleepTimerStatus(false)
+            sleepTimer.updateSleepTimerStatus(false)
         }
     }
 
-    fun timeLeftInSeconds(): Int? {
-        return sleepTimer.timeLeftInSecs()
+    fun timeLeftInSeconds(): Int {
+        return (sleepTimer.state.timeLeft.inWholeMilliseconds / DateUtils.SECOND_IN_MILLIS).toInt()
     }
 
     fun sleepTimerAfter(mins: Int) {
+        sleepTimer.sleepAfter(mins.toDuration(DurationUnit.MINUTES))
         LogBuffer.i(SleepTimer.TAG, "Sleep after $mins minutes configured")
-        sleepTimer.sleepAfter(duration = mins.toDuration(DurationUnit.MINUTES)) {
-            playbackManager.updateSleepTimerStatus(sleepTimeRunning = true)
-        }
     }
 
     fun sleepTimerAfterEpisode(episodes: Int = 1) {
         LogBuffer.i(SleepTimer.TAG, "Sleep after $episodes episodes configured")
         settings.setlastSleepEndOfEpisodes(episodes)
-        playbackManager.updateSleepTimerStatus(sleepTimeRunning = true, sleepAfterEpisodes = episodes)
         sleepTimer.cancelTimer()
+        sleepTimer.updateSleepTimerStatus(sleepTimeRunning = true, sleepAfterEpisodes = episodes)
     }
 
     fun sleepTimerAfterChapter(chapters: Int = 1) {
         LogBuffer.i(SleepTimer.TAG, "Sleep after $chapters chapters configured")
         settings.setlastSleepEndOfChapters(chapters)
-        playbackManager.updateSleepTimerStatus(sleepTimeRunning = true, sleepAfterChapters = chapters)
         sleepTimer.cancelTimer()
+        sleepTimer.updateSleepTimerStatus(sleepTimeRunning = true, sleepAfterChapters = chapters)
     }
 
     fun cancelSleepTimer() {
         LogBuffer.i(SleepTimer.TAG, "Cancelled sleep timer")
-        playbackManager.updateSleepTimerStatus(sleepTimeRunning = false)
+        sleepTimer.updateSleepTimerStatus(sleepTimeRunning = false)
         sleepTimer.cancelTimer()
     }
 
     fun sleepTimerAddExtraMins(mins: Int) {
-        sleepTimer.addExtraTime(mins)
+        sleepTimer.addExtraTime(mins.toDuration(DurationUnit.MINUTES))
         updateSleepTimer()
     }
 
