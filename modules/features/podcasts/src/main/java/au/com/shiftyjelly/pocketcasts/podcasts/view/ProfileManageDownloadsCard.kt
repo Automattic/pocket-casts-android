@@ -15,7 +15,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreHoriz
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -92,7 +92,7 @@ fun ManageDownloadsCard(
             modifier = Modifier.size(24.dp),
         ) {
             Icon(
-                imageVector = Icons.Default.MoreHoriz,
+                imageVector = Icons.Default.MoreVert,
                 contentDescription = stringResource(LR.string.more_options),
                 tint = MaterialTheme.theme.colors.primaryIcon02,
             )

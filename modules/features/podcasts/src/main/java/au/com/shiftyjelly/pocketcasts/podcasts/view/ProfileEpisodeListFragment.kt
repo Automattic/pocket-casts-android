@@ -443,13 +443,25 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
                                     analyticsTracker.track(AnalyticsEvent.FREE_UP_SPACE_MANAGE_DOWNLOADS_TAPPED, mapOf("source" to SourceView.DOWNLOADS.analyticsValue))
                                     showFragment(ManualCleanupFragment.newInstance())
                                 },
-                                onMoreOptionsClick = {},
+                                onMoreOptionsClick = {
+                                    onManageDownloadsMoreOptions()
+                                },
                             )
                         }
                     }
                 }
             }
         }
+    }
+
+    private fun onManageDownloadsMoreOptions() {
+        val dialog = OptionsDialog()
+        dialog.setTitle(resources.getString(LR.string.need_to_free_up_space))
+        dialog.addTextOption(LR.string.dismiss_manage_download_banner, click = this::onDismissManageDownloadTapped)
+        dialog.show(parentFragmentManager, "manage_downloads_more_options")
+    }
+
+    private fun onDismissManageDownloadTapped() {
     }
 
     override fun onMenuItemClick(item: MenuItem): Boolean {

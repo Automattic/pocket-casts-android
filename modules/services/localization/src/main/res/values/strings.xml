@@ -2264,6 +2264,7 @@
     <string name="save_space_by_managing_downloaded_episodes">Save %1$s – by managing downloaded episodes.</string>
     <string name="manage_downloads">Manage downloads</string>
     <string name="maybe_later">Maybe Later</string>
+    <string name="dismiss_manage_download_banner">Dismiss</string>
 
     <!-- Up Next Shuffle -->
     <string name="up_next_shuffle_button_content_description">Up Next shuffle</string>
