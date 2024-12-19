@@ -3,6 +3,9 @@
 *   Bug Fixes
     *   Fix global auto download setting was incorrectly overriding the podcast auto download setting
         ([#3342](https://github.com/Automattic/pocket-casts-android/pull/3342))
+*   Updates
+    *   Add the ability to dismiss the low storage banner in download screen
+        ([#3385](https://github.com/Automattic/pocket-casts-android/pull/3385))
 
 7.79
 -----
