@@ -384,7 +384,7 @@ abstract class EpisodeDao {
     }
 
     @Query("UPDATE podcast_episodes SET starred_modified = NULL, archived_modified = NULL, duration_modified = NULL, played_up_to_modified = NULL, playing_status_modified = NULL WHERE uuid IN (:episodeUuids)")
-    abstract fun markAllSyncedBlocking(episodeUuids: List<String>)
+    abstract suspend fun markAllSynced(episodeUuids: List<String>)
 
     @Query("SELECT podcasts.uuid AS uuid, count(podcast_episodes.uuid) AS count FROM podcast_episodes, podcasts WHERE podcast_episodes.podcast_id = podcasts.uuid AND (podcast_episodes.playing_status = :playingStatusNotPlayed OR podcast_episodes.playing_status = :playingStatusInProgress) AND podcast_episodes.archived = 0 GROUP BY podcasts.uuid")
     protected abstract fun podcastToUnfinishedEpisodeCountRxFlowable(playingStatusNotPlayed: Int = EpisodePlayingStatus.NOT_PLAYED.ordinal, playingStatusInProgress: Int = EpisodePlayingStatus.IN_PROGRESS.ordinal): Flowable<List<UuidCount>>

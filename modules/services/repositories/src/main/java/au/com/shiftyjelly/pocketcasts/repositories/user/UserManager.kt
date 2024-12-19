@@ -94,7 +94,7 @@ class UserManagerImpl @Inject constructor(
                             if (value != null) {
                                 Single.just(value)
                             } else {
-                                subscriptionManager.getSubscriptionStatus(allowCache = false)
+                                subscriptionManager.getSubscriptionStatusRxSingle(allowCache = false)
                             }
                         }
                         .combineLatest(syncManager.emailFlowable())

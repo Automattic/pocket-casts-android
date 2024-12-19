@@ -121,18 +121,20 @@ class PodcastSyncProcess(
             }
         }
         val syncUpNextObservable = downloadObservable
-            .andThen(syncSettings(lastSyncTime))
-            .andThen(syncCloudFiles())
-            .andThen(firstSyncChanges())
+            .andThen(rxCompletable { syncSettings(lastSyncTime) })
+            .andThen(rxCompletable { syncCloudFiles() })
+            .andThen(rxCompletable { firstSyncChanges() })
             .andThen(
                 if (Util.isWearOs(context)) {
                     // We don't use the play history on wear os, so we can skip this potentially large call
                     Completable.complete()
                 } else {
-                    syncPlayHistory()
+                    Completable.fromAction {
+                        syncPlayHistory()
+                    }
                 },
             )
-            .andThen(syncRatings())
+            .andThen(rxCompletable { syncRatings() })
         return syncUpNextObservable
             .doOnError { throwable ->
                 crashLogging.sendReport(throwable, message = "Sync failed")
@@ -164,7 +166,7 @@ class PodcastSyncProcess(
         // grab the last sync date before we begin
         return syncManager.getLastSyncAtRxSingle()
             .flatMapCompletable { lastSyncAt ->
-                cacheStats()
+                rxCompletable { cacheStats() }
                     .andThen(downloadAndImportHomeFolder())
                     .andThen(downloadAndImportFilters())
                     .andThen(rxCompletable { downloadAndImportBookmarks() })
@@ -319,46 +321,36 @@ class PodcastSyncProcess(
         }
     }
 
-    private fun syncPlayHistory(): Completable {
-        return Completable.fromAction {
-            val startTime = SystemClock.elapsedRealtime()
-            SyncHistoryTask.scheduleToRun(context)
-            logTime("Refresh - sync play history", startTime)
+    private fun syncPlayHistory() {
+        val startTime = SystemClock.elapsedRealtime()
+        SyncHistoryTask.scheduleToRun(context)
+        logTime("Refresh - sync play history", startTime)
+    }
+
+    private suspend fun syncSettings(lastSyncTime: Instant) {
+        val startTime = SystemClock.elapsedRealtime()
+        SyncSettingsTask.run(settings, lastSyncTime, syncManager)
+        logTime("Refresh - sync settings", startTime)
+    }
+
+    private suspend fun syncCloudFiles() {
+        val status = subscriptionManager.getSubscriptionStatus(allowCache = false)
+        if (status is SubscriptionStatus.Paid) {
+            userEpisodeManager.syncFiles(playbackManager)
         }
     }
 
-    private fun syncSettings(lastSyncTime: Instant): Completable {
-        return rxCompletable {
-            val startTime = SystemClock.elapsedRealtime()
-            SyncSettingsTask.run(settings, lastSyncTime, syncManager)
-            logTime("Refresh - sync settings", startTime)
-        }
-    }
-
-    private fun syncCloudFiles(): Completable {
-        return subscriptionManager.getSubscriptionStatus(allowCache = false)
-            .flatMapCompletable {
-                if (it is SubscriptionStatus.Paid) {
-                    rxCompletable { userEpisodeManager.syncFiles(playbackManager) }
-                } else {
-                    Completable.complete()
-                }
+    private suspend fun syncRatings() {
+        syncManager.getPodcastRatings()?.podcastRatingsList
+            ?.mapNotNull { rating ->
+                val modifiedAt = rating.modifiedAt.toDate() ?: return@mapNotNull null
+                UserPodcastRating(
+                    podcastUuid = rating.podcastUuid,
+                    rating = rating.podcastRating,
+                    modifiedAt = modifiedAt,
+                )
             }
-    }
-
-    private fun syncRatings(): Completable {
-        return rxCompletable {
-            syncManager.getPodcastRatings()?.podcastRatingsList
-                ?.mapNotNull { rating ->
-                    val modifiedAt = rating.modifiedAt.toDate() ?: return@mapNotNull null
-                    UserPodcastRating(
-                        podcastUuid = rating.podcastUuid,
-                        rating = rating.podcastRating,
-                        modifiedAt = modifiedAt,
-                    )
-                }
-                ?.let { ratingsManager.updateUserRatings(it) }
-        }
+            ?.let { ratingsManager.updateUserRatings(it) }
     }
 
     private fun uploadChanges(): Pair<String, List<PodcastEpisode>> {
@@ -379,7 +371,7 @@ class PodcastSyncProcess(
 
     private fun uploadFolderChanges(records: JSONArray) {
         try {
-            val folders = folderManager.findFoldersToSync()
+            val folders = folderManager.findFoldersToSyncBlocking()
             for (folder in folders) {
                 val fields = JSONObject()
 
@@ -632,7 +624,7 @@ class PodcastSyncProcess(
             return Single.error(Exception("Server response doesn't return a last modified"))
         }
         // import episodes first so that newly added podcasts get their own episodes from the server.
-        return markAllLocalItemsSynced(episodes)
+        return rxCompletable { markAllLocalItemsSynced(episodes) }
             .andThen(importEpisodes(response.episodes))
             .andThen(importPodcasts(response.podcasts))
             .andThen(importFilters(response.playlists))
@@ -640,33 +632,27 @@ class PodcastSyncProcess(
             .andThen(rxCompletable { importBookmarks(response.bookmarks) })
             .andThen(updateSettings(response))
             .andThen(updateShortcuts(response.playlists))
-            .andThen(cacheStats())
+            .andThen(rxCompletable { cacheStats() })
             .toSingle { response.lastModified }
     }
 
-    private fun cacheStats(): Completable {
-        return rxCompletable {
-            statsManager.cacheMergedStats()
-            statsManager.setSyncStatus(true)
-        }
+    private suspend fun cacheStats() {
+        statsManager.cacheMergedStats()
+        statsManager.setSyncStatus(true)
     }
 
-    private fun markAllLocalItemsSynced(episodes: List<PodcastEpisode>): Completable {
-        return Completable.fromAction {
-            podcastManager.markAllPodcastsSyncedBlocking()
-            episodeManager.markAllEpisodesSyncedBlocking(episodes)
-            playlistManager.markAllSyncedBlocking()
-            folderManager.markAllSynced()
-        }
+    private suspend fun markAllLocalItemsSynced(episodes: List<PodcastEpisode>) {
+        podcastManager.markAllPodcastsSynced()
+        episodeManager.markAllEpisodesSynced(episodes)
+        playlistManager.markAllSynced()
+        folderManager.markAllSynced()
     }
 
-    private fun firstSyncChanges(): Completable {
-        return Completable.fromAction {
-            val firstSync = settings.isFirstSyncRun()
-            if (firstSync) {
-                runBlocking { fileStorage.fixBrokenFiles(episodeManager) }
-                settings.setFirstSyncRun(false)
-            }
+    private suspend fun firstSyncChanges() {
+        val firstSync = settings.isFirstSyncRun()
+        if (firstSync) {
+            fileStorage.fixBrokenFiles(episodeManager)
+            settings.setFirstSyncRun(false)
         }
     }
 

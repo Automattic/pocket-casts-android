@@ -42,8 +42,6 @@ import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import java.util.Date
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -56,6 +54,7 @@ import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.rx2.await
+import kotlinx.coroutines.rx2.rxSingle
 import timber.log.Timber
 
 private const val SUBSCRIPTION_REPLACEMENT_MODE_NOT_SET = -1
@@ -116,34 +115,35 @@ class SubscriptionManagerImpl @Inject constructor(
         }.distinctUntilChanged()
     }
 
-    override fun getSubscriptionStatus(allowCache: Boolean): Single<SubscriptionStatus> {
+    override fun getSubscriptionStatusRxSingle(allowCache: Boolean): Single<SubscriptionStatus> {
+        return rxSingle {
+            getSubscriptionStatus(allowCache)
+        }
+    }
+
+    override suspend fun getSubscriptionStatus(allowCache: Boolean): SubscriptionStatus {
         val cache = cachedSubscriptionStatus
         if (cache != null && allowCache) {
-            return Single.just(cache)
+            return cache
         }
 
-        return syncManager.subscriptionStatusRxSingle()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .map {
-                it.toStatus()
-            }
-            .doOnSuccess {
-                subscriptionStatus.accept(Optional.of(it))
-                val oldStatus = cachedSubscriptionStatus
-                if (oldStatus != it) {
-                    if (it is SubscriptionStatus.Paid && oldStatus is SubscriptionStatus.Free) {
-                        subscriptionChangedEvents.accept(SubscriptionChangedEvent.AccountUpgradedToPlus)
-                    } else if (it is SubscriptionStatus.Free && oldStatus is SubscriptionStatus.Paid) {
-                        subscriptionChangedEvents.accept(SubscriptionChangedEvent.AccountDowngradedToFree)
-                    }
-                }
-                cachedSubscriptionStatus = it
+        val status = syncManager.subscriptionStatus().toStatus()
 
-                if (!it.isPocketCastsChampion && it is SubscriptionStatus.Paid && it.platform == SubscriptionPlatform.GIFT) { // This account is a trial account
-                    settings.setTrialFinishedSeen(false) // Make sure on expiry we show the trial finished dialog
-                }
+        subscriptionStatus.accept(Optional.of(status))
+        val oldStatus = cachedSubscriptionStatus
+        if (oldStatus != status) {
+            if (status is SubscriptionStatus.Paid && oldStatus is SubscriptionStatus.Free) {
+                subscriptionChangedEvents.accept(SubscriptionChangedEvent.AccountUpgradedToPlus)
+            } else if (status is SubscriptionStatus.Free && oldStatus is SubscriptionStatus.Paid) {
+                subscriptionChangedEvents.accept(SubscriptionChangedEvent.AccountDowngradedToFree)
             }
+        }
+        cachedSubscriptionStatus = status
+
+        if (!status.isPocketCastsChampion && status is SubscriptionStatus.Paid && status.platform == SubscriptionPlatform.GIFT) { // This account is a trial account
+            settings.setTrialFinishedSeen(false) // Make sure on expiry we show the trial finished dialog
+        }
+        return status
     }
 
     override fun connectToGooglePlay(context: Context) {

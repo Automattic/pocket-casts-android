@@ -162,7 +162,7 @@ abstract class PodcastDao {
     }
 
     @Query("UPDATE podcasts SET sync_status = :syncStatus")
-    abstract fun updateAllSyncStatusBlocking(syncStatus: Int)
+    abstract suspend fun updateAllSyncStatus(syncStatus: Int)
 
     @Query("UPDATE podcasts SET sync_status = :syncStatus WHERE subscribed = 1")
     abstract suspend fun updateAllSubscribedSyncStatus(syncStatus: Int)

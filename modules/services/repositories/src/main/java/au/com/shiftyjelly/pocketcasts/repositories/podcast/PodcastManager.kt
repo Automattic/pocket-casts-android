@@ -94,7 +94,7 @@ interface PodcastManager {
     suspend fun updateFolderUuid(folderUuid: String?, podcastUuids: List<String>)
 
     fun markPodcastUuidAsNotSyncedBlocking(podcastUuid: String)
-    fun markAllPodcastsSyncedBlocking()
+    suspend fun markAllPodcastsSynced()
     suspend fun markAllPodcastsUnsynced()
 
     fun clearAllDownloadErrorsBlocking()

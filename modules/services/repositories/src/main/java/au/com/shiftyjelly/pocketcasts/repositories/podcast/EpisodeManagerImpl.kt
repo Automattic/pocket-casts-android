@@ -879,10 +879,10 @@ class EpisodeManagerImpl @Inject constructor(
         return episodeDao.findEpisodesForHistorySyncBlocking()
     }
 
-    override fun markAllEpisodesSyncedBlocking(episodes: List<PodcastEpisode>) {
+    override suspend fun markAllEpisodesSynced(episodes: List<PodcastEpisode>) {
         val episodeUuids = episodes.map { it.uuid }
         episodeUuids.chunked(500).forEach { chunked ->
-            episodeDao.markAllSyncedBlocking(chunked)
+            episodeDao.markAllSynced(chunked)
         }
     }
 

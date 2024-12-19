@@ -91,7 +91,7 @@ class PodcastSyncProcessTest {
             whenever(playlistManager.findPlaylistsToSyncBlocking()).thenReturn(emptyList())
 
             val folderManager: FolderManager = mock()
-            whenever(folderManager.findFoldersToSync()).thenReturn(emptyList())
+            whenever(folderManager.findFoldersToSyncBlocking()).thenReturn(emptyList())
 
             val bookmarkManager = BookmarkManagerImpl(appDatabase = appDatabase, AnalyticsTracker.test())
             val bookmarkToUpdate = bookmarkManager.add(

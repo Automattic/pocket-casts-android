@@ -43,7 +43,7 @@ interface EpisodeManager {
 
     fun findEpisodesToSyncBlocking(): List<PodcastEpisode>
     fun findEpisodesForHistorySyncBlocking(): List<PodcastEpisode>
-    fun markAllEpisodesSyncedBlocking(episodes: List<PodcastEpisode>)
+    suspend fun markAllEpisodesSynced(episodes: List<PodcastEpisode>)
 
     fun findEpisodesDownloadingBlocking(queued: Boolean = true, waitingForPower: Boolean = true, waitingForWifi: Boolean = true, downloading: Boolean = true): List<PodcastEpisode>
 

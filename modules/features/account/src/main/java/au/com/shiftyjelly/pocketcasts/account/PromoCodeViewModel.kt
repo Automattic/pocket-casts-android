@@ -39,7 +39,7 @@ class PromoCodeViewModel @Inject constructor(
     fun setup(code: String, context: Context) {
         val signedInFlow = Single.defer<ViewState> { syncManager.redeemPromoCodeRxSingle(code).map { ViewState.Success(it) } }
             .flatMap { viewState ->
-                subscriptionManager.getSubscriptionStatus(allowCache = false).map { viewState } // Force reloading of the new subscription status
+                subscriptionManager.getSubscriptionStatusRxSingle(allowCache = false).map { viewState } // Force reloading of the new subscription status
             }
             .observeOn(AndroidSchedulers.mainThread())
             .onErrorReturn(errorHandler(isSignedIn = true, resources = context.resources))

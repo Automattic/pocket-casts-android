@@ -23,7 +23,8 @@ interface SubscriptionManager {
     fun observePurchaseEvents(): Flowable<PurchaseEvent>
     fun observeSubscriptionStatus(): Flowable<Optional<SubscriptionStatus>>
     fun subscriptionTier(): Flow<SubscriptionTier>
-    fun getSubscriptionStatus(allowCache: Boolean = true): Single<SubscriptionStatus>
+    fun getSubscriptionStatusRxSingle(allowCache: Boolean = true): Single<SubscriptionStatus>
+    suspend fun getSubscriptionStatus(allowCache: Boolean = true): SubscriptionStatus
     fun connectToGooglePlay(context: Context)
     fun loadProducts()
     fun onPurchasesUpdated(billingResult: BillingResult, purchases: MutableList<Purchase>?)

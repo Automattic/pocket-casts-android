@@ -151,12 +151,12 @@ class FolderManagerImpl @Inject constructor(
         updatePositions(folders)
     }
 
-    override fun findFoldersToSync(): List<Folder> {
+    override fun findFoldersToSyncBlocking(): List<Folder> {
         return folderDao.findNotSyncedBlocking()
     }
 
-    override fun markAllSynced() {
-        folderDao.updateAllSyncedBlocking()
+    override suspend fun markAllSynced() {
+        folderDao.updateAllSynced()
     }
 
     override suspend fun getHomeFolder(): List<FolderItem> {
@@ -165,7 +165,7 @@ class FolderManagerImpl @Inject constructor(
         val podcasts = if (sortType == EPISODE_DATE_NEWEST_TO_OLDEST) {
             podcastManager.findPodcastsOrderByLatestEpisode(orderAsc = false)
         } else {
-            podcastManager.findSubscribedBlocking()
+            podcastManager.findSubscribedNoOrder()
         }
         val folders = folderDao.findFolders()
         val folderItems = combineFoldersPodcasts(folders, podcasts)
@@ -208,5 +208,5 @@ class FolderManagerImpl @Inject constructor(
         return podcasts.sortedWith(folder.podcastsSortType.podcastComparator)
     }
 
-    override fun countFolders() = folderDao.countBlocking()
+    override suspend fun countFolders() = folderDao.count()
 }

@@ -533,7 +533,7 @@ class PlaylistManagerImpl @Inject constructor(
         )
     }
 
-    override fun markAllSyncedBlocking() {
-        playlistDao.updateAllSyncStatusBlocking(Playlist.SYNC_STATUS_SYNCED)
+    override suspend fun markAllSynced() {
+        playlistDao.updateAllSyncStatus(Playlist.SYNC_STATUS_SYNCED)
     }
 }

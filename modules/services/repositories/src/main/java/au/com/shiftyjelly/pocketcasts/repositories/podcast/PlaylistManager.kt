@@ -48,7 +48,7 @@ interface PlaylistManager {
 
     fun getSystemDownloadsFilter(): Playlist
 
-    fun markAllSyncedBlocking()
+    suspend fun markAllSynced()
 
     fun updateAllBlocking(playlists: List<Playlist>)
     fun observeEpisodesPreviewBlocking(playlist: Playlist, episodeManager: EpisodeManager, playbackManager: PlaybackManager): Flowable<List<PodcastEpisode>>
