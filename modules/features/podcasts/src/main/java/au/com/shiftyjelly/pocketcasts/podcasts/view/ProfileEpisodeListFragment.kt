@@ -456,10 +456,10 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
     }
 
     private fun onManageDownloadsMoreOptions() {
-        val dialog = OptionsDialog()
-        dialog.setTitle(resources.getString(LR.string.need_to_free_up_space))
-        dialog.addTextOption(LR.string.dismiss_manage_download_banner, click = this::onDismissManageDownloadTapped)
-        dialog.show(parentFragmentManager, "manage_downloads_more_options")
+        OptionsDialog()
+            .setTitle(resources.getString(LR.string.need_to_free_up_space))
+            .addTextOption(LR.string.dismiss_manage_download_banner, click = this::onDismissManageDownloadTapped)
+            .show(parentFragmentManager, "manage_downloads_more_options")
     }
 
     private fun onDismissManageDownloadTapped() {
