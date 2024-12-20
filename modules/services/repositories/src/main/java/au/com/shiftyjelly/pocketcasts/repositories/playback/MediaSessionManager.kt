@@ -536,6 +536,7 @@ class MediaSessionManager(
             if (Intent.ACTION_MEDIA_BUTTON == mediaButtonEvent.action) {
                 val keyEvent = IntentCompat.getParcelableExtra(mediaButtonEvent, Intent.EXTRA_KEY_EVENT, KeyEvent::class.java)
                     ?: return false
+                logEvent(keyEvent.toString())
                 if (keyEvent.action == KeyEvent.ACTION_DOWN) {
                     when (keyEvent.keyCode) {
                         KeyEvent.KEYCODE_HEADSETHOOK -> {
@@ -552,6 +553,8 @@ class MediaSessionManager(
                         }
                     }
                 }
+            } else {
+                logEvent("onMediaButtonEvent(${mediaButtonEvent.action ?: "unknown action"})")
             }
 
             return super.onMediaButtonEvent(mediaButtonEvent)
@@ -665,11 +668,19 @@ class MediaSessionManager(
         }
 
         override fun onSkipToPrevious() {
+            onRewind()
+        }
+
+        override fun onSkipToNext() {
+            onFastForward()
+        }
+
+        override fun onRewind() {
             logEvent("skip backwards")
             enqueueCommand("skip backwards") { playbackManager.skipBackwardSuspend(sourceView = source) }
         }
 
-        override fun onSkipToNext() {
+        override fun onFastForward() {
             logEvent("skip forwards")
             enqueueCommand("skip forwards") { playbackManager.skipForwardSuspend(sourceView = source) }
         }
