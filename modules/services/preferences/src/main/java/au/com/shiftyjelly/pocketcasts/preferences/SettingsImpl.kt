@@ -339,6 +339,22 @@ class SettingsImpl @Inject constructor(
         return timeSinceDismiss >= 7.days
     }
 
+    override fun setDismissLowStorageBannerTime(lastUpdateTime: Long) {
+        sharedPreferences.edit {
+            putLong(Settings.LAST_DISMISS_LOW_STORAGE_BANNER_TIME, lastUpdateTime)
+        }
+    }
+
+    override fun shouldShowLowStorageBannerAfterSnooze(): Boolean {
+        val lastSnoozeTime = sharedPreferences.getLong(Settings.LAST_DISMISS_LOW_STORAGE_BANNER_TIME, 0)
+
+        if (lastSnoozeTime == 0L) return true
+
+        val timeSinceDismiss = (System.currentTimeMillis() - lastSnoozeTime).milliseconds
+
+        return timeSinceDismiss >= 14.days
+    }
+
     override fun getRefreshState(): RefreshState? {
         return refreshStateObservable.value
     }

@@ -74,6 +74,7 @@ interface Settings {
         const val SYNC_API_MODEL = "mobile"
         const val LAST_UPDATE_TIME = "LastUpdateTime"
         const val LAST_DISMISS_LOW_STORAGE_MODAL_TIME = "LastDismissLowStorageModalTime"
+        const val LAST_DISMISS_LOW_STORAGE_BANNER_TIME = "LastDismissLowStorageBannerTime"
         const val PREFERENCE_SKIP_FORWARD = "skipForward"
         const val PREFERENCE_SKIP_BACKWARD = "skipBack"
         const val PREFERENCE_STORAGE_CHOICE = "storageChoice"
@@ -326,6 +327,9 @@ interface Settings {
 
     fun setDismissLowStorageModalTime(lastUpdateTime: Long)
     fun shouldShowLowStorageModalAfterSnooze(): Boolean
+
+    fun setDismissLowStorageBannerTime(lastUpdateTime: Long)
+    fun shouldShowLowStorageBannerAfterSnooze(): Boolean
 
     val hideNotificationOnPause: UserSetting<Boolean>
 

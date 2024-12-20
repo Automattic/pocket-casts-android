@@ -10,6 +10,9 @@
         ([#3387](https://github.com/Automattic/pocket-casts-android/pull/3387))
     *   Fix sleep timer was not stopping as expected
         ([#3377](https://github.com/Automattic/pocket-casts-android/pull/3377))
+*   Updates
+    *   Add the ability to dismiss the low storage banner in download screen
+        ([#3385](https://github.com/Automattic/pocket-casts-android/pull/3385))
 
 7.79
 -----
