@@ -94,7 +94,7 @@ private fun WaitText(
     textFactory: HumaneTextFactory,
 ) {
     ScrollingRow(
-        items = listOf("WAIT", "ATTENDEZ", "ESPERA", "ASPETTARE", "AGARDA"),
+        items = listOf("WAIT", "ATTENDEZ", "ESPERA", "ASPETTA", "AGARDA"),
         scrollDirection = scrollDirection,
     ) { text ->
         Row(
