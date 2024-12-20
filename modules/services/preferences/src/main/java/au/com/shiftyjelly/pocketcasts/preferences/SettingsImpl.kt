@@ -340,9 +340,9 @@ class SettingsImpl @Inject constructor(
     }
 
     override fun setDismissLowStorageBannerTime(lastUpdateTime: Long) {
-        val editor = sharedPreferences.edit()
-        editor.putLong(Settings.LAST_DISMISS_LOW_STORAGE_BANNER_TIME, lastUpdateTime)
-        editor.apply()
+        sharedPreferences.edit {
+            putLong(Settings.LAST_DISMISS_LOW_STORAGE_BANNER_TIME, lastUpdateTime)
+        }
     }
 
     override fun shouldShowLowStorageBannerAfterSnooze(): Boolean {
