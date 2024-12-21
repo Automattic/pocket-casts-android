@@ -8,7 +8,7 @@
         ([#3342](https://github.com/Automattic/pocket-casts-android/pull/3342))
     *   Fix sleep timer was not stopping as expected
         ([#3377](https://github.com/Automattic/pocket-casts-android/pull/3377))
-    *   Added logging to debug Galaxy Watch skip issues
+    *   Fix Galaxy Watch playback skip issues
         ([#3388](https://github.com/Automattic/pocket-casts-android/pull/3388))
 
 7.79
