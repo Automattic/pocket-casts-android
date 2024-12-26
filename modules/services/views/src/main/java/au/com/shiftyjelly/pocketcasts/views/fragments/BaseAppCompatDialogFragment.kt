@@ -6,7 +6,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatDialogFragment
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
-import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
+import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -18,7 +18,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 @AndroidEntryPoint
 open class BaseAppCompatDialogFragment : AppCompatDialogFragment(), CoroutineScope {
 
-    open val statusBarColor: StatusBarColor? = StatusBarColor.Light
+    open val statusBarIconColor: StatusBarIconColor? = StatusBarIconColor.Theme
 
     @Inject
     lateinit var theme: Theme
@@ -34,12 +34,11 @@ open class BaseAppCompatDialogFragment : AppCompatDialogFragment(), CoroutineSco
         view.isClickable = true
 
         val activity = activity
-        val statusBarColor = statusBarColor
-        if (activity != null && statusBarColor != null) {
-            theme.updateWindowStatusBar(
+        val statusBarIconColor = statusBarIconColor
+        if (activity != null && statusBarIconColor != null) {
+            theme.updateWindowStatusBarIcons(
                 window = activity.window,
-                statusBarColor = statusBarColor,
-                context = activity,
+                statusBarIconColor = statusBarIconColor,
             )
         }
     }

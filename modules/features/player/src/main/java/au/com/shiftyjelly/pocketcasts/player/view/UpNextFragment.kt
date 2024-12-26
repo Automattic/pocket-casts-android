@@ -34,7 +34,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
-import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
+import au.com.shiftyjelly.pocketcasts.ui.helper.NavigationBarColor
+import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.hideShadow
@@ -118,13 +119,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         get() = arguments?.getString(ARG_SOURCE)?.let { UpNextSource.fromString(it) } ?: UpNextSource.UNKNOWN
 
     val overrideTheme: Theme.ThemeType
-        get() = if (settings.useDarkUpNextTheme.value &&
-            upNextSource != UpNextSource.UP_NEXT_TAB
-        ) {
-            Theme.ThemeType.DARK
-        } else {
-            theme.activeTheme
-        }
+        get() = theme.getUpNextTheme(isFullScreen = upNextSource != UpNextSource.UP_NEXT_TAB)
 
     val multiSelectListener = object : MultiSelectHelper.Listener<BaseEpisode> {
         override fun multiSelectSelectAll() {
@@ -249,12 +244,8 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
 
     private fun updateStatusAndNavColors() {
         activity?.let {
-            theme.setNavigationBarColor(it.window, true, ThemeColor.primaryUi03(overrideTheme))
-            theme.updateWindowStatusBar(
-                it.window,
-                StatusBarColor.Custom(ThemeColor.secondaryUi01(overrideTheme), overrideTheme.darkTheme),
-                it,
-            )
+            theme.updateWindowNavigationBarColor(window = it.window, navigationBarColor = NavigationBarColor.UpNext(isFullScreen = true))
+            theme.updateWindowStatusBarIcons(window = it.window, statusBarIconColor = StatusBarIconColor.Theme)
         }
     }
 

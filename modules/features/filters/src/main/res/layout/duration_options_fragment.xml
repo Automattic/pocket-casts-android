@@ -1,17 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
     android:background="?attr/primary_ui_01"
     android:clickable="true"
     android:focusable="true">
+
+    <au.com.shiftyjelly.pocketcasts.views.component.StatusBarSpacer
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="?attr/secondary_ui_01" />
+
+    <ImageButton
+        android:id="@+id/btnClose"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/close"
+        android:src="@drawable/ic_cancel"
+        app:tint="?attr/primary_icon_01" />
+
     <ScrollView
         android:id="@+id/scrollView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingBottom="60dp"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:clipToPadding="false">
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -85,6 +103,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="30dp"
                 android:layout_marginEnd="8dp"
+                android:layout_marginBottom="32dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/stepperShorterThan"
                 app:layout_constraintTop_toBottomOf="@+id/lblLongerThan"
@@ -104,23 +123,14 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 
-    <ImageButton
-        android:id="@+id/btnClose"
-        android:layout_width="28dp"
-        android:layout_height="28dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="20dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="@string/close"
-        android:src="@drawable/ic_cancel"
-        android:tint="?attr/primary_icon_01" />
-
-    <FrameLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:elevation="16dp"
         android:layout_gravity="bottom"
-        android:padding="16dp"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="16dp"
         android:clipToPadding="false"
         android:clipChildren="false"
         android:background="?attr/primary_ui_01">
@@ -131,5 +141,10 @@
             android:textAllCaps="false"
             android:text="@string/filters_update_filter"
             style="@style/PCButton"/>
-    </FrameLayout>
-</FrameLayout>
+
+        <au.com.shiftyjelly.pocketcasts.views.component.NavigationBarSpacer
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="?attr/primary_ui_01" />
+    </LinearLayout>
+</LinearLayout>

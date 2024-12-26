@@ -1,13 +1,12 @@
 package au.com.shiftyjelly.pocketcasts.views.extensions
 
-import android.graphics.Rect
 import android.util.TypedValue
 import android.view.View
-import android.view.ViewGroup
-import android.view.animation.Animation
-import android.view.animation.Transformation
 import androidx.appcompat.widget.Toolbar
-import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
+import androidx.core.view.updatePadding
 import au.com.shiftyjelly.pocketcasts.views.R
 
 fun View.showIf(show: Boolean) {
@@ -41,13 +40,6 @@ fun View.isInvisible() = visibility == View.INVISIBLE
 
 fun View.isHidden() = visibility == View.GONE
 
-fun View.getPositionRectFromContainer(viewGroup: ViewGroup): Rect {
-    val offsetViewBounds = Rect()
-    this.getDrawingRect(offsetViewBounds)
-    viewGroup.offsetDescendantRectToMyCoords(this, offsetViewBounds)
-    return offsetViewBounds
-}
-
 fun View.setRippleBackground(borderless: Boolean = false) {
     val resId = if (borderless) android.R.attr.selectableItemBackgroundBorderless else android.R.attr.selectableItemBackground
     val outValue = TypedValue()
@@ -55,56 +47,70 @@ fun View.setRippleBackground(borderless: Boolean = false) {
     this.setBackgroundResource(outValue.resourceId)
 }
 
-fun View.setRippleForeground(borderless: Boolean = false) {
-    val resId = if (borderless) android.R.attr.selectableItemBackgroundBorderless else android.R.attr.selectableItemBackground
-    val outValue = TypedValue()
-    context.theme.resolveAttribute(resId, outValue, true)
-    foreground = ContextCompat.getDrawable(context, outValue.resourceId)
-}
+fun View.setSystemWindowInsetToPadding(
+    left: Boolean = false,
+    top: Boolean = false,
+    right: Boolean = false,
+    bottom: Boolean = false,
+    consumeInsets: Boolean = false,
+) {
+    ViewCompat.setOnApplyWindowInsetsListener(this) { view, windowInsets ->
+        val insets = windowInsets.getInsets(
+            WindowInsetsCompat.Type.systemBars() or
+                WindowInsetsCompat.Type.displayCutout(),
+        )
 
-fun View.expand() {
-    measure(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-    val targtetHeight = measuredHeight
+        view.updatePadding(
+            left = if (left) insets.left else paddingLeft,
+            top = if (top) insets.top else paddingTop,
+            right = if (right) insets.right else paddingRight,
+            bottom = if (bottom) insets.bottom else paddingBottom,
+        )
 
-    layoutParams.height = 0
-    visibility = View.VISIBLE
-    val animation = object : Animation() {
-        override fun applyTransformation(interpolatedTime: Float, t: Transformation) {
-            layoutParams.height = if (interpolatedTime == 1f) {
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            } else {
-                (targtetHeight * interpolatedTime).toInt()
-            }
-            requestLayout()
-        }
-
-        override fun willChangeBounds(): Boolean {
-            return true
-        }
-    }
-
-    animation.duration = (targtetHeight / context.resources.displayMetrics.density).toInt().toLong()
-    startAnimation(animation)
-}
-
-fun View.collapse() {
-    val initialHeight = measuredHeight
-
-    val animation = object : Animation() {
-        override fun applyTransformation(interpolatedTime: Float, t: Transformation) {
-            if (interpolatedTime == 1f) {
-                visibility = View.GONE
-            } else {
-                layoutParams.height = initialHeight - (initialHeight * interpolatedTime).toInt()
-                requestLayout()
-            }
-        }
-
-        override fun willChangeBounds(): Boolean {
-            return true
+        if (consumeInsets) {
+            ViewCompat.onApplyWindowInsets(
+                view,
+                windowInsets.inset(
+                    if (left) insets.left else 0,
+                    if (top) insets.top else 0,
+                    if (right) insets.right else 0,
+                    if (bottom) insets.bottom else 0,
+                ),
+            )
+        } else {
+            windowInsets
         }
     }
+}
 
-    animation.duration = (initialHeight / context.resources.displayMetrics.density).toInt().toLong()
-    startAnimation(animation)
+fun View.setSystemWindowInsetToHeight(
+    top: Boolean = false,
+    bottom: Boolean = false,
+    consumeInsets: Boolean = false,
+) {
+    ViewCompat.setOnApplyWindowInsetsListener(this) { view, windowInsets ->
+        val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+
+        view.updateLayoutParams {
+            height = when {
+                top -> insets.top
+                bottom -> insets.bottom
+                else -> 0
+            }
+        }
+
+        if (consumeInsets) {
+            ViewCompat.onApplyWindowInsets(
+                view,
+                windowInsets.inset(
+                    0,
+                    if (top) insets.top else 0,
+                    0,
+                    if (bottom) insets.bottom else 0,
+                ),
+            )
+        } else {
+            windowInsets
+        }
+    }
 }

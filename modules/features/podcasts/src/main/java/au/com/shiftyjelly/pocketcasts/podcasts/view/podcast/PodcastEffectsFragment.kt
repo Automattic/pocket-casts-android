@@ -17,16 +17,15 @@ import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastEffectsViewModel
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getTintedDrawable
-import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
+import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.views.extensions.includeStatusBarPadding
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
-import au.com.shiftyjelly.pocketcasts.views.extensions.updateColors
-import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
+import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.images.R as IR
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
@@ -43,6 +42,7 @@ class PodcastEffectsFragment : PreferenceFragmentCompat() {
     private var preferenceTrimMode: ListPreference? = null
 
     private val viewModel: PodcastEffectsViewModel by viewModels()
+    private var toolbar: Toolbar? = null
 
     companion object {
         const val ARG_PODCAST_UUID = "ARG_PODCAST_UUID"
@@ -64,6 +64,11 @@ class PodcastEffectsFragment : PreferenceFragmentCompat() {
         viewModel.loadPodcast(podcastUuid)
     }
 
+    override fun onDestroyView() {
+        toolbar = null
+        super.onDestroyView()
+    }
+
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preferences_podcast_effects, rootKey)
 
@@ -80,15 +85,8 @@ class PodcastEffectsFragment : PreferenceFragmentCompat() {
         view.setBackgroundColor(view.context.getThemeColor(UR.attr.primary_ui_01))
         view.isClickable = true
 
-        val toolbar = view.findViewById<Toolbar>(R.id.toolbar)
-
-        toolbar.setup(
-            title = getString(LR.string.podcast_playback_effects),
-            navigationIcon = NavigationIcon.BackArrow,
-            activity = activity,
-            theme = theme,
-            toolbarColors = ToolbarColors.theme(theme = theme, context = toolbar.context),
-        )
+        toolbar = view.findViewById(R.id.toolbar)
+        toolbar?.includeStatusBarPadding()
 
         preferencePlaybackSpeed?.isVisible = false
         preferenceTrimSilence?.isVisible = false
@@ -96,12 +94,24 @@ class PodcastEffectsFragment : PreferenceFragmentCompat() {
         preferenceTrimMode?.isVisible = false
 
         viewModel.podcast.observe(viewLifecycleOwner) { podcast ->
+            val context = context ?: return@observe
 
             val colors = ToolbarColors.podcast(podcast = podcast, theme = theme)
 
             updateTintColor(colors.iconColor)
-            toolbar.updateColors(toolbarColors = colors, navigationIcon = NavigationIcon.BackArrow)
-            theme.updateWindowStatusBar(window = requireActivity().window, statusBarColor = StatusBarColor.Custom(colors.backgroundColor, true), context = requireContext())
+            toolbar?.setup(
+                title = podcast.title,
+                navigationIcon = BackArrow,
+                toolbarColors = colors,
+                theme = theme,
+                activity = activity,
+                includeStatusBarPadding = false,
+            )
+
+            theme.updateWindowStatusBarIcons(
+                window = requireActivity().window,
+                statusBarIconColor = StatusBarIconColor.Theme,
+            )
 
             preferenceCustomForPodcast?.isChecked = podcast.overrideGlobalEffects
 

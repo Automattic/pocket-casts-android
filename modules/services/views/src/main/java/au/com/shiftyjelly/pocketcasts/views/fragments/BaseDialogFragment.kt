@@ -13,7 +13,8 @@ import androidx.core.view.doOnLayout
 import androidx.navigation.NavHostController
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
-import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
+import au.com.shiftyjelly.pocketcasts.ui.helper.NavigationBarColor
+import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -28,7 +29,8 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 @AndroidEntryPoint
 open class BaseDialogFragment : BottomSheetDialogFragment(), CoroutineScope {
 
-    open val statusBarColor: StatusBarColor? = StatusBarColor.Light
+    open val statusBarIconColor: StatusBarIconColor = StatusBarIconColor.Theme
+    open val navigationBarColor: NavigationBarColor = NavigationBarColor.Theme
 
     private var isBeingDragged = false
     private val dismissCallback = object : BottomSheetBehavior.BottomSheetCallback() {
@@ -51,10 +53,9 @@ open class BaseDialogFragment : BottomSheetDialogFragment(), CoroutineScope {
         }
         view.isClickable = true
 
-        val activity = activity
-        val statusBarColor = statusBarColor
-        if (activity != null && statusBarColor != null) {
-            theme.updateWindowStatusBar(window = activity.window, statusBarColor = statusBarColor, context = activity)
+        dialog?.window?.let { window ->
+            theme.updateWindowStatusBarIcons(window = window, statusBarIconColor = statusBarIconColor)
+            theme.updateWindowNavigationBarColor(window = window, navigationBarColor = navigationBarColor)
         }
 
         view.doOnLayout {
@@ -121,11 +122,9 @@ open class BaseDialogFragment : BottomSheetDialogFragment(), CoroutineScope {
         @ColorInt navigationBar: Int,
     ) {
         requireActivity().window?.let { activityWindow ->
-            activityWindow.statusBarColor = navigationBar
             WindowInsetsControllerCompat(activityWindow, activityWindow.decorView).isAppearanceLightStatusBars = ColorUtils.calculateLuminance(navigationBar) > 0.5f
         }
         requireDialog().window?.let { dialogWindow ->
-            dialogWindow.navigationBarColor = background
             WindowInsetsControllerCompat(dialogWindow, dialogWindow.decorView).isAppearanceLightNavigationBars = ColorUtils.calculateLuminance(background) > 0.5f
         }
         bottomSheetView()?.backgroundTintList = ColorStateList.valueOf(background)

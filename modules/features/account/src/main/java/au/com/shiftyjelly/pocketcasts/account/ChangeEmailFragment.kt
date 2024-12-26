@@ -10,12 +10,12 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.compose.content
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.account.AccountActivity.AccountUpdatedSource
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.ChangeEmailViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.DoneViewModel
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.ui.extensions.setupKeyboardModePan
 import au.com.shiftyjelly.pocketcasts.ui.extensions.setupKeyboardModeResize
@@ -41,7 +41,7 @@ class ChangeEmailFragment : BaseFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ) = content {
+    ) = contentWithoutConsumedInsets {
         val email: String by viewModel.email.observeAsState("")
         val password: String by viewModel.password.observeAsState("")
         val bottomOffset by settings.bottomInset.collectAsStateWithLifecycle(initialValue = 0)

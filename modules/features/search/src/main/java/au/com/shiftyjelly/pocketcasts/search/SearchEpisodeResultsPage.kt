@@ -9,6 +9,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeItem
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls.Companion.items
@@ -26,7 +27,6 @@ fun SearchEpisodeResultsPage(
     Column {
         ThemedTopAppBar(
             title = stringResource(LR.string.search_results_all_episodes),
-            bottomShadow = true,
             onNavigationClick = { onBackClick() },
         )
         SearchEpisodeResultsView(
@@ -44,7 +44,7 @@ private fun SearchEpisodeResultsView(
     bottomInset: Dp,
 ) {
     LazyColumn(
-        contentPadding = PaddingValues(bottom = bottomInset),
+        contentPadding = PaddingValues(top = 16.dp, bottom = bottomInset + 16.dp),
     ) {
         items(
             items = state.episodes,

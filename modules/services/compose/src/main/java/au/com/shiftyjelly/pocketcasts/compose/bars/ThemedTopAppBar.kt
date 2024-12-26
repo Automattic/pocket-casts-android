@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.compose.bars
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -31,14 +32,31 @@ sealed class NavigationButton(val image: ImageVector, val contentDescription: In
     object Close : NavigationButton(image = Icons.Default.Close, contentDescription = LR.string.close)
 }
 
+object ThemedTopAppBar {
+    sealed interface Style {
+        data object Solid : Style
+        data object Immersive : Style
+    }
+}
+
 @Composable
 fun ThemedTopAppBar(
     modifier: Modifier = Modifier,
     title: String? = null,
     navigationButton: NavigationButton = NavigationButton.Back,
-    iconColor: Color = MaterialTheme.theme.colors.secondaryIcon01,
-    textColor: Color = MaterialTheme.theme.colors.secondaryText01,
-    backgroundColor: Color = MaterialTheme.theme.colors.secondaryUi01,
+    style: ThemedTopAppBar.Style = ThemedTopAppBar.Style.Solid,
+    iconColor: Color = when (style) {
+        ThemedTopAppBar.Style.Solid -> MaterialTheme.theme.colors.secondaryIcon01
+        ThemedTopAppBar.Style.Immersive -> MaterialTheme.theme.colors.primaryIcon01
+    },
+    textColor: Color = when (style) {
+        ThemedTopAppBar.Style.Solid -> MaterialTheme.theme.colors.secondaryText01
+        ThemedTopAppBar.Style.Immersive -> MaterialTheme.theme.colors.primaryText01
+    },
+    backgroundColor: Color = when (style) {
+        ThemedTopAppBar.Style.Solid -> MaterialTheme.theme.colors.secondaryUi01
+        ThemedTopAppBar.Style.Immersive -> MaterialTheme.theme.colors.primaryUi01
+    },
     bottomShadow: Boolean = false,
     actions: @Composable RowScope.() -> Unit = {},
     onNavigationClick: () -> Unit,
@@ -62,6 +80,7 @@ fun ThemedTopAppBar(
         actions = actions,
         backgroundColor = backgroundColor,
         elevation = 0.dp,
+        windowInsets = AppBarDefaults.topAppBarWindowInsets,
         modifier = if (bottomShadow) {
             modifier
                 .zIndex(1f)
@@ -98,6 +117,7 @@ private fun ThemedTopAppBarPreview(@PreviewParameter(ThemePreviewParameterProvid
         Column {
             ThemedTopAppBar(title = "Hello World", navigationButton = NavigationButton.Back, onNavigationClick = {})
             ThemedTopAppBar(title = "Hello World", navigationButton = NavigationButton.Close, onNavigationClick = {})
+            ThemedTopAppBar(title = "Hello World", navigationButton = NavigationButton.Back, style = ThemedTopAppBar.Style.Immersive, onNavigationClick = {})
         }
     }
 }
