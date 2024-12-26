@@ -11,8 +11,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.TextButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -37,6 +40,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun ManageDownloadsCard(
     totalDownloadSize: Long,
     onManageDownloadsClick: () -> Unit,
+    onMoreOptionsClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val formattedTotalDownloadSize = Util.formattedBytes(bytes = totalDownloadSize, context = LocalContext.current)
@@ -52,35 +56,46 @@ fun ManageDownloadsCard(
             .padding(horizontal = 16.dp).padding(top = 16.dp),
 
     ) {
-        Icon(
-            painter = painterResource(id = IR.drawable.pencil_cleanup),
-            contentDescription = stringResource(LR.string.pencil_clean_up_icon_content_description),
-            modifier = Modifier
-                .padding(end = 12.dp)
-                .size(24.dp),
-            // The icon isn't clickable so the design matches the title color
-            tint = MaterialTheme.theme.colors.primaryText01,
-        )
-
-        Column(
-            modifier = Modifier.padding(end = 16.dp),
-        ) {
-            TextH40(
-                text = stringResource(LR.string.need_to_free_up_space),
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.theme.colors.primaryText01,
+        Row(modifier = Modifier.weight(1f)) {
+            Icon(
+                painter = painterResource(id = IR.drawable.pencil_cleanup),
+                contentDescription = stringResource(LR.string.pencil_clean_up_icon_content_description),
+                modifier = Modifier
+                    .padding(end = 12.dp)
+                    .size(24.dp),
+                // The icon isn't clickable so the design matches the title color
+                tint = MaterialTheme.theme.colors.primaryText01,
             )
 
-            Spacer(modifier = Modifier.height(2.dp))
+            Column {
+                TextH40(
+                    text = stringResource(LR.string.need_to_free_up_space),
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.theme.colors.primaryText01,
+                )
 
-            TextP50(
-                text = stringResource(LR.string.save_space_by_managing_downloaded_episodes, formattedTotalDownloadSize),
-                color = MaterialTheme.theme.colors.primaryText02,
-            )
+                Spacer(modifier = Modifier.height(2.dp))
 
-            TextButton(onClick = { onManageDownloadsClick.invoke() }, contentPadding = PaddingValues()) {
-                TextH50(text = stringResource(LR.string.manage_downloads), color = MaterialTheme.theme.colors.primaryIcon01)
+                TextP50(
+                    text = stringResource(LR.string.save_space_by_managing_downloaded_episodes, formattedTotalDownloadSize),
+                    color = MaterialTheme.theme.colors.primaryText02,
+                )
+
+                TextButton(onClick = { onManageDownloadsClick.invoke() }, contentPadding = PaddingValues()) {
+                    TextH50(text = stringResource(LR.string.manage_downloads), color = MaterialTheme.theme.colors.primaryIcon01)
+                }
             }
+        }
+
+        IconButton(
+            onClick = { onMoreOptionsClick.invoke() },
+            modifier = Modifier.size(24.dp),
+        ) {
+            Icon(
+                imageVector = Icons.Default.MoreVert,
+                contentDescription = stringResource(LR.string.manage_download_more_options_content_description),
+                tint = MaterialTheme.theme.colors.primaryIcon02,
+            )
         }
     }
 }
@@ -91,6 +106,6 @@ fun ManageDownloadsCardPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppThemeWithBackground(themeType) {
-        ManageDownloadsCard(totalDownloadSize = 15023232, onManageDownloadsClick = {})
+        ManageDownloadsCard(totalDownloadSize = 15023232, onManageDownloadsClick = {}, onMoreOptionsClick = {})
     }
 }

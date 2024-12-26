@@ -425,7 +425,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
 
     private suspend fun updateManageDownloadsCard(downloadedEpisodesSize: Long) {
         binding?.manageDownloadsCard?.apply {
-            isVisible = downloadedEpisodesSize != 0L && isDeviceRunningOnLowStorage()
+            isVisible = downloadedEpisodesSize != 0L && isDeviceRunningOnLowStorage() && settings.shouldShowLowStorageBannerAfterSnooze()
             if (isVisible) {
                 setContent {
                     AppTheme(theme.activeTheme) {
@@ -443,12 +443,32 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
                                     analyticsTracker.track(AnalyticsEvent.FREE_UP_SPACE_MANAGE_DOWNLOADS_TAPPED, mapOf("source" to SourceView.DOWNLOADS.analyticsValue))
                                     showFragment(ManualCleanupFragment.newInstance())
                                 },
+                                onMoreOptionsClick = {
+                                    analyticsTracker.track(AnalyticsEvent.FREE_UP_SPACE_MANAGE_DOWNLOADS_MORE_OPTIONS_TAPPED, mapOf("source" to SourceView.DOWNLOADS.analyticsValue))
+                                    onManageDownloadsMoreOptions()
+                                },
                             )
                         }
                     }
                 }
             }
         }
+    }
+
+    private fun onManageDownloadsMoreOptions() {
+        OptionsDialog()
+            .setTitle(resources.getString(LR.string.need_to_free_up_space))
+            .addTextOption(LR.string.dismiss_manage_download_banner, click = this::onDismissManageDownloadTapped)
+            .show(parentFragmentManager, "manage_downloads_more_options")
+    }
+
+    private fun onDismissManageDownloadTapped() {
+        analyticsTracker.track(
+            AnalyticsEvent.FREE_UP_SPACE_MANAGE_DOWNLOADS_MORE_OPTIONS_DISMISS_TAPPED,
+            mapOf("source" to SourceView.DOWNLOADS.analyticsValue),
+        )
+        settings.setDismissLowStorageBannerTime(System.currentTimeMillis())
+        binding?.manageDownloadsCard?.isVisible = false
     }
 
     override fun onMenuItemClick(item: MenuItem): Boolean {
