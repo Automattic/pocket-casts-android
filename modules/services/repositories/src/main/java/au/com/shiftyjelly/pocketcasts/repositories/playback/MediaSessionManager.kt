@@ -687,12 +687,6 @@ class MediaSessionManager(
                 .subscribeBy(onError = { Timber.e(it) })
         }
 
-        // note: the stop event is called from cars when they only want to pause, this is less destructive and doesn't cause issues if they try to play again
-        override fun onStop() {
-            logEvent("stop")
-            enqueueCommand("stop") { playbackManager.pauseSuspend(sourceView = source) }
-        }
-
         override fun onSkipToPrevious() {
             onRewind()
         }
