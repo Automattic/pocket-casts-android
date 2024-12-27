@@ -204,10 +204,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
         }
 
         binding.btnDiscover.setOnClickListener {
-            (activity as FragmentHostListener).openTab(VR.id.navigation_discover)
-        }
-
-        binding.btnDiscover.setOnClickListener {
+            analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_DISCOVER_BUTTON_TAPPED)
             (activity as FragmentHostListener).openTab(VR.id.navigation_discover)
         }
 
