@@ -348,6 +348,8 @@ class PodcastViewModel
         return episodes.find { !it.isArchived && it.isFinished } != null
     }
 
+    fun canSharePodcast(): Boolean = podcast.value?.isPrivate == false
+
     fun archivePlayed() {
         val podcast = this.podcast.value ?: return
         launch {
