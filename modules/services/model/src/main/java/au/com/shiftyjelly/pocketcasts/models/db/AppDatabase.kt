@@ -876,6 +876,10 @@ abstract class AppDatabase : RoomDatabase() {
             database.execSQL("ALTER TABLE podcasts ADD COLUMN podcast_html_description TEXT NOT NULL DEFAULT ''")
         }
 
+        val MIGRATION_105_106 = addMigration(105, 106) { database ->
+            database.execSQL("ALTER TABLE podcasts ADD COLUMN is_private INTEGER NOT NULL DEFAULT 0")
+        }
+
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
             databaseBuilder.addMigrations(
                 addMigration(1, 2) { },
@@ -1271,6 +1275,7 @@ abstract class AppDatabase : RoomDatabase() {
                 // 102 to 103 added via auto migration
                 MIGRATION_103_104,
                 MIGRATION_104_105,
+                MIGRATION_105_106,
             )
         }
 
