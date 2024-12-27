@@ -979,7 +979,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     private fun share() {
         analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_SHARE_TAPPED)
 
-        if (!viewModel.canSharePodcast() && FeatureFlag.isEnabled(Feature.SHARE_PODCAST_PRIVATE_NOT_AVAILABLE)) {
+        if (!viewModel.canSharePodcast()) {
             (activity as? FragmentHostListener)?.snackBarView()?.let { snackBarView ->
                 Snackbar.make(snackBarView, getString(LR.string.sharing_is_not_available_for_private_podcasts), Snackbar.LENGTH_LONG).show()
             }

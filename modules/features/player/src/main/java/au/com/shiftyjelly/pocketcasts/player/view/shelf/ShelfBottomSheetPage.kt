@@ -40,8 +40,6 @@ import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.google.android.gms.cast.framework.CastButtonFactory
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -83,10 +81,10 @@ fun ShelfBottomSheetPage(
                         val podcast = playerViewModel.podcast ?: return@MenuShelfItems
                         val episode = playerViewModel.episode as? PodcastEpisode ?: return@MenuShelfItems
 
-                        if (podcast.isPrivate && FeatureFlag.isEnabled(Feature.SHARE_PODCAST_PRIVATE_NOT_AVAILABLE)) {
-                            shelfSharedViewModel.onShareNotAvailable(ShelfItemSource.OverflowMenu)
-                        } else {
+                        if (podcast.canShare) {
                             shelfSharedViewModel.onShareClick(podcast, episode, ShelfItemSource.OverflowMenu)
+                        } else {
+                            shelfSharedViewModel.onShareNotAvailable(ShelfItemSource.OverflowMenu)
                         }
                     }
 
