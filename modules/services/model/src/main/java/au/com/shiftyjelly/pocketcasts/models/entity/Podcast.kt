@@ -175,7 +175,7 @@ data class Podcast(
         get() = trimMode != TrimMode.OFF
 
     val canShare: Boolean
-        get() = !FeatureFlag.isEnabled(Feature.SHARE_PODCAST_PRIVATE_NOT_AVAILABLE) || (!isPrivate)
+        get() = !FeatureFlag.isEnabled(Feature.SHARE_PODCAST_PRIVATE_NOT_AVAILABLE) || !isPrivate
 
     val isUsingEffects: Boolean
         get() = overrideGlobalEffects && (isSilenceRemoved || isVolumeBoosted || playbackSpeed != 1.0)

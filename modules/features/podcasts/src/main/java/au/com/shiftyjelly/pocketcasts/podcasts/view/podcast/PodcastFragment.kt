@@ -977,16 +977,17 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     }
 
     private fun share() {
+        val podcast = viewModel.podcast.value ?: return
+
         analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_SHARE_TAPPED)
 
-        if (!viewModel.canSharePodcast()) {
+        if (!podcast.canShare) {
             (activity as? FragmentHostListener)?.snackBarView()?.let { snackBarView ->
                 Snackbar.make(snackBarView, getString(LR.string.sharing_is_not_available_for_private_podcasts), Snackbar.LENGTH_LONG).show()
             }
             return
         }
 
-        val podcast = viewModel.podcast.value ?: return
         if (FeatureFlag.isEnabled(Feature.REIMAGINE_SHARING)) {
             SharePodcastFragment
                 .newInstance(podcast, SourceView.PODCAST_SCREEN)
