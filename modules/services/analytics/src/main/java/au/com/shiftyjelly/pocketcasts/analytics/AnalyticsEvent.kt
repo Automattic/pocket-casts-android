@@ -96,6 +96,7 @@ enum class AnalyticsEvent(val key: String) {
     PODCASTS_LIST_SORT_ORDER_CHANGED("podcasts_list_sort_order_changed"),
     PODCASTS_LIST_LAYOUT_CHANGED("podcasts_list_layout_changed"),
     PODCASTS_LIST_BADGES_CHANGED("podcasts_list_badges_changed"),
+    PODCASTS_LIST_DISCOVER_BUTTON_TAPPED("podcasts_list_discover_button_tapped"),
 
     /* Tab bar items */
     PODCASTS_TAB_OPENED("podcasts_tab_opened"),
