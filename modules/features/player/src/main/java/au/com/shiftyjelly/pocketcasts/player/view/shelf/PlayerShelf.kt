@@ -43,6 +43,8 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSourc
 import au.com.shiftyjelly.pocketcasts.ui.helper.ColorUtils
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.extensions.updateColor
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.SimpleColorFilter
@@ -112,7 +114,12 @@ fun PlayerShelf(
         onShareClick = {
             val podcast = playerViewModel.podcast ?: return@PlayerShelfContent
             val episode = playerViewModel.episode as? PodcastEpisode ?: return@PlayerShelfContent
-            shelfSharedViewModel.onShareClick(podcast, episode, ShelfItemSource.Shelf)
+
+            if (podcast.isPrivate && FeatureFlag.isEnabled(Feature.SHARE_PODCAST_PRIVATE_NOT_AVAILABLE)) {
+                shelfSharedViewModel.onShareNotAvailable(ShelfItemSource.Shelf)
+            } else {
+                shelfSharedViewModel.onShareClick(podcast, episode, ShelfItemSource.Shelf)
+            }
         },
         onShowPodcast = {
             shelfSharedViewModel.onShowPodcastOrCloudFiles(playerViewModel.podcast, ShelfItemSource.Shelf)
