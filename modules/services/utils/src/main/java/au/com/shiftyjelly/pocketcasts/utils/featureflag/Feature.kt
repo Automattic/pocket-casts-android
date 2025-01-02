@@ -192,7 +192,7 @@ enum class Feature(
         title = "Sharing is not available for private podcasts",
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
     ;
