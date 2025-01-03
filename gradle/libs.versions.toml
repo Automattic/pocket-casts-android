@@ -29,7 +29,7 @@ glance = "1.0.0"
 google-services = "4.4.2"
 hilt = "2.54"
 hilt-compiler = "1.2.0"
-horologist = "0.6.20"
+horologist = "0.6.22"
 java = "17"
 kotlin = "2.1.0"
 kotlin-coroutines = "1.9.0"
@@ -74,7 +74,7 @@ coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 compose-activity = "androidx.activity:activity-compose:1.9.3"
 compose-animation = { module = "androidx.compose.animation:animation" }
 compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose" }
-compose-constraintlayout = "androidx.constraintlayout:constraintlayout-compose:1.0.1"
+compose-constraintlayout = "androidx.constraintlayout:constraintlayout-compose:1.1.0"
 compose-foundation = { module = "androidx.compose.foundation:foundation" }
 compose-livedata = { module = "androidx.compose.runtime:runtime-livedata" }
 compose-material = { module = "androidx.compose.material:material" }
@@ -253,7 +253,7 @@ androidx-appcompat = "androidx.appcompat:appcompat:1.7.0"
 androidx-arch-core = "androidx.arch.core:core-testing:2.2.0"
 androidx-car = "androidx.car.app:app:1.4.0"
 androidx-cardview = "androidx.cardview:cardview:1.0.0"
-androidx-constraintlayout = "androidx.constraintlayout:constraintlayout:2.1.4"
+androidx-constraintlayout = "androidx.constraintlayout:constraintlayout:2.2.0"
 androidx-core-ktx = "androidx.core:core-ktx:1.13.1"
 androidx-mediarouter = "androidx.mediarouter:mediarouter:1.7.0"
 androidx-palette = "androidx.palette:palette:1.0.0"
