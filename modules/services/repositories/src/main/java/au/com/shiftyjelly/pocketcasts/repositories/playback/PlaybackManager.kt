@@ -2260,21 +2260,22 @@ open class PlaybackManager @Inject constructor(
     }
 
     private fun verifySleepTimeForEndOfChapter() {
-        val currentChapterUuid = getCurrentChapterUuid()
-        val currentEpisodeUui = getCurrentEpisode()?.uuid
-
         applicationScope.launch {
-            sleepTimer.verifySleepTimeForEndOfChapter(currentChapterUuid, currentEpisodeUui) {
-                showToast(application.getString(LR.string.player_sleep_time_fired_end_of_chapter))
+            sleepTimer.verifySleepTimeForEndOfChapter(
+                currentChapterUuid = getCurrentChapterUuid(),
+                currentEpisodeUuid = getCurrentEpisode()?.uuid,
+                onSleepEndOfChapter = {
+                    showToast(application.getString(LR.string.player_sleep_time_fired_end_of_chapter))
 
-                val podcast = playbackStateRelay.blockingFirst().podcast
-                if (podcast != null && podcast.skipLastSecs > 0) {
-                    pause(sourceView = SourceView.AUTO_PAUSE)
-                }
-                onPlayerPaused()
+                    val podcast = playbackStateRelay.blockingFirst().podcast
+                    if (podcast != null && podcast.skipLastSecs > 0) {
+                        pause(sourceView = SourceView.AUTO_PAUSE)
+                    }
+                    onPlayerPaused()
 
-                stop()
-            }
+                    stop()
+                },
+            )
         }
     }
 
