@@ -73,7 +73,7 @@ abstract class PlaylistDao {
     abstract fun updateSyncStatusBlocking(syncStatus: Int, uuid: String)
 
     @Query("UPDATE filters SET syncStatus = :syncStatus")
-    abstract fun updateAllSyncStatusBlocking(syncStatus: Int)
+    abstract suspend fun updateAllSyncStatus(syncStatus: Int)
 
     @Query("SELECT * FROM filters WHERE UPPER(title) = UPPER(:title)")
     abstract fun searchByTitleBlocking(title: String): Playlist?

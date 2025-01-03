@@ -24,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepTimer
+import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepTimerState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue.State
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -249,6 +250,7 @@ class PlayerViewModelTest {
     private fun initViewModel(
         currentEpisode: BaseEpisode = podcastEpisode,
     ) {
+        whenever(sleepTimer.state).thenReturn(SleepTimerState())
         whenever(playbackManager.playbackStateRelay).thenReturn(BehaviorRelay.create<PlaybackState>().toSerialized())
         whenever(upNextQueue.currentEpisode).thenReturn(currentEpisode)
         whenever(playbackManager.upNextQueue).thenReturn(upNextQueue)

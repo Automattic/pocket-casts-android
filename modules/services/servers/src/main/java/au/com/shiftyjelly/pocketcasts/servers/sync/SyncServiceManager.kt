@@ -186,7 +186,10 @@ open class SyncServiceManager @Inject constructor(
     fun episodeSync(request: EpisodeSyncRequest, token: AccessToken): Completable =
         service.episodeProgressSync(addBearer(token), request)
 
-    fun subscriptionStatus(token: AccessToken): Single<SubscriptionStatusResponse> =
+    fun subscriptionStatusRxSingle(token: AccessToken): Single<SubscriptionStatusResponse> =
+        service.subscriptionStatusRxSingle(addBearer(token))
+
+    suspend fun subscriptionStatus(token: AccessToken): SubscriptionStatusResponse =
         service.subscriptionStatus(addBearer(token))
 
     fun subscriptionPurchase(

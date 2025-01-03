@@ -34,6 +34,7 @@ data class Podcast(
     @ColumnInfo(name = "title") var title: String = "",
     @ColumnInfo(name = "podcast_url") var podcastUrl: String? = null,
     @ColumnInfo(name = "podcast_description") var podcastDescription: String = "",
+    @ColumnInfo(name = "podcast_html_description") var podcastHtmlDescription: String = "",
     @ColumnInfo(name = "podcast_category") var podcastCategory: String = "",
     @ColumnInfo(name = "podcast_language") var podcastLanguage: String = "",
     @ColumnInfo(name = "media_type") var mediaType: String? = null,
