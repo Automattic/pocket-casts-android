@@ -153,23 +153,6 @@ class SleepTimer @Inject constructor(
         onSleepEndOfEpisode()
     }
 
-    private suspend fun sleepEndOfChapter(onSleepEndOfChapter: suspend () -> Unit) {
-        if (state.isSleepEndOfChapterRunning) {
-            updateSleepTimer {
-                copy(numberOfChaptersLeft = state.numberOfChaptersLeft - 1)
-            }
-            setEndOfChapter()
-        }
-
-        if (state.isSleepEndOfChapterRunning) return
-
-        updateSleepTimerStatus(sleepTimeRunning = false)
-
-        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Sleeping playback for end of chapters")
-
-        onSleepEndOfChapter()
-    }
-
     fun cancelTimer() {
         LogBuffer.i(TAG, "Cleaning automatic sleep timer feature...")
         updateSleepTimerStatus(sleepTimeRunning = false, sleepAfterChapters = 0, sleepAfterEpisodes = 0)
@@ -201,6 +184,23 @@ class SleepTimer @Inject constructor(
             updateLastListenedState { copy(chapterUuid = currentChapterUuid, episodeUuid = currentEpisodeUuid) }
             sleepEndOfChapter { onSleepEndOfChapter() }
         }
+    }
+
+    private suspend fun sleepEndOfChapter(onSleepEndOfChapter: suspend () -> Unit) {
+        if (state.isSleepEndOfChapterRunning) {
+            updateSleepTimer {
+                copy(numberOfChaptersLeft = state.numberOfChaptersLeft - 1)
+            }
+            setEndOfChapter()
+        }
+
+        if (state.isSleepEndOfChapterRunning) return
+
+        updateSleepTimerStatus(sleepTimeRunning = false)
+
+        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Sleeping playback for end of chapters")
+
+        onSleepEndOfChapter()
     }
 
     private fun setEndOfEpisodeUuid(uuid: String) {
