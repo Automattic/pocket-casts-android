@@ -39,7 +39,7 @@ class ShareListCreateViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             val podcasts = podcastManager.findPodcastsOrderByTitle()
-            mutableState.value = mutableState.value.copy(podcasts = podcasts)
+            mutableState.value = mutableState.value.copy(podcasts = podcasts.filter { it.canShare })
         }
     }
 

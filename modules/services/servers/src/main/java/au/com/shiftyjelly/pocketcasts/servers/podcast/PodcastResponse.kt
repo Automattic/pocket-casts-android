@@ -46,6 +46,7 @@ data class PodcastInfo(
     @field:Json(name = "category") val category: String?,
     @field:Json(name = "audio") val audio: Boolean?,
     @field:Json(name = "episodes") val episodes: List<EpisodeInfo>?,
+    @field:Json(name = "is_private") val isPrivate: Boolean?,
 ) {
 
     fun toPodcast(): Podcast {
@@ -63,6 +64,7 @@ data class PodcastInfo(
         episodes?.mapNotNull { it.toEpisode(uuid) }?.let { episodes ->
             podcast.episodes.addAll(episodes)
         }
+        podcast.isPrivate = isPrivate ?: false
         return podcast
     }
 }

@@ -274,6 +274,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                         SnackbarMessage.EpisodeDownloadStarted -> LR.string.episode_queued_for_download
                         SnackbarMessage.EpisodeRemoved -> LR.string.episode_was_removed
                         SnackbarMessage.TranscriptNotAvailable -> LR.string.transcript_error_not_available
+                        SnackbarMessage.ShareNotAvailable -> LR.string.sharing_is_not_available_for_private_podcasts
                     }
                     showSnackBar(text = getString(text))
                 }

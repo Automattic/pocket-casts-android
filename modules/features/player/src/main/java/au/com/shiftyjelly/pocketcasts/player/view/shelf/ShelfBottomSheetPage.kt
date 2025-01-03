@@ -80,7 +80,12 @@ fun ShelfBottomSheetPage(
                     ShelfItem.Share -> {
                         val podcast = playerViewModel.podcast ?: return@MenuShelfItems
                         val episode = playerViewModel.episode as? PodcastEpisode ?: return@MenuShelfItems
-                        shelfSharedViewModel.onShareClick(podcast, episode, ShelfItemSource.OverflowMenu)
+
+                        if (podcast.canShare) {
+                            shelfSharedViewModel.onShareClick(podcast, episode, ShelfItemSource.OverflowMenu)
+                        } else {
+                            shelfSharedViewModel.onShareNotAvailable(ShelfItemSource.OverflowMenu)
+                        }
                     }
 
                     ShelfItem.Podcast -> shelfSharedViewModel.onShowPodcastOrCloudFiles(playerViewModel.podcast, ShelfItemSource.OverflowMenu)
