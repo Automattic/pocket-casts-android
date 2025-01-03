@@ -1,11 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-12-04 13:54:03+0000
+Translation-Revision-Date: 2024-12-11 09:54:04+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="up_next_shuffle_enable_confirmation_message">Slumpmässig uppspelning är på. Avsnitten kommer att spelas upp i slumpmässig ordning.</string>
+    <string name="number_ten">tio</string>
+    <string name="number_five">fem</string>
+    <string name="number_three">tre</string>
+    <string name="number_two">två</string>
+    <string name="settings_auto_download_on_follow_podcast">Vid följande</string>
+    <string name="number_stepper_minus_content_description">Minus</string>
+    <string name="number_stepper_plus_content_description">Plus</string>
+    <string name="player_sleep_episode_plus">Öka antalet avsnitt</string>
+    <string name="player_sleep_episode_minus">Minska antalet avsnitt</string>
+    <string name="player_sleep_chapter_plus">Öka antalet kapitel</string>
+    <string name="player_sleep_chapter_minus">Minska antalet kapitel</string>
+    <string name="player_sleep_custom_plus">Öka anpassad varaktighet</string>
+    <string name="player_sleep_custom_minus">Minska anpassad varaktighet</string>
     <string name="plus_subscription_finished">Prenumerationen har löpt ut</string>
     <string name="shuffle_whats_new_message">Spela enkelt upp ett slumpmässigt avsnitt utan att ändra ordningen på din kö.</string>
     <string name="shuffle_whats_new_title">Vi introducerar slumpmässig uppspelning</string>
@@ -1910,5 +1924,9 @@ Language: sv_SE
     <plurals name="second">
         <item quantity="one">sekund</item>
         <item quantity="other">sekunder</item>
+    </plurals>
+    <plurals name="settings_auto_download_on_follow_podcast_description">
+        <item quantity="one">Ladda automatiskt ner det senaste avsnittet från nya shower som du följer.</item>
+        <item quantity="other">Ladda automatiskt ner de %s avsnitten från nya shower som du följer.</item>
     </plurals>
 </resources>

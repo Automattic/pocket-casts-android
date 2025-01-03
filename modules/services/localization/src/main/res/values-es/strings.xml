@@ -1,11 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-12-03 16:54:03+0000
+Translation-Revision-Date: 2024-12-10 13:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+    <string name="up_next_shuffle_enable_confirmation_message">La reproducción aleatoria está activada. Los episodios se reproducirán en orden aleatorio.</string>
+    <string name="number_ten">diez</string>
+    <string name="number_five">cinco</string>
+    <string name="number_three">tres</string>
+    <string name="number_two">dos</string>
+    <string name="settings_auto_download_on_follow_podcast">Siguiendo</string>
+    <string name="number_stepper_minus_content_description">Menos</string>
+    <string name="number_stepper_plus_content_description">Más</string>
+    <string name="player_sleep_episode_plus">Aumentar número de episodios</string>
+    <string name="player_sleep_episode_minus">Reducir número de episodios</string>
+    <string name="player_sleep_chapter_plus">Aumentar número de capítulos</string>
+    <string name="player_sleep_chapter_minus">Reducir número de capítulos</string>
+    <string name="player_sleep_custom_plus">Aumentar duración personalizada</string>
+    <string name="player_sleep_custom_minus">Reducir duración personalizada</string>
     <string name="plus_subscription_finished">Suscripción terminada</string>
     <string name="shuffle_whats_new_message">Reproduce un episodio aleatorio fácilmente sin cambiar el orden de la cola.</string>
     <string name="shuffle_whats_new_title">Te presentamos Shuffle</string>
@@ -1910,5 +1924,9 @@ Language: es
     <plurals name="second">
         <item quantity="one">segundo</item>
         <item quantity="other">segundos</item>
+    </plurals>
+    <plurals name="settings_auto_download_on_follow_podcast_description">
+        <item quantity="one">Descarga automáticamente el último episodio de los nuevos programas que sigues.</item>
+        <item quantity="other">Descarga automáticamente los últimos %s episodios de los nuevos programas que sigues.</item>
     </plurals>
 </resources>

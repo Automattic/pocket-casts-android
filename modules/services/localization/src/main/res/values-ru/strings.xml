@@ -1,11 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-12-04 15:54:03+0000
+Translation-Revision-Date: 2024-12-10 09:54:04+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="up_next_shuffle_enable_confirmation_message">Режим «В случайном порядке» включён. Выпуски будут воспроизводиться в случайном порядке.</string>
+    <string name="number_ten">десять</string>
+    <string name="number_five">пять</string>
+    <string name="number_three">три</string>
+    <string name="number_two">два</string>
+    <string name="settings_auto_download_on_follow_podcast">По подписке</string>
+    <string name="number_stepper_minus_content_description">Минус</string>
+    <string name="number_stepper_plus_content_description">Плюс</string>
+    <string name="player_sleep_episode_plus">Увеличить число выпусков</string>
+    <string name="player_sleep_episode_minus">Уменьшить число выпусков</string>
+    <string name="player_sleep_chapter_plus">Увеличить число глав</string>
+    <string name="player_sleep_chapter_minus">Уменьшить число глав</string>
+    <string name="player_sleep_custom_plus">Увеличить произвольную продолжительность</string>
+    <string name="player_sleep_custom_minus">Уменьшить произвольную продолжительность</string>
     <string name="plus_subscription_finished">Подписка оформлена</string>
     <string name="shuffle_whats_new_message">Воспроизводите любой выпуск, не меняя очередности в списке.</string>
     <string name="shuffle_whats_new_title">Представляем режим случайного воспроизведения</string>
@@ -1928,5 +1942,10 @@ Language: ru
         <item quantity="one">сек</item>
         <item quantity="few">сек</item>
         <item quantity="many">сек</item>
+    </plurals>
+    <plurals name="settings_auto_download_on_follow_podcast_description">
+        <item quantity="one">Автоматически загружать свежие выпуски новых шоу, на которые вы подписаны.</item>
+        <item quantity="few">Автоматически загружать свежие выпуски (%s) новых шоу, на которые вы подписаны.</item>
+        <item quantity="many">Автоматически загружать свежие выпуски (%s) новых шоу, на которые вы подписаны.</item>
     </plurals>
 </resources>

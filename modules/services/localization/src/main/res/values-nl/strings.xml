@@ -1,11 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-12-04 11:54:04+0000
+Translation-Revision-Date: 2024-12-10 13:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="up_next_shuffle_enable_confirmation_message">Shuffle staat aan. De afleveringen worden in willekeurige volgorde afgespeeld.</string>
+    <string name="number_ten">tien</string>
+    <string name="number_five">vijf</string>
+    <string name="number_three">drie</string>
+    <string name="number_two">twee</string>
+    <string name="settings_auto_download_on_follow_podcast">Volgend</string>
+    <string name="number_stepper_minus_content_description">Min</string>
+    <string name="number_stepper_plus_content_description">Plus</string>
+    <string name="player_sleep_episode_plus">Aantal afleveringen verhogen</string>
+    <string name="player_sleep_episode_minus">Aantal afleveringen verlagen</string>
+    <string name="player_sleep_chapter_plus">Aantal hoofdstukken verhogen</string>
+    <string name="player_sleep_chapter_minus">Aantal hoofdstukken verlagen</string>
+    <string name="player_sleep_custom_plus">Aangepaste duur verhogen</string>
+    <string name="player_sleep_custom_minus">Aangepaste duur verlagen</string>
     <string name="plus_subscription_finished">Abonnement afgerond</string>
     <string name="shuffle_whats_new_message">Speel eenvoudig een willekeurige aflevering af zonder de volgorde van je wachtrij te veranderen.</string>
     <string name="shuffle_whats_new_title">Maak kennis met shuffle</string>
@@ -1910,5 +1924,9 @@ Language: nl
     <plurals name="second">
         <item quantity="one">seconde</item>
         <item quantity="other">seconden</item>
+    </plurals>
+    <plurals name="settings_auto_download_on_follow_podcast_description">
+        <item quantity="one">Download automatisch de nieuwste aflevering van nieuwe shows die je volgt.</item>
+        <item quantity="other">Download automatisch de nieuwste %s afleveringen van nieuwe shows die je volgt.</item>
     </plurals>
 </resources>
