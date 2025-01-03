@@ -32,6 +32,8 @@ class SleepTimer @Inject constructor(
 
     private var sleepTimerHistory: SleepTimerHistory = SleepTimerHistory.None
 
+    private var lastListenedState: LastListenedState = LastListenedState()
+
     private val _stateFlow: MutableStateFlow<SleepTimerState> = MutableStateFlow(SleepTimerState())
     val stateFlow: StateFlow<SleepTimerState> = _stateFlow
 
@@ -151,7 +153,7 @@ class SleepTimer @Inject constructor(
         onSleepEndOfEpisode()
     }
 
-    suspend fun sleepEndOfChapter(onSleepEndOfChapter: suspend () -> Unit) {
+    private suspend fun sleepEndOfChapter(onSleepEndOfChapter: suspend () -> Unit) {
         if (state.isSleepEndOfChapterRunning) {
             updateSleepTimer {
                 copy(numberOfChaptersLeft = state.numberOfChaptersLeft - 1)
@@ -172,6 +174,33 @@ class SleepTimer @Inject constructor(
         LogBuffer.i(TAG, "Cleaning automatic sleep timer feature...")
         updateSleepTimerStatus(sleepTimeRunning = false, sleepAfterChapters = 0, sleepAfterEpisodes = 0)
         sleepTimerHistory = SleepTimerHistory.None
+    }
+
+    suspend fun verifySleepTimeForEndOfChapter(currentChapterUuid: String?, currentEpisodeUuid: String?, onSleepEndOfChapter: suspend () -> Unit) {
+        if (!state.isSleepEndOfChapterRunning) {
+            updateLastListenedState { copy(chapterUuid = null, episodeUuid = null) }
+            return
+        }
+
+        if (lastListenedState.chapterUuid.isNullOrEmpty()) {
+            updateLastListenedState { copy(chapterUuid = currentChapterUuid) }
+        }
+
+        if (lastListenedState.episodeUuid.isNullOrEmpty()) {
+            updateLastListenedState { copy(episodeUuid = currentEpisodeUuid) }
+        }
+
+        // When we switch from a episode that contains chapters to another one that does not have chapters
+        // the current chapter is null, so for this case we would need to verify if the episode changed to update the sleep timer counter for end of chapter
+        if (currentChapterUuid.isNullOrEmpty() && !lastListenedState.episodeUuid.isNullOrEmpty() && lastListenedState.episodeUuid != currentEpisodeUuid) {
+            updateLastListenedState { copy(episodeUuid = currentEpisodeUuid) }
+            sleepEndOfChapter { onSleepEndOfChapter() }
+        } else if (lastListenedState.chapterUuid == currentChapterUuid) { // Same Chapter
+            return
+        } else { // Changed chapter
+            updateLastListenedState { copy(chapterUuid = currentChapterUuid, episodeUuid = currentEpisodeUuid) }
+            sleepEndOfChapter { onSleepEndOfChapter() }
+        }
     }
 
     private fun setEndOfEpisodeUuid(uuid: String) {
@@ -204,5 +233,9 @@ class SleepTimer @Inject constructor(
 
     private fun updateSleepTimer(update: SleepTimerState.() -> SleepTimerState) {
         _stateFlow.update { currentState -> currentState.update() }
+    }
+
+    private fun updateLastListenedState(update: LastListenedState.() -> LastListenedState) {
+        lastListenedState = lastListenedState.update()
     }
 }

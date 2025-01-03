@@ -1470,20 +1470,6 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
-    private suspend fun sleepEndOfChapter() {
-        sleepTimer.sleepEndOfChapter {
-            showToast(application.getString(LR.string.player_sleep_time_fired_end_of_chapter))
-
-            val podcast = playbackStateRelay.blockingFirst().podcast
-            if (podcast != null && podcast.skipLastSecs > 0) {
-                pause(sourceView = SourceView.AUTO_PAUSE)
-            }
-            onPlayerPaused()
-
-            stop()
-        }
-    }
-
     private suspend fun showToast(message: String) {
         withContext(Dispatchers.Main) {
             Toast.makeText(application, message, Toast.LENGTH_LONG).show()
@@ -2277,44 +2263,18 @@ open class PlaybackManager @Inject constructor(
         val currentChapterUuid = getCurrentChapterUuid()
         val currentEpisodeUui = getCurrentEpisode()?.uuid
 
-        if (!isSleepAfterChapterEnabled()) {
-            updateLastListenedState { copy(chapterUuid = null, episodeUuid = null) }
-            return
-        }
+        applicationScope.launch {
+            sleepTimer.verifySleepTimeForEndOfChapter(currentChapterUuid, currentEpisodeUui) {
+                showToast(application.getString(LR.string.player_sleep_time_fired_end_of_chapter))
 
-        if (playbackStateRelay.blockingFirst().lastListenedState.chapterUuid.isNullOrEmpty()) {
-            updateLastListenedState { copy(chapterUuid = currentChapterUuid) }
-        }
+                val podcast = playbackStateRelay.blockingFirst().podcast
+                if (podcast != null && podcast.skipLastSecs > 0) {
+                    pause(sourceView = SourceView.AUTO_PAUSE)
+                }
+                onPlayerPaused()
 
-        if (playbackStateRelay.blockingFirst().lastListenedState.episodeUuid.isNullOrEmpty()) {
-            updateLastListenedState { copy(episodeUuid = currentEpisodeUui) }
-        }
-
-        // When we switch from a episode that contains chapters to another one that does not have chapters
-        // the current chapter is null, so for this case we would need to verify if the episode changed to update the sleep timer counter for end of chapter
-        if (currentChapterUuid.isNullOrEmpty() && !playbackStateRelay.blockingFirst().lastListenedState.episodeUuid.isNullOrEmpty() && playbackStateRelay.blockingFirst().lastListenedState.episodeUuid != currentEpisodeUui) {
-            applicationScope.launch {
-                updateLastListenedState { copy(episodeUuid = currentEpisodeUui) }
-                sleepEndOfChapter()
+                stop()
             }
-        } else if (playbackStateRelay.blockingFirst().lastListenedState.chapterUuid == currentChapterUuid) { // Same chapter
-            return
-        } else { // Changed chapter
-            applicationScope.launch {
-                updateLastListenedState { copy(chapterUuid = currentChapterUuid, episodeUuid = getCurrentEpisode()?.uuid) }
-                sleepEndOfChapter()
-            }
-        }
-    }
-
-    private fun updateLastListenedState(update: PlaybackState.LastListenedState.() -> PlaybackState.LastListenedState) {
-        playbackStateRelay.blockingFirst().let { currentState ->
-            val updatedLastListenedState = currentState.lastListenedState.update()
-            playbackStateRelay.accept(
-                currentState.copy(
-                    lastListenedState = updatedLastListenedState,
-                ),
-            )
         }
     }
 
