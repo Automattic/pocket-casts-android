@@ -1,11 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-12-03 11:54:08+0000
+Translation-Revision-Date: 2024-12-10 09:54:11+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="up_next_shuffle_enable_confirmation_message">„Mischen“ ist aktiviert. Folgen werden in zufälliger Reihenfolge wiedergegeben.</string>
+    <string name="number_ten">zehn</string>
+    <string name="number_five">fünf</string>
+    <string name="number_three">drei</string>
+    <string name="number_two">zwei</string>
+    <string name="settings_auto_download_on_follow_podcast">Beim Folgen</string>
+    <string name="number_stepper_minus_content_description">Minus</string>
+    <string name="number_stepper_plus_content_description">Plus</string>
+    <string name="player_sleep_episode_plus">Anzahl der Folgen erhöhen</string>
+    <string name="player_sleep_episode_minus">Anzahl der Folgen verringern</string>
+    <string name="player_sleep_chapter_plus">Anzahl der Kapitel erhöhen</string>
+    <string name="player_sleep_chapter_minus">Anzahl der Kapitel verringern</string>
+    <string name="player_sleep_custom_plus">Individuelle Dauer erhöhen</string>
+    <string name="player_sleep_custom_minus">Individuelle Dauer verringern</string>
     <string name="plus_subscription_finished">Abonnement beendet</string>
     <string name="shuffle_whats_new_message">Gib ganz einfach eine zufällige Folge wieder, ohne dabei die Reihenfolge deiner Warteschlange zu ändern.</string>
     <string name="shuffle_whats_new_title">Jetzt neu: Mischen</string>
@@ -1910,5 +1924,9 @@ Language: de
     <plurals name="second">
         <item quantity="one">Sekunde</item>
         <item quantity="other">Sekunden</item>
+    </plurals>
+    <plurals name="settings_auto_download_on_follow_podcast_description">
+        <item quantity="one">Lade automatisch die aktuellste Folge von Shows herunter, denen du seit Neuestem folgst.</item>
+        <item quantity="other">Lade automatisch die %s aktuellsten Folgen von Shows herunter, denen du seit Neuestem folgst.</item>
     </plurals>
 </resources>

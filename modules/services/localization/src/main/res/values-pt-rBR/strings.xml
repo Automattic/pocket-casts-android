@@ -1,11 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-12-04 13:54:03+0000
+Translation-Revision-Date: 2024-12-09 18:54:04+0000
 Plural-Forms: nplurals=2; plural=(n > 1);
 Generator: GlotPress/2.4.0-alpha
 Language: pt_BR
 -->
 <resources>
+    <string name="up_next_shuffle_enable_confirmation_message">A ordem aleatória está ativada. Os episódios serão reproduzidos aleatoriamente.</string>
+    <string name="number_ten">dez</string>
+    <string name="number_five">cinco</string>
+    <string name="number_three">três</string>
+    <string name="number_two">dois</string>
+    <string name="settings_auto_download_on_follow_podcast">Ao seguir</string>
+    <string name="number_stepper_minus_content_description">Menos</string>
+    <string name="number_stepper_plus_content_description">Mais</string>
+    <string name="player_sleep_episode_plus">Aumentar contagem de episódios</string>
+    <string name="player_sleep_episode_minus">Diminuir contagem de episódios</string>
+    <string name="player_sleep_chapter_plus">Aumentar contagem de capítulos</string>
+    <string name="player_sleep_chapter_minus">Diminuir contagem de capítulos</string>
+    <string name="player_sleep_custom_plus">Aumentar duração personalizada</string>
+    <string name="player_sleep_custom_minus">Diminuir duração personalizada</string>
     <string name="plus_subscription_finished">Assinatura finalizada</string>
     <string name="shuffle_whats_new_message">É fácil reproduzir um episódio aleatório sem mudar a ordem da sua fila.</string>
     <string name="shuffle_whats_new_title">Apresentamos a ordem aleatória</string>
@@ -1910,5 +1924,9 @@ Language: pt_BR
     <plurals name="second">
         <item quantity="one">segundo</item>
         <item quantity="other">segundos</item>
+    </plurals>
+    <plurals name="settings_auto_download_on_follow_podcast_description">
+        <item quantity="one">Faça download automático do episódio mais recente de programas que você começar a seguir.</item>
+        <item quantity="other">Faça download automático dos %s episódios mais recentes de programas que você começar a seguir.</item>
     </plurals>
 </resources>

@@ -1,11 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-12-04 09:54:03+0000
+Translation-Revision-Date: 2024-12-10 09:54:04+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="up_next_shuffle_enable_confirmation_message">순서 섞기가 켜졌습니다. 에피소드가 랜덤 순서로 재생됩니다.</string>
+    <string name="number_ten">10</string>
+    <string name="number_five">5</string>
+    <string name="number_three">3</string>
+    <string name="number_two">2</string>
+    <string name="settings_auto_download_on_follow_podcast">팔로우 시</string>
+    <string name="number_stepper_minus_content_description">빼기</string>
+    <string name="number_stepper_plus_content_description">더하기</string>
+    <string name="player_sleep_episode_plus">에피소드 개수 늘리기</string>
+    <string name="player_sleep_episode_minus">에피소드 개수 줄이기</string>
+    <string name="player_sleep_chapter_plus">챕터 개수 늘리기</string>
+    <string name="player_sleep_chapter_minus">챕터 개수 줄이기</string>
+    <string name="player_sleep_custom_plus">사용자 정의 지속시간 늘리기</string>
+    <string name="player_sleep_custom_minus">사용자 정의 지속시간 줄이기</string>
     <string name="plus_subscription_finished">구독 종료됨</string>
     <string name="shuffle_whats_new_message">대기열 순서를 바꾸지 않고도 에피소드를 랜덤으로 쉽게 재생할 수 있습니다.</string>
     <string name="shuffle_whats_new_title">셔플 기능 소개</string>
@@ -1892,5 +1906,8 @@ Language: ko_KR
     </plurals>
     <plurals name="second">
         <item quantity="other">초</item>
+    </plurals>
+    <plurals name="settings_auto_download_on_follow_podcast_description">
+        <item quantity="other">팔로우하는 새 프로그램의 최신 에피소드 %s개를 자동으로 다운로드하세요.</item>
     </plurals>
 </resources>
