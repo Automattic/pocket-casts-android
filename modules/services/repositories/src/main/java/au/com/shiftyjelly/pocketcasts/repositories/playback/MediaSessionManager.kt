@@ -531,6 +531,7 @@ class MediaSessionManager(
 
         private var playPauseTimer: Timer? = null
         private var playFromSearchDisposable: Disposable? = null
+        private var buttonPressSuccessions: Int = 0
 
         override fun onMediaButtonEvent(mediaButtonEvent: Intent): Boolean {
             if (Intent.ACTION_MEDIA_BUTTON == mediaButtonEvent.action) {
@@ -539,15 +540,29 @@ class MediaSessionManager(
                 logEvent(keyEvent.toString())
                 if (keyEvent.action == KeyEvent.ACTION_DOWN) {
                     when (keyEvent.keyCode) {
+                        // When the phone is in sleep mode, and the audio player doesn't have focus, KEYCODE_MEDIA_PLAY is
+                        // called instead of KEYCODE_MEDIA_PLAY_PAUSE or KEYCODE_HEADSETHOOK
+                        KeyEvent.KEYCODE_MEDIA_PLAY -> {
+                            handleMediaButtonSingleTap()
+                            return true
+                        }
+                        // Some wired headphones, such as the Apple USB-C headphones do not invoke KeyEvent.KEYCODE_HEADSETHOOK.
+                        KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE -> {
+                            handleMediaButtonSingleTap()
+                            return true
+                        }
+                        // This should be called on most wired headsets.
                         KeyEvent.KEYCODE_HEADSETHOOK -> {
                             handleMediaButtonSingleTap()
                             return true
                         }
                         KeyEvent.KEYCODE_MEDIA_NEXT -> {
+                            // Not sent on some devices. Use KEYCODE_MEDIA_PLAY_PAUSE or KEYCODE_HEADSETHOOK timeout workarounds
                             handleMediaButtonDoubleTap()
                             return true
                         }
                         KeyEvent.KEYCODE_MEDIA_PREVIOUS -> {
+                            // Not sent on some devices. Use KEYCODE_MEDIA_PLAY_PAUSE or KEYCODE_HEADSETHOOK timeout workarounds
                             handleMediaButtonTripleTap()
                             return true
                         }
@@ -583,26 +598,37 @@ class MediaSessionManager(
         }
 
         private fun handleMediaButtonSingleTap() {
-            // this code allows the user to double tap their play pause button to skip ahead. Basically it allows them 600ms to press it again to cause a skip instead of a play/pause
-            if (playPauseTimer == null) {
+            // this code allows the user to double tap or triple tap their play pause button to skip ahead.
+            // Basically it allows them 600ms to press it again (or a third time) to cause a skip forward/backward instead of a play/pause
+            buttonPressSuccessions++
+
+            if (buttonPressSuccessions == 1) {
                 playPauseTimer = Timer().apply {
                     schedule(
                         object : TimerTask() {
                             override fun run() {
                                 logEvent("play from headset hook", inSessionCallback = false)
-                                playbackManager.playPause(sourceView = source)
+
+                                when {
+                                    buttonPressSuccessions == 2 && playbackManager.isPlaying() ->
+                                        playbackManager.skipForward(sourceView = source)
+
+                                    buttonPressSuccessions == 3 && playbackManager.isPlaying() ->
+                                        playbackManager.skipBackward(sourceView = source)
+
+                                    else ->
+                                        playbackManager.playPause(sourceView = source)
+                                }
+
+                                // Invalidate timer and reset the number of button press quick successions
+                                playPauseTimer?.cancel()
                                 playPauseTimer = null
+                                buttonPressSuccessions = 0
                             }
                         },
                         600,
                     )
                 }
-            } else {
-                // timer is not null, which means they pressed play pause in the last 300ms, fire a next instead
-                playPauseTimer?.cancel()
-                playPauseTimer = null
-
-                playbackManager.skipForward(sourceView = source)
             }
         }
 
