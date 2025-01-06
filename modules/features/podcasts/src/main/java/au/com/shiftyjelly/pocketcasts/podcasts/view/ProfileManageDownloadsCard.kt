@@ -15,7 +15,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -40,7 +40,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun ManageDownloadsCard(
     totalDownloadSize: Long,
     onManageDownloadsClick: () -> Unit,
-    onMoreOptionsClick: () -> Unit,
+    onDismissClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val formattedTotalDownloadSize = Util.formattedBytes(bytes = totalDownloadSize, context = LocalContext.current)
@@ -88,12 +88,12 @@ fun ManageDownloadsCard(
         }
 
         IconButton(
-            onClick = { onMoreOptionsClick.invoke() },
+            onClick = { onDismissClick.invoke() },
             modifier = Modifier.size(24.dp),
         ) {
             Icon(
-                imageVector = Icons.Default.MoreVert,
-                contentDescription = stringResource(LR.string.manage_download_more_options_content_description),
+                imageVector = Icons.Default.Close,
+                contentDescription = stringResource(LR.string.manage_download_dismiss_content_description),
                 tint = MaterialTheme.theme.colors.primaryIcon02,
             )
         }
@@ -106,6 +106,6 @@ fun ManageDownloadsCardPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppThemeWithBackground(themeType) {
-        ManageDownloadsCard(totalDownloadSize = 15023232, onManageDownloadsClick = {}, onMoreOptionsClick = {})
+        ManageDownloadsCard(totalDownloadSize = 15023232, onManageDownloadsClick = {}, onDismissClick = {})
     }
 }
