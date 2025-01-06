@@ -32,6 +32,9 @@ class SleepTimer @Inject constructor(
 
     private var sleepTimerHistory: SleepTimerHistory = SleepTimerHistory.None
 
+    private var lastChapterUuid: String? = null
+    private var lastEpisodeUuid: String? = null
+
     private val _stateFlow: MutableStateFlow<SleepTimerState> = MutableStateFlow(SleepTimerState())
     val stateFlow: StateFlow<SleepTimerState> = _stateFlow
 
@@ -151,7 +154,42 @@ class SleepTimer @Inject constructor(
         onSleepEndOfEpisode()
     }
 
-    suspend fun sleepEndOfChapter(onSleepEndOfChapter: suspend () -> Unit) {
+    fun cancelTimer() {
+        LogBuffer.i(TAG, "Cleaning automatic sleep timer feature...")
+        updateSleepTimerStatus(sleepTimeRunning = false, sleepAfterChapters = 0, sleepAfterEpisodes = 0)
+        sleepTimerHistory = SleepTimerHistory.None
+    }
+
+    suspend fun verifySleepTimeForEndOfChapter(currentChapterUuid: String?, currentEpisodeUuid: String?, onSleepEndOfChapter: suspend () -> Unit) {
+        if (!state.isSleepEndOfChapterRunning) {
+            lastChapterUuid = null
+            lastEpisodeUuid = null
+            return
+        }
+
+        if (lastChapterUuid.isNullOrEmpty()) {
+            lastChapterUuid = currentChapterUuid
+        }
+
+        if (lastEpisodeUuid.isNullOrEmpty()) {
+            lastEpisodeUuid = currentEpisodeUuid
+        }
+
+        // When we switch from a episode that contains chapters to another one that does not have chapters
+        // the current chapter is null, so for this case we would need to verify if the episode changed to update the sleep timer counter for end of chapter
+        if (currentChapterUuid.isNullOrEmpty() && !lastEpisodeUuid.isNullOrEmpty() && lastEpisodeUuid != currentEpisodeUuid) {
+            lastEpisodeUuid = currentEpisodeUuid
+            sleepEndOfChapter { onSleepEndOfChapter() }
+        } else if (lastChapterUuid == currentChapterUuid) { // Same Chapter
+            return
+        } else { // Changed chapter
+            lastEpisodeUuid = currentEpisodeUuid
+            lastChapterUuid = currentChapterUuid
+            sleepEndOfChapter { onSleepEndOfChapter() }
+        }
+    }
+
+    private suspend fun sleepEndOfChapter(onSleepEndOfChapter: suspend () -> Unit) {
         if (state.isSleepEndOfChapterRunning) {
             updateSleepTimer {
                 copy(numberOfChaptersLeft = state.numberOfChaptersLeft - 1)
@@ -166,12 +204,6 @@ class SleepTimer @Inject constructor(
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Sleeping playback for end of chapters")
 
         onSleepEndOfChapter()
-    }
-
-    fun cancelTimer() {
-        LogBuffer.i(TAG, "Cleaning automatic sleep timer feature...")
-        updateSleepTimerStatus(sleepTimeRunning = false, sleepAfterChapters = 0, sleepAfterEpisodes = 0)
-        sleepTimerHistory = SleepTimerHistory.None
     }
 
     private fun setEndOfEpisodeUuid(uuid: String) {
