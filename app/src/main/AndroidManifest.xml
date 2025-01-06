@@ -516,7 +516,7 @@
             android:targetActivity=".ui.MainActivity"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_pride_2023">
+            android:icon="@mipmap/ic_launcher_pride">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

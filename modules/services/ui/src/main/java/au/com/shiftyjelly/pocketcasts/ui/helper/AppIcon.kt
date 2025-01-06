@@ -97,10 +97,10 @@ class AppIcon @Inject constructor(
         ),
         PRIDE_2023(
             setting = AppIconSetting.PRIDE_2023,
-            labelId = LR.string.settings_app_icon_pride_2023,
-            settingsIcon = IR.drawable.appicon_pride_2023,
+            labelId = LR.string.settings_app_icon_pride,
+            settingsIcon = IR.drawable.appicon_pride,
             tier = SubscriptionTier.NONE,
-            launcherIcon = IR.mipmap.ic_launcher_pride_2023,
+            launcherIcon = IR.mipmap.ic_launcher_pride,
             aliasName = ".ui.MainActivity_18",
         ),
         PLUS(
