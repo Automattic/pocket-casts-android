@@ -38,7 +38,10 @@ import androidx.compose.ui.unit.dp
 import androidx.fragment.compose.content
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.GradientIcon
@@ -69,12 +72,18 @@ class BatteryRestrictionsSettingsFragment : BaseFragment() {
     @Inject
     lateinit var batteryRestrictions: SystemBatteryRestrictions
 
+    @Inject
+    lateinit var analyticsTracker: AnalyticsTracker
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = content {
         AppThemeWithBackground(theme.activeTheme) {
+            CallOnce {
+                analyticsTracker.track(AnalyticsEvent.BATTERY_RESTRICTIONS_SHOWN)
+            }
             var isUnrestricted by remember { mutableStateOf(batteryRestrictions.isUnrestricted()) }
             DisposableEffect(this) {
                 val observer = LifecycleEventObserver { _, event ->
@@ -102,7 +111,10 @@ class BatteryRestrictionsSettingsFragment : BaseFragment() {
                     @Suppress("DEPRECATION")
                     activity?.onBackPressed()
                 },
-                onClick = { batteryRestrictions.promptToUpdateBatteryRestriction(context) },
+                onClick = {
+                    analyticsTracker.track(AnalyticsEvent.BATTERY_RESTRICTIONS_TOGGLED, mapOf("current_status" to batteryRestrictions.status.name.lowercase()))
+                    batteryRestrictions.promptToUpdateBatteryRestriction(context)
+                },
                 openUrl = { url ->
                     startActivity(
                         Intent(Intent.ACTION_VIEW, Uri.parse(url)),

@@ -672,4 +672,8 @@ enum class AnalyticsEvent(val key: String) {
     FREE_UP_SPACE_MANAGE_DOWNLOADS_MORE_OPTIONS_TAPPED("free_up_space_manage_downloads_more_options_tapped"),
     FREE_UP_SPACE_MANAGE_DOWNLOADS_MORE_OPTIONS_DISMISS_TAPPED("free_up_space_manage_downloads_more_options_dismiss_tapped"),
     FREE_UP_SPACE_MAYBE_LATER_TAPPED("free_up_space_maybe_later_tapped"),
+
+    /* Battery Restrictions */
+    BATTERY_RESTRICTIONS_SHOWN("battery_restrictions_shown"),
+    BATTERY_RESTRICTIONS_TOGGLED("battery_restrictions_toggled"),
 }
