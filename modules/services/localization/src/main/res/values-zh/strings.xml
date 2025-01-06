@@ -1,11 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-12-03 11:54:03+0000
+Translation-Revision-Date: 2024-12-10 09:54:04+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="up_next_shuffle_enable_confirmation_message">随机播放功能已启用。 剧集将按随机顺序播放。</string>
+    <string name="number_ten">十</string>
+    <string name="number_five">五</string>
+    <string name="number_three">三</string>
+    <string name="number_two">两</string>
+    <string name="settings_auto_download_on_follow_podcast">关注时</string>
+    <string name="number_stepper_minus_content_description">减号</string>
+    <string name="number_stepper_plus_content_description">加号</string>
+    <string name="player_sleep_episode_plus">增加剧集数量</string>
+    <string name="player_sleep_episode_minus">减少剧集数量</string>
+    <string name="player_sleep_chapter_plus">增加章节数量</string>
+    <string name="player_sleep_chapter_minus">减少章节数量</string>
+    <string name="player_sleep_custom_plus">增加自定义时长</string>
+    <string name="player_sleep_custom_minus">减少自定义时长</string>
     <string name="plus_subscription_finished">订阅完成</string>
     <string name="shuffle_whats_new_message">无需更改队列顺序，即可轻松播放随机剧集。</string>
     <string name="shuffle_whats_new_title">推出随机播放功能</string>
@@ -1892,5 +1906,8 @@ Language: zh_CN
     </plurals>
     <plurals name="second">
         <item quantity="other">秒</item>
+    </plurals>
+    <plurals name="settings_auto_download_on_follow_podcast_description">
+        <item quantity="other">自动下载所关注新节目的最新 %s 集。</item>
     </plurals>
 </resources>

@@ -1,11 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-12-03 09:54:03+0000
+Translation-Revision-Date: 2024-12-10 13:54:03+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="up_next_shuffle_enable_confirmation_message">La lecture aléatoire est activée. Les épisodes seront lus de manière aléatoire.</string>
+    <string name="number_ten">dix</string>
+    <string name="number_five">cinq</string>
+    <string name="number_three">trois</string>
+    <string name="number_two">deux</string>
+    <string name="settings_auto_download_on_follow_podcast">Lors de l’abonnement</string>
+    <string name="number_stepper_minus_content_description">Moins</string>
+    <string name="number_stepper_plus_content_description">Plus</string>
+    <string name="player_sleep_episode_plus">Augmenter le nombre d’épisodes</string>
+    <string name="player_sleep_episode_minus">Réduire le nombre d’épisodes</string>
+    <string name="player_sleep_chapter_plus">Augmenter le nombre de chapitres</string>
+    <string name="player_sleep_chapter_minus">Réduire le nombre de chapitres</string>
+    <string name="player_sleep_custom_plus">Augmenter la durée personnalisée</string>
+    <string name="player_sleep_custom_minus">Réduire la durée personnalisée</string>
     <string name="plus_subscription_finished">Abonnement terminé</string>
     <string name="shuffle_whats_new_message">Écoutez facilement un épisode aléatoire sans changer l’ordre dans votre file d’attente.</string>
     <string name="shuffle_whats_new_title">Présentation de la lecture aléatoire</string>
@@ -1910,5 +1924,9 @@ Language: fr
     <plurals name="second">
         <item quantity="one">seconde</item>
         <item quantity="other">secondes</item>
+    </plurals>
+    <plurals name="settings_auto_download_on_follow_podcast_description">
+        <item quantity="one">Téléchargez automatiquement le dernier épisode des nouvelles émissions auxquelles vous vous abonnez.</item>
+        <item quantity="other">Téléchargez automatiquement les %s derniers épisodes des nouvelles émissions auxquelles vous vous abonnez.</item>
     </plurals>
 </resources>
