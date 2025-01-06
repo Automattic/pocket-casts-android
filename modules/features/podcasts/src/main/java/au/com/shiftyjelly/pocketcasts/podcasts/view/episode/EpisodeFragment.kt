@@ -583,12 +583,16 @@ class EpisodeFragment : BaseFragment() {
     }
 
     private fun share(state: EpisodeFragmentState.Loaded) {
-        ShareDialogFragment.newInstance(
-            state.podcast,
-            state.episode,
-            SourceView.EPISODE_DETAILS,
-            options = listOf(ShareDialogFragment.Options.Episode),
-        ).show(parentFragmentManager, "share_dialog")
+        if (state.podcast.canShare) {
+            ShareDialogFragment.newInstance(
+                state.podcast,
+                state.episode,
+                SourceView.EPISODE_DETAILS,
+                options = listOf(ShareDialogFragment.Options.Episode),
+            ).show(parentFragmentManager, "share_dialog")
+        } else {
+            Toast.makeText(context, LR.string.sharing_is_not_available_for_private_podcasts, Toast.LENGTH_LONG).show()
+        }
     }
 
     interface EpisodeLoadedListener {
