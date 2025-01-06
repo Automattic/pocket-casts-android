@@ -2268,6 +2268,8 @@ open class PlaybackManager @Inject constructor(
                     showToast(application.getString(LR.string.player_sleep_time_fired_end_of_chapter))
 
                     val podcast = playbackStateRelay.blockingFirst().podcast
+                    // When the "skip last" option is enabled, we need to pause the chapter at the time configured in "skip last."
+                    // Otherwise, this won't work with the sleep timer, as the sleep timer stops only when the chapter finishes
                     if (podcast != null && podcast.skipLastSecs > 0) {
                         pause(sourceView = SourceView.AUTO_PAUSE)
                     }
