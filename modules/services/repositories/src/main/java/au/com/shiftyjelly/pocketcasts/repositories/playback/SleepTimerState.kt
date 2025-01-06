@@ -35,8 +35,3 @@ sealed class SleepTimerHistory(
 
     data object None : SleepTimerHistory(lastFinishedTime = null)
 }
-
-data class LastListenedState(
-    val chapterUuid: String? = null,
-    val episodeUuid: String? = null,
-)
