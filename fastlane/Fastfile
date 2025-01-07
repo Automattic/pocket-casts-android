@@ -395,8 +395,6 @@ platform :android do
       name: version_number
     )
 
-    create_backmerge_pr
-
     # At this point, an intermediate branch has been created by creating a backmerge PR to a hotfix or the next version release branch.
     # This allows us to safely delete the `release/*` remote branch.
     remove_branch_protection(repository: GITHUB_REPO, branch: current_branch)
