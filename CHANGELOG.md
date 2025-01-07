@@ -19,6 +19,8 @@
 *   Updates
     *   Add the ability to dismiss the low storage banner in download screen
         ([#3385](https://github.com/Automattic/pocket-casts-android/pull/3385))
+    *   Disable Private Feed Sharing
+        ([#3395](https://github.com/Automattic/pocket-casts-android/pull/3395))
 
 7.79
 -----

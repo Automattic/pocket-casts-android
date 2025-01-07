@@ -172,6 +172,13 @@ class ShelfSharedViewModel @Inject constructor(
         }
     }
 
+    fun onShareNotAvailable(source: ShelfItemSource) {
+        trackShelfAction(ShelfItem.Share, source)
+        viewModelScope.launch {
+            _snackbarMessages.emit(SnackbarMessage.ShareNotAvailable)
+        }
+    }
+
     fun onEpisodeRemoveClick(source: ShelfItemSource) {
         trackShelfAction(ShelfItem.Download, source)
         viewModelScope.launch {
@@ -365,6 +372,7 @@ class ShelfSharedViewModel @Inject constructor(
         data object EpisodeDownloadStarted : SnackbarMessage
         data object EpisodeRemoved : SnackbarMessage
         data object TranscriptNotAvailable : SnackbarMessage
+        data object ShareNotAvailable : SnackbarMessage
     }
 
     sealed class TransitionState {
