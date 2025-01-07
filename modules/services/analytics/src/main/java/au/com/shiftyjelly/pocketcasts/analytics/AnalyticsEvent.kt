@@ -449,6 +449,7 @@ enum class AnalyticsEvent(val key: String) {
 
     /* Settings - About */
     SETTINGS_ABOUT_SHOWN("settings_about_shown"),
+    SETTINGS_ABOUT_SHARE_WITH_FRIENDS_TAPPED("settings_about_share_with_friends_tapped"),
 
     /* Settings - Appearance */
     SETTINGS_APPEARANCE_SHOWN("settings_appearance_shown"),

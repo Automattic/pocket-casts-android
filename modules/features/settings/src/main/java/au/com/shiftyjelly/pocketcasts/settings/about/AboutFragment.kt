@@ -103,6 +103,9 @@ class AboutFragment : BaseFragment() {
                 onRateUsTapped = {
                     analyticsTracker.track(AnalyticsEvent.RATE_US_TAPPED, mapOf("source" to SourceView.ABOUT.analyticsValue))
                 },
+                onShareWithFriendsTapped = {
+                    analyticsTracker.track(AnalyticsEvent.SETTINGS_ABOUT_SHARE_WITH_FRIENDS_TAPPED)
+                },
             )
         }
     }
@@ -182,6 +185,7 @@ private val icons = listOf(
 private fun AboutPage(
     onBackPressed: () -> Unit,
     onRateUsTapped: () -> Unit,
+    onShareWithFriendsTapped: () -> Unit,
     bottomInset: Dp,
     openFragment: (Fragment) -> Unit,
 ) {
@@ -230,7 +234,10 @@ private fun AboutPage(
         item {
             RowTextButton(
                 text = stringResource(LR.string.settings_about_share_with_friends),
-                onClick = { shareWithFriends(context) },
+                onClick = {
+                    onShareWithFriendsTapped()
+                    shareWithFriends(context)
+                },
             )
         }
         item {
@@ -430,5 +437,6 @@ private fun AboutPagePreview() {
         bottomInset = 0.dp,
         openFragment = {},
         onRateUsTapped = {},
+        onShareWithFriendsTapped = {},
     )
 }
