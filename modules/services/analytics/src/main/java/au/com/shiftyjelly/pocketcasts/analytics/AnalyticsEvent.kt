@@ -621,6 +621,7 @@ enum class AnalyticsEvent(val key: String) {
 
     /* App Store Review */
     APP_STORE_REVIEW_REQUESTED("app_store_review_requested"),
+    RATE_US_TAPPED("rate_us_tapped"),
 
     /* Deselect Chapters */
     DESELECT_CHAPTERS_TOGGLED_ON("deselect_chapters_toggled_on"),

@@ -139,6 +139,7 @@ internal fun OnboardingUpgradeFeaturesPage(
                         state = loadedState,
                         onNotNowPressed = onNotNowPressed,
                         onClickSubscribe = { onClickSubscribe(true) },
+                        onRateUsPressed = { viewModel.onRateUsPressed() },
                         canUpgrade = canUpgrade,
                     )
                 }
