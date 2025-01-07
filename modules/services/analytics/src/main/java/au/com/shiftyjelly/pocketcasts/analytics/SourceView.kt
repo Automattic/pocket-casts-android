@@ -51,6 +51,7 @@ enum class SourceView(val analyticsValue: String) {
     UNKNOWN("unknown"),
     UP_NEXT("up_next"),
     WHATS_NEW("whats_new"),
+    ABOUT("about"),
     STORAGE_AND_DATA_USAGE("storage_and_data_usage"),
     WIDGET_PLAYER_LARGE("widget_player_large"),
     WIDGET_PLAYER_MEDIUM("widget_player_medium"),

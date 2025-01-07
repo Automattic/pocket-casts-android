@@ -53,6 +53,7 @@ import androidx.fragment.compose.content
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
@@ -99,6 +100,9 @@ class AboutFragment : BaseFragment() {
                 },
                 onBackPressed = { closeFragment() },
                 bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
+                onRateUsTapped = {
+                    analyticsTracker.track(AnalyticsEvent.RATE_US_TAPPED, mapOf("source" to SourceView.ABOUT.analyticsValue))
+                },
             )
         }
     }
@@ -177,6 +181,7 @@ private val icons = listOf(
 @Composable
 private fun AboutPage(
     onBackPressed: () -> Unit,
+    onRateUsTapped: () -> Unit,
     bottomInset: Dp,
     openFragment: (Fragment) -> Unit,
 ) {
@@ -216,7 +221,10 @@ private fun AboutPage(
         item {
             RowTextButton(
                 text = stringResource(LR.string.settings_about_rate_us),
-                onClick = { rateUs(context) },
+                onClick = {
+                    onRateUsTapped()
+                    rateUs(context)
+                },
             )
         }
         item {
@@ -421,5 +429,6 @@ private fun AboutPagePreview() {
         onBackPressed = {},
         bottomInset = 0.dp,
         openFragment = {},
+        onRateUsTapped = {},
     )
 }
