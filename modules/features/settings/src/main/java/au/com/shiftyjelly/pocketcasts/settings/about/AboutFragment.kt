@@ -106,6 +106,9 @@ class AboutFragment : BaseFragment() {
                 onShareWithFriendsTapped = {
                     analyticsTracker.track(AnalyticsEvent.SETTINGS_ABOUT_SHARE_WITH_FRIENDS_TAPPED)
                 },
+                onWebsiteTapped = {
+                    analyticsTracker.track(AnalyticsEvent.SETTINGS_ABOUT_WEBSITE_TAPPED)
+                },
             )
         }
     }
@@ -186,6 +189,7 @@ private fun AboutPage(
     onBackPressed: () -> Unit,
     onRateUsTapped: () -> Unit,
     onShareWithFriendsTapped: () -> Unit,
+    onWebsiteTapped: () -> Unit,
     bottomInset: Dp,
     openFragment: (Fragment) -> Unit,
 ) {
@@ -247,7 +251,10 @@ private fun AboutPage(
             RowTextButton(
                 text = stringResource(LR.string.settings_about_website),
                 secondaryText = "pocketcasts.com",
-                onClick = { openUrl("https://www.pocketcasts.com", context) },
+                onClick = {
+                    onWebsiteTapped()
+                    openUrl("https://www.pocketcasts.com", context)
+                },
             )
         }
         item {
@@ -438,5 +445,6 @@ private fun AboutPagePreview() {
         openFragment = {},
         onRateUsTapped = {},
         onShareWithFriendsTapped = {},
+        onWebsiteTapped = {},
     )
 }
