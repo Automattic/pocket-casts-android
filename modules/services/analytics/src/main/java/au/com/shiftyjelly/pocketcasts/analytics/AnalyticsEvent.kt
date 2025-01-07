@@ -503,6 +503,8 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_GENERAL_EPISODE_GROUPING_APPLYING_TO_EXISTING("settings_general_episode_grouping_applying_to_existing"),
     SETTINGS_GENERAL_EPISODE_GROUPING_NO_APPLYING_TO_EXISTING("settings_general_episode_grouping_no_applying_to_existing"),
     SETTINGS_GENERAL_ARCHIVED_EPISODES_CHANGED("settings_general_archived_episodes_changed"),
+    SETTINGS_GENERAL_ARCHIVED_EPISODES_APPLY_TO_EXISTING("settings_general_archived_episodes_apply_to_existing"),
+    SETTINGS_GENERAL_ARCHIVED_EPISODES_DO_NOT_APPLY_TO_EXISTING("settings_general_archived_episodes_do_not_apply_to_existing"),
     SETTINGS_GENERAL_UP_NEXT_SWIPE_CHANGED("settings_general_up_next_swipe_changed"),
     SETTINGS_GENERAL_SKIP_FORWARD_CHANGED("settings_general_skip_forward_changed"),
     SETTINGS_GENERAL_SKIP_BACK_CHANGED("settings_general_skip_back_changed"),

@@ -711,7 +711,11 @@ class PlaybackSettingsFragment : BaseFragment() {
             .setTitle(getString(LR.string.settings_apply_to_existing_podcasts))
             .setSummary(getString(if (shouldShow) LR.string.settings_apply_archived_show else LR.string.settings_apply_archived_hide))
             .setIconId(R.drawable.ic_podcasts)
+            .setOnSecondary {
+                analyticsTracker.track(AnalyticsEvent.SETTINGS_GENERAL_ARCHIVED_EPISODES_DO_NOT_APPLY_TO_EXISTING)
+            }
             .setOnConfirm {
+                analyticsTracker.track(AnalyticsEvent.SETTINGS_GENERAL_ARCHIVED_EPISODES_APPLY_TO_EXISTING)
                 applicationScope.launch {
                     podcastManager.updateAllShowArchived(shouldShow)
                 }
