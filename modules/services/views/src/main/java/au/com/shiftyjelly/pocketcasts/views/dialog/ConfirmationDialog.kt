@@ -20,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.databinding.FragmentConfirmationBinding
+import au.com.shiftyjelly.pocketcasts.views.extensions.setSystemWindowInsetToPadding
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -132,6 +133,8 @@ open class ConfirmationDialog : BottomSheetDialogFragment() {
         iconTintAttr?.let { binding.imgIcon.imageTintList = ColorStateList.valueOf(context.getThemeColor(it)) }
 
         val layout = binding.root as ViewGroup
+        layout.setSystemWindowInsetToPadding(bottom = true)
+
         val btnConfirm = binding.btnConfirm
         val btnSecondary = binding.btnSecondary
 
