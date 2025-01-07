@@ -127,6 +127,7 @@ class AccountDetailsFragment : BaseFragment() {
                 OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
             },
             onFeatureCardChanged = { featureCard ->
+                analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_SUBSCRIPTION_TIER_CHANGED, mapOf("value" to featureCard.subscriptionTier.name.lowercase()))
                 upgradeBannerViewModel.onFeatureCardChanged(featureCard)
             },
             onChangeAvatar = { email ->
