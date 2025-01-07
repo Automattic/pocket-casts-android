@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.compose.dialogs
 
 import androidx.annotation.ColorInt
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -76,8 +75,7 @@ private fun OptionsDialogRow(option: OptionsDialogOption, @ColorInt iconColor: I
             .height(74.dp)
             .fillMaxWidth()
             .clickable(enabled = option.click != null) { option.click?.invoke() }
-            .testTag("option_$index")
-            .background(option.backgroundColor ?: MaterialTheme.theme.colors.primaryUi01),
+            .testTag("option_$index"),
     ) {
         if (option.imageId != null) {
             Spacer(modifier = Modifier.width(20.dp))

@@ -197,6 +197,7 @@
         <item name="isDark">false</item>
         <item name="isImageTintEnabled">false</item>
         <item name="imageTintThemeCacheTag">light</item>
+        <item name="enableEdgeToEdge">true</item>
 
         <item name="toolbarTheme">@style/LightToolbarTheme</item>
 
@@ -411,6 +412,7 @@
         <item name="isDark">true</item>
         <item name="isImageTintEnabled">false</item>
         <item name="imageTintThemeCacheTag">dark</item>
+        <item name="enableEdgeToEdge">true</item>
 
         <!-- Default colours -->
         <item name="colorSearchBox">@color/searchBoxDark</item>
