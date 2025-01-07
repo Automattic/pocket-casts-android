@@ -692,7 +692,11 @@ class PlaybackSettingsFragment : BaseFragment() {
                 ),
             )
             .setIconId(R.drawable.ic_podcasts)
+            .setOnSecondary {
+                analyticsTracker.track(AnalyticsEvent.SETTINGS_GENERAL_EPISODE_GROUPING_NO_APPLYING_TO_EXISTING)
+            }
             .setOnConfirm {
+                analyticsTracker.track(AnalyticsEvent.SETTINGS_GENERAL_EPISODE_GROUPING_APPLYING_TO_EXISTING)
                 applicationScope.launch {
                     podcastManager.updateGroupingForAllBlocking(grouping)
                 }
