@@ -412,8 +412,6 @@
         <item name="isDark">true</item>
         <item name="isImageTintEnabled">false</item>
         <item name="imageTintThemeCacheTag">dark</item>
-        <item name="enableEdgeToEdge">true</item>
-        <item name="android:navigationBarColor">@android:color/transparent</item>
 
         <!-- Default colours -->
         <item name="colorSearchBox">@color/searchBoxDark</item>
