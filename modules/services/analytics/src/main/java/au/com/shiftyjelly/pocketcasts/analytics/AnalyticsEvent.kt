@@ -451,6 +451,11 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_ABOUT_SHOWN("settings_about_shown"),
     SETTINGS_ABOUT_SHARE_WITH_FRIENDS_TAPPED("settings_about_share_with_friends_tapped"),
     SETTINGS_ABOUT_WEBSITE_TAPPED("settings_about_website_tapped"),
+    SETTINGS_ABOUT_INSTAGRAM_TAPPED("settings_about_instagram_tapped"),
+    SETTINGS_ABOUT_TWITTER_TAPPED("settings_about_twitter_tapped"),
+    SETTINGS_ABOUT_AUTOMATTIC_FAMILY_TAPPED("settings_about_automattic_family_tapped"),
+    SETTINGS_ABOUT_LEGAL_AND_MORE_TAPPED("settings_about_legal_and_more_tapped"),
+    SETTINGS_ABOUT_WORK_WITH_US_TAPPED("settings_about_work_with_us_tapped"),
 
     /* Settings - Appearance */
     SETTINGS_APPEARANCE_SHOWN("settings_appearance_shown"),
