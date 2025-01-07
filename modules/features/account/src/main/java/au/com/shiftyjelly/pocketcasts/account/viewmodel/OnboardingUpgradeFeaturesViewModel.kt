@@ -177,6 +177,7 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
                     frequency = frequency,
                 )
             settings.setLastSelectedSubscriptionFrequency(frequency)
+            analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_SUBSCRIPTION_FREQUENCY_CHANGED, mapOf("value" to frequency.name.lowercase()))
             currentSubscription?.let {
                 _state.update {
                     loadedState.copy(
@@ -196,6 +197,7 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
                     tier = upgradeFeatureCard.subscriptionTier,
                     frequency = loadedState.currentSubscriptionFrequency,
                 )
+            analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_SUBSCRIPTION_TIER_CHANGED, mapOf("value" to upgradeFeatureCard.subscriptionTier.name.lowercase()))
             settings.setLastSelectedSubscriptionTier(upgradeFeatureCard.subscriptionTier)
             currentSubscription?.let {
                 _state.update {
