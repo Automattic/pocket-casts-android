@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade
 import androidx.activity.SystemBarStyle
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -154,6 +153,8 @@ internal fun OnboardingUpgradeFeaturesPage(
                         onFeatureCardChanged = { viewModel.onFeatureCardChanged(loadedState.featureCardsState.featureCards[it]) },
                         onClickSubscribe = { onClickSubscribe(false) },
                         canUpgrade = canUpgrade,
+                        onPrivacyPolicyClick = { viewModel.onPrivacyPolicyPressed() },
+                        onTermsAndConditionsClick = { viewModel.onTermsAndConditionsPressed() },
                     )
                 }
             }
@@ -178,6 +179,8 @@ private fun UpgradeLayoutOriginal(
     onSubscriptionFrequencyChanged: (SubscriptionFrequency) -> Unit,
     onFeatureCardChanged: (Int) -> Unit,
     onClickSubscribe: () -> Unit,
+    onPrivacyPolicyClick: () -> Unit = {},
+    onTermsAndConditionsClick: () -> Unit = {},
     canUpgrade: Boolean,
     modifier: Modifier = Modifier,
 ) {
@@ -275,6 +278,8 @@ private fun UpgradeLayoutOriginal(
                             state = state,
                             upgradeButton = state.currentUpgradeButton,
                             onFeatureCardChanged = onFeatureCardChanged,
+                            onPrivacyPolicyClick = onPrivacyPolicyClick,
+                            onTermsAndConditionsClick = onTermsAndConditionsClick,
                         )
                     }
 
@@ -292,12 +297,13 @@ private fun UpgradeLayoutOriginal(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FeatureCards(
     state: OnboardingUpgradeFeaturesState.Loaded,
     upgradeButton: UpgradeButton,
     onFeatureCardChanged: (Int) -> Unit,
+    onPrivacyPolicyClick: () -> Unit = {},
+    onTermsAndConditionsClick: () -> Unit = {},
 ) {
     val featureCardsState = state.featureCardsState
     val currentSubscriptionFrequency = state.currentSubscriptionFrequency
@@ -314,6 +320,8 @@ fun FeatureCards(
             card = featureCardsState.featureCards[index],
             subscriptionFrequency = currentSubscriptionFrequency,
             upgradeButton = upgradeButton,
+            onPrivacyPolicyClick = onPrivacyPolicyClick,
+            onTermsAndConditionsClick = onTermsAndConditionsClick,
             modifier = if (pagerHeight > 0) {
                 Modifier.height(pagerHeight.pxToDp(LocalContext.current).dp)
             } else {
@@ -330,6 +338,8 @@ private fun FeatureCard(
     subscription: Subscription,
     subscriptionFrequency: SubscriptionFrequency,
     modifier: Modifier = Modifier,
+    onPrivacyPolicyClick: () -> Unit = {},
+    onTermsAndConditionsClick: () -> Unit = {},
 ) {
     Card(
         shape = RoundedCornerShape(24.dp),
@@ -416,6 +426,8 @@ private fun FeatureCard(
                     color = Color.Black.copy(alpha = .5f),
                     textAlign = TextAlign.Start,
                     lineHeight = 18.sp,
+                    onPrivacyPolicyClick = onPrivacyPolicyClick,
+                    onTermsAndConditionsClick = onTermsAndConditionsClick,
                 )
             }
         }

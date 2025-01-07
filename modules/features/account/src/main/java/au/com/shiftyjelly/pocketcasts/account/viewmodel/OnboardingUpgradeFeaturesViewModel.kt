@@ -276,6 +276,18 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
         }
     }
 
+    fun onRateUsPressed() {
+        analyticsTracker.track(AnalyticsEvent.RATE_US_TAPPED, mapOf("source" to OnboardingUpgradeSource.PLUS_DETAILS.analyticsValue))
+    }
+
+    fun onPrivacyPolicyPressed() {
+        analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_PRIVACY_POLICY_TAPPED)
+    }
+
+    fun onTermsAndConditionsPressed() {
+        analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_TERMS_AND_CONDITIONS_TAPPED)
+    }
+
     companion object {
         private fun analyticsProps(flow: OnboardingFlow, source: OnboardingUpgradeSource) =
             mapOf("flow" to flow.analyticsValue, "source" to source.analyticsValue)

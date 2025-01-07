@@ -60,6 +60,8 @@ private const val UNKNOWN_TIER = "unknown_tier"
 @Composable
 fun OnboardingUpgradeBottomSheet(
     onClickSubscribe: () -> Unit,
+    onPrivacyPolicyClick: () -> Unit = {},
+    onTermsAndConditionsClick: () -> Unit = {},
 ) {
     // The keyboard sometimes gets opened when returning from the Google payment flow.
     // This is keeps it closed while on this screen.
@@ -219,6 +221,8 @@ fun OnboardingUpgradeBottomSheet(
         OnboardingUpgradeHelper.PrivacyPolicy(
             color = Color.White,
             textAlign = TextAlign.Center,
+            onPrivacyPolicyClick = onPrivacyPolicyClick,
+            onTermsAndConditionsClick = onTermsAndConditionsClick,
         )
 
         Spacer(Modifier.height(16.dp))
