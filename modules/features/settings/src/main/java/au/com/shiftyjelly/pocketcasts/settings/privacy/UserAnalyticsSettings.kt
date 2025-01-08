@@ -22,6 +22,7 @@ class UserAnalyticsSettings @Inject constructor(
     }
 
     fun updateCrashReportsSetting(enabled: Boolean) {
+        analyticsTracker.track(AnalyticsEvent.CRASH_REPORTS_TOGGLED, mapOf("enabled" to enabled))
         settings.sendCrashReports.set(enabled, updateModifiedAt = true)
     }
 
