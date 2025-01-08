@@ -229,7 +229,7 @@ class Support @Inject constructor(
             output.append(eol)
 
             output.append("Background refresh: ").append(settings.backgroundRefreshPodcasts.value).append(eol)
-            output.append("Battery restriction: ${systemBatteryRestrictions.status}")
+            output.append("Battery restriction: ${systemBatteryRestrictions.status}").append(eol)
             output.append(eol)
 
             if (Build.VERSION.SDK_INT >= 30) {
@@ -248,7 +248,7 @@ class Support @Inject constructor(
 
             val features = Feature.entries.map { "${it.key}: ${FeatureFlag.isEnabled(it)}" }
             output.append("Feature flags").append(eol)
-            features.forEach { output.append(it).append(eol) }
+            features.forEach { output.append("  ").append(it).append(eol) }
 
             val podcastsOutput = StringBuilder()
             podcastsOutput.append("Podcasts").append(eol).append("--------").append(eol).append(eol)
@@ -264,8 +264,11 @@ class Support @Inject constructor(
                     podcastsOutput.append(if (podcast.title.isEmpty()) "-" else podcast.title).append(eol)
                     podcastsOutput.append("Last episode: ").append(podcast.latestEpisodeUuid).append(eol)
                     val effects = podcast.playbackEffects
-                    podcastsOutput.append("Audio effects: ").append(if (podcast.overrideGlobalEffects) "on" else "off").append(" Silence removed: ").append(effects.trimMode).append(" Speed: ").append(effects.playbackSpeed).append(" Boost: ")
-                        .append(if (effects.isVolumeBoosted) "on" else "off").append(eol)
+                    podcastsOutput.append("Audio effects: ").append(if (podcast.overrideGlobalEffects) "on" else "off")
+                        .append(" Silence removed: ").append(effects.trimMode.toString().lowercase())
+                        .append(" Speed: ").append(effects.playbackSpeed)
+                        .append(" Boost: ").append(if (effects.isVolumeBoosted) "on" else "off")
+                        .append(eol)
                     podcastsOutput.append("Auto download? ").append(podcast.isAutoDownloadNewEpisodes).append(eol)
                     podcastsOutput.append("Custom auto archive: ").append(podcast.overrideGlobalArchive.toString()).append(eol)
                     if (podcast.overrideGlobalArchive) {
@@ -284,16 +287,16 @@ class Support @Inject constructor(
 
             output.append(eol)
             output.append("Auto archive settings").append(eol)
-            output.append("Auto archive played episodes after: ${settings.autoArchiveAfterPlaying.value.analyticsValue}").append(eol)
-            output.append("Auto archive inactive episodes after: ${settings.autoArchiveInactive.value.analyticsValue}").append(eol)
-            output.append("Auto archive starred episodes: ${settings.autoArchiveIncludesStarred.value}").append(eol)
+            output.append("  Auto archive played episodes after: ${settings.autoArchiveAfterPlaying.value.analyticsValue}").append(eol)
+            output.append("  Auto archive inactive episodes after: ${settings.autoArchiveInactive.value.analyticsValue}").append(eol)
+            output.append("  Auto archive starred episodes: ${settings.autoArchiveIncludesStarred.value}").append(eol)
 
             output.append(eol)
             output.append("Auto downloads").append(eol)
             output.append("  Any podcast? ").append(yesNoString(autoDownloadOn[0])).append(eol)
-            output.append("  New Episodes? ").append(yesNoString(settings.autoDownloadNewEpisodes.value == AUTO_DOWNLOAD_NEW_EPISODES)).append(eol)
-            output.append("  On Follow? ").append(yesNoString(settings.autoDownloadOnFollowPodcast.value)).append(eol)
-            output.append("  Limit Downloads ").append(settings.autoDownloadLimit.value).append(eol)
+            output.append("  New episodes? ").append(yesNoString(settings.autoDownloadNewEpisodes.value == AUTO_DOWNLOAD_NEW_EPISODES)).append(eol)
+            output.append("  On follow? ").append(yesNoString(settings.autoDownloadOnFollowPodcast.value)).append(eol)
+            output.append("  Limit downloads: ").append(settings.autoDownloadLimit.value).append(eol)
             output.append("  Up Next? ").append(yesNoString(settings.autoDownloadUpNext.value)).append(eol)
             output.append("  Only on unmetered WiFi? ").append(yesNoString(settings.autoDownloadUnmeteredOnly.value)).append(eol)
             output.append("  Only when charging? ").append(yesNoString(settings.autoDownloadOnlyWhenCharging.value)).append(eol)
@@ -392,7 +395,7 @@ class Support @Inject constructor(
                 output.append("Effects").append(eol)
                 output.append("Global Audio effects: ")
                     .append(" Playback speed: ").append(effects.playbackSpeed).append(eol)
-                    .append(" Silence removed: ").append(effects.trimMode).append(eol)
+                    .append(" Silence removed: ").append(effects.trimMode.toString().lowercase()).append(eol)
                     .append(" Volume boost: ").append(if (effects.isVolumeBoosted) "on" else "off").append(eol).append(eol)
 
                 output.append("Database").append(eol)

@@ -95,12 +95,12 @@ class AppIcon @Inject constructor(
             launcherIcon = IR.mipmap.ic_launcher_redvelvet,
             aliasName = ".ui.MainActivity_11",
         ),
-        PRIDE_2023(
-            setting = AppIconSetting.PRIDE_2023,
-            labelId = LR.string.settings_app_icon_pride_2023,
-            settingsIcon = IR.drawable.appicon_pride_2023,
+        PRIDE(
+            setting = AppIconSetting.PRIDE,
+            labelId = LR.string.settings_app_icon_pride,
+            settingsIcon = IR.drawable.appicon_pride,
             tier = SubscriptionTier.NONE,
-            launcherIcon = IR.mipmap.ic_launcher_pride_2023,
+            launcherIcon = IR.mipmap.ic_launcher_pride,
             aliasName = ".ui.MainActivity_18",
         ),
         PLUS(
@@ -195,7 +195,7 @@ class AppIcon @Inject constructor(
                 AppIconSetting.ROSE -> ROSE
                 AppIconSetting.CAT -> CAT
                 AppIconSetting.REDVELVET -> REDVELVET
-                AppIconSetting.PRIDE_2023 -> PRIDE_2023
+                AppIconSetting.PRIDE -> PRIDE
                 AppIconSetting.PLUS -> PLUS
                 AppIconSetting.CLASSIC -> CLASSIC
                 AppIconSetting.ELECTRIC_BLUE -> ELECTRIC_BLUE

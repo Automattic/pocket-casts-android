@@ -101,7 +101,7 @@ class SettingsAppearanceViewModel @Inject constructor(
                     AppIcon.AppIconType.PATRON_ROUND -> "patron_round"
                     AppIcon.AppIconType.PATRON_GLOW -> "patron_glow"
                     AppIcon.AppIconType.PATRON_DARK -> "patron_dark"
-                    AppIcon.AppIconType.PRIDE_2023 -> "pride_2023"
+                    AppIcon.AppIconType.PRIDE -> "pride_2023"
                 },
             ),
         )
