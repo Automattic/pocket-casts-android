@@ -487,6 +487,12 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_AUTO_DOWNLOAD_STOP_ALL_DOWNLOADS("settings_auto_download_stop_all_downloads"),
     SETTINGS_AUTO_DOWNLOAD_CLEAR_DOWNLOAD_ERRORS("settings_auto_download_clear_download_errors"),
 
+    /* Settings - Select Podcasts */
+    SETTINGS_SELECT_PODCASTS_SHOWN("settings_select_podcasts_shown"),
+    SETTINGS_SELECT_PODCASTS_SELECT_ALL_TAPPED("settings_select_podcasts_select_all_tapped"),
+    SETTINGS_SELECT_PODCASTS_SELECT_NONE_TAPPED("settings_select_podcasts_select_none_tapped"),
+    SETTINGS_SELECT_PODCASTS_PODCAST_TOGGLED("settings_select_podcasts_podcast_toggled"),
+
     /* Settings - Files */
     SETTINGS_FILES_SHOWN("settings_files_shown"),
     SETTINGS_FILES_AUTO_ADD_UP_NEXT_TOGGLED("settings_files_auto_add_up_next_toggled"),
