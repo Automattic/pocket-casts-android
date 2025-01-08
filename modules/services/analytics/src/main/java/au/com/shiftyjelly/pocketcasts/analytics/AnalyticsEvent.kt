@@ -117,6 +117,7 @@ enum class AnalyticsEvent(val key: String) {
     PROFILE_ACCOUNT_BUTTON_TAPPED("profile_account_button_tapped"),
     PROFILE_SETTINGS_BUTTON_TAPPED("profile_settings_button_tapped"),
     PROFILE_REFRESH_BUTTON_TAPPED("profile_refresh_button_tapped"),
+    PROFILE_REFRESH_UPGRADE_BANNER_DISMISSED("profile_refresh_upgrade_banner_dismissed"),
 
     /* Stats View */
     STATS_SHOWN("stats_shown"),
