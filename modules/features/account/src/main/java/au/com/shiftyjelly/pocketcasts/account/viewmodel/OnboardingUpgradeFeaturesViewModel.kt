@@ -177,6 +177,7 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
                     frequency = frequency,
                 )
             settings.setLastSelectedSubscriptionFrequency(frequency)
+            analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_SUBSCRIPTION_FREQUENCY_CHANGED, mapOf("value" to frequency.name.lowercase()))
             currentSubscription?.let {
                 _state.update {
                     loadedState.copy(
@@ -196,6 +197,7 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
                     tier = upgradeFeatureCard.subscriptionTier,
                     frequency = loadedState.currentSubscriptionFrequency,
                 )
+            analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_SUBSCRIPTION_TIER_CHANGED, mapOf("value" to upgradeFeatureCard.subscriptionTier.name.lowercase()))
             settings.setLastSelectedSubscriptionTier(upgradeFeatureCard.subscriptionTier)
             currentSubscription?.let {
                 _state.update {
@@ -272,6 +274,18 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    fun onRateUsPressed() {
+        analyticsTracker.track(AnalyticsEvent.RATE_US_TAPPED, mapOf("source" to OnboardingUpgradeSource.PLUS_DETAILS.analyticsValue))
+    }
+
+    fun onPrivacyPolicyPressed() {
+        analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_PRIVACY_POLICY_TAPPED)
+    }
+
+    fun onTermsAndConditionsPressed() {
+        analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_TERMS_AND_CONDITIONS_TAPPED)
     }
 
     companion object {
