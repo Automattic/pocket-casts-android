@@ -472,6 +472,11 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_APPEARANCE_USE_DARK_UP_NEXT_TOGGLED("settings_appearance_use_dark_up_next_toggled"),
     SETTINGS_APPEARANCE_USE_DYNAMIC_COLORS_WIDGET_TOGGLED("settings_appearance_use_dynamic_colors_widget_toggled"),
 
+    /* Settings - Advanced Episode Artwork */
+    SETTINGS_ADVANCED_EPISODE_ARTWORK_SHOWN("settings_advanced_episode_artwork_shown"),
+    SETTINGS_ADVANCED_EPISODE_ARTWORK_USE_EPISODE_ARTWORK_TOGGLED("settings_advanced_episode_artwork_use_episode_artwork_toggled"),
+    SETTINGS_ADVANCED_EPISODE_ARTWORK_CUSTOMIZATION_ELEMENT_TOGGLED("settings_advanced_episode_artwork_customization_element_toggled"),
+
     /* Settings - Auto add */
     SETTINGS_AUTO_ADD_UP_NEXT_SHOWN("settings_auto_add_up_next_shown"),
     SETTINGS_AUTO_ADD_UP_NEXT_AUTO_ADD_LIMIT_CHANGED("settings_auto_add_up_next_auto_add_limit_changed"),
