@@ -68,6 +68,7 @@ fun BookmarksPage(
     showOptionsDialog: (Int) -> Unit,
     openFragment: (Fragment) -> Unit,
     onClearSearchTapped: () -> Unit,
+    onSearchBarClearButtonTapped: () -> Unit,
     bottomInset: Dp,
 ) {
     val context = LocalContext.current
@@ -88,6 +89,7 @@ fun BookmarksPage(
         openFragment = openFragment,
         bottomInset = bottomInset,
         onClearSearchTapped = onClearSearchTapped,
+        onSearchBarClearButtonTapped = onSearchBarClearButtonTapped,
     )
     LaunchedEffect(episodeUuid) {
         bookmarksViewModel.loadBookmarks(
@@ -135,6 +137,7 @@ private fun Content(
     onUpgradeClicked: () -> Unit,
     openFragment: (Fragment) -> Unit,
     onClearSearchTapped: () -> Unit,
+    onSearchBarClearButtonTapped: () -> Unit,
     bottomInset: Dp,
 ) {
     Box(
@@ -153,6 +156,7 @@ private fun Content(
                 onSearchTextChanged = onSearchTextChanged,
                 bottomInset = bottomInset,
                 onClearSearchTapped = onClearSearchTapped,
+                onSearchBarClearButtonTapped = onSearchBarClearButtonTapped,
             )
 
             is UiState.Empty -> NoBookmarksView(
@@ -184,6 +188,7 @@ private fun BookmarksView(
     onPlayClick: (Bookmark) -> Unit,
     onSearchTextChanged: (String) -> Unit,
     onClearSearchTapped: () -> Unit,
+    onSearchBarClearButtonTapped: () -> Unit,
     bottomInset: Dp,
 ) {
     val focusRequester = remember { FocusRequester() }
@@ -198,6 +203,7 @@ private fun BookmarksView(
                     text = state.searchText,
                     placeholder = stringResource(LR.string.search),
                     onTextChanged = onSearchTextChanged,
+                    onClearButtonTapped = onSearchBarClearButtonTapped,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
@@ -307,6 +313,7 @@ private fun BookmarksPreview(
             onUpgradeClicked = {},
             openFragment = {},
             onClearSearchTapped = {},
+            onSearchBarClearButtonTapped = {},
             bottomInset = 0.dp,
         )
     }

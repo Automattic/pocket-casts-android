@@ -356,6 +356,10 @@ class BookmarksViewModel
         analyticsTracker.track(AnalyticsEvent.BOOKMARKS_CLEAR_SEARCH_TAPPED)
     }
 
+    fun searchBarClearButtonTapped() {
+        analyticsTracker.track(AnalyticsEvent.BOOKMARKS_SEARCHBAR_CLEAR_BUTTON_TAPPED)
+    }
+
     sealed class UiState {
         data class Empty(val sourceView: SourceView) : UiState() {
             val colors: NoBookmarksViewColors
