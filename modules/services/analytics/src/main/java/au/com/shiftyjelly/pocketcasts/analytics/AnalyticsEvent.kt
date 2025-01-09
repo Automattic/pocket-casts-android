@@ -17,6 +17,8 @@ enum class AnalyticsEvent(val key: String) {
     BOOKMARKS_SORT_BY_CHANGED("bookmarks_sort_by_changed"),
     BOOKMARK_DELETED("bookmark_deleted"),
     BOOKMARKS_CLEAR_SEARCH_TAPPED("bookmarks_clear_search_tapped"),
+    BOOKMARK_DELETE_FORM_SHOWN("bookmark_delete_form_shown"),
+    BOOKMARK_DELETE_FORM_SUBMITTED("bookmark_delete_form_submitted"),
     BOOKMARKS_SEARCHBAR_CLEAR_BUTTON_TAPPED("bookmarks_searchbar_clear_button_tapped"),
     BOOKMARK_EDIT_FORM_SHOWN("bookmark_edit_form_shown"),
     BOOKMARK_EDIT_FORM_DISMISSED("bookmark_edit_form_dismissed"),
