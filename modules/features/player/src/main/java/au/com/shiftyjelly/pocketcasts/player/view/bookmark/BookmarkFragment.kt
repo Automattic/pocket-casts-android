@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import dagger.hilt.android.AndroidEntryPoint
@@ -30,6 +31,11 @@ class BookmarkFragment : Fragment() {
         LaunchedEffect(Unit) { viewModel.load(BookmarkArguments.createFromArguments(arguments)) }
         AppThemeWithBackground(Theme.ThemeType.DARK) {
             val uiState: BookmarkViewModel.UiState by viewModel.uiState.collectAsState()
+
+            CallOnce {
+                viewModel.onShown()
+            }
+
             BookmarkPage(
                 isNewBookmark = uiState.isNewBookmark,
                 title = uiState.title,
@@ -44,6 +50,7 @@ class BookmarkFragment : Fragment() {
     }
 
     private fun saveBookmark() {
+        viewModel.onSubmitBookmark()
         viewModel.saveBookmark(onSaved = { bookmark, isExisting ->
             bookmarkSaved(bookmark, isExisting)
         })
@@ -63,6 +70,7 @@ class BookmarkFragment : Fragment() {
     }
 
     private fun close() {
+        viewModel.onClose()
         requireActivity().run {
             setResult(Activity.RESULT_CANCELED)
             finish()
