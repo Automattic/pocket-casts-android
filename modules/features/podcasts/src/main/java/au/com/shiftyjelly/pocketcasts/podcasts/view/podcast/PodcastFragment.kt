@@ -723,6 +723,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     private fun onShareBookmarkClick() {
         lifecycleScope.launch {
             val (podcast, episode, bookmark) = viewModel.getSharedBookmark() ?: return@launch
+            viewModel.onBookmarkShare(podcast.uuid, episode.uuid, sourceView)
             val timestamp = bookmark.timeSecs.seconds
             if (FeatureFlag.isEnabled(Feature.REIMAGINE_SHARING)) {
                 ShareEpisodeTimestampFragment
