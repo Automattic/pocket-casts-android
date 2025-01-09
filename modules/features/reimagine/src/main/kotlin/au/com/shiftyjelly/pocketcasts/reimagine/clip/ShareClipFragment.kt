@@ -17,6 +17,8 @@ import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.reimagine.clip.ShareClipViewModel.SnackbarMessage
@@ -68,6 +70,9 @@ class ShareClipFragment : BaseDialogFragment() {
     lateinit var sharingClient: SharingClient
 
     @Inject
+    lateinit var analyticsTracker: AnalyticsTracker
+
+    @Inject
     lateinit var clipAnalyticsFactory: ClipAnalytics.Factory
 
     private lateinit var clipAnalytics: ClipAnalytics
@@ -114,6 +119,7 @@ class ShareClipFragment : BaseDialogFragment() {
             assetController = assetController,
             listener = listener,
             snackbarHostState = snackbarHostState,
+            onNavigationButtonTapped = { analyticsTracker.track(AnalyticsEvent.SHARE_SCREEN_NAVIGATION_BUTTON_TAPPED) },
         )
 
         LaunchedEffect(Unit) {
