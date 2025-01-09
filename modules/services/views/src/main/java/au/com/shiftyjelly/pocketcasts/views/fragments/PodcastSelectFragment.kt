@@ -291,7 +291,7 @@ private class PodcastSelectAdapter(val list: List<SelectablePodcast>, @ColorInt 
 }
 
 private fun PodcastSelectFragmentSource?.toEventProperty(): Map<String, String> {
-    return this?.name?.let { mapOf("source" to it.lowercase()) } ?: emptyMap()
+    return this?.analyticsValue?.let { mapOf("source" to it) } ?: emptyMap()
 }
 
 @Parcelize
@@ -301,9 +301,9 @@ private data class PodcastSelectFragmentArgs(
     val source: PodcastSelectFragmentSource,
 ) : Parcelable
 
-enum class PodcastSelectFragmentSource {
-    AUTO_ADD,
-    DOWNLOADS,
-    NOTIFICATIONS,
-    FILTERS,
+enum class PodcastSelectFragmentSource(val analyticsValue: String) {
+    AUTO_ADD("auto_add"),
+    DOWNLOADS("downloads"),
+    NOTIFICATIONS("notifications"),
+    FILTERS("filters"),
 }
