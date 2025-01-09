@@ -7,10 +7,11 @@ import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.transition.ChangeBounds
 import androidx.transition.TransitionManager
 
-fun TextView.readMore(collapsedLines: Int) {
+fun TextView.readMore(collapsedLines: Int, onTextClicked: () -> Unit = {}) {
     maxLines = collapsedLines
     ellipsize = TextUtils.TruncateAt.END
     setOnClickListener {
+        onTextClicked()
         val transition = ChangeBounds().apply {
             duration = 200
             interpolator = FastOutSlowInInterpolator()

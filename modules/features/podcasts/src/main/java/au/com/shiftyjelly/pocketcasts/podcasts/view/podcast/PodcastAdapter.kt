@@ -135,6 +135,7 @@ class PodcastAdapter(
     private val onEpisodeRowLongPress: (PodcastEpisode) -> Unit,
     private val onBookmarkRowLongPress: (Bookmark) -> Unit,
     private val onFoldersClicked: () -> Unit,
+    private val onPodcastDescriptionClicked: () -> Unit,
     private val onNotificationsClicked: () -> Unit,
     private val onSettingsClicked: () -> Unit,
     private val playButtonListener: PlayButton.OnClickListener,
@@ -318,7 +319,9 @@ class PodcastAdapter(
                 podcast.podcastDescription
             }
         holder.binding.bottom.description.setLinkTextColor(tintColor)
-        holder.binding.bottom.description.readMore(3)
+        holder.binding.bottom.description.readMore(3) {
+            onPodcastDescriptionClicked()
+        }
         holder.binding.bottom.authorText.text = podcast.author
         holder.binding.bottom.authorText.isVisible = podcast.author.isNotBlank()
         holder.binding.bottom.authorImage.isVisible = podcast.author.isNotBlank()

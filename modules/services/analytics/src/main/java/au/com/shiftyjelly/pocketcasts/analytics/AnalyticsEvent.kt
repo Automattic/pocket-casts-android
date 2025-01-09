@@ -214,6 +214,7 @@ enum class AnalyticsEvent(val key: String) {
     PODCAST_SCREEN_OPTIONS_TAPPED("podcast_screen_options_tapped"),
     PODCAST_SCREEN_TOGGLE_ARCHIVED("podcast_screen_toggle_archived"),
     PODCAST_SCREEN_TOGGLE_SUMMARY("podcast_screen_toggle_summary"),
+    PODCAST_SCREEN_PODCAST_DESCRIPTION_TAPPED("podcast_screen_podcast_description_tapped"),
     PODCAST_SCREEN_SHARE_TAPPED("podcast_screen_share_tapped"),
     PODCASTS_SCREEN_SORT_ORDER_CHANGED("podcasts_screen_sort_order_changed"),
     PODCASTS_SCREEN_EPISODE_GROUPING_CHANGED("podcasts_screen_episode_grouping_changed"),
