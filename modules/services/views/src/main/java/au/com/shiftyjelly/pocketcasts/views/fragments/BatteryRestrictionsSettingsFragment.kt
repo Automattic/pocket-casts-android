@@ -112,7 +112,7 @@ class BatteryRestrictionsSettingsFragment : BaseFragment() {
                     activity?.onBackPressed()
                 },
                 onClick = {
-                    analyticsTracker.track(AnalyticsEvent.BATTERY_RESTRICTIONS_TOGGLED, mapOf("current_status" to batteryRestrictions.status.name.lowercase()))
+                    analyticsTracker.track(AnalyticsEvent.BATTERY_RESTRICTIONS_TOGGLED, mapOf("current_status" to batteryRestrictions.status.analyticsValue))
                     batteryRestrictions.promptToUpdateBatteryRestriction(context)
                 },
                 openUrl = { url ->
