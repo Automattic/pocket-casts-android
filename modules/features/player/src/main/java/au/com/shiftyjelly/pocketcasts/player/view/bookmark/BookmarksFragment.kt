@@ -146,6 +146,9 @@ class BookmarksFragment : BaseFragment() {
                             addFragment(fragment)
                         }
                     },
+                    onClearSearchTapped = {
+                        bookmarksViewModel.clearSearchTapped()
+                    },
                     bottomInset = if (sourceView == SourceView.PROFILE) {
                         0.dp + bottomInset.value.pxToDp(LocalContext.current).dp
                     } else {

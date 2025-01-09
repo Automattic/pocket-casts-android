@@ -352,6 +352,10 @@ class BookmarksViewModel
         return sortType as UserSetting<BookmarksSortType>
     }
 
+    fun clearSearchTapped() {
+        analyticsTracker.track(AnalyticsEvent.BOOKMARKS_CLEAR_SEARCH_TAPPED)
+    }
+
     sealed class UiState {
         data class Empty(val sourceView: SourceView) : UiState() {
             val colors: NoBookmarksViewColors

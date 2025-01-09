@@ -67,6 +67,7 @@ fun BookmarksPage(
     onUpgradeClicked: () -> Unit,
     showOptionsDialog: (Int) -> Unit,
     openFragment: (Fragment) -> Unit,
+    onClearSearchTapped: () -> Unit,
     bottomInset: Dp,
 ) {
     val context = LocalContext.current
@@ -86,6 +87,7 @@ fun BookmarksPage(
         onUpgradeClicked = onUpgradeClicked,
         openFragment = openFragment,
         bottomInset = bottomInset,
+        onClearSearchTapped = onClearSearchTapped,
     )
     LaunchedEffect(episodeUuid) {
         bookmarksViewModel.loadBookmarks(
@@ -132,6 +134,7 @@ private fun Content(
     onSearchTextChanged: (String) -> Unit,
     onUpgradeClicked: () -> Unit,
     openFragment: (Fragment) -> Unit,
+    onClearSearchTapped: () -> Unit,
     bottomInset: Dp,
 ) {
     Box(
@@ -149,6 +152,7 @@ private fun Content(
                 onPlayClick = onPlayClick,
                 onSearchTextChanged = onSearchTextChanged,
                 bottomInset = bottomInset,
+                onClearSearchTapped = onClearSearchTapped,
             )
 
             is UiState.Empty -> NoBookmarksView(
@@ -179,6 +183,7 @@ private fun BookmarksView(
     onOptionsMenuClicked: () -> Unit,
     onPlayClick: (Bookmark) -> Unit,
     onSearchTextChanged: (String) -> Unit,
+    onClearSearchTapped: () -> Unit,
     bottomInset: Dp,
 ) {
     val focusRequester = remember { FocusRequester() }
@@ -205,7 +210,14 @@ private fun BookmarksView(
             state.searchText.isNotEmpty() &&
             state.bookmarks.isEmpty()
         ) {
-            item { NoBookmarksInSearchView(onActionClick = { onSearchTextChanged("") }) }
+            item {
+                NoBookmarksInSearchView(
+                    onActionClick = {
+                        onClearSearchTapped()
+                        onSearchTextChanged("")
+                    },
+                )
+            }
         } else {
             item {
                 val title = stringResource(
@@ -294,6 +306,7 @@ private fun BookmarksPreview(
             onSearchTextChanged = {},
             onUpgradeClicked = {},
             openFragment = {},
+            onClearSearchTapped = {},
             bottomInset = 0.dp,
         )
     }
