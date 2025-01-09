@@ -11,16 +11,17 @@ data class ArtworkConfiguration(
     fun disable(element: Element) = copy(enabledElements = enabledElements - element)
 
     enum class Element(
+        val analyticsValue: String,
         internal val key: String,
     ) {
-        Filters("filters"),
-        UpNext("up_next"),
-        Downloads("downloads"),
-        Files("files"),
-        Starred("starred"),
-        Bookmarks("bookmarks"),
-        ListeningHistory("listening_history"),
-        Podcasts("podcasts"),
+        Filters(key = "filters", analyticsValue = "filters"),
+        UpNext(key = "up_next", analyticsValue = "upnext"),
+        Downloads(key = "downloads", analyticsValue = "downloads"),
+        Files(key = "files", analyticsValue = "files"),
+        Starred(key = "starred", analyticsValue = "starred"),
+        Bookmarks(key = "bookmarks", analyticsValue = "bookmarks"),
+        ListeningHistory(key = "listening_history", analyticsValue = "listeninghistory"),
+        Podcasts(key = "podcasts", analyticsValue = "podcasts"),
         ;
 
         companion object {
