@@ -73,6 +73,7 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import timber.log.Timber
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -341,8 +342,37 @@ private fun AboutPage(
             }
         }
         item {
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
         }
+        item {
+            AutomatticLogo(onAutomatticFamilyTapped = onAutomatticFamilyTapped)
+        }
+        item {
+            Spacer(modifier = Modifier.height(24.dp))
+        }
+    }
+}
+
+@Composable
+fun AutomatticLogo(
+    onAutomatticFamilyTapped: () -> Unit = {},
+    modifier: Modifier = Modifier,
+) {
+    val context = LocalContext.current
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable {
+                onAutomatticFamilyTapped()
+                openUrl("https://automattic.com", context)
+            }
+            .padding(16.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Image(
+            painter = painterResource(IR.drawable.about_logo_automattic),
+            contentDescription = stringResource(LR.string.settings_app_icon),
+        )
     }
 }
 
