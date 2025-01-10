@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.views.R
+import au.com.shiftyjelly.pocketcasts.views.extensions.includeStatusBarPadding
 import au.com.shiftyjelly.pocketcasts.views.extensions.tintIcons
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -40,6 +41,7 @@ class MultiSelectToolbar @JvmOverloads constructor(
         multiSelectHelper: MultiSelectHelper<T>,
         @MenuRes menuRes: Int?,
         activity: FragmentActivity,
+        includeStatusBarPadding: Boolean = true,
     ) {
         setBackgroundColor(context.getThemeColor(UR.attr.support_01))
         if (menuRes != null) {
@@ -111,6 +113,10 @@ class MultiSelectToolbar @JvmOverloads constructor(
             multiSelectHelper.isMultiSelecting = false
         }
         navigationContentDescription = context.getString(LR.string.back)
+
+        if (includeStatusBarPadding) {
+            includeStatusBarPadding()
+        }
     }
 
     private fun showOverflowBottomSheet(
