@@ -14,11 +14,9 @@ import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
-import au.com.shiftyjelly.pocketcasts.views.extensions.applyColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
-import kotlin.getValue
 
 @AndroidEntryPoint
 class ShelfBottomSheet : BaseDialogFragment() {
@@ -46,7 +44,7 @@ class ShelfBottomSheet : BaseDialogFragment() {
         savedInstanceState: Bundle?,
     ) = contentWithoutConsumedInsets {
         playerViewModel.playingEpisodeLive.observe(viewLifecycleOwner) { (_, backgroundColor) ->
-            applyColor(theme, backgroundColor)
+            styleBackgroundColor(backgroundColor)
         }
         AppTheme(theme.activeTheme) {
             ShelfBottomSheetPage(

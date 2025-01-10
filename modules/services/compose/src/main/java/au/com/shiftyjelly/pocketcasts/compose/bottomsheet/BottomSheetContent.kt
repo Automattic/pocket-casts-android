@@ -16,8 +16,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,8 +41,7 @@ private val OutlinedBorder: BorderStroke
     get() = BorderStroke(2.dp, MaterialTheme.theme.colors.primaryText01)
 
 private val PillSize = DpSize(width = 56.dp, height = 4.dp)
-private val PillCornerRadius = 10.dp
-private const val PillAlpha = 0.2f
+private val PillCornerRadius = 3.dp
 
 class BottomSheetContentState(
     val content: Content,
@@ -119,14 +118,14 @@ fun BottomSheetContent(
 
 @Composable
 fun Pill(
+    backgroundColor: Color = MaterialTheme.theme.colors.primaryIcon02,
     modifier: Modifier = Modifier,
 ) {
     Box(
         modifier = modifier
             .size(PillSize)
             .clip(RoundedCornerShape(PillCornerRadius))
-            .alpha(PillAlpha)
-            .background(MaterialTheme.theme.colors.primaryText02),
+            .background(backgroundColor),
     )
 }
 

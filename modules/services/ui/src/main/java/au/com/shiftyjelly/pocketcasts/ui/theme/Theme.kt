@@ -434,8 +434,8 @@ class Theme @Inject constructor(private val settings: Settings) {
     fun updateWindowNavigationBarColor(window: Window?, navigationBarColor: NavigationBarColor) {
         window?.peekDecorView() ?: return
 
-        // This is required to color the navigation bar on SDK lower than 35
-        window.navigationBarColor = getNavigationBarColor(navigationBarColor)
+        // The navigation bar on SDK lower than 35 is a solid color if we don't force it to be transparent. For example on the full screen player.
+        window.navigationBarColor = Color.TRANSPARENT
         // setting to true makes the icons dark, false makes them light
         WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightNavigationBars = !getNavigationBarLightIcons(navigationBarColor)
     }

@@ -11,11 +11,11 @@ import androidx.core.graphics.ColorUtils
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.doOnLayout
 import androidx.navigation.NavHostController
-import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.NavigationBarColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.views.extensions.setSystemWindowInsetToPadding
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -24,7 +24,6 @@ import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
 open class BaseDialogFragment : BottomSheetDialogFragment(), CoroutineScope {
@@ -48,9 +47,7 @@ open class BaseDialogFragment : BottomSheetDialogFragment(), CoroutineScope {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if (view.background == null) {
-            view.setBackgroundColor(view.context.getThemeColor(UR.attr.primary_ui_01))
-        }
+
         view.isClickable = true
 
         dialog?.window?.let { window ->
@@ -61,6 +58,9 @@ open class BaseDialogFragment : BottomSheetDialogFragment(), CoroutineScope {
         view.doOnLayout {
             ensureExpanded()
         }
+
+        // add padding to the bottom of the dialog for the navigation bar
+        view.setSystemWindowInsetToPadding(bottom = true)
 
         isBeingDragged = false
         addDismissCallback()
@@ -117,16 +117,13 @@ open class BaseDialogFragment : BottomSheetDialogFragment(), CoroutineScope {
         }
     }
 
-    protected fun styleBackgroundColor(
-        @ColorInt background: Int,
-        @ColorInt navigationBar: Int,
-    ) {
+    protected fun styleBackgroundColor(@ColorInt color: Int) {
         requireActivity().window?.let { activityWindow ->
-            WindowInsetsControllerCompat(activityWindow, activityWindow.decorView).isAppearanceLightStatusBars = ColorUtils.calculateLuminance(navigationBar) > 0.5f
+            WindowInsetsControllerCompat(activityWindow, activityWindow.decorView).isAppearanceLightStatusBars = ColorUtils.calculateLuminance(color) > 0.5f
         }
         requireDialog().window?.let { dialogWindow ->
-            WindowInsetsControllerCompat(dialogWindow, dialogWindow.decorView).isAppearanceLightNavigationBars = ColorUtils.calculateLuminance(background) > 0.5f
+            WindowInsetsControllerCompat(dialogWindow, dialogWindow.decorView).isAppearanceLightNavigationBars = ColorUtils.calculateLuminance(color) > 0.5f
         }
-        bottomSheetView()?.backgroundTintList = ColorStateList.valueOf(background)
+        bottomSheetView()?.backgroundTintList = ColorStateList.valueOf(color)
     }
 }
