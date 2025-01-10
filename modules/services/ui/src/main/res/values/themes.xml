@@ -198,6 +198,7 @@
         <item name="isImageTintEnabled">false</item>
         <item name="imageTintThemeCacheTag">light</item>
         <item name="enableEdgeToEdge">true</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
 
         <item name="toolbarTheme">@style/LightToolbarTheme</item>
 
@@ -388,7 +389,6 @@
 
     <style name="ThemeLight" parent="ThemeBaseLight" tools:ignore="NewApi">
         <!-- For older APIs, leave the status bar as black, always since the APIs to tint the icons don't exist -->
-        <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:statusBarColor">@color/white</item>
     </style>
 
@@ -413,6 +413,7 @@
         <item name="isImageTintEnabled">false</item>
         <item name="imageTintThemeCacheTag">dark</item>
         <item name="enableEdgeToEdge">true</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
 
         <!-- Default colours -->
         <item name="colorSearchBox">@color/searchBoxDark</item>
@@ -602,7 +603,6 @@
 
     <style name="ThemeDark" parent="ThemeBaseDark">
         <!-- For older APIs, leave the status bar as black, always since the APIs to tint the icons don't exist -->
-        <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:statusBarColor">@color/black</item>
     </style>
 
@@ -850,9 +850,6 @@
     </style>
 
     <style name="ClassicLight" parent="BaseClassicLight" tools:ignore="NewApi">
-        <!-- For older APIs, leave the status bar as black, always since the APIs to tint the icons don't exist -->
-        <item name="android:navigationBarColor">@android:color/transparent</item>
-
         <!-- Only 23 and above support having a light status bar using windowLightStatusBar. There are other hacks, but too hard so just black for 21,22 -->
         <item name="android:statusBarColor">@color/black</item>
     </style>
