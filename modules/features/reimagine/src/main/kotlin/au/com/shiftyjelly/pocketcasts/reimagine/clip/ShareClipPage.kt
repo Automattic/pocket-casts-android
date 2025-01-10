@@ -131,6 +131,7 @@ internal fun ShareClipPage(
     assetController: BackgroundAssetController,
     onNavigationButtonTapped: () -> Unit,
     onEditTapped: () -> Unit,
+    onCloseTapped: () -> Unit,
     listener: ShareClipPageListener,
     state: ClipPageState = rememberClipPageState(
         firstVisibleItemIndex = (clipRange.startInSeconds - 10).coerceAtLeast(0),
@@ -153,6 +154,7 @@ internal fun ShareClipPage(
             listener = listener,
             onNavigationButtonTapped = onNavigationButtonTapped,
             onEditTapped = onEditTapped,
+            onCloseTapped = onCloseTapped,
             state = state,
             snackbarHostState = snackbarHostState,
         )
@@ -171,6 +173,7 @@ internal fun ShareClipPage(
             listener = listener,
             onNavigationButtonTapped = onNavigationButtonTapped,
             onEditTapped = onEditTapped,
+            onCloseTapped = onCloseTapped,
             state = state,
             snackbarHostState = snackbarHostState,
         )
@@ -193,6 +196,7 @@ private fun VerticalClipPage(
     listener: ShareClipPageListener,
     onNavigationButtonTapped: () -> Unit,
     onEditTapped: () -> Unit,
+    onCloseTapped: () -> Unit,
     state: ClipPageState,
     snackbarHostState: SnackbarHostState,
 ) {
@@ -254,7 +258,10 @@ private fun VerticalClipPage(
         }
         CloseButton(
             shareColors = shareColors,
-            onClick = listener::onClose,
+            onClick = {
+                onCloseTapped()
+                listener.onClose()
+            },
             modifier = Modifier
                 .padding(top = 12.dp, end = 12.dp)
                 .align(Alignment.TopEnd),
@@ -282,6 +289,7 @@ private fun HorizontalClipPage(
     assetController: BackgroundAssetController,
     listener: ShareClipPageListener,
     onNavigationButtonTapped: () -> Unit,
+    onCloseTapped: () -> Unit,
     onEditTapped: () -> Unit,
     state: ClipPageState,
     snackbarHostState: SnackbarHostState,
@@ -346,7 +354,10 @@ private fun HorizontalClipPage(
         }
         CloseButton(
             shareColors = shareColors,
-            onClick = listener::onClose,
+            onClick = {
+                onCloseTapped()
+                listener.onClose()
+            },
             modifier = Modifier
                 .padding(top = 12.dp, end = 12.dp)
                 .align(Alignment.TopEnd),
@@ -848,6 +859,7 @@ internal fun ShareClipPagePreview(
         assetController = BackgroundAssetController.preview(),
         listener = ShareClipPageListener.Preview,
         onNavigationButtonTapped = {},
+        onCloseTapped = {},
         onEditTapped = {},
         state = rememberClipPageState(
             firstVisibleItemIndex = 0,
