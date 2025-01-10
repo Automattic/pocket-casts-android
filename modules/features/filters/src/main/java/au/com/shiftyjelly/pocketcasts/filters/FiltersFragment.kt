@@ -130,6 +130,7 @@ class FiltersFragment : BaseFragment(), CoroutineScope, Toolbar.OnMenuItemClickL
     override fun onMenuItemClick(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.filter_create -> {
+                viewModel.trackOnCreateFilterTap()
                 openCreate()
                 true
             }

@@ -272,6 +272,7 @@ enum class AnalyticsEvent(val key: String) {
     /* Filters */
     FILTER_AUTO_DOWNLOAD_LIMIT_UPDATED("filter_auto_download_limit_updated"),
     FILTER_AUTO_DOWNLOAD_UPDATED("filter_auto_download_updated"),
+    FILTER_CREATE_BUTTON_TAPPED("filter_create_button_tapped"),
     FILTER_CREATED("filter_created"),
     FILTER_DELETED("filter_deleted"),
     FILTER_EDIT_DISMISSED("filter_edit_dismissed"),
