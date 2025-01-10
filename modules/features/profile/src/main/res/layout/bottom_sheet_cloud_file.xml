@@ -10,7 +10,7 @@
         android:layout_width="48dp"
         android:layout_height="6dp"
         android:layout_marginTop="12dp"
-        android:background="@drawable/background_dragger_player"
+        android:background="@drawable/background_dragger"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

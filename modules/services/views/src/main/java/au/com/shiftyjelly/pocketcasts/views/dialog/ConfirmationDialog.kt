@@ -137,17 +137,20 @@ open class ConfirmationDialog : BottomSheetDialogFragment() {
 
         val btnConfirm = binding.btnConfirm
         val btnSecondary = binding.btnSecondary
+        val bottomPaddingView = binding.bottomPaddingView
 
-        if (displayConfirmButtonFirst) {
-            layout.removeView(btnConfirm)
-            layout.removeView(btnSecondary)
-            layout.addView(btnConfirm)
-            layout.addView(btnSecondary)
-        } else {
-            layout.removeView(btnSecondary)
-            layout.removeView(btnConfirm)
-            layout.addView(btnSecondary)
-            layout.addView(btnConfirm)
+        with(layout) {
+            removeView(btnConfirm)
+            removeView(btnSecondary)
+            removeView(bottomPaddingView)
+            if (displayConfirmButtonFirst) {
+                addView(btnConfirm)
+                addView(btnSecondary)
+            } else {
+                addView(btnSecondary)
+                addView(btnConfirm)
+            }
+            addView(bottomPaddingView)
         }
 
         btnConfirm.text = buttonType.text
