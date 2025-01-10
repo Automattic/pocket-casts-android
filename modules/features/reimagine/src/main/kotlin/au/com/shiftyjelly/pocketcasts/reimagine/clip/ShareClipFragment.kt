@@ -120,6 +120,7 @@ class ShareClipFragment : BaseDialogFragment() {
             listener = listener,
             snackbarHostState = snackbarHostState,
             onNavigationButtonTapped = { analyticsTracker.track(AnalyticsEvent.SHARE_SCREEN_NAVIGATION_BUTTON_TAPPED) },
+            onEditTapped = { analyticsTracker.track(AnalyticsEvent.SHARE_SCREEN_EDIT_BUTTON_TAPPED) },
         )
 
         LaunchedEffect(Unit) {

@@ -130,6 +130,7 @@ internal fun ShareClipPage(
     useKeyboardInput: Boolean,
     assetController: BackgroundAssetController,
     onNavigationButtonTapped: () -> Unit,
+    onEditTapped: () -> Unit,
     listener: ShareClipPageListener,
     state: ClipPageState = rememberClipPageState(
         firstVisibleItemIndex = (clipRange.startInSeconds - 10).coerceAtLeast(0),
@@ -151,6 +152,7 @@ internal fun ShareClipPage(
             assetController = assetController,
             listener = listener,
             onNavigationButtonTapped = onNavigationButtonTapped,
+            onEditTapped = onEditTapped,
             state = state,
             snackbarHostState = snackbarHostState,
         )
@@ -168,6 +170,7 @@ internal fun ShareClipPage(
             assetController = assetController,
             listener = listener,
             onNavigationButtonTapped = onNavigationButtonTapped,
+            onEditTapped = onEditTapped,
             state = state,
             snackbarHostState = snackbarHostState,
         )
@@ -189,6 +192,7 @@ private fun VerticalClipPage(
     assetController: BackgroundAssetController,
     listener: ShareClipPageListener,
     onNavigationButtonTapped: () -> Unit,
+    onEditTapped: () -> Unit,
     state: ClipPageState,
     snackbarHostState: SnackbarHostState,
 ) {
@@ -215,6 +219,7 @@ private fun VerticalClipPage(
                         sharingState = sharingState,
                         shareColors = shareColors,
                         selectedCard = selectedCard,
+                        onEditTapped = onEditTapped,
                         listener = listener,
                         state = state,
                     )
@@ -277,6 +282,7 @@ private fun HorizontalClipPage(
     assetController: BackgroundAssetController,
     listener: ShareClipPageListener,
     onNavigationButtonTapped: () -> Unit,
+    onEditTapped: () -> Unit,
     state: ClipPageState,
     snackbarHostState: SnackbarHostState,
 ) {
@@ -293,6 +299,7 @@ private fun HorizontalClipPage(
                     sharingState = sharingState,
                     shareColors = shareColors,
                     selectedCard = CardType.Horizontal,
+                    onEditTapped = onEditTapped,
                     listener = listener,
                     state = state,
                 )
@@ -357,6 +364,7 @@ private fun DescriptionContent(
     sharingState: SharingState,
     shareColors: ShareColors,
     selectedCard: CardType,
+    onEditTapped: () -> Unit,
     listener: ShareClipPageListener,
     state: ClipPageState,
 ) {
@@ -425,7 +433,10 @@ private fun DescriptionContent(
                             indication = ripple(color = shareColors.accent),
                             onClickLabel = stringResource(LR.string.share_clip_edit_label),
                             role = Role.Button,
-                            onClick = listener::onShowClipSelection,
+                            onClick = {
+                                onEditTapped()
+                                listener.onShowClipSelection()
+                            },
                         )
                         .padding(vertical = 4.dp, horizontal = 16.dp),
                 )
@@ -837,6 +848,7 @@ internal fun ShareClipPagePreview(
         assetController = BackgroundAssetController.preview(),
         listener = ShareClipPageListener.Preview,
         onNavigationButtonTapped = {},
+        onEditTapped = {},
         state = rememberClipPageState(
             firstVisibleItemIndex = 0,
         ),

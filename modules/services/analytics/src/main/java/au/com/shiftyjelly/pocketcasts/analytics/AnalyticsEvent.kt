@@ -668,6 +668,7 @@ enum class AnalyticsEvent(val key: String) {
     SHARE_SCREEN_PAUSE_TAPPED("share_screen_pause_tapped"),
     SHARE_SCREEN_CLIP_SHARED("share_screen_clip_shared"),
     SHARE_SCREEN_NAVIGATION_BUTTON_TAPPED("share_screen_navigation_button_tapped"),
+    SHARE_SCREEN_EDIT_BUTTON_TAPPED("share_screen_edit_button_tapped"),
 
     /* Pocket Casts Champion */
     POCKET_CASTS_CHAMPION_DIALOG_SHOWN("pocket_casts_champion_dialog_shown"),
