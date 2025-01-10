@@ -8,7 +8,6 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -146,6 +145,12 @@ class BookmarksFragment : BaseFragment() {
                             addFragment(fragment)
                         }
                     },
+                    onClearSearchTapped = {
+                        bookmarksViewModel.clearSearchTapped()
+                    },
+                    onSearchBarClearButtonTapped = {
+                        bookmarksViewModel.searchBarClearButtonTapped()
+                    },
                     bottomInset = if (sourceView == SourceView.PROFILE) {
                         0.dp + bottomInset.value.pxToDp(LocalContext.current).dp
                     } else {
@@ -212,6 +217,7 @@ class BookmarksFragment : BaseFragment() {
     private fun onShareBookmarkClick() {
         lifecycleScope.launch {
             val (podcast, episode, bookmark) = bookmarksViewModel.getSharedBookmark() ?: return@launch
+            bookmarksViewModel.onShare(podcast.uuid, episode.uuid, sourceView)
             val timestamp = bookmark.timeSecs.seconds
             if (FeatureFlag.isEnabled(Feature.REIMAGINE_SHARING)) {
                 ShareEpisodeTimestampFragment
