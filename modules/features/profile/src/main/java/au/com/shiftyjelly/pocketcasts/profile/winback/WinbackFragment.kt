@@ -40,7 +40,13 @@ class WinbackFragment : BaseDialogFragment() {
             ) {
                 composable(WinbackNavRoutes.WinbackOffer) {
                     WinbackOfferPage(
-                        onClaimOffer = { navController.navigate(WinbackNavRoutes.OfferClaimed) },
+                        onClaimOffer = {
+                            navController.navigate(WinbackNavRoutes.OfferClaimed) {
+                                popUpTo(WinbackNavRoutes.WinbackOffer) {
+                                    inclusive = true
+                                }
+                            }
+                        },
                         onSeeAvailablePlans = { navController.navigate(WinbackNavRoutes.AvailablePlans) },
                         onSeeHelpAndFeedback = { navController.navigate(WinbackNavRoutes.HelpAndFeedback) },
                         onContinueToCancellation = { navController.navigate(WinbackNavRoutes.CancelConfirmation) },
@@ -48,6 +54,7 @@ class WinbackFragment : BaseDialogFragment() {
                 }
                 composable(WinbackNavRoutes.OfferClaimed) {
                     OfferClaimedPage(
+                        theme = theme.activeTheme,
                         onConfirm = { dismiss() },
                     )
                 }
@@ -85,14 +92,17 @@ private fun AnimatedContentTransitionScope<NavBackStackEntry>.slideInToStart() =
     towards = AnimatedContentTransitionScope.SlideDirection.Start,
     animationSpec = animationSpec,
 )
+
 private fun AnimatedContentTransitionScope<NavBackStackEntry>.slideOutToStart() = slideOutOfContainer(
     towards = AnimatedContentTransitionScope.SlideDirection.Start,
     animationSpec = animationSpec,
 )
+
 private fun AnimatedContentTransitionScope<NavBackStackEntry>.slideInToEnd() = slideIntoContainer(
     towards = AnimatedContentTransitionScope.SlideDirection.End,
     animationSpec = animationSpec,
 )
+
 private fun AnimatedContentTransitionScope<NavBackStackEntry>.slideOutToEnd() = slideOutOfContainer(
     towards = AnimatedContentTransitionScope.SlideDirection.End,
     animationSpec = animationSpec,
