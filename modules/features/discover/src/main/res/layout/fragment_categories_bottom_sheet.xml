@@ -1,8 +1,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:paddingTop="14dp">
+    android:orientation="vertical">
 
     <TextView
         android:layout_width="match_parent"
@@ -11,6 +10,7 @@
         android:gravity="start"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
+        android:paddingTop="24dp"
         android:text="@string/discover_select_categories"
         android:contentDescription="@string/discover_select_categories"
         android:textAllCaps="true"
@@ -20,6 +20,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/categoriesRecyclerView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:clipToPadding="false"/>
 
 </LinearLayout>

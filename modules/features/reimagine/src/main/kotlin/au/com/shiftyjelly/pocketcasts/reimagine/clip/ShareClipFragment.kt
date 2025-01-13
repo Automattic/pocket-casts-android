@@ -16,7 +16,6 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
-import androidx.fragment.compose.content
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
@@ -147,10 +146,7 @@ class ShareClipFragment : BaseDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setDialogTint(
-            statusBar = shareColors.navigationBar.toArgb(),
-            navigationBar = shareColors.background.toArgb(),
-        )
+        setDialogTint(color = shareColors.background.toArgb())
     }
 
     @Parcelize

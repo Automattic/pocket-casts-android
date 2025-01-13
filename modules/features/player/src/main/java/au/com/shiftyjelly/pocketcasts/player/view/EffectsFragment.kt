@@ -49,7 +49,6 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.extensions.roundedSpeed
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
-import au.com.shiftyjelly.pocketcasts.views.extensions.applyColor
 import au.com.shiftyjelly.pocketcasts.views.extensions.updateTint
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.google.android.material.button.MaterialButtonToggleGroup
@@ -112,10 +111,6 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
         return binding?.root
     }
 
-    override fun onPause() {
-        super.onPause()
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
@@ -164,7 +159,7 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.playingEpisodeLive.observe(viewLifecycleOwner) { (_, backgroundColor) ->
-            applyColor(theme, backgroundColor)
+            setDialogTint(backgroundColor)
 
             val tintColor = theme.playerHighlightColor(viewModel.podcast)
             val playerContrast01 = ThemeColor.playerContrast01(theme.activeTheme)
