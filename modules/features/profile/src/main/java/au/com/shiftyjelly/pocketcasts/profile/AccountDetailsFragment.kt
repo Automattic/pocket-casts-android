@@ -41,6 +41,8 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.Gravatar
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -62,29 +64,41 @@ class AccountDetailsFragment : BaseFragment() {
         }
     }
 
-    @Inject lateinit var analyticsTracker: AnalyticsTracker
+    @Inject
+    lateinit var analyticsTracker: AnalyticsTracker
 
-    @Inject lateinit var episodeManager: EpisodeManager
+    @Inject
+    lateinit var episodeManager: EpisodeManager
 
-    @Inject lateinit var folderManager: FolderManager
+    @Inject
+    lateinit var folderManager: FolderManager
 
-    @Inject lateinit var playlistManager: PlaylistManager
+    @Inject
+    lateinit var playlistManager: PlaylistManager
 
-    @Inject lateinit var playbackManager: PlaybackManager
+    @Inject
+    lateinit var playbackManager: PlaybackManager
 
-    @Inject lateinit var podcastManager: PodcastManager
+    @Inject
+    lateinit var podcastManager: PodcastManager
 
-    @Inject lateinit var searchHistoryManager: SearchHistoryManager
+    @Inject
+    lateinit var searchHistoryManager: SearchHistoryManager
 
-    @Inject lateinit var settings: Settings
+    @Inject
+    lateinit var settings: Settings
 
-    @Inject lateinit var upNextQueue: UpNextQueue
+    @Inject
+    lateinit var upNextQueue: UpNextQueue
 
-    @Inject lateinit var userEpisodeManager: UserEpisodeManager
+    @Inject
+    lateinit var userEpisodeManager: UserEpisodeManager
 
-    @Inject lateinit var userManager: UserManager
+    @Inject
+    lateinit var userManager: UserManager
 
-    @Inject lateinit var syncManager: SyncManager
+    @Inject
+    lateinit var syncManager: SyncManager
 
     private val accountViewModel by viewModels<AccountDetailsViewModel>()
     private val upgradeBannerViewModel by viewModels<ProfileUpgradeBannerViewModel>()
@@ -148,9 +162,12 @@ class AccountDetailsFragment : BaseFragment() {
             },
             onCancelSubscription = {
                 analyticsTracker.track(AnalyticsEvent.ACCOUNT_DETAILS_CANCEL_TAPPED)
-                CancelConfirmationFragment
-                    .newInstance()
-                    .show(childFragmentManager, "cancel_subscription_confirmation_dialog")
+                if (FeatureFlag.isEnabled(Feature.WINBACK)) {
+                } else {
+                    CancelConfirmationFragment
+                        .newInstance()
+                        .show(childFragmentManager, "cancel_subscription_confirmation_dialog")
+                }
             },
             onChangeNewsletterSubscription = { isChecked ->
                 accountViewModel.updateNewsletter(isChecked)
@@ -224,6 +241,7 @@ class AccountDetailsFragment : BaseFragment() {
                 accountViewModel.clearDeleteAccountState()
                 performSignOut()
             }
+
             is DeleteAccountState.Failure -> {
                 accountViewModel.clearDeleteAccountState()
                 AlertDialog.Builder(requireContext())
@@ -232,6 +250,7 @@ class AccountDetailsFragment : BaseFragment() {
                     .setPositiveButton(getString(LR.string.ok)) { dialog, _ -> dialog.dismiss() }
                     .show()
             }
+
             is DeleteAccountState.Empty -> {}
         }
     }
