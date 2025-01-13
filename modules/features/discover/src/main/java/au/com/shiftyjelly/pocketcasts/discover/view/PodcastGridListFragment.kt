@@ -174,6 +174,7 @@ open class PodcastGridListFragment : BaseFragment(), Toolbar.OnMenuItemClickList
                 type = "text/plain"
                 putExtra(Intent.EXTRA_TEXT, shareUrl ?: "")
             }
+            analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_SHARE_TAPPED_TAPPED)
             startActivity(Intent.createChooser(intent, getString(LR.string.podcasts_share_via)))
             return true
         }
