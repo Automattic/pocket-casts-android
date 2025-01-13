@@ -222,6 +222,7 @@ enum class AnalyticsEvent(val key: String) {
     PODCAST_SCREEN_OPTIONS_TAPPED("podcast_screen_options_tapped"),
     PODCAST_SCREEN_TOGGLE_ARCHIVED("podcast_screen_toggle_archived"),
     PODCAST_SCREEN_TOGGLE_SUMMARY("podcast_screen_toggle_summary"),
+    PODCAST_SCREEN_PODCAST_DESCRIPTION_TAPPED("podcast_screen_podcast_description_tapped"),
     PODCAST_SCREEN_SHARE_TAPPED("podcast_screen_share_tapped"),
     PODCASTS_SCREEN_SORT_ORDER_CHANGED("podcasts_screen_sort_order_changed"),
     PODCASTS_SCREEN_EPISODE_GROUPING_CHANGED("podcasts_screen_episode_grouping_changed"),
@@ -674,6 +675,9 @@ enum class AnalyticsEvent(val key: String) {
     SHARE_SCREEN_PLAY_TAPPED("share_screen_play_tapped"),
     SHARE_SCREEN_PAUSE_TAPPED("share_screen_pause_tapped"),
     SHARE_SCREEN_CLIP_SHARED("share_screen_clip_shared"),
+    SHARE_SCREEN_NAVIGATION_BUTTON_TAPPED("share_screen_navigation_button_tapped"),
+    SHARE_SCREEN_EDIT_BUTTON_TAPPED("share_screen_edit_button_tapped"),
+    SHARE_SCREEN_CLOSE_BUTTON_TAPPED("share_screen_close_button_tapped"),
 
     /* Pocket Casts Champion */
     POCKET_CASTS_CHAMPION_DIALOG_SHOWN("pocket_casts_champion_dialog_shown"),

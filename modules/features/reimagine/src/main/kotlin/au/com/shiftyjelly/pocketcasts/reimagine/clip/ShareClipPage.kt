@@ -7,7 +7,6 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.animateIntOffsetAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
@@ -130,6 +129,9 @@ internal fun ShareClipPage(
     useEpisodeArtwork: Boolean,
     useKeyboardInput: Boolean,
     assetController: BackgroundAssetController,
+    onNavigationButtonTapped: () -> Unit,
+    onEditTapped: () -> Unit,
+    onCloseTapped: () -> Unit,
     listener: ShareClipPageListener,
     state: ClipPageState = rememberClipPageState(
         firstVisibleItemIndex = (clipRange.startInSeconds - 10).coerceAtLeast(0),
@@ -150,6 +152,9 @@ internal fun ShareClipPage(
             useKeyboardInput = useKeyboardInput,
             assetController = assetController,
             listener = listener,
+            onNavigationButtonTapped = onNavigationButtonTapped,
+            onEditTapped = onEditTapped,
+            onCloseTapped = onCloseTapped,
             state = state,
             snackbarHostState = snackbarHostState,
         )
@@ -166,13 +171,15 @@ internal fun ShareClipPage(
             useKeyboardInput = useKeyboardInput,
             assetController = assetController,
             listener = listener,
+            onNavigationButtonTapped = onNavigationButtonTapped,
+            onEditTapped = onEditTapped,
+            onCloseTapped = onCloseTapped,
             state = state,
             snackbarHostState = snackbarHostState,
         )
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun VerticalClipPage(
     episode: PodcastEpisode?,
@@ -187,6 +194,9 @@ private fun VerticalClipPage(
     useKeyboardInput: Boolean,
     assetController: BackgroundAssetController,
     listener: ShareClipPageListener,
+    onNavigationButtonTapped: () -> Unit,
+    onEditTapped: () -> Unit,
+    onCloseTapped: () -> Unit,
     state: ClipPageState,
     snackbarHostState: SnackbarHostState,
 ) {
@@ -213,6 +223,7 @@ private fun VerticalClipPage(
                         sharingState = sharingState,
                         shareColors = shareColors,
                         selectedCard = selectedCard,
+                        onEditTapped = onEditTapped,
                         listener = listener,
                         state = state,
                     )
@@ -239,6 +250,7 @@ private fun VerticalClipPage(
                     shareColors = shareColors,
                     useKeyboardInput = useKeyboardInput,
                     selectedCard = selectedCard,
+                    onNavigationButtonTapped = onNavigationButtonTapped,
                     listener = listener,
                     state = state,
                 )
@@ -246,7 +258,10 @@ private fun VerticalClipPage(
         }
         CloseButton(
             shareColors = shareColors,
-            onClick = listener::onClose,
+            onClick = {
+                onCloseTapped()
+                listener.onClose()
+            },
             modifier = Modifier
                 .padding(top = 12.dp, end = 12.dp)
                 .align(Alignment.TopEnd),
@@ -273,6 +288,9 @@ private fun HorizontalClipPage(
     useKeyboardInput: Boolean,
     assetController: BackgroundAssetController,
     listener: ShareClipPageListener,
+    onNavigationButtonTapped: () -> Unit,
+    onCloseTapped: () -> Unit,
+    onEditTapped: () -> Unit,
     state: ClipPageState,
     snackbarHostState: SnackbarHostState,
 ) {
@@ -289,6 +307,7 @@ private fun HorizontalClipPage(
                     sharingState = sharingState,
                     shareColors = shareColors,
                     selectedCard = CardType.Horizontal,
+                    onEditTapped = onEditTapped,
                     listener = listener,
                     state = state,
                 )
@@ -323,6 +342,7 @@ private fun HorizontalClipPage(
                         useKeyboardInput = useKeyboardInput,
                         selectedCard = CardType.Horizontal,
                         listener = listener,
+                        onNavigationButtonTapped = onNavigationButtonTapped,
                         state = state,
                         modifier = Modifier.weight(1f),
                     )
@@ -334,7 +354,10 @@ private fun HorizontalClipPage(
         }
         CloseButton(
             shareColors = shareColors,
-            onClick = listener::onClose,
+            onClick = {
+                onCloseTapped()
+                listener.onClose()
+            },
             modifier = Modifier
                 .padding(top = 12.dp, end = 12.dp)
                 .align(Alignment.TopEnd),
@@ -352,6 +375,7 @@ private fun DescriptionContent(
     sharingState: SharingState,
     shareColors: ShareColors,
     selectedCard: CardType,
+    onEditTapped: () -> Unit,
     listener: ShareClipPageListener,
     state: ClipPageState,
 ) {
@@ -420,7 +444,10 @@ private fun DescriptionContent(
                             indication = ripple(color = shareColors.accent),
                             onClickLabel = stringResource(LR.string.share_clip_edit_label),
                             role = Role.Button,
-                            onClick = listener::onShowClipSelection,
+                            onClick = {
+                                onEditTapped()
+                                listener.onShowClipSelection()
+                            },
                         )
                         .padding(vertical = 4.dp, horizontal = 16.dp),
                 )
@@ -439,7 +466,6 @@ private fun DescriptionContent(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun PagingContent(
     episode: PodcastEpisode,
@@ -527,6 +553,7 @@ private fun PageControlsContent(
     useKeyboardInput: Boolean,
     selectedCard: CardType,
     listener: ShareClipPageListener,
+    onNavigationButtonTapped: () -> Unit,
     state: ClipPageState,
     modifier: Modifier = Modifier,
 ) {
@@ -547,6 +574,7 @@ private fun PageControlsContent(
                 useKeyboardInput = useKeyboardInput,
                 selectedCard = selectedCard,
                 listener = listener,
+                onNavigationButtonTapped = onNavigationButtonTapped,
                 state = state,
             )
             Step.PlatformSelection -> SharingControls(
@@ -574,6 +602,7 @@ private fun ClipControls(
     shareColors: ShareColors,
     useKeyboardInput: Boolean,
     selectedCard: CardType,
+    onNavigationButtonTapped: () -> Unit,
     listener: ShareClipPageListener,
     state: ClipPageState,
 ) {
@@ -598,6 +627,8 @@ private fun ClipControls(
         )
         BaseRowButton(
             onClick = {
+                onNavigationButtonTapped()
+
                 if (!sharingState.iSharing) {
                     when (selectedCard) {
                         CardType.Vertical, CardType.Horizontal, CardType.Square -> {
@@ -827,6 +858,9 @@ internal fun ShareClipPagePreview(
         useKeyboardInput = useKeyboardInput,
         assetController = BackgroundAssetController.preview(),
         listener = ShareClipPageListener.Preview,
+        onNavigationButtonTapped = {},
+        onCloseTapped = {},
+        onEditTapped = {},
         state = rememberClipPageState(
             firstVisibleItemIndex = 0,
         ),

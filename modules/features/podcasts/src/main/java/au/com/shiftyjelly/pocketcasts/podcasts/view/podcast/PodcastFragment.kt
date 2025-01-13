@@ -678,6 +678,9 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                     sortType = settings.podcastBookmarksSortType.flow.value,
                 ).asObservable(),
                 fragmentManager = parentFragmentManager,
+                onPodcastDescriptionClicked = {
+                    analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_PODCAST_DESCRIPTION_TAPPED)
+                },
             )
         }
 

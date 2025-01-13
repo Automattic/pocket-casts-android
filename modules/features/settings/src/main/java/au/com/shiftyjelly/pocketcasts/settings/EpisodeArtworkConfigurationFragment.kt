@@ -136,7 +136,7 @@ class EpisodeArtworkConfigurationFragment : BaseFragment() {
             toggle = SettingRowToggle.Checkbox(checked = configuration.useEpisodeArtwork(element), enabled = configuration.useEpisodeArtwork),
             modifier = Modifier.toggleable(value = configuration.useEpisodeArtwork(element), role = Role.Checkbox) { newValue ->
                 if (configuration.useEpisodeArtwork) {
-                    analyticsTracker.track(AnalyticsEvent.SETTINGS_ADVANCED_EPISODE_ARTWORK_CUSTOMIZATION_ELEMENT_TOGGLED, mapOf("enabled" to newValue, "element" to element.name.lowercase()))
+                    analyticsTracker.track(AnalyticsEvent.SETTINGS_ADVANCED_EPISODE_ARTWORK_CUSTOMIZATION_ELEMENT_TOGGLED, mapOf("enabled" to newValue, "element" to element.analyticsValue))
                 }
                 onUpdateConfiguration(if (newValue) configuration.enable(element) else configuration.disable(element))
             },
