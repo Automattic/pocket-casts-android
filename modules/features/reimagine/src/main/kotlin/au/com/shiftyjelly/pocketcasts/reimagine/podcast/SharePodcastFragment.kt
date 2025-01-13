@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.reimagine.ui.ShareColors
 import au.com.shiftyjelly.pocketcasts.reimagine.ui.rememberBackgroundAssetControler
 import au.com.shiftyjelly.pocketcasts.sharing.SocialPlatform
+import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.utils.parceler.ColorParceler
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -45,6 +46,8 @@ class SharePodcastFragment : BaseDialogFragment() {
     )
 
     @Inject internal lateinit var shareListenerFactory: SharePodcastListener.Factory
+
+    override val statusBarIconColor = StatusBarIconColor.Light
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,10 +78,7 @@ class SharePodcastFragment : BaseDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setDialogTint(
-            statusBar = shareColors.navigationBar.toArgb(),
-            navigationBar = shareColors.background.toArgb(),
-        )
+        setDialogTint(color = shareColors.background.toArgb())
     }
 
     @Parcelize

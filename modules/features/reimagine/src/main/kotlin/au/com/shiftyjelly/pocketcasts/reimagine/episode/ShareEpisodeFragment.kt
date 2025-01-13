@@ -78,10 +78,7 @@ class ShareEpisodeFragment : BaseDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setDialogTint(
-            statusBar = shareColors.navigationBar.toArgb(),
-            navigationBar = shareColors.background.toArgb(),
-        )
+        setDialogTint(color = shareColors.background.toArgb())
     }
 
     @Parcelize
