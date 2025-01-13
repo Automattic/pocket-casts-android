@@ -24,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.profile.champion.PocketCastsChampionBottomSheetDialog
+import au.com.shiftyjelly.pocketcasts.profile.winback.WinbackFragment
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -64,41 +65,29 @@ class AccountDetailsFragment : BaseFragment() {
         }
     }
 
-    @Inject
-    lateinit var analyticsTracker: AnalyticsTracker
+    @Inject lateinit var analyticsTracker: AnalyticsTracker
 
-    @Inject
-    lateinit var episodeManager: EpisodeManager
+    @Inject lateinit var episodeManager: EpisodeManager
 
-    @Inject
-    lateinit var folderManager: FolderManager
+    @Inject lateinit var folderManager: FolderManager
 
-    @Inject
-    lateinit var playlistManager: PlaylistManager
+    @Inject lateinit var playlistManager: PlaylistManager
 
-    @Inject
-    lateinit var playbackManager: PlaybackManager
+    @Inject lateinit var playbackManager: PlaybackManager
 
-    @Inject
-    lateinit var podcastManager: PodcastManager
+    @Inject lateinit var podcastManager: PodcastManager
 
-    @Inject
-    lateinit var searchHistoryManager: SearchHistoryManager
+    @Inject lateinit var searchHistoryManager: SearchHistoryManager
 
-    @Inject
-    lateinit var settings: Settings
+    @Inject lateinit var settings: Settings
 
-    @Inject
-    lateinit var upNextQueue: UpNextQueue
+    @Inject lateinit var upNextQueue: UpNextQueue
 
-    @Inject
-    lateinit var userEpisodeManager: UserEpisodeManager
+    @Inject lateinit var userEpisodeManager: UserEpisodeManager
 
-    @Inject
-    lateinit var userManager: UserManager
+    @Inject lateinit var userManager: UserManager
 
-    @Inject
-    lateinit var syncManager: SyncManager
+    @Inject lateinit var syncManager: SyncManager
 
     private val accountViewModel by viewModels<AccountDetailsViewModel>()
     private val upgradeBannerViewModel by viewModels<ProfileUpgradeBannerViewModel>()
@@ -163,6 +152,7 @@ class AccountDetailsFragment : BaseFragment() {
             onCancelSubscription = {
                 analyticsTracker.track(AnalyticsEvent.ACCOUNT_DETAILS_CANCEL_TAPPED)
                 if (FeatureFlag.isEnabled(Feature.WINBACK)) {
+                    WinbackFragment().show(childFragmentManager, "subscription_windback")
                 } else {
                     CancelConfirmationFragment
                         .newInstance()
