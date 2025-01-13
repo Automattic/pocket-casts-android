@@ -164,6 +164,15 @@ class SleepFragment : BaseDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Ensures that both buttons have the same height.
+        // Sometimes the 5-minute button wraps to a new line, increasing its height.
+        binding?.buttonAdd5Minute?.post {
+            binding?.buttonAdd1Minute?.apply {
+                layoutParams?.height = binding?.buttonAdd5Minute?.height ?: return@post
+                requestLayout()
+            }
+        }
+
         viewModel.sleepTimeLeftText.observe(viewLifecycleOwner) { sleepTime ->
             binding?.sleepTime?.text = sleepTime
         }
