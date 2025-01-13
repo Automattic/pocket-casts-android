@@ -1,6 +1,8 @@
 7.81
 -----
-
+*   Bug Fixes
+    *   Fix the cropping issue with the Add 5 Minutes sleep timer button.
+        ([#3436](https://github.com/Automattic/pocket-casts-android/pull/3436))
 
 7.80
 -----
