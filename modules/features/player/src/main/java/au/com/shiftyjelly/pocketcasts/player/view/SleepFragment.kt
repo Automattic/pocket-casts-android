@@ -24,7 +24,6 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.combineLatest
 import au.com.shiftyjelly.pocketcasts.utils.minutes
-import au.com.shiftyjelly.pocketcasts.views.extensions.applyColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.model.KeyPath
@@ -199,7 +198,7 @@ class SleepFragment : BaseDialogFragment() {
         viewModel.playingEpisodeLive.observe(
             viewLifecycleOwner,
             Observer { (_, backgroundColor) ->
-                applyColor(theme, backgroundColor)
+                styleBackgroundColor(backgroundColor)
 
                 val tintColor = theme.playerHighlightColor(viewModel.podcast)
                 val tintColorStateList = ColorStateList.valueOf(tintColor)

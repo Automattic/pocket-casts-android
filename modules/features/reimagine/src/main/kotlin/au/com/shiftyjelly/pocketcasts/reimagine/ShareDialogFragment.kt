@@ -10,9 +10,6 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -22,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.unit.dp
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.WindowInsetsControllerCompat
@@ -109,8 +105,7 @@ class ShareDialogFragment : BottomSheetDialogFragment() {
 
             Box(modifier = Modifier.background(backgroundColor)) {
                 ShareDialog(
-                    options = createShareOptions(podcast, episode, backgroundColor, textColor),
-                    handleColor = Color(ThemeColor.primaryIcon02(theme.activeTheme)),
+                    options = createShareOptions(podcast, episode, textColor),
                     dividerColor = dividerColor,
                 )
             }
@@ -119,10 +114,7 @@ class ShareDialogFragment : BottomSheetDialogFragment() {
             }
         } else {
             AppTheme(theme.activeTheme) {
-                ShareDialog(
-                    options = createShareOptions(podcast, episode),
-                    handleColor = Color(ThemeColor.primaryIcon02(theme.activeTheme)),
-                )
+                ShareDialog(options = createShareOptions(podcast, episode))
             }
         }
     }
@@ -142,17 +134,10 @@ class ShareDialogFragment : BottomSheetDialogFragment() {
     @Composable
     private fun ShareDialog(
         options: List<OptionsDialogOption>,
-        handleColor: Color,
         dividerColor: Color? = null,
     ) = Column(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Box(
-            modifier = Modifier
-                .width(48.dp)
-                .height(4.dp)
-                .background(handleColor, RoundedCornerShape(2.dp)),
-        )
         OptionsDialogComponent(
             options = options,
             dividerColor = dividerColor,
@@ -164,7 +149,6 @@ class ShareDialogFragment : BottomSheetDialogFragment() {
     private fun createShareOptions(
         podcast: Podcast,
         episode: PodcastEpisode,
-        backgroundColor: Color? = null,
         textColor: Color? = null,
     ) = buildList {
         if (ShareDialogFragment.Options.Podcast in args.options) {
@@ -172,7 +156,6 @@ class ShareDialogFragment : BottomSheetDialogFragment() {
                 shareOption(
                     textId = LR.string.share_podcast,
                     textColor = textColor,
-                    backgroundColor = backgroundColor,
                     onClick = {
                         if (FeatureFlag.isEnabled(Feature.REIMAGINE_SHARING)) {
                             SharePodcastFragment
@@ -195,7 +178,6 @@ class ShareDialogFragment : BottomSheetDialogFragment() {
                 shareOption(
                     textId = LR.string.podcast_share_episode,
                     textColor = textColor,
-                    backgroundColor = backgroundColor,
                     onClick = {
                         if (FeatureFlag.isEnabled(Feature.REIMAGINE_SHARING)) {
                             ShareEpisodeFragment
@@ -216,7 +198,6 @@ class ShareDialogFragment : BottomSheetDialogFragment() {
                 shareOption(
                     textId = LR.string.podcast_share_current_position,
                     textColor = textColor,
-                    backgroundColor = backgroundColor,
                     onClick = {
                         if (FeatureFlag.isEnabled(Feature.REIMAGINE_SHARING)) {
                             ShareEpisodeTimestampFragment
@@ -238,7 +219,6 @@ class ShareDialogFragment : BottomSheetDialogFragment() {
                     shareOption(
                         textId = LR.string.podcast_share_clip,
                         textColor = textColor,
-                        backgroundColor = backgroundColor,
                         onClick = {
                             ShareClipFragment
                                 .newInstance(episode, podcast.backgroundColor, args.source)
@@ -252,7 +232,6 @@ class ShareDialogFragment : BottomSheetDialogFragment() {
                     shareOption(
                         textId = LR.string.podcast_share_open_file_in,
                         textColor = textColor,
-                        backgroundColor = backgroundColor,
                         onClick = {
                             lifecycleScope.launch(NonCancellable) {
                                 val request = SharingRequest.episodeFile(podcast, episode)
@@ -270,12 +249,10 @@ class ShareDialogFragment : BottomSheetDialogFragment() {
     private fun shareOption(
         @StringRes textId: Int,
         textColor: Color?,
-        backgroundColor: Color?,
         onClick: () -> Unit,
     ) = OptionsDialogOption(
         titleId = textId,
         titleColor = textColor?.toArgb(),
-        backgroundColor = backgroundColor,
         click = {
             onClick()
             dismiss()

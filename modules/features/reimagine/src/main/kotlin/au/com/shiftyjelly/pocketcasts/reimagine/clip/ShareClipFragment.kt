@@ -141,10 +141,7 @@ class ShareClipFragment : BaseDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        styleBackgroundColor(
-            background = shareColors.background.toArgb(),
-            navigationBar = shareColors.navigationBar.toArgb(),
-        )
+        styleBackgroundColor(color = shareColors.background.toArgb())
     }
 
     @Parcelize

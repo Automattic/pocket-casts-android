@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.player.view.shelf
 
 import android.view.View
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -142,12 +141,11 @@ private fun Content(
         modifier = Modifier
             .fillMaxWidth(),
     ) {
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(12.dp))
 
         Pill(
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .background(MaterialTheme.theme.colors.playerContrast01),
+            backgroundColor = MaterialTheme.theme.colors.playerContrast01,
+            modifier = Modifier.align(Alignment.CenterHorizontally),
         )
 
         Spacer(Modifier.height(8.dp))
