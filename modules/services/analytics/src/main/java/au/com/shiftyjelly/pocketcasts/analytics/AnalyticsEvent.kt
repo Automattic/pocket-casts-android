@@ -273,6 +273,7 @@ enum class AnalyticsEvent(val key: String) {
     /* Filters */
     FILTER_AUTO_DOWNLOAD_LIMIT_UPDATED("filter_auto_download_limit_updated"),
     FILTER_AUTO_DOWNLOAD_UPDATED("filter_auto_download_updated"),
+    FILTER_CREATE_BUTTON_TAPPED("filter_create_button_tapped"),
     FILTER_CREATED("filter_created"),
     FILTER_DELETED("filter_deleted"),
     FILTER_EDIT_DISMISSED("filter_edit_dismissed"),
@@ -520,6 +521,7 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_SELECT_PODCASTS_SELECT_ALL_TAPPED("settings_select_podcasts_select_all_tapped"),
     SETTINGS_SELECT_PODCASTS_SELECT_NONE_TAPPED("settings_select_podcasts_select_none_tapped"),
     SETTINGS_SELECT_PODCASTS_PODCAST_TOGGLED("settings_select_podcasts_podcast_toggled"),
+    SETTINGS_SELECT_PODCASTS_SELECT_ALL_PODCASTS_TOGGLED("settings_select_podcasts_select_all_podcasts_toggled"),
 
     /* Settings - Files */
     SETTINGS_FILES_SHOWN("settings_files_shown"),
