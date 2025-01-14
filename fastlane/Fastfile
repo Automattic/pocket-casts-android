@@ -292,8 +292,8 @@ platform :android do
     create_backmerge_pr
     begin
       close_milestone(repository: GITHUB_REPO, milestone: release_version_current)
-    rescue
-      UI.important("Could not find a GitHub milestone for hotfix #{release_version_current} to close.")
+    rescue StandardError => e
+      UI.important("Could not find a GitHub milestone for hotfix #{release_version_current} to close: #{e}")
     end
   end
 
