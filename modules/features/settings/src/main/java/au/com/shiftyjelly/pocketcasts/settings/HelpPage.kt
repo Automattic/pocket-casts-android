@@ -91,10 +91,10 @@ fun HelpPage(
     onShowLogs: () -> Unit,
     onShowStatusPage: () -> Unit,
     onGoBack: () -> Unit,
-    onWebViewCreated: (WebView) -> Unit,
-    onWebViewDisposed: (WebView) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HelpViewModel = hiltViewModel(),
+    onWebViewCreated: (WebView) -> Unit = {},
+    onWebViewDisposed: (WebView) -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
     val state by viewModel.uiState.collectAsState()
