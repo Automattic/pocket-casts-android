@@ -54,3 +54,10 @@ object ColorUtils {
 fun Int.colorIntWithAlpha(alpha: Int): Int {
     return ColorUtils.colorWithAlpha(this, alpha)
 }
+
+fun ComposeColor.modifyHsv(
+    block: (h: Float, s: Float, v: Float) -> ComposeColor,
+): ComposeColor {
+    val hsv = FloatArray(3).also { Color.colorToHSV(toArgb(), it) }
+    return block(hsv[0], hsv[1], hsv[2])
+}
