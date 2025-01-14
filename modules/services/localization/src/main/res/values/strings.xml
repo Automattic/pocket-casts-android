@@ -2274,7 +2274,7 @@
 
     <!-- Winback -->
 
-    <string name="winback_offer_header">Before you cancel, check out these offers</string>
+    <string name="winback_offer_header">Before you cancel, check&#160;out these offers</string>
     <string name="winback_offer_free_offer_title">Get your next month free</string>
     <!-- %1$s is the amount of money saved -->
     <string name="winback_offer_free_offer_description">Save %1$s at the start of your next billing cycle.</string>
