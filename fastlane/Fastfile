@@ -288,7 +288,13 @@ platform :android do
     UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.") unless skip_confirm || UI.confirm('Do you want to continue?')
 
     trigger_release_build(branch_to_build: "release/#{version}")
+
     create_backmerge_pr
+    begin
+      close_milestone(repository: GITHUB_REPO, milestone: release_version_current)
+    rescue
+      UI.important("Could not find a GitHub milestone for hotfix #{release_version_current} to close.")
+    end
   end
 
   # Update the rollout of all 3 variants (app, automotive, wear) of the current version to the given value
