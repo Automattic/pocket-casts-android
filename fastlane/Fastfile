@@ -136,7 +136,7 @@ platform :android do
       new_version: new_version,
       release_notes_file_path: RELEASE_NOTES_SOURCE_PATH
     )
-    push_to_git_remote(tags: false)
+    push_to_git_remote(set_upstream: true, tags: false)
 
     trigger_release_build(branch_to_build: "release/#{new_version}")
     create_backmerge_pr
@@ -272,6 +272,7 @@ platform :android do
       version_code: new_version_code
     )
     commit_version_bump
+    push_to_git_remote(set_upstream: true, tags: false)
     UI.success("Done! New Release Version: #{release_version_current}. New Build Code: #{build_code_current}")
   end
 
