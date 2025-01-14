@@ -59,6 +59,7 @@ dependencies {
     implementation(libs.lifecycle.reactivestreams.ktx)
     implementation(libs.media3.datasource)
     implementation(libs.media3.extractor)
+    implementation(libs.navigation.compose)
     implementation(libs.play.cast)
     implementation(libs.rx2.java)
     implementation(libs.rx2.kotlin)

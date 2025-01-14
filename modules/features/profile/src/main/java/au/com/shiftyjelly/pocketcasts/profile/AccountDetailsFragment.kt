@@ -24,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.profile.champion.PocketCastsChampionBottomSheetDialog
+import au.com.shiftyjelly.pocketcasts.profile.winback.WinbackFragment
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -41,6 +42,8 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.Gravatar
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -148,9 +151,13 @@ class AccountDetailsFragment : BaseFragment() {
             },
             onCancelSubscription = {
                 analyticsTracker.track(AnalyticsEvent.ACCOUNT_DETAILS_CANCEL_TAPPED)
-                CancelConfirmationFragment
-                    .newInstance()
-                    .show(childFragmentManager, "cancel_subscription_confirmation_dialog")
+                if (FeatureFlag.isEnabled(Feature.WINBACK)) {
+                    WinbackFragment().show(childFragmentManager, "subscription_windback")
+                } else {
+                    CancelConfirmationFragment
+                        .newInstance()
+                        .show(childFragmentManager, "cancel_subscription_confirmation_dialog")
+                }
             },
             onChangeNewsletterSubscription = { isChecked ->
                 accountViewModel.updateNewsletter(isChecked)
@@ -224,6 +231,7 @@ class AccountDetailsFragment : BaseFragment() {
                 accountViewModel.clearDeleteAccountState()
                 performSignOut()
             }
+
             is DeleteAccountState.Failure -> {
                 accountViewModel.clearDeleteAccountState()
                 AlertDialog.Builder(requireContext())
@@ -232,6 +240,7 @@ class AccountDetailsFragment : BaseFragment() {
                     .setPositiveButton(getString(LR.string.ok)) { dialog, _ -> dialog.dismiss() }
                     .show()
             }
+
             is DeleteAccountState.Empty -> {}
         }
     }
