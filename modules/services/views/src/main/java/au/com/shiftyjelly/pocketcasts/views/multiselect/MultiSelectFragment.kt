@@ -31,10 +31,14 @@ class MultiSelectFragment : BaseFragment(), MultiSelectTouchCallback.ItemTouchHe
     @Inject lateinit var analyticsTracker: AnalyticsTracker
 
     @Inject lateinit var multiSelectEpisodesHelper: MultiSelectEpisodesHelper
+
     private val source: String
         get() = arguments?.getString(ARG_SOURCE) ?: SourceView.UNKNOWN.analyticsValue
 
-    private val adapter = MultiSelectAdapter(editable = true, listener = null, dragListener = this::onItemStartDrag)
+    private val shouldShowRemoveListeningHistory: Boolean
+        get() = arguments?.getBoolean(ARG_SHOULD_SHOW_REMOVE_LISTENING_HISTORY) ?: false
+
+    private val adapter = MultiSelectAdapter(editable = true, listener = null, shouldShowRemoveListeningHistory = shouldShowRemoveListeningHistory, dragListener = this::onItemStartDrag)
     private lateinit var itemTouchHelper: ItemTouchHelper
     private var items = emptyList<Any>()
     private val shortcutTitle = MultiSelectAdapter.Title(LR.string.multiselect_actions_shown)
@@ -86,6 +90,7 @@ class MultiSelectFragment : BaseFragment(), MultiSelectTouchCallback.ItemTouchHe
                 multiSelectActions.add(multiSelectEpisodesHelper.maxToolbarIcons + 1, overflowTitle)
 
                 items = multiSelectActions.toList()
+                adapter.shouldShowRemoveListeningHistory = shouldShowRemoveListeningHistory
                 adapter.submitList(multiSelectActions.toList())
             }
     }
@@ -186,9 +191,11 @@ class MultiSelectFragment : BaseFragment(), MultiSelectTouchCallback.ItemTouchHe
 
     companion object {
         private const val ARG_SOURCE = "source"
-        fun newInstance(source: SourceView) = MultiSelectFragment().apply {
+        private const val ARG_SHOULD_SHOW_REMOVE_LISTENING_HISTORY = "should_show_remove_listening_history"
+        fun newInstance(source: SourceView, shouldShowRemoveListeningHistory: Boolean) = MultiSelectFragment().apply {
             arguments = bundleOf(
                 ARG_SOURCE to source.analyticsValue,
+                ARG_SHOULD_SHOW_REMOVE_LISTENING_HISTORY to shouldShowRemoveListeningHistory,
             )
         }
     }

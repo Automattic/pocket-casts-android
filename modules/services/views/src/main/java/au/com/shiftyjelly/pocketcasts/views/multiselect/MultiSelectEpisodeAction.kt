@@ -109,9 +109,16 @@ sealed class MultiSelectEpisodeAction(
         iconRes = IR.drawable.ic_star,
         analyticsValue = "star",
     )
+    object RemoveListeningHistory : MultiSelectEpisodeAction(
+        groupId = "listening_history",
+        actionId = UR.id.menu_remove_listening_history,
+        title = LR.string.clean_history,
+        iconRes = IR.drawable.ic_delete,
+        analyticsValue = "remove_listening_history",
+    )
 
     companion object {
-        private val STANDARD = listOf(Download, Archive, MarkAsPlayed, PlayNext, PlayLast, Star, Share)
+        private val STANDARD = listOf(Download, Archive, MarkAsPlayed, PlayNext, PlayLast, Star, Share, RemoveListeningHistory)
         private val ALL = STANDARD + listOf(DeleteDownload, DeleteUserEpisode, MarkAsUnplayed, Unstar, Unarchive)
         private val STANDARD_BY_GROUP_ID = STANDARD.associateBy { it.groupId }
         val ALL_BY_ACTION_ID = ALL.associateBy { it.actionId }
@@ -160,6 +167,14 @@ sealed class MultiSelectEpisodeAction(
                     }
 
                     return Unstar
+                }
+                RemoveListeningHistory.groupId -> {
+                    if (selected.any { it is UserEpisode }) return null
+
+                    val hasPlayedAnyEpisode = selected.any { episode ->
+                        episode is PodcastEpisode && (episode.lastPlaybackInteraction ?: 0L) > 0L
+                    }
+                    return if (hasPlayedAnyEpisode) RemoveListeningHistory else null
                 }
                 PlayNext.groupId -> return PlayNext
                 PlayLast.groupId -> return PlayLast
