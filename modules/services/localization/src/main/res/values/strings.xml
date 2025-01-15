@@ -244,6 +244,9 @@
     <string name="unstarred_episodes_singular">1 episode unstarred</string>
     <string name="unstarred_episodes_plural">%1$d episodes unstarred</string>
 
+    <string name="remove_listening_history_episodes_singular">Removed 1 episode from listening history</string>
+    <string name="remove_listening_history_episodes_plural">Removed %1$d episodes from listening history</string>
+
     <string name="download_warning_button">Download %1$d episodes</string>
     <string name="download_warning_title">Download All</string>
     <string name="download_warning_limit_summary">Bulk downloads are limited to %1$d.</string>
