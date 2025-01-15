@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.account.viewmodel
 
-import android.app.Activity
 import android.app.Application
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
@@ -211,7 +211,7 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
     }
 
     fun onClickSubscribe(
-        activity: Activity,
+        activity: AppCompatActivity,
         flow: OnboardingFlow,
         source: OnboardingUpgradeSource,
         onComplete: () -> Unit,
