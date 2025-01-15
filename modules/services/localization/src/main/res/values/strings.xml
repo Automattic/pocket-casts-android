@@ -2272,4 +2272,17 @@
     <string name="up_next_shuffle_disable_button_content_description">Up Next shuffle disable</string>
     <string name="up_next_shuffle_enable_confirmation_message">Shuffle is on. Episodes will play in random order.</string>
 
+    <!-- Winback -->
+
+    <string name="winback_offer_header">Before you cancel, check&#160;out these offers</string>
+    <string name="winback_offer_free_offer_title">Get your next month free</string>
+    <!-- %1$s is the amount of money saved -->
+    <string name="winback_offer_free_offer_description">Save %1$s at the start of your next billing cycle.</string>
+    <string name="winback_offer_free_offer_button_label">Claim offer</string>
+    <string name="winback_offer_differnt_plan_title">Looking for a different plan?</string>
+    <string name="winback_offer_differnt_plan_description">Find the plan that\'s right for you.</string>
+    <string name="winback_offer_help_title">Need help with Pocket&#160;Casts?</string>
+    <string name="winback_offer_help_description">Struggling with any features or having issues.</string>
+    <string name="winback_offer_cancel_continue_button_label">Continue to Cancellation</string>
+
 </resources>
