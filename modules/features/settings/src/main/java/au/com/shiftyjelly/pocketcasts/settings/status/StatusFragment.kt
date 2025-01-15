@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
@@ -63,8 +64,8 @@ class StatusFragment : BaseFragment() {
         AppThemeWithBackground(theme.activeTheme) {
             StatusPage(
                 viewModel = viewModel,
-                onBackPressed = { closeFragment() },
                 bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
+                onBackPressed = { closeFragment() },
             )
         }
     }
@@ -76,9 +77,9 @@ class StatusFragment : BaseFragment() {
 
 @Composable
 fun StatusPage(
-    viewModel: StatusViewModel,
-    onBackPressed: () -> Unit,
     bottomInset: Dp,
+    onBackPressed: () -> Unit,
+    viewModel: StatusViewModel = hiltViewModel(),
 ) {
     LazyColumn(
         contentPadding = PaddingValues(bottom = bottomInset),

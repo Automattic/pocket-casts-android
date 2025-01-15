@@ -116,18 +116,37 @@ open class BaseDialogFragment : BottomSheetDialogFragment(), CoroutineScope {
         }
     }
 
-    protected fun styleBackgroundColor(
-        @ColorInt background: Int,
+    protected fun setDialogTint(
+        @ColorInt statusBar: Int,
         @ColorInt navigationBar: Int,
+        @ColorInt background: Int = navigationBar,
+    ) {
+        setStatusBarTint(statusBar)
+        setNavigationBarTint(navigationBar)
+        setBackgroundTint(background)
+    }
+
+    protected fun setStatusBarTint(
+        @ColorInt color: Int,
     ) {
         requireActivity().window?.let { activityWindow ->
-            activityWindow.statusBarColor = navigationBar
-            WindowInsetsControllerCompat(activityWindow, activityWindow.decorView).isAppearanceLightStatusBars = ColorUtils.calculateLuminance(navigationBar) > 0.5f
+            activityWindow.statusBarColor = color
+            WindowInsetsControllerCompat(activityWindow, activityWindow.decorView).isAppearanceLightStatusBars = ColorUtils.calculateLuminance(color) > 0.5f
         }
+    }
+
+    protected fun setNavigationBarTint(
+        @ColorInt color: Int,
+    ) {
         requireDialog().window?.let { dialogWindow ->
-            dialogWindow.navigationBarColor = background
-            WindowInsetsControllerCompat(dialogWindow, dialogWindow.decorView).isAppearanceLightNavigationBars = ColorUtils.calculateLuminance(background) > 0.5f
+            dialogWindow.navigationBarColor = color
+            WindowInsetsControllerCompat(dialogWindow, dialogWindow.decorView).isAppearanceLightNavigationBars = ColorUtils.calculateLuminance(color) > 0.5f
         }
-        bottomSheetView()?.backgroundTintList = ColorStateList.valueOf(background)
+    }
+
+    protected fun setBackgroundTint(
+        @ColorInt color: Int,
+    ) {
+        bottomSheetView()?.backgroundTintList = ColorStateList.valueOf(color)
     }
 }

@@ -75,9 +75,9 @@ class SharePodcastFragment : BaseDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        styleBackgroundColor(
-            background = shareColors.background.toArgb(),
-            navigationBar = shareColors.navigationBar.toArgb(),
+        setDialogTint(
+            statusBar = shareColors.navigationBar.toArgb(),
+            navigationBar = shareColors.background.toArgb(),
         )
     }
 
