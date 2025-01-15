@@ -144,6 +144,10 @@ class MultiSelectEpisodesHelper @Inject constructor(
                 unstar(resources = resources)
                 true
             }
+            UR.id.menu_remove_listening_history -> {
+                removeListeningHistory(resources = resources)
+                true
+            }
             else -> false
         }
     }
@@ -275,6 +279,24 @@ class MultiSelectEpisodesHelper @Inject constructor(
             episodeAnalytics.trackBulkEvent(AnalyticsEvent.EPISODE_BULK_UNSTARRED, source, list.size)
             withContext(Dispatchers.Main) {
                 val snackText = resources.getStringPlural(selectedList.size, LR.string.unstarred_episodes_singular, LR.string.unstarred_episodes_plural)
+                showSnackBar(snackText)
+                closeMultiSelect()
+            }
+        }
+    }
+
+    private fun removeListeningHistory(resources: Resources) {
+        if (selectedList.isEmpty()) {
+            closeMultiSelect()
+            return
+        }
+
+        launch {
+            val list = selectedList.filterIsInstance<PodcastEpisode>().toList()
+            episodeManager.clearEpisodeHistory(list)
+            episodeAnalytics.trackBulkEvent(AnalyticsEvent.EPISODE_REMOVED_LISTENING_HISTORY, source, list.size)
+            withContext(Dispatchers.Main) {
+                val snackText = resources.getStringPlural(selectedList.size, LR.string.remove_listening_history_episodes_singular, LR.string.remove_listening_history_episodes_plural)
                 showSnackBar(snackText)
                 closeMultiSelect()
             }

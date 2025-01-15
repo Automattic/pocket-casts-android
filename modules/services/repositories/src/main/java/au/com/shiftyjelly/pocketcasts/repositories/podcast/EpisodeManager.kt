@@ -97,6 +97,7 @@ interface EpisodeManager {
     fun userHasInteractedWithEpisode(episode: PodcastEpisode, playbackManager: PlaybackManager): Boolean
     fun clearEpisodePlaybackInteractionDatesBeforeBlocking(lastCleared: Date)
     suspend fun clearAllEpisodeHistory()
+    suspend fun clearEpisodeHistory(episodes: List<PodcastEpisode>)
     fun markPlaybackHistorySyncedBlocking()
     fun stopDownloadAndCleanUp(episodeUuid: String, from: String)
     fun stopDownloadAndCleanUp(episode: PodcastEpisode, from: String)

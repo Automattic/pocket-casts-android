@@ -1010,6 +1010,10 @@ class EpisodeManagerImpl @Inject constructor(
         settings.setClearHistoryTimeNow()
     }
 
+    override suspend fun clearEpisodeHistory(episodes: List<PodcastEpisode>) {
+        episodeDao.clearEpisodePlaybackInteractions(episodes.map { it.uuid })
+    }
+
     override fun markPlaybackHistorySyncedBlocking() {
         return episodeDao.markPlaybackHistorySyncedBlocking()
     }
