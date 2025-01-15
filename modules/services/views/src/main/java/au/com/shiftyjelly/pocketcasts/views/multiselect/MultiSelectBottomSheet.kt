@@ -5,18 +5,24 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import androidx.lifecycle.asFlow
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.databinding.FragmentMultiselectBottomSheetBinding
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private const val ARG_ACTION_IDS = "actionids"
@@ -75,13 +81,23 @@ class MultiSelectBottomSheet : BaseDialogFragment() {
         }
 
         binding.btnEdit.setOnClickListener {
-            val source = (multiSelectHelper?.source ?: SourceView.UNKNOWN)
-            analyticsTracker.track(
-                AnalyticsEvent.MULTI_SELECT_VIEW_OVERFLOW_MENU_REARRANGE_STARTED,
-                AnalyticsProp.sourceMap(source),
-            )
-            (activity as FragmentHostListener).showModal(MultiSelectFragment.newInstance(source))
-            dismiss()
+            lifecycleScope.launch {
+                val selectedEpisodes: List<BaseEpisode> = multiSelectHelper?.selectedListLive
+                    ?.asFlow()
+                    ?.first() ?: emptyList()
+
+                val hasPlayedAnyEpisode = selectedEpisodes.any { episode ->
+                    episode is PodcastEpisode && (episode.lastPlaybackInteraction ?: 0L) > 0L
+                }
+
+                val source = (multiSelectHelper?.source ?: SourceView.UNKNOWN)
+                analyticsTracker.track(
+                    AnalyticsEvent.MULTI_SELECT_VIEW_OVERFLOW_MENU_REARRANGE_STARTED,
+                    AnalyticsProp.sourceMap(source),
+                )
+                (activity as FragmentHostListener).showModal(MultiSelectFragment.newInstance(source, shouldShowRemoveListeningHistory = hasPlayedAnyEpisode))
+                dismiss()
+            }
         }
     }
 
