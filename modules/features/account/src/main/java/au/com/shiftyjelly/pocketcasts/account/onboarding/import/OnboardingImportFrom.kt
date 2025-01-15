@@ -151,7 +151,7 @@ private fun OnboardingImportFromPreview(
     AppThemeWithBackground(themeType = themeType) {
         OnboardingImportFrom(
             theme = themeType,
-            drawableRes = IR.drawable.castbox,
+            drawableRes = IR.drawable.ic_heart,
             title = "Import from something",
             text = "Some text to go with the title.",
             steps = listOf(
