@@ -56,6 +56,7 @@ internal fun WinbackOfferPage(
     modifier: Modifier = Modifier,
 ) {
     Column(
+        verticalArrangement = Arrangement.spacedBy(16.dp),
         modifier = modifier
             .fillMaxSize()
             .nestedScroll(rememberNestedScrollInteropConnection())
@@ -262,11 +263,7 @@ private fun ChevronRow(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier,
     ) {
-        Box(
-            modifier = Modifier.weight(1f),
-        ) {
-            content()
-        }
+        content()
         Image(
             painter = painterResource(IR.drawable.ic_chevron_small_right),
             contentDescription = null,

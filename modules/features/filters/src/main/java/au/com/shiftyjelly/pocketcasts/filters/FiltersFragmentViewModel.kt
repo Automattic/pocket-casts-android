@@ -88,4 +88,8 @@ class FiltersFragmentViewModel @Inject constructor(
             onSuccess(playlist)
         }
     }
+
+    fun trackOnCreateFilterTap() {
+        analyticsTracker.track(AnalyticsEvent.FILTER_CREATE_BUTTON_TAPPED)
+    }
 }
