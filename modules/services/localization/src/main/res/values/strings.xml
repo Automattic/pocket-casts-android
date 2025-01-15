@@ -2284,5 +2284,7 @@
     <string name="winback_offer_help_title">Need help with Pocket&#160;Casts?</string>
     <string name="winback_offer_help_description">Struggling with any features or having issues.</string>
     <string name="winback_offer_cancel_continue_button_label">Continue to Cancellation</string>
+    <string name="winback_claimed_offer_message_1">Enjoy your free month!</string>
+    <string name="winback_claimed_offer_message_2">Thanks for choosing Pocket&#160;Casts. Billing starts after your free month ends.</string>
 
 </resources>
