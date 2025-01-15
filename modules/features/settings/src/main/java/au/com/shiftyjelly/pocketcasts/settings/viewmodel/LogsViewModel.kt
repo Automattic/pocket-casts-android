@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @HiltViewModel
 class LogsViewModel @Inject constructor(
@@ -19,17 +20,17 @@ class LogsViewModel @Inject constructor(
 
     data class State(
         val logs: String?,
+        val logLines: List<String>,
     )
 
-    private val _state = MutableStateFlow(State(null))
+    private val _state = MutableStateFlow(State(null, emptyList()))
     val state = _state.asStateFlow()
 
     init {
         viewModelScope.launch {
-            _state.update {
-                val logs = support.getLogs()
-                it.copy(logs = logs)
-            }
+            val logs = support.getLogs()
+            val logLines = withContext(Dispatchers.Default) { logs.split('\n') }
+            _state.update { it.copy(logs = logs, logLines = logLines) }
         }
     }
 
