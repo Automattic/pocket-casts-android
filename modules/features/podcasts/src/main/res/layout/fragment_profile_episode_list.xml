@@ -15,16 +15,22 @@
         android:id="@+id/multiSelectToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="?android:attr/actionBarSize"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@+id/toolbar" />
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/toolbarBarrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="toolbar,multiSelectToolbar" />
 
     <androidx.compose.ui.platform.ComposeView
         android:id="@+id/layoutSearch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/secondary_ui_01"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+        app:layout_constraintTop_toBottomOf="@+id/toolbarBarrier" />
 
     <androidx.compose.ui.platform.ComposeView
         android:id="@+id/manageDownloadsCard"
