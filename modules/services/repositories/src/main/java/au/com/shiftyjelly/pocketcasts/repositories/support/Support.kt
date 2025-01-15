@@ -79,7 +79,7 @@ class Support @Inject constructor(
         val intent = Intent(Intent.ACTION_SEND)
 
         withContext(Dispatchers.IO) {
-            intent.type = "text/html"
+            intent.type = "message/rfc822"
             if (emailSupport) {
                 intent.putExtra(Intent.EXTRA_EMAIL, arrayOf("support@pocketcasts.com"))
             }

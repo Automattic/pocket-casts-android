@@ -55,6 +55,7 @@ dependencies {
     implementation(libs.compose.rxjava2)
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.tooling.preview)
+    implementation(libs.compose.webview)
     implementation(libs.coroutines.core)
     implementation(libs.coroutines.rx2)
     implementation(libs.firebase.analytics)
