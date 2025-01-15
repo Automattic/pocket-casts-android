@@ -1,16 +1,22 @@
+@file:OptIn(ExperimentalMaterialApi::class)
+
 package au.com.shiftyjelly.pocketcasts.compose.bars
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.LocalRippleConfiguration
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.RippleConfiguration
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -40,36 +46,40 @@ fun ThemedTopAppBar(
     textColor: Color = MaterialTheme.theme.colors.secondaryText01,
     backgroundColor: Color = MaterialTheme.theme.colors.secondaryUi01,
     bottomShadow: Boolean = false,
-    actions: @Composable RowScope.() -> Unit = {},
+    actions: @Composable RowScope.(Color) -> Unit = {},
     onNavigationClick: () -> Unit,
 ) {
-    TopAppBar(
-        navigationIcon = {
-            NavigationIconButton(
-                onNavigationClick = onNavigationClick,
-                navigationButton = navigationButton,
-                iconColor = iconColor,
-            )
-        },
-        title = {
-            if (title != null) {
-                Text(
-                    text = title,
-                    color = textColor,
+    CompositionLocalProvider(
+        LocalRippleConfiguration provides RippleConfiguration(color = iconColor),
+    ) {
+        TopAppBar(
+            navigationIcon = {
+                NavigationIconButton(
+                    onNavigationClick = onNavigationClick,
+                    navigationButton = navigationButton,
+                    iconColor = iconColor,
                 )
-            }
-        },
-        actions = actions,
-        backgroundColor = backgroundColor,
-        elevation = 0.dp,
-        modifier = if (bottomShadow) {
-            modifier
-                .zIndex(1f)
-                .shadow(4.dp)
-        } else {
-            modifier
-        },
-    )
+            },
+            title = {
+                if (title != null) {
+                    Text(
+                        text = title,
+                        color = textColor,
+                    )
+                }
+            },
+            actions = { actions(iconColor) },
+            backgroundColor = backgroundColor,
+            elevation = 0.dp,
+            modifier = if (bottomShadow) {
+                modifier
+                    .zIndex(1f)
+                    .shadow(4.dp)
+            } else {
+                modifier
+            },
+        )
+    }
 }
 
 @Composable
