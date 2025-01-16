@@ -136,7 +136,7 @@ platform :android do
       new_version: new_version,
       release_notes_file_path: RELEASE_NOTES_SOURCE_PATH
     )
-    push_to_git_remote(tags: false)
+    push_to_git_remote(set_upstream: true, tags: false)
 
     trigger_release_build(branch_to_build: "release/#{new_version}")
     create_backmerge_pr
@@ -272,6 +272,7 @@ platform :android do
       version_code: new_version_code
     )
     commit_version_bump
+    push_to_git_remote(set_upstream: true, tags: false)
     UI.success("Done! New Release Version: #{release_version_current}. New Build Code: #{build_code_current}")
   end
 
@@ -287,7 +288,13 @@ platform :android do
     UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.") unless skip_confirm || UI.confirm('Do you want to continue?')
 
     trigger_release_build(branch_to_build: "release/#{version}")
+
     create_backmerge_pr
+    begin
+      close_milestone(repository: GITHUB_REPO, milestone: release_version_current)
+    rescue StandardError => e
+      UI.important("Could not find a GitHub milestone for hotfix #{release_version_current} to close: #{e}")
+    end
   end
 
   # Update the rollout of all 3 variants (app, automotive, wear) of the current version to the given value
