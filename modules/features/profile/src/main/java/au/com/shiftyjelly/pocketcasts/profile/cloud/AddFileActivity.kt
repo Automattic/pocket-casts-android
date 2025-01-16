@@ -14,6 +14,7 @@ import android.provider.OpenableColumns
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
@@ -58,6 +59,7 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSourc
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.views.extensions.setSystemWindowInsetToPadding
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
@@ -199,9 +201,12 @@ class AddFileActivity :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         theme.setupThemeForConfig(this, resources.configuration)
+        enableEdgeToEdge(navigationBarStyle = theme.getNavigationBarStyle(this))
+        theme.updateWindowStatusBarIcons(window = window)
 
         binding = ActivityAddFileBinding.inflate(layoutInflater)
         val view = binding.root
+        view.setSystemWindowInsetToPadding(right = true, left = true)
         setContentView(view)
 
         colorAdapter = AddFileColourAdapter(
@@ -261,6 +266,8 @@ class AddFileActivity :
         if (launchedFileChooser) {
             // do nothing as we are returning from the file chooser
         } else if (existingUuid == null) {
+            setupToolbar(title = LR.string.profile_cloud_add_file)
+
             if (isFileChooserMode) {
                 launchFileChooser()
                 return
@@ -273,14 +280,14 @@ class AddFileActivity :
             }
             setupForNewFile(dataUri)
         } else {
+            setupToolbar(title = LR.string.profile_cloud_edit_file)
+
             launch {
                 val userEpisode = getUserEpisode(existingUuid)
                 if (userEpisode == null) {
                     finish()
                     return@launch
                 }
-
-                setupToolbar(title = LR.string.profile_cloud_edit_file)
 
                 binding.lblFilename.text = ""
                 binding.lblFilesize.text = Util.formattedBytes(bytes = userEpisode.sizeInBytes, context = binding.lblFilesize.context)

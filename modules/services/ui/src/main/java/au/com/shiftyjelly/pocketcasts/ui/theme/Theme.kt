@@ -402,7 +402,7 @@ class Theme @Inject constructor(private val settings: Settings) {
             return
         }
 
-        val color = statusBarIconColor ?: (if (isDarkTheme) StatusBarIconColor.Dark else StatusBarIconColor.Light)
+        val color = statusBarIconColor ?: StatusBarIconColor.Theme
         when (color) {
             StatusBarIconColor.Theme -> {
                 if (activeTheme.toolbarLightIcons) {
