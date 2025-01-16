@@ -16,6 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
@@ -234,6 +235,7 @@ class AppearanceSettingsFragment : BaseFragment() {
         }
 
         binding.btnCloseUpgrade.setOnClickListener {
+            viewModel.onUpgradeBannerDismissed(SourceView.APPEARANCE)
             settings.setUpgradeClosedAppearSettings(true)
             binding.upgradeGroup.isVisible = false
         }

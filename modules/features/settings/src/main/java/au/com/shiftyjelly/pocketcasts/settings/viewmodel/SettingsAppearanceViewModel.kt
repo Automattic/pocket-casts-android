@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
@@ -154,6 +155,10 @@ class SettingsAppearanceViewModel @Inject constructor(
             AnalyticsEvent.SETTINGS_APPEARANCE_FOLLOW_SYSTEM_THEME_TOGGLED,
             mapOf("enabled" to use),
         )
+    }
+
+    fun onUpgradeBannerDismissed(source: SourceView) {
+        analyticsTracker.track(AnalyticsEvent.UPGRADE_BANNER_DISMISSED, mapOf("source" to source.analyticsValue))
     }
 }
 

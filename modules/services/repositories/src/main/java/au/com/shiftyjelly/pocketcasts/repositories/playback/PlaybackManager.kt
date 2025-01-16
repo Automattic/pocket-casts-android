@@ -547,6 +547,7 @@ open class PlaybackManager @Inject constructor(
             SourceView.STATS,
             SourceView.WHATS_NEW,
             SourceView.ABOUT,
+            SourceView.APPEARANCE,
             SourceView.STORAGE_AND_DATA_USAGE,
             SourceView.NOTIFICATION_BOOKMARK,
             SourceView.METERED_NETWORK_CHANGE,
