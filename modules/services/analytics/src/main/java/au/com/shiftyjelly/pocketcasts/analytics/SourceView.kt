@@ -19,6 +19,7 @@ enum class SourceView(val analyticsValue: String) {
     EPISODE_DETAILS("episode_details"),
     EPISODE_SWIPE_ACTION("episode_swipe_action"),
     FILES("files"),
+    FILES_SETTINGS("files_settings"),
     FILTERS("filters"),
     FULL_SCREEN_VIDEO("full_screen_video"),
     LISTENING_HISTORY("listening_history"),

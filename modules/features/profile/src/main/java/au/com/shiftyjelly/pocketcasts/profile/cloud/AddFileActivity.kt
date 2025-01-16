@@ -234,6 +234,7 @@ class AddFileActivity :
 
         val upgradeLayout = binding.upgradeLayout.root
         upgradeLayout.findViewById<View>(R.id.btnClose).setOnClickListener {
+            analyticsTracker.track(AnalyticsEvent.UPGRADE_BANNER_DISMISSED, mapOf("source" to OnboardingUpgradeSource.FILES.analyticsValue))
             settings.setUpgradeClosedAddFile(true)
             upgradeLayout.isVisible = false
         }
