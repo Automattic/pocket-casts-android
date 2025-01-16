@@ -182,12 +182,13 @@ class SubscriptionManagerImpl @Inject constructor(
     }
 
     private suspend fun loadProducts() {
+        productDetails.accept(ProductDetailsState.Loading)
         val (result, products) = billingClient.loadProducts(productDetailsParams)
         if (result.isOk()) {
             productDetails.accept(ProductDetailsState.Loaded(products))
             refreshPurchases()
         } else {
-            productDetails.accept(ProductDetailsState.Error(result.debugMessage))
+            productDetails.accept(ProductDetailsState.Failure)
         }
     }
 
@@ -343,7 +344,7 @@ class SubscriptionManagerImpl @Inject constructor(
         .asFlow()
         .transformLatest { productDetails ->
             val subscriptions = when (productDetails) {
-                is ProductDetailsState.Error -> null
+                is ProductDetailsState.Loading, ProductDetailsState.Failure -> null
                 is ProductDetailsState.Loaded -> productDetails.productDetails.mapNotNull { productDetailsState ->
                     subscriptionMapper.mapFromProductDetails(
                         productDetails = productDetailsState,
@@ -444,9 +445,12 @@ private fun getSubscriptionReplacementMode(
     else -> SUBSCRIPTION_REPLACEMENT_MODE_NOT_SET
 }
 
-sealed class ProductDetailsState {
-    data class Loaded(val productDetails: List<ProductDetails>) : ProductDetailsState()
-    data class Error(val message: String) : ProductDetailsState()
+sealed interface ProductDetailsState {
+    data class Loaded(val productDetails: List<ProductDetails>) : ProductDetailsState
+
+    data object Loading : ProductDetailsState
+
+    data object Failure : ProductDetailsState
 }
 
 sealed class PurchaseEvent {
