@@ -384,6 +384,8 @@ object OnboardingUpgradeHelper {
         textAlign: TextAlign,
         modifier: Modifier = Modifier,
         lineHeight: TextUnit = 16.sp,
+        onPrivacyPolicyClick: () -> Unit = {},
+        onTermsAndConditionsClick: () -> Unit = {},
     ) {
         val privacyPolicyText = stringResource(LR.string.onboarding_plus_privacy_policy)
         val termsAndConditionsText = stringResource(LR.string.onboarding_plus_terms_and_conditions)
@@ -402,12 +404,14 @@ object OnboardingUpgradeHelper {
                 Clickable(
                     text = privacyPolicyText,
                     onClick = {
+                        onPrivacyPolicyClick()
                         uriHandler.openUri(Settings.INFO_PRIVACY_URL)
                     },
                 ),
                 Clickable(
                     text = termsAndConditionsText,
                     onClick = {
+                        onTermsAndConditionsClick()
                         uriHandler.openUri(Settings.INFO_TOS_URL)
                     },
                 ),

@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.subscription
 
-import android.app.Activity
-import android.content.Context
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PATRON_MONTHLY_PRODUCT_ID
@@ -14,7 +14,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionPurchaseRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionResponse
@@ -22,31 +21,27 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionStatusResponse
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.android.billingclient.api.AcknowledgePurchaseParams
-import com.android.billingclient.api.AcknowledgePurchaseResponseListener
 import com.android.billingclient.api.BillingClient
-import com.android.billingclient.api.BillingClientStateListener
 import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingResult
-import com.android.billingclient.api.PendingPurchasesParams
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
-import com.android.billingclient.api.PurchasesResult
-import com.android.billingclient.api.PurchasesUpdatedListener
+import com.android.billingclient.api.PurchaseHistoryRecord
 import com.android.billingclient.api.QueryProductDetailsParams
 import com.android.billingclient.api.QueryPurchaseHistoryParams
 import com.android.billingclient.api.QueryPurchasesParams
-import com.android.billingclient.api.queryPurchaseHistory
-import com.android.billingclient.api.queryPurchasesAsync
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.Single
 import java.util.Date
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -55,20 +50,16 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.rx2.rxSingle
-import timber.log.Timber
 
 private const val SUBSCRIPTION_REPLACEMENT_MODE_NOT_SET = -1
 
 @Singleton
 class SubscriptionManagerImpl @Inject constructor(
-    private val syncManager: SyncManager,
-    private val productDetailsInterceptor: ProductDetailsInterceptor,
-    private val settings: Settings,
+    private val billingClient: BillingClientWrapper,
     private val subscriptionMapper: SubscriptionMapper,
-    @ApplicationScope private val applicationScope: CoroutineScope,
-) : SubscriptionManager,
-    PurchasesUpdatedListener,
-    AcknowledgePurchaseResponseListener {
+    private val syncManager: SyncManager,
+    private val settings: Settings,
+) : SubscriptionManager {
 
     private var cachedSubscriptionStatus: SubscriptionStatus?
         get() = settings.cachedSubscriptionStatus.value
@@ -83,18 +74,14 @@ class SubscriptionManagerImpl @Inject constructor(
         }
     }
 
-    private lateinit var billingClient: BillingClient
     private val productDetails = BehaviorRelay.create<ProductDetailsState>()
     private val purchaseEvents = PublishRelay.create<PurchaseEvent>()
     private val subscriptionChangedEvents = PublishRelay.create<SubscriptionChangedEvent>()
-    private var hasOfferEligible = HashMap<SubscriptionTier, Boolean>()
+
+    private var hasOfferEligible = ConcurrentHashMap<SubscriptionTier, Boolean>()
 
     override fun signOut() {
         clearCachedStatus()
-    }
-
-    override fun observeSubscriptionChangeEvents(): Flowable<SubscriptionChangedEvent> {
-        return subscriptionChangedEvents.toFlowable(BackpressureStrategy.LATEST).distinctUntilChanged()
     }
 
     override fun observeProductDetails(): Flowable<ProductDetailsState> {
@@ -146,155 +133,109 @@ class SubscriptionManagerImpl @Inject constructor(
         return status
     }
 
-    override fun connectToGooglePlay(context: Context) {
-        val params = PendingPurchasesParams.newBuilder()
-            .enablePrepaidPlans()
-            .enableOneTimeProducts()
-            .build()
-        billingClient = BillingClient.newBuilder(context)
-            .enablePendingPurchases(params)
-            .setListener(this)
-            .build()
-        billingClient.startConnection(object : BillingClientStateListener {
-            override fun onBillingSetupFinished(billingResult: BillingResult) {
-                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                    Timber.d("Connected to google play")
-                    loadProducts()
-                } else {
-                    Timber.e("Couldn't set up billing connection: ${billingResult.debugMessage}")
-                    loadProducts()
-                }
-            }
-
-            override fun onBillingServiceDisconnected() {
-                // Try to restart the connection on the next request to
-                // Google Play by calling the startConnection() method.
-                Timber.d("Disconnected from Google Play")
-            }
-        })
+    override suspend fun initializeBillingConnection() = coroutineScope {
+        launch { listenToPurchaseUpdates() }
+        launch { loadProducts() }
+        awaitCancellation()
     }
 
-    override fun loadProducts() {
-        val productList =
-            mutableListOf(
-                QueryProductDetailsParams.Product.newBuilder()
-                    .setProductId(PLUS_MONTHLY_PRODUCT_ID)
-                    .setProductType(BillingClient.ProductType.SUBS)
-                    .build(),
-                QueryProductDetailsParams.Product.newBuilder()
-                    .setProductId(PLUS_YEARLY_PRODUCT_ID)
-                    .setProductType(BillingClient.ProductType.SUBS)
-                    .build(),
-                QueryProductDetailsParams.Product.newBuilder()
-                    .setProductId(PATRON_MONTHLY_PRODUCT_ID)
-                    .setProductType(BillingClient.ProductType.SUBS)
-                    .build(),
-                QueryProductDetailsParams.Product.newBuilder()
-                    .setProductId(PATRON_YEARLY_PRODUCT_ID)
-                    .setProductType(BillingClient.ProductType.SUBS)
-                    .build(),
-            )
-
-        val params = QueryProductDetailsParams.newBuilder()
-            .setProductList(productList)
-            .build()
-
-        billingClient.queryProductDetailsAsync(params) { billingResult, productDetailsList ->
-            val (result, products) = productDetailsInterceptor.intercept(billingResult, productDetailsList)
-            if (result.responseCode == BillingClient.BillingResponseCode.OK) {
-                Timber.d("Billing products loaded")
-                productDetails.accept(ProductDetailsState.Loaded(products))
-
-                refreshPurchases()
-            } else {
-                productDetails.accept(ProductDetailsState.Error(result.debugMessage))
-            }
-        }
-    }
-
-    override fun onPurchasesUpdated(billingResult: BillingResult, purchases: MutableList<Purchase>?) {
-        if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && purchases != null) {
-            for (purchase in purchases) {
-                handlePurchase(purchase)
-            }
-        } else if (billingResult.responseCode == BillingClient.BillingResponseCode.USER_CANCELED) {
-            purchaseEvents.accept(PurchaseEvent.Cancelled(billingResult.responseCode))
-        } else {
-            if (billingResult.responseCode == BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED) {
-                applicationScope.launch {
-                    val purchasesResult = getPurchases()
-                    if (purchasesResult == null) {
-                        LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, "unable to update purchase because billing result returned null purchases")
-                        return@launch
+    private suspend fun listenToPurchaseUpdates(): Nothing {
+        billingClient.purchaseUpdates.collect { (billingResult, purchases) ->
+            when (billingResult.responseCode) {
+                BillingClient.BillingResponseCode.OK -> {
+                    purchases.forEach { purchase ->
+                        handlePurchase(purchase)
                     }
+                }
 
-                    if (purchasesResult.purchasesList.isNotEmpty()) {
-                        val existingPurchase = purchasesResult.purchasesList.first()
+                BillingClient.BillingResponseCode.USER_CANCELED -> {
+                    purchaseEvents.accept(PurchaseEvent.Cancelled(billingResult.responseCode))
+                }
 
-                        try {
-                            sendPurchaseToServer(existingPurchase)
-                        } catch (e: Exception) {
-                            LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, e, "Could not send purchase info")
-                            val failureEvent = PurchaseEvent.Failure(
-                                e.message ?: "Unknown error",
-                                billingResult.responseCode,
-                            )
+                BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED -> {
+                    val (result, freshPurchases) = billingClient.loadPurchases(purchasesParams)
+                    if (result.isOk()) {
+                        val existingPurchase = freshPurchases.firstOrNull()
+                        if (existingPurchase != null) {
+                            try {
+                                sendPurchaseToServer(existingPurchase)
+                            } catch (e: Throwable) {
+                                logSubscriptionError(e, "Failed to send purchase info")
+                                val failureEvent = PurchaseEvent.Failure(e.message ?: "Unknown errror", billingResult.responseCode)
+                                purchaseEvents.accept(failureEvent)
+                            }
+                        } else {
+                            logSubscriptionWarning("Failed to load already owned purchase: ${billingResult.debugMessage}")
+                            val failureEvent = PurchaseEvent.Failure(result.debugMessage, billingResult.responseCode)
                             purchaseEvents.accept(failureEvent)
                         }
-                    } else {
-                        LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, "Subscription purchase returned already owned but we couldn't load it")
-                        val failureEvent = PurchaseEvent.Failure(
-                            purchasesResult.billingResult.debugMessage,
-                            billingResult.responseCode,
-                        )
-                        purchaseEvents.accept(failureEvent)
                     }
                 }
-            } else {
-                LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, "Could not purchase subscription: ${billingResult.debugMessage}")
-                val failureEvent = PurchaseEvent.Failure(billingResult.debugMessage, billingResult.responseCode)
-                purchaseEvents.accept(failureEvent)
+
+                else -> {
+                    logSubscriptionWarning("Could not purchase subscription: ${billingResult.debugMessage}")
+                    val failureEvent = PurchaseEvent.Failure(billingResult.debugMessage, billingResult.responseCode)
+                    purchaseEvents.accept(failureEvent)
+                }
             }
         }
     }
 
-    override fun onAcknowledgePurchaseResponse(billingResult: BillingResult) {
-        Timber.d("Purchase ack")
-        if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-            LogBuffer.i(LogBuffer.TAG_SUBSCRIPTIONS, "Purchase ack OK")
+    private suspend fun loadProducts() {
+        val (result, products) = billingClient.loadProducts(productDetailsParams)
+        if (result.isOk()) {
+            productDetails.accept(ProductDetailsState.Loaded(products))
+            refreshPurchases()
         } else {
-            LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, "Purchase ack FAILED. code= ${billingResult.responseCode} message=${billingResult.debugMessage}")
+            productDetails.accept(ProductDetailsState.Error(result.debugMessage))
         }
     }
 
-    override fun handlePurchase(purchase: Purchase) {
-        if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
-            Timber.d("Purchase: ${purchase.purchaseToken}")
-            // Grant entitlement to the user.
-            applicationScope.launch {
-                try {
-                    sendPurchaseToServer(purchase)
-                    // Acknowledge the purchase if it hasn't already been acknowledged.
-                    if (!purchase.isAcknowledged) {
-                        val acknowledgePurchaseParams = AcknowledgePurchaseParams.newBuilder()
-                            .setPurchaseToken(purchase.purchaseToken)
-                            .build()
-                        billingClient.acknowledgePurchase(acknowledgePurchaseParams, this@SubscriptionManagerImpl)
-                    }
-                    purchase.products.map {
-                        SubscriptionTier.fromProductId(it.toString())
-                    }.distinct().forEach {
-                        updateOfferEligible(it, false)
-                    }
-                } catch (e: Exception) {
-                    LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, e, "Could not send purchase info")
-                    purchaseEvents.accept(PurchaseEvent.Failure(e.message ?: "Unknown error", null))
+    override suspend fun refreshPurchases() = coroutineScope {
+        val (historyResults, historyRecords) = billingClient.loadPurchaseHistory(purchaseHistoryParams)
+        if (historyResults.isOk()) {
+            historyRecords.forEach(::handleHistoryRecord)
+        }
+
+        val (purchasesResult, purchases) = billingClient.loadPurchases(purchasesParams)
+        if (purchasesResult.isOk()) {
+            purchases.forEach { purchase ->
+                if (!purchase.isAcknowledged) {
+                    launch { handlePurchase(purchase) }
                 }
             }
         }
     }
 
-    override suspend fun sendPurchaseToServer(purchase: Purchase) {
+    private fun handleHistoryRecord(record: PurchaseHistoryRecord) {
+        record.products
+            .map(SubscriptionTier::fromProductId)
+            .distinct()
+            .forEach { tier -> updateOfferEligible(tier, false) }
+    }
+
+    private suspend fun handlePurchase(purchase: Purchase) {
+        if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
+            try {
+                sendPurchaseToServer(purchase)
+                if (!purchase.isAcknowledged) {
+                    acknowledgePurchase(purchase)
+                }
+                purchase.products
+                    .map(SubscriptionTier::fromProductId)
+                    .distinct()
+                    .forEach { tier -> updateOfferEligible(tier, false) }
+            } catch (e: Throwable) {
+                logSubscriptionError(e, "Could not send purchase info: ${purchase.orderId}")
+            }
+        }
+    }
+
+    private suspend fun acknowledgePurchase(purchase: Purchase) {
+        billingClient.acknowledgePurchase(acknowledgePurchaseParams(purchase))
+    }
+
+    private suspend fun sendPurchaseToServer(purchase: Purchase) {
         if (purchase.products.size != 1) {
             LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, "expected 1 product when sending purchase to server, but there were ${purchase.products.size}")
         }
@@ -306,89 +247,58 @@ class SubscriptionManagerImpl @Inject constructor(
         purchaseEvents.accept(PurchaseEvent.Success)
     }
 
-    override fun refreshPurchases() {
-        if (!billingClient.isReady) return
+    override fun launchBillingFlow(
+        activity: AppCompatActivity,
+        productDetails: ProductDetails,
+        offerToken: String,
+    ) {
+        activity.lifecycleScope.launch {
+            val (result, subscriptionUpdateParams) = loadSubscriptionUpdateParamsMode(productDetails)
+            if (!result.isOk()) {
+                logSubscriptionWarning("Unable to upgrade subscription plan: ${result.debugMessage}")
+                return@launch
+            }
+            val productDetailsParams = BillingFlowParams.ProductDetailsParams.newBuilder()
+                .setProductDetails(productDetails)
+                .setOfferToken(offerToken)
+                .build()
 
-        applicationScope.launch {
-            updateOfferEligibilityIfPurchaseHistoryExists()
-        }
-
-        val queryPurchasesParams = QueryPurchasesParams.newBuilder()
-            .setProductType(BillingClient.ProductType.SUBS)
-            .build()
-        billingClient.queryPurchasesAsync(queryPurchasesParams) { _, purchases ->
-            purchases.forEach {
-                if (!it.isAcknowledged) { // Purchase was purchased in the play store, or in the background somehow
-                    handlePurchase(it)
+            val billingFlowParams = BillingFlowParams.newBuilder()
+                .setProductDetailsParamsList(listOf(productDetailsParams))
+                .let { builder ->
+                    if (subscriptionUpdateParams != null) {
+                        builder.setSubscriptionUpdateParams(subscriptionUpdateParams)
+                    } else {
+                        builder
+                    }
                 }
-            }
+                .build()
+            billingClient.launchBillingFlow(activity, billingFlowParams)
         }
     }
 
-    private suspend fun updateOfferEligibilityIfPurchaseHistoryExists() {
-        val queryPurchaseHistoryParams = QueryPurchaseHistoryParams.newBuilder()
-            .setProductType(BillingClient.ProductType.SUBS)
-            .build()
-        val result = billingClient.queryPurchaseHistory(queryPurchaseHistoryParams)
-        result.purchaseHistoryRecordList?.forEach {
-            it.products.map { productId ->
-                SubscriptionTier.fromProductId(productId)
-            }.distinct().forEach { tier ->
-                updateOfferEligible(tier, false)
-            }
+    private suspend fun loadSubscriptionUpdateParamsMode(
+        productDetails: ProductDetails,
+    ): Pair<BillingResult, BillingFlowParams.SubscriptionUpdateParams?> {
+        val replacementMode = settings.cachedSubscriptionStatus.value
+            ?.let { subscriptionStatus -> getSubscriptionReplacementMode(subscriptionStatus, productDetails) }
+            ?.takeIf { it != SUBSCRIPTION_REPLACEMENT_MODE_NOT_SET }
+
+        if (replacementMode == null) {
+            return okResult to null
         }
-    }
 
-    override suspend fun getPurchases(): PurchasesResult? {
-        if (!billingClient.isReady) return null
-
-        val queryPurchasesParams = QueryPurchasesParams.newBuilder()
-            .setProductType(BillingClient.ProductType.SUBS)
-            .build()
-        return billingClient.queryPurchasesAsync(params = queryPurchasesParams)
-    }
-
-    override fun launchBillingFlow(activity: Activity, productDetails: ProductDetails, offerToken: String) {
-        applicationScope.launch {
-            val productDetailsParams =
-                BillingFlowParams.ProductDetailsParams.newBuilder()
-                    .setProductDetails(productDetails)
-                    .setOfferToken(offerToken)
+        val (result, purchases) = billingClient.loadPurchases(purchasesParams)
+        return if (result.isOk()) {
+            val params = purchases.firstOrNull()?.let { purchase ->
+                BillingFlowParams.SubscriptionUpdateParams.newBuilder()
+                    .setOldPurchaseToken(purchase.purchaseToken)
+                    .setSubscriptionReplacementMode(replacementMode)
                     .build()
-            val productDetailsParamsList = listOf(productDetailsParams)
-            var billingFlowParams =
-                BillingFlowParams.newBuilder()
-                    .setProductDetailsParamsList(productDetailsParamsList)
-
-            settings.cachedSubscriptionStatus.value?.let { subscriptionStatus ->
-                val replacementMode = getSubscriptionReplacementMode(
-                    subscribedPlanStatus = subscriptionStatus,
-                    newPlanDetails = productDetails,
-                )
-
-                if (replacementMode != SUBSCRIPTION_REPLACEMENT_MODE_NOT_SET) {
-                    val purchasesResult = getPurchases()
-                    if (purchasesResult == null) {
-                        LogBuffer.e(
-                            LogBuffer.TAG_SUBSCRIPTIONS,
-                            "unable to upgrade plan because billing result returned null purchases",
-                        )
-                        return@launch
-                    }
-
-                    if (purchasesResult.purchasesList.isNotEmpty()) {
-                        val existingPurchase = purchasesResult.purchasesList.first()
-                        billingFlowParams = billingFlowParams.setSubscriptionUpdateParams(
-                            BillingFlowParams.SubscriptionUpdateParams.newBuilder()
-                                .setOldPurchaseToken(existingPurchase.purchaseToken)
-                                /* User is changing subscription entitlement, proration rate applied at runtime (https://rb.gy/e876y) */
-                                .setSubscriptionReplacementMode(replacementMode)
-                                .build(),
-                        )
-                    }
-                }
             }
-            billingClient.launchBillingFlow(activity, billingFlowParams.build())
+            okResult to params
+        } else {
+            result to null
         }
     }
 
@@ -400,7 +310,8 @@ class SubscriptionManagerImpl @Inject constructor(
         cachedSubscriptionStatus = null
         subscriptionStatus.accept(Optional.empty())
     }
-    override fun isOfferEligible(tier: SubscriptionTier): Boolean = (hasOfferEligible[tier] ?: true)
+    override fun isOfferEligible(tier: SubscriptionTier): Boolean = hasOfferEligible[tier] ?: true
+
     override fun updateOfferEligible(tier: SubscriptionTier, eligible: Boolean) {
         hasOfferEligible[tier] = eligible
     }
@@ -456,6 +367,47 @@ class SubscriptionManagerImpl @Inject constructor(
                 ),
             )
         }
+
+    private companion object {
+        val okResult = BillingResult.newBuilder()
+            .setResponseCode(BillingClient.BillingResponseCode.OK)
+            .build()
+
+        val purchasesParams = QueryPurchasesParams.newBuilder()
+            .setProductType(BillingClient.ProductType.SUBS)
+            .build()
+
+        val purchaseHistoryParams = QueryPurchaseHistoryParams.newBuilder()
+            .setProductType(BillingClient.ProductType.SUBS)
+            .build()
+
+        val productDetailsParams = QueryProductDetailsParams.newBuilder()
+            .setProductList(
+                listOf(
+                    QueryProductDetailsParams.Product.newBuilder()
+                        .setProductId(PLUS_MONTHLY_PRODUCT_ID)
+                        .setProductType(BillingClient.ProductType.SUBS)
+                        .build(),
+                    QueryProductDetailsParams.Product.newBuilder()
+                        .setProductId(PLUS_YEARLY_PRODUCT_ID)
+                        .setProductType(BillingClient.ProductType.SUBS)
+                        .build(),
+                    QueryProductDetailsParams.Product.newBuilder()
+                        .setProductId(PATRON_MONTHLY_PRODUCT_ID)
+                        .setProductType(BillingClient.ProductType.SUBS)
+                        .build(),
+                    QueryProductDetailsParams.Product.newBuilder()
+                        .setProductId(PATRON_YEARLY_PRODUCT_ID)
+                        .setProductType(BillingClient.ProductType.SUBS)
+                        .build(),
+                ),
+            )
+            .build()
+
+        fun acknowledgePurchaseParams(purchase: Purchase) = AcknowledgePurchaseParams.newBuilder()
+            .setPurchaseToken(purchase.purchaseToken)
+            .build()
+    }
 }
 
 private fun getSubscriptionReplacementMode(

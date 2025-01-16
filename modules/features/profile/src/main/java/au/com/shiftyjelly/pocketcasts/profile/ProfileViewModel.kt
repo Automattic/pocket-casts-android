@@ -179,6 +179,7 @@ class ProfileViewModel @Inject constructor(
     }
 
     internal fun closeUpgradeProfile() {
+        tracker.track(AnalyticsEvent.PROFILE_REFRESH_UPGRADE_BANNER_DISMISSED)
         settings.upgradeProfileClosed.set(true, updateModifiedAt = false)
     }
 }

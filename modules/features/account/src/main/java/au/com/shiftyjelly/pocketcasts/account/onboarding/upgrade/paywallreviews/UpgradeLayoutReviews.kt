@@ -61,6 +61,7 @@ fun UpgradeLayoutReviews(
     state: OnboardingUpgradeFeaturesState.Loaded,
     onNotNowPressed: () -> Unit,
     onClickSubscribe: () -> Unit,
+    onRateUsPressed: () -> Unit,
     canUpgrade: Boolean,
     modifier: Modifier = Modifier,
     data: List<ReviewData> = reviews,
@@ -153,6 +154,7 @@ fun UpgradeLayoutReviews(
                 item {
                     Button(
                         onClick = {
+                            onRateUsPressed()
                             rateUs(context)
                         },
                         colors = ButtonDefaults.buttonColors(

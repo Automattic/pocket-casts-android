@@ -8,6 +8,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.filters.databinding.PodcastOptionsFragmentBinding
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
@@ -54,6 +57,8 @@ class PodcastOptionsFragment : BaseFragment(), PodcastSelectFragment.Listener, C
 
     @Inject lateinit var playlistManager: PlaylistManager
 
+    @Inject lateinit var analyticsTracker: AnalyticsTracker
+
     var podcastSelection: List<String> = listOf()
     var playlist: Playlist? = null
     private var binding: PodcastOptionsFragmentBinding? = null
@@ -99,6 +104,7 @@ class PodcastOptionsFragment : BaseFragment(), PodcastSelectFragment.Listener, C
             }
 
             switchAllPodcasts.setOnCheckedChangeListener { _, isChecked ->
+                analyticsTracker.track(AnalyticsEvent.SETTINGS_SELECT_PODCASTS_SELECT_ALL_PODCASTS_TOGGLED, mapOf("source" to SourceView.FILTERS.analyticsValue, "enabled" to isChecked))
                 podcastSelectDisabled.isVisible = isChecked
                 if (!isChecked) {
                     podcastSelection = emptyList()

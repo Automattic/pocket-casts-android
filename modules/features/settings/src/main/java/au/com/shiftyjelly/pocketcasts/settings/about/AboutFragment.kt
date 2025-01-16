@@ -53,6 +53,7 @@ import androidx.fragment.compose.content
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
@@ -95,10 +96,38 @@ class AboutFragment : BaseFragment() {
         AppThemeWithBackground(theme.activeTheme) {
             AboutPage(
                 openFragment = { fragment ->
+                    analyticsTracker.track(AnalyticsEvent.SETTINGS_ABOUT_LEGAL_AND_MORE_TAPPED, mapOf("row" to "acknowledgements"))
                     (activity as? FragmentHostListener)?.addFragment(fragment)
                 },
                 onBackPressed = { closeFragment() },
                 bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
+                onRateUsTapped = {
+                    analyticsTracker.track(AnalyticsEvent.RATE_US_TAPPED, mapOf("source" to SourceView.ABOUT.analyticsValue))
+                },
+                onShareWithFriendsTapped = {
+                    analyticsTracker.track(AnalyticsEvent.SETTINGS_ABOUT_SHARE_WITH_FRIENDS_TAPPED)
+                },
+                onWebsiteTapped = {
+                    analyticsTracker.track(AnalyticsEvent.SETTINGS_ABOUT_WEBSITE_TAPPED)
+                },
+                onInstagramTapped = {
+                    analyticsTracker.track(AnalyticsEvent.SETTINGS_ABOUT_INSTAGRAM_TAPPED)
+                },
+                onTwitterTapped = {
+                    analyticsTracker.track(AnalyticsEvent.SETTINGS_ABOUT_TWITTER_TAPPED)
+                },
+                onAutomatticFamilyTapped = {
+                    analyticsTracker.track(AnalyticsEvent.SETTINGS_ABOUT_AUTOMATTIC_FAMILY_TAPPED)
+                },
+                onWorkWithUsTapped = {
+                    analyticsTracker.track(AnalyticsEvent.SETTINGS_ABOUT_WORK_WITH_US_TAPPED)
+                },
+                onTermsOfServiceTapped = {
+                    analyticsTracker.track(AnalyticsEvent.SETTINGS_ABOUT_LEGAL_AND_MORE_TAPPED, mapOf("row" to "terms_of_service"))
+                },
+                onPrivacyPolicyTapped = {
+                    analyticsTracker.track(AnalyticsEvent.SETTINGS_ABOUT_LEGAL_AND_MORE_TAPPED, mapOf("row" to "privacy_policy"))
+                },
             )
         }
     }
@@ -177,6 +206,15 @@ private val icons = listOf(
 @Composable
 private fun AboutPage(
     onBackPressed: () -> Unit,
+    onRateUsTapped: () -> Unit,
+    onShareWithFriendsTapped: () -> Unit,
+    onWebsiteTapped: () -> Unit,
+    onInstagramTapped: () -> Unit,
+    onTwitterTapped: () -> Unit,
+    onAutomatticFamilyTapped: () -> Unit = {},
+    onWorkWithUsTapped: () -> Unit = {},
+    onTermsOfServiceTapped: () -> Unit = {},
+    onPrivacyPolicyTapped: () -> Unit = {},
     bottomInset: Dp,
     openFragment: (Fragment) -> Unit,
 ) {
@@ -216,13 +254,19 @@ private fun AboutPage(
         item {
             RowTextButton(
                 text = stringResource(LR.string.settings_about_rate_us),
-                onClick = { rateUs(context) },
+                onClick = {
+                    onRateUsTapped()
+                    rateUs(context)
+                },
             )
         }
         item {
             RowTextButton(
                 text = stringResource(LR.string.settings_about_share_with_friends),
-                onClick = { shareWithFriends(context) },
+                onClick = {
+                    onShareWithFriendsTapped()
+                    shareWithFriends(context)
+                },
             )
         }
         item {
@@ -232,34 +276,43 @@ private fun AboutPage(
             RowTextButton(
                 text = stringResource(LR.string.settings_about_website),
                 secondaryText = "pocketcasts.com",
-                onClick = { openUrl("https://www.pocketcasts.com", context) },
+                onClick = {
+                    onWebsiteTapped()
+                    openUrl("https://www.pocketcasts.com", context)
+                },
             )
         }
         item {
             RowTextButton(
                 text = stringResource(LR.string.settings_about_instagram),
                 secondaryText = "@pocketcasts",
-                onClick = { openUrl("https://www.instagram.com/pocketcasts/", context) },
+                onClick = {
+                    onInstagramTapped()
+                    openUrl("https://www.instagram.com/pocketcasts/", context)
+                },
             )
         }
         item {
             RowTextButton(
                 text = stringResource(LR.string.settings_about_twitter),
                 secondaryText = "@pocketcasts",
-                onClick = { openUrl("https://twitter.com/pocketcasts", context) },
+                onClick = {
+                    onTwitterTapped()
+                    openUrl("https://twitter.com/pocketcasts", context)
+                },
             )
         }
         item {
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
         }
         item {
-            AutomatticFamilyRow()
+            AutomatticFamilyRow(onAutomatticFamilyTapped = onAutomatticFamilyTapped)
         }
         item {
             HorizontalDivider(modifier = Modifier.padding(bottom = 8.dp))
         }
         item {
-            LegalAndMoreRow(openFragment)
+            LegalAndMoreRow(onTermsOfServiceTapped, onPrivacyPolicyTapped, openFragment)
         }
         item {
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
@@ -267,7 +320,10 @@ private fun AboutPage(
         item {
             Column(
                 modifier = Modifier
-                    .clickable { openUrl("https://automattic.com/work-with-us/", context) }
+                    .clickable {
+                        onWorkWithUsTapped()
+                        openUrl("https://automattic.com/work-with-us/", context)
+                    }
                     .fillMaxWidth()
                     .padding(all = 14.dp),
             ) {
@@ -291,7 +347,9 @@ private fun AboutPage(
 }
 
 @Composable
-fun AutomatticFamilyRow() {
+fun AutomatticFamilyRow(
+    onAutomatticFamilyTapped: () -> Unit = {},
+) {
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
     var appIconViewWidth = configuration.screenWidthDp
@@ -300,7 +358,10 @@ fun AutomatticFamilyRow() {
     }
     Box(
         modifier = Modifier
-            .clickable { openUrl("https://automattic.com", context) }
+            .clickable {
+                onAutomatticFamilyTapped()
+                openUrl("https://automattic.com", context)
+            }
             .height(192.dp)
             .fillMaxWidth(),
         contentAlignment = Alignment.TopStart,
@@ -331,7 +392,11 @@ fun AutomatticFamilyRow() {
 }
 
 @Composable
-fun LegalAndMoreRow(openFragment: (Fragment) -> Unit) {
+fun LegalAndMoreRow(
+    termsOfService: () -> Unit,
+    privacyPolicy: () -> Unit,
+    openFragment: (Fragment) -> Unit,
+) {
     val context = LocalContext.current
     var legalExpanded by rememberSaveable { mutableStateOf(false) }
     val target = if (legalExpanded) 360f else 180f
@@ -359,11 +424,17 @@ fun LegalAndMoreRow(openFragment: (Fragment) -> Unit) {
         Column {
             RowTextButton(
                 text = stringResource(LR.string.settings_about_terms_of_serivce),
-                onClick = { openUrl(Settings.INFO_TOS_URL, context) },
+                onClick = {
+                    termsOfService()
+                    openUrl(Settings.INFO_TOS_URL, context)
+                },
             )
             RowTextButton(
                 text = stringResource(LR.string.settings_about_privacy_policy),
-                onClick = { openUrl(Settings.INFO_PRIVACY_URL, context) },
+                onClick = {
+                    privacyPolicy()
+                    openUrl(Settings.INFO_PRIVACY_URL, context)
+                },
             )
             RowTextButton(
                 text = stringResource(LR.string.settings_about_acknowledgements),
@@ -421,5 +492,12 @@ private fun AboutPagePreview() {
         onBackPressed = {},
         bottomInset = 0.dp,
         openFragment = {},
+        onRateUsTapped = {},
+        onShareWithFriendsTapped = {},
+        onWebsiteTapped = {},
+        onInstagramTapped = {},
+        onTwitterTapped = {},
+        onAutomatticFamilyTapped = {},
+        onWorkWithUsTapped = {},
     )
 }

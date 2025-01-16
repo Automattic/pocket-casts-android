@@ -352,6 +352,18 @@ class BookmarksViewModel
         return sortType as UserSetting<BookmarksSortType>
     }
 
+    fun clearSearchTapped() {
+        analyticsTracker.track(AnalyticsEvent.BOOKMARKS_CLEAR_SEARCH_TAPPED)
+    }
+
+    fun searchBarClearButtonTapped() {
+        analyticsTracker.track(AnalyticsEvent.BOOKMARKS_SEARCHBAR_CLEAR_BUTTON_TAPPED)
+    }
+
+    fun onShare(podcastUuid: String, episodeUuid: String, source: SourceView) {
+        analyticsTracker.track(AnalyticsEvent.BOOKMARK_SHARE_TAPPED, mapOf("podcast_uuid" to podcastUuid, "episode_uuid" to episodeUuid, "source" to source.analyticsValue))
+    }
+
     sealed class UiState {
         data class Empty(val sourceView: SourceView) : UiState() {
             val colors: NoBookmarksViewColors

@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.referrals
 
-import android.app.Activity
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
@@ -147,7 +147,7 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
     }
 
     fun launchBillingFlow(
-        activity: Activity,
+        activity: AppCompatActivity,
         subscriptionWithOffer: Subscription.WithOffer,
     ) {
         analyticsTracker.track(AnalyticsEvent.REFERRAL_PURCHASE_SHOWN)

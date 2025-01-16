@@ -566,6 +566,10 @@ class PodcastViewModel
         }
     }
 
+    fun onBookmarkShare(podcastUuid: String, episodeUuid: String, source: SourceView) {
+        analyticsTracker.track(AnalyticsEvent.BOOKMARK_SHARE_TAPPED, mapOf("podcast_uuid" to podcastUuid, "episode_uuid" to episodeUuid, "source" to source.analyticsValue))
+    }
+
     private fun trackEpisodeBulkEvent(event: AnalyticsEvent, count: Int) {
         episodeAnalytics.trackBulkEvent(
             event,

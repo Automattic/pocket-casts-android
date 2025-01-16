@@ -5,6 +5,8 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -25,6 +27,7 @@ class BookmarkViewModel
     private val episodeManager: EpisodeManager,
     private val userEpisodeManager: UserEpisodeManager,
     private val bookmarkManager: BookmarkManager,
+    private val analyticsTracker: AnalyticsTracker,
 ) : ViewModel(), CoroutineScope {
 
     private lateinit var arguments: BookmarkArguments
@@ -113,5 +116,17 @@ class BookmarkViewModel
                 Timber.e(e)
             }
         }
+    }
+
+    fun onShown() {
+        analyticsTracker.track(AnalyticsEvent.BOOKMARK_EDIT_FORM_SHOWN)
+    }
+
+    fun onClose() {
+        analyticsTracker.track(AnalyticsEvent.BOOKMARK_EDIT_FORM_DISMISSED)
+    }
+
+    fun onSubmitBookmark() {
+        analyticsTracker.track(AnalyticsEvent.BOOKMARK_EDIT_FORM_SUBMITTED)
     }
 }
