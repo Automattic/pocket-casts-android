@@ -163,7 +163,7 @@ class WinbackViewModelTest {
             val availablePlans = awaitItem().availablePlans as AvailablePlans.Loaded
 
             val plan = availablePlans[Subscription.PLUS_MONTHLY_PRODUCT_ID]
-            assertEquals(Subscription.PLUS_MONTHLY_PRODUCT_ID, plan?.offetToken)
+            assertEquals(Subscription.PLUS_MONTHLY_PRODUCT_ID, plan?.offerToken)
         }
     }
 

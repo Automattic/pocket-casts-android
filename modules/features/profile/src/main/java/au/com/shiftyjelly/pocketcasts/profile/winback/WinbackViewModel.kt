@@ -64,7 +64,7 @@ class WinbackViewModel @Inject constructor(
 
 internal data class SubscriptionPlan(
     val productId: String,
-    val offetToken: String,
+    val offerToken: String,
     val name: String,
     val formattedPrice: String,
     val billingPeriod: BillingPeriod,
@@ -111,7 +111,7 @@ private fun createAvailablePlans(
 
 private fun Subscription.Simple.toPlan() = SubscriptionPlan(
     productId = productDetails.productId,
-    offetToken = offerToken,
+    offerToken = offerToken,
     name = shortTitle,
     formattedPrice = recurringPricingPhase.formattedPrice,
     billingPeriod = when (recurringPricingPhase) {
