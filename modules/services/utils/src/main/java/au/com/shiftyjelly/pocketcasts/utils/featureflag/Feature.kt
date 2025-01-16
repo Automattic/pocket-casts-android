@@ -187,6 +187,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
+    SHARE_PODCAST_PRIVATE_NOT_AVAILABLE(
+        key = "share_podcast_private_not_available",
+        title = "Sharing is not available for private podcasts",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    ),
     WINBACK(
         key = "winback",
         title = "Winback flow",

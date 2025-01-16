@@ -19,6 +19,8 @@ import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import java.io.Serializable
 import java.net.MalformedURLException
 import java.net.URL
@@ -115,6 +117,7 @@ data class Podcast(
     @ColumnInfo(name = "folder_uuid") internal var rawFolderUuid: String? = null,
     @ColumnInfo(name = "licensing") var licensing: Licensing = Licensing.KEEP_EPISODES,
     @ColumnInfo(name = "isPaid") var isPaid: Boolean = false,
+    @ColumnInfo(name = "is_private") var isPrivate: Boolean = false,
     @Embedded(prefix = "bundle") var singleBundle: Bundle? = null,
     @Ignore val episodes: MutableList<PodcastEpisode> = mutableListOf(),
 ) : Serializable {
@@ -170,6 +173,9 @@ data class Podcast(
 
     val isSilenceRemoved: Boolean
         get() = trimMode != TrimMode.OFF
+
+    val canShare: Boolean
+        get() = !FeatureFlag.isEnabled(Feature.SHARE_PODCAST_PRIVATE_NOT_AVAILABLE) || !isPrivate
 
     val isUsingEffects: Boolean
         get() = overrideGlobalEffects && (isSilenceRemoved || isVolumeBoosted || playbackSpeed != 1.0)

@@ -112,7 +112,12 @@ fun PlayerShelf(
         onShareClick = {
             val podcast = playerViewModel.podcast ?: return@PlayerShelfContent
             val episode = playerViewModel.episode as? PodcastEpisode ?: return@PlayerShelfContent
-            shelfSharedViewModel.onShareClick(podcast, episode, ShelfItemSource.Shelf)
+
+            if (podcast.canShare) {
+                shelfSharedViewModel.onShareClick(podcast, episode, ShelfItemSource.Shelf)
+            } else {
+                shelfSharedViewModel.onShareNotAvailable(ShelfItemSource.Shelf)
+            }
         },
         onShowPodcast = {
             shelfSharedViewModel.onShowPodcastOrCloudFiles(playerViewModel.podcast, ShelfItemSource.Shelf)

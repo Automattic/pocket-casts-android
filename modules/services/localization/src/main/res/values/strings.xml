@@ -130,6 +130,7 @@
     <string name="error">Error</string>
     <string name="error_generic_message">Something went wrong. Please try again later.</string>
     <string name="are_you_sure">Are you sure?</string>
+    <string name="sharing_is_not_available_for_private_podcasts">Sharing is not available for private podcasts</string>
     <string name="back">Back</string>
     <string name="retry">Retry</string>
     <string name="queue_for_later">Queue for later</string>

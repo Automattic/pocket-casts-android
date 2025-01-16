@@ -84,6 +84,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper.NavigationState
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectToolbar
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
@@ -981,7 +982,16 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
     private fun share() {
         val podcast = viewModel.podcast.value ?: return
+
         analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_SHARE_TAPPED)
+
+        if (!podcast.canShare) {
+            (activity as? FragmentHostListener)?.snackBarView()?.let { snackBarView ->
+                Snackbar.make(snackBarView, getString(LR.string.sharing_is_not_available_for_private_podcasts), Snackbar.LENGTH_LONG).show()
+            }
+            return
+        }
+
         if (FeatureFlag.isEnabled(Feature.REIMAGINE_SHARING)) {
             SharePodcastFragment
                 .newInstance(podcast, SourceView.PODCAST_SCREEN)
