@@ -56,7 +56,6 @@ internal fun WinbackOfferPage(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(16.dp),
         modifier = modifier
             .fillMaxSize()
             .nestedScroll(rememberNestedScrollInteropConnection())
