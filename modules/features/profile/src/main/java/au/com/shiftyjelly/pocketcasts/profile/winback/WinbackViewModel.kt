@@ -6,9 +6,11 @@ import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import com.android.billingclient.api.ProductDetails
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
@@ -28,56 +30,59 @@ class WinbackViewModel @Inject constructor(
     internal val uiState = combine(
         signInState,
         productDetails,
-    ) { signInState, productDetails ->
+    ) { signInState, productsState ->
+        val primarySubscription = signInState.findPrimarySubscription()
         UiState(
-            subscriptionsState = createAvailablePlans(signInState, productDetails),
+            userSubscriptionId = primarySubscription?.plan,
+            googleBillingProducts = when (productsState) {
+                is ProductDetailsState.Failure, ProductDetailsState.Loading -> emptyList()
+                is ProductDetailsState.Loaded -> productsState.productDetails
+            },
+            availablePlans = if (primarySubscription != null) {
+                createAvailablePlans(productsState)
+            } else {
+                AvailablePlans.Failure
+            },
+
         )
     }.stateIn(viewModelScope, SharingStarted.Eagerly, UiState.Empty)
 
     internal data class UiState(
-        val subscriptionsState: SubscriptionsState,
+        val userSubscriptionId: String?,
+        val googleBillingProducts: List<ProductDetails>,
+        val availablePlans: AvailablePlans,
     ) {
         companion object {
             val Empty = UiState(
-                subscriptionsState = SubscriptionsState.Loading,
+                userSubscriptionId = null,
+                googleBillingProducts = emptyList(),
+                availablePlans = AvailablePlans.Loading,
             )
         }
     }
 }
 
-internal sealed interface SubscriptionsState {
-    data object Loading : SubscriptionsState
+internal data class SubscriptionPlan(
+    val productId: String,
+    val offetToken: String,
+    val name: String,
+    val formattedPrice: String,
+    val billingPeriod: BillingPeriod,
+)
 
-    data object Failure : SubscriptionsState
-
-    data class Loaded(
-        val userSubscription: Subscription.Simple?,
-        val subscriptions: List<Subscription.Simple>,
-    ) : SubscriptionsState
+internal enum class BillingPeriod {
+    Monthly,
+    Yearly,
 }
 
-private fun createAvailablePlans(
-    signInState: SignInState,
-    productDetailsState: ProductDetailsState,
-): SubscriptionsState {
-    val primarySubscription = signInState.findPrimarySubscription()
-    if (primarySubscription == null) {
-        return SubscriptionsState.Failure
-    }
+internal sealed interface AvailablePlans {
+    data object Loading : AvailablePlans
 
-    return when (productDetailsState) {
-        is ProductDetailsState.Loading -> SubscriptionsState.Loading
-        is ProductDetailsState.Failure -> SubscriptionsState.Failure
-        is ProductDetailsState.Loaded -> {
-            val mapper = SubscriptionMapper()
-            val subscriptions = productDetailsState.productDetails
-                .map(mapper::mapFromProductDetails)
-                .filterIsInstance<Subscription.Simple>()
-                .sortedWith(SubscriptionsComparator)
-            val matchingSubscription = subscriptions.find { it.productDetails.productId == primarySubscription.plan }
-            SubscriptionsState.Loaded(matchingSubscription, subscriptions)
-        }
-    }
+    data object Failure : AvailablePlans
+
+    data class Loaded(
+        val plans: List<SubscriptionPlan>,
+    ) : AvailablePlans
 }
 
 private fun SignInState.findPrimarySubscription() = when (this) {
@@ -88,7 +93,34 @@ private fun SignInState.findPrimarySubscription() = when (this) {
     }
 }
 
-private object SubscriptionsComparator : Comparator<Subscription.Simple> {
+private fun createAvailablePlans(
+    productDetailsState: ProductDetailsState,
+) = when (productDetailsState) {
+    is ProductDetailsState.Loading -> AvailablePlans.Loading
+    is ProductDetailsState.Failure -> AvailablePlans.Failure
+    is ProductDetailsState.Loaded -> {
+        val mapper = SubscriptionMapper()
+        val plans = productDetailsState.productDetails
+            .map(mapper::mapFromProductDetails)
+            .filterIsInstance<Subscription.Simple>()
+            .map(Subscription.Simple::toPlan)
+            .sortedWith(PlanComparator)
+        AvailablePlans.Loaded(plans)
+    }
+}
+
+private fun Subscription.Simple.toPlan() = SubscriptionPlan(
+    productId = productDetails.productId,
+    offetToken = offerToken,
+    name = shortTitle,
+    formattedPrice = recurringPricingPhase.formattedPrice,
+    billingPeriod = when (recurringPricingPhase) {
+        is SubscriptionPricingPhase.Months -> BillingPeriod.Monthly
+        is SubscriptionPricingPhase.Years -> BillingPeriod.Yearly
+    },
+)
+
+private object PlanComparator : Comparator<SubscriptionPlan> {
     private val priorities = mapOf(
         Subscription.PLUS_MONTHLY_PRODUCT_ID to 0,
         Subscription.PATRON_MONTHLY_PRODUCT_ID to 1,
@@ -96,14 +128,14 @@ private object SubscriptionsComparator : Comparator<Subscription.Simple> {
         Subscription.PATRON_YEARLY_PRODUCT_ID to 3,
     )
 
-    override fun compare(o1: Subscription.Simple, o2: Subscription.Simple): Int {
-        val priority1 = priorities[o1.productDetails.productId]
-        val priority2 = priorities[o2.productDetails.productId]
+    override fun compare(o1: SubscriptionPlan, o2: SubscriptionPlan): Int {
+        val priority1 = priorities[o1.productId]
+        val priority2 = priorities[o2.productId]
         return when {
             priority1 != null && priority2 != null -> priority1 - priority2
             priority1 != null && priority2 == null -> -1
             priority1 == null && priority2 != null -> 1
-            else -> o1.productDetails.title.compareTo(o2.productDetails.title)
+            else -> o1.name.compareTo(o2.name)
         }
     }
 }

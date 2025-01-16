@@ -21,7 +21,7 @@ import kotlinx.coroutines.rx2.asFlowable
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.doReturn
@@ -52,95 +52,96 @@ class WinbackViewModelTest {
     }
 
     @Test
-    fun `subscriptions state for paid user with known subscription`() = runTest {
+    fun `available plans for paid user with known subscription`() = runTest {
         viewModel.uiState.test {
             skipItems(1)
 
             signInStateFlow.emit(createPaidUser(SubscriptionView(plan = Subscription.PLUS_MONTHLY_PRODUCT_ID, isPrimary = true)))
             productDetailsFlow.emit(ProductDetailsState.Loaded(availableSubscriptions))
-            val state = awaitItem().subscriptionsState as SubscriptionsState.Loaded
+            val state = awaitItem()
+            val plans = state.availablePlans as AvailablePlans.Loaded
 
-            val plusMonthly = state[Subscription.PLUS_MONTHLY_PRODUCT_ID]
-            val patronMonthly = state[Subscription.PATRON_MONTHLY_PRODUCT_ID]
-            val plusYearly = state[Subscription.PLUS_YEARLY_PRODUCT_ID]
-            val patronYearly = state[Subscription.PATRON_YEARLY_PRODUCT_ID]
+            val plusMonthly = plans[Subscription.PLUS_MONTHLY_PRODUCT_ID]
+            val patronMonthly = plans[Subscription.PATRON_MONTHLY_PRODUCT_ID]
+            val plusYearly = plans[Subscription.PLUS_YEARLY_PRODUCT_ID]
+            val patronYearly = plans[Subscription.PATRON_YEARLY_PRODUCT_ID]
 
-            assertNotNull(plusMonthly?.offerToken)
-            assertNotNull(patronMonthly?.offerToken)
-            assertNotNull(plusYearly?.offerToken)
-            assertNotNull(patronYearly?.offerToken)
+            assertNotNull(plusMonthly?.productId)
+            assertNotNull(patronMonthly?.productId)
+            assertNotNull(plusYearly?.productId)
+            assertNotNull(patronYearly?.productId)
 
-            assertEquals(state.userSubscription, plusMonthly)
+            assertEquals(state.userSubscriptionId, Subscription.PLUS_MONTHLY_PRODUCT_ID)
         }
     }
 
     @Test
-    fun `subscriptions state for paid user with unknown subscription`() = runTest {
+    fun `available plans for paid user with unknown subscription`() = runTest {
         viewModel.uiState.test {
             skipItems(1)
 
-            signInStateFlow.emit(createPaidUser(SubscriptionView(plan = "no.plan", isPrimary = true)))
+            signInStateFlow.emit(createPaidUser(SubscriptionView(plan = "unknown.plan", isPrimary = true)))
             productDetailsFlow.emit(ProductDetailsState.Loaded(availableSubscriptions))
-            val state = awaitItem().subscriptionsState as SubscriptionsState.Loaded
+            val availablePlans = awaitItem().availablePlans
 
-            assertNull(state.userSubscription)
+            assertTrue(availablePlans is AvailablePlans.Loaded)
         }
     }
 
     @Test
-    fun `subscriptions state for paid user without any plan`() = runTest {
+    fun `available plans for paid user without any plan`() = runTest {
         viewModel.uiState.test {
             skipItems(1)
 
             signInStateFlow.emit(createPaidUser(SubscriptionView(plan = null, isPrimary = true)))
             productDetailsFlow.emit(ProductDetailsState.Loaded(availableSubscriptions))
-            val state = awaitItem().subscriptionsState as SubscriptionsState.Loaded
+            val availablePlans = awaitItem().availablePlans
 
-            assertNull(state.userSubscription)
+            assertTrue(availablePlans is AvailablePlans.Loaded)
         }
     }
 
     @Test
-    fun `subscriptions state for signed out user`() = runTest {
+    fun `available plans for signed out user`() = runTest {
         viewModel.uiState.test {
             skipItems(1)
 
             signInStateFlow.emit(SignInState.SignedOut)
             productDetailsFlow.emit(ProductDetailsState.Loaded(availableSubscriptions))
-            val state = awaitItem().subscriptionsState
+            val availablePlans = awaitItem().availablePlans
 
-            assertEquals(SubscriptionsState.Failure, state)
+            assertTrue(availablePlans is AvailablePlans.Failure)
         }
     }
 
     @Test
-    fun `subscriptions state for free user`() = runTest {
+    fun `available plans for free user`() = runTest {
         viewModel.uiState.test {
             skipItems(1)
 
             signInStateFlow.emit(SignInState.SignedOut)
             productDetailsFlow.emit(ProductDetailsState.Loaded(availableSubscriptions))
-            val state = awaitItem().subscriptionsState
+            val availablePlans = awaitItem().availablePlans
 
-            assertEquals(SubscriptionsState.Failure, state)
+            assertTrue(availablePlans is AvailablePlans.Failure)
         }
     }
 
     @Test
-    fun `subscriptions state for paid user without primary subscription`() = runTest {
+    fun `available plans for paid user without primary subscription`() = runTest {
         viewModel.uiState.test {
             skipItems(1)
 
             signInStateFlow.emit(createPaidUser(SubscriptionView(plan = "no.plan", isPrimary = false)))
             productDetailsFlow.emit(ProductDetailsState.Loaded(availableSubscriptions))
-            val state = awaitItem().subscriptionsState
+            val availablePlans = awaitItem().availablePlans
 
-            assertEquals(SubscriptionsState.Failure, state)
+            assertTrue(availablePlans is AvailablePlans.Failure)
         }
     }
 
     @Test
-    fun `subscritpions state ignores subscription offers`() = runTest {
+    fun `available plans ignore subscription offers`() = runTest {
         viewModel.uiState.test {
             skipItems(1)
 
@@ -159,23 +160,23 @@ class WinbackViewModelTest {
                     ),
                 ),
             )
-            val state = awaitItem().subscriptionsState as SubscriptionsState.Loaded
+            val availablePlans = awaitItem().availablePlans as AvailablePlans.Loaded
 
-            val subscritpion = state[Subscription.PLUS_MONTHLY_PRODUCT_ID]
-            assertEquals(Subscription.PLUS_MONTHLY_PRODUCT_ID, subscritpion?.offerToken)
+            val plan = availablePlans[Subscription.PLUS_MONTHLY_PRODUCT_ID]
+            assertEquals(Subscription.PLUS_MONTHLY_PRODUCT_ID, plan?.offetToken)
         }
     }
 
     @Test
-    fun `subscritpions are sorted`() = runTest {
+    fun `available plans are sorted`() = runTest {
         viewModel.uiState.test {
             skipItems(1)
 
             signInStateFlow.emit(createPaidUser(SubscriptionView(plan = "", isPrimary = true)))
             productDetailsFlow.emit(ProductDetailsState.Loaded(availableSubscriptions.reversed()))
-            val state = awaitItem().subscriptionsState as SubscriptionsState.Loaded
+            val availablePlans = awaitItem().availablePlans as AvailablePlans.Loaded
 
-            val tokens = state.subscriptions.map(Subscription::offerToken)
+            val tokens = availablePlans.plans.map(SubscriptionPlan::productId)
             val expected = listOf(
                 Subscription.PLUS_MONTHLY_PRODUCT_ID,
                 Subscription.PATRON_MONTHLY_PRODUCT_ID,
@@ -185,28 +186,9 @@ class WinbackViewModelTest {
             assertEquals(expected, tokens)
         }
     }
-
-    private val availableSubscriptions = listOf(
-        createProductDetails(
-            id = Subscription.PLUS_MONTHLY_PRODUCT_ID,
-            period = BillingPeriod.Monthly,
-        ),
-        createProductDetails(
-            id = Subscription.PATRON_MONTHLY_PRODUCT_ID,
-            period = BillingPeriod.Monthly,
-        ),
-        createProductDetails(
-            id = Subscription.PLUS_YEARLY_PRODUCT_ID,
-            period = BillingPeriod.Yearly,
-        ),
-        createProductDetails(
-            id = Subscription.PATRON_YEARLY_PRODUCT_ID,
-            period = BillingPeriod.Yearly,
-        ),
-    )
 }
 
-private operator fun SubscriptionsState.Loaded.get(offerToken: String) = subscriptions.singleOrNull { it.offerToken == offerToken }
+private operator fun AvailablePlans.Loaded.get(productId: String) = plans.singleOrNull { it.productId == productId }
 
 private class SubscriptionView(
     val plan: String?,
@@ -218,12 +200,24 @@ private class Offer(
     val billingPeriod: BillingPeriod,
 )
 
-private enum class BillingPeriod(
-    val value: String,
-) {
-    Monthly("P1M"),
-    Yearly("P1Y"),
-}
+private val availableSubscriptions = listOf(
+    createProductDetails(
+        id = Subscription.PLUS_MONTHLY_PRODUCT_ID,
+        period = BillingPeriod.Monthly,
+    ),
+    createProductDetails(
+        id = Subscription.PATRON_MONTHLY_PRODUCT_ID,
+        period = BillingPeriod.Monthly,
+    ),
+    createProductDetails(
+        id = Subscription.PLUS_YEARLY_PRODUCT_ID,
+        period = BillingPeriod.Yearly,
+    ),
+    createProductDetails(
+        id = Subscription.PATRON_YEARLY_PRODUCT_ID,
+        period = BillingPeriod.Yearly,
+    ),
+)
 
 private fun createPaidUser(
     vararg subscriptions: SubscriptionView,
@@ -263,6 +257,7 @@ private fun createProductDetails(
     check(id != offer?.id) { "ID and offer ID must be different" }
 
     val basePricingPhase = mock<PricingPhase> {
+        on { formattedPrice } doReturn "price: $id"
         on { billingPeriod } doReturn period.value
         on { recurrenceMode } doReturn RecurrenceMode.INFINITE_RECURRING
     }
@@ -302,5 +297,11 @@ private fun createProductDetails(
     }
 
     on { productId } doReturn id
+    on { title } doReturn "title: $id"
     on { subscriptionOfferDetails } doReturn offerDetails
+}
+
+private val BillingPeriod.value get() = when (this) {
+    BillingPeriod.Monthly -> "P1M"
+    BillingPeriod.Yearly -> "P1Y"
 }
