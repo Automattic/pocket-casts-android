@@ -52,6 +52,7 @@ enum class AnalyticsEvent(val key: String) {
     PLUS_PROMOTION_SUBSCRIPTION_FREQUENCY_CHANGED("plus_promotion_subscription_frequency_changed"),
     PLUS_PROMOTION_PRIVACY_POLICY_TAPPED("plus_promotion_privacy_policy_tapped"),
     PLUS_PROMOTION_TERMS_AND_CONDITIONS_TAPPED("plus_promotion_terms_and_conditions_tapped"),
+    UPGRADE_BANNER_DISMISSED("upgrade_banner_dismissed"),
 
     /* Pull to refresh */
     PULLED_TO_REFRESH("pulled_to_refresh"),
@@ -125,7 +126,6 @@ enum class AnalyticsEvent(val key: String) {
     PROFILE_ACCOUNT_BUTTON_TAPPED("profile_account_button_tapped"),
     PROFILE_SETTINGS_BUTTON_TAPPED("profile_settings_button_tapped"),
     PROFILE_REFRESH_BUTTON_TAPPED("profile_refresh_button_tapped"),
-    PROFILE_REFRESH_UPGRADE_BANNER_DISMISSED("profile_refresh_upgrade_banner_dismissed"),
 
     /* Stats View */
     STATS_SHOWN("stats_shown"),
