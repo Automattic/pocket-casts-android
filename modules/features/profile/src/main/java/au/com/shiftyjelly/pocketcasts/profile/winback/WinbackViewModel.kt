@@ -30,7 +30,7 @@ class WinbackViewModel @Inject constructor(
         loadInitialPlans()
     }
 
-    private fun loadInitialPlans() {
+    internal fun loadInitialPlans() {
         _uiState.value = _uiState.value.copy(subscriptionPlansState = SubscriptionPlansState.Loading)
         viewModelScope.launch {
             val plansDeferred = async { loadPlans() }

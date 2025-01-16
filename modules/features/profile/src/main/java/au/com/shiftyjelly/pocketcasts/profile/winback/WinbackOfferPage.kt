@@ -287,7 +287,10 @@ private fun Divider(
 private fun WinbackOfferPagePreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) theme: Theme.ThemeType,
 ) {
-    AppThemeWithBackground(theme) {
+    AppThemeWithBackground(
+        themeType = theme,
+        backgroundColor = { MaterialTheme.theme.colors.primaryUi04 },
+    ) {
         WinbackOfferPage(
             onClaimOffer = {},
             onSeeAvailablePlans = {},

@@ -8,9 +8,14 @@ import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.LocalRippleConfiguration
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.RippleConfiguration
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -21,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
@@ -38,14 +44,16 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class WinbackFragment : BaseDialogFragment() {
+    private val viewModel by viewModels<WinbackViewModel>()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = content {
-        AppThemeWithBackground(
-            themeType = theme.activeTheme,
-        ) {
+        val state by viewModel.uiState.collectAsState()
+
+        ContentContainer {
             val navController = rememberNavController()
 
             DialogTintEffect(navController)
@@ -81,6 +89,9 @@ class WinbackFragment : BaseDialogFragment() {
                 }
                 composable(WinbackNavRoutes.AvailablePlans) {
                     AvailablePlansPage(
+                        plansState = state.subscriptionPlansState,
+                        onSelectPlan = { },
+                        onReload = { viewModel.loadInitialPlans() },
                         onGoBack = { navController.popBackStack() },
                     )
                 }
@@ -114,6 +125,23 @@ class WinbackFragment : BaseDialogFragment() {
         }
     }
 
+    @OptIn(ExperimentalMaterialApi::class)
+    @Composable
+    private fun ContentContainer(
+        content: @Composable () -> Unit,
+    ) {
+        AppThemeWithBackground(
+            themeType = theme.activeTheme,
+            backgroundColor = { MaterialTheme.theme.colors.primaryUi04 },
+        ) {
+            CompositionLocalProvider(
+                LocalRippleConfiguration provides RippleConfiguration(color = MaterialTheme.theme.colors.primaryIcon01),
+            ) {
+                content()
+            }
+        }
+    }
+
     @Composable
     private fun DialogTintEffect(
         navController: NavHostController,
@@ -128,11 +156,11 @@ class WinbackFragment : BaseDialogFragment() {
         }
         val backgroundTint by animateColorAsState(
             animationSpec = colorAnimationSpec,
-            targetValue = with(MaterialTheme.theme.colors) { if (isBackgroundStyled) secondaryUi01 else primaryUi01 },
+            targetValue = with(MaterialTheme.theme.colors) { if (isBackgroundStyled) secondaryUi01 else primaryUi04 },
         )
         val navigationBarTint by animateColorAsState(
             animationSpec = colorAnimationSpec,
-            targetValue = with(MaterialTheme.theme.colors) { if (isNavBarWhite) Color.White else primaryUi01 },
+            targetValue = with(MaterialTheme.theme.colors) { if (isNavBarWhite) Color.White else primaryUi04 },
         )
         LaunchedEffect(Unit) {
             launch {
@@ -172,10 +200,12 @@ private fun AnimatedContentTransitionScope<NavBackStackEntry>.slideOutToStart() 
     towards = AnimatedContentTransitionScope.SlideDirection.Start,
     animationSpec = intOffsetAnimationSpec,
 )
+
 private fun AnimatedContentTransitionScope<NavBackStackEntry>.slideInToEnd() = slideIntoContainer(
     towards = AnimatedContentTransitionScope.SlideDirection.End,
     animationSpec = intOffsetAnimationSpec,
 )
+
 private fun AnimatedContentTransitionScope<NavBackStackEntry>.slideOutToEnd() = slideOutOfContainer(
     towards = AnimatedContentTransitionScope.SlideDirection.End,
     animationSpec = intOffsetAnimationSpec,
