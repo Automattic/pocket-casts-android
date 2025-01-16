@@ -37,6 +37,8 @@ class ReferralsGuestPassFragment : BaseFragment() {
     private val args get() = requireNotNull(arguments?.let { BundleCompat.getParcelable(it, NEW_INSTANCE_ARG, Args::class.java) })
     private val pageType get() = args.pageType
 
+    override var statusBarIconColor: StatusBarIconColor = StatusBarIconColor.Light
+
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -87,7 +89,7 @@ class ReferralsGuestPassFragment : BaseFragment() {
     private fun updateStatusAndNavColors() {
         activity?.let {
             theme.updateWindowNavigationBarColor(window = it.window, navigationBarColor = NavigationBarColor.Color(color = Color.BLACK, lightIcons = true))
-            theme.updateWindowStatusBarIcons(window = it.window, statusBarIconColor = StatusBarIconColor.Dark)
+            theme.updateWindowStatusBarIcons(window = it.window, statusBarIconColor = StatusBarIconColor.Light)
         }
     }
 
