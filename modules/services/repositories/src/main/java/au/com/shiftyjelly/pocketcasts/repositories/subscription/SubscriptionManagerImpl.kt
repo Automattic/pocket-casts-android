@@ -135,8 +135,7 @@ class SubscriptionManagerImpl @Inject constructor(
 
     override suspend fun initializeBillingConnection() = coroutineScope {
         launch { listenToPurchaseUpdates() }
-        launch { refreshProducts() }
-        launch { refreshPurchases() }
+        launch { refresh() }
         awaitCancellation()
     }
 
@@ -182,28 +181,39 @@ class SubscriptionManagerImpl @Inject constructor(
         }
     }
 
-    override suspend fun refreshProducts() {
+    override suspend fun loadProducts(): ProductDetailsState {
         val (result, products) = billingClient.loadProducts(productDetailsParams)
-        if (result.isOk()) {
-            productDetails.accept(ProductDetailsState.Loaded(products))
+        val state = if (result.isOk()) {
+            ProductDetailsState.Loaded(products)
         } else {
-            productDetails.accept(ProductDetailsState.Failure)
+            ProductDetailsState.Failure
         }
+        productDetails.accept(state)
+        return state
     }
 
-    override suspend fun refreshPurchases() = coroutineScope {
-        val (historyResults, historyRecords) = billingClient.loadPurchaseHistory(purchaseHistoryParams)
-        if (historyResults.isOk()) {
-            historyRecords.forEach(::handleHistoryRecord)
-        }
-
+    override suspend fun loadPurchases() = coroutineScope {
         val (purchasesResult, purchases) = billingClient.loadPurchases(purchasesParams)
+
         if (purchasesResult.isOk()) {
             purchases.forEach { purchase ->
                 if (!purchase.isAcknowledged) {
                     launch { handlePurchase(purchase) }
                 }
             }
+            PurchasesState.Loaded(purchases)
+        } else {
+            PurchasesState.Failure
+        }
+    }
+
+    override suspend fun loadPurchaseHistory(): PurchaseHistoryState {
+        val (historyResults, historyRecords) = billingClient.loadPurchaseHistory(purchaseHistoryParams)
+        return if (historyResults.isOk()) {
+            historyRecords.forEach(::handleHistoryRecord)
+            PurchaseHistoryState.Loaded(historyRecords)
+        } else {
+            PurchaseHistoryState.Failure
         }
     }
 
@@ -448,6 +458,18 @@ sealed interface ProductDetailsState {
     data class Loaded(val productDetails: List<ProductDetails>) : ProductDetailsState
 
     data object Failure : ProductDetailsState
+}
+
+sealed interface PurchasesState {
+    data class Loaded(val purchases: List<Purchase>) : PurchasesState
+
+    data object Failure : PurchasesState
+}
+
+sealed interface PurchaseHistoryState {
+    data class Loaded(val history: List<PurchaseHistoryRecord>) : PurchaseHistoryState
+
+    data object Failure : PurchaseHistoryState
 }
 
 sealed class PurchaseEvent {

@@ -585,8 +585,7 @@ class MainActivity :
             source = PocketCastsShortcuts.Source.REFRESH_APP,
         )
 
-        lifecycleScope.launch { subscriptionManager.refreshProducts() }
-        lifecycleScope.launch { subscriptionManager.refreshPurchases() }
+        lifecycleScope.launch { subscriptionManager.refresh() }
 
         // Schedule next refresh in the background
         RefreshPodcastsTask.scheduleOrCancel(this@MainActivity, settings)
