@@ -8,8 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -104,11 +103,9 @@ internal fun AccountDetailsPage(
     }
     AppTheme(theme) {
         Column(
-            verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = modifier
                 .fillMaxSize()
-                .background(MaterialTheme.theme.colors.primaryUi02)
-                .verticalScroll(rememberScrollState()),
+                .background(MaterialTheme.theme.colors.primaryUi02),
         ) {
             if (!state.isAutomotive) {
                 ThemedTopAppBar(
@@ -116,43 +113,57 @@ internal fun AccountDetailsPage(
                     onNavigationClick = onNavigateBack,
                 )
             }
-            AccountHeader(
-                state = state.headerState,
-                config = headerConfig,
-                onClick = onClickHeader,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-                    .then(if (state.isAutomotive) Modifier.padding(top = 32.dp) else Modifier),
-            )
-            if (bannerState is UpgradeBannerState.Loaded) {
-                Divider()
-                ProfileUpgradeBanner(
-                    state = bannerState,
-                    onClick = onClickUpgradeBanner,
-                    onFeatureCardChanged = onFeatureCardChanged,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
-            Column {
-                AccountSections(
-                    state = sectionsState,
-                    config = sectionsConfig,
-                    onChangeAvatar = onChangeAvatar,
-                    onChangeEmail = onChangeEmail,
-                    onChangePassword = onChangePassword,
-                    onUpgradeToPatron = onUpgradeToPatron,
-                    onCancelSubscription = onCancelSubscription,
-                    onChangeNewsletterSubscription = onChangeNewsletterSubscription,
-                    onShowPrivacyPolicy = onShowPrivacyPolicy,
-                    onShowTermsOfUse = onShowTermsOfUse,
-                    onSignOut = onSignOut,
-                    onDeleteAccount = onDeleteAccount,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                Spacer(
-                    modifier = Modifier.height(state.miniPlayerPadding),
-                )
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = modifier.fillMaxSize(),
+            ) {
+                item {
+                    Spacer(Modifier.height(16.dp))
+                }
+                item {
+                    AccountHeader(
+                        state = state.headerState,
+                        config = headerConfig,
+                        onClick = onClickHeader,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                            .then(if (state.isAutomotive) Modifier.padding(top = 32.dp) else Modifier),
+                    )
+                }
+                if (bannerState is UpgradeBannerState.Loaded) {
+                    item {
+                        Divider()
+                    }
+                    item {
+                        ProfileUpgradeBanner(
+                            state = bannerState,
+                            onClick = onClickUpgradeBanner,
+                            onFeatureCardChanged = onFeatureCardChanged,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+                }
+                item {
+                    AccountSections(
+                        state = sectionsState,
+                        config = sectionsConfig,
+                        onChangeAvatar = onChangeAvatar,
+                        onChangeEmail = onChangeEmail,
+                        onChangePassword = onChangePassword,
+                        onUpgradeToPatron = onUpgradeToPatron,
+                        onCancelSubscription = onCancelSubscription,
+                        onChangeNewsletterSubscription = onChangeNewsletterSubscription,
+                        onShowPrivacyPolicy = onShowPrivacyPolicy,
+                        onShowTermsOfUse = onShowTermsOfUse,
+                        onSignOut = onSignOut,
+                        onDeleteAccount = onDeleteAccount,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+                item {
+                    Spacer(Modifier.height(state.miniPlayerPadding))
+                }
             }
         }
     }
