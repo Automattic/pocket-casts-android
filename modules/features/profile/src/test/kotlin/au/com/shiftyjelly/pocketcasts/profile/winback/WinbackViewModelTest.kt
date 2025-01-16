@@ -166,6 +166,26 @@ class WinbackViewModelTest {
         }
     }
 
+    @Test
+    fun `subscritpions are sorted`() = runTest {
+        viewModel.uiState.test {
+            skipItems(1)
+
+            signInStateFlow.emit(createPaidUser(SubscriptionView(plan = "", isPrimary = true)))
+            productDetailsFlow.emit(ProductDetailsState.Loaded(availableSubscriptions.reversed()))
+            val state = awaitItem().subscriptionsState as SubscriptionsState.Loaded
+
+            val tokens = state.subscriptions.map(Subscription::offerToken)
+            val expected = listOf(
+                Subscription.PLUS_MONTHLY_PRODUCT_ID,
+                Subscription.PATRON_MONTHLY_PRODUCT_ID,
+                Subscription.PLUS_YEARLY_PRODUCT_ID,
+                Subscription.PATRON_YEARLY_PRODUCT_ID,
+            )
+            assertEquals(expected, tokens)
+        }
+    }
+
     private val availableSubscriptions = listOf(
         createProductDetails(
             id = Subscription.PLUS_MONTHLY_PRODUCT_ID,

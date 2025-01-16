@@ -73,6 +73,7 @@ private fun createAvailablePlans(
             val subscriptions = productDetailsState.productDetails
                 .map(mapper::mapFromProductDetails)
                 .filterIsInstance<Subscription.Simple>()
+                .sortedWith(SubscriptionsComparator)
             val matchingSubscription = subscriptions.find { it.productDetails.productId == primarySubscription.plan }
             SubscriptionsState.Loaded(matchingSubscription, subscriptions)
         }
@@ -84,5 +85,25 @@ private fun SignInState.findPrimarySubscription() = when (this) {
     is SignInState.SignedIn -> when (val subscriptionStatus = subscriptionStatus) {
         is SubscriptionStatus.Free -> null
         is SubscriptionStatus.Paid -> subscriptionStatus.subscriptions.find { it.isPrimarySubscription }
+    }
+}
+
+private object SubscriptionsComparator : Comparator<Subscription.Simple> {
+    private val priorities = mapOf(
+        Subscription.PLUS_MONTHLY_PRODUCT_ID to 0,
+        Subscription.PATRON_MONTHLY_PRODUCT_ID to 1,
+        Subscription.PLUS_YEARLY_PRODUCT_ID to 2,
+        Subscription.PATRON_YEARLY_PRODUCT_ID to 3,
+    )
+
+    override fun compare(o1: Subscription.Simple, o2: Subscription.Simple): Int {
+        val priority1 = priorities[o1.productDetails.productId]
+        val priority2 = priorities[o2.productDetails.productId]
+        return when {
+            priority1 != null && priority2 != null -> priority1 - priority2
+            priority1 != null && priority2 == null -> -1
+            priority1 == null && priority2 != null -> 1
+            else -> o1.productDetails.title.compareTo(o2.productDetails.title)
+        }
     }
 }
