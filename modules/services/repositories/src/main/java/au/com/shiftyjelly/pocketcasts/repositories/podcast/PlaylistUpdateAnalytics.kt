@@ -36,6 +36,10 @@ class PlaylistUpdateAnalytics @Inject constructor(
             put(Key.DOWNLOADED, playlist.downloaded)
             put(Key.NOT_DOWNLOADED, playlist.notDownloaded)
             put(Key.DURATION, playlist.filterDuration)
+            if (playlist.filterDuration) {
+                put(Key.DURATION_LONGER_THAN, playlist.longerThan)
+                put(Key.DURATION_SHORTER_THAN, playlist.shorterThan)
+            }
             put(Key.EPISODE_STATUS_IN_PROGRESS, playlist.partiallyPlayed)
             put(Key.EPISODE_STATUS_PLAYED, playlist.finished)
             put(Key.EPISODE_STATUS_UNPLAYED, playlist.unplayed)
@@ -158,6 +162,8 @@ class PlaylistUpdateAnalytics @Inject constructor(
             const val COLOR = "color"
             const val DOWNLOADED = "downloaded"
             const val DURATION = "duration"
+            const val DURATION_LONGER_THAN = "duration_longer_than"
+            const val DURATION_SHORTER_THAN = "duration_shorter_than"
             const val ENABLED = "enabled"
             const val GROUP = "group"
             const val ICON_NAME = "icon_name"
