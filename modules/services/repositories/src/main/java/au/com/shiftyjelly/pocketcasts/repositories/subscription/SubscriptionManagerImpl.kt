@@ -135,7 +135,8 @@ class SubscriptionManagerImpl @Inject constructor(
 
     override suspend fun initializeBillingConnection() = coroutineScope {
         launch { listenToPurchaseUpdates() }
-        launch { loadProducts() }
+        launch { refreshProducts() }
+        launch { refreshPurchases() }
         awaitCancellation()
     }
 
@@ -181,12 +182,10 @@ class SubscriptionManagerImpl @Inject constructor(
         }
     }
 
-    private suspend fun loadProducts() {
-        productDetails.accept(ProductDetailsState.Loading)
+    override suspend fun refreshProducts() {
         val (result, products) = billingClient.loadProducts(productDetailsParams)
         if (result.isOk()) {
             productDetails.accept(ProductDetailsState.Loaded(products))
-            refreshPurchases()
         } else {
             productDetails.accept(ProductDetailsState.Failure)
         }
@@ -344,7 +343,7 @@ class SubscriptionManagerImpl @Inject constructor(
         .asFlow()
         .transformLatest { productDetails ->
             val subscriptions = when (productDetails) {
-                is ProductDetailsState.Loading, ProductDetailsState.Failure -> null
+                is ProductDetailsState.Failure -> null
                 is ProductDetailsState.Loaded -> productDetails.productDetails.mapNotNull { productDetailsState ->
                     subscriptionMapper.mapFromProductDetails(
                         productDetails = productDetailsState,
@@ -447,8 +446,6 @@ private fun getSubscriptionReplacementMode(
 
 sealed interface ProductDetailsState {
     data class Loaded(val productDetails: List<ProductDetails>) : ProductDetailsState
-
-    data object Loading : ProductDetailsState
 
     data object Failure : ProductDetailsState
 }

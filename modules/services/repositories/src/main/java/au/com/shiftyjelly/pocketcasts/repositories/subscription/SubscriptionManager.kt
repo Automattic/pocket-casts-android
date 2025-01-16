@@ -15,7 +15,9 @@ import timber.log.Timber
 
 interface SubscriptionManager {
     suspend fun initializeBillingConnection(): Nothing
+    suspend fun refreshProducts()
     suspend fun refreshPurchases()
+
     fun launchBillingFlow(activity: AppCompatActivity, productDetails: ProductDetails, offerToken: String)
 
     fun signOut()
