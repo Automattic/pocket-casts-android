@@ -460,6 +460,7 @@ class AddFileActivity :
     override fun onMenuItemClick(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_save -> {
+                analyticsTracker.track(AnalyticsEvent.USER_FILE_EDIT_SAVE)
                 saveFile()
                 true
             }
