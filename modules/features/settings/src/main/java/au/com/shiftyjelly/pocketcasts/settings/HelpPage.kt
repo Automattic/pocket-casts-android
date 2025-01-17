@@ -34,7 +34,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -81,7 +80,6 @@ import com.kevinnzou.web.WebViewState
 import com.kevinnzou.web.rememberWebViewState
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -518,7 +516,6 @@ private class HelpWebViewClient(
             contactSupportAction.any { url.startsWith(it) } -> onContactSupport()
             url.startsWith("https://support.pocketcasts.com") -> {
                 val androidUrl = if ("device=android" !in url) {
-                    Timber.tag("LOG_TAG").i("Reload Android URL: $url")
                     buildString {
                         append(url)
                         append(if ('?' in url) '&' else '?')
