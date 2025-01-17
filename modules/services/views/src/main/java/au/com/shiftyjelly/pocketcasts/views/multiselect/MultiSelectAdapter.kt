@@ -39,7 +39,7 @@ private val MULTI_SELECT_ACTION_DIFF = object : DiffUtil.ItemCallback<Any>() {
     }
 }
 
-class MultiSelectAdapter(val editable: Boolean, val listener: ((MultiSelectAction) -> Unit)? = null, val dragListener: ((ItemViewHolder) -> Unit)?) : ListAdapter<Any, RecyclerView.ViewHolder>(MULTI_SELECT_ACTION_DIFF) {
+class MultiSelectAdapter(val editable: Boolean, val listener: ((MultiSelectAction) -> Unit)? = null, var shouldShowRemoveListeningHistory: Boolean = true, val dragListener: ((ItemViewHolder) -> Unit)?) : ListAdapter<Any, RecyclerView.ViewHolder>(MULTI_SELECT_ACTION_DIFF) {
     var episode: BaseEpisode? = null
         set(value) {
             field = value
@@ -101,6 +101,13 @@ class MultiSelectAdapter(val editable: Boolean, val listener: ((MultiSelectActio
     @SuppressLint("ClickableViewAccessibility")
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val item = getItem(position)
+
+        if (item is MultiSelectEpisodeAction.RemoveListeningHistory && !shouldShowRemoveListeningHistory) {
+            holder.itemView.visibility = View.GONE
+            return
+        } else {
+            holder.itemView.visibility = View.VISIBLE
+        }
 
         if (item is MultiSelectAction && holder is ItemViewHolder) {
             holder.binding.lblTitle.setText(item.title)
