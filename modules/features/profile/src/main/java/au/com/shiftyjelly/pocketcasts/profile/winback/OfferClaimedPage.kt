@@ -190,7 +190,10 @@ private val graySparkle = Color(0xFFCCD6D9) to Color(0xFFE5F7FF)
 private fun WinbackOfferPagePreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) theme: ThemeType,
 ) {
-    AppThemeWithBackground(theme) {
+    AppThemeWithBackground(
+        themeType = theme,
+        backgroundColor = { MaterialTheme.theme.colors.primaryUi04 },
+    ) {
         OfferClaimedPage(
             theme = theme,
             onConfirm = {},
