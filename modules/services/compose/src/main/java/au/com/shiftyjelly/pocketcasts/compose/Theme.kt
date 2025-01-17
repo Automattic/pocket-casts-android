@@ -1,6 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.compose
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -8,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -22,12 +25,19 @@ val LocalColors = staticCompositionLocalOf { PocketCastsTheme(type = Theme.Theme
 @Composable
 fun AppThemeWithBackground(
     themeType: Theme.ThemeType,
-    backgroundColor: @Composable () -> Color = { MaterialTheme.colors.background },
+    backgroundColor: @Composable () -> Color = { Color.Unspecified },
     content: @Composable () -> Unit,
 ) {
     AppTheme(themeType) {
-        Surface(color = backgroundColor()) {
-            content()
+        // Use surface so Material uses appropraite tinting for icons etc.
+        Surface(color = MaterialTheme.colors.background) {
+            // If we specify a custom color set is a background after Material
+            // sets colors through a surface
+            Box(
+                modifier = Modifier.background(backgroundColor()),
+            ) {
+                content()
+            }
         }
     }
 }
