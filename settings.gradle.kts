@@ -14,7 +14,7 @@ pluginManagement {
 }
 
 plugins {
-    id("com.gradle.enterprise").version("3.16.2")
+    id("com.gradle.develocity").version("3.19")
 }
 apply(from = File("./config/gradle/gradle_build_cache.gradle.kts"))
 
