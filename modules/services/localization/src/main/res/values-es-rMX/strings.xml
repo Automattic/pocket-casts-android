@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-12-10 13:54:03+0000
+Translation-Revision-Date: 2025-01-15 15:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+    <string name="settings_app_icon_pride">Orgullo</string>
+    <string name="manage_download_dismiss_content_description">Gestionar el descarte de los banners de descarga</string>
+    <string name="dismiss_manage_download_banner">Descartar</string>
     <string name="up_next_shuffle_enable_confirmation_message">La reproducción aleatoria está activada. Los episodios se reproducirán en orden aleatorio.</string>
     <string name="number_ten">diez</string>
     <string name="number_five">cinco</string>
@@ -442,7 +445,6 @@ Language: es
     <string name="error_invalid_password_length">Introduce una contraseña que tenga al menos 6 caracteres.</string>
     <string name="error_invalid_email_address">Introduce una dirección de correo electrónico válida.</string>
     <string name="settings_privacy_crash_link_short">Vincular tu cuenta</string>
-    <string name="settings_app_icon_pride_2023">Orgullo 2023</string>
     <string name="log_in_with_plus">Accede con una cuenta Plus</string>
     <string name="log_in_watch_requires_plus">Para utilizar esta aplicación o mejorar la experiencia de visita, accede con una cuenta Plus.</string>
     <string name="enter_password">Escribe contraseña</string>

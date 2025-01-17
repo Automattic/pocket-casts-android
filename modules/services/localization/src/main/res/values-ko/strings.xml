@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-12-10 09:54:04+0000
+Translation-Revision-Date: 2025-01-16 09:54:04+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="settings_app_icon_pride">프라이드</string>
+    <string name="manage_download_dismiss_content_description">다운로드 배너 닫기 관리</string>
+    <string name="dismiss_manage_download_banner">해제</string>
     <string name="up_next_shuffle_enable_confirmation_message">순서 섞기가 켜졌습니다. 에피소드가 랜덤 순서로 재생됩니다.</string>
     <string name="number_ten">10</string>
     <string name="number_five">5</string>
@@ -442,7 +445,6 @@ Language: ko_KR
     <string name="error_invalid_password_length">비밀번호를 6자 이상 입력하세요.</string>
     <string name="error_invalid_email_address">유효한 이메일 주소를 입력하세요.</string>
     <string name="settings_privacy_crash_link_short">계정 연결</string>
-    <string name="settings_app_icon_pride_2023">프라이드 2023</string>
     <string name="log_in_with_plus">Plus 계정으로 로그인하세요.</string>
     <string name="log_in_watch_requires_plus">이 앱을 사용하거나 방문을 업그레이드하려면 Plus 계정으로 로그인하세요.</string>
     <string name="enter_password">비밀번호 입력</string>

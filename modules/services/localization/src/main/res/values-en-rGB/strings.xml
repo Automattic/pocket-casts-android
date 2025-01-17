@@ -97,7 +97,6 @@ Language: en_GB
     <string name="error_invalid_password_length">Please enter a password that is at least 6 characters long.</string>
     <string name="settings_privacy_crash_link_short">Link your account</string>
     <string name="log_in_with_plus">Please log in with a Plus account</string>
-    <string name="settings_app_icon_pride_2023">Pride 2023</string>
     <string name="log_in_watch_requires_plus">Log in with a Plus account to use this app or upgrade visiting</string>
     <string name="enter_email">Enter email</string>
     <string name="enter_password">Enter password</string>
