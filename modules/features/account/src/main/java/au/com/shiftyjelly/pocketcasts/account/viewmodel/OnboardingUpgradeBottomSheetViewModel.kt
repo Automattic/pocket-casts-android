@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.account.viewmodel
 
-import android.app.Activity
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -62,7 +62,7 @@ class OnboardingUpgradeBottomSheetViewModel @Inject constructor(
                 .stateIn(viewModelScope)
                 .collect { productDetails ->
                     val subscriptions = when (productDetails) {
-                        is ProductDetailsState.Error -> null
+                        is ProductDetailsState.Failure -> null
                         is ProductDetailsState.Loaded -> productDetails.productDetails.mapNotNull { productDetailsState ->
                             subscriptionMapper.mapFromProductDetails(
                                 productDetails = productDetailsState,
@@ -101,7 +101,7 @@ class OnboardingUpgradeBottomSheetViewModel @Inject constructor(
     }
 
     fun onClickSubscribe(
-        activity: Activity,
+        activity: AppCompatActivity,
         flow: OnboardingFlow,
         source: OnboardingUpgradeSource,
         onComplete: () -> Unit,

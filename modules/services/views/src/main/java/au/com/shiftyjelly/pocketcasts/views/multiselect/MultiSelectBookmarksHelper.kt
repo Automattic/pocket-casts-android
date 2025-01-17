@@ -109,6 +109,11 @@ class MultiSelectBookmarksHelper @Inject constructor(
             return
         }
 
+        analyticsTracker.track(
+            AnalyticsEvent.BOOKMARK_DELETE_FORM_SHOWN,
+            mapOf("source" to source.analyticsValue),
+        )
+
         val count = bookmarks.size
         ConfirmationDialog()
             .setForceDarkTheme(source == SourceView.PLAYER)
@@ -133,6 +138,11 @@ class MultiSelectBookmarksHelper @Inject constructor(
             .setIconTint(UR.attr.support_05)
             .setOnConfirm {
                 launch {
+                    analyticsTracker.track(
+                        AnalyticsEvent.BOOKMARK_DELETE_FORM_SUBMITTED,
+                        mapOf("source" to source.analyticsValue),
+                    )
+
                     bookmarks.forEach {
                         bookmarkManager.deleteToSync(it.uuid)
                         analyticsTracker.track(

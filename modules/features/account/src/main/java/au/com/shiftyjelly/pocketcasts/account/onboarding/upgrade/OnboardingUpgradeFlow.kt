@@ -163,6 +163,12 @@ fun OnboardingUpgradeFlow(
                         LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, NULL_ACTIVITY_ERROR)
                     }
                 },
+                onPrivacyPolicyClick = {
+                    mainSheetViewModel.onPrivacyPolicyPressed()
+                },
+                onTermsAndConditionsClick = {
+                    mainSheetViewModel.onTermsAndConditionsPressed()
+                },
             )
         },
     )

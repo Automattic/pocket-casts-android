@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.helper.AppIcon
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -101,7 +102,7 @@ class SettingsAppearanceViewModel @Inject constructor(
                     AppIcon.AppIconType.PATRON_ROUND -> "patron_round"
                     AppIcon.AppIconType.PATRON_GLOW -> "patron_glow"
                     AppIcon.AppIconType.PATRON_DARK -> "patron_dark"
-                    AppIcon.AppIconType.PRIDE_2023 -> "pride_2023"
+                    AppIcon.AppIconType.PRIDE -> "pride_2023"
                 },
             ),
         )
@@ -154,6 +155,10 @@ class SettingsAppearanceViewModel @Inject constructor(
             AnalyticsEvent.SETTINGS_APPEARANCE_FOLLOW_SYSTEM_THEME_TOGGLED,
             mapOf("enabled" to use),
         )
+    }
+
+    fun onUpgradeBannerDismissed(source: OnboardingUpgradeSource) {
+        analyticsTracker.track(AnalyticsEvent.UPGRADE_BANNER_DISMISSED, mapOf("source" to source.analyticsValue))
     }
 }
 

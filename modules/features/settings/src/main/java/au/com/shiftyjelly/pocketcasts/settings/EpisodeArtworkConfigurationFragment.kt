@@ -20,7 +20,10 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.fragment.compose.content
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRowToggle
@@ -39,6 +42,9 @@ class EpisodeArtworkConfigurationFragment : BaseFragment() {
     @Inject
     lateinit var settings: Settings
 
+    @Inject
+    lateinit var analyticsTracker: AnalyticsTracker
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -48,10 +54,17 @@ class EpisodeArtworkConfigurationFragment : BaseFragment() {
         AppThemeWithBackground(theme.activeTheme) {
             val artworkConfiguration by settings.artworkConfiguration.flow.collectAsState()
 
+            CallOnce {
+                analyticsTracker.track(AnalyticsEvent.SETTINGS_ADVANCED_EPISODE_ARTWORK_SHOWN)
+            }
+
             EpisodeArtworkSettings(
                 artworkConfiguration = artworkConfiguration,
                 elements = sortedElements,
                 onUpdateConfiguration = { configuration ->
+                    if (artworkConfiguration.useEpisodeArtwork != configuration.useEpisodeArtwork) {
+                        analyticsTracker.track(AnalyticsEvent.SETTINGS_ADVANCED_EPISODE_ARTWORK_USE_EPISODE_ARTWORK_TOGGLED, mapOf("enabled" to configuration.useEpisodeArtwork))
+                    }
                     settings.artworkConfiguration.set(configuration, updateModifiedAt = true)
                 },
                 onBackPressed = {
@@ -122,6 +135,9 @@ class EpisodeArtworkConfigurationFragment : BaseFragment() {
             primaryText = stringResource(element.titleId),
             toggle = SettingRowToggle.Checkbox(checked = configuration.useEpisodeArtwork(element), enabled = configuration.useEpisodeArtwork),
             modifier = Modifier.toggleable(value = configuration.useEpisodeArtwork(element), role = Role.Checkbox) { newValue ->
+                if (configuration.useEpisodeArtwork) {
+                    analyticsTracker.track(AnalyticsEvent.SETTINGS_ADVANCED_EPISODE_ARTWORK_CUSTOMIZATION_ELEMENT_TOGGLED, mapOf("enabled" to newValue, "element" to element.analyticsValue))
+                }
                 onUpdateConfiguration(if (newValue) configuration.enable(element) else configuration.disable(element))
             },
         )

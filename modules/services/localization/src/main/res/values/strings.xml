@@ -1514,7 +1514,7 @@
     <string name="settings_app_icon_rose" translatable="false">@string/settings_theme_rose</string>
     <string name="settings_app_icon_pocket_cats" translatable="false">Pocket Cats</string>
     <string name="settings_app_icon_red_velvet">Red Velvet</string>
-    <string name="settings_app_icon_pride_2023">Pride 2023</string>
+    <string name="settings_app_icon_pride">Pride</string>
     <string name="settings_app_icon_plus">Plus</string>
     <string name="settings_app_icon_classic" translatable="false">@string/settings_theme_classic</string>
     <string name="settings_app_icon_electric_blue">Electric Blue</string>
@@ -2266,11 +2266,26 @@
     <string name="manage_downloads">Manage downloads</string>
     <string name="maybe_later">Maybe Later</string>
     <string name="dismiss_manage_download_banner">Dismiss</string>
-    <string name="manage_download_more_options_content_description">Manage Download Banner More Options</string>
+    <string name="manage_download_dismiss_content_description">Manage Download Banner Dismiss</string>
 
     <!-- Up Next Shuffle -->
     <string name="up_next_shuffle_button_content_description">Up Next shuffle</string>
     <string name="up_next_shuffle_disable_button_content_description">Up Next shuffle disable</string>
     <string name="up_next_shuffle_enable_confirmation_message">Shuffle is on. Episodes will play in random order.</string>
+
+    <!-- Winback -->
+
+    <string name="winback_offer_header">Before you cancel, check&#160;out these offers</string>
+    <string name="winback_offer_free_offer_title">Get your next month free</string>
+    <!-- %1$s is the amount of money saved -->
+    <string name="winback_offer_free_offer_description">Save %1$s at the start of your next billing cycle.</string>
+    <string name="winback_offer_free_offer_button_label">Claim offer</string>
+    <string name="winback_offer_differnt_plan_title">Looking for a different plan?</string>
+    <string name="winback_offer_differnt_plan_description">Find the plan that\'s right for you.</string>
+    <string name="winback_offer_help_title">Need help with Pocket&#160;Casts?</string>
+    <string name="winback_offer_help_description">Struggling with any features or having issues.</string>
+    <string name="winback_offer_cancel_continue_button_label">Continue to Cancellation</string>
+    <string name="winback_claimed_offer_message_1">Enjoy your free month!</string>
+    <string name="winback_claimed_offer_message_2">Thanks for choosing Pocket&#160;Casts. Billing starts after your free month ends.</string>
 
 </resources>

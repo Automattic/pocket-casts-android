@@ -9,7 +9,7 @@ enum class AppIconSetting(val id: String) {
     ROSE("rose"),
     CAT("cat"),
     REDVELVET("redvelvet"),
-    PRIDE_2023("pride_2023"),
+    PRIDE("pride_2023"), // Leave the 2023 in the setting value so existing users don't lose their icon
     PLUS("plus"),
     CLASSIC("classic"),
     ELECTRIC_BLUE("electricBlue"),

@@ -136,7 +136,7 @@ platform :android do
       new_version: new_version,
       release_notes_file_path: RELEASE_NOTES_SOURCE_PATH
     )
-    push_to_git_remote(tags: false)
+    push_to_git_remote(set_upstream: true, tags: false)
 
     trigger_release_build(branch_to_build: "release/#{new_version}")
     create_backmerge_pr
@@ -272,6 +272,7 @@ platform :android do
       version_code: new_version_code
     )
     commit_version_bump
+    push_to_git_remote(set_upstream: true, tags: false)
     UI.success("Done! New Release Version: #{release_version_current}. New Build Code: #{build_code_current}")
   end
 
@@ -287,7 +288,126 @@ platform :android do
     UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.") unless skip_confirm || UI.confirm('Do you want to continue?')
 
     trigger_release_build(branch_to_build: "release/#{version}")
+
     create_backmerge_pr
+    begin
+      close_milestone(repository: GITHUB_REPO, milestone: release_version_current)
+    rescue StandardError => e
+      UI.important("Could not find a GitHub milestone for hotfix #{release_version_current} to close: #{e}")
+    end
+  end
+
+  # Update the rollout of all 3 variants (app, automotive, wear) of the current version to the given value
+  #
+  # @param percent [Float] The rollout percentage, between 0 and 1
+  #
+  lane :update_rollouts do |percent:|
+    version = version_name_current
+    build_code = build_code_current
+    is_beta = beta_version?(version)
+
+    not_found_variants = []
+    APPS.each do |app|
+      track = play_store_track(app: app, is_beta: is_beta)
+      version_code = version_code_for_app(app: app, version_code: build_code)
+      upload_to_play_store(
+        **UPLOAD_TO_PLAY_STORE_COMMON_OPTIONS,
+        skip_upload_aab: true,
+        track: track,
+        version_code: version_code,
+        release_status: percent.to_f < 1.0 ? 'inProgress' : 'completed',
+        rollout: percent.to_s
+      )
+    rescue FastlaneCore::Interface::FastlaneError => e
+      raise unless e.message =~ /Unable to find the requested release on track/
+
+      not_found_variants << app
+    end
+
+    not_found_variants.each do |app|
+      UI.important("'#{app}' variant for `#{version}` was not found in Google Play Console")
+    end
+    UI.user_error!('None of the 3 app variants were found in Google Play Console. We expected at least one') if not_found_variants.count == APPS.count
+  end
+
+  # @param skip_confirm [Boolean] If true, avoids any interactive prompt
+  #
+  lane :finalize_release do |skip_confirm: false|
+    UI.user_error!('Please use `finalize_hotfix_release` lane for hotfixes') if release_is_hotfix?
+    ensure_git_branch(branch: '^release/') # Match branch names that begin with `release/`
+    ensure_git_status_clean
+
+    UI.important("Finalizing release: #{release_version_current}")
+    UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.") unless skip_confirm || UI.confirm('Do you want to continue?')
+
+    configure_apply(force: is_ci)
+
+    # Bump the release version and build code
+    UI.message('Bumping final release version and build code...')
+    VERSION_FILE.write_version(
+      version_name: release_version_current,
+      version_code: build_code_next
+    )
+    commit_version_bump
+    UI.success("Done! New Release Version: #{release_version_current}. New Build Code: #{build_code_current}")
+
+    # Download Localizations
+    android_download_translations(
+      res_dir: File.join('modules', 'services', 'localization', 'src', 'main', 'res'),
+      glotpress_url: GLOTPRESS_APP_STRINGS_PROJECT_URL,
+      locales: SUPPORTED_LOCALES,
+      lint_task: 'aggregatedLintRelease'
+    )
+
+    version = release_version_current
+
+    # Wrap up
+    remove_branch_protection(repository: GITHUB_REPO, branch: "release/#{version}")
+    set_milestone_frozen_marker(repository: GITHUB_REPO, milestone: version, freeze: false)
+    create_new_milestone(repository: GITHUB_REPO, need_appstore_submission: true)
+    close_milestone(repository: GITHUB_REPO, milestone: version)
+
+    push_to_git_remote(tags: false)
+    trigger_release_build(branch_to_build: "release/#{version}")
+    create_backmerge_pr
+  end
+
+  # This lane publishes a release on GitHub and creates a PR to backmerge the current release branch into the next release/ branch
+  #
+  # @param [Boolean] skip_confirm (default: false) If set, will skip the confirmation prompt before running the rest of the lane
+  #
+  lane :publish_release do |skip_confirm: false|
+    ensure_git_status_clean
+    ensure_git_branch(branch: '^release/')
+
+    version_number = release_version_current
+
+    current_branch = "release/#{version_number}"
+    next_release_branch = "release/#{release_version_next}"
+
+    UI.important <<~PROMPT
+      Publish the #{version_number} release. This will:
+      - Publish the existing draft `#{version_number}` release on GitHub
+      - Which will also have GitHub create the associated git tag, pointing to the tip of the branch
+      - If the release branch for the next version `#{next_release_branch}` already exists, backmerge `#{current_branch}` into it
+      - If needed, backmerge `#{current_branch}` back into `#{DEFAULT_BRANCH}`
+      - Delete the `#{current_branch}` branch
+    PROMPT
+    UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.") unless skip_confirm || UI.confirm('Do you want to continue?')
+
+    UI.important "Publishing release #{version_number} on GitHub"
+
+    publish_github_release(
+      repository: GITHUB_REPO,
+      name: version_number
+    )
+
+    # At this point, an intermediate branch has been created by creating a backmerge PR to a hotfix or the next version release branch.
+    # This allows us to safely delete the `release/*` remote branch.
+    remove_branch_protection(repository: GITHUB_REPO, branch: current_branch)
+    Fastlane::Helper::GitHelper.delete_remote_branch_if_exists!(current_branch)
+    Fastlane::Helper::GitHelper.checkout_and_pull(DEFAULT_BRANCH)
+    Fastlane::Helper::GitHelper.delete_local_branch_if_exists!(current_branch)
   end
 
   # Update the rollout of all 3 variants (app, automotive, wear) of the current version to the given value

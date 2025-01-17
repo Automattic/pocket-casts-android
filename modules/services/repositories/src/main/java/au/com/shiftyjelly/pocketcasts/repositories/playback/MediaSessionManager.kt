@@ -689,8 +689,11 @@ class MediaSessionManager(
 
         // note: the stop event is called from cars when they only want to pause, this is less destructive and doesn't cause issues if they try to play again
         override fun onStop() {
-            logEvent("stop")
-            enqueueCommand("stop") { playbackManager.pauseSuspend(sourceView = source) }
+            // This event is causing issues during casting, so as a temporary solution, we are going to ignore it for now
+            if (playbackManager.player !is CastPlayer) {
+                logEvent("stop")
+                enqueueCommand("stop") { playbackManager.pauseSuspend(sourceView = source) }
+            }
         }
 
         override fun onSkipToPrevious() {

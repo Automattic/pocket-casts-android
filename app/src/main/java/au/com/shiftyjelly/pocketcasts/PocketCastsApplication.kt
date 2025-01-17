@@ -256,12 +256,11 @@ class PocketCastsApplication : Application(), Configuration.Provider {
                 // init the stats engine
                 statsManager.initStatsEngine()
 
-                subscriptionManager.connectToGooglePlay(this@PocketCastsApplication)
-
                 sleepTimerRestartWhenShakingDevice.init() // Begin detecting when the device has been shaken to restart the sleep timer.
             }
         }
 
+        applicationScope.launch { subscriptionManager.initializeBillingConnection() }
         applicationScope.launch(Dispatchers.IO) { fileStorage.fixBrokenFiles(episodeManager) }
 
         userEpisodeManager.monitorUploads(applicationContext)

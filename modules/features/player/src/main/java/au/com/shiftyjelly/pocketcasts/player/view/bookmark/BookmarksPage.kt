@@ -67,6 +67,8 @@ fun BookmarksPage(
     onUpgradeClicked: () -> Unit,
     showOptionsDialog: (Int) -> Unit,
     openFragment: (Fragment) -> Unit,
+    onClearSearchTapped: () -> Unit,
+    onSearchBarClearButtonTapped: () -> Unit,
     bottomInset: Dp,
 ) {
     val context = LocalContext.current
@@ -86,6 +88,8 @@ fun BookmarksPage(
         onUpgradeClicked = onUpgradeClicked,
         openFragment = openFragment,
         bottomInset = bottomInset,
+        onClearSearchTapped = onClearSearchTapped,
+        onSearchBarClearButtonTapped = onSearchBarClearButtonTapped,
     )
     LaunchedEffect(episodeUuid) {
         bookmarksViewModel.loadBookmarks(
@@ -132,6 +136,8 @@ private fun Content(
     onSearchTextChanged: (String) -> Unit,
     onUpgradeClicked: () -> Unit,
     openFragment: (Fragment) -> Unit,
+    onClearSearchTapped: () -> Unit,
+    onSearchBarClearButtonTapped: () -> Unit,
     bottomInset: Dp,
 ) {
     Box(
@@ -149,6 +155,8 @@ private fun Content(
                 onPlayClick = onPlayClick,
                 onSearchTextChanged = onSearchTextChanged,
                 bottomInset = bottomInset,
+                onClearSearchTapped = onClearSearchTapped,
+                onSearchBarClearButtonTapped = onSearchBarClearButtonTapped,
             )
 
             is UiState.Empty -> NoBookmarksView(
@@ -179,6 +187,8 @@ private fun BookmarksView(
     onOptionsMenuClicked: () -> Unit,
     onPlayClick: (Bookmark) -> Unit,
     onSearchTextChanged: (String) -> Unit,
+    onClearSearchTapped: () -> Unit,
+    onSearchBarClearButtonTapped: () -> Unit,
     bottomInset: Dp,
 ) {
     val focusRequester = remember { FocusRequester() }
@@ -193,6 +203,7 @@ private fun BookmarksView(
                     text = state.searchText,
                     placeholder = stringResource(LR.string.search),
                     onTextChanged = onSearchTextChanged,
+                    onClearButtonTapped = onSearchBarClearButtonTapped,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
@@ -205,7 +216,14 @@ private fun BookmarksView(
             state.searchText.isNotEmpty() &&
             state.bookmarks.isEmpty()
         ) {
-            item { NoBookmarksInSearchView(onActionClick = { onSearchTextChanged("") }) }
+            item {
+                NoBookmarksInSearchView(
+                    onActionClick = {
+                        onClearSearchTapped()
+                        onSearchTextChanged("")
+                    },
+                )
+            }
         } else {
             item {
                 val title = stringResource(
@@ -294,6 +312,8 @@ private fun BookmarksPreview(
             onSearchTextChanged = {},
             onUpgradeClicked = {},
             openFragment = {},
+            onClearSearchTapped = {},
+            onSearchBarClearButtonTapped = {},
             bottomInset = 0.dp,
         )
     }

@@ -9,6 +9,7 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.profile.R
 import au.com.shiftyjelly.pocketcasts.profile.databinding.FragmentCloudSettingsBinding
@@ -124,6 +125,7 @@ class CloudSettingsFragment : BaseFragment() {
         }
 
         binding.btnClose.setOnClickListener {
+            viewModel.onUpgradeBannerDismissed(SourceView.FILES_SETTINGS)
             settings.setUpgradeClosedCloudSettings(true)
             binding.upgradeLayout.isVisible = false
         }

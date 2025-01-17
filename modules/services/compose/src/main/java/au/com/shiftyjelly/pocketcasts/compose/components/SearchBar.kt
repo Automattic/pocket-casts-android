@@ -90,6 +90,7 @@ object SearchBarDefaults {
 fun SearchBar(
     text: String,
     onTextChanged: (String) -> Unit,
+    onClearButtonTapped: () -> Unit = {},
     modifier: Modifier = Modifier,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
@@ -163,6 +164,7 @@ fun SearchBar(
                     if (text.isNotEmpty()) {
                         IconButton(
                             onClick = {
+                                onClearButtonTapped()
                                 onTextChanged("")
                                 focusManager.clearFocus()
                             },

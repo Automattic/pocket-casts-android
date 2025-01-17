@@ -234,6 +234,7 @@ class AppearanceSettingsFragment : BaseFragment() {
         }
 
         binding.btnCloseUpgrade.setOnClickListener {
+            viewModel.onUpgradeBannerDismissed(OnboardingUpgradeSource.APPEARANCE)
             settings.setUpgradeClosedAppearSettings(true)
             binding.upgradeGroup.isVisible = false
         }
