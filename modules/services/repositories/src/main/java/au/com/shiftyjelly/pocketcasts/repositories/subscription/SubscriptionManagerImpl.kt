@@ -135,7 +135,7 @@ class SubscriptionManagerImpl @Inject constructor(
 
     override suspend fun initializeBillingConnection() = coroutineScope {
         launch { listenToPurchaseUpdates() }
-        launch { loadProducts() }
+        launch { refresh() }
         awaitCancellation()
     }
 
@@ -181,29 +181,39 @@ class SubscriptionManagerImpl @Inject constructor(
         }
     }
 
-    private suspend fun loadProducts() {
+    override suspend fun loadProducts(): ProductDetailsState {
         val (result, products) = billingClient.loadProducts(productDetailsParams)
-        if (result.isOk()) {
-            productDetails.accept(ProductDetailsState.Loaded(products))
-            refreshPurchases()
+        val state = if (result.isOk()) {
+            ProductDetailsState.Loaded(products)
         } else {
-            productDetails.accept(ProductDetailsState.Error(result.debugMessage))
+            ProductDetailsState.Failure
         }
+        productDetails.accept(state)
+        return state
     }
 
-    override suspend fun refreshPurchases() = coroutineScope {
-        val (historyResults, historyRecords) = billingClient.loadPurchaseHistory(purchaseHistoryParams)
-        if (historyResults.isOk()) {
-            historyRecords.forEach(::handleHistoryRecord)
-        }
-
+    override suspend fun loadPurchases() = coroutineScope {
         val (purchasesResult, purchases) = billingClient.loadPurchases(purchasesParams)
+
         if (purchasesResult.isOk()) {
             purchases.forEach { purchase ->
                 if (!purchase.isAcknowledged) {
                     launch { handlePurchase(purchase) }
                 }
             }
+            PurchasesState.Loaded(purchases)
+        } else {
+            PurchasesState.Failure
+        }
+    }
+
+    override suspend fun loadPurchaseHistory(): PurchaseHistoryState {
+        val (historyResults, historyRecords) = billingClient.loadPurchaseHistory(purchaseHistoryParams)
+        return if (historyResults.isOk()) {
+            historyRecords.forEach(::handleHistoryRecord)
+            PurchaseHistoryState.Loaded(historyRecords)
+        } else {
+            PurchaseHistoryState.Failure
         }
     }
 
@@ -343,7 +353,7 @@ class SubscriptionManagerImpl @Inject constructor(
         .asFlow()
         .transformLatest { productDetails ->
             val subscriptions = when (productDetails) {
-                is ProductDetailsState.Error -> null
+                is ProductDetailsState.Failure -> null
                 is ProductDetailsState.Loaded -> productDetails.productDetails.mapNotNull { productDetailsState ->
                     subscriptionMapper.mapFromProductDetails(
                         productDetails = productDetailsState,
@@ -444,9 +454,22 @@ private fun getSubscriptionReplacementMode(
     else -> SUBSCRIPTION_REPLACEMENT_MODE_NOT_SET
 }
 
-sealed class ProductDetailsState {
-    data class Loaded(val productDetails: List<ProductDetails>) : ProductDetailsState()
-    data class Error(val message: String) : ProductDetailsState()
+sealed interface ProductDetailsState {
+    data class Loaded(val productDetails: List<ProductDetails>) : ProductDetailsState
+
+    data object Failure : ProductDetailsState
+}
+
+sealed interface PurchasesState {
+    data class Loaded(val purchases: List<Purchase>) : PurchasesState
+
+    data object Failure : PurchasesState
+}
+
+sealed interface PurchaseHistoryState {
+    data class Loaded(val history: List<PurchaseHistoryRecord>) : PurchaseHistoryState
+
+    data object Failure : PurchaseHistoryState
 }
 
 sealed class PurchaseEvent {

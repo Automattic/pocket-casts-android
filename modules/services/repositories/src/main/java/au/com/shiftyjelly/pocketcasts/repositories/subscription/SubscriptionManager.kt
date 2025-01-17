@@ -10,12 +10,26 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.android.billingclient.api.ProductDetails
 import io.reactivex.Flowable
 import io.reactivex.Single
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 interface SubscriptionManager {
     suspend fun initializeBillingConnection(): Nothing
-    suspend fun refreshPurchases()
+
+    suspend fun loadProducts(): ProductDetailsState
+
+    suspend fun loadPurchases(): PurchasesState
+
+    suspend fun loadPurchaseHistory(): PurchaseHistoryState
+
+    suspend fun refresh() = coroutineScope {
+        launch { loadProducts() }
+        launch { loadPurchases() }
+        launch { loadPurchaseHistory() }
+    }
+
     fun launchBillingFlow(activity: AppCompatActivity, productDetails: ProductDetails, offerToken: String)
 
     fun signOut()

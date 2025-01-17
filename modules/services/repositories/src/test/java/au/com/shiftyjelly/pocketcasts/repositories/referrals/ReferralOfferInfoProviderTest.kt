@@ -76,7 +76,7 @@ class ReferralOfferInfoProviderTest {
 
     @Test
     fun `referralOfferInfo returns null subscription when product details state is error`() = runTest {
-        val productDetailsState = ProductDetailsState.Error("error")
+        val productDetailsState = ProductDetailsState.Failure
         whenever(subscriptionManager.observeProductDetails()).thenReturn(Flowable.just(productDetailsState))
 
         val result = referralOfferInfoProvider.referralOfferInfo()

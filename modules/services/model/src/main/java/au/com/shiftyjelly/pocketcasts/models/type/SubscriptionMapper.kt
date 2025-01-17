@@ -30,13 +30,12 @@ class SubscriptionMapper @Inject constructor() {
         val relevantSubscriptionOfferDetails = if ((FeatureFlag.isEnabled(Feature.REFERRALS_CLAIM) || FeatureFlag.isEnabled(Feature.REFERRALS_SEND)) && referralProductDetails != null) {
             matchingSubscriptionOfferDetails.find { it.offerId == referralProductDetails.offerId }
         } else {
-            val matchingSubscriptionOfferDetailsWithoutReferralOffer = matchingSubscriptionOfferDetails
+            matchingSubscriptionOfferDetails
                 .filter { !it.offerTags.contains(REFERRAL_OFFER_TAG) }
-            // TODO handle multiple matching SubscriptionOfferDetails
-            if (matchingSubscriptionOfferDetailsWithoutReferralOffer.size > 1) {
-                LogBuffer.w(LogBuffer.TAG_SUBSCRIPTIONS, "Multiple matching SubscriptionOfferDetails found. Only using the first.")
-            }
-            matchingSubscriptionOfferDetailsWithoutReferralOffer.firstOrNull()
+                // This assumes that base plan has lowest number of pricing phases,
+                // and if something else has the same number of phases,
+                // base plan will be the first one
+                .minByOrNull { offerDetails -> offerDetails.pricingPhases.pricingPhaseList.size }
         }
 
         return relevantSubscriptionOfferDetails
