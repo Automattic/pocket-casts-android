@@ -14,9 +14,10 @@ pluginManagement {
 }
 
 plugins {
-    id("com.gradle.enterprise").version("3.16.2")
+    id("com.gradle.develocity").version("3.19")
 }
-apply(from = File("gradle_build_cache.gradle.kts"))
+apply(from = File("./config/gradle/gradle_build_cache.gradle.kts"))
+apply(from = File("./config/gradle/gradle_build_scan.gradle"))
 
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
