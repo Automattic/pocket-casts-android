@@ -17,6 +17,7 @@ plugins {
     id("com.gradle.develocity").version("3.19")
 }
 apply(from = File("./config/gradle/gradle_build_cache.gradle.kts"))
+apply(from = File("./config/gradle/gradle_build_scan.gradle"))
 
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
