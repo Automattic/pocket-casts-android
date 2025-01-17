@@ -23,6 +23,7 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.Alignment
@@ -179,7 +180,13 @@ private fun SubscriptionRow(
                     Modifier
                 },
             )
-            .clickable(enabled = !isSelected, onClick = onClick, role = Role.Button)
+            .clickable(
+                enabled = !isSelected,
+                onClick = onClick,
+                role = Role.Button,
+                indication = ripple(color = MaterialTheme.theme.colors.primaryIcon01),
+                interactionSource = null,
+            )
             .padding(start = 20.dp, end = 10.dp, top = 10.dp, bottom = 10.dp),
     ) {
         Column(

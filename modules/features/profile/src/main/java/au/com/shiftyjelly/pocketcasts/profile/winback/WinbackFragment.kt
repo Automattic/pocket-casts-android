@@ -8,12 +8,8 @@ import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.LocalRippleConfiguration
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.RippleConfiguration
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -53,7 +49,10 @@ class WinbackFragment : BaseDialogFragment() {
     ) = content {
         val state by viewModel.uiState.collectAsState()
 
-        ContentContainer {
+        AppThemeWithBackground(
+            themeType = theme.activeTheme,
+            backgroundColor = { MaterialTheme.theme.colors.primaryUi04 },
+        ) {
             val navController = rememberNavController()
 
             DialogTintEffect(navController)
@@ -121,23 +120,6 @@ class WinbackFragment : BaseDialogFragment() {
                         onCancelSubscription = { Toast.makeText(requireActivity(), "Go to Play Store subscription", Toast.LENGTH_LONG).show() },
                     )
                 }
-            }
-        }
-    }
-
-    @OptIn(ExperimentalMaterialApi::class)
-    @Composable
-    private fun ContentContainer(
-        content: @Composable () -> Unit,
-    ) {
-        AppThemeWithBackground(
-            themeType = theme.activeTheme,
-            backgroundColor = { MaterialTheme.theme.colors.primaryUi04 },
-        ) {
-            CompositionLocalProvider(
-                LocalRippleConfiguration provides RippleConfiguration(color = MaterialTheme.theme.colors.primaryIcon01),
-            ) {
-                content()
             }
         }
     }
