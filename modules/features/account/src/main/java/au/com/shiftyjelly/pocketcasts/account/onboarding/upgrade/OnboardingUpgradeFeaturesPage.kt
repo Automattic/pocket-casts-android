@@ -441,7 +441,8 @@ internal fun UpgradeButton(
 ) {
     val resources = LocalContext.current.resources
     val shortName = resources.getString(button.shortNameRes)
-    val primaryText = stringResource(LR.string.subscribe_to, shortName)
+    val upgradeButtonText =
+        if (button.subscription is Subscription.Trial) stringResource(LR.string.onboarding_start_free_trial_upgrade_button) else stringResource(LR.string.upgrade_to, shortName)
 
     Box(
         contentAlignment = Alignment.BottomCenter,
@@ -449,7 +450,7 @@ internal fun UpgradeButton(
     ) {
         Column {
             UpgradeRowButton(
-                primaryText = primaryText,
+                primaryText = upgradeButtonText,
                 backgroundColor = colorResource(button.backgroundColorRes),
                 textColor = colorResource(button.textColorRes),
                 fontWeight = FontWeight.W500,
