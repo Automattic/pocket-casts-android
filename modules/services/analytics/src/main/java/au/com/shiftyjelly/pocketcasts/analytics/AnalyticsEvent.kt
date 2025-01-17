@@ -52,6 +52,7 @@ enum class AnalyticsEvent(val key: String) {
     PLUS_PROMOTION_SUBSCRIPTION_FREQUENCY_CHANGED("plus_promotion_subscription_frequency_changed"),
     PLUS_PROMOTION_PRIVACY_POLICY_TAPPED("plus_promotion_privacy_policy_tapped"),
     PLUS_PROMOTION_TERMS_AND_CONDITIONS_TAPPED("plus_promotion_terms_and_conditions_tapped"),
+    UPGRADE_BANNER_DISMISSED("upgrade_banner_dismissed"),
 
     /* Pull to refresh */
     PULLED_TO_REFRESH("pulled_to_refresh"),
@@ -125,7 +126,6 @@ enum class AnalyticsEvent(val key: String) {
     PROFILE_ACCOUNT_BUTTON_TAPPED("profile_account_button_tapped"),
     PROFILE_SETTINGS_BUTTON_TAPPED("profile_settings_button_tapped"),
     PROFILE_REFRESH_BUTTON_TAPPED("profile_refresh_button_tapped"),
-    PROFILE_REFRESH_UPGRADE_BANNER_DISMISSED("profile_refresh_upgrade_banner_dismissed"),
 
     /* Stats View */
     STATS_SHOWN("stats_shown"),
@@ -171,6 +171,7 @@ enum class AnalyticsEvent(val key: String) {
     UPLOADED_FILES_ADD_FILE_TAPPED("uploaded_files_add_file_tapped"),
     UPLOADED_FILES_INVALID_FILE_ERROR("uploaded_files_invalid_file_error"),
     UPLOADED_FILES_UPLOAD_FAILED("uploaded_files_upload_failed"),
+    USER_FILE_EDIT_SAVE("user_file_edit_save"),
 
     /* User File Details View */
     USER_FILE_DETAIL_SHOWN("user_file_detail_shown"),

@@ -112,7 +112,7 @@ class ProfileFragment : BaseFragment() {
                 )
             },
             onCloseUpgradeProfileClick = {
-                profileViewModel.closeUpgradeProfile()
+                profileViewModel.closeUpgradeProfile(SourceView.PROFILE)
             },
             modifier = Modifier.fillMaxSize(),
         )

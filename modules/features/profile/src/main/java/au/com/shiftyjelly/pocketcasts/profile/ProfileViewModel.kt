@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
@@ -178,8 +179,8 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    internal fun closeUpgradeProfile() {
-        tracker.track(AnalyticsEvent.PROFILE_REFRESH_UPGRADE_BANNER_DISMISSED)
+    internal fun closeUpgradeProfile(source: SourceView) {
+        tracker.track(AnalyticsEvent.UPGRADE_BANNER_DISMISSED, mapOf("source" to source.analyticsValue))
         settings.upgradeProfileClosed.set(true, updateModifiedAt = false)
     }
 }
