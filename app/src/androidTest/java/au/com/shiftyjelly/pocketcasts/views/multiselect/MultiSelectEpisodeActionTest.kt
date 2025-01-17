@@ -10,7 +10,7 @@ class MultiSelectEpisodeActionTest {
 
     @Test
     fun testListFromIds() {
-        val ids = listOf("star", "play_last", "play_next", "download", "archive", "share", "mark_as_played")
+        val ids = listOf("star", "play_last", "play_next", "download", "archive", "share", "mark_as_played", "remove_listening_history")
         val result = MultiSelectEpisodeAction.listFromIds(ids)
         val expectedActions = listOf(
             MultiSelectEpisodeAction.Star,
@@ -20,6 +20,7 @@ class MultiSelectEpisodeActionTest {
             MultiSelectEpisodeAction.Archive,
             MultiSelectEpisodeAction.Share,
             MultiSelectEpisodeAction.MarkAsPlayed,
+            MultiSelectEpisodeAction.RemoveListeningHistory,
         )
         assertEquals(expectedActions, result)
     }

@@ -366,6 +366,9 @@ abstract class EpisodeDao {
     @Query("UPDATE podcast_episodes SET last_playback_interaction_date = 0, last_playback_interaction_sync_status = 1")
     abstract suspend fun clearAllEpisodePlaybackInteractions()
 
+    @Query("UPDATE podcast_episodes SET last_playback_interaction_date = 0, last_playback_interaction_sync_status = 1 WHERE uuid IN (:episodeUuids)")
+    abstract suspend fun clearEpisodePlaybackInteractions(episodeUuids: List<String>)
+
     @Query("UPDATE podcast_episodes SET last_playback_interaction_sync_status = 1")
     abstract fun markPlaybackHistorySyncedBlocking()
 

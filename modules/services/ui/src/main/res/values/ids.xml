@@ -11,4 +11,5 @@
     <item name="menu_undownload" type="id" />
     <item name="menu_unarchive" type="id" />
     <item name="menu_edit" type="id" />
+    <item name="menu_remove_listening_history" type="id" />
 </resources>
