@@ -2289,5 +2289,6 @@
     <string name="winback_claimed_offer_message_2">Thanks for choosing Pocket&#160;Casts. Billing starts after your free month ends.</string>
     <string name="winback_available_plans_title">Available Plans</string>
     <string name="winback_available_plans_billing_note">Your new plan will activate at the end of your current billing period.</string>
+    <string name="winback_error_fetch_description">Sorry, but something went wrong fetching your plans.</string>
 
 </resources>

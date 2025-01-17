@@ -33,6 +33,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -178,7 +179,7 @@ private fun SubscriptionRow(
                     Modifier
                 },
             )
-            .clickable(enabled = !isSelected, onClick = onClick)
+            .clickable(enabled = !isSelected, onClick = onClick, role = Role.Button)
             .padding(start = 20.dp, end = 10.dp, top = 10.dp, bottom = 10.dp),
     ) {
         Column(
@@ -262,7 +263,7 @@ private fun ErrorState(
             modifier = Modifier.height(16.dp),
         )
         TextH40(
-            text = "Sorry, but something went wrong fetching your plans.",
+            text = stringResource(LR.string.winback_error_fetch_description),
             textAlign = TextAlign.Center,
         )
         Spacer(
