@@ -1,6 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.player.view.shelf
 
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Surface
@@ -32,6 +35,7 @@ fun MenuShelfItems(
     shelfViewModel: ShelfViewModel,
     normalBackgroundColor: Color = Color.Transparent,
     selectedBackgroundColor: Color = Color.Black,
+    navigationBarPadding: Boolean = false,
     onClick: ((ShelfItem, Boolean) -> Unit)? = null,
 ) {
     val uiState by shelfViewModel.uiState.collectAsStateWithLifecycle()
@@ -40,6 +44,7 @@ fun MenuShelfItems(
         selectedBackgroundColor = selectedBackgroundColor,
         normalBackgroundColor = normalBackgroundColor,
         onClick = onClick,
+        includeNavigationBarsPadding = navigationBarPadding,
         onMove = { from, to -> shelfViewModel.onShelfItemMove(from, to) },
     )
 }
@@ -49,6 +54,7 @@ private fun Content(
     state: UiState,
     selectedBackgroundColor: Color,
     normalBackgroundColor: Color,
+    includeNavigationBarsPadding: Boolean = true,
     onClick: ((ShelfItem, Boolean) -> Unit)? = null,
     onMove: (from: Int, to: Int) -> Unit,
 ) {
@@ -58,8 +64,10 @@ private fun Content(
         onMove(from.index, to.index)
     }
 
-    LazyColumn(state = lazyListState) {
-        items.forEachIndexed { index, listItem ->
+    LazyColumn(
+        state = lazyListState,
+    ) {
+        items.forEach { listItem ->
             when (listItem) {
                 is ShelfItem -> {
                     item(key = listItem.id) {
@@ -87,6 +95,14 @@ private fun Content(
                     }
                 }
             }
+        }
+        item {
+            Spacer(
+                modifier = Modifier
+                    // add the bottom padding in the list so the content is under the navigation bar but last item is above it
+                    .let { if (includeNavigationBarsPadding) it.navigationBarsPadding() else it }
+                    .height(8.dp),
+            )
         }
     }
 }

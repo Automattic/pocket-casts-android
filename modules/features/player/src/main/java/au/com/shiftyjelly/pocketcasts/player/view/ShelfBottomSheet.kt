@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.player.view
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -14,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
@@ -43,10 +45,12 @@ class ShelfBottomSheet : BaseDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = contentWithoutConsumedInsets {
+        // set the initial background color to black to stop the dialog from flashing white
+        setDialogTint(Color.BLACK)
         playerViewModel.playingEpisodeLive.observe(viewLifecycleOwner) { (_, backgroundColor) ->
             setDialogTint(backgroundColor)
         }
-        AppTheme(theme.activeTheme) {
+        AppTheme(Theme.ThemeType.DARK) {
             ShelfBottomSheetPage(
                 shelfViewModel = shelfViewModel,
                 shelfSharedViewModel = shelfSharedViewModel,
