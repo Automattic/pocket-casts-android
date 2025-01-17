@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-12-10 13:54:03+0000
+Translation-Revision-Date: 2025-01-16 09:54:04+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="settings_app_icon_pride">Pride</string>
+    <string name="manage_download_dismiss_content_description">Gérer le rejet de la bannière de téléchargement</string>
+    <string name="dismiss_manage_download_banner">Ignorer</string>
     <string name="up_next_shuffle_enable_confirmation_message">La lecture aléatoire est activée. Les épisodes seront lus de manière aléatoire.</string>
     <string name="number_ten">dix</string>
     <string name="number_five">cinq</string>
@@ -442,7 +445,6 @@ Language: fr
     <string name="error_invalid_password_length">Veuillez saisir un mot de passe d’au moins 6 caractères.</string>
     <string name="error_invalid_email_address">Veuillez saisir une adresse e-mail valide.</string>
     <string name="settings_privacy_crash_link_short">Associer votre compte</string>
-    <string name="settings_app_icon_pride_2023">Pride 2023</string>
     <string name="log_in_with_plus">Veuillez vous connecter avec un compte Plus</string>
     <string name="log_in_watch_requires_plus">Connectez-vous avec un compte Plus pour utiliser cette application ou souscrivez une option payante en vous rendant sur le site</string>
     <string name="enter_password">Saisissez un mot de passe</string>

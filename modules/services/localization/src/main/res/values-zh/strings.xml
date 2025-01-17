@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-12-10 09:54:04+0000
+Translation-Revision-Date: 2025-01-15 10:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="settings_app_icon_pride">骄傲</string>
+    <string name="manage_download_dismiss_content_description">管理下载横幅关闭</string>
+    <string name="dismiss_manage_download_banner">忽略</string>
     <string name="up_next_shuffle_enable_confirmation_message">随机播放功能已启用。 剧集将按随机顺序播放。</string>
     <string name="number_ten">十</string>
     <string name="number_five">五</string>
@@ -442,7 +445,6 @@ Language: zh_CN
     <string name="error_invalid_password_length">请输入密码，至少包含 6 个字符。</string>
     <string name="error_invalid_email_address">请输入有效的电子邮箱地址。</string>
     <string name="settings_privacy_crash_link_short">关联您的账户</string>
-    <string name="settings_app_icon_pride_2023">2023 年骄傲月</string>
     <string name="log_in_with_plus">请使用 Plus 账户登录</string>
     <string name="log_in_watch_requires_plus">使用 Plus 账户登录以使用此应用或升级访问</string>
     <string name="enter_password">输入密码</string>
