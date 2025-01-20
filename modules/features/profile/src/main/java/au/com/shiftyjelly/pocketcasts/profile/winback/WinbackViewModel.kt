@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchasesState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -39,18 +40,25 @@ class WinbackViewModel @Inject constructor(
             val plansResult = plansDeferred.await()
             val activePurchaseResult = activePurchaseDeferred.await()
 
-            val productsDetails = plansResult?.first.orEmpty()
-            val plans = plansResult?.second
-            val purchases = activePurchaseResult?.first.orEmpty()
-            val activePurchase = activePurchaseResult?.second
+            val productsDetails = plansResult.first
+            val plans = plansResult.second
+            val purchases = activePurchaseResult.first
+            val activePurchase = activePurchaseResult.second
 
             _uiState.value = _uiState.value.copy(
                 productsDetails = productsDetails,
                 purchases = purchases,
-                subscriptionPlansState = if (plans == null || activePurchase == null) {
-                    SubscriptionPlansState.Failure
-                } else {
-                    SubscriptionPlansState.Loaded(activePurchase, plans)
+                subscriptionPlansState = when (activePurchase) {
+                    is ActivePurchaseResult.Found -> if (plans != null) {
+                        SubscriptionPlansState.Loaded(activePurchase.purchase, plans)
+                    } else {
+                        SubscriptionPlansState.Failure(FailureReason.Default)
+                    }
+
+                    is ActivePurchaseResult.NotFound -> {
+                        LogBuffer.w(LogBuffer.TAG_SUBSCRIPTIONS, "Failed to load active purchase: ${activePurchase.reason}")
+                        SubscriptionPlansState.Failure(activePurchase.reason)
+                    }
                 },
             )
         }
@@ -58,12 +66,12 @@ class WinbackViewModel @Inject constructor(
 
     private suspend fun loadPlans() = when (val state = subscriptionManager.loadProducts()) {
         is ProductDetailsState.Loaded -> state.productDetails to state.productDetails.toSubscriptionPlans()
-        is ProductDetailsState.Failure -> null
+        is ProductDetailsState.Failure -> emptyList<ProductDetails>() to null
     }
 
     private suspend fun loadActivePurchase() = when (val state = subscriptionManager.loadPurchases()) {
         is PurchasesState.Loaded -> state.purchases to state.purchases.findActivePurchase()
-        is PurchasesState.Failure -> null
+        is PurchasesState.Failure -> emptyList<Purchase>() to ActivePurchaseResult.NotFound(FailureReason.Default)
     }
 
     private fun List<ProductDetails>.toSubscriptionPlans() = map(subscriptionMapper::mapFromProductDetails)
@@ -71,14 +79,35 @@ class WinbackViewModel @Inject constructor(
         .map(Subscription.Simple::toPlan)
         .sortedWith(PlanComparator)
 
-    private fun List<Purchase>.findActivePurchase(): ActivePurchase? {
-        val purchase = filter(Purchase::isAcknowledged).singleOrNull()
-        val orderId = purchase?.orderId
-        val productId = purchase?.products?.singleOrNull()
-        return if (orderId != null && productId != null) {
-            ActivePurchase(orderId, productId)
-        } else {
-            null
+    private fun List<Purchase>.findActivePurchase(): ActivePurchaseResult {
+        val acknowledgedPurchases = filter(Purchase::isAcknowledged)
+
+        if (acknowledgedPurchases.isEmpty()) {
+            return ActivePurchaseResult.NotFound(FailureReason.NoPurchases)
+        }
+        if (acknowledgedPurchases.size > 1) {
+            return ActivePurchaseResult.NotFound(FailureReason.TooManyPurchases)
+        }
+
+        val purchase = acknowledgedPurchases.single()
+        val orderId = purchase.orderId
+
+        return when {
+            orderId == null -> {
+                ActivePurchaseResult.NotFound(FailureReason.NoOrderId)
+            }
+
+            purchase.products.isEmpty() -> {
+                ActivePurchaseResult.NotFound(FailureReason.NoProducts)
+            }
+
+            purchase.products.size == 1 -> {
+                ActivePurchaseResult.Found(ActivePurchase(orderId, purchase.products.single()))
+            }
+
+            else -> {
+                ActivePurchaseResult.NotFound(FailureReason.TooManyProducts)
+            }
         }
     }
 
@@ -95,12 +124,19 @@ class WinbackViewModel @Inject constructor(
             )
         }
     }
+
+    private sealed interface ActivePurchaseResult {
+        data class Found(val purchase: ActivePurchase) : ActivePurchaseResult
+        data class NotFound(val reason: FailureReason) : ActivePurchaseResult
+    }
 }
 
 internal sealed interface SubscriptionPlansState {
     data object Loading : SubscriptionPlansState
 
-    data object Failure : SubscriptionPlansState
+    data class Failure(
+        val reason: FailureReason,
+    ) : SubscriptionPlansState
 
     data class Loaded(
         val activePurchase: ActivePurchase,
@@ -124,6 +160,15 @@ internal data class ActivePurchase(
 internal enum class BillingPeriod {
     Monthly,
     Yearly,
+}
+
+internal enum class FailureReason {
+    NoPurchases,
+    TooManyPurchases,
+    NoProducts,
+    TooManyProducts,
+    NoOrderId,
+    Default,
 }
 
 private fun Subscription.Simple.toPlan() = SubscriptionPlan(

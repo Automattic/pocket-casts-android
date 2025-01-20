@@ -90,6 +90,7 @@ class WinbackFragment : BaseDialogFragment() {
                     AvailablePlansPage(
                         plansState = state.subscriptionPlansState,
                         onSelectPlan = { },
+                        onGoToSubscriptions = { },
                         onReload = { viewModel.loadInitialPlans() },
                         onGoBack = { navController.popBackStack() },
                     )
