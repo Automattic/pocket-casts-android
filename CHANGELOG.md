@@ -1,6 +1,8 @@
 7.82
 -----
-
+*   Bug Fixes
+    *   Fix status bar theming during onboarding.
+        ([#3460](https://github.com/Automattic/pocket-casts-android/pull/3460)) 
 
 7.81
 -----
