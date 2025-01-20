@@ -52,14 +52,7 @@ steps:
     plugins: [$CI_TOOLKIT]
 
   - label: "Instrumented tests"
-    command: |
-      .buildkite/commands/restore-cache.sh
-      echo "--- :rubygems: Setting up Gems"
-      install_gems
-      echo "--- :closed_lock_with_key: Installing Secrets"
-      bundle exec fastlane run configure_apply
-      echo "--- 🧪 Testing"
-      bundle exec fastlane build_and_instrumented_test
+    command: ".buildkite/commands/run-instrumented-tests.sh"
     plugins: [$CI_TOOLKIT]
     artifact_paths:
       - "**/build/instrumented-tests/**/*"
