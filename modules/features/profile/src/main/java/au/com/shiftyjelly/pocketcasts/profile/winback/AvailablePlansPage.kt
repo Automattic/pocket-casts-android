@@ -83,6 +83,7 @@ internal fun AvailablePlansPage(
                 TooManyPurchases, TooManyProducts -> TooManyPurchasesState(
                     onGoToSubscriptions = onGoToSubscriptions,
                 )
+
                 NoPurchases, NoProducts, NoOrderId, Default -> ErrorState(
                     onReload = onReload,
                 )
@@ -282,12 +283,7 @@ private fun SubscriptionRow(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(8.dp))
-            .background(
-                color = when (MaterialTheme.theme.type) {
-                    ThemeType.INDIGO -> Color.White
-                    else -> MaterialTheme.theme.colors.primaryUi01
-                },
-            )
+            .background(MaterialTheme.theme.colors.primaryUi01Active)
             .then(
                 if (isSelected) {
                     Modifier.border(
@@ -386,7 +382,6 @@ private fun AvailablePlansPagePreview(
 ) {
     AppThemeWithBackground(
         themeType = theme,
-        backgroundColor = { MaterialTheme.theme.colors.primaryUi04 },
     ) {
         AvailablePlansPage(
             plansState = SubscriptionPlansState.Loaded(
@@ -440,7 +435,6 @@ private fun AvailablePlansPageFailureTooManyPreview(
 ) {
     AppThemeWithBackground(
         themeType = theme,
-        backgroundColor = { MaterialTheme.theme.colors.primaryUi04 },
     ) {
         AvailablePlansPage(
             plansState = SubscriptionPlansState.Failure(TooManyPurchases),
@@ -459,7 +453,6 @@ private fun AvailablePlansPageFailureDefaultPreview(
 ) {
     AppThemeWithBackground(
         themeType = theme,
-        backgroundColor = { MaterialTheme.theme.colors.primaryUi04 },
     ) {
         AvailablePlansPage(
             plansState = SubscriptionPlansState.Failure(Default),

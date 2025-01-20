@@ -36,7 +36,6 @@ import au.com.shiftyjelly.pocketcasts.settings.LogsPage
 import au.com.shiftyjelly.pocketcasts.settings.status.StatusPage
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class WinbackFragment : BaseDialogFragment() {
@@ -51,7 +50,6 @@ class WinbackFragment : BaseDialogFragment() {
 
         AppThemeWithBackground(
             themeType = theme.activeTheme,
-            backgroundColor = { MaterialTheme.theme.colors.primaryUi04 },
         ) {
             val navController = rememberNavController()
 
@@ -129,29 +127,18 @@ class WinbackFragment : BaseDialogFragment() {
     private fun DialogTintEffect(
         navController: NavHostController,
     ) {
-        var isBackgroundStyled by remember { mutableStateOf(false) }
         var isNavBarWhite by remember { mutableStateOf(false) }
         LaunchedEffect(navController) {
             navController.currentBackStackEntryFlow.collect { entry ->
-                isBackgroundStyled = entry.destination.route in routesWithAppBar
                 isNavBarWhite = entry.destination.route == WinbackNavRoutes.HelpAndFeedback
             }
         }
-        val backgroundTint by animateColorAsState(
-            animationSpec = colorAnimationSpec,
-            targetValue = with(MaterialTheme.theme.colors) { if (isBackgroundStyled) secondaryUi01 else primaryUi04 },
-        )
         val navigationBarTint by animateColorAsState(
             animationSpec = colorAnimationSpec,
-            targetValue = with(MaterialTheme.theme.colors) { if (isNavBarWhite) Color.White else primaryUi04 },
+            targetValue = if (isNavBarWhite) Color.White else MaterialTheme.theme.colors.primaryUi01 ,
         )
         LaunchedEffect(Unit) {
-            launch {
-                snapshotFlow { backgroundTint }.collect { tint -> setBackgroundTint(tint.toArgb()) }
-            }
-            launch {
-                snapshotFlow { navigationBarTint }.collect { tint -> setNavigationBarTint(tint.toArgb()) }
-            }
+            snapshotFlow { navigationBarTint }.collect { tint -> setNavigationBarTint(tint.toArgb()) }
         }
     }
 }
@@ -165,12 +152,6 @@ private object WinbackNavRoutes {
     const val StatusCheck = "StatusCheck"
     const val CancelConfirmation = "CancelConfirmation"
 }
-
-private val routesWithAppBar = listOf(
-    WinbackNavRoutes.HelpAndFeedback,
-    WinbackNavRoutes.SupportLogs,
-    WinbackNavRoutes.StatusCheck,
-)
 
 private val colorAnimationSpec = tween<Color>(350)
 private val intOffsetAnimationSpec = tween<IntOffset>(350)
