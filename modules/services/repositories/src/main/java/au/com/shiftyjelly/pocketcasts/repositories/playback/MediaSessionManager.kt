@@ -83,11 +83,8 @@ class MediaSessionManager(
         const val EXTRA_TRANSIENT = "pocketcasts_transient_loss"
         const val ACTION_NOT_SUPPORTED = "action_not_supported"
 
-        // there's an issue on Samsung phones that if you don't say you support ACTION_SKIP_TO_PREVIOUS and
-        // ACTION_SKIP_TO_NEXT then the skip buttons on the lock screen are disabled. We work around this
-        // by hiding our custom buttons on Samsung phones. It means the buttons in Android Auto aren't our
-        // custom skip buttons, but it all still works.
-        private val MANUFACTURERS_TO_HIDE_CUSTOM_SKIP_BUTTONS = listOf("samsung", "mercedes-benz")
+        // These manufacturers have issues when the skip to next/previous track are missing from the media session.
+        private val MANUFACTURERS_TO_HIDE_CUSTOM_SKIP_BUTTONS = listOf("mercedes-benz")
 
         fun calculateSearchQueryOptions(query: String): List<String> {
             val options = mutableListOf<String>()
@@ -277,20 +274,8 @@ class MediaSessionManager(
             return PlaybackStateCompat.ACTION_PLAY_FROM_SEARCH or
                 PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID or
                 prepareActions
-        } else if (shouldHideCustomSkipButtons()) {
-            return PlaybackStateCompat.ACTION_PLAY or
-                PlaybackStateCompat.ACTION_PAUSE or
-                PlaybackStateCompat.ACTION_SEEK_TO or
-                PlaybackStateCompat.ACTION_PLAY_FROM_SEARCH or
-                PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID or
-                PlaybackStateCompat.ACTION_PLAY_PAUSE or
-                PlaybackStateCompat.ACTION_STOP or
-                PlaybackStateCompat.ACTION_SKIP_TO_QUEUE_ITEM or
-                PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS or
-                PlaybackStateCompat.ACTION_SKIP_TO_NEXT or
-                prepareActions
         } else {
-            return PlaybackStateCompat.ACTION_PLAY or
+            val actions = PlaybackStateCompat.ACTION_PLAY or
                 PlaybackStateCompat.ACTION_PAUSE or
                 PlaybackStateCompat.ACTION_SEEK_TO or
                 PlaybackStateCompat.ACTION_PLAY_FROM_SEARCH or
@@ -298,7 +283,17 @@ class MediaSessionManager(
                 PlaybackStateCompat.ACTION_PLAY_PAUSE or
                 PlaybackStateCompat.ACTION_STOP or
                 PlaybackStateCompat.ACTION_SKIP_TO_QUEUE_ITEM or
+                PlaybackStateCompat.ACTION_FAST_FORWARD or
+                PlaybackStateCompat.ACTION_REWIND or
                 prepareActions
+
+            return if (shouldHideCustomSkipButtons()) {
+                PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS or
+                    PlaybackStateCompat.ACTION_SKIP_TO_NEXT or
+                    actions
+            } else {
+                actions
+            }
         }
     }
 
@@ -434,8 +429,8 @@ class MediaSessionManager(
 
     private fun addCustomActions(stateBuilder: PlaybackStateCompat.Builder, currentEpisode: BaseEpisode, playbackState: PlaybackState) {
         if (!shouldHideCustomSkipButtons()) {
-            addCustomAction(stateBuilder, APP_ACTION_SKIP_BACK, "Skip back", IR.drawable.auto_skipback)
-            addCustomAction(stateBuilder, APP_ACTION_SKIP_FWD, "Skip forward", IR.drawable.auto_skipforward)
+            addCustomAction(stateBuilder, APP_ACTION_SKIP_BACK, "Skip back", IR.drawable.media_skipback)
+            addCustomAction(stateBuilder, APP_ACTION_SKIP_FWD, "Skip forward", IR.drawable.media_skipforward)
         }
 
         val visibleCount = if (settings.customMediaActionsVisibility.value) MediaNotificationControls.MAX_VISIBLE_OPTIONS else 0
