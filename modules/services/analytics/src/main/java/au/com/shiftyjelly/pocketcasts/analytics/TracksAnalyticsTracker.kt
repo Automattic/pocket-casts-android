@@ -83,6 +83,10 @@ class TracksAnalyticsTracker @Inject constructor(
             PredefinedEventProperty.PLUS_SUBSCRIPTION_TIER to subscriptionTier,
             PredefinedEventProperty.PLUS_SUBSCRIPTION_PLATFORM to subscriptionPlatform,
             PredefinedEventProperty.PLUS_SUBSCRIPTION_FREQUENCY to subscriptionFrequency,
+            PredefinedEventProperty.THEME_SELECTED to settings.theme.value.analyticsValue,
+            PredefinedEventProperty.THEME_DARK_PREFERENCE to settings.darkThemePreference.value.analyticsValue,
+            PredefinedEventProperty.THEME_LIGHT_PREFERENCE to settings.lightThemePreference.value.analyticsValue,
+            PredefinedEventProperty.THEME_USE_SYSTEM_SETTINGS to settings.useSystemTheme.value,
             PredefinedEventProperty.PLATFORM to when (Util.getAppPlatform(appContext)) {
                 AppPlatform.Automotive -> "automotive"
                 AppPlatform.Phone -> "phone"
@@ -129,6 +133,10 @@ class TracksAnalyticsTracker @Inject constructor(
         PLUS_SUBSCRIPTION_PLATFORM("plus_subscription_platform"),
         PLUS_SUBSCRIPTION_FREQUENCY("plus_subscription_frequency"),
         PLATFORM("platform"),
+        THEME_SELECTED("theme_selected"),
+        THEME_DARK_PREFERENCE("theme_dark_preference"),
+        THEME_LIGHT_PREFERENCE("theme_light_preference"),
+        THEME_USE_SYSTEM_SETTINGS("theme_use_system_settings"),
     }
 
     companion object {
