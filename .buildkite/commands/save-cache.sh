@@ -17,7 +17,7 @@ echo ""
 
 # .buildkite/commands/lint.sh -> ./gradlew :app:lintRelease + ./gradlew :automotive:lintRelease :wear:lintRelease
 echo "--- 🧹 Download Lint Dependencies [Lint Apps]"
-./gradlew lintDebug
+./gradlew :app:lintDebug :automotive:lintDebug :wear:lintDebug
 echo ""
 
 # .buildkite/pipeline.yml -> ./gradlew testDebugUnitTest
