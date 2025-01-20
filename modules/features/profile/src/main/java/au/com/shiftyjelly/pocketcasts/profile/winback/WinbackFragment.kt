@@ -1,22 +1,30 @@
 package au.com.shiftyjelly.pocketcasts.profile.winback
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Snackbar
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -30,12 +38,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.settings.HelpPage
 import au.com.shiftyjelly.pocketcasts.settings.LogsPage
 import au.com.shiftyjelly.pocketcasts.settings.status.StatusPage
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
 class WinbackFragment : BaseDialogFragment() {
@@ -46,79 +57,109 @@ class WinbackFragment : BaseDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = content {
+        val scope = rememberCoroutineScope()
         val state by viewModel.uiState.collectAsState()
 
         AppThemeWithBackground(
             themeType = theme.activeTheme,
         ) {
             val navController = rememberNavController()
+            val snackbarHostState = remember { SnackbarHostState() }
 
-            DialogTintEffect(navController)
-
-            NavHost(
-                navController = navController,
-                startDestination = WinbackNavRoutes.WinbackOffer,
-                enterTransition = { slideInToStart() },
-                exitTransition = { slideOutToStart() },
-                popEnterTransition = { slideInToEnd() },
-                popExitTransition = { slideOutToEnd() },
-                modifier = Modifier.fillMaxSize(),
-            ) {
-                composable(WinbackNavRoutes.WinbackOffer) {
-                    WinbackOfferPage(
-                        onClaimOffer = {
-                            navController.navigate(WinbackNavRoutes.OfferClaimed) {
-                                popUpTo(WinbackNavRoutes.WinbackOffer) {
-                                    inclusive = true
+            Box {
+                NavHost(
+                    navController = navController,
+                    startDestination = WinbackNavRoutes.WinbackOffer,
+                    enterTransition = { slideInToStart() },
+                    exitTransition = { slideOutToStart() },
+                    popEnterTransition = { slideInToEnd() },
+                    popExitTransition = { slideOutToEnd() },
+                    modifier = Modifier.fillMaxSize(),
+                ) {
+                    composable(WinbackNavRoutes.WinbackOffer) {
+                        WinbackOfferPage(
+                            onClaimOffer = {
+                                navController.navigate(WinbackNavRoutes.OfferClaimed) {
+                                    popUpTo(WinbackNavRoutes.WinbackOffer) {
+                                        inclusive = true
+                                    }
                                 }
-                            }
-                        },
-                        onSeeAvailablePlans = { navController.navigate(WinbackNavRoutes.AvailablePlans) },
-                        onSeeHelpAndFeedback = { navController.navigate(WinbackNavRoutes.HelpAndFeedback) },
-                        onContinueToCancellation = { navController.navigate(WinbackNavRoutes.CancelConfirmation) },
-                    )
+                            },
+                            onSeeAvailablePlans = { navController.navigate(WinbackNavRoutes.AvailablePlans) },
+                            onSeeHelpAndFeedback = { navController.navigate(WinbackNavRoutes.HelpAndFeedback) },
+                            onContinueToCancellation = { navController.navigate(WinbackNavRoutes.CancelConfirmation) },
+                        )
+                    }
+                    composable(WinbackNavRoutes.OfferClaimed) {
+                        OfferClaimedPage(
+                            theme = theme.activeTheme,
+                            onConfirm = { dismiss() },
+                        )
+                    }
+                    composable(WinbackNavRoutes.AvailablePlans) {
+                        AvailablePlansPage(
+                            plansState = state.subscriptionPlansState,
+                            onSelectPlan = { },
+                            onGoToSubscriptions = {
+                                if (!goToPlayStoreSubscriptions()) {
+                                    scope.launch {
+                                        snackbarHostState.showSnackbar(getString(LR.string.error))
+                                    }
+                                }
+                            },
+                            onReload = { viewModel.loadInitialPlans() },
+                            onGoBack = { navController.popBackStack() },
+                        )
+                    }
+                    composable(WinbackNavRoutes.HelpAndFeedback) {
+                        HelpPage(
+                            activity = requireActivity(),
+                            onShowLogs = { navController.navigate(WinbackNavRoutes.SupportLogs) },
+                            onShowStatusPage = { navController.navigate(WinbackNavRoutes.StatusCheck) },
+                            onGoBack = { navController.popBackStack() },
+                        )
+                    }
+                    composable(WinbackNavRoutes.SupportLogs) {
+                        LogsPage(
+                            bottomInset = 0.dp,
+                            onBackPressed = { navController.popBackStack() },
+                        )
+                    }
+                    composable(WinbackNavRoutes.StatusCheck) {
+                        StatusPage(
+                            bottomInset = 0.dp,
+                            onBackPressed = { navController.popBackStack() },
+                        )
+                    }
+                    composable(WinbackNavRoutes.CancelConfirmation) {
+                        CancelConfirmationPage(
+                            onKeepSubscription = { dismiss() },
+                            onCancelSubscriptions = {
+                                if (!goToPlayStoreSubscriptions()) {
+                                    scope.launch {
+                                        snackbarHostState.showSnackbar(getString(LR.string.error))
+                                    }
+                                }
+                            },
+                        )
+                    }
                 }
-                composable(WinbackNavRoutes.OfferClaimed) {
-                    OfferClaimedPage(
-                        theme = theme.activeTheme,
-                        onConfirm = { dismiss() },
-                    )
-                }
-                composable(WinbackNavRoutes.AvailablePlans) {
-                    AvailablePlansPage(
-                        plansState = state.subscriptionPlansState,
-                        onSelectPlan = { },
-                        onGoToSubscriptions = { },
-                        onReload = { viewModel.loadInitialPlans() },
-                        onGoBack = { navController.popBackStack() },
-                    )
-                }
-                composable(WinbackNavRoutes.HelpAndFeedback) {
-                    HelpPage(
-                        activity = requireActivity(),
-                        onShowLogs = { navController.navigate(WinbackNavRoutes.SupportLogs) },
-                        onShowStatusPage = { navController.navigate(WinbackNavRoutes.StatusCheck) },
-                        onGoBack = { navController.popBackStack() },
-                    )
-                }
-                composable(WinbackNavRoutes.SupportLogs) {
-                    LogsPage(
-                        bottomInset = 0.dp,
-                        onBackPressed = { navController.popBackStack() },
-                    )
-                }
-                composable(WinbackNavRoutes.StatusCheck) {
-                    StatusPage(
-                        bottomInset = 0.dp,
-                        onBackPressed = { navController.popBackStack() },
-                    )
-                }
-                composable(WinbackNavRoutes.CancelConfirmation) {
-                    CancelConfirmationPage(
-                        onKeepSubscription = { dismiss() },
-                        onCancelSubscription = { Toast.makeText(requireActivity(), "Go to Play Store subscription", Toast.LENGTH_LONG).show() },
-                    )
-                }
+
+                DialogTintEffect(navController)
+
+                SnackbarHost(
+                    hostState = snackbarHostState,
+                    snackbar = { data ->
+                        val isLightTheme = MaterialTheme.theme.isLight
+                        Snackbar(
+                            backgroundColor = if (isLightTheme) Color.Black else Color.White,
+                            content = { TextH50(data.message, color = if (isLightTheme) Color.White else Color.Black) },
+                        )
+                    },
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(16.dp),
+                )
             }
         }
     }
@@ -135,11 +176,19 @@ class WinbackFragment : BaseDialogFragment() {
         }
         val navigationBarTint by animateColorAsState(
             animationSpec = colorAnimationSpec,
-            targetValue = if (isNavBarWhite) Color.White else MaterialTheme.theme.colors.primaryUi01 ,
+            targetValue = if (isNavBarWhite) Color.White else MaterialTheme.theme.colors.primaryUi01,
         )
         LaunchedEffect(Unit) {
             snapshotFlow { navigationBarTint }.collect { tint -> setNavigationBarTint(tint.toArgb()) }
         }
+    }
+
+    private fun goToPlayStoreSubscriptions(): Boolean {
+        val uri = Uri.parse("https://play.google.com/store/account/subscriptions")
+            .buildUpon()
+            .appendQueryParameter("package", requireContext().packageName)
+            .build()
+        return runCatching { startActivity(Intent(Intent.ACTION_VIEW, uri)) }.isSuccess
     }
 }
 

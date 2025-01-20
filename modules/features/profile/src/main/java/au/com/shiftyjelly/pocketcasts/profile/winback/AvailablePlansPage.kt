@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.Devices
+import au.com.shiftyjelly.pocketcasts.compose.bars.BottomSheetAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
@@ -72,28 +73,35 @@ internal fun AvailablePlansPage(
     onGoBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    AnimatedContent(
-        targetState = plansState,
-        modifier = modifier,
-    ) { state ->
-        when (state) {
-            is SubscriptionPlansState.Loading -> LoadingState()
+    Column(
+        modifier = Modifier.nestedScroll(rememberViewInteropNestedScrollConnection()),
+    ) {
+        BottomSheetAppBar(
+            onNavigationClick = onGoBack,
+        )
+        AnimatedContent(
+            targetState = plansState,
+            modifier = modifier,
+        ) { state ->
+            when (state) {
+                is SubscriptionPlansState.Loading -> LoadingState()
 
-            is SubscriptionPlansState.Failure -> when (state.reason) {
-                TooManyPurchases, TooManyProducts -> TooManyPurchasesState(
-                    onGoToSubscriptions = onGoToSubscriptions,
-                )
+                is SubscriptionPlansState.Failure -> when (state.reason) {
+                    TooManyPurchases, TooManyProducts -> TooManyPurchasesState(
+                        onGoToSubscriptions = onGoToSubscriptions,
+                    )
 
-                NoPurchases, NoProducts, NoOrderId, Default -> ErrorState(
-                    onReload = onReload,
+                    NoPurchases, NoProducts, NoOrderId, Default -> ErrorState(
+                        onReload = onReload,
+                    )
+                }
+
+                is SubscriptionPlansState.Loaded -> LoadedState(
+                    userPlanId = state.activePurchase.productId,
+                    plans = state.plans,
+                    onSelectPlan = onSelectPlan,
                 )
             }
-
-            is SubscriptionPlansState.Loaded -> LoadedState(
-                userPlanId = state.activePurchase.productId,
-                plans = state.plans,
-                onSelectPlan = onSelectPlan,
-            )
         }
     }
 }
@@ -109,7 +117,6 @@ private fun LoadedState(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 20.dp)
-            .nestedScroll(rememberViewInteropNestedScrollConnection())
             .verticalScroll(rememberScrollState()),
     ) {
         Spacer(
@@ -157,7 +164,8 @@ private fun TooManyPurchasesState(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 20.dp),
+            .padding(horizontal = 20.dp)
+            .verticalScroll(rememberScrollState()),
     ) {
         Spacer(
             modifier = Modifier.height(64.dp),
@@ -216,7 +224,8 @@ private fun ErrorState(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 48.dp),
+            .padding(horizontal = 48.dp)
+            .verticalScroll(rememberScrollState()),
     ) {
         Spacer(
             modifier = Modifier.weight(3f),
