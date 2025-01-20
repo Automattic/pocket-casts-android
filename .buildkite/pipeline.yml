@@ -65,14 +65,7 @@ steps:
       - "**/build/instrumented-tests/**/*"
 
   - label: "Assemble release APK"
-    command: |
-      .buildkite/commands/restore-cache.sh
-      echo "--- :rubygems: Setting up Gems"
-      install_gems
-      echo "--- :closed_lock_with_key: Installing Secrets"
-      bundle exec fastlane run configure_apply
-      echo "--- ⚙️ Building release variant"
-      ./gradlew assembleRelease -PskipSentryProguardMappingUpload=true
+    command: ".buildkite/commands/assemble-release-apk.sh"
     plugins: [ $CI_TOOLKIT ]
     artifact_paths:
       - "**/build/outputs/apk/**/*"
