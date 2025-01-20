@@ -32,10 +32,7 @@ steps:
           - "**/build/reports/lint-results*.*"
 
   - label: 'Unit tests'
-    command: |
-      .buildkite/commands/restore-cache.sh
-      echo "--- 🧪 Testing"
-      ./gradlew testDebugUnitTest
+    command: ".buildkite/commands/run-unit-tests.sh"
     plugins: [$CI_TOOLKIT]
 
   - label: 'Dependency diff'
