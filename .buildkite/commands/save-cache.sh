@@ -22,7 +22,7 @@ echo ""
 
 # .buildkite/pipeline.yml -> ./gradlew testDebugUnitTest
 echo "--- 🧪 Download Unit Test Dependencies [Assemble Unit Tests]"
-./gradlew testDebugUnitTest
+./gradlew assembleDebugUnitTest
 echo ""
 
 # .buildkite/pipeline.yml -> build_and_instrumented_test
