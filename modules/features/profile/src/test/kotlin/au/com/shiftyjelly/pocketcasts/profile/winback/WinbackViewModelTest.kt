@@ -15,7 +15,6 @@ import com.android.billingclient.api.Purchase
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.doReturn
@@ -84,9 +83,9 @@ class WinbackViewModelTest {
         val viewModel = WinbackViewModel(subscriptionManager)
 
         viewModel.uiState.test {
-            val availablePlans = awaitItem().subscriptionPlansState
+            val availablePlans = awaitItem().subscriptionPlansState as SubscriptionPlansState.Failure
 
-            assertTrue(availablePlans is SubscriptionPlansState.Failure)
+            assertEquals(FailureReason.NoPurchases, availablePlans.reason)
         }
     }
 
@@ -100,9 +99,9 @@ class WinbackViewModelTest {
         val viewModel = WinbackViewModel(subscriptionManager)
 
         viewModel.uiState.test {
-            val availablePlans = awaitItem().subscriptionPlansState
+            val availablePlans = awaitItem().subscriptionPlansState as SubscriptionPlansState.Failure
 
-            assertTrue(availablePlans is SubscriptionPlansState.Failure)
+            assertEquals(FailureReason.NoOrderId, availablePlans.reason)
         }
     }
 
@@ -119,9 +118,9 @@ class WinbackViewModelTest {
         val viewModel = WinbackViewModel(subscriptionManager)
 
         viewModel.uiState.test {
-            val availablePlans = awaitItem().subscriptionPlansState
+            val availablePlans = awaitItem().subscriptionPlansState as SubscriptionPlansState.Failure
 
-            assertTrue(availablePlans is SubscriptionPlansState.Failure)
+            assertEquals(FailureReason.TooManyPurchases, availablePlans.reason)
         }
     }
 
@@ -142,9 +141,25 @@ class WinbackViewModelTest {
         val viewModel = WinbackViewModel(subscriptionManager)
 
         viewModel.uiState.test {
-            val availablePlans = awaitItem().subscriptionPlansState
+            val availablePlans = awaitItem().subscriptionPlansState as SubscriptionPlansState.Failure
 
-            assertTrue(availablePlans is SubscriptionPlansState.Failure)
+            assertEquals(FailureReason.TooManyProducts, availablePlans.reason)
+        }
+    }
+
+    @Test
+    fun `subscription plans for user with purchase with no products`() = runTest {
+        val purchases = listOf(createPurchase(productIds = emptyList()))
+
+        wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
+        wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
+
+        val viewModel = WinbackViewModel(subscriptionManager)
+
+        viewModel.uiState.test {
+            val availablePlans = awaitItem().subscriptionPlansState as SubscriptionPlansState.Failure
+
+            assertEquals(FailureReason.NoProducts, availablePlans.reason)
         }
     }
 
