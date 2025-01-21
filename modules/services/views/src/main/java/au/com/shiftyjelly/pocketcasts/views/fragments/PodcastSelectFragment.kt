@@ -181,6 +181,7 @@ class PodcastSelectFragment : BaseFragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        analyticsTracker.track(AnalyticsEvent.SETTINGS_SELECT_PODCASTS_DISMISSED)
         disposables.clear()
         trackChange()
         binding = null
