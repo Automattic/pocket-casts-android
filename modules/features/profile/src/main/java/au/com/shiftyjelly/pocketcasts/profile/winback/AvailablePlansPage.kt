@@ -35,6 +35,8 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -43,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.Devices
+import au.com.shiftyjelly.pocketcasts.compose.bars.BottomSheetAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
@@ -51,6 +54,12 @@ import au.com.shiftyjelly.pocketcasts.compose.components.rememberViewInteropNest
 import au.com.shiftyjelly.pocketcasts.compose.pocketRed
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.profile.winback.FailureReason.Default
+import au.com.shiftyjelly.pocketcasts.profile.winback.FailureReason.NoOrderId
+import au.com.shiftyjelly.pocketcasts.profile.winback.FailureReason.NoProducts
+import au.com.shiftyjelly.pocketcasts.profile.winback.FailureReason.NoPurchases
+import au.com.shiftyjelly.pocketcasts.profile.winback.FailureReason.TooManyProducts
+import au.com.shiftyjelly.pocketcasts.profile.winback.FailureReason.TooManyPurchases
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -59,26 +68,40 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 internal fun AvailablePlansPage(
     plansState: SubscriptionPlansState,
     onSelectPlan: (SubscriptionPlan) -> Unit,
+    onGoToSubscriptions: () -> Unit,
     onReload: () -> Unit,
     onGoBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    AnimatedContent(
-        targetState = plansState,
-        modifier = modifier,
-    ) { state ->
-        when (state) {
-            is SubscriptionPlansState.Loading -> LoadingState()
+    Column(
+        modifier = Modifier.nestedScroll(rememberViewInteropNestedScrollConnection()),
+    ) {
+        BottomSheetAppBar(
+            onNavigationClick = onGoBack,
+        )
+        AnimatedContent(
+            targetState = plansState,
+            modifier = modifier,
+        ) { state ->
+            when (state) {
+                is SubscriptionPlansState.Loading -> LoadingState()
 
-            is SubscriptionPlansState.Failure -> ErrorState(
-                onReload = onReload,
-            )
+                is SubscriptionPlansState.Failure -> when (state.reason) {
+                    TooManyPurchases, TooManyProducts -> TooManyPurchasesState(
+                        onGoToSubscriptions = onGoToSubscriptions,
+                    )
 
-            is SubscriptionPlansState.Loaded -> LoadedState(
-                userPlanId = state.activePurchase.productId,
-                plans = state.plans,
-                onSelectPlan = onSelectPlan,
-            )
+                    NoPurchases, NoProducts, NoOrderId, Default -> ErrorState(
+                        onReload = onReload,
+                    )
+                }
+
+                is SubscriptionPlansState.Loaded -> LoadedState(
+                    userPlanId = state.activePurchase.productId,
+                    plans = state.plans,
+                    onSelectPlan = onSelectPlan,
+                )
+            }
         }
     }
 }
@@ -94,7 +117,6 @@ private fun LoadedState(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 20.dp)
-            .nestedScroll(rememberViewInteropNestedScrollConnection())
             .verticalScroll(rememberScrollState()),
     ) {
         Spacer(
@@ -135,6 +157,113 @@ private fun LoadedState(
 }
 
 @Composable
+private fun TooManyPurchasesState(
+    onGoToSubscriptions: () -> Unit,
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 20.dp)
+            .verticalScroll(rememberScrollState()),
+    ) {
+        Spacer(
+            modifier = Modifier.height(64.dp),
+        )
+        PocketCastsLogo()
+        Spacer(
+            modifier = Modifier.height(20.dp),
+        )
+        Text(
+            text = stringResource(LR.string.winback_too_many_subscritpions_title),
+            fontSize = 28.sp,
+            fontWeight = FontWeight.Bold,
+            lineHeight = 38.5.sp,
+            color = MaterialTheme.theme.colors.primaryText01,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(
+            modifier = Modifier.height(8.dp),
+        )
+        TextP50(
+            text = stringResource(LR.string.winback_too_many_subscritpions_note),
+            color = MaterialTheme.theme.colors.primaryText02,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(horizontal = 4.dp),
+        )
+        Spacer(
+            modifier = Modifier.weight(1f),
+        )
+        ManageSubscriptions(
+            onClick = onGoToSubscriptions,
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+        )
+        Spacer(
+            modifier = Modifier.height(52.dp),
+        )
+    }
+}
+
+@Composable
+private fun LoadingState() {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier.fillMaxSize(),
+    ) {
+        CircularProgressIndicator(
+            color = MaterialTheme.theme.colors.secondaryIcon01,
+        )
+    }
+}
+
+@Composable
+private fun ErrorState(
+    onReload: () -> Unit,
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 48.dp)
+            .verticalScroll(rememberScrollState()),
+    ) {
+        Spacer(
+            modifier = Modifier.weight(3f),
+        )
+        Image(
+            painter = painterResource(IR.drawable.ic_warning),
+            colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.primaryIcon03),
+            contentDescription = null,
+            modifier = Modifier.size(40.dp),
+        )
+        Spacer(
+            modifier = Modifier.height(16.dp),
+        )
+        TextH40(
+            text = stringResource(LR.string.winback_error_fetch_description),
+            textAlign = TextAlign.Center,
+        )
+        Spacer(
+            modifier = Modifier.height(16.dp),
+        )
+        Button(
+            onClick = onReload,
+            shape = RoundedCornerShape(percent = 100),
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = MaterialTheme.theme.colors.primaryInteractive03,
+            ),
+        ) {
+            TextP40(
+                text = stringResource(LR.string.try_again),
+            )
+        }
+        Spacer(
+            modifier = Modifier.weight(5f),
+        )
+    }
+}
+
+@Composable
 private fun PocketCastsLogo(
     modifier: Modifier = Modifier,
 ) {
@@ -163,12 +292,7 @@ private fun SubscriptionRow(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(8.dp))
-            .background(
-                color = when (MaterialTheme.theme.type) {
-                    ThemeType.INDIGO -> Color.White
-                    else -> MaterialTheme.theme.colors.primaryUi01
-                },
-            )
+            .background(MaterialTheme.theme.colors.primaryUi01Active)
             .then(
                 if (isSelected) {
                     Modifier.border(
@@ -236,59 +360,19 @@ private fun CheckMark(
 }
 
 @Composable
-private fun LoadingState() {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier.fillMaxSize(),
-    ) {
-        CircularProgressIndicator(
-            color = MaterialTheme.theme.colors.secondaryIcon01,
-        )
-    }
-}
-
-@Composable
-private fun ErrorState(
-    onReload: () -> Unit,
+private fun ManageSubscriptions(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 48.dp),
+    Box(
+        modifier = modifier
+            .clickable(onClick = onClick)
+            .semantics(mergeDescendants = true) { role = Role.Button },
     ) {
-        Spacer(
-            modifier = Modifier.weight(3f),
-        )
-        Image(
-            painter = painterResource(IR.drawable.ic_warning),
-            colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.primaryIcon03),
-            contentDescription = null,
-            modifier = Modifier.size(40.dp),
-        )
-        Spacer(
-            modifier = Modifier.height(16.dp),
-        )
-        TextH40(
-            text = stringResource(LR.string.winback_error_fetch_description),
+        TextH30(
+            text = stringResource(LR.string.winback_too_many_subscritpions_button_label),
             textAlign = TextAlign.Center,
-        )
-        Spacer(
-            modifier = Modifier.height(16.dp),
-        )
-        Button(
-            onClick = onReload,
-            shape = RoundedCornerShape(percent = 100),
-            colors = ButtonDefaults.buttonColors(
-                backgroundColor = MaterialTheme.theme.colors.primaryInteractive03,
-            ),
-        ) {
-            TextP40(
-                text = stringResource(LR.string.try_again),
-            )
-        }
-        Spacer(
-            modifier = Modifier.weight(5f),
+            modifier = Modifier.padding(16.dp),
         )
     }
 }
@@ -307,7 +391,6 @@ private fun AvailablePlansPagePreview(
 ) {
     AppThemeWithBackground(
         themeType = theme,
-        backgroundColor = { MaterialTheme.theme.colors.primaryUi04 },
     ) {
         AvailablePlansPage(
             plansState = SubscriptionPlansState.Loaded(
@@ -347,6 +430,7 @@ private fun AvailablePlansPagePreview(
                 ),
             ),
             onSelectPlan = {},
+            onGoToSubscriptions = {},
             onReload = {},
             onGoBack = {},
         )
@@ -355,16 +439,34 @@ private fun AvailablePlansPagePreview(
 
 @Preview(device = Devices.PortraitRegular)
 @Composable
-private fun AvailablePlansPageFailurePreview(
+private fun AvailablePlansPageFailureTooManyPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) theme: ThemeType,
 ) {
     AppThemeWithBackground(
         themeType = theme,
-        backgroundColor = { MaterialTheme.theme.colors.primaryUi04 },
     ) {
         AvailablePlansPage(
-            plansState = SubscriptionPlansState.Failure,
+            plansState = SubscriptionPlansState.Failure(TooManyPurchases),
             onSelectPlan = {},
+            onGoToSubscriptions = {},
+            onReload = {},
+            onGoBack = {},
+        )
+    }
+}
+
+@Preview(device = Devices.PortraitRegular)
+@Composable
+private fun AvailablePlansPageFailureDefaultPreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) theme: ThemeType,
+) {
+    AppThemeWithBackground(
+        themeType = theme,
+    ) {
+        AvailablePlansPage(
+            plansState = SubscriptionPlansState.Failure(Default),
+            onSelectPlan = {},
+            onGoToSubscriptions = {},
             onReload = {},
             onGoBack = {},
         )

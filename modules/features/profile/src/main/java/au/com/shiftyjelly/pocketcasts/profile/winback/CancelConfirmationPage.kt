@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 internal fun CancelConfirmationPage(
     onKeepSubscription: () -> Unit,
-    onCancelSubscription: () -> Unit,
+    onCancelSubscriptions: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -63,7 +63,7 @@ internal fun CancelConfirmationPage(
                 .height(64.dp)
                 .fillMaxWidth()
                 .background(Color(0xFFEDDDD1))
-                .clickable(onClick = onCancelSubscription),
+                .clickable(onClick = onCancelSubscriptions),
         ) {
             Text(
                 text = "Cancel subscription",
