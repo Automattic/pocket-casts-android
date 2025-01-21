@@ -2,11 +2,6 @@ package au.com.shiftyjelly.pocketcasts.repositories.subscription
 
 import android.app.Activity
 import android.content.Context
-import androidx.lifecycle.AtomicReference
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.ClientConnection.ClientConnectionState.Connected
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.ClientConnection.ClientConnectionState.Connecting
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.ClientConnection.ClientConnectionState.Disconnected
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.ClientConnection.ClientConnectionState.Uninitialized
 import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClientStateListener
@@ -134,48 +129,32 @@ class BillingClientWrapper @Inject constructor(
 }
 
 private class ClientConnection(
-    context: Context,
-    listener: PurchasesUpdatedListener,
+    private val context: Context,
+    private val listener: PurchasesUpdatedListener,
 ) {
-    private val connectionState = AtomicReference<ClientConnectionState>(Uninitialized)
     private val connectionMutex = Mutex()
 
-    private val billingClient = run {
-        val params = PendingPurchasesParams.newBuilder()
-            .enablePrepaidPlans()
-            .enableOneTimeProducts()
-            .build()
-        BillingClient.newBuilder(context)
-            .enablePendingPurchases(params)
-            .setListener(listener)
-            .build()
-    }
-
     suspend fun <T> withConnectedClient(block: suspend (BillingClient) -> T): T {
-        connect()
-        return block(billingClient)
+        val client = connect()
+        return block(client)
     }
 
     private suspend fun connect() = connectionMutex.withLock {
-        val state = connectionState.getAndUpdate { currentState ->
-            if (currentState != Connected) Connecting else currentState
-        }
-        logSubscriptionInfo("Billing client connection: $state")
-        if (state == Disconnected || state == Uninitialized) {
-            val isConnectionEstablished = setupBillingClient()
+        val client = getActiveClient()
+        logSubscriptionInfo("Billing client connected: ${client.isReady}")
+        if (!client.isReady) {
+            val isConnectionEstablished = setupBillingClient(client)
             if (!isConnectionEstablished) {
-                billingClient.endConnection()
-            }
-            connectionState.updateAndGet { currentState ->
-                if (isConnectionEstablished && currentState == Connecting) Connected else Disconnected
+                client.endConnection()
             }
         }
+        client
     }
 
-    private suspend fun setupBillingClient(): Boolean {
+    private suspend fun setupBillingClient(client: BillingClient): Boolean {
         logSubscriptionInfo("Connecting to billing client")
         return suspendCancellableCoroutine<Boolean> { continuation ->
-            billingClient.startConnection(object : BillingClientStateListener {
+            client.startConnection(object : BillingClientStateListener {
                 override fun onBillingSetupFinished(billingResult: BillingResult) {
                     logSubscriptionInfo("Billing setup finished: $billingResult")
                     continuation.resume(billingResult.responseCode == BillingClient.BillingResponseCode.OK)
@@ -183,12 +162,7 @@ private class ClientConnection(
 
                 override fun onBillingServiceDisconnected() {
                     logSubscriptionWarning("Billing client disconnected")
-
-                    // Emitting disconnected state here as well as this an ongoing listener
-                    // And we  want to update the status if this changes
-                    billingClient.endConnection()
-                    connectionState.set(Disconnected)
-
+                    client.endConnection()
                     if (continuation.isActive) {
                         continuation.resume(false)
                     }
@@ -197,11 +171,29 @@ private class ClientConnection(
         }
     }
 
-    private enum class ClientConnectionState {
-        Uninitialized,
-        Disconnected,
-        Connecting,
-        Connected,
+    private var billingClient: BillingClient? = null
+
+    private fun getActiveClient(): BillingClient {
+        val currentClient = billingClient
+        return if (currentClient == null || !currentClient.isReady) {
+            if (currentClient != null) {
+                currentClient.endConnection()
+            }
+            createBillingClient().also { billingClient = it }
+        } else {
+            currentClient
+        }
+    }
+
+    private fun createBillingClient(): BillingClient {
+        val params = PendingPurchasesParams.newBuilder()
+            .enablePrepaidPlans()
+            .enableOneTimeProducts()
+            .build()
+        return BillingClient.newBuilder(context)
+            .enablePendingPurchases(params)
+            .setListener(listener)
+            .build()
     }
 }
 
