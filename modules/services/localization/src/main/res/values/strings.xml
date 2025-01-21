@@ -2297,5 +2297,6 @@
     <string name="winback_too_many_subscritpions_note">You have more than one active Pocket&#160;Casts subscription. Please manage your subscriptions in the Play&#160;Store to avoid duplicate charges.</string>
     <string name="winback_too_many_subscritpions_button_label">Manage subscriptions in Play&#160;Store</string>
     <string name="winback_error_fetch_description">Sorry, but something went wrong fetching your plans.</string>
+    <string name="winback_changing_plan">Changing plan</string>
 
 </resources>

@@ -161,7 +161,7 @@ private fun LoadedState(
         }
         if (isChangingPlan) {
             ProgressDialog(
-                text = "Changing plan",
+                text = stringResource(LR.string.winback_changing_plan),
                 onDismiss = {},
             )
         }
