@@ -1,11 +1,13 @@
 package au.com.shiftyjelly.pocketcasts.profile.winback
 
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchaseEvent
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchasesState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -13,10 +15,14 @@ import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.reactive.asFlow
+import timber.log.Timber
 
 @HiltViewModel
 class WinbackViewModel @Inject constructor(
@@ -56,11 +62,88 @@ class WinbackViewModel @Inject constructor(
                     }
 
                     is ActivePurchaseResult.NotFound -> {
-                        LogBuffer.w(LogBuffer.TAG_SUBSCRIPTIONS, "Failed to load active purchase: ${activePurchase.reason}")
+                        logWarning("Failed to load active purchase: ${activePurchase.reason}")
                         SubscriptionPlansState.Failure(activePurchase.reason)
                     }
                 },
             )
+        }
+    }
+
+    private var changePlanJob: Job? = null
+
+    internal fun changePlan(
+        activity: AppCompatActivity,
+        newPlan: SubscriptionPlan,
+    ) {
+        if (changePlanJob?.isActive == true) {
+            return
+        }
+
+        val loadedState = (_uiState.value.subscriptionPlansState as? SubscriptionPlansState.Loaded) ?: run {
+            logWarning("Failed to start change product flow. Subscriptions are not loaded.")
+            return
+        }
+        val currentPurchase = _uiState.value.purchases.find { it.orderId == loadedState.activePurchase.orderId } ?: run {
+            logWarning("Failed to start change product flow. No matching current purchase.")
+            return
+        }
+        val newProduct = _uiState.value.productsDetails.find { it.productId == newPlan.productId } ?: run {
+            logWarning("Failed to start change product flow. No matching new product.")
+            return
+        }
+
+        changePlanJob = viewModelScope.launch {
+            val isChangeFlowStarted = subscriptionManager.changeProduct(
+                currentPurchase = currentPurchase,
+                currentPurchaseProductId = loadedState.activePurchase.productId,
+                newProduct = newProduct,
+                newProductOfferToken = newPlan.offerToken,
+                activity = activity,
+            )
+            if (isChangeFlowStarted) {
+                _uiState.value = _uiState.value.withLoadedSubscriptionPlans { plans ->
+                    plans.copy(isChangingPlan = true)
+                }
+
+                val purchaseEvent = subscriptionManager.observePurchaseEvents().asFlow().first()
+                when (purchaseEvent) {
+                    is PurchaseEvent.Cancelled -> {
+                        _uiState.value = _uiState.value.withLoadedSubscriptionPlans { plans ->
+                            plans.copy(isChangingPlan = false)
+                        }
+                    }
+
+                    is PurchaseEvent.Failure -> {
+                        logWarning("Purchase failure: ${purchaseEvent.responseCode}, ${purchaseEvent.errorMessage}")
+                        _uiState.value = _uiState.value.withLoadedSubscriptionPlans { plans ->
+                            plans.copy(isChangingPlan = false, hasPlanChangeFailed = true)
+                        }
+                    }
+
+                    is PurchaseEvent.Success -> {
+                        val (newPurchases, newPurchase) = loadActivePurchase()
+                        when (newPurchase) {
+                            is ActivePurchaseResult.Found -> {
+                                _uiState.value = _uiState.value
+                                    .copy(purchases = newPurchases)
+                                    .withLoadedSubscriptionPlans { plans ->
+                                        plans.copy(isChangingPlan = false, activePurchase = newPurchase.purchase)
+                                    }
+                            }
+                            is ActivePurchaseResult.NotFound -> {
+                                val failure = SubscriptionPlansState.Failure(FailureReason.Default)
+                                _uiState.value = _uiState.value.copy(subscriptionPlansState = failure)
+                            }
+                        }
+                    }
+                }
+            } else {
+                logWarning("Failed to start change product flow.")
+                _uiState.value = _uiState.value.withLoadedSubscriptionPlans { plans ->
+                    plans.copy(hasPlanChangeFailed = true)
+                }
+            }
         }
     }
 
@@ -80,7 +163,7 @@ class WinbackViewModel @Inject constructor(
         .sortedWith(PlanComparator)
 
     private fun List<Purchase>.findActivePurchase(): ActivePurchaseResult {
-        val acknowledgedPurchases = filter(Purchase::isAcknowledged)
+        val acknowledgedPurchases = filter { it.isAcknowledged && it.isAutoRenewing }
 
         if (acknowledgedPurchases.isEmpty()) {
             return ActivePurchaseResult.NotFound(FailureReason.NoPurchases)
@@ -109,6 +192,19 @@ class WinbackViewModel @Inject constructor(
                 ActivePurchaseResult.NotFound(FailureReason.TooManyProducts)
             }
         }
+    }
+
+    private fun UiState.withLoadedSubscriptionPlans(block: (SubscriptionPlansState.Loaded) -> SubscriptionPlansState): UiState {
+        return if (subscriptionPlansState is SubscriptionPlansState.Loaded) {
+            copy(subscriptionPlansState = block(subscriptionPlansState))
+        } else {
+            this
+        }
+    }
+
+    private fun logWarning(message: String) {
+        Timber.tag(LogBuffer.TAG_SUBSCRIPTIONS).w(message)
+        LogBuffer.w(LogBuffer.TAG_SUBSCRIPTIONS, message)
     }
 
     internal data class UiState(
@@ -141,6 +237,8 @@ internal sealed interface SubscriptionPlansState {
     data class Loaded(
         val activePurchase: ActivePurchase,
         val plans: List<SubscriptionPlan>,
+        val isChangingPlan: Boolean = false,
+        val hasPlanChangeFailed: Boolean = false,
     ) : SubscriptionPlansState
 }
 
