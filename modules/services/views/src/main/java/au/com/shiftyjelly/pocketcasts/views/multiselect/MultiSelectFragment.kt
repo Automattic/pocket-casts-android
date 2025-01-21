@@ -38,7 +38,7 @@ class MultiSelectFragment : BaseFragment(), MultiSelectTouchCallback.ItemTouchHe
     private val shouldShowRemoveListeningHistory: Boolean
         get() = arguments?.getBoolean(ARG_SHOULD_SHOW_REMOVE_LISTENING_HISTORY) ?: false
 
-    private val adapter = MultiSelectAdapter(editable = true, listener = null, dragListener = this::onItemStartDrag)
+    private val adapter = MultiSelectAdapter(editable = true, listener = null, shouldShowRemoveListeningHistory = shouldShowRemoveListeningHistory, dragListener = this::onItemStartDrag)
     private lateinit var itemTouchHelper: ItemTouchHelper
     private var items = emptyList<Any>()
     private val shortcutTitle = MultiSelectAdapter.Title(LR.string.multiselect_actions_shown)
@@ -86,16 +86,11 @@ class MultiSelectFragment : BaseFragment(), MultiSelectTouchCallback.ItemTouchHe
             .observe(viewLifecycleOwner) {
                 val multiSelectActions: MutableList<Any> = MultiSelectEpisodeAction.listFromIds(it).toMutableList()
 
-                if (!shouldShowRemoveListeningHistory) {
-                    multiSelectActions.removeAll { action ->
-                        action is MultiSelectEpisodeAction.RemoveListeningHistory
-                    }
-                }
-
                 multiSelectActions.add(0, shortcutTitle)
                 multiSelectActions.add(multiSelectEpisodesHelper.maxToolbarIcons + 1, overflowTitle)
 
                 items = multiSelectActions.toList()
+                adapter.shouldShowRemoveListeningHistory = shouldShowRemoveListeningHistory
                 adapter.submitList(multiSelectActions.toList())
             }
     }
