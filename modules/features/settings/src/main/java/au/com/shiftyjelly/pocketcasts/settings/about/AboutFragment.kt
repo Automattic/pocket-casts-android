@@ -383,7 +383,7 @@ fun AutomatticFamilyRow(
                 onAutomatticFamilyTapped()
                 openUrl("https://automattic.com", context)
             }
-            .height(192.dp)
+            .height(180.dp)
             .fillMaxWidth(),
         contentAlignment = Alignment.TopStart,
     ) {
@@ -405,7 +405,7 @@ fun AutomatticFamilyRow(
                 onClick = { openUrl(icon.url, context) },
                 modifier = Modifier.offset(
                     x = (if (icon.x == 0.0) 0.0 else appIconViewWidth / icon.x).dp,
-                    y = (192 - circleWidth - (if (icon.y == 0.0) 0.0 else appIconViewWidth / icon.y)).dp,
+                    y = (180 - circleWidth - (if (icon.y == 0.0) 0.0 else appIconViewWidth / icon.y)).dp,
                 ),
             )
         }
