@@ -328,8 +328,14 @@ private fun SubscriptionRow(
         Column(
             modifier = Modifier.weight(1f),
         ) {
-            TextH30(text = plan.title)
-            TextP40(text = plan.price())
+            TextH30(
+                text = plan.title,
+            )
+            TextP40(
+                text = plan.price(),
+                fontSize = 15.sp,
+                lineHeight = 21.sp,
+            )
         }
         CheckMark(
             isSelected = isSelected,

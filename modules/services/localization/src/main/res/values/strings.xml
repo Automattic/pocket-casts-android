@@ -2298,5 +2298,15 @@
     <string name="winback_too_many_subscritpions_button_label">Manage subscriptions in Play&#160;Store</string>
     <string name="winback_error_fetch_description">Sorry, but something went wrong fetching your plans.</string>
     <string name="winback_changing_plan">Changing plan</string>
+    <string name="winback_cancel_subscription_header_title">Changing plan</string>
+    <string name="winback_cancel_subscription_header_description">This will change your plan to a free account.</string>
+    <string name="winback_cancel_subscription_perk_active_with_date">Your current subscription will remain active until %1$s.</string>
+    <string name="winback_cancel_subscription_perk_active_without_date">Your current subscription will remain active until its expiration date.</string>
+    <string name="winback_cancel_subscription_perk_plus">Access to Pocket Casts Plus features will be locked after this date.</string>
+    <string name="winback_cancel_subscription_perk_folders">Your folders will be removed and their contents will move back to the Podcasts screen.</string>
+    <string name="winback_cancel_subscription_perk_files">All files uploaded to your Pocket Casts account will be deleted (but downloaded files on your mobile devices will remain).</string>
+    <string name="winback_cancel_subscription_perk_web">You will no longer be able to access Pocket Casts using your web browser, or desktop computer.</string>
+    <string name="winback_cancel_subscription_stay_button_label">Actually, I want to stay</string>
+    <string name="winback_cancel_subscription_cancel_button_label">Yes, Cancel my Subscription</string>
 
 </resources>

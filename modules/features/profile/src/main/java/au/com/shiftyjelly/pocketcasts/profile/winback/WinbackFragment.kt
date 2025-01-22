@@ -41,9 +41,11 @@ import androidx.navigation.compose.rememberNavController
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.settings.HelpPage
 import au.com.shiftyjelly.pocketcasts.settings.LogsPage
 import au.com.shiftyjelly.pocketcasts.settings.status.StatusPage
+import au.com.shiftyjelly.pocketcasts.views.activity.WebViewActivity
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -134,9 +136,12 @@ class WinbackFragment : BaseDialogFragment() {
                     }
                     composable(WinbackNavRoutes.CancelConfirmation) {
                         CancelConfirmationPage(
+                            expirationDate = state.currentSubscriptionExpirationDate,
                             onKeepSubscription = { dismiss() },
-                            onCancelSubscriptions = {
-                                if (!goToPlayStoreSubscriptions()) {
+                            onCancelSubscription = {
+                                if (handleSubscriptionCancellation(state.purchasedProductIds)) {
+                                    dismiss()
+                                } else {
                                     scope.launch {
                                         snackbarHostState.showSnackbar(getString(LR.string.error_generic_message))
                                     }
@@ -191,9 +196,29 @@ class WinbackFragment : BaseDialogFragment() {
         }
     }
 
-    private fun goToPlayStoreSubscriptions(): Boolean {
+    private fun handleSubscriptionCancellation(productIds: List<String>): Boolean {
+        return if (productIds.isNotEmpty()) {
+            goToPlayStoreSubscriptions(productIds.singleOrNull())
+        } else {
+            WebViewActivity.show(
+                context,
+                resources.getString(LR.string.winback_cancel_subscription_cancel_button_label),
+                Settings.INFO_CANCEL_URL,
+            )
+            true
+        }
+    }
+
+    private fun goToPlayStoreSubscriptions(sku: String? = null): Boolean {
         val uri = Uri.parse("https://play.google.com/store/account/subscriptions")
             .buildUpon()
+            .let { builder ->
+                if (sku != null) {
+                    builder.appendQueryParameter("sku", sku)
+                } else {
+                    builder
+                }
+            }
             .appendQueryParameter("package", requireContext().packageName)
             .build()
         return runCatching { startActivity(Intent(Intent.ACTION_VIEW, uri)) }.isSuccess
