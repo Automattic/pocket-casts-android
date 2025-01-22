@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
@@ -99,11 +100,11 @@ class WinbackFragment : BaseDialogFragment() {
                     composable(WinbackNavRoutes.AvailablePlans) {
                         AvailablePlansPage(
                             plansState = state.subscriptionPlansState,
-                            onSelectPlan = { },
+                            onSelectPlan = { plan -> viewModel.changePlan(requireActivity() as AppCompatActivity, plan) },
                             onGoToSubscriptions = {
                                 if (!goToPlayStoreSubscriptions()) {
                                     scope.launch {
-                                        snackbarHostState.showSnackbar(getString(LR.string.error))
+                                        snackbarHostState.showSnackbar(getString(LR.string.error_generic_message))
                                     }
                                 }
                             },
@@ -137,7 +138,7 @@ class WinbackFragment : BaseDialogFragment() {
                             onCancelSubscriptions = {
                                 if (!goToPlayStoreSubscriptions()) {
                                     scope.launch {
-                                        snackbarHostState.showSnackbar(getString(LR.string.error))
+                                        snackbarHostState.showSnackbar(getString(LR.string.error_generic_message))
                                     }
                                 }
                             },
@@ -146,6 +147,13 @@ class WinbackFragment : BaseDialogFragment() {
                 }
 
                 DialogTintEffect(navController)
+
+                val hasPlanChangeFailed = (state.subscriptionPlansState as? SubscriptionPlansState.Loaded)?.hasPlanChangeFailed == true
+                if (hasPlanChangeFailed) {
+                    LaunchedEffect(Unit) {
+                        snackbarHostState.showSnackbar(getString(LR.string.error_generic_message))
+                    }
+                }
 
                 SnackbarHost(
                     hostState = snackbarHostState,

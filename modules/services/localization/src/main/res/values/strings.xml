@@ -1579,7 +1579,6 @@
     <string name="settings_about_legal">Legal and more</string>
     <string name="settings_about_work_from_anywhere">Work from Anywhere</string>
     <string name="settings_about_automattic_family">Automattic family</string>
-    <string name="settings_about_wordpress" translatable="false">WordPress</string>
     <string name="settings_about_jetpack" translatable="false">Jetpack</string>
     <string name="settings_about_dayone" translatable="false">Day One</string>
     <string name="settings_about_woo" translatable="false">WooCommerce</string>
@@ -2298,5 +2297,6 @@
     <string name="winback_too_many_subscritpions_note">You have more than one active Pocket&#160;Casts subscription. Please manage your subscriptions in the Play&#160;Store to avoid duplicate charges.</string>
     <string name="winback_too_many_subscritpions_button_label">Manage subscriptions in Play&#160;Store</string>
     <string name="winback_error_fetch_description">Sorry, but something went wrong fetching your plans.</string>
+    <string name="winback_changing_plan">Changing plan</string>
 
 </resources>
