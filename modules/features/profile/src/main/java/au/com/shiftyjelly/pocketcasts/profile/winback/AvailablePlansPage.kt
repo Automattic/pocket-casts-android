@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.bars.BottomSheetAppBar
+import au.com.shiftyjelly.pocketcasts.compose.components.ProgressDialog
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
@@ -81,6 +82,7 @@ internal fun AvailablePlansPage(
         )
         AnimatedContent(
             targetState = plansState,
+            contentKey = { state -> state.javaClass },
             modifier = modifier,
         ) { state ->
             when (state) {
@@ -99,6 +101,7 @@ internal fun AvailablePlansPage(
                 is SubscriptionPlansState.Loaded -> LoadedState(
                     userPlanId = state.activePurchase.productId,
                     plans = state.plans,
+                    isChangingPlan = state.isChangingPlan,
                     onSelectPlan = onSelectPlan,
                 )
             }
@@ -110,49 +113,58 @@ internal fun AvailablePlansPage(
 private fun LoadedState(
     userPlanId: String?,
     plans: List<SubscriptionPlan>,
+    isChangingPlan: Boolean,
     onSelectPlan: (SubscriptionPlan) -> Unit,
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 20.dp)
-            .verticalScroll(rememberScrollState()),
-    ) {
-        Spacer(
-            modifier = Modifier.height(64.dp),
-        )
-        PocketCastsLogo()
-        Spacer(
-            modifier = Modifier.height(20.dp),
-        )
-        Text(
-            text = stringResource(LR.string.winback_available_plans_title),
-            fontSize = 28.sp,
-            fontWeight = FontWeight.Bold,
-            lineHeight = 38.5.sp,
-            color = MaterialTheme.theme.colors.primaryText01,
-            textAlign = TextAlign.Center,
-        )
-        Spacer(
-            modifier = Modifier.height(24.dp),
-        )
-        plans.forEach { plan ->
-            SubscriptionRow(
-                plan = plan,
-                isSelected = plan.productId == userPlanId,
-                onClick = { onSelectPlan(plan) },
+    Box {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 20.dp)
+                .verticalScroll(rememberScrollState()),
+        ) {
+            Spacer(
+                modifier = Modifier.height(64.dp),
+            )
+            PocketCastsLogo()
+            Spacer(
+                modifier = Modifier.height(20.dp),
+            )
+            Text(
+                text = stringResource(LR.string.winback_available_plans_title),
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+                lineHeight = 38.5.sp,
+                color = MaterialTheme.theme.colors.primaryText01,
+                textAlign = TextAlign.Center,
             )
             Spacer(
-                modifier = Modifier.height(16.dp),
+                modifier = Modifier.height(24.dp),
+            )
+            plans.forEach { plan ->
+                SubscriptionRow(
+                    plan = plan,
+                    isSelected = plan.productId == userPlanId,
+                    onClick = { onSelectPlan(plan) },
+                )
+                Spacer(
+                    modifier = Modifier.height(16.dp),
+                )
+            }
+            TextP50(
+                text = stringResource(LR.string.winback_available_plans_billing_note),
+                color = MaterialTheme.theme.colors.primaryText02,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(horizontal = 36.dp),
             )
         }
-        TextP50(
-            text = stringResource(LR.string.winback_available_plans_billing_note),
-            color = MaterialTheme.theme.colors.primaryText02,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 36.dp),
-        )
+        if (isChangingPlan) {
+            ProgressDialog(
+                text = stringResource(LR.string.winback_changing_plan),
+                onDismiss = {},
+            )
+        }
     }
 }
 
