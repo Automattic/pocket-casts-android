@@ -73,6 +73,7 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import timber.log.Timber
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -139,21 +140,12 @@ class AboutFragment : BaseFragment() {
 
 private val icons = listOf(
     AppIcon(
-        image = UR.attr.about_logo_wordpress,
-        text = LR.string.settings_about_wordpress,
-        url = "https://wordpress.com/",
-        color = UR.attr.about_logo_wordpress_color,
-        rotate = (-45..45).random(),
-        x = 0.0,
-        y = 23.20,
-    ),
-    AppIcon(
         image = UR.attr.about_logo_jetpack,
         text = LR.string.settings_about_jetpack,
         url = "https://jetpack.com/",
         color = UR.attr.about_logo_jetpack_color,
         rotate = (-45..45).random(),
-        x = 6.17,
+        x = 0.0,
         y = 0.0,
     ),
     AppIcon(
@@ -162,8 +154,8 @@ private val icons = listOf(
         url = "https://dayoneapp.com/",
         color = UR.attr.about_logo_dayone_color,
         rotate = (-45..45).random(),
-        x = 3.83,
-        y = 7.40,
+        x = 6.70,
+        y = 9.40,
     ),
     AppIcon(
         image = UR.attr.about_logo_pocketcasts,
@@ -171,7 +163,7 @@ private val icons = listOf(
         url = "https://www.pocketcasts.com/",
         color = UR.attr.about_logo_pocketcasts_color,
         rotate = 0,
-        x = 2.77,
+        x = 3.37,
         y = 0.0,
     ),
     AppIcon(
@@ -180,7 +172,7 @@ private val icons = listOf(
         url = "https://woocommerce.com/",
         color = UR.attr.about_logo_woo_color,
         rotate = (-45..45).random(),
-        x = 1.94,
+        x = 2.13,
         y = 17.28,
     ),
     AppIcon(
@@ -189,7 +181,7 @@ private val icons = listOf(
         url = "https://simplenote.com/",
         color = UR.attr.about_logo_simplenote_color,
         rotate = (-45..45).random(),
-        x = 1.49,
+        x = 1.56,
         y = 0.0,
     ),
     AppIcon(
@@ -198,8 +190,8 @@ private val icons = listOf(
         url = "https://tumblr.com/",
         color = UR.attr.about_logo_tumblr_color,
         rotate = (-45..45).random(),
-        x = 1.205,
-        y = 19.9,
+        x = 1.225,
+        y = 20.0,
     ),
 )
 
@@ -341,8 +333,38 @@ private fun AboutPage(
             }
         }
         item {
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
         }
+        item {
+            AutomatticLogo(onAutomatticFamilyTapped = onAutomatticFamilyTapped)
+        }
+        item {
+            Spacer(modifier = Modifier.height(24.dp))
+        }
+    }
+}
+
+@Composable
+fun AutomatticLogo(
+    modifier: Modifier = Modifier,
+    onAutomatticFamilyTapped: () -> Unit = {},
+) {
+    val context = LocalContext.current
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable {
+                onAutomatticFamilyTapped()
+                openUrl("https://automattic.com", context)
+            }
+            .padding(16.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Image(
+            painter = painterResource(IR.drawable.about_logo_automattic),
+            contentDescription = stringResource(LR.string.settings_app_icon),
+            colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.primaryText01),
+        )
     }
 }
 
@@ -362,7 +384,7 @@ fun AutomatticFamilyRow(
                 onAutomatticFamilyTapped()
                 openUrl("https://automattic.com", context)
             }
-            .height(192.dp)
+            .height(180.dp)
             .fillMaxWidth(),
         contentAlignment = Alignment.TopStart,
     ) {
@@ -373,7 +395,7 @@ fun AutomatticFamilyRow(
             modifier = Modifier.padding(all = 14.dp),
         )
 
-        val circleWidth = appIconViewWidth / 6.0
+        val circleWidth = appIconViewWidth / 5.5
         icons.forEach { icon ->
             AppLogoImage(
                 width = circleWidth.dp,
@@ -384,7 +406,7 @@ fun AutomatticFamilyRow(
                 onClick = { openUrl(icon.url, context) },
                 modifier = Modifier.offset(
                     x = (if (icon.x == 0.0) 0.0 else appIconViewWidth / icon.x).dp,
-                    y = (192 - circleWidth - (if (icon.y == 0.0) 0.0 else appIconViewWidth / icon.y)).dp,
+                    y = (180 - circleWidth - (if (icon.y == 0.0) 0.0 else appIconViewWidth / icon.y)).dp,
                 ),
             )
         }

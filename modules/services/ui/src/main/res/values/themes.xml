@@ -46,14 +46,12 @@
         <attr name="plus_logo" format="reference" />
         <attr name="logo_title_horizontal" format="reference" />
         <attr name="logo_title_vertical" format="reference" />
-        <attr name="about_logo_wordpress" format="reference" />
         <attr name="about_logo_jetpack" format="reference" />
         <attr name="about_logo_dayone" format="reference" />
         <attr name="about_logo_pocketcasts" format="reference" />
         <attr name="about_logo_woo" format="reference" />
         <attr name="about_logo_simplenote" format="reference" />
         <attr name="about_logo_tumblr" format="reference" />
-        <attr name="about_logo_wordpress_color" format="color" />
         <attr name="about_logo_jetpack_color" format="color" />
         <attr name="about_logo_dayone_color" format="color" />
         <attr name="about_logo_pocketcasts_color" format="color" />
@@ -372,14 +370,12 @@
         <item name="plus_logo">@drawable/plus_logo_horizontal_light</item>
         <item name="logo_title_horizontal">@drawable/ic_logo_title_hor_dark</item>
         <item name="logo_title_vertical">@drawable/ic_logo_title_ver_light</item>
-        <item name="about_logo_wordpress">@drawable/about_logo_wordpress</item>
         <item name="about_logo_jetpack">@drawable/about_logo_jetpack</item>
         <item name="about_logo_dayone">@drawable/about_logo_dayone</item>
         <item name="about_logo_pocketcasts">@drawable/about_logo_pocketcasts</item>
         <item name="about_logo_woo">@drawable/about_logo_woo</item>
         <item name="about_logo_simplenote">@drawable/about_logo_simplenote</item>
         <item name="about_logo_tumblr">@drawable/about_logo_tumblr</item>
-        <item name="about_logo_wordpress_color">#280675C4</item>
         <item name="about_logo_jetpack_color">#2800BE28</item>
         <item name="about_logo_dayone_color">#2844C0FF</item>
         <item name="about_logo_pocketcasts_color">#28F43E37</item>
@@ -585,18 +581,16 @@
         <item name="plus_logo">@drawable/plus_logo_horizontal_dark</item>
         <item name="logo_title_horizontal">@drawable/ic_logo_title_hor_light</item>
         <item name="logo_title_vertical">@drawable/ic_logo_title_ver_dark</item>
-        <item name="about_logo_wordpress">@drawable/about_logo_wordpress</item>
         <item name="about_logo_jetpack">@drawable/about_logo_jetpack</item>
         <item name="about_logo_dayone">@drawable/about_logo_dayone</item>
         <item name="about_logo_pocketcasts">@drawable/about_logo_pocketcasts</item>
         <item name="about_logo_woo">@drawable/about_logo_woo</item>
         <item name="about_logo_simplenote">@drawable/about_logo_simplenote</item>
         <item name="about_logo_tumblr">@drawable/about_logo_tumblr_dark</item>
-        <item name="about_logo_wordpress_color">#280675C4</item>
         <item name="about_logo_jetpack_color">#2800BE28</item>
         <item name="about_logo_dayone_color">#2844C0FF</item>
         <item name="about_logo_pocketcasts_color">#28F43E37</item>
-        <item name="about_logo_woo_color">#287D57A4</item>
+        <item name="about_logo_woo_color">#28B999FF</item>
         <item name="about_logo_simplenote_color">#283361CC</item>
         <item name="about_logo_tumblr_color">#28FFFFFF</item>
     </style>

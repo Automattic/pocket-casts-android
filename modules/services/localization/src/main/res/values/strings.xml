@@ -1579,7 +1579,6 @@
     <string name="settings_about_legal">Legal and more</string>
     <string name="settings_about_work_from_anywhere">Work from Anywhere</string>
     <string name="settings_about_automattic_family">Automattic family</string>
-    <string name="settings_about_wordpress" translatable="false">WordPress</string>
     <string name="settings_about_jetpack" translatable="false">Jetpack</string>
     <string name="settings_about_dayone" translatable="false">Day One</string>
     <string name="settings_about_woo" translatable="false">WooCommerce</string>
