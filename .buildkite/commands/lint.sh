@@ -1,5 +1,7 @@
 #!/bin/bash -u
 
+"$(dirname "${BASH_SOURCE[0]}")/restore-cache.sh"
+
 echo "--- :rubygems: Setting up Gems"
 install_gems
 
