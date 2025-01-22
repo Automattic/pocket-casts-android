@@ -420,9 +420,6 @@ class EpisodeFragment : BaseFragment() {
         binding?.btnArchive?.let { button ->
             button.onStateChange = {
                 viewModel.archiveClicked(button.isOn)
-                if (button.isOn) {
-                    (parentFragment as? BaseDialogFragment)?.dismiss()
-                }
             }
         }
 
