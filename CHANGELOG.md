@@ -2,7 +2,9 @@
 -----
 *   Bug Fixes
     *   Fix status bar theming during onboarding.
-        ([#3460](https://github.com/Automattic/pocket-casts-android/pull/3460)) 
+        ([#3460](https://github.com/Automattic/pocket-casts-android/pull/3460))
+    *   Fix do not close episode details when archiving an episode
+        ([#3473](https://github.com/Automattic/pocket-casts-android/pull/3473))
 
 7.81
 -----
