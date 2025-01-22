@@ -363,6 +363,7 @@ fun AutomatticLogo(
         Image(
             painter = painterResource(IR.drawable.about_logo_automattic),
             contentDescription = stringResource(LR.string.settings_app_icon),
+            colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.primaryText01),
         )
     }
 }
