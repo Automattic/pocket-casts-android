@@ -723,4 +723,16 @@ enum class AnalyticsEvent(val key: String) {
     /* Battery Restrictions */
     BATTERY_RESTRICTIONS_SHOWN("battery_restrictions_shown"),
     BATTERY_RESTRICTIONS_TOGGLED("battery_restrictions_toggled"),
+
+    /* Winback */
+    WINBACK_SCREEN_SHOWN("winback_screen_shown"),
+    WINBACK_SCREEN_DISMISSED("winback_screen_dismissed"),
+    WINBACK_CONTINUE_BUTTON_TAP("winback_continue_button_tap"),
+    WINBACK_MAIN_SCREEN_ROW_TAP("winback_main_screen_row_tap"),
+    WINBACK_OFFER_CLAIMED_DONE_BUTTON_TAPPED("winback_offer_claimed_done_button_tapped"),
+    WINBACK_AVAILABLE_PLANS_BACK_BUTTON_TAPPED("winback_available_plans_back_button_tapped"),
+    WINBACK_AVAILABLE_PLANS_SELECT_PLAN("winback_available_plans_select_plan"),
+    WINBACK_AVAILABLE_PLANS_NEW_PLAN_PURCHASE_SUCCESSFUL("winback_available_plans_new_plan_purchase_successful"),
+    WINBACK_CANCEL_CONFIRMATION_STAY_BUTTON_TAPPED("winback_cancel_confirmation_stay_button_tapped"),
+    WINBACK_CANCEL_CONFIRMATION_CANCEL_BUTTON_TAPPED("winback_cancel_confirmation_cancel_button_tapped"),
 }

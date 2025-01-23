@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.profile.winback
 
+import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -59,9 +60,12 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 class WinbackFragment : BaseDialogFragment() {
     private val viewModel by viewModels<WinbackViewModel>()
 
-    private val params get() = requireNotNull(BundleCompat.getParcelable(requireArguments(), INPUT_ARGS, WinbackInitParams::class.java)) {
-        "Missing input parameters"
-    }
+    private val params
+        get() = requireNotNull(BundleCompat.getParcelable(requireArguments(), INPUT_ARGS, WinbackInitParams::class.java)) {
+            "Missing input parameters"
+        }
+
+    private var currentRoute: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -94,21 +98,34 @@ class WinbackFragment : BaseDialogFragment() {
                     composable(WinbackNavRoutes.WinbackOffer) {
                         WinbackOfferPage(
                             onClaimOffer = {
+                                viewModel.trackClaimOfferTapped()
                                 navController.navigate(WinbackNavRoutes.OfferClaimed) {
                                     popUpTo(WinbackNavRoutes.WinbackOffer) {
                                         inclusive = true
                                     }
                                 }
                             },
-                            onSeeAvailablePlans = { navController.navigate(WinbackNavRoutes.AvailablePlans) },
-                            onSeeHelpAndFeedback = { navController.navigate(WinbackNavRoutes.HelpAndFeedback) },
-                            onContinueToCancellation = { navController.navigate(WinbackNavRoutes.CancelConfirmation) },
+                            onSeeAvailablePlans = {
+                                viewModel.trackAvailablePlansTapped()
+                                navController.navigate(WinbackNavRoutes.AvailablePlans)
+                            },
+                            onSeeHelpAndFeedback = {
+                                viewModel.trackHelpAndFeedbackTapped()
+                                navController.navigate(WinbackNavRoutes.HelpAndFeedback)
+                            },
+                            onContinueToCancellation = {
+                                viewModel.trackContinueCancellationTapped()
+                                navController.navigate(WinbackNavRoutes.CancelConfirmation)
+                            },
                         )
                     }
                     composable(WinbackNavRoutes.OfferClaimed) {
                         OfferClaimedPage(
                             theme = theme.activeTheme,
-                            onConfirm = { dismiss() },
+                            onConfirm = {
+                                viewModel.trackOfferClaimedConfirmationTapped()
+                                dismiss()
+                            },
                         )
                     }
                     composable(WinbackNavRoutes.AvailablePlans) {
@@ -123,7 +140,10 @@ class WinbackFragment : BaseDialogFragment() {
                                 }
                             },
                             onReload = { viewModel.loadInitialPlans() },
-                            onGoBack = { navController.popBackStack() },
+                            onGoBack = {
+                                viewModel.trackPlansBackButtonTapped()
+                                navController.popBackStack()
+                            },
                         )
                     }
                     composable(WinbackNavRoutes.HelpAndFeedback) {
@@ -149,8 +169,12 @@ class WinbackFragment : BaseDialogFragment() {
                     composable(WinbackNavRoutes.CancelConfirmation) {
                         CancelConfirmationPage(
                             expirationDate = state.currentSubscriptionExpirationDate,
-                            onKeepSubscription = { dismiss() },
+                            onKeepSubscription = {
+                                viewModel.trackKeepSubscriptionTapped()
+                                dismiss()
+                            },
                             onCancelSubscription = {
+                                viewModel.trackCancelSubscriptionTapped()
                                 if (handleSubscriptionCancellation(state.purchasedProductIds)) {
                                     dismiss()
                                 } else {
@@ -169,6 +193,15 @@ class WinbackFragment : BaseDialogFragment() {
                 if (hasPlanChangeFailed) {
                     LaunchedEffect(Unit) {
                         snackbarHostState.showSnackbar(getString(LR.string.error_generic_message))
+                    }
+                }
+
+                LaunchedEffect(navController) {
+                    navController.currentBackStackEntryFlow.collect { entry ->
+                        val route = entry.destination.route.also { currentRoute = it }
+                        if (route != null) {
+                            viewModel.trackScreenShown(route)
+                        }
                     }
                 }
 
@@ -205,6 +238,14 @@ class WinbackFragment : BaseDialogFragment() {
         )
         LaunchedEffect(Unit) {
             snapshotFlow { navigationBarTint }.collect { tint -> setNavigationBarTint(tint.toArgb()) }
+        }
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        val route = currentRoute
+        if (route != null) {
+            viewModel.trackScreenDismissed(route)
         }
     }
 
@@ -257,13 +298,13 @@ data class WinbackInitParams(
 }
 
 private object WinbackNavRoutes {
-    const val WinbackOffer = "WinbackOffer"
-    const val OfferClaimed = "OfferClaimed"
-    const val AvailablePlans = "AvailablePlans"
-    const val HelpAndFeedback = "HelpAndFeedback"
-    const val SupportLogs = "SupportLogs"
-    const val StatusCheck = "StatusCheck"
-    const val CancelConfirmation = "CancelConfirmation"
+    const val WinbackOffer = "main"
+    const val OfferClaimed = "offer_claimed"
+    const val AvailablePlans = "available_plans"
+    const val HelpAndFeedback = "help_and_feedback"
+    const val SupportLogs = "logs"
+    const val StatusCheck = "connection_status"
+    const val CancelConfirmation = "cancel_confirmation"
 }
 
 private val colorAnimationSpec = tween<Color>(350)
