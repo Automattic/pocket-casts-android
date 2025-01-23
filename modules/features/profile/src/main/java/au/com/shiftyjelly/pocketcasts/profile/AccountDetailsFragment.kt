@@ -111,6 +111,7 @@ class AccountDetailsFragment : BaseFragment() {
             upgradeBannerState = upgradeBannerState.collectAsState(null).value,
             sectionsState = accountViewModel.sectionsState.collectAsState().value,
         )
+
         AccountDetailsPage(
             state = state,
             theme = theme.activeTheme,
@@ -149,10 +150,12 @@ class AccountDetailsFragment : BaseFragment() {
                 val onboardingFlow = OnboardingFlow.PatronAccountUpgrade(source)
                 OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
             },
-            onCancelSubscription = {
+            onCancelSubscription = { winbackParams ->
                 analyticsTracker.track(AnalyticsEvent.ACCOUNT_DETAILS_CANCEL_TAPPED)
                 if (FeatureFlag.isEnabled(Feature.WINBACK)) {
-                    WinbackFragment().show(childFragmentManager, "subscription_windback")
+                    WinbackFragment
+                        .create(winbackParams)
+                        .show(childFragmentManager, "subscription_windback")
                 } else {
                     CancelConfirmationFragment
                         .newInstance()
