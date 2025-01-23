@@ -384,7 +384,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             optionsDialog = optionsDialog.addTextOption(
                 titleId = LR.string.podcast_refresh_episodes,
                 imageId = IR.drawable.ic_refresh,
-                click = {},
+                click = { viewModel.onRefreshPodcast() },
             )
         }
 
@@ -912,6 +912,28 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
                     if (BuildConfig.DEBUG) {
                         UiUtil.displayAlertError(requireContext(), state.errorMessage, null)
+                    }
+                }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.refreshState.collect { state ->
+                when (state) {
+                    PodcastViewModel.RefreshState.Error -> {}
+                    PodcastViewModel.RefreshState.NotStarted -> {}
+                    PodcastViewModel.RefreshState.Refreshed -> {
+                        binding?.loading?.visibility = View.GONE
+                        binding?.errorContainer?.visibility = View.GONE
+
+                        (activity as? FragmentHostListener)?.snackBarView()?.let { snackBarView ->
+                            Snackbar.make(snackBarView, getString(LR.string.podcast_refresh_list_updated), Snackbar.LENGTH_LONG).show()
+                        }
+                    }
+
+                    PodcastViewModel.RefreshState.Refreshing -> {
+                        binding?.loading?.visibility = View.VISIBLE
+                        binding?.errorContainer?.visibility = View.GONE
                     }
                 }
             }

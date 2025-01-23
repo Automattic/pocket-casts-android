@@ -55,10 +55,14 @@ import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.min
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlowable
@@ -96,6 +100,9 @@ class PodcastViewModel
     private val _uiState: MutableLiveData<UiState> = MutableLiveData(UiState.Loading)
     val uiState: LiveData<UiState>
         get() = _uiState
+
+    private val _refreshState = MutableSharedFlow<RefreshState>()
+    val refreshState = _refreshState.asSharedFlow()
 
     val groupedEpisodes: MutableLiveData<List<List<PodcastEpisode>>> = MutableLiveData()
     val signInState = userManager.getSignInState().toLiveData()
@@ -570,6 +577,18 @@ class PodcastViewModel
         analyticsTracker.track(AnalyticsEvent.BOOKMARK_SHARE_TAPPED, mapOf("podcast_uuid" to podcastUuid, "episode_uuid" to episodeUuid, "source" to source.analyticsValue))
     }
 
+    fun onRefreshPodcast() {
+        val podcast = podcast.value ?: return
+
+        analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_REFRESH_EPISODE_LIST_TAPPED, mapOf("podcast_uuid" to podcast.uuid))
+
+        launch {
+            _refreshState.emit(RefreshState.Refreshing)
+            delay(2.seconds)
+            _refreshState.emit(RefreshState.Refreshed)
+        }
+    }
+
     private fun trackEpisodeBulkEvent(event: AnalyticsEvent, count: Int) {
         episodeAnalytics.trackBulkEvent(
             event,
@@ -587,7 +606,7 @@ class PodcastViewModel
     }
 
     sealed class UiState {
-        data class Loaded constructor(
+        data class Loaded(
             val podcast: Podcast,
             val episodes: List<PodcastEpisode>,
             val bookmarks: List<Bookmark>,
@@ -603,7 +622,14 @@ class PodcastViewModel
         data class Error(
             val errorMessage: String,
         ) : UiState()
-        object Loading : UiState()
+        data object Loading : UiState()
+    }
+
+    sealed class RefreshState {
+        data object NotStarted : RefreshState()
+        data object Refreshing : RefreshState()
+        data object Refreshed : RefreshState()
+        data object Error : RefreshState()
     }
 
     private object AnalyticsProp {
