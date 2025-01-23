@@ -1357,6 +1357,12 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
+    override val nextPreviousTrackSkipButtons = UserSetting.BoolPref(
+        sharedPrefKey = "NextPreviousTrackSkipButtonsKey",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
+
     override fun isNotificationsDisabledMessageShown() =
         getBoolean(NOTIFICATIONS_DISABLED_MESSAGE_SHOWN, false)
 

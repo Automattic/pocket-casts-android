@@ -43,6 +43,7 @@ class MediaActionsFragment : BaseFragment() {
             MediaActionsPage(
                 state = state,
                 onShowCustomActionsChanged = viewModel::setShowCustomActionsChanged,
+                onNextPreviousTrackSkipButtonsChanged = viewModel::setNextPreviousTrackSkipButtonsChanged,
                 onActionsOrderChanged = viewModel::onActionsOrderChanged,
                 onActionMoved = viewModel::onActionMoved,
                 onBackClick = ::onBackClick,

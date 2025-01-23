@@ -489,6 +489,7 @@ interface Settings {
     fun setHasDoneInitialOnboarding()
 
     val customMediaActionsVisibility: UserSetting<Boolean>
+    val nextPreviousTrackSkipButtons: UserSetting<Boolean>
 
     fun isNotificationsDisabledMessageShown(): Boolean
     fun setNotificationsDisabledMessageShown(value: Boolean)

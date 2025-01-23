@@ -25,6 +25,7 @@ class MediaActionsViewModel @Inject constructor(
 
     data class State(
         val customActionsVisibility: Boolean = false,
+        val nextPreviousTrackSkipButtons: Boolean = false,
         val actions: List<MenuAction> = emptyList(),
     )
 
@@ -36,9 +37,11 @@ class MediaActionsViewModel @Inject constructor(
             combine(
                 settings.mediaControlItems.flow,
                 settings.customMediaActionsVisibility.flow,
-            ) { items, visibility ->
+                settings.nextPreviousTrackSkipButtons.flow,
+            ) { items, visibility, skipButtons ->
                 State(
                     customActionsVisibility = visibility,
+                    nextPreviousTrackSkipButtons = skipButtons,
                     actions = items.map { MenuAction(key = it.key, name = it.controlName, icon = it.iconRes) },
                 )
             }
@@ -52,6 +55,14 @@ class MediaActionsViewModel @Inject constructor(
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_GENERAL_MEDIA_NOTIFICATION_CONTROLS_SHOW_CUSTOM_TOGGLED,
             mapOf("enabled" to visibility),
+        )
+    }
+
+    fun setNextPreviousTrackSkipButtonsChanged(enabled: Boolean) {
+        settings.nextPreviousTrackSkipButtons.set(enabled, updateModifiedAt = true)
+        analyticsTracker.track(
+            AnalyticsEvent.SETTINGS_GENERAL_MEDIA_NOTIFICATION_NEXT_PREVIOUS_TRACK_SKIP_BUTTONS_TOGGLED,
+            mapOf("enabled" to enabled),
         )
     }
 
