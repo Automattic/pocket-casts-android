@@ -379,6 +379,16 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     private val onEpisodesOptionsClicked: () -> Unit = {
         analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_OPTIONS_TAPPED)
         var optionsDialog = OptionsDialog()
+
+        if (FeatureFlag.isEnabled(Feature.PODCAST_FEED_UPDATE)) {
+            optionsDialog = optionsDialog.addTextOption(
+                titleId = LR.string.podcast_refresh_episodes,
+                imageId = IR.drawable.ic_refresh,
+                click = {},
+            )
+        }
+
+        optionsDialog
             .addTextOption(
                 titleId = LR.string.podcast_sort_episodes,
                 imageId = IR.drawable.ic_sort,
