@@ -40,6 +40,7 @@ class MultiSelectToolbar @JvmOverloads constructor(
         multiSelectHelper: MultiSelectHelper<T>,
         @MenuRes menuRes: Int?,
         activity: FragmentActivity,
+        sourceView: SourceView? = null,
     ) {
         setBackgroundColor(context.getThemeColor(UR.attr.support_01))
         if (menuRes != null) {
@@ -56,7 +57,8 @@ class MultiSelectToolbar @JvmOverloads constructor(
                     val item = menu.add(Menu.NONE, action.actionId, 0, action.title)
                     item.setIcon(action.iconRes)
                     item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
-                    item.isVisible = action.isVisible
+                    item.isVisible =
+                        if (action is MultiSelectEpisodeAction.RemoveListeningHistory && sourceView != SourceView.LISTENING_HISTORY) false else action.isVisible
                 }
 
                 overflowItems = it.subList(maxIcons, it.size)
@@ -95,7 +97,7 @@ class MultiSelectToolbar @JvmOverloads constructor(
                         AnalyticsEvent.MULTI_SELECT_VIEW_OVERFLOW_MENU_SHOWN,
                         AnalyticsProp.sourceMap(multiSelectHelper.source),
                     )
-                    showOverflowBottomSheet(activity.supportFragmentManager, multiSelectHelper)
+                    showOverflowBottomSheet(activity.supportFragmentManager, multiSelectHelper, sourceView)
                 }
                 true
             } else {
@@ -116,9 +118,10 @@ class MultiSelectToolbar @JvmOverloads constructor(
     private fun showOverflowBottomSheet(
         fragmentManager: FragmentManager?,
         multiSelectHelper: MultiSelectEpisodesHelper,
+        sourceView: SourceView?,
     ) {
         if (fragmentManager == null) return
-        val overflowSheet = MultiSelectBottomSheet.newInstance(overflowItems.map { it.actionId })
+        val overflowSheet = MultiSelectBottomSheet.newInstance(overflowItems.map { it.actionId }, shouldShowRemoveListeningHistory = sourceView == SourceView.LISTENING_HISTORY)
         overflowSheet.multiSelectHelper = multiSelectHelper
         overflowSheet.show(fragmentManager, "multiselectbottomsheet")
     }
