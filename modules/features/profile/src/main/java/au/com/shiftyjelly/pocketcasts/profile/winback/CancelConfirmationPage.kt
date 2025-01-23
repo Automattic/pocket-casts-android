@@ -73,7 +73,7 @@ internal fun CancelConfirmationPage(
             modifier = Modifier
                 .weight(1f)
                 .verticalScroll(rememberScrollState())
-                .padding(top = 40.dp, start = 20.dp, end = 20.dp),
+                .padding(vertical = 40.dp, horizontal = 20.dp),
         )
         Buttons(
             onKeepSubscription = onKeepSubscription,
