@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPricingPhase
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchaseEvent
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchasesState
@@ -14,11 +15,13 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.util.Date
 import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
@@ -26,7 +29,8 @@ import timber.log.Timber
 
 @HiltViewModel
 class WinbackViewModel @Inject constructor(
-    val subscriptionManager: SubscriptionManager,
+    private val subscriptionManager: SubscriptionManager,
+    private val settings: Settings,
 ) : ViewModel() {
     private val subscriptionMapper = SubscriptionMapper()
 
@@ -35,6 +39,11 @@ class WinbackViewModel @Inject constructor(
 
     init {
         loadInitialPlans()
+        viewModelScope.launch {
+            settings.cachedSubscriptionStatus.flow.collect { status ->
+                _uiState.value = _uiState.value.copy(currentSubscriptionExpirationDate = status?.expiryDate)
+            }
+        }
     }
 
     internal fun loadInitialPlans() {
@@ -208,12 +217,16 @@ class WinbackViewModel @Inject constructor(
     }
 
     internal data class UiState(
+        val currentSubscriptionExpirationDate: Date?,
         val productsDetails: List<ProductDetails>,
         val purchases: List<Purchase>,
         val subscriptionPlansState: SubscriptionPlansState,
     ) {
+        val purchasedProductIds get() = purchases.flatMap { it.products }
+
         companion object {
             val Empty = UiState(
+                currentSubscriptionExpirationDate = null,
                 purchases = emptyList(),
                 productsDetails = emptyList(),
                 subscriptionPlansState = SubscriptionPlansState.Loading,

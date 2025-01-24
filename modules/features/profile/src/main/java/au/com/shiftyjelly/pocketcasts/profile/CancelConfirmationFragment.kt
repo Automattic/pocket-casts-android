@@ -234,7 +234,7 @@ class CancelConfirmationFragment : BaseDialogFragment() {
             ),
         ),
         Row(
-            iconResId = R.drawable.ic_locked_large,
+            iconResId = IR.drawable.ic_locked_large,
             text = stringResource(LR.string.profile_cancel_confirm_item_plus),
         ),
         Row(
@@ -242,7 +242,7 @@ class CancelConfirmationFragment : BaseDialogFragment() {
             text = stringResource(LR.string.profile_cancel_confirm_item_folders),
         ),
         Row(
-            iconResId = R.drawable.ic_upload___remove_from_cloud___menu,
+            iconResId = IR.drawable.ic_remove_from_cloud,
             text = stringResource(LR.string.profile_cancel_confirm_item_uploads),
         ),
         Row(
@@ -265,7 +265,7 @@ class CancelConfirmationFragment : BaseDialogFragment() {
             CancelConfirmationPage(
                 rows = listOf(
                     Row(
-                        iconResId = R.drawable.ic_locked_large,
+                        iconResId = IR.drawable.ic_locked_large,
                         text = stringResource(LR.string.profile_cancel_confirm_item_plus),
                     ),
                     Row(

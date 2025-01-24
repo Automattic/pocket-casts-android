@@ -277,7 +277,7 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
                 val cloudRes = when (episode.serverStatus) {
                     UserEpisodeServerStatus.LOCAL, UserEpisodeServerStatus.MISSING -> PR.drawable.ic_upload_file
                     UserEpisodeServerStatus.UPLOADING, UserEpisodeServerStatus.WAITING_FOR_WIFI, UserEpisodeServerStatus.QUEUED -> IR.drawable.ic_downloading
-                    UserEpisodeServerStatus.UPLOADED -> if (episode.isDownloaded) R.drawable.ic_upload___remove_from_cloud___menu else IR.drawable.ic_download
+                    UserEpisodeServerStatus.UPLOADED -> if (episode.isDownloaded) IR.drawable.ic_remove_from_cloud else IR.drawable.ic_download
                 }
                 binding.imgIconCloud.setImageResource(cloudRes)
 

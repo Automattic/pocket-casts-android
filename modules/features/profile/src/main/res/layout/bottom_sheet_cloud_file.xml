@@ -279,7 +279,7 @@
             android:id="@+id/imgIconCloud"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            app:srcCompat="@drawable/ic_upload___remove_from_cloud___menu"
+            app:srcCompat="@drawable/ic_remove_from_cloud"
             app:tint="?attr/primary_icon_01"/>
         <TextView
             android:id="@+id/lblCloud"

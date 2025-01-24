@@ -2,7 +2,10 @@ package au.com.shiftyjelly.pocketcasts.profile.winback
 
 import app.cash.turbine.TurbineTestContext
 import app.cash.turbine.test
+import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchaseEvent
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchasesState
@@ -15,6 +18,7 @@ import com.android.billingclient.api.ProductDetails.RecurrenceMode
 import com.android.billingclient.api.ProductDetails.SubscriptionOfferDetails
 import com.android.billingclient.api.Purchase
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.rx2.asFlowable
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -38,9 +42,15 @@ class WinbackViewModelTest {
     private val purchaseEvents = MutableSharedFlow<PurchaseEvent>()
     private val purchaseEventsFlowable = purchaseEvents.asFlowable()
 
+    private val settings = mock<Settings>()
+
     @Before
     fun setUp() {
         whenever(subscriptionManager.observePurchaseEvents()) doReturn purchaseEventsFlowable
+        val subscriptionSettingMock = mock<UserSetting<SubscriptionStatus?>> {
+            on { flow } doReturn MutableStateFlow(null)
+        }
+        whenever(settings.cachedSubscriptionStatus) doReturn subscriptionSettingMock
     }
 
     private val products = listOf(
@@ -77,7 +87,7 @@ class WinbackViewModelTest {
         wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
         wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
 
-        val viewModel = WinbackViewModel(subscriptionManager)
+        val viewModel = createViewModel()
 
         viewModel.uiState.test {
             val state = awaitLoadedState()
@@ -103,7 +113,7 @@ class WinbackViewModelTest {
         wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
         wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
 
-        val viewModel = WinbackViewModel(subscriptionManager)
+        val viewModel = createViewModel()
 
         viewModel.uiState.test {
             val availablePlans = awaitItem().subscriptionPlansState as SubscriptionPlansState.Failure
@@ -119,7 +129,7 @@ class WinbackViewModelTest {
         wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
         wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
 
-        val viewModel = WinbackViewModel(subscriptionManager)
+        val viewModel = createViewModel()
 
         viewModel.uiState.test {
             val availablePlans = awaitItem().subscriptionPlansState as SubscriptionPlansState.Failure
@@ -135,7 +145,7 @@ class WinbackViewModelTest {
         wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
         wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
 
-        val viewModel = WinbackViewModel(subscriptionManager)
+        val viewModel = createViewModel()
 
         viewModel.uiState.test {
             val availablePlans = awaitItem().subscriptionPlansState as SubscriptionPlansState.Failure
@@ -154,7 +164,7 @@ class WinbackViewModelTest {
         wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
         wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
 
-        val viewModel = WinbackViewModel(subscriptionManager)
+        val viewModel = createViewModel()
 
         viewModel.uiState.test {
             val availablePlans = awaitItem().subscriptionPlansState as SubscriptionPlansState.Failure
@@ -177,7 +187,7 @@ class WinbackViewModelTest {
         wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
         wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
 
-        val viewModel = WinbackViewModel(subscriptionManager)
+        val viewModel = createViewModel()
 
         viewModel.uiState.test {
             val availablePlans = awaitItem().subscriptionPlansState as SubscriptionPlansState.Failure
@@ -193,7 +203,7 @@ class WinbackViewModelTest {
         wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
         wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
 
-        val viewModel = WinbackViewModel(subscriptionManager)
+        val viewModel = createViewModel()
 
         viewModel.uiState.test {
             val availablePlans = awaitItem().subscriptionPlansState as SubscriptionPlansState.Failure
@@ -219,7 +229,7 @@ class WinbackViewModelTest {
         wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
         wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
 
-        val viewModel = WinbackViewModel(subscriptionManager)
+        val viewModel = createViewModel()
 
         viewModel.uiState.test {
             val subscriptionPlansState = awaitLoadedState()
@@ -237,7 +247,7 @@ class WinbackViewModelTest {
         wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
         wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
 
-        val viewModel = WinbackViewModel(subscriptionManager)
+        val viewModel = createViewModel()
 
         viewModel.uiState.test {
             val subscriptionPlansState = awaitLoadedState()
@@ -261,7 +271,7 @@ class WinbackViewModelTest {
         wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
         wheneverBlocking { subscriptionManager.changeProduct(any(), any(), any(), any(), any()) } doReturn true
 
-        val viewModel = WinbackViewModel(subscriptionManager)
+        val viewModel = createViewModel()
 
         viewModel.uiState.test {
             assertFalse(awaitLoadedState().isChangingPlan)
@@ -284,7 +294,7 @@ class WinbackViewModelTest {
         wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
         wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(emptyList())
 
-        val viewModel = WinbackViewModel(subscriptionManager)
+        val viewModel = createViewModel()
 
         viewModel.uiState.test {
             skipItems(1)
@@ -301,7 +311,7 @@ class WinbackViewModelTest {
         wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
         wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
 
-        val viewModel = WinbackViewModel(subscriptionManager)
+        val viewModel = createViewModel()
 
         viewModel.uiState.test {
             skipItems(1)
@@ -319,7 +329,7 @@ class WinbackViewModelTest {
         wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
         wheneverBlocking { subscriptionManager.changeProduct(any(), any(), any(), any(), any()) } doReturn false
 
-        val viewModel = WinbackViewModel(subscriptionManager)
+        val viewModel = createViewModel()
 
         viewModel.uiState.test {
             skipItems(1)
@@ -337,7 +347,7 @@ class WinbackViewModelTest {
         wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
         wheneverBlocking { subscriptionManager.changeProduct(any(), any(), any(), any(), any()) } doReturn true
 
-        val viewModel = WinbackViewModel(subscriptionManager)
+        val viewModel = createViewModel()
 
         viewModel.uiState.test {
             assertFalse(awaitLoadedState().isChangingPlan)
@@ -360,7 +370,7 @@ class WinbackViewModelTest {
         wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
         wheneverBlocking { subscriptionManager.changeProduct(any(), any(), any(), any(), any()) } doReturn true
 
-        val viewModel = WinbackViewModel(subscriptionManager)
+        val viewModel = createViewModel()
 
         viewModel.uiState.test {
             assertFalse(awaitLoadedState().isChangingPlan)
@@ -383,7 +393,7 @@ class WinbackViewModelTest {
         wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
         wheneverBlocking { subscriptionManager.changeProduct(any(), any(), any(), any(), any()) } doReturn true
 
-        val viewModel = WinbackViewModel(subscriptionManager)
+        val viewModel = createViewModel()
 
         viewModel.uiState.test {
             assertFalse(awaitLoadedState().isChangingPlan)
@@ -398,6 +408,11 @@ class WinbackViewModelTest {
             assertTrue(state is SubscriptionPlansState.Failure)
         }
     }
+
+    private fun createViewModel() = WinbackViewModel(
+        subscriptionManager,
+        settings,
+    )
 }
 
 private suspend fun TurbineTestContext<WinbackViewModel.UiState>.awaitLoadedState(): SubscriptionPlansState.Loaded {
