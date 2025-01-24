@@ -97,7 +97,13 @@ class ShareClipFragment : BaseDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = content {
-        val platforms = remember { SocialPlatform.getAvailablePlatforms(requireContext()) }
+        val platforms = remember {
+            SocialPlatform.getAvailablePlatforms(
+                requireContext(),
+                // Exclude IG video clips are available
+                exclude = setOf(SocialPlatform.Instagram),
+            )
+        }
         val isTalkbackOn = remember { Util.isTalkbackOn(requireContext()) }
 
         val assetController = rememberBackgroundAssetControler(shareColors)

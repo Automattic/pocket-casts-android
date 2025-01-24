@@ -4,6 +4,8 @@
     *   Fix status bar theming during onboarding.
         ([#3460](https://github.com/Automattic/pocket-casts-android/pull/3460))
 *   Updates
+    *   Remove audio and video clip sharing
+        ([#3481](https://github.com/Automattic/pocket-casts-android/pull/3481))
     *   Do not close episode details screen when archiving an episode
         ([#3473](https://github.com/Automattic/pocket-casts-android/pull/3473))
 
