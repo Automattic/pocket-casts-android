@@ -3,6 +3,8 @@ package au.com.shiftyjelly.pocketcasts.profile.winback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPricingPhase
@@ -21,7 +23,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
@@ -31,6 +32,7 @@ import timber.log.Timber
 class WinbackViewModel @Inject constructor(
     private val subscriptionManager: SubscriptionManager,
     private val settings: Settings,
+    private val tracker: AnalyticsTracker,
 ) : ViewModel() {
     private val subscriptionMapper = SubscriptionMapper()
 
@@ -85,6 +87,7 @@ class WinbackViewModel @Inject constructor(
         activity: AppCompatActivity,
         newPlan: SubscriptionPlan,
     ) {
+        trackPlanSelected(newPlan.productId)
         if (changePlanJob?.isActive == true) {
             return
         }
@@ -103,9 +106,10 @@ class WinbackViewModel @Inject constructor(
         }
 
         changePlanJob = viewModelScope.launch {
+            val currentProductId = loadedState.activePurchase.productId
             val isChangeFlowStarted = subscriptionManager.changeProduct(
                 currentPurchase = currentPurchase,
-                currentPurchaseProductId = loadedState.activePurchase.productId,
+                currentPurchaseProductId = currentProductId,
                 newProduct = newProduct,
                 newProductOfferToken = newPlan.offerToken,
                 activity = activity,
@@ -131,6 +135,11 @@ class WinbackViewModel @Inject constructor(
                     }
 
                     is PurchaseEvent.Success -> {
+                        trackPlanPurchased(
+                            currentProductId = currentProductId,
+                            newProductId = newProduct.productId,
+                        )
+
                         val (newPurchases, newPurchase) = loadActivePurchase()
                         when (newPurchase) {
                             is ActivePurchaseResult.Found -> {
@@ -140,6 +149,7 @@ class WinbackViewModel @Inject constructor(
                                         plans.copy(isChangingPlan = false, activePurchase = newPurchase.purchase)
                                     }
                             }
+
                             is ActivePurchaseResult.NotFound -> {
                                 val failure = SubscriptionPlansState.Failure(FailureReason.Default)
                                 _uiState.value = _uiState.value.copy(subscriptionPlansState = failure)
@@ -216,6 +226,103 @@ class WinbackViewModel @Inject constructor(
         LogBuffer.w(LogBuffer.TAG_SUBSCRIPTIONS, message)
     }
 
+    internal fun trackScreenShown(screen: String) {
+        tracker.track(
+            event = AnalyticsEvent.WINBACK_SCREEN_SHOWN,
+            properties = mapOf("screen" to screen),
+        )
+    }
+
+    internal fun trackScreenDismissed(screen: String) {
+        tracker.track(
+            event = AnalyticsEvent.WINBACK_SCREEN_DISMISSED,
+            properties = mapOf("screen" to screen),
+        )
+    }
+
+    internal fun trackContinueCancellationTapped() {
+        tracker.track(
+            event = AnalyticsEvent.WINBACK_CONTINUE_BUTTON_TAP,
+        )
+    }
+
+    internal fun trackClaimOfferTapped() {
+        val activePurchase = (uiState.value.subscriptionPlansState as? SubscriptionPlansState.Loaded)?.activePurchase
+        tracker.track(
+            event = AnalyticsEvent.WINBACK_MAIN_SCREEN_ROW_TAP,
+            properties = buildMap {
+                put("row", "claim_offer")
+                activePurchase?.tier?.let { tier ->
+                    put("tier", tier)
+                }
+                activePurchase?.frequency?.let { frequency ->
+                    put("frequency", frequency)
+                }
+            },
+        )
+    }
+
+    internal fun trackAvailablePlansTapped() {
+        tracker.track(
+            event = AnalyticsEvent.WINBACK_MAIN_SCREEN_ROW_TAP,
+            properties = mapOf(
+                "row" to "available_plans",
+            ),
+        )
+    }
+
+    internal fun trackHelpAndFeedbackTapped() {
+        tracker.track(
+            event = AnalyticsEvent.WINBACK_MAIN_SCREEN_ROW_TAP,
+            properties = mapOf(
+                "row" to "help_and_feedback",
+            ),
+        )
+    }
+
+    internal fun trackOfferClaimedConfirmationTapped() {
+        tracker.track(
+            event = AnalyticsEvent.WINBACK_OFFER_CLAIMED_DONE_BUTTON_TAPPED,
+        )
+    }
+
+    internal fun trackPlansBackButtonTapped() {
+        tracker.track(
+            event = AnalyticsEvent.WINBACK_AVAILABLE_PLANS_BACK_BUTTON_TAPPED,
+        )
+    }
+
+    private fun trackPlanSelected(productId: String) {
+        tracker.track(
+            event = AnalyticsEvent.WINBACK_AVAILABLE_PLANS_SELECT_PLAN,
+            properties = mapOf(
+                "product" to productId,
+            ),
+        )
+    }
+
+    private fun trackPlanPurchased(currentProductId: String, newProductId: String) {
+        tracker.track(
+            event = AnalyticsEvent.WINBACK_AVAILABLE_PLANS_NEW_PLAN_PURCHASE_SUCCESSFUL,
+            properties = mapOf(
+                "current_product" to currentProductId,
+                "new_product" to newProductId,
+            ),
+        )
+    }
+
+    internal fun trackKeepSubscriptionTapped() {
+        tracker.track(
+            event = AnalyticsEvent.WINBACK_CANCEL_CONFIRMATION_STAY_BUTTON_TAPPED,
+        )
+    }
+
+    internal fun trackCancelSubscriptionTapped() {
+        tracker.track(
+            event = AnalyticsEvent.WINBACK_CANCEL_CONFIRMATION_CANCEL_BUTTON_TAPPED,
+        )
+    }
+
     internal data class UiState(
         val currentSubscriptionExpirationDate: Date?,
         val productsDetails: List<ProductDetails>,
@@ -266,7 +373,19 @@ internal data class SubscriptionPlan(
 internal data class ActivePurchase(
     val orderId: String,
     val productId: String,
-)
+) {
+    val tier get() = when (productId) {
+        Subscription.PLUS_MONTHLY_PRODUCT_ID, Subscription.PLUS_YEARLY_PRODUCT_ID -> "plus"
+        Subscription.PATRON_MONTHLY_PRODUCT_ID, Subscription.PATRON_YEARLY_PRODUCT_ID -> "patron"
+        else -> null
+    }
+
+    val frequency get() = when (productId) {
+        Subscription.PLUS_MONTHLY_PRODUCT_ID, Subscription.PATRON_MONTHLY_PRODUCT_ID -> "monthly"
+        Subscription.PLUS_YEARLY_PRODUCT_ID, Subscription.PATRON_YEARLY_PRODUCT_ID -> "yearly"
+        else -> null
+    }
+}
 
 internal enum class BillingPeriod {
     Monthly,
