@@ -40,6 +40,7 @@ data class ShowNotesChapter(
     @Json(name = "title") val title: String? = null,
     @Json(name = "img") val image: String? = null,
     @Json(name = "url") val url: String? = null,
+    @Json(name = "toc") val useInTableOfContents: Boolean? = null,
 )
 
 @JsonClass(generateAdapter = true)

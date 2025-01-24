@@ -65,13 +65,17 @@ class ShowNotesProcessor @Inject constructor(
 
         val podcastIndexChapters = try {
             episode.chaptersUrl?.let { url ->
-                service.getShowNotesChapters(url).chapters?.map { it.toChapter(episodeUuid) }
+                service.getShowNotesChapters(url).chapters
+                    ?.filter { it.useInTableOfContents != false }
+                    ?.map { it.toChapter(episodeUuid) }
             }
         } catch (e: Throwable) {
             Timber.e(e, "Failed to fetch chapters for episode $episodeUuid from ${episode.chaptersUrl}")
             null
         }
-        val podLoveChapters = episode.chapters?.map { chapterShowNotes -> chapterShowNotes.toChapter(episodeUuid) }
+        val podLoveChapters = episode.chapters
+            ?.filter { it.useInTableOfContents != false }
+            ?.map { chapterShowNotes -> chapterShowNotes.toChapter(episodeUuid) }
 
         val newChapters = if (podcastIndexChapters != null && podLoveChapters != null) {
             maxOf(podcastIndexChapters, podLoveChapters) { a, b -> a.size.compareTo(b.size) }

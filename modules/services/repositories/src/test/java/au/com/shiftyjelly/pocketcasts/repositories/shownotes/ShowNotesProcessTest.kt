@@ -513,4 +513,103 @@ class ShowNotesProcessTest {
         val expected2 = emptyList<Transcript>()
         verify(transcriptsManager, never()).updateTranscripts("podcast-id", "episode-id", expected2, LoadTranscriptSource.DEFAULT)
     }
+
+    @Test
+    fun `handle table of contents for direct chapters`() = runTest(coroutineRule.testDispatcher) {
+        val processor = ShowNotesProcessor(this, episodeManager, chapterManager, transcriptsManager, service)
+        val episode = ShowNotesEpisode(
+            uuid = "episode-id",
+            chapters = listOf(
+                ShowNotesChapter(
+                    startTime = 0.0,
+                    title = "Title 1",
+                    useInTableOfContents = true,
+                ),
+                ShowNotesChapter(
+                    startTime = 1.0,
+                    title = "Title 2",
+                    useInTableOfContents = false,
+                ),
+                ShowNotesChapter(
+                    startTime = 2.0,
+                    title = "Title 3",
+                    useInTableOfContents = null,
+                ),
+            ),
+            chaptersUrl = "url",
+        )
+        val showNotesResponse = ShowNotesResponse(
+            podcast = ShowNotesPodcast(
+                uuid = "podcast-id",
+                episodes = listOf(episode),
+            ),
+        )
+
+        processor.process("episode-id", showNotesResponse)
+
+        val expected = listOf(
+            Chapter(
+                episodeUuid = "episode-id",
+                startTimeMs = 0,
+                title = "Title 1",
+            ),
+            Chapter(
+                episodeUuid = "episode-id",
+                startTimeMs = 2000,
+                title = "Title 3",
+            ),
+        )
+        verify(chapterManager).updateChapters("episode-id", expected)
+    }
+
+    @Test
+    fun `handle table of contents for URL chapters`() = runTest(coroutineRule.testDispatcher) {
+        val processor = ShowNotesProcessor(this, episodeManager, chapterManager, transcriptsManager, service)
+        val episode = ShowNotesEpisode(
+            uuid = "episode-id",
+            chapters = emptyList(),
+            chaptersUrl = "url",
+        )
+        val showNotesResponse = ShowNotesResponse(
+            podcast = ShowNotesPodcast(
+                uuid = "podcast-id",
+                episodes = listOf(episode),
+            ),
+        )
+
+        val urlChapters = listOf(
+            ShowNotesChapter(
+                startTime = 0.0,
+                title = "Title 1",
+                useInTableOfContents = true,
+            ),
+            ShowNotesChapter(
+                startTime = 1.0,
+                title = "Title 2",
+                useInTableOfContents = false,
+            ),
+            ShowNotesChapter(
+                startTime = 2.0,
+                title = "Title 3",
+                useInTableOfContents = null,
+            ),
+        )
+        whenever(service.getShowNotesChapters("url")).doSuspendableAnswer { RawChaptersResponse(urlChapters) }
+
+        processor.process("episode-id", showNotesResponse)
+
+        val expected = listOf(
+            Chapter(
+                episodeUuid = "episode-id",
+                startTimeMs = 0,
+                title = "Title 1",
+            ),
+            Chapter(
+                episodeUuid = "episode-id",
+                startTimeMs = 2000,
+                title = "Title 3",
+            ),
+        )
+        verify(chapterManager).updateChapters("episode-id", expected)
+    }
 }
