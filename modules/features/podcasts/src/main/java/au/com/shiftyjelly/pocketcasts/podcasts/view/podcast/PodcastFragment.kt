@@ -712,6 +712,10 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             loadData()
         }
 
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            viewModel.onRefreshPodcast()
+        }
+
         binding.episodesRecyclerView.requestFocus()
 
         return binding.root
@@ -923,12 +927,15 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                     PodcastViewModel.RefreshState.Error -> {}
                     PodcastViewModel.RefreshState.NotStarted -> {}
                     PodcastViewModel.RefreshState.Refreshed -> {
+                        binding?.swipeRefreshLayout?.isRefreshing = false
                         (activity as? FragmentHostListener)?.snackBarView()?.let { snackBarView ->
                             Snackbar.make(snackBarView, getString(LR.string.podcast_refresh_list_updated), Snackbar.LENGTH_LONG).show()
                         }
                     }
 
                     PodcastViewModel.RefreshState.Refreshing -> {
+                        // Setting isRefreshing to false because Snackbar handles refresh progress
+                        binding?.swipeRefreshLayout?.isRefreshing = false
                         (activity as? FragmentHostListener)?.snackBarView()?.let { snackBarView ->
                             Snackbar.make(snackBarView, getString(LR.string.podcast_refreshing_episode_list), Snackbar.LENGTH_INDEFINITE).show()
                         }
