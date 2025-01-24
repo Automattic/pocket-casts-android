@@ -2,6 +2,9 @@ package au.com.shiftyjelly.pocketcasts.profile.winback
 
 import app.cash.turbine.TurbineTestContext
 import app.cash.turbine.test
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.Tracker
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -43,6 +46,8 @@ class WinbackViewModelTest {
     private val purchaseEventsFlowable = purchaseEvents.asFlowable()
 
     private val settings = mock<Settings>()
+
+    private val tracker = FakeTracker()
 
     @Before
     fun setUp() {
@@ -409,9 +414,289 @@ class WinbackViewModelTest {
         }
     }
 
+    @Test
+    fun `track screen shown`() = runTest {
+        val purchases = listOf(createPurchase())
+        wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
+        wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
+
+        val viewModel = createViewModel()
+        viewModel.trackScreenShown("screen_key")
+
+        val event = tracker.events.single()
+        assertEquals(
+            TrackEvent(
+                AnalyticsEvent.WINBACK_SCREEN_SHOWN,
+                mapOf("screen" to "screen_key"),
+            ),
+            event,
+        )
+    }
+
+    @Test
+    fun `track screen dismissed`() = runTest {
+        val purchases = listOf(createPurchase())
+        wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
+        wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
+
+        val viewModel = createViewModel()
+        viewModel.trackScreenDismissed("screen_key")
+
+        val event = tracker.events.single()
+        assertEquals(
+            TrackEvent(
+                AnalyticsEvent.WINBACK_SCREEN_DISMISSED,
+                mapOf("screen" to "screen_key"),
+            ),
+            event,
+        )
+    }
+
+    @Test
+    fun `track continue cancellation tapped`() = runTest {
+        val purchases = listOf(createPurchase())
+        wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
+        wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
+
+        val viewModel = createViewModel()
+        viewModel.trackContinueCancellationTapped()
+
+        val event = tracker.events.single()
+        assertEquals(
+            TrackEvent(AnalyticsEvent.WINBACK_CONTINUE_BUTTON_TAP, emptyMap()),
+            event,
+        )
+    }
+
+    @Test
+    fun `track claim plus monthly offer tapped`() = runTest {
+        val purchases = listOf(createPurchase(productIds = listOf(Subscription.PLUS_MONTHLY_PRODUCT_ID)))
+        wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
+        wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
+
+        val viewModel = createViewModel()
+        viewModel.trackClaimOfferTapped()
+
+        val event = tracker.events.single()
+        assertEquals(
+            TrackEvent(
+                AnalyticsEvent.WINBACK_MAIN_SCREEN_ROW_TAP,
+                mapOf(
+                    "row" to "claim_offer",
+                    "tier" to "plus",
+                    "frequency" to "monthly",
+                ),
+            ),
+            event,
+        )
+    }
+
+    @Test
+    fun `track claim plus yearly offer tapped`() = runTest {
+        val purchases = listOf(createPurchase(productIds = listOf(Subscription.PLUS_YEARLY_PRODUCT_ID)))
+        wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
+        wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
+
+        val viewModel = createViewModel()
+        viewModel.trackClaimOfferTapped()
+
+        val event = tracker.events.single()
+        assertEquals(
+            TrackEvent(
+                AnalyticsEvent.WINBACK_MAIN_SCREEN_ROW_TAP,
+                mapOf(
+                    "row" to "claim_offer",
+                    "tier" to "plus",
+                    "frequency" to "yearly",
+                ),
+            ),
+            event,
+        )
+    }
+
+    @Test
+    fun `track claim patron monthly offer tapped`() = runTest {
+        val purchases = listOf(createPurchase(productIds = listOf(Subscription.PATRON_MONTHLY_PRODUCT_ID)))
+        wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
+        wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
+
+        val viewModel = createViewModel()
+        viewModel.trackClaimOfferTapped()
+
+        val event = tracker.events.single()
+        assertEquals(
+            TrackEvent(
+                AnalyticsEvent.WINBACK_MAIN_SCREEN_ROW_TAP,
+                mapOf(
+                    "row" to "claim_offer",
+                    "tier" to "patron",
+                    "frequency" to "monthly",
+                ),
+            ),
+            event,
+        )
+    }
+
+    @Test
+    fun `track claim patron yearly offer tapped`() = runTest {
+        val purchases = listOf(createPurchase(productIds = listOf(Subscription.PATRON_YEARLY_PRODUCT_ID)))
+        wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
+        wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
+
+        val viewModel = createViewModel()
+        viewModel.trackClaimOfferTapped()
+
+        val event = tracker.events.single()
+        assertEquals(
+            TrackEvent(
+                AnalyticsEvent.WINBACK_MAIN_SCREEN_ROW_TAP,
+                mapOf(
+                    "row" to "claim_offer",
+                    "tier" to "patron",
+                    "frequency" to "yearly",
+                ),
+            ),
+            event,
+        )
+    }
+
+    @Test
+    fun `track available plans tapped`() = runTest {
+        val purchases = listOf(createPurchase())
+        wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
+        wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
+
+        val viewModel = createViewModel()
+        viewModel.trackAvailablePlansTapped()
+
+        val event = tracker.events.single()
+        assertEquals(
+            TrackEvent(
+                AnalyticsEvent.WINBACK_MAIN_SCREEN_ROW_TAP,
+                mapOf("row" to "available_plans"),
+            ),
+            event,
+        )
+    }
+
+    @Test
+    fun `track help and feedback tapped`() = runTest {
+        val purchases = listOf(createPurchase())
+        wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
+        wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
+
+        val viewModel = createViewModel()
+        viewModel.trackHelpAndFeedbackTapped()
+
+        val event = tracker.events.single()
+        assertEquals(
+            TrackEvent(
+                AnalyticsEvent.WINBACK_MAIN_SCREEN_ROW_TAP,
+                mapOf("row" to "help_and_feedback"),
+            ),
+            event,
+        )
+    }
+
+    @Test
+    fun `track offer claimed confirmation tapped`() = runTest {
+        val purchases = listOf(createPurchase())
+        wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
+        wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
+
+        val viewModel = createViewModel()
+        viewModel.trackOfferClaimedConfirmationTapped()
+
+        val event = tracker.events.single()
+        assertEquals(
+            TrackEvent(AnalyticsEvent.WINBACK_OFFER_CLAIMED_DONE_BUTTON_TAPPED, emptyMap()),
+            event,
+        )
+    }
+
+    @Test
+    fun `track plans back button tapped`() = runTest {
+        val purchases = listOf(createPurchase())
+        wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
+        wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
+
+        val viewModel = createViewModel()
+        viewModel.trackPlansBackButtonTapped()
+
+        val event = tracker.events.single()
+        assertEquals(
+            TrackEvent(AnalyticsEvent.WINBACK_AVAILABLE_PLANS_BACK_BUTTON_TAPPED, emptyMap()),
+            event,
+        )
+    }
+
+    @Test
+    fun `track plan change`() = runTest {
+        val purchases = listOf(createPurchase(productIds = listOf(Subscription.PLUS_MONTHLY_PRODUCT_ID)))
+        wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
+        wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
+        wheneverBlocking { subscriptionManager.changeProduct(any(), any(), any(), any(), any()) } doReturn true
+
+        val viewModel = createViewModel()
+        viewModel.changePlan(mock(), knownPlan)
+        purchaseEvents.emit(PurchaseEvent.Success)
+
+        assertEquals(
+            listOf(
+                TrackEvent(
+                    AnalyticsEvent.WINBACK_AVAILABLE_PLANS_SELECT_PLAN,
+                    mapOf(
+                        "product" to knownPlan.productId,
+                    ),
+                ),
+                TrackEvent(
+                    AnalyticsEvent.WINBACK_AVAILABLE_PLANS_NEW_PLAN_PURCHASE_SUCCESSFUL,
+                    mapOf(
+                        "current_product" to Subscription.PLUS_MONTHLY_PRODUCT_ID,
+                        "new_product" to knownPlan.productId,
+                    ),
+                ),
+            ),
+            tracker.events,
+        )
+    }
+
+    @Test
+    fun `track keep subscription tapped`() = runTest {
+        val purchases = listOf(createPurchase())
+        wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
+        wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
+
+        val viewModel = createViewModel()
+        viewModel.trackKeepSubscriptionTapped()
+
+        val event = tracker.events.single()
+        assertEquals(
+            TrackEvent(AnalyticsEvent.WINBACK_CANCEL_CONFIRMATION_STAY_BUTTON_TAPPED, emptyMap()),
+            event,
+        )
+    }
+
+    @Test
+    fun `track cancel subscription tapped`() = runTest {
+        val purchases = listOf(createPurchase())
+        wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
+        wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
+
+        val viewModel = createViewModel()
+        viewModel.trackCancelSubscriptionTapped()
+
+        val event = tracker.events.single()
+        assertEquals(
+            TrackEvent(AnalyticsEvent.WINBACK_CANCEL_CONFIRMATION_CANCEL_BUTTON_TAPPED, emptyMap()),
+            event,
+        )
+    }
+
     private fun createViewModel() = WinbackViewModel(
         subscriptionManager,
         settings,
+        AnalyticsTracker.test(tracker, isEnabled = true),
     )
 }
 
@@ -496,3 +781,24 @@ private val BillingPeriod.value
         BillingPeriod.Monthly -> "P1M"
         BillingPeriod.Yearly -> "P1Y"
     }
+
+class FakeTracker : Tracker {
+    private val _events = mutableListOf<TrackEvent>()
+
+    val events get() = _events.toList()
+
+    override fun track(event: AnalyticsEvent, properties: Map<String, Any>) {
+        _events += TrackEvent(event, properties)
+    }
+
+    override fun refreshMetadata() = Unit
+
+    override fun flush() = Unit
+
+    override fun clearAllData() = Unit
+}
+
+data class TrackEvent(
+    val type: AnalyticsEvent,
+    val properties: Map<String, Any>,
+)
