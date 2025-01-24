@@ -26,14 +26,16 @@ import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private const val ARG_ACTION_IDS = "actionids"
+private const val ARG_SHOULD_SHOW_REMOVE_LISTENING_HISTORY = "arg_should_show_remove_listening_history"
 
 @AndroidEntryPoint
 class MultiSelectBottomSheet : BaseDialogFragment() {
     companion object {
-        fun newInstance(itemIds: List<Int>): MultiSelectBottomSheet {
+        fun newInstance(itemIds: List<Int>, shouldShowRemoveListeningHistory: Boolean): MultiSelectBottomSheet {
             val instance = MultiSelectBottomSheet()
             instance.arguments = bundleOf(
                 ARG_ACTION_IDS to itemIds.toIntArray(),
+                ARG_SHOULD_SHOW_REMOVE_LISTENING_HISTORY to shouldShowRemoveListeningHistory,
             )
             return instance
         }
@@ -73,7 +75,13 @@ class MultiSelectBottomSheet : BaseDialogFragment() {
         recyclerView.layoutManager = LinearLayoutManager(recyclerView.context, LinearLayoutManager.VERTICAL, false)
         recyclerView.addItemDecoration(DividerItemDecoration(recyclerView.context, LinearLayoutManager.VERTICAL))
 
-        val items = arguments?.getIntArray(ARG_ACTION_IDS)?.map { MultiSelectEpisodeAction.ALL_BY_ACTION_ID[it] } ?: emptyList()
+        val items = arguments?.getIntArray(ARG_ACTION_IDS)?.map { MultiSelectEpisodeAction.ALL_BY_ACTION_ID[it] }?.toMutableList() ?: mutableListOf()
+        val shouldShowRemoveListeningHistory = arguments?.getBoolean(ARG_SHOULD_SHOW_REMOVE_LISTENING_HISTORY) ?: false
+
+        if (!shouldShowRemoveListeningHistory) {
+            items.removeAll { it is MultiSelectEpisodeAction.RemoveListeningHistory }
+        }
+
         adapter.submitList(items + listOf(MultiSelectAction.SelectAll))
 
         multiSelectHelper?.selectedCount?.observe(viewLifecycleOwner) {
@@ -95,7 +103,9 @@ class MultiSelectBottomSheet : BaseDialogFragment() {
                     AnalyticsEvent.MULTI_SELECT_VIEW_OVERFLOW_MENU_REARRANGE_STARTED,
                     AnalyticsProp.sourceMap(source),
                 )
-                (activity as FragmentHostListener).showModal(MultiSelectFragment.newInstance(source, shouldShowRemoveListeningHistory = hasPlayedAnyEpisode))
+                (activity as FragmentHostListener).showModal(
+                    MultiSelectFragment.newInstance(source, shouldShowRemoveListeningHistory = hasPlayedAnyEpisode && source == SourceView.LISTENING_HISTORY),
+                )
                 dismiss()
             }
         }
