@@ -20,7 +20,6 @@ import au.com.shiftyjelly.pocketcasts.sharing.CardType
 import au.com.shiftyjelly.pocketcasts.sharing.Clip
 import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
 import au.com.shiftyjelly.pocketcasts.sharing.SocialPlatform
-import java.io.IOException
 import java.util.Date
 import junit.framework.TestCase.assertTrue
 import kotlin.time.Duration.Companion.milliseconds
@@ -31,11 +30,9 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.TemporaryFolder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
@@ -43,9 +40,6 @@ import org.mockito.kotlin.whenever
 class ShareClipViewModelTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule()
-
-    @get:Rule
-    val tempDir = TemporaryFolder()
 
     private val clipPlayer = FakeClipPlayer()
     private val sharingClient = FakeClipSharingClient()
@@ -314,7 +308,7 @@ class ShareClipViewModelTest {
     }
 
     @Test
-    fun `track sharing video clip`() = runTest {
+    fun `track sharing Instagram clip`() = runTest {
         viewModel.shareClip(
             podcast,
             episode,
@@ -322,7 +316,7 @@ class ShareClipViewModelTest {
             SocialPlatform.Instagram,
             CardType.Square,
             SourceView.PLAYER,
-            createBackgroundAsset = { Result.success(tempDir.newFile()) },
+            createBackgroundAsset = { error("Unexpected operation") },
         )
 
         val event = tracker.events.last()
@@ -339,7 +333,7 @@ class ShareClipViewModelTest {
                     "end" to 30,
                     "start_modified" to false,
                     "end_modified" to false,
-                    "type" to "video",
+                    "type" to "link",
                     "card_type" to "square",
                 ),
             ),
@@ -532,7 +526,7 @@ class ShareClipViewModelTest {
     }
 
     @Test
-    fun `share video clip`() = runTest {
+    fun `share Instagram clip`() = runTest {
         viewModel.shareClip(
             podcast,
             episode,
@@ -540,26 +534,11 @@ class ShareClipViewModelTest {
             SocialPlatform.Instagram,
             CardType.Vertical,
             SourceView.PLAYER,
-            createBackgroundAsset = { Result.success(tempDir.newFile()) },
+            createBackgroundAsset = { error("Unexpected operation") },
         )
         val request = sharingClient.request!!
 
-        assertTrue(request.data is SharingRequest.Data.ClipVideo)
-    }
-
-    @Test
-    fun `fail to share video clip when there is no background asset`() = runTest {
-        viewModel.shareClip(
-            podcast,
-            episode,
-            clipRange,
-            SocialPlatform.Instagram,
-            CardType.Vertical,
-            SourceView.PLAYER,
-            createBackgroundAsset = { Result.failure(IOException("Whoops!")) },
-        )
-
-        assertNull(sharingClient.request)
+        assertTrue(request.data is SharingRequest.Data.ClipLink)
     }
 
     @Test

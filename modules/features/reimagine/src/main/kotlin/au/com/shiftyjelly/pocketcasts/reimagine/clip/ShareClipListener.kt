@@ -23,7 +23,7 @@ internal class ShareClipListener(
             platform = platform,
             cardType = cardType,
             sourceView = sourceView,
-            createBackgroundAsset = { assetController.capture(it) },
+            createBackgroundAsset = assetController::capture,
         )
     }
 

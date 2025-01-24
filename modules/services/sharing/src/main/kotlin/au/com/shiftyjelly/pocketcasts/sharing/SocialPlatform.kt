@@ -50,8 +50,11 @@ enum class SocialPlatform(
     ;
 
     companion object {
-        fun getAvailablePlatforms(context: Context): Set<SocialPlatform> = buildSet {
-            SocialPlatform.entries.forEach { platform ->
+        fun getAvailablePlatforms(
+            context: Context,
+            exclude: Set<SocialPlatform> = emptySet(),
+        ): Set<SocialPlatform> = buildSet {
+            (SocialPlatform.entries - exclude).forEach { platform ->
                 if (platform.packageId?.let(context::getPackageInfo) != null) {
                     add(platform)
                 }

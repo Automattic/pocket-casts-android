@@ -207,9 +207,10 @@ private fun VerticalClipPage(
     ) {
         AnimatedVisiblity(podcast = podcast, episode = episode) { podcast, episode ->
             Column {
-                val pagerState = rememberPagerState(pageCount = { CardType.entires.size })
+                // Hide audio card until audio clips are available
+                val pagerState = rememberPagerState(pageCount = { CardType.visualEntries.size })
                 val scrollState = rememberScrollState()
-                val selectedCard = CardType.entires[pagerState.currentPage]
+                val selectedCard = CardType.visualEntries[pagerState.currentPage]
                 Column(
                     verticalArrangement = Arrangement.Center,
                     modifier = Modifier
