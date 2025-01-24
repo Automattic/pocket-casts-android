@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.profile.winback
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
@@ -31,6 +32,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.core.os.BundleCompat
+import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
 import androidx.navigation.NavBackStackEntry
@@ -49,11 +52,16 @@ import au.com.shiftyjelly.pocketcasts.views.activity.WebViewActivity
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import kotlinx.parcelize.Parcelize
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
 class WinbackFragment : BaseDialogFragment() {
     private val viewModel by viewModels<WinbackViewModel>()
+
+    private val params get() = requireNotNull(BundleCompat.getParcelable(requireArguments(), INPUT_ARGS, WinbackInitParams::class.java)) {
+        "Missing input parameters"
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -72,7 +80,11 @@ class WinbackFragment : BaseDialogFragment() {
             Box {
                 NavHost(
                     navController = navController,
-                    startDestination = WinbackNavRoutes.WinbackOffer,
+                    startDestination = if (params.hasGoogleSubscription) {
+                        WinbackNavRoutes.WinbackOffer
+                    } else {
+                        WinbackNavRoutes.CancelConfirmation
+                    },
                     enterTransition = { slideInToStart() },
                     exitTransition = { slideOutToStart() },
                     popEnterTransition = { slideInToEnd() },
@@ -197,7 +209,7 @@ class WinbackFragment : BaseDialogFragment() {
     }
 
     private fun handleSubscriptionCancellation(productIds: List<String>): Boolean {
-        return if (productIds.isNotEmpty()) {
+        return if (productIds.isNotEmpty() && params.hasGoogleSubscription) {
             goToPlayStoreSubscriptions(productIds.singleOrNull())
         } else {
             WebViewActivity.show(
@@ -222,6 +234,25 @@ class WinbackFragment : BaseDialogFragment() {
             .appendQueryParameter("package", requireContext().packageName)
             .build()
         return runCatching { startActivity(Intent(Intent.ACTION_VIEW, uri)) }.isSuccess
+    }
+
+    companion object {
+        private const val INPUT_ARGS = "WinbackFragment.Params"
+
+        fun create(params: WinbackInitParams) = WinbackFragment().apply {
+            arguments = bundleOf(INPUT_ARGS to params)
+        }
+    }
+}
+
+@Parcelize
+data class WinbackInitParams(
+    val hasGoogleSubscription: Boolean,
+) : Parcelable {
+    companion object {
+        val Empty = WinbackInitParams(
+            hasGoogleSubscription = false,
+        )
     }
 }
 

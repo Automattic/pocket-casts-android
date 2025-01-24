@@ -9,9 +9,12 @@ import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.profile.winback.WinbackInitParams
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchasesState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
@@ -34,12 +37,11 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 @HiltViewModel
-class AccountDetailsViewModel
-@Inject constructor(
-    subscriptionManager: SubscriptionManager,
+class AccountDetailsViewModel @Inject constructor(
     userManager: UserManager,
-    private val settings: Settings,
+    private val subscriptionManager: SubscriptionManager,
     private val syncManager: SyncManager,
+    private val settings: Settings,
     private val analyticsTracker: AnalyticsTracker,
     private val crashLogging: CrashLogging,
     private val subscriptionMapper: SubscriptionMapper,
@@ -131,6 +133,7 @@ class AccountDetailsViewModel
         AccountSectionsState(
             isSubscribedToNewsLetter = marketingOptIn,
             email = signedInState?.email,
+            winbackInitParams = computeWinbackParams(signInState),
             canChangeCredentials = !syncManager.isGoogleLogin(),
             canUpgradeAccount = signedInState?.isSignedInAsPlus == true && isGiftExpiring,
             canCancelSubscription = signedInState?.isSignedInAsPaid == true,
@@ -141,11 +144,30 @@ class AccountDetailsViewModel
         initialValue = AccountSectionsState(
             isSubscribedToNewsLetter = false,
             email = null,
+            winbackInitParams = WinbackInitParams.Empty,
             canChangeCredentials = false,
             canUpgradeAccount = false,
             canCancelSubscription = false,
         ),
     )
+
+    private suspend fun computeWinbackParams(signInState: SignInState): WinbackInitParams {
+        val paidSubscriptionStatus = (signInState as? SignInState.SignedIn)?.subscriptionStatus as? SubscriptionStatus.Paid
+        val subscriptionPlatform = paidSubscriptionStatus?.platform
+
+        return if (subscriptionPlatform != SubscriptionPlatform.ANDROID) {
+            WinbackInitParams.Empty
+        } else {
+            when (val purchasesState = subscriptionManager.loadPurchases()) {
+                is PurchasesState.Failure -> WinbackInitParams.Empty
+                is PurchasesState.Loaded -> WinbackInitParams(
+                    hasGoogleSubscription = purchasesState.purchases
+                        .filter { it.isAcknowledged && it.isAutoRenewing }
+                        .isNotEmpty(),
+                )
+            }
+        }
+    }
 
     internal val miniPlayerInset = settings.bottomInset.stateIn(
         scope = viewModelScope,

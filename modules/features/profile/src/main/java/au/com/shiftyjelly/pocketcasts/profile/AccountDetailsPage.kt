@@ -33,6 +33,7 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.profile.winback.WinbackInitParams
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import kotlin.time.Duration.Companion.days
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.ProfileUpgradeBannerViewModel.State as UpgradeBannerState
@@ -50,7 +51,7 @@ internal fun AccountDetailsPage(
     onChangeEmail: () -> Unit,
     onChangePassword: () -> Unit,
     onUpgradeToPatron: () -> Unit,
-    onCancelSubscription: () -> Unit,
+    onCancelSubscription: (WinbackInitParams) -> Unit,
     onChangeNewsletterSubscription: (Boolean) -> Unit,
     onShowPrivacyPolicy: () -> Unit,
     onShowTermsOfUse: () -> Unit,
@@ -222,6 +223,7 @@ private fun AccountDetailsPageStub(
             sectionsState = AccountSectionsState(
                 isSubscribedToNewsLetter = false,
                 email = "noreplay@pocketcasts.com",
+                winbackInitParams = WinbackInitParams.Empty,
                 canChangeCredentials = true,
                 canUpgradeAccount = true,
                 canCancelSubscription = true,
