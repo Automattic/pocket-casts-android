@@ -53,15 +53,22 @@ class MultiSelectToolbar @JvmOverloads constructor(
                 menu.clear()
 
                 val maxIcons = multiSelectHelper.maxToolbarIcons
-                it.subList(0, maxIcons).forEachIndexed { _, action ->
+
+                val visibleIcons = it.filter { action ->
+                    if (action is MultiSelectEpisodeAction.RemoveListeningHistory) {
+                        sourceView == SourceView.LISTENING_HISTORY
+                    } else {
+                        action.isVisible
+                    }
+                }.take(maxIcons)
+
+                visibleIcons.forEachIndexed { _, action ->
                     val item = menu.add(Menu.NONE, action.actionId, 0, action.title)
                     item.setIcon(action.iconRes)
                     item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
-                    item.isVisible =
-                        if (action is MultiSelectEpisodeAction.RemoveListeningHistory && sourceView != SourceView.LISTENING_HISTORY) false else action.isVisible
                 }
 
-                overflowItems = it.subList(maxIcons, it.size)
+                overflowItems = it - visibleIcons
 
                 when (multiSelectHelper) {
                     is MultiSelectBookmarksHelper -> {
