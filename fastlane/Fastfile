@@ -300,16 +300,31 @@ platform :android do
   # Update the rollout of all 3 variants (app, automotive, wear) of the current version to the given value
   #
   # @param percent [Float] The rollout percentage, between 0 and 1
+  # @param production_track [Boolean]
+  #        If `true`, will update the rollout of the latest build in Production tracks.
+  #        If `false`, will update the rollout of the latest build in Beta tracks.
+  #        If `nil`, will derive the track based on if the `version_name_current` contains `-rc-` or not.
   #
-  lane :update_rollouts do |percent:|
-    version = version_name_current
-    build_code = build_code_current
-    is_beta = beta_version?(version)
+  lane :update_rollouts do |percent:, production_track: nil|
+    if production_track.nil?
+      # Derive values from current version in `version.properties`
+      is_beta = beta_version?(version_name_current)
+      base_version_code = build_code_current
+    else
+      # Use Google Play API to find the latest versionCode for the requested track
+      is_beta = !production_track
+      prod_version_codes = google_play_track_version_codes(
+        package_name: APP_PACKAGE_NAME,
+        track: production_track ? 'production' : 'beta', # Use the mobile app's track (not wear or automotive), to get the base_version_code
+        json_key: UPLOAD_TO_PLAY_STORE_JSON_KEY
+      )
+      base_version_code = prod_version_codes.max # Use the latest (as there's likely to be 2: the previous one already at 100%, and the latest one with partial rollout)
+    end
 
     not_found_variants = []
     APPS.each do |app|
       track = play_store_track(app: app, is_beta: is_beta)
-      version_code = version_code_for_app(app: app, version_code: build_code)
+      version_code = version_code_for_app(app: app, version_code: base_version_code)
       upload_to_play_store(
         **UPLOAD_TO_PLAY_STORE_COMMON_OPTIONS,
         skip_upload_aab: true,
@@ -321,11 +336,11 @@ platform :android do
     rescue FastlaneCore::Interface::FastlaneError => e
       raise unless e.message =~ /Unable to find the requested release on track/
 
-      not_found_variants << app
+      not_found_variants << "'#{app}' variant with version code `#{version_code}` was not found in `#{track}` track in Google Play Console"
     end
 
-    not_found_variants.each do |app|
-      UI.important("'#{app}' variant for `#{version}` was not found in Google Play Console")
+    not_found_variants.each do |message|
+      UI.important(message)
     end
     UI.user_error!('None of the 3 app variants were found in Google Play Console. We expected at least one') if not_found_variants.count == APPS.count
   end
