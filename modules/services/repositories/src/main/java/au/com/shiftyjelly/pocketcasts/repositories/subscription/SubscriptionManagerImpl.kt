@@ -51,8 +51,6 @@ import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.rx2.rxSingle
 
-private const val SUBSCRIPTION_REPLACEMENT_MODE_NOT_SET = -1
-
 @Singleton
 class SubscriptionManagerImpl @Inject constructor(
     private val billingClient: BillingClientWrapper,
@@ -159,6 +157,7 @@ class SubscriptionManagerImpl @Inject constructor(
                         if (existingPurchase != null) {
                             try {
                                 sendPurchaseToServer(existingPurchase)
+                                purchaseEvents.accept(PurchaseEvent.Success)
                             } catch (e: Throwable) {
                                 logSubscriptionError(e, "Failed to send purchase info")
                                 val failureEvent = PurchaseEvent.Failure(e.message ?: "Unknown errror", billingResult.responseCode)
@@ -242,7 +241,12 @@ class SubscriptionManagerImpl @Inject constructor(
     }
 
     private suspend fun acknowledgePurchase(purchase: Purchase) {
-        billingClient.acknowledgePurchase(acknowledgePurchaseParams(purchase))
+        val result = billingClient.acknowledgePurchase(acknowledgePurchaseParams(purchase))
+        if (result.isOk()) {
+            purchaseEvents.accept(PurchaseEvent.Success)
+        } else {
+            purchaseEvents.accept(PurchaseEvent.Failure(result.debugMessage, result.responseCode))
+        }
     }
 
     private suspend fun sendPurchaseToServer(purchase: Purchase) {
@@ -254,7 +258,6 @@ class SubscriptionManagerImpl @Inject constructor(
         val newStatus = response.toStatus()
         cachedSubscriptionStatus = newStatus
         subscriptionStatus.accept(Optional.of(newStatus))
-        purchaseEvents.accept(PurchaseEvent.Success)
     }
 
     override fun launchBillingFlow(
@@ -287,12 +290,46 @@ class SubscriptionManagerImpl @Inject constructor(
         }
     }
 
+    override suspend fun changeProduct(
+        currentPurchase: Purchase,
+        currentPurchaseProductId: String,
+        newProduct: ProductDetails,
+        newProductOfferToken: String,
+        activity: AppCompatActivity,
+    ): Boolean {
+        val productDetailsParams = BillingFlowParams.ProductDetailsParams.newBuilder()
+            .setProductDetails(newProduct)
+            .setOfferToken(newProductOfferToken)
+            .build()
+
+        val updateParams = getReplacementMode(currentPurchaseProductId, newProduct.productId)
+            ?.let { replacementMode ->
+                BillingFlowParams.SubscriptionUpdateParams.newBuilder()
+                    .setOldPurchaseToken(currentPurchase.purchaseToken)
+                    .setSubscriptionReplacementMode(replacementMode)
+                    .build()
+            }
+
+        val billingFlowParams = BillingFlowParams.newBuilder()
+            .setProductDetailsParamsList(listOf(productDetailsParams))
+            .let { builder ->
+                if (updateParams != null) {
+                    builder.setSubscriptionUpdateParams(updateParams)
+                } else {
+                    builder
+                }
+            }
+            .build()
+        val result = billingClient.launchBillingFlow(activity, billingFlowParams)
+        return result.isOk()
+    }
+
     private suspend fun loadSubscriptionUpdateParamsMode(
         productDetails: ProductDetails,
     ): Pair<BillingResult, BillingFlowParams.SubscriptionUpdateParams?> {
         val replacementMode = settings.cachedSubscriptionStatus.value
-            ?.let { subscriptionStatus -> getSubscriptionReplacementMode(subscriptionStatus, productDetails) }
-            ?.takeIf { it != SUBSCRIPTION_REPLACEMENT_MODE_NOT_SET }
+            ?.let(::getProductId)
+            ?.let { productId -> getReplacementMode(oldProductId = productId, newProductId = productDetails.productId) }
 
         if (replacementMode == null) {
             return okResult to null
@@ -420,38 +457,83 @@ class SubscriptionManagerImpl @Inject constructor(
     }
 }
 
-private fun getSubscriptionReplacementMode(
-    subscribedPlanStatus: SubscriptionStatus,
-    newPlanDetails: ProductDetails,
-) = when {
-    /* Since upgrading to a more expensive tier, recommended replacement mode is CHARGE_PRORATED_PRICE (https://rb.gy/acghw) */
-    subscribedPlanStatus is SubscriptionStatus.Paid &&
-        subscribedPlanStatus.tier == SubscriptionTier.PLUS &&
-        subscribedPlanStatus.platform == SubscriptionPlatform.ANDROID &&
-        newPlanDetails.productId in listOf(PATRON_MONTHLY_PRODUCT_ID, PATRON_YEARLY_PRODUCT_ID)
-    -> BillingFlowParams.SubscriptionUpdateParams.ReplacementMode.CHARGE_PRORATED_PRICE
+private fun getProductId(subscriptionStatus: SubscriptionStatus): String? {
+    return (subscriptionStatus as? SubscriptionStatus.Paid)
+        ?.takeIf { it.platform == SubscriptionPlatform.ANDROID }
+        ?.let { status ->
+            when (status.tier) {
+                SubscriptionTier.NONE -> null
+                SubscriptionTier.PLUS -> when (status.frequency) {
+                    SubscriptionFrequency.NONE -> null
+                    SubscriptionFrequency.MONTHLY -> PLUS_MONTHLY_PRODUCT_ID
+                    SubscriptionFrequency.YEARLY -> PLUS_YEARLY_PRODUCT_ID
+                }
+                SubscriptionTier.PATRON -> when (status.frequency) {
+                    SubscriptionFrequency.NONE -> null
+                    SubscriptionFrequency.MONTHLY -> PATRON_MONTHLY_PRODUCT_ID
+                    SubscriptionFrequency.YEARLY -> PATRON_YEARLY_PRODUCT_ID
+                }
+            }
+        }
+}
 
-    /* Since upgrading from shorter to longer billing period within same Plus tier, recommended replacement mode is CHARGE_FULL_PRICE (https://rb.gy/8h4adz) */
-    subscribedPlanStatus is SubscriptionStatus.Paid &&
-        subscribedPlanStatus.tier == SubscriptionTier.PLUS &&
-        subscribedPlanStatus.platform == SubscriptionPlatform.ANDROID &&
-        subscribedPlanStatus.frequency == SubscriptionFrequency.MONTHLY &&
-        newPlanDetails.productId == PLUS_YEARLY_PRODUCT_ID -> BillingFlowParams.SubscriptionUpdateParams.ReplacementMode.CHARGE_FULL_PRICE
+/**
+ * Determines the correct subscription replacement mode when a user switches subscriptions
+ * from one plan to another, based on a predefined transition table.
+ *
+ * Transition Table:
+ * ```
+ * |                | Plus Monthly        | Patron Monthly        | Plus Yearly           | Patron Yearly         |
+ * | Plus Monthly   | N/A                 | CHARGE_PRORATED_PRICE | CHARGE_FULL_PRICE     | CHARGE_FULL_PRICE     |
+ * | Patron Monthly | WITH_TIME_PRORATION | N/A                   | CHARGE_FULL_PRICE     | CHARGE_FULL_PRICE     |
+ * | Plus Yearly    | WITH_TIME_PRORATION | WITH_TIME_PRORATION   | N/A                   | CHARGE_PRORATED_PRICE |
+ * | Patron Yearly  | WITH_TIME_PRORATION | WITH_TIME_PRORATION   | WITH_TIME_PRORATION   | N/A                   |
+ * ```
+ *
+ * * `CHARGE_PRORATED_PRICE`: Charge the price difference and keep the billing cycle.
+ * * `CHARGE_FULL_PRICE`: Upgrade or downgrade immediately. The remaining value is either carried over or prorated for time.
+ * * `WITH_TIME_PRORATION`: Upgrade or downgrade immediately. The remaining time is adjusted based on the price difference.
+ *
+ * Note: We avoid using the DEFERRED replacement mode because it leaves users
+ * without an active subscription until the deferred date, which complicates handling
+ * further plan changes.
+ *
+ * See the [documentation](https://developer.android.com/google/play/billing/subscriptions#replacement-modes) for details
+ * on replacement modes.
+ */
+private fun getReplacementMode(
+    oldProductId: String,
+    newProductId: String,
+) = when (oldProductId) {
+    PLUS_MONTHLY_PRODUCT_ID -> when (newProductId) {
+        PATRON_MONTHLY_PRODUCT_ID -> BillingFlowParams.SubscriptionUpdateParams.ReplacementMode.CHARGE_PRORATED_PRICE
+        PLUS_YEARLY_PRODUCT_ID -> BillingFlowParams.SubscriptionUpdateParams.ReplacementMode.CHARGE_FULL_PRICE
+        PATRON_YEARLY_PRODUCT_ID -> BillingFlowParams.SubscriptionUpdateParams.ReplacementMode.CHARGE_FULL_PRICE
+        else -> null
+    }
 
-    /* Since upgrading from shorter to longer billing period within same Patron tier, recommended replacement mode is CHARGE_FULL_PRICE (https://rb.gy/8h4adz) */
-    subscribedPlanStatus is SubscriptionStatus.Paid &&
-        subscribedPlanStatus.tier == SubscriptionTier.PATRON &&
-        subscribedPlanStatus.platform == SubscriptionPlatform.ANDROID &&
-        subscribedPlanStatus.frequency == SubscriptionFrequency.MONTHLY &&
-        newPlanDetails.productId == PATRON_YEARLY_PRODUCT_ID -> BillingFlowParams.SubscriptionUpdateParams.ReplacementMode.CHARGE_FULL_PRICE
+    PATRON_MONTHLY_PRODUCT_ID -> when (newProductId) {
+        PLUS_MONTHLY_PRODUCT_ID -> BillingFlowParams.SubscriptionUpdateParams.ReplacementMode.WITH_TIME_PRORATION
+        PLUS_YEARLY_PRODUCT_ID -> BillingFlowParams.SubscriptionUpdateParams.ReplacementMode.CHARGE_FULL_PRICE
+        PATRON_YEARLY_PRODUCT_ID -> BillingFlowParams.SubscriptionUpdateParams.ReplacementMode.CHARGE_FULL_PRICE
+        else -> null
+    }
 
-    /* Since downgrading to less expensive plan, recommended replacement mode is DEFERRED (https://rb.gy/8y0wx0) */
-    subscribedPlanStatus is SubscriptionStatus.Paid &&
-        subscribedPlanStatus.platform == SubscriptionPlatform.ANDROID &&
-        subscribedPlanStatus.frequency == SubscriptionFrequency.YEARLY &&
-        newPlanDetails.productId in listOf(PLUS_MONTHLY_PRODUCT_ID, PATRON_MONTHLY_PRODUCT_ID) -> BillingFlowParams.SubscriptionUpdateParams.ReplacementMode.DEFERRED
+    PLUS_YEARLY_PRODUCT_ID -> when (newProductId) {
+        PLUS_MONTHLY_PRODUCT_ID -> BillingFlowParams.SubscriptionUpdateParams.ReplacementMode.WITH_TIME_PRORATION
+        PATRON_MONTHLY_PRODUCT_ID -> BillingFlowParams.SubscriptionUpdateParams.ReplacementMode.WITH_TIME_PRORATION
+        PATRON_YEARLY_PRODUCT_ID -> BillingFlowParams.SubscriptionUpdateParams.ReplacementMode.CHARGE_PRORATED_PRICE
+        else -> null
+    }
 
-    else -> SUBSCRIPTION_REPLACEMENT_MODE_NOT_SET
+    PATRON_YEARLY_PRODUCT_ID -> when (newProductId) {
+        PLUS_MONTHLY_PRODUCT_ID -> BillingFlowParams.SubscriptionUpdateParams.ReplacementMode.WITH_TIME_PRORATION
+        PATRON_MONTHLY_PRODUCT_ID -> BillingFlowParams.SubscriptionUpdateParams.ReplacementMode.WITH_TIME_PRORATION
+        PLUS_YEARLY_PRODUCT_ID -> BillingFlowParams.SubscriptionUpdateParams.ReplacementMode.WITH_TIME_PRORATION
+        else -> null
+    }
+
+    else -> null
 }
 
 sealed interface ProductDetailsState {

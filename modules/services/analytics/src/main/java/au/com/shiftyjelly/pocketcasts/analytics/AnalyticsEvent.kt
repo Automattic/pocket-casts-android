@@ -311,7 +311,7 @@ enum class AnalyticsEvent(val key: String) {
     DISCOVER_LIST_EPISODE_TAPPED("discover_list_episode_tapped"),
     DISCOVER_LIST_EPISODE_PLAY("discover_list_episode_play"),
     DISCOVER_LIST_PODCAST_TAPPED("discover_list_podcast_tapped"),
-    DISCOVER_LIST_SHARE_TAPPED_TAPPED("discover_list_share_tapped_tapped"),
+    DISCOVER_LIST_SHARE_TAPPED("discover_list_share_tapped"),
     DISCOVER_LIST_PODCAST_SUBSCRIBED("discover_list_podcast_subscribed"),
     DISCOVER_FEATURED_PAGE_CHANGED("discover_featured_page_changed"),
     DISCOVER_SMALL_LIST_PAGE_CHANGED("discover_small_list_page_changed"),
@@ -524,6 +524,7 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_SELECT_PODCASTS_SELECT_NONE_TAPPED("settings_select_podcasts_select_none_tapped"),
     SETTINGS_SELECT_PODCASTS_PODCAST_TOGGLED("settings_select_podcasts_podcast_toggled"),
     SETTINGS_SELECT_PODCASTS_SELECT_ALL_PODCASTS_TOGGLED("settings_select_podcasts_select_all_podcasts_toggled"),
+    SETTINGS_SELECT_PODCASTS_DISMISSED("settings_select_podcasts_dismissed"),
 
     /* Settings - Files */
     SETTINGS_FILES_SHOWN("settings_files_shown"),
@@ -723,4 +724,16 @@ enum class AnalyticsEvent(val key: String) {
     /* Battery Restrictions */
     BATTERY_RESTRICTIONS_SHOWN("battery_restrictions_shown"),
     BATTERY_RESTRICTIONS_TOGGLED("battery_restrictions_toggled"),
+
+    /* Winback */
+    WINBACK_SCREEN_SHOWN("winback_screen_shown"),
+    WINBACK_SCREEN_DISMISSED("winback_screen_dismissed"),
+    WINBACK_CONTINUE_BUTTON_TAP("winback_continue_button_tap"),
+    WINBACK_MAIN_SCREEN_ROW_TAP("winback_main_screen_row_tap"),
+    WINBACK_OFFER_CLAIMED_DONE_BUTTON_TAPPED("winback_offer_claimed_done_button_tapped"),
+    WINBACK_AVAILABLE_PLANS_BACK_BUTTON_TAPPED("winback_available_plans_back_button_tapped"),
+    WINBACK_AVAILABLE_PLANS_SELECT_PLAN("winback_available_plans_select_plan"),
+    WINBACK_AVAILABLE_PLANS_NEW_PLAN_PURCHASE_SUCCESSFUL("winback_available_plans_new_plan_purchase_successful"),
+    WINBACK_CANCEL_CONFIRMATION_STAY_BUTTON_TAPPED("winback_cancel_confirmation_stay_button_tapped"),
+    WINBACK_CANCEL_CONFIRMATION_CANCEL_BUTTON_TAPPED("winback_cancel_confirmation_cancel_button_tapped"),
 }

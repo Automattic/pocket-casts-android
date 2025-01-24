@@ -55,9 +55,9 @@ class TracksAnalyticsTracker @Inject constructor(
 
             tracksClient.track(EVENTS_PREFIX + eventKey, propertiesToJSON, user, userType)
             if (propertiesToJSON.length() > 0) {
-                Timber.i("\uD83D\uDD35 Tracked: $eventKey, Properties: $propertiesToJSON")
+                Timber.tag("Tracks").i("\uD83D\uDD35 Tracked: $eventKey, Properties: $propertiesToJSON")
             } else {
-                Timber.i("\uD83D\uDD35 Tracked: $eventKey")
+                Timber.tag("Tracks").i("\uD83D\uDD35 Tracked: $eventKey")
             }
         }
     }

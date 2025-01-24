@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.android.billingclient.api.ProductDetails
+import com.android.billingclient.api.Purchase
 import io.reactivex.Flowable
 import io.reactivex.Single
 import kotlinx.coroutines.coroutineScope
@@ -31,6 +32,14 @@ interface SubscriptionManager {
     }
 
     fun launchBillingFlow(activity: AppCompatActivity, productDetails: ProductDetails, offerToken: String)
+
+    suspend fun changeProduct(
+        currentPurchase: Purchase,
+        currentPurchaseProductId: String,
+        newProduct: ProductDetails,
+        newProductOfferToken: String,
+        activity: AppCompatActivity,
+    ): Boolean
 
     fun signOut()
 
