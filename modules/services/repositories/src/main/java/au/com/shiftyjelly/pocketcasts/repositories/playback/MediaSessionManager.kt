@@ -287,12 +287,12 @@ class MediaSessionManager(
                 PlaybackStateCompat.ACTION_REWIND or
                 prepareActions
 
-            return if (shouldHideCustomSkipButtons()) {
+            return if (useCustomSkipButtons()) {
+                actions
+            } else {
                 PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS or
                     PlaybackStateCompat.ACTION_SKIP_TO_NEXT or
                     actions
-            } else {
-                actions
             }
         }
     }
@@ -428,7 +428,7 @@ class MediaSessionManager(
     }
 
     private fun addCustomActions(stateBuilder: PlaybackStateCompat.Builder, currentEpisode: BaseEpisode, playbackState: PlaybackState) {
-        if (!shouldHideCustomSkipButtons()) {
+        if (useCustomSkipButtons()) {
             addCustomAction(stateBuilder, APP_ACTION_SKIP_BACK, "Skip back", IR.drawable.media_skipback)
             addCustomAction(stateBuilder, APP_ACTION_SKIP_FWD, "Skip forward", IR.drawable.media_skipforward)
         }
@@ -960,8 +960,9 @@ class MediaSessionManager(
         playbackManager.playNow(episode = latestEpisode, sourceView = sourceView)
     }
 
-    private fun shouldHideCustomSkipButtons(): Boolean {
-        return MANUFACTURERS_TO_HIDE_CUSTOM_SKIP_BUTTONS.contains(Build.MANUFACTURER.lowercase())
+    private fun useCustomSkipButtons(): Boolean {
+        return !MANUFACTURERS_TO_HIDE_CUSTOM_SKIP_BUTTONS.contains(Build.MANUFACTURER.lowercase()) &&
+            !settings.nextPreviousTrackSkipButtons.value
     }
 }
 

@@ -15,6 +15,8 @@
 *   Bug Fixes
     *   Fix the Galaxy Watch skip buttons not working.
         ([#3455](https://github.com/Automattic/pocket-casts-android/pull/3455)) 
+    *   Add Pixel Watch skip buttons setting.
+        ([#3474](https://github.com/Automattic/pocket-casts-android/pull/3474))
     *   Fix the cropping issue with the Add 5 Minutes sleep timer button.
         ([#3436](https://github.com/Automattic/pocket-casts-android/pull/3436))
 

@@ -37,6 +37,7 @@ fun MediaActionsPage(
     state: State,
     onBackClick: () -> Unit,
     onShowCustomActionsChanged: (Boolean) -> Unit,
+    onNextPreviousTrackSkipButtonsChanged: (Boolean) -> Unit,
     onActionsOrderChanged: (List<MenuAction>) -> Unit,
     modifier: Modifier = Modifier,
     onActionMoved: (fromIndex: Int, toIndex: Int, action: MenuAction) -> Unit = { _, _, _ -> },
@@ -52,6 +53,8 @@ fun MediaActionsPage(
                 PageHeader(
                     customActionsVisibility = state.customActionsVisibility,
                     onShowCustomActionsChanged = onShowCustomActionsChanged,
+                    nextPreviousTrackSkipButtons = state.nextPreviousTrackSkipButtons,
+                    onNextPreviousTrackSkipButtonsChanged = onNextPreviousTrackSkipButtonsChanged,
                 )
             },
             menuActions = state.actions,
@@ -69,12 +72,18 @@ fun MediaActionsPage(
 private fun PageHeader(
     customActionsVisibility: Boolean,
     onShowCustomActionsChanged: (Boolean) -> Unit,
+    nextPreviousTrackSkipButtons: Boolean,
+    onNextPreviousTrackSkipButtonsChanged: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
         ShowCustomActionsSettings(
             customActionsVisibility = customActionsVisibility,
             onShowCustomActionsChanged = onShowCustomActionsChanged,
+        )
+        PixelWatchSKipButtonsSetting(
+            nextPreviousTrackSkipButtons = nextPreviousTrackSkipButtons,
+            onNextPreviousTrackSkipButtonsChanged = onNextPreviousTrackSkipButtonsChanged,
         )
         Spacer(Modifier.height(16.dp))
         SettingRow(
@@ -111,6 +120,28 @@ private fun ShowCustomActionsSettings(
     )
 }
 
+@Composable
+private fun PixelWatchSKipButtonsSetting(
+    nextPreviousTrackSkipButtons: Boolean,
+    onNextPreviousTrackSkipButtonsChanged: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingRow(
+        primaryText = stringResource(LR.string.settings_pixel_watch_title),
+        secondaryText = stringResource(LR.string.settings_pixel_watch_subtitle),
+        toggle = SettingRowToggle.Switch(checked = nextPreviousTrackSkipButtons),
+        indent = false,
+        modifier = modifier
+            .padding(top = 8.dp)
+            .toggleable(
+                value = nextPreviousTrackSkipButtons,
+                role = Role.Switch,
+            ) {
+                onNextPreviousTrackSkipButtonsChanged(it)
+            },
+    )
+}
+
 @Preview
 @Composable
 fun MediaActionsPagePreview(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
@@ -129,6 +160,7 @@ fun MediaActionsPagePreview(@PreviewParameter(ThemePreviewParameterProvider::cla
             ),
             onBackClick = {},
             onShowCustomActionsChanged = {},
+            onNextPreviousTrackSkipButtonsChanged = {},
             onActionsOrderChanged = {},
         )
     }

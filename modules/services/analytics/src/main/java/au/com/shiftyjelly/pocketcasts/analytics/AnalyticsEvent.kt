@@ -555,6 +555,7 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_GENERAL_AUTO_SLEEP_TIMER_RESTART_TOGGLED("settings_general_auto_sleep_timer_restart_toggled"),
     SETTINGS_GENERAL_MEDIA_NOTIFICATION_CONTROLS_SHOWN("settings_general_media_notification_controls_shown"),
     SETTINGS_GENERAL_MEDIA_NOTIFICATION_CONTROLS_SHOW_CUSTOM_TOGGLED("settings_general_media_notification_controls_show_custom_toggled"),
+    SETTINGS_GENERAL_MEDIA_NOTIFICATION_NEXT_PREVIOUS_TRACK_SKIP_BUTTONS_TOGGLED("settings_general_media_notification_next_previous_track_skip_buttons_toggled"),
     SETTINGS_GENERAL_MEDIA_NOTIFICATION_CONTROLS_ORDER_CHANGED("settings_general_media_notification_controls_order_changed"),
     SETTINGS_GENERAL_AUTOPLAY_TOGGLED("settings_general_autoplay_toggled"),
     SETTINGS_GENERAL_USE_REAL_TIME_FOR_PLAYBACK_REMAINING_TIME("settings_use_real_time_for_playback_remaining_time"),

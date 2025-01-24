@@ -395,7 +395,14 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
             }
         }
         multiSelectHelper.coordinatorLayout = (activity as FragmentHostListener).snackBarView()
-        binding?.multiSelectToolbar?.setup(viewLifecycleOwner, multiSelectHelper, menuRes = null, activity = requireActivity())
+
+        val sourceView = when (mode) {
+            Mode.Downloaded -> SourceView.DOWNLOADS
+            Mode.History -> SourceView.LISTENING_HISTORY
+            Mode.Starred -> SourceView.STARRED
+        }
+
+        binding?.multiSelectToolbar?.setup(viewLifecycleOwner, multiSelectHelper, menuRes = null, activity = requireActivity(), sourceView = sourceView)
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
