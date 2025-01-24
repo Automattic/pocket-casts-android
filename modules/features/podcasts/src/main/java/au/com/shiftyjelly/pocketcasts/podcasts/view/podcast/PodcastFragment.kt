@@ -923,17 +923,15 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                     PodcastViewModel.RefreshState.Error -> {}
                     PodcastViewModel.RefreshState.NotStarted -> {}
                     PodcastViewModel.RefreshState.Refreshed -> {
-                        binding?.loading?.visibility = View.GONE
-                        binding?.errorContainer?.visibility = View.GONE
-
                         (activity as? FragmentHostListener)?.snackBarView()?.let { snackBarView ->
                             Snackbar.make(snackBarView, getString(LR.string.podcast_refresh_list_updated), Snackbar.LENGTH_LONG).show()
                         }
                     }
 
                     PodcastViewModel.RefreshState.Refreshing -> {
-                        binding?.loading?.visibility = View.VISIBLE
-                        binding?.errorContainer?.visibility = View.GONE
+                        (activity as? FragmentHostListener)?.snackBarView()?.let { snackBarView ->
+                            Snackbar.make(snackBarView, getString(LR.string.podcast_refreshing_episode_list), Snackbar.LENGTH_INDEFINITE).show()
+                        }
                     }
                 }
             }
