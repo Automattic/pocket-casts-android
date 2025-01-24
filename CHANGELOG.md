@@ -2,7 +2,10 @@
 -----
 *   Bug Fixes
     *   Fix status bar theming during onboarding.
-        ([#3460](https://github.com/Automattic/pocket-casts-android/pull/3460)) 
+        ([#3460](https://github.com/Automattic/pocket-casts-android/pull/3460))
+*   Updates
+    *   Remove audio and video clip sharing
+        ([#3481](https://github.com/Automattic/pocket-casts-android/pull/3481))
 
 7.81
 -----
