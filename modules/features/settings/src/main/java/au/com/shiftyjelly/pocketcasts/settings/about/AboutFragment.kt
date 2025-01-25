@@ -114,8 +114,8 @@ class AboutFragment : BaseFragment() {
                 onInstagramTapped = {
                     analyticsTracker.track(AnalyticsEvent.SETTINGS_ABOUT_INSTAGRAM_TAPPED)
                 },
-                onTwitterTapped = {
-                    analyticsTracker.track(AnalyticsEvent.SETTINGS_ABOUT_TWITTER_TAPPED)
+                onXTapped = {
+                    analyticsTracker.track(AnalyticsEvent.SETTINGS_ABOUT_X_TAPPED)
                 },
                 onAutomatticFamilyTapped = {
                     analyticsTracker.track(AnalyticsEvent.SETTINGS_ABOUT_AUTOMATTIC_FAMILY_TAPPED)
@@ -202,7 +202,7 @@ private fun AboutPage(
     onShareWithFriendsTapped: () -> Unit,
     onWebsiteTapped: () -> Unit,
     onInstagramTapped: () -> Unit,
-    onTwitterTapped: () -> Unit,
+    onXTapped: () -> Unit,
     onAutomatticFamilyTapped: () -> Unit = {},
     onWorkWithUsTapped: () -> Unit = {},
     onTermsOfServiceTapped: () -> Unit = {},
@@ -286,11 +286,11 @@ private fun AboutPage(
         }
         item {
             RowTextButton(
-                text = stringResource(LR.string.settings_about_twitter),
+                text = stringResource(LR.string.settings_about_x),
                 secondaryText = "@pocketcasts",
                 onClick = {
-                    onTwitterTapped()
-                    openUrl("https://twitter.com/pocketcasts", context)
+                    onXTapped()
+                    openUrl("https://x.com/pocketcasts", context)
                 },
             )
         }
@@ -518,7 +518,7 @@ private fun AboutPagePreview() {
         onShareWithFriendsTapped = {},
         onWebsiteTapped = {},
         onInstagramTapped = {},
-        onTwitterTapped = {},
+        onXTapped = {},
         onAutomatticFamilyTapped = {},
         onWorkWithUsTapped = {},
     )
