@@ -149,6 +149,7 @@ fun BookmarkRow(
                     Box(modifier = Modifier.padding(start = 16.dp)) {
                         EpisodeImage(
                             episode = it,
+                            corners = 8.dp,
                             useEpisodeArtwork = useEpisodeArtwork,
                             modifier = modifier.size(56.dp),
                         )
