@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButtonColors
@@ -182,6 +183,7 @@ fun BookmarkRow(
                     text = bookmark.title,
                     color = colors.primaryTextColor(),
                     maxLines = 2,
+                    lineHeight = 18.sp,
                 )
 
                 TextH70(

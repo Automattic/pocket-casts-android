@@ -143,12 +143,13 @@ fun TextH40(
     fontWeight: FontWeight = FontWeight.W500,
     disableAutoScale: Boolean = false,
     fontScale: Float = 1f,
+    lineHeight: TextUnit = 21.sp.scaled(disableAutoScale, fontScale),
 ) {
     Text(
         text = text,
         color = color,
         fontSize = 15.sp.scaled(disableAutoScale, fontScale),
-        lineHeight = 21.sp.scaled(disableAutoScale, fontScale),
+        lineHeight = lineHeight,
         fontWeight = fontWeight,
         textAlign = textAlign,
         maxLines = maxLines,
