@@ -71,6 +71,7 @@ fun BookmarksPage(
     onClearSearchTapped: () -> Unit,
     onSearchBarClearButtonTapped: () -> Unit,
     bottomInset: Dp,
+    isDarkTheme: Boolean,
 ) {
     val context = LocalContext.current
     val state by bookmarksViewModel.uiState.collectAsStateWithLifecycle()
@@ -91,6 +92,7 @@ fun BookmarksPage(
         bottomInset = bottomInset,
         onClearSearchTapped = onClearSearchTapped,
         onSearchBarClearButtonTapped = onSearchBarClearButtonTapped,
+        isDarkTheme = isDarkTheme,
     )
     LaunchedEffect(episodeUuid) {
         bookmarksViewModel.loadBookmarks(
@@ -140,6 +142,7 @@ private fun Content(
     onClearSearchTapped: () -> Unit,
     onSearchBarClearButtonTapped: () -> Unit,
     bottomInset: Dp,
+    isDarkTheme: Boolean,
 ) {
     Box(
         modifier = Modifier
@@ -158,6 +161,7 @@ private fun Content(
                 bottomInset = bottomInset,
                 onClearSearchTapped = onClearSearchTapped,
                 onSearchBarClearButtonTapped = onSearchBarClearButtonTapped,
+                isDarkTheme = isDarkTheme,
             )
 
             is UiState.Empty -> NoBookmarksView(
@@ -191,6 +195,7 @@ private fun BookmarksView(
     onClearSearchTapped: () -> Unit,
     onSearchBarClearButtonTapped: () -> Unit,
     bottomInset: Dp,
+    isDarkTheme: Boolean,
 ) {
     val focusRequester = remember { FocusRequester() }
     LazyColumn(
@@ -268,6 +273,7 @@ private fun BookmarksView(
                 showIcon = state.showIcon,
                 useEpisodeArtwork = state.useEpisodeArtwork,
                 showEpisodeTitle = state.showEpisodeTitle,
+                isDarkTheme = isDarkTheme,
             )
         }
     }
@@ -317,6 +323,7 @@ private fun BookmarksPreview(
             onClearSearchTapped = {},
             onSearchBarClearButtonTapped = {},
             bottomInset = 0.dp,
+            isDarkTheme = false,
         )
     }
 }
