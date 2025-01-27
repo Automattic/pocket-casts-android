@@ -303,7 +303,7 @@ platform :android do
   # @param track [String] The Google Play track for which to update the rollout of. Must be either `beta` or `production`.
   #
   lane :update_rollouts do |percent:, track:|
-    UI.user_error!('percent parameter must be between 0.0 and 1.0') if percent.to_f < 0 || percent.to_f > 1
+    UI.user_error!('percent parameter must be between 0.0 and 1.0') if percent.to_f.negative? || percent.to_f > 1
     UI.user_error!('track parameter must be either `beta` or `production`') unless %w[beta production].include?(track)
 
     is_beta = track == 'beta'
