@@ -24,11 +24,6 @@
 # Protocol Buffers - keep the field names
 -keep class * extends com.google.protobuf.GeneratedMessageLite { *; }
 
-# https://github.com/google/dagger/issues/4323
--keepclasseswithmembers,includedescriptorclasses class * {
-   @dagger.internal.KeepFieldType <fields>;
-}
-
 # https://github.com/square/retrofit/issues/4134
 -if interface *
 -keepclasseswithmembers,allowobfuscation interface <1> {
