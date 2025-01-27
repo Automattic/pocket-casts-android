@@ -577,15 +577,15 @@ class PodcastViewModel
         analyticsTracker.track(AnalyticsEvent.BOOKMARK_SHARE_TAPPED, mapOf("podcast_uuid" to podcastUuid, "episode_uuid" to episodeUuid, "source" to source.analyticsValue))
     }
 
-    fun onRefreshPodcast() {
+    fun onRefreshPodcast(refreshType: RefreshType) {
         val podcast = podcast.value ?: return
 
         analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_REFRESH_EPISODE_LIST_TAPPED, mapOf("podcast_uuid" to podcast.uuid))
 
         launch {
-            _refreshState.emit(RefreshState.Refreshing)
+            _refreshState.emit(RefreshState.Refreshing(refreshType))
             delay(2.seconds)
-            _refreshState.emit(RefreshState.Refreshed)
+            _refreshState.emit(RefreshState.Refreshed(refreshType))
         }
     }
 
@@ -627,9 +627,14 @@ class PodcastViewModel
 
     sealed class RefreshState {
         data object NotStarted : RefreshState()
-        data object Refreshing : RefreshState()
-        data object Refreshed : RefreshState()
+        data class Refreshing(val type: RefreshType) : RefreshState()
+        data class Refreshed(val type: RefreshType) : RefreshState()
         data object Error : RefreshState()
+    }
+
+    enum class RefreshType {
+        PULL_TO_REFRESH,
+        REFRESH_BUTTON,
     }
 
     private object AnalyticsProp {
