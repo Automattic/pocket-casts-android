@@ -8,6 +8,8 @@
         ([#3481](https://github.com/Automattic/pocket-casts-android/pull/3481))
     *   Do not close episode details screen when archiving an episode
         ([#3473](https://github.com/Automattic/pocket-casts-android/pull/3473))
+    *   Rename Twitter to X
+        ([#3489](https://github.com/Automattic/pocket-casts-android/pull/3489))
 
 7.81
 -----
