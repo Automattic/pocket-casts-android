@@ -297,35 +297,44 @@ platform :android do
     end
   end
 
-  # Update the rollout of all 3 variants (app, automotive, wear) of the current version to the given value
+  # Update the rollout of all 3 variants/form-factors (app, automotive, wear) of the latest builds of the given Google Play track to the given % value
   #
   # @param percent [Float] The rollout percentage, between 0 and 1
+  # @param track [String] The Google Play track for which to update the rollout of. Must be either `beta` or `production`.
   #
-  lane :update_rollouts do |percent:|
-    version = version_name_current
-    build_code = build_code_current
-    is_beta = beta_version?(version)
+  lane :update_rollouts do |percent:, track:|
+    UI.user_error!('percent parameter must be between 0.0 and 1.0') if percent.to_f.negative? || percent.to_f > 1
+    UI.user_error!('track parameter must be either `beta` or `production`') unless %w[beta production].include?(track)
+
+    is_beta = track == 'beta'
+    # Use Google Play API to find the latest versionCode for the requested track
+    prod_version_codes = google_play_track_version_codes(
+      package_name: APP_PACKAGE_NAME,
+      track: track,
+      json_key: UPLOAD_TO_PLAY_STORE_JSON_KEY
+    )
+    base_version_code = prod_version_codes.max # Use the latest (as there's likely to be 2: the previous one already at 100%, and the latest one with partial rollout)
 
     not_found_variants = []
     APPS.each do |app|
-      track = play_store_track(app: app, is_beta: is_beta)
-      version_code = version_code_for_app(app: app, version_code: build_code)
+      variant_track = play_store_track(app: app, is_beta: is_beta)
+      variant_version_code = version_code_for_app(app: app, version_code: base_version_code)
       upload_to_play_store(
         **UPLOAD_TO_PLAY_STORE_COMMON_OPTIONS,
         skip_upload_aab: true,
-        track: track,
-        version_code: version_code,
+        track: variant_track,
+        version_code: variant_version_code,
         release_status: percent.to_f < 1.0 ? 'inProgress' : 'completed',
         rollout: percent.to_s
       )
     rescue FastlaneCore::Interface::FastlaneError => e
       raise unless e.message =~ /Unable to find the requested release on track/
 
-      not_found_variants << app
+      not_found_variants << "'#{app}' variant with version code `#{variant_version_code}` was not found in `#{variant_track}` track in Google Play Console"
     end
 
-    not_found_variants.each do |app|
-      UI.important("'#{app}' variant for `#{version}` was not found in Google Play Console")
+    not_found_variants.each do |message|
+      UI.important(message)
     end
     UI.user_error!('None of the 3 app variants were found in Google Play Console. We expected at least one') if not_found_variants.count == APPS.count
   end
