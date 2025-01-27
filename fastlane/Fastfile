@@ -297,31 +297,23 @@ platform :android do
     end
   end
 
-  # Update the rollout of all 3 variants (app, automotive, wear) of the current version to the given value
+  # Update the rollout of all 3 variants/form-factors (app, automotive, wear) of the latest builds of the given Google Play track to the given % value
   #
   # @param percent [Float] The rollout percentage, between 0 and 1
-  # @param track [String]
-  #        If `beta`, will update the rollout of the latest build in all 3 Beta tracks.
-  #        If `production`, will update the rollout of the latest build in all 3 Production tracks.
-  #        If `nil`, will derive the track based on if the `version_name_current` contains `-rc-` or not.
+  # @param track [String] The Google Play track for which to update the rollout of. Must be either `beta` or `production`.
   #
-  lane :update_rollouts do |percent:, track: nil|
-    if track.nil?
-      # Derive values from current version in `version.properties`
-      is_beta = beta_version?(version_name_current)
-      base_version_code = build_code_current
-    else
-      # Use Google Play API to find the latest versionCode for the requested track
-      UI.user_error!('track parameter must be either `beta` or `production`') unless %w[beta production].include?(track)
+  lane :update_rollouts do |percent:, track:|
+    UI.user_error!('percent parameter must be between 0.0 and 1.0') if percent.to_f < 0 || percent.to_f > 1
+    UI.user_error!('track parameter must be either `beta` or `production`') unless %w[beta production].include?(track)
 
-      is_beta = track == 'beta'
-      prod_version_codes = google_play_track_version_codes(
-        package_name: APP_PACKAGE_NAME,
-        track: track,
-        json_key: UPLOAD_TO_PLAY_STORE_JSON_KEY
-      )
-      base_version_code = prod_version_codes.max # Use the latest (as there's likely to be 2: the previous one already at 100%, and the latest one with partial rollout)
-    end
+    is_beta = track == 'beta'
+    # Use Google Play API to find the latest versionCode for the requested track
+    prod_version_codes = google_play_track_version_codes(
+      package_name: APP_PACKAGE_NAME,
+      track: track,
+      json_key: UPLOAD_TO_PLAY_STORE_JSON_KEY
+    )
+    base_version_code = prod_version_codes.max # Use the latest (as there's likely to be 2: the previous one already at 100%, and the latest one with partial rollout)
 
     not_found_variants = []
     APPS.each do |app|
