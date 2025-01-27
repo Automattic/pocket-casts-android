@@ -49,8 +49,6 @@ import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
-import java.util.Timer
-import java.util.TimerTask
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -524,43 +522,37 @@ class MediaSessionManager(
         val enqueueCommand: (String, suspend () -> Unit) -> Unit,
     ) : MediaSessionCompat.Callback() {
 
-        private var playPauseTimer: Timer? = null
         private var playFromSearchDisposable: Disposable? = null
-        private var buttonPressSuccessions: Int = 0
+        private val mediaEventQueue = MediaEventQueue(scope = this@MediaSessionManager)
 
         override fun onMediaButtonEvent(mediaButtonEvent: Intent): Boolean {
             if (Intent.ACTION_MEDIA_BUTTON == mediaButtonEvent.action) {
-                val keyEvent = IntentCompat.getParcelableExtra(mediaButtonEvent, Intent.EXTRA_KEY_EVENT, KeyEvent::class.java)
-                    ?: return false
+                val keyEvent = IntentCompat.getParcelableExtra(mediaButtonEvent, Intent.EXTRA_KEY_EVENT, KeyEvent::class.java) ?: return false
                 logEvent(keyEvent.toString())
                 if (keyEvent.action == KeyEvent.ACTION_DOWN) {
-                    when (keyEvent.keyCode) {
-                        // When the phone is in sleep mode, and the audio player doesn't have focus, KEYCODE_MEDIA_PLAY is
-                        // called instead of KEYCODE_MEDIA_PLAY_PAUSE or KEYCODE_HEADSETHOOK
-                        KeyEvent.KEYCODE_MEDIA_PLAY -> {
-                            handleMediaButtonSingleTap()
-                            return true
+                    val inputEvent = when (keyEvent.keyCode) {
+                        /**
+                         * KEYCODE_MEDIA_PLAY_PAUSE - called when the player audio has focus
+                         * KEYCODE_MEDIA_PLAY - can be called when the player doesn't have focus such when sleep mode
+                         * KEYCODE_HEADSETHOOK - called on most wired headsets
+                         */
+                        KeyEvent.KEYCODE_MEDIA_PLAY, KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, KeyEvent.KEYCODE_HEADSETHOOK -> MediaEvent.SingleTap
+                        KeyEvent.KEYCODE_MEDIA_NEXT -> MediaEvent.DoubleTap
+                        KeyEvent.KEYCODE_MEDIA_PREVIOUS -> MediaEvent.TrippleTap
+                        else -> null
+                    }
+
+                    if (inputEvent != null) {
+                        launch {
+                            val outputEvent = mediaEventQueue.consumeEvent(inputEvent)
+                            when (outputEvent) {
+                                MediaEvent.SingleTap -> handleMediaButtonSingleTap()
+                                MediaEvent.DoubleTap -> handleMediaButtonDoubleTap()
+                                MediaEvent.TrippleTap -> handleMediaButtonTripleTap()
+                                null -> Unit
+                            }
                         }
-                        // Some wired headphones, such as the Apple USB-C headphones do not invoke KeyEvent.KEYCODE_HEADSETHOOK.
-                        KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE -> {
-                            handleMediaButtonSingleTap()
-                            return true
-                        }
-                        // This should be called on most wired headsets.
-                        KeyEvent.KEYCODE_HEADSETHOOK -> {
-                            handleMediaButtonSingleTap()
-                            return true
-                        }
-                        KeyEvent.KEYCODE_MEDIA_NEXT -> {
-                            // Not sent on some devices. Use KEYCODE_MEDIA_PLAY_PAUSE or KEYCODE_HEADSETHOOK timeout workarounds
-                            handleMediaButtonDoubleTap()
-                            return true
-                        }
-                        KeyEvent.KEYCODE_MEDIA_PREVIOUS -> {
-                            // Not sent on some devices. Use KEYCODE_MEDIA_PLAY_PAUSE or KEYCODE_HEADSETHOOK timeout workarounds
-                            handleMediaButtonTripleTap()
-                            return true
-                        }
+                        return true
                     }
                 }
             } else {
@@ -582,49 +574,15 @@ class MediaSessionManager(
             }
         }
 
-        private fun getCurrentControllerInfo(): String {
-            val info = mediaSession.currentControllerInfo
-            return "Controller: ${info.packageName} pid: ${info.pid} uid: ${info.uid}"
+        private fun logEvent(action: String) {
+            val userInfo = runCatching {
+                val info = mediaSession.currentControllerInfo
+                "Controller: ${info.packageName} pid: ${info.pid} uid: ${info.uid}"
+            }.getOrNull()
+            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Event from Media Session to $action. ${userInfo.orEmpty()}")
         }
-
-        // The parameter inSessionCallback can only be set to true if being called from the MediaSession.Callback thread. The method getCurrentControllerInfo() can only be called from this thread.
-        private fun logEvent(action: String, inSessionCallback: Boolean = true) {
-            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Event from Media Session to $action. ${if (inSessionCallback) getCurrentControllerInfo() else ""}")
-        }
-
         private fun handleMediaButtonSingleTap() {
-            // this code allows the user to double tap or triple tap their play pause button to skip ahead.
-            // Basically it allows them 600ms to press it again (or a third time) to cause a skip forward/backward instead of a play/pause
-            buttonPressSuccessions++
-
-            if (buttonPressSuccessions == 1) {
-                playPauseTimer = Timer().apply {
-                    schedule(
-                        object : TimerTask() {
-                            override fun run() {
-                                logEvent("play from headset hook", inSessionCallback = false)
-
-                                when {
-                                    buttonPressSuccessions == 2 && playbackManager.isPlaying() ->
-                                        playbackManager.skipForward(sourceView = source)
-
-                                    buttonPressSuccessions == 3 && playbackManager.isPlaying() ->
-                                        playbackManager.skipBackward(sourceView = source)
-
-                                    else ->
-                                        playbackManager.playPause(sourceView = source)
-                                }
-
-                                // Invalidate timer and reset the number of button press quick successions
-                                playPauseTimer?.cancel()
-                                playPauseTimer = null
-                                buttonPressSuccessions = 0
-                            }
-                        },
-                        600,
-                    )
-                }
-            }
+            playbackManager.playPause(sourceView = source)
         }
 
         private fun handleMediaButtonDoubleTap() {
@@ -722,7 +680,7 @@ class MediaSessionManager(
         override fun onPlayFromMediaId(mediaId: String?, extras: Bundle?) {
             mediaId ?: return
             launch {
-                logEvent("play from media id", inSessionCallback = false)
+                logEvent("play from media id")
 
                 val autoMediaId = AutoMediaId.fromMediaId(mediaId)
                 val episodeId = autoMediaId.episodeId
