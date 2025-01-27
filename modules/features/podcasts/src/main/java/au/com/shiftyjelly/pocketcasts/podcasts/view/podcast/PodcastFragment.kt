@@ -384,7 +384,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             optionsDialog = optionsDialog.addTextOption(
                 titleId = LR.string.podcast_refresh_episodes,
                 imageId = IR.drawable.ic_refresh,
-                click = { viewModel.onRefreshPodcast() },
+                click = { viewModel.onRefreshPodcast(PodcastViewModel.RefreshType.REFRESH_BUTTON) },
             )
         }
 
@@ -712,6 +712,10 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             loadData()
         }
 
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            viewModel.onRefreshPodcast(PodcastViewModel.RefreshType.PULL_TO_REFRESH)
+        }
+
         binding.episodesRecyclerView.requestFocus()
 
         return binding.root
@@ -922,15 +926,23 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                 when (state) {
                     PodcastViewModel.RefreshState.Error -> {}
                     PodcastViewModel.RefreshState.NotStarted -> {}
-                    PodcastViewModel.RefreshState.Refreshed -> {
-                        (activity as? FragmentHostListener)?.snackBarView()?.let { snackBarView ->
-                            Snackbar.make(snackBarView, getString(LR.string.podcast_refresh_list_updated), Snackbar.LENGTH_LONG).show()
+                    is PodcastViewModel.RefreshState.Refreshed -> {
+                        if (state.type == PodcastViewModel.RefreshType.PULL_TO_REFRESH) {
+                            binding?.swipeRefreshLayout?.isRefreshing = false
+                        } else {
+                            (activity as? FragmentHostListener)?.snackBarView()?.let { snackBarView ->
+                                Snackbar.make(snackBarView, getString(LR.string.podcast_refresh_list_updated), Snackbar.LENGTH_LONG).show()
+                            }
                         }
                     }
 
-                    PodcastViewModel.RefreshState.Refreshing -> {
-                        (activity as? FragmentHostListener)?.snackBarView()?.let { snackBarView ->
-                            Snackbar.make(snackBarView, getString(LR.string.podcast_refreshing_episode_list), Snackbar.LENGTH_INDEFINITE).show()
+                    is PodcastViewModel.RefreshState.Refreshing -> {
+                        if (state.type == PodcastViewModel.RefreshType.PULL_TO_REFRESH) {
+                            binding?.swipeRefreshLayout?.isRefreshing = true
+                        } else {
+                            (activity as? FragmentHostListener)?.snackBarView()?.let { snackBarView ->
+                                Snackbar.make(snackBarView, getString(LR.string.podcast_refreshing_episode_list), Snackbar.LENGTH_INDEFINITE).show()
+                            }
                         }
                     }
                 }
