@@ -580,7 +580,7 @@ class PodcastViewModel
     fun onRefreshPodcast(refreshType: RefreshType) {
         val podcast = podcast.value ?: return
 
-        analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_REFRESH_EPISODE_LIST_TAPPED, mapOf("podcast_uuid" to podcast.uuid))
+        analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_REFRESH_EPISODE_LIST, mapOf("podcast_uuid" to podcast.uuid, "action" to refreshType.analyticsValue))
 
         launch {
             _refreshState.emit(RefreshState.Refreshing(refreshType))
@@ -632,9 +632,9 @@ class PodcastViewModel
         data object Error : RefreshState()
     }
 
-    enum class RefreshType {
-        PULL_TO_REFRESH,
-        REFRESH_BUTTON,
+    enum class RefreshType(val analyticsValue: String) {
+        PULL_TO_REFRESH("pull_to_refresh"),
+        REFRESH_BUTTON("refresh_button"),
     }
 
     private object AnalyticsProp {
