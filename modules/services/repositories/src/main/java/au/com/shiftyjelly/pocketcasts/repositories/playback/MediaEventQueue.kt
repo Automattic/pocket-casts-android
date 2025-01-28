@@ -13,7 +13,7 @@ internal class MediaEventQueue(
 
     suspend fun consumeEvent(event: MediaEvent) = when (event) {
         MediaEvent.SingleTap -> handleSingleTapEvent()
-        MediaEvent.DoubleTap, MediaEvent.TrippleTap -> handleMultiTapEvent(event)
+        MediaEvent.DoubleTap, MediaEvent.TripleTap -> handleMultiTapEvent(event)
     }
 
     private suspend fun handleSingleTapEvent(): MediaEvent? {
@@ -65,7 +65,7 @@ internal class MediaEventQueue(
         fun event() = when (counter) {
             1 -> MediaEvent.SingleTap
             2 -> MediaEvent.DoubleTap
-            else -> MediaEvent.TrippleTap
+            else -> MediaEvent.TripleTap
         }
     }
 }
@@ -73,5 +73,5 @@ internal class MediaEventQueue(
 internal enum class MediaEvent {
     SingleTap,
     DoubleTap,
-    TrippleTap,
+    TripleTap,
 }

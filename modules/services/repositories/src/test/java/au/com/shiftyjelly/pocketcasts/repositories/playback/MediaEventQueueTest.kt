@@ -31,9 +31,9 @@ class MediaEventQueueTest {
     fun `tripple tap event`() = runTest {
         val handler = MediaEventQueue(this)
 
-        val event = handler.consumeEvent(MediaEvent.TrippleTap)
+        val event = handler.consumeEvent(MediaEvent.TripleTap)
 
-        assertEquals(MediaEvent.TrippleTap, event)
+        assertEquals(MediaEvent.TripleTap, event)
     }
 
     @Test
@@ -58,7 +58,7 @@ class MediaEventQueueTest {
         assertNull(handler.consumeEvent(MediaEvent.SingleTap))
         assertNull(handler.consumeEvent(MediaEvent.SingleTap))
 
-        assertEquals(MediaEvent.TrippleTap, firstEvent.await())
+        assertEquals(MediaEvent.TripleTap, firstEvent.await())
     }
 
     @Test
@@ -72,7 +72,7 @@ class MediaEventQueueTest {
             assertNull(handler.consumeEvent(MediaEvent.SingleTap))
         }
 
-        assertEquals(MediaEvent.TrippleTap, firstEvent.await())
+        assertEquals(MediaEvent.TripleTap, firstEvent.await())
     }
 
     @Test
@@ -118,7 +118,7 @@ class MediaEventQueueTest {
         yield()
         assertNull(handler.consumeEvent(MediaEvent.SingleTap))
 
-        assertEquals(MediaEvent.TrippleTap, firstEvent.await())
+        assertEquals(MediaEvent.TripleTap, firstEvent.await())
         assertEquals(MediaEvent.DoubleTap, secondEvent.await())
     }
 
@@ -140,7 +140,7 @@ class MediaEventQueueTest {
     fun `ignore single tap events while tripple tap window is active`() = runTest {
         val handler = MediaEventQueue(this)
 
-        handler.consumeEvent(MediaEvent.TrippleTap)
+        handler.consumeEvent(MediaEvent.TripleTap)
 
         delay(250)
         assertNull(handler.consumeEvent(MediaEvent.SingleTap))

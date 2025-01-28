@@ -538,7 +538,7 @@ class MediaSessionManager(
                          */
                         KeyEvent.KEYCODE_MEDIA_PLAY, KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, KeyEvent.KEYCODE_HEADSETHOOK -> MediaEvent.SingleTap
                         KeyEvent.KEYCODE_MEDIA_NEXT -> MediaEvent.DoubleTap
-                        KeyEvent.KEYCODE_MEDIA_PREVIOUS -> MediaEvent.TrippleTap
+                        KeyEvent.KEYCODE_MEDIA_PREVIOUS -> MediaEvent.TripleTap
                         else -> null
                     }
 
@@ -548,7 +548,7 @@ class MediaSessionManager(
                             when (outputEvent) {
                                 MediaEvent.SingleTap -> handleMediaButtonSingleTap()
                                 MediaEvent.DoubleTap -> handleMediaButtonDoubleTap()
-                                MediaEvent.TrippleTap -> handleMediaButtonTripleTap()
+                                MediaEvent.TripleTap -> handleMediaButtonTripleTap()
                                 null -> Unit
                             }
                         }
