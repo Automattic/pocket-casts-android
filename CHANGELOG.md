@@ -3,6 +3,8 @@
 *   Bug Fixes
     *   Fix status bar theming during onboarding.
         ([#3460](https://github.com/Automattic/pocket-casts-android/pull/3460))
+    *   Fix issue with playback stopping when using Pixel Buds actions.
+        ([#3493](https://github.com/Automattic/pocket-casts-android/pull/3493))
 *   Updates
     *   Remove audio and video clip sharing
         ([#3481](https://github.com/Automattic/pocket-casts-android/pull/3481))
