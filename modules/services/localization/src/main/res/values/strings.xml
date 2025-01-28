@@ -628,7 +628,7 @@
     <string name="podcast_show_archived" translatable="false">@string/show_archived</string>
     <string name="podcast_refresh_episodes">Refresh episode list</string>
     <string name="podcast_refreshing_episode_list">Refreshing episode list…</string>
-    <string name="podcast_refresh_list_updated">Episode list updated!</string>
+    <string name="podcast_refresh_new_episode_found">New episode found!</string>
     <string name="podcast_sort_episodes">Sort episodes</string>
     <string name="podcast_subscribed">Following</string>
     <string name="podcast_not_subscribed">Not Following</string>
