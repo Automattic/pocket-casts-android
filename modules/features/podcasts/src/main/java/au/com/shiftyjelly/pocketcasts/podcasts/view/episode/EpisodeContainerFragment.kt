@@ -253,6 +253,7 @@ class EpisodeContainerFragment :
             multiSelectHelper = bookmarksViewModel.multiSelectHelper,
             menuRes = null,
             activity = requireActivity(),
+            includeStatusBarPadding = false,
         )
     }
 
