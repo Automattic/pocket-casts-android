@@ -30,6 +30,7 @@ open class BaseDialogFragment : BottomSheetDialogFragment(), CoroutineScope {
 
     open val statusBarIconColor: StatusBarIconColor = StatusBarIconColor.Theme
     open val navigationBarColor: NavigationBarColor = NavigationBarColor.Theme
+    open val includeNavigationBarPadding: Boolean = true
 
     private var isBeingDragged = false
     private val dismissCallback = object : BottomSheetBehavior.BottomSheetCallback() {
@@ -60,7 +61,9 @@ open class BaseDialogFragment : BottomSheetDialogFragment(), CoroutineScope {
         }
 
         // add padding to the bottom of the dialog for the navigation bar
-        view.setSystemWindowInsetToPadding(bottom = true)
+        if (includeNavigationBarPadding) {
+            view.setSystemWindowInsetToPadding(bottom = true)
+        }
 
         isBeingDragged = false
         addDismissCallback()
