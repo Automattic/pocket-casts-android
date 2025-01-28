@@ -44,6 +44,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -235,6 +236,7 @@ private fun AboutPage(
                 text = stringResource(LR.string.settings_version, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE.toString()),
                 style = MaterialTheme.typography.body1,
                 modifier = Modifier.padding(top = 8.dp),
+                textAlign = TextAlign.Center,
                 color = MaterialTheme.theme.colors.primaryText02,
             )
         }
