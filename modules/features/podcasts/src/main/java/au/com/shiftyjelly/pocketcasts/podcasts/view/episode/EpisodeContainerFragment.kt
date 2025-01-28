@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.podcasts.view.episode
 
 import android.app.Dialog
 import android.content.res.ColorStateList
-import android.content.res.Resources
 import android.os.Bundle
 import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
@@ -12,7 +11,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.annotation.StringRes
 import androidx.core.os.BundleCompat
 import androidx.core.view.isVisible
-import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
@@ -32,7 +30,6 @@ import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersViewModel.Mod
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.FragmentEpisodeContainerBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeFragment.EpisodeFragmentArgs
-import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
@@ -101,8 +98,7 @@ class EpisodeContainerFragment :
             bundle?.let { BundleCompat.getParcelable(it, NEW_INSTANCE_ARG, EpisodeFragmentArgs::class.java) }
     }
 
-    override val statusBarIconColor: StatusBarIconColor
-        get() = StatusBarIconColor.Light
+    override val includeNavigationBarPadding: Boolean = false
 
     var binding: FragmentEpisodeContainerBinding? = null
 
@@ -186,14 +182,6 @@ class EpisodeContainerFragment :
             state = BottomSheetBehavior.STATE_EXPANDED
             skipCollapsed = true
         }
-        // Ensure the dialog ends up the full height of the screen
-        // Bottom sheet dialogs get wrapped in a sheet that is WRAP_CONTENT so setting MATCH_PARENT on our
-        // root view is ignored.
-        bottomSheetDialog?.setOnShowListener {
-            view.updateLayoutParams<ViewGroup.LayoutParams> {
-                height = Resources.getSystem().displayMetrics.heightPixels
-            }
-        }
 
         val binding = binding ?: return
 
@@ -265,6 +253,7 @@ class EpisodeContainerFragment :
             multiSelectHelper = bookmarksViewModel.multiSelectHelper,
             menuRes = null,
             activity = requireActivity(),
+            includeStatusBarPadding = false,
         )
     }
 
