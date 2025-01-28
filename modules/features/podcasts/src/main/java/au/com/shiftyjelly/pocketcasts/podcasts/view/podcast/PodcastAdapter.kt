@@ -279,6 +279,22 @@ class PodcastAdapter(
             }
         }
 
+        holder.binding.bottom.podcastInfoPanel.setContent {
+            AppTheme(theme.activeTheme) {
+                PodcastInfoView(
+                    PodcastInfoState(
+                        author = podcast.author,
+                        link = podcast.getShortUrl(),
+                        schedule = podcast.displayableFrequency(context.resources),
+                        next = podcast.displayableNextEpisodeDate(context),
+                    ),
+                    onWebsiteLinkClicked = {
+                        onWebsiteLinkClicked(context)
+                    },
+                )
+            }
+        }
+
         val imageView = holder.binding.top.artwork
         // stopping the artwork flickering when the image is reloaded
         if (imageView.drawable == null || holder.lastImagePodcastUuid == null || holder.lastImagePodcastUuid != podcast.uuid) {
@@ -304,9 +320,6 @@ class PodcastAdapter(
         with(holder.binding.bottom.category) {
             text = podcast.getFirstCategory(context.resources)
         }
-        with(holder.binding.bottom.nextText) {
-            text = podcast.displayableNextEpisodeDate(context)
-        }
         holder.binding.bottom.description.text =
             if (FeatureFlag.isEnabled(Feature.PODCAST_HTML_DESCRIPTION) && podcast.podcastHtmlDescription.isNotEmpty()) {
                 // keep the extra line break from paragraphs as it looks better
@@ -321,22 +334,6 @@ class PodcastAdapter(
         holder.binding.bottom.description.setLinkTextColor(tintColor)
         holder.binding.bottom.description.readMore(3) {
             onPodcastDescriptionClicked()
-        }
-        holder.binding.bottom.authorText.text = podcast.author
-        holder.binding.bottom.authorText.isVisible = podcast.author.isNotBlank()
-        holder.binding.bottom.authorImage.isVisible = podcast.author.isNotBlank()
-        holder.binding.bottom.linkImage.isVisible = podcast.getShortUrl().isNotBlank()
-        holder.binding.bottom.linkText.text = podcast.getShortUrl()
-        holder.binding.bottom.linkText.setTextColor(tintColor)
-        holder.binding.bottom.linkText.isVisible = podcast.getShortUrl().isNotBlank()
-        with(holder.binding.bottom.frequencyGroup) {
-            isVisible = podcast.displayableFrequency(context.resources) != null
-        }
-        with(holder.binding.bottom.scheduleText) {
-            text = podcast.displayableFrequency(context.resources)
-        }
-        with(holder.binding.bottom.nextGroup) {
-            isVisible = podcast.displayableNextEpisodeDate(context) != null
         }
     }
 
@@ -752,9 +749,6 @@ class PodcastAdapter(
             }
             binding.top.settings.setOnClickListener {
                 adapter.onSettingsClicked()
-            }
-            binding.bottom.linkText.setOnClickListener {
-                adapter.onWebsiteLinkClicked(it.context)
             }
             binding.bottom.ratings.setViewCompositionStrategy(
                 ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
