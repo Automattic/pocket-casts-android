@@ -35,7 +35,7 @@ fun PodcastInfoView(
 ) {
     Card(
         shape = RoundedCornerShape(8.dp),
-        elevation = 8.dp,
+        elevation = 0.dp,
         backgroundColor = MaterialTheme.theme.colors.primaryUi02,
         modifier = Modifier
             .border(
