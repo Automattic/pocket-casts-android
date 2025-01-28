@@ -4,6 +4,7 @@ package au.com.shiftyjelly.pocketcasts.compose.bars
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
@@ -64,6 +65,7 @@ fun ThemedTopAppBar(
         ThemedTopAppBar.Style.Immersive -> MaterialTheme.theme.colors.primaryUi01
     },
     bottomShadow: Boolean = false,
+    windowInsets: WindowInsets = AppBarDefaults.topAppBarWindowInsets,
     actions: @Composable RowScope.(Color) -> Unit = {},
     onNavigationClick: () -> Unit,
 ) {
@@ -89,7 +91,7 @@ fun ThemedTopAppBar(
             actions = { actions(iconColor) },
             backgroundColor = backgroundColor,
             elevation = 0.dp,
-            windowInsets = AppBarDefaults.topAppBarWindowInsets,
+            windowInsets = windowInsets,
             modifier = if (bottomShadow) {
                 modifier
                     .zIndex(1f)

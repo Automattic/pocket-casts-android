@@ -12,8 +12,11 @@ import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Snackbar
 import androidx.compose.material.SnackbarHost
@@ -149,6 +152,7 @@ class WinbackFragment : BaseDialogFragment() {
                     composable(WinbackNavRoutes.HelpAndFeedback) {
                         HelpPage(
                             activity = requireActivity(),
+                            appBarInsets = AppBarDefaults.topAppBarWindowInsets.only(WindowInsetsSides.Horizontal),
                             onShowLogs = { navController.navigate(WinbackNavRoutes.SupportLogs) },
                             onShowStatusPage = { navController.navigate(WinbackNavRoutes.StatusCheck) },
                             onGoBack = { navController.popBackStack() },
@@ -157,12 +161,14 @@ class WinbackFragment : BaseDialogFragment() {
                     composable(WinbackNavRoutes.SupportLogs) {
                         LogsPage(
                             bottomInset = 0.dp,
+                            appBarInsets = AppBarDefaults.topAppBarWindowInsets.only(WindowInsetsSides.Horizontal),
                             onBackPressed = { navController.popBackStack() },
                         )
                     }
                     composable(WinbackNavRoutes.StatusCheck) {
                         StatusPage(
                             bottomInset = 0.dp,
+                            appBarInsets = AppBarDefaults.topAppBarWindowInsets.only(WindowInsetsSides.Horizontal),
                             onBackPressed = { navController.popBackStack() },
                         )
                     }

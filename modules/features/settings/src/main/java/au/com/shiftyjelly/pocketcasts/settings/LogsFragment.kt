@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -13,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
@@ -84,6 +86,7 @@ class LogsFragment : BaseFragment() {
 @Composable
 fun LogsPage(
     bottomInset: Dp,
+    appBarInsets: WindowInsets = AppBarDefaults.topAppBarWindowInsets,
     onBackPressed: () -> Unit,
 ) {
     val viewModel = hiltViewModel<LogsViewModel>()
@@ -100,6 +103,7 @@ fun LogsPage(
         includeAppBar = !Util.isAutomotive(context),
         logLines = logLines,
         bottomInset = bottomInset,
+        appBarInsets = appBarInsets,
     )
 }
 
@@ -111,12 +115,15 @@ private fun LogsContent(
     logLines: List<String>,
     includeAppBar: Boolean,
     bottomInset: Dp,
+    appBarInsets: WindowInsets,
 ) {
     val logScrollState = rememberLazyListState()
     Column {
         if (includeAppBar) {
             val coroutineScope = rememberCoroutineScope()
             AppBarWithShare(
+                appBarInsets = appBarInsets,
+                logsAvailable = logLines.isNotEmpty(),
                 onBackPressed = onBackPressed,
                 onCopyToClipboard = onCopyToClipboard,
                 onShareLogs = onShareLogs,
@@ -134,7 +141,6 @@ private fun LogsContent(
                         }
                     }
                 },
-                logsAvailable = logLines.isNotEmpty(),
             )
         }
         Box(
@@ -183,10 +189,12 @@ private fun AppBarWithShare(
     onScrollToTop: () -> Unit,
     onScrollToBottom: () -> Unit,
     logsAvailable: Boolean,
+    appBarInsets: WindowInsets,
     modifier: Modifier = Modifier,
 ) {
     ThemedTopAppBar(
         title = stringResource(LR.string.settings_logs),
+        windowInsets = appBarInsets,
         onNavigationClick = onBackPressed,
         actions = {
             IconButton(
@@ -245,6 +253,7 @@ private fun LogsContentPreview(@PreviewParameter(ThemePreviewParameterProvider::
             ),
             includeAppBar = true,
             bottomInset = 0.dp,
+            appBarInsets = AppBarDefaults.topAppBarWindowInsets,
         )
     }
 }
@@ -260,6 +269,7 @@ private fun LogsContentLoadingPreview(@PreviewParameter(ThemePreviewParameterPro
             logLines = emptyList(),
             includeAppBar = true,
             bottomInset = 0.dp,
+            appBarInsets = AppBarDefaults.topAppBarWindowInsets,
         )
     }
 }

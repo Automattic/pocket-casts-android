@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -34,6 +35,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -90,6 +92,7 @@ fun HelpPage(
     onShowStatusPage: () -> Unit,
     onGoBack: () -> Unit,
     modifier: Modifier = Modifier,
+    appBarInsets: WindowInsets = AppBarDefaults.topAppBarWindowInsets,
     viewModel: HelpViewModel = hiltViewModel(),
     onWebViewCreated: (WebView) -> Unit = {},
     onWebViewDisposed: (WebView) -> Unit = {},
@@ -102,6 +105,7 @@ fun HelpPage(
         modifier = modifier,
     ) {
         HelpPage(
+            appBarInsets = appBarInsets,
             onSendFeedbackEmail = {
                 scope.launch {
                     val intent = viewModel.getFeedbackIntent(activity)
@@ -173,7 +177,8 @@ fun HelpPage(
 }
 
 @Composable
-fun HelpPage(
+private fun HelpPage(
+    appBarInsets: WindowInsets,
     onSendFeedbackEmail: () -> Unit,
     onContactSupport: () -> Unit,
     onTapUri: (Uri) -> Unit,
@@ -193,6 +198,7 @@ fun HelpPage(
             AppBar(
                 onGoBack = onGoBack,
                 onShowActions = { showActionPopup = true },
+                windowInsets = appBarInsets,
                 modifier = Modifier
                     .fillMaxWidth()
                     // We use z-index to control the drawing order.
@@ -225,10 +231,12 @@ private fun AppBar(
     onGoBack: () -> Unit,
     onShowActions: () -> Unit,
     modifier: Modifier = Modifier,
+    windowInsets: WindowInsets,
 ) {
     ThemedTopAppBar(
         modifier = modifier.fillMaxWidth(),
         title = stringResource(LR.string.settings_title_help),
+        windowInsets = windowInsets,
         onNavigationClick = onGoBack,
         actions = { iconColor ->
             IconButton(onClick = onShowActions) {
