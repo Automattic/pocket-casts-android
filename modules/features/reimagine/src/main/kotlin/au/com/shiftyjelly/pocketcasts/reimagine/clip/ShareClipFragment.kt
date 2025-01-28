@@ -16,10 +16,10 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
-import androidx.fragment.compose.content
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.reimagine.clip.ShareClipViewModel.SnackbarMessage
 import au.com.shiftyjelly.pocketcasts.reimagine.ui.ShareColors
@@ -96,7 +96,7 @@ class ShareClipFragment : BaseDialogFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ) = content {
+    ) = contentWithoutConsumedInsets {
         val platforms = remember {
             SocialPlatform.getAvailablePlatforms(
                 requireContext(),
@@ -146,10 +146,7 @@ class ShareClipFragment : BaseDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setDialogTint(
-            statusBar = shareColors.navigationBar.toArgb(),
-            navigationBar = shareColors.background.toArgb(),
-        )
+        setDialogTint(color = shareColors.background.toArgb())
     }
 
     @Parcelize

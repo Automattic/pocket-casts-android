@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="2dp"
+    android:paddingTop="12dp"
     android:paddingBottom="16dp"
     android:paddingStart="32dp"
     android:paddingEnd="32dp"
@@ -13,7 +13,7 @@
     <View
         android:layout_width="48dp"
         android:layout_height="4dp"
-        android:background="@drawable/background_dragger_player"
+        android:background="@drawable/background_dragger"
         android:layout_marginBottom="16dp"/>
     <ImageView
         android:id="@+id/imgIcon"
@@ -63,4 +63,8 @@
         android:letterSpacing="0"
         android:textAllCaps="false"
         tools:text="Confirm" />
+    <View
+        android:id="@+id/bottomPaddingView"
+        android:layout_width="match_parent"
+        android:layout_height="16dp" />
 </LinearLayout>

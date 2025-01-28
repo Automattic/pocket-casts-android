@@ -26,13 +26,13 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.getColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getColors
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themeColors
-import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.adapter.ColorAdapter
 import au.com.shiftyjelly.pocketcasts.views.adapter.IconView
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.extensions.addAfterTextChanged
+import au.com.shiftyjelly.pocketcasts.views.extensions.includeStatusBarPadding
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
@@ -68,7 +68,6 @@ class CreateFilterFragment : BaseFragment(), CoroutineScope {
         }
     }
 
-    override var statusBarColor: StatusBarColor = StatusBarColor.Light
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main
 
@@ -175,7 +174,7 @@ class CreateFilterFragment : BaseFragment(), CoroutineScope {
         observePlaylist()
 
         if (isCreate) {
-            binding.toolbarLayout.isVisible = false
+            binding.toolbar.isVisible = false
         } else {
             binding.toolbar.setNavigationOnClickListener {
                 @Suppress("DEPRECATION")
@@ -257,6 +256,7 @@ class CreateFilterFragment : BaseFragment(), CoroutineScope {
         toolbar.setTitleTextColor(titleColor)
         toolbar.navigationIcon?.setTintList(iconColorStateList)
         toolbar.setBackgroundColor(backgroundColor)
+        toolbar.includeStatusBarPadding()
     }
 
     private fun setupIconView(view: IconView, selected: Boolean) {

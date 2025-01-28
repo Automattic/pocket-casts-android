@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,8 +12,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -71,12 +72,12 @@ internal fun ProfilePage(
     onCloseUpgradeProfileClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val isPortrait = LocalConfiguration.current.orientation != Configuration.ORIENTATION_LANDSCAPE
     AppTheme(themeType) {
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .background(MaterialTheme.theme.colors.primaryUi02)
-                .verticalScroll(rememberScrollState()),
+                .background(MaterialTheme.theme.colors.primaryUi02),
         ) {
             Toolbar(
                 showReferralsIcon = state.isSendReferralsEnabled,
@@ -86,68 +87,99 @@ internal fun ProfilePage(
                 onReferralsTooltipShown = onReferralsTooltipShown,
                 onSettingsClick = onSettingsClick,
             )
-            VerticalSpacer()
-            HeaderWithStats(
-                headerState = state.headerState,
-                statsState = state.statsState,
-                onHeaderClick = onHeaderClick,
-            )
-            VerticalSpacer()
-            if (state.isPlaybackEnabled) {
-                EndOfYearPromptCard(
-                    onClick = onPlaybackClick,
-                    modifier = Modifier.padding(horizontal = horizontalPadding),
-                )
-                VerticalSpacer()
-            }
-            if (state.isClaimReferralsEnabled) {
-                ReferralsClaimGuestPassBannerCard(
-                    state = state.referralsState,
-                    onClick = onClaimReferralsClick,
-                    onHideBannerClick = onHideReferralsCardClick,
-                    onBannerShown = onReferralsCardShown,
-                    onShowReferralsSheet = onShowReferralsSheet,
-                    modifier = Modifier.padding(horizontal = horizontalPadding),
-                )
-                if ((state.referralsState as? ReferralsViewModel.UiState.Loaded)?.showProfileBanner == true) {
+            LazyColumn(
+                modifier = modifier.fillMaxSize(),
+            ) {
+                item {
                     VerticalSpacer()
                 }
+                HeaderWithStats(
+                    headerState = state.headerState,
+                    statsState = state.statsState,
+                    onHeaderClick = onHeaderClick,
+                    isPortrait = isPortrait,
+                )
+                item {
+                    VerticalSpacer()
+                }
+                if (state.isPlaybackEnabled) {
+                    item {
+                        EndOfYearPromptCard(
+                            onClick = onPlaybackClick,
+                            modifier = Modifier.padding(horizontal = horizontalPadding),
+                        )
+                    }
+                    item {
+                        VerticalSpacer()
+                    }
+                }
+                if (state.isClaimReferralsEnabled) {
+                    item {
+                        ReferralsClaimGuestPassBannerCard(
+                            state = state.referralsState,
+                            onClick = onClaimReferralsClick,
+                            onHideBannerClick = onHideReferralsCardClick,
+                            onBannerShown = onReferralsCardShown,
+                            onShowReferralsSheet = onShowReferralsSheet,
+                            modifier = Modifier.padding(horizontal = horizontalPadding),
+                        )
+                    }
+                    if ((state.referralsState as? ReferralsViewModel.UiState.Loaded)?.showProfileBanner == true) {
+                        item {
+                            VerticalSpacer()
+                        }
+                    }
+                }
+                item {
+                    HorizontalDivider()
+                }
+                item {
+                    ProfileSections(
+                        sections = ProfileSection.entries,
+                        onClick = onSectionClick,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+                item {
+                    VerticalSpacer()
+                }
+                item {
+                    var localRefreshState by remember(state.refreshState) { mutableStateOf(state.refreshState) }
+                    RefreshSection(
+                        refreshState = localRefreshState,
+                        onClick = {
+                            localRefreshState = RefreshState.Refreshing
+                            onRefreshClick()
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = horizontalPadding),
+                    )
+                }
+                item {
+                    VerticalSpacer()
+                }
+                item {
+                    ProfileUpgradeSection(
+                        isVisible = state.isUpgradeBannerVisible,
+                        contentPadding = PaddingValues(
+                            horizontal = 64.dp,
+                            vertical = verticalSpacing,
+                        ),
+                        onClick = onUpgradeProfileClick,
+                        onCloseClick = onCloseUpgradeProfileClick,
+                        modifier = Modifier
+                            .background(MaterialTheme.colors.background)
+                            .fillMaxWidth(),
+                    )
+                }
+                item {
+                    MiniPlayerPadding(
+                        padding = state.miniPlayerPadding,
+                        isUpgradeBannerVisible = state.isUpgradeBannerVisible,
+                    )
+                }
             }
-            HorizontalDivider()
-            ProfileSections(
-                sections = ProfileSection.entries,
-                onClick = onSectionClick,
-                modifier = Modifier.fillMaxWidth(),
-            )
-            VerticalSpacer()
-            var localRefreshState by remember(state.refreshState) { mutableStateOf(state.refreshState) }
-            RefreshSection(
-                refreshState = localRefreshState,
-                onClick = {
-                    localRefreshState = RefreshState.Refreshing
-                    onRefreshClick()
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = horizontalPadding),
-            )
-            VerticalSpacer()
-            ProfileUpgradeSection(
-                isVisible = state.isUpgradeBannerVisible,
-                contentPadding = PaddingValues(
-                    horizontal = 64.dp,
-                    vertical = verticalSpacing,
-                ),
-                onClick = onUpgradeProfileClick,
-                onCloseClick = onCloseUpgradeProfileClick,
-                modifier = Modifier
-                    .background(MaterialTheme.colors.background)
-                    .fillMaxWidth(),
-            )
-            MiniPlayerPadding(
-                padding = state.miniPlayerPadding,
-                isUpgradeBannerVisible = state.isUpgradeBannerVisible,
-            )
         }
     }
 }
@@ -188,8 +220,9 @@ private fun Toolbar(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .height(56.dp)
             .background(MaterialTheme.theme.colors.secondaryUi01)
+            .windowInsetsPadding(AppBarDefaults.topAppBarWindowInsets)
+            .height(56.dp)
             .padding(horizontal = horizontalPadding),
     ) {
         if (showReferralsIcon) {
@@ -217,46 +250,58 @@ private fun Toolbar(
     }
 }
 
-@Composable
-private fun ColumnScope.HeaderWithStats(
+private fun LazyListScope.HeaderWithStats(
     headerState: ProfileHeaderState,
     statsState: ProfileStatsState,
     onHeaderClick: () -> Unit,
+    isPortrait: Boolean,
 ) {
-    if (LocalConfiguration.current.orientation != Configuration.ORIENTATION_LANDSCAPE) {
-        ProfileHeader(
-            state = headerState,
-            onClick = onHeaderClick,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = horizontalPadding),
-        )
-        VerticalSpacer()
-        ProfileStats(
-            state = statsState,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = horizontalPadding),
-        )
-        VerticalSpacer()
-    } else {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = horizontalPadding),
-        ) {
+    if (isPortrait) {
+        item {
             ProfileHeader(
                 state = headerState,
                 onClick = onHeaderClick,
-                modifier = Modifier.weight(1f),
-            )
-            ProfileStats(
-                state = statsState,
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = horizontalPadding),
             )
         }
-        VerticalSpacer()
+        item {
+            VerticalSpacer()
+        }
+        item {
+            ProfileStats(
+                state = statsState,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = horizontalPadding),
+            )
+        }
+        item {
+            VerticalSpacer()
+        }
+    } else {
+        item {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = horizontalPadding),
+            ) {
+                ProfileHeader(
+                    state = headerState,
+                    onClick = onHeaderClick,
+                    modifier = Modifier.weight(1f),
+                )
+                ProfileStats(
+                    state = statsState,
+                    modifier = Modifier.weight(1f),
+                )
+            }
+        }
+        item {
+            VerticalSpacer()
+        }
     }
 }
 

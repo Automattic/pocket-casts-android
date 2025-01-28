@@ -7,7 +7,6 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.ColorUtils
 internal data class ShareColors(
     val base: Color,
 ) {
-    val navigationBar = ColorUtils.changeHsvValue(base, factor = 0.15f)
     val background = ColorUtils.changeHsvValue(base, factor = 0.4f)
     val onBackgroundPrimary = if (background.isDark) Color.White else Color.Black
     val onBackgroundSecondary = onBackgroundPrimary.copy(alpha = 0.5f)

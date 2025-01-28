@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="64dp"
+    android:paddingBottom="16dp"
     android:clipToPadding="false"
     android:background="?attr/primary_ui_01">
 
@@ -294,7 +294,7 @@
             android:paddingStart="@dimen/episode_card_edge_padding"
             android:paddingEnd="@dimen/episode_card_edge_padding"
             android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/navigationBarSpacer"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/lblDate" />
@@ -324,11 +324,12 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/lblDate" />
 
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/center_vertical_guideline"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_percent="0.5" />
+        <au.com.shiftyjelly.pocketcasts.views.component.NavigationBarSpacer
+            android:id="@+id/navigationBarSpacer"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toBottomOf="@+id/webViewShowNotes"
+            app:layout_constraintBottom_toBottomOf="parent"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>

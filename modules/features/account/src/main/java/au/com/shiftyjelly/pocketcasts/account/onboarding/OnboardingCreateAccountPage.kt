@@ -59,7 +59,7 @@ internal fun OnboardingCreateAccountPage(
 
     LaunchedEffect(Unit) {
         // Use secondaryUI01 so the status bar matches the ThemedTopAppBar
-        val statusBar = SystemBarStyle.custom(pocketCastsTheme.colors.secondaryUi01, theme.defaultLightIcons)
+        val statusBar = SystemBarStyle.custom(pocketCastsTheme.colors.secondaryUi01, theme.toolbarLightIcons)
         val navigationBar = SystemBarStyle.transparent { theme.darkTheme }
         onUpdateSystemBars(SystemBarsStyles(statusBar, navigationBar))
     }

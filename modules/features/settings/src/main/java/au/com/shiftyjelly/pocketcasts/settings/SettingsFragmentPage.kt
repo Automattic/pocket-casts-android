@@ -54,10 +54,8 @@ fun SettingsFragmentPage(
             onNavigationClick = onBackPressed,
         )
         LazyColumn(
-            contentPadding = PaddingValues(bottom = bottomInset),
-            modifier = Modifier
-                .background(MaterialTheme.theme.colors.primaryUi02)
-                .padding(vertical = 8.dp),
+            contentPadding = PaddingValues(top = 8.dp, bottom = bottomInset + 8.dp),
+            modifier = Modifier.background(MaterialTheme.theme.colors.primaryUi02),
         ) {
             if (isDebug) {
                 item {
