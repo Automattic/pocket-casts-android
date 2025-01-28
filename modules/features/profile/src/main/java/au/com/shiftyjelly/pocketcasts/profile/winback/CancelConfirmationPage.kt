@@ -178,6 +178,8 @@ private fun Buttons(
             TextH30(
                 text = stringResource(LR.string.winback_cancel_subscription_stay_button_label),
                 color = MaterialTheme.theme.colors.primaryInteractive02,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth(),
             )
         }
         Box(

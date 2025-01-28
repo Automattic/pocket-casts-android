@@ -9,11 +9,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
@@ -79,15 +81,16 @@ class StatusFragment : BaseFragment() {
 fun StatusPage(
     bottomInset: Dp,
     onBackPressed: () -> Unit,
+    appBarInsets: WindowInsets = AppBarDefaults.topAppBarWindowInsets,
     viewModel: StatusViewModel = hiltViewModel(),
 ) {
     LazyColumn(
         contentPadding = PaddingValues(bottom = bottomInset),
-
     ) {
         item {
             ThemedTopAppBar(
                 title = stringResource(LR.string.settings_status_page),
+                windowInsets = appBarInsets,
                 onNavigationClick = onBackPressed,
             )
         }
