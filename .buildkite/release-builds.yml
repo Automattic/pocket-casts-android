@@ -1,8 +1,7 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
 ---
 
-# This pipeline is meant to be run via the Buildkite API, and is
-# only used for release builds
+# This pipeline is meant to be run via the Buildkite API, and is only used for release builds
 
 agents:
   queue: "android"
@@ -20,7 +19,9 @@ steps:
   - wait
 
   - label: "🛠 Release Build"
-    command: ".buildkite/commands/release-build.sh"
+    command: |
+      [ -n "$RELEASE_VERSION" ] && git checkout release/$RELEASE_VERSION
+      .buildkite/commands/release-build.sh
     priority: 1
     plugins: [$CI_TOOLKIT]
     artifact_paths:
