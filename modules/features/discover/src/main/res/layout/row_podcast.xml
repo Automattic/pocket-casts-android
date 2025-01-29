@@ -11,7 +11,8 @@
         android:layout_height="56dp"
         android:elevation="2dp"
         app:cardCornerRadius="4dp"
-        android:layout_marginRight="8dp">
+        android:layout_marginRight="8dp"
+        android:layout_gravity="center_vertical">
         <ImageView
             android:id="@+id/imageView"
             android:layout_width="56dp"
