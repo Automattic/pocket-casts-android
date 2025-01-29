@@ -96,7 +96,6 @@ platform :android do
   lane :code_freeze do |skip_confirm: false|
     ensure_git_status_clean
     Fastlane::Helper::GitHelper.checkout_and_pull(DEFAULT_BRANCH)
-    ensure_git_branch(branch: DEFAULT_BRANCH)
 
     confirmation_message = <<-MESSAGE
 
