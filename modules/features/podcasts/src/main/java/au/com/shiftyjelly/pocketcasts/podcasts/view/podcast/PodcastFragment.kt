@@ -925,23 +925,28 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.refreshState.collect { state ->
+                var message: String? = null
                 when (state) {
-                    PodcastViewModel.RefreshState.Error -> {}
                     PodcastViewModel.RefreshState.NotStarted -> {}
                     PodcastViewModel.RefreshState.NewEpisodeFound -> {
                         binding?.swipeRefreshLayout?.isRefreshing = false
-                        (activity as? FragmentHostListener)?.snackBarView()?.let { snackBarView ->
-                            Snackbar.make(snackBarView, getString(LR.string.podcast_refresh_new_episode_found), Snackbar.LENGTH_LONG).show()
-                        }
+                        message = getString(LR.string.podcast_refresh_new_episode_found)
+                    }
+                    PodcastViewModel.RefreshState.NoEpisodesFound -> {
+                        binding?.swipeRefreshLayout?.isRefreshing = false
+                        message = getString(LR.string.podcast_refresh_no_episodes_found)
                     }
                     is PodcastViewModel.RefreshState.Refreshing -> {
                         if (state.type == PodcastViewModel.RefreshType.PULL_TO_REFRESH) {
                             binding?.swipeRefreshLayout?.isRefreshing = true
                         } else {
-                            (activity as? FragmentHostListener)?.snackBarView()?.let { snackBarView ->
-                                Snackbar.make(snackBarView, getString(LR.string.podcast_refreshing_episode_list), Snackbar.LENGTH_INDEFINITE).show()
-                            }
+                            message = getString(LR.string.podcast_refreshing_episode_list)
                         }
+                    }
+                }
+                if (message != null) {
+                    (activity as? FragmentHostListener)?.snackBarView()?.let { snackBarView ->
+                        Snackbar.make(snackBarView, message, Snackbar.LENGTH_LONG).show()
                     }
                 }
             }

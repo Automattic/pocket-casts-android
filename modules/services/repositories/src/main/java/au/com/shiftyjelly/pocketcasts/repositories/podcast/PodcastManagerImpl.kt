@@ -42,6 +42,7 @@ import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
@@ -627,8 +628,31 @@ class PodcastManagerImpl @Inject constructor(
         return podcastDao.findAutoAddToUpNextPodcasts()
     }
 
-    override suspend fun refreshPodcastFeed(podcastUuid: String): Boolean {
-        return refreshServiceManager.refreshPodcastFeed(podcastUuid).isSuccessful
+    override suspend fun refreshPodcastFeed(podcast: Podcast): Boolean {
+        var response = refreshServiceManager.updatePodcast(
+            podcastUuid = podcast.uuid,
+            lastEpisodeUuid = podcast.latestEpisodeUuid,
+        )
+        Timber.i("Refresh podcast feed: %d", response.code())
+
+        while (response.code() == 202) {
+            val location = response.headers()["Location"]
+            val retryAfter = response.headers()["Retry-After"]?.toIntOrNull()
+            if (location != null && retryAfter != null) {
+                delay(retryAfter * 1000L)
+                response = refreshServiceManager.pollUpdatePodcast(location)
+                Timber.i("Refresh podcast feed poll: %d", response.code())
+            } else {
+                return false
+            }
+        }
+
+        if (response.code() == 200) {
+            refreshPodcasts("Refresh podcast feed")
+            return true
+        } else {
+            return false
+        }
     }
 
     override suspend fun findRandomPodcasts(limit: Int): List<Podcast> {

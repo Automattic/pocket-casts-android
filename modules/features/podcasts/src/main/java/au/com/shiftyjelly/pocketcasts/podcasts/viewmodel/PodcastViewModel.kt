@@ -55,12 +55,10 @@ import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.min
-import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.flatMapLatest
@@ -582,10 +580,10 @@ class PodcastViewModel
 
         analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_REFRESH_EPISODE_LIST_TAPPED, mapOf("podcast_uuid" to podcast.uuid))
 
-        launch {
+        viewModelScope.launch {
             _refreshState.emit(RefreshState.Refreshing(refreshType))
-            delay(2.seconds)
-            _refreshState.emit(RefreshState.NewEpisodeFound)
+            val newEpisodeFound = podcastManager.refreshPodcastFeed(podcast = podcast)
+            _refreshState.emit(if (newEpisodeFound) RefreshState.NewEpisodeFound else RefreshState.NoEpisodesFound)
         }
     }
 
@@ -629,7 +627,7 @@ class PodcastViewModel
         data object NotStarted : RefreshState()
         data class Refreshing(val type: RefreshType) : RefreshState()
         data object NewEpisodeFound : RefreshState()
-        data object Error : RefreshState()
+        data object NoEpisodesFound : RefreshState()
     }
 
     enum class RefreshType {
