@@ -156,6 +156,7 @@ class BookmarksFragment : BaseFragment() {
                     } else {
                         28.dp
                     },
+                    isDarkTheme = overrideTheme.darkTheme,
                 )
             }
         }

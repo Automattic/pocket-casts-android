@@ -40,6 +40,7 @@ class BookmarkViewHolder(
                     showIcon = true,
                     useEpisodeArtwork = data.useEpisodeArtwork,
                     showEpisodeTitle = true,
+                    isDarkTheme = false,
                 )
             }
         }
