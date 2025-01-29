@@ -43,6 +43,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun StarRatingView(
     fragmentManager: FragmentManager,
     viewModel: PodcastRatingsViewModel,
+    modifier: Modifier = Modifier,
 ) {
     val state by viewModel.stateFlow.collectAsState()
 
@@ -51,6 +52,7 @@ fun StarRatingView(
             val loadedState = state as RatingState.Loaded
             Content(
                 state = loadedState,
+                modifier = modifier,
                 onClick = { source ->
                     viewModel.onRatingStarsTapped(
                         podcastUuid = loadedState.podcastUuid,
@@ -70,23 +72,19 @@ fun StarRatingView(
 @Composable
 private fun Content(
     state: RatingState.Loaded,
+    modifier: Modifier = Modifier,
     onClick: (RatingTappedSource) -> Unit,
 ) {
     val starsContentDescription = stringResource(LR.string.podcast_star_rating_content_description)
 
     Row(
-        modifier = Modifier.padding(
-            start = 8.dp,
-            end = 4.dp,
-            top = 8.dp,
-        ),
+        modifier = modifier.padding(top = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .clickable { onClick(RatingTappedSource.STARS) }
-                .padding(8.dp)
                 .semantics {
                     this.contentDescription = starsContentDescription
                 },

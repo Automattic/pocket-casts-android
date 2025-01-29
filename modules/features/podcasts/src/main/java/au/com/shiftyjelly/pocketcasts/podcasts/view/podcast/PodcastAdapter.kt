@@ -19,7 +19,6 @@ import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.TextView
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
@@ -43,7 +42,6 @@ import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterEpisodeBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterEpisodeHeaderBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterPodcastHeaderBinding
-import au.com.shiftyjelly.pocketcasts.podcasts.helper.readMore
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.ratings.StarRatingView
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.BookmarkHeaderViewHolder
@@ -54,7 +52,6 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.TabsViewHold
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastViewModel.PodcastTab
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
@@ -232,7 +229,7 @@ class PodcastAdapter(
             VIEW_TYPE_NO_BOOKMARK -> NoBookmarkViewHolder(ComposeView(parent.context), theme, onHeadsetSettingsClicked)
             else -> EpisodeViewHolder(
                 binding = AdapterEpisodeBinding.inflate(inflater, parent, false),
-                viewMode = if (settings.artworkConfiguration.value.useEpisodeArtwork(ArtworkConfiguration.Element.Podcasts)) {
+                viewMode = if (settings.artworkConfiguration.value.useEpisodeArtwork(Element.Podcasts)) {
                     EpisodeViewHolder.ViewMode.Artwork
                 } else {
                     EpisodeViewHolder.ViewMode.NoArtwork
@@ -243,7 +240,7 @@ class PodcastAdapter(
                 imageRequestFactory = imageRequestFactory.smallSize(),
                 settings = settings,
                 swipeButtonLayoutFactory = swipeButtonLayoutFactory,
-                artworkContext = ArtworkConfiguration.Element.Podcasts,
+                artworkContext = Element.Podcasts,
             )
         }
     }
@@ -273,28 +270,6 @@ class PodcastAdapter(
         bindHeaderBottom(holder)
         bindHeaderTop(holder)
 
-        holder.binding.bottom.ratings.setContent {
-            AppTheme(theme.activeTheme) {
-                StarRatingView(fragmentManager, ratingsViewModel)
-            }
-        }
-
-        holder.binding.bottom.podcastInfoPanel.setContent {
-            AppTheme(theme.activeTheme) {
-                PodcastInfoView(
-                    PodcastInfoState(
-                        author = podcast.author,
-                        link = podcast.getShortUrl(),
-                        schedule = podcast.displayableFrequency(context.resources),
-                        next = podcast.displayableNextEpisodeDate(context),
-                    ),
-                    onWebsiteLinkClicked = {
-                        onWebsiteLinkClicked(context)
-                    },
-                )
-            }
-        }
-
         val imageView = holder.binding.top.artwork
         // stopping the artwork flickering when the image is reloaded
         if (imageView.drawable == null || holder.lastImagePodcastUuid == null || holder.lastImagePodcastUuid != podcast.uuid) {
@@ -314,26 +289,43 @@ class PodcastAdapter(
 
     private fun bindHeaderBottom(holder: PodcastViewHolder) {
         holder.binding.bottom.root.isVisible = headerExpanded
-        val tintColor = ThemeColor.podcastText02(theme.activeTheme, tintColor)
-        holder.binding.bottom.title.text = podcast.title
-        holder.binding.bottom.title.readMore(3)
-        with(holder.binding.bottom.category) {
-            text = podcast.getFirstCategory(context.resources)
+
+        val description = if (FeatureFlag.isEnabled(Feature.PODCAST_HTML_DESCRIPTION) && podcast.podcastHtmlDescription.isNotEmpty()) {
+            // keep the extra line break from paragraphs as it looks better
+            Html.fromHtml(
+                podcast.podcastHtmlDescription,
+                Html.FROM_HTML_MODE_COMPACT and
+                    Html.FROM_HTML_SEPARATOR_LINE_BREAK_PARAGRAPH.inv(),
+            ).trimPadding()
+        } else {
+            podcast.podcastDescription
         }
-        holder.binding.bottom.description.text =
-            if (FeatureFlag.isEnabled(Feature.PODCAST_HTML_DESCRIPTION) && podcast.podcastHtmlDescription.isNotEmpty()) {
-                // keep the extra line break from paragraphs as it looks better
-                Html.fromHtml(
-                    podcast.podcastHtmlDescription,
-                    Html.FROM_HTML_MODE_COMPACT and
-                        Html.FROM_HTML_SEPARATOR_LINE_BREAK_PARAGRAPH.inv(),
-                ).trimPadding()
-            } else {
-                podcast.podcastDescription
+
+        holder.binding.bottom.podcastHeaderBottom.setContent {
+            AppTheme(theme.activeTheme) {
+                PodcastHeaderBottom(
+                    title = podcast.title,
+                    category = podcast.getFirstCategory(context.resources),
+                    description = description.toString(),
+                    podcastInfoContent = {
+                        PodcastInfoView(
+                            PodcastInfoState(
+                                author = podcast.author,
+                                link = podcast.getShortUrl(),
+                                schedule = podcast.displayableFrequency(context.resources),
+                                next = podcast.displayableNextEpisodeDate(context),
+                            ),
+                            onWebsiteLinkClicked = {
+                                onWebsiteLinkClicked(context)
+                            },
+                        )
+                    },
+                    ratingsContent = {
+                        StarRatingView(fragmentManager, ratingsViewModel)
+                    },
+                    onDescriptionClicked = onPodcastDescriptionClicked,
+                )
             }
-        holder.binding.bottom.description.setLinkTextColor(tintColor)
-        holder.binding.bottom.description.readMore(3) {
-            onPodcastDescriptionClicked()
         }
     }
 
@@ -750,9 +742,6 @@ class PodcastAdapter(
             binding.top.settings.setOnClickListener {
                 adapter.onSettingsClicked()
             }
-            binding.bottom.ratings.setViewCompositionStrategy(
-                ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
-            )
         }
 
         private fun unsubscribe() {
