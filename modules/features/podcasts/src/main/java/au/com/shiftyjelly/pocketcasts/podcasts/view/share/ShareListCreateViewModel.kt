@@ -99,7 +99,7 @@ class ShareListCreateViewModel @Inject constructor(
                     type = "text/plain"
                     putExtra(Intent.EXTRA_TEXT, url)
                 }
-                startActivity(context, Intent.createChooser(intent, label), null)
+                context.startActivity(Intent.createChooser(intent, label), null)
                 trackShareEvent(
                     AnalyticsEvent.SHARE_PODCASTS_LIST_PUBLISH_SUCCEEDED,
                     AnalyticsProp.countMap(selectedPodcasts.size),
