@@ -18,10 +18,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.TextView
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.startActivity
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
@@ -321,7 +323,7 @@ class PodcastAdapter(
                         )
                     },
                     ratingsContent = {
-                        StarRatingView(fragmentManager, ratingsViewModel)
+                        StarRatingView(fragmentManager, ratingsViewModel, Modifier.padding(top = 8.dp))
                     },
                     onDescriptionClicked = onPodcastDescriptionClicked,
                 )
