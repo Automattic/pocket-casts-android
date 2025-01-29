@@ -928,16 +928,12 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                 when (state) {
                     PodcastViewModel.RefreshState.Error -> {}
                     PodcastViewModel.RefreshState.NotStarted -> {}
-                    is PodcastViewModel.RefreshState.Refreshed -> {
-                        if (state.type == PodcastViewModel.RefreshType.PULL_TO_REFRESH) {
-                            binding?.swipeRefreshLayout?.isRefreshing = false
-                        } else {
-                            (activity as? FragmentHostListener)?.snackBarView()?.let { snackBarView ->
-                                Snackbar.make(snackBarView, getString(LR.string.podcast_refresh_list_updated), Snackbar.LENGTH_LONG).show()
-                            }
+                    PodcastViewModel.RefreshState.NewEpisodeFound -> {
+                        binding?.swipeRefreshLayout?.isRefreshing = false
+                        (activity as? FragmentHostListener)?.snackBarView()?.let { snackBarView ->
+                            Snackbar.make(snackBarView, getString(LR.string.podcast_refresh_new_episode_found), Snackbar.LENGTH_LONG).show()
                         }
                     }
-
                     is PodcastViewModel.RefreshState.Refreshing -> {
                         if (state.type == PodcastViewModel.RefreshType.PULL_TO_REFRESH) {
                             binding?.swipeRefreshLayout?.isRefreshing = true

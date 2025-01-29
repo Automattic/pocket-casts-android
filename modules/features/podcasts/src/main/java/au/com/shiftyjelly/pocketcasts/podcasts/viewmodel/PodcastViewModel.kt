@@ -585,7 +585,7 @@ class PodcastViewModel
         launch {
             _refreshState.emit(RefreshState.Refreshing(refreshType))
             delay(2.seconds)
-            _refreshState.emit(RefreshState.Refreshed(refreshType))
+            _refreshState.emit(RefreshState.NewEpisodeFound)
         }
     }
 
@@ -628,7 +628,7 @@ class PodcastViewModel
     sealed class RefreshState {
         data object NotStarted : RefreshState()
         data class Refreshing(val type: RefreshType) : RefreshState()
-        data class Refreshed(val type: RefreshType) : RefreshState()
+        data object NewEpisodeFound : RefreshState()
         data object Error : RefreshState()
     }
 
