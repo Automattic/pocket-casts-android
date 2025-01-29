@@ -925,28 +925,22 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.refreshState.collect { state ->
-                var message: String? = null
                 when (state) {
                     PodcastViewModel.RefreshState.NotStarted -> {}
                     PodcastViewModel.RefreshState.NewEpisodeFound -> {
                         binding?.swipeRefreshLayout?.isRefreshing = false
-                        message = getString(LR.string.podcast_refresh_new_episode_found)
+                        showSnackBar(getString(LR.string.podcast_refresh_new_episode_found))
                     }
                     PodcastViewModel.RefreshState.NoEpisodesFound -> {
                         binding?.swipeRefreshLayout?.isRefreshing = false
-                        message = getString(LR.string.podcast_refresh_no_episodes_found)
+                        showSnackBar(getString(LR.string.podcast_refresh_no_episodes_found))
                     }
                     is PodcastViewModel.RefreshState.Refreshing -> {
                         if (state.type == PodcastViewModel.RefreshType.PULL_TO_REFRESH) {
                             binding?.swipeRefreshLayout?.isRefreshing = true
                         } else {
-                            message = getString(LR.string.podcast_refreshing_episode_list)
+                            showSnackBar(getString(LR.string.podcast_refreshing_episode_list), Snackbar.LENGTH_INDEFINITE)
                         }
-                    }
-                }
-                if (message != null) {
-                    (activity as? FragmentHostListener)?.snackBarView()?.let { snackBarView ->
-                        Snackbar.make(snackBarView, message, Snackbar.LENGTH_LONG).show()
                     }
                 }
             }
@@ -1031,9 +1025,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_SHARE_TAPPED)
 
         if (!podcast.canShare) {
-            (activity as? FragmentHostListener)?.snackBarView()?.let { snackBarView ->
-                Snackbar.make(snackBarView, getString(LR.string.sharing_is_not_available_for_private_podcasts), Snackbar.LENGTH_LONG).show()
-            }
+            showSnackBar(getString(LR.string.sharing_is_not_available_for_private_podcasts))
             return
         }
 
@@ -1057,6 +1049,12 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             viewModel.downloadAll()
         }
         dialog?.show(parentFragmentManager, "download_confirm")
+    }
+
+    private fun showSnackBar(message: String, duration: Int = Snackbar.LENGTH_LONG) {
+        (activity as? FragmentHostListener)?.snackBarView()?.let { snackBarView ->
+            Snackbar.make(snackBarView, message, duration).show()
+        }
     }
 
     override fun onBackPressed() = if (viewModel.multiSelectEpisodesHelper.isMultiSelecting) {
