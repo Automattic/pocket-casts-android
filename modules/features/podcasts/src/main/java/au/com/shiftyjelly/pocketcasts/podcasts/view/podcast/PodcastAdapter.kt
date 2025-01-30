@@ -9,7 +9,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
-import android.text.Html
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
@@ -21,9 +20,11 @@ import android.widget.TextView
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
+import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
@@ -33,6 +34,7 @@ import androidx.transition.ChangeBounds
 import androidx.transition.TransitionManager
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.text.toAnnotatedString
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -69,7 +71,6 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.extensions.hide
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
 import au.com.shiftyjelly.pocketcasts.views.extensions.toggleVisibility
-import au.com.shiftyjelly.pocketcasts.views.extensions.trimPadding
 import au.com.shiftyjelly.pocketcasts.views.helper.AnimatorUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
 import au.com.shiftyjelly.pocketcasts.views.helper.toCircle
@@ -292,15 +293,17 @@ class PodcastAdapter(
     private fun bindHeaderBottom(holder: PodcastViewHolder) {
         holder.binding.bottom.root.isVisible = headerExpanded
 
-        val description = if (FeatureFlag.isEnabled(Feature.PODCAST_HTML_DESCRIPTION) && podcast.podcastHtmlDescription.isNotEmpty()) {
-            // keep the extra line break from paragraphs as it looks better
-            Html.fromHtml(
+        val isHtmlDescription = FeatureFlag.isEnabled(Feature.PODCAST_HTML_DESCRIPTION) && podcast.podcastHtmlDescription.isNotEmpty()
+        val descriptionLinkColor: Int = ThemeColor.podcastText02(theme.activeTheme, tintColor)
+
+        val description = if (isHtmlDescription) {
+            HtmlCompat.fromHtml(
                 podcast.podcastHtmlDescription,
-                Html.FROM_HTML_MODE_COMPACT and
-                    Html.FROM_HTML_SEPARATOR_LINE_BREAK_PARAGRAPH.inv(),
-            ).trimPadding()
+                HtmlCompat.FROM_HTML_MODE_COMPACT and
+                    HtmlCompat.FROM_HTML_SEPARATOR_LINE_BREAK_PARAGRAPH.inv(), // keep the extra line break from paragraphs as it looks better
+            ).toAnnotatedString(urlColor = descriptionLinkColor)
         } else {
-            podcast.podcastDescription
+            AnnotatedString(podcast.podcastDescription)
         }
 
         holder.binding.bottom.podcastHeaderBottom.setContent {
@@ -308,7 +311,7 @@ class PodcastAdapter(
                 PodcastHeaderBottom(
                     title = podcast.title,
                     category = podcast.getFirstCategory(context.resources),
-                    description = description.toString(),
+                    description = description,
                     podcastInfoContent = {
                         PodcastInfoView(
                             PodcastInfoState(

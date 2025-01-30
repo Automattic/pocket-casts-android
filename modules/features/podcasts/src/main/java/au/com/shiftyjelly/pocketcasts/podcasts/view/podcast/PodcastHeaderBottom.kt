@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -18,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -31,7 +33,7 @@ private const val collapsedLines: Int = 3
 fun PodcastHeaderBottom(
     title: String,
     category: String,
-    description: String,
+    description: AnnotatedString,
     onDescriptionClicked: () -> Unit,
     modifier: Modifier = Modifier,
     ratingsContent: @Composable () -> Unit = {},
@@ -87,11 +89,13 @@ fun PodcastHeaderBottom(
             thickness = 1.dp,
         )
 
-        TextP40(
+        Text(
             text = description,
             maxLines = if (isDescriptionExpanded) Int.MAX_VALUE else collapsedLines,
             overflow = if (isDescriptionExpanded) TextOverflow.Clip else TextOverflow.Ellipsis,
             lineHeight = 21.sp,
+            fontSize = 16.sp,
+            color = MaterialTheme.theme.colors.primaryText01,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 12.dp, bottom = 16.dp)
