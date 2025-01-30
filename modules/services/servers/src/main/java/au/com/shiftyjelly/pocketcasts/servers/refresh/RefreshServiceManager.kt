@@ -8,5 +8,7 @@ interface RefreshServiceManager {
 
     suspend fun pollImportOpml(pollUuids: List<String>): Response<StatusResponse<ImportOpmlResponse>>
 
-    suspend fun refreshPodcastFeed(podcastUuid: String): Response<StatusResponse<BasicResponse>>
+    suspend fun updatePodcast(podcastUuid: String, lastEpisodeUuid: String?): Response<Unit>
+
+    suspend fun pollUpdatePodcast(url: String): Response<Unit>
 }

@@ -463,7 +463,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
 
     private fun onDismissManageDownloadTapped() {
         analyticsTracker.track(
-            AnalyticsEvent.FREE_UP_SPACE_MANAGE_DOWNLOADS_MORE_OPTIONS_DISMISS_TAPPED,
+            AnalyticsEvent.FREE_UP_SPACE_MAYBE_LATER_TAPPED,
             mapOf("source" to SourceView.DOWNLOADS.analyticsValue),
         )
         settings.setDismissLowStorageBannerTime(System.currentTimeMillis())

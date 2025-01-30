@@ -174,13 +174,31 @@ class SharingClient(
             }
         }
 
-        is SharingRequest.Data.ClipLink -> {
-            shareStarter.copyLink(context, ClipData.newPlainText(context.getString(data.linkDescription()), data.sharingUrl(hostUrl)))
-            SharingResponse(
-                isSuccsessful = true,
-                feedbackMessage = if (showCustomCopyFeedback) context.getString(LR.string.share_link_copied_feedback) else null,
-                error = null,
-            )
+        is SharingRequest.Data.ClipLink -> when (platform) {
+            PocketCasts -> {
+                shareStarter.copyLink(context, ClipData.newPlainText(context.getString(data.linkDescription()), data.sharingUrl(hostUrl)))
+                SharingResponse(
+                    isSuccsessful = true,
+                    feedbackMessage = if (showCustomCopyFeedback) context.getString(LR.string.share_link_copied_feedback) else null,
+                    error = null,
+                )
+            }
+
+            Instagram, WhatsApp, Telegram, X, Tumblr, More -> {
+                Intent()
+                    .setAction(Intent.ACTION_SEND)
+                    .setType("text/plain")
+                    .putExtra(EXTRA_TEXT, data.sharingUrl(hostUrl))
+                    .putExtra(EXTRA_TITLE, data.sharingTitle())
+                    .setPackage(platform.packageId)
+                    .toChooserIntent()
+                    .share()
+                SharingResponse(
+                    isSuccsessful = true,
+                    feedbackMessage = null,
+                    error = null,
+                )
+            }
         }
 
         is SharingRequest.Data.ClipAudio -> {
@@ -551,6 +569,8 @@ data class SharingRequest internal constructor(
             val range: Clip.Range,
         ) : Data {
             fun sharingUrl(host: String) = "$host/episode/${episode.uuid}?t=${range.start.toSecondsWithSingleMilli()},${range.end.toSecondsWithSingleMilli()}"
+
+            fun sharingTitle() = episode.title
 
             fun linkDescription() = LR.string.share_link_clip
 

@@ -3,14 +3,14 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:background="?attr/primary_ui_01">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <View
         android:id="@+id/topMarker"
         android:layout_width="48dp"
         android:layout_height="6dp"
-        android:background="@drawable/background_dragger_player"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/background_dragger"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -152,11 +152,11 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/separator"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:paddingStart="24dp"
         android:paddingEnd="24dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp">
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp">
         <ImageView
             android:id="@+id/imgIconUpNext"
             android:layout_width="24dp"
@@ -182,11 +182,10 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/layoutUpNext"
-        android:layout_marginTop="16dp"
         android:paddingStart="24dp"
         android:paddingEnd="24dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp">
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp">
         <ImageView
             android:id="@+id/imgIconPlayed"
             android:layout_width="24dp"
@@ -212,11 +211,10 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/layoutPlayed"
-        android:layout_marginTop="16dp"
         android:paddingStart="24dp"
         android:paddingEnd="24dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp">
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp">
         <ImageView
             android:id="@+id/imgIconBookmark"
             android:layout_width="24dp"
@@ -242,11 +240,10 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/layoutBookmark"
-        android:layout_marginTop="16dp"
         android:paddingStart="24dp"
         android:paddingEnd="24dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp">
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp">
         <ImageView
             android:layout_width="24dp"
             android:layout_height="24dp"
@@ -270,16 +267,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/layoutEdit"
-        android:layout_marginTop="16dp"
         android:paddingStart="24dp"
         android:paddingEnd="24dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp">
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp">
         <ImageView
             android:id="@+id/imgIconCloud"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            app:srcCompat="@drawable/ic_upload___remove_from_cloud___menu"
+            app:srcCompat="@drawable/ic_remove_from_cloud"
             app:tint="?attr/primary_icon_01"/>
         <TextView
             android:id="@+id/lblCloud"
@@ -299,11 +295,10 @@
         android:background="?attr/selectableItemBackground"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/layoutCloud"
-        android:layout_marginTop="16dp"
         android:paddingStart="24dp"
         android:paddingEnd="24dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
         android:alpha="0.5">
         <ImageView
             android:layout_width="24dp"
@@ -320,6 +315,7 @@
             style="@style/H40"
             android:text="@string/profile_cloud_upload"/>
     </LinearLayout>
+
     <LinearLayout
         android:id="@+id/layoutDelete"
         android:layout_width="match_parent"
@@ -329,15 +325,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/layoutLockedCloud"
-        android:layout_marginTop="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="8dp"
         android:paddingStart="24dp"
         android:paddingEnd="24dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp">
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp">
+
         <ImageView
             android:layout_width="24dp"
             android:layout_height="24dp"
-            app:srcCompat="@drawable/ic_delete"/>
+            app:srcCompat="@drawable/ic_delete"
+            app:tint="?attr/support_05" />
 
         <TextView
             style="@style/H40"
@@ -348,6 +347,7 @@
             android:layout_weight="1"
             android:text="@string/profile_files_delete"
             android:textColor="?attr/support_05" />
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,11 +7,11 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.view.doOnLayout
-import androidx.fragment.compose.content
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
+import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.rateUs
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -31,7 +31,7 @@ class PocketCastsChampionBottomSheetDialog : BottomSheetDialogFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ) = content {
+    ) = contentWithoutConsumedInsets {
         AppTheme(theme.activeTheme) {
             CallOnce {
                 analyticsTracker.track(AnalyticsEvent.POCKET_CASTS_CHAMPION_DIALOG_SHOWN)

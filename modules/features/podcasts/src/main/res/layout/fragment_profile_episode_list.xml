@@ -4,53 +4,45 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="?attr/primary_ui_01">
 
-    <com.google.android.material.appbar.AppBarLayout
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:id="@+id/appBar"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent">
+        android:background="?attr/secondary_ui_01"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <com.google.android.material.appbar.CollapsingToolbarLayout
-            android:id="@+id/collapsingToolbar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?attr/secondary_ui_01"
-            android:minHeight="?android:attr/actionBarSize"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            app:titleEnabled="false">
+    <au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectToolbar
+        android:id="@+id/multiSelectToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent" />
 
-            <androidx.compose.ui.platform.ComposeView
-                android:id="@+id/layoutSearch"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="?attr/actionBarSize" />
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/toolbarBarrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="toolbar,multiSelectToolbar" />
 
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="?attr/secondary_ui_01"
-                android:minHeight="?android:attr/actionBarSize"
-                app:layout_collapseMode="pin" />
-
-            <au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectToolbar
-                android:id="@+id/multiSelectToolbar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="?android:attr/actionBarSize"
-                android:visibility="gone"
-                app:layout_collapseMode="pin" />
-
-        </com.google.android.material.appbar.CollapsingToolbarLayout>
-
-    </com.google.android.material.appbar.AppBarLayout>
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/layoutSearch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/secondary_ui_01"
+        app:layout_constraintTop_toBottomOf="@+id/toolbarBarrier" />
 
     <androidx.compose.ui.platform.ComposeView
         android:id="@+id/manageDownloadsCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/appBar"
-        android:visibility="gone" />
+        app:layout_constraintTop_toBottomOf="@id/layoutSearch"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:visibility="gone"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="16dp"
+        />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
@@ -58,8 +50,7 @@
         android:layout_height="0dp"
         android:clipToPadding="false"
         android:background="?attr/primary_ui_02"
-        android:paddingTop="16dp"
-        android:paddingBottom="16dp"
+        android:paddingVertical="8dp"
         app:layout_constraintTop_toBottomOf="@id/manageDownloadsCard"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"/>

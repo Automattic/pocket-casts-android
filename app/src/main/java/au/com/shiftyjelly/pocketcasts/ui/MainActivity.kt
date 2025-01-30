@@ -12,6 +12,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -22,6 +23,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.ContextCompat
+import androidx.core.view.WindowCompat
 import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
@@ -138,7 +140,8 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSourc
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewFragment
 import au.com.shiftyjelly.pocketcasts.ui.MainActivityViewModel.NavigationState
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
-import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
+import au.com.shiftyjelly.pocketcasts.ui.helper.NavigationBarColor
+import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Network
@@ -149,6 +152,7 @@ import au.com.shiftyjelly.pocketcasts.utils.observeOnce
 import au.com.shiftyjelly.pocketcasts.view.BottomNavHideManager
 import au.com.shiftyjelly.pocketcasts.view.LockableBottomSheetBehavior
 import au.com.shiftyjelly.pocketcasts.views.activity.WebViewActivity
+import au.com.shiftyjelly.pocketcasts.views.extensions.setSystemWindowInsetToPadding
 import au.com.shiftyjelly.pocketcasts.views.extensions.showAllowingStateLoss
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
@@ -323,7 +327,7 @@ class MainActivity :
                 shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) -> {
                     if (settings.isNotificationsDisabledMessageShown()) return
                     Snackbar.make(
-                        findViewById(R.id.root),
+                        snackBarView(),
                         getString(LR.string.notifications_blocked_warning),
                         EXTRA_LONG_SNACKBAR_DURATION_MS,
                     ).setAction(
@@ -350,8 +354,11 @@ class MainActivity :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Timber.d("Main Activity onCreate")
+        // Changing the theme draws the status and navigation bars as black, unless this is manually set
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
         theme.setupThemeForConfig(this, resources.configuration)
+        enableEdgeToEdge(navigationBarStyle = theme.getNavigationBarStyle(this))
 
         playbackManager.setNotificationPermissionChecker(this)
 
@@ -365,6 +372,8 @@ class MainActivity :
         val view = binding.root
         setContentView(view)
         checkForNotificationPermission()
+
+        binding.root.setSystemWindowInsetToPadding(left = true, right = true)
 
         binding.bottomNavigation.doOnLayout {
             val miniPlayerHeight = miniPlayerHeight
@@ -453,7 +462,7 @@ class MainActivity :
         }
         navigator.infoStream()
             .doOnNext {
-                updateStatusBar()
+                updateSystemColors()
                 if (it is NavigatorAction.TabSwitched) {
                     val currentTab = navigator.currentTab()
                     if (settings.selectedTab() != currentTab) {
@@ -674,32 +683,31 @@ class MainActivity :
     }
 
     override fun updateStatusBar() {
-        val topFragment = navigator.currentFragment()
+        val topFragment = supportFragmentManager.fragments.lastOrNull()
         val color = if (binding.playerBottomSheet.isPlayerOpen) {
-            val playerBgColor = theme.playerBackgroundColor(viewModel.lastPlaybackState?.podcast)
-            StatusBarColor.Custom(playerBgColor, true)
+            StatusBarIconColor.Light
         } else if (topFragment is BaseFragment) {
-            topFragment.statusBarColor
+            topFragment.statusBarIconColor
         } else {
             null
         }
 
         if (color != null) {
-            theme.updateWindowStatusBar(window = window, statusBarColor = color, context = this)
+            theme.updateWindowStatusBarIcons(window = window, statusBarIconColor = color)
         }
     }
 
     private fun updateNavAndStatusColors(playerOpen: Boolean, playingPodcast: Podcast?) {
-        if (playerOpen) {
-            val playerBgColor = theme.playerBackgroundColor(playingPodcast)
-            theme.setNavigationBarColor(window, true, playerBgColor)
+        val navigationBarColor = if (playerOpen) {
+            NavigationBarColor.Player(playingPodcast)
         } else {
-            theme.setNavigationBarColor(
-                window,
-                theme.isDarkTheme,
-                ThemeColor.primaryUi03(theme.activeTheme),
-            )
+            NavigationBarColor.Theme
         }
+
+        theme.updateWindowNavigationBarColor(window = window, navigationBarColor = navigationBarColor)
+
+        // Color the side bars of the screen if there is inset for areas such as cameras
+        binding.root.setBackgroundColor(theme.getNavigationBarColor(navigationBarColor))
 
         updateStatusBar()
     }
@@ -799,7 +807,7 @@ class MainActivity :
                     }
 
                     if (viewModel.isPlayerOpen && isEpisodeChanged) {
-                        updateNavAndStatusColors(true, state.podcast)
+                        updateNavAndStatusColors(playerOpen = true, playingPodcast = state.podcast)
                     }
 
                     if (lastPlaybackState != null && (isEpisodeChanged || isPlaybackChanged) && settings.openPlayerAutomatically.value) {
@@ -942,8 +950,9 @@ class MainActivity :
                     }
 
                     binding.playerBottomSheet.isDragEnabled = true
+                    frameBottomSheetBehavior.swipeEnabled = false
 
-                    updateNavAndStatusColors(playerOpen = viewModel.isPlayerOpen, viewModel.lastPlaybackState?.podcast)
+                    updateNavAndStatusColors(playerOpen = viewModel.isPlayerOpen, playingPodcast = viewModel.lastPlaybackState?.podcast)
                 } else {
                     binding.playerBottomSheet.isDragEnabled = false
                 }
@@ -999,7 +1008,6 @@ class MainActivity :
 
     override fun onMiniPlayerVisible() {
         updateSnackbarPosition(miniPlayerOpen = true)
-
         settings.updateBottomInset(miniPlayerHeight)
 
         // Handle up next shortcut
@@ -1026,7 +1034,7 @@ class MainActivity :
             }
         }
 
-        updateNavAndStatusColors(true, viewModel.lastPlaybackState?.podcast)
+        updateNavAndStatusColors(playerOpen = true, playingPodcast = viewModel.lastPlaybackState?.podcast)
         UiUtil.hideKeyboard(binding.root)
 
         viewModel.isPlayerOpen = true
@@ -1037,7 +1045,7 @@ class MainActivity :
     }
 
     override fun onPlayerClosed() {
-        updateNavAndStatusColors(false, null)
+        updateNavAndStatusColors(playerOpen = false, playingPodcast = null)
 
         viewModel.isPlayerOpen = false
         viewModel.closeMultiSelect()

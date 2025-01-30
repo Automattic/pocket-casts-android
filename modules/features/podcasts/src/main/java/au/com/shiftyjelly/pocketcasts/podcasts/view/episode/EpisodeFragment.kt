@@ -42,7 +42,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
-import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
+import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Network
@@ -114,7 +114,7 @@ class EpisodeFragment : BaseFragment() {
             bundle?.let { BundleCompat.getParcelable(it, NEW_INSTANCE_ARG, EpisodeFragmentArgs::class.java) }
     }
 
-    override lateinit var statusBarColor: StatusBarColor
+    override lateinit var statusBarIconColor: StatusBarIconColor
 
     @Inject lateinit var settings: Settings
 
@@ -177,9 +177,7 @@ class EpisodeFragment : BaseFragment() {
 
         showNotesFormatter = createShowNotesFormatter(contextThemeWrapper)
 
-        statusBarColor = StatusBarColor.Custom(
-            context?.getThemeColor(R.attr.primary_ui_01) ?: Color.WHITE, theme.isDarkTheme,
-        )
+        statusBarIconColor = StatusBarIconColor.Light
         return binding?.root
     }
 
@@ -420,9 +418,6 @@ class EpisodeFragment : BaseFragment() {
         binding?.btnArchive?.let { button ->
             button.onStateChange = {
                 viewModel.archiveClicked(button.isOn)
-                if (button.isOn) {
-                    (parentFragment as? BaseDialogFragment)?.dismiss()
-                }
             }
         }
 

@@ -229,6 +229,7 @@ enum class AnalyticsEvent(val key: String) {
     PODCASTS_SCREEN_EPISODE_GROUPING_CHANGED("podcasts_screen_episode_grouping_changed"),
     PODCASTS_SCREEN_TAB_TAPPED("podcasts_screen_tab_tapped"),
     PODCAST_SCREEN_REPORT_TAPPED("podcast_screen_report_tapped"),
+    PODCAST_SCREEN_REFRESH_EPISODE_LIST("podcast_screen_refresh_episode_list"),
 
     /* Podcast Settings */
     PODCAST_SETTINGS_FEED_ERROR_TAPPED("podcast_settings_feed_error_tapped"),
@@ -311,7 +312,7 @@ enum class AnalyticsEvent(val key: String) {
     DISCOVER_LIST_EPISODE_TAPPED("discover_list_episode_tapped"),
     DISCOVER_LIST_EPISODE_PLAY("discover_list_episode_play"),
     DISCOVER_LIST_PODCAST_TAPPED("discover_list_podcast_tapped"),
-    DISCOVER_LIST_SHARE_TAPPED_TAPPED("discover_list_share_tapped_tapped"),
+    DISCOVER_LIST_SHARE_TAPPED("discover_list_share_tapped"),
     DISCOVER_LIST_PODCAST_SUBSCRIBED("discover_list_podcast_subscribed"),
     DISCOVER_FEATURED_PAGE_CHANGED("discover_featured_page_changed"),
     DISCOVER_SMALL_LIST_PAGE_CHANGED("discover_small_list_page_changed"),
@@ -471,7 +472,7 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_ABOUT_SHARE_WITH_FRIENDS_TAPPED("settings_about_share_with_friends_tapped"),
     SETTINGS_ABOUT_WEBSITE_TAPPED("settings_about_website_tapped"),
     SETTINGS_ABOUT_INSTAGRAM_TAPPED("settings_about_instagram_tapped"),
-    SETTINGS_ABOUT_TWITTER_TAPPED("settings_about_twitter_tapped"),
+    SETTINGS_ABOUT_X_TAPPED("settings_about_twitter_tapped"),
     SETTINGS_ABOUT_AUTOMATTIC_FAMILY_TAPPED("settings_about_automattic_family_tapped"),
     SETTINGS_ABOUT_LEGAL_AND_MORE_TAPPED("settings_about_legal_and_more_tapped"),
     SETTINGS_ABOUT_WORK_WITH_US_TAPPED("settings_about_work_with_us_tapped"),
@@ -524,6 +525,7 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_SELECT_PODCASTS_SELECT_NONE_TAPPED("settings_select_podcasts_select_none_tapped"),
     SETTINGS_SELECT_PODCASTS_PODCAST_TOGGLED("settings_select_podcasts_podcast_toggled"),
     SETTINGS_SELECT_PODCASTS_SELECT_ALL_PODCASTS_TOGGLED("settings_select_podcasts_select_all_podcasts_toggled"),
+    SETTINGS_SELECT_PODCASTS_DISMISSED("settings_select_podcasts_dismissed"),
 
     /* Settings - Files */
     SETTINGS_FILES_SHOWN("settings_files_shown"),
@@ -716,11 +718,21 @@ enum class AnalyticsEvent(val key: String) {
     FREE_UP_SPACE_BANNER_SHOWN("free_up_space_banner_shown"),
     FREE_UP_SPACE_MODAL_SHOWN("free_up_space_modal_shown"),
     FREE_UP_SPACE_MANAGE_DOWNLOADS_TAPPED("free_up_space_manage_downloads_tapped"),
-    FREE_UP_SPACE_MANAGE_DOWNLOADS_MORE_OPTIONS_TAPPED("free_up_space_manage_downloads_more_options_tapped"),
-    FREE_UP_SPACE_MANAGE_DOWNLOADS_MORE_OPTIONS_DISMISS_TAPPED("free_up_space_manage_downloads_more_options_dismiss_tapped"),
     FREE_UP_SPACE_MAYBE_LATER_TAPPED("free_up_space_maybe_later_tapped"),
 
     /* Battery Restrictions */
     BATTERY_RESTRICTIONS_SHOWN("battery_restrictions_shown"),
     BATTERY_RESTRICTIONS_TOGGLED("battery_restrictions_toggled"),
+
+    /* Winback */
+    WINBACK_SCREEN_SHOWN("winback_screen_shown"),
+    WINBACK_SCREEN_DISMISSED("winback_screen_dismissed"),
+    WINBACK_CONTINUE_BUTTON_TAP("winback_continue_button_tap"),
+    WINBACK_MAIN_SCREEN_ROW_TAP("winback_main_screen_row_tap"),
+    WINBACK_OFFER_CLAIMED_DONE_BUTTON_TAPPED("winback_offer_claimed_done_button_tapped"),
+    WINBACK_AVAILABLE_PLANS_BACK_BUTTON_TAPPED("winback_available_plans_back_button_tapped"),
+    WINBACK_AVAILABLE_PLANS_SELECT_PLAN("winback_available_plans_select_plan"),
+    WINBACK_AVAILABLE_PLANS_NEW_PLAN_PURCHASE_SUCCESSFUL("winback_available_plans_new_plan_purchase_successful"),
+    WINBACK_CANCEL_CONFIRMATION_STAY_BUTTON_TAPPED("winback_cancel_confirmation_stay_button_tapped"),
+    WINBACK_CANCEL_CONFIRMATION_CANCEL_BUTTON_TAPPED("winback_cancel_confirmation_cancel_button_tapped"),
 }

@@ -626,6 +626,10 @@
         <item quantity="other">End clip handle: %d seconds</item>
     </plurals>
     <string name="podcast_show_archived" translatable="false">@string/show_archived</string>
+    <string name="podcast_refresh_episodes">Refresh episode list</string>
+    <string name="podcast_refreshing_episode_list">Refreshing episode list…</string>
+    <string name="podcast_refresh_new_episode_found">New episode found!</string>
+    <string name="podcast_refresh_no_episodes_found">No episodes found.</string>
     <string name="podcast_sort_episodes">Sort episodes</string>
     <string name="podcast_subscribed">Following</string>
     <string name="podcast_not_subscribed">Not Following</string>
@@ -1576,12 +1580,11 @@
     <string name="settings_about_share_with_friends_message">Hey! Here is a link to download the Pocket Casts app. I\'m really enjoying it and thought you might too. \nhttps://www.pocketcasts.com</string>
     <string name="settings_about_rate_us">Rate us</string>
     <string name="settings_about_instagram">Instagram</string>
-    <string name="settings_about_twitter">Twitter</string>
+    <string name="settings_about_x" translatable="false">X</string>
     <string name="settings_about_work_with_us">Work with us</string>
     <string name="settings_about_legal">Legal and more</string>
     <string name="settings_about_work_from_anywhere">Work from Anywhere</string>
     <string name="settings_about_automattic_family">Automattic family</string>
-    <string name="settings_about_wordpress" translatable="false">WordPress</string>
     <string name="settings_about_jetpack" translatable="false">Jetpack</string>
     <string name="settings_about_dayone" translatable="false">Day One</string>
     <string name="settings_about_woo" translatable="false">WooCommerce</string>
@@ -2296,6 +2299,20 @@
     <string name="winback_claimed_offer_message_2">Thanks for choosing Pocket&#160;Casts. Billing starts after your free month ends.</string>
     <string name="winback_available_plans_title">Available Plans</string>
     <string name="winback_available_plans_billing_note">Your new plan will activate at the end of your current billing period.</string>
+    <string name="winback_too_many_subscritpions_title">Multiple subscriptions found</string>
+    <string name="winback_too_many_subscritpions_note">You have more than one active Pocket&#160;Casts subscription. Please manage your subscriptions in the Play&#160;Store to avoid duplicate charges.</string>
+    <string name="winback_too_many_subscritpions_button_label">Manage subscriptions in Play&#160;Store</string>
     <string name="winback_error_fetch_description">Sorry, but something went wrong fetching your plans.</string>
+    <string name="winback_changing_plan">Changing plan</string>
+    <string name="winback_cancel_subscription_header_title">Changing plan</string>
+    <string name="winback_cancel_subscription_header_description">This will change your plan to a free account.</string>
+    <string name="winback_cancel_subscription_perk_active_with_date">Your current subscription will remain active until %1$s.</string>
+    <string name="winback_cancel_subscription_perk_active_without_date">Your current subscription will remain active until its expiration date.</string>
+    <string name="winback_cancel_subscription_perk_plus">Access to Pocket Casts Plus features will be locked after this date.</string>
+    <string name="winback_cancel_subscription_perk_folders">Your folders will be removed and their contents will move back to the Podcasts screen.</string>
+    <string name="winback_cancel_subscription_perk_files">All files uploaded to your Pocket Casts account will be deleted (but downloaded files on your mobile devices will remain).</string>
+    <string name="winback_cancel_subscription_perk_web">You will no longer be able to access Pocket Casts using your web browser, or desktop computer.</string>
+    <string name="winback_cancel_subscription_stay_button_label">Actually, I want to stay</string>
+    <string name="winback_cancel_subscription_cancel_button_label">Yes, Cancel my Subscription</string>
 
 </resources>

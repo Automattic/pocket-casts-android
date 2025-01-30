@@ -8,8 +8,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentLongPressOptionsBinding
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
-import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
-import au.com.shiftyjelly.pocketcasts.views.extensions.applyColor
+import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -18,7 +17,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class LongPressOptionsFragment : BaseDialogFragment() {
 
-    override val statusBarColor: StatusBarColor? = null
+    override val statusBarIconColor = StatusBarIconColor.Light
 
     private val viewModel: PlayerViewModel by activityViewModels()
     private var binding: FragmentLongPressOptionsBinding? = null
@@ -45,7 +44,7 @@ class LongPressOptionsFragment : BaseDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.playingEpisodeLive.observe(viewLifecycleOwner) { (_, backgroundColor) ->
-            applyColor(theme, backgroundColor)
+            setDialogTint(backgroundColor)
         }
 
         (dialog as? BottomSheetDialog)?.behavior?.state = BottomSheetBehavior.STATE_EXPANDED

@@ -110,7 +110,7 @@ dependencies {
     implementation(projects.modules.services.crashlogging)
     implementation(projects.modules.services.deeplink)
     implementation(projects.modules.services.localization)
-    implementation(projects.modules.services.mediaFfmpeg)
+    implementation(projects.modules.services.mediaNoop)
     implementation(projects.modules.services.model)
     implementation(projects.modules.services.preferences)
     implementation(projects.modules.services.repositories)

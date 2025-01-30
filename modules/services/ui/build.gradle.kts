@@ -33,6 +33,7 @@ dependencies {
     implementation(libs.androidx.mediarouter)
     implementation(libs.androidx.preference.ktx)
     implementation(libs.coil)
+    implementation(libs.compose.activity)
     implementation(libs.coroutines.core)
     implementation(libs.material.dialogs)
     implementation(libs.material.progressbar)

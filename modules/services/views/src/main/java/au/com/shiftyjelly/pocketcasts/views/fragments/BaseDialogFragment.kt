@@ -11,10 +11,11 @@ import androidx.core.graphics.ColorUtils
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.doOnLayout
 import androidx.navigation.NavHostController
-import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
-import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
+import au.com.shiftyjelly.pocketcasts.ui.helper.NavigationBarColor
+import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.views.extensions.setSystemWindowInsetToPadding
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -23,12 +24,13 @@ import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
 open class BaseDialogFragment : BottomSheetDialogFragment(), CoroutineScope {
 
-    open val statusBarColor: StatusBarColor? = StatusBarColor.Light
+    open val statusBarIconColor: StatusBarIconColor = StatusBarIconColor.Theme
+    open val navigationBarColor: NavigationBarColor = NavigationBarColor.Theme
+    open val includeNavigationBarPadding: Boolean = true
 
     private var isBeingDragged = false
     private val dismissCallback = object : BottomSheetBehavior.BottomSheetCallback() {
@@ -46,19 +48,21 @@ open class BaseDialogFragment : BottomSheetDialogFragment(), CoroutineScope {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if (view.background == null) {
-            view.setBackgroundColor(view.context.getThemeColor(UR.attr.primary_ui_01))
-        }
+
         view.isClickable = true
 
-        val activity = activity
-        val statusBarColor = statusBarColor
-        if (activity != null && statusBarColor != null) {
-            theme.updateWindowStatusBar(window = activity.window, statusBarColor = statusBarColor, context = activity)
+        dialog?.window?.let { window ->
+            theme.updateWindowStatusBarIcons(window = window, statusBarIconColor = statusBarIconColor)
+            theme.updateWindowNavigationBarColor(window = window, navigationBarColor = navigationBarColor)
         }
 
         view.doOnLayout {
             ensureExpanded()
+        }
+
+        // add padding to the bottom of the dialog for the navigation bar
+        if (includeNavigationBarPadding) {
+            view.setSystemWindowInsetToPadding(bottom = true)
         }
 
         isBeingDragged = false
@@ -117,20 +121,17 @@ open class BaseDialogFragment : BottomSheetDialogFragment(), CoroutineScope {
     }
 
     protected fun setDialogTint(
-        @ColorInt statusBar: Int,
-        @ColorInt navigationBar: Int,
-        @ColorInt background: Int = navigationBar,
+        @ColorInt color: Int,
     ) {
-        setStatusBarTint(statusBar)
-        setNavigationBarTint(navigationBar)
-        setBackgroundTint(background)
+        setStatusBarTint(color)
+        setNavigationBarTint(color)
+        setBackgroundTint(color)
     }
 
     protected fun setStatusBarTint(
         @ColorInt color: Int,
     ) {
         requireActivity().window?.let { activityWindow ->
-            activityWindow.statusBarColor = color
             WindowInsetsControllerCompat(activityWindow, activityWindow.decorView).isAppearanceLightStatusBars = ColorUtils.calculateLuminance(color) > 0.5f
         }
     }
@@ -139,7 +140,6 @@ open class BaseDialogFragment : BottomSheetDialogFragment(), CoroutineScope {
         @ColorInt color: Int,
     ) {
         requireDialog().window?.let { dialogWindow ->
-            dialogWindow.navigationBarColor = color
             WindowInsetsControllerCompat(dialogWindow, dialogWindow.decorView).isAppearanceLightNavigationBars = ColorUtils.calculateLuminance(color) > 0.5f
         }
     }

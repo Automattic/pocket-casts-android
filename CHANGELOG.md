@@ -1,6 +1,17 @@
 7.82
 -----
-
+*   Bug Fixes
+    *   Fix status bar theming during onboarding.
+        ([#3460](https://github.com/Automattic/pocket-casts-android/pull/3460))
+    *   Fix issue with playback stopping when using Pixel Buds actions.
+        ([#3493](https://github.com/Automattic/pocket-casts-android/pull/3493))
+*   Updates
+    *   Remove audio and video clip sharing
+        ([#3481](https://github.com/Automattic/pocket-casts-android/pull/3481))
+    *   Do not close episode details screen when archiving an episode
+        ([#3473](https://github.com/Automattic/pocket-casts-android/pull/3473))
+    *   Rename Twitter to X
+        ([#3489](https://github.com/Automattic/pocket-casts-android/pull/3489))
 
 7.81
 -----

@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
@@ -15,12 +16,13 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
-import androidx.fragment.compose.content
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
-import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
+import au.com.shiftyjelly.pocketcasts.ui.helper.NavigationBarColor
+import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil.setBackgroundColor
@@ -35,12 +37,14 @@ class ReferralsGuestPassFragment : BaseFragment() {
     private val args get() = requireNotNull(arguments?.let { BundleCompat.getParcelable(it, NEW_INSTANCE_ARG, Args::class.java) })
     private val pageType get() = args.pageType
 
+    override var statusBarIconColor: StatusBarIconColor = StatusBarIconColor.Light
+
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ) = content {
+    ) = contentWithoutConsumedInsets {
         val context = LocalContext.current
         val windowSize = calculateWindowSizeClass(context.getActivity() as Activity)
 
@@ -78,16 +82,14 @@ class ReferralsGuestPassFragment : BaseFragment() {
                 }
             }
         }
+    }.apply {
+        consumeWindowInsets = false
     }
 
     private fun updateStatusAndNavColors() {
         activity?.let {
-            theme.setNavigationBarColor(it.window, true, Color.BLACK)
-            theme.updateWindowStatusBar(
-                it.window,
-                StatusBarColor.Custom(Color.BLACK, true),
-                it,
-            )
+            theme.updateWindowNavigationBarColor(window = it.window, navigationBarColor = NavigationBarColor.Color(color = Color.BLACK, lightIcons = true))
+            theme.updateWindowStatusBarIcons(window = it.window, statusBarIconColor = StatusBarIconColor.Light)
         }
     }
 
