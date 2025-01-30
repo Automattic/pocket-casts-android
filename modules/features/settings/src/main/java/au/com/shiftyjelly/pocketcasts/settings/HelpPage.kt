@@ -35,6 +35,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
@@ -218,6 +219,7 @@ private fun HelpPage(
         }
         AppBarActionsEffect(
             show = showActionPopup,
+            appBarInsets = appBarInsets,
             onShowLogs = onShowLogs,
             onShowStatusPage = onShowStatusPage,
             onExportDatabase = onExportDatabase,
@@ -253,6 +255,7 @@ private fun AppBar(
 @Composable
 private fun BoxScope.AppBarActionsEffect(
     show: Boolean,
+    appBarInsets: WindowInsets,
     onShowLogs: () -> Unit,
     onShowStatusPage: () -> Unit,
     onExportDatabase: () -> Unit,
@@ -277,6 +280,7 @@ private fun BoxScope.AppBarActionsEffect(
         exit = popupExitTranstion,
         modifier = Modifier
             .align(Alignment.TopEnd)
+            .windowInsetsPadding(appBarInsets)
             .offset(x = -16.dp, y = 16.dp)
             .shadow(elevation = 8.dp),
     ) {
