@@ -370,9 +370,7 @@ platform :android do
     version = release_version_current
 
     # Wrap up
-    remove_branch_protection(repository: GITHUB_REPO, branch: "release/#{version}")
     set_milestone_frozen_marker(repository: GITHUB_REPO, milestone: version, freeze: false)
-    create_new_milestone(repository: GITHUB_REPO, need_appstore_submission: true)
     close_milestone(repository: GITHUB_REPO, milestone: version)
 
     push_to_git_remote(tags: false)
