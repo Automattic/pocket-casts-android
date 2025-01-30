@@ -18,7 +18,7 @@ steps:
       bundle exec fastlane run configure_apply
 
       echo '--- 🚀 Update Rollouts'
-      bundle exec fastlane update_rollouts track:$TRACK percent:$ROLLOUT_PERCENT skip_confirm:true
+      bundle exec fastlane update_rollouts track:$TRACK percent:$ROLLOUT_PERCENT
     plugins: [$CI_TOOLKIT]
     agents:
       queue: "tumblr-metal"
