@@ -65,6 +65,7 @@ class PodcastManagerImpl @Inject constructor(
 
     companion object {
         private const val FIVE_MINUTES_IN_MILLIS = (5 * 60 * 1000).toLong()
+        private const val TAG = "PodcastManager"
     }
 
     override val coroutineContext: CoroutineContext
@@ -633,7 +634,7 @@ class PodcastManagerImpl @Inject constructor(
             podcastUuid = podcast.uuid,
             lastEpisodeUuid = podcast.latestEpisodeUuid,
         )
-        Timber.i("Refresh podcast feed: %d", response.code())
+        LogBuffer.i(TAG, "Refresh podcast feed: ${response.code()}")
 
         while (response.code() == 202) {
             val location = response.headers()["Location"]
@@ -641,7 +642,7 @@ class PodcastManagerImpl @Inject constructor(
             if (location != null && retryAfter != null) {
                 delay(retryAfter * 1000L)
                 response = refreshServiceManager.pollUpdatePodcast(location)
-                Timber.i("Refresh podcast feed poll: %d", response.code())
+                LogBuffer.i(TAG, "Refresh podcast feed poll: ${response.code()}")
             } else {
                 return false
             }
