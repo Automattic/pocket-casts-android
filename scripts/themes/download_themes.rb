@@ -73,7 +73,7 @@ def response_to_tokens_map(response)
     }
   end
   tokens.each do |token_attrs|
-    token_attrs[:user_input] = token_attrs[:themes].any? { |_key, value| value[:hex] == '$podcast' || value[:hex] == '$filter' }
+    token_attrs[:user_input] = token_attrs[:themes].any? { |_key, value| ['$podcast', '$filter'].include?(value[:hex]) }
   end
   tokens
 end
