@@ -19,9 +19,7 @@ steps:
   - wait
 
   - label: "🛠 Release Build"
-    command: |
-      [ -n "$RELEASE_VERSION" ] && git checkout release/$RELEASE_VERSION
-      .buildkite/commands/release-build.sh
+    command: .buildkite/commands/release-build.sh "${RELEASE_VERSION}"
     priority: 1
     plugins: [$CI_TOOLKIT]
     artifact_paths:
