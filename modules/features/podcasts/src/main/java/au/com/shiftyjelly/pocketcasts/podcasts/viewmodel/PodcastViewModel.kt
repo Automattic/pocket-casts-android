@@ -575,16 +575,14 @@ class PodcastViewModel
         analyticsTracker.track(AnalyticsEvent.BOOKMARK_SHARE_TAPPED, mapOf("podcast_uuid" to podcastUuid, "episode_uuid" to episodeUuid, "source" to source.analyticsValue))
     }
 
-    fun onRefreshPodcast(refreshType: RefreshType) {
+    suspend fun onRefreshPodcast(refreshType: RefreshType) {
         val podcast = podcast.value ?: return
 
         analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_REFRESH_EPISODE_LIST, mapOf("podcast_uuid" to podcast.uuid, "action" to refreshType.analyticsValue))
 
-        viewModelScope.launch {
-            _refreshState.emit(RefreshState.Refreshing(refreshType))
-            val newEpisodeFound = podcastManager.refreshPodcastFeed(podcast = podcast)
-            _refreshState.emit(if (newEpisodeFound) RefreshState.NewEpisodeFound else RefreshState.NoEpisodesFound)
-        }
+        _refreshState.emit(RefreshState.Refreshing(refreshType))
+        val newEpisodeFound = podcastManager.refreshPodcastFeed(podcast = podcast)
+        _refreshState.emit(if (newEpisodeFound) RefreshState.NewEpisodeFound else RefreshState.NoEpisodesFound)
     }
 
     private fun trackEpisodeBulkEvent(event: AnalyticsEvent, count: Int) {

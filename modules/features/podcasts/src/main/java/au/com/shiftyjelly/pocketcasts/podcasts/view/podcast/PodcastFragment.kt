@@ -168,6 +168,8 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
     private var listState: Parcelable? = null
 
+    private var currentSnackBar: Snackbar? = null
+
     private val onScrollListener = object : RecyclerView.OnScrollListener() {
         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {}
 
@@ -385,7 +387,11 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             optionsDialog = optionsDialog.addTextOption(
                 titleId = LR.string.podcast_refresh_episodes,
                 imageId = IR.drawable.ic_refresh,
-                click = { viewModel.onRefreshPodcast(PodcastViewModel.RefreshType.REFRESH_BUTTON) },
+                click = {
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        viewModel.onRefreshPodcast(PodcastViewModel.RefreshType.REFRESH_BUTTON)
+                    }
+                },
             )
         }
 
@@ -715,7 +721,9 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         }
 
         binding.swipeRefreshLayout.setOnRefreshListener {
-            viewModel.onRefreshPodcast(PodcastViewModel.RefreshType.PULL_TO_REFRESH)
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewModel.onRefreshPodcast(PodcastViewModel.RefreshType.PULL_TO_REFRESH)
+            }
         }
 
         binding.episodesRecyclerView.requestFocus()
@@ -993,6 +1001,8 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         binding?.episodesRecyclerView?.removeOnScrollListener(onScrollListener)
         binding?.episodesRecyclerView?.adapter = null
         binding = null
+        currentSnackBar?.dismiss()
+        currentSnackBar = null
     }
 
     private fun archiveAllPlayed() {
@@ -1053,7 +1063,9 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
     private fun showSnackBar(message: String, duration: Int = Snackbar.LENGTH_LONG) {
         (activity as? FragmentHostListener)?.snackBarView()?.let { snackBarView ->
-            Snackbar.make(snackBarView, message, duration).show()
+            currentSnackBar = Snackbar.make(snackBarView, message, duration).apply {
+                show()
+            }
         }
     }
 
