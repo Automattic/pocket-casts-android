@@ -131,7 +131,7 @@ interface PodcastManager {
     fun autoAddToUpNextPodcastsRxFlowable(): Flowable<List<Podcast>>
     suspend fun findAutoAddToUpNextPodcasts(): List<Podcast>
 
-    suspend fun refreshPodcastFeed(podcastUuid: String): Boolean
+    suspend fun refreshPodcastFeed(podcast: Podcast): Boolean
 
     suspend fun findRandomPodcasts(limit: Int): List<Podcast>
 

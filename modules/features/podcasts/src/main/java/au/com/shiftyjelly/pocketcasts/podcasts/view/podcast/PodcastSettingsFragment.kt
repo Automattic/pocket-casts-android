@@ -237,7 +237,9 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
                     lifecycleScope.launch {
                         analyticsTracker.track(AnalyticsEvent.PODCAST_SETTINGS_FEED_ERROR_UPDATE_TAPPED)
                         podcastManager.updateRefreshAvailable(podcastUuid = podcastUuid, refreshAvailable = false)
-                        val success = podcastManager.refreshPodcastFeed(podcastUuid = podcastUuid)
+                        val success = podcastManager.findPodcastByUuid(podcastUuid)?.let { podcast ->
+                            podcastManager.refreshPodcastFeed(podcast = podcast)
+                        } ?: false
                         analyticsTracker.track(
                             if (success) {
                                 AnalyticsEvent.PODCAST_SETTINGS_FEED_ERROR_FIX_SUCCEEDED
