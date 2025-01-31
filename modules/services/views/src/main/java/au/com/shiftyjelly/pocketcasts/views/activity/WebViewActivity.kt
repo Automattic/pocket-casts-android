@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.views.databinding.ActivityWebViewBinding
+import au.com.shiftyjelly.pocketcasts.views.extensions.includeStatusBarPadding
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -61,6 +62,7 @@ class WebViewActivity : AppCompatActivity(), CoroutineScope {
         setContentView(binding.root)
 
         binding.toolbar.title = intent.extras?.getString(EXTRA_TITLE)
+        binding.toolbar.includeStatusBarPadding()
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
