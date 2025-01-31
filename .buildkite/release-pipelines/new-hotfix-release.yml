@@ -18,7 +18,7 @@ steps:
       bundle exec fastlane run configure_apply
 
       echo '--- 🚀 New Hotfix Release'
-      bundle exec fastlane new_hotfix_release version_name:$RELEASE_VERSION version_code:$VERSION_CODE skip_confirm:true
+      bundle exec fastlane new_hotfix_release version_name:"$RELEASE_VERSION" version_code:"$VERSION_CODE" skip_confirm:true
     plugins: [$CI_TOOLKIT]
     agents:
       queue: "tumblr-metal"
