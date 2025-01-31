@@ -7,13 +7,13 @@ import android.graphics.drawable.Drawable
 import android.os.Build
 import android.util.TypedValue
 import android.view.Window
+import androidx.activity.SystemBarStyle
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.annotation.StyleRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -21,7 +21,8 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
 import au.com.shiftyjelly.pocketcasts.ui.BuildConfig
 import au.com.shiftyjelly.pocketcasts.ui.R
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
-import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
+import au.com.shiftyjelly.pocketcasts.ui.helper.NavigationBarColor
+import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -70,7 +71,8 @@ class Theme @Inject constructor(private val settings: Settings) {
         @StringRes val labelId: Int,
         @StyleRes val resourceId: Int,
         @DrawableRes val iconResourceId: Int,
-        val defaultLightIcons: Boolean,
+        val toolbarLightIcons: Boolean,
+        val backgroundLightIcons: Boolean,
         val darkTheme: Boolean,
         val isPlus: Boolean,
     ) {
@@ -79,7 +81,8 @@ class Theme @Inject constructor(private val settings: Settings) {
             labelId = LR.string.settings_theme_light,
             resourceId = R.style.ThemeLight,
             iconResourceId = IR.drawable.ic_apptheme0,
-            defaultLightIcons = false,
+            toolbarLightIcons = false,
+            backgroundLightIcons = false,
             darkTheme = false,
             isPlus = false,
         ),
@@ -88,7 +91,8 @@ class Theme @Inject constructor(private val settings: Settings) {
             labelId = LR.string.settings_theme_dark,
             resourceId = R.style.ThemeDark,
             iconResourceId = IR.drawable.ic_apptheme1,
-            defaultLightIcons = true,
+            toolbarLightIcons = true,
+            backgroundLightIcons = true,
             darkTheme = true,
             isPlus = false,
         ),
@@ -97,7 +101,8 @@ class Theme @Inject constructor(private val settings: Settings) {
             labelId = LR.string.settings_theme_rose,
             resourceId = R.style.Rose,
             iconResourceId = IR.drawable.ic_theme_rose,
-            defaultLightIcons = false,
+            toolbarLightIcons = false,
+            backgroundLightIcons = false,
             darkTheme = false,
             isPlus = false,
         ),
@@ -106,7 +111,8 @@ class Theme @Inject constructor(private val settings: Settings) {
             labelId = LR.string.settings_theme_indigo,
             resourceId = R.style.Indigo,
             iconResourceId = IR.drawable.ic_indigo,
-            defaultLightIcons = true,
+            toolbarLightIcons = true,
+            backgroundLightIcons = false,
             darkTheme = false,
             isPlus = false,
         ),
@@ -115,7 +121,8 @@ class Theme @Inject constructor(private val settings: Settings) {
             labelId = LR.string.settings_theme_extra_dark,
             resourceId = R.style.ExtraThemeDark,
             iconResourceId = IR.drawable.ic_apptheme2,
-            defaultLightIcons = true,
+            toolbarLightIcons = true,
+            backgroundLightIcons = true,
             darkTheme = true,
             isPlus = false,
         ),
@@ -124,7 +131,8 @@ class Theme @Inject constructor(private val settings: Settings) {
             labelId = LR.string.settings_theme_dark_contrast,
             resourceId = R.style.DarkContrast,
             iconResourceId = IR.drawable.ic_apptheme6,
-            defaultLightIcons = true,
+            toolbarLightIcons = true,
+            backgroundLightIcons = true,
             darkTheme = true,
             isPlus = false,
         ),
@@ -133,7 +141,8 @@ class Theme @Inject constructor(private val settings: Settings) {
             labelId = LR.string.settings_theme_light_contrast,
             resourceId = R.style.LightContrast,
             iconResourceId = IR.drawable.ic_apptheme7,
-            defaultLightIcons = false,
+            toolbarLightIcons = false,
+            backgroundLightIcons = false,
             darkTheme = false,
             isPlus = false,
         ),
@@ -142,7 +151,8 @@ class Theme @Inject constructor(private val settings: Settings) {
             labelId = LR.string.settings_theme_electricity,
             resourceId = R.style.Electric,
             iconResourceId = IR.drawable.ic_apptheme5,
-            defaultLightIcons = true,
+            toolbarLightIcons = true,
+            backgroundLightIcons = true,
             darkTheme = true,
             isPlus = true,
         ),
@@ -151,7 +161,8 @@ class Theme @Inject constructor(private val settings: Settings) {
             labelId = LR.string.settings_theme_classic, // "Classic Light"
             resourceId = R.style.ClassicLight,
             iconResourceId = IR.drawable.ic_apptheme3,
-            defaultLightIcons = true,
+            toolbarLightIcons = true,
+            backgroundLightIcons = false,
             darkTheme = false,
             isPlus = true,
         ),
@@ -160,7 +171,8 @@ class Theme @Inject constructor(private val settings: Settings) {
             labelId = LR.string.settings_theme_radioactivity,
             resourceId = R.style.Radioactive,
             iconResourceId = IR.drawable.ic_theme_radioactive,
-            defaultLightIcons = true,
+            toolbarLightIcons = true,
+            backgroundLightIcons = true,
             darkTheme = true,
             isPlus = true,
         ),
@@ -278,6 +290,14 @@ class Theme @Inject constructor(private val settings: Settings) {
         settings.lightThemePreference.set(theme.themeSetting, updateModifiedAt = true)
     }
 
+    fun getUpNextTheme(isFullScreen: Boolean): ThemeType {
+        return if (settings.useDarkUpNextTheme.value && isFullScreen) {
+            Theme.ThemeType.DARK
+        } else {
+            activeTheme
+        }
+    }
+
     fun setUseSystemTheme(value: Boolean, activity: AppCompatActivity?) {
         settings.useSystemTheme.set(value, commit = true, updateModifiedAt = true)
 
@@ -344,8 +364,27 @@ class Theme @Inject constructor(private val settings: Settings) {
         return context.getThemeColor(R.attr.secondary_ui_01)
     }
 
-    @ColorInt fun getStatusBarColor(context: Context): Int {
-        return getColorForeground(context)
+    @ColorInt fun getNavigationBackgroundColor(context: Context): Int {
+        // For SDK 24 and 25 the navigation bar icons aren't tinted correctly so always use black
+        return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            Color.BLACK
+        } else {
+            return context.getThemeColor(R.attr.primary_ui_03)
+        }
+    }
+
+    @ColorInt fun getNavigationBackgroundColor(theme: ThemeType): Int {
+        // For SDK 24 and 25 the navigation bar icons aren't tinted correctly so always use black
+        return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            Color.BLACK
+        } else {
+            return ThemeColor.primaryUi03(theme)
+        }
+    }
+
+    fun getNavigationBarStyle(context: Context): SystemBarStyle {
+        val navigationBarColor = getNavigationBackgroundColor(context)
+        return if (isDarkTheme) SystemBarStyle.dark(scrim = navigationBarColor) else SystemBarStyle.light(scrim = navigationBarColor, darkScrim = navigationBarColor)
     }
 
     /**
@@ -355,7 +394,7 @@ class Theme @Inject constructor(private val settings: Settings) {
      * StatusBarColor.Light means the background is light and the icons are black
      * StatusBarColor.Dark means the background is dark and the icons are white
      */
-    fun updateWindowStatusBar(window: Window?, statusBarColor: StatusBarColor? = null, context: Context) {
+    fun updateWindowStatusBarIcons(window: Window?, statusBarIconColor: StatusBarIconColor? = null) {
         window ?: return
 
         // Fixes the issue where the window internal DecorView is null and causes a crash. https://console.firebase.google.com/project/singular-vector-91401/crashlytics/app/android:au.com.shiftyjelly.pocketcasts/issues/d44d873d36442ac43b59f56fe95e311b
@@ -363,32 +402,63 @@ class Theme @Inject constructor(private val settings: Settings) {
             return
         }
 
-        val color = statusBarColor ?: (if (isDarkTheme) StatusBarColor.Dark else StatusBarColor.Light)
-        when {
-            color is StatusBarColor.Custom -> {
-                if (color.isWhiteIcons) {
+        val color = statusBarIconColor ?: StatusBarIconColor.Theme
+        when (color) {
+            StatusBarIconColor.Theme -> {
+                if (activeTheme.toolbarLightIcons) {
                     useLightStatusBarIcons(window)
                 } else {
                     useDarkStatusBarIcons(window)
                 }
-                window.statusBarColor = color.color
             }
-            isDarkTheme -> {
-                useLightStatusBarIcons(window)
-                window.statusBarColor = context.getThemeColor(R.attr.secondary_ui_01)
-            }
-            color is StatusBarColor.Dark -> {
-                useLightStatusBarIcons(window)
-                window.statusBarColor = ContextCompat.getColor(context, R.color.colorStatusBarDarkInLight)
-            }
-            color is StatusBarColor.Light -> {
-                if (activeTheme.defaultLightIcons) {
+            StatusBarIconColor.ThemeNoToolbar -> {
+                if (activeTheme.backgroundLightIcons) {
                     useLightStatusBarIcons(window)
                 } else {
                     useDarkStatusBarIcons(window)
                 }
-                window.statusBarColor = getStatusBarColor(context)
             }
+            StatusBarIconColor.Dark -> useDarkStatusBarIcons(window)
+            StatusBarIconColor.Light -> useLightStatusBarIcons(window)
+            is StatusBarIconColor.UpNext -> {
+                if (getUpNextTheme(isFullScreen = color.isFullScreen).toolbarLightIcons) {
+                    useLightStatusBarIcons(window)
+                } else {
+                    useDarkStatusBarIcons(window)
+                }
+            }
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    fun updateWindowNavigationBarColor(window: Window?, navigationBarColor: NavigationBarColor) {
+        window?.peekDecorView() ?: return
+
+        // The navigation bar on SDK lower than 35 is a solid color if we don't force it to be transparent. For example on the full screen player.
+        window.navigationBarColor = Color.TRANSPARENT
+        // setting to true makes the icons dark, false makes them light
+        WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightNavigationBars = !getNavigationBarLightIcons(navigationBarColor)
+    }
+
+    fun getNavigationBarColor(navigationBarColor: NavigationBarColor): Int {
+        return when (navigationBarColor) {
+            NavigationBarColor.Theme -> getNavigationBackgroundColor(activeTheme)
+            NavigationBarColor.Dark -> getNavigationBackgroundColor(ThemeType.DARK)
+            NavigationBarColor.Light -> getNavigationBackgroundColor(ThemeType.LIGHT)
+            is NavigationBarColor.Player -> playerBackgroundColor(navigationBarColor.podcast)
+            is NavigationBarColor.UpNext -> getNavigationBackgroundColor(getUpNextTheme(isFullScreen = navigationBarColor.isFullScreen))
+            is NavigationBarColor.Color -> navigationBarColor.color
+        }
+    }
+
+    fun getNavigationBarLightIcons(navigationBarColor: NavigationBarColor): Boolean {
+        return when (navigationBarColor) {
+            NavigationBarColor.Theme -> activeTheme.backgroundLightIcons
+            NavigationBarColor.Dark -> true
+            NavigationBarColor.Light -> false
+            is NavigationBarColor.Player -> true
+            is NavigationBarColor.UpNext -> getUpNextTheme(isFullScreen = navigationBarColor.isFullScreen).backgroundLightIcons
+            is NavigationBarColor.Color -> navigationBarColor.lightIcons
         }
     }
 
@@ -398,13 +468,6 @@ class Theme @Inject constructor(private val settings: Settings) {
 
     private fun useLightStatusBarIcons(window: Window) {
         WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = false
-    }
-
-    fun setNavigationBarColor(window: Window, isDark: Boolean, color: Int? = null) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
-
-        window.navigationBarColor = color ?: (if (isDark) Color.BLACK else Color.WHITE)
-        WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightNavigationBars = !isDark
     }
 
     fun verticalPlusLogo(context: Context?): Drawable? {

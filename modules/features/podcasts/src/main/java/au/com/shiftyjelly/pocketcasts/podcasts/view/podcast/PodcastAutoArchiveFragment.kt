@@ -26,7 +26,6 @@ import androidx.core.graphics.ColorUtils
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
-import androidx.fragment.compose.content
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingInfoRow
@@ -34,11 +33,12 @@ import au.com.shiftyjelly.pocketcasts.compose.components.SettingRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRowToggle
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingSection
 import au.com.shiftyjelly.pocketcasts.compose.dialogs.RadioOptionsDialog
+import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveLimit
-import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
+import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
 import dagger.hilt.android.AndroidEntryPoint
@@ -69,7 +69,7 @@ class PodcastAutoArchiveFragment : BaseFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ) = content {
+    ) = contentWithoutConsumedInsets {
         val state by viewModel.state.collectAsState(PodcastAutoArchiveViewModel.State())
         AppThemeWithBackground(themeType = theme.activeTheme) {
             AutoArchiveSettings(
@@ -92,10 +92,9 @@ class PodcastAutoArchiveFragment : BaseFragment() {
     }
 
     private fun tintToolbar(color: Int) {
-        theme.updateWindowStatusBar(
+        theme.updateWindowStatusBarIcons(
             window = requireActivity().window,
-            statusBarColor = StatusBarColor.Custom(color, isWhiteIcons = ColorUtils.calculateLuminance(color) < 0.5),
-            context = requireActivity(),
+            statusBarIconColor = if (ColorUtils.calculateLuminance(color) < 0.5) StatusBarIconColor.Light else StatusBarIconColor.Dark,
         )
     }
 
@@ -124,7 +123,6 @@ class PodcastAutoArchiveFragment : BaseFragment() {
             ThemedTopAppBar(
                 title = stringResource(LR.string.settings_title_auto_archive),
                 onNavigationClick = onBackPressed,
-                bottomShadow = true,
                 iconColor = Color(toolbarColors.iconColor),
                 textColor = Color(toolbarColors.titleColor),
                 backgroundColor = Color(toolbarColors.backgroundColor),

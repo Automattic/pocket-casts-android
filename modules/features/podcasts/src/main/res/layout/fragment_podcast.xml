@@ -10,7 +10,7 @@
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?android:attr/actionBarSize"
+        android:layout_height="wrap_content"
         android:elevation="0dp"
         android:minHeight="?android:attr/actionBarSize"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
@@ -38,55 +38,62 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <FrameLayout
-            android:id="@+id/podcastContent"
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipeRefreshLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <View
-                android:id="@+id/headerBackgroundPlaceholder"
+            <FrameLayout
+                android:id="@+id/podcastContent"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/podcast_header_height" />
+                android:layout_height="match_parent">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/episodesRecyclerView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:clipToPadding="false"
-                android:scrollbars="vertical"
-                android:scrollbarStyle="outsideOverlay"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+                <View
+                    android:id="@+id/headerBackgroundPlaceholder"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/podcast_header_height" />
 
-            <ProgressBar
-                android:id="@+id/loading"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center" />
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/episodesRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clipToPadding="false"
+                    android:scrollbars="vertical"
+                    android:scrollbarStyle="outsideOverlay"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
 
-            <LinearLayout
-                android:id="@+id/errorContainer"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_gravity="center"
-                android:clipChildren="false"
-                android:clipToPadding="false"
-                android:padding="16dp">
-                <TextView
-                    android:id="@+id/errorMessage"
+                <ProgressBar
+                    android:id="@+id/loading"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
-                    style="?attr/textBody1"
-                    android:layout_marginBottom="8dp"/>
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnRetry"
+                    android:layout_gravity="center" />
+
+                <LinearLayout
+                    android:id="@+id/errorContainer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:orientation="vertical"
                     android:layout_gravity="center"
-                    android:text="@string/podcasts_download_retry"/>
-            </LinearLayout>
-        </FrameLayout>
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
+                    android:padding="16dp">
+                    <TextView
+                        android:id="@+id/errorMessage"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        style="?attr/textBody1"
+                        android:layout_marginBottom="8dp"/>
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnRetry"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="@string/podcasts_download_retry"/>
+                </LinearLayout>
+            </FrameLayout>
+
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
         <ImageView
             android:id="@+id/transitionArtwork"

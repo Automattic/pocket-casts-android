@@ -481,6 +481,26 @@ class SharingClientTest {
     }
 
     @Test
+    fun shareClipLinkToRegularPlatforms() = runTest {
+        regularPlatforms.forEach { platform ->
+            val request = SharingRequest.clipLink(
+                podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
+                episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
+                range = Clip.Range(15.seconds + 200.milliseconds, 28.seconds + 105.milliseconds),
+            ).setPlatform(platform).build()
+
+            client.share(request)
+            val intent = shareStarter.requireChooserIntent
+
+            assertEquals(ACTION_SEND, intent.action)
+            assertEquals("text/plain", intent.type)
+            assertEquals("https://pca.st/episode/episode-uuid?t=15.2,28.1", intent.getStringExtra(EXTRA_TEXT))
+            assertEquals("Episode Title", intent.getStringExtra(EXTRA_TITLE))
+            assertEquals(platform.packageId, intent.`package`)
+        }
+    }
+
+    @Test
     fun copyClipLinkWithFeedback() = runTest {
         val client = createClient(showCustomCopyFeedback = true)
 

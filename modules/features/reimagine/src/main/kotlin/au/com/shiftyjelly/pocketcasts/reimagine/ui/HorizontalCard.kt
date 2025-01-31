@@ -122,6 +122,7 @@ private fun HorizontalCard(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.matchParentSize(),
         ) {
             Spacer(
                 modifier = Modifier.width(height * 0.15f),

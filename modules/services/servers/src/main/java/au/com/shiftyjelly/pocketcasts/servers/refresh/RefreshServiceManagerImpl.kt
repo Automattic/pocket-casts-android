@@ -26,10 +26,12 @@ class RefreshServiceManagerImpl @Inject constructor(
         return service.importOpml(request)
     }
 
-    override suspend fun refreshPodcastFeed(podcastUuid: String): Response<StatusResponse<BasicResponse>> {
-        val request = RefreshPodcastFeedRequest(podcastUuid = podcastUuid)
-        addDeviceParameters(request)
-        return service.refreshPodcastFeed(request)
+    override suspend fun updatePodcast(podcastUuid: String, lastEpisodeUuid: String?): Response<Unit> {
+        return service.updatePodcast(podcastUuid = podcastUuid, lastEpisodeUuid = lastEpisodeUuid)
+    }
+
+    override suspend fun pollUpdatePodcast(url: String): Response<Unit> {
+        return service.pollUpdatePodcast(url)
     }
 
     private fun addDeviceParameters(request: BaseRequest) {

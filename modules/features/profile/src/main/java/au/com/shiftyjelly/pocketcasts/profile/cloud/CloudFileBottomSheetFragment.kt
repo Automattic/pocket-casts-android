@@ -47,6 +47,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
+import au.com.shiftyjelly.pocketcasts.views.extensions.setSystemWindowInsetToPadding
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -145,6 +146,8 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
             behavior.peekHeight = 0
             behavior.skipCollapsed = true
         }
+
+        binding?.root?.setSystemWindowInsetToPadding(bottom = true)
 
         viewModel.setup(args.episodeId)
         viewModel.state.observe(
@@ -277,7 +280,7 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
                 val cloudRes = when (episode.serverStatus) {
                     UserEpisodeServerStatus.LOCAL, UserEpisodeServerStatus.MISSING -> PR.drawable.ic_upload_file
                     UserEpisodeServerStatus.UPLOADING, UserEpisodeServerStatus.WAITING_FOR_WIFI, UserEpisodeServerStatus.QUEUED -> IR.drawable.ic_downloading
-                    UserEpisodeServerStatus.UPLOADED -> if (episode.isDownloaded) R.drawable.ic_upload___remove_from_cloud___menu else IR.drawable.ic_download
+                    UserEpisodeServerStatus.UPLOADED -> if (episode.isDownloaded) IR.drawable.ic_remove_from_cloud else IR.drawable.ic_download
                 }
                 binding.imgIconCloud.setImageResource(cloudRes)
 

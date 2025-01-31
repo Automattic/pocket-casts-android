@@ -28,9 +28,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
-import androidx.fragment.compose.content
 import au.com.shiftyjelly.pocketcasts.compose.AutomotiveTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
+import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.extensions.openUrl
 import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
@@ -49,7 +49,7 @@ class AutomotiveAboutFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ) = content {
+    ) = contentWithoutConsumedInsets {
         AutomotiveTheme {
             AboutPage(
                 onOpenLicenses = { openLicenses() },

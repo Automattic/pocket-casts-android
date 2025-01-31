@@ -64,7 +64,7 @@ import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.openUrl
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
-import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
+import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.images.CoilManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
@@ -73,6 +73,7 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
+import au.com.shiftyjelly.pocketcasts.views.extensions.includeStatusBarPadding
 import au.com.shiftyjelly.pocketcasts.views.extensions.setupChromeCastButton
 import au.com.shiftyjelly.pocketcasts.views.extensions.smoothScrollToTop
 import au.com.shiftyjelly.pocketcasts.views.extensions.tintIcons
@@ -178,7 +179,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         }
     }
 
-    override var statusBarColor: StatusBarColor = StatusBarColor.Custom(color = 0xFF1E1F1E.toInt(), isWhiteIcons = true)
+    override var statusBarIconColor: StatusBarIconColor = StatusBarIconColor.Light
 
     private val onHeaderSummaryToggled: (
         expanded: Boolean,
@@ -379,6 +380,16 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     private val onEpisodesOptionsClicked: () -> Unit = {
         analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_OPTIONS_TAPPED)
         var optionsDialog = OptionsDialog()
+
+        if (FeatureFlag.isEnabled(Feature.PODCAST_FEED_UPDATE)) {
+            optionsDialog = optionsDialog.addTextOption(
+                titleId = LR.string.podcast_refresh_episodes,
+                imageId = IR.drawable.ic_refresh,
+                click = { viewModel.onRefreshPodcast(PodcastViewModel.RefreshType.REFRESH_BUTTON) },
+            )
+        }
+
+        optionsDialog
             .addTextOption(
                 titleId = LR.string.podcast_sort_episodes,
                 imageId = IR.drawable.ic_sort,
@@ -605,7 +616,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         val headerColor = context.getThemeColor(UR.attr.support_09)
         binding.headerBackgroundPlaceholder.setBackgroundColor(headerColor)
         binding.toolbar.setBackgroundColor(headerColor)
-        statusBarColor = StatusBarColor.Custom(headerColor, true)
+        statusBarIconColor = StatusBarIconColor.Light
         updateStatusBar()
 
         loadData()
@@ -632,6 +643,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                 theme.toggleDarkLightThemeActivity(activity as AppCompatActivity)
                 true
             }
+            it.includeStatusBarPadding()
         }
 
         playButtonListener.source = SourceView.PODCAST_SCREEN
@@ -700,6 +712,10 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
         binding.btnRetry.setOnClickListener {
             loadData()
+        }
+
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            viewModel.onRefreshPodcast(PodcastViewModel.RefreshType.PULL_TO_REFRESH)
         }
 
         binding.episodesRecyclerView.requestFocus()
@@ -845,7 +861,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
                 viewModel.archiveEpisodeLimit()
 
-                statusBarColor = StatusBarColor.Custom(backgroundColor, true)
+                statusBarIconColor = StatusBarIconColor.Light
                 updateStatusBar()
             },
         )
@@ -902,6 +918,29 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
                     if (BuildConfig.DEBUG) {
                         UiUtil.displayAlertError(requireContext(), state.errorMessage, null)
+                    }
+                }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.refreshState.collect { state ->
+                when (state) {
+                    PodcastViewModel.RefreshState.NotStarted -> {}
+                    PodcastViewModel.RefreshState.NewEpisodeFound -> {
+                        binding?.swipeRefreshLayout?.isRefreshing = false
+                        showSnackBar(getString(LR.string.podcast_refresh_new_episode_found))
+                    }
+                    PodcastViewModel.RefreshState.NoEpisodesFound -> {
+                        binding?.swipeRefreshLayout?.isRefreshing = false
+                        showSnackBar(getString(LR.string.podcast_refresh_no_episodes_found))
+                    }
+                    is PodcastViewModel.RefreshState.Refreshing -> {
+                        if (state.type == PodcastViewModel.RefreshType.PULL_TO_REFRESH) {
+                            binding?.swipeRefreshLayout?.isRefreshing = true
+                        } else {
+                            showSnackBar(getString(LR.string.podcast_refreshing_episode_list), Snackbar.LENGTH_INDEFINITE)
+                        }
                     }
                 }
             }
@@ -986,9 +1025,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_SHARE_TAPPED)
 
         if (!podcast.canShare) {
-            (activity as? FragmentHostListener)?.snackBarView()?.let { snackBarView ->
-                Snackbar.make(snackBarView, getString(LR.string.sharing_is_not_available_for_private_podcasts), Snackbar.LENGTH_LONG).show()
-            }
+            showSnackBar(getString(LR.string.sharing_is_not_available_for_private_podcasts))
             return
         }
 
@@ -1012,6 +1049,12 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             viewModel.downloadAll()
         }
         dialog?.show(parentFragmentManager, "download_confirm")
+    }
+
+    private fun showSnackBar(message: String, duration: Int = Snackbar.LENGTH_LONG) {
+        (activity as? FragmentHostListener)?.snackBarView()?.let { snackBarView ->
+            Snackbar.make(snackBarView, message, duration).show()
+        }
     }
 
     override fun onBackPressed() = if (viewModel.multiSelectEpisodesHelper.isMultiSelecting) {

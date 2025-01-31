@@ -41,6 +41,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.patronPurple
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.profile.winback.WinbackInitParams
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -52,7 +53,7 @@ internal fun AccountSections(
     onChangeEmail: () -> Unit,
     onChangePassword: () -> Unit,
     onUpgradeToPatron: () -> Unit,
-    onCancelSubscription: () -> Unit,
+    onCancelSubscription: (WinbackInitParams) -> Unit,
     onChangeNewsletterSubscription: (Boolean) -> Unit,
     onShowPrivacyPolicy: () -> Unit,
     onShowTermsOfUse: () -> Unit,
@@ -96,7 +97,7 @@ internal fun AccountSections(
                     AccountSection.CancelSubscription -> ButtonSection(
                         section = section,
                         config = config,
-                        onClick = onCancelSubscription,
+                        onClick = { onCancelSubscription(state.winbackInitParams) },
                     )
                     AccountSection.Newsletter -> SwitchSection(
                         isToggled = state.isSubscribedToNewsLetter,
@@ -149,17 +150,20 @@ internal data class AccountSectionsConfig(
 internal data class AccountSectionsState(
     val isSubscribedToNewsLetter: Boolean,
     val email: String?,
+    val winbackInitParams: WinbackInitParams,
     val availableSections: List<AccountSection>,
 ) {
     constructor(
         isSubscribedToNewsLetter: Boolean,
         email: String?,
+        winbackInitParams: WinbackInitParams,
         canChangeCredentials: Boolean,
         canUpgradeAccount: Boolean,
         canCancelSubscription: Boolean,
     ) : this(
         isSubscribedToNewsLetter = isSubscribedToNewsLetter,
         email = email,
+        winbackInitParams = winbackInitParams,
         availableSections = buildList {
             addAll(AccountSection.entries)
             if (email == null) {
@@ -182,6 +186,7 @@ internal data class AccountSectionsState(
         fun empty() = AccountSectionsState(
             isSubscribedToNewsLetter = false,
             email = null,
+            winbackInitParams = WinbackInitParams.Empty,
             canChangeCredentials = false,
             canUpgradeAccount = false,
             canCancelSubscription = false,
@@ -390,6 +395,7 @@ private fun AccountSectionsPreview() {
                     isSubscribedToNewsLetter = false,
                     email = "",
                     availableSections = AccountSection.entries,
+                    winbackInitParams = WinbackInitParams.Empty,
                 ),
                 onChangeAvatar = { },
                 onChangeEmail = { },

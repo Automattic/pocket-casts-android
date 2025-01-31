@@ -28,7 +28,6 @@ import au.com.shiftyjelly.pocketcasts.compose.plusGradientBrush
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-import au.com.shiftyjelly.pocketcasts.profile.R as PR
 
 private val DefaultCardShape = RoundedCornerShape(8.dp)
 
@@ -96,7 +95,7 @@ private enum class TrialFinishedNotesItem(
 ) {
     LOCK_FEATURE(
         text = LR.string.plus_trial_finished_locked,
-        icon = PR.drawable.ic_locked_large,
+        icon = IR.drawable.ic_locked_large,
     ),
     FILES_REMOVED(
         text = LR.string.plus_trial_finished_files_removed,

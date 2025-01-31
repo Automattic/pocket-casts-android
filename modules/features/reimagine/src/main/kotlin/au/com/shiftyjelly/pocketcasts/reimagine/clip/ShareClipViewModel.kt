@@ -188,7 +188,7 @@ class ShareClipViewModel @AssistedInject constructor(
                     delay(1.seconds)
                 }
             }
-            createLinkRequest(podcast, episode, clipRange, platform, cardType, sourceView, createBackgroundAsset)
+            createClipRequest(podcast, episode, clipRange, platform, cardType, sourceView, createBackgroundAsset)
                 .map { clipSharingClient.shareClip(it) }
                 .onSuccess { response ->
                     response.feedbackMessage?.let { _snackbarMessages.emit(SnackbarMessage.SharingResponse(it)) }
@@ -201,7 +201,7 @@ class ShareClipViewModel @AssistedInject constructor(
         }
     }
 
-    private suspend fun createLinkRequest(
+    private suspend fun createClipRequest(
         podcast: Podcast,
         episode: PodcastEpisode,
         clipRange: Clip.Range,
@@ -211,20 +211,9 @@ class ShareClipViewModel @AssistedInject constructor(
         createBackgroundAsset: suspend (VisualCardType) -> Result<File>,
     ): Result<SharingRequest> {
         return when (cardType) {
-            is VisualCardType -> when (platform) {
-                SocialPlatform.PocketCasts -> {
-                    clipAnalytics.clipShared(clipRange, ClipShareType.Link, cardType)
-                    Result.success(clipLinkRequest(podcast, episode, clipRange, cardType, sourceView))
-                }
-
-                SocialPlatform.Instagram, SocialPlatform.WhatsApp, SocialPlatform.Telegram,
-                SocialPlatform.X, SocialPlatform.Tumblr, SocialPlatform.More,
-                -> {
-                    clipAnalytics.clipShared(clipRange, ClipShareType.Video, cardType)
-                    createBackgroundAsset(cardType).map { asset ->
-                        videoClipRequest(podcast, episode, clipRange, platform, cardType, asset, sourceView)
-                    }
-                }
+            is VisualCardType -> {
+                clipAnalytics.clipShared(clipRange, ClipShareType.Link, cardType)
+                Result.success(clipLinkRequest(podcast, episode, clipRange, platform, cardType, sourceView))
             }
             is CardType.Audio -> {
                 clipAnalytics.clipShared(clipRange, ClipShareType.Audio, cardType)
@@ -237,10 +226,12 @@ class ShareClipViewModel @AssistedInject constructor(
         podcast: Podcast,
         episode: PodcastEpisode,
         clipRange: Clip.Range,
+        platform: SocialPlatform,
         cardType: CardType,
         sourceView: SourceView,
     ): SharingRequest {
         return SharingRequest.clipLink(podcast, episode, clipRange)
+            .setPlatform(platform)
             .setCardType(cardType)
             .setSourceView(sourceView)
             .build()

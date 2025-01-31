@@ -192,7 +192,6 @@ private fun WinbackOfferPagePreview(
 ) {
     AppThemeWithBackground(
         themeType = theme,
-        backgroundColor = { MaterialTheme.theme.colors.primaryUi04 },
     ) {
         OfferClaimedPage(
             theme = theme,

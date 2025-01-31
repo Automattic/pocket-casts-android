@@ -1,28 +1,31 @@
 package au.com.shiftyjelly.pocketcasts.player.view
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.fragment.compose.content
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.player.view.shelf.ShelfBottomSheetPage
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
-import au.com.shiftyjelly.pocketcasts.views.extensions.applyColor
+import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
-import kotlin.getValue
 
 @AndroidEntryPoint
 class ShelfBottomSheet : BaseDialogFragment() {
     private val episodeId: String
         get() = requireNotNull(arguments?.getString(ARG_EPISODE_ID))
+
+    override val statusBarIconColor: StatusBarIconColor = StatusBarIconColor.Light
 
     private val playerViewModel: PlayerViewModel by activityViewModels()
     private val shelfSharedViewModel: ShelfSharedViewModel by activityViewModels()
@@ -41,11 +44,13 @@ class ShelfBottomSheet : BaseDialogFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ) = content {
+    ) = contentWithoutConsumedInsets {
+        // set the initial background color to black to stop the dialog from flashing white
+        setDialogTint(Color.BLACK)
         playerViewModel.playingEpisodeLive.observe(viewLifecycleOwner) { (_, backgroundColor) ->
-            applyColor(theme, backgroundColor)
+            setDialogTint(backgroundColor)
         }
-        AppTheme(theme.activeTheme) {
+        AppTheme(Theme.ThemeType.DARK) {
             ShelfBottomSheetPage(
                 shelfViewModel = shelfViewModel,
                 shelfSharedViewModel = shelfSharedViewModel,

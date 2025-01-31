@@ -3,14 +3,13 @@ package au.com.shiftyjelly.pocketcasts.views.fragments
 import android.os.Bundle
 import android.view.Menu
 import android.view.View
-import androidx.annotation.ColorInt
 import androidx.annotation.MenuRes
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.ChromeCastAnalytics
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
-import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
+import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.extensions.tintIcons
@@ -29,7 +28,8 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 @AndroidEntryPoint
 open class BaseFragment : Fragment(), CoroutineScope, HasBackstack {
 
-    open var statusBarColor: StatusBarColor = StatusBarColor.Light
+    open var statusBarIconColor: StatusBarIconColor = StatusBarIconColor.Theme
+    open var backgroundTransparent: Boolean = false
 
     @Inject lateinit var theme: Theme
 
@@ -40,7 +40,7 @@ open class BaseFragment : Fragment(), CoroutineScope, HasBackstack {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if (view.background == null) {
+        if (view.background == null && !backgroundTransparent) {
             view.setBackgroundColor(view.context.getThemeColor(UR.attr.primary_ui_01))
         }
         view.isClickable = true
@@ -63,13 +63,8 @@ open class BaseFragment : Fragment(), CoroutineScope, HasBackstack {
         if (activity is FragmentHostListener) {
             activity.updateStatusBar()
         } else {
-            theme.updateWindowStatusBar(window = activity.window, statusBarColor = statusBarColor, context = activity)
+            theme.updateWindowStatusBarIcons(window = activity.window, statusBarIconColor = statusBarIconColor)
         }
-    }
-
-    fun updateStatusBarColor(@ColorInt color: Int) {
-        statusBarColor = StatusBarColor.Custom(color = color, isWhiteIcons = theme.activeTheme.defaultLightIcons)
-        updateStatusBar()
     }
 
     fun setupToolbarAndStatusBar(
@@ -92,7 +87,7 @@ open class BaseFragment : Fragment(), CoroutineScope, HasBackstack {
             toolbarColors = toolbarColors,
         )
         if (toolbarColors != null) {
-            updateStatusBarColor(toolbarColors.backgroundColor)
+            updateStatusBar()
         }
     }
 

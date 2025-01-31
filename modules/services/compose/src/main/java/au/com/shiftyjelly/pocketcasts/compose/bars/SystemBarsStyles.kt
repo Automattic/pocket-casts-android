@@ -18,3 +18,8 @@ fun SystemBarStyle.Companion.singleAuto(
 fun SystemBarStyle.Companion.transparent(
     detectDarkMode: (Resources) -> Boolean,
 ) = singleAuto(Color.Transparent, detectDarkMode)
+
+fun SystemBarStyle.Companion.custom(
+    color: Color,
+    isDark: Boolean,
+) = if (isDark) dark(color.toArgb()) else light(color.toArgb(), color.toArgb())

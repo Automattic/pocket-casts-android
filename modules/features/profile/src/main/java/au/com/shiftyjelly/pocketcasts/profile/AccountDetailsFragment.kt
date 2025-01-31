@@ -13,7 +13,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.viewModels
-import androidx.fragment.compose.content
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -22,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.account.ChangePwdFragment
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.ProfileUpgradeBannerViewModel
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.profile.champion.PocketCastsChampionBottomSheetDialog
 import au.com.shiftyjelly.pocketcasts.profile.winback.WinbackFragment
@@ -96,7 +96,7 @@ class AccountDetailsFragment : BaseFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ) = content {
+    ) = contentWithoutConsumedInsets {
         val upgradeBannerState = remember {
             combine(
                 accountViewModel.showUpgradeBanner,
@@ -111,6 +111,7 @@ class AccountDetailsFragment : BaseFragment() {
             upgradeBannerState = upgradeBannerState.collectAsState(null).value,
             sectionsState = accountViewModel.sectionsState.collectAsState().value,
         )
+
         AccountDetailsPage(
             state = state,
             theme = theme.activeTheme,
@@ -149,10 +150,12 @@ class AccountDetailsFragment : BaseFragment() {
                 val onboardingFlow = OnboardingFlow.PatronAccountUpgrade(source)
                 OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
             },
-            onCancelSubscription = {
+            onCancelSubscription = { winbackParams ->
                 analyticsTracker.track(AnalyticsEvent.ACCOUNT_DETAILS_CANCEL_TAPPED)
                 if (FeatureFlag.isEnabled(Feature.WINBACK)) {
-                    WinbackFragment().show(childFragmentManager, "subscription_windback")
+                    WinbackFragment
+                        .create(winbackParams)
+                        .show(childFragmentManager, "subscription_windback")
                 } else {
                     CancelConfirmationFragment
                         .newInstance()
