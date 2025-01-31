@@ -1,11 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-01-15 13:54:03+0000
+Translation-Revision-Date: 2025-01-22 13:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="winback_error_fetch_description">抱歉，擷取方案時發生錯誤。</string>
+    <string name="winback_available_plans_billing_note">新的方案會在目前的帳單週期結束時生效。</string>
+    <string name="winback_available_plans_title">可用的方案</string>
+    <string name="remove_listening_history_episodes_plural">已從收聽記錄移除 %1$d 個單集</string>
+    <string name="remove_listening_history_episodes_singular">已從收聽記錄移除 1 個單集</string>
+    <string name="clean_history">從記錄中移除</string>
+    <string name="onboarding_start_free_trial_upgrade_button">開始免費試用</string>
+    <string name="sharing_is_not_available_for_private_podcasts">私人 Podcast 不提供分享</string>
+    <string name="winback_claimed_offer_message_2">感謝選用 Pocket Casts。 免費試用月結束後，將開始計費。</string>
+    <string name="winback_claimed_offer_message_1">盡情免費試用一個月！</string>
+    <string name="winback_offer_cancel_continue_button_label">繼續取消</string>
+    <string name="winback_offer_help_description">對功能有疑問或遇到問題。</string>
+    <string name="winback_offer_help_title">需要 Pocket Casts 的說明嗎？</string>
+    <string name="winback_offer_differnt_plan_description">尋找適合你的方案。</string>
+    <string name="winback_offer_differnt_plan_title">正在尋找其他方案？</string>
+    <string name="winback_offer_free_offer_button_label">領取優惠</string>
+    <string name="winback_offer_free_offer_description">自下一期帳單起省下 %1$s。</string>
+    <string name="winback_offer_free_offer_title">下個月免費使用</string>
+    <string name="winback_offer_header">取消前，不妨看看以下優惠</string>
     <string name="settings_app_icon_pride">驕傲</string>
     <string name="manage_download_dismiss_content_description">關閉管理下載橫幅</string>
     <string name="dismiss_manage_download_banner">關閉</string>
@@ -807,7 +826,6 @@ Language: zh_TW
     <string name="settings_about_work_from_anywhere">遠端工作，不限地點</string>
     <string name="settings_about_legal">法律與其他</string>
     <string name="settings_about_work_with_us">工作機會</string>
-    <string name="settings_about_twitter">Twitter</string>
     <string name="settings_about_instagram">Instagram</string>
     <string name="settings_about_rate_us">幫我們評分</string>
     <string name="settings_about_share_with_friends_message">嗨！分享 Pocket Casts 的下載連結。我很喜歡這個 App，相信你也會喜歡它。 \nhttps://www.pocketcasts.com</string>

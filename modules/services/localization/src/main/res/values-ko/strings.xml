@@ -1,11 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-01-16 09:54:04+0000
+Translation-Revision-Date: 2025-01-21 09:54:04+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="winback_error_fetch_description">죄송합니다. 요금제를 가져오는 중에 문제가 발생했습니다.</string>
+    <string name="winback_available_plans_billing_note">새 요금제는 현재 청구 기간이 종료된 후 활성화됩니다.</string>
+    <string name="winback_available_plans_title">이용 가능한 요금제</string>
+    <string name="remove_listening_history_episodes_plural">청취 기록에서 에피소드 %1$d개를 제거했습니다.</string>
+    <string name="remove_listening_history_episodes_singular">청취 기록에서 에피소드 1개를 제거했습니다.</string>
+    <string name="clean_history">기록에서 제거</string>
+    <string name="onboarding_start_free_trial_upgrade_button">무료 평가판 시작</string>
+    <string name="sharing_is_not_available_for_private_podcasts">비공개 팟캐스트의 경우 공유할 수 없습니다.</string>
+    <string name="winback_claimed_offer_message_2">Pocket Casts를 선택해 주셔서 감사합니다. 1개월 무료 이용이 종료된 후부터 요금이 청구됩니다.</string>
+    <string name="winback_claimed_offer_message_1">1개월 무료 이용권을 사용하세요!</string>
+    <string name="winback_offer_cancel_continue_button_label">취소 계속하기</string>
+    <string name="winback_offer_help_description">기능을 사용하는 데 어려움이 있거나 문제가 있습니다.</string>
+    <string name="winback_offer_help_title">Pocket Casts와 관련하여 도움이 필요하신가요?</string>
+    <string name="winback_offer_differnt_plan_description">나에게 맞는 요금제를 찾아보세요.</string>
+    <string name="winback_offer_differnt_plan_title">다른 요금제를 찾고 있나요?</string>
+    <string name="winback_offer_free_offer_button_label">혜택 받기</string>
+    <string name="winback_offer_free_offer_description">다음 청구 주기가 시작될 때 %1$s 할인을 받아 보세요.</string>
+    <string name="winback_offer_free_offer_title">다음 달에 무료로 이용해 보세요</string>
+    <string name="winback_offer_header">취소하기 전에 혜택을 확인해 보세요</string>
     <string name="settings_app_icon_pride">프라이드</string>
     <string name="manage_download_dismiss_content_description">다운로드 배너 닫기 관리</string>
     <string name="dismiss_manage_download_banner">해제</string>
@@ -807,7 +826,6 @@ Language: ko_KR
     <string name="settings_about_work_from_anywhere">어디에서나 근무</string>
     <string name="settings_about_legal">법적 고지 사항 및 기타</string>
     <string name="settings_about_work_with_us">채용 공고</string>
-    <string name="settings_about_twitter">Twitter</string>
     <string name="settings_about_instagram">Instagram</string>
     <string name="settings_about_rate_us">평가하기</string>
     <string name="settings_about_share_with_friends_message">안녕하세요! Pocket Casts 앱을 다운로드하는 링크가 있습니다. 정말 즐겁게 사용하고 있는데 여러분도 그럴 것입니다. \nhttps://www.pocketcasts.com</string>

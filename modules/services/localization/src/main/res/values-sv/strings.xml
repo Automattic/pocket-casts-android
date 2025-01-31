@@ -1,11 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-01-16 13:54:03+0000
+Translation-Revision-Date: 2025-01-30 11:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="settings_pixel_watch_subtitle">Ersätt de anpassade Hoppa över-knapparna med standardknappar för nästa/föregående spår som fungerar som Hoppa över-knappar, vilket möjliggör kompatibilitet med fler enheter.</string>
+    <string name="settings_pixel_watch_title">Hoppa över-knappar på Pixel Watch</string>
+    <string name="winback_cancel_subscription_cancel_button_label">Ja, avsluta min prenumeration</string>
+    <string name="winback_cancel_subscription_stay_button_label">Jag vill faktiskt fortsätta</string>
+    <string name="winback_cancel_subscription_perk_web">Du vill inte längre ha åtkomst till Pocket Casts via din webbläsare eller stationära dator.</string>
+    <string name="winback_cancel_subscription_perk_files">Alla filer som har laddats upp till ditt Pocket Casts-konto kommer att tas bort (men nedladdade filer på dina mobila enheter kommer att vara kvar).</string>
+    <string name="winback_cancel_subscription_perk_folders">Dina mappar kommer att tas bort och deras innehåll kommer att flyttas tillbaka till skärmen Podcasts.</string>
+    <string name="winback_cancel_subscription_perk_plus">Åtkomst till Pocket Casts Plus-funktioner kommer att låsas efter detta datum.</string>
+    <string name="winback_cancel_subscription_perk_active_without_date">Din nuvarande prenumeration förblir aktiv till utgångsdatumet.</string>
+    <string name="winback_cancel_subscription_perk_active_with_date">Din nuvarande prenumeration förblir aktiv till %1$s.</string>
+    <string name="winback_cancel_subscription_header_description">Detta kommer att ändra ditt paket till ett gratiskonto.</string>
+    <string name="winback_cancel_subscription_header_title">Byta paket</string>
+    <string name="winback_changing_plan">Byta paket</string>
+    <string name="winback_too_many_subscritpions_button_label">Hantera prenumerationer i Play Store</string>
+    <string name="winback_too_many_subscritpions_note">Du har mer än en aktiv Pocket Casts-prenumeration. Hantera dina prenumerationer i Play Store för att undvika dubbla avgifter.</string>
+    <string name="winback_too_many_subscritpions_title">Flera prenumerationer hittades</string>
+    <string name="winback_error_fetch_description">Något gick fel vid hämtningen av dina paket.</string>
+    <string name="winback_available_plans_billing_note">Ditt nya paket kommer att aktiveras i slutet av din nuvarande faktureringsperiod.</string>
+    <string name="winback_available_plans_title">Tillgängliga paket</string>
+    <string name="remove_listening_history_episodes_plural">Tog bort %1$d avsnitt från lyssningshistoriken</string>
+    <string name="remove_listening_history_episodes_singular">Tog bort 1 avsnitt från lyssningshistoriken</string>
+    <string name="clean_history">Ta bort från historik</string>
+    <string name="onboarding_start_free_trial_upgrade_button">Starta kostnadsfri testperiod</string>
+    <string name="sharing_is_not_available_for_private_podcasts">Delning är inte tillgängligt för privata podcasts</string>
+    <string name="winback_claimed_offer_message_2">Tack för att du väljer Pocket Casts. Fakturering startar när din gratismånad har löpt ut.</string>
+    <string name="winback_claimed_offer_message_1">Njut av din gratismånad!</string>
+    <string name="winback_offer_cancel_continue_button_label">Fortsätt till annullering</string>
+    <string name="winback_offer_help_description">Har du stött på problem eller någon funktion som krånglar?</string>
+    <string name="winback_offer_help_title">Behöver du hjälp med Pocket Casts?</string>
+    <string name="winback_offer_differnt_plan_description">Hitta rätt paket för dig.</string>
+    <string name="winback_offer_differnt_plan_title">Letar du efter ett annat paket?</string>
+    <string name="winback_offer_free_offer_button_label">Utnyttja erbjudande</string>
+    <string name="winback_offer_free_offer_description">Spara %1$s i början av nästa faktureringscykel.</string>
+    <string name="winback_offer_free_offer_title">Få nästa månad gratis</string>
+    <string name="winback_offer_header">Innan du avslutar, kolla in dessa erbjudanden</string>
     <string name="settings_app_icon_pride">Pride</string>
     <string name="manage_download_dismiss_content_description">Hantera nedladdning, banner, avfärda</string>
     <string name="dismiss_manage_download_banner">Avfärda</string>
@@ -807,7 +842,6 @@ Language: sv_SE
     <string name="settings_about_work_from_anywhere">Jobba var du än är</string>
     <string name="settings_about_legal">Juridisk information med mera</string>
     <string name="settings_about_work_with_us">Jobba med oss</string>
-    <string name="settings_about_twitter">Twitter</string>
     <string name="settings_about_instagram">Instagram</string>
     <string name="settings_about_rate_us">Betygsätt oss</string>
     <string name="settings_about_share_with_friends_message">Hej! Här är en länk för att ladda ner Pocket Casts-appen. Jag tycker att den är jättebra och tänkte att du också skulle gilla den. \nhttps://www.pocketcasts.com</string>

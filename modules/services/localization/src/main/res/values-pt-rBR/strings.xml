@@ -1,11 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-01-15 15:54:03+0000
+Translation-Revision-Date: 2025-01-29 15:54:03+0000
 Plural-Forms: nplurals=2; plural=(n > 1);
 Generator: GlotPress/2.4.0-alpha
 Language: pt_BR
 -->
 <resources>
+    <string name="settings_pixel_watch_subtitle">Substitua os botões personalizados de pular por botões padrão de próximo e anterior, que têm a mesma função, mas são compatíveis com mais dispositivos.</string>
+    <string name="settings_pixel_watch_title">Botões de pular do Pixel Watch</string>
+    <string name="winback_cancel_subscription_cancel_button_label">Sim, cancelar minha assinatura</string>
+    <string name="winback_cancel_subscription_stay_button_label">Não, desejo manter a assinatura</string>
+    <string name="winback_cancel_subscription_perk_web">Você não terá mais acesso ao Pocket Casts usando seu navegador ou computador.</string>
+    <string name="winback_cancel_subscription_perk_files">Os arquivos enviados para sua conta no Pocket Casts serão removidos (mas os arquivos baixados em seus dispositivos móveis permanecerão).</string>
+    <string name="winback_cancel_subscription_perk_folders">Suas pastas serão removidas, e o conteúdo delas voltará para a tela Podcasts.</string>
+    <string name="winback_cancel_subscription_perk_plus">O acesso às funcionalidades do Pocket Casts Plus será bloqueado após esta data.</string>
+    <string name="winback_cancel_subscription_perk_active_without_date">Sua assinatura atual permanecerá ativa até a data de expiração.</string>
+    <string name="winback_cancel_subscription_perk_active_with_date">Sua assinatura atual permanecerá ativa até %1$s.</string>
+    <string name="winback_cancel_subscription_header_description">Isso mudará seu plano para uma conta gratuita.</string>
+    <string name="winback_cancel_subscription_header_title">Alterar plano</string>
+    <string name="winback_changing_plan">Alterar plano</string>
+    <string name="winback_too_many_subscritpions_button_label">Gerenciar assinaturas na Play Store</string>
+    <string name="winback_too_many_subscritpions_note">Você tem mais de uma assinatura ativa no Pocket Casts. Gerencie suas assinaturas na Play Store para evitar cobranças duplicadas.</string>
+    <string name="winback_too_many_subscritpions_title">Várias assinaturas encontradas</string>
+    <string name="winback_error_fetch_description">Ocorreu um erro ao buscar seus planos.</string>
+    <string name="winback_available_plans_billing_note">A ativação do seu novo plano ocorrerá no final do período de cobrança atual.</string>
+    <string name="winback_available_plans_title">Planos disponíveis</string>
+    <string name="remove_listening_history_episodes_plural">%1$d episódios removidos do seu histórico de reprodução</string>
+    <string name="remove_listening_history_episodes_singular">Um episódio removido do seu histórico de reprodução</string>
+    <string name="clean_history">Remover do histórico</string>
+    <string name="onboarding_start_free_trial_upgrade_button">Iniciar teste gratuito</string>
+    <string name="sharing_is_not_available_for_private_podcasts">Não foi possível compartilhar podcasts privados</string>
+    <string name="winback_claimed_offer_message_2">Agradecemos por escolher o Pocket Casts. A cobrança começa após o mês gratuito.</string>
+    <string name="winback_claimed_offer_message_1">Aproveite seu mês gratuito!</string>
+    <string name="winback_offer_cancel_continue_button_label">Continuar com o cancelamento</string>
+    <string name="winback_offer_help_description">Está tendo problemas com uma funcionalidade ou alguma outra coisa?</string>
+    <string name="winback_offer_help_title">Precisa de ajuda com o Pocket Casts?</string>
+    <string name="winback_offer_differnt_plan_description">Encontre o plano ideal para você.</string>
+    <string name="winback_offer_differnt_plan_title">Quer um plano diferente?</string>
+    <string name="winback_offer_free_offer_button_label">Aproveitar oferta</string>
+    <string name="winback_offer_free_offer_description">Economize %1$s no começo do próximo ciclo de cobrança.</string>
+    <string name="winback_offer_free_offer_title">Não pague nada no próximo mês</string>
+    <string name="winback_offer_header">Antes de cancelar, confira estas ofertas</string>
     <string name="settings_app_icon_pride">Orgulho</string>
     <string name="manage_download_dismiss_content_description">Ignore o banner Gerenciar download</string>
     <string name="dismiss_manage_download_banner">Ignorar</string>
@@ -807,7 +842,6 @@ Language: pt_BR
     <string name="settings_about_work_from_anywhere">Trabalhe de qualquer lugar</string>
     <string name="settings_about_legal">Jurídico e mais</string>
     <string name="settings_about_work_with_us">Trabalhe conosco</string>
-    <string name="settings_about_twitter">Twitter</string>
     <string name="settings_about_instagram">Instagram</string>
     <string name="settings_about_rate_us">Classifique-nos</string>
     <string name="settings_about_share_with_friends_message">Oi! Este é um link para fazer download do aplicativo do Pocket Casts. Eu estou gostando muito de usá-lo e acho que talvez você goste também. \nhttps://www.pocketcasts.com</string>

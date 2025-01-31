@@ -1,11 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-01-16 09:54:04+0000
+Translation-Revision-Date: 2025-01-29 15:54:03+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="settings_pixel_watch_subtitle">Remplacez les boutons Passer personnalisés par des boutons standards Piste suivante / précédente qui fonctionnent comme des boutons Passer, afin d’assurer la compatibilité avec davantage d’appareils.</string>
+    <string name="settings_pixel_watch_title">Boutons passer Pixel Watch</string>
+    <string name="winback_cancel_subscription_cancel_button_label">Oui, annuler mon abonnement</string>
+    <string name="winback_cancel_subscription_stay_button_label">En fait, je veux rester</string>
+    <string name="winback_cancel_subscription_perk_web">Vous n’aurez plus accès à Pocket Casts via votre navigateur Web ou votre ordinateur.</string>
+    <string name="winback_cancel_subscription_perk_files">Tous les fichiers chargés sur votre compte Pocket Casts seront supprimés (mais les fichiers téléchargés sur vos appareils mobiles seront conservés).</string>
+    <string name="winback_cancel_subscription_perk_folders">Vos dossiers seront supprimés et leur contenu sera retransféré vers l’écran Podcasts.</string>
+    <string name="winback_cancel_subscription_perk_plus">L’accès aux fonctionnalités de Pocket Casts Plus sera verrouillé après cette date.</string>
+    <string name="winback_cancel_subscription_perk_active_without_date">Votre abonnement actuel restera actif jusqu’à sa date d’expiration.</string>
+    <string name="winback_cancel_subscription_perk_active_with_date">Votre abonnement actuel restera actif jusqu’au %1$s.</string>
+    <string name="winback_cancel_subscription_header_description">Votre plan passera à un compte gratuit.</string>
+    <string name="winback_cancel_subscription_header_title">Changement de plan</string>
+    <string name="winback_changing_plan">Changement de plan</string>
+    <string name="winback_too_many_subscritpions_button_label">Gérer les abonnements dans le Play Store</string>
+    <string name="winback_too_many_subscritpions_note">Vous avez plusieurs abonnements Pocket Casts actifs. Veuillez gérer vos abonnements dans le Play Store afin d’éviter une double facturation.</string>
+    <string name="winback_too_many_subscritpions_title">Plusieurs abonnements détectés</string>
+    <string name="winback_error_fetch_description">Veuillez nous excuser, un problème est survenu lors de l’extraction de vos plans.</string>
+    <string name="winback_available_plans_billing_note">Votre nouveau plan sera activé à la fin de votre période de facturation actuelle.</string>
+    <string name="winback_available_plans_title">Plans disponibles</string>
+    <string name="remove_listening_history_episodes_plural">%1$d épisodes retirés de l’historique d’écoute</string>
+    <string name="remove_listening_history_episodes_singular">1 épisode retiré de l’historique d’écoute</string>
+    <string name="clean_history">Retirer de l’historique</string>
+    <string name="onboarding_start_free_trial_upgrade_button">Démarrer l’essai gratuit</string>
+    <string name="sharing_is_not_available_for_private_podcasts">Le partage n’est pas disponible pour les podcasts privés</string>
+    <string name="winback_claimed_offer_message_2">Merci d’avoir choisi Pocket Casts. La facturation commence au terme du mois gratuit.</string>
+    <string name="winback_claimed_offer_message_1">Profitez de votre mois gratuit !</string>
+    <string name="winback_offer_cancel_continue_button_label">Poursuivre vers l’annulation</string>
+    <string name="winback_offer_help_description">Des problèmes avec des fonctionnalités ou autres ?</string>
+    <string name="winback_offer_help_title">Besoin d’aide avec Pocket Casts ?</string>
+    <string name="winback_offer_differnt_plan_description">Trouvez le plan qui vous convient.</string>
+    <string name="winback_offer_differnt_plan_title">À la recherche d’un plan différent ?</string>
+    <string name="winback_offer_free_offer_button_label">Profiter de l’offre</string>
+    <string name="winback_offer_free_offer_description">Économisez %1$s au début de votre prochain cycle de facturation.</string>
+    <string name="winback_offer_free_offer_title">Obtenir votre prochain mois gratuit</string>
+    <string name="winback_offer_header">Avant que vous n’annuliez, jetez un coup d’œil à ces offres</string>
     <string name="settings_app_icon_pride">Pride</string>
     <string name="manage_download_dismiss_content_description">Gérer le rejet de la bannière de téléchargement</string>
     <string name="dismiss_manage_download_banner">Ignorer</string>
@@ -807,7 +842,6 @@ Language: fr
     <string name="settings_about_work_from_anywhere">Travaillez de n’importe où</string>
     <string name="settings_about_legal">Droit et divers</string>
     <string name="settings_about_work_with_us">Rejoignez-nous</string>
-    <string name="settings_about_twitter">Twitter</string>
     <string name="settings_about_instagram">Instagram</string>
     <string name="settings_about_rate_us">Donnez-nous votre avis</string>
     <string name="settings_about_share_with_friends_message">Salut, Voici un lien pour télécharger l’application Pocket Casts. Je la trouve super et je me suis dit qu’elle pourrait aussi te plaire. \nhttps://www.pocketcasts.com</string>

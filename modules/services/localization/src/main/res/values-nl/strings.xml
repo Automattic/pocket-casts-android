@@ -1,11 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-01-16 11:54:03+0000
+Translation-Revision-Date: 2025-01-30 11:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="settings_pixel_watch_subtitle">Vervang de aangepaste overslaan-knoppen door standaardknoppen voor volgende/vorige aflevering. Deze werken hetzelfde als de overslaan-knoppen, maar zijn compatibel met meer apparaten.</string>
+    <string name="settings_pixel_watch_title">Pixel Watch overslaan-knoppen</string>
+    <string name="winback_cancel_subscription_cancel_button_label">Ja, annuleer mijn abonnement</string>
+    <string name="winback_cancel_subscription_stay_button_label">Ik wil toch blijven</string>
+    <string name="winback_cancel_subscription_perk_web">Je zal Pocket Casts niet meer kunnen openen met je webbrowser of computer.</string>
+    <string name="winback_cancel_subscription_perk_files">Alle bestanden die zijn geüpload naar je Pocket Casts-account worden verwijderd (bestanden die zijn gedownload op je mobiele apparaten blijven behouden).</string>
+    <string name="winback_cancel_subscription_perk_folders">Je mappen worden verwijderd en hun inhoud wordt teruggezet naar het scherm Podcasts.</string>
+    <string name="winback_cancel_subscription_perk_plus">Na deze datum wordt toegang tot Pocket Casts Plus-functies vergrendeld.</string>
+    <string name="winback_cancel_subscription_perk_active_without_date">Je huidige abonnement blijft actief tot de vervaldatum.</string>
+    <string name="winback_cancel_subscription_perk_active_with_date">Je huidige abonnement blijft actief tot %1$s.</string>
+    <string name="winback_cancel_subscription_header_description">Hierdoor wordt je abonnement aangepast naar een gratis account.</string>
+    <string name="winback_cancel_subscription_header_title">Abonnement wordt gewijzigd</string>
+    <string name="winback_changing_plan">Abonnement wordt gewijzigd</string>
+    <string name="winback_too_many_subscritpions_button_label">Abonnementen beheren in de Play Store</string>
+    <string name="winback_too_many_subscritpions_note">Je hebt meer dan één actief Pocket Casts-abonnement. Beheer je abonnementen in de Pocket Casts om dubbele betalingen te voorkomen.</string>
+    <string name="winback_too_many_subscritpions_title">Meerdere abonnementen gevonden</string>
+    <string name="winback_error_fetch_description">Er is iets fout gegaan bij het ophalen van je abonnementen.</string>
+    <string name="winback_available_plans_billing_note">Je nieuwe abonnement wordt aan het einde van je huidige factuurperiode geactiveerd.</string>
+    <string name="winback_available_plans_title">Beschikbare abonnementen</string>
+    <string name="remove_listening_history_episodes_plural">%1$d afleveringen verwijderd uit je luistergeschiedenis</string>
+    <string name="remove_listening_history_episodes_singular">1 aflevering verwijderd uit je luistergeschiedenis</string>
+    <string name="clean_history">Verwijderen uit geschiedenis</string>
+    <string name="onboarding_start_free_trial_upgrade_button">Gratis proefversie starten</string>
+    <string name="sharing_is_not_available_for_private_podcasts">Delen is niet beschikbaar voor privépodcasts.</string>
+    <string name="winback_claimed_offer_message_2">Bedankt dat je voor Pocket Casts kiest. De facturering begint nadat je gratis maand is afgelopen.</string>
+    <string name="winback_claimed_offer_message_1">Geniet van een maand gratis toegang!</string>
+    <string name="winback_offer_cancel_continue_button_label">Doorgaan met annuleren</string>
+    <string name="winback_offer_help_description">Moeite met een van de functies of andere problemen?</string>
+    <string name="winback_offer_help_title">Hulp nodig met Pocket Casts?</string>
+    <string name="winback_offer_differnt_plan_description">Vind het abonnement dat bij je past.</string>
+    <string name="winback_offer_differnt_plan_title">Op zoek naar een ander abonnement?</string>
+    <string name="winback_offer_free_offer_button_label">Aanbieding claimen</string>
+    <string name="winback_offer_free_offer_description">Bespaar %1$s aan het begin van je volgende factuurperiode.</string>
+    <string name="winback_offer_free_offer_title">Krijg je volgende maand gratis</string>
+    <string name="winback_offer_header">Kijk eens naar deze aanbiedingen voordat je annuleert</string>
     <string name="settings_app_icon_pride">Pride</string>
     <string name="manage_download_dismiss_content_description">Downloadbanner beheren negeren</string>
     <string name="dismiss_manage_download_banner">Negeren</string>
@@ -807,7 +842,6 @@ Language: nl
     <string name="settings_about_work_from_anywhere">Werken vanaf elke locatie</string>
     <string name="settings_about_legal">Juridisch en meer</string>
     <string name="settings_about_work_with_us">Met ons samenwerken</string>
-    <string name="settings_about_twitter">Twitter</string>
     <string name="settings_about_instagram">Instagram</string>
     <string name="settings_about_rate_us">Beoordeel ons</string>
     <string name="settings_about_share_with_friends_message">Hallo! Alsjeblieft, een downloadlink voor de Pocket Casts-app. Ik vind hem geweldig en ik dacht, jij vast ook. \nhttps://www.pocketcasts.com</string>
