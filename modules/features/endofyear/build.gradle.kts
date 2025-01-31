@@ -38,7 +38,7 @@ dependencies {
 
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)
-    implementation(projects.modules.services.capturable)
+    implementation(libs.capturable)
     implementation(libs.compose.activity)
     implementation(libs.compose.constraintlayout)
     implementation(libs.compose.material)
