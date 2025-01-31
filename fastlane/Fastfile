@@ -96,7 +96,6 @@ platform :android do
   lane :code_freeze do |skip_confirm: false|
     ensure_git_status_clean
     Fastlane::Helper::GitHelper.checkout_and_pull(DEFAULT_BRANCH)
-    ensure_git_branch(branch: DEFAULT_BRANCH)
 
     confirmation_message = <<-MESSAGE
 
@@ -371,9 +370,7 @@ platform :android do
     version = release_version_current
 
     # Wrap up
-    remove_branch_protection(repository: GITHUB_REPO, branch: "release/#{version}")
     set_milestone_frozen_marker(repository: GITHUB_REPO, milestone: version, freeze: false)
-    create_new_milestone(repository: GITHUB_REPO, need_appstore_submission: true)
     close_milestone(repository: GITHUB_REPO, milestone: version)
 
     push_to_git_remote(tags: false)
@@ -422,12 +419,22 @@ platform :android do
   # @param branch_to_build [String] The branch to build. Defaults to the current git branch.
   #
   lane :trigger_release_build do |branch_to_build: git_branch|
-    buildkite_trigger_build(
-      buildkite_organization: 'automattic',
-      buildkite_pipeline: 'pocket-casts-android',
-      branch: branch_to_build,
-      pipeline_file: 'release-builds.yml'
-    )
+    pipeline_args = {
+      pipeline_file: 'release-builds.yml',
+      environment: {
+        RELEASE_VERSION: release_version_current
+      }
+    }
+    if is_ci?
+      buildkite_pipeline_upload(**pipeline_args)
+    else
+      buildkite_trigger_build(
+        buildkite_organization: 'automattic',
+        buildkite_pipeline: 'pocket-casts-android',
+        branch: branch_to_build,
+        **pipeline_args
+      )
+    end
   end
 
   # Builds and uploads a new build to Google Play (without releasing it)
