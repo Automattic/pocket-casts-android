@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -18,13 +17,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.FragmentManager
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
-import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -43,6 +43,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun StarRatingView(
     fragmentManager: FragmentManager,
     viewModel: PodcastRatingsViewModel,
+    modifier: Modifier = Modifier,
 ) {
     val state by viewModel.stateFlow.collectAsState()
 
@@ -51,6 +52,7 @@ fun StarRatingView(
             val loadedState = state as RatingState.Loaded
             Content(
                 state = loadedState,
+                modifier = modifier,
                 onClick = { source ->
                     viewModel.onRatingStarsTapped(
                         podcastUuid = loadedState.podcastUuid,
@@ -70,26 +72,23 @@ fun StarRatingView(
 @Composable
 private fun Content(
     state: RatingState.Loaded,
+    modifier: Modifier = Modifier,
     onClick: (RatingTappedSource) -> Unit,
 ) {
     val starsContentDescription = stringResource(LR.string.podcast_star_rating_content_description)
 
     Row(
-        modifier = Modifier.padding(
-            start = 8.dp,
-            end = 4.dp,
-            top = 8.dp,
-        ),
+        modifier = modifier.padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .clickable { onClick(RatingTappedSource.STARS) }
-                .padding(8.dp)
                 .semantics {
                     this.contentDescription = starsContentDescription
-                },
+                }
+                .padding(8.dp),
         ) {
             Stars(
                 stars = state.stars,
@@ -112,20 +111,16 @@ private fun Content(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        RowOutlinedButton(
+        TextH30(
             text = stringResource(R.string.rate_button),
-            onClick = { onClick(RatingTappedSource.BUTTON) },
-            includePadding = false,
-            fontSize = 16.sp,
-            textPadding = 0.dp,
             fontWeight = FontWeight.W500,
-            border = null,
-            fullWidth = false,
-            colors = ButtonDefaults.outlinedButtonColors(
-                backgroundColor = Color.Transparent,
-                contentColor = MaterialTheme.theme.colors.primaryText01,
-            ),
-            modifier = Modifier.padding(top = 2.dp, bottom = 2.dp),
+            textAlign = TextAlign.Center,
+            fontSize = 16.sp,
+            modifier = Modifier
+                .clickable {
+                    onClick(RatingTappedSource.BUTTON)
+                }
+                .padding(8.dp),
         )
     }
 }
