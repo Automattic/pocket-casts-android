@@ -8,8 +8,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.IntOffset
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
+import androidx.core.view.doOnNextLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
@@ -23,6 +29,7 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
@@ -90,6 +97,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asObservable
 import kotlinx.coroutines.withContext
@@ -167,6 +175,9 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     private var itemTouchHelper: EpisodeItemTouchHelper? = null
 
     private var listState: Parcelable? = null
+
+    private var tooltipOffset by mutableStateOf(IntOffset.Zero)
+    private var showTooltip by mutableStateOf(false)
 
     private var currentSnackBar: Snackbar? = null
 
@@ -735,6 +746,21 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         super.onViewCreated(view, savedInstanceState)
         binding?.setupMultiSelect()
 
+        binding?.composeTooltipHost?.setContent {
+            AppTheme(theme.activeTheme) {
+                if (showTooltip) {
+                    PodcastTooltip(
+                        title = stringResource(LR.string.podcast_feed_update_tooltip_title),
+                        subtitle = stringResource(LR.string.podcast_feed_update_tooltip_subtitle),
+                        offset = tooltipOffset,
+                        onDismissRequest = {
+                            showTooltip = false
+                        },
+                    )
+                }
+            }
+        }
+
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.multiSelectBookmarksHelper.navigationState
@@ -746,6 +772,43 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                     }
             }
         }
+
+        binding?.episodesRecyclerView?.doOnNextLayout {
+            showTooltipOnEpisodeOptions()
+        }
+    }
+
+    private fun showTooltipOnEpisodeOptions() {
+        lifecycleScope.launch {
+            delay(500)
+
+            val headerPositionInList = 2 // See: au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastAdapter.setEpisodes
+
+            val viewHolder = binding?.episodesRecyclerView?.findViewHolderForAdapterPosition(headerPositionInList)
+                as? PodcastAdapter.EpisodeHeaderViewHolder
+
+            val anchorView = viewHolder?.binding?.btnEpisodeOptions
+            anchorView?.let { showTooltipAbove(it) }
+        }
+    }
+
+    private fun showTooltipAbove(view: View) {
+        val anchorLocation = IntArray(2)
+        view.getLocationOnScreen(anchorLocation)
+
+        val composeLocation = IntArray(2)
+        requireView().findViewById<View>(R.id.composeTooltipHost)
+            .getLocationOnScreen(composeLocation)
+
+        val anchorX = anchorLocation[0] - composeLocation[0] + (view.width / 2)
+        var anchorY = anchorLocation[1] - composeLocation[1] - 350
+
+        if (anchorY < 0) {
+            anchorY = 0
+        }
+
+        tooltipOffset = IntOffset(anchorX, anchorY)
+        showTooltip = true
     }
 
     private fun onShareBookmarkClick() {
