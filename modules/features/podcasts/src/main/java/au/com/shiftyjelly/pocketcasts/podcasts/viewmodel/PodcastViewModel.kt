@@ -582,7 +582,14 @@ class PodcastViewModel
 
         _refreshState.emit(RefreshState.Refreshing(refreshType))
         val newEpisodeFound = podcastManager.refreshPodcastFeed(podcast = podcast)
-        _refreshState.emit(if (newEpisodeFound) RefreshState.NewEpisodeFound else RefreshState.NoEpisodesFound)
+
+        if (newEpisodeFound) {
+            analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_REFRESH_NEW_EPISODE_FOUND, mapOf("podcast_uuid" to podcast.uuid, "action" to refreshType.analyticsValue))
+            _refreshState.emit(RefreshState.NewEpisodeFound)
+        } else {
+            analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_REFRESH_NO_EPISODES_FOUND, mapOf("podcast_uuid" to podcast.uuid, "action" to refreshType.analyticsValue))
+            _refreshState.emit(RefreshState.NoEpisodesFound)
+        }
     }
 
     private fun trackEpisodeBulkEvent(event: AnalyticsEvent, count: Int) {
