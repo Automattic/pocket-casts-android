@@ -1,4 +1,5 @@
 #!/bin/bash -eu
+
 echo "--- :git: Checkout Release Branch"
 # Buildkite, by default, checks out a specific commit. But given this step will be run on a CI build that will
 # first push a commit to do the version bump, before `pipeline upload`-ing the job calling this script, we need
