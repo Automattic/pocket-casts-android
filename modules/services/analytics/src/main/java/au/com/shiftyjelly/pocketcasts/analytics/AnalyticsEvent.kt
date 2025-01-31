@@ -230,6 +230,8 @@ enum class AnalyticsEvent(val key: String) {
     PODCASTS_SCREEN_TAB_TAPPED("podcasts_screen_tab_tapped"),
     PODCAST_SCREEN_REPORT_TAPPED("podcast_screen_report_tapped"),
     PODCAST_SCREEN_REFRESH_EPISODE_LIST("podcast_screen_refresh_episode_list"),
+    PODCAST_SCREEN_REFRESH_NEW_EPISODE_FOUND("podcast_screen_refresh_new_episode_found"),
+    PODCAST_SCREEN_REFRESH_NO_EPISODES_FOUND("podcast_screen_refresh_no_episodes_found"),
 
     /* Podcast Settings */
     PODCAST_SETTINGS_FEED_ERROR_TAPPED("podcast_settings_feed_error_tapped"),
