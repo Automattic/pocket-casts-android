@@ -1,11 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-01-15 10:54:03+0000
+Translation-Revision-Date: 2025-01-28 09:54:09+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="settings_pixel_watch_subtitle">将自定义的跳过按钮替换为具备跳过功能的标准下一曲/上一曲按钮，从而实现与更多设备的兼容。</string>
+    <string name="settings_pixel_watch_title">Pixel Watch 跳过按钮</string>
+    <string name="winback_cancel_subscription_cancel_button_label">是，取消我的订阅</string>
+    <string name="winback_cancel_subscription_stay_button_label">实际上，我想留下来</string>
+    <string name="winback_cancel_subscription_perk_web">您将无法再使用 Web 浏览器或台式计算机访问 Pocket Casts。</string>
+    <string name="winback_cancel_subscription_perk_files">上传至您的 Pocket Casts 账户的所有文件都将删除（但下载到您移动设备上的文件会保留）。</string>
+    <string name="winback_cancel_subscription_perk_folders">您的文件夹将被删除，其中的内容将移回“播客”界面。</string>
+    <string name="winback_cancel_subscription_perk_plus">在此日期后，您将无法再访问 Pocket Casts Plus 功能。</string>
+    <string name="winback_cancel_subscription_perk_active_without_date">在到期日期之前，您的当前订阅将保持有效。</string>
+    <string name="winback_cancel_subscription_perk_active_with_date">在 %1$s 之前，您的当前订阅将保持有效。</string>
+    <string name="winback_cancel_subscription_header_description">这会将您的套餐更改为免费账户。</string>
+    <string name="winback_cancel_subscription_header_title">更改套餐</string>
+    <string name="winback_changing_plan">更改套餐</string>
+    <string name="winback_too_many_subscritpions_button_label">在 Play 商店中管理订阅</string>
+    <string name="winback_too_many_subscritpions_note">您已激活多项 Pocket Casts 订阅。 请在 Play 商店中管理您的订阅，以避免重复收费。</string>
+    <string name="winback_too_many_subscritpions_title">找到多项订阅</string>
+    <string name="winback_error_fetch_description">很抱歉，获取您的套餐时出错了。</string>
+    <string name="winback_available_plans_billing_note">您的新套餐将在当前计费周期结束时激活。</string>
+    <string name="winback_available_plans_title">可用套餐</string>
+    <string name="remove_listening_history_episodes_plural">已从收听历史记录中删除 %1$d 集</string>
+    <string name="remove_listening_history_episodes_singular">已从收听历史记录中删除 1 集</string>
+    <string name="clean_history">从历史记录中删除</string>
+    <string name="onboarding_start_free_trial_upgrade_button">开始免费试用</string>
+    <string name="sharing_is_not_available_for_private_podcasts">私人播客不可共享</string>
+    <string name="winback_claimed_offer_message_2">感谢您选用 Pocket Casts。 免费月结束后开始计费。</string>
+    <string name="winback_claimed_offer_message_1">享受一个月的免费体验！</string>
+    <string name="winback_offer_cancel_continue_button_label">继续取消</string>
+    <string name="winback_offer_help_description">在使用任何功能时感到困难或遇到问题。</string>
+    <string name="winback_offer_help_title">需要有关 Pocket Casts 的帮助？</string>
+    <string name="winback_offer_differnt_plan_description">找到适合您的套餐。</string>
+    <string name="winback_offer_differnt_plan_title">想换个套餐？</string>
+    <string name="winback_offer_free_offer_button_label">领取优惠</string>
+    <string name="winback_offer_free_offer_description">在您的下一个计费周期开始时节省 %1$s。</string>
+    <string name="winback_offer_free_offer_title">下个月免费</string>
+    <string name="winback_offer_header">在取消之前，请查看以下优惠</string>
     <string name="settings_app_icon_pride">骄傲</string>
     <string name="manage_download_dismiss_content_description">管理下载横幅关闭</string>
     <string name="dismiss_manage_download_banner">忽略</string>

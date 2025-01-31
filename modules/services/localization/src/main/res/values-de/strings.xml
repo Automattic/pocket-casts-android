@@ -1,11 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-01-14 10:54:02+0000
+Translation-Revision-Date: 2025-01-29 11:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="settings_pixel_watch_subtitle">Ersetze die individuellen „Überspringen“-Buttons mit den standardmäßigen „Nächster/Vorheriger Track“-Buttons, die als „Überspringen“-Buttons fungieren und so mit mehr Geräten kompatibel sind.</string>
+    <string name="settings_pixel_watch_title">„Überspringen“-Buttons der Pixel Watch</string>
+    <string name="winback_cancel_subscription_cancel_button_label">Ja, mein Abonnement kündigen</string>
+    <string name="winback_cancel_subscription_stay_button_label">Ich möchte das Abonnement doch weiterhin nutzen</string>
+    <string name="winback_cancel_subscription_perk_web">Du wirst nicht länger über deinen Webbrowser oder Desktop-Computer auf Pocket Casts zugreifen können.</string>
+    <string name="winback_cancel_subscription_perk_files">Alle Dateien, die in dein Pocket Casts-Konto hochgeladen wurden, werden gelöscht (heruntergeladene Dateien auf deinen Mobilgeräten bleiben jedoch erhalten).</string>
+    <string name="winback_cancel_subscription_perk_folders">Deine Ordner werden entfernt und ihre Inhalte werden zum Podcasts-Bildschirm verschoben.</string>
+    <string name="winback_cancel_subscription_perk_plus">Der Zugriff auf Pocket Casts Plus-Funktionen wird nach diesem Datum gesperrt.</string>
+    <string name="winback_cancel_subscription_perk_active_without_date">Dein aktuelles Abonnement bleibt bis zu seinem Ablaufdatum aktiv.</string>
+    <string name="winback_cancel_subscription_perk_active_with_date">Dein aktuelles Abonnement bleibt aktiv bis %1$s.</string>
+    <string name="winback_cancel_subscription_header_description">Dadurch wird dein Tarif in ein kostenloses Konto geändert.</string>
+    <string name="winback_cancel_subscription_header_title">Tarif wechseln</string>
+    <string name="winback_changing_plan">Tarif wechseln</string>
+    <string name="winback_too_many_subscritpions_button_label">Verwalte Abonnements im Play Store</string>
+    <string name="winback_too_many_subscritpions_note">Du hast mehr als ein aktives Pocket Casts-Abonnement. Bitte verwalte deine Abonnements im Play Store, um doppelte Abbuchungen zu vermeiden.</string>
+    <string name="winback_too_many_subscritpions_title">Mehrere Abonnements gefunden</string>
+    <string name="winback_error_fetch_description">Entschuldigung! Beim Abrufen deiner Tarife ist ein Fehler aufgetreten.</string>
+    <string name="winback_available_plans_billing_note">Dein neuer Tarif wird am Ende deines aktuellen Abrechnungszeitraums aktiviert.</string>
+    <string name="winback_available_plans_title">Verfügbare Tarife</string>
+    <string name="remove_listening_history_episodes_plural">%1$d Folgen aus dem Hörverlauf entfernt</string>
+    <string name="remove_listening_history_episodes_singular">1 Folge aus dem Hörverlauf entfernt</string>
+    <string name="clean_history">Aus dem Verlauf entfernen</string>
+    <string name="onboarding_start_free_trial_upgrade_button">Kostenlosen Testzeitraum starten</string>
+    <string name="sharing_is_not_available_for_private_podcasts">Teilen ist für private Podcasts nicht verfügbar</string>
+    <string name="winback_claimed_offer_message_2">Vielen Dank, dass du dich für Pocket Casts entschieden hast. Die Abrechnung beginnt nach dem kostenlosen Monat.</string>
+    <string name="winback_claimed_offer_message_1">Genieße deinen kostenlosen Monat!</string>
+    <string name="winback_offer_cancel_continue_button_label">Weiter zur Kündigung</string>
+    <string name="winback_offer_help_description">Kommst du mit bestimmten Funktionen nicht zurecht oder hast du Probleme?</string>
+    <string name="winback_offer_help_title">Brauchst du Hilfe mit Pocket Casts?</string>
+    <string name="winback_offer_differnt_plan_description">Finde deinen passenden Tarif.</string>
+    <string name="winback_offer_differnt_plan_title">Du suchst nach einem anderen Tarif?</string>
+    <string name="winback_offer_free_offer_button_label">Angebot nutzen</string>
+    <string name="winback_offer_free_offer_description">Spare %1$s zu Beginn deines nächsten Abrechnungszyklus.</string>
+    <string name="winback_offer_free_offer_title">Erhalte deinen nächsten Monat kostenlos</string>
+    <string name="winback_offer_header">Schau dir diese Angebote an, bevor du kündigst</string>
     <string name="settings_app_icon_pride">Pride</string>
     <string name="manage_download_dismiss_content_description">Banner zum Verwalten von Downloads schließen</string>
     <string name="dismiss_manage_download_banner">Verwerfen</string>

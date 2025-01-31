@@ -1,11 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-01-15 15:54:03+0000
+Translation-Revision-Date: 2025-01-28 09:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+    <string name="settings_pixel_watch_subtitle">Reemplaza los botones de salto personalizados por botones estándar de pista siguiente/anterior que funcionan como botones de salto, lo que permite la compatibilidad con más dispositivos.</string>
+    <string name="settings_pixel_watch_title">Botones de salto de Pixel Watch</string>
+    <string name="winback_cancel_subscription_cancel_button_label">Sí, cancelar mi suscripción</string>
+    <string name="winback_cancel_subscription_stay_button_label">En realidad, quiero quedarme</string>
+    <string name="winback_cancel_subscription_perk_web">Ya no podrás acceder a Pocket Casts a través del navegador web ni del ordenador de sobremesa.</string>
+    <string name="winback_cancel_subscription_perk_files">Todos los archivos subidos a tu cuenta de Pocket Casts se eliminarán (sin embargo, los archivos que hayas descargado en tus dispositivos móviles se mantendrán).</string>
+    <string name="winback_cancel_subscription_perk_folders">Tus carpetas se eliminarán y sus contenidos se trasladarán a la pantalla Podcast.</string>
+    <string name="winback_cancel_subscription_perk_plus">El acceso a las funciones de Pocket Casts Plus ya no estará disponible a partir de esta fecha.</string>
+    <string name="winback_cancel_subscription_perk_active_without_date">Tu suscripción actual estará activa hasta su fecha de caducidad.</string>
+    <string name="winback_cancel_subscription_perk_active_with_date">Tu suscripción actual estará activa hasta el %1$s.</string>
+    <string name="winback_cancel_subscription_header_description">Tu plan se cambiará a una cuenta gratuita.</string>
+    <string name="winback_cancel_subscription_header_title">Cómo cambiar de plan</string>
+    <string name="winback_changing_plan">Cómo cambiar de plan</string>
+    <string name="winback_too_many_subscritpions_button_label">Gestionar suscripciones en Play Store</string>
+    <string name="winback_too_many_subscritpions_note">Tienes más de una suscripción activa a Pocket Casts. Gestiona tus suscripciones en Play Store para evitar que se te cobre dos veces.</string>
+    <string name="winback_too_many_subscritpions_title">Se han encontrado varias suscripciones</string>
+    <string name="winback_error_fetch_description">Lo sentimos, pero se ha producido un error al recuperar tus planes.</string>
+    <string name="winback_available_plans_billing_note">El nuevo plan se activará al final del período de facturación actual.</string>
+    <string name="winback_available_plans_title">Planes disponibles</string>
+    <string name="remove_listening_history_episodes_plural">Se han eliminado %1$d episodios del historial de escucha</string>
+    <string name="remove_listening_history_episodes_singular">Se ha eliminado 1 episodio del historial de escucha</string>
+    <string name="clean_history">Eliminar del historial</string>
+    <string name="onboarding_start_free_trial_upgrade_button">Iniciar prueba gratuita</string>
+    <string name="sharing_is_not_available_for_private_podcasts">Los podcasts privados no se pueden compartir</string>
+    <string name="winback_claimed_offer_message_2">Gracias por elegir Pocket Casts. La facturación comienza cuando finalice tu mes gratuito.</string>
+    <string name="winback_claimed_offer_message_1">¡Disfruta de tu mes gratuito!</string>
+    <string name="winback_offer_cancel_continue_button_label">Ir a Cancelación</string>
+    <string name="winback_offer_help_description">¿Tienes problemas con alguna función?</string>
+    <string name="winback_offer_help_title">¿Necesitas ayuda con Pocket Casts?</string>
+    <string name="winback_offer_differnt_plan_description">Encuentra el plan adecuado para ti.</string>
+    <string name="winback_offer_differnt_plan_title">¿Necesitas un plan diferente?</string>
+    <string name="winback_offer_free_offer_button_label">Reclamar oferta</string>
+    <string name="winback_offer_free_offer_description">Ahorra %1$s al principio de tu próximo ciclo de facturación.</string>
+    <string name="winback_offer_free_offer_title">Consigue tu próximo mes gratis</string>
+    <string name="winback_offer_header">Antes de cancelar, echa un vistazo a estas ofertas</string>
     <string name="settings_app_icon_pride">Orgullo</string>
     <string name="manage_download_dismiss_content_description">Gestionar el descarte de los banners de descarga</string>
     <string name="dismiss_manage_download_banner">Descartar</string>
