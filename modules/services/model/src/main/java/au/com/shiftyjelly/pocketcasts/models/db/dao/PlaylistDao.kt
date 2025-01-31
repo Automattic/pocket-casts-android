@@ -46,13 +46,22 @@ abstract class PlaylistDao {
     abstract fun findByUuidAsListRxFlowable(uuid: String): Flowable<List<Playlist>>
 
     @Query("SELECT COUNT(*) FROM filters")
+    abstract suspend fun count(): Int
+
+    @Query("SELECT COUNT(*) FROM filters")
     abstract fun countBlocking(): Int
+
+    @Update
+    abstract suspend fun update(playlist: Playlist)
 
     @Update
     abstract fun updateBlocking(playlist: Playlist)
 
     @Update
     abstract fun updateAllBlocking(playlists: List<Playlist>)
+
+    @Delete
+    abstract suspend fun delete(playlist: Playlist)
 
     @Delete
     abstract fun deleteBlocking(playlist: Playlist)
@@ -62,6 +71,9 @@ abstract class PlaylistDao {
 
     @Query("DELETE FROM filters WHERE deleted = 1")
     abstract fun deleteDeletedBlocking()
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract suspend fun insert(playlist: Playlist): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insertBlocking(playlist: Playlist): Long

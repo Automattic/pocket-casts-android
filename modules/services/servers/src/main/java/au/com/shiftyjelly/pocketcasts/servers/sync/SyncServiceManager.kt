@@ -162,9 +162,10 @@ open class SyncServiceManager @Inject constructor(
         return service.getPodcastEpisodes(addBearer(token), request)
     }
 
-    fun getFilters(token: AccessToken): Single<List<Playlist>> =
-        service.getFilterList(addBearer(token), buildBasicRequest())
-            .map { response -> response.filters?.mapNotNull { it.toFilter() } ?: emptyList() }
+    suspend fun getFilters(token: AccessToken): List<Playlist> {
+        val response = service.getFilterList(addBearer(token), buildBasicRequest())
+        return response.filters?.mapNotNull { it.toFilter() } ?: emptyList()
+    }
 
     suspend fun getBookmarks(token: AccessToken): List<Bookmark> {
         return service.getBookmarkList(addBearer(token), bookmarkRequest {}).bookmarksList.map { it.toBookmark() }

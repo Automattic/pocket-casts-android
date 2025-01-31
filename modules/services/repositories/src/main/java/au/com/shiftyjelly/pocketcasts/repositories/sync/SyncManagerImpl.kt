@@ -413,8 +413,8 @@ class SyncManagerImpl @Inject constructor(
             syncServiceManager.exchangeSonos(token)
         }
 
-    override fun getFiltersRxSingle(): Single<List<Playlist>> =
-        getCacheTokenOrLoginRxSingle { token ->
+    override suspend fun getFilters(): List<Playlist> =
+        getCacheTokenOrLogin { token ->
             syncServiceManager.getFilters(token)
         }
 
