@@ -87,7 +87,8 @@ private fun Content(
                 .clickable { onClick(RatingTappedSource.STARS) }
                 .semantics {
                     this.contentDescription = starsContentDescription
-                },
+                }
+                .padding(8.dp),
         ) {
             Stars(
                 stars = state.stars,
@@ -118,7 +119,8 @@ private fun Content(
             modifier = Modifier
                 .clickable {
                     onClick(RatingTappedSource.BUTTON)
-                },
+                }
+                .padding(8.dp),
         )
     }
 }
