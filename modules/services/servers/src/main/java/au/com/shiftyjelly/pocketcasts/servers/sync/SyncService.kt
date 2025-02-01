@@ -92,7 +92,7 @@ interface SyncService {
     suspend fun getPodcastList(@Header("Authorization") authorization: String, @Body request: UserPodcastListRequest): UserPodcastListResponse
 
     @POST("/user/playlist/list")
-    fun getFilterList(@Header("Authorization") authorization: String, @Body request: BasicRequest): Single<FilterListResponse>
+    suspend fun getFilterList(@Header("Authorization") authorization: String, @Body request: BasicRequest): FilterListResponse
 
     @POST("/history/sync")
     fun historySync(@Header("Authorization") authorization: String, @Body request: HistorySyncRequest): Single<HistorySyncResponse>
