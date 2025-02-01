@@ -10,9 +10,11 @@ plugins {
 
 android {
     namespace = "au.com.shiftyjelly.pocketcasts"
+    compileSdk = 34
 
     defaultConfig {
         minSdk = project.property("minSdkVersionWear") as Int
+        targetSdk = 34
         applicationId = project.property("applicationId").toString()
     }
 
