@@ -39,7 +39,7 @@ class WinbackViewModel @Inject constructor(
     internal val uiState = _uiState.asStateFlow()
 
     init {
-        loadInitialPlans()
+        loadWinbackData()
         viewModelScope.launch {
             settings.cachedSubscriptionStatus.flow.collect { status ->
                 _uiState.value = _uiState.value.copy(currentSubscriptionExpirationDate = status?.expiryDate)
@@ -47,7 +47,7 @@ class WinbackViewModel @Inject constructor(
         }
     }
 
-    internal fun loadInitialPlans() {
+    internal fun loadWinbackData() {
         _uiState.value = _uiState.value.copy(subscriptionPlansState = SubscriptionPlansState.Loading)
         viewModelScope.launch {
             val plansDeferred = async { loadPlans() }
