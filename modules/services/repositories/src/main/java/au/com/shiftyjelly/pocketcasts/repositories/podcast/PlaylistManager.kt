@@ -28,7 +28,8 @@ interface PlaylistManager {
 
     fun createPlaylistBlocking(name: String, iconId: Int, draft: Boolean): Playlist
 
-    fun createBlocking(playlist: Playlist): Long
+    suspend fun create(playlist: Playlist): Long
+    suspend fun update(playlist: Playlist, userPlaylistUpdate: UserPlaylistUpdate?, isCreatingFilter: Boolean = false)
     fun updateBlocking(playlist: Playlist, userPlaylistUpdate: UserPlaylistUpdate?, isCreatingFilter: Boolean = false)
 
     fun updateAutoDownloadStatus(playlist: Playlist, autoDownloadEnabled: Boolean, unmeteredOnly: Boolean, powerOnly: Boolean)
@@ -37,6 +38,7 @@ interface PlaylistManager {
     fun deleteBlocking(playlist: Playlist)
     suspend fun resetDb()
     fun deleteSyncedBlocking()
+    suspend fun deleteSynced(playlist: Playlist)
     fun deleteSyncedBlocking(playlist: Playlist)
 
     fun countEpisodesBlocking(id: Long?, episodeManager: EpisodeManager, playbackManager: PlaybackManager): Int
