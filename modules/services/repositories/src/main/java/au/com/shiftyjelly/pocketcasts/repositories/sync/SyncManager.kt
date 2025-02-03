@@ -34,6 +34,7 @@ import com.pocketcasts.service.api.ReferralCodeResponse
 import com.pocketcasts.service.api.ReferralRedemptionResponse
 import com.pocketcasts.service.api.ReferralValidationResponse
 import com.pocketcasts.service.api.UserPodcastListResponse
+import com.pocketcasts.service.api.WinbackResponse
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Maybe
@@ -113,6 +114,7 @@ interface SyncManager : NamedSettingsCaller {
 
     // Referral
     suspend fun getReferralCode(): Response<ReferralCodeResponse>
+    suspend fun getWinbackOffer(): Response<WinbackResponse>
     suspend fun validateReferralCode(code: String): Response<ReferralValidationResponse>
     suspend fun redeemReferralCode(code: String): Response<ReferralRedemptionResponse>
 }

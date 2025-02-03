@@ -111,3 +111,10 @@ message ReferralRedemptionRequest {
 message ReferralRedemptionResponse {
     string code = 1;
 }
+
+message WinbackResponse {
+  string offer = 1;
+  string platform = 2;
+  string details = 3;
+  string code = 4;
+}
