@@ -112,7 +112,6 @@ platform :android do
     # Create the release branch
     UI.message('Creating release branch...')
     Fastlane::Helper::GitHelper.create_branch("release/#{release_version_next}", from: DEFAULT_BRANCH)
-    ensure_git_branch(branch: '^release/') # Match branch names that begin with `release/`
     UI.success("Done! New release branch is: #{git_branch}")
 
     # Bump the version and build code
@@ -454,6 +453,7 @@ platform :android do
     is_beta = beta_version?(version)
     unless skip_prechecks
       # Match branch names that begin with `release/`
+      # Skip this check on CI because that action relies on CI env vars, but when this lane iscalled as part of `code_freeze` the branch changed since the CI build started, so that wouldn't work
       ensure_git_branch(branch: '^release/') unless is_ci
 
       UI.important("Building version #{version_name_current} (#{build_code_current}) for upload to Google Play Console")
