@@ -212,136 +212,137 @@ private fun AboutPage(
     openFragment: (Fragment) -> Unit,
 ) {
     val context = LocalContext.current
-    LazyColumn(
-        horizontalAlignment = Alignment.CenterHorizontally,
+    Column(
         modifier = Modifier
             .background(MaterialTheme.theme.colors.primaryUi02),
-        contentPadding = PaddingValues(bottom = bottomInset),
     ) {
-        item {
-            ThemedTopAppBar(
-                title = stringResource(LR.string.settings_title_about),
-                onNavigationClick = onBackPressed,
-            )
-        }
-        item {
-            Image(
-                painter = painterResource(context.getThemeDrawable(UR.attr.logo_title_vertical)),
-                contentDescription = stringResource(LR.string.settings_app_icon),
-                modifier = Modifier.padding(top = 56.dp),
-            )
-        }
-        item {
-            Text(
-                text = stringResource(LR.string.settings_version, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE.toString()),
-                style = MaterialTheme.typography.body1,
-                modifier = Modifier.padding(top = 8.dp),
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.theme.colors.primaryText02,
-            )
-        }
-        item {
-            HorizontalDivider(
-                modifier = Modifier.padding(top = 56.dp, bottom = 8.dp),
-            )
-        }
-        item {
-            RowTextButton(
-                text = stringResource(LR.string.settings_about_rate_us),
-                onClick = {
-                    onRateUsTapped()
-                    rateUs(context)
-                },
-            )
-        }
-        item {
-            RowTextButton(
-                text = stringResource(LR.string.settings_about_share_with_friends),
-                onClick = {
-                    onShareWithFriendsTapped()
-                    shareWithFriends(context)
-                },
-            )
-        }
-        item {
-            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-        }
-        item {
-            RowTextButton(
-                text = stringResource(LR.string.settings_about_website),
-                secondaryText = "pocketcasts.com",
-                onClick = {
-                    onWebsiteTapped()
-                    openUrl("https://www.pocketcasts.com", context)
-                },
-            )
-        }
-        item {
-            RowTextButton(
-                text = stringResource(LR.string.settings_about_instagram),
-                secondaryText = "@pocketcasts",
-                onClick = {
-                    onInstagramTapped()
-                    openUrl("https://www.instagram.com/pocketcasts/", context)
-                },
-            )
-        }
-        item {
-            RowTextButton(
-                text = stringResource(LR.string.settings_about_x),
-                secondaryText = "@pocketcasts",
-                onClick = {
-                    onXTapped()
-                    openUrl("https://x.com/pocketcasts", context)
-                },
-            )
-        }
-        item {
-            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-        }
-        item {
-            AutomatticFamilyRow(onAutomatticFamilyTapped = onAutomatticFamilyTapped)
-        }
-        item {
-            HorizontalDivider(modifier = Modifier.padding(bottom = 8.dp))
-        }
-        item {
-            LegalAndMoreRow(onTermsOfServiceTapped, onPrivacyPolicyTapped, openFragment)
-        }
-        item {
-            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-        }
-        item {
-            Column(
-                modifier = Modifier
-                    .clickable {
-                        onWorkWithUsTapped()
-                        openUrl("https://automattic.com/work-with-us/", context)
-                    }
-                    .fillMaxWidth()
-                    .padding(all = 14.dp),
-            ) {
-                Text(
-                    text = stringResource(LR.string.settings_about_work_with_us),
-                    fontSize = 17.sp,
-                    color = MaterialTheme.theme.colors.primaryText01,
+        ThemedTopAppBar(
+            title = stringResource(LR.string.settings_title_about),
+            onNavigationClick = onBackPressed,
+        )
+        LazyColumn(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            contentPadding = PaddingValues(bottom = bottomInset),
+        ) {
+            item {
+                Image(
+                    painter = painterResource(context.getThemeDrawable(UR.attr.logo_title_vertical)),
+                    contentDescription = stringResource(LR.string.settings_app_icon),
+                    modifier = Modifier.padding(top = 56.dp),
                 )
+            }
+            item {
                 Text(
-                    text = stringResource(LR.string.settings_about_work_from_anywhere),
-                    fontSize = 14.sp,
+                    text = stringResource(LR.string.settings_version, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE.toString()),
                     style = MaterialTheme.typography.body1,
+                    modifier = Modifier.padding(top = 8.dp),
+                    textAlign = TextAlign.Center,
                     color = MaterialTheme.theme.colors.primaryText02,
                 )
             }
-        }
-        item {
-            Spacer(modifier = Modifier.height(24.dp))
-        }
-        item {
-            AutomatticLogo(onAutomatticFamilyTapped = onAutomatticFamilyTapped)
-        }
-        item {
-            Spacer(modifier = Modifier.height(24.dp))
+            item {
+                HorizontalDivider(
+                    modifier = Modifier.padding(top = 56.dp, bottom = 8.dp),
+                )
+            }
+            item {
+                RowTextButton(
+                    text = stringResource(LR.string.settings_about_rate_us),
+                    onClick = {
+                        onRateUsTapped()
+                        rateUs(context)
+                    },
+                )
+            }
+            item {
+                RowTextButton(
+                    text = stringResource(LR.string.settings_about_share_with_friends),
+                    onClick = {
+                        onShareWithFriendsTapped()
+                        shareWithFriends(context)
+                    },
+                )
+            }
+            item {
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+            }
+            item {
+                RowTextButton(
+                    text = stringResource(LR.string.settings_about_website),
+                    secondaryText = "pocketcasts.com",
+                    onClick = {
+                        onWebsiteTapped()
+                        openUrl("https://www.pocketcasts.com", context)
+                    },
+                )
+            }
+            item {
+                RowTextButton(
+                    text = stringResource(LR.string.settings_about_instagram),
+                    secondaryText = "@pocketcasts",
+                    onClick = {
+                        onInstagramTapped()
+                        openUrl("https://www.instagram.com/pocketcasts/", context)
+                    },
+                )
+            }
+            item {
+                RowTextButton(
+                    text = stringResource(LR.string.settings_about_x),
+                    secondaryText = "@pocketcasts",
+                    onClick = {
+                        onXTapped()
+                        openUrl("https://x.com/pocketcasts", context)
+                    },
+                )
+            }
+            item {
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+            }
+            item {
+                AutomatticFamilyRow(onAutomatticFamilyTapped = onAutomatticFamilyTapped)
+            }
+            item {
+                HorizontalDivider(modifier = Modifier.padding(bottom = 8.dp))
+            }
+            item {
+                LegalAndMoreRow(onTermsOfServiceTapped, onPrivacyPolicyTapped, openFragment)
+            }
+            item {
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+            }
+            item {
+                Column(
+                    modifier = Modifier
+                        .clickable {
+                            onWorkWithUsTapped()
+                            openUrl("https://automattic.com/work-with-us/", context)
+                        }
+                        .fillMaxWidth()
+                        .padding(all = 14.dp),
+                ) {
+                    Text(
+                        text = stringResource(LR.string.settings_about_work_with_us),
+                        fontSize = 17.sp,
+                        color = MaterialTheme.theme.colors.primaryText01,
+                    )
+                    Text(
+                        text = stringResource(LR.string.settings_about_work_from_anywhere),
+                        fontSize = 14.sp,
+                        style = MaterialTheme.typography.body1,
+                        color = MaterialTheme.theme.colors.primaryText02,
+                    )
+                }
+            }
+            item {
+                Spacer(modifier = Modifier.height(24.dp))
+            }
+            item {
+                AutomatticLogo(onAutomatticFamilyTapped = onAutomatticFamilyTapped)
+            }
+            item {
+                Spacer(modifier = Modifier.height(24.dp))
+            }
         }
     }
 }
