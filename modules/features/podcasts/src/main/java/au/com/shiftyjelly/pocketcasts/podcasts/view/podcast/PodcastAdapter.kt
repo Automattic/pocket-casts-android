@@ -679,7 +679,7 @@ class PodcastAdapter(
         podcast.podcastUrl?.let { url ->
             if (url.isNotBlank()) {
                 try {
-                    startActivity(context, webUrlToIntent(url), null)
+                    context.startActivity(webUrlToIntent(url), null)
                 } catch (e: Exception) {
                     Timber.e(e, "Failed to open podcast web page.")
                 }
