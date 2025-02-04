@@ -30,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.FolderCreateFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.FolderCreateSharedViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.FolderEditFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.FolderEditPodcastsFragment
+import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.SuggestedFolders
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastsViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -66,6 +67,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
         private const val OPTION_KEY = "option"
         private const val SORT_BY = "sort_by"
         private const val EDIT_FOLDER = "edit_folder"
+        private const val REQUIRED_SUBSCRIPTIONS_FOR_SUGGESTED_FOLDERS = 8
         const val ARG_FOLDER_UUID = "ARG_FOLDER_UUID"
 
         fun newInstance(folderUuid: String): PodcastsFragment {
@@ -283,8 +285,13 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
     }
 
     private fun createFolder() {
-        analyticsTracker.track(AnalyticsEvent.FOLDER_CREATE_SHOWN, mapOf(SOURCE_KEY to PODCASTS_LIST))
-        FolderCreateFragment().show(parentFragmentManager, "create_folder_card")
+        val podcastListSize = adapter?.currentList?.size ?: 0
+        if (podcastListSize > REQUIRED_SUBSCRIPTIONS_FOR_SUGGESTED_FOLDERS) {
+            SuggestedFolders().show(parentFragmentManager, "suggested_folders")
+        } else {
+            analyticsTracker.track(AnalyticsEvent.FOLDER_CREATE_SHOWN, mapOf(SOURCE_KEY to PODCASTS_LIST))
+            FolderCreateFragment().show(parentFragmentManager, "create_folder_card")
+        }
     }
 
     override fun onPause() {
