@@ -32,33 +32,16 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/ic_chevron" />
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/artworkContainer"
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/artworkComposeView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="16dp"
-        android:clipToPadding="false"
-        android:elevation="8dp"
-        android:importantForAccessibility="noHideDescendants"
-        android:scaleType="centerCrop"
-        app:cardCornerRadius="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintWidth_default="percent"
-        app:layout_constraintWidth_percent="0.38">
-
-        <ImageView
-            android:id="@+id/artwork"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:adjustViewBounds="true"
-            android:foreground="?attr/selectableItemBackgroundBorderless"
-            android:importantForAccessibility="no"
-            android:scaleType="centerCrop"
-            tools:src="@tools:sample/avatars" />
-
-    </androidx.cardview.widget.CardView>
+        app:layout_constraintWidth_percent="0.38" />
 
     <ImageView
         android:id="@+id/folders"

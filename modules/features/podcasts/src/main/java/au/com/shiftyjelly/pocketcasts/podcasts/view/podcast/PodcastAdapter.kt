@@ -18,6 +18,7 @@ import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.TextView
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.text.AnnotatedString
@@ -59,7 +60,6 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
-import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
@@ -273,20 +273,6 @@ class PodcastAdapter(
         bindHeaderBottom(holder)
         bindHeaderTop(holder)
 
-        val imageView = holder.binding.top.artwork
-        // stopping the artwork flickering when the image is reloaded
-        if (imageView.drawable == null || holder.lastImagePodcastUuid == null || holder.lastImagePodcastUuid != podcast.uuid) {
-            holder.lastImagePodcastUuid = podcast.uuid
-            imageRequestFactory.create(podcast).loadInto(imageView)
-        }
-
-        imageView.setOnLongClickListener {
-            onArtworkLongClicked {
-                imageRequestFactory.create(podcast).loadInto(imageView)
-            }
-            true
-        }
-
         holder.binding.podcastHeader.contentDescription = podcast.title
     }
 
@@ -336,6 +322,24 @@ class PodcastAdapter(
 
     private fun bindHeaderTop(holder: PodcastViewHolder) {
         val isPlusOrPatronUser = signInState.isSignedInAsPlusOrPatron
+
+        // stopping the artwork flickering when the image is reloaded
+        if (holder.lastImagePodcastUuid == null || holder.lastImagePodcastUuid != podcast.uuid) {
+            holder.lastImagePodcastUuid = podcast.uuid
+
+            holder.binding.top.artworkComposeView.setContent {
+                PodcastHeaderArtwork(
+                    podcast,
+                    onPodcastClick = {
+                        onHeaderClicked(holder.binding)
+                    },
+                    onPodcastLongClick = {
+                        onArtworkLongClicked {}
+                    },
+                )
+            }
+        }
+
         holder.binding.top.chevron.isEnabled = headerExpanded
         holder.binding.top.settings.isVisible = podcast.isSubscribed
         holder.binding.top.subscribeButton.isVisible = !podcast.isSubscribed
@@ -664,7 +668,7 @@ class PodcastAdapter(
         val constraintLayout = binding.top.root
         val constraintSet = ConstraintSet()
         constraintSet.clone(constraintLayout)
-        constraintSet.constrainPercentWidth(R.id.artworkContainer, if (!binding.bottom.root.isVisible) 0.40f else 0.38f)
+        constraintSet.constrainPercentWidth(R.id.artworkComposeView, if (!binding.bottom.root.isVisible) 0.40f else 0.38f)
 
         TransitionManager.beginDelayedTransition(binding.root as ViewGroup, transition)
         constraintSet.applyTo(constraintLayout)
@@ -727,9 +731,6 @@ class PodcastAdapter(
 
         init {
             binding.top.header.setOnClickListener {
-                adapter.onHeaderClicked(binding)
-            }
-            binding.top.artwork.setOnClickListener {
                 adapter.onHeaderClicked(binding)
             }
             binding.top.subscribeButton.setOnClickListener {
