@@ -5,9 +5,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.models.type.BillingPeriod
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPricingPhase
+import au.com.shiftyjelly.pocketcasts.models.type.WinbackOfferDetails
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchaseEvent
@@ -16,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.winback.WinbackManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
+import com.pocketcasts.service.api.WinbackResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.Date
 import javax.inject.Inject
@@ -23,7 +26,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -52,6 +54,7 @@ class WinbackViewModel @Inject constructor(
         viewModelScope.launch {
             val plansDeferred = async { loadPlans() }
             val activePurchaseDeferred = async { loadActivePurchase() }
+            val winbackOfferResponseDeferred = async { winbackManager.getWinbackOffer() }
 
             val plansResult = plansDeferred.await()
             val activePurchaseResult = activePurchaseDeferred.await()
@@ -76,6 +79,13 @@ class WinbackViewModel @Inject constructor(
                         SubscriptionPlansState.Failure(activePurchase.reason)
                     }
                 },
+            )
+
+            val winbackResponse = winbackOfferResponseDeferred.await()
+            _uiState.value = _uiState.value.copy(
+                winbackOfferState = winbackResponse
+                    ?.toWinbackOffer(_uiState.value.productsDetails)
+                    ?.let(::WinbackOfferState),
             )
         }
     }
@@ -203,6 +213,28 @@ class WinbackViewModel @Inject constructor(
         }
     }
 
+    private fun WinbackResponse.toWinbackOffer(products: List<ProductDetails>): WinbackOffer? {
+        val offerId = offer.takeIf(String::isNotBlank) ?: return null
+        val redeemCode = code.takeIf(String::isNotBlank) ?: return null
+        val offerDetails = WinbackOfferDetails.fromOfferId(offerId) ?: return null
+        val product = products.find { it.productId == offerDetails.productId } ?: return null
+        val offer = product.subscriptionOfferDetails?.find { it.offerId == offerDetails.offerId } ?: return null
+        val pricingPhases = offer.pricingPhases.pricingPhaseList.takeIf { it.size == 2 } ?: return null
+
+        val discountPhase = pricingPhases[0]
+        val regularPhase = pricingPhases[1]
+
+        return WinbackOffer(
+            details = offerDetails,
+            offerToken = offer.offerToken,
+            redeemCode = redeemCode,
+            formattedPrice = when (offerDetails.billingPeriod) {
+                BillingPeriod.Monthly -> regularPhase.formattedPrice
+                BillingPeriod.Yearly -> discountPhase.formattedPrice
+            },
+        )
+    }
+
     private fun UiState.withLoadedSubscriptionPlans(block: (SubscriptionPlansState.Loaded) -> SubscriptionPlansState): UiState {
         return if (subscriptionPlansState is SubscriptionPlansState.Loaded) {
             copy(subscriptionPlansState = block(subscriptionPlansState))
@@ -317,6 +349,7 @@ class WinbackViewModel @Inject constructor(
         val currentSubscriptionExpirationDate: Date?,
         val productsDetails: List<ProductDetails>,
         val purchases: List<Purchase>,
+        val winbackOfferState: WinbackOfferState?,
         val subscriptionPlansState: SubscriptionPlansState,
     ) {
         val purchasedProductIds get() = purchases.flatMap { it.products }
@@ -326,6 +359,7 @@ class WinbackViewModel @Inject constructor(
                 currentSubscriptionExpirationDate = null,
                 purchases = emptyList(),
                 productsDetails = emptyList(),
+                winbackOfferState = null,
                 subscriptionPlansState = SubscriptionPlansState.Loading,
             )
         }
@@ -336,6 +370,12 @@ class WinbackViewModel @Inject constructor(
         data class NotFound(val reason: FailureReason) : ActivePurchaseResult
     }
 }
+
+internal data class WinbackOfferState(
+    val offer: WinbackOffer,
+    val isClaimingOffer: Boolean = false,
+    val hasOfferClaimFailed: Boolean = false,
+)
 
 internal sealed interface SubscriptionPlansState {
     data object Loading : SubscriptionPlansState
@@ -351,6 +391,13 @@ internal sealed interface SubscriptionPlansState {
         val hasPlanChangeFailed: Boolean = false,
     ) : SubscriptionPlansState
 }
+
+internal data class WinbackOffer(
+    val details: WinbackOfferDetails,
+    val offerToken: String,
+    val redeemCode: String,
+    val formattedPrice: String,
+)
 
 internal data class SubscriptionPlan(
     val productId: String,
@@ -375,11 +422,6 @@ internal data class ActivePurchase(
         Subscription.PLUS_YEARLY_PRODUCT_ID, Subscription.PATRON_YEARLY_PRODUCT_ID -> "yearly"
         else -> null
     }
-}
-
-internal enum class BillingPeriod {
-    Monthly,
-    Yearly,
 }
 
 internal enum class FailureReason {
