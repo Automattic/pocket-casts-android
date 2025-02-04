@@ -18,7 +18,7 @@ class ReferralManagerImpl @Inject constructor(
         ReferralResult.create(e)
     }
 
-    override suspend fun getWinbackOffer() = try {
+    override suspend fun getWinbackResponse() = try {
         ReferralResult.create(syncManager.getWinbackOffer())
     } catch (e: Exception) {
         ReferralResult.create(e)

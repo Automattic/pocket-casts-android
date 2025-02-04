@@ -22,6 +22,7 @@ import com.android.billingclient.api.ProductDetails.PricingPhases
 import com.android.billingclient.api.ProductDetails.RecurrenceMode
 import com.android.billingclient.api.ProductDetails.SubscriptionOfferDetails
 import com.android.billingclient.api.Purchase
+import com.pocketcasts.service.api.WinbackResponse
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -686,6 +687,10 @@ class FakeWinbackManager : WinbackManager {
 
     suspend fun addPurchaseEvent(purchaseEvent: PurchaseEvent) = purchaseEventTurbine.add(purchaseEvent)
 
+    private val winbackResponseTurbine = Turbine<WinbackResponse?>()
+
+    suspend fun addWinbackResponse(response: WinbackResponse?) = winbackResponseTurbine.add(response)
+
     override suspend fun loadProducts() = productDetailsTurbine.awaitItem()
 
     override suspend fun loadPurchases() = purchasesTurbine.awaitItem()
@@ -697,6 +702,8 @@ class FakeWinbackManager : WinbackManager {
         newProductOfferToken: String,
         activity: Activity,
     ) = purchaseEventTurbine.awaitItem()
+
+    override suspend fun getWinbackOffer() = winbackResponseTurbine.awaitItem()
 }
 
 class FakeTracker : Tracker {

@@ -8,7 +8,7 @@ import retrofit2.Response
 
 interface ReferralManager {
     suspend fun getReferralCode(): ReferralResult<ReferralCodeResponse>
-    suspend fun getWinbackOffer(): ReferralResult<WinbackResponse>
+    suspend fun getWinbackResponse(): ReferralResult<WinbackResponse>
     suspend fun validateReferralCode(code: String): ReferralResult<ReferralValidationResponse>
     suspend fun redeemReferralCode(code: String): ReferralResult<ReferralRedemptionResponse>
 
