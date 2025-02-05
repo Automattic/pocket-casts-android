@@ -241,6 +241,7 @@ class PodcastManagerImpl @Inject constructor(
                     latestPlaybackInteraction = interaction
                 }
             }
+            // don't delete the podcast if any of the episodes have been interacted with
             if (episodeManager.userHasInteractedWithEpisode(episode, playbackManager)) {
                 podcastHasChangedEpisodes = true
                 continue
@@ -248,7 +249,7 @@ class PodcastManagerImpl @Inject constructor(
             // bulk delete or it takes 10 seconds on a large podcast
             deleteEpisodes.add(episode)
         }
-        // don't remove episodes or the podcast if the latest playback interaction was less than a month ago,
+        // don't delete episodes or podcast if the latest playback interaction was less than a month ago,
         val oneMonthAgoMs = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(30)
         if (latestPlaybackInteraction > oneMonthAgoMs) {
             return false
