@@ -1,9 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.folders
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -23,6 +25,7 @@ import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
+import au.com.shiftyjelly.pocketcasts.compose.folder.FolderImage
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -67,7 +70,7 @@ fun SuggestedFoldersPage(
                 modifier = Modifier.padding(bottom = 16.dp),
             )
 
-            Spacer(modifier = Modifier.weight(1f))
+            Folders(podcastUuids = mockedPodcastsUuids, Modifier.padding(bottom = 8.dp).weight(1f))
 
             RowButton(
                 text = stringResource(LR.string.suggested_folders_use_these_folders_button),
@@ -94,6 +97,36 @@ fun SuggestedFoldersPage(
     }
 }
 
+@Composable
+private fun Folders(podcastUuids: List<String>, modifier: Modifier = Modifier) {
+    val folders = 25
+
+    LazyVerticalGrid(
+        columns = GridCells.Adaptive(110.dp),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+        modifier = modifier,
+    ) {
+        items(
+            count = folders,
+            key = { index -> index },
+        ) { index ->
+            FolderItem("Test", Color.Yellow, podcastUuids)
+        }
+    }
+}
+
+@Composable
+private fun FolderItem(folderName: String, folderColor: Color, podcastUuids: List<String>, modifier: Modifier = Modifier) {
+    FolderImage(
+        name = folderName,
+        color = folderColor,
+        podcastUuids = podcastUuids,
+        textSpacing = true,
+        modifier = modifier,
+    )
+}
+
 @Preview(showBackground = true)
 @Composable
 private fun SuggestedFoldersPagePreview(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
@@ -105,3 +138,12 @@ private fun SuggestedFoldersPagePreview(@PreviewParameter(ThemePreviewParameterP
         )
     }
 }
+
+private val mockedPodcastsUuids = listOf(
+    "5d308950-1fe3-012e-02b0-00163e1b201c",
+    "f086f200-4f32-0139-3396-0acc26574db2",
+    "2e61ba20-50a9-0135-902b-63f4b61a9224",
+    "f98ce900-79da-0139-347d-0acc26574db2",
+    "39844640-7cb5-013b-f2a7-0acc26574db2",
+    "2d721350-e0d4-0137-b6c9-0acc26574db2",
+)
