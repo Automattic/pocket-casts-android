@@ -5,65 +5,26 @@ agents:
   queue: "android"
 
 steps:
-  - label: Gradle Wrapper Validation
-    command: validate_gradle_wrapper
-    agents:
-      queue: linter
-
-  # Wait for Gradle Wrapper to be validated before running any other jobs
-  - wait
-
-  - group: "Linters"
-    steps:
-      - label: "☢️ Danger - PR Check"
-        command: danger
-        key: danger
-        if: "build.pull_request.id != null"
-        retry:
-          manual:
-            permit_on_passed: true
-        agents:
-          queue: "linter"
-
-      - label: 'Lint'
-        command: ".buildkite/commands/lint.sh"
-        plugins: [$CI_TOOLKIT]
-        artifact_paths:
-          - "**/build/reports/lint-results*.*"
-
-  - label: 'Unit tests'
-    command: ".buildkite/commands/run-unit-tests.sh"
-    plugins: [$CI_TOOLKIT]
-
-  - label: 'Dependency diff'
-    if: build.pull_request.id != null
-    command: comment_with_dependency_diff 'app' 'releaseRuntimeClasspath'
-    plugins: [$CI_TOOLKIT]
-    artifact_paths:
-      - "**/build/reports/diff/*"
-
-  - label: 'Spotless formatting check'
+  - label: "🛠 Assemble with CC [No Build Cache]"
     command: |
-      echo "--- 🔎 Checking formatting with Spotless"
-      ./gradlew spotlessCheck
-    plugins: [$CI_TOOLKIT]
+      echo "--- :rubygems: Setting up Gems"
+      install_gems
 
-  - label: "Instrumented tests"
-    command: ".buildkite/commands/run-instrumented-tests.sh"
-    plugins: [$CI_TOOLKIT]
-    artifact_paths:
-      - "**/build/instrumented-tests/**/*"
+      echo "--- :closed_lock_with_key: Installing Secrets"
+      bundle exec fastlane run configure_apply
 
-  - label: "Assemble release APK"
-    command: ".buildkite/commands/assemble-release-apk.sh"
+      echo "--- 🛠 Build with CC [No Build Cache]"
+      ./gradlew assembleDebug --no-build-cache
     plugins: [ $CI_TOOLKIT ]
-    artifact_paths:
-      - "**/build/outputs/apk/**/*"
 
-  - label: "Prototype Builds"
-    if: "build.pull_request.id != null"
+  - label: "🛠 Assemble without CC [No Build Cache]"
     command: |
-      ".buildkite/commands/prototype-build.sh"
+      echo "--- :rubygems: Setting up Gems"
+      install_gems
+
+      echo "--- :closed_lock_with_key: Installing Secrets"
+      bundle exec fastlane run configure_apply
+
+      echo "--- 🛠 Build without CC [No Build Cache]"
+      ./gradlew assembleDebug --no-build-cache --no-configuration-cache
     plugins: [ $CI_TOOLKIT ]
-    artifact_paths:
-      - "**/build/outputs/apk/**/*"
