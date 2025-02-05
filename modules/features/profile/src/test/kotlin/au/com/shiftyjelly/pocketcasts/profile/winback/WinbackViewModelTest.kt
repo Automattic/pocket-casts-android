@@ -60,6 +60,18 @@ class WinbackViewModelTest {
         billingPeriod = BillingPeriod.Yearly,
     )
 
+    private val winbackResponse = winbackResponse {
+        offer = WinbackOfferDetails.PlusMonthly.offerId
+        code = "ABC"
+    }
+
+    private val winbackOffer = WinbackOffer(
+        details = WinbackOfferDetails.PlusMonthly,
+        offerToken = "offer-token-${WinbackOfferDetails.PlusMonthly.productId}",
+        redeemCode = "ABC",
+        formattedPrice = "formated-price",
+    )
+
     private lateinit var viewModel: WinbackViewModel
 
     @Before
@@ -227,7 +239,7 @@ class WinbackViewModelTest {
         viewModel.uiState.test {
             assertFalse(awaitLoadedState().isChangingPlan)
 
-            viewModel.changePlan(mock(), knownPlan)
+            viewModel.changePlan(knownPlan, mock())
             assertTrue(awaitLoadedState().isChangingPlan)
 
             val newPurchase = createPurchase(orderId = "new-purchase")
@@ -249,7 +261,7 @@ class WinbackViewModelTest {
         viewModel.uiState.test {
             skipItems(1)
 
-            viewModel.changePlan(mock(), knownPlan)
+            viewModel.changePlan(knownPlan, mock())
             expectNoEvents()
         }
     }
@@ -263,7 +275,7 @@ class WinbackViewModelTest {
         viewModel.uiState.test {
             skipItems(1)
 
-            viewModel.changePlan(mock(), knownPlan.copy(productId = "unknown"))
+            viewModel.changePlan(knownPlan.copy(productId = "unknown"), mock())
             expectNoEvents()
         }
     }
@@ -277,7 +289,7 @@ class WinbackViewModelTest {
         viewModel.uiState.test {
             assertFalse(awaitLoadedState().isChangingPlan)
 
-            viewModel.changePlan(mock(), knownPlan)
+            viewModel.changePlan(knownPlan, mock())
             assertTrue(awaitLoadedState().isChangingPlan)
 
             winbackManager.addPurchaseEvent(PurchaseEvent.Cancelled(0))
@@ -297,7 +309,7 @@ class WinbackViewModelTest {
         viewModel.uiState.test {
             assertFalse(awaitLoadedState().isChangingPlan)
 
-            viewModel.changePlan(mock(), knownPlan)
+            viewModel.changePlan(knownPlan, mock())
             assertTrue(awaitLoadedState().isChangingPlan)
 
             winbackManager.addPurchaseEvent(PurchaseEvent.Failure("", 0))
@@ -317,7 +329,7 @@ class WinbackViewModelTest {
         viewModel.uiState.test {
             assertFalse(awaitLoadedState().isChangingPlan)
 
-            viewModel.changePlan(mock(), knownPlan)
+            viewModel.changePlan(knownPlan, mock())
             assertTrue(awaitLoadedState().isChangingPlan)
 
             winbackManager.addPurchases(emptyList())
@@ -570,6 +582,103 @@ class WinbackViewModelTest {
     }
 
     @Test
+    fun `claim winback offer successfully`() = runTest {
+        winbackManager.addProductDetails(products)
+        winbackManager.addPurchase(purchase)
+        winbackManager.addWinbackResponse(winbackResponse)
+
+        viewModel.uiState.test {
+            val initialState = awaitOfferState()
+            assertFalse(initialState.isClaimingOffer)
+            assertFalse(initialState.isOfferClaimed)
+            assertFalse(initialState.hasOfferClaimFailed)
+
+            viewModel.claimOffer(winbackOffer, mock())
+            val claimingState = awaitOfferState()
+            assertTrue(claimingState.isClaimingOffer)
+            assertFalse(claimingState.isOfferClaimed)
+            assertFalse(claimingState.hasOfferClaimFailed)
+
+            winbackManager.addPurchaseEvent(PurchaseEvent.Success)
+            val claimedState = awaitOfferState()
+            assertFalse(claimedState.isClaimingOffer)
+            assertTrue(claimedState.isOfferClaimed)
+            assertFalse(claimedState.hasOfferClaimFailed)
+
+            viewModel.consumeClaimedOffer()
+            assertFalse(awaitOfferState().isOfferClaimed)
+        }
+    }
+
+    @Test
+    fun `claim winback offer when current state is not loaded`() = runTest {
+        winbackManager.addProductDetails(products)
+        winbackManager.addPurchases(emptyList())
+        winbackManager.addWinbackResponse(winbackResponse)
+
+        viewModel.uiState.test {
+            skipItems(1)
+
+            viewModel.claimOffer(winbackOffer, mock())
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun `claim winback offer when there is no matching product`() = runTest {
+        winbackManager.addProductDetails(products)
+        winbackManager.addPurchase(purchase)
+        winbackManager.addWinbackResponse(winbackResponse)
+
+        viewModel.uiState.test {
+            skipItems(1)
+
+            viewModel.claimOffer(winbackOffer.copy(offerToken = "unknown"), mock())
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun `claim winback offer when it is cancelled`() = runTest {
+        winbackManager.addProductDetails(products)
+        winbackManager.addPurchase(purchase)
+        winbackManager.addWinbackResponse(winbackResponse)
+
+        viewModel.uiState.test {
+            assertFalse(awaitOfferState().isClaimingOffer)
+
+            viewModel.claimOffer(winbackOffer, mock())
+            assertTrue(awaitOfferState().isClaimingOffer)
+
+            winbackManager.addPurchaseEvent(PurchaseEvent.Cancelled(responseCode = 1))
+            val claimedState = awaitOfferState()
+            assertFalse(claimedState.isClaimingOffer)
+            assertFalse(claimedState.isOfferClaimed)
+            assertFalse(claimedState.hasOfferClaimFailed)
+        }
+    }
+
+    @Test
+    fun `claim winback offer when purchase fails`() = runTest {
+        winbackManager.addProductDetails(products)
+        winbackManager.addPurchase(purchase)
+        winbackManager.addWinbackResponse(winbackResponse)
+
+        viewModel.uiState.test {
+            skipItems(1)
+
+            viewModel.claimOffer(winbackOffer, mock())
+            skipItems(1)
+
+            winbackManager.addPurchaseEvent(PurchaseEvent.Failure("error", responseCode = 1))
+            val claimedState = awaitOfferState()
+            assertFalse(claimedState.isClaimingOffer)
+            assertFalse(claimedState.isOfferClaimed)
+            assertTrue(claimedState.hasOfferClaimFailed)
+        }
+    }
+
+    @Test
     fun `track screen shown`() = runTest {
         winbackManager.addProductDetails(products)
         winbackManager.addPurchase(purchase)
@@ -626,7 +735,8 @@ class WinbackViewModelTest {
         winbackManager.addPurchase(createPurchase(productIds = listOf(Subscription.PLUS_MONTHLY_PRODUCT_ID)))
         winbackManager.addWinbackResponse(null)
 
-        viewModel.trackClaimOfferTapped()
+        viewModel.claimOffer(winbackOffer, mock())
+        winbackManager.addPurchaseEvent(PurchaseEvent.Success)
 
         val event = tracker.events.single()
         assertEquals(
@@ -648,7 +758,8 @@ class WinbackViewModelTest {
         winbackManager.addPurchase(createPurchase(productIds = listOf(Subscription.PLUS_YEARLY_PRODUCT_ID)))
         winbackManager.addWinbackResponse(null)
 
-        viewModel.trackClaimOfferTapped()
+        viewModel.claimOffer(winbackOffer, mock())
+        winbackManager.addPurchaseEvent(PurchaseEvent.Success)
 
         val event = tracker.events.single()
         assertEquals(
@@ -670,7 +781,8 @@ class WinbackViewModelTest {
         winbackManager.addPurchase(createPurchase(productIds = listOf(Subscription.PATRON_MONTHLY_PRODUCT_ID)))
         winbackManager.addWinbackResponse(null)
 
-        viewModel.trackClaimOfferTapped()
+        viewModel.claimOffer(winbackOffer, mock())
+        winbackManager.addPurchaseEvent(PurchaseEvent.Success)
 
         val event = tracker.events.single()
         assertEquals(
@@ -692,7 +804,8 @@ class WinbackViewModelTest {
         winbackManager.addPurchase(createPurchase(productIds = listOf(Subscription.PATRON_YEARLY_PRODUCT_ID)))
         winbackManager.addWinbackResponse(null)
 
-        viewModel.trackClaimOfferTapped()
+        viewModel.claimOffer(winbackOffer, mock())
+        winbackManager.addPurchaseEvent(PurchaseEvent.Success)
 
         val event = tracker.events.single()
         assertEquals(
@@ -780,7 +893,7 @@ class WinbackViewModelTest {
         winbackManager.addPurchase(purchase)
         winbackManager.addWinbackResponse(null)
 
-        viewModel.changePlan(mock(), knownPlan)
+        viewModel.changePlan(knownPlan, mock())
 
         winbackManager.addPurchase(createPurchase(productIds = listOf(Subscription.PLUS_MONTHLY_PRODUCT_ID)))
         winbackManager.addPurchaseEvent(PurchaseEvent.Success)
@@ -838,6 +951,10 @@ class WinbackViewModelTest {
 
 private suspend fun TurbineTestContext<WinbackViewModel.UiState>.awaitLoadedState(): SubscriptionPlansState.Loaded {
     return awaitItem().subscriptionPlansState as SubscriptionPlansState.Loaded
+}
+
+private suspend fun TurbineTestContext<WinbackViewModel.UiState>.awaitOfferState(): WinbackOfferState {
+    return awaitItem().winbackOfferState!!
 }
 
 private operator fun SubscriptionPlansState.Loaded.get(productId: String) =
@@ -956,6 +1073,14 @@ class FakeWinbackManager : WinbackManager {
     ) = purchaseEventTurbine.awaitItem()
 
     override suspend fun getWinbackOffer() = winbackResponseTurbine.awaitItem()
+
+    override suspend fun claimWinbackOffer(
+        currentPurchase: Purchase,
+        winbackProduct: ProductDetails,
+        winbackOfferToken: String,
+        winbackClaimCode: String,
+        activity: Activity,
+    ) = purchaseEventTurbine.awaitItem()
 }
 
 class FakeTracker : Tracker {

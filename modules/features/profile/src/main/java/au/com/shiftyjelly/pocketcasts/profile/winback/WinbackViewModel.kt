@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.profile.winback
 
-import androidx.appcompat.app.AppCompatActivity
+import android.app.Activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
@@ -93,8 +93,8 @@ class WinbackViewModel @Inject constructor(
     private var changePlanJob: Job? = null
 
     internal fun changePlan(
-        activity: AppCompatActivity,
         newPlan: SubscriptionPlan,
+        activity: Activity,
     ) {
         trackPlanSelected(newPlan.productId)
         if (changePlanJob?.isActive == true) {
@@ -163,6 +163,71 @@ class WinbackViewModel @Inject constructor(
                     }
                 }
             }
+        }
+    }
+
+    private var claimOfferjob: Job? = null
+
+    internal fun claimOffer(
+        offer: WinbackOffer,
+        activity: Activity,
+    ) {
+        trackClaimOfferTapped()
+        if (claimOfferjob?.isActive == true) {
+            return
+        }
+
+        val loadedState = (_uiState.value.subscriptionPlansState as? SubscriptionPlansState.Loaded) ?: run {
+            logWarning("Failed to start winback offer flow. Subscriptions are not loaded.")
+            return
+        }
+        val currentPurchase = _uiState.value.purchases.find { it.orderId == loadedState.activePurchase.orderId } ?: run {
+            logWarning("Failed to start winback offer flow. No matching current purchase.")
+            return
+        }
+        val winbackProduct = _uiState.value.productsDetails.find { product ->
+            product.subscriptionOfferDetails.orEmpty().any { playOffer -> playOffer.offerToken == offer.offerToken }
+        } ?: run {
+            logWarning("Failed to start winback offer flow. No matching product for a winback offer.")
+            return
+        }
+        claimOfferjob = viewModelScope.launch {
+            _uiState.value = _uiState.value.withOfferState { state ->
+                state.copy(isClaimingOffer = true)
+            }
+            val purchaseEvent = winbackManager.claimWinbackOffer(
+                currentPurchase = currentPurchase,
+                winbackProduct = winbackProduct,
+                winbackOfferToken = offer.offerToken,
+                winbackClaimCode = offer.redeemCode,
+                activity = activity,
+            )
+            when (purchaseEvent) {
+                is PurchaseEvent.Cancelled -> {
+                    _uiState.value = _uiState.value.withOfferState { state ->
+                        state.copy(isClaimingOffer = false)
+                    }
+                }
+
+                is PurchaseEvent.Failure -> {
+                    logWarning("Winback offer failure: ${purchaseEvent.responseCode}, ${purchaseEvent.errorMessage}")
+                    _uiState.value = _uiState.value.withOfferState { state ->
+                        state.copy(isClaimingOffer = false, hasOfferClaimFailed = true)
+                    }
+                }
+
+                is PurchaseEvent.Success -> {
+                    _uiState.value = _uiState.value.withOfferState { state ->
+                        state.copy(isClaimingOffer = false, isOfferClaimed = true)
+                    }
+                }
+            }
+        }
+    }
+
+    internal fun consumeClaimedOffer() {
+        _uiState.value = _uiState.value.withOfferState { state ->
+            state.copy(isOfferClaimed = false)
         }
     }
 
@@ -243,6 +308,14 @@ class WinbackViewModel @Inject constructor(
         }
     }
 
+    private fun UiState.withOfferState(block: (WinbackOfferState) -> WinbackOfferState): UiState {
+        return if (winbackOfferState != null) {
+            copy(winbackOfferState = block(winbackOfferState))
+        } else {
+            this
+        }
+    }
+
     private fun logWarning(message: String) {
         Timber.tag(LogBuffer.TAG_SUBSCRIPTIONS).w(message)
         LogBuffer.w(LogBuffer.TAG_SUBSCRIPTIONS, message)
@@ -268,7 +341,7 @@ class WinbackViewModel @Inject constructor(
         )
     }
 
-    internal fun trackClaimOfferTapped() {
+    private fun trackClaimOfferTapped() {
         val activePurchase = (uiState.value.subscriptionPlansState as? SubscriptionPlansState.Loaded)?.activePurchase
         tracker.track(
             event = AnalyticsEvent.WINBACK_MAIN_SCREEN_ROW_TAP,
@@ -374,6 +447,7 @@ class WinbackViewModel @Inject constructor(
 internal data class WinbackOfferState(
     val offer: WinbackOffer,
     val isClaimingOffer: Boolean = false,
+    val isOfferClaimed: Boolean = false,
     val hasOfferClaimFailed: Boolean = false,
 )
 

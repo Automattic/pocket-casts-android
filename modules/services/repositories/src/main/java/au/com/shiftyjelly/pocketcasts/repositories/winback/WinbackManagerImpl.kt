@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.winback
 
 import android.app.Activity
 import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager
+import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager.ReferralResult
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchaseEvent
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.isOk
@@ -44,8 +45,49 @@ class WinbackManagerImpl @Inject constructor(
     }
 
     override suspend fun getWinbackOffer() = when (val result = referralManager.getWinbackResponse()) {
-        is ReferralManager.ReferralResult.SuccessResult -> result.body
-        is ReferralManager.ReferralResult.EmptyResult -> null
-        is ReferralManager.ReferralResult.ErrorResult -> null
+        is ReferralResult.SuccessResult -> result.body
+        is ReferralResult.EmptyResult -> null
+        is ReferralResult.ErrorResult -> null
+    }
+
+    override suspend fun claimWinbackOffer(
+        currentPurchase: Purchase,
+        winbackProduct: ProductDetails,
+        winbackOfferToken: String,
+        winbackClaimCode: String,
+        activity: Activity,
+    ): PurchaseEvent {
+        val startResult = subscriptionManager.claimWinbackOffer(
+            currentPurchase = currentPurchase,
+            winbackProduct = winbackProduct,
+            winbackOfferToken = winbackOfferToken,
+            activity = activity,
+        )
+        return if (startResult.isOk()) {
+            val purchaseEvent = subscriptionManager.observePurchaseEvents().asFlow().first()
+            if (purchaseEvent is PurchaseEvent.Success) {
+                /**
+                 * Successfully redeeming a referral code means that a user is no longer eligible for the Winback offer.
+                 * Failure to redeem the code means that the Winback offer remains available to the user.
+                 *
+                 * However, whether the code was redeemed or not does not affect the purchase itself.
+                 * It only matters for displaying the Winback offer to the user.
+                 *
+                 * If we forwarded the error, the user would see an error in a snackbar or some other form.
+                 * But their purchase would still be processed and added to their subscription.
+                 * They would still see the "Claim offer" button, allowing them to claim the offer indefinitely,
+                 * as long as the redeem call fails.
+                 *
+                 * For this reason, we ignore the result of redeeming the referral code.
+                 */
+                referralManager.redeemReferralCode(winbackClaimCode)
+            }
+            purchaseEvent
+        } else {
+            PurchaseEvent.Failure(
+                "Failed to start change product flow. ${startResult.debugMessage}",
+                startResult.responseCode,
+            )
+        }
     }
 }

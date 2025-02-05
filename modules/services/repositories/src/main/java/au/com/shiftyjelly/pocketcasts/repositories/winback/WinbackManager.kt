@@ -22,4 +22,12 @@ interface WinbackManager {
     ): PurchaseEvent
 
     suspend fun getWinbackOffer(): WinbackResponse?
+
+    suspend fun claimWinbackOffer(
+        currentPurchase: Purchase,
+        winbackProduct: ProductDetails,
+        winbackOfferToken: String,
+        winbackClaimCode: String,
+        activity: Activity,
+    ): PurchaseEvent
 }
