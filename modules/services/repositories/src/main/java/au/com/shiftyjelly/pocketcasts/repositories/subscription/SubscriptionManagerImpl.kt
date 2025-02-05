@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.subscription
 
+import android.app.Activity
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
@@ -295,8 +296,8 @@ class SubscriptionManagerImpl @Inject constructor(
         currentPurchaseProductId: String,
         newProduct: ProductDetails,
         newProductOfferToken: String,
-        activity: AppCompatActivity,
-    ): Boolean {
+        activity: Activity,
+    ): BillingResult {
         val productDetailsParams = BillingFlowParams.ProductDetailsParams.newBuilder()
             .setProductDetails(newProduct)
             .setOfferToken(newProductOfferToken)
@@ -320,8 +321,7 @@ class SubscriptionManagerImpl @Inject constructor(
                 }
             }
             .build()
-        val result = billingClient.launchBillingFlow(activity, billingFlowParams)
-        return result.isOk()
+        return billingClient.launchBillingFlow(activity, billingFlowParams)
     }
 
     private suspend fun loadSubscriptionUpdateParamsMode(

@@ -1,5 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.profile.winback
 
+import android.app.Activity
+import app.cash.turbine.Turbine
 import app.cash.turbine.TurbineTestContext
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
@@ -12,7 +14,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchaseEvent
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchasesState
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
+import au.com.shiftyjelly.pocketcasts.repositories.winback.WinbackManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.ProductDetails.PricingPhase
@@ -20,9 +22,7 @@ import com.android.billingclient.api.ProductDetails.PricingPhases
 import com.android.billingclient.api.ProductDetails.RecurrenceMode
 import com.android.billingclient.api.ProductDetails.SubscriptionOfferDetails
 import com.android.billingclient.api.Purchase
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.rx2.asFlowable
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -31,32 +31,17 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import org.mockito.kotlin.wheneverBlocking
 
 class WinbackViewModelTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule()
 
-    private val subscriptionManager = mock<SubscriptionManager>()
-    private val purchaseEvents = MutableSharedFlow<PurchaseEvent>()
-    private val purchaseEventsFlowable = purchaseEvents.asFlowable()
-
-    private val settings = mock<Settings>()
-
+    private val winbackManager = FakeWinbackManager()
     private val tracker = FakeTracker()
-
-    @Before
-    fun setUp() {
-        whenever(subscriptionManager.observePurchaseEvents()) doReturn purchaseEventsFlowable
-        val subscriptionSettingMock = mock<UserSetting<SubscriptionStatus?>> {
-            on { flow } doReturn MutableStateFlow(null)
-        }
-        whenever(settings.cachedSubscriptionStatus) doReturn subscriptionSettingMock
-    }
+    private val settings = mock<Settings>()
 
     private val products = listOf(
         createProductDetails(
@@ -77,6 +62,8 @@ class WinbackViewModelTest {
         ),
     )
 
+    private val purchase = createPurchase()
+
     private val knownPlan = SubscriptionPlan(
         productId = Subscription.PLUS_YEARLY_PRODUCT_ID,
         offerToken = "token",
@@ -85,14 +72,33 @@ class WinbackViewModelTest {
         billingPeriod = BillingPeriod.Yearly,
     )
 
+    private lateinit var viewModel: WinbackViewModel
+
+    @Before
+    fun setUp() {
+        val subscriptionSettingMock = mock<UserSetting<SubscriptionStatus?>> {
+            on { flow } doReturn MutableStateFlow(null)
+        }
+        whenever(settings.cachedSubscriptionStatus) doReturn subscriptionSettingMock
+
+        viewModel = WinbackViewModel(
+            winbackManager,
+            settings,
+            AnalyticsTracker.test(tracker, isEnabled = true),
+        )
+    }
+
+    @Test
+    fun `initial plans state is loading`() {
+        val state = viewModel.uiState.value
+
+        assertEquals(SubscriptionPlansState.Loading, state.subscriptionPlansState)
+    }
+
     @Test
     fun `subscription plans for user with active subscription`() = runTest {
-        val purchases = listOf(createPurchase())
-
-        wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
-        wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
-
-        val viewModel = createViewModel()
+        winbackManager.addProductDetails(products)
+        winbackManager.addPurchase(purchase)
 
         viewModel.uiState.test {
             val state = awaitLoadedState()
@@ -113,12 +119,8 @@ class WinbackViewModelTest {
 
     @Test
     fun `subscription plans for user with unacknowledged purchase`() = runTest {
-        val purchases = listOf(createPurchase(isAcknowledged = false))
-
-        wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
-        wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
-
-        val viewModel = createViewModel()
+        winbackManager.addProductDetails(products)
+        winbackManager.addPurchase(createPurchase(isAcknowledged = false))
 
         viewModel.uiState.test {
             val availablePlans = awaitItem().subscriptionPlansState as SubscriptionPlansState.Failure
@@ -129,12 +131,8 @@ class WinbackViewModelTest {
 
     @Test
     fun `subscription plans for user with not auto-renewing purchase`() = runTest {
-        val purchases = listOf(createPurchase(isAutoRenewing = false))
-
-        wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
-        wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
-
-        val viewModel = createViewModel()
+        winbackManager.addProductDetails(products)
+        winbackManager.addPurchase(createPurchase(isAutoRenewing = false))
 
         viewModel.uiState.test {
             val availablePlans = awaitItem().subscriptionPlansState as SubscriptionPlansState.Failure
@@ -145,12 +143,8 @@ class WinbackViewModelTest {
 
     @Test
     fun `subscription plans for user with purchase without order ID`() = runTest {
-        val purchases = listOf(createPurchase(orderId = null))
-
-        wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
-        wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
-
-        val viewModel = createViewModel()
+        winbackManager.addProductDetails(products)
+        winbackManager.addPurchase(createPurchase(orderId = null))
 
         viewModel.uiState.test {
             val availablePlans = awaitItem().subscriptionPlansState as SubscriptionPlansState.Failure
@@ -161,15 +155,8 @@ class WinbackViewModelTest {
 
     @Test
     fun `subscription plans for user with multiple purchases`() = runTest {
-        val purchases = listOf(
-            createPurchase(orderId = "1"),
-            createPurchase(orderId = "2"),
-        )
-
-        wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
-        wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
-
-        val viewModel = createViewModel()
+        winbackManager.addProductDetails(products)
+        winbackManager.addPurchases(listOf(createPurchase(orderId = "1"), createPurchase(orderId = "2")))
 
         viewModel.uiState.test {
             val availablePlans = awaitItem().subscriptionPlansState as SubscriptionPlansState.Failure
@@ -180,19 +167,8 @@ class WinbackViewModelTest {
 
     @Test
     fun `subscription plans for user with purchase with multiple products`() = runTest {
-        val purchases = listOf(
-            createPurchase(
-                productIds = listOf(
-                    Subscription.PLUS_MONTHLY_PRODUCT_ID,
-                    Subscription.PLUS_YEARLY_PRODUCT_ID,
-                ),
-            ),
-        )
-
-        wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
-        wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
-
-        val viewModel = createViewModel()
+        winbackManager.addProductDetails(products)
+        winbackManager.addPurchase(createPurchase(productIds = listOf("id1", "id2")))
 
         viewModel.uiState.test {
             val availablePlans = awaitItem().subscriptionPlansState as SubscriptionPlansState.Failure
@@ -203,12 +179,8 @@ class WinbackViewModelTest {
 
     @Test
     fun `subscription plans for user with purchase with no products`() = runTest {
-        val purchases = listOf(createPurchase(productIds = emptyList()))
-
-        wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
-        wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
-
-        val viewModel = createViewModel()
+        winbackManager.addProductDetails(products)
+        winbackManager.addPurchase(createPurchase(productIds = emptyList()))
 
         viewModel.uiState.test {
             val availablePlans = awaitItem().subscriptionPlansState as SubscriptionPlansState.Failure
@@ -219,22 +191,17 @@ class WinbackViewModelTest {
 
     @Test
     fun `subscription plans use only base offer from products`() = runTest {
-        val purchases = listOf(createPurchase())
-        val products = listOf(
+        winbackManager.addProductDetails(
             createProductDetails(
                 id = Subscription.PLUS_MONTHLY_PRODUCT_ID,
                 period = BillingPeriod.Monthly,
-                offer = Offer(
+                bonusOffer = Offer(
                     id = "offer-id",
                     billingPeriod = BillingPeriod.Monthly,
                 ),
             ),
         )
-
-        wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
-        wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
-
-        val viewModel = createViewModel()
+        winbackManager.addPurchase(purchase)
 
         viewModel.uiState.test {
             val subscriptionPlansState = awaitLoadedState()
@@ -246,13 +213,8 @@ class WinbackViewModelTest {
 
     @Test
     fun `subscription plans are sorted`() = runTest {
-        val purchases = listOf(createPurchase())
-        val products = products.reversed()
-
-        wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
-        wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
-
-        val viewModel = createViewModel()
+        winbackManager.addProductDetails(products.reversed())
+        winbackManager.addPurchase(purchase)
 
         viewModel.uiState.test {
             val subscriptionPlansState = awaitLoadedState()
@@ -270,13 +232,8 @@ class WinbackViewModelTest {
 
     @Test
     fun `change subscription plan successfully`() = runTest {
-        val purchases = listOf(createPurchase())
-
-        wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
-        wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
-        wheneverBlocking { subscriptionManager.changeProduct(any(), any(), any(), any(), any()) } doReturn true
-
-        val viewModel = createViewModel()
+        winbackManager.addProductDetails(products)
+        winbackManager.addPurchase(purchase)
 
         viewModel.uiState.test {
             assertFalse(awaitLoadedState().isChangingPlan)
@@ -285,10 +242,10 @@ class WinbackViewModelTest {
             assertTrue(awaitLoadedState().isChangingPlan)
 
             val newPurchase = createPurchase(orderId = "new-purchase")
-            wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(listOf(newPurchase))
-
-            purchaseEvents.emit(PurchaseEvent.Success)
+            winbackManager.addPurchases(listOf(newPurchase))
+            winbackManager.addPurchaseEvent(PurchaseEvent.Success)
             val state = awaitLoadedState()
+
             assertFalse(state.isChangingPlan)
             assertEquals(state.activePurchase, ActivePurchase(newPurchase.orderId!!, newPurchase.products[0]))
         }
@@ -296,10 +253,8 @@ class WinbackViewModelTest {
 
     @Test
     fun `change subscription when current state is not loaded`() = runTest {
-        wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
-        wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(emptyList())
-
-        val viewModel = createViewModel()
+        winbackManager.addProductDetails(products)
+        winbackManager.addPurchases(emptyList())
 
         viewModel.uiState.test {
             skipItems(1)
@@ -311,30 +266,8 @@ class WinbackViewModelTest {
 
     @Test
     fun `change subscription when there is no matching product`() = runTest {
-        val purchases = listOf(createPurchase())
-
-        wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
-        wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
-
-        val viewModel = createViewModel()
-
-        viewModel.uiState.test {
-            skipItems(1)
-
-            viewModel.changePlan(mock(), knownPlan.copy(productId = "unknown"))
-            expectNoEvents()
-        }
-    }
-
-    @Test
-    fun `change subscription when there billing flow fails to start`() = runTest {
-        val purchases = listOf(createPurchase())
-
-        wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
-        wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
-        wheneverBlocking { subscriptionManager.changeProduct(any(), any(), any(), any(), any()) } doReturn false
-
-        val viewModel = createViewModel()
+        winbackManager.addProductDetails(products)
+        winbackManager.addPurchase(purchase)
 
         viewModel.uiState.test {
             skipItems(1)
@@ -346,13 +279,8 @@ class WinbackViewModelTest {
 
     @Test
     fun `change subscription when it is cancelled`() = runTest {
-        val purchases = listOf(createPurchase())
-
-        wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
-        wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
-        wheneverBlocking { subscriptionManager.changeProduct(any(), any(), any(), any(), any()) } doReturn true
-
-        val viewModel = createViewModel()
+        winbackManager.addProductDetails(products)
+        winbackManager.addPurchase(purchase)
 
         viewModel.uiState.test {
             assertFalse(awaitLoadedState().isChangingPlan)
@@ -360,8 +288,9 @@ class WinbackViewModelTest {
             viewModel.changePlan(mock(), knownPlan)
             assertTrue(awaitLoadedState().isChangingPlan)
 
-            purchaseEvents.emit(PurchaseEvent.Cancelled(0))
+            winbackManager.addPurchaseEvent(PurchaseEvent.Cancelled(0))
             val state = awaitLoadedState()
+
             assertFalse(state.isChangingPlan)
             assertFalse(state.hasPlanChangeFailed)
         }
@@ -369,13 +298,8 @@ class WinbackViewModelTest {
 
     @Test
     fun `change subscription when purchase fails`() = runTest {
-        val purchases = listOf(createPurchase())
-
-        wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
-        wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
-        wheneverBlocking { subscriptionManager.changeProduct(any(), any(), any(), any(), any()) } doReturn true
-
-        val viewModel = createViewModel()
+        winbackManager.addProductDetails(products)
+        winbackManager.addPurchase(purchase)
 
         viewModel.uiState.test {
             assertFalse(awaitLoadedState().isChangingPlan)
@@ -383,8 +307,9 @@ class WinbackViewModelTest {
             viewModel.changePlan(mock(), knownPlan)
             assertTrue(awaitLoadedState().isChangingPlan)
 
-            purchaseEvents.emit(PurchaseEvent.Failure("", 0))
+            winbackManager.addPurchaseEvent(PurchaseEvent.Failure("", 0))
             val state = awaitLoadedState()
+
             assertFalse(state.isChangingPlan)
             assertTrue(state.hasPlanChangeFailed)
         }
@@ -392,13 +317,8 @@ class WinbackViewModelTest {
 
     @Test
     fun `change subscription when new plans fail to load`() = runTest {
-        val purchases = listOf(createPurchase())
-
-        wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
-        wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
-        wheneverBlocking { subscriptionManager.changeProduct(any(), any(), any(), any(), any()) } doReturn true
-
-        val viewModel = createViewModel()
+        winbackManager.addProductDetails(products)
+        winbackManager.addPurchase(purchase)
 
         viewModel.uiState.test {
             assertFalse(awaitLoadedState().isChangingPlan)
@@ -406,8 +326,8 @@ class WinbackViewModelTest {
             viewModel.changePlan(mock(), knownPlan)
             assertTrue(awaitLoadedState().isChangingPlan)
 
-            wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(emptyList())
-            purchaseEvents.emit(PurchaseEvent.Success)
+            winbackManager.addPurchases(emptyList())
+            winbackManager.addPurchaseEvent(PurchaseEvent.Success)
 
             val state = awaitItem().subscriptionPlansState
             assertTrue(state is SubscriptionPlansState.Failure)
@@ -416,11 +336,9 @@ class WinbackViewModelTest {
 
     @Test
     fun `track screen shown`() = runTest {
-        val purchases = listOf(createPurchase())
-        wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
-        wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
+        winbackManager.addProductDetails(products)
+        winbackManager.addPurchase(purchase)
 
-        val viewModel = createViewModel()
         viewModel.trackScreenShown("screen_key")
 
         val event = tracker.events.single()
@@ -435,11 +353,9 @@ class WinbackViewModelTest {
 
     @Test
     fun `track screen dismissed`() = runTest {
-        val purchases = listOf(createPurchase())
-        wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
-        wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
+        winbackManager.addProductDetails(products)
+        winbackManager.addPurchase(purchase)
 
-        val viewModel = createViewModel()
         viewModel.trackScreenDismissed("screen_key")
 
         val event = tracker.events.single()
@@ -454,11 +370,9 @@ class WinbackViewModelTest {
 
     @Test
     fun `track continue cancellation tapped`() = runTest {
-        val purchases = listOf(createPurchase())
-        wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
-        wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
+        winbackManager.addProductDetails(products)
+        winbackManager.addPurchase(purchase)
 
-        val viewModel = createViewModel()
         viewModel.trackContinueCancellationTapped()
 
         val event = tracker.events.single()
@@ -470,11 +384,9 @@ class WinbackViewModelTest {
 
     @Test
     fun `track claim plus monthly offer tapped`() = runTest {
-        val purchases = listOf(createPurchase(productIds = listOf(Subscription.PLUS_MONTHLY_PRODUCT_ID)))
-        wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
-        wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
+        winbackManager.addProductDetails(products)
+        winbackManager.addPurchase(createPurchase(productIds = listOf(Subscription.PLUS_MONTHLY_PRODUCT_ID)))
 
-        val viewModel = createViewModel()
         viewModel.trackClaimOfferTapped()
 
         val event = tracker.events.single()
@@ -493,11 +405,9 @@ class WinbackViewModelTest {
 
     @Test
     fun `track claim plus yearly offer tapped`() = runTest {
-        val purchases = listOf(createPurchase(productIds = listOf(Subscription.PLUS_YEARLY_PRODUCT_ID)))
-        wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
-        wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
+        winbackManager.addProductDetails(products)
+        winbackManager.addPurchase(createPurchase(productIds = listOf(Subscription.PLUS_YEARLY_PRODUCT_ID)))
 
-        val viewModel = createViewModel()
         viewModel.trackClaimOfferTapped()
 
         val event = tracker.events.single()
@@ -516,11 +426,9 @@ class WinbackViewModelTest {
 
     @Test
     fun `track claim patron monthly offer tapped`() = runTest {
-        val purchases = listOf(createPurchase(productIds = listOf(Subscription.PATRON_MONTHLY_PRODUCT_ID)))
-        wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
-        wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
+        winbackManager.addProductDetails(products)
+        winbackManager.addPurchase(createPurchase(productIds = listOf(Subscription.PATRON_MONTHLY_PRODUCT_ID)))
 
-        val viewModel = createViewModel()
         viewModel.trackClaimOfferTapped()
 
         val event = tracker.events.single()
@@ -539,11 +447,9 @@ class WinbackViewModelTest {
 
     @Test
     fun `track claim patron yearly offer tapped`() = runTest {
-        val purchases = listOf(createPurchase(productIds = listOf(Subscription.PATRON_YEARLY_PRODUCT_ID)))
-        wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
-        wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
+        winbackManager.addProductDetails(products)
+        winbackManager.addPurchase(createPurchase(productIds = listOf(Subscription.PATRON_YEARLY_PRODUCT_ID)))
 
-        val viewModel = createViewModel()
         viewModel.trackClaimOfferTapped()
 
         val event = tracker.events.single()
@@ -562,11 +468,9 @@ class WinbackViewModelTest {
 
     @Test
     fun `track available plans tapped`() = runTest {
-        val purchases = listOf(createPurchase())
-        wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
-        wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
+        winbackManager.addProductDetails(products)
+        winbackManager.addPurchase(purchase)
 
-        val viewModel = createViewModel()
         viewModel.trackAvailablePlansTapped()
 
         val event = tracker.events.single()
@@ -581,11 +485,9 @@ class WinbackViewModelTest {
 
     @Test
     fun `track help and feedback tapped`() = runTest {
-        val purchases = listOf(createPurchase())
-        wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
-        wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
+        winbackManager.addProductDetails(products)
+        winbackManager.addPurchase(purchase)
 
-        val viewModel = createViewModel()
         viewModel.trackHelpAndFeedbackTapped()
 
         val event = tracker.events.single()
@@ -600,11 +502,9 @@ class WinbackViewModelTest {
 
     @Test
     fun `track offer claimed confirmation tapped`() = runTest {
-        val purchases = listOf(createPurchase())
-        wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
-        wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
+        winbackManager.addProductDetails(products)
+        winbackManager.addPurchase(purchase)
 
-        val viewModel = createViewModel()
         viewModel.trackOfferClaimedConfirmationTapped()
 
         val event = tracker.events.single()
@@ -616,11 +516,9 @@ class WinbackViewModelTest {
 
     @Test
     fun `track plans back button tapped`() = runTest {
-        val purchases = listOf(createPurchase())
-        wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
-        wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
+        winbackManager.addProductDetails(products)
+        winbackManager.addPurchase(purchase)
 
-        val viewModel = createViewModel()
         viewModel.trackPlansBackButtonTapped()
 
         val event = tracker.events.single()
@@ -632,14 +530,13 @@ class WinbackViewModelTest {
 
     @Test
     fun `track plan change`() = runTest {
-        val purchases = listOf(createPurchase(productIds = listOf(Subscription.PLUS_MONTHLY_PRODUCT_ID)))
-        wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
-        wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
-        wheneverBlocking { subscriptionManager.changeProduct(any(), any(), any(), any(), any()) } doReturn true
+        winbackManager.addProductDetails(products)
+        winbackManager.addPurchase(purchase)
 
-        val viewModel = createViewModel()
         viewModel.changePlan(mock(), knownPlan)
-        purchaseEvents.emit(PurchaseEvent.Success)
+
+        winbackManager.addPurchase(createPurchase(productIds = listOf(Subscription.PLUS_MONTHLY_PRODUCT_ID)))
+        winbackManager.addPurchaseEvent(PurchaseEvent.Success)
 
         assertEquals(
             listOf(
@@ -663,11 +560,9 @@ class WinbackViewModelTest {
 
     @Test
     fun `track keep subscription tapped`() = runTest {
-        val purchases = listOf(createPurchase())
-        wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
-        wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
+        winbackManager.addProductDetails(products)
+        winbackManager.addPurchase(purchase)
 
-        val viewModel = createViewModel()
         viewModel.trackKeepSubscriptionTapped()
 
         val event = tracker.events.single()
@@ -679,11 +574,9 @@ class WinbackViewModelTest {
 
     @Test
     fun `track cancel subscription tapped`() = runTest {
-        val purchases = listOf(createPurchase())
-        wheneverBlocking { subscriptionManager.loadProducts() } doReturn ProductDetailsState.Loaded(products)
-        wheneverBlocking { subscriptionManager.loadPurchases() } doReturn PurchasesState.Loaded(purchases)
+        winbackManager.addProductDetails(products)
+        winbackManager.addPurchase(purchase)
 
-        val viewModel = createViewModel()
         viewModel.trackCancelSubscriptionTapped()
 
         val event = tracker.events.single()
@@ -692,12 +585,6 @@ class WinbackViewModelTest {
             event,
         )
     }
-
-    private fun createViewModel() = WinbackViewModel(
-        subscriptionManager,
-        settings,
-        AnalyticsTracker.test(tracker, isEnabled = true),
-    )
 }
 
 private suspend fun TurbineTestContext<WinbackViewModel.UiState>.awaitLoadedState(): SubscriptionPlansState.Loaded {
@@ -715,18 +602,18 @@ private class Offer(
 private fun createProductDetails(
     id: String,
     period: BillingPeriod,
-    offer: Offer? = null,
+    bonusOffer: Offer? = null,
 ) = mock<ProductDetails> {
-    check(id != offer?.id) { "ID and offer ID must be different" }
+    check(id != bonusOffer?.id) { "ID and offer ID must be different" }
 
     val basePricingPhase = mock<PricingPhase> {
         on { formattedPrice } doReturn "price: $id"
         on { billingPeriod } doReturn period.value
         on { recurrenceMode } doReturn RecurrenceMode.INFINITE_RECURRING
     }
-    val offerPricingPhase = offer?.let {
+    val offerPricingPhase = bonusOffer?.let {
         mock<PricingPhase> {
-            on { billingPeriod } doReturn offer.billingPeriod.value
+            on { billingPeriod } doReturn bonusOffer.billingPeriod.value
             on { recurrenceMode } doReturn RecurrenceMode.INFINITE_RECURRING
         }
     }
@@ -745,8 +632,8 @@ private fun createProductDetails(
         if (offserPricingPhases != null) {
             add(
                 mock<SubscriptionOfferDetails> {
-                    on { offerId } doReturn offer.id
-                    on { offerToken } doReturn offer.id
+                    on { offerId } doReturn bonusOffer.id
+                    on { offerToken } doReturn bonusOffer.id
                     on { pricingPhases } doReturn offserPricingPhases
                 },
             )
@@ -781,6 +668,36 @@ private val BillingPeriod.value
         BillingPeriod.Monthly -> "P1M"
         BillingPeriod.Yearly -> "P1Y"
     }
+
+class FakeWinbackManager : WinbackManager {
+    private val productDetailsTurbine = Turbine<ProductDetailsState>()
+
+    suspend fun addProductDetails(productDetails: ProductDetails) = addProductDetails(listOf(productDetails))
+
+    suspend fun addProductDetails(productDetails: List<ProductDetails>) = productDetailsTurbine.add(ProductDetailsState.Loaded(productDetails))
+
+    private val purchasesTurbine = Turbine<PurchasesState>()
+
+    suspend fun addPurchase(purchase: Purchase) = addPurchases(listOf(purchase))
+
+    suspend fun addPurchases(purchases: List<Purchase>) = purchasesTurbine.add(PurchasesState.Loaded(purchases))
+
+    private val purchaseEventTurbine = Turbine<PurchaseEvent>()
+
+    suspend fun addPurchaseEvent(purchaseEvent: PurchaseEvent) = purchaseEventTurbine.add(purchaseEvent)
+
+    override suspend fun loadProducts() = productDetailsTurbine.awaitItem()
+
+    override suspend fun loadPurchases() = purchasesTurbine.awaitItem()
+
+    override suspend fun changeProduct(
+        currentPurchase: Purchase,
+        currentPurchaseProductId: String,
+        newProduct: ProductDetails,
+        newProductOfferToken: String,
+        activity: Activity,
+    ) = purchaseEventTurbine.awaitItem()
+}
 
 class FakeTracker : Tracker {
     private val _events = mutableListOf<TrackEvent>()
