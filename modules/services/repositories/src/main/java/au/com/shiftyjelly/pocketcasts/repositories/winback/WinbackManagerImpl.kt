@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.winback
 
 import android.app.Activity
+import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchaseEvent
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.isOk
@@ -11,7 +12,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.reactive.asFlow
 
 class WinbackManagerImpl @Inject constructor(
-    val subscriptionManager: SubscriptionManager,
+    private val subscriptionManager: SubscriptionManager,
+    private val referralManager: ReferralManager,
 ) : WinbackManager {
     override suspend fun loadProducts() = subscriptionManager.loadProducts()
 
@@ -39,5 +41,11 @@ class WinbackManagerImpl @Inject constructor(
                 startResult.responseCode,
             )
         }
+    }
+
+    override suspend fun getWinbackOffer() = when (val result = referralManager.getWinbackResponse()) {
+        is ReferralManager.ReferralResult.SuccessResult -> result.body
+        is ReferralManager.ReferralResult.EmptyResult -> null
+        is ReferralManager.ReferralResult.ErrorResult -> null
     }
 }

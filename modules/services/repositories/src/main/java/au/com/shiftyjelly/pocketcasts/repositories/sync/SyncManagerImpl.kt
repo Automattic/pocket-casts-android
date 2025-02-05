@@ -51,6 +51,7 @@ import com.pocketcasts.service.api.ReferralCodeResponse
 import com.pocketcasts.service.api.ReferralRedemptionResponse
 import com.pocketcasts.service.api.ReferralValidationResponse
 import com.pocketcasts.service.api.UserPodcastListResponse
+import com.pocketcasts.service.api.WinbackResponse
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.Completable
@@ -453,6 +454,12 @@ class SyncManagerImpl @Inject constructor(
     override suspend fun getReferralCode(): Response<ReferralCodeResponse> {
         return getCacheTokenOrLogin { token ->
             syncServiceManager.getReferralCode(token)
+        }
+    }
+
+    override suspend fun getWinbackOffer(): Response<WinbackResponse> {
+        return getCacheTokenOrLogin { token ->
+            syncServiceManager.getWinbackOffer(token)
         }
     }
 

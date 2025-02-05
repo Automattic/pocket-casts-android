@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -29,6 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.coerceAtMost
 import androidx.compose.ui.unit.dp
@@ -39,19 +41,21 @@ import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP30
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.models.type.BillingPeriod
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 internal fun OfferClaimedPage(
-    theme: ThemeType,
+    billingPeriod: BillingPeriod,
     onConfirm: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
+            .fillMaxSize()
             .nestedScroll(rememberNestedScrollInteropConnection())
             .verticalScroll(rememberScrollState()),
     ) {
@@ -60,7 +64,7 @@ internal fun OfferClaimedPage(
         )
         BoxWithConstraints {
             SparkleImage(
-                gradientColors = theme.sparkleColors,
+                gradientColors = MaterialTheme.theme.type.sparkleColors,
                 modifier = Modifier.size((maxWidth * 0.4f).coerceAtMost(162.dp)),
             )
         }
@@ -68,7 +72,10 @@ internal fun OfferClaimedPage(
             modifier = Modifier.height(20.dp),
         )
         Text(
-            text = stringResource(LR.string.winback_claimed_offer_message_1),
+            text = when (billingPeriod) {
+                BillingPeriod.Monthly -> stringResource(LR.string.winback_claimed_offer_message_1)
+                BillingPeriod.Yearly -> stringResource(LR.string.winback_claimed_offer_message_3)
+            },
             fontWeight = FontWeight.Bold,
             fontSize = 28.sp,
             lineHeight = 38.5.sp,
@@ -187,15 +194,37 @@ private val graySparkle = Color(0xFFCCD6D9) to Color(0xFFE5F7FF)
 
 @Preview(device = Devices.PortraitRegular)
 @Composable
-private fun WinbackOfferPagePreview(
+private fun WinbackOfferPageBillingPeriodPreview(
+    @PreviewParameter(BillingPeriodParameterProvider::class) billingPeriod: BillingPeriod,
+) {
+    AppThemeWithBackground(
+        themeType = ThemeType.ROSE,
+    ) {
+        OfferClaimedPage(
+            billingPeriod = billingPeriod,
+            onConfirm = {},
+        )
+    }
+}
+
+@Preview(device = Devices.PortraitRegular)
+@Composable
+private fun WinbackOfferPageThemePreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) theme: ThemeType,
 ) {
     AppThemeWithBackground(
         themeType = theme,
     ) {
         OfferClaimedPage(
-            theme = theme,
+            billingPeriod = BillingPeriod.Monthly,
             onConfirm = {},
         )
     }
+}
+
+private class BillingPeriodParameterProvider : PreviewParameterProvider<BillingPeriod> {
+    override val values = sequenceOf(
+        BillingPeriod.Monthly,
+        BillingPeriod.Yearly,
+    )
 }

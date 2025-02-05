@@ -6,6 +6,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchaseEvent
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchasesState
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
+import com.pocketcasts.service.api.WinbackResponse
 
 interface WinbackManager {
     suspend fun loadProducts(): ProductDetailsState
@@ -19,4 +20,6 @@ interface WinbackManager {
         newProductOfferToken: String,
         activity: Activity,
     ): PurchaseEvent
+
+    suspend fun getWinbackOffer(): WinbackResponse?
 }
