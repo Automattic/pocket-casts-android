@@ -8,6 +8,9 @@ import android.widget.FrameLayout
 import androidx.core.view.doOnLayout
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -27,7 +30,17 @@ class SuggestedFoldersPaywallBottomSheet : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?,
     ) = contentWithoutConsumedInsets {
         AppTheme(theme.activeTheme) {
-            SuggestedFoldersPaywall()
+            SuggestedFoldersPaywall(
+                onUseTheseFolders = {
+                    dismiss()
+                    val source = OnboardingUpgradeSource.PROFILE
+                    val onboardingFlow = OnboardingFlow.PlusAccountUpgrade(source)
+                    OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
+                },
+                onMaybeLater = {
+                    dismiss()
+                },
+            )
         }
     }
 

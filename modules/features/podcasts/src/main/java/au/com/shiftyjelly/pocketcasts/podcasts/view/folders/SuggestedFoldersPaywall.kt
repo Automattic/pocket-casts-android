@@ -42,7 +42,11 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-fun SuggestedFoldersPaywall(modifier: Modifier = Modifier) {
+fun SuggestedFoldersPaywall(
+    onUseTheseFolders: () -> Unit,
+    onMaybeLater: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Column(
         modifier = modifier
             .wrapContentSize()
@@ -97,13 +101,13 @@ fun SuggestedFoldersPaywall(modifier: Modifier = Modifier) {
                 backgroundColor = MaterialTheme.theme.colors.primaryInteractive01,
             ),
             includePadding = false,
-            onClick = { },
+            onClick = onUseTheseFolders,
         )
 
         RowOutlinedButton(
             text = stringResource(id = LR.string.maybe_later),
             modifier = Modifier.padding(bottom = 16.dp),
-            onClick = {},
+            onClick = onMaybeLater,
             includePadding = false,
             colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.theme.colors.primaryIcon01, backgroundColor = Color.Transparent),
             fontSize = 18.sp,
@@ -149,7 +153,10 @@ private fun FolderItem(folderName: String, folderColor: Color, podcastUuids: Lis
 @Composable
 private fun SuggestedFoldersPagePreview(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
     AppTheme(themeType) {
-        SuggestedFoldersPaywall()
+        SuggestedFoldersPaywall(
+            onUseTheseFolders = {},
+            onMaybeLater = {},
+        )
     }
 }
 
