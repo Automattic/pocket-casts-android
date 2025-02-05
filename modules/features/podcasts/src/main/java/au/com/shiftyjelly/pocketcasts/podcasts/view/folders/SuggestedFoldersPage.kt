@@ -15,6 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -70,7 +72,12 @@ fun SuggestedFoldersPage(
                 modifier = Modifier.padding(bottom = 16.dp),
             )
 
-            Folders(podcastUuids = mockedPodcastsUuids, Modifier.padding(bottom = 8.dp).weight(1f))
+            Folders(
+                podcastUuids = mockedPodcastsUuids,
+                Modifier
+                    .padding(bottom = 8.dp)
+                    .weight(1f),
+            )
 
             RowButton(
                 text = stringResource(LR.string.suggested_folders_use_these_folders_button),
@@ -99,7 +106,7 @@ fun SuggestedFoldersPage(
 
 @Composable
 private fun Folders(podcastUuids: List<String>, modifier: Modifier = Modifier) {
-    val folders = 25
+    val folders = 4
 
     LazyVerticalGrid(
         columns = GridCells.Adaptive(110.dp),
@@ -118,12 +125,16 @@ private fun Folders(podcastUuids: List<String>, modifier: Modifier = Modifier) {
 
 @Composable
 private fun FolderItem(folderName: String, folderColor: Color, podcastUuids: List<String>, modifier: Modifier = Modifier) {
+    val stringResource = stringResource(LR.string.folder_content_description, folderName)
+
     FolderImage(
         name = folderName,
         color = folderColor,
         podcastUuids = podcastUuids,
         textSpacing = true,
-        modifier = modifier,
+        modifier = modifier.clearAndSetSemantics {
+            contentDescription = stringResource
+        },
     )
 }
 
