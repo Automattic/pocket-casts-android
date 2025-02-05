@@ -21,6 +21,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -44,7 +46,8 @@ fun SuggestedFoldersPaywall(modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
             .wrapContentSize()
-            .padding(16.dp),
+            .padding(horizontal = 16.dp)
+            .padding(top = 8.dp, bottom = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         val isPortrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
@@ -57,6 +60,7 @@ fun SuggestedFoldersPaywall(modifier: Modifier = Modifier) {
             painter = painterResource(IR.drawable.ic_swipe),
             contentDescription = null,
             tint = MaterialTheme.theme.colors.primaryUi05,
+            modifier = Modifier.clearAndSetSemantics {},
         )
 
         AnimatedVisibility(isPortrait) {
@@ -128,12 +132,16 @@ private fun Folders(podcastUuids: List<String>, modifier: Modifier = Modifier) {
 
 @Composable
 private fun FolderItem(folderName: String, folderColor: Color, podcastUuids: List<String>, modifier: Modifier = Modifier) {
+    val stringResource = stringResource(LR.string.folder_content_description, folderName)
+
     FolderImage(
         name = folderName,
         color = folderColor,
         podcastUuids = podcastUuids,
         textSpacing = true,
-        modifier = modifier,
+        modifier = modifier.clearAndSetSemantics {
+            contentDescription = stringResource
+        },
     )
 }
 
