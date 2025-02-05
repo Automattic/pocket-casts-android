@@ -37,9 +37,9 @@ import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlin.time.Duration.Companion.days
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -224,7 +224,7 @@ class PodcastManagerImpl @Inject constructor(
 
         // we don't delete podcasts added to the phone in the last week. This is to prevent stuff you just leave open in discover from being removed
         val addedDate = podcast.addedDate
-        val oneWeekAgoMs = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(7)
+        val oneWeekAgoMs = System.currentTimeMillis() - 7.days.inWholeMilliseconds
         if (addedDate != null && addedDate.time > oneWeekAgoMs) {
             return false
         }
@@ -250,7 +250,7 @@ class PodcastManagerImpl @Inject constructor(
             deleteEpisodes.add(episode)
         }
         // don't delete episodes or podcast if the latest playback interaction was less than a month ago,
-        val oneMonthAgoMs = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(30)
+        val oneMonthAgoMs = System.currentTimeMillis() - 30.days.inWholeMilliseconds
         if (latestPlaybackInteraction > oneMonthAgoMs) {
             return false
         }

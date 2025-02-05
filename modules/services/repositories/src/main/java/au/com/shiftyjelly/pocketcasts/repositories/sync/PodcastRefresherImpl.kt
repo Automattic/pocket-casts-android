@@ -28,7 +28,7 @@ class PodcastRefresherImpl @Inject constructor(
     override suspend fun refreshPodcast(existingPodcast: Podcast, playbackManager: PlaybackManager) {
         try {
             val podcastResponse = cacheServiceManager.getPodcastResponse(existingPodcast.uuid)
-            // podcasts that aren't subscribed can have episodes removed, so always refresh them
+            // unsubscribed podcasts have episodes removed, so always refresh them
             if (existingPodcast.isSubscribed && (podcastResponse.wasCached() || podcastResponse.notModified())) {
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refreshing podcast ${existingPodcast.uuid} not required as cached")
                 return
