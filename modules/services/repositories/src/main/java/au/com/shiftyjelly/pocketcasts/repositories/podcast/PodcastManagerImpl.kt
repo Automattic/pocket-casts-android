@@ -37,7 +37,7 @@ import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
-import java.util.Calendar
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
@@ -224,24 +224,34 @@ class PodcastManagerImpl @Inject constructor(
 
         // we don't delete podcasts added to the phone in the last week. This is to prevent stuff you just leave open in discover from being removed
         val addedDate = podcast.addedDate
-        val calendar = Calendar.getInstance()
-        calendar.add(Calendar.DAY_OF_YEAR, -7)
-        val oneWeekAgo = calendar.time
-        if (addedDate != null && addedDate > oneWeekAgo) {
+        val oneWeekAgoMs = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(7)
+        if (addedDate != null && addedDate.time > oneWeekAgoMs) {
             return false
         }
 
         // podcasts can be deleted if all of the episodes are haven't been interacted with
         val episodes = episodeManager.findEpisodesByPodcastOrderedBlocking(podcast)
         var podcastHasChangedEpisodes = false
+        var latestPlaybackInteraction = 0L
         val deleteEpisodes = mutableListOf<PodcastEpisode>()
         for (episode in episodes) {
+            // find the latest playback interaction
+            episode.lastPlaybackInteraction?.let { interaction ->
+                if (interaction > latestPlaybackInteraction) {
+                    latestPlaybackInteraction = interaction
+                }
+            }
             if (episodeManager.userHasInteractedWithEpisode(episode, playbackManager)) {
                 podcastHasChangedEpisodes = true
                 continue
             }
             // bulk delete or it takes 10 seconds on a large podcast
             deleteEpisodes.add(episode)
+        }
+        // don't remove episodes or the podcast if the latest playback interaction was less than a month ago,
+        val oneMonthAgoMs = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(30)
+        if (latestPlaybackInteraction > oneMonthAgoMs) {
+            return false
         }
         if (deleteEpisodes.isNotEmpty()) {
             episodeManager.deleteEpisodesWithoutSyncBlocking(deleteEpisodes, playbackManager)
