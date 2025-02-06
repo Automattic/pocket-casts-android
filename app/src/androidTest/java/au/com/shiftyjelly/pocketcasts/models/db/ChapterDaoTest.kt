@@ -38,6 +38,7 @@ class ChapterDaoTest {
     @Test
     fun insertSingleChapter() = runBlocking {
         val chapter = Chapter(
+            index = 0,
             episodeUuid = "episode-id",
             startTimeMs = 0L,
         )
@@ -51,6 +52,7 @@ class ChapterDaoTest {
     @Test
     fun doNotInsertTheSameChapterTwice() = runBlocking {
         val chapter = Chapter(
+            index = 0,
             episodeUuid = "episode-id",
             startTimeMs = 0L,
         )
@@ -65,6 +67,7 @@ class ChapterDaoTest {
     fun insertMultipleChapters() = runBlocking {
         val chapters = List(10) { index ->
             Chapter(
+                index = index,
                 episodeUuid = "episode-id",
                 startTimeMs = 0L + index,
             )
@@ -83,14 +86,17 @@ class ChapterDaoTest {
 
         val chapters = listOf(
             Chapter(
+                index = 0,
                 episodeUuid = id1,
                 startTimeMs = 0L,
             ),
             Chapter(
+                index = 1,
                 episodeUuid = id1,
                 startTimeMs = 1L,
             ),
             Chapter(
+                index = 0,
                 episodeUuid = id2,
                 startTimeMs = 0L,
             ),
@@ -106,6 +112,7 @@ class ChapterDaoTest {
     fun replaceAllEmbeddedChapters() = runBlocking {
         val chapters1 = List(10) { index ->
             Chapter(
+                index = index,
                 episodeUuid = "episode-id",
                 startTimeMs = 0L + index,
                 isEmbedded = true,
@@ -115,6 +122,7 @@ class ChapterDaoTest {
 
         val chapters2 = List(5) { index ->
             Chapter(
+                index = index,
                 episodeUuid = "episode-id",
                 startTimeMs = 0L + index,
                 isEmbedded = true,
@@ -130,6 +138,7 @@ class ChapterDaoTest {
     fun doNotReplaceEmptyEmbeddedChapters() = runBlocking {
         val chapters = List(10) { index ->
             Chapter(
+                index = index,
                 episodeUuid = "episode-id",
                 startTimeMs = 0L + index,
                 isEmbedded = true,
@@ -147,6 +156,7 @@ class ChapterDaoTest {
     fun replaceNotEmbeddedWithEmbeddedChapters() = runBlocking {
         val chapters1 = List(10) { index ->
             Chapter(
+                index = index,
                 episodeUuid = "episode-id",
                 startTimeMs = 0L + index,
                 isEmbedded = false,
@@ -156,6 +166,7 @@ class ChapterDaoTest {
 
         val chapters2 = List(5) { index ->
             Chapter(
+                index = index,
                 episodeUuid = "episode-id",
                 startTimeMs = 0L + index,
                 isEmbedded = true,
@@ -171,6 +182,7 @@ class ChapterDaoTest {
     fun doNotReplaceEmbeddedWithNotEmbeddedChapters() = runBlocking {
         val chapters1 = List(5) { index ->
             Chapter(
+                index = index,
                 episodeUuid = "episode-id",
                 startTimeMs = 0L + index,
                 isEmbedded = true,
@@ -180,6 +192,7 @@ class ChapterDaoTest {
 
         val chapters2 = List(10) { index ->
             Chapter(
+                index = index,
                 episodeUuid = "episode-id",
                 startTimeMs = 0L + index,
                 isEmbedded = false,
@@ -195,6 +208,7 @@ class ChapterDaoTest {
     fun replaceNotEmbeddedChaptersIfExistingCountIsSmaller() = runBlocking {
         val chapters1 = List(5) { index ->
             Chapter(
+                index = index,
                 title = "$index-0",
                 episodeUuid = "episode-id",
                 startTimeMs = 0L + index,
@@ -204,6 +218,7 @@ class ChapterDaoTest {
 
         val chapters2 = List(6) { index ->
             Chapter(
+                index = index,
                 title = "$index-1",
                 episodeUuid = "episode-id",
                 startTimeMs = 0L + index,
@@ -219,6 +234,7 @@ class ChapterDaoTest {
     fun replaceNotEmbeddedChaptersIfExistingCountIsEqual() = runBlocking {
         val chapters1 = List(5) { index ->
             Chapter(
+                index = index,
                 title = "$index-0",
                 episodeUuid = "episode-id",
                 startTimeMs = 0L + index,
@@ -228,6 +244,7 @@ class ChapterDaoTest {
 
         val chapters2 = List(5) { index ->
             Chapter(
+                index = index,
                 title = "$index-1",
                 episodeUuid = "episode-id",
                 startTimeMs = 0L + index,
@@ -243,6 +260,7 @@ class ChapterDaoTest {
     fun doNotReplaceNotEmbeddedChaptersIfExistingCountIsLarger() = runBlocking {
         val chapters1 = List(6) { index ->
             Chapter(
+                index = index,
                 title = "$index-0",
                 episodeUuid = "episode-id",
                 startTimeMs = 0L + index,
@@ -252,6 +270,7 @@ class ChapterDaoTest {
 
         val chapters2 = List(5) { index ->
             Chapter(
+                index = index,
                 title = "$index-1",
                 episodeUuid = "episode-id",
                 startTimeMs = 0L + index,
@@ -270,20 +289,24 @@ class ChapterDaoTest {
 
         val chapters1 = listOf(
             Chapter(
+                index = 0,
                 episodeUuid = id1,
                 startTimeMs = 0L,
             ),
             Chapter(
+                index = 1,
                 episodeUuid = id1,
                 startTimeMs = 1L,
             ),
         )
         val chapters2 = listOf(
             Chapter(
+                index = 0,
                 episodeUuid = id2,
                 startTimeMs = 0L,
             ),
             Chapter(
+                index = 1,
                 episodeUuid = id2,
                 startTimeMs = 1L,
             ),
@@ -305,6 +328,7 @@ class ChapterDaoTest {
 
             val chaptersEpisode1 = List(3) { index ->
                 Chapter(
+                    index = index,
                     episodeUuid = id1,
                     startTimeMs = 10L + index,
                 )
@@ -313,6 +337,7 @@ class ChapterDaoTest {
             assertEquals(chaptersEpisode1, awaitItem())
 
             val chapterEpisode2 = Chapter(
+                index = 0,
                 episodeUuid = id2,
                 startTimeMs = 0L,
             )
@@ -320,6 +345,7 @@ class ChapterDaoTest {
             expectNoEvents()
 
             val chapterEpisode1 = Chapter(
+                index = 3,
                 episodeUuid = id1,
                 startTimeMs = 0L,
             )

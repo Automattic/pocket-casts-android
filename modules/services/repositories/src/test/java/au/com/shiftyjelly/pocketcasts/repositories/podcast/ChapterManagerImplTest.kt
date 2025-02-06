@@ -42,6 +42,7 @@ class ChapterManagerImplTest {
     fun `observe single chapter`() = runBlocking {
         val episode = PodcastEpisode("id", publishedDate = Date(), duration = 0.001)
         val dbChapter = DbChapter(
+            index = 0,
             episodeUuid = "id",
             startTimeMs = 0,
             endTimeMs = 1,
@@ -74,18 +75,21 @@ class ChapterManagerImplTest {
         val episode = PodcastEpisode("id", publishedDate = Date(), duration = 0.003)
         val dbChapters = listOf(
             DbChapter(
+                index = 0,
                 episodeUuid = "id",
                 startTimeMs = 0,
                 endTimeMs = 1,
                 title = "Title 1",
             ),
             DbChapter(
+                index = 1,
                 episodeUuid = "id",
                 startTimeMs = 1,
                 endTimeMs = 2,
                 title = "Title 2",
             ),
             DbChapter(
+                index = 3,
                 episodeUuid = "id",
                 startTimeMs = 2,
                 endTimeMs = 3,
@@ -130,6 +134,7 @@ class ChapterManagerImplTest {
     fun `observe chapter without title`() = runBlocking {
         val episode = PodcastEpisode("id", publishedDate = Date(), duration = 0.001)
         val dbChapter = DbChapter(
+            index = 0,
             episodeUuid = "id",
             startTimeMs = 0,
             endTimeMs = 1,
@@ -161,6 +166,7 @@ class ChapterManagerImplTest {
     fun `observe chapter without image URL`() = runBlocking {
         val episode = PodcastEpisode("id", publishedDate = Date(), duration = 0.001)
         val dbChapter = DbChapter(
+            index = 1,
             episodeUuid = "id",
             startTimeMs = 0,
             endTimeMs = 1,
@@ -192,6 +198,7 @@ class ChapterManagerImplTest {
     fun `observe chapter without URL`() = runBlocking {
         val episode = PodcastEpisode("id", publishedDate = Date(), duration = 0.001)
         val dbChapter = DbChapter(
+            index = 0,
             episodeUuid = "id",
             startTimeMs = 0,
             endTimeMs = 1,
@@ -223,6 +230,7 @@ class ChapterManagerImplTest {
     fun `observe chapter with invalid URL`() = runBlocking {
         val episode = PodcastEpisode("id", publishedDate = Date(), duration = 0.001)
         val dbChapter = DbChapter(
+            index = 0,
             episodeUuid = "id",
             startTimeMs = 0,
             endTimeMs = 1,
@@ -255,24 +263,28 @@ class ChapterManagerImplTest {
         val episode = PodcastEpisode("id", publishedDate = Date(), duration = 0.004, deselectedChapters = ChapterIndices(listOf(0, 3)))
         val dbChapters = listOf(
             DbChapter(
+                index = 0,
                 episodeUuid = "id",
                 startTimeMs = 0,
                 endTimeMs = 1,
                 title = "Title 1",
             ),
             DbChapter(
+                index = 1,
                 episodeUuid = "id",
                 startTimeMs = 1,
                 endTimeMs = 2,
                 title = "Title 2",
             ),
             DbChapter(
+                index = 2,
                 episodeUuid = "id",
                 startTimeMs = 2,
                 endTimeMs = 3,
                 title = "Title 3",
             ),
             DbChapter(
+                index = 3,
                 episodeUuid = "id",
                 startTimeMs = 3,
                 endTimeMs = 4,
@@ -325,18 +337,21 @@ class ChapterManagerImplTest {
         val episode = PodcastEpisode("id", publishedDate = Date(), duration = 0.003)
         val dbChapters = listOf(
             DbChapter(
+                index = 0,
                 episodeUuid = "id",
                 startTimeMs = 0,
                 endTimeMs = null,
                 title = "Title 1",
             ),
             DbChapter(
+                index = 1,
                 episodeUuid = "id",
                 startTimeMs = 1,
                 endTimeMs = 2,
                 title = "Title 2",
             ),
             DbChapter(
+                index = 2,
                 episodeUuid = "id",
                 startTimeMs = 2,
                 endTimeMs = null,
@@ -382,12 +397,14 @@ class ChapterManagerImplTest {
         val episode = PodcastEpisode("id", publishedDate = Date(), duration = 0.003)
         val dbChapters = listOf(
             DbChapter(
+                index = 0,
                 episodeUuid = "id",
                 startTimeMs = 0,
                 endTimeMs = 3, // end time is larger than next start time
                 title = "Title 1",
             ),
             DbChapter(
+                index = 1,
                 episodeUuid = "id",
                 startTimeMs = 2,
                 endTimeMs = 3,
@@ -426,6 +443,7 @@ class ChapterManagerImplTest {
         val episode = PodcastEpisode("id", publishedDate = Date(), duration = 0.001)
         val episodesFlow = MutableStateFlow(episode)
         val dbChapter = DbChapter(
+            index = 0,
             episodeUuid = "id",
             startTimeMs = 0,
             endTimeMs = 1,
@@ -459,12 +477,14 @@ class ChapterManagerImplTest {
         val episode = PodcastEpisode("id", publishedDate = Date(), duration = 0.003)
         val dbChapters = listOf(
             DbChapter(
+                index = 0,
                 episodeUuid = "id",
                 startTimeMs = 0,
                 endTimeMs = 0,
                 title = "Title 1",
             ),
             DbChapter(
+                index = 1,
                 episodeUuid = "id",
                 startTimeMs = 1,
                 endTimeMs = 1,
@@ -503,12 +523,14 @@ class ChapterManagerImplTest {
         val episode = PodcastEpisode("id", publishedDate = Date(), duration = 0.003)
         val dbChapters = listOf(
             DbChapter(
+                index = 0,
                 episodeUuid = "id",
                 startTimeMs = 0,
                 endTimeMs = -2,
                 title = "Title 1",
             ),
             DbChapter(
+                index = 1,
                 episodeUuid = "id",
                 startTimeMs = 1,
                 endTimeMs = 1,
@@ -547,30 +569,35 @@ class ChapterManagerImplTest {
         val episode = PodcastEpisode("id", publishedDate = Date(), duration = 0.003)
         val dbChapters = listOf(
             DbChapter(
+                index = 0,
                 episodeUuid = "id",
                 startTimeMs = 0,
                 endTimeMs = 0,
                 title = "Title 1",
             ),
             DbChapter(
+                index = 1,
                 episodeUuid = "id",
                 startTimeMs = 0,
                 endTimeMs = 0,
                 title = "Title 2",
             ),
             DbChapter(
+                index = 2,
                 episodeUuid = "id",
                 startTimeMs = 1,
                 endTimeMs = 1,
                 title = "Title 3",
             ),
             DbChapter(
+                index = 3,
                 episodeUuid = "id",
                 startTimeMs = 2,
                 endTimeMs = 2,
                 title = "Title 4",
             ),
             DbChapter(
+                index = 4,
                 episodeUuid = "id",
                 startTimeMs = 2,
                 endTimeMs = 2,
