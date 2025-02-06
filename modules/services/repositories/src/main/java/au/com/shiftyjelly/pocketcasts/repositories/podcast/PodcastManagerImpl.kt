@@ -249,7 +249,7 @@ class PodcastManagerImpl @Inject constructor(
             // bulk delete or it takes 10 seconds on a large podcast
             deleteEpisodes.add(episode)
         }
-        // don't delete episodes or podcast if the latest playback interaction was less than a month ago,
+        // don't delete the episodes or podcast if the latest playback interaction happening in the last month
         val oneMonthAgoMs = System.currentTimeMillis() - 30.days.inWholeMilliseconds
         if (latestPlaybackInteraction > oneMonthAgoMs) {
             return false
