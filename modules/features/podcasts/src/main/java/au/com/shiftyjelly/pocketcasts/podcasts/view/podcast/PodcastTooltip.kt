@@ -37,6 +37,7 @@ fun PodcastTooltip(
     subtitle: String,
     offset: IntOffset,
     onDismissRequest: () -> Unit,
+    onCloseButtonClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val tooltipColor = MaterialTheme.theme.colors.primaryUi01
@@ -49,7 +50,7 @@ fun PodcastTooltip(
         Box(
             modifier = modifier.padding(24.dp).widthIn(max = 400.dp),
         ) {
-            TooltipContent(tooltipColor, title, subtitle, onDismissRequest)
+            TooltipContent(tooltipColor, title, subtitle, onCloseButtonClick)
 
             TooltipArrow(tooltipColor)
         }
@@ -61,7 +62,7 @@ private fun TooltipContent(
     tooltipColor: Color,
     title: String,
     subtitle: String,
-    onDismissRequest: () -> Unit,
+    onCloseButtonClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Card(
@@ -99,7 +100,7 @@ private fun TooltipContent(
                     .align(Alignment.Top)
                     .width(24.dp)
                     .clickable {
-                        onDismissRequest.invoke()
+                        onCloseButtonClick.invoke()
                     },
             )
         }

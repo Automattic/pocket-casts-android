@@ -8,6 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -177,7 +179,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     private var listState: Parcelable? = null
 
     private var tooltipOffset by mutableStateOf(IntOffset.Zero)
-    private var showTooltip by mutableStateOf(false)
+    private var tooltipEnabled by mutableStateOf(false)
 
     private var currentSnackBar: Snackbar? = null
 
@@ -748,13 +750,15 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
         binding?.composeTooltipHost?.setContent {
             AppTheme(theme.activeTheme) {
-                if (showTooltip) {
+                val shouldShow by viewModel.shouldShowPodcastTooltip.collectAsState()
+                AnimatedVisibility(visible = shouldShow && tooltipEnabled) {
                     PodcastTooltip(
                         title = stringResource(LR.string.podcast_feed_update_tooltip_title),
                         subtitle = stringResource(LR.string.podcast_feed_update_tooltip_subtitle),
                         offset = tooltipOffset,
-                        onDismissRequest = {
-                            showTooltip = false
+                        onDismissRequest = {},
+                        onCloseButtonClick = {
+                            viewModel.hidePodcastRefreshTooltip()
                         },
                     )
                 }
@@ -774,11 +778,11 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         }
 
         binding?.episodesRecyclerView?.doOnNextLayout {
-            showTooltipOnEpisodeOptions()
+            configureTooltip()
         }
     }
 
-    private fun showTooltipOnEpisodeOptions() {
+    private fun configureTooltip() {
         lifecycleScope.launch {
             delay(500)
 
@@ -797,8 +801,9 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         view.getLocationOnScreen(anchorLocation)
 
         val composeLocation = IntArray(2)
-        requireView().findViewById<View>(R.id.composeTooltipHost)
-            .getLocationOnScreen(composeLocation)
+        val tooltipComposeView = binding?.composeTooltipHost ?: return
+
+        tooltipComposeView.getLocationOnScreen(composeLocation)
 
         val anchorX = anchorLocation[0] - composeLocation[0] + (view.width / 2)
         var anchorY = anchorLocation[1] - composeLocation[1] - 350
@@ -808,7 +813,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         }
 
         tooltipOffset = IntOffset(anchorX, anchorY)
-        showTooltip = true
+        tooltipEnabled = true
     }
 
     private fun onShareBookmarkClick() {
