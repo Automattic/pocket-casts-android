@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
@@ -62,71 +63,63 @@ fun SuggestedFoldersPage(
             )
         }
 
-        Column(
+        LazyVerticalGrid(
+            columns = GridCells.Adaptive(110.dp),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
             modifier = Modifier
+                .padding(bottom = 8.dp)
                 .padding(horizontal = 16.dp)
-                .padding(bottom = 16.dp),
+                .weight(1f),
         ) {
-            TextH10(
-                text = stringResource(LR.string.suggested_folders),
-                lineHeight = 36.sp,
-                modifier = Modifier.padding(bottom = 8.dp),
-            )
-
-            TextP40(
-                text = stringResource(LR.string.suggested_folders_subtitle),
-                color = MaterialTheme.theme.colors.primaryText02,
-                modifier = Modifier.padding(bottom = 16.dp),
-            )
-
-            Folders(
-                podcastUuids = mockedPodcastsUuids,
-                Modifier
-                    .padding(bottom = 8.dp)
-                    .weight(1f),
-            )
-
-            RowButton(
-                text = stringResource(LR.string.suggested_folders_use_these_folders_button),
-                modifier = Modifier.padding(bottom = 16.dp),
-                textColor = MaterialTheme.theme.colors.primaryInteractive02,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.W600,
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = MaterialTheme.theme.colors.primaryInteractive01,
-                ),
-                includePadding = false,
-                onClick = onUseTheseFolders,
-            )
-
-            RowOutlinedButton(
-                text = stringResource(id = LR.string.suggested_folders_use_create_custom_folders_button),
-                onClick = onCreateCustomFolders,
-                includePadding = false,
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.theme.colors.primaryIcon01, backgroundColor = Color.Transparent),
-                fontSize = 18.sp,
-                fontWeight = FontWeight.W600,
-            )
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                TextH10(
+                    text = stringResource(LR.string.suggested_folders),
+                    lineHeight = 36.sp,
+                    modifier = Modifier.padding(bottom = 2.dp),
+                )
+            }
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                TextP40(
+                    text = stringResource(LR.string.suggested_folders_subtitle),
+                    color = MaterialTheme.theme.colors.primaryText02,
+                    modifier = Modifier.padding(bottom = 10.dp),
+                )
+            }
+            items(
+                count = 4,
+                key = { index -> index },
+            ) { index ->
+                FolderItem("Test", Color.Yellow, podcastUuids = mockedPodcastsUuids)
+            }
         }
-    }
-}
 
-@Composable
-private fun Folders(podcastUuids: List<String>, modifier: Modifier = Modifier) {
-    val folders = 4
+        RowButton(
+            text = stringResource(LR.string.suggested_folders_use_these_folders_button),
+            modifier = Modifier
+                .padding(bottom = 16.dp)
+                .padding(horizontal = 16.dp),
+            textColor = MaterialTheme.theme.colors.primaryInteractive02,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.W600,
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = MaterialTheme.theme.colors.primaryInteractive01,
+            ),
+            includePadding = false,
+            onClick = onUseTheseFolders,
+        )
 
-    LazyVerticalGrid(
-        columns = GridCells.Adaptive(110.dp),
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
-        verticalArrangement = Arrangement.spacedBy(6.dp),
-        modifier = modifier,
-    ) {
-        items(
-            count = folders,
-            key = { index -> index },
-        ) { index ->
-            FolderItem("Test", Color.Yellow, podcastUuids)
-        }
+        RowOutlinedButton(
+            text = stringResource(id = LR.string.suggested_folders_use_create_custom_folders_button),
+            onClick = onCreateCustomFolders,
+            includePadding = false,
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.theme.colors.primaryIcon01, backgroundColor = Color.Transparent),
+            fontSize = 18.sp,
+            fontWeight = FontWeight.W600,
+            modifier = Modifier
+                .padding(bottom = 16.dp)
+                .padding(horizontal = 16.dp),
+        )
     }
 }
 
