@@ -36,6 +36,7 @@ import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.Single
+import java.util.Collections
 import java.util.Date
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
@@ -78,6 +79,8 @@ class SubscriptionManagerImpl @Inject constructor(
     private val subscriptionChangedEvents = PublishRelay.create<SubscriptionChangedEvent>()
 
     private var hasOfferEligible = ConcurrentHashMap<SubscriptionTier, Boolean>()
+
+    private val pendingPurchases = Collections.newSetFromMap(ConcurrentHashMap<String, Boolean>())
 
     override fun signOut() {
         clearCachedStatus()
@@ -225,7 +228,7 @@ class SubscriptionManagerImpl @Inject constructor(
     }
 
     private suspend fun handlePurchase(purchase: Purchase) {
-        if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
+        if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED && pendingPurchases.add(purchase.orderId)) {
             try {
                 sendPurchaseToServer(purchase)
                 if (!purchase.isAcknowledged) {
@@ -236,7 +239,10 @@ class SubscriptionManagerImpl @Inject constructor(
                     .distinct()
                     .forEach { tier -> updateOfferEligible(tier, false) }
             } catch (e: Throwable) {
+                purchaseEvents.accept(PurchaseEvent.Failure(e.message ?: "Unknown error", responseCode = null))
                 logSubscriptionError(e, "Could not send purchase info: ${purchase.orderId}")
+            } finally {
+                pendingPurchases.remove(purchase.orderId)
             }
         }
     }
