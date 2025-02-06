@@ -26,6 +26,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
+import au.com.shiftyjelly.pocketcasts.models.to.DbChapter
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
@@ -962,7 +963,7 @@ open class PlaybackManager @Inject constructor(
 
     private fun skipToEndOfLastChapter() {
         launch {
-            playbackStateRelay.blockingFirst().chapters.lastChapter?.let { chapter ->
+            playbackStateRelay.blockingFirst().chapters.lastOrNull()?.let { chapter ->
                 seekToTimeMsInternal(chapter.endTime)
                 trackPlayback(AnalyticsEvent.PLAYBACK_CHAPTER_SKIPPED, SourceView.PLAYER)
             }
@@ -981,7 +982,7 @@ open class PlaybackManager @Inject constructor(
 
     fun skipToChapter(index: Int) {
         launch {
-            val chapter = playbackStateRelay.blockingFirst().chapters.getList().firstOrNull { it.index == index } ?: return@launch
+            val chapter = playbackStateRelay.blockingFirst().chapters.firstOrNull { it.index == index } ?: return@launch
             if (chapter.selected) {
                 seekToTimeMsInternal(chapter.startTime)
             } else {
@@ -1534,10 +1535,18 @@ open class PlaybackManager @Inject constructor(
     private fun onMetadataAvailable(episodeMetadata: EpisodeFileMetadata) {
         playbackStateRelay.blockingFirst().let { playbackState ->
             launch {
-                chapterManager.updateChapters(
-                    playbackState.episodeUuid,
-                    episodeMetadata.chapters.toDbChapters(playbackState.episodeUuid, isEmbedded = true),
-                )
+                val dbChapters = episodeMetadata.chapters.map { chapter ->
+                    DbChapter(
+                        episodeUuid = playbackState.episodeUuid,
+                        startTimeMs = chapter.startTime.inWholeMilliseconds,
+                        endTimeMs = chapter.endTime.inWholeMilliseconds,
+                        title = chapter.title,
+                        imageUrl = chapter.imagePath,
+                        url = chapter.url?.toString(),
+                        isEmbedded = true,
+                    )
+                }
+                chapterManager.updateChapters(playbackState.episodeUuid, dbChapters)
             }
         }
     }
@@ -1581,7 +1590,7 @@ open class PlaybackManager @Inject constructor(
         observeChaptersSkipping = playbackStateRelay.asFlow()
             .map { it.positionMs.milliseconds }
             .onEach { position ->
-                val currentChapter = chapters.getList().firstOrNull { position in it }
+                val currentChapter = chapters.firstOrNull { position in it }
                 if (currentChapter?.selected == false) {
                     skipToNextSelectedOrLastChapter()
                 }

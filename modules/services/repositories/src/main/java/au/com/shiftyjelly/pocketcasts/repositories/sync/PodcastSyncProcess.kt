@@ -168,7 +168,7 @@ class PodcastSyncProcess(
             .flatMapCompletable { lastSyncAt ->
                 rxCompletable { cacheStats() }
                     .andThen(downloadAndImportHomeFolder())
-                    .andThen(downloadAndImportFilters())
+                    .andThen(rxCompletable { downloadAndImportFilters() })
                     .andThen(rxCompletable { downloadAndImportBookmarks() })
                     .andThen(Completable.fromAction { settings.setLastModified(lastSyncAt) })
             }
@@ -266,9 +266,9 @@ class PodcastSyncProcess(
         )
     }
 
-    private fun downloadAndImportFilters(): Completable {
-        return syncManager.getFiltersRxSingle()
-            .flatMapCompletable { filters -> importFilters(filters) }
+    private suspend fun downloadAndImportFilters() {
+        val filters = syncManager.getFilters()
+        importFilters(filters)
     }
 
     private suspend fun downloadAndImportBookmarks() {
@@ -627,11 +627,11 @@ class PodcastSyncProcess(
         return rxCompletable { markAllLocalItemsSynced(episodes) }
             .andThen(importEpisodes(response.episodes))
             .andThen(importPodcasts(response.podcasts))
-            .andThen(importFilters(response.playlists))
+            .andThen(rxCompletable { importFilters(response.playlists) })
             .andThen(importFolders(response.folders))
             .andThen(rxCompletable { importBookmarks(response.bookmarks) })
             .andThen(updateSettings(response))
-            .andThen(updateShortcuts(response.playlists))
+            .andThen(rxCompletable { updateShortcuts(response.playlists) })
             .andThen(rxCompletable { cacheStats() })
             .toSingle { response.lastModified }
     }
@@ -662,18 +662,16 @@ class PodcastSyncProcess(
         }
     }
 
-    private fun updateShortcuts(playlists: List<Playlist>): Completable {
+    private suspend fun updateShortcuts(playlists: List<Playlist>) {
         // if any playlists have changed update the launcher shortcuts
         if (playlists.isNotEmpty() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
             PocketCastsShortcuts.update(
                 playlistManager = playlistManager,
                 force = true,
-                coroutineScope = applicationScope,
                 context = context,
                 source = PocketCastsShortcuts.Source.UPDATE_SHORTCUTS,
             )
         }
-        return Completable.complete()
     }
 
     private fun importPodcasts(podcasts: List<SyncUpdateResponse.PodcastSync>): Completable {
@@ -695,10 +693,10 @@ class PodcastSyncProcess(
             .ignoreElements()
     }
 
-    private fun importFilters(playlists: List<Playlist>): Completable {
-        return Observable.fromIterable(playlists)
-            .flatMap { playlist -> importPlaylist(playlist).toObservable() }
-            .ignoreElements()
+    private suspend fun importFilters(playlists: List<Playlist>) {
+        for (playlist in playlists) {
+            importPlaylist(playlist)
+        }
     }
 
     private fun importFolders(folders: List<Folder>): Completable {
@@ -722,58 +720,56 @@ class PodcastSyncProcess(
         }
     }
 
-    private fun importPlaylist(sync: Playlist): Maybe<Playlist> {
-        return Maybe.fromCallable<Playlist> {
-            val uuid = sync.uuid
-            if (uuid.isBlank()) {
-                return@fromCallable null
-            }
-            // manual playlists are no longer supported
-            if (sync.manual) {
-                return@fromCallable null
-            }
-
-            var playlist = playlistManager.findByUuidBlocking(uuid)
-            if (sync.deleted) {
-                playlist?.let { playlistManager.deleteSyncedBlocking(it) }
-                return@fromCallable null
-            }
-
-            if (playlist == null) {
-                playlist = Playlist(uuid = sync.uuid)
-            }
-
-            with(playlist) {
-                title = sync.title
-                audioVideo = sync.audioVideo
-                notDownloaded = sync.notDownloaded
-                downloaded = sync.downloaded
-                downloading = sync.downloading
-                finished = sync.finished
-                partiallyPlayed = sync.partiallyPlayed
-                unplayed = sync.unplayed
-                starred = sync.starred
-                manual = sync.manual
-                sortPosition = sync.sortPosition
-                sortId = sync.sortId
-                iconId = sync.iconId
-                allPodcasts = sync.allPodcasts
-                podcastUuids = sync.podcastUuids
-                filterHours = sync.filterHours
-                syncStatus = Playlist.SYNC_STATUS_SYNCED
-                filterDuration = sync.filterDuration
-                longerThan = sync.longerThan
-                shorterThan = sync.shorterThan
-            }
-
-            if (playlist.id == null) {
-                playlist.id = playlistManager.createBlocking(playlist)
-            } else {
-                playlistManager.updateBlocking(playlist, userPlaylistUpdate = null)
-            }
-
-            return@fromCallable playlist
+    private suspend fun importPlaylist(sync: Playlist): Playlist? {
+        val uuid = sync.uuid
+        if (uuid.isBlank()) {
+            return null
         }
+        // manual playlists are no longer supported
+        if (sync.manual) {
+            return null
+        }
+
+        var playlist = playlistManager.findByUuid(uuid)
+        if (sync.deleted) {
+            playlist?.let { playlistManager.deleteSynced(it) }
+            return null
+        }
+
+        if (playlist == null) {
+            playlist = Playlist(uuid = sync.uuid)
+        }
+
+        with(playlist) {
+            title = sync.title
+            audioVideo = sync.audioVideo
+            notDownloaded = sync.notDownloaded
+            downloaded = sync.downloaded
+            downloading = sync.downloading
+            finished = sync.finished
+            partiallyPlayed = sync.partiallyPlayed
+            unplayed = sync.unplayed
+            starred = sync.starred
+            manual = sync.manual
+            sortPosition = sync.sortPosition
+            sortId = sync.sortId
+            iconId = sync.iconId
+            allPodcasts = sync.allPodcasts
+            podcastUuids = sync.podcastUuids
+            filterHours = sync.filterHours
+            syncStatus = Playlist.SYNC_STATUS_SYNCED
+            filterDuration = sync.filterDuration
+            longerThan = sync.longerThan
+            shorterThan = sync.shorterThan
+        }
+
+        if (playlist.id == null) {
+            playlist.id = playlistManager.create(playlist)
+        } else {
+            playlistManager.update(playlist, userPlaylistUpdate = null)
+        }
+
+        return playlist
     }
 
     private fun importPodcast(sync: SyncUpdateResponse.PodcastSync): Maybe<Podcast> {

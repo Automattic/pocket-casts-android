@@ -1,21 +1,24 @@
 package au.com.shiftyjelly.pocketcasts.profile.winback
 
-import androidx.appcompat.app.AppCompatActivity
+import android.app.Activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.models.type.BillingPeriod
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPricingPhase
+import au.com.shiftyjelly.pocketcasts.models.type.WinbackOfferDetails
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchaseEvent
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchasesState
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
+import au.com.shiftyjelly.pocketcasts.repositories.winback.WinbackManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
+import com.pocketcasts.service.api.WinbackResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.Date
 import javax.inject.Inject
@@ -23,14 +26,12 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.reactive.asFlow
 import timber.log.Timber
 
 @HiltViewModel
 class WinbackViewModel @Inject constructor(
-    private val subscriptionManager: SubscriptionManager,
+    private val winbackManager: WinbackManager,
     private val settings: Settings,
     private val tracker: AnalyticsTracker,
 ) : ViewModel() {
@@ -40,7 +41,7 @@ class WinbackViewModel @Inject constructor(
     internal val uiState = _uiState.asStateFlow()
 
     init {
-        loadInitialPlans()
+        loadWinbackData()
         viewModelScope.launch {
             settings.cachedSubscriptionStatus.flow.collect { status ->
                 _uiState.value = _uiState.value.copy(currentSubscriptionExpirationDate = status?.expiryDate)
@@ -48,11 +49,12 @@ class WinbackViewModel @Inject constructor(
         }
     }
 
-    internal fun loadInitialPlans() {
+    internal fun loadWinbackData() {
         _uiState.value = _uiState.value.copy(subscriptionPlansState = SubscriptionPlansState.Loading)
         viewModelScope.launch {
             val plansDeferred = async { loadPlans() }
             val activePurchaseDeferred = async { loadActivePurchase() }
+            val winbackOfferResponseDeferred = async { winbackManager.getWinbackOffer() }
 
             val plansResult = plansDeferred.await()
             val activePurchaseResult = activePurchaseDeferred.await()
@@ -78,14 +80,21 @@ class WinbackViewModel @Inject constructor(
                     }
                 },
             )
+
+            val winbackResponse = winbackOfferResponseDeferred.await()
+            _uiState.value = _uiState.value.copy(
+                winbackOfferState = winbackResponse
+                    ?.toWinbackOffer(_uiState.value.productsDetails)
+                    ?.let(::WinbackOfferState),
+            )
         }
     }
 
     private var changePlanJob: Job? = null
 
     internal fun changePlan(
-        activity: AppCompatActivity,
         newPlan: SubscriptionPlan,
+        activity: Activity,
     ) {
         trackPlanSelected(newPlan.productId)
         if (changePlanJob?.isActive == true) {
@@ -106,72 +115,128 @@ class WinbackViewModel @Inject constructor(
         }
 
         changePlanJob = viewModelScope.launch {
+            _uiState.value = _uiState.value.withLoadedSubscriptionPlans { plans ->
+                plans.copy(isChangingPlan = true)
+            }
             val currentProductId = loadedState.activePurchase.productId
-            val isChangeFlowStarted = subscriptionManager.changeProduct(
+            val purchaseEvent = winbackManager.changeProduct(
                 currentPurchase = currentPurchase,
                 currentPurchaseProductId = currentProductId,
                 newProduct = newProduct,
                 newProductOfferToken = newPlan.offerToken,
                 activity = activity,
             )
-            if (isChangeFlowStarted) {
-                _uiState.value = _uiState.value.withLoadedSubscriptionPlans { plans ->
-                    plans.copy(isChangingPlan = true)
-                }
-
-                val purchaseEvent = subscriptionManager.observePurchaseEvents().asFlow().first()
-                when (purchaseEvent) {
-                    is PurchaseEvent.Cancelled -> {
-                        _uiState.value = _uiState.value.withLoadedSubscriptionPlans { plans ->
-                            plans.copy(isChangingPlan = false)
-                        }
-                    }
-
-                    is PurchaseEvent.Failure -> {
-                        logWarning("Purchase failure: ${purchaseEvent.responseCode}, ${purchaseEvent.errorMessage}")
-                        _uiState.value = _uiState.value.withLoadedSubscriptionPlans { plans ->
-                            plans.copy(isChangingPlan = false, hasPlanChangeFailed = true)
-                        }
-                    }
-
-                    is PurchaseEvent.Success -> {
-                        trackPlanPurchased(
-                            currentProductId = currentProductId,
-                            newProductId = newProduct.productId,
-                        )
-
-                        val (newPurchases, newPurchase) = loadActivePurchase()
-                        when (newPurchase) {
-                            is ActivePurchaseResult.Found -> {
-                                _uiState.value = _uiState.value
-                                    .copy(purchases = newPurchases)
-                                    .withLoadedSubscriptionPlans { plans ->
-                                        plans.copy(isChangingPlan = false, activePurchase = newPurchase.purchase)
-                                    }
-                            }
-
-                            is ActivePurchaseResult.NotFound -> {
-                                val failure = SubscriptionPlansState.Failure(FailureReason.Default)
-                                _uiState.value = _uiState.value.copy(subscriptionPlansState = failure)
-                            }
-                        }
+            when (purchaseEvent) {
+                is PurchaseEvent.Cancelled -> {
+                    _uiState.value = _uiState.value.withLoadedSubscriptionPlans { plans ->
+                        plans.copy(isChangingPlan = false)
                     }
                 }
-            } else {
-                logWarning("Failed to start change product flow.")
-                _uiState.value = _uiState.value.withLoadedSubscriptionPlans { plans ->
-                    plans.copy(hasPlanChangeFailed = true)
+
+                is PurchaseEvent.Failure -> {
+                    logWarning("Purchase failure: ${purchaseEvent.responseCode}, ${purchaseEvent.errorMessage}")
+                    _uiState.value = _uiState.value.withLoadedSubscriptionPlans { plans ->
+                        plans.copy(isChangingPlan = false, hasPlanChangeFailed = true)
+                    }
+                }
+
+                is PurchaseEvent.Success -> {
+                    trackPlanPurchased(
+                        currentProductId = currentProductId,
+                        newProductId = newProduct.productId,
+                    )
+
+                    val (newPurchases, newPurchase) = loadActivePurchase()
+                    when (newPurchase) {
+                        is ActivePurchaseResult.Found -> {
+                            _uiState.value = _uiState.value
+                                .copy(purchases = newPurchases)
+                                .withLoadedSubscriptionPlans { plans ->
+                                    plans.copy(isChangingPlan = false, activePurchase = newPurchase.purchase)
+                                }
+                        }
+
+                        is ActivePurchaseResult.NotFound -> {
+                            val failure = SubscriptionPlansState.Failure(FailureReason.Default)
+                            _uiState.value = _uiState.value.copy(subscriptionPlansState = failure)
+                        }
+                    }
                 }
             }
         }
     }
 
-    private suspend fun loadPlans() = when (val state = subscriptionManager.loadProducts()) {
+    private var claimOfferjob: Job? = null
+
+    internal fun claimOffer(
+        offer: WinbackOffer,
+        activity: Activity,
+    ) {
+        trackClaimOfferTapped()
+        if (claimOfferjob?.isActive == true) {
+            return
+        }
+
+        val loadedState = (_uiState.value.subscriptionPlansState as? SubscriptionPlansState.Loaded) ?: run {
+            logWarning("Failed to start winback offer flow. Subscriptions are not loaded.")
+            return
+        }
+        val currentPurchase = _uiState.value.purchases.find { it.orderId == loadedState.activePurchase.orderId } ?: run {
+            logWarning("Failed to start winback offer flow. No matching current purchase.")
+            return
+        }
+        val winbackProduct = _uiState.value.productsDetails.find { product ->
+            product.subscriptionOfferDetails.orEmpty().any { playOffer -> playOffer.offerToken == offer.offerToken }
+        } ?: run {
+            logWarning("Failed to start winback offer flow. No matching product for a winback offer.")
+            return
+        }
+        claimOfferjob = viewModelScope.launch {
+            _uiState.value = _uiState.value.withOfferState { state ->
+                state.copy(isClaimingOffer = true)
+            }
+            val purchaseEvent = winbackManager.claimWinbackOffer(
+                currentPurchase = currentPurchase,
+                winbackProduct = winbackProduct,
+                winbackOfferToken = offer.offerToken,
+                winbackClaimCode = offer.redeemCode,
+                activity = activity,
+            )
+            when (purchaseEvent) {
+                is PurchaseEvent.Cancelled -> {
+                    _uiState.value = _uiState.value.withOfferState { state ->
+                        state.copy(isClaimingOffer = false)
+                    }
+                }
+
+                is PurchaseEvent.Failure -> {
+                    logWarning("Winback offer failure: ${purchaseEvent.responseCode}, ${purchaseEvent.errorMessage}")
+                    _uiState.value = _uiState.value.withOfferState { state ->
+                        state.copy(isClaimingOffer = false, hasOfferClaimFailed = true)
+                    }
+                }
+
+                is PurchaseEvent.Success -> {
+                    _uiState.value = _uiState.value.withOfferState { state ->
+                        state.copy(isClaimingOffer = false, isOfferClaimed = true)
+                    }
+                }
+            }
+        }
+    }
+
+    internal fun consumeClaimedOffer() {
+        _uiState.value = _uiState.value.withOfferState { state ->
+            state.copy(isOfferClaimed = false)
+        }
+    }
+
+    private suspend fun loadPlans() = when (val state = winbackManager.loadProducts()) {
         is ProductDetailsState.Loaded -> state.productDetails to state.productDetails.toSubscriptionPlans()
         is ProductDetailsState.Failure -> emptyList<ProductDetails>() to null
     }
 
-    private suspend fun loadActivePurchase() = when (val state = subscriptionManager.loadPurchases()) {
+    private suspend fun loadActivePurchase() = when (val state = winbackManager.loadPurchases()) {
         is PurchasesState.Loaded -> state.purchases to state.purchases.findActivePurchase()
         is PurchasesState.Failure -> emptyList<Purchase>() to ActivePurchaseResult.NotFound(FailureReason.Default)
     }
@@ -213,9 +278,39 @@ class WinbackViewModel @Inject constructor(
         }
     }
 
+    private fun WinbackResponse.toWinbackOffer(products: List<ProductDetails>): WinbackOffer? {
+        val offerId = offer.takeIf(String::isNotBlank) ?: return null
+        val redeemCode = code.takeIf(String::isNotBlank) ?: return null
+        val offerDetails = WinbackOfferDetails.fromOfferId(offerId) ?: return null
+        val product = products.find { it.productId == offerDetails.productId } ?: return null
+        val offer = product.subscriptionOfferDetails?.find { it.offerId == offerDetails.offerId } ?: return null
+        val pricingPhases = offer.pricingPhases.pricingPhaseList.takeIf { it.size == 2 } ?: return null
+
+        val discountPhase = pricingPhases[0]
+        val regularPhase = pricingPhases[1]
+
+        return WinbackOffer(
+            details = offerDetails,
+            offerToken = offer.offerToken,
+            redeemCode = redeemCode,
+            formattedPrice = when (offerDetails.billingPeriod) {
+                BillingPeriod.Monthly -> regularPhase.formattedPrice
+                BillingPeriod.Yearly -> discountPhase.formattedPrice
+            },
+        )
+    }
+
     private fun UiState.withLoadedSubscriptionPlans(block: (SubscriptionPlansState.Loaded) -> SubscriptionPlansState): UiState {
         return if (subscriptionPlansState is SubscriptionPlansState.Loaded) {
             copy(subscriptionPlansState = block(subscriptionPlansState))
+        } else {
+            this
+        }
+    }
+
+    private fun UiState.withOfferState(block: (WinbackOfferState) -> WinbackOfferState): UiState {
+        return if (winbackOfferState != null) {
+            copy(winbackOfferState = block(winbackOfferState))
         } else {
             this
         }
@@ -246,7 +341,7 @@ class WinbackViewModel @Inject constructor(
         )
     }
 
-    internal fun trackClaimOfferTapped() {
+    private fun trackClaimOfferTapped() {
         val activePurchase = (uiState.value.subscriptionPlansState as? SubscriptionPlansState.Loaded)?.activePurchase
         tracker.track(
             event = AnalyticsEvent.WINBACK_MAIN_SCREEN_ROW_TAP,
@@ -327,6 +422,7 @@ class WinbackViewModel @Inject constructor(
         val currentSubscriptionExpirationDate: Date?,
         val productsDetails: List<ProductDetails>,
         val purchases: List<Purchase>,
+        val winbackOfferState: WinbackOfferState?,
         val subscriptionPlansState: SubscriptionPlansState,
     ) {
         val purchasedProductIds get() = purchases.flatMap { it.products }
@@ -336,6 +432,7 @@ class WinbackViewModel @Inject constructor(
                 currentSubscriptionExpirationDate = null,
                 purchases = emptyList(),
                 productsDetails = emptyList(),
+                winbackOfferState = null,
                 subscriptionPlansState = SubscriptionPlansState.Loading,
             )
         }
@@ -346,6 +443,13 @@ class WinbackViewModel @Inject constructor(
         data class NotFound(val reason: FailureReason) : ActivePurchaseResult
     }
 }
+
+internal data class WinbackOfferState(
+    val offer: WinbackOffer,
+    val isClaimingOffer: Boolean = false,
+    val isOfferClaimed: Boolean = false,
+    val hasOfferClaimFailed: Boolean = false,
+)
 
 internal sealed interface SubscriptionPlansState {
     data object Loading : SubscriptionPlansState
@@ -361,6 +465,13 @@ internal sealed interface SubscriptionPlansState {
         val hasPlanChangeFailed: Boolean = false,
     ) : SubscriptionPlansState
 }
+
+internal data class WinbackOffer(
+    val details: WinbackOfferDetails,
+    val offerToken: String,
+    val redeemCode: String,
+    val formattedPrice: String,
+)
 
 internal data class SubscriptionPlan(
     val productId: String,
@@ -385,11 +496,6 @@ internal data class ActivePurchase(
         Subscription.PLUS_YEARLY_PRODUCT_ID, Subscription.PATRON_YEARLY_PRODUCT_ID -> "yearly"
         else -> null
     }
-}
-
-internal enum class BillingPeriod {
-    Monthly,
-    Yearly,
 }
 
 internal enum class FailureReason {

@@ -182,7 +182,7 @@ class ChaptersViewModel @AssistedInject constructor(
     }.milliseconds
 
     private fun Chapters.toChapterStates(playbackPosition: Duration): List<ChapterState> {
-        return getList().map { chapter ->
+        return map { chapter ->
             when {
                 playbackPosition in chapter -> ChapterState.Playing(chapter.calculateProgress(playbackPosition), chapter)
                 playbackPosition > chapter.startTime -> ChapterState.Played(chapter)

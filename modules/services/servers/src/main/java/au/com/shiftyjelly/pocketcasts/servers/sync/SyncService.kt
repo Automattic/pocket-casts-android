@@ -25,6 +25,7 @@ import com.pocketcasts.service.api.ReferralValidationResponse
 import com.pocketcasts.service.api.SupportFeedbackRequest
 import com.pocketcasts.service.api.UserPodcastListRequest
 import com.pocketcasts.service.api.UserPodcastListResponse
+import com.pocketcasts.service.api.WinbackResponse
 import io.reactivex.Completable
 import io.reactivex.Single
 import okhttp3.RequestBody
@@ -92,7 +93,7 @@ interface SyncService {
     suspend fun getPodcastList(@Header("Authorization") authorization: String, @Body request: UserPodcastListRequest): UserPodcastListResponse
 
     @POST("/user/playlist/list")
-    fun getFilterList(@Header("Authorization") authorization: String, @Body request: BasicRequest): Single<FilterListResponse>
+    suspend fun getFilterList(@Header("Authorization") authorization: String, @Body request: BasicRequest): FilterListResponse
 
     @POST("/history/sync")
     fun historySync(@Header("Authorization") authorization: String, @Body request: HistorySyncRequest): Single<HistorySyncResponse>
@@ -182,6 +183,10 @@ interface SyncService {
     @Headers("Content-Type: application/octet-stream")
     @GET("/referrals/code")
     suspend fun getReferralCode(@Header("Authorization") authorization: String): Response<ReferralCodeResponse>
+
+    @Headers("Content-Type: application/octet-stream")
+    @GET("/referrals/winback_offers?platform=android")
+    suspend fun getWinbackOffer(@Header("Authorization") authorization: String): Response<WinbackResponse>
 
     @Headers("Content-Type: application/octet-stream")
     @GET("/referrals/validate")

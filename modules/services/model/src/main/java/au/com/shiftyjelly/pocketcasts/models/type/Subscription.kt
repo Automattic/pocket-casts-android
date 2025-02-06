@@ -116,3 +116,40 @@ sealed interface Subscription {
         }
     }
 }
+
+enum class BillingPeriod {
+    Monthly,
+    Yearly,
+}
+
+enum class WinbackOfferDetails(
+    val productId: String,
+    val offerId: String,
+    val billingPeriod: BillingPeriod,
+) {
+    PlusMonthly(
+        productId = Subscription.PLUS_MONTHLY_PRODUCT_ID,
+        offerId = "plus-monthly-winback",
+        billingPeriod = BillingPeriod.Monthly,
+    ),
+    PlusYearly(
+        productId = Subscription.PLUS_YEARLY_PRODUCT_ID,
+        offerId = "plus-yearly-winback",
+        billingPeriod = BillingPeriod.Yearly,
+    ),
+    PatronMonthly(
+        productId = Subscription.PATRON_MONTHLY_PRODUCT_ID,
+        offerId = "patron-monthly-winback",
+        billingPeriod = BillingPeriod.Monthly,
+    ),
+    PatronYearly(
+        productId = Subscription.PATRON_YEARLY_PRODUCT_ID,
+        offerId = "patron-yearly-winback",
+        billingPeriod = BillingPeriod.Yearly,
+    ),
+    ;
+
+    companion object {
+        fun fromOfferId(id: String) = entries.find { it.offerId == id }
+    }
+}

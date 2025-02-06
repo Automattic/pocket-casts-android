@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.subscription
 
+import android.app.Activity
 import androidx.appcompat.app.AppCompatActivity
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
@@ -7,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.android.billingclient.api.BillingResult
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
 import io.reactivex.Flowable
@@ -38,8 +40,15 @@ interface SubscriptionManager {
         currentPurchaseProductId: String,
         newProduct: ProductDetails,
         newProductOfferToken: String,
-        activity: AppCompatActivity,
-    ): Boolean
+        activity: Activity,
+    ): BillingResult
+
+    suspend fun claimWinbackOffer(
+        currentPurchase: Purchase,
+        winbackProduct: ProductDetails,
+        winbackOfferToken: String,
+        activity: Activity,
+    ): BillingResult
 
     fun signOut()
 

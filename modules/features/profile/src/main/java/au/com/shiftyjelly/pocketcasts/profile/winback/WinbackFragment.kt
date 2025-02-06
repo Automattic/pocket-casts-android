@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
@@ -30,12 +29,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.core.os.BundleCompat
@@ -43,12 +42,16 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
 import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.components.ProgressDialog
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.models.type.BillingPeriod
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.settings.HelpPage
 import au.com.shiftyjelly.pocketcasts.settings.LogsPage
@@ -69,7 +72,7 @@ class WinbackFragment : BaseDialogFragment() {
             "Missing input parameters"
         }
 
-    private var currentRoute: String? = null
+    private var currentScreenId: String? = null
 
     override val includeNavigationBarPadding = false
 
@@ -116,13 +119,9 @@ class WinbackFragment : BaseDialogFragment() {
                     ) {
                         composable(WinbackNavRoutes.WinbackOffer) {
                             WinbackOfferPage(
-                                onClaimOffer = {
-                                    viewModel.trackClaimOfferTapped()
-                                    navController.navigate(WinbackNavRoutes.OfferClaimed) {
-                                        popUpTo(WinbackNavRoutes.WinbackOffer) {
-                                            inclusive = true
-                                        }
-                                    }
+                                offer = state.winbackOfferState?.offer,
+                                onClaimOffer = { offer ->
+                                    viewModel.claimOffer(offer, requireActivity())
                                 },
                                 onSeeAvailablePlans = {
                                     viewModel.trackAvailablePlansTapped()
@@ -138,9 +137,20 @@ class WinbackFragment : BaseDialogFragment() {
                                 },
                             )
                         }
-                        composable(WinbackNavRoutes.OfferClaimed) {
+                        composable(
+                            WinbackNavRoutes.offerClaimedRoute(),
+                            listOf(
+                                navArgument(WinbackNavRoutes.OfferClaimedBillingPeriodArgument) {
+                                    type = NavType.EnumType(BillingPeriod::class.java)
+                                },
+                            ),
+                        ) { backStackEntry ->
+                            val arguments = requireNotNull(backStackEntry.arguments) { "Missing back stack entry arguments" }
+                            val billingPeriod = requireNotNull(BundleCompat.getSerializable(arguments, WinbackNavRoutes.OfferClaimedBillingPeriodArgument, BillingPeriod::class.java)) {
+                                "Missing billing period argument"
+                            }
                             OfferClaimedPage(
-                                theme = theme.activeTheme,
+                                billingPeriod = billingPeriod,
                                 onConfirm = {
                                     viewModel.trackOfferClaimedConfirmationTapped()
                                     dismiss()
@@ -150,7 +160,7 @@ class WinbackFragment : BaseDialogFragment() {
                         composable(WinbackNavRoutes.AvailablePlans) {
                             AvailablePlansPage(
                                 plansState = state.subscriptionPlansState,
-                                onSelectPlan = { plan -> viewModel.changePlan(requireActivity() as AppCompatActivity, plan) },
+                                onSelectPlan = { plan -> viewModel.changePlan(plan, requireActivity()) },
                                 onGoToSubscriptions = {
                                     if (!goToPlayStoreSubscriptions()) {
                                         scope.launch {
@@ -158,7 +168,7 @@ class WinbackFragment : BaseDialogFragment() {
                                         }
                                     }
                                 },
-                                onReload = { viewModel.loadInitialPlans() },
+                                onReload = { viewModel.loadWinbackData() },
                                 onGoBack = {
                                     viewModel.trackPlansBackButtonTapped()
                                     navController.popBackStack()
@@ -209,6 +219,33 @@ class WinbackFragment : BaseDialogFragment() {
                         }
                     }
 
+                    val offerState = state.winbackOfferState
+                    if (offerState?.isClaimingOffer == true) {
+                        ProgressDialog(
+                            text = stringResource(LR.string.winback_claiming_offer),
+                            onDismiss = {},
+                        )
+                    }
+
+                    if (offerState?.isOfferClaimed == true) {
+                        LaunchedEffect(Unit) {
+                            viewModel.consumeClaimedOffer()
+                            val billingPeriod = offerState.offer.details.billingPeriod
+                            navController.navigate(WinbackNavRoutes.offerClaimedDestination(billingPeriod)) {
+                                popUpTo(WinbackNavRoutes.WinbackOffer) {
+                                    inclusive = true
+                                }
+                            }
+                        }
+                    }
+
+                    val hasClaimOfferFailed = offerState?.hasOfferClaimFailed == true
+                    if (hasClaimOfferFailed) {
+                        LaunchedEffect(Unit) {
+                            snackbarHostState.showSnackbar(getString(LR.string.error_generic_message))
+                        }
+                    }
+
                     val hasPlanChangeFailed = (state.subscriptionPlansState as? SubscriptionPlansState.Loaded)?.hasPlanChangeFailed == true
                     if (hasPlanChangeFailed) {
                         LaunchedEffect(Unit) {
@@ -218,9 +255,11 @@ class WinbackFragment : BaseDialogFragment() {
 
                     LaunchedEffect(navController) {
                         navController.currentBackStackEntryFlow.collect { entry ->
-                            val route = entry.destination.route.also { currentRoute = it }
-                            if (route != null) {
-                                viewModel.trackScreenShown(route)
+                            val screenId = entry.destination.route
+                                ?.substringBefore('/') // Track only the top part of the route
+                                .also { currentScreenId = it }
+                            if (screenId != null) {
+                                viewModel.trackScreenShown(screenId)
                             }
                         }
                     }
@@ -245,9 +284,9 @@ class WinbackFragment : BaseDialogFragment() {
 
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
-        val route = currentRoute
-        if (route != null) {
-            viewModel.trackScreenDismissed(route)
+        val screenId = currentScreenId
+        if (screenId != null) {
+            viewModel.trackScreenDismissed(screenId)
         }
     }
 
@@ -301,15 +340,20 @@ data class WinbackInitParams(
 
 private object WinbackNavRoutes {
     const val WinbackOffer = "main"
-    const val OfferClaimed = "offer_claimed"
     const val AvailablePlans = "available_plans"
     const val HelpAndFeedback = "help_and_feedback"
     const val SupportLogs = "logs"
     const val StatusCheck = "connection_status"
     const val CancelConfirmation = "cancel_confirmation"
+    private const val OfferClaimed = "offer_claimed"
+
+    const val OfferClaimedBillingPeriodArgument = "billingPeriod"
+
+    fun offerClaimedRoute() = "$OfferClaimed/{$OfferClaimedBillingPeriodArgument}"
+
+    fun offerClaimedDestination(billingPeriod: BillingPeriod) = "$OfferClaimed/$billingPeriod"
 }
 
-private val colorAnimationSpec = tween<Color>(350)
 private val intOffsetAnimationSpec = tween<IntOffset>(350)
 private fun AnimatedContentTransitionScope<NavBackStackEntry>.slideInToStart() = slideIntoContainer(
     towards = AnimatedContentTransitionScope.SlideDirection.Start,

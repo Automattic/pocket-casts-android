@@ -7,13 +7,19 @@ import au.com.shiftyjelly.pocketcasts.utils.exception.NoNetworkException
 import javax.inject.Inject
 
 class ReferralManagerImpl @Inject constructor(
-    var syncManager: SyncManager,
+    private val syncManager: SyncManager,
     private val networkWrapper: NetworkWrapper,
 ) : ReferralManager {
 
     override suspend fun getReferralCode() = try {
         if (!networkWrapper.isConnected()) throw NoNetworkException()
         ReferralResult.create(syncManager.getReferralCode())
+    } catch (e: Exception) {
+        ReferralResult.create(e)
+    }
+
+    override suspend fun getWinbackResponse() = try {
+        ReferralResult.create(syncManager.getWinbackOffer())
     } catch (e: Exception) {
         ReferralResult.create(e)
     }

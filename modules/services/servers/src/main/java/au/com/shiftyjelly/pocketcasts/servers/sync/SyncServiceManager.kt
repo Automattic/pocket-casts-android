@@ -34,6 +34,7 @@ import com.pocketcasts.service.api.ReferralRedemptionResponse
 import com.pocketcasts.service.api.ReferralValidationResponse
 import com.pocketcasts.service.api.SupportFeedbackRequest
 import com.pocketcasts.service.api.UserPodcastListResponse
+import com.pocketcasts.service.api.WinbackResponse
 import com.pocketcasts.service.api.bookmarkRequest
 import com.pocketcasts.service.api.userPodcastListRequest
 import io.reactivex.BackpressureStrategy
@@ -162,9 +163,10 @@ open class SyncServiceManager @Inject constructor(
         return service.getPodcastEpisodes(addBearer(token), request)
     }
 
-    fun getFilters(token: AccessToken): Single<List<Playlist>> =
-        service.getFilterList(addBearer(token), buildBasicRequest())
-            .map { response -> response.filters?.mapNotNull { it.toFilter() } ?: emptyList() }
+    suspend fun getFilters(token: AccessToken): List<Playlist> {
+        val response = service.getFilterList(addBearer(token), buildBasicRequest())
+        return response.filters?.mapNotNull { it.toFilter() } ?: emptyList()
+    }
 
     suspend fun getBookmarks(token: AccessToken): List<Bookmark> {
         return service.getBookmarkList(addBearer(token), bookmarkRequest {}).bookmarksList.map { it.toBookmark() }
@@ -306,6 +308,10 @@ open class SyncServiceManager @Inject constructor(
     // Referral
     suspend fun getReferralCode(token: AccessToken): Response<ReferralCodeResponse> {
         return service.getReferralCode(addBearer(token))
+    }
+
+    suspend fun getWinbackOffer(token: AccessToken): Response<WinbackResponse> {
+        return service.getWinbackOffer(addBearer(token))
     }
 
     suspend fun validateReferralCode(token: AccessToken, code: String): Response<ReferralValidationResponse> {

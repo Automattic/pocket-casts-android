@@ -196,13 +196,12 @@ class PlaylistManagerImpl @Inject constructor(
         else -> null
     }
 
-    override fun createBlocking(playlist: Playlist): Long {
-        val id = playlistDao.insertBlocking(playlist)
-        if (countPlaylistsBlocking() == 1 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+    override suspend fun create(playlist: Playlist): Long {
+        val id = playlistDao.insert(playlist)
+        if (countPlaylists() == 1 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
             PocketCastsShortcuts.update(
                 playlistManager = this,
                 force = true,
-                coroutineScope = applicationScope,
                 context = context,
                 source = PocketCastsShortcuts.Source.CREATE_PLAYLIST,
             )
@@ -219,6 +218,15 @@ class PlaylistManagerImpl @Inject constructor(
         isCreatingFilter: Boolean,
     ) {
         playlistDao.updateBlocking(playlist)
+        playlistUpdateAnalytics.update(playlist, userPlaylistUpdate, isCreatingFilter)
+    }
+
+    override suspend fun update(
+        playlist: Playlist,
+        userPlaylistUpdate: UserPlaylistUpdate?,
+        isCreatingFilter: Boolean,
+    ) {
+        playlistDao.update(playlist)
         playlistUpdateAnalytics.update(playlist, userPlaylistUpdate, isCreatingFilter)
     }
 
@@ -280,6 +288,10 @@ class PlaylistManagerImpl @Inject constructor(
     override suspend fun resetDb() {
         playlistDao.deleteAll()
         setupDefaultPlaylists()
+    }
+
+    override suspend fun deleteSynced(playlist: Playlist) {
+        playlistDao.delete(playlist)
     }
 
     override fun deleteSyncedBlocking(playlist: Playlist) {
@@ -508,6 +520,10 @@ class PlaylistManagerImpl @Inject constructor(
     private fun markAsNotSyncedBlocking(playlist: Playlist) {
         playlist.syncStatus = Playlist.SYNC_STATUS_NOT_SYNCED
         playlistDao.updateSyncStatusBlocking(Playlist.SYNC_STATUS_NOT_SYNCED, playlist.uuid)
+    }
+
+    fun countPlaylists(): Int {
+        return playlistDao.countBlocking()
     }
 
     fun countPlaylistsBlocking(): Int {

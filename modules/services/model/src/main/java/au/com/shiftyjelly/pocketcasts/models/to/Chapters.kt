@@ -6,19 +6,9 @@ import kotlin.time.Duration
 
 data class Chapters(
     private val items: List<Chapter> = emptyList(),
-) {
-
-    val isEmpty: Boolean
-        get() = items.isEmpty()
-
-    val size: Int
-        get() = items.size
-
+) : List<Chapter> by items {
     private val selectedItems: List<Chapter>
-        get() = items.filter { it.selected }
-
-    val lastChapter: Chapter?
-        get() = items.getOrNull(items.size - 1)
+        get() = filter { it.selected }
 
     fun getNextSelectedChapter(time: Duration): Chapter? {
         val currentTimeFinal = time.coerceAtLeast(Duration.ZERO)
@@ -32,7 +22,7 @@ data class Chapters(
     }
 
     fun getPreviousSelectedChapter(time: Duration): Chapter? {
-        if (items.isEmpty()) {
+        if (isEmpty()) {
             return null
         }
         var foundChapter: Chapter? = null
@@ -55,22 +45,17 @@ data class Chapters(
 
     fun getChapter(time: Duration): Chapter? {
         val finalTime = time.coerceAtLeast(Duration.ZERO)
-        return items.firstOrNull { chapter -> finalTime in chapter }
+        return firstOrNull { chapter -> finalTime in chapter }
     }
 
     fun getChapterIndex(time: Duration): Int {
         val finalTime = time.coerceAtLeast(Duration.ZERO)
-        return items.indexOfFirst { chapter -> finalTime in chapter }
-    }
-
-    fun getList(): List<Chapter> {
-        return items
+        return indexOfFirst { chapter -> finalTime in chapter }
     }
 
     fun getChapterSummary(time: Duration): ChapterSummaryData {
-        val chapterSize = items.size
         val chapterIndex = getChapterIndex(time)
-        return ChapterSummaryData(chapterIndex + 1, chapterSize)
+        return ChapterSummaryData(chapterIndex + 1, size)
     }
 
     fun isFirstChapter(time: Duration): Boolean {
@@ -78,7 +63,7 @@ data class Chapters(
     }
 
     fun isLastChapter(time: Duration): Boolean {
-        return getChapterIndex(time) == items.size - 1
+        return getChapterIndex(time) == size - 1
     }
 
     fun skippedChaptersDuration(time: Duration): Duration {
@@ -95,21 +80,6 @@ data class Chapters(
         } else {
             Duration.ZERO
         }
-    }
-
-    fun toDbChapters(
-        episodeId: String,
-        isEmbedded: Boolean,
-    ) = items.map { chapter ->
-        DbChapter(
-            episodeUuid = episodeId,
-            startTimeMs = chapter.startTime.inWholeMilliseconds,
-            endTimeMs = chapter.endTime.inWholeMilliseconds,
-            title = chapter.title,
-            imageUrl = chapter.imagePath,
-            url = chapter.url?.toString(),
-            isEmbedded = isEmbedded,
-        )
     }
 }
 
