@@ -627,6 +627,8 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
         loadData()
 
+        binding.swipeRefreshLayout.isEnabled = FeatureFlag.isEnabled(Feature.PODCAST_FEED_UPDATE)
+
         binding.toolbar.let {
             it.inflateMenu(R.menu.podcast_menu)
             it.setOnMenuItemClickListener(this)
