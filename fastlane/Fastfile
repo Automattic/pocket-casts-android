@@ -139,10 +139,7 @@ platform :android do
     trigger_release_build(branch_to_build: "release/#{new_version}")
     create_backmerge_pr
 
-    # We cannot use the `copy_branch_protection` action here as it would create a branch protection rule with the same
-    # restrictions we have in `main`, and the release managers wouldn't be able to push due to permissions.
-    # This should be changed only when we have PC Android releases done on CI, when the CI bot is the one running `git push`.
-    set_branch_protection(repository: GITHUB_REPO, branch: "release/#{new_version}")
+    copy_branch_protection(repository: GITHUB_REPO, branch: "release/#{new_version}", from_branch: DEFAULT_BRANCH)
 
     begin
       # Move PRs to next milestone
