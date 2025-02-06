@@ -62,9 +62,9 @@ class ChaptersViewModelTest {
     private val episode = PodcastEpisode(uuid = "id", publishedDate = Date())
     private val chapters = Chapters(
         listOf(
-            Chapter("1", 0.milliseconds, 100.milliseconds, selected = true, index = 0),
-            Chapter("2", 101.milliseconds, 200.milliseconds, selected = true, index = 1),
-            Chapter("3", 201.milliseconds, 300.milliseconds, selected = true, index = 2),
+            Chapter("1", 0.milliseconds, 100.milliseconds, selected = true, index = 0, uiIndex = 1),
+            Chapter("2", 101.milliseconds, 200.milliseconds, selected = true, index = 1, uiIndex = 2),
+            Chapter("3", 201.milliseconds, 300.milliseconds, selected = true, index = 2, uiIndex = 3),
         ),
     )
 
@@ -267,7 +267,7 @@ class ChaptersViewModelTest {
         )
 
         val episode = PodcastEpisode(uuid = "id2", publishedDate = Date())
-        val chapter = Chapter("Chapter", startTime = 2.seconds, endTime = 3.seconds)
+        val chapter = Chapter("Chapter", startTime = 2.seconds, endTime = 3.seconds, index = 0, uiIndex = 1)
         whenever(episodeManager.findEpisodeByUuid("id2")).thenReturn(episode)
 
         chaptersViewModel.playChapter(chapter)

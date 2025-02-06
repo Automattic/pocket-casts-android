@@ -12,6 +12,8 @@ class ChapterTest {
             title = "",
             startTime = 5.seconds,
             endTime = 10.seconds,
+            index = 0,
+            uiIndex = 1,
         )
 
         assertEquals(0f, chapter.calculateProgress(1.milliseconds), 0.001f)
@@ -27,6 +29,8 @@ class ChapterTest {
             title = "",
             startTime = 5.seconds,
             endTime = 70.seconds,
+            index = 0,
+            uiIndex = 1,
         )
 
         assertEquals("1m", chapter.remainingTime(5000.milliseconds, playbackSpeed = 1.0, adjustRemainingTimeDuration = false))
@@ -43,6 +47,8 @@ class ChapterTest {
             title = "",
             startTime = 0.seconds,
             endTime = 120.seconds,
+            index = 0,
+            uiIndex = 1,
         )
 
         assertEquals("4m", chapter.remainingTime(0.seconds, playbackSpeed = 0.5, adjustRemainingTimeDuration = true))
@@ -62,6 +68,8 @@ class ChapterTest {
             title = "",
             startTime = 0.seconds,
             endTime = 120.seconds,
+            index = 0,
+            uiIndex = 1,
         )
 
         assertEquals("2m", chapter.remainingTime(0.seconds, playbackSpeed = 0.5, adjustRemainingTimeDuration = false))

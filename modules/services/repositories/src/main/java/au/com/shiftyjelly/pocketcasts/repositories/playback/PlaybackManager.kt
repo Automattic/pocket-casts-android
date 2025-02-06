@@ -1535,9 +1535,9 @@ open class PlaybackManager @Inject constructor(
     private fun onMetadataAvailable(episodeMetadata: EpisodeFileMetadata) {
         playbackStateRelay.blockingFirst().let { playbackState ->
             launch {
-                val dbChapters = episodeMetadata.chapters.mapIndexed { index, chapter ->
+                val dbChapters = episodeMetadata.chapters.map { chapter ->
                     DbChapter(
-                        index = index,
+                        index = chapter.index,
                         episodeUuid = playbackState.episodeUuid,
                         startTimeMs = chapter.startTime.inWholeMilliseconds,
                         endTimeMs = chapter.endTime.inWholeMilliseconds,
