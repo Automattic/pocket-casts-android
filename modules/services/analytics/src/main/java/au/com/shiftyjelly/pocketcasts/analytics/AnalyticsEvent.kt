@@ -232,6 +232,8 @@ enum class AnalyticsEvent(val key: String) {
     PODCAST_SCREEN_REFRESH_EPISODE_LIST("podcast_screen_refresh_episode_list"),
     PODCAST_SCREEN_REFRESH_NEW_EPISODE_FOUND("podcast_screen_refresh_new_episode_found"),
     PODCAST_SCREEN_REFRESH_NO_EPISODES_FOUND("podcast_screen_refresh_no_episodes_found"),
+    PODCAST_REFRESH_EPISODE_TOOLTIP_SHOWN("podcast_refresh_episode_tooltip_shown"),
+    PODCAST_REFRESH_EPISODE_TOOLTIP_DISMISSED("podcast_refresh_episode_tooltip_dismissed"),
 
     /* Podcast Settings */
     PODCAST_SETTINGS_FEED_ERROR_TAPPED("podcast_settings_feed_error_tapped"),

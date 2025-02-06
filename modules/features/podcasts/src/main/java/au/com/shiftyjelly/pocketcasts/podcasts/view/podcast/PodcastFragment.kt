@@ -756,8 +756,12 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                         title = stringResource(LR.string.podcast_feed_update_tooltip_title),
                         subtitle = stringResource(LR.string.podcast_feed_update_tooltip_subtitle),
                         offset = tooltipOffset,
+                        onTooltipShown = {
+                            analyticsTracker.track(AnalyticsEvent.PODCAST_REFRESH_EPISODE_TOOLTIP_SHOWN)
+                        },
                         onDismissRequest = {},
                         onCloseButtonClick = {
+                            analyticsTracker.track(AnalyticsEvent.PODCAST_REFRESH_EPISODE_TOOLTIP_DISMISSED)
                             viewModel.hidePodcastRefreshTooltip()
                         },
                     )

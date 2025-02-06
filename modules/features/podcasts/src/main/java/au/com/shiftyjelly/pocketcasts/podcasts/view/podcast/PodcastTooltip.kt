@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -36,11 +37,16 @@ fun PodcastTooltip(
     title: String,
     subtitle: String,
     offset: IntOffset,
+    onTooltipShown: () -> Unit,
     onDismissRequest: () -> Unit,
     onCloseButtonClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val tooltipColor = MaterialTheme.theme.colors.primaryUi01
+
+    CallOnce {
+        onTooltipShown.invoke()
+    }
 
     Popup(
         alignment = Alignment.TopStart,
