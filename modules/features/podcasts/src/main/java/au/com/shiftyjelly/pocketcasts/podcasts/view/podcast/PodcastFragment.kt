@@ -751,7 +751,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         binding?.composeTooltipHost?.setContent {
             AppTheme(theme.activeTheme) {
                 val shouldShow by viewModel.shouldShowPodcastTooltip.collectAsState()
-                AnimatedVisibility(visible = shouldShow && tooltipEnabled) {
+                AnimatedVisibility(visible = shouldShow && tooltipEnabled && FeatureFlag.isEnabled(Feature.PODCAST_FEED_UPDATE)) {
                     PodcastTooltip(
                         title = stringResource(LR.string.podcast_feed_update_tooltip_title),
                         subtitle = stringResource(LR.string.podcast_feed_update_tooltip_subtitle),
@@ -784,7 +784,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
     private fun configureTooltip() {
         lifecycleScope.launch {
-            delay(500)
+            delay(1.seconds) // Delay to wait the recyclerview to be configured
 
             val headerPositionInList = 2 // See: au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastAdapter.setEpisodes
 
