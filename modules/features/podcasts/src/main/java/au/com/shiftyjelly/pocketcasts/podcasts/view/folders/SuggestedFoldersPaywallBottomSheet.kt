@@ -6,12 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.core.view.doOnLayout
+import androidx.fragment.compose.content
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.views.extensions.setSystemWindowInsetToPadding
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -28,7 +29,7 @@ class SuggestedFoldersPaywallBottomSheet : BottomSheetDialogFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ) = contentWithoutConsumedInsets {
+    ) = content {
         AppTheme(theme.activeTheme) {
             SuggestedFoldersPaywall(
                 onUseTheseFolders = {
@@ -58,5 +59,6 @@ class SuggestedFoldersPaywallBottomSheet : BottomSheetDialogFragment() {
                 }
             }
         }
+        view.setSystemWindowInsetToPadding(right = true, left = true)
     }
 }

@@ -2327,10 +2327,5 @@
     <string name="folder_content_description">Folder %s</string>
     <string name="suggested_folders_paywall_tittle">Your podcasts, automatically organized</string>
     <string name="suggested_folders_paywall_subtitle">We\'ve pre-made folders for your podcasts. Unlock this and features like bookmarks, transcripts, and more with Pocket Casts Plus.</string>
-<<<<<<< HEAD
-=======
-    <string name="suggested_folders_use_these_folders_button">Use these folders</string>
-    <string name="folder_content_description">Folder %s</string>
->>>>>>> 7bc169f6e (improve accessibility)
 
 </resources>
