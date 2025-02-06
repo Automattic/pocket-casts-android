@@ -3,6 +3,9 @@
 *   Bug Fixes
     *   Fix missing episodes with unfollowed podcasts
         ([#3546](https://github.com/Automattic/pocket-casts-android/pull/3546))
+*   Updates
+    *   Filter out chapters that do not belong in table of contents. See [the specification](https://github.com/Podcastindex-org/podcast-namespace/blob/main/chapters/jsonChapters.md) for more details.
+        ([#3556](https://github.com/Automattic/pocket-casts-android/pull/3556))
 
 7.82
 -----
