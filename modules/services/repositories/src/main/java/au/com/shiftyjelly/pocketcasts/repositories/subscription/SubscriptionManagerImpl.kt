@@ -330,6 +330,30 @@ class SubscriptionManagerImpl @Inject constructor(
         return billingClient.launchBillingFlow(activity, billingFlowParams)
     }
 
+    override suspend fun claimWinbackOffer(
+        currentPurchase: Purchase,
+        winbackProduct: ProductDetails,
+        winbackOfferToken: String,
+        activity: Activity,
+    ): BillingResult {
+        val productDetailsParams = BillingFlowParams.ProductDetailsParams.newBuilder()
+            .setProductDetails(winbackProduct)
+            .setOfferToken(winbackOfferToken)
+            .build()
+
+        val updateParams = BillingFlowParams.SubscriptionUpdateParams.newBuilder()
+            .setOldPurchaseToken(currentPurchase.purchaseToken)
+            .setSubscriptionReplacementMode(BillingFlowParams.SubscriptionUpdateParams.ReplacementMode.CHARGE_FULL_PRICE)
+            .build()
+
+        val billingFlowParams = BillingFlowParams.newBuilder()
+            .setProductDetailsParamsList(listOf(productDetailsParams))
+            .setSubscriptionUpdateParams(updateParams)
+            .build()
+
+        return billingClient.launchBillingFlow(activity, billingFlowParams)
+    }
+
     private suspend fun loadSubscriptionUpdateParamsMode(
         productDetails: ProductDetails,
     ): Pair<BillingResult, BillingFlowParams.SubscriptionUpdateParams?> {

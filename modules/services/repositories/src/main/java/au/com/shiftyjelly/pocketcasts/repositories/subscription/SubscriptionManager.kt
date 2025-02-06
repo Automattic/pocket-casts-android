@@ -43,6 +43,13 @@ interface SubscriptionManager {
         activity: Activity,
     ): BillingResult
 
+    suspend fun claimWinbackOffer(
+        currentPurchase: Purchase,
+        winbackProduct: ProductDetails,
+        winbackOfferToken: String,
+        activity: Activity,
+    ): BillingResult
+
     fun signOut()
 
     fun observeProductDetails(): Flowable<ProductDetailsState>
