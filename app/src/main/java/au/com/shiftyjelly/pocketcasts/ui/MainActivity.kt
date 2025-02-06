@@ -996,6 +996,10 @@ class MainActivity :
         return binding.snackbarFragment
     }
 
+    override fun setFullScreenDarkOverlayViewVisibility(visible: Boolean) {
+        binding.fullScreenDarkOverlayView.isVisible = visible
+    }
+
     override fun onMiniPlayerHidden() {
         updateSnackbarPosition(miniPlayerOpen = false)
         settings.updateBottomInset(0)

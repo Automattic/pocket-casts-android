@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -751,16 +750,21 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         binding?.composeTooltipHost?.setContent {
             AppTheme(theme.activeTheme) {
                 val shouldShow by viewModel.shouldShowPodcastTooltip.collectAsState()
-                AnimatedVisibility(visible = shouldShow && tooltipEnabled && FeatureFlag.isEnabled(Feature.PODCAST_FEED_UPDATE)) {
+                if (shouldShow && tooltipEnabled && FeatureFlag.isEnabled(Feature.PODCAST_FEED_UPDATE)) {
                     PodcastTooltip(
                         title = stringResource(LR.string.podcast_feed_update_tooltip_title),
                         subtitle = stringResource(LR.string.podcast_feed_update_tooltip_subtitle),
                         offset = tooltipOffset,
                         onTooltipShown = {
+                            (activity as? FragmentHostListener)?.setFullScreenDarkOverlayViewVisibility(true)
                             analyticsTracker.track(AnalyticsEvent.PODCAST_REFRESH_EPISODE_TOOLTIP_SHOWN)
                         },
-                        onDismissRequest = {},
+                        onDismissRequest = {
+                            (activity as? FragmentHostListener)?.setFullScreenDarkOverlayViewVisibility(false)
+                            tooltipEnabled = false
+                        },
                         onCloseButtonClick = {
+                            (activity as? FragmentHostListener)?.setFullScreenDarkOverlayViewVisibility(false)
                             analyticsTracker.track(AnalyticsEvent.PODCAST_REFRESH_EPISODE_TOOLTIP_DISMISSED)
                             viewModel.hidePodcastRefreshTooltip()
                         },

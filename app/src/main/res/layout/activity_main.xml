@@ -66,6 +66,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/fullScreenDarkOverlayView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#80000000"
+        android:visibility="gone" />
+
     <au.com.shiftyjelly.pocketcasts.views.component.RadioactiveLineView
         android:id="@+id/radioactiveLineView"
         android:layout_width="match_parent"
