@@ -125,7 +125,7 @@ class PlayerViewModel @Inject constructor(
         val isStarred = (episode as? PodcastEpisode)?.isStarred == true
         val isUserEpisode = episode is UserEpisode
 
-        val isChaptersPresent: Boolean = !chapters.isEmpty
+        val isChaptersPresent: Boolean = chapters.isNotEmpty()
         val chapter: Chapter? = chapters.getChapter(positionMs.milliseconds)
         val chapterProgress: Float = chapter?.calculateProgress(positionMs.milliseconds) ?: 0f
         val chapterTimeRemaining: String = chapter?.remainingTime(
@@ -375,7 +375,7 @@ class PlayerViewModel @Inject constructor(
                 chapters = playbackState.chapters,
                 backgroundColor = playerBackground,
                 iconTintColor = iconTintColor,
-                podcastTitle = if (playbackState.chapters.isEmpty) podcast?.title else null,
+                podcastTitle = if (playbackState.chapters.isEmpty()) podcast?.title else null,
                 skipBackwardInSecs = skipBackwardInSecs,
                 skipForwardInSecs = skipForwardInSecs,
                 isSleepRunning = sleepTimerState.isSleepTimerRunning,
