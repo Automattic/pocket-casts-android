@@ -146,9 +146,9 @@ class ChaptersViewModelTest {
         chaptersViewModel.uiState.test {
             val state = awaitItem()
 
-            assertEquals(ChaptersViewModel.ChapterState.Played(chapters.getList()[0]), state.chapters[0])
-            assertEquals(ChaptersViewModel.ChapterState.Playing(progress = 0.4949495f, chapters.getList()[1]), state.chapters[1])
-            assertEquals(ChaptersViewModel.ChapterState.NotPlayed(chapters.getList()[2]), state.chapters[2])
+            assertEquals(ChaptersViewModel.ChapterState.Played(chapters[0]), state.chapters[0])
+            assertEquals(ChaptersViewModel.ChapterState.Playing(progress = 0.4949495f, chapters[1]), state.chapters[1])
+            assertEquals(ChaptersViewModel.ChapterState.NotPlayed(chapters[2]), state.chapters[2])
         }
     }
 
@@ -206,14 +206,14 @@ class ChaptersViewModelTest {
 
     @Test
     fun `select chapter`() = runTest {
-        chaptersViewModel.selectChapter(true, chapters.getList()[1])
+        chaptersViewModel.selectChapter(true, chapters[1])
 
         verifyBlocking(chapterManager, times(1)) { selectChapter("id", chapterIndex = 1, true) }
     }
 
     @Test
     fun `deselect chapter`() = runTest {
-        chaptersViewModel.selectChapter(false, chapters.getList()[0])
+        chaptersViewModel.selectChapter(false, chapters[0])
 
         verifyBlocking(chapterManager, times(1)) { selectChapter("id", chapterIndex = 0, false) }
     }
@@ -223,14 +223,14 @@ class ChaptersViewModelTest {
         chaptersViewModel.scrollToChapter.test {
             expectNoEvents()
 
-            chaptersViewModel.scrollToChapter(chapters.getList()[0])
-            assertEquals(chapters.getList()[0], awaitItem())
+            chaptersViewModel.scrollToChapter(chapters[0])
+            assertEquals(chapters[0], awaitItem())
 
-            chaptersViewModel.scrollToChapter(chapters.getList()[0])
-            assertEquals(chapters.getList()[0], awaitItem())
+            chaptersViewModel.scrollToChapter(chapters[0])
+            assertEquals(chapters[0], awaitItem())
 
-            chaptersViewModel.scrollToChapter(chapters.getList()[1])
-            assertEquals(chapters.getList()[1], awaitItem())
+            chaptersViewModel.scrollToChapter(chapters[1])
+            assertEquals(chapters[1], awaitItem())
         }
     }
 
@@ -238,9 +238,9 @@ class ChaptersViewModelTest {
     fun `skip to chapter from current episode while playing`() = runTest {
         playbackStateFlow.update { it.copy(state = PlaybackState.State.PLAYING) }
 
-        chaptersViewModel.playChapter(chapters.getList()[2])
+        chaptersViewModel.playChapter(chapters[2])
 
-        verify(playbackManager, times(1)).skipToChapter(chapters.getList()[2])
+        verify(playbackManager, times(1)).skipToChapter(chapters[2])
         verifyBlocking(playbackManager, never()) { playNowSuspend("id") }
     }
 
@@ -248,9 +248,9 @@ class ChaptersViewModelTest {
     fun `skip to and play chapter from current episode while not playing`() = runTest {
         playbackStateFlow.update { it.copy(state = PlaybackState.State.STOPPED) }
 
-        chaptersViewModel.playChapter(chapters.getList()[2])
+        chaptersViewModel.playChapter(chapters[2])
 
-        verify(playbackManager, times(1)).skipToChapter(chapters.getList()[2])
+        verify(playbackManager, times(1)).skipToChapter(chapters[2])
         verifyBlocking(playbackManager, times(1)) { playNowSuspend("id") }
     }
 
@@ -281,10 +281,10 @@ class ChaptersViewModelTest {
         chaptersViewModel.showPlayer.test {
             expectNoEvents()
 
-            chaptersViewModel.playChapter(chapters.getList()[0])
+            chaptersViewModel.playChapter(chapters[0])
             assertEquals(Unit, awaitItem())
 
-            chaptersViewModel.playChapter(chapters.getList()[0])
+            chaptersViewModel.playChapter(chapters[0])
             assertEquals(Unit, awaitItem())
         }
     }
