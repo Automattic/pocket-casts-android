@@ -2319,4 +2319,11 @@
     <string name="winback_cancel_subscription_stay_button_label">Actually, I want to stay</string>
     <string name="winback_cancel_subscription_cancel_button_label">Yes, Cancel my Subscription</string>
 
+    <!-- Suggested Folders -->
+    <string name="suggested_folders">Suggested Folders</string>
+    <string name="suggested_folders_subtitle">We’ve organized your podcasts for you. Save or customize them to fit your style.</string>
+    <string name="suggested_folders_use_these_folders_button">Use these folders</string>
+    <string name="suggested_folders_use_create_custom_folders_button">Create custom folders</string>
+    <string name="folder_content_description">Folder %s</string>
+
 </resources>
