@@ -139,7 +139,7 @@ platform :android do
     trigger_release_build(branch_to_build: "release/#{new_version}")
     create_backmerge_pr
 
-    copy_branch_protection(repository: GITHUB_REPO, branch: "release/#{new_version}", from_branch: DEFAULT_BRANCH)
+    copy_branch_protection(repository: GITHUB_REPO, from_branch: DEFAULT_BRANCH, to_branch: "release/#{new_version}")
 
     begin
       # Move PRs to next milestone
