@@ -1,6 +1,8 @@
 7.83
 -----
-
+*   Bug Fixes
+    *   Fix missing episodes with unfollowed podcasts
+        ([#3546](https://github.com/Automattic/pocket-casts-android/pull/3546))
 
 7.82
 -----
