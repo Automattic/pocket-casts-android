@@ -245,10 +245,18 @@ class WinbackViewModelTest {
             val newPurchase = createPurchase(orderId = "new-purchase")
             winbackManager.addPurchases(listOf(newPurchase))
             winbackManager.addPurchaseEvent(PurchaseEvent.Success)
-            val state = awaitLoadedState()
 
-            assertFalse(state.isChangingPlan)
-            assertEquals(state.activePurchase, ActivePurchase(newPurchase.orderId!!, newPurchase.products[0]))
+            val changedPlanState = awaitItem()
+            val plansState = changedPlanState.subscriptionPlansState as SubscriptionPlansState.Loaded
+            assertFalse(plansState.isChangingPlan)
+            assertEquals(plansState.activePurchase, ActivePurchase(newPurchase.orderId!!, newPurchase.products[0]))
+            assertNull(changedPlanState.winbackOfferState)
+
+            winbackManager.addWinbackResponse(winbackResponse)
+            assertEquals(
+                "offer-token-${Subscription.PLUS_MONTHLY_PRODUCT_ID}",
+                awaitOfferState().offer.offerToken,
+            )
         }
     }
 
@@ -335,8 +343,12 @@ class WinbackViewModelTest {
             winbackManager.addPurchases(emptyList())
             winbackManager.addPurchaseEvent(PurchaseEvent.Success)
 
-            val state = awaitItem().subscriptionPlansState
-            assertTrue(state is SubscriptionPlansState.Failure)
+            val changedPlanState = awaitItem()
+            assertTrue(changedPlanState.subscriptionPlansState is SubscriptionPlansState.Failure)
+            assertNull(changedPlanState.winbackOfferState)
+
+            winbackManager.addWinbackResponse(winbackResponse)
+            expectNoEvents()
         }
     }
 
@@ -896,6 +908,7 @@ class WinbackViewModelTest {
         viewModel.changePlan(knownPlan, mock())
 
         winbackManager.addPurchase(createPurchase(productIds = listOf(Subscription.PLUS_MONTHLY_PRODUCT_ID)))
+        winbackManager.addWinbackResponse(null)
         winbackManager.addPurchaseEvent(PurchaseEvent.Success)
 
         assertEquals(

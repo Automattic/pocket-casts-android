@@ -22,8 +22,10 @@ import com.pocketcasts.service.api.WinbackResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.Date
 import javax.inject.Inject
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -54,7 +56,7 @@ class WinbackViewModel @Inject constructor(
         viewModelScope.launch {
             val plansDeferred = async { loadPlans() }
             val activePurchaseDeferred = async { loadActivePurchase() }
-            val winbackOfferResponseDeferred = async { winbackManager.getWinbackOffer() }
+            val winbackOfferResponseDeferred = async { loadWinbackOffer() }
 
             val plansResult = plansDeferred.await()
             val activePurchaseResult = activePurchaseDeferred.await()
@@ -82,11 +84,7 @@ class WinbackViewModel @Inject constructor(
             )
 
             val winbackResponse = winbackOfferResponseDeferred.await()
-            _uiState.value = _uiState.value.copy(
-                winbackOfferState = winbackResponse
-                    ?.toWinbackOffer(_uiState.value.productsDetails)
-                    ?.let(::WinbackOfferState),
-            )
+            _uiState.value = _uiState.value.applyWinbackResponse(winbackResponse)
         }
     }
 
@@ -145,12 +143,15 @@ class WinbackViewModel @Inject constructor(
                         currentProductId = currentProductId,
                         newProductId = newProduct.productId,
                     )
+                    val activePurchaseDeferred = async { loadActivePurchase() }
+                    val winbackOfferResponseDeferred = async { loadWinbackOffer() }
 
-                    val (newPurchases, newPurchase) = loadActivePurchase()
-                    when (newPurchase) {
+                    val (newPurchases, newPurchase) = activePurchaseDeferred.await()
+
+                    _uiState.value = when (newPurchase) {
                         is ActivePurchaseResult.Found -> {
-                            _uiState.value = _uiState.value
-                                .copy(purchases = newPurchases)
+                            _uiState.value
+                                .copy(purchases = newPurchases, winbackOfferState = null)
                                 .withLoadedSubscriptionPlans { plans ->
                                     plans.copy(isChangingPlan = false, activePurchase = newPurchase.purchase)
                                 }
@@ -158,9 +159,12 @@ class WinbackViewModel @Inject constructor(
 
                         is ActivePurchaseResult.NotFound -> {
                             val failure = SubscriptionPlansState.Failure(FailureReason.Default)
-                            _uiState.value = _uiState.value.copy(subscriptionPlansState = failure)
+                            uiState.value.copy(subscriptionPlansState = failure, winbackOfferState = null)
                         }
                     }
+
+                    val winbackResponse = winbackOfferResponseDeferred.await()
+                    _uiState.value = _uiState.value.applyWinbackResponse(winbackResponse)
                 }
             }
         }
@@ -241,6 +245,22 @@ class WinbackViewModel @Inject constructor(
         is PurchasesState.Failure -> emptyList<Purchase>() to ActivePurchaseResult.NotFound(FailureReason.Default)
     }
 
+    private var winbackOfferJob: Deferred<WinbackResponse?>? = null
+
+    // The winback offer is loaded this way to avoid plan change race conditions.
+    // Changing a plan means the user may have a different winback offer available, which needs to be loaded.
+    //
+    // However, the offer from the initial call may not have loaded yet.
+    //
+    // If we start loading a new one without canceling the previous call, we might end up
+    // displaying an incorrect winback offer to the user, as the old call could complete after the new one.
+    private suspend fun loadWinbackOffer(): WinbackResponse? {
+        winbackOfferJob?.cancelAndJoin()
+        return viewModelScope.async { winbackManager.getWinbackOffer() }
+            .also { winbackOfferJob = it }
+            .await()
+    }
+
     private fun List<ProductDetails>.toSubscriptionPlans() = map(subscriptionMapper::mapFromProductDetails)
         .filterIsInstance<Subscription.Simple>()
         .map(Subscription.Simple::toPlan)
@@ -314,6 +334,16 @@ class WinbackViewModel @Inject constructor(
         } else {
             this
         }
+    }
+
+    private fun UiState.applyWinbackResponse(response: WinbackResponse?): UiState {
+        val activePurchase = (subscriptionPlansState as? SubscriptionPlansState.Loaded)?.activePurchase
+        return copy(
+            winbackOfferState = response
+                ?.takeIf { activePurchase != null }
+                ?.toWinbackOffer(productsDetails)
+                ?.let(::WinbackOfferState),
+        )
     }
 
     private fun logWarning(message: String) {
