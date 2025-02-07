@@ -754,8 +754,8 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
                 var show by remember { mutableStateOf(true) }
 
-                LaunchedEffect(canShowTooltip) {
-                    show = canShowTooltip && FeatureFlag.isEnabled(Feature.PODCAST_FEED_UPDATE) && shouldShowPodcastTooltip
+                LaunchedEffect(canShowTooltip, shouldShowPodcastTooltip) {
+                    show = canShowTooltip && shouldShowPodcastTooltip && FeatureFlag.isEnabled(Feature.PODCAST_FEED_UPDATE)
                 }
 
                 if (show) {
@@ -768,14 +768,11 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                             analyticsTracker.track(AnalyticsEvent.PODCAST_REFRESH_EPISODE_TOOLTIP_SHOWN)
                         },
                         onDismissRequest = {
-                            (activity as? FragmentHostListener)?.setFullScreenDarkOverlayViewVisibility(false)
-                            viewModel.hidePodcastRefreshTooltip()
-                            canShowTooltip = false
+                            hideTooltip()
                         },
                         onCloseButtonClick = {
-                            (activity as? FragmentHostListener)?.setFullScreenDarkOverlayViewVisibility(false)
                             analyticsTracker.track(AnalyticsEvent.PODCAST_REFRESH_EPISODE_TOOLTIP_DISMISSED)
-                            viewModel.hidePodcastRefreshTooltip()
+                            hideTooltip()
                         },
                     )
                 } else {
@@ -829,6 +826,12 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
         tooltipOffset = IntOffset(anchorX, anchorY)
         canShowTooltip = true
+    }
+
+    private fun hideTooltip() {
+        (activity as? FragmentHostListener)?.setFullScreenDarkOverlayViewVisibility(false)
+        viewModel.hidePodcastRefreshTooltip()
+        canShowTooltip = false
     }
 
     private fun onShareBookmarkClick() {
@@ -948,7 +951,8 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                 binding?.toolbar?.setBackgroundColor(backgroundColor)
                 binding?.headerBackgroundPlaceholder?.setBackgroundColor(backgroundColor)
 
-                adapter?.setPodcast(podcast)
+                val forceHeaderExpanded = !viewModel.shouldShowPodcastTooltip.value && FeatureFlag.isEnabled(Feature.PODCAST_FEED_UPDATE)
+                adapter?.setPodcast(podcast, forceHeaderExpanded = forceHeaderExpanded)
 
                 viewModel.archiveEpisodeLimit()
 

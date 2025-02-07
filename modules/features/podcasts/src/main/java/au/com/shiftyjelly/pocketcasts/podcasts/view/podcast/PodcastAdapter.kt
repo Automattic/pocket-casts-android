@@ -446,10 +446,10 @@ class PodcastAdapter(
         }
     }
 
-    fun setPodcast(podcast: Podcast) {
+    fun setPodcast(podcast: Podcast, forceHeaderExpanded: Boolean? = null) {
         // expand the podcast description and details if the user hasn't subscribed
         if (this.podcast.uuid != podcast.uuid) {
-            headerExpanded = !podcast.isSubscribed
+            headerExpanded = forceHeaderExpanded ?: !podcast.isSubscribed
             ratingsViewModel.loadRatings(podcast.uuid)
             ratingsViewModel.refreshPodcastRatings(podcast.uuid)
             onHeaderSummaryToggled(headerExpanded, false)
