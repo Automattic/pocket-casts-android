@@ -116,6 +116,9 @@ class AutomotiveSettingsActivity : AppCompatActivity(), FragmentHostListener {
         return findViewById(android.R.id.content)
     }
 
+    override fun setFullScreenDarkOverlayViewVisibility(visible: Boolean) {
+    }
+
     override fun showAccountUpgradeNow(autoSelectPlus: Boolean) {
     }
 
