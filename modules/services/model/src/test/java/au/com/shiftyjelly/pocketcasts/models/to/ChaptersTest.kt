@@ -74,11 +74,11 @@ class ChaptersTest {
     private fun initChapters(): Chapters {
         return Chapters(
             items = listOf(
-                Chapter("1", 0.milliseconds, 101.milliseconds, selected = true),
-                Chapter("2", 101.milliseconds, 201.milliseconds, selected = false),
-                Chapter("3", 201.milliseconds, 301.milliseconds, selected = false),
-                Chapter("4", 301.milliseconds, 401.milliseconds, selected = false),
-                Chapter("5", 401.milliseconds, 500.milliseconds, selected = true),
+                Chapter("1", 0.milliseconds, 101.milliseconds, selected = true, index = 0, uiIndex = 1),
+                Chapter("2", 101.milliseconds, 201.milliseconds, selected = false, index = 1, uiIndex = 2),
+                Chapter("3", 201.milliseconds, 301.milliseconds, selected = false, index = 2, uiIndex = 3),
+                Chapter("4", 301.milliseconds, 401.milliseconds, selected = false, index = 3, uiIndex = 4),
+                Chapter("5", 401.milliseconds, 500.milliseconds, selected = true, index = 4, uiIndex = 5),
             ),
         )
     }

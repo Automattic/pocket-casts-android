@@ -1537,6 +1537,7 @@ open class PlaybackManager @Inject constructor(
             launch {
                 val dbChapters = episodeMetadata.chapters.map { chapter ->
                     DbChapter(
+                        index = chapter.index,
                         episodeUuid = playbackState.episodeUuid,
                         startTimeMs = chapter.startTime.inWholeMilliseconds,
                         endTimeMs = chapter.endTime.inWholeMilliseconds,

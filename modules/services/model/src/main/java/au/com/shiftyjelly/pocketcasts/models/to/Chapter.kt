@@ -8,9 +8,10 @@ data class Chapter(
     val title: String,
     val startTime: Duration,
     val endTime: Duration,
+    val index: Int,
+    val uiIndex: Int,
     val url: HttpUrl? = null,
     val imagePath: String? = null,
-    val index: Int = 0,
     val selected: Boolean = true,
 ) {
 
