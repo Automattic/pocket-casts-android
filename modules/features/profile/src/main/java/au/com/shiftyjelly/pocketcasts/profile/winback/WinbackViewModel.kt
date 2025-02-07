@@ -84,11 +84,7 @@ class WinbackViewModel @Inject constructor(
             )
 
             val winbackResponse = winbackOfferResponseDeferred.await()
-            _uiState.value = _uiState.value.copy(
-                winbackOfferState = winbackResponse
-                    ?.toWinbackOffer(_uiState.value.productsDetails)
-                    ?.let(::WinbackOfferState),
-            )
+            _uiState.value = _uiState.value.applyWinbackResponse(winbackResponse)
         }
     }
 
@@ -147,12 +143,15 @@ class WinbackViewModel @Inject constructor(
                         currentProductId = currentProductId,
                         newProductId = newProduct.productId,
                     )
+                    val activePurchaseDeferred = async { loadActivePurchase() }
+                    val winbackOfferResponseDeferred = async { loadWinbackOffer() }
 
-                    val (newPurchases, newPurchase) = loadActivePurchase()
-                    when (newPurchase) {
+                    val (newPurchases, newPurchase) = activePurchaseDeferred.await()
+
+                    _uiState.value = when (newPurchase) {
                         is ActivePurchaseResult.Found -> {
-                            _uiState.value = _uiState.value
-                                .copy(purchases = newPurchases)
+                            _uiState.value
+                                .copy(purchases = newPurchases, winbackOfferState = null)
                                 .withLoadedSubscriptionPlans { plans ->
                                     plans.copy(isChangingPlan = false, activePurchase = newPurchase.purchase)
                                 }
@@ -160,9 +159,12 @@ class WinbackViewModel @Inject constructor(
 
                         is ActivePurchaseResult.NotFound -> {
                             val failure = SubscriptionPlansState.Failure(FailureReason.Default)
-                            _uiState.value = _uiState.value.copy(subscriptionPlansState = failure)
+                            uiState.value.copy(subscriptionPlansState = failure, winbackOfferState = null)
                         }
                     }
+
+                    val winbackResponse = winbackOfferResponseDeferred.await()
+                    _uiState.value = _uiState.value.applyWinbackResponse(winbackResponse)
                 }
             }
         }
@@ -332,6 +334,14 @@ class WinbackViewModel @Inject constructor(
         } else {
             this
         }
+    }
+
+    private fun UiState.applyWinbackResponse(response: WinbackResponse?): UiState {
+        return copy(
+            winbackOfferState = response
+                ?.toWinbackOffer(productsDetails)
+                ?.let(::WinbackOfferState),
+        )
     }
 
     private fun logWarning(message: String) {
