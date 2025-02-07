@@ -31,7 +31,7 @@
 }
 
 # Do not optimize PlaybackService class.
-# It causes na issue where the media notification is not displayed in some cases.
+# It causes an issue where the media notification is not displayed in some cases.
 # https://github.com/shiftyjelly/pocketcasts-android/issues/1656
 # https://github.com/shiftyjelly/pocketcasts-android/pulls/2921
 -keep,allowobfuscation,allowshrinking class au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackService { *; }
