@@ -208,7 +208,7 @@ enum class Feature(
         title = "Podcast Feed Update",
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
     SUGGESTED_FOLDERS(
