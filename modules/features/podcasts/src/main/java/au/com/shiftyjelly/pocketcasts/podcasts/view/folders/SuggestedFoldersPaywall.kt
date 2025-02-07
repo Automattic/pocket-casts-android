@@ -11,10 +11,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -41,6 +42,8 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
+import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -76,8 +79,7 @@ fun SuggestedFoldersPaywall(
                 podcastUuids = mockedPodcastsUuids,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = animatedPadding)
-                    .align(Alignment.CenterHorizontally),
+                    .padding(vertical = animatedPadding),
             )
         }
 
@@ -122,18 +124,17 @@ fun SuggestedFoldersPaywall(
 
 @Composable
 private fun Folders(podcastUuids: List<String>, modifier: Modifier = Modifier) {
-    val folders = 3
+    val episodeImageWidthDp = UiUtil.getGridImageWidthPx(smallArtwork = false, context = LocalContext.current).pxToDp(LocalContext.current).toInt()
 
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(3),
+    LazyRow(
         horizontalArrangement = Arrangement.spacedBy(6.dp),
         modifier = modifier,
     ) {
         items(
-            count = folders,
+            count = 3,
             key = { index -> index },
         ) { index ->
-            FolderItem("Test", Color.Yellow, podcastUuids)
+            FolderItem("Test", Color.Yellow, podcastUuids, Modifier.size(episodeImageWidthDp.dp))
         }
     }
 }
