@@ -348,10 +348,7 @@ class WinbackViewModelTest {
             assertNull(changedPlanState.winbackOfferState)
 
             winbackManager.addWinbackResponse(winbackResponse)
-            assertEquals(
-                "offer-token-${Subscription.PLUS_MONTHLY_PRODUCT_ID}",
-                awaitOfferState().offer.offerToken,
-            )
+            expectNoEvents()
         }
     }
 

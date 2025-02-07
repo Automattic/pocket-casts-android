@@ -337,8 +337,10 @@ class WinbackViewModel @Inject constructor(
     }
 
     private fun UiState.applyWinbackResponse(response: WinbackResponse?): UiState {
+        val activePurchase = (subscriptionPlansState as? SubscriptionPlansState.Loaded)?.activePurchase
         return copy(
             winbackOfferState = response
+                ?.takeIf { activePurchase != null }
                 ?.toWinbackOffer(productsDetails)
                 ?.let(::WinbackOfferState),
         )
