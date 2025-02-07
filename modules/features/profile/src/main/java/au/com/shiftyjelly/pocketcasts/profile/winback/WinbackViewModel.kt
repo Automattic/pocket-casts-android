@@ -22,8 +22,10 @@ import com.pocketcasts.service.api.WinbackResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.Date
 import javax.inject.Inject
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -54,7 +56,7 @@ class WinbackViewModel @Inject constructor(
         viewModelScope.launch {
             val plansDeferred = async { loadPlans() }
             val activePurchaseDeferred = async { loadActivePurchase() }
-            val winbackOfferResponseDeferred = async { winbackManager.getWinbackOffer() }
+            val winbackOfferResponseDeferred = async { loadWinbackOffer() }
 
             val plansResult = plansDeferred.await()
             val activePurchaseResult = activePurchaseDeferred.await()
@@ -239,6 +241,22 @@ class WinbackViewModel @Inject constructor(
     private suspend fun loadActivePurchase() = when (val state = winbackManager.loadPurchases()) {
         is PurchasesState.Loaded -> state.purchases to state.purchases.findActivePurchase()
         is PurchasesState.Failure -> emptyList<Purchase>() to ActivePurchaseResult.NotFound(FailureReason.Default)
+    }
+
+    private var winbackOfferJob: Deferred<WinbackResponse?>? = null
+
+    // The winback offer is loaded this way to avoid plan change race conditions.
+    // Changing a plan means the user may have a different winback offer available, which needs to be loaded.
+    //
+    // However, the offer from the initial call may not have loaded yet.
+    //
+    // If we start loading a new one without canceling the previous call, we might end up
+    // displaying an incorrect winback offer to the user, as the old call could complete after the new one.
+    private suspend fun loadWinbackOffer(): WinbackResponse? {
+        winbackOfferJob?.cancelAndJoin()
+        return viewModelScope.async { winbackManager.getWinbackOffer() }
+            .also { winbackOfferJob = it }
+            .await()
     }
 
     private fun List<ProductDetails>.toSubscriptionPlans() = map(subscriptionMapper::mapFromProductDetails)
