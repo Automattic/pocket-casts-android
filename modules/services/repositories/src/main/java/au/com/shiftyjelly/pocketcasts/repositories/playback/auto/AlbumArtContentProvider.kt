@@ -6,20 +6,20 @@ import android.content.Context
 import android.database.Cursor
 import android.net.Uri
 import android.os.ParcelFileDescriptor
-import au.com.shiftyjelly.pocketcasts.servers.di.Downloads
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import coil.ImageLoader
+import coil.annotation.ExperimentalCoilApi
+import coil.request.ErrorResult
+import coil.request.SuccessResult
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
 import java.io.File
+import kotlinx.coroutines.runBlocking
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.Response
-import okio.buffer
-import okio.sink
 import okio.use
 import timber.log.Timber
 
@@ -42,12 +42,9 @@ class AlbumArtContentProvider : ContentProvider() {
 
             val imageUrl = uri.toImageUrl()
             val artworkFile = if (imageUrl != null) {
-                val cacheFile = imageUrl.toCachedArtworkFile(applicationContext)
-                if (cacheFile.exists()) {
-                    cacheFile
-                } else {
-                    entryPoint.okHttpClient().fetchAndSaveArtwork(imageUrl, cacheFile)
-                }
+                entryPoint.imageLoader()
+                    .getArtworkFile(imageUrl, applicationContext)
+                    ?.takeIf(File::exists)
             } else {
                 uri.path?.let(::File)
             }
@@ -69,28 +66,18 @@ class AlbumArtContentProvider : ContentProvider() {
 
     private fun Uri.toImageUrl() = lastPathSegment?.toHttpUrlOrNull()
 
-    private fun HttpUrl.toCachedArtworkFile(context: Context): File {
-        val fileName = "${host}$encodedPath".replace(oldChar = '/', newChar = ':')
-        return context.cacheDir.resolve(fileName)
-    }
-
-    private fun OkHttpClient.fetchAndSaveArtwork(imageUrl: HttpUrl, file: File): File? {
-        Timber.tag("AlbumArtProvider").d("Executing call for $imageUrl")
-        val request = Request.Builder().url(imageUrl).build()
-        val response = newCall(request).execute()
-        return response.use { it.writeSuccessBody(file) }
-    }
-
-    private fun Response.writeSuccessBody(file: File): File? {
-        val responseBody = body
-        return if (isSuccessful && responseBody != null) {
-            file.sink().buffer().use { sink ->
-                sink.writeAll(responseBody.source())
-            }
-            file
-        } else {
-            null
+    private fun ImageLoader.getArtworkFile(url: HttpUrl, context: Context): File? {
+        val requestFactory = PocketCastsImageRequestFactory(context)
+        val request = requestFactory.createForFileOrUrl(url.toString())
+        return when (val result = runBlocking { execute(request) }) {
+            is SuccessResult -> result.diskCacheKey?.let { key -> getCachedArtworkFile(key) }
+            is ErrorResult -> null
         }
+    }
+
+    @OptIn(ExperimentalCoilApi::class)
+    private fun ImageLoader.getCachedArtworkFile(key: String): File? {
+        return diskCache?.openSnapshot(key)?.use { snapshot -> snapshot.data.toFile() }
     }
 
     override fun insert(uri: Uri, values: ContentValues?): Uri? = null
@@ -117,7 +104,6 @@ class AlbumArtContentProvider : ContentProvider() {
     @EntryPoint
     @InstallIn(SingletonComponent::class)
     interface AlbumArtEntryPoint {
-        @Downloads
-        fun okHttpClient(): OkHttpClient
+        fun imageLoader(): ImageLoader
     }
 }
