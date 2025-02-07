@@ -769,6 +769,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                         },
                         onDismissRequest = {
                             (activity as? FragmentHostListener)?.setFullScreenDarkOverlayViewVisibility(false)
+                            viewModel.hidePodcastRefreshTooltip()
                             canShowTooltip = false
                         },
                         onCloseButtonClick = {
