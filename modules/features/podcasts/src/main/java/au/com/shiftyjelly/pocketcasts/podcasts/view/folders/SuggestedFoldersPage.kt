@@ -124,7 +124,7 @@ fun SuggestedFoldersPage(
 }
 
 @Composable
-private fun FolderItem(folderName: String, folderColor: Color, podcastUuids: List<String>, modifier: Modifier = Modifier) {
+fun FolderItem(folderName: String, folderColor: Color, podcastUuids: List<String>, modifier: Modifier = Modifier) {
     val stringResource = stringResource(LR.string.folder_content_description, folderName)
 
     FolderImage(

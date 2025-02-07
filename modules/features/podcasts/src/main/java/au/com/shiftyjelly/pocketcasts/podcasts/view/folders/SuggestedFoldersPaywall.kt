@@ -27,7 +27,6 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
-import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,7 +38,6 @@ import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
-import au.com.shiftyjelly.pocketcasts.compose.folder.FolderImage
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -138,21 +136,6 @@ private fun Folders(podcastUuids: List<String>, modifier: Modifier = Modifier) {
             FolderItem("Test", Color.Yellow, podcastUuids)
         }
     }
-}
-
-@Composable
-private fun FolderItem(folderName: String, folderColor: Color, podcastUuids: List<String>, modifier: Modifier = Modifier) {
-    val stringResource = stringResource(LR.string.folder_content_description, folderName)
-
-    FolderImage(
-        name = folderName,
-        color = folderColor,
-        podcastUuids = podcastUuids,
-        textSpacing = true,
-        modifier = modifier.clearAndSetSemantics {
-            contentDescription = stringResource
-        },
-    )
 }
 
 @Preview(showBackground = true)
