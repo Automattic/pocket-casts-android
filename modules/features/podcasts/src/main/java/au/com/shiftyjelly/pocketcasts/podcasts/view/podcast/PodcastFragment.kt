@@ -8,15 +8,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
-import androidx.core.view.doOnNextLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
@@ -178,7 +179,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     private var listState: Parcelable? = null
 
     private var tooltipOffset by mutableStateOf(IntOffset.Zero)
-    private var tooltipEnabled by mutableStateOf(false)
+    private var canShowTooltip by mutableStateOf(false)
 
     private var currentSnackBar: Snackbar? = null
 
@@ -749,8 +750,15 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
         binding?.composeTooltipHost?.setContent {
             AppTheme(theme.activeTheme) {
-                val shouldShow by viewModel.shouldShowPodcastTooltip.collectAsState()
-                if (shouldShow && tooltipEnabled && FeatureFlag.isEnabled(Feature.PODCAST_FEED_UPDATE)) {
+                val shouldShowPodcastTooltip by viewModel.shouldShowPodcastTooltip.collectAsState()
+
+                var show by remember { mutableStateOf(true) }
+
+                LaunchedEffect(canShowTooltip) {
+                    show = canShowTooltip && FeatureFlag.isEnabled(Feature.PODCAST_FEED_UPDATE) && shouldShowPodcastTooltip
+                }
+
+                if (show) {
                     PodcastTooltip(
                         title = stringResource(LR.string.podcast_feed_update_tooltip_title),
                         subtitle = stringResource(LR.string.podcast_feed_update_tooltip_subtitle),
@@ -761,7 +769,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                         },
                         onDismissRequest = {
                             (activity as? FragmentHostListener)?.setFullScreenDarkOverlayViewVisibility(false)
-                            tooltipEnabled = false
+                            canShowTooltip = false
                         },
                         onCloseButtonClick = {
                             (activity as? FragmentHostListener)?.setFullScreenDarkOverlayViewVisibility(false)
@@ -769,6 +777,8 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                             viewModel.hidePodcastRefreshTooltip()
                         },
                     )
+                } else {
+                    (activity as? FragmentHostListener)?.setFullScreenDarkOverlayViewVisibility(false)
                 }
             }
         }
@@ -783,10 +793,6 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                         }
                     }
             }
-        }
-
-        binding?.episodesRecyclerView?.doOnNextLayout {
-            configureTooltip()
         }
     }
 
@@ -821,7 +827,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         }
 
         tooltipOffset = IntOffset(anchorX, anchorY)
-        tooltipEnabled = true
+        canShowTooltip = true
     }
 
     private fun onShareBookmarkClick() {
@@ -977,6 +983,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                                 podcast = state.podcast,
                                 context = requireContext(),
                             )
+                            configureTooltip()
                         }
                         PodcastTab.BOOKMARKS -> {
                             adapter?.setBookmarks(
@@ -1079,6 +1086,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         binding = null
         currentSnackBar?.dismiss()
         currentSnackBar = null
+        (activity as? FragmentHostListener)?.setFullScreenDarkOverlayViewVisibility(false)
     }
 
     private fun archiveAllPlayed() {
