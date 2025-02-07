@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.podcast
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -27,8 +28,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -54,7 +55,7 @@ fun PodcastTooltip(
         onDismissRequest = onDismissRequest,
     ) {
         Box(
-            modifier = modifier.padding(24.dp).widthIn(max = 400.dp),
+            modifier = modifier.background(Color.Transparent).padding(16.dp).widthIn(max = 400.dp),
         ) {
             TooltipContent(tooltipColor, title, subtitle, onCloseButtonClick)
 
@@ -73,23 +74,23 @@ private fun TooltipContent(
 ) {
     Card(
         backgroundColor = tooltipColor,
-        elevation = 8.dp,
         shape = RoundedCornerShape(8.dp),
+        elevation = 0.dp,
         modifier = modifier,
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.background(tooltipColor).padding(16.dp),
             verticalAlignment = Alignment.Top,
         ) {
             Column(
                 modifier = Modifier.weight(1f),
             ) {
-                TextH40(
+                TextH30(
                     text = title,
                     modifier = Modifier.padding(bottom = 4.dp),
                 )
 
-                TextH70(
+                TextP40(
                     text = subtitle,
                     fontSize = 12.sp,
                     color = MaterialTheme.theme.colors.primaryText02,

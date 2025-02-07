@@ -814,7 +814,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         tooltipComposeView.getLocationOnScreen(composeLocation)
 
         val anchorX = anchorLocation[0] - composeLocation[0] + (view.width / 2)
-        var anchorY = anchorLocation[1] - composeLocation[1] - 350
+        var anchorY = anchorLocation[1] - composeLocation[1] - 360
 
         if (anchorY < 0) {
             anchorY = 0
