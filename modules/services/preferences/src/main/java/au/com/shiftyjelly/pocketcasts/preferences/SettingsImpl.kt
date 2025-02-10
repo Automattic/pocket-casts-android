@@ -555,6 +555,12 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
+    override val suggestedFolderPaywallDismissTime = UserSetting.LongPref(
+        sharedPrefKey = "globalAutoDownloadNewEpisodes",
+        defaultValue = 0L,
+        sharedPrefs = sharedPreferences,
+    )
+
     override val streamingMode: UserSetting<Boolean> = UserSetting.BoolPref(
         sharedPrefKey = Settings.PREFERENCE_GLOBAL_STREAMING_MODE,
         defaultValue = true,
