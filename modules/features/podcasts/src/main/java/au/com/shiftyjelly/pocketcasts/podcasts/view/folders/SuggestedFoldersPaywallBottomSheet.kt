@@ -33,8 +33,7 @@ class SuggestedFoldersPaywallBottomSheet : BottomSheetDialogFragment() {
             SuggestedFoldersPaywall(
                 onUseTheseFolders = {
                     dismiss()
-                    val source = OnboardingUpgradeSource.PROFILE
-                    val onboardingFlow = OnboardingFlow.PlusAccountUpgrade(source)
+                    val onboardingFlow = OnboardingFlow.PlusAccountUpgrade(OnboardingUpgradeSource.FOLDERS)
                     OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
                 },
                 onMaybeLater = {
