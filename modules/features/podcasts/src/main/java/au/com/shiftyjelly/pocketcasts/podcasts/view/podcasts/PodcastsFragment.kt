@@ -224,6 +224,28 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
         return binding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.fetchSuggestedFolders()
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.userSuggestedFoldersState.collect { (signInState, suggestedFoldersState) ->
+                when (suggestedFoldersState) {
+                    PodcastsViewModel.SuggestedFoldersState.Loaded -> {
+                        if (viewModel.showSuggestedFoldersPaywallOnOpen(signInState.isSignedInAsPlusOrPatron)) {
+                            SuggestedFoldersPaywallBottomSheet().show(parentFragmentManager, "suggested_folders_paywall")
+                        }
+                    }
+                    PodcastsViewModel.SuggestedFoldersState.Fetching -> {}
+                    is PodcastsViewModel.SuggestedFoldersState.Error -> {}
+                }
+            }
+        }
+    }
+
     override fun onDestroyView() {
         listState = binding.recyclerView.layoutManager?.onSaveInstanceState()
         binding.recyclerView.adapter = null

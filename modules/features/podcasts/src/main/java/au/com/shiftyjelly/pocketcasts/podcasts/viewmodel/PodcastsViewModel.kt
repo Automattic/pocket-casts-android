@@ -17,6 +17,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.jakewharton.rxrelay2.BehaviorRelay
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
@@ -26,11 +28,16 @@ import java.util.Collections
 import java.util.Optional
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.rx2.asObservable
 import timber.log.Timber
 
@@ -125,6 +132,13 @@ class PodcastsViewModel
 
     val folder: Folder?
         get() = folderState.value?.folder
+
+    private val _suggestedFoldersState = MutableSharedFlow<SuggestedFoldersState>()
+
+    val userSuggestedFoldersState: Flow<Pair<SignInState, SuggestedFoldersState>> = userManager.getSignInState().asFlow()
+        .combine(_suggestedFoldersState) { signIn, suggestedFolders ->
+            Pair(signIn, suggestedFolders)
+        }
 
     private fun buildHomeFolderItems(podcasts: List<Podcast>, folders: List<FolderItem>, podcastSortType: PodcastsSortType): List<FolderItem> {
         if (podcastSortType == PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST) {
@@ -280,6 +294,23 @@ class PodcastsViewModel
             properties[NUMBER_OF_PODCASTS_KEY] = folderManager.findFolderPodcastsSorted(folderUuid).size
             analyticsTracker.track(AnalyticsEvent.FOLDER_SHOWN, properties)
         }
+    }
+
+    suspend fun fetchSuggestedFolders() {
+        if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS)) {
+            _suggestedFoldersState.emit(SuggestedFoldersState.Fetching)
+            delay(2.seconds)
+            _suggestedFoldersState.emit(SuggestedFoldersState.Loaded)
+        }
+    }
+
+    fun showSuggestedFoldersPaywallOnOpen(isSignedInAsPlusOrPatron: Boolean) =
+        FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS) && !isSignedInAsPlusOrPatron
+
+    sealed class SuggestedFoldersState {
+        data object Fetching : SuggestedFoldersState()
+        data object Loaded : SuggestedFoldersState()
+        data class Error(val message: String) : SuggestedFoldersState()
     }
 
     companion object {
