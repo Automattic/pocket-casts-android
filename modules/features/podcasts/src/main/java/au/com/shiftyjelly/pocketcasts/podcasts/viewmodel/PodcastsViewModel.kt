@@ -226,7 +226,7 @@ class PodcastsViewModel
                 }
             }
         } catch (ex: IndexOutOfBoundsException) {
-            Timber.e("Move folder item failed.", ex)
+            Timber.e("Move folder item failed: $ex")
         }
 
         return adapterState.toList()
@@ -305,7 +305,7 @@ class PodcastsViewModel
     }
 
     fun showSuggestedFoldersPaywallOnOpen(isSignedInAsPlusOrPatron: Boolean) =
-        FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS) && !isSignedInAsPlusOrPatron
+        FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS) && !isSignedInAsPlusOrPatron && settings.suggestedFolderPaywallDismissTime.value == 0L
 
     sealed class SuggestedFoldersState {
         data object Fetching : SuggestedFoldersState()
