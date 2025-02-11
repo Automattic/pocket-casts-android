@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.core.view.doOnLayout
+import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
@@ -24,6 +25,8 @@ class SuggestedFoldersPaywallBottomSheet : BottomSheetDialogFragment() {
     @Inject
     lateinit var theme: Theme
 
+    private val viewModel: SuggestedFoldersPaywallViewModel by viewModels<SuggestedFoldersPaywallViewModel>()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -37,6 +40,7 @@ class SuggestedFoldersPaywallBottomSheet : BottomSheetDialogFragment() {
                     OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
                 },
                 onMaybeLater = {
+                    viewModel.dismissModal()
                     dismiss()
                 },
             )

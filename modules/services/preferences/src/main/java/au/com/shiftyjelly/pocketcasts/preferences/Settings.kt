@@ -335,6 +335,8 @@ interface Settings {
 
     val hideNotificationOnPause: UserSetting<Boolean>
 
+    val suggestedFolderPaywallDismissTime: UserSetting<Long>
+
     val streamingMode: UserSetting<Boolean>
     val keepScreenAwake: UserSetting<Boolean>
     val openPlayerAutomatically: UserSetting<Boolean>
