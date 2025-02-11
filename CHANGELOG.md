@@ -8,6 +8,8 @@
 *   Updates
     *   Filter out chapters that do not belong in table of contents. See [the specification](https://github.com/Podcastindex-org/podcast-namespace/blob/main/chapters/jsonChapters.md) for more details.
         ([#3556](https://github.com/Automattic/pocket-casts-android/pull/3556))
+    *   Make sharing the default 4th player shelf action.
+        ([#3576](https://github.com/Automattic/pocket-casts-android/pull/3576))
 
 7.82
 -----
