@@ -10,7 +10,6 @@ Language: ja_JP
     <string name="settings_pixel_watch_title">Pixel Watch スキップボタン</string>
     <string name="winback_cancel_subscription_cancel_button_label">はい、サブスクリプションをキャンセルします</string>
     <string name="winback_cancel_subscription_stay_button_label">利用を続けます</string>
-    <string name="winback_cancel_subscription_perk_web">ウェブブラウザーやデスクトップコンピューターで Pocket Casts にアクセスできなくなります。</string>
     <string name="winback_cancel_subscription_perk_files">Pocket Casts アカウントにアップロードされたファイルはすべて削除されます (ただし、モバイルデバイスにダウンロードされたファイルは残ります)。</string>
     <string name="winback_cancel_subscription_perk_folders">フォルダーは消去され、保存されているコンテンツは再びポッドキャスト画面に移動します。</string>
     <string name="winback_cancel_subscription_perk_plus">この日付以降、Pocket Casts Plus の機能を利用できなくなります。</string>

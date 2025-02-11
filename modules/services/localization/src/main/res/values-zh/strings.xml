@@ -10,7 +10,6 @@ Language: zh_CN
     <string name="settings_pixel_watch_title">Pixel Watch 跳过按钮</string>
     <string name="winback_cancel_subscription_cancel_button_label">是，取消我的订阅</string>
     <string name="winback_cancel_subscription_stay_button_label">实际上，我想留下来</string>
-    <string name="winback_cancel_subscription_perk_web">您将无法再使用 Web 浏览器或台式计算机访问 Pocket Casts。</string>
     <string name="winback_cancel_subscription_perk_files">上传至您的 Pocket Casts 账户的所有文件都将删除（但下载到您移动设备上的文件会保留）。</string>
     <string name="winback_cancel_subscription_perk_folders">您的文件夹将被删除，其中的内容将移回“播客”界面。</string>
     <string name="winback_cancel_subscription_perk_plus">在此日期后，您将无法再访问 Pocket Casts Plus 功能。</string>
