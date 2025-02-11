@@ -556,7 +556,7 @@ class SettingsImpl @Inject constructor(
     )
 
     override val suggestedFolderPaywallDismissTime = UserSetting.LongPref(
-        sharedPrefKey = "globalAutoDownloadNewEpisodes",
+        sharedPrefKey = "suggestedFolderPaywallDismissTime",
         defaultValue = 0L,
         sharedPrefs = sharedPreferences,
     )
