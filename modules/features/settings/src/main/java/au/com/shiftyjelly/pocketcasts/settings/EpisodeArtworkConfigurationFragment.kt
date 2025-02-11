@@ -83,30 +83,32 @@ class EpisodeArtworkConfigurationFragment : BaseFragment() {
         onBackPressed: () -> Unit,
     ) {
         Column(
-            modifier = Modifier
-                .background(MaterialTheme.theme.colors.primaryUi02)
-                .verticalScroll(rememberScrollState()),
+            modifier = Modifier.background(MaterialTheme.theme.colors.primaryUi02),
         ) {
             ThemedTopAppBar(
                 title = stringResource(LR.string.settings_use_episode_artwork_title),
                 onNavigationClick = onBackPressed,
                 bottomShadow = true,
             )
-            SettingSection {
-                UseEpisodeArtwork(artworkConfiguration, onUpdateConfiguration)
-            }
-            SettingSection(
-                heading = stringResource(LR.string.settings_use_episode_artwork_customization_section),
-                subHeading = stringResource(LR.string.settings_use_episode_artwork_customization_description),
-                showDivider = false,
+            Column(
+                modifier = Modifier.verticalScroll(rememberScrollState()),
             ) {
-                elements.forEach { element ->
-                    ArtworkElement(artworkConfiguration, element, onUpdateConfiguration)
+                SettingSection {
+                    UseEpisodeArtwork(artworkConfiguration, onUpdateConfiguration)
                 }
+                SettingSection(
+                    heading = stringResource(LR.string.settings_use_episode_artwork_customization_section),
+                    subHeading = stringResource(LR.string.settings_use_episode_artwork_customization_description),
+                    showDivider = false,
+                ) {
+                    elements.forEach { element ->
+                        ArtworkElement(artworkConfiguration, element, onUpdateConfiguration)
+                    }
+                }
+                Spacer(
+                    modifier = Modifier.height(dimensionResource(UR.dimen.mini_player_height)),
+                )
             }
-            Spacer(
-                modifier = Modifier.height(dimensionResource(UR.dimen.mini_player_height)),
-            )
         }
     }
 
