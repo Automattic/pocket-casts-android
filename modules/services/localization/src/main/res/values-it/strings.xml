@@ -10,7 +10,6 @@ Language: it
     <string name="settings_pixel_watch_title">Pulsanti Skip di Piwel Watch</string>
     <string name="winback_cancel_subscription_cancel_button_label">Sì, cancella il mio abbonamento</string>
     <string name="winback_cancel_subscription_stay_button_label">Anzi, voglio restare</string>
-    <string name="winback_cancel_subscription_perk_web">Non sarai più in grado di accedere a Pocket Casts utilizzando il tuo browser web o il tuo computer desktop.</string>
     <string name="winback_cancel_subscription_perk_files">Tutti i file caricati sul tuo account Pocket Casts verranno eliminati (ma i file scaricati sui tuoi dispositivi mobili rimarranno).</string>
     <string name="winback_cancel_subscription_perk_folders">Le tue cartelle verranno rimosse e i loro contenuti verranno spostati indietro alla schermata Podcast.</string>
     <string name="winback_cancel_subscription_perk_plus">L\'accesso alle funzionalità di Pocket Casts Plus verrà bloccato dopo tale data.</string>

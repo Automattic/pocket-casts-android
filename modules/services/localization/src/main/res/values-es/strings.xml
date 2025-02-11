@@ -10,7 +10,6 @@ Language: es
     <string name="settings_pixel_watch_title">Botones de salto de Pixel Watch</string>
     <string name="winback_cancel_subscription_cancel_button_label">Sí, cancelar mi suscripción</string>
     <string name="winback_cancel_subscription_stay_button_label">En realidad, quiero quedarme</string>
-    <string name="winback_cancel_subscription_perk_web">Ya no podrás acceder a Pocket Casts a través del navegador web ni del ordenador de sobremesa.</string>
     <string name="winback_cancel_subscription_perk_files">Todos los archivos subidos a tu cuenta de Pocket Casts se eliminarán (sin embargo, los archivos que hayas descargado en tus dispositivos móviles se mantendrán).</string>
     <string name="winback_cancel_subscription_perk_folders">Tus carpetas se eliminarán y sus contenidos se trasladarán a la pantalla Podcast.</string>
     <string name="winback_cancel_subscription_perk_plus">El acceso a las funciones de Pocket Casts Plus ya no estará disponible a partir de esta fecha.</string>

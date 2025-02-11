@@ -10,7 +10,6 @@ Language: ru
     <string name="settings_pixel_watch_title">Кнопки пропуска Pixel Watch</string>
     <string name="winback_cancel_subscription_cancel_button_label">Да, отмените мою подписку</string>
     <string name="winback_cancel_subscription_stay_button_label">На самом деле я хочу остаться</string>
-    <string name="winback_cancel_subscription_perk_web">Вы больше не сможете открыть Pocket Casts в браузере или на ПК.</string>
     <string name="winback_cancel_subscription_perk_files">Файлы, загруженные в вашу учётную запись Pocket Casts, будут удалены (однако файлы, загруженные на ваши мобильные устройства, сохранятся).</string>
     <string name="winback_cancel_subscription_perk_folders">Папки будут удалены, а их содержимое перемещено обратно на экран подкастов.</string>
     <string name="winback_cancel_subscription_perk_plus">С этой даты доступ к функциям Pocket Casts Plus будет заблокирован.</string>

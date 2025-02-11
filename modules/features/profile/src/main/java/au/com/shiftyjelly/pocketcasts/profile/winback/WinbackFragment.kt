@@ -207,13 +207,7 @@ class WinbackFragment : BaseDialogFragment() {
                                 },
                                 onCancelSubscription = {
                                     viewModel.trackCancelSubscriptionTapped()
-                                    if (handleSubscriptionCancellation(state.purchasedProductIds)) {
-                                        dismiss()
-                                    } else {
-                                        scope.launch {
-                                            snackbarHostState.showSnackbar(getString(LR.string.error_generic_message))
-                                        }
-                                    }
+                                    handleSubscriptionCancellation(state.purchasedProductIds)
                                 },
                             )
                         }
@@ -290,17 +284,17 @@ class WinbackFragment : BaseDialogFragment() {
         }
     }
 
-    private fun handleSubscriptionCancellation(productIds: List<String>): Boolean {
-        return if (productIds.isNotEmpty() && params.hasGoogleSubscription) {
+    private fun handleSubscriptionCancellation(productIds: List<String>) {
+        val isPlayStoreSubscriptionOpened = if (productIds.isNotEmpty() && params.hasGoogleSubscription) {
             goToPlayStoreSubscriptions(productIds.singleOrNull())
         } else {
-            WebViewActivity.show(
-                context,
-                resources.getString(LR.string.winback_cancel_subscription_cancel_button_label),
-                Settings.INFO_CANCEL_URL,
-            )
-            true
+            false
         }
+        if (!isPlayStoreSubscriptionOpened) {
+            goToWebViewCancellationInfo()
+        }
+
+        dismiss()
     }
 
     private fun goToPlayStoreSubscriptions(sku: String? = null): Boolean {
@@ -316,6 +310,14 @@ class WinbackFragment : BaseDialogFragment() {
             .appendQueryParameter("package", requireContext().packageName)
             .build()
         return runCatching { startActivity(Intent(Intent.ACTION_VIEW, uri)) }.isSuccess
+    }
+
+    private fun goToWebViewCancellationInfo() {
+        WebViewActivity.show(
+            context,
+            resources.getString(LR.string.winback_cancel_subscription_cancel_button_label),
+            Settings.INFO_CANCEL_URL,
+        )
     }
 
     companion object {

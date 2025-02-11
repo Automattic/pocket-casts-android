@@ -10,7 +10,6 @@ Language: nl
     <string name="settings_pixel_watch_title">Pixel Watch overslaan-knoppen</string>
     <string name="winback_cancel_subscription_cancel_button_label">Ja, annuleer mijn abonnement</string>
     <string name="winback_cancel_subscription_stay_button_label">Ik wil toch blijven</string>
-    <string name="winback_cancel_subscription_perk_web">Je zal Pocket Casts niet meer kunnen openen met je webbrowser of computer.</string>
     <string name="winback_cancel_subscription_perk_files">Alle bestanden die zijn geüpload naar je Pocket Casts-account worden verwijderd (bestanden die zijn gedownload op je mobiele apparaten blijven behouden).</string>
     <string name="winback_cancel_subscription_perk_folders">Je mappen worden verwijderd en hun inhoud wordt teruggezet naar het scherm Podcasts.</string>
     <string name="winback_cancel_subscription_perk_plus">Na deze datum wordt toegang tot Pocket Casts Plus-functies vergrendeld.</string>
