@@ -18,6 +18,8 @@
         ([#3460](https://github.com/Automattic/pocket-casts-android/pull/3460))
     *   Fix issue with playback stopping when using Pixel Buds actions.
         ([#3493](https://github.com/Automattic/pocket-casts-android/pull/3493))
+    *   Fix issue with sleep timer end of episode when has skip last set
+        ([#3582](https://github.com/Automattic/pocket-casts-android/pull/3582))
 *   Updates
     *   Remove audio and video clip sharing
         ([#3481](https://github.com/Automattic/pocket-casts-android/pull/3481))
