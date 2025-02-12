@@ -35,6 +35,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
@@ -49,10 +50,15 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun SuggestedFoldersPaywall(
+    onShown: () -> Unit,
     onUseTheseFolders: () -> Unit,
     onMaybeLater: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    CallOnce {
+        onShown.invoke()
+    }
+
     Column(
         modifier = modifier
             .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal))
@@ -146,6 +152,7 @@ private fun SuggestedFoldersPagePreview(@PreviewParameter(ThemePreviewParameterP
         SuggestedFoldersPaywall(
             onUseTheseFolders = {},
             onMaybeLater = {},
+            onShown = {},
         )
     }
 }

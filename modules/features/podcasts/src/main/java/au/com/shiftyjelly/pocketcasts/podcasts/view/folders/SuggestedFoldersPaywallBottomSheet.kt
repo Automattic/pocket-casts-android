@@ -34,13 +34,17 @@ class SuggestedFoldersPaywallBottomSheet : BottomSheetDialogFragment() {
     ) = content {
         AppTheme(theme.activeTheme) {
             SuggestedFoldersPaywall(
+                onShown = {
+                    viewModel.onShown()
+                },
                 onUseTheseFolders = {
+                    viewModel.onUseTheseFolders()
                     dismiss()
                     val onboardingFlow = OnboardingFlow.PlusAccountUpgrade(OnboardingUpgradeSource.FOLDERS)
                     OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
                 },
                 onMaybeLater = {
-                    viewModel.dismissModal()
+                    viewModel.onMaybeLater()
                     dismiss()
                 },
             )
