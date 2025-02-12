@@ -36,8 +36,7 @@ class SuggestedFolders : BaseDialogFragment() {
                 },
                 onCreateCustomFolders = {
                     analyticsTracker.track(AnalyticsEvent.SUGGESTED_FOLDERS_MODAL_CREATE_CUSTOM_FOLDERS_TAPPED)
-                    analyticsTracker.track(AnalyticsEvent.FOLDER_CREATE_SHOWN, mapOf("source" to "suggested_folders"))
-                    FolderCreateFragment().show(parentFragmentManager, "create_folder_card")
+                    FolderCreateFragment.newInstance(source = "suggested_folders").show(parentFragmentManager, "create_folder_card")
                     dismiss()
                 },
             )

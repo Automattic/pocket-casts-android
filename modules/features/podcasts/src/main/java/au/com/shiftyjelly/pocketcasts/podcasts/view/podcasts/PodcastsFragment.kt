@@ -316,8 +316,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
         if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS)) {
             SuggestedFolders().show(parentFragmentManager, "suggested_folders")
         } else {
-            analyticsTracker.track(AnalyticsEvent.FOLDER_CREATE_SHOWN, mapOf(SOURCE_KEY to PODCASTS_LIST))
-            FolderCreateFragment().show(parentFragmentManager, "create_folder_card")
+            FolderCreateFragment.newInstance(PODCASTS_LIST).show(parentFragmentManager, "create_folder_card")
         }
     }
 

@@ -314,6 +314,10 @@ class FolderEditViewModel
         }
     }
 
+    fun trackShown(source: String) {
+        analyticsTracker.track(AnalyticsEvent.FOLDER_CREATE_SHOWN, mapOf("source" to source))
+    }
+
     companion object {
         private const val SORT_ORDER_KEY = "sort_order"
         private const val NUMBER_OF_PODCASTS_KEY = "number_of_podcasts"
