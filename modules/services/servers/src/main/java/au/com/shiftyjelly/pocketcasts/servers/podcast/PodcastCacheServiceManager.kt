@@ -18,4 +18,5 @@ interface PodcastCacheServiceManager {
     suspend fun getShowNotes(podcastUuid: String): ShowNotesResponse
     suspend fun getShowNotesCache(podcastUuid: String): ShowNotesResponse?
     suspend fun getEpisodeUrl(episode: PodcastEpisode): String?
+    suspend fun suggestedFolders(): SuggestedFoldersResponse
 }

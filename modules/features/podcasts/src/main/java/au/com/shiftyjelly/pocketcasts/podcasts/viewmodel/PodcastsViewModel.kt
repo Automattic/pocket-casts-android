@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.SuggestedFoldersManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
@@ -49,6 +50,7 @@ class PodcastsViewModel
     private val folderManager: FolderManager,
     private val settings: Settings,
     private val analyticsTracker: AnalyticsTracker,
+    private val suggestedFoldersManager: SuggestedFoldersManager,
     userManager: UserManager,
 ) : ViewModel(), CoroutineScope {
     var isFragmentChangingConfigurations: Boolean = false
@@ -298,6 +300,8 @@ class PodcastsViewModel
 
     suspend fun fetchSuggestedFolders() {
         if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS)) {
+            suggestedFoldersManager.suggestedFolders()
+
             _suggestedFoldersState.emit(SuggestedFoldersState.Fetching)
             delay(2.seconds)
             _suggestedFoldersState.emit(SuggestedFoldersState.Loaded)
