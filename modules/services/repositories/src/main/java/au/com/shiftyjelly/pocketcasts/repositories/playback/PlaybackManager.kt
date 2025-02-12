@@ -1458,8 +1458,8 @@ open class PlaybackManager @Inject constructor(
             val podcast = playbackStateRelay.blockingFirst().podcast
             if (podcast != null && podcast.skipLastSecs > 0) {
                 pause(sourceView = SourceView.AUTO_PAUSE)
+                onPlayerPaused()
             }
-            onPlayerPaused()
 
             // jump back 5 seconds from the current time so when the player opens it doesn't complete before giving the user a chance to skip back
             player?.let {
@@ -2206,6 +2206,7 @@ open class PlaybackManager @Inject constructor(
             if (timeRemaining < skipLast) {
                 if (isSleepAfterEpisodeEnabled()) {
                     sleepEndOfEpisode(episode)
+                    episodeManager.markAsPlayedBlocking(episode, this, podcastManager)
                 } else {
                     statsManager.addTimeSavedAutoSkipping(timeRemaining.toLong() * 1000L)
                     episodeManager.markAsPlayedBlocking(episode, this, podcastManager)
