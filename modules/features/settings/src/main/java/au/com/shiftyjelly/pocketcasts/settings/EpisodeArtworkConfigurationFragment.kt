@@ -16,9 +16,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.unit.Dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -35,7 +37,6 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
 class EpisodeArtworkConfigurationFragment : BaseFragment() {
@@ -51,6 +52,8 @@ class EpisodeArtworkConfigurationFragment : BaseFragment() {
         savedInstanceState: Bundle?,
     ) = contentWithoutConsumedInsets {
         val sortedElements = remember { ArtworkConfiguration.Element.entries.sortedBy { getString(it.titleId) } }
+        val bottomInset by settings.bottomInset.collectAsStateWithLifecycle(initialValue = 0)
+
         AppThemeWithBackground(theme.activeTheme) {
             val artworkConfiguration by settings.artworkConfiguration.flow.collectAsState()
 
@@ -61,6 +64,7 @@ class EpisodeArtworkConfigurationFragment : BaseFragment() {
             EpisodeArtworkSettings(
                 artworkConfiguration = artworkConfiguration,
                 elements = sortedElements,
+                bottomInset = LocalDensity.current.run { bottomInset.toDp() },
                 onUpdateConfiguration = { configuration ->
                     if (artworkConfiguration.useEpisodeArtwork != configuration.useEpisodeArtwork) {
                         analyticsTracker.track(AnalyticsEvent.SETTINGS_ADVANCED_EPISODE_ARTWORK_USE_EPISODE_ARTWORK_TOGGLED, mapOf("enabled" to configuration.useEpisodeArtwork))
@@ -79,6 +83,7 @@ class EpisodeArtworkConfigurationFragment : BaseFragment() {
     private fun EpisodeArtworkSettings(
         artworkConfiguration: ArtworkConfiguration,
         elements: List<ArtworkConfiguration.Element>,
+        bottomInset: Dp,
         onUpdateConfiguration: (ArtworkConfiguration) -> Unit,
         onBackPressed: () -> Unit,
     ) {
@@ -106,7 +111,7 @@ class EpisodeArtworkConfigurationFragment : BaseFragment() {
                     }
                 }
                 Spacer(
-                    modifier = Modifier.height(dimensionResource(UR.dimen.mini_player_height)),
+                    modifier = Modifier.height(bottomInset),
                 )
             }
         }
