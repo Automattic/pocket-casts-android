@@ -14,7 +14,8 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class SuggestedFolders : BaseDialogFragment() {
 
-    @Inject lateinit var analyticsTracker: AnalyticsTracker
+    @Inject
+    lateinit var analyticsTracker: AnalyticsTracker
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -23,11 +24,18 @@ class SuggestedFolders : BaseDialogFragment() {
     ) = contentWithoutConsumedInsets {
         AppThemeWithBackground(theme.activeTheme) {
             SuggestedFoldersPage(
+                onShown = {
+                    analyticsTracker.track(AnalyticsEvent.SUGGESTED_FOLDERS_MODAL_SHOWN)
+                },
                 onDismiss = {
+                    analyticsTracker.track(AnalyticsEvent.SUGGESTED_FOLDERS_MODAL_DISMISSED)
                     dismiss()
                 },
-                onUseTheseFolders = {},
+                onUseTheseFolders = {
+                    analyticsTracker.track(AnalyticsEvent.SUGGESTED_FOLDERS_MODAL_USE_THESE_FOLDERS_TAPPED)
+                },
                 onCreateCustomFolders = {
+                    analyticsTracker.track(AnalyticsEvent.SUGGESTED_FOLDERS_MODAL_CREATE_CUSTOM_FOLDERS_TAPPED)
                     analyticsTracker.track(AnalyticsEvent.FOLDER_CREATE_SHOWN, mapOf("source" to "suggested_folders"))
                     FolderCreateFragment().show(parentFragmentManager, "create_folder_card")
                     dismiss()
