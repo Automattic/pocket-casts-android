@@ -3,19 +3,16 @@ package au.com.shiftyjelly.pocketcasts.podcasts.view.folders
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class SuggestedFolders : BaseDialogFragment() {
 
-    @Inject
-    lateinit var analyticsTracker: AnalyticsTracker
+    private val viewModel: SuggestedFoldersViewModel by viewModels<SuggestedFoldersViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -25,17 +22,17 @@ class SuggestedFolders : BaseDialogFragment() {
         AppThemeWithBackground(theme.activeTheme) {
             SuggestedFoldersPage(
                 onShown = {
-                    analyticsTracker.track(AnalyticsEvent.SUGGESTED_FOLDERS_MODAL_SHOWN)
+                    viewModel.onShown()
                 },
                 onDismiss = {
-                    analyticsTracker.track(AnalyticsEvent.SUGGESTED_FOLDERS_MODAL_DISMISSED)
+                    viewModel.onDismissed()
                     dismiss()
                 },
                 onUseTheseFolders = {
-                    analyticsTracker.track(AnalyticsEvent.SUGGESTED_FOLDERS_MODAL_USE_THESE_FOLDERS_TAPPED)
+                    viewModel.onUseTheseFolders()
                 },
                 onCreateCustomFolders = {
-                    analyticsTracker.track(AnalyticsEvent.SUGGESTED_FOLDERS_MODAL_CREATE_CUSTOM_FOLDERS_TAPPED)
+                    viewModel.onCreateCustomFolders()
                     FolderCreateFragment.newInstance(source = "suggested_folders").show(parentFragmentManager, "create_folder_card")
                     dismiss()
                 },
