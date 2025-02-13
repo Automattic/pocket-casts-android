@@ -29,6 +29,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
@@ -94,8 +95,8 @@ class ExportSettingsFragment : PreferenceFragmentCompat() {
                 false
             }
             setOnPreferenceChangeListener { _, newValue ->
-                val url = newValue.toString()
-                if (url.isNotBlank()) {
+                val url = newValue.toString().toHttpUrlOrNull()
+                if (url != null) {
                     OpmlImportTask.run(url, activity)
                 }
                 false

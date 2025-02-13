@@ -68,8 +68,8 @@ class OpmlImportTask @AssistedInject constructor(
             run(data, context)
         }
 
-        fun run(url: String, context: Context) {
-            val data = workDataOf(INPUT_URL to url)
+        fun run(url: HttpUrl, context: Context) {
+            val data = workDataOf(INPUT_URL to url.toString())
             run(data, context)
         }
 
