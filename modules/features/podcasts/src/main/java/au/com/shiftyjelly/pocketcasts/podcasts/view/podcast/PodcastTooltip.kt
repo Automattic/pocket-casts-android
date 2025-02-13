@@ -25,7 +25,6 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
@@ -92,7 +91,6 @@ private fun TooltipContent(
 
                 TextP40(
                     text = subtitle,
-                    fontSize = 12.sp,
                     color = MaterialTheme.theme.colors.primaryText02,
                 )
             }
