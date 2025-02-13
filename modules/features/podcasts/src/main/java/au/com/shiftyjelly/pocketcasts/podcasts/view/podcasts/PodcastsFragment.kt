@@ -13,7 +13,9 @@ import androidx.core.os.bundleOf
 import androidx.core.view.updatePadding
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -232,15 +234,18 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.userSuggestedFoldersState.collect { (signInState, suggestedFoldersState) ->
-                when (suggestedFoldersState) {
-                    PodcastsViewModel.SuggestedFoldersState.Loaded -> {
-                        if (viewModel.showSuggestedFoldersPaywallOnOpen(signInState.isSignedInAsPlusOrPatron)) {
-                            SuggestedFoldersPaywallBottomSheet().show(parentFragmentManager, "suggested_folders_paywall")
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.userSuggestedFoldersState.collect { (signInState, suggestedFoldersState) ->
+                    when (suggestedFoldersState) {
+                        PodcastsViewModel.SuggestedFoldersState.Loaded -> {
+                            if (viewModel.showSuggestedFoldersPaywallOnOpen(signInState.isSignedInAsPlusOrPatron)) {
+                                SuggestedFoldersPaywallBottomSheet().show(parentFragmentManager, "suggested_folders_paywall")
+                            }
                         }
+
+                        PodcastsViewModel.SuggestedFoldersState.Fetching -> {}
+                        is PodcastsViewModel.SuggestedFoldersState.Error -> {}
                     }
-                    PodcastsViewModel.SuggestedFoldersState.Fetching -> {}
-                    is PodcastsViewModel.SuggestedFoldersState.Error -> {}
                 }
             }
         }
