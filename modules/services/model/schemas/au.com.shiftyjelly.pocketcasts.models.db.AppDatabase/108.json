@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 107,
-    "identityHash": "620d67275842e1a5098e755d3d9222cd",
+    "version": 108,
+    "identityHash": "aea069d39f2b5a02f9adb05a4be50bfe",
     "entities": [
       {
         "tableName": "bump_stats",
@@ -456,7 +456,7 @@
       },
       {
         "tableName": "suggested_folders",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uuid` TEXT NOT NULL, `folder_name` TEXT NOT NULL, `podcastUuid` TEXT NOT NULL, `color` INTEGER NOT NULL, PRIMARY KEY(`uuid`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uuid` TEXT NOT NULL, `folder_name` TEXT NOT NULL, `podcastUuid` TEXT NOT NULL, PRIMARY KEY(`uuid`))",
         "fields": [
           {
             "fieldPath": "uuid",
@@ -474,12 +474,6 @@
             "fieldPath": "podcastUuid",
             "columnName": "podcastUuid",
             "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "color",
-            "columnName": "color",
-            "affinity": "INTEGER",
             "notNull": true
           }
         ],
@@ -1908,7 +1902,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '620d67275842e1a5098e755d3d9222cd')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'aea069d39f2b5a02f9adb05a4be50bfe')"
     ]
   }
 }
