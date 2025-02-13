@@ -200,7 +200,7 @@ enum class Feature(
         title = "Winback flow",
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
     PODCAST_FEED_UPDATE(
