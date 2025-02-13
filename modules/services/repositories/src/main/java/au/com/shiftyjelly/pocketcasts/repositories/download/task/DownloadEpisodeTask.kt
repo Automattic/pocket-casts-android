@@ -69,11 +69,11 @@ private class UnderscoreInHostName : Exception("Download URL is invalid, as it c
 
 @HiltWorker
 class DownloadEpisodeTask @AssistedInject constructor(
-    @Assisted val context: Context,
+    @Assisted context: Context,
     @Assisted params: WorkerParameters,
-    var downloadManager: DownloadManager,
-    var episodeManager: EpisodeManager,
-    var userEpisodeManager: UserEpisodeManager,
+    private val downloadManager: DownloadManager,
+    private val episodeManager: EpisodeManager,
+    private val userEpisodeManager: UserEpisodeManager,
     @Downloads private val callFactory: Call.Factory,
     @Downloads private val requestBuilderProvider: Provider<Request.Builder>,
 ) : Worker(context, params) {
@@ -215,8 +215,8 @@ class DownloadEpisodeTask @AssistedInject constructor(
     private fun failureData(e: Exception? = null): Data {
         val downloadMessage = (e?.cause as? DownloadFailed)?.message
         episodeDownloadError.taskDuration = (timeSource.markNow() - startTimestamp).toLong(DurationUnit.MILLISECONDS)
-        episodeDownloadError.isCellular = Network.isCellularConnection(context)
-        episodeDownloadError.isProxy = Network.isVpnConnection(context)
+        episodeDownloadError.isCellular = Network.isCellularConnection(applicationContext)
+        episodeDownloadError.isProxy = Network.isVpnConnection(applicationContext)
 
         val outputData = Data.Builder()
             .putString(OUTPUT_ERROR_MESSAGE, downloadMessage ?: e?.message)
@@ -495,7 +495,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
             exception = e
             errorMessage = if (e.anyMessageContains("chtbl.com")) {
                 episodeDownloadError.reason = EpisodeDownloadError.Reason.ChartableBlocked
-                context.resources.getString(LR.string.error_chartable)
+                applicationContext.resources.getString(LR.string.error_chartable)
             } else {
                 episodeDownloadError.reason = EpisodeDownloadError.Reason.SocketIssue
                 createErrorMessage(e)
