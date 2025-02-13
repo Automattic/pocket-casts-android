@@ -29,6 +29,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
@@ -42,11 +43,15 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun SuggestedFoldersPage(
+    onShown: () -> Unit,
     onDismiss: () -> Unit,
     onUseTheseFolders: () -> Unit,
     onCreateCustomFolders: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    CallOnce {
+        onShown.invoke()
+    }
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -146,6 +151,7 @@ private fun SuggestedFoldersPagePreview(@PreviewParameter(ThemePreviewParameterP
             onDismiss = {},
             onUseTheseFolders = {},
             onCreateCustomFolders = {},
+            onShown = {},
         )
     }
 }
