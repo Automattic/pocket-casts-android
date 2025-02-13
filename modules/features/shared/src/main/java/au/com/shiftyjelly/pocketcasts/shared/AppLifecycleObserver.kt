@@ -103,6 +103,9 @@ class AppLifecycleObserver constructor(
             // new installs default to not forcing up next to use the dark theme
             settings.useDarkUpNextTheme.set(false, updateModifiedAt = false)
 
+            // new installations default to not displaying the tooltip
+            settings.showPodcastRefreshTooltip.set(false, updateModifiedAt = false)
+
             when (getAppPlatform()) {
                 // do nothing because this already defaults to true for all users on automotive
                 AppPlatform.Automotive -> {}
