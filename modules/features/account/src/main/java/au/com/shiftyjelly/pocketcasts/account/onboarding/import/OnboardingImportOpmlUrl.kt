@@ -8,12 +8,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -68,8 +70,7 @@ fun OnboardingImportOpmlUrl(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .windowInsetsPadding(WindowInsets.statusBars)
-            .windowInsetsPadding(WindowInsets.navigationBars)
+            .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal))
             .windowInsetsPadding(WindowInsets.ime),
     ) {
         ThemedTopAppBar(
@@ -79,6 +80,7 @@ fun OnboardingImportOpmlUrl(
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier
+                .fillMaxSize()
                 .padding(horizontal = 24.dp)
                 .verticalScroll(rememberScrollState()),
         ) {
@@ -137,29 +139,29 @@ fun OnboardingImportOpmlUrl(
                 }
             }
 
+            Spacer(
+                modifier = Modifier.weight(1f),
+            )
+
             AnimatedVisibility(
                 visible = !isImporting,
             ) {
+                RowButton(
+                    text = stringResource(LR.string.onboarding_recommendations_import),
+                    onClick = {
+                        val url = inputText.toHttpUrlOrNull()
+                        if (url != null) {
+                            onImport(url)
+                        } else {
+                            showError = true
+                        }
+                    },
+                    includePadding = false,
+                )
             }
-        }
 
-        Spacer(
-            modifier = Modifier.weight(1f),
-        )
-
-        AnimatedVisibility(
-            visible = !isImporting,
-        ) {
-            RowButton(
-                text = stringResource(LR.string.onboarding_recommendations_import),
-                onClick = {
-                    val url = inputText.toHttpUrlOrNull()
-                    if (url != null) {
-                        onImport(url)
-                    } else {
-                        showError = true
-                    }
-                },
+            Spacer(
+                modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars),
             )
         }
     }

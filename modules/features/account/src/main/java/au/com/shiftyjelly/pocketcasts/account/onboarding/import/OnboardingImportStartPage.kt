@@ -8,12 +8,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
@@ -66,18 +68,19 @@ fun OnboardingImportStartPage(
         onUpdateSystemBars(SystemBarsStyles(statusBar, navigationBar))
     }
 
-    Column {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)),
+
+    ) {
+        ThemedTopAppBar(
+            onNavigationClick = onBackPressed,
+        )
+
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState()),
+            modifier = Modifier.verticalScroll(rememberScrollState()),
         ) {
-            Spacer(Modifier.windowInsetsPadding(WindowInsets.statusBars))
-
-            ThemedTopAppBar(
-                onNavigationClick = onBackPressed,
-            )
-
             Spacer(Modifier.height(12.dp))
             TextH10(
                 text = stringResource(LR.string.onboarding_bring_your_podcasts),
@@ -110,7 +113,10 @@ fun OnboardingImportStartPage(
             )
 
             Spacer(Modifier.weight(1f))
-            Spacer(Modifier.windowInsetsPadding(WindowInsets.navigationBars))
+
+            Spacer(
+                modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars),
+            )
         }
     }
 }
