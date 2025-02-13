@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.SuggestedFolder
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
@@ -29,10 +30,8 @@ import java.util.Collections
 import java.util.Optional
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
-import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.combine
@@ -41,6 +40,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.rx2.asObservable
 import timber.log.Timber
+import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.Folder as SuggestedFolderModel
 
 @HiltViewModel
 class PodcastsViewModel
@@ -298,13 +298,37 @@ class PodcastsViewModel
         }
     }
 
-    suspend fun fetchSuggestedFolders() {
+    suspend fun refreshSuggestedFolders() {
         if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS)) {
-            suggestedFoldersManager.suggestedFolders()
+            val ids = listOf(
+                "3782b780-0bc5-012e-fb02-00163e1b201c",
+                "12012c20-0423-012e-f9a0-00163e1b201c",
+                "f5b97290-0422-012e-f9a0-00163e1b201c",
+                "d81fbcb0-0422-012e-f9a0-00163e1b201c",
+                "2f31d1b0-2249-0132-b5ae-5f4c86fd3263",
+                "4eb5b260-c933-0134-10da-25324e2a541d",
+                "0cc43410-1d2f-012e-0175-00163e1b201c",
+                "3ec78c50-0d62-012e-fb9c-00163e1b201c",
+                "c59b45b0-0bc4-012e-fb02-00163e1b201c",
+                "7868f900-21de-0133-2464-059c869cc4eb",
+                "052df5e0-72b8-012f-1d57-525400c11844",
+            )
 
-            _suggestedFoldersState.emit(SuggestedFoldersState.Fetching)
-            delay(2.seconds)
-            _suggestedFoldersState.emit(SuggestedFoldersState.Loaded)
+            suggestedFoldersManager.getSuggestedFolders(ids)?.collect { state ->
+                _suggestedFoldersState.emit(SuggestedFoldersState.Loaded(state.toFolders()))
+            }
+        }
+    }
+
+    private fun List<SuggestedFolder>.toFolders(): List<SuggestedFolderModel> {
+        val grouped = this.groupBy { it.name }
+
+        return grouped.map { (folderName, folderItems) ->
+            SuggestedFolderModel(
+                name = folderName,
+                podcasts = folderItems.map { it.podcastUuid },
+                color = 1,
+            )
         }
     }
 
@@ -313,8 +337,7 @@ class PodcastsViewModel
 
     sealed class SuggestedFoldersState {
         data object Fetching : SuggestedFoldersState()
-        data object Loaded : SuggestedFoldersState()
-        data class Error(val message: String) : SuggestedFoldersState()
+        data class Loaded(val folders: List<SuggestedFolderModel>) : SuggestedFoldersState()
     }
 
     companion object {

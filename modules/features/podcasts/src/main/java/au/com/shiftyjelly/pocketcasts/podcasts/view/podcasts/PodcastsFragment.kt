@@ -228,19 +228,18 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
         super.onViewCreated(view, savedInstanceState)
 
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.fetchSuggestedFolders()
+            viewModel.refreshSuggestedFolders()
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.userSuggestedFoldersState.collect { (signInState, suggestedFoldersState) ->
-                when (suggestedFoldersState) {
-                    PodcastsViewModel.SuggestedFoldersState.Loaded -> {
-                        if (viewModel.showSuggestedFoldersPaywallOnOpen(signInState.isSignedInAsPlusOrPatron)) {
+            viewModel.userSuggestedFoldersState.collect { (signInState, state) ->
+                when (state) {
+                    is PodcastsViewModel.SuggestedFoldersState.Loaded -> {
+                        if (viewModel.showSuggestedFoldersPaywallOnOpen(signInState.isSignedInAsPlusOrPatron) && !state.folders.isEmpty()) {
                             SuggestedFoldersPaywallBottomSheet().show(parentFragmentManager, "suggested_folders_paywall")
                         }
                     }
                     PodcastsViewModel.SuggestedFoldersState.Fetching -> {}
-                    is PodcastsViewModel.SuggestedFoldersState.Error -> {}
                 }
             }
         }

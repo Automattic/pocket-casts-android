@@ -1,11 +1,13 @@
 package au.com.shiftyjelly.pocketcasts.servers.podcast
 
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
+import au.com.shiftyjelly.pocketcasts.models.entity.SuggestedFolder
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeItem
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import io.reactivex.Single
 import java.util.Date
+import java.util.UUID
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
@@ -67,7 +69,47 @@ data class PodcastRatingsResponse(
 @JsonClass(generateAdapter = true)
 data class SuggestedFoldersResponse(
     val foldersMap: Map<String, List<String>> = emptyMap(),
-)
+) {
+    fun toSuggestedFolders(): List<SuggestedFolder> {
+        val folderEntities = mutableListOf<SuggestedFolder>()
+
+        foldersMap.forEach { (folderName, podcastList) ->
+            // For each podcast in the list, create a SuggestedFolder entity
+            podcastList.forEach { podcastUuid ->
+                folderEntities.add(
+                    SuggestedFolder(
+                        uuid = UUID.randomUUID().toString(),
+                        name = folderName,
+                        podcastUuid = podcastUuid,
+                    ),
+                )
+            }
+        }
+        folderEntities.add(
+            SuggestedFolder(
+                uuid = UUID.randomUUID().toString(),
+                name = "Pack",
+                podcastUuid = "4eb5b260-c933-0134-10da-25324e2a541d",
+            ),
+        )
+        folderEntities.add(
+            SuggestedFolder(
+                uuid = UUID.randomUUID().toString(),
+                name = "Pack",
+                podcastUuid = "f5b97290-0422-012e-f9a0-00163e1b201c",
+            ),
+        )
+
+        folderEntities.add(
+            SuggestedFolder(
+                uuid = UUID.randomUUID().toString(),
+                name = "New",
+                podcastUuid = "c59b45b0-0bc4-012e-fb02-00163e1b201c",
+            ),
+        )
+        return folderEntities
+    }
+}
 
 @JsonClass(generateAdapter = true)
 data class SuggestedFoldersRequest(

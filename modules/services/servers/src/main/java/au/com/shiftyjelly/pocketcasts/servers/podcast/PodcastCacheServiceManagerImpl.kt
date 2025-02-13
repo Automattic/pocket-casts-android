@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.servers.podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
+import au.com.shiftyjelly.pocketcasts.models.entity.SuggestedFolder
 import au.com.shiftyjelly.pocketcasts.servers.discover.EpisodeSearch
 import io.reactivex.Single
 import javax.inject.Inject
@@ -84,21 +85,7 @@ class PodcastCacheServiceManagerImpl @Inject constructor(
             }
         }
 
-    override suspend fun suggestedFolders(): SuggestedFoldersResponse {
-        val ids = listOf(
-            "3782b780-0bc5-012e-fb02-00163e1b201c",
-            "12012c20-0423-012e-f9a0-00163e1b201c",
-            "f5b97290-0422-012e-f9a0-00163e1b201c",
-            "d81fbcb0-0422-012e-f9a0-00163e1b201c",
-            "2f31d1b0-2249-0132-b5ae-5f4c86fd3263",
-            "4eb5b260-c933-0134-10da-25324e2a541d",
-            "0cc43410-1d2f-012e-0175-00163e1b201c",
-            "3ec78c50-0d62-012e-fb9c-00163e1b201c",
-            "c59b45b0-0bc4-012e-fb02-00163e1b201c",
-            "7868f900-21de-0133-2464-059c869cc4eb",
-            "052df5e0-72b8-012f-1d57-525400c11844",
-        )
-        val request = SuggestedFoldersRequest(ids)
-        return service.suggestedFolders(request)
+    override suspend fun suggestedFolders(request: SuggestedFoldersRequest): List<SuggestedFolder> {
+        return service.suggestedFolders(request).toSuggestedFolders()
     }
 }

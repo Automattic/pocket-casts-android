@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 108,
-    "identityHash": "aea069d39f2b5a02f9adb05a4be50bfe",
+    "identityHash": "de6bb83a8340529c1a0e81e5392649af",
     "entities": [
       {
         "tableName": "bump_stats",
@@ -483,7 +483,18 @@
             "uuid"
           ]
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_suggested_folders_folder_name_podcastUuid",
+            "unique": true,
+            "columnNames": [
+              "folder_name",
+              "podcastUuid"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_suggested_folders_folder_name_podcastUuid` ON `${TABLE_NAME}` (`folder_name`, `podcastUuid`)"
+          }
+        ],
         "foreignKeys": []
       },
       {
@@ -1902,7 +1913,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'aea069d39f2b5a02f9adb05a4be50bfe')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'de6bb83a8340529c1a0e81e5392649af')"
     ]
   }
 }
