@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
@@ -47,8 +47,9 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun OnboardingImportStartPage(
     theme: Theme.ThemeType,
     onShown: () -> Unit,
-    onCastboxClicked: () -> Unit,
-    onOtherAppsClicked: () -> Unit,
+    onCastboxClick: () -> Unit,
+    onOtherAppsClick: () -> Unit,
+    onImportFromUrlClick: () -> Unit,
     onBackPressed: () -> Unit,
     onUpdateSystemBars: (SystemBarsStyles) -> Unit,
 ) {
@@ -67,8 +68,8 @@ fun OnboardingImportStartPage(
 
     Column {
         Column(
-            Modifier
-                .fillMaxHeight()
+            modifier = Modifier
+                .fillMaxSize()
                 .verticalScroll(rememberScrollState()),
         ) {
             Spacer(Modifier.windowInsetsPadding(WindowInsets.statusBars))
@@ -93,13 +94,19 @@ fun OnboardingImportStartPage(
             ImportRow(
                 text = stringResource(LR.string.onboarding_import_from_castbox),
                 iconRes = IR.drawable.castbox,
-                onClick = onCastboxClicked,
+                onClick = onCastboxClick,
             )
 
             ImportRow(
                 text = stringResource(LR.string.onboarding_import_from_other_apps),
                 iconRes = IR.drawable.other_apps,
-                onClick = onOtherAppsClicked,
+                onClick = onOtherAppsClick,
+            )
+
+            ImportRow(
+                text = stringResource(LR.string.onboarding_import_from_url),
+                iconRes = IR.drawable.opml_from_url,
+                onClick = onImportFromUrlClick,
             )
 
             Spacer(Modifier.weight(1f))
@@ -139,8 +146,9 @@ private fun OnboardingImportStartPagePreview(
         OnboardingImportStartPage(
             theme = themeType,
             onShown = {},
-            onCastboxClicked = {},
-            onOtherAppsClicked = {},
+            onCastboxClick = {},
+            onOtherAppsClick = {},
+            onImportFromUrlClick = {},
             onBackPressed = {},
             onUpdateSystemBars = {},
         )

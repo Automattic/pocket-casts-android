@@ -60,8 +60,9 @@ class OpmlImportTask @AssistedInject constructor(
 ) : CoroutineWorker(context, parameters) {
 
     companion object {
-        const val INPUT_URI = "INPUT_URI"
-        const val INPUT_URL = "INPUT_URL"
+        private const val INPUT_URI = "INPUT_URI"
+        private const val INPUT_URL = "INPUT_URL"
+        private const val WORKER_TAG = "OpmlImportTask.Tag"
 
         fun run(uri: Uri, context: Context) {
             val data = workDataOf(INPUT_URI to uri.toString())
@@ -73,6 +74,8 @@ class OpmlImportTask @AssistedInject constructor(
             run(data, context)
         }
 
+        fun workInfos(context: Context) = WorkManager.getInstance(context).getWorkInfosByTagFlow(WORKER_TAG)
+
         private fun run(data: Data, context: Context) {
             val constraints = Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
@@ -81,6 +84,7 @@ class OpmlImportTask @AssistedInject constructor(
             val task = OneTimeWorkRequestBuilder<OpmlImportTask>()
                 .setInputData(data)
                 .setConstraints(constraints)
+                .addTag(WORKER_TAG)
                 .build()
 
             WorkManager.getInstance(context).enqueue(task)
