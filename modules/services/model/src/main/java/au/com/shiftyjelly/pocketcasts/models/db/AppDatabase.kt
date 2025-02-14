@@ -941,14 +941,23 @@ abstract class AppDatabase : RoomDatabase() {
         }
 
         val MIGRATION_107_108 = addMigration(107, 108) { database ->
+            // Create the suggested_folders table if it doesn't exist
             database.execSQL(
                 """
-                CREATE TABLE IF NOT EXISTS suggested_folders (
-                    uuid TEXT NOT NULL,
-                    folder_name TEXT NOT NULL,
-                    podcastUuid TEXT NOT NULL,
-                    PRIMARY KEY(uuid)
-                );
+                    CREATE TABLE IF NOT EXISTS `suggested_folders` (
+                    `uuid` TEXT NOT NULL PRIMARY KEY,
+                    `folder_name` TEXT NOT NULL,
+                    `podcastUuid` TEXT NOT NULL,
+                    UNIQUE (`folder_name`, `podcastUuid`)
+                    );
+                """.trimIndent(),
+            )
+
+            // Create the unique index for folder_name and podcastUuid if it doesn't already exist
+            database.execSQL(
+                """
+                    CREATE UNIQUE INDEX IF NOT EXISTS `index_suggested_folders_folder_name_podcastUuid`
+                    ON `suggested_folders` (`folder_name`, `podcastUuid`);
                 """.trimIndent(),
             )
         }
