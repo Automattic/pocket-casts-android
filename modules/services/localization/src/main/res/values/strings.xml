@@ -1969,6 +1969,11 @@
     <string name="onboarding_coming_from_another_app">Coming from another app? Import your podcasts and get listening. You can always do this later in settings.</string>
     <string name="onboarding_import_from_castbox">Import from Castbox</string>
     <string name="onboarding_import_from_other_apps">Import from other apps</string>
+    <string name="onboarding_import_from_url">Import from URL</string>
+    <string name="onboarding_import_from_url_description">Import your podcasts from an OPML file using a URL.</string>
+    <string name="onboarding_import_from_url_importing_message">OPML import in progress. You can go back to your onboarding process.</string>
+    <string name="onboarding_import_from_url_error_message">Invalid URL</string>
+    <string name="onboarding_import_from_url_failed">OPML import failed</string>
     <string name="onboarding_import_from_castbox_step_1">Open Castbox.</string>
     <string name="onboarding_import_from_castbox_step_2">Tap the \“Personal\” tab.</string>
     <string name="onboarding_import_from_castbox_step_3">Tap “Settings”.</string>
