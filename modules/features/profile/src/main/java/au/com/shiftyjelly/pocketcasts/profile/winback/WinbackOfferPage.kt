@@ -278,11 +278,13 @@ private fun ChevronRow(
     content: @Composable () -> Unit,
 ) {
     Row(
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier,
     ) {
         content()
+        Spacer(
+            modifier = Modifier.weight(1f),
+        )
         Image(
             painter = painterResource(IR.drawable.ic_chevron_small_right),
             contentDescription = null,
