@@ -1,23 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-01-30 11:54:03+0000
+Translation-Revision-Date: 2025-02-11 13:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="suggested_folders_paywall_subtitle">Vi har skapat färdiga mappar för dina podcasts. Lås upp den här och andra funktioner, exempelvis bokmärken, transkriptioner med mera, med Pocket Casts Plus.</string>
+    <string name="suggested_folders_paywall_tittle">Dina podcasts, organiserade automatiskt</string>
+    <string name="podcast_feed_update_tooltip_subtitle">Dra nedåt eller använd den här menyn för att se om det finns något nytt.</string>
+    <string name="podcast_feed_update_tooltip_title">Nya avsnitt, med en gång!</string>
+    <string name="folder_content_description">Mappen %s</string>
+    <string name="suggested_folders_use_create_custom_folders_button">Skapa anpassade mappar</string>
+    <string name="suggested_folders_use_these_folders_button">Använd dessa mappar</string>
+    <string name="suggested_folders_subtitle">Vi har organiserat dina podcasts åt dig. Spara eller anpassa dem efter din stil.</string>
+    <string name="suggested_folders">Föreslagna mappar</string>
+    <string name="winback_claiming_offer">Utnyttjar erbjudande</string>
+    <string name="winback_claimed_offer_message_3">50 % rabatt på ditt nästa år.</string>
+    <string name="winback_offer_free_offer_yearly_description">Betala %1$s nu för ytterligare ett år med 50 %% rabatt.</string>
+    <string name="winback_offer_free_offer_yearly_title">Få 50 % rabatt på ditt nästa år</string>
+    <string name="podcast_refresh_no_episodes_found">Inga avsnitt hittades.</string>
+    <string name="podcast_refresh_new_episode_found">Nytt avsnitt hittat.</string>
+    <string name="podcast_refreshing_episode_list">Uppdaterar avsnittslista…</string>
+    <string name="podcast_refresh_episodes">Uppdatera avsnittslista</string>
     <string name="settings_pixel_watch_subtitle">Ersätt de anpassade Hoppa över-knapparna med standardknappar för nästa/föregående spår som fungerar som Hoppa över-knappar, vilket möjliggör kompatibilitet med fler enheter.</string>
     <string name="settings_pixel_watch_title">Hoppa över-knappar på Pixel Watch</string>
     <string name="winback_cancel_subscription_cancel_button_label">Ja, avsluta min prenumeration</string>
     <string name="winback_cancel_subscription_stay_button_label">Jag vill faktiskt fortsätta</string>
-    <string name="winback_cancel_subscription_perk_web">Du vill inte längre ha åtkomst till Pocket Casts via din webbläsare eller stationära dator.</string>
     <string name="winback_cancel_subscription_perk_files">Alla filer som har laddats upp till ditt Pocket Casts-konto kommer att tas bort (men nedladdade filer på dina mobila enheter kommer att vara kvar).</string>
     <string name="winback_cancel_subscription_perk_folders">Dina mappar kommer att tas bort och deras innehåll kommer att flyttas tillbaka till skärmen Podcasts.</string>
     <string name="winback_cancel_subscription_perk_plus">Åtkomst till Pocket Casts Plus-funktioner kommer att låsas efter detta datum.</string>
     <string name="winback_cancel_subscription_perk_active_without_date">Din nuvarande prenumeration förblir aktiv till utgångsdatumet.</string>
     <string name="winback_cancel_subscription_perk_active_with_date">Din nuvarande prenumeration förblir aktiv till %1$s.</string>
     <string name="winback_cancel_subscription_header_description">Detta kommer att ändra ditt paket till ett gratiskonto.</string>
-    <string name="winback_cancel_subscription_header_title">Byta paket</string>
     <string name="winback_changing_plan">Byta paket</string>
     <string name="winback_too_many_subscritpions_button_label">Hantera prenumerationer i Play Store</string>
     <string name="winback_too_many_subscritpions_note">Du har mer än en aktiv Pocket Casts-prenumeration. Hantera dina prenumerationer i Play Store för att undvika dubbla avgifter.</string>

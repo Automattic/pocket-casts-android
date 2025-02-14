@@ -1,23 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-01-29 11:54:03+0000
+Translation-Revision-Date: 2025-02-11 15:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="suggested_folders_paywall_subtitle">Wir haben vorgefertigte Ordner für deine Podcasts. Nutze diese und weitere Funktionen wie Lesezeichen, Transkripte und mehr mit Pocket Casts Plus.</string>
+    <string name="suggested_folders_paywall_tittle">Deine Podcasts, automatisch organisiert</string>
+    <string name="podcast_feed_update_tooltip_subtitle">Ziehe nach unten oder schaue über dieses Menü nach, ob es etwas Neues gibt.</string>
+    <string name="podcast_feed_update_tooltip_title">Neue Episoden bald verfügbar!</string>
+    <string name="folder_content_description">Ordner %s</string>
+    <string name="suggested_folders_use_create_custom_folders_button">Individuelle Ordner erstellen</string>
+    <string name="suggested_folders_use_these_folders_button">Diese Ordner verwenden</string>
+    <string name="suggested_folders_subtitle">Wir haben deine Podcasts für dich organisiert. Speichere sie oder passe sie nach Belieben an.</string>
+    <string name="suggested_folders">Vorgeschlagene Order</string>
+    <string name="winback_claiming_offer">Angebot nutzen</string>
+    <string name="winback_claimed_offer_message_3">50 % Rabatt auf das nächstes Jahr!</string>
+    <string name="winback_offer_free_offer_yearly_description">Zahle jetzt %1$s und erhalte für ein weiteres Jahr 50 %% Rabatt.</string>
+    <string name="winback_offer_free_offer_yearly_title">50 % Rabatt auf das nächste Jahr sichern</string>
+    <string name="podcast_refresh_no_episodes_found">Keine Folgen gefunden.</string>
+    <string name="podcast_refresh_new_episode_found">Neue Folge gefunden!</string>
+    <string name="podcast_refreshing_episode_list">Folgenliste wird aktualisiert …</string>
+    <string name="podcast_refresh_episodes">Folgenliste aktualisieren</string>
     <string name="settings_pixel_watch_subtitle">Ersetze die individuellen „Überspringen“-Buttons mit den standardmäßigen „Nächster/Vorheriger Track“-Buttons, die als „Überspringen“-Buttons fungieren und so mit mehr Geräten kompatibel sind.</string>
     <string name="settings_pixel_watch_title">„Überspringen“-Buttons der Pixel Watch</string>
     <string name="winback_cancel_subscription_cancel_button_label">Ja, mein Abonnement kündigen</string>
     <string name="winback_cancel_subscription_stay_button_label">Ich möchte das Abonnement doch weiterhin nutzen</string>
-    <string name="winback_cancel_subscription_perk_web">Du wirst nicht länger über deinen Webbrowser oder Desktop-Computer auf Pocket Casts zugreifen können.</string>
     <string name="winback_cancel_subscription_perk_files">Alle Dateien, die in dein Pocket Casts-Konto hochgeladen wurden, werden gelöscht (heruntergeladene Dateien auf deinen Mobilgeräten bleiben jedoch erhalten).</string>
     <string name="winback_cancel_subscription_perk_folders">Deine Ordner werden entfernt und ihre Inhalte werden zum Podcasts-Bildschirm verschoben.</string>
     <string name="winback_cancel_subscription_perk_plus">Der Zugriff auf Pocket Casts Plus-Funktionen wird nach diesem Datum gesperrt.</string>
     <string name="winback_cancel_subscription_perk_active_without_date">Dein aktuelles Abonnement bleibt bis zu seinem Ablaufdatum aktiv.</string>
     <string name="winback_cancel_subscription_perk_active_with_date">Dein aktuelles Abonnement bleibt aktiv bis %1$s.</string>
     <string name="winback_cancel_subscription_header_description">Dadurch wird dein Tarif in ein kostenloses Konto geändert.</string>
-    <string name="winback_cancel_subscription_header_title">Tarif wechseln</string>
     <string name="winback_changing_plan">Tarif wechseln</string>
     <string name="winback_too_many_subscritpions_button_label">Verwalte Abonnements im Play Store</string>
     <string name="winback_too_many_subscritpions_note">Du hast mehr als ein aktives Pocket Casts-Abonnement. Bitte verwalte deine Abonnements im Play Store, um doppelte Abbuchungen zu vermeiden.</string>

@@ -1,23 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-01-28 09:54:03+0000
+Translation-Revision-Date: 2025-02-11 15:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+    <string name="suggested_folders_paywall_subtitle">Hemos predefinido carpetas para tus podcasts. Consigue esta y otras funciones como marcadores, transcripciones y más con Pocket Casts Plus.</string>
+    <string name="suggested_folders_paywall_tittle">Organiza tus podcasts automáticamente</string>
+    <string name="podcast_feed_update_tooltip_subtitle">Arrastra hacia abajo o usa este menú para ver si hay alguna novedad.</string>
+    <string name="podcast_feed_update_tooltip_title">¡Episodios nuevos, marchando!</string>
+    <string name="folder_content_description">Carpeta %s</string>
+    <string name="suggested_folders_use_create_custom_folders_button">Crear carpetas personalizadas</string>
+    <string name="suggested_folders_use_these_folders_button">Usar estas carpetas</string>
+    <string name="suggested_folders_subtitle">Hemos organizado tus podcasts. Guárdalas o personalízalas para que se adapten a tu estilo.</string>
+    <string name="suggested_folders">Carpetas sugeridas</string>
+    <string name="winback_claiming_offer">Reclamar oferta</string>
+    <string name="winback_claimed_offer_message_3">50 % de descuento el próximo año</string>
+    <string name="winback_offer_free_offer_yearly_description">Paga %1$s ahora para obtener un año más al 50 %% de descuento.</string>
+    <string name="winback_offer_free_offer_yearly_title">Consigue un 50 % de descuento el próximo año</string>
+    <string name="podcast_refresh_no_episodes_found">No se ha encontrado ningún episodio.</string>
+    <string name="podcast_refresh_new_episode_found">Se ha encontrado un nuevo episodio.</string>
+    <string name="podcast_refreshing_episode_list">Actualizando la lista de episodios…</string>
+    <string name="podcast_refresh_episodes">Actualizar la lista de episodios</string>
     <string name="settings_pixel_watch_subtitle">Reemplaza los botones de salto personalizados por botones estándar de pista siguiente/anterior que funcionan como botones de salto, lo que permite la compatibilidad con más dispositivos.</string>
     <string name="settings_pixel_watch_title">Botones de salto de Pixel Watch</string>
     <string name="winback_cancel_subscription_cancel_button_label">Sí, cancelar mi suscripción</string>
     <string name="winback_cancel_subscription_stay_button_label">En realidad, quiero quedarme</string>
-    <string name="winback_cancel_subscription_perk_web">Ya no podrás acceder a Pocket Casts a través del navegador web ni del ordenador de sobremesa.</string>
     <string name="winback_cancel_subscription_perk_files">Todos los archivos subidos a tu cuenta de Pocket Casts se eliminarán (sin embargo, los archivos que hayas descargado en tus dispositivos móviles se mantendrán).</string>
     <string name="winback_cancel_subscription_perk_folders">Tus carpetas se eliminarán y sus contenidos se trasladarán a la pantalla Podcast.</string>
     <string name="winback_cancel_subscription_perk_plus">El acceso a las funciones de Pocket Casts Plus ya no estará disponible a partir de esta fecha.</string>
     <string name="winback_cancel_subscription_perk_active_without_date">Tu suscripción actual estará activa hasta su fecha de caducidad.</string>
     <string name="winback_cancel_subscription_perk_active_with_date">Tu suscripción actual estará activa hasta el %1$s.</string>
     <string name="winback_cancel_subscription_header_description">Tu plan se cambiará a una cuenta gratuita.</string>
-    <string name="winback_cancel_subscription_header_title">Cómo cambiar de plan</string>
     <string name="winback_changing_plan">Cómo cambiar de plan</string>
     <string name="winback_too_many_subscritpions_button_label">Gestionar suscripciones en Play Store</string>
     <string name="winback_too_many_subscritpions_note">Tienes más de una suscripción activa a Pocket Casts. Gestiona tus suscripciones en Play Store para evitar que se te cobre dos veces.</string>

@@ -1,11 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-01-21 09:54:04+0000
+Translation-Revision-Date: 2025-02-11 09:54:08+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="suggested_folders_paywall_subtitle">팟캐스트 폴더를 미리 만들었습니다. Pocket Casts Plus로 그 외에도 북마크, 대본 등의 다양한 기능을 이용하세요.</string>
+    <string name="suggested_folders_paywall_tittle">자동으로 정리되는 팟캐스트</string>
+    <string name="podcast_feed_update_tooltip_subtitle">당기거나 이 메뉴를 사용하여 새로워진 점이 있는지 알아보세요.</string>
+    <string name="podcast_feed_update_tooltip_title">새로운 에피소드가 곧 찾아옵니다!</string>
+    <string name="folder_content_description">폴더 %s</string>
+    <string name="suggested_folders_use_create_custom_folders_button">사용자 정의 폴더 생성</string>
+    <string name="suggested_folders_use_these_folders_button">이대로 폴더 사용</string>
+    <string name="suggested_folders_subtitle">팟캐스트를 자동으로 정리했습니다. 이대로 저장하거나 원하는 형식으로 사용자 정의하세요.</string>
+    <string name="suggested_folders">폴더 제안</string>
+    <string name="winback_claiming_offer">혜택 받는 중</string>
+    <string name="winback_claimed_offer_message_3">다음 해 50% 할인!</string>
+    <string name="winback_offer_free_offer_yearly_description">지금 %1$s을(를) 결제하고 다음 해에 50%% 할인을 받으세요.</string>
+    <string name="winback_offer_free_offer_yearly_title">다음 해에 50% 할인을 받으세요</string>
+    <string name="podcast_refresh_no_episodes_found">에피소드를 찾을 수 없음</string>
+    <string name="podcast_refresh_new_episode_found">새 에피소드 발견</string>
+    <string name="podcast_refreshing_episode_list">에피소드 목록 새로 고치는 중…</string>
+    <string name="podcast_refresh_episodes">에피소드 목록 새로 고침</string>
+    <string name="settings_pixel_watch_subtitle">사용자 정의된 건너뛰기 버튼을 건너뛰기 버튼으로 작동하는 표준 다음/이전 트랙 버튼으로 교체하여 더 많은 기기와의 호환성을 확보하세요.</string>
+    <string name="settings_pixel_watch_title">Pixel Watch 건너뛰기 버튼</string>
+    <string name="winback_cancel_subscription_cancel_button_label">예, 구독을 취소합니다</string>
+    <string name="winback_cancel_subscription_stay_button_label">구독을 유지하고 싶습니다</string>
+    <string name="winback_cancel_subscription_perk_files">Pocket Casts에 업로드된 모든 파일이 삭제됩니다(단, 모바일 장치에 다운로드한 파일은 유지).</string>
+    <string name="winback_cancel_subscription_perk_folders">폴더가 제거되며 폴더에 있던 콘텐츠는 팟캐스트 화면으로 다시 이동합니다.</string>
+    <string name="winback_cancel_subscription_perk_plus">이 날짜 이후로 Pocket Casts Plus 기능에 접근하는 기능이 잠깁니다.</string>
+    <string name="winback_cancel_subscription_perk_active_without_date">현재 구독은 만료일까지 활성 상태로 유지됩니다.</string>
+    <string name="winback_cancel_subscription_perk_active_with_date">현재 구독은 %1$s까지 활성 상태로 유지됩니다.</string>
+    <string name="winback_cancel_subscription_header_description">이렇게 하면 요금제가 무료 계정으로 변경됩니다.</string>
+    <string name="winback_changing_plan">요금제 변경</string>
+    <string name="winback_too_many_subscritpions_button_label">Play 스토어에서 구독 관리</string>
+    <string name="winback_too_many_subscritpions_note">활성 상태인 Pocket Casts 구독이 두 개 이상 있습니다. 중복 청구가 발생하지 않도록 하려면 Play 스토어에서 구독을 관리하세요.</string>
+    <string name="winback_too_many_subscritpions_title">다중 구독이 확인되었습니다</string>
     <string name="winback_error_fetch_description">죄송합니다. 요금제를 가져오는 중에 문제가 발생했습니다.</string>
     <string name="winback_available_plans_billing_note">새 요금제는 현재 청구 기간이 종료된 후 활성화됩니다.</string>
     <string name="winback_available_plans_title">이용 가능한 요금제</string>

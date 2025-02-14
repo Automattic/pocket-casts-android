@@ -1,23 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-01-30 11:54:03+0000
+Translation-Revision-Date: 2025-02-11 11:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="suggested_folders_paywall_subtitle">We hebben alvast wat mappen aangemaakt voor je podcasts. Ontgrendel dit en functies zoals bladwijzers, transcripties en meer met Pocket Casts Plus.</string>
+    <string name="suggested_folders_paywall_tittle">Jouw podcasts, automatisch geordend</string>
+    <string name="podcast_feed_update_tooltip_subtitle">Vouw uit of gebruik dit menu om te zien of er iets nieuws is.</string>
+    <string name="podcast_feed_update_tooltip_title">Nieuwe afleveringen staan voor je klaar!</string>
+    <string name="folder_content_description">Map %s</string>
+    <string name="suggested_folders_use_create_custom_folders_button">Aangepaste mappen aanmaken</string>
+    <string name="suggested_folders_use_these_folders_button">Deze mappen gebruiken</string>
+    <string name="suggested_folders_subtitle">We hebben je podcasts voor je geordend. Sla ze op of pas ze naar eigen smaak aan.</string>
+    <string name="suggested_folders">Voorgestelde mappen</string>
+    <string name="winback_claiming_offer">Aanbieding claimen</string>
+    <string name="winback_claimed_offer_message_3">50% korting op je eerste jaar!</string>
+    <string name="winback_offer_free_offer_yearly_description">Betaal nu %1$s voor nog een jaar met 50%% korting.</string>
+    <string name="winback_offer_free_offer_yearly_title">Krijg 50% korting op je eerste jaar</string>
+    <string name="podcast_refresh_no_episodes_found">Geen afleveringen gevonden.</string>
+    <string name="podcast_refresh_new_episode_found">Nieuwe afleveringen gevonden!</string>
+    <string name="podcast_refreshing_episode_list">Lijst met afleveringen vernieuwen …</string>
+    <string name="podcast_refresh_episodes">Lijst met afleveringen vernieuwen</string>
     <string name="settings_pixel_watch_subtitle">Vervang de aangepaste overslaan-knoppen door standaardknoppen voor volgende/vorige aflevering. Deze werken hetzelfde als de overslaan-knoppen, maar zijn compatibel met meer apparaten.</string>
     <string name="settings_pixel_watch_title">Pixel Watch overslaan-knoppen</string>
     <string name="winback_cancel_subscription_cancel_button_label">Ja, annuleer mijn abonnement</string>
     <string name="winback_cancel_subscription_stay_button_label">Ik wil toch blijven</string>
-    <string name="winback_cancel_subscription_perk_web">Je zal Pocket Casts niet meer kunnen openen met je webbrowser of computer.</string>
     <string name="winback_cancel_subscription_perk_files">Alle bestanden die zijn geüpload naar je Pocket Casts-account worden verwijderd (bestanden die zijn gedownload op je mobiele apparaten blijven behouden).</string>
     <string name="winback_cancel_subscription_perk_folders">Je mappen worden verwijderd en hun inhoud wordt teruggezet naar het scherm Podcasts.</string>
     <string name="winback_cancel_subscription_perk_plus">Na deze datum wordt toegang tot Pocket Casts Plus-functies vergrendeld.</string>
     <string name="winback_cancel_subscription_perk_active_without_date">Je huidige abonnement blijft actief tot de vervaldatum.</string>
     <string name="winback_cancel_subscription_perk_active_with_date">Je huidige abonnement blijft actief tot %1$s.</string>
     <string name="winback_cancel_subscription_header_description">Hierdoor wordt je abonnement aangepast naar een gratis account.</string>
-    <string name="winback_cancel_subscription_header_title">Abonnement wordt gewijzigd</string>
     <string name="winback_changing_plan">Abonnement wordt gewijzigd</string>
     <string name="winback_too_many_subscritpions_button_label">Abonnementen beheren in de Play Store</string>
     <string name="winback_too_many_subscritpions_note">Je hebt meer dan één actief Pocket Casts-abonnement. Beheer je abonnementen in de Pocket Casts om dubbele betalingen te voorkomen.</string>

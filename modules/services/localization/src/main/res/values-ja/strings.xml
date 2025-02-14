@@ -1,23 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-01-29 09:54:03+0000
+Translation-Revision-Date: 2025-02-12 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="suggested_folders_paywall_subtitle">ポッドキャスト用のフォルダーがあらかじめ作成されています。 Pocket Casts Plus を利用すると、この機能やブックマーク、トランスクリプトなどの機能が利用できるようになります。</string>
+    <string name="suggested_folders_paywall_tittle">ポッドキャストを自動で整理</string>
+    <string name="podcast_feed_update_tooltip_subtitle">プルダウンまたはこちらのメニューを使って、新しいものがあるかを確認します。</string>
+    <string name="podcast_feed_update_tooltip_title">最新エピソードがまもなく登場 !</string>
+    <string name="folder_content_description">フォルダー %s</string>
+    <string name="suggested_folders_use_create_custom_folders_button">カスタムフォルダーを作成</string>
+    <string name="suggested_folders_use_these_folders_button">これらのフォルダーを使用</string>
+    <string name="suggested_folders_subtitle">ポッドキャストを整理しておきました。 保存するか、カスタマイズしてご自身のスタイルに合わせましょう。</string>
+    <string name="suggested_folders">おすすめのフォルダー</string>
+    <string name="winback_claiming_offer">オファーの獲得</string>
+    <string name="winback_claimed_offer_message_3">次年度が50% オフ !</string>
+    <string name="winback_offer_free_offer_yearly_description">今すぐ%1$sを支払うと、もう1年が50%% オフになります。</string>
+    <string name="winback_offer_free_offer_yearly_title">次年度が50% オフ</string>
+    <string name="podcast_refresh_no_episodes_found">エピソードがありません。</string>
+    <string name="podcast_refresh_new_episode_found">新しいエピソードが見つかりました !</string>
+    <string name="podcast_refreshing_episode_list">エピソードリストを更新中…</string>
+    <string name="podcast_refresh_episodes">エピソードリストを更新</string>
     <string name="settings_pixel_watch_subtitle">標準の「次 / 前」トラックボタンをカスタムスキップボタンに置き換え、スキップボタンとして機能するようにすると、互換できる端末が増えます。</string>
     <string name="settings_pixel_watch_title">Pixel Watch スキップボタン</string>
     <string name="winback_cancel_subscription_cancel_button_label">はい、サブスクリプションをキャンセルします</string>
     <string name="winback_cancel_subscription_stay_button_label">利用を続けます</string>
-    <string name="winback_cancel_subscription_perk_web">ウェブブラウザーやデスクトップコンピューターで Pocket Casts にアクセスできなくなります。</string>
     <string name="winback_cancel_subscription_perk_files">Pocket Casts アカウントにアップロードされたファイルはすべて削除されます (ただし、モバイルデバイスにダウンロードされたファイルは残ります)。</string>
     <string name="winback_cancel_subscription_perk_folders">フォルダーは消去され、保存されているコンテンツは再びポッドキャスト画面に移動します。</string>
     <string name="winback_cancel_subscription_perk_plus">この日付以降、Pocket Casts Plus の機能を利用できなくなります。</string>
     <string name="winback_cancel_subscription_perk_active_without_date">現在のサブスクリプションは有効期限日まで有効です。</string>
     <string name="winback_cancel_subscription_perk_active_with_date">現在のサブスクリプションは%1$sまで有効です。</string>
     <string name="winback_cancel_subscription_header_description">これにより、お客様のプランが無料アカウントに変更されます。</string>
-    <string name="winback_cancel_subscription_header_title">プランの変更</string>
     <string name="winback_changing_plan">プランの変更</string>
     <string name="winback_too_many_subscritpions_button_label">Play Store でサブスクリプションを管理</string>
     <string name="winback_too_many_subscritpions_note">アクティブな Pocket Casts サブスクリプションが複数あります。  Play Store でサブスクリプションを管理して、重複請求を回避してください。</string>
