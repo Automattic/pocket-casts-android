@@ -120,7 +120,7 @@ internal fun OnboardingUpgradeFeaturesPage(
         is OnboardingUpgradeFeaturesState.Loading -> Unit // Do Nothing
         is OnboardingUpgradeFeaturesState.Loaded -> {
             val loadedState = state as OnboardingUpgradeFeaturesState.Loaded
-            UpgradeLayoutOriginal(
+            UpgradeLayout(
                 state = loadedState,
                 source = source,
                 scrollState = scrollState,
@@ -145,7 +145,7 @@ internal fun OnboardingUpgradeFeaturesPage(
 }
 
 @Composable
-private fun UpgradeLayoutOriginal(
+private fun UpgradeLayout(
     state: OnboardingUpgradeFeaturesState.Loaded,
     source: OnboardingUpgradeSource,
     scrollState: ScrollState,
