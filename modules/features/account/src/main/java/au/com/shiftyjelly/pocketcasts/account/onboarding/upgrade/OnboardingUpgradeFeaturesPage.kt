@@ -62,8 +62,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradeFeatureItem
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UpgradeRowButton
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.paywallfeatures.UpgradeLayoutFeatures
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.paywallreviews.UpgradeLayoutReviews
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesViewModel
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
@@ -122,42 +120,19 @@ internal fun OnboardingUpgradeFeaturesPage(
         is OnboardingUpgradeFeaturesState.Loading -> Unit // Do Nothing
         is OnboardingUpgradeFeaturesState.Loaded -> {
             val loadedState = state as OnboardingUpgradeFeaturesState.Loaded
-            when (loadedState.upgradeLayout) {
-                UpgradeLayout.Features -> {
-                    UpgradeLayoutFeatures(
-                        state = loadedState,
-                        source = source,
-                        scrollState = scrollState,
-                        onNotNowPressed = onNotNowPressed,
-                        onClickSubscribe = { onClickSubscribe(true) },
-                        canUpgrade = canUpgrade,
-                    )
-                }
-                UpgradeLayout.Reviews -> {
-                    UpgradeLayoutReviews(
-                        state = loadedState,
-                        onNotNowPressed = onNotNowPressed,
-                        onClickSubscribe = { onClickSubscribe(true) },
-                        onRateUsPressed = { viewModel.onRateUsPressed() },
-                        canUpgrade = canUpgrade,
-                    )
-                }
-                UpgradeLayout.Original -> {
-                    UpgradeLayoutOriginal(
-                        state = loadedState,
-                        source = source,
-                        scrollState = scrollState,
-                        onBackPressed = onBackPressed,
-                        onNotNowPressed = onNotNowPressed,
-                        onSubscriptionFrequencyChanged = { viewModel.onSubscriptionFrequencyChanged(it) },
-                        onFeatureCardChanged = { viewModel.onFeatureCardChanged(loadedState.featureCardsState.featureCards[it]) },
-                        onClickSubscribe = { onClickSubscribe(false) },
-                        canUpgrade = canUpgrade,
-                        onPrivacyPolicyClick = { viewModel.onPrivacyPolicyPressed() },
-                        onTermsAndConditionsClick = { viewModel.onTermsAndConditionsPressed() },
-                    )
-                }
-            }
+            UpgradeLayoutOriginal(
+                state = loadedState,
+                source = source,
+                scrollState = scrollState,
+                onBackPressed = onBackPressed,
+                onNotNowPressed = onNotNowPressed,
+                onSubscriptionFrequencyChanged = { viewModel.onSubscriptionFrequencyChanged(it) },
+                onFeatureCardChanged = { viewModel.onFeatureCardChanged(loadedState.featureCardsState.featureCards[it]) },
+                onClickSubscribe = { onClickSubscribe(false) },
+                canUpgrade = canUpgrade,
+                onPrivacyPolicyClick = { viewModel.onPrivacyPolicyPressed() },
+                onTermsAndConditionsClick = { viewModel.onTermsAndConditionsPressed() },
+            )
         }
         is OnboardingUpgradeFeaturesState.NoSubscriptions -> {
             NoSubscriptionsLayout(
