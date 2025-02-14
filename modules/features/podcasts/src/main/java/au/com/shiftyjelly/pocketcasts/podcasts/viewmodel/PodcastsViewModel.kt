@@ -65,8 +65,6 @@ class PodcastsViewModel
         val isSignedInAsPlusOrPatron: Boolean,
     )
 
-    val signInState: LiveData<SignInState> = userManager.getSignInState().toLiveData()
-
     val folderState: LiveData<FolderState> = combineLatest(
         // monitor all subscribed podcasts, get the podcast in 'Episode release date' as the rest can be done in memory
         podcastManager.podcastsOrderByLatestEpisodeRxFlowable(),
@@ -300,22 +298,15 @@ class PodcastsViewModel
 
     suspend fun refreshSuggestedFolders() {
         if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS)) {
-            val ids = listOf(
-                "3782b780-0bc5-012e-fb02-00163e1b201c",
-                "12012c20-0423-012e-f9a0-00163e1b201c",
-                "f5b97290-0422-012e-f9a0-00163e1b201c",
-                "d81fbcb0-0422-012e-f9a0-00163e1b201c",
-                "2f31d1b0-2249-0132-b5ae-5f4c86fd3263",
-                "4eb5b260-c933-0134-10da-25324e2a541d",
-                "0cc43410-1d2f-012e-0175-00163e1b201c",
-                "3ec78c50-0d62-012e-fb9c-00163e1b201c",
-                "c59b45b0-0bc4-012e-fb02-00163e1b201c",
-                "7868f900-21de-0133-2464-059c869cc4eb",
-                "052df5e0-72b8-012f-1d57-525400c11844",
-            )
+            val uuids = podcastManager.findSubscribedUuids()
 
-            suggestedFoldersManager.getSuggestedFolders(ids)?.collect { state ->
-                _suggestedFoldersState.emit(SuggestedFoldersState.Loaded(state.toFolders()))
+            _suggestedFoldersState.emit(SuggestedFoldersState.Fetching)
+
+            suggestedFoldersManager.getSuggestedFolders(uuids)?.collect { state ->
+                val folders = state.toFolders()
+                if (!folders.isEmpty()) {
+                    _suggestedFoldersState.emit(SuggestedFoldersState.Loaded(folders))
+                }
             }
         }
     }

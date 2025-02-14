@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 107,
-    "identityHash": "620d67275842e1a5098e755d3d9222cd",
+    "identityHash": "3a6f5acf1f9def8186051ca708c30b54",
     "entities": [
       {
         "tableName": "bump_stats",
@@ -441,44 +441,6 @@
           {
             "fieldPath": "syncModified",
             "columnName": "sync_modified",
-            "affinity": "INTEGER",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": false,
-          "columnNames": [
-            "uuid"
-          ]
-        },
-        "indices": [],
-        "foreignKeys": []
-      },
-      {
-        "tableName": "suggested_folders",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uuid` TEXT NOT NULL, `folder_name` TEXT NOT NULL, `podcastUuid` TEXT NOT NULL, `color` INTEGER NOT NULL, PRIMARY KEY(`uuid`))",
-        "fields": [
-          {
-            "fieldPath": "uuid",
-            "columnName": "uuid",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "name",
-            "columnName": "folder_name",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "podcastUuid",
-            "columnName": "podcastUuid",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "color",
-            "columnName": "color",
             "affinity": "INTEGER",
             "notNull": true
           }
@@ -1908,7 +1870,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '620d67275842e1a5098e755d3d9222cd')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '3a6f5acf1f9def8186051ca708c30b54')"
     ]
   }
 }

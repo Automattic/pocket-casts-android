@@ -85,28 +85,6 @@ data class SuggestedFoldersResponse(
                 )
             }
         }
-        folderEntities.add(
-            SuggestedFolder(
-                uuid = UUID.randomUUID().toString(),
-                name = "Pack",
-                podcastUuid = "4eb5b260-c933-0134-10da-25324e2a541d",
-            ),
-        )
-        folderEntities.add(
-            SuggestedFolder(
-                uuid = UUID.randomUUID().toString(),
-                name = "Pack",
-                podcastUuid = "f5b97290-0422-012e-f9a0-00163e1b201c",
-            ),
-        )
-
-        folderEntities.add(
-            SuggestedFolder(
-                uuid = UUID.randomUUID().toString(),
-                name = "New",
-                podcastUuid = "c59b45b0-0bc4-012e-fb02-00163e1b201c",
-            ),
-        )
         return folderEntities
     }
 }
