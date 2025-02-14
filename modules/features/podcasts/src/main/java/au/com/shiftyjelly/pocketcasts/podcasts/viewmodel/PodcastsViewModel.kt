@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.podcasts.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
+import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
@@ -296,17 +297,24 @@ class PodcastsViewModel
         }
     }
 
-    suspend fun refreshSuggestedFolders() {
+    suspend fun loadSuggestedFolders() {
         if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS)) {
-            val uuids = podcastManager.findSubscribedUuids()
+            _suggestedFoldersState.emit(SuggestedFoldersState.Loading)
 
-            _suggestedFoldersState.emit(SuggestedFoldersState.Fetching)
-
-            suggestedFoldersManager.getSuggestedFolders(uuids)?.collect { state ->
+            suggestedFoldersManager.getSuggestedFolders()?.collect { state ->
                 val folders = state.toFolders()
                 if (!folders.isEmpty()) {
                     _suggestedFoldersState.emit(SuggestedFoldersState.Loaded(folders))
                 }
+            }
+        }
+    }
+
+    fun refreshSuggestedFolders() {
+        viewModelScope.launch {
+            if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS)) {
+                val uuids = podcastManager.findSubscribedUuids()
+                suggestedFoldersManager.refreshSuggestedFolders(uuids)
             }
         }
     }
@@ -327,7 +335,7 @@ class PodcastsViewModel
         FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS) && !isSignedInAsPlusOrPatron && settings.suggestedFolderPaywallDismissTime.value == 0L
 
     sealed class SuggestedFoldersState {
-        data object Fetching : SuggestedFoldersState()
+        data object Loading : SuggestedFoldersState()
         data class Loaded(val folders: List<SuggestedFolderModel>) : SuggestedFoldersState()
     }
 

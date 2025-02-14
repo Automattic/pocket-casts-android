@@ -22,9 +22,8 @@ class SuggestedFoldersManager @Inject constructor(
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
-    suspend fun getSuggestedFolders(podcastUuids: List<String>): Flow<List<SuggestedFolder>>? {
+    fun getSuggestedFolders(): Flow<List<SuggestedFolder>>? {
         try {
-            refreshSuggestedFolders(podcastUuids)
             return suggestedFoldersDao.findAll()
         } catch (e: Exception) {
             Timber.e(e, "Getting suggested folders failed")

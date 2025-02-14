@@ -49,17 +49,16 @@ class SuggestedFoldersManagerTest {
 
         whenever(mockSuggestedFoldersDao.findAll()).thenReturn(flowOf(folders))
 
-        val result = suggestedFoldersManager.getSuggestedFolders(podcastUuids)?.first()
+        val result = suggestedFoldersManager.getSuggestedFolders()?.first()
 
         assertEquals(folders, result)
     }
 
     @Test
     fun `should return null if db throws an exception`() = runBlocking {
-        val podcastUuids = listOf("uuid1", "uuid2")
         whenever(mockSuggestedFoldersDao.findAll()).thenThrow(RuntimeException("Test Exception"))
 
-        val result = suggestedFoldersManager.getSuggestedFolders(podcastUuids)
+        val result = suggestedFoldersManager.getSuggestedFolders()
 
         assertNull(result)
     }
