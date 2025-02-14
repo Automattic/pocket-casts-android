@@ -2315,7 +2315,7 @@
     <string name="winback_error_fetch_description">Sorry, but something went wrong fetching your plans.</string>
     <string name="winback_changing_plan">Changing plan</string>
     <string name="winback_claiming_offer">Claiming offer</string>
-    <string name="winback_cancel_subscription_header_title">Changing plan</string>
+    <string name="winback_cancel_subscription_header_title">Cancel Subscription</string>
     <string name="winback_cancel_subscription_header_description">This will change your plan to a free account.</string>
     <string name="winback_cancel_subscription_perk_active_with_date">Your current subscription will remain active until %1$s.</string>
     <string name="winback_cancel_subscription_perk_active_without_date">Your current subscription will remain active until its expiration date.</string>
