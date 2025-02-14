@@ -37,9 +37,9 @@ import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
-import java.util.Calendar
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlin.time.Duration.Companion.days
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -224,24 +224,35 @@ class PodcastManagerImpl @Inject constructor(
 
         // we don't delete podcasts added to the phone in the last week. This is to prevent stuff you just leave open in discover from being removed
         val addedDate = podcast.addedDate
-        val calendar = Calendar.getInstance()
-        calendar.add(Calendar.DAY_OF_YEAR, -7)
-        val oneWeekAgo = calendar.time
-        if (addedDate != null && addedDate > oneWeekAgo) {
+        val oneWeekAgoMs = System.currentTimeMillis() - 7.days.inWholeMilliseconds
+        if (addedDate != null && addedDate.time > oneWeekAgoMs) {
             return false
         }
 
         // podcasts can be deleted if all of the episodes are haven't been interacted with
         val episodes = episodeManager.findEpisodesByPodcastOrderedBlocking(podcast)
         var podcastHasChangedEpisodes = false
+        var latestPlaybackInteraction = 0L
         val deleteEpisodes = mutableListOf<PodcastEpisode>()
         for (episode in episodes) {
+            // find the latest playback interaction
+            episode.lastPlaybackInteraction?.let { interaction ->
+                if (interaction > latestPlaybackInteraction) {
+                    latestPlaybackInteraction = interaction
+                }
+            }
+            // don't delete the podcast if any of the episodes have been interacted with
             if (episodeManager.userHasInteractedWithEpisode(episode, playbackManager)) {
                 podcastHasChangedEpisodes = true
                 continue
             }
             // bulk delete or it takes 10 seconds on a large podcast
             deleteEpisodes.add(episode)
+        }
+        // don't delete the episodes or podcast if the latest playback interaction happening in the last month
+        val oneMonthAgoMs = System.currentTimeMillis() - 30.days.inWholeMilliseconds
+        if (latestPlaybackInteraction > oneMonthAgoMs) {
+            return false
         }
         if (deleteEpisodes.isNotEmpty()) {
             episodeManager.deleteEpisodesWithoutSyncBlocking(deleteEpisodes, playbackManager)

@@ -30,35 +30,31 @@ class ChapterManagerImpl @Inject constructor(
     override fun observerChaptersForEpisode(episodeUuid: String) = combine(
         episodeManager.findEpisodeByUuidFlow(episodeUuid).distinctUntilChangedBy(BaseEpisode::deselectedChapters),
         chapterDao.observerChaptersForEpisode(episodeUuid),
-    ) { episode, dbChapters -> dbChapters.toChapters(episode) }
+    ) { episode, dbChapters -> Chapters(dbChapters.fixChapterTimestamps(episode)) }
 
-    private fun List<DbChapter>.toChapters(episode: BaseEpisode): Chapters {
-        val chaptersList = asSequence()
-            .fixChapterTimestamps(episode)
-            .filter { it.duration > Duration.ZERO }
-            .mapIndexed { index, chapter -> chapter.copy(index = index) }
-            .toList()
-        return Chapters(chaptersList)
-    }
+    private fun List<DbChapter>.fixChapterTimestamps(episode: BaseEpisode) = asSequence()
+        .withIndex()
+        .windowed(size = 2, partialWindows = true) { window ->
+            val sequenceIndex = window[0].index
+            val firstChapter = window[0].value
+            val secondChapter = window.getOrNull(1)?.value
 
-    private fun Sequence<DbChapter>.fixChapterTimestamps(episode: BaseEpisode) = withIndex().windowed(size = 2, partialWindows = true) { window ->
-        val index = window[0].index
-        val chapterIndex = window[0].index
-        val firstChapter = window[0].value
-        val secondChapter = window.getOrNull(1)?.value
+            val newStartTime = if (sequenceIndex == 0) Duration.ZERO else firstChapter.startTimeMs.milliseconds
+            val secondStartTime = secondChapter?.startTimeMs?.milliseconds ?: episode.durationMs.milliseconds
+            val newEndTime = firstChapter.endTimeMs?.milliseconds?.takeIf { it <= secondStartTime && it > newStartTime } ?: secondStartTime
 
-        val newStartTime = if (index == 0) Duration.ZERO else firstChapter.startTimeMs.milliseconds
-        val secondStartTime = secondChapter?.startTimeMs?.milliseconds ?: episode.durationMs.milliseconds
-        val newEndTime = firstChapter.endTimeMs?.milliseconds?.takeIf { it <= secondStartTime && it > newStartTime } ?: secondStartTime
-
-        Chapter(
-            title = firstChapter.title.orEmpty(),
-            startTime = newStartTime,
-            endTime = newEndTime,
-            url = firstChapter.url?.toHttpUrlOrNull(),
-            imagePath = firstChapter.imageUrl,
-            index = chapterIndex,
-            selected = chapterIndex !in episode.deselectedChapters,
-        )
-    }
+            Chapter(
+                title = firstChapter.title.orEmpty(),
+                startTime = newStartTime,
+                endTime = newEndTime,
+                url = firstChapter.url?.toHttpUrlOrNull(),
+                imagePath = firstChapter.imageUrl,
+                index = firstChapter.index,
+                uiIndex = -1, // We set any value here as it is updated later in the processing chain
+                selected = firstChapter.index !in episode.deselectedChapters,
+            )
+        }
+        .filter { it.duration > Duration.ZERO }
+        .mapIndexed { index, chapter -> chapter.copy(uiIndex = index + 1) }
+        .toList()
 }

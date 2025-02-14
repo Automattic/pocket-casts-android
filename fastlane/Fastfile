@@ -111,7 +111,8 @@ platform :android do
 
     # Create the release branch
     UI.message('Creating release branch...')
-    Fastlane::Helper::GitHelper.create_branch("release/#{release_version_next}", from: DEFAULT_BRANCH)
+    release_branch_name = "release/#{release_version_next}"
+    Fastlane::Helper::GitHelper.create_branch(release_branch_name, from: DEFAULT_BRANCH)
     UI.success("Done! New release branch is: #{git_branch}")
 
     # Bump the version and build code
@@ -136,13 +137,13 @@ platform :android do
     )
     push_to_git_remote(set_upstream: true, tags: false)
 
-    trigger_release_build(branch_to_build: "release/#{new_version}")
+    trigger_release_build(branch_to_build: release_branch_name)
     create_backmerge_pr
 
-    # We cannot use the `copy_branch_protection` action here as it would create a branch protection rule with the same
-    # restrictions we have in `main`, and the release managers wouldn't be able to push due to permissions.
-    # This should be changed only when we have PC Android releases done on CI, when the CI bot is the one running `git push`.
-    set_branch_protection(repository: GITHUB_REPO, branch: "release/#{new_version}")
+    # Copy the branch protection settings from the default branch to the new release branch
+    copy_branch_protection(repository: GITHUB_REPO, from_branch: DEFAULT_BRANCH, to_branch: release_branch_name)
+    # But allow admins to bypass restrictions, so that wpmobilebot can push to the release branch directly for beta version bumps
+    set_branch_protection(repository: GITHUB_REPO, branch: release_branch_name, enforce_admins: false)
 
     begin
       # Move PRs to next milestone
@@ -453,7 +454,7 @@ platform :android do
     is_beta = beta_version?(version)
     unless skip_prechecks
       # Match branch names that begin with `release/`
-      # Skip this check on CI because that action relies on CI env vars, but when this lane iscalled as part of `code_freeze` the branch changed since the CI build started, so that wouldn't work
+      # Skip this check on CI because that action relies on CI env vars, but when this lane is called as part of `code_freeze` the branch changed since the CI build started, so that wouldn't work
       ensure_git_branch(branch: '^release/') unless is_ci
 
       UI.important("Building version #{version_name_current} (#{build_code_current}) for upload to Google Play Console")

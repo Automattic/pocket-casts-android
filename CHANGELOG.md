@@ -1,6 +1,20 @@
 7.83
 -----
-
+*   New Features
+    *   Add support for updating podcast feed
+        ([#3569](https://github.com/Automattic/pocket-casts-android/pull/3569))
+*   Bug Fixes
+    *   Fix missing episodes with unfollowed podcasts
+        ([#3546](https://github.com/Automattic/pocket-casts-android/pull/3546))
+    *   Fix Media Notification artwork caching issues
+        ([#3566](https://github.com/Automattic/pocket-casts-android/pull/3566))
+    *   Fix issue causing the Account Details page to become unresponsive after viewing an offer
+        ([#3574](https://github.com/Automattic/pocket-casts-android/pull/3574))
+*   Updates
+    *   Filter out chapters that do not belong in table of contents. See [the specification](https://github.com/Podcastindex-org/podcast-namespace/blob/main/chapters/jsonChapters.md) for more details.
+        ([#3556](https://github.com/Automattic/pocket-casts-android/pull/3556))
+    *   Add OPML import from URL to the onboarding process.
+        ([#3584](https://github.com/Automattic/pocket-casts-android/pull/3584))
 
 7.82
 -----
@@ -9,6 +23,8 @@
         ([#3460](https://github.com/Automattic/pocket-casts-android/pull/3460))
     *   Fix issue with playback stopping when using Pixel Buds actions.
         ([#3493](https://github.com/Automattic/pocket-casts-android/pull/3493))
+    *   Fix issue with sleep timer end of episode when has skip last set
+        ([#3582](https://github.com/Automattic/pocket-casts-android/pull/3582))
 *   Updates
     *   Remove audio and video clip sharing
         ([#3481](https://github.com/Automattic/pocket-casts-android/pull/3481))

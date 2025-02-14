@@ -102,7 +102,7 @@ fun ChapterRow(
                 Spacer(Modifier.width(8.dp))
             }
             TextH50(
-                text = (chapter.index + 1).toString(),
+                text = (chapter.uiIndex).toString(),
                 color = textColor,
                 modifier = Modifier
                     .padding(horizontal = 12.dp),
@@ -247,7 +247,8 @@ private fun ChapterRowPreview(theme: Theme.ThemeType) {
         endTime = 62.seconds,
         url = "https://pocketcasts.com".toHttpUrlOrNull(),
         imagePath = null,
-        index = 1,
+        index = 0,
+        uiIndex = 5,
     )
     AppThemeWithBackground(theme) {
         ChaptersTheme {

@@ -33,15 +33,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.Devices
+import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedNonNullVisibility
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH60
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.models.type.BillingPeriod
+import au.com.shiftyjelly.pocketcasts.models.type.WinbackOfferDetails
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import androidx.compose.material.Divider as MaterialDivider
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -49,7 +53,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 internal fun WinbackOfferPage(
-    onClaimOffer: () -> Unit,
+    offer: WinbackOffer?,
+    onClaimOffer: (WinbackOffer) -> Unit,
     onSeeAvailablePlans: () -> Unit,
     onSeeHelpAndFeedback: () -> Unit,
     onContinueToCancellation: () -> Unit,
@@ -72,11 +77,19 @@ internal fun WinbackOfferPage(
         Spacer(
             modifier = Modifier.height(16.dp),
         )
-        ClaimFreeOffer(
-            onClick = onClaimOffer,
-            modifier = Modifier.fillMaxWidth(),
-        )
-        Divider()
+        AnimatedNonNullVisibility(
+            item = offer,
+        ) { offer ->
+            Column {
+                ClaimFreeOffer(
+                    offer = offer,
+                    onClick = { onClaimOffer(offer) },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Divider()
+            }
+        }
+
         AvailablePlans(
             onClick = onSeeAvailablePlans,
             modifier = Modifier.fillMaxWidth(),
@@ -117,6 +130,7 @@ private fun WinbackOfferHeader(
 
 @Composable
 private fun ClaimFreeOffer(
+    offer: WinbackOffer,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -129,13 +143,19 @@ private fun ClaimFreeOffer(
     ) {
         Column {
             TextH40(
-                text = stringResource(LR.string.winback_offer_free_offer_title),
+                text = when (offer.details.billingPeriod) {
+                    BillingPeriod.Monthly -> stringResource(LR.string.winback_offer_free_offer_title)
+                    BillingPeriod.Yearly -> stringResource(LR.string.winback_offer_free_offer_yearly_title)
+                },
             )
             Spacer(
                 modifier = Modifier.height(4.dp),
             )
             TextH60(
-                text = stringResource(LR.string.winback_offer_free_offer_description, "\$3.99"),
+                text = when (offer.details.billingPeriod) {
+                    BillingPeriod.Monthly -> stringResource(LR.string.winback_offer_free_offer_description, offer.formattedPrice)
+                    BillingPeriod.Yearly -> stringResource(LR.string.winback_offer_free_offer_yearly_description, offer.formattedPrice)
+                },
                 color = MaterialTheme.theme.colors.primaryText02,
             )
             Spacer(
@@ -258,11 +278,13 @@ private fun ChevronRow(
     content: @Composable () -> Unit,
 ) {
     Row(
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier,
     ) {
         content()
+        Spacer(
+            modifier = Modifier.weight(1f),
+        )
         Image(
             painter = painterResource(IR.drawable.ic_chevron_small_right),
             contentDescription = null,
@@ -284,17 +306,59 @@ private fun Divider(
 
 @Preview(device = Devices.PortraitRegular)
 @Composable
-private fun WinbackOfferPagePreview(
-    @PreviewParameter(ThemePreviewParameterProvider::class) theme: Theme.ThemeType,
+private fun WinbackOfferPageOfferTypePreview(
+    @PreviewParameter(WinbackOfferParameterProvider::class) offer: WinbackOffer,
 ) {
     AppThemeWithBackground(
-        themeType = theme,
+        themeType = Theme.ThemeType.INDIGO,
     ) {
         WinbackOfferPage(
+            offer = offer,
             onClaimOffer = {},
             onSeeAvailablePlans = {},
             onSeeHelpAndFeedback = {},
             onContinueToCancellation = {},
         )
     }
+}
+
+@Preview(device = Devices.PortraitRegular)
+@Composable
+private fun WinbackOfferPageThemePreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) theme: Theme.ThemeType,
+) {
+    AppThemeWithBackground(
+        themeType = theme,
+    ) {
+        WinbackOfferPage(
+            offer = WinbackOffer(
+                details = WinbackOfferDetails.PlusMonthly,
+                offerToken = "",
+                redeemCode = "",
+                formattedPrice = "\$3.99",
+            ),
+            onClaimOffer = {},
+            onSeeAvailablePlans = {},
+            onSeeHelpAndFeedback = {},
+            onContinueToCancellation = {},
+        )
+    }
+}
+
+private class WinbackOfferParameterProvider : PreviewParameterProvider<WinbackOffer?> {
+    override val values = sequenceOf(
+        WinbackOffer(
+            details = WinbackOfferDetails.PlusMonthly,
+            offerToken = "",
+            redeemCode = "",
+            formattedPrice = "\$3.99",
+        ),
+        WinbackOffer(
+            details = WinbackOfferDetails.PlusYearly,
+            offerToken = "",
+            redeemCode = "",
+            formattedPrice = "\$19.99",
+        ),
+        null,
+    )
 }

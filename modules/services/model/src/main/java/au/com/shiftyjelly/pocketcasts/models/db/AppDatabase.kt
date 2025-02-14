@@ -4,6 +4,8 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import androidx.core.content.contentValuesOf
+import androidx.core.database.getIntOrNull
+import androidx.core.database.getStringOrNull
 import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.DeleteColumn
@@ -31,6 +33,7 @@ import au.com.shiftyjelly.pocketcasts.models.converter.SafeDateTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.SyncStatusConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.TrimModeTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.UserEpisodeServerStatusConverter
+import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase.Companion.decrement
 import au.com.shiftyjelly.pocketcasts.models.db.dao.BookmarkDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.BumpStatsDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.ChapterDao
@@ -87,7 +90,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         Transcript::class,
         UserPodcastRating::class,
     ],
-    version = 106,
+    version = 107,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 81, to = 82, spec = AppDatabase.Companion.DeleteSilenceRemovedMigration::class),
@@ -880,6 +883,59 @@ abstract class AppDatabase : RoomDatabase() {
             database.execSQL("ALTER TABLE podcasts ADD COLUMN is_private INTEGER NOT NULL DEFAULT 0")
         }
 
+        val MIGRATION_106_107 = addMigration(106, 107) { database ->
+            with(database) {
+                beginTransaction()
+                try {
+                    database.execSQL(
+                        """
+                        CREATE TABLE episode_chapters_tmp(
+                            chapter_index INTEGER NOT NULL,
+                            episode_uuid TEXT NOT NULL,
+                            start_time INTEGER NOT NULL,
+                            end_time INTEGER,
+                            title TEXT,
+                            image_url TEXT,
+                            url TEXT,
+                            is_embedded INTEGER NOT NULL,
+                            PRIMARY KEY (episode_uuid, chapter_index)
+                        )
+                        """.trimIndent(),
+                    )
+
+                    database.execSQL("DELETE FROM episode_chapters WHERE is_embedded IS 0")
+                    database.query("SELECT episode_uuid, start_time, end_time, title, image_url, url, is_embedded FROM episode_chapters ORDER BY start_time").use { cursor ->
+                        val chapterIndices = mutableMapOf<String, Int>()
+                        while (cursor.moveToNext()) {
+                            val episodeUuid = cursor.getString(0)
+                            val chapterIndex = chapterIndices[episodeUuid] ?: 0
+                            chapterIndices[episodeUuid] = chapterIndex + 1
+                            val contentValues = ContentValues().apply {
+                                put("chapter_index", chapterIndex)
+                                put("episode_uuid", episodeUuid)
+                                put("start_time", cursor.getInt(1))
+                                put("end_time", cursor.getIntOrNull(2))
+                                put("title", cursor.getStringOrNull(3))
+                                put("image_url", cursor.getStringOrNull(4))
+                                put("url", cursor.getStringOrNull(5))
+                                put("is_embedded", cursor.getInt(6))
+                            }
+                            database.insert("episode_chapters_tmp", SQLiteDatabase.CONFLICT_FAIL, contentValues)
+                        }
+                    }
+
+                    database.execSQL("DROP INDEX IF EXISTS chapter_episode_uuid_index")
+                    database.execSQL("DROP TABLE episode_chapters")
+                    database.execSQL("ALTER TABLE episode_chapters_tmp RENAME TO episode_chapters")
+                    database.execSQL("CREATE INDEX chapter_episode_uuid_index ON episode_chapters(episode_uuid)")
+
+                    setTransactionSuccessful()
+                } finally {
+                    endTransaction()
+                }
+            }
+        }
+
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
             databaseBuilder.addMigrations(
                 addMigration(1, 2) { },
@@ -1276,6 +1332,7 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_103_104,
                 MIGRATION_104_105,
                 MIGRATION_105_106,
+                MIGRATION_106_107,
             )
         }
 

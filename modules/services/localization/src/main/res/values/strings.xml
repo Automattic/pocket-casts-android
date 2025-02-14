@@ -566,6 +566,8 @@
     <string name="podcast_group_unplayed" translatable="false">@string/unplayed</string>
     <string name="podcast_hide_archived">Hide archived</string>
     <string name="podcast_load_error">There was an error loading the podcast.</string>
+    <string name="podcast_feed_update_tooltip_title">Fresh episodes, coming right up!</string>
+    <string name="podcast_feed_update_tooltip_subtitle">Pull down or use this menu to see if there\'s something new.</string>
     <string name="podcast_loading">Loading your podcasts</string>
     <string name="podcast_next_episode_any_day_now">Next episode any day now</string>
     <string name="podcast_next_episode_today">Next episode today</string>
@@ -1967,6 +1969,11 @@
     <string name="onboarding_coming_from_another_app">Coming from another app? Import your podcasts and get listening. You can always do this later in settings.</string>
     <string name="onboarding_import_from_castbox">Import from Castbox</string>
     <string name="onboarding_import_from_other_apps">Import from other apps</string>
+    <string name="onboarding_import_from_url">Import from URL</string>
+    <string name="onboarding_import_from_url_description">Import your podcasts from an OPML file using a URL.</string>
+    <string name="onboarding_import_from_url_importing_message">OPML import in progress. You can go back to your onboarding process.</string>
+    <string name="onboarding_import_from_url_error_message">Invalid URL</string>
+    <string name="onboarding_import_from_url_failed">OPML import failed</string>
     <string name="onboarding_import_from_castbox_step_1">Open Castbox.</string>
     <string name="onboarding_import_from_castbox_step_2">Tap the \“Personal\” tab.</string>
     <string name="onboarding_import_from_castbox_step_3">Tap “Settings”.</string>
@@ -2287,8 +2294,10 @@
 
     <string name="winback_offer_header">Before you cancel, check&#160;out these offers</string>
     <string name="winback_offer_free_offer_title">Get your next month free</string>
+    <string name="winback_offer_free_offer_yearly_title">Get 50% off your next year</string>
     <!-- %1$s is the amount of money saved -->
     <string name="winback_offer_free_offer_description">Save %1$s at the start of your next billing cycle.</string>
+    <string name="winback_offer_free_offer_yearly_description">Pay %1$s now for another year at 50%% off.</string>
     <string name="winback_offer_free_offer_button_label">Claim offer</string>
     <string name="winback_offer_differnt_plan_title">Looking for a different plan?</string>
     <string name="winback_offer_differnt_plan_description">Find the plan that\'s right for you.</string>
@@ -2297,6 +2306,7 @@
     <string name="winback_offer_cancel_continue_button_label">Continue to Cancellation</string>
     <string name="winback_claimed_offer_message_1">Enjoy your free month!</string>
     <string name="winback_claimed_offer_message_2">Thanks for choosing Pocket&#160;Casts. Billing starts after your free month ends.</string>
+    <string name="winback_claimed_offer_message_3">50% off your next year!</string>
     <string name="winback_available_plans_title">Available Plans</string>
     <string name="winback_available_plans_billing_note">Your new plan will activate at the end of your current billing period.</string>
     <string name="winback_too_many_subscritpions_title">Multiple subscriptions found</string>
@@ -2304,15 +2314,24 @@
     <string name="winback_too_many_subscritpions_button_label">Manage subscriptions in Play&#160;Store</string>
     <string name="winback_error_fetch_description">Sorry, but something went wrong fetching your plans.</string>
     <string name="winback_changing_plan">Changing plan</string>
-    <string name="winback_cancel_subscription_header_title">Changing plan</string>
+    <string name="winback_claiming_offer">Claiming offer</string>
+    <string name="winback_cancel_subscription_header_title">Cancel Subscription</string>
     <string name="winback_cancel_subscription_header_description">This will change your plan to a free account.</string>
     <string name="winback_cancel_subscription_perk_active_with_date">Your current subscription will remain active until %1$s.</string>
     <string name="winback_cancel_subscription_perk_active_without_date">Your current subscription will remain active until its expiration date.</string>
     <string name="winback_cancel_subscription_perk_plus">Access to Pocket Casts Plus features will be locked after this date.</string>
     <string name="winback_cancel_subscription_perk_folders">Your folders will be removed and their contents will move back to the Podcasts screen.</string>
     <string name="winback_cancel_subscription_perk_files">All files uploaded to your Pocket Casts account will be deleted (but downloaded files on your mobile devices will remain).</string>
-    <string name="winback_cancel_subscription_perk_web">You will no longer be able to access Pocket Casts using your web browser, or desktop computer.</string>
     <string name="winback_cancel_subscription_stay_button_label">Actually, I want to stay</string>
     <string name="winback_cancel_subscription_cancel_button_label">Yes, Cancel my Subscription</string>
+
+    <!-- Suggested Folders -->
+    <string name="suggested_folders">Suggested Folders</string>
+    <string name="suggested_folders_subtitle">We’ve organized your podcasts for you. Save or customize them to fit your style.</string>
+    <string name="suggested_folders_use_these_folders_button">Use these folders</string>
+    <string name="suggested_folders_use_create_custom_folders_button">Create custom folders</string>
+    <string name="folder_content_description">Folder %s</string>
+    <string name="suggested_folders_paywall_tittle">Your podcasts, automatically organized</string>
+    <string name="suggested_folders_paywall_subtitle">We\'ve pre-made folders for your podcasts. Unlock this and features like bookmarks, transcripts, and more with Pocket Casts Plus.</string>
 
 </resources>

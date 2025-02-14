@@ -99,6 +99,18 @@ abstract class UserSetting<T>(
         toInt = { it },
     )
 
+    class LongPref(
+        sharedPrefKey: String,
+        defaultValue: Long,
+        sharedPrefs: SharedPreferences,
+    ) : PrefFromLong<Long>(
+        sharedPrefKey = sharedPrefKey,
+        defaultValue = defaultValue,
+        sharedPrefs = sharedPrefs,
+        fromLong = { it },
+        toLong = { it },
+    )
+
     class StringPref(
         sharedPrefKey: String,
         defaultValue: String,
@@ -162,6 +174,36 @@ abstract class UserSetting<T>(
             val floatValue = toFloat(value)
             sharedPrefs.edit().run {
                 putFloat(sharedPrefKey, floatValue)
+                if (commit) {
+                    commit()
+                } else {
+                    apply()
+                }
+            }
+        }
+    }
+
+    // This persists the parameterized object as a Long in shared preferences.
+    open class PrefFromLong<T>(
+        sharedPrefKey: String,
+        private val defaultValue: T,
+        sharedPrefs: SharedPreferences,
+        private val fromLong: (Long) -> T,
+        private val toLong: (T) -> Long,
+    ) : UserSetting<T>(
+        sharedPrefKey = sharedPrefKey,
+        sharedPrefs = sharedPrefs,
+    ) {
+        override fun get(): T {
+            val persistedLong = sharedPrefs.getLong(sharedPrefKey, toLong(defaultValue))
+            return fromLong(persistedLong)
+        }
+
+        @SuppressLint("ApplySharedPref")
+        override fun persist(value: T, commit: Boolean) {
+            val longValue = toLong(value)
+            sharedPrefs.edit().run {
+                putLong(sharedPrefKey, longValue)
                 if (commit) {
                     commit()
                 } else {

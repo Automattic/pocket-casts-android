@@ -119,6 +119,8 @@ interface Settings {
         const val AUTOMOTIVE_CONNECTED_TO_MEDIA_SESSION = "automotive_connected_to_media_session"
 
         const val SHOW_REFERRALS_TOOLTIP = "show_referrals_tooltip"
+
+        const val SHOW_PODCAST_REFRESH_TOOLTIP = "show_podcast_refresh_tooltip"
     }
 
     enum class NotificationChannel(val id: String) {
@@ -332,6 +334,8 @@ interface Settings {
     fun shouldShowLowStorageBannerAfterSnooze(): Boolean
 
     val hideNotificationOnPause: UserSetting<Boolean>
+
+    val suggestedFolderPaywallDismissTime: UserSetting<Long>
 
     val streamingMode: UserSetting<Boolean>
     val keepScreenAwake: UserSetting<Boolean>
@@ -555,6 +559,8 @@ interface Settings {
     fun setAutomotiveConnectedToMediaSession(isLoaded: Boolean)
 
     val showReferralsTooltip: UserSetting<Boolean>
+
+    val showPodcastRefreshTooltip: UserSetting<Boolean>
 
     val playerOrUpNextBottomSheetState: Flow<Int>
     fun updatePlayerOrUpNextBottomSheetState(state: Int)

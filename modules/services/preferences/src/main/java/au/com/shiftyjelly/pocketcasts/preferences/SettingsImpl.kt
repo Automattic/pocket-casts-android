@@ -555,6 +555,12 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
+    override val suggestedFolderPaywallDismissTime = UserSetting.LongPref(
+        sharedPrefKey = "suggestedFolderPaywallDismissTime",
+        defaultValue = 0L,
+        sharedPrefs = sharedPreferences,
+    )
+
     override val streamingMode: UserSetting<Boolean> = UserSetting.BoolPref(
         sharedPrefKey = Settings.PREFERENCE_GLOBAL_STREAMING_MODE,
         defaultValue = true,
@@ -1532,6 +1538,12 @@ class SettingsImpl @Inject constructor(
 
     override val showReferralsTooltip: UserSetting<Boolean> = UserSetting.BoolPref(
         sharedPrefKey = Settings.SHOW_REFERRALS_TOOLTIP,
+        defaultValue = true,
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val showPodcastRefreshTooltip: UserSetting<Boolean> = UserSetting.BoolPref(
+        sharedPrefKey = Settings.SHOW_PODCAST_REFRESH_TOOLTIP,
         defaultValue = true,
         sharedPrefs = sharedPreferences,
     )

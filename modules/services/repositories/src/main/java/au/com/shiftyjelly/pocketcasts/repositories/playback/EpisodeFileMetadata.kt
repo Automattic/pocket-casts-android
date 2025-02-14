@@ -75,7 +75,7 @@ class EpisodeFileMetadata(val filenamePrefix: String? = null) {
             }
             // sort the chapters by start time
             val indexedChapters = newChapters.sortedWith(START_TIME_COMPARATOR).mapIndexed { index, chapter ->
-                chapter.copy(index = index + 1)
+                chapter.copy(index = index, uiIndex = index + 1)
             }
             chapters = Chapters(indexedChapters)
         } catch (e: Exception) {
@@ -114,6 +114,9 @@ class EpisodeFileMetadata(val filenamePrefix: String? = null) {
             startTime = frame.startTimeMs.milliseconds,
             endTime = frame.endTimeMs.milliseconds,
             imagePath = imagePath,
+            // We set any values here as they are updated later after sorting
+            index = -1,
+            uiIndex = -1,
         )
     }
 

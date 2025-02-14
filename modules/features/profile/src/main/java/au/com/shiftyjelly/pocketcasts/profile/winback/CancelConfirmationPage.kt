@@ -151,10 +151,6 @@ private fun Perks(
             image = painterResource(IR.drawable.ic_remove_from_cloud),
             text = stringResource(LR.string.winback_cancel_subscription_perk_files),
         )
-        PerkRow(
-            image = painterResource(IR.drawable.ic_website),
-            text = stringResource(LR.string.winback_cancel_subscription_perk_web),
-        )
     }
 }
 

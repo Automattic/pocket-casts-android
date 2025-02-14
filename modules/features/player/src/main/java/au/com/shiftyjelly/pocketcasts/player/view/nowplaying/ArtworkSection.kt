@@ -215,6 +215,8 @@ private fun ArtworkSectionChapterPreview() {
                 startTime = 0.toDuration(DurationUnit.MINUTES),
                 imagePath = "",
                 url = "https://pocketcasts.com".toHttpUrlOrNull(),
+                index = 0,
+                uiIndex = 1,
             ),
             isChapterArtworkVisible = true,
         ),

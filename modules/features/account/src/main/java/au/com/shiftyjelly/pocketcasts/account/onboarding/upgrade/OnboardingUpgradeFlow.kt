@@ -101,6 +101,15 @@ fun OnboardingUpgradeFlow(
         }
     }
 
+    LaunchedEffect(sheetState.currentValue) {
+        // We need to check if the screen was initialized with the expanded state.
+        // Otherwise, the sheet will never be shown since the initial state is Hidden.
+        // This will trigger this event, and onBackPressed will be called.
+        if (sheetState.currentValue == ModalBottomSheetValue.Hidden && startSelectPaymentFrequencyInExpandedState) {
+            onBackPressed()
+        }
+    }
+
     BackHandler {
         if (sheetState.isVisible) {
             coroutineScope.launch { sheetState.hide() }

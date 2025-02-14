@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.compose.material.MaterialTheme
 import androidx.compose.ui.graphics.toArgb
+import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.NavHostController
@@ -14,6 +15,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.FolderEditViewModel.Companion.COLOR_KEY
@@ -31,11 +33,26 @@ class FolderCreateFragment : BaseDialogFragment() {
     private val sharedViewModel: FolderCreateSharedViewModel by activityViewModels()
     private var navHostController: NavHostController? = null
 
+    companion object {
+        const val ARG_SOURCE = "ARG_SOURCE"
+
+        fun newInstance(source: String): FolderCreateFragment {
+            return FolderCreateFragment().apply {
+                arguments = bundleOf(
+                    ARG_SOURCE to source,
+                )
+            }
+        }
+    }
+
     private object NavRoutes {
         const val podcasts = "folder_podcasts"
         const val name = "folder_name"
         const val color = "folder_color"
     }
+
+    private val source: String
+        get() = arguments?.getString(ARG_SOURCE) ?: ""
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -43,6 +60,10 @@ class FolderCreateFragment : BaseDialogFragment() {
         savedInstanceState: Bundle?,
     ) = contentWithoutConsumedInsets {
         AppThemeWithBackground(theme.activeTheme) {
+            CallOnce {
+                viewModel.trackShown(source)
+            }
+
             navHostController = rememberNavController()
             val navController = navHostController ?: return@AppThemeWithBackground
             NavHost(navController = navController, startDestination = NavRoutes.podcasts) {

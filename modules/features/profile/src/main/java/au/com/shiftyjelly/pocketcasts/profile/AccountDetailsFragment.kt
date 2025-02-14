@@ -25,6 +25,7 @@ import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedI
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.profile.champion.PocketCastsChampionBottomSheetDialog
 import au.com.shiftyjelly.pocketcasts.profile.winback.WinbackFragment
+import au.com.shiftyjelly.pocketcasts.profile.winback.WinbackInitParams
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -152,15 +153,9 @@ class AccountDetailsFragment : BaseFragment() {
             },
             onCancelSubscription = { winbackParams ->
                 analyticsTracker.track(AnalyticsEvent.ACCOUNT_DETAILS_CANCEL_TAPPED)
-                if (FeatureFlag.isEnabled(Feature.WINBACK)) {
-                    WinbackFragment
-                        .create(winbackParams)
-                        .show(childFragmentManager, "subscription_windback")
-                } else {
-                    CancelConfirmationFragment
-                        .newInstance()
-                        .show(childFragmentManager, "cancel_subscription_confirmation_dialog")
-                }
+                WinbackFragment
+                    .create(if (FeatureFlag.isEnabled(Feature.WINBACK)) winbackParams else WinbackInitParams.Empty)
+                    .show(childFragmentManager, "subscription_winback")
             },
             onChangeNewsletterSubscription = { isChecked ->
                 accountViewModel.updateNewsletter(isChecked)

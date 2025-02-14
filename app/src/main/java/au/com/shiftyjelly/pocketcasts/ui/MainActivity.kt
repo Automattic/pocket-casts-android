@@ -586,15 +586,16 @@ class MainActivity :
             doRefresh()
         }
 
-        PocketCastsShortcuts.update(
-            playlistManager = playlistManager,
-            force = true,
-            coroutineScope = applicationScope,
-            context = this,
-            source = PocketCastsShortcuts.Source.REFRESH_APP,
-        )
+        lifecycleScope.launch {
+            PocketCastsShortcuts.update(
+                playlistManager = playlistManager,
+                force = true,
+                context = this@MainActivity,
+                source = PocketCastsShortcuts.Source.REFRESH_APP,
+            )
 
-        lifecycleScope.launch { subscriptionManager.refresh() }
+            subscriptionManager.refresh()
+        }
 
         // Schedule next refresh in the background
         RefreshPodcastsTask.scheduleOrCancel(this@MainActivity, settings)
@@ -993,6 +994,10 @@ class MainActivity :
 
     override fun snackBarView(): View {
         return binding.snackbarFragment
+    }
+
+    override fun setFullScreenDarkOverlayViewVisibility(visible: Boolean) {
+        binding.fullScreenDarkOverlayView.isVisible = visible
     }
 
     override fun onMiniPlayerHidden() {

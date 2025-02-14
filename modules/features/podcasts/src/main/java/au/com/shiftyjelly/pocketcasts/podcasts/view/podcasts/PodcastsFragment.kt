@@ -13,7 +13,9 @@ import androidx.core.os.bundleOf
 import androidx.core.view.updatePadding
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -30,6 +32,8 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.FolderCreateFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.FolderCreateSharedViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.FolderEditFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.FolderEditPodcastsFragment
+import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.SuggestedFolders
+import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.SuggestedFoldersPaywallBottomSheet
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastsViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -42,6 +46,8 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSourc
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.hideShadow
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.adapter.PodcastTouchCallback
 import au.com.shiftyjelly.pocketcasts.views.extensions.showIf
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -195,7 +201,11 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
         toolbar.setOnMenuItemClickListener(this)
 
         toolbar.menu.findItem(R.id.folders_locked).setOnMenuItemClickListener {
-            OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.Upsell(OnboardingUpgradeSource.FOLDERS))
+            if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS)) {
+                SuggestedFoldersPaywallBottomSheet().show(childFragmentManager, "suggested_folders_paywall")
+            } else {
+                OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.Upsell(OnboardingUpgradeSource.FOLDERS))
+            }
             true
         }
 
@@ -214,6 +224,31 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
         }
 
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.fetchSuggestedFolders()
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.userSuggestedFoldersState.collect { (signInState, suggestedFoldersState) ->
+                    when (suggestedFoldersState) {
+                        PodcastsViewModel.SuggestedFoldersState.Loaded -> {
+                            if (viewModel.showSuggestedFoldersPaywallOnOpen(signInState.isSignedInAsPlusOrPatron)) {
+                                SuggestedFoldersPaywallBottomSheet().show(parentFragmentManager, "suggested_folders_paywall")
+                            }
+                        }
+
+                        PodcastsViewModel.SuggestedFoldersState.Fetching -> {}
+                        is PodcastsViewModel.SuggestedFoldersState.Error -> {}
+                    }
+                }
+            }
+        }
     }
 
     override fun onDestroyView() {
@@ -283,8 +318,11 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
     }
 
     private fun createFolder() {
-        analyticsTracker.track(AnalyticsEvent.FOLDER_CREATE_SHOWN, mapOf(SOURCE_KEY to PODCASTS_LIST))
-        FolderCreateFragment().show(parentFragmentManager, "create_folder_card")
+        if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS)) {
+            SuggestedFolders().show(parentFragmentManager, "suggested_folders")
+        } else {
+            FolderCreateFragment.newInstance(PODCASTS_LIST).show(parentFragmentManager, "create_folder_card")
+        }
     }
 
     override fun onPause() {

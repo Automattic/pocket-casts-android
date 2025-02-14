@@ -37,12 +37,13 @@ enum class ShelfItem(
         showIf = { it is PodcastEpisode },
         analyticsValue = "star_episode",
     ),
-    Transcript(
-        id = "transcript",
-        titleId = { LR.string.transcript },
-        iconId = { IR.drawable.ic_transcript_24 },
+    Share(
+        id = "share",
+        titleId = { LR.string.podcast_share_episode },
+        subtitleId = { episode -> LR.string.player_actions_hidden_for_custom.takeIf { episode is UserEpisode } },
+        iconId = { IR.drawable.ic_share },
         showIf = { it is PodcastEpisode },
-        analyticsValue = "transcript",
+        analyticsValue = "share_episode",
     ),
     Download(
         id = "download",
@@ -64,13 +65,12 @@ enum class ShelfItem(
         showIf = { it is PodcastEpisode },
         analyticsValue = "download",
     ),
-    Share(
-        id = "share",
-        titleId = { LR.string.podcast_share_episode },
-        subtitleId = { episode -> LR.string.player_actions_hidden_for_custom.takeIf { episode is UserEpisode } },
-        iconId = { IR.drawable.ic_share },
+    Transcript(
+        id = "transcript",
+        titleId = { LR.string.transcript },
+        iconId = { IR.drawable.ic_transcript_24 },
         showIf = { it is PodcastEpisode },
-        analyticsValue = "share_episode",
+        analyticsValue = "transcript",
     ),
     Podcast(
         id = "podcast",

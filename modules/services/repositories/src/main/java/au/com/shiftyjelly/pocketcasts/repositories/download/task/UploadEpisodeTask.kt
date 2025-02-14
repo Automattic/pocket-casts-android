@@ -17,10 +17,10 @@ import retrofit2.HttpException
 
 @HiltWorker
 class UploadEpisodeTask @AssistedInject constructor(
-    @Assisted val context: Context,
+    @Assisted context: Context,
     @Assisted params: WorkerParameters,
-    var userEpisodeManager: UserEpisodeManager,
-    var playbackManager: PlaybackManager,
+    private val userEpisodeManager: UserEpisodeManager,
+    private val playbackManager: PlaybackManager,
     private val moshi: Moshi,
 ) : RxWorker(context, params) {
 
@@ -51,7 +51,7 @@ class UploadEpisodeTask @AssistedInject constructor(
 
                 if (it is HttpException) {
                     val errorResponse = it.parseErrorResponse(moshi)
-                    errorMessage = errorResponse?.messageLocalized(context.resources)
+                    errorMessage = errorResponse?.messageLocalized(applicationContext.resources)
 
                     if (errorMessage == null) {
                         errorMessage = when (it.code()) {
