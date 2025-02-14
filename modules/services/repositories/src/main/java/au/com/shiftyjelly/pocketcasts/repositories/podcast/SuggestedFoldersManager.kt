@@ -27,7 +27,7 @@ class SuggestedFoldersManager @Inject constructor(
             refreshSuggestedFolders(podcastUuids)
             return suggestedFoldersDao.findAll()
         } catch (e: Exception) {
-            Timber.e(e)
+            Timber.e(e, "Getting suggested folders failed")
             return null
         }
     }
@@ -38,7 +38,7 @@ class SuggestedFoldersManager @Inject constructor(
             val folders: List<SuggestedFolder> = podcastCacheService.suggestedFolders(request)
             suggestedFoldersDao.insertAll(folders)
         } catch (e: Exception) {
-            Timber.e(e)
+            Timber.e(e, "Refreshing suggested folders failed")
         }
     }
 }

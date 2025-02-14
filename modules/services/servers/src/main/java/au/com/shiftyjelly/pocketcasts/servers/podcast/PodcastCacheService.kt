@@ -1,13 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.servers.podcast
 
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
-import au.com.shiftyjelly.pocketcasts.models.entity.SuggestedFolder
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeItem
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import io.reactivex.Single
 import java.util.Date
-import java.util.UUID
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
@@ -17,6 +15,8 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 import retrofit2.http.Url
+
+typealias SuggestedFoldersResponse = Map<String, List<String>>
 
 @JsonClass(generateAdapter = true)
 data class SearchBody(@field:Json(name = "podcastuuid") val podcastuuid: String, @field:Json(name = "searchterm") val searchterm: String)
@@ -64,29 +64,6 @@ data class PodcastRatingsResponse(
         average = average ?: 0.0,
         total = total ?: 0,
     )
-}
-
-@JsonClass(generateAdapter = true)
-data class SuggestedFoldersResponse(
-    val foldersMap: Map<String, List<String>> = emptyMap(),
-) {
-    fun toSuggestedFolders(): List<SuggestedFolder> {
-        val folderEntities = mutableListOf<SuggestedFolder>()
-
-        foldersMap.forEach { (folderName, podcastList) ->
-            // For each podcast in the list, create a SuggestedFolder entity
-            podcastList.forEach { podcastUuid ->
-                folderEntities.add(
-                    SuggestedFolder(
-                        uuid = UUID.randomUUID().toString(),
-                        name = folderName,
-                        podcastUuid = podcastUuid,
-                    ),
-                )
-            }
-        }
-        return folderEntities
-    }
 }
 
 @JsonClass(generateAdapter = true)
