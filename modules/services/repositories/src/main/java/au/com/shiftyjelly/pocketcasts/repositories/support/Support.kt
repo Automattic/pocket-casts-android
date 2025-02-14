@@ -18,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.file.StorageOptions
@@ -300,17 +301,22 @@ class Support @Inject constructor(
             output.append("  Up Next? ").append(yesNoString(settings.autoDownloadUpNext.value)).append(eol)
             output.append("  Only on unmetered WiFi? ").append(yesNoString(settings.autoDownloadUnmeteredOnly.value)).append(eol)
             output.append("  Only when charging? ").append(yesNoString(settings.autoDownloadOnlyWhenCharging.value)).append(eol)
-            output.append(eol)
 
+            output.append(eol)
+            output.append("Auto-play settings").append(eol)
+            output.append("  Is enabled? ${settings.autoPlayNextEpisodeOnEmpty.value}").append(eol)
+            output.append("  Latest source: ${settings.lastAutoPlaySource.value.prettyPrint(podcastManager, playlistManager)}").append(eol)
+
+            output.append(eol)
             output.append("Current connection").append(eol)
             output.append("  Type: ").append(Network.getConnectedNetworkTypeName(context).lowercase()).append(eol)
             output.append("  Metered? ").append(if (Network.isActiveNetworkMetered(context)) "yes (costs money)" else "no (unlimited, free)").append(eol)
             output.append("  Restrict Background Status: ").append(Network.getRestrictBackgroundStatusString(context)).append(eol)
-            output.append(eol)
 
+            output.append(eol)
             output.append("Warning when not on Wifi? ").append(yesNoString(settings.warnOnMeteredNetwork.value)).append(eol)
-            output.append(eol)
 
+            output.append(eol)
             output.append("Work Manager Tasks").append(eol)
             val workInfos = WorkManager.getInstance(context)
                 .getWorkInfosByTagLiveData(DownloadManager.WORK_MANAGER_DOWNLOAD_TAG)
@@ -469,4 +475,23 @@ class Support @Inject constructor(
             return ""
         }
     }
+}
+
+private fun AutoPlaySource.prettyPrint(
+    podcastManager: PodcastManager,
+    playlistManager: PlaylistManager,
+): String = when (this) {
+    is AutoPlaySource.PodcastOrFilter -> {
+        podcastManager.findPodcastByUuidBlocking(uuid)?.let { podcast ->
+            return "Podcast / ${podcast.title} / ${podcast.uuid}"
+        }
+        playlistManager.findByUuidBlocking(uuid)?.let { filter ->
+            return "Filter / ${filter.title} / ${filter.uuid}"
+        }
+        "Podcast or filter: $uuid"
+    }
+    is AutoPlaySource.Downloads -> "Downloads"
+    is AutoPlaySource.Files -> "Files"
+    is AutoPlaySource.Starred -> "Starred"
+    is AutoPlaySource.None -> "None"
 }
