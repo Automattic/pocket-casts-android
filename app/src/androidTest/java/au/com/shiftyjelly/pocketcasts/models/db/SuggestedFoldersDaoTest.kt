@@ -47,11 +47,11 @@ class SuggestedFoldersDaoTest {
 
         suggestedFolderDao.insert(fakeFolder)
 
-        val foundFolder = suggestedFolderDao.findByUuid(fakeFolder.uuid)
+        val foundFolder = suggestedFolderDao.findAllFolderPodcasts(fakeFolder.name)
 
         assertNotNull(foundFolder)
-        assertEquals(fakeFolder.uuid, foundFolder?.uuid)
-        assertEquals(fakeFolder.name, foundFolder?.name)
+        assertEquals(fakeFolder.uuid, foundFolder[0].uuid)
+        assertEquals(fakeFolder.name, foundFolder[0].name)
     }
 
     @Test
