@@ -1969,6 +1969,11 @@
     <string name="onboarding_coming_from_another_app">Coming from another app? Import your podcasts and get listening. You can always do this later in settings.</string>
     <string name="onboarding_import_from_castbox">Import from Castbox</string>
     <string name="onboarding_import_from_other_apps">Import from other apps</string>
+    <string name="onboarding_import_from_url">Import from URL</string>
+    <string name="onboarding_import_from_url_description">Import your podcasts from an OPML file using a URL.</string>
+    <string name="onboarding_import_from_url_importing_message">OPML import in progress. You can go back to your onboarding process.</string>
+    <string name="onboarding_import_from_url_error_message">Invalid URL</string>
+    <string name="onboarding_import_from_url_failed">OPML import failed</string>
     <string name="onboarding_import_from_castbox_step_1">Open Castbox.</string>
     <string name="onboarding_import_from_castbox_step_2">Tap the \“Personal\” tab.</string>
     <string name="onboarding_import_from_castbox_step_3">Tap “Settings”.</string>
@@ -2310,7 +2315,7 @@
     <string name="winback_error_fetch_description">Sorry, but something went wrong fetching your plans.</string>
     <string name="winback_changing_plan">Changing plan</string>
     <string name="winback_claiming_offer">Claiming offer</string>
-    <string name="winback_cancel_subscription_header_title">Changing plan</string>
+    <string name="winback_cancel_subscription_header_title">Cancel Subscription</string>
     <string name="winback_cancel_subscription_header_description">This will change your plan to a free account.</string>
     <string name="winback_cancel_subscription_perk_active_with_date">Your current subscription will remain active until %1$s.</string>
     <string name="winback_cancel_subscription_perk_active_without_date">Your current subscription will remain active until its expiration date.</string>

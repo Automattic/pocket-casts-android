@@ -7,6 +7,7 @@ import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
 import android.net.Uri
 import android.os.Build
 import android.widget.Toast
+import androidx.core.net.toUri
 import androidx.hilt.work.HiltWorker
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
@@ -22,17 +23,12 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.servers.di.Downloads
 import au.com.shiftyjelly.pocketcasts.servers.refresh.ImportOpmlResponse
 import au.com.shiftyjelly.pocketcasts.servers.refresh.RefreshServiceManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import java.io.InputStream
-import java.io.StringReader
-import java.net.URL
-import java.util.Scanner
-import java.util.regex.Pattern
-import javax.xml.parsers.SAXParserFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -43,11 +39,12 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
-import org.xml.sax.Attributes
-import org.xml.sax.InputSource
-import org.xml.sax.SAXException
-import org.xml.sax.SAXParseException
-import org.xml.sax.helpers.DefaultHandler
+import okhttp3.HttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okio.Source
+import okio.source
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -55,25 +52,29 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 class OpmlImportTask @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted parameters: WorkerParameters,
-    var podcastManager: PodcastManager,
-    var refreshServiceManager: RefreshServiceManager,
-    var notificationHelper: NotificationHelper,
+    private val podcastManager: PodcastManager,
+    private val refreshServiceManager: RefreshServiceManager,
+    @Downloads private val httpClient: OkHttpClient,
+    private val notificationHelper: NotificationHelper,
     private val analyticsTracker: AnalyticsTracker,
 ) : CoroutineWorker(context, parameters) {
 
     companion object {
-        const val INPUT_URI = "INPUT_URI"
-        const val INPUT_URL = "INPUT_URL"
+        private const val INPUT_URI = "INPUT_URI"
+        private const val INPUT_URL = "INPUT_URL"
+        private const val WORKER_TAG = "OpmlImportTask.Tag"
 
         fun run(uri: Uri, context: Context) {
             val data = workDataOf(INPUT_URI to uri.toString())
             run(data, context)
         }
 
-        fun run(url: String, context: Context) {
-            val data = workDataOf(INPUT_URL to url)
+        fun run(url: HttpUrl, context: Context) {
+            val data = workDataOf(INPUT_URL to url.toString())
             run(data, context)
         }
+
+        fun workInfos(context: Context) = WorkManager.getInstance(context).getWorkInfosByTagFlow(WORKER_TAG)
 
         private fun run(data: Data, context: Context) {
             val constraints = Constraints.Builder()
@@ -83,69 +84,12 @@ class OpmlImportTask @AssistedInject constructor(
             val task = OneTimeWorkRequestBuilder<OpmlImportTask>()
                 .setInputData(data)
                 .setConstraints(constraints)
+                .addTag(WORKER_TAG)
                 .build()
 
             WorkManager.getInstance(context).enqueue(task)
 
             Toast.makeText(context, context.getString(LR.string.settings_import_opml_toast), Toast.LENGTH_LONG).show()
-        }
-
-        /**
-         * Extract the feed urls from an OPML file using a SAX Parser.
-         */
-        fun readOpmlUrlsSax(inputStream: InputStream): List<String> {
-            val parser = SAXParserFactory.newInstance().newSAXParser()
-            val urls = mutableListOf<String>()
-            parser.parse(
-                inputStream,
-                object : DefaultHandler() {
-                    override fun startElement(
-                        uri: String?,
-                        localName: String?,
-                        qName: String?,
-                        attributes: Attributes?,
-                    ) {
-                        if (localName.equals("outline", ignoreCase = true)) {
-                            val url = attributes?.getValue("xmlUrl")
-                            if (!url.isNullOrBlank()) {
-                                urls.add(url)
-                            }
-                        }
-                    }
-                },
-            )
-            return urls
-        }
-
-        /**
-         * Extract the feed urls from an OPML file using a Regex.
-         */
-        fun readOpmlUrlsRegex(inputStream: InputStream): List<String> {
-            val urls = mutableListOf<String>()
-            val scanner = Scanner(inputStream, "UTF-8")
-            val pattern = Pattern.compile("xmlUrl=\"([^\"]+)\"")
-            while (scanner.findWithinHorizon(pattern, 0) != null) {
-                val result = scanner.match()
-                val url = encodeXmlString(result.group(1))
-                urls.add(url)
-            }
-            return urls
-        }
-
-        private fun encodeXmlString(url: String): String {
-            val parser = SAXParserFactory.newInstance().newSAXParser()
-            val decodedUrl = StringBuilder()
-            parser.parse(
-                InputSource().apply {
-                    characterStream = StringReader("<root>$url</root>")
-                },
-                object : DefaultHandler() {
-                    override fun characters(charArray: CharArray, start: Int, length: Int) {
-                        decodedUrl.append(String(charArray, start, length))
-                    }
-                },
-            )
-            return decodedUrl.toString()
         }
     }
 
@@ -154,34 +98,45 @@ class OpmlImportTask @AssistedInject constructor(
     override suspend fun doWork(): Result {
         try {
             analyticsTracker.track(AnalyticsEvent.OPML_IMPORT_STARTED)
-            val url = inputData.getString(INPUT_URL)
-            if (!url.isNullOrBlank()) {
-                val numberProcessed = processUrl(URL(url))
-                trackProcessed(numberProcessed)
-                return Result.success()
+            val url = inputData.getString(INPUT_URL)?.toHttpUrlOrNull()
+            val uri = inputData.getString(INPUT_URI)?.toUri()
+            val source = when {
+                url != null -> createUrlOpmlSource(url)
+                uri != null -> createUriOpmlSource(uri)
+                else -> {
+                    trackFailure(reason = "no_input_found")
+                    null
+                }
             }
-
-            val uri = Uri.parse(inputData.getString(INPUT_URI))
-            if (uri == null) {
-                trackFailure(reason = "no_input_found")
+            if (source == null) {
                 return Result.failure()
             }
-            val numberProcessed = processFile(uri)
-            trackProcessed(numberProcessed)
+
+            val urls = OpmlUrlReader().readUrls(source)
+            processUrls(urls)
+            trackProcessed(urls.size)
+
             CoroutineScope(Dispatchers.Main).launch {
                 Toast.makeText(applicationContext, applicationContext.getString(LR.string.settings_import_opml_succeeded_message), Toast.LENGTH_LONG).show()
             }
             return Result.success()
         } catch (t: Throwable) {
-            if (t is SAXParseException) {
-                CoroutineScope(Dispatchers.Main).launch {
-                    Toast.makeText(applicationContext, applicationContext.getString(LR.string.settings_import_opml_import_failed_message), Toast.LENGTH_LONG).show()
-                }
+            CoroutineScope(Dispatchers.Main).launch {
+                Toast.makeText(applicationContext, applicationContext.getString(LR.string.settings_import_opml_import_failed_message), Toast.LENGTH_LONG).show()
             }
             LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, t, "OPML import failed.")
             trackFailure(reason = "unknown")
             return Result.failure()
         }
+    }
+
+    private fun createUrlOpmlSource(url: HttpUrl): Source? {
+        val request = Request.Builder().url(url).build()
+        return httpClient.newCall(request).execute().body?.source()
+    }
+
+    private fun createUriOpmlSource(uri: Uri): Source? {
+        return applicationContext.contentResolver.openInputStream(uri)?.source()
     }
 
     private fun trackProcessed(numberParsed: Int) {
@@ -196,48 +151,6 @@ class OpmlImportTask @AssistedInject constructor(
             AnalyticsEvent.OPML_IMPORT_FAILED,
             mapOf("reason" to reason),
         )
-    }
-
-    /**
-     * Returns the number of urls found in the input url
-     */
-    private suspend fun processUrl(url: URL): Int {
-        var urls = emptyList<String>()
-
-        try {
-            url.openStream()?.use { inputStream ->
-                urls = readOpmlUrlsSax(inputStream)
-            }
-        } catch (e: SAXException) {
-            url.openStream()?.use { inputStream ->
-                urls = readOpmlUrlsRegex(inputStream)
-            }
-        }
-
-        processUrls(urls)
-        return urls.size
-    }
-
-    /**
-     * Returns the number of urls found in the input file
-     */
-    private suspend fun processFile(uri: Uri): Int {
-        var urls = emptyList<String>()
-
-        val resolver = applicationContext.contentResolver
-        try {
-            resolver.openInputStream(uri)?.use { inputStream ->
-                val modifiedInputStream = PreProcessOpmlFile().replaceInvalidXmlCharacter(inputStream)
-                urls = readOpmlUrlsSax(modifiedInputStream)
-            }
-        } catch (e: SAXException) {
-            resolver.openInputStream(uri)?.use { inputStream ->
-                urls = readOpmlUrlsRegex(inputStream)
-            }
-        }
-
-        processUrls(urls)
-        return urls.size
     }
 
     private suspend fun processUrls(urls: List<String>) {

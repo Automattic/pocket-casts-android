@@ -95,7 +95,8 @@ data class PocketCastsTheme(
     val type: Theme.ThemeType,
     val colors: ThemeColors,
 ) {
-    val isLight get() = !type.darkTheme
+    val isDark get() = type.darkTheme
+    val isLight get() = !isDark
 }
 
 @SuppressLint("ConflictingOnColor")
