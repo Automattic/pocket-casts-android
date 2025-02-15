@@ -1,11 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-01-22 13:54:03+0000
+Translation-Revision-Date: 2025-02-11 13:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="suggested_folders_paywall_subtitle">我們已為你的 Podcast 預先建立資料夾。 升級至 Pocket Casts Plus，即可解鎖書籤、逐字稿等更多功能。</string>
+    <string name="suggested_folders_paywall_tittle">自動整理 Podcast</string>
+    <string name="podcast_feed_update_tooltip_subtitle">下拉或透過此選單查看新功能。</string>
+    <string name="podcast_feed_update_tooltip_title">第一時間收聽全新單集！</string>
+    <string name="folder_content_description">資料夾「%s」</string>
+    <string name="suggested_folders_use_create_custom_folders_button">建立自訂資料夾</string>
+    <string name="suggested_folders_use_these_folders_button">使用這些資料夾</string>
+    <string name="suggested_folders_subtitle">我們已為你整理 Podcast。 你可直接儲存，或視需求自訂資料夾。</string>
+    <string name="suggested_folders">建議資料夾</string>
+    <string name="winback_claiming_offer">領取優惠</string>
+    <string name="winback_claimed_offer_message_3">次年享五折優惠！</string>
+    <string name="winback_offer_free_offer_yearly_description">立即支付「%1$s」，次年再享 50%% 優惠。</string>
+    <string name="winback_offer_free_offer_yearly_title">次年享有五折優惠</string>
+    <string name="podcast_refresh_no_episodes_found">找不到任何單集。</string>
+    <string name="podcast_refresh_new_episode_found">找到新的單集！</string>
+    <string name="podcast_refreshing_episode_list">正在重新整理單集清單…</string>
+    <string name="podcast_refresh_episodes">重新整理單集清單</string>
+    <string name="settings_pixel_watch_subtitle">將標準下一首/上一首按鈕作為略過按鈕，取代自訂略過按鈕，以便與更多裝置相容。</string>
+    <string name="settings_pixel_watch_title">Pixel Watch 略過按鈕</string>
+    <string name="winback_cancel_subscription_cancel_button_label">是，請取消我的訂閱</string>
+    <string name="winback_cancel_subscription_stay_button_label">我其實想繼續訂閱</string>
+    <string name="winback_cancel_subscription_perk_files">系統會刪除上傳至你 Pocket Casts 帳號的所有檔案 (但會保留下載到你行動裝置的檔案)。</string>
+    <string name="winback_cancel_subscription_perk_folders">你的資料夾將會移除，而資料夾內容會移回 Podcast 畫面中。</string>
+    <string name="winback_cancel_subscription_perk_plus">在此日期之後，Pocket Casts Plus 功能使用權限將會鎖定。</string>
+    <string name="winback_cancel_subscription_perk_active_without_date">你仍可繼續使用目前訂閱至到期日為止。</string>
+    <string name="winback_cancel_subscription_perk_active_with_date">目前訂閱的有效期限至 %1$s為止。</string>
+    <string name="winback_cancel_subscription_header_description">這項動作會將你的方案變更為免費帳號。</string>
+    <string name="winback_changing_plan">變更方案</string>
+    <string name="winback_too_many_subscritpions_button_label">在「Play 商店」管理訂閱項目</string>
+    <string name="winback_too_many_subscritpions_note">你有不只一項 Pocket Casts 訂閱項目。 為避免重複扣款，請在「Play 商店」管理訂閱項目。</string>
+    <string name="winback_too_many_subscritpions_title">發現多筆訂閱</string>
     <string name="winback_error_fetch_description">抱歉，擷取方案時發生錯誤。</string>
     <string name="winback_available_plans_billing_note">新的方案會在目前的帳單週期結束時生效。</string>
     <string name="winback_available_plans_title">可用的方案</string>

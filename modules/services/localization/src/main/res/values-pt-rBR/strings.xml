@@ -1,11 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-01-29 15:54:03+0000
+Translation-Revision-Date: 2025-02-11 09:54:03+0000
 Plural-Forms: nplurals=2; plural=(n > 1);
 Generator: GlotPress/2.4.0-alpha
 Language: pt_BR
 -->
 <resources>
+    <string name="suggested_folders_paywall_subtitle">Criamos pastas para os seus podcasts. Aproveite esse recurso e outros como favoritos, transcrições e muito mais com o Pocket Casts Plus.</string>
+    <string name="suggested_folders_paywall_tittle">Seus podcasts organizados automaticamente</string>
+    <string name="podcast_feed_update_tooltip_subtitle">Deslize a tela para baixo ou use este menu para saber se tem alguma novidade.</string>
+    <string name="podcast_feed_update_tooltip_title">Em breve, episódios inéditos!</string>
+    <string name="folder_content_description">Pasta %s</string>
+    <string name="suggested_folders_use_create_custom_folders_button">Criar pastas personalizadas</string>
+    <string name="suggested_folders_use_these_folders_button">Usar estas pastas</string>
+    <string name="suggested_folders_subtitle">Organizamos seus podcasts por você. Salve ou personalize conforme o seu estilo.</string>
+    <string name="suggested_folders">Pastas sugeridas</string>
+    <string name="winback_claiming_offer">Aproveitando oferta</string>
+    <string name="winback_claimed_offer_message_3">50% de desconto no próximo ano!</string>
+    <string name="winback_offer_free_offer_yearly_description">Pague %1$s agora e tenha mais um ano com 50%% de desconto.</string>
+    <string name="winback_offer_free_offer_yearly_title">Obtenha 50% de desconto no próximo ano</string>
+    <string name="podcast_refresh_no_episodes_found">Nenhum episódio encontrado.</string>
+    <string name="podcast_refresh_new_episode_found">Novo episódio encontrado!</string>
+    <string name="podcast_refreshing_episode_list">Atualizando lista de episódios…</string>
+    <string name="podcast_refresh_episodes">Atualizar lista de episódios</string>
     <string name="settings_pixel_watch_subtitle">Substitua os botões personalizados de pular por botões padrão de próximo e anterior, que têm a mesma função, mas são compatíveis com mais dispositivos.</string>
     <string name="settings_pixel_watch_title">Botões de pular do Pixel Watch</string>
     <string name="winback_cancel_subscription_cancel_button_label">Sim, cancelar minha assinatura</string>
@@ -16,7 +33,6 @@ Language: pt_BR
     <string name="winback_cancel_subscription_perk_active_without_date">Sua assinatura atual permanecerá ativa até a data de expiração.</string>
     <string name="winback_cancel_subscription_perk_active_with_date">Sua assinatura atual permanecerá ativa até %1$s.</string>
     <string name="winback_cancel_subscription_header_description">Isso mudará seu plano para uma conta gratuita.</string>
-    <string name="winback_cancel_subscription_header_title">Alterar plano</string>
     <string name="winback_changing_plan">Alterar plano</string>
     <string name="winback_too_many_subscritpions_button_label">Gerenciar assinaturas na Play Store</string>
     <string name="winback_too_many_subscritpions_note">Você tem mais de uma assinatura ativa no Pocket Casts. Gerencie suas assinaturas na Play Store para evitar cobranças duplicadas.</string>
