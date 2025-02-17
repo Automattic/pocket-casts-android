@@ -241,7 +241,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
                     if (state is PodcastsViewModel.SuggestedFoldersState.Loaded) {
                         val existingModal = parentFragmentManager.findFragmentByTag("suggested_folders_paywall")
                         if (viewModel.showSuggestedFoldersPaywallOnOpen(signInState.isSignedInAsPlusOrPatron) && existingModal == null) {
-                            SuggestedFoldersPaywallBottomSheet().show(parentFragmentManager, "suggested_folders_paywall")
+                            SuggestedFoldersPaywallBottomSheet.newInstance(state.folders()).show(parentFragmentManager, "suggested_folders_paywall")
                         }
                     }
                 }

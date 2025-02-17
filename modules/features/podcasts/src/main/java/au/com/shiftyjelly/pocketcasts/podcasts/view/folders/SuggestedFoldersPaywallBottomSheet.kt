@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.compose.runtime.collectAsState
+import androidx.core.os.BundleCompat
 import androidx.core.view.doOnLayout
 import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
@@ -23,10 +24,25 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class SuggestedFoldersPaywallBottomSheet : BottomSheetDialogFragment() {
 
+    companion object {
+        private const val FOLDERS_KEY = "folders_key"
+
+        fun newInstance(folders: List<Folder>): SuggestedFoldersPaywallBottomSheet {
+            return SuggestedFoldersPaywallBottomSheet().apply {
+                arguments = Bundle().apply {
+                    putParcelableArrayList(FOLDERS_KEY, ArrayList(folders))
+                }
+            }
+        }
+    }
+
     @Inject
     lateinit var theme: Theme
 
     private val viewModel: SuggestedFoldersPaywallViewModel by viewModels<SuggestedFoldersPaywallViewModel>()
+
+    val suggestedFolders: ArrayList<Folder>
+        get() = arguments?.let { (BundleCompat.getParcelableArrayList(it, FOLDERS_KEY, Folder::class.java)) } ?: ArrayList()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -37,6 +53,7 @@ class SuggestedFoldersPaywallBottomSheet : BottomSheetDialogFragment() {
             val signInState = viewModel.signInState.collectAsState(null)
 
             SuggestedFoldersPaywall(
+                folders = suggestedFolders,
                 onShown = {
                     viewModel.onShown()
                 },

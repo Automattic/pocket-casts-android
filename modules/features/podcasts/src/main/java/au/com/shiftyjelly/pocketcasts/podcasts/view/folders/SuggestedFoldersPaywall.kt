@@ -50,6 +50,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun SuggestedFoldersPaywall(
+    folders: List<Folder>,
     onShown: () -> Unit,
     onUseTheseFolders: () -> Unit,
     onMaybeLater: () -> Unit,
@@ -82,7 +83,7 @@ fun SuggestedFoldersPaywall(
 
         AnimatedVisibility(isPortrait) {
             Folders(
-                podcastUuids = mockedPodcastsUuids,
+                folders = folders,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = animatedPadding),
@@ -129,7 +130,7 @@ fun SuggestedFoldersPaywall(
 }
 
 @Composable
-private fun Folders(podcastUuids: List<String>, modifier: Modifier = Modifier) {
+private fun Folders(folders: List<Folder>, modifier: Modifier = Modifier) {
     val episodeImageWidthDp = UiUtil.getGridImageWidthPx(smallArtwork = false, context = LocalContext.current).pxToDp(LocalContext.current).toInt()
 
     LazyRow(
@@ -137,10 +138,11 @@ private fun Folders(podcastUuids: List<String>, modifier: Modifier = Modifier) {
         modifier = modifier,
     ) {
         items(
-            count = 3,
+            count = folders.take(3).size,
             key = { index -> index },
         ) { index ->
-            FolderItem("Test", Color.Yellow, podcastUuids, Modifier.size(episodeImageWidthDp.dp))
+            val folder = folders[index]
+            FolderItem(folder.name, Color.Yellow, folder.podcasts, Modifier.size(episodeImageWidthDp.dp))
         }
     }
 }
@@ -150,15 +152,13 @@ private fun Folders(podcastUuids: List<String>, modifier: Modifier = Modifier) {
 private fun SuggestedFoldersPagePreview(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
     AppTheme(themeType) {
         SuggestedFoldersPaywall(
+            folders = listOf(
+                Folder("Folder 1", listOf("2e61ba20-50a9-0135-902b-63f4b61a9224", "2e61ba20-50a9-0135-902b-63f4b61a9224"), 1),
+                Folder("Folder 2", listOf("2e61ba20-50a9-0135-902b-63f4b61a9224", "2e61ba20-50a9-0135-902b-63f4b61a9224"), 2),
+            ),
             onUseTheseFolders = {},
             onMaybeLater = {},
             onShown = {},
         )
     }
 }
-
-private val mockedPodcastsUuids = listOf(
-    "5d308950-1fe3-012e-02b0-00163e1b201c",
-    "f086f200-4f32-0139-3396-0acc26574db2",
-    "2e61ba20-50a9-0135-902b-63f4b61a9224",
-)
