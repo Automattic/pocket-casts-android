@@ -238,13 +238,11 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.userSuggestedFoldersState.collect { (signInState, state) ->
-                    when (state) {
-                        is PodcastsViewModel.SuggestedFoldersState.Loaded -> {
-                            if (viewModel.showSuggestedFoldersPaywallOnOpen(signInState.isSignedInAsPlusOrPatron)) {
-                                SuggestedFoldersPaywallBottomSheet().show(parentFragmentManager, "suggested_folders_paywall")
-                            }
+                    if (state is PodcastsViewModel.SuggestedFoldersState.Loaded) {
+                        val existingModal = parentFragmentManager.findFragmentByTag("suggested_folders_paywall")
+                        if (viewModel.showSuggestedFoldersPaywallOnOpen(signInState.isSignedInAsPlusOrPatron) && existingModal == null) {
+                            SuggestedFoldersPaywallBottomSheet().show(parentFragmentManager, "suggested_folders_paywall")
                         }
-                        PodcastsViewModel.SuggestedFoldersState.Loading -> {}
                     }
                 }
             }

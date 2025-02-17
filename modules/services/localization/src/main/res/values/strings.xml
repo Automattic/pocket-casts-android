@@ -2238,6 +2238,7 @@
     <string name="themes_plus_prompt">Get exclusive themes with Pocket&#160;Casts&#160;Plus, and more</string>
     <string name="icons_plus_prompt">Get exclusive app icons with Pocket&#160;Casts&#160;Plus, and more</string>
     <string name="files_plus_prompt">Upload your files with Pocket&#160;Casts&#160;Plus, and more</string>
+    <string name="suggested_folders_plus_prompt">Organize your shows, with Pocket&#160;Casts&#160;Plus, and more</string>
     <string name="up_next_shuffle_plus_prompt">Shuffle your episodes with Pocket&#160;Casts&#160;Plus, and more</string>
 
     <!-- Engage SDK -->
