@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import au.com.shiftyjelly.pocketcasts.models.entity.SuggestedFolder
 import kotlinx.coroutines.flow.Flow
 
@@ -21,4 +22,13 @@ abstract class SuggestedFoldersDao {
 
     @Query("SELECT * FROM suggested_folders")
     abstract fun findAll(): Flow<List<SuggestedFolder>>
+
+    @Query("DELETE FROM suggested_folders")
+    protected abstract suspend fun deleteAll()
+
+    @Transaction
+    open suspend fun deleteAndInsertAll(folders: List<SuggestedFolder>) {
+        deleteAll()
+        insertAll(folders)
+    }
 }

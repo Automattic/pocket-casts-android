@@ -74,7 +74,7 @@ class SuggestedFoldersManagerTest {
 
         suggestedFoldersManager.refreshSuggestedFolders(podcastUuids)
 
-        verify(mockSuggestedFoldersDao).insertAll(folders)
+        verify(mockSuggestedFoldersDao).deleteAndInsertAll(folders)
     }
 
     @Test
