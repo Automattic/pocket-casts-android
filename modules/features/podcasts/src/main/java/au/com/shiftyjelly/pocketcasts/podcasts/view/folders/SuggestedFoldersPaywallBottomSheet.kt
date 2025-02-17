@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.compose.runtime.collectAsState
 import androidx.core.view.doOnLayout
 import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
@@ -33,15 +34,19 @@ class SuggestedFoldersPaywallBottomSheet : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?,
     ) = content {
         AppTheme(theme.activeTheme) {
+            val signInState = viewModel.signInState.collectAsState(null)
+
             SuggestedFoldersPaywall(
                 onShown = {
                     viewModel.onShown()
                 },
                 onUseTheseFolders = {
-                    viewModel.onUseTheseFolders()
-                    dismiss()
-                    val onboardingFlow = OnboardingFlow.PlusAccountUpgrade(OnboardingUpgradeSource.FOLDERS)
-                    OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
+                    if (signInState.value?.isSignedInAsPlusOrPatron == true) {
+                        dismiss()
+                        SuggestedFolders().show(parentFragmentManager, "suggested_folders")
+                    } else {
+                        OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.Upsell(OnboardingUpgradeSource.SUGGESTED_FOLDERS))
+                    }
                 },
                 onMaybeLater = {
                     viewModel.onMaybeLater()
