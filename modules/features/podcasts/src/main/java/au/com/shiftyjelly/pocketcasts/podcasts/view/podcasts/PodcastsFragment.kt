@@ -223,6 +223,8 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
             FolderEditPodcastsFragment.newInstance(folderUuid = folder.uuid).show(parentFragmentManager, "add_podcasts_card")
         }
 
+        viewModel.refreshSuggestedFolders()
+
         return binding.root
     }
 
@@ -230,21 +232,19 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
         super.onViewCreated(view, savedInstanceState)
 
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.fetchSuggestedFolders()
+            viewModel.loadSuggestedFolders()
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.userSuggestedFoldersState.collect { (signInState, suggestedFoldersState) ->
-                    when (suggestedFoldersState) {
-                        PodcastsViewModel.SuggestedFoldersState.Loaded -> {
+                viewModel.userSuggestedFoldersState.collect { (signInState, state) ->
+                    when (state) {
+                        is PodcastsViewModel.SuggestedFoldersState.Loaded -> {
                             if (viewModel.showSuggestedFoldersPaywallOnOpen(signInState.isSignedInAsPlusOrPatron)) {
                                 SuggestedFoldersPaywallBottomSheet().show(parentFragmentManager, "suggested_folders_paywall")
                             }
                         }
-
-                        PodcastsViewModel.SuggestedFoldersState.Fetching -> {}
-                        is PodcastsViewModel.SuggestedFoldersState.Error -> {}
+                        PodcastsViewModel.SuggestedFoldersState.Loading -> {}
                     }
                 }
             }
