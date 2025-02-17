@@ -35,7 +35,7 @@ import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
@@ -135,7 +135,9 @@ class PodcastsViewModel
     val folder: Folder?
         get() = folderState.value?.folder
 
-    private val _suggestedFoldersState = MutableSharedFlow<SuggestedFoldersState>()
+    private val _suggestedFoldersState = MutableStateFlow<SuggestedFoldersState>(SuggestedFoldersState.Idle)
+    val suggestedFoldersState: SuggestedFoldersState
+        get() = _suggestedFoldersState.value
 
     val userSuggestedFoldersState: Flow<Pair<SignInState, SuggestedFoldersState>> = userManager.getSignInState().asFlow()
         .combine(_suggestedFoldersState) { signIn, suggestedFolders ->
@@ -321,6 +323,7 @@ class PodcastsViewModel
         FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS) && !isSignedInAsPlusOrPatron && settings.suggestedFolderPaywallDismissTime.value == 0L
 
     sealed class SuggestedFoldersState {
+        data object Idle : SuggestedFoldersState()
         data object Loading : SuggestedFoldersState()
         data class Loaded(private val folders: List<SuggestedFolder>) : SuggestedFoldersState() {
             private val convertedFolders: List<SuggestedFolderModel> by lazy {
