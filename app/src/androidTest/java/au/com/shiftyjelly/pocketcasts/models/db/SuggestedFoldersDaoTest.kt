@@ -40,7 +40,6 @@ class SuggestedFoldersDaoTest {
     @Test
     fun shouldStoreSuggestedFolder() = runTest {
         val fakeFolder = SuggestedFolder(
-            uuid = FakeFileGenerator.uuid,
             name = "name",
             podcastUuid = FakeFileGenerator.uuid,
         )
@@ -50,26 +49,22 @@ class SuggestedFoldersDaoTest {
         val foundFolder = suggestedFolderDao.findAllFolderPodcasts(fakeFolder.name)
 
         assertNotNull(foundFolder)
-        assertEquals(fakeFolder.uuid, foundFolder[0].uuid)
         assertEquals(fakeFolder.name, foundFolder[0].name)
     }
 
     @Test
     fun shouldRetrieveAllFolderPodcasts() = runTest {
         val item1 = SuggestedFolder(
-            uuid = "1234",
             name = "folder1",
             podcastUuid = "1234",
         )
 
         val item2 = SuggestedFolder(
-            uuid = "5678",
             name = "folder1",
             podcastUuid = "5678",
         )
 
         val item3 = SuggestedFolder(
-            uuid = "9876",
             name = "folder2",
             podcastUuid = "9876",
         )
