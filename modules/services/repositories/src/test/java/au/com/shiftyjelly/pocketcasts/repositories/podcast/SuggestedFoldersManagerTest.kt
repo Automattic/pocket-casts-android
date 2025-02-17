@@ -40,11 +40,9 @@ class SuggestedFoldersManagerTest {
 
     @Test
     fun `should return a list of suggested folders`() = runBlocking {
-        val podcastUuids = listOf("uuid1", "uuid2")
-
         val folders = listOf(
-            SuggestedFolder("uuid", "Folder1", podcastUuids[0]),
-            SuggestedFolder("uuid2", "Folder2", podcastUuids[1]),
+            SuggestedFolder("uuid", "Folder1"),
+            SuggestedFolder("uuid2", "Folder2"),
         )
 
         whenever(mockSuggestedFoldersDao.findAll()).thenReturn(flowOf(folders))
@@ -67,7 +65,7 @@ class SuggestedFoldersManagerTest {
     fun `should insert folders into database when server returns folders`() = runBlocking {
         val podcastUuids = listOf("podcastUuid")
         val folders = listOf(
-            SuggestedFolder("uuid", "Folder1", podcastUuids[0]),
+            SuggestedFolder("uuid", "Folder1"),
         )
 
         whenever(mockPodcastCacheService.suggestedFolders(any())).thenReturn(folders)

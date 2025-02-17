@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 108,
-    "identityHash": "de6bb83a8340529c1a0e81e5392649af",
+    "identityHash": "a3907797937431e9bb44b11f5bb58496",
     "entities": [
       {
         "tableName": "bump_stats",
@@ -456,14 +456,8 @@
       },
       {
         "tableName": "suggested_folders",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uuid` TEXT NOT NULL, `folder_name` TEXT NOT NULL, `podcastUuid` TEXT NOT NULL, PRIMARY KEY(`uuid`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`folder_name` TEXT NOT NULL, `podcast_uuid` TEXT NOT NULL, PRIMARY KEY(`folder_name`, `podcast_uuid`))",
         "fields": [
-          {
-            "fieldPath": "uuid",
-            "columnName": "uuid",
-            "affinity": "TEXT",
-            "notNull": true
-          },
           {
             "fieldPath": "name",
             "columnName": "folder_name",
@@ -472,7 +466,7 @@
           },
           {
             "fieldPath": "podcastUuid",
-            "columnName": "podcastUuid",
+            "columnName": "podcast_uuid",
             "affinity": "TEXT",
             "notNull": true
           }
@@ -480,21 +474,11 @@
         "primaryKey": {
           "autoGenerate": false,
           "columnNames": [
-            "uuid"
+            "folder_name",
+            "podcast_uuid"
           ]
         },
-        "indices": [
-          {
-            "name": "index_suggested_folders_folder_name_podcastUuid",
-            "unique": true,
-            "columnNames": [
-              "folder_name",
-              "podcastUuid"
-            ],
-            "orders": [],
-            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_suggested_folders_folder_name_podcastUuid` ON `${TABLE_NAME}` (`folder_name`, `podcastUuid`)"
-          }
-        ],
+        "indices": [],
         "foreignKeys": []
       },
       {
@@ -1913,7 +1897,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'de6bb83a8340529c1a0e81e5392649af')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a3907797937431e9bb44b11f5bb58496')"
     ]
   }
 }

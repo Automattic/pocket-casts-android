@@ -6,7 +6,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.models.entity.SuggestedFolder
 import au.com.shiftyjelly.pocketcasts.servers.discover.EpisodeSearch
 import io.reactivex.Single
-import java.util.UUID
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -94,11 +93,9 @@ class PodcastCacheServiceManagerImpl @Inject constructor(
         val folderEntities = mutableListOf<SuggestedFolder>()
 
         this.forEach { (folderName, podcastList) ->
-            // For each podcast in the list, create a SuggestedFolder entity
             podcastList.forEach { podcastUuid ->
                 folderEntities.add(
                     SuggestedFolder(
-                        uuid = UUID.randomUUID().toString(),
                         name = folderName,
                         podcastUuid = podcastUuid,
                     ),
