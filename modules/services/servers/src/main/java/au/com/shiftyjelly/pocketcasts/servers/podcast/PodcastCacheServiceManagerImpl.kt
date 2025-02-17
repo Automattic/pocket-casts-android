@@ -90,18 +90,13 @@ class PodcastCacheServiceManagerImpl @Inject constructor(
     }
 
     private fun Map<String, List<String>>.toSuggestedFolders(): List<SuggestedFolder> {
-        val folderEntities = mutableListOf<SuggestedFolder>()
-
-        this.forEach { (folderName, podcastList) ->
-            podcastList.forEach { podcastUuid ->
-                folderEntities.add(
-                    SuggestedFolder(
-                        name = folderName,
-                        podcastUuid = podcastUuid,
-                    ),
+        return this.flatMap { (folderName, podcastList) ->
+            podcastList.map { podcastUuid ->
+                SuggestedFolder(
+                    name = folderName,
+                    podcastUuid = podcastUuid,
                 )
             }
         }
-        return folderEntities
     }
 }
