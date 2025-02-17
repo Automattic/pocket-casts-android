@@ -142,7 +142,8 @@ private fun Folders(folders: List<Folder>, modifier: Modifier = Modifier) {
             key = { index -> index },
         ) { index ->
             val folder = folders[index]
-            FolderItem(folder.name, Color.Yellow, folder.podcasts, Modifier.size(episodeImageWidthDp.dp))
+            val backgroundColor = MaterialTheme.theme.colors.getFolderColor(folder.color)
+            FolderItem(folder.name, backgroundColor, folder.podcasts, Modifier.size(episodeImageWidthDp.dp))
         }
     }
 }
