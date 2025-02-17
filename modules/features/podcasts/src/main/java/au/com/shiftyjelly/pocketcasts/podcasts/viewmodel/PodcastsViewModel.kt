@@ -300,12 +300,9 @@ class PodcastsViewModel
     suspend fun loadSuggestedFolders() {
         if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS)) {
             _suggestedFoldersState.emit(SuggestedFoldersState.Loading)
-
-            suggestedFoldersManager.getSuggestedFolders()?.collect { state ->
-                val folders = state.toFolders()
-                if (!folders.isEmpty()) {
-                    _suggestedFoldersState.emit(SuggestedFoldersState.Loaded(folders))
-                }
+            val folders = suggestedFoldersManager.getSuggestedFolders().toFolders()
+            if (!folders.isEmpty()) {
+                _suggestedFoldersState.emit(SuggestedFoldersState.Loaded(folders))
             }
         }
     }

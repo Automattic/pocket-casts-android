@@ -6,7 +6,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.SuggestedFolder
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.SuggestedFoldersRequest
 import jakarta.inject.Inject
-import kotlinx.coroutines.flow.Flow
 import timber.log.Timber
 
 class SuggestedFoldersManager @Inject constructor(
@@ -16,14 +15,7 @@ class SuggestedFoldersManager @Inject constructor(
 
     private val suggestedFoldersDao: SuggestedFoldersDao = appDatabase.suggestedFoldersDao()
 
-    fun getSuggestedFolders(): Flow<List<SuggestedFolder>>? {
-        try {
-            return suggestedFoldersDao.findAll()
-        } catch (e: Exception) {
-            Timber.e(e, "Getting suggested folders failed")
-            return null
-        }
-    }
+    suspend fun getSuggestedFolders(): List<SuggestedFolder> = suggestedFoldersDao.findAll()
 
     suspend fun refreshSuggestedFolders(podcastUuids: List<String>) {
         try {
