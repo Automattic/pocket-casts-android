@@ -13,6 +13,7 @@ android {
 
     defaultConfig {
         minSdk = project.property("minSdkVersionWear") as Int
+        targetSdk = 34
         applicationId = project.property("applicationId").toString()
     }
 
