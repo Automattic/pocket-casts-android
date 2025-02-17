@@ -23,8 +23,8 @@ coil = "2.7.0"
 compose = "2024.10.00" # https://developer.android.com/jetpack/compose/bom/bom-mapping
 dependency-analysis = "2.8.0"
 espresso = "3.6.1"
-firebase = "33.7.0"
-fragment = "1.8.5"
+firebase = "33.9.0"
+fragment = "1.8.6"
 glance = "1.0.0"
 google-services = "4.4.2"
 hilt = "2.55"
@@ -231,7 +231,7 @@ automattic-explat = { module = "com.automattic.tracks:experimentation", version.
 
 # Wear
 wear-input = "androidx.wear:wear-input:1.2.0-alpha02"
-wear-remote-interactions = "androidx.wear:wear-remote-interactions:1.0.0"
+wear-remote-interactions = "androidx.wear:wear-remote-interactions:1.1.0"
 wear-tooling-preview = "androidx.wear:wear-tooling-preview:1.0.0"
 
 # Wear Compose
@@ -300,5 +300,5 @@ ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 measure-builds = "com.automattic.android.measure-builds:3.1.1"
 protobuf = { id = "com.google.protobuf", version.ref = "protobuf-plugin" }
 sentry = { id = "io.sentry.android.gradle", version.ref = "sentry-plugin" }
-spotless = "com.diffplug.spotless:6.25.0"
+spotless = "com.diffplug.spotless:7.0.2"
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
