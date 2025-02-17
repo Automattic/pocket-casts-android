@@ -231,7 +231,7 @@ automattic-explat = { module = "com.automattic.tracks:experimentation", version.
 
 # Wear
 wear-input = "androidx.wear:wear-input:1.2.0-alpha02"
-wear-remote-interactions = "androidx.wear:wear-remote-interactions:1.0.0"
+wear-remote-interactions = "androidx.wear:wear-remote-interactions:1.1.0"
 wear-tooling-preview = "androidx.wear:wear-tooling-preview:1.0.0"
 
 # Wear Compose
