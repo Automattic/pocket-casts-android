@@ -134,8 +134,8 @@ private fun Folders(folders: List<Folder>, modifier: Modifier = Modifier) {
     val episodeImageWidthDp = UiUtil.getGridImageWidthPx(smallArtwork = false, context = LocalContext.current).pxToDp(LocalContext.current).toInt()
 
     LazyRow(
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
-        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
+        modifier = modifier.fillMaxWidth(),
     ) {
         items(
             count = folders.take(3).size,
