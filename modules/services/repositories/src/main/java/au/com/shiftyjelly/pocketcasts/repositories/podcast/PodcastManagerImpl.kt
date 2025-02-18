@@ -317,6 +317,10 @@ class PodcastManagerImpl @Inject constructor(
         return podcastDao.findPodcastsNotInFolder()
     }
 
+    override suspend fun findFollowedPodcastsNotInFolderUuid(): List<String> {
+        return podcastDao.findFollowedPodcastsNotInFolderUuid()
+    }
+
     override fun findSubscribedBlocking(): List<Podcast> {
         return podcastDao.findSubscribedBlocking()
     }

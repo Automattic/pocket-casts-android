@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.models.di.addTypeConverters
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import com.squareup.moshi.Moshi
 import java.util.UUID
+import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -99,6 +100,19 @@ class PodcastDaoTest {
         val subscribedList = podcastDao.findSubscribedBlocking()
         assertEquals("Should only be 1 result", 1, subscribedList.count())
         assertEquals("Should only find the subscribed podcast", subscribed.uuid, subscribedList.first().uuid)
+    }
+
+    @Test
+    fun testFindSubscribedNotInFolder() = runBlocking {
+        val subscribed1 = Podcast(uuid = "podcast1", isSubscribed = true, rawFolderUuid = UUID.randomUUID().toString())
+        val subscribed2 = Podcast(uuid = "podcast2", isSubscribed = true, rawFolderUuid = null)
+
+        podcastDao.insertBlocking(subscribed1)
+        podcastDao.insertBlocking(subscribed2)
+
+        val uuids = podcastDao.findFollowedPodcastsNotInFolderUuid()
+        assertEquals(1, uuids.size)
+        assertEquals("podcast2", uuids[0])
     }
 
     @Test

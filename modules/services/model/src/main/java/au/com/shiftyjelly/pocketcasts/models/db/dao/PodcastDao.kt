@@ -142,6 +142,9 @@ abstract class PodcastDao {
     @Query("SELECT * FROM podcasts WHERE folder_uuid IS NULL")
     abstract suspend fun findPodcastsNotInFolder(): List<Podcast>
 
+    @Query("SELECT uuid FROM podcasts WHERE subscribed = 1 AND folder_uuid IS NULL")
+    abstract suspend fun findFollowedPodcastsNotInFolderUuid(): List<String>
+
     @Query("SELECT * FROM podcasts WHERE UPPER(title) LIKE UPPER(:title)")
     abstract fun searchByTitleBlocking(title: String): Podcast?
 
