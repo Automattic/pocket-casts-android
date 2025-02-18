@@ -17,9 +17,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.TextView
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.widget.ConstraintSet
@@ -120,6 +127,7 @@ private val differ: DiffUtil.ItemCallback<Any> = object : DiffUtil.ItemCallback<
 
 class PodcastAdapter(
     var fromListUuid: String?,
+    private val isHeaderRedesigned: Boolean,
     private val context: Context,
     private val downloadManager: DownloadManager,
     private val playbackManager: PlaybackManager,
@@ -220,7 +228,11 @@ class PodcastAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
-            VIEW_TYPE_PODCAST_HEADER -> PodcastViewHolder(AdapterPodcastHeaderBinding.inflate(inflater, parent, false), this)
+            VIEW_TYPE_PODCAST_HEADER -> if (isHeaderRedesigned) {
+                PodcastHeaderViewHolder(parent.context)
+            } else {
+                PodcastViewHolder(AdapterPodcastHeaderBinding.inflate(inflater, parent, false), this)
+            }
             VIEW_TYPE_TABS -> TabsViewHolder(ComposeView(parent.context), theme)
             VIEW_TYPE_EPISODE_HEADER -> EpisodeHeaderViewHolder(AdapterEpisodeHeaderBinding.inflate(inflater, parent, false), onEpisodesOptionsClicked, onSearchFocus)
             VIEW_TYPE_EPISODE_LIMIT_ROW -> EpisodeLimitViewHolder(inflater.inflate(R.layout.adapter_episode_limit, parent, false))
@@ -250,6 +262,7 @@ class PodcastAdapter(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
+            is PodcastHeaderViewHolder -> holder.bind()
             is EpisodeViewHolder -> bindEpisodeViewHolder(holder, position, fromListUuid)
             is PodcastViewHolder -> bindPodcastViewHolder(holder)
             is TabsViewHolder -> holder.bind(getItem(position) as TabsHeader)
@@ -854,6 +867,27 @@ class PodcastAdapter(
                 }
             })
             set.start()
+        }
+    }
+
+    private class PodcastHeaderViewHolder(
+        context: Context,
+    ) : RecyclerView.ViewHolder(ComposeView(context)) {
+        private val composeView get() = itemView as ComposeView
+
+        init {
+            composeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+        }
+
+        fun bind() {
+            composeView.setContent {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(300.dp)
+                        .background(Color.Blue),
+                )
+            }
         }
     }
 
