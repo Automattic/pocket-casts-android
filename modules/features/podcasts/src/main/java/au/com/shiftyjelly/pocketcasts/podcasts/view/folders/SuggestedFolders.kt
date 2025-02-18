@@ -3,12 +3,16 @@ package au.com.shiftyjelly.pocketcasts.podcasts.view.folders
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.core.os.BundleCompat
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
+import kotlin.getValue
 
 @AndroidEntryPoint
 class SuggestedFolders : BaseDialogFragment() {
@@ -36,6 +40,14 @@ class SuggestedFolders : BaseDialogFragment() {
         savedInstanceState: Bundle?,
     ) = contentWithoutConsumedInsets {
         AppThemeWithBackground(theme.activeTheme) {
+            val state by viewModel.state.collectAsState()
+
+            LaunchedEffect(state) {
+                if (state is SuggestedFoldersViewModel.FoldersState.Created) {
+                    dismiss()
+                }
+            }
+
             SuggestedFoldersPage(
                 folders = suggestedFolders,
                 onShown = {
@@ -46,7 +58,7 @@ class SuggestedFolders : BaseDialogFragment() {
                     dismiss()
                 },
                 onUseTheseFolders = {
-                    viewModel.onUseTheseFolders()
+                    viewModel.onUseTheseFolders(suggestedFolders)
                 },
                 onCreateCustomFolders = {
                     viewModel.onCreateCustomFolders()

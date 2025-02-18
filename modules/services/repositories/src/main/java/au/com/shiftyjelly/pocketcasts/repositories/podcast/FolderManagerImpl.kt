@@ -67,10 +67,8 @@ class FolderManagerImpl @Inject constructor(
         folderDao.insertAll(newFolders)
         podcastManager.updateFoldersUuid(folders)
 
-        // Update the drag and drop sort positions
         val podcasts = podcastManager.findPodcastsNotInFolder().map { FolderItem.Podcast(it) }
         val sorted = (existingFolders + podcasts).sortedBy { it.sortPosition }
-
         val convertedFolders = newFolders.map {
             FolderItem.Folder(it, emptyList())
         }
