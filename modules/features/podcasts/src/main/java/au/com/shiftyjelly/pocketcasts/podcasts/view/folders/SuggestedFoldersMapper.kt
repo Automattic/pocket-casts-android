@@ -15,3 +15,14 @@ fun List<SuggestedFolder>.toFolders(): List<SuggestedFolderModel> {
         )
     }
 }
+
+fun List<SuggestedFolderModel>.toSuggestedFolders(): List<SuggestedFolder> {
+    return this.flatMap { folder ->
+        folder.podcasts.map { podcastUuid ->
+            SuggestedFolder(
+                name = folder.name,
+                podcastUuid = podcastUuid,
+            )
+        }
+    }
+}

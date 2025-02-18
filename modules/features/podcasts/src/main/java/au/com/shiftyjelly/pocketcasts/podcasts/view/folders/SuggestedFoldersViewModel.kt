@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.SuggestedFolderDetails
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.SuggestedFoldersManager
 import au.com.shiftyjelly.pocketcasts.utils.UUIDProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -17,6 +18,7 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class SuggestedFoldersViewModel @Inject constructor(
     private val folderManager: FolderManager,
+    private val suggestedFoldersManager: SuggestedFoldersManager,
     private val settings: Settings,
     private val analyticsTracker: AnalyticsTracker,
     private val uuidProvider: UUIDProvider,
@@ -33,12 +35,12 @@ class SuggestedFoldersViewModel @Inject constructor(
         analyticsTracker.track(AnalyticsEvent.SUGGESTED_FOLDERS_MODAL_DISMISSED)
     }
 
-    fun onUseTheseFolders(suggestedFolders: List<Folder>) {
+    fun onUseTheseFolders(folders: List<Folder>) {
         _state.value = FoldersState.Creating
         analyticsTracker.track(AnalyticsEvent.SUGGESTED_FOLDERS_MODAL_USE_THESE_FOLDERS_TAPPED)
 
         viewModelScope.launch {
-            val newFolders = suggestedFolders.map {
+            val newFolders = folders.map {
                 SuggestedFolderDetails(
                     uuid = uuidProvider.generateUUID(),
                     name = it.name,
@@ -49,6 +51,7 @@ class SuggestedFoldersViewModel @Inject constructor(
             }
 
             folderManager.createFolders(newFolders)
+            suggestedFoldersManager.deleteSuggestedFolders(folders.toSuggestedFolders())
             _state.value = FoldersState.Created
         }
     }

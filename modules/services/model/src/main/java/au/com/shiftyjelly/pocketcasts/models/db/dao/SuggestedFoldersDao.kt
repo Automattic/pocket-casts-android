@@ -23,6 +23,9 @@ abstract class SuggestedFoldersDao {
     @Query("SELECT * FROM suggested_folders")
     abstract fun findAll(): Flow<List<SuggestedFolder>>
 
+    @Query("DELETE FROM suggested_folders WHERE folder_name = :folderName AND podcast_uuid = :podcastUuid")
+    abstract suspend fun deleteFolder(folderName: String, podcastUuid: String)
+
     @Query("DELETE FROM suggested_folders")
     protected abstract suspend fun deleteAll()
 
@@ -30,5 +33,12 @@ abstract class SuggestedFoldersDao {
     open suspend fun deleteAndInsertAll(folders: List<SuggestedFolder>) {
         deleteAll()
         insertAll(folders)
+    }
+
+    @Transaction
+    open suspend fun deleteFolders(folders: List<SuggestedFolder>) {
+        for (folder in folders) {
+            deleteFolder(folder.name, folder.podcastUuid)
+        }
     }
 }

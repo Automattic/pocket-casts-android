@@ -69,4 +69,15 @@ class SuggestedFoldersManagerTest {
 
         verify(mockSuggestedFoldersDao, times(0)).insertAll(any())
     }
+
+    @Test
+    fun `should delete suggested folders`() = runBlocking {
+        val folders = listOf(
+            SuggestedFolder("uuid", "Folder1"),
+        )
+
+        suggestedFoldersManager.deleteSuggestedFolders(folders)
+
+        verify(mockSuggestedFoldersDao).deleteFolders(folders)
+    }
 }
