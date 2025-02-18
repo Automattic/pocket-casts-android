@@ -219,6 +219,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
     ),
+    PODCAST_VIEW_CHANGES(
+        key = "podcast_view_changes_2025",
+        title = "Podcast view changes",
+        defaultValue = false,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = true,
+    ),
     ;
 
     companion object {
