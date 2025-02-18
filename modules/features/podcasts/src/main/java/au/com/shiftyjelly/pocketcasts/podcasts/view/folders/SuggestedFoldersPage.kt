@@ -43,6 +43,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun SuggestedFoldersPage(
+    folders: List<Folder>,
     onShown: () -> Unit,
     onDismiss: () -> Unit,
     onUseTheseFolders: () -> Unit,
@@ -92,10 +93,12 @@ fun SuggestedFoldersPage(
                 )
             }
             items(
-                count = 4,
+                count = folders.size,
                 key = { index -> index },
             ) { index ->
-                FolderItem("Test", Color.Yellow, podcastUuids = mockedPodcastsUuids)
+                val folder = folders[index]
+                val backgroundColor = MaterialTheme.theme.colors.getFolderColor(folder.color)
+                FolderItem(folder.name, backgroundColor, podcastUuids = folder.podcasts)
             }
         }
 
@@ -152,15 +155,10 @@ private fun SuggestedFoldersPagePreview(@PreviewParameter(ThemePreviewParameterP
             onUseTheseFolders = {},
             onCreateCustomFolders = {},
             onShown = {},
+            folders = listOf(
+                Folder("Folder 1", listOf("2e61ba20-50a9-0135-902b-63f4b61a9224", "2e61ba20-50a9-0135-902b-63f4b61a9224"), 1),
+                Folder("Folder 2", listOf("2e61ba20-50a9-0135-902b-63f4b61a9224", "2e61ba20-50a9-0135-902b-63f4b61a9224"), 2),
+            ),
         )
     }
 }
-
-private val mockedPodcastsUuids = listOf(
-    "5d308950-1fe3-012e-02b0-00163e1b201c",
-    "f086f200-4f32-0139-3396-0acc26574db2",
-    "2e61ba20-50a9-0135-902b-63f4b61a9224",
-    "f98ce900-79da-0139-347d-0acc26574db2",
-    "39844640-7cb5-013b-f2a7-0acc26574db2",
-    "2d721350-e0d4-0137-b6c9-0acc26574db2",
-)
