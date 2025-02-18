@@ -157,14 +157,20 @@ private class ClientConnection(
             client.startConnection(object : BillingClientStateListener {
                 override fun onBillingSetupFinished(billingResult: BillingResult) {
                     logSubscriptionInfo("Billing setup finished: $billingResult")
-                    continuation.resume(billingResult.responseCode == BillingClient.BillingResponseCode.OK)
+                    try {
+                        continuation.resume(billingResult.responseCode == BillingClient.BillingResponseCode.OK)
+                    } catch (e: IllegalStateException) {
+                        logSubscriptionError(e, "Failed to dispatch billing connection client setup")
+                    }
                 }
 
                 override fun onBillingServiceDisconnected() {
                     logSubscriptionWarning("Billing client disconnected")
                     client.endConnection()
-                    if (continuation.isActive) {
+                    try {
                         continuation.resume(false)
+                    } catch (e: IllegalStateException) {
+                        logSubscriptionError(e, "Failed to dispatch billing client disconnection")
                     }
                 }
             })
