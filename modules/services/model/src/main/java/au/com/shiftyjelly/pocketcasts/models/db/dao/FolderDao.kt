@@ -17,6 +17,9 @@ abstract class FolderDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insert(folder: Folder)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract suspend fun insertAll(folder: List<Folder>)
+
     @Query("DELETE FROM folders")
     abstract suspend fun deleteAll()
 
