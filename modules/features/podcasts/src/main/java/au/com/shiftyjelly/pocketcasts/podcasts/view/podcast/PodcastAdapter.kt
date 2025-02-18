@@ -119,13 +119,13 @@ private val differ: DiffUtil.ItemCallback<Any> = object : DiffUtil.ItemCallback<
 }
 
 class PodcastAdapter(
-    private val context: Context,
-    val downloadManager: DownloadManager,
-    val playbackManager: PlaybackManager,
-    val upNextQueue: UpNextQueue,
-    val settings: Settings,
-    val theme: Theme,
     var fromListUuid: String?,
+    private val context: Context,
+    private val downloadManager: DownloadManager,
+    private val playbackManager: PlaybackManager,
+    private val upNextQueue: UpNextQueue,
+    private val settings: Settings,
+    private val theme: Theme,
     private val podcastBookmarksObservable: Observable<List<Bookmark>>,
     private val onHeaderSummaryToggled: (Boolean, Boolean) -> Unit,
     private val onSubscribeClicked: () -> Unit,
