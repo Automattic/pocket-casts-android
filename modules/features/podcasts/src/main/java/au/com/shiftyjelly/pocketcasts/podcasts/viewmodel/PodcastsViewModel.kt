@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
+import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.toFolders
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -34,7 +35,7 @@ import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
@@ -134,7 +135,9 @@ class PodcastsViewModel
     val folder: Folder?
         get() = folderState.value?.folder
 
-    private val _suggestedFoldersState = MutableSharedFlow<SuggestedFoldersState>()
+    private val _suggestedFoldersState = MutableStateFlow<SuggestedFoldersState>(SuggestedFoldersState.Idle)
+    val suggestedFoldersState: SuggestedFoldersState
+        get() = _suggestedFoldersState.value
 
     val userSuggestedFoldersState: Flow<Pair<SignInState, SuggestedFoldersState>> = userManager.getSignInState().asFlow()
         .combine(_suggestedFoldersState) { signIn, suggestedFolders ->
@@ -300,7 +303,7 @@ class PodcastsViewModel
     suspend fun loadSuggestedFolders() {
         if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS)) {
             _suggestedFoldersState.emit(SuggestedFoldersState.Loading)
-            val folders = suggestedFoldersManager.getSuggestedFolders().toFolders()
+            val folders = suggestedFoldersManager.getSuggestedFolders()
             if (!folders.isEmpty()) {
                 _suggestedFoldersState.emit(SuggestedFoldersState.Loaded(folders))
             }
@@ -316,24 +319,19 @@ class PodcastsViewModel
         }
     }
 
-    private fun List<SuggestedFolder>.toFolders(): List<SuggestedFolderModel> {
-        val grouped = this.groupBy { it.name }
-
-        return grouped.map { (folderName, folderItems) ->
-            SuggestedFolderModel(
-                name = folderName,
-                podcasts = folderItems.map { it.podcastUuid },
-                color = 1,
-            )
-        }
-    }
-
     fun showSuggestedFoldersPaywallOnOpen(isSignedInAsPlusOrPatron: Boolean) =
         FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS) && !isSignedInAsPlusOrPatron && settings.suggestedFolderPaywallDismissTime.value == 0L
 
     sealed class SuggestedFoldersState {
+        data object Idle : SuggestedFoldersState()
         data object Loading : SuggestedFoldersState()
-        data class Loaded(val folders: List<SuggestedFolderModel>) : SuggestedFoldersState()
+        data class Loaded(private val folders: List<SuggestedFolder>) : SuggestedFoldersState() {
+            private val convertedFolders: List<SuggestedFolderModel> by lazy {
+                folders.toFolders()
+            }
+
+            fun folders(): List<SuggestedFolderModel> = convertedFolders
+        }
     }
 
     companion object {

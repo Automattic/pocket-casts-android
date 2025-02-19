@@ -201,8 +201,9 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
         toolbar.setOnMenuItemClickListener(this)
 
         toolbar.menu.findItem(R.id.folders_locked).setOnMenuItemClickListener {
-            if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS)) {
-                SuggestedFoldersPaywallBottomSheet().show(childFragmentManager, "suggested_folders_paywall")
+            val state = viewModel.suggestedFoldersState
+            if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS) && state is PodcastsViewModel.SuggestedFoldersState.Loaded) {
+                SuggestedFoldersPaywallBottomSheet.newInstance(state.folders()).show(childFragmentManager, "suggested_folders_paywall")
             } else {
                 OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.Upsell(OnboardingUpgradeSource.FOLDERS))
             }
@@ -241,7 +242,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
                     if (state is PodcastsViewModel.SuggestedFoldersState.Loaded) {
                         val existingModal = parentFragmentManager.findFragmentByTag("suggested_folders_paywall")
                         if (viewModel.showSuggestedFoldersPaywallOnOpen(signInState.isSignedInAsPlusOrPatron) && existingModal == null) {
-                            SuggestedFoldersPaywallBottomSheet().show(parentFragmentManager, "suggested_folders_paywall")
+                            SuggestedFoldersPaywallBottomSheet.newInstance(state.folders()).show(parentFragmentManager, "suggested_folders_paywall")
                         }
                     }
                 }
