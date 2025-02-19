@@ -45,6 +45,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.PlaylistDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastRatingsDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.SearchHistoryDao
+import au.com.shiftyjelly.pocketcasts.models.db.dao.SuggestedFoldersDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextChangeDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextDao
@@ -60,6 +61,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.models.entity.SearchHistoryItem
+import au.com.shiftyjelly.pocketcasts.models.entity.SuggestedFolder
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextChange
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -77,6 +79,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         Bookmark::class,
         PodcastEpisode::class,
         Folder::class,
+        SuggestedFolder::class,
         Playlist::class,
         PlaylistEpisode::class,
         Podcast::class,
@@ -90,7 +93,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         Transcript::class,
         UserPodcastRating::class,
     ],
-    version = 107,
+    version = 108,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 81, to = 82, spec = AppDatabase.Companion.DeleteSilenceRemovedMigration::class),
@@ -127,6 +130,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun upNextChangeDao(): UpNextChangeDao
     abstract fun userEpisodeDao(): UserEpisodeDao
     abstract fun folderDao(): FolderDao
+    abstract fun suggestedFoldersDao(): SuggestedFoldersDao
     abstract fun bumpStatsDao(): BumpStatsDao
     abstract fun searchHistoryDao(): SearchHistoryDao
     abstract fun podcastRatingsDao(): PodcastRatingsDao
@@ -936,6 +940,18 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_107_108 = addMigration(107, 108) { database ->
+            database.execSQL(
+                """
+                    CREATE TABLE IF NOT EXISTS `suggested_folders` (
+                    `folder_name` TEXT NOT NULL,
+                    `podcast_uuid` TEXT NOT NULL,
+                     PRIMARY KEY (`folder_name`, `podcast_uuid`)
+                    );
+                """.trimIndent(),
+            )
+        }
+
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
             databaseBuilder.addMigrations(
                 addMigration(1, 2) { },
@@ -1333,6 +1349,7 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_104_105,
                 MIGRATION_105_106,
                 MIGRATION_106_107,
+                MIGRATION_107_108,
             )
         }
 
