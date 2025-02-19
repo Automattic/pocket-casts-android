@@ -152,9 +152,6 @@ fun PlayerShelf(
         onTranscriptClick = { isTranscriptAvailable: Boolean ->
             shelfSharedViewModel.onTranscriptClick(isTranscriptAvailable, ShelfItemSource.Shelf)
         },
-        onReportClick = {
-            shelfSharedViewModel.onReportClick(ShelfItemSource.Shelf)
-        },
         onMoreClick = {
             shelfSharedViewModel.onMoreClick()
         },
@@ -178,7 +175,6 @@ private fun PlayerShelfContent(
     onDownloadClick: () -> Unit,
     onAddBookmarkClick: () -> Unit,
     onTranscriptClick: (Boolean) -> Unit,
-    onReportClick: () -> Unit,
     onMoreClick: () -> Unit,
 ) {
     Row(
@@ -244,10 +240,6 @@ private fun PlayerShelfContent(
                     isUserEpisode = playerShelfData.isUserEpisode,
                     iconColors = iconColors,
                     onClick = onArchiveClick,
-                )
-                ShelfItem.Report -> ReportButton(
-                    iconColors = iconColors,
-                    onClick = onReportClick,
                 )
             }
         }
@@ -528,7 +520,6 @@ private fun PlayerShelfPreview(
             onDownloadClick = {},
             onAddBookmarkClick = {},
             onTranscriptClick = {},
-            onReportClick = {},
             onMoreClick = {},
         )
     }

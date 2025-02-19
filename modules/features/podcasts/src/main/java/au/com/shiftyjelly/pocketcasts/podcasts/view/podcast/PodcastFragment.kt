@@ -87,7 +87,6 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSourc
 import au.com.shiftyjelly.pocketcasts.sharing.SharingClient
 import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
-import au.com.shiftyjelly.pocketcasts.ui.extensions.openUrl
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.images.CoilManager
@@ -662,10 +661,6 @@ class PodcastFragment : BaseFragment() {
             onShare = {
                 share()
             },
-            onReport = {
-                analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_REPORT_TAPPED)
-                openUrl(settings.getReportViolationUrl())
-            },
             onNavigateBack = {
                 @Suppress("DEPRECATION")
                 activity?.onBackPressed()
@@ -1215,7 +1210,6 @@ private sealed interface BindingWrapper {
         @MenuRes menuId: Int,
         onChromeCast: () -> Unit,
         onShare: () -> Unit,
-        onReport: () -> Unit,
         onNavigateBack: () -> Unit,
         onLongClick: () -> Unit,
     )
@@ -1251,13 +1245,11 @@ private sealed interface BindingWrapper {
             @MenuRes menuId: Int,
             onChromeCast: () -> Unit,
             onShare: () -> Unit,
-            onReport: () -> Unit,
             onNavigateBack: () -> Unit,
             onLongClick: () -> Unit,
         ) {
             binding.toolbar.apply {
                 inflateMenu(menuId)
-                menu.findItem(R.id.report)?.isVisible = FeatureFlag.isEnabled(Feature.REPORT_VIOLATION)
 
                 setNavigationOnClickListener { onNavigateBack() }
                 menu.setupChromeCastButton(context, onChromeCast)
@@ -1265,7 +1257,6 @@ private sealed interface BindingWrapper {
                     override fun onMenuItemClick(item: MenuItem): Boolean {
                         when (item.itemId) {
                             R.id.share -> onShare()
-                            R.id.report -> onReport()
                         }
                         return true
                     }
@@ -1337,7 +1328,6 @@ private sealed interface BindingWrapper {
             @MenuRes menuId: Int,
             onChromeCast: () -> Unit,
             onShare: () -> Unit,
-            onReport: () -> Unit,
             onNavigateBack: () -> Unit,
             onLongClick: () -> Unit,
         ) {
