@@ -42,7 +42,7 @@ class SuggestedFoldersViewModel @Inject constructor(
         viewModelScope.launch {
             val newFolders = folders.map {
                 SuggestedFolderDetails(
-                    uuid = uuidProvider.generateUUID(),
+                    uuid = uuidProvider.generateUUID().toString(),
                     name = it.name,
                     color = it.color,
                     podcastsSortType = settings.podcastsSortType.value,

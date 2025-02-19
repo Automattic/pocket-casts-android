@@ -6,13 +6,16 @@ import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.SuggestedFoldersManager
 import au.com.shiftyjelly.pocketcasts.utils.UUIDProvider
+import java.util.UUID
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.Mockito.mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.any
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -30,7 +33,12 @@ class SuggestedFoldersViewModelTest {
     @Mock
     lateinit var analyticsTracker: AnalyticsTracker
 
+    @Mock
+    lateinit var suggestedFoldersManager: SuggestedFoldersManager
+
     lateinit var viewModel: SuggestedFoldersViewModel
+
+    private var mockedUUID = UUID.randomUUID()
 
     @Before
     fun setUp() {
@@ -39,22 +47,22 @@ class SuggestedFoldersViewModelTest {
         val mockedPodcastsSortType = mock<UserSetting<PodcastsSortType>>()
         whenever(mockedPodcastsSortType.value).thenReturn(PodcastsSortType.NAME_A_TO_Z)
         whenever(settings.podcastsSortType).thenReturn(mockedPodcastsSortType)
-        whenever(uuidProvider.generateUUID()).thenReturn("uuid")
+        whenever(uuidProvider.generateUUID()).thenReturn(mockedUUID)
 
-        viewModel = SuggestedFoldersViewModel(folderManager, settings, analyticsTracker, uuidProvider)
+        viewModel = SuggestedFoldersViewModel(folderManager, suggestedFoldersManager, settings, analyticsTracker, uuidProvider)
     }
 
     @Test
     fun shouldCreateFolders() = runBlocking {
-        val suggestedFolders = listOf(
+        val folders = listOf(
             Folder("Tech Podcasts", listOf("podcastuuid1"), 1),
         )
 
-        viewModel.onUseTheseFolders(suggestedFolders)
+        viewModel.onUseTheseFolders(folders)
 
-        val newFolders = suggestedFolders.map {
+        val newFolders: List<SuggestedFolderDetails> = folders.map {
             SuggestedFolderDetails(
-                uuid = uuidProvider.generateUUID(),
+                uuid = mockedUUID.toString(),
                 name = it.name,
                 color = it.color,
                 podcastsSortType = settings.podcastsSortType.value,
@@ -63,5 +71,6 @@ class SuggestedFoldersViewModelTest {
         }
 
         verify(folderManager).createFolders(newFolders)
+        verify(suggestedFoldersManager).deleteSuggestedFolders(any())
     }
 }
