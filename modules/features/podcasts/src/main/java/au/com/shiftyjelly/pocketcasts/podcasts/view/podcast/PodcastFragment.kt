@@ -953,8 +953,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                 binding?.toolbar?.setBackgroundColor(backgroundColor)
                 binding?.headerBackgroundPlaceholder?.setBackgroundColor(backgroundColor)
 
-                val forceHeaderExpanded = !viewModel.shouldShowPodcastTooltip.value && FeatureFlag.isEnabled(Feature.PODCAST_FEED_UPDATE)
-                adapter?.setPodcast(podcast, forceHeaderExpanded = forceHeaderExpanded)
+                adapter?.setPodcast(podcast)
 
                 viewModel.archiveEpisodeLimit()
 
