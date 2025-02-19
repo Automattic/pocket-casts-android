@@ -5,6 +5,8 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.SuggestedFoldersDao
 import au.com.shiftyjelly.pocketcasts.models.entity.SuggestedFolder
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import junit.framework.TestCase.assertEquals
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
@@ -37,9 +39,9 @@ class SuggestedFoldersManagerTest {
             SuggestedFolder("uuid2", "Folder2"),
         )
 
-        whenever(mockSuggestedFoldersDao.findAll()).thenReturn(folders)
+        whenever(mockSuggestedFoldersDao.findAll()).thenReturn(flowOf(folders))
 
-        val result = suggestedFoldersManager.getSuggestedFolders()
+        val result = suggestedFoldersManager.getSuggestedFolders().first()
 
         assertEquals(folders, result)
     }

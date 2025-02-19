@@ -233,7 +233,9 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
         super.onViewCreated(view, savedInstanceState)
 
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.loadSuggestedFolders()
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.loadSuggestedFolders()
+            }
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -317,7 +319,8 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
     }
 
     private fun createFolder() {
-        if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS)) {
+        val state = viewModel.suggestedFoldersState
+        if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS) && state is PodcastsViewModel.SuggestedFoldersState.Loaded) {
             SuggestedFolders().show(parentFragmentManager, "suggested_folders")
         } else {
             FolderCreateFragment.newInstance(PODCASTS_LIST).show(parentFragmentManager, "create_folder_card")

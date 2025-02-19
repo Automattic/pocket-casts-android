@@ -41,8 +41,10 @@ class SuggestedFoldersPaywallBottomSheet : BottomSheetDialogFragment() {
 
     private val viewModel: SuggestedFoldersPaywallViewModel by viewModels<SuggestedFoldersPaywallViewModel>()
 
-    val suggestedFolders: ArrayList<Folder>
-        get() = arguments?.let { (BundleCompat.getParcelableArrayList(it, FOLDERS_KEY, Folder::class.java)) } ?: ArrayList()
+    private val suggestedFolders
+        get() = requireNotNull(BundleCompat.getParcelableArrayList(requireArguments(), FOLDERS_KEY, Folder::class.java)) {
+            "Missing input parameters"
+        }
 
     override fun onCreateView(
         inflater: LayoutInflater,
