@@ -876,6 +876,7 @@ class PodcastAdapter(
         private val composeView get() = itemView as ComposeView
 
         init {
+            composeView.setTag(UR.id.podcast_view_header_tag, true)
             composeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
         }
 
