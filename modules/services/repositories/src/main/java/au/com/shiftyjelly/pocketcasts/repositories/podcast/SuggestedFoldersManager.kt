@@ -20,11 +20,8 @@ class SuggestedFoldersManager @Inject constructor(
 
     suspend fun refreshSuggestedFolders(podcastUuids: List<String>) {
         try {
-            val request = SuggestedFoldersRequest(podcastUuids)
-            val folders: List<SuggestedFolder> = podcastCacheService.suggestedFolders(request)
-            if (!folders.isEmpty()) {
-                suggestedFoldersDao.deleteAndInsertAll(folders)
-            }
+            val folders = podcastCacheService.suggestedFolders(SuggestedFoldersRequest(podcastUuids))
+            suggestedFoldersDao.deleteAndInsertAll(folders)
         } catch (e: Exception) {
             Timber.e(e, "Refreshing suggested folders failed")
         }
