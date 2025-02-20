@@ -52,7 +52,7 @@ fun PodcastImage(
             .semantics(mergeDescendants = true) {
                 role = Role.Image
                 contentDescription = context.getString(LR.string.podcast_artwork_description)
-            }
+            },
     ) {
         val corners = if (roundCorners) cornerSize ?: podcastImageCornerSize(maxWidth) else null
         if (dropShadow) {

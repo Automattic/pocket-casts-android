@@ -9,10 +9,12 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateIntOffset
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -46,7 +48,6 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.text
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -68,6 +69,7 @@ import kotlin.math.roundToInt
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun PodcastHeader(
     uuid: String,
@@ -82,6 +84,7 @@ internal fun PodcastHeader(
     onClickFolder: () -> Unit,
     onClickNotification: () -> Unit,
     onClickSettings: () -> Unit,
+    onLongClickArtwork: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     BoxWithConstraints(
@@ -96,7 +99,12 @@ internal fun PodcastHeader(
             PodcastImage(
                 uuid = uuid,
                 cornerSize = 8.dp,
-                modifier = Modifier.size(expandedCoverSize),
+                modifier = Modifier
+                    .size(expandedCoverSize)
+                    .combinedClickable(
+                        onClick = {},
+                        onLongClick = onLongClickArtwork,
+                    ),
             )
             Spacer(
                 modifier = Modifier.height(24.dp),
@@ -420,6 +428,7 @@ private fun PodcastHeaderPreview() {
             onClickFolder = {},
             onClickNotification = {},
             onClickSettings = {},
+            onLongClickArtwork = {},
         )
     }
 }

@@ -243,6 +243,9 @@ class PodcastAdapter(
                     onClickFolder = onFoldersClicked,
                     onClickNotification = onNotificationsClicked,
                     onClickSettings = onSettingsClicked,
+                    onLongClickArtwork = {
+                        onArtworkLongClicked { notifyItemChanged(0) }
+                    },
                 )
             } else {
                 PodcastViewHolder(AdapterPodcastHeaderBinding.inflate(inflater, parent, false), this)
@@ -904,6 +907,7 @@ class PodcastAdapter(
         private val onClickFolder: () -> Unit,
         private val onClickNotification: () -> Unit,
         private val onClickSettings: () -> Unit,
+        private val onLongClickArtwork: () -> Unit,
     ) : RecyclerView.ViewHolder(ComposeView(context)) {
         private val composeView get() = itemView as ComposeView
 
@@ -942,6 +946,7 @@ class PodcastAdapter(
                         onClickFolder = onClickFolder,
                         onClickNotification = onClickNotification,
                         onClickSettings = onClickSettings,
+                        onLongClickArtwork = onLongClickArtwork,
                         modifier = Modifier
                             .padding(
                                 top = statusBarPadding + 40.dp, // Eyeball the position inside app bar
