@@ -10,26 +10,27 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.annotation.ColorInt
+import androidx.annotation.FloatRange
 import androidx.annotation.MenuRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar.OnMenuItemClickListener
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.lerp
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isInvisible
@@ -40,7 +41,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import androidx.recyclerview.widget.SimpleItemAnimator
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
@@ -114,6 +117,7 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -142,6 +146,8 @@ class PodcastFragment : BaseFragment() {
         private const val GO_TO = "go_to"
         private const val EPISODE_CARD = "episode_card"
 
+        private const val SCROLL_POSITION_STATE = "ScrollPositionState"
+
         fun newInstance(
             podcastUuid: String,
             sourceView: SourceView,
@@ -164,27 +170,38 @@ class PodcastFragment : BaseFragment() {
         }
     }
 
-    @Inject lateinit var settings: Settings
+    @Inject
+    lateinit var settings: Settings
 
-    @Inject lateinit var podcastManager: PodcastManager
+    @Inject
+    lateinit var podcastManager: PodcastManager
 
-    @Inject lateinit var episodeManager: EpisodeManager
+    @Inject
+    lateinit var episodeManager: EpisodeManager
 
-    @Inject lateinit var playbackManager: PlaybackManager
+    @Inject
+    lateinit var playbackManager: PlaybackManager
 
-    @Inject lateinit var downloadManager: DownloadManager
+    @Inject
+    lateinit var downloadManager: DownloadManager
 
-    @Inject lateinit var playButtonListener: PlayButton.OnClickListener
+    @Inject
+    lateinit var playButtonListener: PlayButton.OnClickListener
 
-    @Inject lateinit var upNextQueue: UpNextQueue
+    @Inject
+    lateinit var upNextQueue: UpNextQueue
 
-    @Inject lateinit var bookmarkManager: BookmarkManager
+    @Inject
+    lateinit var bookmarkManager: BookmarkManager
 
-    @Inject lateinit var coilManager: CoilManager
+    @Inject
+    lateinit var coilManager: CoilManager
 
-    @Inject lateinit var analyticsTracker: AnalyticsTracker
+    @Inject
+    lateinit var analyticsTracker: AnalyticsTracker
 
-    @Inject lateinit var sharingClient: SharingClient
+    @Inject
+    lateinit var sharingClient: SharingClient
 
     private val viewModel: PodcastViewModel by viewModels()
     private val ratingsViewModel: PodcastRatingsViewModel by viewModels()
@@ -196,15 +213,64 @@ class PodcastFragment : BaseFragment() {
     private var itemTouchHelper: EpisodeItemTouchHelper? = null
     private var adapter: PodcastAdapter? = null
 
-    private var listState: Parcelable? = null
-
     private var tooltipOffset by mutableStateOf(IntOffset.Zero)
     private var canShowTooltip by mutableStateOf(false)
 
     private var currentSnackBar: Snackbar? = null
 
     private val onScrollListener = object : RecyclerView.OnScrollListener() {
-        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {}
+        private var transparencyThreshold = -1
+        private var maxProgressDistance = -1
+
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            if (transparencyThreshold == -1) {
+                transparencyThreshold = 40.dpToPx(recyclerView.context)
+            }
+            if (maxProgressDistance == -1) {
+                maxProgressDistance = 100.dpToPx(recyclerView.context)
+            }
+
+            /*
+             * Computing the correct scroll offset for toolbar animation is challenging.
+             *
+             * We can't simply accumulate 'dy' because it does not update correctly when items
+             * are changed due to archiving episodes, swapping to bookmarks, and so on.
+             *
+             * 'dy' accumulation also encounters issues with configuration changes.
+             * While we can save and restore the scroll position, it may not be accurate
+             * after screen rotation or due to different layouts.
+             *
+             * Normally, we could achieve a correct animation using a CoordinatorLayout
+             * with a custom behavior. However, this approach runs into issues with Compose interop,
+             * varying layouts due to feature flags and maintenance concerns, etc.
+             *
+             * Fortunately, our header is large enough to allow for a reasonable scroll distance,
+             * resulting in a visually pleasing animation. For simplicity, we use this workaround.
+             */
+            val layoutManager = (recyclerView.layoutManager as? LinearLayoutManager) ?: return
+            val headerViewOffset = getHeaderViewOffset(layoutManager)
+            binding?.setToolbarTransparency(computeTransparencyProgress(headerViewOffset))
+        }
+
+        private fun getHeaderViewOffset(layoutManager: LinearLayoutManager): Int {
+            return layoutManager
+                .findViewByPosition(layoutManager.findFirstVisibleItemPosition())
+                ?.takeIf { it.getTag(UR.id.podcast_view_header_tag) == true }
+                ?.let { view -> view.top.absoluteValue }
+                ?: Int.MAX_VALUE
+        }
+
+        private fun computeTransparencyProgress(offset: Int): Float {
+            return if (offset > transparencyThreshold) {
+                lerp(
+                    start = 1f,
+                    stop = 0f,
+                    fraction = (offset - transparencyThreshold).toFloat() / (maxProgressDistance),
+                ).coerceIn(0f, 1f)
+            } else {
+                1f
+            }
+        }
 
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
@@ -275,6 +341,7 @@ class PodcastFragment : BaseFragment() {
                 viewModel.multiSelectEpisodesHelper
                     .defaultLongPress(multiSelectable = it, fragmentManager = childFragmentManager)
             }
+
             is Bookmark -> {
                 if (viewModel.multiSelectBookmarksHelper.listener == null) {
                     binding?.setupMultiSelect()
@@ -609,49 +676,35 @@ class PodcastFragment : BaseFragment() {
         super.onCreate(savedInstanceState)
 
         adapter?.fromListUuid = fromListUuid
-
         if (savedInstanceState == null) {
             analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_SHOWN, mapOf(SOURCE_KEY to sourceView.analyticsValue))
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        settings.trackingAutoPlaySource.set(AutoPlaySource.fromId(podcastUuid), updateModifiedAt = false)
-    }
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ): View {
+        val binding = BindingWrapper.inflate(
+            inflater = inflater,
+            container = container,
+            isHeaderRedesigned = args.isHeaderRedesigned,
+            onToolbarColorChange = { color ->
+                val currentStatusBarColor = statusBarIconColor
+                statusBarIconColor = when {
+                    color.alpha <= 0.5f -> StatusBarIconColor.Light
+                    color.luminance() > 0.5f -> StatusBarIconColor.Dark
+                    else -> StatusBarIconColor.Light
+                }
+                if (currentStatusBarColor != statusBarIconColor) {
+                    updateStatusBar()
+                }
+            },
+        ).also { binding = it }
 
-    override fun onPause() {
-        super.onPause()
-        viewModel.multiSelectEpisodesHelper.isMultiSelecting = false
-        viewModel.multiSelectBookmarksHelper.isMultiSelecting = false
-    }
-
-    override fun onStop() {
-        super.onStop()
-
-        // Detach the adapter so when the app is in the background we don't update the row (needless battery)
-        // We still want to remember the scroll state though so when we come back its not at the top of the page
-        binding?.let {
-            listState = it.episodesRecyclerView.layoutManager?.onSaveInstanceState()
-            it.episodesRecyclerView.adapter = null
-            UiUtil.hideKeyboard(it.root)
-        }
-    }
-
-    override fun onStart() {
-        super.onStart()
-
-        updateStatusBar()
-
-        binding?.episodesRecyclerView?.adapter = adapter
-        binding?.episodesRecyclerView?.layoutManager?.onRestoreInstanceState(listState)
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        val binding = BindingWrapper.inflate(inflater, container, isHeaderRedesigned = args.isHeaderRedesigned)
-        this.binding = binding
-
-        binding.setStaticToolbarColor(requireContext().getThemeColor(UR.attr.support_09))
+        binding.swipeRefreshLayout.isEnabled = FeatureFlag.isEnabled(Feature.PODCAST_FEED_UPDATE)
+        binding.setToolbarStaticColor(requireContext().getThemeColor(UR.attr.support_09))
         binding.setUpToolbar(
             theme = theme,
             menuId = R.menu.podcast_menu,
@@ -669,63 +722,56 @@ class PodcastFragment : BaseFragment() {
                 theme.toggleDarkLightThemeActivity(activity as AppCompatActivity)
             },
         )
-        statusBarIconColor = StatusBarIconColor.Light
-        updateStatusBar()
 
-        loadData()
-
-        binding.swipeRefreshLayout.isEnabled = FeatureFlag.isEnabled(Feature.PODCAST_FEED_UPDATE)
-
-        playButtonListener.source = SourceView.PODCAST_SCREEN
-        if (adapter == null) {
-            adapter = PodcastAdapter(
-                context = requireContext(),
-                isHeaderRedesigned = binding.isHeaderRedesigned,
-                downloadManager = downloadManager,
-                playbackManager = playbackManager,
-                upNextQueue = upNextQueue,
-                settings = settings,
-                theme = theme,
-                fromListUuid = fromListUuid,
-                onHeaderSummaryToggled = onHeaderSummaryToggled,
-                onSubscribeClicked = onSubscribeClicked,
-                onUnsubscribeClicked = onUnsubscribeClicked,
-                onEpisodesOptionsClicked = onEpisodesOptionsClicked,
-                onBookmarksOptionsClicked = showBookmarksOptionsDialog,
-                onEpisodeRowLongPress = onRowLongPress(),
-                onBookmarkRowLongPress = onRowLongPress(),
-                onFoldersClicked = onFoldersClicked,
-                onNotificationsClicked = onNotificationsClicked,
-                onSettingsClicked = onSettingsClicked,
-                playButtonListener = playButtonListener,
-                onRowClicked = onRowClicked,
-                onSearchQueryChanged = onSearchQueryChanged,
-                onSearchFocus = onSearchFocus,
-                onShowArchivedClicked = onShowArchivedClicked,
-                multiSelectEpisodesHelper = viewModel.multiSelectEpisodesHelper,
-                multiSelectBookmarksHelper = viewModel.multiSelectBookmarksHelper,
-                onArtworkLongClicked = onArtworkLongClicked,
-                onTabClicked = onTabClicked,
-                onBookmarkPlayClicked = onBookmarkPlayClicked,
-                ratingsViewModel = ratingsViewModel,
-                swipeButtonLayoutFactory = SwipeButtonLayoutFactory(
-                    swipeButtonLayoutViewModel = swipeButtonLayoutViewModel,
-                    onItemUpdated = ::notifyItemChanged,
-                    defaultUpNextSwipeAction = { settings.upNextSwipe.value },
-                    fragmentManager = parentFragmentManager,
-                    swipeSource = EpisodeItemTouchHelper.SwipeSource.PODCAST_DETAILS,
-                ),
-                onHeadsetSettingsClicked = ::onHeadsetSettingsClicked,
-                sourceView = SourceView.PODCAST_SCREEN,
-                podcastBookmarksObservable = bookmarkManager.findPodcastBookmarksFlow(
-                    podcastUuid = podcastUuid,
-                    sortType = settings.podcastBookmarksSortType.flow.value,
-                ).asObservable(),
+        adapter = PodcastAdapter(
+            context = requireContext(),
+            isHeaderRedesigned = binding.isHeaderRedesigned,
+            downloadManager = downloadManager,
+            playbackManager = playbackManager,
+            upNextQueue = upNextQueue,
+            settings = settings,
+            theme = theme,
+            fromListUuid = fromListUuid,
+            onHeaderSummaryToggled = onHeaderSummaryToggled,
+            onSubscribeClicked = onSubscribeClicked,
+            onUnsubscribeClicked = onUnsubscribeClicked,
+            onEpisodesOptionsClicked = onEpisodesOptionsClicked,
+            onBookmarksOptionsClicked = showBookmarksOptionsDialog,
+            onEpisodeRowLongPress = onRowLongPress(),
+            onBookmarkRowLongPress = onRowLongPress(),
+            onFoldersClicked = onFoldersClicked,
+            onNotificationsClicked = onNotificationsClicked,
+            onSettingsClicked = onSettingsClicked,
+            playButtonListener = playButtonListener,
+            onRowClicked = onRowClicked,
+            onSearchQueryChanged = onSearchQueryChanged,
+            onSearchFocus = onSearchFocus,
+            onShowArchivedClicked = onShowArchivedClicked,
+            multiSelectEpisodesHelper = viewModel.multiSelectEpisodesHelper,
+            multiSelectBookmarksHelper = viewModel.multiSelectBookmarksHelper,
+            onArtworkLongClicked = onArtworkLongClicked,
+            onTabClicked = onTabClicked,
+            onBookmarkPlayClicked = onBookmarkPlayClicked,
+            ratingsViewModel = ratingsViewModel,
+            swipeButtonLayoutFactory = SwipeButtonLayoutFactory(
+                swipeButtonLayoutViewModel = swipeButtonLayoutViewModel,
+                onItemUpdated = ::notifyItemChanged,
+                defaultUpNextSwipeAction = { settings.upNextSwipe.value },
                 fragmentManager = parentFragmentManager,
-                onPodcastDescriptionClicked = {
-                    analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_PODCAST_DESCRIPTION_TAPPED)
-                },
-            )
+                swipeSource = EpisodeItemTouchHelper.SwipeSource.PODCAST_DETAILS,
+            ),
+            onHeadsetSettingsClicked = ::onHeadsetSettingsClicked,
+            sourceView = SourceView.PODCAST_SCREEN,
+            podcastBookmarksObservable = bookmarkManager.findPodcastBookmarksFlow(
+                podcastUuid = podcastUuid,
+                sortType = settings.podcastBookmarksSortType.flow.value,
+            ).asObservable(),
+            fragmentManager = parentFragmentManager,
+            onPodcastDescriptionClicked = {
+                analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_PODCAST_DESCRIPTION_TAPPED)
+            },
+        ).apply {
+            stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
         }
 
         binding.episodesRecyclerView.let {
@@ -751,7 +797,9 @@ class PodcastFragment : BaseFragment() {
             }
         }
 
-        binding.episodesRecyclerView.requestFocus()
+        playButtonListener.source = SourceView.PODCAST_SCREEN
+        loadData()
+        updateStatusBar()
 
         return binding.root
     }
@@ -804,6 +852,17 @@ class PodcastFragment : BaseFragment() {
                     }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        settings.trackingAutoPlaySource.set(AutoPlaySource.fromId(podcastUuid), updateModifiedAt = false)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.multiSelectEpisodesHelper.isMultiSelecting = false
+        viewModel.multiSelectBookmarksHelper.isMultiSelecting = false
     }
 
     private fun configureTooltip() {
@@ -960,13 +1019,12 @@ class PodcastFragment : BaseFragment() {
             viewLifecycleOwner,
             Observer<Podcast> { podcast ->
                 val backgroundColor = ThemeColor.podcastUi03(theme.activeTheme, podcast.backgroundColor)
-                binding?.setStaticToolbarColor(backgroundColor)
+                binding?.setToolbarStaticColor(backgroundColor)
+                binding?.setToolbarTitle(podcast.title)
 
                 adapter?.setPodcast(podcast)
 
                 viewModel.archiveEpisodeLimit()
-
-                statusBarIconColor = StatusBarIconColor.Light
                 updateStatusBar()
             },
         )
@@ -981,6 +1039,7 @@ class PodcastFragment : BaseFragment() {
                     binding?.loading?.visibility = View.VISIBLE
                     binding?.errorContainer?.visibility = View.GONE
                 }
+
                 is PodcastViewModel.UiState.Loaded -> {
                     binding?.loading?.visibility = View.GONE
                     binding?.errorContainer?.visibility = View.GONE
@@ -1000,6 +1059,7 @@ class PodcastFragment : BaseFragment() {
                             )
                             configureTooltip()
                         }
+
                         PodcastTab.BOOKMARKS -> {
                             adapter?.setBookmarks(
                                 bookmarks = state.bookmarks,
@@ -1016,6 +1076,7 @@ class PodcastFragment : BaseFragment() {
                     }
                     lastSearchTerm = state.searchTerm
                 }
+
                 is PodcastViewModel.UiState.Error -> {
                     adapter?.setError()
                     binding?.loading?.visibility = View.GONE
@@ -1037,10 +1098,12 @@ class PodcastFragment : BaseFragment() {
                         binding?.swipeRefreshLayout?.isRefreshing = false
                         showSnackBar(getString(LR.string.podcast_refresh_new_episode_found))
                     }
+
                     PodcastViewModel.RefreshState.NoEpisodesFound -> {
                         binding?.swipeRefreshLayout?.isRefreshing = false
                         showSnackBar(getString(LR.string.podcast_refresh_no_episodes_found))
                     }
+
                     is PodcastViewModel.RefreshState.Refreshing -> {
                         if (state.type == PodcastViewModel.RefreshType.PULL_TO_REFRESH) {
                             binding?.swipeRefreshLayout?.isRefreshing = true
@@ -1196,14 +1259,11 @@ private sealed interface BindingWrapper {
     val btnRetry: MaterialButton
     val composeTooltipHost: ComposeView
 
-    val isHeaderRedesigned get() = when (this) {
-        is RedesignBindingWrapper -> true
-        is RegularBindingWrapper -> false
-    }
-
-    fun setStaticToolbarColor(@ColorInt color: Int)
-
-    fun showToolbar(show: Boolean)
+    val isHeaderRedesigned
+        get() = when (this) {
+            is RedesignBindingWrapper -> true
+            is RegularBindingWrapper -> false
+        }
 
     fun setUpToolbar(
         theme: Theme,
@@ -1214,6 +1274,14 @@ private sealed interface BindingWrapper {
         onLongClick: () -> Unit,
     )
 
+    fun setToolbarTitle(title: String)
+
+    fun setToolbarStaticColor(@ColorInt color: Int)
+
+    fun setToolbarTransparency(@FloatRange(0.0, 1.0) progress: Float)
+
+    fun showToolbar(show: Boolean)
+
     fun showBackgroundPlaceholder(show: Boolean)
 
     companion object {
@@ -1221,24 +1289,20 @@ private sealed interface BindingWrapper {
             inflater: LayoutInflater,
             container: ViewGroup?,
             isHeaderRedesigned: Boolean,
+            onToolbarColorChange: (Color) -> Unit,
         ): BindingWrapper = if (isHeaderRedesigned) {
-            RedesignBindingWrapper(inflater, container)
+            RedesignBindingWrapper(onToolbarColorChange, inflater, container)
         } else {
-            RegularBindingWrapper(inflater, container)
+            RegularBindingWrapper(onToolbarColorChange, inflater, container)
         }
     }
 
-    private class RegularBindingWrapper(inflater: LayoutInflater, container: ViewGroup?) : BindingWrapper {
+    private class RegularBindingWrapper(
+        private val onToolbarColorChange: (Color) -> Unit,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+    ) : BindingWrapper {
         private val binding = FragmentPodcastBinding.inflate(inflater, container, false)
-
-        override fun setStaticToolbarColor(color: Int) {
-            binding.toolbar.setBackgroundColor(color)
-            binding.headerBackgroundPlaceholder.setBackgroundColor(color)
-        }
-
-        override fun showToolbar(show: Boolean) {
-            binding.toolbar.isVisible = show
-        }
 
         override fun setUpToolbar(
             theme: Theme,
@@ -1273,6 +1337,20 @@ private sealed interface BindingWrapper {
                 }
                 includeStatusBarPadding()
             }
+        }
+
+        override fun setToolbarTitle(title: String) = Unit
+
+        override fun setToolbarStaticColor(color: Int) {
+            binding.toolbar.setBackgroundColor(color)
+            binding.headerBackgroundPlaceholder.setBackgroundColor(color)
+            onToolbarColorChange(Color(color))
+        }
+
+        override fun setToolbarTransparency(progress: Float) = Unit
+
+        override fun showToolbar(show: Boolean) {
+            binding.toolbar.isVisible = show
         }
 
         override fun showBackgroundPlaceholder(show: Boolean) {
@@ -1310,19 +1388,18 @@ private sealed interface BindingWrapper {
             get() = binding.composeTooltipHost
     }
 
-    private class RedesignBindingWrapper(inflater: LayoutInflater, container: ViewGroup?) : BindingWrapper {
+    private class RedesignBindingWrapper(
+        private val onToolbarColorChange: (Color) -> Unit,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+    ) : BindingWrapper {
         private val binding = FragmentPodcastRedesignBinding.inflate(inflater, container, false)
 
         init {
             binding.toolbar.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
         }
 
-        override fun setStaticToolbarColor(color: Int) = Unit
-
-        override fun showToolbar(show: Boolean) {
-            binding.toolbar.isInvisible = !show
-        }
-
+        @OptIn(ExperimentalFoundationApi::class)
         override fun setUpToolbar(
             theme: Theme,
             @MenuRes menuId: Int,
@@ -1332,13 +1409,42 @@ private sealed interface BindingWrapper {
             onLongClick: () -> Unit,
         ) {
             binding.toolbar.setContent {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(80.dp)
-                        .background(Color.Red),
-                )
+                AppTheme(theme.activeTheme) {
+                    PodcastToolbar(
+                        title = toolbarText,
+                        transparencyProgress = toolbarTransparencyProgress,
+                        onGoBack = onNavigateBack,
+                        onChromeCast = onChromeCast,
+                        onShare = onShare,
+                        onBackgroundColorChange = onToolbarColorChange,
+                        modifier = Modifier
+                            .combinedClickable(
+                                interactionSource = null,
+                                indication = null,
+                                onClick = {},
+                                onLongClick = onLongClick,
+                            ),
+                    )
+                }
             }
+        }
+
+        private var toolbarText by mutableStateOf("")
+
+        override fun setToolbarTitle(title: String) {
+            toolbarText = title
+        }
+
+        override fun setToolbarStaticColor(color: Int) = Unit
+
+        private var toolbarTransparencyProgress by mutableFloatStateOf(1f)
+
+        override fun setToolbarTransparency(progress: Float) {
+            toolbarTransparencyProgress = progress
+        }
+
+        override fun showToolbar(show: Boolean) {
+            binding.toolbar.isInvisible = !show
         }
 
         override fun showBackgroundPlaceholder(show: Boolean) = Unit
