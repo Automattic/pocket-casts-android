@@ -355,8 +355,6 @@ Language: pt_BR
     <string name="onboarding_plus_recurring_after_intro_offer">Pagamento recorrente em %s</string>
     <string name="half_price_first_year">50% de desconto no primeiro ano</string>
     <string name="plus_offer_duration">%s de desconto</string>
-    <string name="report_subtitle">Denunciar conteúdo inapropriado</string>
-    <string name="report">Denunciar</string>
     <string name="onboarding_plus_feature_watch_playback">Aplicativos para Wear OS e Apple Watch</string>
     <string name="onboarding_plus_feature_folders_and_bookmarks_title">Pastas e favoritos</string>
     <string name="settings_use_dynamic_colors_widget_details">Quando essa opção está ativada, as cores do widget mudam com base nas cores do tema do dispositivo.</string>

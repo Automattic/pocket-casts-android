@@ -355,8 +355,6 @@ Language: nl
     <string name="onboarding_plus_recurring_after_intro_offer">Herhaaldelijke betaling op %s</string>
     <string name="half_price_first_year">50% korting op je eerste jaar</string>
     <string name="plus_offer_duration">%s aanbieding</string>
-    <string name="report_subtitle">Opgepaste content melden</string>
-    <string name="report">Melden</string>
     <string name="onboarding_plus_feature_watch_playback">Apple Watch- en Wear OS-apps</string>
     <string name="onboarding_plus_feature_folders_and_bookmarks_title">Mappen en bladwijzers</string>
     <string name="settings_use_dynamic_colors_widget_details">Wanneer deze instelling is ingeschakeld, veranderen de widgetkleuren op basis van de themakleuren van het apparaat.</string>

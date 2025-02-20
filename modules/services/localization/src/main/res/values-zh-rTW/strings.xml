@@ -355,8 +355,6 @@ Language: zh_TW
     <string name="onboarding_plus_recurring_after_intro_offer">於 %s定期付款</string>
     <string name="half_price_first_year">首年享五折優惠</string>
     <string name="plus_offer_duration">%s優惠</string>
-    <string name="report_subtitle">檢舉不當內容</string>
-    <string name="report">檢舉</string>
     <string name="onboarding_plus_feature_watch_playback">Apple Watch 和穿戴式裝置 OS</string>
     <string name="onboarding_plus_feature_folders_and_bookmarks_title">資料夾和書籤</string>
     <string name="settings_use_dynamic_colors_widget_details">若你啟用此功能，小工具的顏色就會配合裝置的佈景主題顏色連帶變更。</string>

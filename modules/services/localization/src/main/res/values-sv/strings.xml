@@ -355,8 +355,6 @@ Language: sv_SE
     <string name="onboarding_plus_recurring_after_intro_offer">Återkommande betalning på %s</string>
     <string name="half_price_first_year">50 % rabatt på ditt första år</string>
     <string name="plus_offer_duration">%s erbjudande</string>
-    <string name="report_subtitle">Rapportera olämpligt innehåll</string>
-    <string name="report">Rapportera</string>
     <string name="onboarding_plus_feature_watch_playback">Apple Watch- och Wear OS-appar</string>
     <string name="onboarding_plus_feature_folders_and_bookmarks_title">Mappar och bokmärken</string>
     <string name="settings_use_dynamic_colors_widget_details">När denna funktion är aktiverad ändras widgetens färger baserat på enhetens temafärger.</string>

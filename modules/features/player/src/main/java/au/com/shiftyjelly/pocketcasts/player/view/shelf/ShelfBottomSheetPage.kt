@@ -117,9 +117,6 @@ fun ShelfBottomSheetPage(
                         OnboardingUpgradeSource.OVERFLOW_MENU,
                         ShelfItemSource.OverflowMenu,
                     )
-                    ShelfItem.Report -> {
-                        shelfSharedViewModel.onReportClick(ShelfItemSource.OverflowMenu)
-                    }
                     ShelfItem.Download -> {
                         playerViewModel.handleDownloadClickFromPlaybackActions(
                             onDownloadStart = { shelfSharedViewModel.onEpisodeDownloadStart(ShelfItemSource.OverflowMenu) },

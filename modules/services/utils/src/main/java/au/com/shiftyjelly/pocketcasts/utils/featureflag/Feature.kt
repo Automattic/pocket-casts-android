@@ -27,14 +27,6 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = false,
     ),
-    REPORT_VIOLATION(
-        key = "report_violation",
-        title = "Report Violation",
-        defaultValue = false,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = false,
-    ),
     INTRO_PLUS_OFFER_ENABLED(
         key = "intro_plus_offer_enabled",
         title = "Intro Offer Plus",

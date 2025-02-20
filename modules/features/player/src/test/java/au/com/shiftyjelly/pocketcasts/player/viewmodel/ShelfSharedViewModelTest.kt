@@ -308,7 +308,6 @@ class ShelfSharedViewModelTest {
         val userSetting = mock<UserSetting<List<ShelfItem>>>()
         whenever(userSetting.flow).thenReturn(MutableStateFlow(ShelfItem.entries))
         whenever(settings.shelfItems).thenReturn(userSetting)
-        whenever(settings.getReportViolationUrl()).thenReturn("")
         shelfSharedViewModel = ShelfSharedViewModel(
             analyticsTracker = analyticsTracker,
             applicationScope = applicationScope,

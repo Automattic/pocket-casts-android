@@ -409,7 +409,6 @@ interface Settings {
     fun getPlayerReleaseTimeOutMs(): Long
     fun getPodcastSearchDebounceMs(): Long
     fun getEpisodeSearchDebounceMs(): Long
-    fun getReportViolationUrl(): String
     fun getSlumberStudiosPromoCode(): String
     fun getSleepTimerDeviceShakeThreshold(): Long
     fun getRefreshPodcastsBatchSize(): Long
