@@ -42,6 +42,12 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.text
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
@@ -90,8 +96,7 @@ internal fun PodcastHeader(
             PodcastImage(
                 uuid = uuid,
                 cornerSize = 8.dp,
-                modifier = Modifier
-                    .size(expandedCoverSize),
+                modifier = Modifier.size(expandedCoverSize),
             )
             Spacer(
                 modifier = Modifier.height(24.dp),
@@ -295,6 +300,7 @@ private fun PodcastActions(
                 targetValueByState = { followed -> if (followed) 0f else 1f },
             )
 
+            val buttonDescription = stringResource(if (isFollowed) LR.string.unsubscribe else LR.string.subscribe)
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
@@ -316,7 +322,11 @@ private fun PodcastActions(
                                 if (isFollowed) onClickUnfollow() else onClickFollow()
                             }
                         },
-                    ),
+                    )
+                    .clearAndSetSemantics {
+                        role = Role.Button
+                        contentDescription = buttonDescription
+                    },
             ) {
                 TextH40(
                     text = stringResource(LR.string.subscribe),
