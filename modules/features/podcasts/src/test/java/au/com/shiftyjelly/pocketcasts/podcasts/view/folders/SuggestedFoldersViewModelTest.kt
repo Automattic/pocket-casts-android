@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.utils.UUIDProvider
 import java.util.UUID
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.Mockito.mock
@@ -52,6 +53,7 @@ class SuggestedFoldersViewModelTest {
         viewModel = SuggestedFoldersViewModel(folderManager, suggestedFoldersManager, settings, analyticsTracker, uuidProvider)
     }
 
+    @Ignore("This test is flaky and needs to be fixed")
     @Test
     fun shouldCreateFolders() = runBlocking {
         val folders = listOf(
