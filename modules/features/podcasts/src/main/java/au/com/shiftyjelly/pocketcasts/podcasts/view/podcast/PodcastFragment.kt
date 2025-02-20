@@ -766,9 +766,15 @@ class PodcastFragment : BaseFragment() {
                 podcastUuid = podcastUuid,
                 sortType = settings.podcastBookmarksSortType.flow.value,
             ).asObservable(),
-            fragmentManager = parentFragmentManager,
             onPodcastDescriptionClicked = {
                 analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_PODCAST_DESCRIPTION_TAPPED)
+            },
+            onClickRating = { podcastUuid, source ->
+                ratingsViewModel.onRatingStarsTapped(
+                    podcastUuid = podcastUuid,
+                    fragmentManager = parentFragmentManager,
+                    source = source,
+                )
             },
         ).apply {
             stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
@@ -850,6 +856,14 @@ class PodcastFragment : BaseFragment() {
                             NavigationState.EditBookmark -> onEditBookmarkClick()
                         }
                     }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                ratingsViewModel.stateFlow.collect { state ->
+                    adapter?.setRatingState(state)
+                }
             }
         }
     }
