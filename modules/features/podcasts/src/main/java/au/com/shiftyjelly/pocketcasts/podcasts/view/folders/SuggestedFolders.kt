@@ -10,9 +10,13 @@ import androidx.core.os.BundleCompat
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
+import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlin.getValue
+import au.com.shiftyjelly.pocketcasts.images.R as VR
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
 class SuggestedFolders : BaseDialogFragment() {
@@ -60,7 +64,7 @@ class SuggestedFolders : BaseDialogFragment() {
                     dismiss()
                 },
                 onUseTheseFolders = {
-                    viewModel.onUseTheseFolders(suggestedFolders)
+                    showConfirmationDialog()
                 },
                 onCreateCustomFolders = {
                     viewModel.onCreateCustomFolders()
@@ -69,5 +73,16 @@ class SuggestedFolders : BaseDialogFragment() {
                 },
             )
         }
+    }
+
+    private fun showConfirmationDialog() {
+        ConfirmationDialog()
+            .setButtonType(ConfirmationDialog.ButtonType.Danger(getString(LR.string.suggested_folders_replace_folders_button)))
+            .setTitle(getString(LR.string.suggested_folders_replace_folders_confirmation_tittle))
+            .setSummary(getString(LR.string.suggested_folders_replace_folders_confirmation_description))
+            .setOnConfirm { viewModel.onUseTheseFolders(suggestedFolders) }
+            .setIconId(VR.drawable.ic_replace)
+            .setIconTint(UR.attr.primary_interactive_01)
+            .show(childFragmentManager, "suggested-folders-confirmation-dialog")
     }
 }
