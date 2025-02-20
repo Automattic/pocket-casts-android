@@ -356,7 +356,6 @@ class ShelfSharedViewModel @Inject constructor(
         data object ShowMoreActions : NavigationState
         data object ShowAddBookmark : NavigationState
         data class StartUpsellFlow(val source: OnboardingUpgradeSource) : NavigationState
-        data class ShowReportViolation(val reportUrl: String) : NavigationState
     }
 
     sealed interface SnackbarMessage {

@@ -355,8 +355,6 @@ Language: ru
     <string name="onboarding_plus_recurring_after_intro_offer">Регулярный платёж %s</string>
     <string name="half_price_first_year">Скидка 50 % на первый год</string>
     <string name="plus_offer_duration">Предложение %s</string>
-    <string name="report_subtitle">Пожаловаться на нежелательный контент</string>
-    <string name="report">Пожаловаться</string>
     <string name="onboarding_plus_feature_watch_playback">Приложения для Apple Watch и Wear OS</string>
     <string name="onboarding_plus_feature_folders_and_bookmarks_title">Папки и закладки</string>
     <string name="settings_use_dynamic_colors_widget_details">Если этот параметр включён, цвета виджета будут меняться в зависимости от цветов темы устройства.</string>

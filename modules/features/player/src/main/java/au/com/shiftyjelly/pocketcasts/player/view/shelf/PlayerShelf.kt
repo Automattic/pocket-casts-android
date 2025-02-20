@@ -454,20 +454,6 @@ fun DownloadButton(
 }
 
 @Composable
-fun ReportButton(
-    iconColors: PlayerShelfIconColors,
-    onClick: () -> Unit,
-) {
-    IconButton(onClick = onClick) {
-        Icon(
-            painterResource(id = IR.drawable.ic_flag),
-            contentDescription = stringResource(LR.string.report),
-            tint = iconColors.normalColor,
-        )
-    }
-}
-
-@Composable
 fun MoreButton(
     onClick: () -> Unit,
     iconColors: PlayerShelfIconColors,

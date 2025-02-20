@@ -357,7 +357,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                         }
 
                         is NavigationState.StartUpsellFlow -> startUpsellFlow(navigationState.source)
-                        is NavigationState.ShowReportViolation -> openUrl(navigationState.reportUrl)
                     }
                 }
             }

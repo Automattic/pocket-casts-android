@@ -355,8 +355,6 @@ Language: fr
     <string name="onboarding_plus_recurring_after_intro_offer">Paiements récurrents de %s</string>
     <string name="half_price_first_year">-50 % sur votre première année</string>
     <string name="plus_offer_duration">Offre de %s</string>
-    <string name="report_subtitle">Signaler du contenu inapproprié</string>
-    <string name="report">Signaler</string>
     <string name="onboarding_plus_feature_watch_playback">Applications Apple Watch et Wear OS</string>
     <string name="onboarding_plus_feature_folders_and_bookmarks_title">Dossiers et favoris</string>
     <string name="settings_use_dynamic_colors_widget_details">En cas d’activation, les couleurs du widget changeront en fonction des couleurs du thème de l’appareil.</string>

@@ -355,8 +355,6 @@ Language: zh_CN
     <string name="onboarding_plus_recurring_after_intro_offer">定期付款费用为 %s</string>
     <string name="half_price_first_year">首年享 5 折优惠</string>
     <string name="plus_offer_duration">%s 优惠</string>
-    <string name="report_subtitle">报告不适宜的内容</string>
-    <string name="report">报告</string>
     <string name="onboarding_plus_feature_watch_playback">Apple Watch &amp; Wear OS 应用程序</string>
     <string name="onboarding_plus_feature_folders_and_bookmarks_title">文件夹和书签</string>
     <string name="settings_use_dynamic_colors_widget_details">启用后，小工具的颜色会跟随设备主题颜色而改变。</string>
