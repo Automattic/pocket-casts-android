@@ -72,7 +72,7 @@ class SuggestedFoldersViewModelTest {
             )
         }
 
-        verify(folderManager).createFolders(newFolders)
+        verify(folderManager).overrideFoldersWithSuggested(newFolders)
         verify(suggestedFoldersManager).deleteSuggestedFolders(any())
     }
 }

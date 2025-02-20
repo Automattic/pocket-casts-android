@@ -50,7 +50,7 @@ class SuggestedFoldersViewModel @Inject constructor(
                 )
             }
 
-            folderManager.createFolders(newFolders)
+            folderManager.overrideFoldersWithSuggested(newFolders)
             suggestedFoldersManager.deleteSuggestedFolders(folders.toSuggestedFolders())
             _state.value = FoldersState.Created
         }

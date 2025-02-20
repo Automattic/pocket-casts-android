@@ -59,7 +59,7 @@ class FolderManagerImpl @Inject constructor(
         return newFolder
     }
 
-    override suspend fun createFolders(folders: List<SuggestedFolderDetails>) {
+    override suspend fun overrideFoldersWithSuggested(folders: List<SuggestedFolderDetails>) {
         val existingFolders = folderDao.findFolders().map { FolderItem.Folder(it, emptyList()) }
 
         val newFolders = folders.toFolders()
