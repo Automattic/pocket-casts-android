@@ -7,16 +7,6 @@
     android:background="?attr/primary_ui_02"
     android:orientation="vertical">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:elevation="0dp"
-        android:minHeight="?android:attr/actionBarSize"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        app:navigationIcon="@drawable/ic_arrow_back_24dp"
-        app:popupTheme="@style/LightPopupTheme" />
-
     <au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectToolbar
         android:id="@+id/multiSelectEpisodesToolbar"
         android:layout_width="match_parent"
@@ -47,11 +37,6 @@
                 android:id="@+id/podcastContent"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
-
-                <View
-                    android:id="@+id/headerBackgroundPlaceholder"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/podcast_header_height" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/episodesRecyclerView"
@@ -96,7 +81,12 @@
             </FrameLayout>
 
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-        
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
         <androidx.compose.ui.platform.ComposeView
             android:id="@+id/composeTooltipHost"
             android:layout_width="wrap_content"
