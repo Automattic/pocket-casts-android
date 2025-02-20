@@ -64,7 +64,7 @@ class FolderManagerImpl @Inject constructor(
 
         val newFolders = folders.toFolders()
 
-        folderDao.insertAll(newFolders)
+        folderDao.deleteAndInsertAll(newFolders)
         podcastManager.updateFoldersUuid(folders)
 
         val podcasts = podcastManager.findPodcastsNotInFolder().map { FolderItem.Podcast(it) }
