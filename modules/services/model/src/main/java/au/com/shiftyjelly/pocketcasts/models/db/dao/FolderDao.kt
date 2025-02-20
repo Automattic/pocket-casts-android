@@ -76,7 +76,7 @@ abstract class FolderDao {
     }
 
     @Transaction
-    open suspend fun deleteAndInsertAll(folders: List<Folder>) {
+    open suspend fun replaceAllFolders(folders: List<Folder>) {
         deleteAll()
         insertAll(folders)
     }

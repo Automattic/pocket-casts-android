@@ -60,7 +60,7 @@ class FolderManagerImpl @Inject constructor(
     }
 
     override suspend fun overrideFoldersWithSuggested(folders: List<SuggestedFolderDetails>) {
-        folderDao.deleteAndInsertAll(folders.toFolders())
+        folderDao.replaceAllFolders(folders.toFolders())
         podcastManager.updateFoldersUuid(folders)
     }
 

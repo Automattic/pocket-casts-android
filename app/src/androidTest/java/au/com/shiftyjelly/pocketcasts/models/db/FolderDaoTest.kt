@@ -165,7 +165,7 @@ class FolderDaoTest {
             fakeFolder.copy(uuid = "uuid4"),
         )
 
-        folderDao.deleteAndInsertAll(newFolders)
+        folderDao.replaceAllFolders(newFolders)
 
         foundFolder1 = folderDao.findByUuid("uuid1")
         foundFolder2 = folderDao.findByUuid("uuid2")
