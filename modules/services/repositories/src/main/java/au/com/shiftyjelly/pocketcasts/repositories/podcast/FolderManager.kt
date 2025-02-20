@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 interface FolderManager {
 
     suspend fun create(name: String, color: Int, podcastsSortType: PodcastsSortType, podcastUuids: List<String>): Folder
-    suspend fun createFolders(folders: List<SuggestedFolderDetails>)
+    suspend fun overrideFoldersWithSuggested(folders: List<SuggestedFolderDetails>)
     suspend fun delete(folder: Folder)
     suspend fun deleteAll()
     suspend fun upsertSynced(folder: Folder): Folder

@@ -59,21 +59,9 @@ class FolderManagerImpl @Inject constructor(
         return newFolder
     }
 
-    override suspend fun createFolders(folders: List<SuggestedFolderDetails>) {
-        val existingFolders = folderDao.findFolders().map { FolderItem.Folder(it, emptyList()) }
-
-        val newFolders = folders.toFolders()
-
-        folderDao.insertAll(newFolders)
+    override suspend fun overrideFoldersWithSuggested(folders: List<SuggestedFolderDetails>) {
+        folderDao.replaceAllFolders(folders.toFolders())
         podcastManager.updateFoldersUuid(folders)
-
-        val podcasts = podcastManager.findPodcastsNotInFolder().map { FolderItem.Podcast(it) }
-        val sorted = (existingFolders + podcasts).sortedBy { it.sortPosition }
-        val convertedFolders = newFolders.map {
-            FolderItem.Folder(it, emptyList())
-        }
-
-        updateSortPosition(convertedFolders + sorted)
     }
 
     override suspend fun upsertSynced(folder: Folder): Folder {

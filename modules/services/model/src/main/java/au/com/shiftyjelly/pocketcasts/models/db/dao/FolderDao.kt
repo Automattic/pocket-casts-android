@@ -75,6 +75,12 @@ abstract class FolderDao {
         }
     }
 
+    @Transaction
+    open suspend fun replaceAllFolders(folders: List<Folder>) {
+        deleteAll()
+        insertAll(folders)
+    }
+
     @Query("SELECT COUNT(*) FROM folders WHERE deleted = 0")
     abstract suspend fun count(): Int
 }
