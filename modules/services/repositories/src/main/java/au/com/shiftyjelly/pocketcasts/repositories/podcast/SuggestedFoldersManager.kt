@@ -29,4 +29,8 @@ class SuggestedFoldersManager @Inject constructor(
             Timber.e(e, "Refreshing suggested folders failed")
         }
     }
+
+    suspend fun deleteSuggestedFolders(folders: List<SuggestedFolder>) {
+        suggestedFoldersDao.deleteFolders(folders)
+    }
 }

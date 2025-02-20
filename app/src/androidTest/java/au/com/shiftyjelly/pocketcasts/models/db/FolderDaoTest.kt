@@ -50,6 +50,17 @@ class FolderDaoTest {
     }
 
     @Test
+    fun testInsertAllFoldersShouldStoreItCorrectly() = runTest {
+        folderDao.insertAll(listOf(fakeFolder.copy(uuid = "uuid1"), fakeFolder.copy(uuid = "uuid2")))
+
+        val foundFolder1 = folderDao.findByUuid("uuid1")
+        assertEquals(foundFolder1?.uuid, "uuid1")
+
+        val foundFolder2 = folderDao.findByUuid("uuid2")
+        assertEquals(foundFolder2?.uuid, "uuid2")
+    }
+
+    @Test
     fun deleteAllShouldRemoveAllFolders() = runTest {
         folderDao.insert(fakeFolder)
         folderDao.deleteAll()
