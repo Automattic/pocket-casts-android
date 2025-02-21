@@ -502,7 +502,7 @@ private val previewColors = listOf(
     Color(0xFFFF6663),
 )
 
-private fun Modifier.blurOrScrim(useBlur: Boolean) = this then if (useBlur) {
+private fun Modifier.blurOrScrim(useBlur: Boolean) = if (useBlur) {
     blur(80.dp, BlurredEdgeTreatment.Unbounded)
 } else {
     graphicsLayer(
