@@ -314,9 +314,8 @@ class PodcastsViewModel
     fun refreshSuggestedFolders() {
         viewModelScope.launch {
             if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS)) {
-                podcastManager.findSubscribedFlow().collect { podcasts ->
-                    suggestedFoldersManager.refreshSuggestedFolders(podcasts.map { it.uuid })
-                }
+                val uuids = podcastManager.findSubscribedUuids()
+                suggestedFoldersManager.refreshSuggestedFolders(uuids)
             }
         }
     }

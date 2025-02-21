@@ -243,7 +243,13 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
                 viewModel.userSuggestedFoldersState.collect { (signInState, state) ->
                     if (state is PodcastsViewModel.SuggestedFoldersState.Loaded) {
                         val existingModal = parentFragmentManager.findFragmentByTag("suggested_folders_paywall")
-                        if (viewModel.showSuggestedFoldersPaywallOnOpen(signInState.isSignedInAsPlusOrPatron) && existingModal == null) {
+                        if (existingModal != null && existingModal is SuggestedFoldersPaywallBottomSheet && !signInState.isSignedInAsPlusOrPatron) {
+                            // We don't want to close this modal for Paid users because this scenario might occur when the user upgrades their account
+                            // after the modal has already been opened. In this case, we want to keep the modal open so the user can tap the button
+                            // to open the suggested folders screen.
+                            existingModal.dismiss()
+                        }
+                        if (viewModel.showSuggestedFoldersPaywallOnOpen(signInState.isSignedInAsPlusOrPatron)) {
                             SuggestedFoldersPaywallBottomSheet.newInstance(state.folders()).show(parentFragmentManager, "suggested_folders_paywall")
                         }
                     }
