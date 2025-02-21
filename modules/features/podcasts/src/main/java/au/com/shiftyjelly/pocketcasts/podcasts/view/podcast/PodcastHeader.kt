@@ -213,11 +213,11 @@ private fun PodcastActions(
             )
 
             Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.alpha(alpha),
             ) {
                 Spacer(
-                    modifier = Modifier.size(24.dp),
+                    modifier = Modifier.size(32.dp),
                 )
                 ActionButton(
                     iconId = folderIcon.id,
@@ -290,12 +290,17 @@ private fun PodcastActions(
             val buttonWidth by transition.animateDp(
                 label = "buttonWidth",
                 transitionSpec = { dpSpec },
-                targetValueByState = { followed -> if (followed) 24.dp else dummyButtonWidthDp },
+                targetValueByState = { followed -> if (followed) 32.dp else dummyButtonWidthDp },
             )
             val buttonHeight by transition.animateDp(
                 label = "buttonHeight",
                 transitionSpec = { dpSpec },
-                targetValueByState = { followed -> if (followed) 24.dp else dummyButtonHeightDp },
+                targetValueByState = { followed -> if (followed) 32.dp else dummyButtonHeightDp },
+            )
+            val buttonPadding by transition.animateDp(
+                label = "buttonPadding",
+                transitionSpec = { dpSpec },
+                targetValueByState = { followed -> if (followed) 4.dp else 0.dp },
             )
             val buttonOffset by transition.animateIntOffset(
                 label = "buttonOffset",
@@ -312,9 +317,10 @@ private fun PodcastActions(
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
-                    .offset { buttonOffset }
+                    .offset { buttonOffset.copy(x = buttonOffset.x + buttonPadding.roundToPx()) }
                     .width(buttonWidth)
                     .height(buttonHeight)
+                    .padding(buttonPadding)
                     .background(backgroundColor, RoundedCornerShape(cornerRadius))
                     .border(
                         width = 2.dp,
@@ -369,6 +375,7 @@ private fun ActionButton(
         contentDescription = contentDescription,
         colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.primaryIcon02),
         modifier = Modifier
+            .padding(4.dp)
             .size(24.dp)
             .clickable(
                 indication = controlActionRipple,
