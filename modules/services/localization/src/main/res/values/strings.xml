@@ -659,6 +659,7 @@
     <string name="podcast_effects_summary_default">Default</string>
     <string name="podcast_no_season">No season</string>
     <string name="podcast_season_x">Season %d</string>
+    <string name="podcast_artwork_description">Podcast artwork</string>
     <string name="podcast_refresh_artwork">Refresh artwork</string>
     <string name="podcast_rate">Rate %s</string>
     <string name="podcast_cover_description">Cover of %s podcast</string>
