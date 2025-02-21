@@ -92,7 +92,7 @@ private fun FolderGridAdapter(color: Color, name: String, podcastUuids: List<Str
         podcastUuids = podcastUuids,
         badgeCount = badgeCount,
         badgeType = badgeType,
-        textSpacing = podcastGridLayout == PodcastGridLayoutType.LARGE_ARTWORK,
+        textSpacing = podcastGridLayout != PodcastGridLayoutType.LIST_VIEW,
         modifier = modifier.clickable { onClick() },
     )
 }
