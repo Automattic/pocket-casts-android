@@ -434,16 +434,27 @@ private fun PodcastBackgroundArtwork(
         onArtworkAvailable = onArtworkAvailable,
         modifier = Modifier
             .layout { measurable, constraints ->
+                val imageHeightPx = if (useBlurredArtwork) {
+                    imageSizePx
+                } else {
+                    imageSizePx - imageBottomOffsetPx
+                }
                 val const = constraints.copy(
                     minWidth = imageSizePx,
                     maxWidth = imageSizePx,
-                    minHeight = imageSizePx - imageBottomOffsetPx,
-                    maxHeight = imageSizePx - imageBottomOffsetPx,
+                    minHeight = imageHeightPx,
+                    maxHeight = imageHeightPx,
                 )
+
                 val placeable = measurable.measure(const)
                 val width = const.constrainWidth(placeable.width)
                 val height = const.constrainHeight(placeable.height)
-                layout(width, height) { placeable.placeRelative(0, 0) }
+                val offset = if (useBlurredArtwork) {
+                    imageBottomOffsetPx
+                } else {
+                    0
+                }
+                layout(width, height - offset) { placeable.place(0, -offset) }
             }
             .blurOrScrim(useBlur = useBlurredArtwork),
     )
