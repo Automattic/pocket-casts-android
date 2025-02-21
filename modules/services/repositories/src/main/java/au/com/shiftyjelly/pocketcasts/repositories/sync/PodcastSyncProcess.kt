@@ -62,6 +62,7 @@ import kotlin.math.roundToInt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.rx2.rxCompletable
@@ -314,7 +315,7 @@ class PodcastSyncProcess(
             emitter.onComplete()
         } else {
             ProcessLifecycleOwner.get().lifecycleScope.launch {
-                WorkManager.getInstance(context).getWorkInfoByIdFlow(workRequestId).first { it.state.isFinished }
+                WorkManager.getInstance(context).getWorkInfoByIdFlow(workRequestId).firstOrNull { it?.state?.isFinished ?: true }
                 logTime("Refresh - sync up next", startTime)
                 emitter.onComplete()
             }
