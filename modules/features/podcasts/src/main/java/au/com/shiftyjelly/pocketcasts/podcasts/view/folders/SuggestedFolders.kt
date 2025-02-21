@@ -51,6 +51,8 @@ class SuggestedFolders : BaseFragment() {
             LaunchedEffect(state) {
                 if (state is SuggestedFoldersViewModel.FoldersState.Created) {
                     (activity as FragmentHostListener).closeToRoot()
+                } else if (state is SuggestedFoldersViewModel.FoldersState.ShowConfirmationDialog) {
+                    showConfirmationDialog()
                 }
             }
 
@@ -64,7 +66,7 @@ class SuggestedFolders : BaseFragment() {
                     (activity as FragmentHostListener).closeToRoot()
                 },
                 onUseTheseFolders = {
-                    showConfirmationDialog()
+                    viewModel.onUseTheseFolders(suggestedFolders)
                 },
                 onCreateCustomFolders = {
                     viewModel.onCreateCustomFolders()
@@ -80,7 +82,7 @@ class SuggestedFolders : BaseFragment() {
             .setButtonType(ConfirmationDialog.ButtonType.Danger(getString(LR.string.suggested_folders_replace_folders_button)))
             .setTitle(getString(LR.string.suggested_folders_replace_folders_confirmation_tittle))
             .setSummary(getString(LR.string.suggested_folders_replace_folders_confirmation_description))
-            .setOnConfirm { viewModel.onUseTheseFolders(suggestedFolders) }
+            .setOnConfirm { viewModel.overrideFoldersWithSuggested(suggestedFolders) }
             .setIconId(VR.drawable.ic_replace)
             .setIconTint(UR.attr.primary_interactive_01)
             .show(childFragmentManager, "suggested-folders-confirmation-dialog")
