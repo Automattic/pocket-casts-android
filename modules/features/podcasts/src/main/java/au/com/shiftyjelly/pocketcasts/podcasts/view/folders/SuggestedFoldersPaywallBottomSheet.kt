@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
+import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -62,7 +63,7 @@ class SuggestedFoldersPaywallBottomSheet : BottomSheetDialogFragment() {
                 onUseTheseFolders = {
                     if (signInState.value?.isSignedInAsPlusOrPatron == true) {
                         dismiss()
-                        SuggestedFolders().show(parentFragmentManager, "suggested_folders")
+                        (activity as FragmentHostListener).showModal(SuggestedFolders.newInstance(suggestedFolders))
                     } else {
                         OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.Upsell(OnboardingUpgradeSource.SUGGESTED_FOLDERS))
                     }

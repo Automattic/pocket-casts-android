@@ -321,7 +321,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
     private fun createFolder() {
         val state = viewModel.suggestedFoldersState
         if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS) && state is PodcastsViewModel.SuggestedFoldersState.Loaded) {
-            SuggestedFolders.newInstance(state.folders()).show(parentFragmentManager, "suggested_folders")
+            (activity as FragmentHostListener).showModal(SuggestedFolders.newInstance(state.folders()))
         } else {
             FolderCreateFragment.newInstance(PODCASTS_LIST).show(parentFragmentManager, "create_folder_card")
         }

@@ -10,16 +10,16 @@ import androidx.core.os.BundleCompat
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
+import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
-import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
+import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
-import kotlin.getValue
 import au.com.shiftyjelly.pocketcasts.images.R as VR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
-class SuggestedFolders : BaseDialogFragment() {
+class SuggestedFolders : BaseFragment() {
 
     companion object {
         private const val FOLDERS_KEY = "folders_key"
@@ -50,7 +50,7 @@ class SuggestedFolders : BaseDialogFragment() {
 
             LaunchedEffect(state) {
                 if (state is SuggestedFoldersViewModel.FoldersState.Created) {
-                    dismiss()
+                    (activity as FragmentHostListener).closeToRoot()
                 }
             }
 
@@ -61,7 +61,7 @@ class SuggestedFolders : BaseDialogFragment() {
                 },
                 onDismiss = {
                     viewModel.onDismissed()
-                    dismiss()
+                    (activity as FragmentHostListener).closeToRoot()
                 },
                 onUseTheseFolders = {
                     showConfirmationDialog()
@@ -69,7 +69,7 @@ class SuggestedFolders : BaseDialogFragment() {
                 onCreateCustomFolders = {
                     viewModel.onCreateCustomFolders()
                     FolderCreateFragment.newInstance(source = "suggested_folders").show(parentFragmentManager, "create_folder_card")
-                    dismiss()
+                    (activity as FragmentHostListener).closeToRoot()
                 },
             )
         }
