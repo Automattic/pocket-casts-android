@@ -19,8 +19,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -37,23 +39,36 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.SubcomposeLayout
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
-import androidx.compose.ui.semantics.text
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.constrainHeight
+import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
@@ -64,7 +79,9 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.ratings.PodcastRating
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel.RatingState
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel.RatingTappedSource
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import coil.compose.rememberAsyncImagePainter
 import kotlin.math.roundToInt
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -78,6 +95,8 @@ internal fun PodcastHeader(
     isFollowed: Boolean,
     areNotificationsEnabled: Boolean,
     folderIcon: PodcastFolderIcon,
+    contentPadding: PaddingValues,
+    useBlurredArtwork: Boolean,
     onClickRating: (String, RatingTappedSource) -> Unit,
     onClickFollow: () -> Unit,
     onClickUnfollow: () -> Unit,
@@ -85,6 +104,7 @@ internal fun PodcastHeader(
     onClickNotification: () -> Unit,
     onClickSettings: () -> Unit,
     onLongClickArtwork: () -> Unit,
+    onArtworkAvailable: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     BoxWithConstraints(
@@ -92,9 +112,19 @@ internal fun PodcastHeader(
     ) {
         val expandedCoverSize = minOf(maxWidth * 0.48f, 192.dp)
 
+        PodcastBackgroundArtwork(
+            uuid = uuid,
+            useBlurredArtwork = useBlurredArtwork,
+            maxWidth = maxWidth,
+            bottomAnchor = contentPadding.calculateTopPadding() + expandedCoverSize * 0.75f,
+            onArtworkAvailable = { onArtworkAvailable(uuid) },
+        )
+
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(contentPadding),
         ) {
             PodcastImage(
                 uuid = uuid,
@@ -385,6 +415,115 @@ private fun ActionButton(
     )
 }
 
+@Composable
+private fun PodcastBackgroundArtwork(
+    uuid: String,
+    useBlurredArtwork: Boolean,
+    maxWidth: Dp,
+    bottomAnchor: Dp,
+    onArtworkAvailable: () -> Unit,
+) {
+    val imageSize = maxWidth * if (useBlurredArtwork) 1.3f else 1f
+    val imageSizePx = LocalDensity.current.run { imageSize.roundToPx() }
+
+    val imageBottomOffset = imageSize - bottomAnchor
+    val imageBottomOffsetPx = LocalDensity.current.run { imageBottomOffset.roundToPx() }
+
+    ImageOrPreview(
+        uuid = uuid,
+        onArtworkAvailable = onArtworkAvailable,
+        modifier = Modifier
+            .layout { measurable, constraints ->
+                val const = constraints.copy(
+                    minWidth = imageSizePx,
+                    maxWidth = imageSizePx,
+                    minHeight = imageSizePx - imageBottomOffsetPx,
+                    maxHeight = imageSizePx - imageBottomOffsetPx,
+                )
+                val placeable = measurable.measure(const)
+                val width = const.constrainWidth(placeable.width)
+                val height = const.constrainHeight(placeable.height)
+                layout(width, height) { placeable.placeRelative(0, 0) }
+            }
+            .blurOrScrim(useBlur = useBlurredArtwork),
+    )
+}
+
+@Composable
+private fun ImageOrPreview(
+    uuid: String,
+    onArtworkAvailable: () -> Unit,
+    modifier: Modifier,
+) {
+    if (!LocalInspectionMode.current) {
+        val context = LocalContext.current
+        val imageRequest = remember(uuid) {
+            PocketCastsImageRequestFactory(context).createForPodcast(uuid, onSuccess = onArtworkAvailable)
+        }
+        val painter = rememberAsyncImagePainter(
+            model = imageRequest,
+            contentScale = ContentScale.Crop,
+        )
+        Image(
+            painter = painter,
+            contentScale = ContentScale.Crop,
+            alignment = Alignment.BottomCenter,
+            contentDescription = null,
+            modifier = modifier,
+        )
+    } else {
+        Row(
+            modifier = modifier.fillMaxWidth(),
+        ) {
+            previewColors.forEach { color ->
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .background(color),
+                )
+            }
+        }
+    }
+}
+
+private val previewColors = listOf(
+    Color(0xFFCC99C9),
+    Color(0xFF9EC1CF),
+    Color(0xFF9EE09E),
+    Color(0xFFFDFD97),
+    Color(0xFFFEB144),
+    Color(0xFFFF6663),
+    Color(0xFFCC99C9),
+    Color(0xFF9EC1CF),
+    Color(0xFF9EE09E),
+    Color(0xFFFDFD97),
+    Color(0xFFFEB144),
+    Color(0xFFFF6663),
+)
+
+private fun Modifier.blurOrScrim(useBlur: Boolean) = this then if (useBlur) {
+    blur(80.dp, BlurredEdgeTreatment.Unbounded)
+} else {
+    graphicsLayer(
+        compositingStrategy = CompositingStrategy.Offscreen,
+    ).drawWithContent {
+        drawContent()
+        drawRect(
+            brush = Brush.verticalGradient(
+                colorStops = arrayOf(
+                    0f to Color.Transparent,
+                    0.65f to Color.Black.copy(alpha = 0.5f),
+                    1f to Color.Transparent,
+                ),
+                startY = 0f,
+                endY = Float.POSITIVE_INFINITY,
+            ),
+            blendMode = BlendMode.DstIn,
+        )
+    }
+}
+
 internal enum class PodcastFolderIcon(
     @DrawableRes val id: Int,
 ) {
@@ -429,6 +568,8 @@ private fun PodcastHeaderPreview() {
             isFollowed = isFollowed,
             areNotificationsEnabled = true,
             folderIcon = PodcastFolderIcon.BuyFolders,
+            contentPadding = PaddingValues(top = 48.dp),
+            useBlurredArtwork = false,
             onClickRating = { _, _ -> },
             onClickFollow = { isFollowed = true },
             onClickUnfollow = { isFollowed = false },
@@ -436,6 +577,7 @@ private fun PodcastHeaderPreview() {
             onClickNotification = {},
             onClickSettings = {},
             onLongClickArtwork = {},
+            onArtworkAvailable = {},
         )
     }
 }
