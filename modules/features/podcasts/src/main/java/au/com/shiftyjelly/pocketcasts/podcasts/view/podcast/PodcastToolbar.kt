@@ -191,13 +191,7 @@ private fun toolbarColors(progress: Float): PodcastToolbarColors {
 
     return remember(progress) {
         PodcastToolbarColors(
-            backgroundColor = Color(
-                ColorUtils.blendARGB(
-                    backgroundColor.toArgb(),
-                    Color.Transparent.toArgb(),
-                    progress,
-                ),
-            ),
+            backgroundColor = backgroundColor.copy(alpha = 1f - progress),
             titleColor = Color(
                 ColorUtils.blendARGB(
                     titleColor.toArgb(),

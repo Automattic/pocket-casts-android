@@ -53,6 +53,8 @@ dependencies {
     implementation(libs.compose.material)
     implementation(libs.compose.material.icons.extended)
     implementation(libs.compose.ui)
+    implementation(libs.coil.base)
+    implementation(libs.coil.compose)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.coroutines.core)
     implementation(libs.coroutines.rx2)
