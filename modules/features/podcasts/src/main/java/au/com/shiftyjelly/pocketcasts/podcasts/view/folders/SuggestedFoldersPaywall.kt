@@ -64,7 +64,6 @@ fun SuggestedFoldersPaywall(
         modifier = modifier
             .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal))
             .wrapContentSize()
-            .padding(horizontal = 16.dp)
             .padding(top = 8.dp, bottom = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -94,19 +93,19 @@ fun SuggestedFoldersPaywall(
             text = stringResource(LR.string.suggested_folders_paywall_tittle),
             fontWeight = FontWeight.W600,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(bottom = 12.dp),
+            modifier = Modifier.padding(bottom = 12.dp).padding(horizontal = 16.dp),
         )
 
         TextH50(
             text = stringResource(LR.string.suggested_folders_paywall_subtitle),
             color = MaterialTheme.theme.colors.primaryText02,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(bottom = 12.dp),
+            modifier = Modifier.padding(bottom = 12.dp).padding(horizontal = 16.dp),
         )
 
         RowButton(
             text = stringResource(LR.string.suggested_folders_use_these_folders_button),
-            modifier = Modifier.padding(bottom = 16.dp),
+            modifier = Modifier.padding(bottom = 16.dp).padding(horizontal = 16.dp),
             textColor = MaterialTheme.theme.colors.primaryInteractive02,
             fontSize = 18.sp,
             fontWeight = FontWeight.W600,
@@ -119,7 +118,7 @@ fun SuggestedFoldersPaywall(
 
         RowOutlinedButton(
             text = stringResource(id = LR.string.maybe_later),
-            modifier = Modifier.padding(bottom = 16.dp),
+            modifier = Modifier.padding(bottom = 16.dp).padding(horizontal = 16.dp),
             onClick = onMaybeLater,
             includePadding = false,
             colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.theme.colors.primaryIcon01, backgroundColor = Color.Transparent),
@@ -156,6 +155,7 @@ private fun SuggestedFoldersPagePreview(@PreviewParameter(ThemePreviewParameterP
             folders = listOf(
                 Folder("Folder 1", listOf("2e61ba20-50a9-0135-902b-63f4b61a9224", "2e61ba20-50a9-0135-902b-63f4b61a9224"), 1),
                 Folder("Folder 2", listOf("2e61ba20-50a9-0135-902b-63f4b61a9224", "2e61ba20-50a9-0135-902b-63f4b61a9224"), 2),
+                Folder("Folder 3", listOf("2e61ba20-50a9-0135-902b-63f4b61a9224", "2e61ba20-50a9-0135-902b-63f4b61a9224"), 5),
             ),
             onUseTheseFolders = {},
             onMaybeLater = {},

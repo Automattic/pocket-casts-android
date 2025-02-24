@@ -60,7 +60,7 @@ class SuggestedFoldersViewModelTest {
             Folder("Tech Podcasts", listOf("podcastuuid1"), 1),
         )
 
-        viewModel.onUseTheseFolders(folders)
+        viewModel.overrideFoldersWithSuggested(folders)
 
         val newFolders: List<SuggestedFolderDetails> = folders.map {
             SuggestedFolderDetails(

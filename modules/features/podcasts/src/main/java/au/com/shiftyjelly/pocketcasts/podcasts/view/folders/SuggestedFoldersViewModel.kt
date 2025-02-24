@@ -36,9 +36,23 @@ class SuggestedFoldersViewModel @Inject constructor(
     }
 
     fun onUseTheseFolders(folders: List<Folder>) {
-        _state.value = FoldersState.Creating
         analyticsTracker.track(AnalyticsEvent.SUGGESTED_FOLDERS_MODAL_USE_THESE_FOLDERS_TAPPED)
+        viewModelScope.launch {
+            val currentFoldersCount = folderManager.countFolders()
+            if (currentFoldersCount > 0) {
+                _state.value = FoldersState.ShowConfirmationDialog
+            } else {
+                overrideFoldersWithSuggested(folders)
+            }
+        }
+    }
 
+    fun onCreateCustomFolders() {
+        analyticsTracker.track(AnalyticsEvent.SUGGESTED_FOLDERS_MODAL_CREATE_CUSTOM_FOLDERS_TAPPED)
+    }
+
+    fun overrideFoldersWithSuggested(folders: List<Folder>) {
+        _state.value = FoldersState.Creating
         viewModelScope.launch {
             val newFolders = folders.map {
                 SuggestedFolderDetails(
@@ -56,13 +70,10 @@ class SuggestedFoldersViewModel @Inject constructor(
         }
     }
 
-    fun onCreateCustomFolders() {
-        analyticsTracker.track(AnalyticsEvent.SUGGESTED_FOLDERS_MODAL_CREATE_CUSTOM_FOLDERS_TAPPED)
-    }
-
     sealed class FoldersState {
         data object Idle : FoldersState()
         data object Creating : FoldersState()
         data object Created : FoldersState()
+        data object ShowConfirmationDialog : FoldersState()
     }
 }
