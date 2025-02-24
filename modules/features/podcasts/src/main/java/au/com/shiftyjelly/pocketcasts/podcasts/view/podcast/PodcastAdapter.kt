@@ -947,6 +947,8 @@ class PodcastAdapter(
                     PodcastHeader(
                         uuid = podcast.uuid,
                         title = podcast.title,
+                        category = podcast.getFirstCategory(itemView.context.resources),
+                        author = podcast.author,
                         rating = ratingState,
                         isFollowed = podcast.isSubscribed,
                         areNotificationsEnabled = podcast.isShowNotifications,
@@ -963,7 +965,7 @@ class PodcastAdapter(
                             bottom = 16.dp,
                         ),
                         useBlurredArtwork = useBlurredArtwork,
-                        onClickRating = onClickRating,
+                        onClickRating = { source -> onClickRating(podcast.uuid, source) },
                         onClickFollow = onClickFollow,
                         onClickUnfollow = onClickUnfollow,
                         onClickFolder = onClickFolder,
@@ -971,7 +973,7 @@ class PodcastAdapter(
                         onClickSettings = onClickSettings,
                         onToggleHeader = onToggleHeader,
                         onLongClickArtwork = onLongClickArtwork,
-                        onArtworkAvailable = onArtworkAvailable,
+                        onArtworkAvailable = { onArtworkAvailable(podcast.uuid) },
                     )
                 }
             }

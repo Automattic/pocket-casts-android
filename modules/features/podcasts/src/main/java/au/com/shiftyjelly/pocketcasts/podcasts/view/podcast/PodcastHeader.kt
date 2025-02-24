@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.podcast
 
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.EaseOutCubic
 import androidx.compose.animation.core.VisibilityThreshold
@@ -12,6 +13,10 @@ import androidx.compose.animation.core.animateIntOffset
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -77,14 +82,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.ratings.PodcastRating
@@ -102,6 +110,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 internal fun PodcastHeader(
     uuid: String,
     title: String,
+    category: String,
+    author: String,
     rating: RatingState,
     isFollowed: Boolean,
     areNotificationsEnabled: Boolean,
@@ -109,7 +119,7 @@ internal fun PodcastHeader(
     isHeaderExpanded: Boolean,
     contentPadding: PaddingValues,
     useBlurredArtwork: Boolean,
-    onClickRating: (String, RatingTappedSource) -> Unit,
+    onClickRating: (RatingTappedSource) -> Unit,
     onClickFollow: () -> Unit,
     onClickUnfollow: () -> Unit,
     onClickFolder: () -> Unit,
@@ -117,7 +127,7 @@ internal fun PodcastHeader(
     onClickSettings: () -> Unit,
     onToggleHeader: () -> Unit,
     onLongClickArtwork: () -> Unit,
-    onArtworkAvailable: (String) -> Unit,
+    onArtworkAvailable: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     BoxWithConstraints(
@@ -135,7 +145,7 @@ internal fun PodcastHeader(
             useBlurredArtwork = useBlurredArtwork,
             maxWidth = maxWidth,
             bottomAnchor = contentPadding.calculateTopPadding() + coverSize * 0.75f,
-            onArtworkAvailable = { onArtworkAvailable(uuid) },
+            onArtworkAvailable = onArtworkAvailable,
         )
 
         Column(
@@ -161,8 +171,10 @@ internal fun PodcastHeader(
             )
             PodcastControls(
                 title = title,
+                category = category,
+                author = author,
                 rating = rating,
-                onClickRating = { source -> onClickRating(uuid, source) },
+                onClickRating = onClickRating,
                 isFollowed = isFollowed,
                 areNotificationsEnabled = areNotificationsEnabled,
                 folderIcon = folderIcon,
@@ -181,6 +193,8 @@ internal fun PodcastHeader(
 @Composable
 private fun PodcastControls(
     title: String,
+    category: String,
+    author: String,
     rating: RatingState,
     isFollowed: Boolean,
     areNotificationsEnabled: Boolean,
@@ -204,7 +218,21 @@ private fun PodcastControls(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxWidth(),
     ) {
-        // TODO: Categories list
+        AnimatedVisibility(
+            visible = isHeaderExpanded,
+            enter = categoriesEnterTransition,
+            exit = categoriesExitTransition,
+        ) {
+            val text = remember(category, author) {
+                listOf(category, author).filter(String::isNotBlank).joinToString(separator = " · ")
+            }
+            TextP60(
+                text = text,
+                color = MaterialTheme.theme.colors.primaryText02,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(bottom = 16.dp),
+            )
+        }
         TextH20(
             text = buildAnnotatedString {
                 append(title)
@@ -617,6 +645,26 @@ private val coverSizeSpec = spring<Dp>(
     stiffness = 100f,
     visibilityThreshold = Dp.VisibilityThreshold,
 )
+private val categoriesEnterTransition = run {
+    val fadeIn = fadeIn(
+        animationSpec = spring(stiffness = 200f, visibilityThreshold = 0.001f),
+    )
+    val expand = expandVertically(
+        animationSpec = spring(stiffness = 200f, visibilityThreshold = IntSize.VisibilityThreshold),
+        expandFrom = Alignment.Top,
+    )
+    fadeIn + expand
+}
+private val categoriesExitTransition = run {
+    val fadeOut = fadeOut(
+        animationSpec = spring(stiffness = 200f, visibilityThreshold = 0.001f),
+    )
+    val shrink = shrinkVertically(
+        animationSpec = spring(stiffness = 200f, visibilityThreshold = IntSize.VisibilityThreshold),
+        shrinkTowards = Alignment.Top,
+    )
+    fadeOut + shrink
+}
 private val chevronRotationSpec = spring<Float>(
     stiffness = 200f,
     visibilityThreshold = 0.001f,
@@ -637,43 +685,49 @@ private val previewColors = listOf(
     Color(0xFFFF6663),
 )
 
-@Preview
+@Preview(device = Devices.PortraitRegular)
 @Composable
 private fun PodcastHeaderPreview() {
     var isFollowed by remember { mutableStateOf(false) }
     var isHeaderExpanded by remember { mutableStateOf(true) }
 
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
-        PodcastHeader(
-            uuid = "uuid",
-            title = "The Pitchfork Review",
-            rating = RatingState.Loaded(
-                ratings = PodcastRatings(
-                    podcastUuid = "uuid",
-                    average = 3.5,
-                    total = 42_000,
+        Column(
+            modifier = Modifier.fillMaxSize(),
+        ) {
+            PodcastHeader(
+                uuid = "uuid",
+                title = "The Pitchfork Review",
+                category = "Music",
+                author = "Pitchfork",
+                rating = RatingState.Loaded(
+                    ratings = PodcastRatings(
+                        podcastUuid = "uuid",
+                        average = 3.5,
+                        total = 42_000,
+                    ),
                 ),
-            ),
-            isFollowed = isFollowed,
-            areNotificationsEnabled = true,
-            folderIcon = PodcastFolderIcon.BuyFolders,
-            isHeaderExpanded = isHeaderExpanded,
-            contentPadding = PaddingValues(
-                top = 48.dp,
-                start = 16.dp,
-                end = 16.dp,
-                bottom = 16.dp,
-            ),
-            useBlurredArtwork = false,
-            onClickRating = { _, _ -> },
-            onClickFollow = { isFollowed = true },
-            onClickUnfollow = { isFollowed = false },
-            onClickFolder = {},
-            onClickNotification = {},
-            onClickSettings = {},
-            onToggleHeader = { isHeaderExpanded = !isHeaderExpanded },
-            onLongClickArtwork = {},
-            onArtworkAvailable = {},
-        )
+                isFollowed = isFollowed,
+                areNotificationsEnabled = true,
+                folderIcon = PodcastFolderIcon.BuyFolders,
+                isHeaderExpanded = isHeaderExpanded,
+                contentPadding = PaddingValues(
+                    top = 48.dp,
+                    start = 16.dp,
+                    end = 16.dp,
+                    bottom = 16.dp,
+                ),
+                useBlurredArtwork = false,
+                onClickRating = {},
+                onClickFollow = { isFollowed = true },
+                onClickUnfollow = { isFollowed = false },
+                onClickFolder = {},
+                onClickNotification = {},
+                onClickSettings = {},
+                onToggleHeader = { isHeaderExpanded = !isHeaderExpanded },
+                onLongClickArtwork = {},
+                onArtworkAvailable = {},
+            )
+        }
     }
 }
