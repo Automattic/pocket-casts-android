@@ -17,12 +17,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.TextView
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.text.AnnotatedString
@@ -128,7 +126,7 @@ private val differ: DiffUtil.ItemCallback<Any> = object : DiffUtil.ItemCallback<
 
 class PodcastAdapter(
     var fromListUuid: String?,
-    private val isHeaderRedesigned: Boolean,
+    private val headerType: PodcastAdapter.HeaderType,
     private val context: Context,
     private val downloadManager: DownloadManager,
     private val playbackManager: PlaybackManager,
@@ -161,6 +159,7 @@ class PodcastAdapter(
     private val onBookmarkPlayClicked: (Bookmark) -> Unit,
     private val onHeadsetSettingsClicked: () -> Unit,
     private val onClickRating: (String, RatingTappedSource) -> Unit,
+    private val onArtworkAvailable: (String) -> Unit,
     private val sourceView: SourceView,
 ) : LargeListAdapter<Any, RecyclerView.ViewHolder>(1500, differ) {
 
@@ -194,6 +193,12 @@ class PodcastAdapter(
 
     object BookmarkUpsell
     object NoBookmarkMessage
+
+    enum class HeaderType {
+        SolidColor,
+        Blur,
+        Scrim,
+    }
 
     companion object {
         private const val VIEW_TYPE_TABS = 100
@@ -233,10 +238,12 @@ class PodcastAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
-            VIEW_TYPE_PODCAST_HEADER -> if (isHeaderRedesigned) {
-                PodcastHeaderViewHolder(
+            VIEW_TYPE_PODCAST_HEADER -> when (headerType) {
+                HeaderType.SolidColor -> PodcastViewHolder(AdapterPodcastHeaderBinding.inflate(inflater, parent, false), this)
+                HeaderType.Blur, HeaderType.Scrim -> PodcastHeaderViewHolder(
                     context = parent.context,
                     theme = theme,
+                    useBlurredArtwork = headerType == HeaderType.Blur,
                     onClickRating = onClickRating,
                     onClickFollow = onSubscribeClicked,
                     onClickUnfollow = { onUnsubscribeClicked { } },
@@ -246,9 +253,8 @@ class PodcastAdapter(
                     onLongClickArtwork = {
                         onArtworkLongClicked { notifyItemChanged(0) }
                     },
+                    onArtworkAvailable = onArtworkAvailable,
                 )
-            } else {
-                PodcastViewHolder(AdapterPodcastHeaderBinding.inflate(inflater, parent, false), this)
             }
 
             VIEW_TYPE_TABS -> TabsViewHolder(ComposeView(parent.context), theme)
@@ -901,6 +907,7 @@ class PodcastAdapter(
     private class PodcastHeaderViewHolder(
         context: Context,
         private val theme: Theme,
+        private val useBlurredArtwork: Boolean,
         private val onClickRating: (String, RatingTappedSource) -> Unit,
         private val onClickFollow: () -> Unit,
         private val onClickUnfollow: () -> Unit,
@@ -908,6 +915,7 @@ class PodcastAdapter(
         private val onClickNotification: () -> Unit,
         private val onClickSettings: () -> Unit,
         private val onLongClickArtwork: () -> Unit,
+        private val onArtworkAvailable: (String) -> Unit,
     ) : RecyclerView.ViewHolder(ComposeView(context)) {
         private val composeView get() = itemView as ComposeView
 
@@ -940,6 +948,12 @@ class PodcastAdapter(
                             podcast.folderUuid != null -> PodcastFolderIcon.AddedToFolder
                             else -> PodcastFolderIcon.NotInFolder
                         },
+                        contentPadding = PaddingValues(
+                            top = statusBarPadding + 40.dp, // Eyeball the position inside app bar
+                            start = 16.dp,
+                            end = 16.dp,
+                        ),
+                        useBlurredArtwork = useBlurredArtwork,
                         onClickRating = onClickRating,
                         onClickFollow = onClickFollow,
                         onClickUnfollow = onClickUnfollow,
@@ -947,12 +961,7 @@ class PodcastAdapter(
                         onClickNotification = onClickNotification,
                         onClickSettings = onClickSettings,
                         onLongClickArtwork = onLongClickArtwork,
-                        modifier = Modifier
-                            .padding(
-                                top = statusBarPadding + 40.dp, // Eyeball the position inside app bar
-                                start = 16.dp,
-                                end = 16.dp,
-                            ),
+                        onArtworkAvailable = onArtworkAvailable,
                     )
                 }
             }

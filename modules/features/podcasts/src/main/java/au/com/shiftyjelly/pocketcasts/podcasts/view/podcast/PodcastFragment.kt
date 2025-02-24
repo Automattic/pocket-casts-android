@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.podcast
 
+import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.LayoutInflater
@@ -67,6 +68,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.databinding.FragmentPodcastRedesi
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.FolderChooserFragment
+import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastAdapter.HeaderType
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcasts.PodcastsFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.EpisodeListBookmarkViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel
@@ -78,6 +80,7 @@ import au.com.shiftyjelly.pocketcasts.reimagine.podcast.SharePodcastFragment
 import au.com.shiftyjelly.pocketcasts.reimagine.timestamp.ShareEpisodeTimestampFragment
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
+import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageColorAnalyzer
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -202,6 +205,9 @@ class PodcastFragment : BaseFragment() {
 
     @Inject
     lateinit var sharingClient: SharingClient
+
+    @Inject
+    lateinit var colorAnalyzer: PodcastImageColorAnalyzer
 
     private val viewModel: PodcastViewModel by viewModels()
     private val ratingsViewModel: PodcastRatingsViewModel by viewModels()
@@ -681,6 +687,9 @@ class PodcastFragment : BaseFragment() {
         }
     }
 
+    var currentToolbarColor: Color? = null
+    var artworkDominantColor: Color? = null
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -691,15 +700,8 @@ class PodcastFragment : BaseFragment() {
             container = container,
             isHeaderRedesigned = args.isHeaderRedesigned,
             onToolbarColorChange = { color ->
-                val currentStatusBarColor = statusBarIconColor
-                statusBarIconColor = when {
-                    color.alpha <= 0.5f -> StatusBarIconColor.Light
-                    color.luminance() > 0.5f -> StatusBarIconColor.Dark
-                    else -> StatusBarIconColor.Light
-                }
-                if (currentStatusBarColor != statusBarIconColor) {
-                    updateStatusBar()
-                }
+                currentToolbarColor = color
+                updateStausBarForBackground()
             },
         ).also { binding = it }
 
@@ -725,7 +727,7 @@ class PodcastFragment : BaseFragment() {
 
         adapter = PodcastAdapter(
             context = requireContext(),
-            isHeaderRedesigned = binding.isHeaderRedesigned,
+            headerType = binding.headerType,
             downloadManager = downloadManager,
             playbackManager = playbackManager,
             upNextQueue = upNextQueue,
@@ -776,6 +778,12 @@ class PodcastFragment : BaseFragment() {
                     source = source,
                 )
             },
+            onArtworkAvailable = { uuid ->
+                viewLifecycleOwner.lifecycleScope.launch {
+                    artworkDominantColor = colorAnalyzer.getArtworkDominantColor(uuid)
+                    updateStausBarForBackground()
+                }
+            },
         ).apply {
             stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
         }
@@ -801,6 +809,11 @@ class PodcastFragment : BaseFragment() {
             viewLifecycleOwner.lifecycleScope.launch {
                 viewModel.onRefreshPodcast(PodcastViewModel.RefreshType.PULL_TO_REFRESH)
             }
+        }
+
+        val progressSpinnerPadding = 16.dpToPx(requireContext())
+        binding.toolbar.addOnLayoutChangeListener { view, _, _, _, _, _, _, _, _ ->
+            binding.swipeRefreshLayout.setProgressViewOffset(false, 0, view.height + progressSpinnerPadding)
         }
 
         playButtonListener.source = SourceView.PODCAST_SCREEN
@@ -1251,6 +1264,46 @@ class PodcastFragment : BaseFragment() {
             0
         }
 
+    private fun updateStausBarForBackground() {
+        val headerType = binding?.headerType ?: return
+        val toolbarColor = currentToolbarColor ?: return
+
+        val currentStatusBarColor = statusBarIconColor
+        statusBarIconColor = when (headerType) {
+            HeaderType.SolidColor -> getStatusBarColorForSolidColor(toolbarColor)
+            HeaderType.Blur -> getStatusBarColorForBlur(toolbarColor, artworkDominantColor)
+            HeaderType.Scrim -> getStatusBarColorForTheme()
+        }
+
+        if (currentStatusBarColor != statusBarIconColor) {
+            updateStatusBar()
+        }
+    }
+
+    private fun getStatusBarColorForSolidColor(backgroundColor: Color) = if (backgroundColor.luminance() > 0.5f) {
+        StatusBarIconColor.Dark
+    } else {
+        StatusBarIconColor.Light
+    }
+
+    private fun getStatusBarColorForTheme() = if (theme.isLightTheme) {
+        StatusBarIconColor.Dark
+    } else {
+        StatusBarIconColor.Light
+    }
+
+    private fun getStatusBarColorForBlur(
+        toolbarColor: Color,
+        artworkColor: Color?,
+    ) = when (toolbarColor.alpha) {
+        in Float.NEGATIVE_INFINITY..0.5f -> when (val artworkLuminance = artworkColor?.luminance()) {
+            null -> getStatusBarColorForTheme()
+            in Float.NEGATIVE_INFINITY..0.6f -> StatusBarIconColor.Light
+            else -> StatusBarIconColor.Dark
+        }
+        else -> getStatusBarColorForSolidColor(toolbarColor.copy(alpha = 1f))
+    }
+
     @Parcelize
     data class PodcastFragmentArgs(
         val podcastUuid: String,
@@ -1265,6 +1318,7 @@ private sealed interface BindingWrapper {
     val root: LinearLayout
     val multiSelectEpisodesToolbar: MultiSelectToolbar
     val multiSelectBookmarksToolbar: MultiSelectToolbar
+    val toolbar: View
     val swipeRefreshLayout: SwipeRefreshLayout
     val episodesRecyclerView: RecyclerView
     val loading: ProgressBar
@@ -1273,10 +1327,14 @@ private sealed interface BindingWrapper {
     val btnRetry: MaterialButton
     val composeTooltipHost: ComposeView
 
-    val isHeaderRedesigned
+    val headerType
         get() = when (this) {
-            is RedesignBindingWrapper -> true
-            is RegularBindingWrapper -> false
+            is RedesignBindingWrapper -> if (Build.VERSION.SDK_INT >= 31) {
+                HeaderType.Blur
+            } else {
+                HeaderType.Scrim
+            }
+            is RegularBindingWrapper -> HeaderType.SolidColor
         }
 
     fun setUpToolbar(
@@ -1374,6 +1432,9 @@ private sealed interface BindingWrapper {
         override val root: LinearLayout
             get() = binding.root
 
+        override val toolbar: View
+            get() = binding.toolbar
+
         override val multiSelectEpisodesToolbar: MultiSelectToolbar
             get() = binding.multiSelectEpisodesToolbar
 
@@ -1465,6 +1526,9 @@ private sealed interface BindingWrapper {
 
         override val root: LinearLayout
             get() = binding.root
+
+        override val toolbar: View
+            get() = binding.toolbar
 
         override val multiSelectEpisodesToolbar: MultiSelectToolbar
             get() = binding.multiSelectEpisodesToolbar
