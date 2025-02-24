@@ -50,7 +50,7 @@ class SuggestedFolders : BaseFragment() {
 
             LaunchedEffect(state) {
                 if (state is SuggestedFoldersViewModel.FoldersState.Created) {
-                    (activity as FragmentHostListener).closeToRoot()
+                    (activity as FragmentHostListener).closeModal(this@SuggestedFolders)
                 } else if (state is SuggestedFoldersViewModel.FoldersState.ShowConfirmationDialog) {
                     showConfirmationDialog()
                 }
@@ -63,7 +63,7 @@ class SuggestedFolders : BaseFragment() {
                 },
                 onDismiss = {
                     viewModel.onDismissed()
-                    (activity as FragmentHostListener).closeToRoot()
+                    (activity as FragmentHostListener).closeModal(this)
                 },
                 onUseTheseFolders = {
                     viewModel.onUseTheseFolders(suggestedFolders)
@@ -71,7 +71,7 @@ class SuggestedFolders : BaseFragment() {
                 onCreateCustomFolders = {
                     viewModel.onCreateCustomFolders()
                     FolderCreateFragment.newInstance(source = "suggested_folders").show(parentFragmentManager, "create_folder_card")
-                    (activity as FragmentHostListener).closeToRoot()
+                    (activity as FragmentHostListener).closeModal(this)
                 },
             )
         }
