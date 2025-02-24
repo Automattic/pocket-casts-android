@@ -6,9 +6,14 @@ import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.EaseOutCubic
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.animateIntOffset
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -179,7 +184,7 @@ private fun PodcastControls(
             text = title,
             textAlign = TextAlign.Center,
         )
-        AnimatedPodcastRating(
+        PodcastRatingOrSpacing(
             rating = rating,
             onClickRating = onClickRating,
         )
@@ -197,23 +202,44 @@ private fun PodcastControls(
 }
 
 @Composable
-private fun AnimatedPodcastRating(
+private fun PodcastRatingOrSpacing(
     rating: RatingState,
     onClickRating: (RatingTappedSource) -> Unit,
 ) {
-    AnimatedContent(
-        targetState = rating,
-    ) { state ->
-        when (state) {
-            is RatingState.Loaded -> PodcastRating(
-                state = state,
-                onClick = onClickRating,
+    SubcomposeLayout { constraints ->
+        val anyRating = RatingState.Loaded(
+            ratings = PodcastRatings(
+                podcastUuid = "",
+                average = null,
+                total = null,
+            )
+        )
+        val dummyRating = subcompose("dummyRating") {
+            PodcastRating(
+                state = anyRating,
+                onClick = {},
                 modifier = Modifier.padding(vertical = 8.dp),
             )
+        }[0].measure(constraints)
 
-            is RatingState.Loading, is RatingState.Error -> Spacer(
-                modifier = Modifier.height(16.dp),
-            )
+        val width = dummyRating.width.toDp()
+        val height = dummyRating.height.toDp()
+
+        val ratingUi = subcompose("rating") {
+            when (rating) {
+                is RatingState.Loaded -> PodcastRating(
+                    state = rating,
+                    onClick = onClickRating,
+                    modifier = Modifier.padding(vertical = 8.dp),
+                )
+                is RatingState.Error, is RatingState.Loading -> Spacer(
+                    modifier = Modifier.size(width, height)
+                )
+            }
+        }[0].measure(constraints)
+
+        layout(ratingUi.width, ratingUi.height) {
+            ratingUi.place(0, 0)
         }
     }
 }
