@@ -953,16 +953,7 @@ abstract class AppDatabase : RoomDatabase() {
         }
 
         val MIGRATION_108_109 = addMigration(108, 109) { database ->
-            with(database) {
-                beginTransaction()
-                try {
-                    execSQL("ALTER TABLE podcasts ADD COLUMN is_header_expanded INTEGER NOT NULL DEFAULT 1")
-                    execSQL("UPDATE podcasts SET is_header_expanded = 0 WHERE subscribed IS NOT 0")
-                    setTransactionSuccessful()
-                } finally {
-                    endTransaction()
-                }
-            }
+            database.execSQL("ALTER TABLE podcasts ADD COLUMN is_header_expanded INTEGER NOT NULL DEFAULT 1")
         }
 
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
