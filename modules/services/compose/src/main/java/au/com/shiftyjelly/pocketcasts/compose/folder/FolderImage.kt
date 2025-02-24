@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -47,7 +48,7 @@ private val gradientBottom = Color(0x33000000)
 private val topPodcastImageGradient = listOf(Color(0x00000000), Color(0x16000000))
 private val bottomPodcastImageGradient = listOf(Color(0x16000000), Color(0x33000000))
 private const val paddingImageRatio = 4f / 120f
-private const val imageSizeRatio = 44f / 120f
+private const val imageSizeRatio = 38f / 120f
 
 @Composable
 fun FolderImage(
@@ -88,6 +89,7 @@ fun FolderImage(
             val podcastSize = (constraints.maxWidth.value * imageSizeRatio).dp
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 val imagePadding = (constraints.maxWidth.value * paddingImageRatio).dp
@@ -127,13 +129,13 @@ fun FolderImage(
                 }
                 if (name.isNotBlank()) {
                     if (textSpacing) {
-                        Spacer(modifier = Modifier.height(imagePadding))
+                        Spacer(modifier = Modifier.height(imagePadding * 2))
                     }
                     Text(
                         text = name,
                         color = Color.White,
                         fontSize = fontSize,
-                        fontWeight = FontWeight(500),
+                        fontWeight = FontWeight.W700,
                         letterSpacing = 0.25.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -151,6 +153,7 @@ fun FolderImage(
                                 trim = LineHeightStyle.Trim.Both,
                             ),
                         ),
+                        modifier = Modifier.padding(horizontal = 2.dp),
                     )
                 }
             }

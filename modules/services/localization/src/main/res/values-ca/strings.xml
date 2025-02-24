@@ -296,8 +296,6 @@ Language: ca
     <string name="onboarding_plus_recurring_after_intro_offer">Pagament recurrent a %s</string>
     <string name="half_price_first_year">50% de descompte en el teu primer any</string>
     <string name="plus_offer_duration">Oferta %s</string>
-    <string name="report_subtitle">Informar de contingut inapropiat</string>
-    <string name="report">Reportar</string>
     <string name="onboarding_plus_feature_folders_and_bookmarks_title">Carpetes i marcadors</string>
     <string name="onboarding_plus_feature_watch_playback">Aplicacions d\'Apple Watch i de Wear OS</string>
     <string name="widget">Giny</string>

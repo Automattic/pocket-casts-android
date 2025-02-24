@@ -1000,10 +1000,6 @@ class SettingsImpl @Inject constructor(
         return getRemoteConfigLong(FirebaseConfig.EPISODE_SEARCH_DEBOUNCE_MS)
     }
 
-    override fun getReportViolationUrl(): String {
-        return firebaseRemoteConfig.getString(FirebaseConfig.REPORT_VIOLATION_URL)
-    }
-
     override fun getSlumberStudiosPromoCode(): String {
         return firebaseRemoteConfig.getString(FirebaseConfig.SLUMBER_STUDIOS_YEARLY_PROMO_CODE)
     }

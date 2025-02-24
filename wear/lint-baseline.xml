@@ -2338,6 +2338,28 @@
 
     <issue
         id="UnusedResources"
+        message="The resource `R.color.coolgrey_50` appears to be unused"
+        errorLine1="    &lt;color name=&quot;coolgrey_50&quot;>#B8C3C9&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../modules/services/ui/src/main/res/values/colors.xml"
+            line="103"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.coolgrey_60` appears to be unused"
+        errorLine1="    &lt;color name=&quot;coolgrey_60&quot;>#8F97A4&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../modules/services/ui/src/main/res/values/colors.xml"
+            line="104"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
         message="The resource `R.color.coolgrey_70` appears to be unused"
         errorLine1="    &lt;color name=&quot;coolgrey_70&quot;>#686C74&lt;/color>"
         errorLine2="           ~~~~~~~~~~~~~~~~~~">
@@ -2538,6 +2560,18 @@
         id="UnusedResources"
         message="The resource `R.color.darkgrey_50` appears to be unused"
         errorLine1="    &lt;color name=&quot;darkgrey_50&quot;>#222427&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../modules/services/ui/src/main/res/values/colors.xml"
+            line="122"
+            column="12"/>
+    </issue>
+
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.darkgrey_60` appears to be unused"
+        errorLine1="    &lt;color name=&quot;darkgrey_60&quot;>#1A1C1E&lt;/color>"
         errorLine2="           ~~~~~~~~~~~~~~~~~~">
         <location
             file="../modules/services/ui/src/main/res/values/colors.xml"

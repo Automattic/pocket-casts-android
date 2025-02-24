@@ -81,7 +81,7 @@ class ShelfSharedViewModel @Inject constructor(
     ).stateIn(
         viewModelScope,
         SharingStarted.Lazily,
-        UiState(reportUrl = settings.getReportViolationUrl()),
+        UiState(),
     )
 
     private fun createUiState(
@@ -93,7 +93,6 @@ class ShelfSharedViewModel @Inject constructor(
             shelfItems = shelfItems
                 .filter { item ->
                     when (item) {
-                        ShelfItem.Report -> FeatureFlag.isEnabled(Feature.REPORT_VIOLATION)
                         ShelfItem.Transcript -> FeatureFlag.isEnabled(Feature.TRANSCRIPTS)
                         else -> true
                     }
@@ -274,13 +273,6 @@ class ShelfSharedViewModel @Inject constructor(
         }
     }
 
-    fun onReportClick(source: ShelfItemSource) {
-        trackShelfAction(ShelfItem.Report, source)
-        viewModelScope.launch {
-            _navigationState.emit(NavigationState.ShowReportViolation(settings.getReportViolationUrl()))
-        }
-    }
-
     fun onMoreClick() {
         track(AnalyticsEvent.PLAYER_SHELF_OVERFLOW_MENU_SHOWN)
         viewModelScope.launch {
@@ -314,7 +306,6 @@ class ShelfSharedViewModel @Inject constructor(
     data class UiState(
         val shelfItems: List<ShelfItem> = emptyList(),
         val episode: BaseEpisode? = null,
-        val reportUrl: String,
     ) {
         val playerShelfItems: List<ShelfItem>
             get() = shelfItems.take(MIN_SHELF_ITEMS_SIZE)
@@ -365,7 +356,6 @@ class ShelfSharedViewModel @Inject constructor(
         data object ShowMoreActions : NavigationState
         data object ShowAddBookmark : NavigationState
         data class StartUpsellFlow(val source: OnboardingUpgradeSource) : NavigationState
-        data class ShowReportViolation(val reportUrl: String) : NavigationState
     }
 
     sealed interface SnackbarMessage {

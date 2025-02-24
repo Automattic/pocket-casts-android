@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.compose.runtime.collectAsState
+import androidx.core.os.BundleCompat
 import androidx.core.view.doOnLayout
 import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
@@ -22,10 +24,27 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class SuggestedFoldersPaywallBottomSheet : BottomSheetDialogFragment() {
 
+    companion object {
+        private const val FOLDERS_KEY = "folders_key"
+
+        fun newInstance(folders: List<Folder>): SuggestedFoldersPaywallBottomSheet {
+            return SuggestedFoldersPaywallBottomSheet().apply {
+                arguments = Bundle().apply {
+                    putParcelableArrayList(FOLDERS_KEY, ArrayList(folders))
+                }
+            }
+        }
+    }
+
     @Inject
     lateinit var theme: Theme
 
     private val viewModel: SuggestedFoldersPaywallViewModel by viewModels<SuggestedFoldersPaywallViewModel>()
+
+    private val suggestedFolders
+        get() = requireNotNull(BundleCompat.getParcelableArrayList(requireArguments(), FOLDERS_KEY, Folder::class.java)) {
+            "Missing input parameters"
+        }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -33,15 +52,20 @@ class SuggestedFoldersPaywallBottomSheet : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?,
     ) = content {
         AppTheme(theme.activeTheme) {
+            val signInState = viewModel.signInState.collectAsState(null)
+
             SuggestedFoldersPaywall(
+                folders = suggestedFolders,
                 onShown = {
                     viewModel.onShown()
                 },
                 onUseTheseFolders = {
-                    viewModel.onUseTheseFolders()
-                    dismiss()
-                    val onboardingFlow = OnboardingFlow.PlusAccountUpgrade(OnboardingUpgradeSource.FOLDERS)
-                    OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
+                    if (signInState.value?.isSignedInAsPlusOrPatron == true) {
+                        dismiss()
+                        SuggestedFolders().show(parentFragmentManager, "suggested_folders")
+                    } else {
+                        OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.Upsell(OnboardingUpgradeSource.SUGGESTED_FOLDERS))
+                    }
                 },
                 onMaybeLater = {
                     viewModel.onMaybeLater()

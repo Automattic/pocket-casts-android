@@ -14,11 +14,6 @@ class FirebaseRemoteFeatureProvider @Inject constructor(
     override val priority: Int = MAX_PRIORITY
 
     override fun isEnabled(feature: Feature) = when (feature) {
-        Feature.REPORT_VIOLATION ->
-            firebaseRemoteConfig
-                .getString(FirebaseConfig.REPORT_VIOLATION_URL)
-                .isNotEmpty()
-
         Feature.SLUMBER_STUDIOS_YEARLY_PROMO ->
             firebaseRemoteConfig
                 .getString(FirebaseConfig.SLUMBER_STUDIOS_YEARLY_PROMO_CODE)

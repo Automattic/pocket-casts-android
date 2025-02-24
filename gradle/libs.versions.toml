@@ -16,15 +16,15 @@
 #    horologist = Horologist Version
 
 [versions]
-aboutlibraries = "11.2.3"
+aboutlibraries = "11.6.2"
 android-gradle-plugin = "8.8.1"
 billing = "7.0.0"
 coil = "2.7.0"
 compose = "2024.10.00" # https://developer.android.com/jetpack/compose/bom/bom-mapping
 dependency-analysis = "2.8.0"
 espresso = "3.6.1"
-firebase = "33.7.0"
-fragment = "1.8.5"
+firebase = "33.9.0"
+fragment = "1.8.6"
 glance = "1.0.0"
 google-services = "4.4.2"
 hilt = "2.55"
@@ -33,7 +33,7 @@ horologist = "0.6.20"
 java = "17"
 kotlin = "2.1.10"
 kotlin-coroutines = "1.10.1"
-ksp = "2.1.10-1.0.29"
+ksp = "2.1.10-1.0.30"
 ktlint = "0.50.0"
 lifecycle = "2.8.7"
 lottie = "6.6.2"
@@ -231,7 +231,7 @@ automattic-explat = { module = "com.automattic.tracks:experimentation", version.
 
 # Wear
 wear-input = "androidx.wear:wear-input:1.2.0-alpha02"
-wear-remote-interactions = "androidx.wear:wear-remote-interactions:1.0.0"
+wear-remote-interactions = "androidx.wear:wear-remote-interactions:1.1.0"
 wear-tooling-preview = "androidx.wear:wear-tooling-preview:1.0.0"
 
 # Wear Compose
@@ -267,7 +267,7 @@ capturable = "dev.shreyaspatil:capturable:3.0.1"
 compose-webview = "io.github.kevinnzou:compose-webview:0.33.6"
 desugar-jdk = "com.android.tools:desugar_jdk_libs:2.1.4"
 device-names = "com.jaredrummler:android-device-names:2.1.1"
-encryptedlogging = "com.automattic:encryptedlogging:0.0.1"
+encryptedlogging = "com.automattic:encryptedlogging:0.0.2"
 engage = "com.google.android.engage:engage-core:1.5.5"
 flexbox = "com.google.android.flexbox:flexbox:3.0.0"
 guava = "com.google.guava:guava:33.3.1-android" # Required to fix conflict between versions in exoplayer and workmanager
@@ -300,5 +300,5 @@ ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 measure-builds = "com.automattic.android.measure-builds:3.1.1"
 protobuf = { id = "com.google.protobuf", version.ref = "protobuf-plugin" }
 sentry = { id = "io.sentry.android.gradle", version.ref = "sentry-plugin" }
-spotless = "com.diffplug.spotless:6.25.0"
+spotless = "com.diffplug.spotless:7.0.2"
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

@@ -346,6 +346,19 @@ class PlaybackSettingsFragment : BaseFragment() {
                             )
                         }
 
+                        SettingsItems.SETTINGS_GENERAL_AUTOPLAY -> {
+                            AutoPlayNextOnEmpty(
+                                saved = settings.autoPlayNextEpisodeOnEmpty.flow.collectAsState().value,
+                                onSave = {
+                                    analyticsTracker.track(
+                                        AnalyticsEvent.SETTINGS_GENERAL_AUTOPLAY_TOGGLED,
+                                        mapOf("enabled" to it),
+                                    )
+                                    settings.autoPlayNextEpisodeOnEmpty.set(it, updateModifiedAt = true)
+                                },
+                            )
+                        }
+
                         SettingsItems.SETTINGS_HEADER_SLEEP_TIMER -> {
                             Column {
                                 Spacer(modifier = Modifier.height(SettingsSection.verticalPadding))
@@ -378,19 +391,6 @@ class PlaybackSettingsFragment : BaseFragment() {
                                         mapOf("enabled" to it),
                                     )
                                     settings.shakeToResetSleepTimer.set(it, updateModifiedAt = true)
-                                },
-                            )
-                        }
-
-                        SettingsItems.SETTINGS_GENERAL_AUTOPLAY -> {
-                            AutoPlayNextOnEmpty(
-                                saved = settings.autoPlayNextEpisodeOnEmpty.flow.collectAsState().value,
-                                onSave = {
-                                    analyticsTracker.track(
-                                        AnalyticsEvent.SETTINGS_GENERAL_AUTOPLAY_TOGGLED,
-                                        mapOf("enabled" to it),
-                                    )
-                                    settings.autoPlayNextEpisodeOnEmpty.set(it, updateModifiedAt = true)
                                 },
                             )
                         }
@@ -739,12 +739,8 @@ private enum class SettingsItems {
     SETTINGS_INTELLIGENT_PLAYBACK,
     SETTINGS_PLAY_UP_NEXT_EPISODE,
     SETTINGS_ADJUST_REMAINING_TIME,
+    SETTINGS_GENERAL_AUTOPLAY,
     SETTINGS_HEADER_SLEEP_TIMER,
     SETTINGS_SLEEP_TIMER_RESTART,
     SETTINGS_SLEEP_TIMER_SHAKE,
-
-    // The [scrollToAutoPlay] fragment argument handling depends on this item being last
-    // in the list. If it's position is changed, make sure you update the handling when
-    // we scroll to this item as well.
-    SETTINGS_GENERAL_AUTOPLAY,
 }

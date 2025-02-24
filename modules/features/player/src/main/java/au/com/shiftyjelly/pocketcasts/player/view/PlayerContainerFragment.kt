@@ -236,6 +236,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
             multiSelectHelper = bookmarksViewModel.multiSelectHelper,
             menuRes = null,
             activity = requireActivity(),
+            includeStatusBarPadding = false,
         )
     }
 
