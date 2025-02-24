@@ -252,9 +252,7 @@ class PodcastAdapter(
                     onClickNotification = onNotificationsClicked,
                     onClickSettings = onSettingsClicked,
                     onToggleHeader = {
-                        podcast.isHeaderExpanded = !podcast.isHeaderExpanded
-                        onChangeHeaderExpanded(podcast.uuid, podcast.isHeaderExpanded)
-                        notifyItemChanged(0)
+                        onChangeHeaderExpanded(podcast.uuid, !podcast.isHeaderExpanded)
                     },
                     onLongClickArtwork = {
                         onArtworkLongClicked { notifyItemChanged(0) }
