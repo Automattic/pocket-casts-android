@@ -958,20 +958,6 @@ abstract class AppDatabase : RoomDatabase() {
                 try {
                     execSQL("ALTER TABLE podcasts ADD COLUMN is_header_expanded INTEGER NOT NULL DEFAULT 1")
                     execSQL("UPDATE podcasts SET is_header_expanded = 0 WHERE subscribed IS NOT 0")
-//                    query("SELECT uuid FROM podcasts WHERE subscribed IS NOT 0").use { cursor ->
-//                        while (cursor.moveToNext()) {
-//                            val uuid = cursor.getString(0)
-//                            update(
-//                                table = "podcasts",
-//                                conflictAlgorithm = SQLiteDatabase.CONFLICT_NONE,
-//                                values = ContentValues().apply {
-//                                    put("is_header_expanded", false)
-//                                },
-//                                whereClause = "uuid IS ?",
-//                                whereArgs = arrayOf(uuid),
-//                            )
-//                        }
-//                    }
                     setTransactionSuccessful()
                 } finally {
                     endTransaction()
