@@ -771,6 +771,11 @@ class PodcastFragment : BaseFragment() {
             onPodcastDescriptionClicked = {
                 analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_PODCAST_DESCRIPTION_TAPPED)
             },
+            onChangeHeaderExpanded = { uuid, isExpanded ->
+                lifecycleScope.launch {
+                    podcastManager.updateIsHeaderExpanded(uuid, isExpanded)
+                }
+            },
             onClickRating = { podcastUuid, source ->
                 ratingsViewModel.onRatingStarsTapped(
                     podcastUuid = podcastUuid,

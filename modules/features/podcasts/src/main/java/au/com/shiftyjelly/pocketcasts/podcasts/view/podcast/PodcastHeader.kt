@@ -1,19 +1,17 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.podcast
 
 import androidx.annotation.DrawableRes
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.EaseOutCubic
+import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.animateIntOffset
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -28,6 +26,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -35,6 +34,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.InlineTextContent
+import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ripple
 import androidx.compose.runtime.Composable
@@ -49,6 +50,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -67,6 +69,9 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.PlaceholderVerticalAlign
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
@@ -75,6 +80,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
@@ -100,6 +106,7 @@ internal fun PodcastHeader(
     isFollowed: Boolean,
     areNotificationsEnabled: Boolean,
     folderIcon: PodcastFolderIcon,
+    isHeaderExpanded: Boolean,
     contentPadding: PaddingValues,
     useBlurredArtwork: Boolean,
     onClickRating: (String, RatingTappedSource) -> Unit,
@@ -108,6 +115,7 @@ internal fun PodcastHeader(
     onClickFolder: () -> Unit,
     onClickNotification: () -> Unit,
     onClickSettings: () -> Unit,
+    onToggleHeader: () -> Unit,
     onLongClickArtwork: () -> Unit,
     onArtworkAvailable: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -116,12 +124,17 @@ internal fun PodcastHeader(
         modifier = modifier,
     ) {
         val expandedCoverSize = minOf(maxWidth * 0.48f, 192.dp)
+        val shrunkCoverSize = expandedCoverSize * 0.5625f
+        val coverSize by animateDpAsState(
+            targetValue = if (isHeaderExpanded) expandedCoverSize else shrunkCoverSize,
+            animationSpec = coverSizeSpec,
+        )
 
         PodcastBackgroundArtwork(
             uuid = uuid,
             useBlurredArtwork = useBlurredArtwork,
             maxWidth = maxWidth,
-            bottomAnchor = contentPadding.calculateTopPadding() + expandedCoverSize * 0.75f,
+            bottomAnchor = contentPadding.calculateTopPadding() + coverSize * 0.75f,
             onArtworkAvailable = { onArtworkAvailable(uuid) },
         )
 
@@ -135,9 +148,11 @@ internal fun PodcastHeader(
                 uuid = uuid,
                 cornerSize = 8.dp,
                 modifier = Modifier
-                    .size(expandedCoverSize)
+                    .size(coverSize)
                     .combinedClickable(
-                        onClick = {},
+                        indication = null,
+                        interactionSource = null,
+                        onClick = onToggleHeader,
                         onLongClick = onLongClickArtwork,
                     ),
             )
@@ -151,6 +166,8 @@ internal fun PodcastHeader(
                 isFollowed = isFollowed,
                 areNotificationsEnabled = areNotificationsEnabled,
                 folderIcon = folderIcon,
+                isHeaderExpanded = isHeaderExpanded,
+                onClickTitle = onToggleHeader,
                 onClickFollow = onClickFollow,
                 onClickUnfollow = onClickUnfollow,
                 onClickFolder = onClickFolder,
@@ -168,6 +185,8 @@ private fun PodcastControls(
     isFollowed: Boolean,
     areNotificationsEnabled: Boolean,
     folderIcon: PodcastFolderIcon,
+    isHeaderExpanded: Boolean,
+    onClickTitle: () -> Unit,
     onClickRating: (RatingTappedSource) -> Unit,
     onClickFollow: () -> Unit,
     onClickUnfollow: () -> Unit,
@@ -175,14 +194,40 @@ private fun PodcastControls(
     onClickNotification: () -> Unit,
     onClickSettings: () -> Unit,
 ) {
+    val chevronRotation by animateFloatAsState(
+        targetValue = if (isHeaderExpanded) 0f else 180f,
+        animationSpec = chevronRotationSpec,
+        visibilityThreshold = 0.001f,
+    )
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxWidth(),
     ) {
         // TODO: Categories list
         TextH20(
-            text = title,
+            text = buildAnnotatedString {
+                append(title)
+                appendInlineContent(id = "chevronId")
+            },
             textAlign = TextAlign.Center,
+            inlineContent = mapOf(
+                "chevronId" to InlineTextContent(Placeholder(24.sp, 24.sp, PlaceholderVerticalAlign.TextCenter)) {
+                    Image(
+                        painter = painterResource(IR.drawable.ic_chevron_small_up),
+                        colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.primaryText01),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .rotate(chevronRotation),
+                    )
+                },
+            ),
+            modifier = Modifier.clickable(
+                indication = null,
+                interactionSource = null,
+                onClick = onClickTitle,
+            ),
         )
         PodcastRatingOrSpacing(
             rating = rating,
@@ -212,7 +257,7 @@ private fun PodcastRatingOrSpacing(
                 podcastUuid = "",
                 average = null,
                 total = null,
-            )
+            ),
         )
         val dummyRating = subcompose("dummyRating") {
             PodcastRating(
@@ -233,7 +278,7 @@ private fun PodcastRatingOrSpacing(
                     modifier = Modifier.padding(vertical = 8.dp),
                 )
                 is RatingState.Error, is RatingState.Loading -> Spacer(
-                    modifier = Modifier.size(width, height)
+                    modifier = Modifier.size(width, height),
                 )
             }
         }[0].measure(constraints)
@@ -261,7 +306,7 @@ private fun PodcastActions(
         val controls = subcompose("controls") {
             val alpha by transition.animateFloat(
                 label = "controlsAlpha",
-                transitionSpec = { if (targetState) actionAlphaInSpec else actionAlphaOutSpec },
+                transitionSpec = { if (targetState) followAlphaInSpec else followAlphaOutSpec },
                 targetValueByState = { followed -> if (followed) 1f else 0f },
             )
 
@@ -327,42 +372,42 @@ private fun PodcastActions(
         val followButton = subcompose("followButton") {
             val backgroundColor by transition.animateColor(
                 label = "backgroundColor",
-                transitionSpec = { colorSpec },
+                transitionSpec = { followColorSpec },
                 targetValueByState = { followed -> if (followed) MaterialTheme.theme.colors.support02 else Color.Transparent },
             )
             val borderColor by transition.animateColor(
                 label = "borderColor",
-                transitionSpec = { colorSpec },
+                transitionSpec = { followColorSpec },
                 targetValueByState = { followed -> if (followed) MaterialTheme.theme.colors.support02 else MaterialTheme.theme.colors.primaryIcon02 },
             )
             val cornerRadius by transition.animateDp(
                 label = "cornerRadius",
-                transitionSpec = { dpSpec },
+                transitionSpec = { followDpSpec },
                 targetValueByState = { followed -> if (followed) 12.dp else 8.dp },
             )
             val buttonWidth by transition.animateDp(
                 label = "buttonWidth",
-                transitionSpec = { dpSpec },
+                transitionSpec = { followDpSpec },
                 targetValueByState = { followed -> if (followed) 32.dp else dummyButtonWidthDp },
             )
             val buttonHeight by transition.animateDp(
                 label = "buttonHeight",
-                transitionSpec = { dpSpec },
+                transitionSpec = { followDpSpec },
                 targetValueByState = { followed -> if (followed) 32.dp else dummyButtonHeightDp },
             )
             val buttonPadding by transition.animateDp(
                 label = "buttonPadding",
-                transitionSpec = { dpSpec },
+                transitionSpec = { followDpSpec },
                 targetValueByState = { followed -> if (followed) 4.dp else 0.dp },
             )
             val buttonOffset by transition.animateIntOffset(
                 label = "buttonOffset",
-                transitionSpec = { intOffsetSpec },
+                transitionSpec = { followIntOffsetSpec },
                 targetValueByState = { followed -> if (followed) IntOffset(unfollowButtonOffsetX, 0) else IntOffset.Zero },
             )
             val textAlpha by transition.animateFloat(
                 label = "textAlpha",
-                transitionSpec = { floatSpec },
+                transitionSpec = { followFloatSpec },
                 targetValueByState = { followed -> if (followed) 0f else 1f },
             )
 
@@ -521,21 +566,6 @@ private fun ImageOrPreview(
     }
 }
 
-private val previewColors = listOf(
-    Color(0xFFCC99C9),
-    Color(0xFF9EC1CF),
-    Color(0xFF9EE09E),
-    Color(0xFFFDFD97),
-    Color(0xFFFEB144),
-    Color(0xFFFF6663),
-    Color(0xFFCC99C9),
-    Color(0xFF9EC1CF),
-    Color(0xFF9EE09E),
-    Color(0xFFFDFD97),
-    Color(0xFFFEB144),
-    Color(0xFFFF6663),
-)
-
 private fun Modifier.blurOrScrim(useBlur: Boolean) = if (useBlur) {
     blur(80.dp, BlurredEdgeTreatment.Unbounded)
 } else {
@@ -575,20 +605,45 @@ internal enum class PodcastFolderIcon(
 private val buttonRipple = ripple()
 private val controlActionRipple = ripple(bounded = false)
 
-private val colorSpec = tween<Color>(durationMillis = 450, easing = EaseOutCubic)
-private val dpSpec = tween<Dp>(durationMillis = 450, easing = EaseOutCubic)
-private val intOffsetSpec = tween<IntOffset>(durationMillis = 450, easing = EaseOutCubic)
-private val floatSpec = tween<Float>(durationMillis = 450, easing = EaseOutCubic)
+private val followColorSpec = tween<Color>(durationMillis = 450, easing = EaseOutCubic)
+private val followDpSpec = tween<Dp>(durationMillis = 450, easing = EaseOutCubic)
+private val followIntOffsetSpec = tween<IntOffset>(durationMillis = 450, easing = EaseOutCubic)
+private val followFloatSpec = tween<Float>(durationMillis = 450, easing = EaseOutCubic)
+private val followAlphaInSpec = tween<Float>(durationMillis = 250, delayMillis = 300, easing = EaseOutCubic)
+private val followAlphaOutSpec = tween<Float>(durationMillis = 200, delayMillis = 0, easing = EaseOutCubic)
 
-private val actionAlphaInSpec = tween<Float>(durationMillis = 250, delayMillis = 300, easing = EaseOutCubic)
-private val actionAlphaOutSpec = tween<Float>(durationMillis = 200, delayMillis = 0, easing = EaseOutCubic)
+private val coverSizeSpec = spring<Dp>(
+    dampingRatio = 0.65f,
+    stiffness = 100f,
+    visibilityThreshold = Dp.VisibilityThreshold,
+)
+private val chevronRotationSpec = spring<Float>(
+    stiffness = 200f,
+    visibilityThreshold = 0.001f,
+)
+
+private val previewColors = listOf(
+    Color(0xFFCC99C9),
+    Color(0xFF9EC1CF),
+    Color(0xFF9EE09E),
+    Color(0xFFFDFD97),
+    Color(0xFFFEB144),
+    Color(0xFFFF6663),
+    Color(0xFFCC99C9),
+    Color(0xFF9EC1CF),
+    Color(0xFF9EE09E),
+    Color(0xFFFDFD97),
+    Color(0xFFFEB144),
+    Color(0xFFFF6663),
+)
 
 @Preview
 @Composable
 private fun PodcastHeaderPreview() {
-    AppThemeWithBackground(Theme.ThemeType.LIGHT) {
-        var isFollowed by remember { mutableStateOf(false) }
+    var isFollowed by remember { mutableStateOf(false) }
+    var isHeaderExpanded by remember { mutableStateOf(true) }
 
+    AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         PodcastHeader(
             uuid = "uuid",
             title = "The Pitchfork Review",
@@ -602,6 +657,7 @@ private fun PodcastHeaderPreview() {
             isFollowed = isFollowed,
             areNotificationsEnabled = true,
             folderIcon = PodcastFolderIcon.BuyFolders,
+            isHeaderExpanded = isHeaderExpanded,
             contentPadding = PaddingValues(
                 top = 48.dp,
                 start = 16.dp,
@@ -615,6 +671,7 @@ private fun PodcastHeaderPreview() {
             onClickFolder = {},
             onClickNotification = {},
             onClickSettings = {},
+            onToggleHeader = { isHeaderExpanded = !isHeaderExpanded },
             onLongClickArtwork = {},
             onArtworkAvailable = {},
         )

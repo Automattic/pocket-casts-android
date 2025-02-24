@@ -630,6 +630,10 @@ class PodcastManagerImpl @Inject constructor(
         podcastDao.updateFoldersUuid(folders)
     }
 
+    override suspend fun updateIsHeaderExpanded(podcastUuid: String, isExpanded: Boolean) {
+        podcastDao.updateIsHeaderExpanded(podcastUuid, isExpanded)
+    }
+
     override suspend fun updatePodcastPositions(podcasts: List<Podcast>) {
         podcastDao.updateSortPositions(podcasts)
     }
