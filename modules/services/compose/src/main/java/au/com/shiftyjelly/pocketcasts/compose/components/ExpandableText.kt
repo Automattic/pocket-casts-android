@@ -52,9 +52,9 @@ fun ExpandableText(
                 buildAnnotatedString {
                     // Estimate the number of characters to trim in order to fit the overflow text.
                     // Since character widths vary, we approximate by adding 2 (for the ellipsis and space)
-                    // and multiplying by 1.3 to account for potential width differences.
+                    // and multiplying by 1.5 to account for potential width differences.
                     // The final trimmed length attempts to give enough of the available space.
-                    val trimCharCount = ((overflowText.length + 2) * 1.3f).roundToInt()
+                    val trimCharCount = ((overflowText.length + 2) * 1.5f).roundToInt()
                     append(text, 0, (lastCharIndex - trimCharCount).coerceAtLeast(0))
                     append("… ")
                     withStyle(style.toSpanStyle().copy(fontWeight = FontWeight.Bold)) {
