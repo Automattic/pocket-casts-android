@@ -1538,12 +1538,6 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override val showPodcastRefreshTooltip: UserSetting<Boolean> = UserSetting.BoolPref(
-        sharedPrefKey = Settings.SHOW_PODCAST_REFRESH_TOOLTIP,
-        defaultValue = true,
-        sharedPrefs = sharedPreferences,
-    )
-
     override val referralClaimCode = UserSetting.StringPref(
         sharedPrefKey = "referralCode",
         defaultValue = "",
@@ -1580,7 +1574,7 @@ class SettingsImpl @Inject constructor(
 
     override val showPodcastHeaderChangesTooltip: UserSetting<Boolean> = UserSetting.BoolPref(
         sharedPrefKey = "show_podcast_header_ui_changes_tooltip",
-        defaultValue = false,
+        defaultValue = true,
         sharedPrefs = sharedPreferences,
     )
 }

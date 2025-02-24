@@ -17,20 +17,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar.OnMenuItemClickListener
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.util.lerp
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
@@ -123,7 +118,6 @@ import javax.inject.Inject
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asObservable
 import kotlinx.coroutines.withContext
@@ -218,9 +212,6 @@ class PodcastFragment : BaseFragment() {
 
     private var itemTouchHelper: EpisodeItemTouchHelper? = null
     private var adapter: PodcastAdapter? = null
-
-    private var tooltipOffset by mutableStateOf(IntOffset.Zero)
-    private var canShowTooltip by mutableStateOf(false)
 
     private var currentSnackBar: Snackbar? = null
 
@@ -835,39 +826,6 @@ class PodcastFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         binding?.setupMultiSelect()
 
-        binding?.composeTooltipHost?.setContent {
-            AppTheme(theme.activeTheme) {
-                val shouldShowPodcastTooltip by viewModel.shouldShowPodcastTooltip.collectAsState()
-
-                var show by remember { mutableStateOf(true) }
-
-                LaunchedEffect(canShowTooltip, shouldShowPodcastTooltip) {
-                    show = canShowTooltip && shouldShowPodcastTooltip && FeatureFlag.isEnabled(Feature.PODCAST_FEED_UPDATE)
-                }
-
-                if (show) {
-                    PodcastTooltip(
-                        title = stringResource(LR.string.podcast_feed_update_tooltip_title),
-                        subtitle = stringResource(LR.string.podcast_feed_update_tooltip_subtitle),
-                        offset = tooltipOffset,
-                        onTooltipShown = {
-                            (activity as? FragmentHostListener)?.setFullScreenDarkOverlayViewVisibility(true)
-                            analyticsTracker.track(AnalyticsEvent.PODCAST_REFRESH_EPISODE_TOOLTIP_SHOWN)
-                        },
-                        onDismissRequest = {
-                            hideTooltip()
-                        },
-                        onCloseButtonClick = {
-                            analyticsTracker.track(AnalyticsEvent.PODCAST_REFRESH_EPISODE_TOOLTIP_DISMISSED)
-                            hideTooltip()
-                        },
-                    )
-                } else {
-                    (activity as? FragmentHostListener)?.setFullScreenDarkOverlayViewVisibility(false)
-                }
-            }
-        }
-
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.multiSelectBookmarksHelper.navigationState
@@ -898,46 +856,6 @@ class PodcastFragment : BaseFragment() {
         super.onPause()
         viewModel.multiSelectEpisodesHelper.isMultiSelecting = false
         viewModel.multiSelectBookmarksHelper.isMultiSelecting = false
-    }
-
-    private fun configureTooltip() {
-        lifecycleScope.launch {
-            delay(1.seconds) // Delay to wait the recyclerview to be configured
-
-            val headerPositionInList = 2 // See: au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastAdapter.setEpisodes
-
-            val viewHolder = binding?.episodesRecyclerView?.findViewHolderForAdapterPosition(headerPositionInList)
-                as? PodcastAdapter.EpisodeHeaderViewHolder
-
-            val anchorView = viewHolder?.binding?.btnEpisodeOptions
-            anchorView?.let { showTooltipAbove(it) }
-        }
-    }
-
-    private fun showTooltipAbove(view: View) {
-        val anchorLocation = IntArray(2)
-        view.getLocationOnScreen(anchorLocation)
-
-        val composeLocation = IntArray(2)
-        val tooltipComposeView = binding?.composeTooltipHost ?: return
-
-        tooltipComposeView.getLocationOnScreen(composeLocation)
-
-        val anchorX = anchorLocation[0] - composeLocation[0] + (view.width / 2)
-        var anchorY = anchorLocation[1] - composeLocation[1] - 360
-
-        if (anchorY < 0) {
-            anchorY = 0
-        }
-
-        tooltipOffset = IntOffset(anchorX, anchorY)
-        canShowTooltip = true
-    }
-
-    private fun hideTooltip() {
-        (activity as? FragmentHostListener)?.setFullScreenDarkOverlayViewVisibility(false)
-        viewModel.hidePodcastRefreshTooltip()
-        canShowTooltip = false
     }
 
     private fun onShareBookmarkClick() {
@@ -1092,7 +1010,6 @@ class PodcastFragment : BaseFragment() {
                                 podcast = state.podcast,
                                 context = requireContext(),
                             )
-                            configureTooltip()
                         }
 
                         PodcastTab.BOOKMARKS -> {

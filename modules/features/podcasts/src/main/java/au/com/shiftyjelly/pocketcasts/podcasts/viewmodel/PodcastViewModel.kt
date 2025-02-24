@@ -58,7 +58,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
@@ -100,8 +99,6 @@ class PodcastViewModel
 
     private val _refreshState = MutableSharedFlow<RefreshState>()
     val refreshState = _refreshState.asSharedFlow()
-
-    val shouldShowPodcastTooltip = MutableStateFlow(settings.showPodcastRefreshTooltip.value)
 
     val groupedEpisodes: MutableLiveData<List<List<PodcastEpisode>>> = MutableLiveData()
     val signInState = userManager.getSignInState().toLiveData()
@@ -592,11 +589,6 @@ class PodcastViewModel
             analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_REFRESH_NO_EPISODES_FOUND, mapOf("podcast_uuid" to podcast.uuid, "action" to refreshType.analyticsValue))
             _refreshState.emit(RefreshState.NoEpisodesFound)
         }
-    }
-
-    fun hidePodcastRefreshTooltip() {
-        settings.showPodcastRefreshTooltip.set(false, updateModifiedAt = false)
-        shouldShowPodcastTooltip.value = false
     }
 
     private fun trackEpisodeBulkEvent(event: AnalyticsEvent, count: Int) {
