@@ -16,7 +16,14 @@ import androidx.annotation.MenuRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar.OnMenuItemClickListener
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -24,11 +31,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.MeasurePolicy
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
+import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
@@ -46,6 +57,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
@@ -819,6 +831,8 @@ class PodcastFragment : BaseFragment() {
         loadData()
         updateStatusBar()
 
+        setupTooltip(binding, adapter!!)
+
         return binding.root
     }
 
@@ -856,6 +870,59 @@ class PodcastFragment : BaseFragment() {
         super.onPause()
         viewModel.multiSelectEpisodesHelper.isMultiSelecting = false
         viewModel.multiSelectBookmarksHelper.isMultiSelecting = false
+    }
+
+    private fun setupTooltip(binding: BindingWrapper, adapter: PodcastAdapter) {
+        val isNewHeaderDesign = when (binding.headerType) {
+            HeaderType.SolidColor -> false
+            HeaderType.Blur -> true
+            HeaderType.Scrim -> true
+        }
+        if (!isNewHeaderDesign || !settings.showPodcastHeaderChangesTooltip.value) {
+            binding.composeTooltipHost.isGone = true
+            return
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            val offset = adapter.awaitTooltipHeaderTopOffset()
+            if (offset != null) {
+                binding.composeTooltipHost.isVisible = true
+                binding.composeTooltipHost.setContentWithViewCompositionStrategy {
+                    AppTheme(theme.activeTheme) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(Color.Black.copy(alpha = 0.4f))
+                                .clickable(
+                                    interactionSource = null,
+                                    indication = null,
+                                    onClick = { dismissHeaderTooltip() },
+                                ),
+                        ) {
+                            Layout(
+                                content = {
+                                    PodcastHeaderTooltip(
+                                        onClickClose = { dismissHeaderTooltip() },
+                                        modifier = Modifier.padding(horizontal = 38.dp),
+                                    )
+                                },
+                                measurePolicy = MeasurePolicy { measurables, constraints ->
+                                    val tooltip = measurables[0].measure(constraints)
+                                    layout(tooltip.width, tooltip.height) {
+                                        tooltip.place(0, offset.roundToPx() - tooltip.height)
+                                    }
+                                },
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun dismissHeaderTooltip() {
+        settings.showPodcastHeaderChangesTooltip.set(false, updateModifiedAt = false)
+        binding?.composeTooltipHost?.isGone = true
+        binding?.composeTooltipHost?.disposeComposition()
     }
 
     private fun onShareBookmarkClick() {
@@ -1226,6 +1293,7 @@ class PodcastFragment : BaseFragment() {
             in Float.NEGATIVE_INFINITY..0.6f -> StatusBarIconColor.Light
             else -> StatusBarIconColor.Dark
         }
+
         else -> getStatusBarColorForSolidColor(toolbarColor.copy(alpha = 1f))
     }
 
@@ -1259,6 +1327,7 @@ private sealed interface BindingWrapper {
             } else {
                 HeaderType.Scrim
             }
+
             is RegularBindingWrapper -> HeaderType.SolidColor
         }
 

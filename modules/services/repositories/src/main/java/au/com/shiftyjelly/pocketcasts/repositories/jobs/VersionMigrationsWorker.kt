@@ -185,10 +185,6 @@ class VersionMigrationsWorker @AssistedInject constructor(
         }
 
         upgradeMultiSelectItems(settings)
-
-        if (previousVersionCode < 9314) {
-            enableHeaderChangesTooltip()
-        }
     }
 
     private fun removeOldTempPodcastDirectory() {
@@ -275,10 +271,6 @@ class VersionMigrationsWorker @AssistedInject constructor(
             val useEpisodeArtwork = settings.getBooleanForKey("useEpisodeArtwork", false)
             settings.artworkConfiguration.set(ArtworkConfiguration((useEpisodeArtwork)), updateModifiedAt = true)
         }
-    }
-
-    private fun enableHeaderChangesTooltip() {
-        settings.showPodcastHeaderChangesTooltip.set(value = true, updateModifiedAt = true)
     }
 
     private fun enableDynamicColors() {
