@@ -62,6 +62,9 @@ abstract class FolderDao {
     @Query("UPDATE folders SET deleted = :deleted, sync_modified = :syncModified WHERE uuid = :uuid")
     abstract suspend fun updateDeleted(uuid: String, deleted: Boolean, syncModified: Long)
 
+    @Query("UPDATE folders SET deleted = :deleted, sync_modified = :syncModified")
+    abstract suspend fun updateAllDeleted(deleted: Boolean, syncModified: Long)
+
     @Query("UPDATE folders SET sort_position = :sortPosition, sync_modified = :syncModified WHERE uuid = :uuid")
     abstract suspend fun updateSortPosition(sortPosition: Int, uuid: String, syncModified: Long)
 
@@ -76,8 +79,8 @@ abstract class FolderDao {
     }
 
     @Transaction
-    open suspend fun replaceAllFolders(folders: List<Folder>) {
-        deleteAll()
+    open suspend fun replaceAllFolders(folders: List<Folder>, syncModified: Long) {
+        updateAllDeleted(deleted = true, syncModified = syncModified)
         insertAll(folders)
     }
 

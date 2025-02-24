@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.SuggestedFolderDetails
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SuggestedFoldersManager
 import au.com.shiftyjelly.pocketcasts.utils.UUIDProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,6 +20,7 @@ import kotlinx.coroutines.launch
 class SuggestedFoldersViewModel @Inject constructor(
     private val folderManager: FolderManager,
     private val suggestedFoldersManager: SuggestedFoldersManager,
+    private val podcastManager: PodcastManager,
     private val settings: Settings,
     private val analyticsTracker: AnalyticsTracker,
     private val uuidProvider: UUIDProvider,
@@ -65,6 +67,7 @@ class SuggestedFoldersViewModel @Inject constructor(
             }
 
             folderManager.overrideFoldersWithSuggested(newFolders)
+            podcastManager.refreshPodcasts("suggested-folders")
             suggestedFoldersManager.deleteSuggestedFolders(folders.toSuggestedFolders())
             _state.value = FoldersState.Created
         }
