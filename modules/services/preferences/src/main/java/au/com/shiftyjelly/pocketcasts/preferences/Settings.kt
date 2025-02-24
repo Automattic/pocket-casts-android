@@ -570,4 +570,6 @@ interface Settings {
     val lastEoySyncTimestamp: UserSetting<Instant>
 
     val useRealTimeForPlaybackRemaingTime: UserSetting<Boolean>
+
+    val showPodcastHeaderChangesTooltip: UserSetting<Boolean>
 }

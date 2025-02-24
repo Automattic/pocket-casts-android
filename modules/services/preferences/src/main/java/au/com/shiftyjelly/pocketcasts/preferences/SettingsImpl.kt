@@ -1577,4 +1577,10 @@ class SettingsImpl @Inject constructor(
         defaultValue = false,
         sharedPrefs = sharedPreferences,
     )
+
+    override val showPodcastHeaderChangesTooltip: UserSetting<Boolean> = UserSetting.BoolPref(
+        sharedPrefKey = "show_podcast_header_ui_changes_tooltip",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
 }
