@@ -4,6 +4,8 @@ import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.dao.SuggestedFoldersDao
 import au.com.shiftyjelly.pocketcasts.models.entity.SuggestedFolder
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
+import au.com.shiftyjelly.pocketcasts.servers.podcast.SuggestedFoldersRequest
+import au.com.shiftyjelly.pocketcasts.utils.LocaleUtil
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
@@ -15,6 +17,7 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.times
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -25,11 +28,17 @@ class SuggestedFoldersManagerTest {
     private val mockPodcastCacheService: PodcastCacheServiceManager = mock<PodcastCacheServiceManager>()
     private val mockAppDatabase: AppDatabase = mock<AppDatabase>()
     private val mockSuggestedFoldersDao: SuggestedFoldersDao = mock<SuggestedFoldersDao>()
+    private val localeUtil: LocaleUtil = object : LocaleUtil {
+        override fun getLanguage(): String = "language"
+    }
+    private val emptyLocaleUtil: LocaleUtil = object : LocaleUtil {
+        override fun getLanguage(): String = ""
+    }
 
     @Before
     fun setup() {
         whenever(mockAppDatabase.suggestedFoldersDao()).thenReturn(mockSuggestedFoldersDao)
-        suggestedFoldersManager = SuggestedFoldersManager(mockPodcastCacheService, mockAppDatabase)
+        suggestedFoldersManager = SuggestedFoldersManager(mockPodcastCacheService, localeUtil, mockAppDatabase)
     }
 
     @Test
@@ -53,7 +62,27 @@ class SuggestedFoldersManagerTest {
             SuggestedFolder("uuid", "Folder1"),
         )
 
-        whenever(mockPodcastCacheService.suggestedFolders(any())).thenReturn(folders)
+        whenever(
+            mockPodcastCacheService.suggestedFolders(eq(SuggestedFoldersRequest(podcastUuids, "language"))),
+        ).thenReturn(folders)
+
+        suggestedFoldersManager.refreshSuggestedFolders(podcastUuids)
+
+        verify(mockSuggestedFoldersDao).deleteAndInsertAll(folders)
+    }
+
+    @Test
+    fun `should insert folders into database with default language`() = runBlocking {
+        val podcastUuids = listOf("podcastUuid")
+        val folders = listOf(
+            SuggestedFolder("uuid", "Folder1"),
+        )
+
+        suggestedFoldersManager = SuggestedFoldersManager(mockPodcastCacheService, emptyLocaleUtil, mockAppDatabase)
+
+        whenever(
+            mockPodcastCacheService.suggestedFolders(eq(SuggestedFoldersRequest(podcastUuids, "en"))),
+        ).thenReturn(folders)
 
         suggestedFoldersManager.refreshSuggestedFolders(podcastUuids)
 
