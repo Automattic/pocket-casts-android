@@ -213,8 +213,8 @@ enum class Feature(
     ),
     PODCAST_VIEW_CHANGES(
         key = "podcast_view_changes_2025",
-        title = "Podcast view changes",
-        defaultValue = false,
+        title = "Podcast View Changes",
+        defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
