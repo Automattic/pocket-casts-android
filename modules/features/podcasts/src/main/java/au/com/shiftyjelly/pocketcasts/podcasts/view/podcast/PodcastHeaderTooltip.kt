@@ -54,14 +54,14 @@ internal fun PodcastHeaderTooltip(
                 modifier = Modifier.padding(24.dp),
             ) {
                 TextH30(
-                    text = "We've made some changes!",
+                    text = stringResource(LR.string.podcast_header_redesign_title),
                     disableAutoScale = true,
                 )
                 Spacer(
                     modifier = Modifier.height(8.dp),
                 )
                 TextP40(
-                    text = "Tap on the podcast title to hide its description and go straight to the episode list.",
+                    text = stringResource(LR.string.podcast_header_redesign_message),
                     color = MaterialTheme.theme.colors.primaryText02,
                     disableAutoScale = true,
                 )
