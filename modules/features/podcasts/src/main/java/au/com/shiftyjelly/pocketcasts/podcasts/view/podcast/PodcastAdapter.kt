@@ -952,6 +952,7 @@ class PodcastAdapter(
                             top = statusBarPadding + 40.dp, // Eyeball the position inside app bar
                             start = 16.dp,
                             end = 16.dp,
+                            bottom = 16.dp,
                         ),
                         useBlurredArtwork = useBlurredArtwork,
                         onClickRating = onClickRating,

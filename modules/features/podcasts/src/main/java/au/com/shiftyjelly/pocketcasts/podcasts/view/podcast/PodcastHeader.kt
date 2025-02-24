@@ -152,9 +152,6 @@ internal fun PodcastHeader(
                 onClickNotification = onClickNotification,
                 onClickSettings = onClickSettings,
             )
-            Spacer(
-                modifier = Modifier.height(16.dp),
-            )
         }
     }
 }
@@ -579,7 +576,12 @@ private fun PodcastHeaderPreview() {
             isFollowed = isFollowed,
             areNotificationsEnabled = true,
             folderIcon = PodcastFolderIcon.BuyFolders,
-            contentPadding = PaddingValues(top = 48.dp),
+            contentPadding = PaddingValues(
+                top = 48.dp,
+                start = 16.dp,
+                end = 16.dp,
+                bottom = 16.dp,
+            ),
             useBlurredArtwork = false,
             onClickRating = { _, _ -> },
             onClickFollow = { isFollowed = true },
