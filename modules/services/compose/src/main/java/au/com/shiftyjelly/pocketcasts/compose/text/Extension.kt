@@ -24,10 +24,11 @@ import androidx.compose.ui.unit.sp
 // See: https://iamjosephmj.medium.com/how-to-display-styled-strings-in-jetpack-compose-decd6b705746
 
 fun Spanned.toAnnotatedString(urlColor: Int? = null): AnnotatedString = buildAnnotatedString {
+    val timmedText = this@toAnnotatedString.toString().trim()
     // Step 1: Copy over the raw text
-    append(this@toAnnotatedString.toString())
+    append(timmedText)
     // Step 2: Go through each span
-    getSpans(0, length, Any::class.java).forEach { span ->
+    getSpans(0, timmedText.length, Any::class.java).forEach { span ->
         val start = getSpanStart(span)
         val end = getSpanEnd(span)
         when (span) {

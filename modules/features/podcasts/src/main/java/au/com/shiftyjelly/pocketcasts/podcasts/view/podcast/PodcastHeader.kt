@@ -74,8 +74,10 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -89,6 +91,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.Devices
+import au.com.shiftyjelly.pocketcasts.compose.components.ExpandableText
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
@@ -112,11 +115,13 @@ internal fun PodcastHeader(
     title: String,
     category: String,
     author: String,
+    description: AnnotatedString,
     rating: RatingState,
     isFollowed: Boolean,
     areNotificationsEnabled: Boolean,
     folderIcon: PodcastFolderIcon,
     isHeaderExpanded: Boolean,
+    isDescriptionExpanded: Boolean,
     contentPadding: PaddingValues,
     useBlurredArtwork: Boolean,
     onClickRating: (RatingTappedSource) -> Unit,
@@ -126,6 +131,7 @@ internal fun PodcastHeader(
     onClickNotification: () -> Unit,
     onClickSettings: () -> Unit,
     onToggleHeader: () -> Unit,
+    onToggleDescription: () -> Unit,
     onLongClickArtwork: () -> Unit,
     onArtworkAvailable: () -> Unit,
     modifier: Modifier = Modifier,
@@ -186,6 +192,17 @@ internal fun PodcastHeader(
                 onClickNotification = onClickNotification,
                 onClickSettings = onClickSettings,
             )
+            AnimatedVisibility(
+                visible = isHeaderExpanded,
+                enter = headerInTranstion,
+                exit = headerOutTranstion,
+            ) {
+                PodcastDetails(
+                    description = description,
+                    isDescriptionExpanded = isDescriptionExpanded,
+                    onClickShowNotes = onToggleDescription,
+                )
+            }
         }
     }
 }
@@ -512,6 +529,35 @@ private fun ActionButton(
 }
 
 @Composable
+private fun PodcastDetails(
+    description: AnnotatedString,
+    isDescriptionExpanded: Boolean,
+    onClickShowNotes: () -> Unit,
+) {
+    Column {
+        Spacer(
+            modifier = Modifier.height(24.dp),
+        )
+        ExpandableText(
+            text = description,
+            overflowText = stringResource(LR.string.see_more),
+            isExpanded = isDescriptionExpanded,
+            style = detailsInfoTextStyle.copy(
+                color = MaterialTheme.theme.colors.primaryText01,
+            ),
+            maxLines = 4,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(
+                    indication = null,
+                    interactionSource = null,
+                    onClick = onClickShowNotes,
+                ),
+        )
+    }
+}
+
+@Composable
 private fun PodcastBackgroundArtwork(
     uuid: String,
     useBlurredArtwork: Boolean,
@@ -630,6 +676,11 @@ internal enum class PodcastFolderIcon(
     ),
 }
 
+val detailsInfoTextStyle = TextStyle(
+    fontSize = 16.sp,
+    lineHeight = 22.sp,
+)
+
 private val buttonRipple = ripple()
 private val controlActionRipple = ripple(bounded = false)
 
@@ -669,6 +720,14 @@ private val chevronRotationSpec = spring<Float>(
     stiffness = 200f,
     visibilityThreshold = 0.001f,
 )
+private val headerInTranstion = expandVertically(
+    animationSpec = spring(stiffness = 200f, visibilityThreshold = IntSize.VisibilityThreshold),
+    expandFrom = Alignment.Top,
+)
+private val headerOutTranstion = shrinkVertically(
+    animationSpec = spring(stiffness = 200f, visibilityThreshold = IntSize.VisibilityThreshold),
+    shrinkTowards = Alignment.Top,
+)
 
 private val previewColors = listOf(
     Color(0xFFCC99C9),
@@ -690,6 +749,7 @@ private val previewColors = listOf(
 private fun PodcastHeaderPreview() {
     var isFollowed by remember { mutableStateOf(false) }
     var isHeaderExpanded by remember { mutableStateOf(true) }
+    var isDescriptionExpanded by remember { mutableStateOf(false) }
 
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         Column(
@@ -700,6 +760,13 @@ private fun PodcastHeaderPreview() {
                 title = "The Pitchfork Review",
                 category = "Music",
                 author = "Pitchfork",
+                description = AnnotatedString(
+                    """
+                    |Savor & Stir is a culinary podcast exploring flavors, techniques, and food stories from chefs and home cooks.
+                    |Each episode serves up tips, trends, and recipes to inspire your kitchen adventures.
+                    |Whether you cook or just love to eat, join us for a delicious journey!
+                    """.trimMargin().lines().joinToString(separator = " "),
+                ),
                 rating = RatingState.Loaded(
                     ratings = PodcastRatings(
                         podcastUuid = "uuid",
@@ -711,6 +778,7 @@ private fun PodcastHeaderPreview() {
                 areNotificationsEnabled = true,
                 folderIcon = PodcastFolderIcon.BuyFolders,
                 isHeaderExpanded = isHeaderExpanded,
+                isDescriptionExpanded = isDescriptionExpanded,
                 contentPadding = PaddingValues(
                     top = 48.dp,
                     start = 16.dp,
@@ -725,6 +793,7 @@ private fun PodcastHeaderPreview() {
                 onClickNotification = {},
                 onClickSettings = {},
                 onToggleHeader = { isHeaderExpanded = !isHeaderExpanded },
+                onToggleDescription = { isDescriptionExpanded = !isDescriptionExpanded },
                 onLongClickArtwork = {},
                 onArtworkAvailable = {},
             )
