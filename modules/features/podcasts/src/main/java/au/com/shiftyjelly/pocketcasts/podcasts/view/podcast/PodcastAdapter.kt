@@ -145,7 +145,7 @@ class PodcastAdapter(
     private val onBookmarkRowLongPress: (Bookmark) -> Unit,
     private val onFoldersClicked: () -> Unit,
     private val onPodcastDescriptionClicked: () -> Unit,
-    private val onNotificationsClicked: () -> Unit,
+    private val onNotificationsClicked: (Podcast, Boolean) -> Unit,
     private val onSettingsClicked: () -> Unit,
     private val playButtonListener: PlayButton.OnClickListener,
     private val onRowClicked: (PodcastEpisode) -> Unit,
@@ -161,8 +161,8 @@ class PodcastAdapter(
     private val onBookmarkPlayClicked: (Bookmark) -> Unit,
     private val onHeadsetSettingsClicked: () -> Unit,
     private val onChangeHeaderExpanded: (String, Boolean) -> Unit,
-    private val onClickRating: (String, RatingTappedSource) -> Unit,
-    private val onArtworkAvailable: (String) -> Unit,
+    private val onClickRating: (Podcast, RatingTappedSource) -> Unit,
+    private val onArtworkAvailable: (Podcast) -> Unit,
     private val sourceView: SourceView,
 ) : LargeListAdapter<Any, RecyclerView.ViewHolder>(1500, differ) {
 
@@ -371,7 +371,7 @@ class PodcastAdapter(
                         if (ratingState is RatingState.Loaded) {
                             PodcastRatingRow(
                                 state = ratingState,
-                                onClick = { source -> onClickRating(podcast.uuid, source) },
+                                onClick = { source -> onClickRating(podcast, source) },
                             )
                         }
                     },
@@ -806,7 +806,7 @@ class PodcastAdapter(
                 adapter.onFoldersClicked()
             }
             binding.top.notifications.setOnClickListener {
-                adapter.onNotificationsClicked()
+                adapter.onNotificationsClicked(podcast, !podcast.isShowNotifications)
             }
             binding.top.settings.setOnClickListener {
                 adapter.onSettingsClicked()
@@ -925,17 +925,17 @@ class PodcastAdapter(
         context: Context,
         private val theme: Theme,
         private val useBlurredArtwork: Boolean,
-        private val onClickRating: (String, RatingTappedSource) -> Unit,
+        private val onClickRating: (Podcast, RatingTappedSource) -> Unit,
         private val onClickFollow: () -> Unit,
         private val onClickUnfollow: () -> Unit,
         private val onClickFolder: () -> Unit,
-        private val onClickNotification: () -> Unit,
+        private val onClickNotification: (Podcast, Boolean) -> Unit,
         private val onClickSettings: () -> Unit,
         private val onClickWebsiteLink: () -> Unit,
         private val onToggleHeader: () -> Unit,
         private val onToggleDescription: () -> Unit,
         private val onLongClickArtwork: () -> Unit,
-        private val onArtworkAvailable: (String) -> Unit,
+        private val onArtworkAvailable: (Podcast) -> Unit,
     ) : RecyclerView.ViewHolder(ComposeView(context)) {
         private val composeView get() = itemView as ComposeView
 
@@ -988,17 +988,17 @@ class PodcastAdapter(
                             bottom = 16.dp,
                         ),
                         useBlurredArtwork = useBlurredArtwork,
-                        onClickRating = { source -> onClickRating(podcast.uuid, source) },
+                        onClickRating = { source -> onClickRating(podcast, source) },
                         onClickFollow = onClickFollow,
                         onClickUnfollow = onClickUnfollow,
                         onClickFolder = onClickFolder,
-                        onClickNotification = onClickNotification,
+                        onClickNotification = { onClickNotification(podcast, !podcast.isShowNotifications) },
                         onClickSettings = onClickSettings,
                         onClickWebsiteLink = onClickWebsiteLink,
                         onToggleHeader = onToggleHeader,
                         onToggleDescription = onToggleDescription,
                         onLongClickArtwork = onLongClickArtwork,
-                        onArtworkAvailable = { onArtworkAvailable(podcast.uuid) },
+                        onArtworkAvailable = { onArtworkAvailable(podcast) },
                     )
                 }
             }

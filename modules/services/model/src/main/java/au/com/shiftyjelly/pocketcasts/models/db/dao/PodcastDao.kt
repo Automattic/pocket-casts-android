@@ -305,7 +305,7 @@ abstract class PodcastDao {
     abstract fun updateEpisodesSortTypeBlocking(episodesSortType: EpisodesSortType, uuid: String, modified: Date = Date())
 
     @Query("UPDATE podcasts SET show_notifications = :show, show_notifications_modified = :modified, sync_status = 0 WHERE uuid = :uuid")
-    abstract fun updateShowNotificationsBlocking(show: Boolean, uuid: String, modified: Date = Date())
+    abstract suspend fun updateShowNotifications(uuid: String, show: Boolean, modified: Date = Date())
 
     @Query("UPDATE podcasts SET subscribed = :subscribed WHERE uuid = :uuid")
     abstract fun updateSubscribedBlocking(subscribed: Boolean, uuid: String)

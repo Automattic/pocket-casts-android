@@ -184,7 +184,7 @@ class NotificationsSettingsFragment :
     override fun podcastSelectFragmentSelectionChanged(newSelection: List<String>) {
         launch(Dispatchers.Default) {
             podcastManager.findSubscribedBlocking().forEach {
-                podcastManager.updateShowNotificationsBlocking(it, newSelection.contains(it.uuid))
+                podcastManager.updateShowNotifications(it.uuid, newSelection.contains(it.uuid))
             }
         }
     }

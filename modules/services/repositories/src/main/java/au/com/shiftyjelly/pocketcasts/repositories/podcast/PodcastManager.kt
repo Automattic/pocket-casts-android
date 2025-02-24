@@ -82,7 +82,7 @@ interface PodcastManager {
     fun updatePlaybackSpeedBlocking(podcast: Podcast, speed: Double)
     fun updateEffectsBlocking(podcast: Podcast, effects: PlaybackEffects)
     fun updateEpisodesSortTypeBlocking(podcast: Podcast, episodesSortType: EpisodesSortType)
-    fun updateShowNotificationsBlocking(podcast: Podcast, show: Boolean)
+    suspend fun updateShowNotifications(podcastUuid: String, show: Boolean)
     suspend fun updatePodcastPositions(podcasts: List<Podcast>)
     suspend fun updateRefreshAvailable(podcastUuid: String, refreshAvailable: Boolean)
     suspend fun updateStartFromInSec(podcast: Podcast, autoStartFrom: Int)

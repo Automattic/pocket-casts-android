@@ -334,13 +334,10 @@ class PodcastViewModel
         }
     }
 
-    fun toggleNotifications(context: Context) {
-        val podcast = podcast.value ?: return
-        val showNotifications = !podcast.isShowNotifications
-        analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_NOTIFICATIONS_TAPPED, AnalyticsProp.notificationEnabled(showNotifications))
-        Toast.makeText(context, if (showNotifications) LR.string.podcast_notifications_on else LR.string.podcast_notifications_off, Toast.LENGTH_SHORT).show()
-        launch {
-            podcastManager.updateShowNotificationsBlocking(podcast, showNotifications)
+    fun showNotifications(podcastUuid: String, show: Boolean) {
+        analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_NOTIFICATIONS_TAPPED, AnalyticsProp.notificationEnabled(show))
+        viewModelScope.launch {
+            podcastManager.updateShowNotifications(podcastUuid, show)
         }
     }
 

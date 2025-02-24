@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.annotation.ColorInt
 import androidx.annotation.FloatRange
 import androidx.annotation.MenuRes
@@ -607,10 +608,9 @@ class PodcastFragment : BaseFragment() {
         viewModel.multiSelectBookmarksHelper.isMultiSelecting = false
     }
 
-    private val onNotificationsClicked: () -> Unit = {
-        context?.let {
-            viewModel.toggleNotifications(it)
-        }
+    private val onNotificationsClicked: (Podcast, Boolean) -> Unit = { podcast, show ->
+        viewModel.showNotifications(podcast.uuid, show)
+        Toast.makeText(context, if (show) LR.string.podcast_notifications_on else LR.string.podcast_notifications_off, Toast.LENGTH_SHORT).show()
     }
 
     private val onSettingsClicked: () -> Unit = {
@@ -774,16 +774,16 @@ class PodcastFragment : BaseFragment() {
             onChangeHeaderExpanded = { uuid, isExpanded ->
                 viewModel.updateIsHeaderExpanded(uuid, isExpanded)
             },
-            onClickRating = { podcastUuid, source ->
+            onClickRating = { podcast, source ->
                 ratingsViewModel.onRatingStarsTapped(
-                    podcastUuid = podcastUuid,
+                    podcastUuid = podcast.uuid,
                     fragmentManager = parentFragmentManager,
                     source = source,
                 )
             },
-            onArtworkAvailable = { uuid ->
+            onArtworkAvailable = { podcast ->
                 viewLifecycleOwner.lifecycleScope.launch {
-                    artworkDominantColor = colorAnalyzer.getArtworkDominantColor(uuid)
+                    artworkDominantColor = colorAnalyzer.getArtworkDominantColor(podcast.uuid)
                     updateStausBarForBackground()
                 }
             },
