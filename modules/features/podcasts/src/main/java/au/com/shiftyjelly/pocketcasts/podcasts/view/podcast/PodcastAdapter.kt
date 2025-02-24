@@ -255,6 +255,7 @@ class PodcastAdapter(
                     onClickFolder = onFoldersClicked,
                     onClickNotification = onNotificationsClicked,
                     onClickSettings = onSettingsClicked,
+                    onClickWebsiteLink = ::onWebsiteLinkClicked,
                     onToggleHeader = {
                         onChangeHeaderExpanded(podcast.uuid, !podcast.isHeaderExpanded)
                     },
@@ -305,6 +306,7 @@ class PodcastAdapter(
                 ratingState,
                 signInState,
             )
+
             is EpisodeViewHolder -> bindEpisodeViewHolder(holder, position, fromListUuid)
             is PodcastViewHolder -> bindPodcastViewHolder(holder)
             is TabsViewHolder -> holder.bind(getItem(position) as TabsHeader)
@@ -362,9 +364,7 @@ class PodcastAdapter(
                                 schedule = podcast.displayableFrequency(context.resources),
                                 next = podcast.displayableNextEpisodeDate(context),
                             ),
-                            onWebsiteLinkClicked = {
-                                onWebsiteLinkClicked(context)
-                            },
+                            onWebsiteLinkClicked = ::onWebsiteLinkClicked,
                         )
                     },
                     ratingsContent = {
@@ -739,7 +739,7 @@ class PodcastAdapter(
         onHeaderSummaryToggled(expanded, true)
     }
 
-    private fun onWebsiteLinkClicked(context: Context) {
+    private fun onWebsiteLinkClicked() {
         podcast.podcastUrl?.let { url ->
             if (url.isNotBlank()) {
                 try {
@@ -931,6 +931,7 @@ class PodcastAdapter(
         private val onClickFolder: () -> Unit,
         private val onClickNotification: () -> Unit,
         private val onClickSettings: () -> Unit,
+        private val onClickWebsiteLink: () -> Unit,
         private val onToggleHeader: () -> Unit,
         private val onToggleDescription: () -> Unit,
         private val onLongClickArtwork: () -> Unit,
@@ -964,6 +965,12 @@ class PodcastAdapter(
                         category = podcast.getFirstCategory(itemView.context.resources),
                         author = podcast.author,
                         description = podcastDescription,
+                        podcastInfoState = PodcastInfoState(
+                            author = podcast.author,
+                            link = podcast.getShortUrl(),
+                            schedule = podcast.displayableFrequency(context.resources),
+                            next = podcast.displayableNextEpisodeDate(context),
+                        ),
                         rating = ratingState,
                         isFollowed = podcast.isSubscribed,
                         areNotificationsEnabled = podcast.isShowNotifications,
@@ -987,6 +994,7 @@ class PodcastAdapter(
                         onClickFolder = onClickFolder,
                         onClickNotification = onClickNotification,
                         onClickSettings = onClickSettings,
+                        onClickWebsiteLink = onClickWebsiteLink,
                         onToggleHeader = onToggleHeader,
                         onToggleDescription = onToggleDescription,
                         onLongClickArtwork = onLongClickArtwork,

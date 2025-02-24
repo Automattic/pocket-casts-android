@@ -116,6 +116,7 @@ internal fun PodcastHeader(
     category: String,
     author: String,
     description: AnnotatedString,
+    podcastInfoState: PodcastInfoState,
     rating: RatingState,
     isFollowed: Boolean,
     areNotificationsEnabled: Boolean,
@@ -130,6 +131,7 @@ internal fun PodcastHeader(
     onClickFolder: () -> Unit,
     onClickNotification: () -> Unit,
     onClickSettings: () -> Unit,
+    onClickWebsiteLink: () -> Unit,
     onToggleHeader: () -> Unit,
     onToggleDescription: () -> Unit,
     onLongClickArtwork: () -> Unit,
@@ -199,8 +201,10 @@ internal fun PodcastHeader(
             ) {
                 PodcastDetails(
                     description = description,
+                    podcastInfoState = podcastInfoState,
                     isDescriptionExpanded = isDescriptionExpanded,
                     onClickShowNotes = onToggleDescription,
+                    onClickWebsiteLink = onClickWebsiteLink,
                 )
             }
         }
@@ -531,8 +535,10 @@ private fun ActionButton(
 @Composable
 private fun PodcastDetails(
     description: AnnotatedString,
+    podcastInfoState: PodcastInfoState,
     isDescriptionExpanded: Boolean,
     onClickShowNotes: () -> Unit,
+    onClickWebsiteLink: () -> Unit,
 ) {
     Column {
         Spacer(
@@ -553,6 +559,13 @@ private fun PodcastDetails(
                     interactionSource = null,
                     onClick = onClickShowNotes,
                 ),
+        )
+        Spacer(
+            modifier = Modifier.height(16.dp),
+        )
+        PodcastInfoView(
+            state = podcastInfoState,
+            onWebsiteLinkClicked = onClickWebsiteLink,
         )
     }
 }
@@ -767,6 +780,12 @@ private fun PodcastHeaderPreview() {
                     |Whether you cook or just love to eat, join us for a delicious journey!
                     """.trimMargin().lines().joinToString(separator = " "),
                 ),
+                podcastInfoState = PodcastInfoState(
+                    author = "Pocket Casts",
+                    link = "pocketcasts.com",
+                    schedule = "Every two weeks",
+                    next = "Meaning of life",
+                ),
                 rating = RatingState.Loaded(
                     ratings = PodcastRatings(
                         podcastUuid = "uuid",
@@ -792,6 +811,7 @@ private fun PodcastHeaderPreview() {
                 onClickFolder = {},
                 onClickNotification = {},
                 onClickSettings = {},
+                onClickWebsiteLink = {},
                 onToggleHeader = { isHeaderExpanded = !isHeaderExpanded },
                 onToggleDescription = { isDescriptionExpanded = !isDescriptionExpanded },
                 onLongClickArtwork = {},
