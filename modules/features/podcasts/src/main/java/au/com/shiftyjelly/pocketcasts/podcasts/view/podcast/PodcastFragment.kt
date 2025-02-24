@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
-import android.widget.Toast
 import androidx.annotation.ColorInt
 import androidx.annotation.FloatRange
 import androidx.annotation.MenuRes
@@ -610,7 +609,13 @@ class PodcastFragment : BaseFragment() {
 
     private val onNotificationsClicked: (Podcast, Boolean) -> Unit = { podcast, show ->
         viewModel.showNotifications(podcast.uuid, show)
-        Toast.makeText(context, if (show) LR.string.podcast_notifications_on else LR.string.podcast_notifications_off, Toast.LENGTH_SHORT).show()
+        currentSnackBar?.dismiss()
+        if (show) {
+            showSnackBar(
+                message = getString(LR.string.notifications_enabled_message, podcast.title),
+                duration = 3000,
+            )
+        }
     }
 
     private val onSettingsClicked: () -> Unit = {

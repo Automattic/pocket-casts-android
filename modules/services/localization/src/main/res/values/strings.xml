@@ -680,6 +680,8 @@
         <item quantity="one">second</item>
         <item quantity="other">seconds</item>
     </plurals>
+    <!-- %1$s is a podcast's title -->
+    <string name="notifications_enabled_message">We’ll notify you with new episodes of %1$s</string>
 
     <!-- Give Rating -->
 

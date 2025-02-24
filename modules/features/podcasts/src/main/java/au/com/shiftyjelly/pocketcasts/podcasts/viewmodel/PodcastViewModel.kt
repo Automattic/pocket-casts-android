@@ -1,8 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.viewmodel
 
-import android.content.Context
 import android.content.res.Resources
-import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
