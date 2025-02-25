@@ -1,8 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.viewmodel
 
-import android.content.Context
 import android.content.res.Resources
-import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -109,7 +107,6 @@ class PodcastViewModel
     val signInState = userManager.getSignInState().toLiveData()
 
     val tintColor = MutableLiveData<Int>()
-    val observableHeaderExpanded = MutableLiveData<Boolean>()
 
     val castConnected = castManager.isConnectedObservable
         .toFlowable(BackpressureStrategy.LATEST)
@@ -161,7 +158,6 @@ class PodcastViewModel
             .doOnNext { newPodcast: Podcast ->
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Observing podcast $uuid changes")
                 tintColor.value = theme.getPodcastTintColor(newPodcast)
-                observableHeaderExpanded.value = !newPodcast.isSubscribed
                 podcast.postValue(newPodcast)
             }
             .switchMap {
@@ -223,6 +219,12 @@ class PodcastViewModel
         // Refresh the podcast application coroutine scope so the podcast continues to update if the view model is closed
         applicationScope.launch {
             podcastManager.refreshPodcast(existingPodcast, playbackManager)
+        }
+    }
+
+    fun updateIsHeaderExpanded(uuid: String, isExpanded: Boolean) {
+        viewModelScope.launch {
+            podcastManager.updateIsHeaderExpanded(uuid, isExpanded)
         }
     }
 
@@ -330,13 +332,10 @@ class PodcastViewModel
         }
     }
 
-    fun toggleNotifications(context: Context) {
-        val podcast = podcast.value ?: return
-        val showNotifications = !podcast.isShowNotifications
-        analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_NOTIFICATIONS_TAPPED, AnalyticsProp.notificationEnabled(showNotifications))
-        Toast.makeText(context, if (showNotifications) LR.string.podcast_notifications_on else LR.string.podcast_notifications_off, Toast.LENGTH_SHORT).show()
-        launch {
-            podcastManager.updateShowNotificationsBlocking(podcast, showNotifications)
+    fun showNotifications(podcastUuid: String, show: Boolean) {
+        analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_NOTIFICATIONS_TAPPED, AnalyticsProp.notificationEnabled(show))
+        viewModelScope.launch {
+            podcastManager.updateShowNotifications(podcastUuid, show)
         }
     }
 

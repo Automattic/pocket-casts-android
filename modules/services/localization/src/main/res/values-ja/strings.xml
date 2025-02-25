@@ -355,8 +355,6 @@ Language: ja_JP
     <string name="onboarding_plus_recurring_after_intro_offer">%s に定期支払い</string>
     <string name="half_price_first_year">初年度は50% オフ</string>
     <string name="plus_offer_duration">%s のオファー</string>
-    <string name="report_subtitle">不適切なコンテンツを報告する</string>
-    <string name="report">報告</string>
     <string name="onboarding_plus_feature_watch_playback">Apple Watch アプリと Wear OS アプリ</string>
     <string name="onboarding_plus_feature_folders_and_bookmarks_title">フォルダーとブックマーク</string>
     <string name="settings_use_dynamic_colors_widget_details">有効化すると、端末のテーマカラーに合わせてウィジェットの色が変わります。</string>

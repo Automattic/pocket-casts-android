@@ -172,8 +172,6 @@
     <string name="go_to_next">Go to next</string>
     <string name="got_it">Got it</string>
     <string name="submit">Submit</string>
-    <string name="report">Report</string>
-    <string name="report_subtitle">Report inappropriate content</string>
     <string name="widget">Widget</string>
     <string name="medium_player_classic_widget_label">Medium Player (Classic)</string>
     <string name="small_player_widget_label">Small Player</string>
@@ -190,6 +188,7 @@
     <string name="widget_preview_time_left_4">1h 36m left</string>
     <string name="move_up">Move up</string>
     <string name="move_down">Move down</string>
+    <string name="see_more">See more</string>
 
     <string name="multiselect_actions_shown">Shortcut in toolbar</string>
     <string name="multiselect_actions_hidden">In overflow</string>
@@ -661,6 +660,7 @@
     <string name="podcast_effects_summary_default">Default</string>
     <string name="podcast_no_season">No season</string>
     <string name="podcast_season_x">Season %d</string>
+    <string name="podcast_artwork_description">Podcast artwork</string>
     <string name="podcast_refresh_artwork">Refresh artwork</string>
     <string name="podcast_rate">Rate %s</string>
     <string name="podcast_cover_description">Cover of %s podcast</string>
@@ -680,6 +680,8 @@
         <item quantity="one">second</item>
         <item quantity="other">seconds</item>
     </plurals>
+    <!-- %1$s is a podcast's title -->
+    <string name="notifications_enabled_message">We’ll notify you with new episodes of %1$s.</string>
 
     <!-- Give Rating -->
 
@@ -1930,9 +1932,9 @@
     <string name="onboarding_patron_feature_gratitude_title" translatable="false">@string/onboarding_plus_feature_gratitude_title</string>
     <string name="onboarding_patron_subscribe">Subscribe to Pocket&#160;Casts Patron</string>
     <string name="onboarding_plus_features_title" translatable="false">@string/onboarding_upgrade_everything_you_love_about_pocket_casts_plus</string>
-    <string name="onboarding_plus_feature_desktop_and_web_apps_title">Desktop &amp; Web apps</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Listen in more places with our Windows, macOS, and Web apps.</string>
     <string name="onboarding_plus_feature_folders_and_bookmarks_title">Folders &amp; Bookmarks</string>
+    <string name="onboarding_plus_feature_up_next_shuffle_title">Up Next Shuffle</string>
     <string name="onboarding_plus_feature_folders_text">Organize your podcasts in folders and keep them in sync across all your devices.</string>
     <string name="onboarding_plus_feature_cloud_storage_title">20GB Cloud Storage</string>
     <string name="onboarding_plus_feature_cloud_storage_text">Upload your files to cloud storage and have them available everywhere.</string>
@@ -2180,64 +2182,11 @@
     <string name="rate_pocket_casts">Rate Pocket Casts</string>
     <string name="pocket_casts_logo">Pocket Casts logo</string>
 
-    <!-- Paywall -->
-    <string name="paywall_save_50_off">Save 50% off your first year.</string>
-    <string name="paywall_free_1_month_trial">Free 1-month trial.</string>
-    <string name="paywall_desktop_and_web_title">Desktop and web apps</string>
-    <string name="paywall_desktop_and_web_description">Listen in more places with our Windows, macOS and Web apps.</string>
-    <string name="paywall_desktop_and_web_content_description">Desktop and web apps image</string>
-    <string name="paywall_folders_title">Folders</string>
-    <string name="paywall_folders_description">Organize your podcasts in folders, and keep them in sync across all your devices.</string>
-    <string name="paywall_folders_content_description">Folders image</string>
-    <string name="paywall_bookmarks_title">Bookmarks</string>
-    <string name="paywall_bookmarks_description">Save your favorite bits from any episode and go back to them.</string>
-    <string name="paywall_bookmarks_content_description">Bookmarks image</string>
-    <string name="paywall_watch_title">Apple Watch and Wear OS playback</string>
-    <string name="paywall_watch_description">Ditch the phone and go for a run.</string>
-    <string name="paywall_watch_content_description">Apple Watch and Wear OS playback image</string>
-    <string name="paywall_slumber_studios_title">Dream with Slumber Studios</string>
-    <string name="paywall_slumber_studios_description">Get 1 year of premium content from Slumber Studios.</string>
-    <string name="paywall_slumber_studios_content_description">Dream with Slumber Studios image</string>
-    <string name="paywall_storage_title">20 GB of storage</string>
-    <string name="paywall_storage_description">Upload your audio files to cloud storage and have them available everywhere.</string>
-    <string name="paywall_storage_content_description">20 GB of storage image</string>
-    <string name="paywall_themes_title">Extra themes and icons</string>
-    <string name="paywall_themes_description">Fly your true colors. Exclusive icons and themes for our subscribers.</string>
-    <string name="paywall_themes_content_description">Extra themes and icons image</string>
-    <string name="paywall_layout_reviews_title">\"Quite simply the best way to listen to podcasts\"</string>
-    <string name="paywall_layout_reviews_subtitle">See why people have upgraded to Plus</string>
-    <string name="paywall_layout_reviews_stars_content_description">Stars</string>
-    <string name="paywall_layout_reviews_rating">4.1 Rating (5.7K Reviews)</string>
-    <string name="paywall_layout_reviews_see_all_reviews_in_store">See all reviews in the Play Store</string>
-
-    <string name="paywall_layout_reviews_review_one_title">Best Podcast App By FAR</string>
-    <string name="paywall_layout_reviews_review_one_message">I\'ve been a long time user and the amount of functionality and customization you get with the free version is astounding. I love that it syncs across devices so I can start listening on my phone and then pick up on an Alexa device. It\'s my recommendation for anyone who listens to podcasts. Also love the stats!</string>
-    <string name="paywall_layout_reviews_review_one_date">Jul 10</string>
-
-    <string name="paywall_layout_reviews_review_two_title">The essential podcast app</string>
-    <string name="paywall_layout_reviews_review_two_message">8 years of excellence and continuous improvement</string>
-    <string name="paywall_layout_reviews_review_two_date">Jun 15</string>
-
-    <string name="paywall_layout_reviews_review_three_title">Best podcast app out there</string>
-    <string name="paywall_layout_reviews_review_three_message">I\'ve been a Pocket Casts user since 2017. \n\nThis is hands down the best app to listen to podcasts. It\'s feature rich and actively developed. There have been some complaints about the Ul change but I haven\'t really noticed it too much. \n\nThis app can be as simple or difficult to use as you\'d like it to be. So either let it be a plug and play or set up skip outro and intro timers and any other little feature you want to enable.</string>
-    <string name="paywall_layout_reviews_review_three_date">Jun 9</string>
-
-    <string name="paywall_layout_reviews_review_four_title">Fantastic app</string>
-    <string name="paywall_layout_reviews_review_four_message">The sync function is magic. Don\'t know what special magic this app has going on but it\'s better than any other app I\'ve used.</string>
-    <string name="paywall_layout_reviews_review_four_date">Jun 1</string>
-
-    <string name="paywall_layout_reviews_review_five_title">Works great and easy to find or add new pods</string>
-    <string name="paywall_layout_reviews_review_five_message">Been using this app for 6 years or better, started on android and now I have been on iOS for almost a year. Works the same on both platforms. Easy to find new podcasts to listen to, very nice Ul, can add podcasts by rss feed url too. The watch app is functional, but I mostly use for my play/pause. Sign in with an account to sync across devices but no requirement to do so.</string>
-    <string name="paywall_layout_reviews_review_five_date">May 6</string>
-
-    <string name="paywall_layout_reviews_review_six_title">Go-To Podcast App</string>
-    <string name="paywall_layout_reviews_review_six_message">PC has been my go-to for years. I\'ve tried other podcast apps and always come back to PC for their simplicity, Ul and support. Definitely worth checking it out, especially if you have grown tired of your current podcast app.</string>
-    <string name="paywall_layout_reviews_review_six_date">Mar 8</string>
-
     <string name="folders_plus_prompt">Organize your podcasts with Pocket&#160;Casts&#160;Plus, and more</string>
     <string name="themes_plus_prompt">Get exclusive themes with Pocket&#160;Casts&#160;Plus, and more</string>
     <string name="icons_plus_prompt">Get exclusive app icons with Pocket&#160;Casts&#160;Plus, and more</string>
     <string name="files_plus_prompt">Upload your files with Pocket&#160;Casts&#160;Plus, and more</string>
+    <string name="suggested_folders_plus_prompt">Organize your shows, with Pocket&#160;Casts&#160;Plus, and more</string>
     <string name="up_next_shuffle_plus_prompt">Shuffle your episodes with Pocket&#160;Casts&#160;Plus, and more</string>
 
     <!-- Engage SDK -->
@@ -2327,11 +2276,14 @@
 
     <!-- Suggested Folders -->
     <string name="suggested_folders">Suggested Folders</string>
-    <string name="suggested_folders_subtitle">We’ve organized your podcasts for you. Save or customize them to fit your style.</string>
+    <string name="suggested_folders_subtitle">We\'ve organized your podcasts into folders. Save them now and customize later to fit your style.</string>
     <string name="suggested_folders_use_these_folders_button">Use these folders</string>
     <string name="suggested_folders_use_create_custom_folders_button">Create custom folders</string>
     <string name="folder_content_description">Folder %s</string>
     <string name="suggested_folders_paywall_tittle">Your podcasts, automatically organized</string>
     <string name="suggested_folders_paywall_subtitle">We\'ve pre-made folders for your podcasts. Unlock this and features like bookmarks, transcripts, and more with Pocket Casts Plus.</string>
+    <string name="suggested_folders_replace_folders_button">Replace folders</string>
+    <string name="suggested_folders_replace_folders_confirmation_tittle">Replace existing folders?</string>
+    <string name="suggested_folders_replace_folders_confirmation_description">Accepting suggested folders will overwrite your current folders. This can\'t be undone.</string>
 
 </resources>

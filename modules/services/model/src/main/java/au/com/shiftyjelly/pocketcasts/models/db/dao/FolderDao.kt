@@ -17,6 +17,9 @@ abstract class FolderDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insert(folder: Folder)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract suspend fun insertAll(folder: List<Folder>)
+
     @Query("DELETE FROM folders")
     abstract suspend fun deleteAll()
 
@@ -70,6 +73,12 @@ abstract class FolderDao {
         for (folder in folders) {
             updateSortPosition(sortPosition = folder.sortPosition, uuid = folder.uuid, syncModified = syncModified)
         }
+    }
+
+    @Transaction
+    open suspend fun replaceAllFolders(folders: List<Folder>) {
+        deleteAll()
+        insertAll(folders)
     }
 
     @Query("SELECT COUNT(*) FROM folders WHERE deleted = 0")

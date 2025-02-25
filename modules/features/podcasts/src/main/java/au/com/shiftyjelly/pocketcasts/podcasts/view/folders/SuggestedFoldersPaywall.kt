@@ -50,6 +50,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun SuggestedFoldersPaywall(
+    folders: List<Folder>,
     onShown: () -> Unit,
     onUseTheseFolders: () -> Unit,
     onMaybeLater: () -> Unit,
@@ -63,7 +64,6 @@ fun SuggestedFoldersPaywall(
         modifier = modifier
             .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal))
             .wrapContentSize()
-            .padding(horizontal = 16.dp)
             .padding(top = 8.dp, bottom = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -82,7 +82,7 @@ fun SuggestedFoldersPaywall(
 
         AnimatedVisibility(isPortrait) {
             Folders(
-                podcastUuids = mockedPodcastsUuids,
+                folders = folders,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = animatedPadding),
@@ -93,19 +93,19 @@ fun SuggestedFoldersPaywall(
             text = stringResource(LR.string.suggested_folders_paywall_tittle),
             fontWeight = FontWeight.W600,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(bottom = 12.dp),
+            modifier = Modifier.padding(bottom = 12.dp).padding(horizontal = 16.dp),
         )
 
         TextH50(
             text = stringResource(LR.string.suggested_folders_paywall_subtitle),
             color = MaterialTheme.theme.colors.primaryText02,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(bottom = 12.dp),
+            modifier = Modifier.padding(bottom = 12.dp).padding(horizontal = 16.dp),
         )
 
         RowButton(
             text = stringResource(LR.string.suggested_folders_use_these_folders_button),
-            modifier = Modifier.padding(bottom = 16.dp),
+            modifier = Modifier.padding(bottom = 16.dp).padding(horizontal = 16.dp),
             textColor = MaterialTheme.theme.colors.primaryInteractive02,
             fontSize = 18.sp,
             fontWeight = FontWeight.W600,
@@ -118,7 +118,7 @@ fun SuggestedFoldersPaywall(
 
         RowOutlinedButton(
             text = stringResource(id = LR.string.maybe_later),
-            modifier = Modifier.padding(bottom = 16.dp),
+            modifier = Modifier.padding(bottom = 16.dp).padding(horizontal = 16.dp),
             onClick = onMaybeLater,
             includePadding = false,
             colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.theme.colors.primaryIcon01, backgroundColor = Color.Transparent),
@@ -129,18 +129,20 @@ fun SuggestedFoldersPaywall(
 }
 
 @Composable
-private fun Folders(podcastUuids: List<String>, modifier: Modifier = Modifier) {
+private fun Folders(folders: List<Folder>, modifier: Modifier = Modifier) {
     val episodeImageWidthDp = UiUtil.getGridImageWidthPx(smallArtwork = false, context = LocalContext.current).pxToDp(LocalContext.current).toInt()
 
     LazyRow(
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
-        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
+        modifier = modifier.fillMaxWidth(),
     ) {
         items(
-            count = 3,
+            count = folders.take(3).size,
             key = { index -> index },
         ) { index ->
-            FolderItem("Test", Color.Yellow, podcastUuids, Modifier.size(episodeImageWidthDp.dp))
+            val folder = folders[index]
+            val backgroundColor = MaterialTheme.theme.colors.getFolderColor(folder.color)
+            FolderItem(folder.name, backgroundColor, folder.podcasts, Modifier.size(episodeImageWidthDp.dp))
         }
     }
 }
@@ -150,15 +152,14 @@ private fun Folders(podcastUuids: List<String>, modifier: Modifier = Modifier) {
 private fun SuggestedFoldersPagePreview(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
     AppTheme(themeType) {
         SuggestedFoldersPaywall(
+            folders = listOf(
+                Folder("Folder 1", listOf("2e61ba20-50a9-0135-902b-63f4b61a9224", "2e61ba20-50a9-0135-902b-63f4b61a9224"), 1),
+                Folder("Folder 2", listOf("2e61ba20-50a9-0135-902b-63f4b61a9224", "2e61ba20-50a9-0135-902b-63f4b61a9224"), 2),
+                Folder("Folder 3", listOf("2e61ba20-50a9-0135-902b-63f4b61a9224", "2e61ba20-50a9-0135-902b-63f4b61a9224"), 5),
+            ),
             onUseTheseFolders = {},
             onMaybeLater = {},
             onShown = {},
         )
     }
 }
-
-private val mockedPodcastsUuids = listOf(
-    "5d308950-1fe3-012e-02b0-00163e1b201c",
-    "f086f200-4f32-0139-3396-0acc26574db2",
-    "2e61ba20-50a9-0135-902b-63f4b61a9224",
-)

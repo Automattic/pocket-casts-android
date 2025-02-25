@@ -103,14 +103,6 @@ enum class ShelfItem(
         iconId = { if (it is UserEpisode) IR.drawable.ic_delete else IR.drawable.ic_archive },
         analyticsValue = "archive",
     ),
-    Report(
-        id = "report",
-        titleId = { LR.string.report },
-        subtitleId = { if (it is PodcastEpisode) LR.string.report_subtitle else LR.string.player_actions_hidden_for_custom },
-        iconId = { IR.drawable.ic_flag },
-        showIf = { it is PodcastEpisode },
-        analyticsValue = "report",
-    ),
     ;
 
     // We can safely use the ID as server ID. Keeping it if need to make changes in the future.

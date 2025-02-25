@@ -95,7 +95,7 @@ class PodcastSettingsViewModel @Inject constructor(
     fun showNotifications(show: Boolean) {
         val podcast = this.podcast.value ?: return
         launch {
-            podcastManager.updateShowNotificationsBlocking(podcast, show)
+            podcastManager.updateShowNotifications(podcast.uuid, show)
         }
     }
 
