@@ -607,9 +607,14 @@ class PodcastFragment : BaseFragment() {
         viewModel.multiSelectBookmarksHelper.isMultiSelecting = false
     }
 
-    private val onNotificationsClicked: () -> Unit = {
-        context?.let {
-            viewModel.toggleNotifications(it)
+    private val onNotificationsClicked: (Podcast, Boolean) -> Unit = { podcast, show ->
+        viewModel.showNotifications(podcast.uuid, show)
+        currentSnackBar?.dismiss()
+        if (show) {
+            showSnackBar(
+                message = getString(LR.string.notifications_enabled_message, podcast.title),
+                duration = 3000,
+            )
         }
     }
 
@@ -774,16 +779,16 @@ class PodcastFragment : BaseFragment() {
             onChangeHeaderExpanded = { uuid, isExpanded ->
                 viewModel.updateIsHeaderExpanded(uuid, isExpanded)
             },
-            onClickRating = { podcastUuid, source ->
+            onClickRating = { podcast, source ->
                 ratingsViewModel.onRatingStarsTapped(
-                    podcastUuid = podcastUuid,
+                    podcastUuid = podcast.uuid,
                     fragmentManager = parentFragmentManager,
                     source = source,
                 )
             },
-            onArtworkAvailable = { uuid ->
+            onArtworkAvailable = { podcast ->
                 viewLifecycleOwner.lifecycleScope.launch {
-                    artworkDominantColor = colorAnalyzer.getArtworkDominantColor(uuid)
+                    artworkDominantColor = colorAnalyzer.getArtworkDominantColor(podcast.uuid)
                     updateStausBarForBackground()
                 }
             },

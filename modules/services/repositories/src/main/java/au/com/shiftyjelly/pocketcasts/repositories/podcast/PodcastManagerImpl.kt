@@ -521,11 +521,11 @@ class PodcastManagerImpl @Inject constructor(
         podcastDao.updateEpisodesSortTypeBlocking(episodesSortType, podcast.uuid)
     }
 
-    override fun updateShowNotificationsBlocking(podcast: Podcast, show: Boolean) {
+    override suspend fun updateShowNotifications(podcastUuid: String, show: Boolean) {
         if (show) {
             settings.notifyRefreshPodcast.set(true, updateModifiedAt = true)
         }
-        podcastDao.updateShowNotificationsBlocking(show, podcast.uuid)
+        podcastDao.updateShowNotifications(podcastUuid, show)
     }
 
     override suspend fun updateRefreshAvailable(podcastUuid: String, refreshAvailable: Boolean) {
