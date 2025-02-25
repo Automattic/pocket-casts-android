@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.localization.helper
 import android.content.res.Resources
-import android.util.Log
 import au.com.shiftyjelly.pocketcasts.localization.R
 
 object LocaliseHelper {
@@ -124,17 +123,14 @@ object LocaliseHelper {
             }
         }
 
-    fun tryToLocalise(text: String, resources: Resources, args: List<String>? = null, p: Boolean = false): String {
+    fun tryToLocalise(text: String, resources: Resources, args: List<String>? = null): String {
         val stringLower = text.lowercase()
-        if (p) {
-            Log.i("LOG_TAG", "$stringLower")
-        }
         return stringToId[stringLower]?.let { if (args.isNullOrEmpty()) resources.getString(it) else resources.getString(it, *args.toTypedArray()) } ?: text
     }
 }
 
-fun String.tryToLocalise(resources: Resources, args: List<String>? = null, p: Boolean = false): String {
-    return LocaliseHelper.tryToLocalise(this, resources, args, p)
+fun String.tryToLocalise(resources: Resources, args: List<String>? = null): String {
+    return LocaliseHelper.tryToLocalise(this, resources, args)
 }
 
 fun String.tryToLocaliseFilters(resources: Resources): String {
