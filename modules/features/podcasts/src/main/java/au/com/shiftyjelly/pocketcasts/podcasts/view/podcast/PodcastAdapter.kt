@@ -158,6 +158,7 @@ class PodcastAdapter(
     private val onTabClicked: (PodcastTab) -> Unit,
     private val onBookmarkPlayClicked: (Bookmark) -> Unit,
     private val onHeadsetSettingsClicked: () -> Unit,
+    private val onChangeHeaderExpanded: (String, Boolean) -> Unit,
     private val onClickRating: (String, RatingTappedSource) -> Unit,
     private val onArtworkAvailable: (String) -> Unit,
     private val sourceView: SourceView,
@@ -250,6 +251,9 @@ class PodcastAdapter(
                     onClickFolder = onFoldersClicked,
                     onClickNotification = onNotificationsClicked,
                     onClickSettings = onSettingsClicked,
+                    onToggleHeader = {
+                        onChangeHeaderExpanded(podcast.uuid, !podcast.isHeaderExpanded)
+                    },
                     onLongClickArtwork = {
                         onArtworkLongClicked { notifyItemChanged(0) }
                     },
@@ -914,6 +918,7 @@ class PodcastAdapter(
         private val onClickFolder: () -> Unit,
         private val onClickNotification: () -> Unit,
         private val onClickSettings: () -> Unit,
+        private val onToggleHeader: () -> Unit,
         private val onLongClickArtwork: () -> Unit,
         private val onArtworkAvailable: (String) -> Unit,
     ) : RecyclerView.ViewHolder(ComposeView(context)) {
@@ -940,6 +945,8 @@ class PodcastAdapter(
                     PodcastHeader(
                         uuid = podcast.uuid,
                         title = podcast.title,
+                        category = podcast.getFirstCategory(itemView.context.resources),
+                        author = podcast.author,
                         rating = ratingState,
                         isFollowed = podcast.isSubscribed,
                         areNotificationsEnabled = podcast.isShowNotifications,
@@ -948,20 +955,23 @@ class PodcastAdapter(
                             podcast.folderUuid != null -> PodcastFolderIcon.AddedToFolder
                             else -> PodcastFolderIcon.NotInFolder
                         },
+                        isHeaderExpanded = podcast.isHeaderExpanded,
                         contentPadding = PaddingValues(
                             top = statusBarPadding + 40.dp, // Eyeball the position inside app bar
                             start = 16.dp,
                             end = 16.dp,
+                            bottom = 16.dp,
                         ),
                         useBlurredArtwork = useBlurredArtwork,
-                        onClickRating = onClickRating,
+                        onClickRating = { source -> onClickRating(podcast.uuid, source) },
                         onClickFollow = onClickFollow,
                         onClickUnfollow = onClickUnfollow,
                         onClickFolder = onClickFolder,
                         onClickNotification = onClickNotification,
                         onClickSettings = onClickSettings,
+                        onToggleHeader = onToggleHeader,
                         onLongClickArtwork = onLongClickArtwork,
-                        onArtworkAvailable = onArtworkAvailable,
+                        onArtworkAvailable = { onArtworkAvailable(podcast.uuid) },
                     )
                 }
             }
@@ -971,12 +981,12 @@ class PodcastAdapter(
     private val NoOpEpisode = PodcastEpisode(uuid = "", publishedDate = Date())
 }
 
-// We can simply apply 'WindowInsets.statusBars' inset.
+// We can't simply apply 'WindowInsets.statusBars' inset.
 // When navigating to this screen the inset isn't available before first layout
 // which can cause an ugly jump effect.
 //
 // I'm not exactly sure why it happens only in this scenario but I assume it has
 // something to do with mix of recycler view and compose.
 //
-// 48.dp is a standard status bar height and should be good enough.
+// 48.dp is a standard status bar height and should be good enough for the initial pass.
 private var cachedStatusBarPadding: Dp = 48.dp

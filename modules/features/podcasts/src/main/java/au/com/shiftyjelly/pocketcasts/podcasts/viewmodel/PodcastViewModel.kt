@@ -109,7 +109,6 @@ class PodcastViewModel
     val signInState = userManager.getSignInState().toLiveData()
 
     val tintColor = MutableLiveData<Int>()
-    val observableHeaderExpanded = MutableLiveData<Boolean>()
 
     val castConnected = castManager.isConnectedObservable
         .toFlowable(BackpressureStrategy.LATEST)
@@ -161,7 +160,6 @@ class PodcastViewModel
             .doOnNext { newPodcast: Podcast ->
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Observing podcast $uuid changes")
                 tintColor.value = theme.getPodcastTintColor(newPodcast)
-                observableHeaderExpanded.value = !newPodcast.isSubscribed
                 podcast.postValue(newPodcast)
             }
             .switchMap {
@@ -223,6 +221,12 @@ class PodcastViewModel
         // Refresh the podcast application coroutine scope so the podcast continues to update if the view model is closed
         applicationScope.launch {
             podcastManager.refreshPodcast(existingPodcast, playbackManager)
+        }
+    }
+
+    fun updateIsHeaderExpanded(uuid: String, isExpanded: Boolean) {
+        viewModelScope.launch {
+            podcastManager.updateIsHeaderExpanded(uuid, isExpanded)
         }
     }
 

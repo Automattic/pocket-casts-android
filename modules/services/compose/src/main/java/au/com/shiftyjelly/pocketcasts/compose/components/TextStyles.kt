@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.compose.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -75,6 +76,34 @@ fun TextH20(
         maxLines = maxLines,
         overflow = overflow,
         textAlign = textAlign,
+        modifier = modifier,
+    )
+}
+
+@Composable
+fun TextH20(
+    text: AnnotatedString,
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.theme.colors.primaryText01,
+    maxLines: Int = Int.MAX_VALUE,
+    textAlign: TextAlign? = null,
+    overflow: TextOverflow = TextOverflow.Ellipsis,
+    disableAutoScale: Boolean = false,
+    fontSize: TextUnit = 22.sp,
+    lineHeight: TextUnit = 30.sp,
+    fontScale: Float = 1f,
+    inlineContent: Map<String, InlineTextContent> = mapOf(),
+) {
+    Text(
+        text = text,
+        color = color,
+        fontSize = fontSize.scaled(disableAutoScale, fontScale),
+        lineHeight = lineHeight.scaled(disableAutoScale, fontScale),
+        fontWeight = FontWeight.W700,
+        maxLines = maxLines,
+        overflow = overflow,
+        textAlign = textAlign,
+        inlineContent = inlineContent,
         modifier = modifier,
     )
 }
