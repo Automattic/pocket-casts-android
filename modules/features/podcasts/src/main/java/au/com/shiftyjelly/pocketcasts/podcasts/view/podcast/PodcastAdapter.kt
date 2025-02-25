@@ -21,6 +21,8 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.text.AnnotatedString
@@ -216,8 +218,10 @@ class PodcastAdapter(
 
     private val disposables = CompositeDisposable()
     private var podcast: Podcast = Podcast()
+    private var podcastDescription = AnnotatedString("")
 
     private var headerExpanded: Boolean = false
+    private var isDescriptionExpanded = false
     private var tintColor: Int = 0x000000
     private var signInState: SignInState = SignInState.SignedOut
     private var ratingState: RatingState = RatingState.Loading
@@ -251,8 +255,13 @@ class PodcastAdapter(
                     onClickFolder = onFoldersClicked,
                     onClickNotification = onNotificationsClicked,
                     onClickSettings = onSettingsClicked,
+                    onClickWebsiteLink = ::onWebsiteLinkClicked,
                     onToggleHeader = {
                         onChangeHeaderExpanded(podcast.uuid, !podcast.isHeaderExpanded)
+                    },
+                    onToggleDescription = {
+                        isDescriptionExpanded = !isDescriptionExpanded
+                        notifyItemChanged(0)
                     },
                     onLongClickArtwork = {
                         onArtworkLongClicked { notifyItemChanged(0) }
@@ -290,7 +299,14 @@ class PodcastAdapter(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
-            is PodcastHeaderViewHolder -> holder.bind(podcast, ratingState, signInState)
+            is PodcastHeaderViewHolder -> holder.bind(
+                podcast,
+                podcastDescription,
+                isDescriptionExpanded,
+                ratingState,
+                signInState,
+            )
+
             is EpisodeViewHolder -> bindEpisodeViewHolder(holder, position, fromListUuid)
             is PodcastViewHolder -> bindPodcastViewHolder(holder)
             is TabsViewHolder -> holder.bind(getItem(position) as TabsHeader)
@@ -334,25 +350,12 @@ class PodcastAdapter(
     private fun bindHeaderBottom(holder: PodcastViewHolder, ratingState: RatingState) {
         holder.binding.bottom.root.isVisible = headerExpanded
 
-        val isHtmlDescription = FeatureFlag.isEnabled(Feature.PODCAST_HTML_DESCRIPTION) && podcast.podcastHtmlDescription.isNotEmpty()
-        val descriptionLinkColor: Int = ThemeColor.podcastText02(theme.activeTheme, tintColor)
-
-        val description = if (isHtmlDescription) {
-            HtmlCompat.fromHtml(
-                podcast.podcastHtmlDescription,
-                HtmlCompat.FROM_HTML_MODE_COMPACT and
-                    HtmlCompat.FROM_HTML_SEPARATOR_LINE_BREAK_PARAGRAPH.inv(), // keep the extra line break from paragraphs as it looks better
-            ).toAnnotatedString(urlColor = descriptionLinkColor)
-        } else {
-            AnnotatedString(podcast.podcastDescription)
-        }
-
         holder.binding.bottom.podcastHeaderBottom.setContent {
             AppTheme(theme.activeTheme) {
                 PodcastHeaderBottom(
                     title = podcast.title,
                     category = podcast.getFirstCategory(context.resources),
-                    description = description,
+                    description = podcastDescription,
                     podcastInfoContent = {
                         PodcastInfoView(
                             PodcastInfoState(
@@ -361,9 +364,7 @@ class PodcastAdapter(
                                 schedule = podcast.displayableFrequency(context.resources),
                                 next = podcast.displayableNextEpisodeDate(context),
                             ),
-                            onWebsiteLinkClicked = {
-                                onWebsiteLinkClicked(context)
-                            },
+                            onWebsiteLinkClicked = ::onWebsiteLinkClicked,
                         )
                     },
                     ratingsContent = {
@@ -501,6 +502,18 @@ class PodcastAdapter(
             onHeaderSummaryToggled(headerExpanded, false)
         }
         this.podcast = podcast
+        val isHtmlDescription = FeatureFlag.isEnabled(Feature.PODCAST_HTML_DESCRIPTION) && podcast.podcastHtmlDescription.isNotEmpty()
+        this.podcastDescription = if (isHtmlDescription) {
+            val ann = HtmlCompat.fromHtml(
+                podcast.podcastHtmlDescription,
+                HtmlCompat.FROM_HTML_MODE_COMPACT and
+                    HtmlCompat.FROM_HTML_SEPARATOR_LINE_BREAK_PARAGRAPH.inv(), // keep the extra line break from paragraphs as it looks better
+            ).toAnnotatedString(urlColor = ThemeColor.podcastText02(theme.activeTheme, tintColor))
+            ann
+        } else {
+            AnnotatedString(podcast.podcastDescription)
+        }
+
         notifyDataSetChanged()
     }
 
@@ -726,7 +739,7 @@ class PodcastAdapter(
         onHeaderSummaryToggled(expanded, true)
     }
 
-    private fun onWebsiteLinkClicked(context: Context) {
+    private fun onWebsiteLinkClicked() {
         podcast.podcastUrl?.let { url ->
             if (url.isNotBlank()) {
                 try {
@@ -908,7 +921,7 @@ class PodcastAdapter(
         }
     }
 
-    private class PodcastHeaderViewHolder(
+    private inner class PodcastHeaderViewHolder(
         context: Context,
         private val theme: Theme,
         private val useBlurredArtwork: Boolean,
@@ -918,7 +931,9 @@ class PodcastAdapter(
         private val onClickFolder: () -> Unit,
         private val onClickNotification: () -> Unit,
         private val onClickSettings: () -> Unit,
+        private val onClickWebsiteLink: () -> Unit,
         private val onToggleHeader: () -> Unit,
+        private val onToggleDescription: () -> Unit,
         private val onLongClickArtwork: () -> Unit,
         private val onArtworkAvailable: (String) -> Unit,
     ) : RecyclerView.ViewHolder(ComposeView(context)) {
@@ -931,6 +946,8 @@ class PodcastAdapter(
 
         fun bind(
             podcast: Podcast,
+            podcastDescription: AnnotatedString,
+            isDescriptionExpanded: Boolean,
             ratingState: RatingState,
             signInState: SignInState,
         ) {
@@ -947,6 +964,13 @@ class PodcastAdapter(
                         title = podcast.title,
                         category = podcast.getFirstCategory(itemView.context.resources),
                         author = podcast.author,
+                        description = podcastDescription,
+                        podcastInfoState = PodcastInfoState(
+                            author = podcast.author,
+                            link = podcast.getShortUrl(),
+                            schedule = podcast.displayableFrequency(context.resources),
+                            next = podcast.displayableNextEpisodeDate(context),
+                        ),
                         rating = ratingState,
                         isFollowed = podcast.isSubscribed,
                         areNotificationsEnabled = podcast.isShowNotifications,
@@ -956,6 +980,7 @@ class PodcastAdapter(
                             else -> PodcastFolderIcon.NotInFolder
                         },
                         isHeaderExpanded = podcast.isHeaderExpanded,
+                        isDescriptionExpanded = isDescriptionExpanded,
                         contentPadding = PaddingValues(
                             top = statusBarPadding + 40.dp, // Eyeball the position inside app bar
                             start = 16.dp,
@@ -969,7 +994,9 @@ class PodcastAdapter(
                         onClickFolder = onClickFolder,
                         onClickNotification = onClickNotification,
                         onClickSettings = onClickSettings,
+                        onClickWebsiteLink = onClickWebsiteLink,
                         onToggleHeader = onToggleHeader,
+                        onToggleDescription = onToggleDescription,
                         onLongClickArtwork = onLongClickArtwork,
                         onArtworkAvailable = { onArtworkAvailable(podcast.uuid) },
                     )
