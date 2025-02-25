@@ -104,7 +104,7 @@ class AppLifecycleObserver constructor(
             settings.useDarkUpNextTheme.set(false, updateModifiedAt = false)
 
             // new installations default to not displaying the tooltip
-            settings.showPodcastRefreshTooltip.set(false, updateModifiedAt = false)
+            settings.showPodcastHeaderChangesTooltip.set(false, updateModifiedAt = false)
 
             when (getAppPlatform()) {
                 // do nothing because this already defaults to true for all users on automotive

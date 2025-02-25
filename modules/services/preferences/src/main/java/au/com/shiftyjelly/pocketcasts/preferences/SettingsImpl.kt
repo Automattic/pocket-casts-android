@@ -1538,12 +1538,6 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override val showPodcastRefreshTooltip: UserSetting<Boolean> = UserSetting.BoolPref(
-        sharedPrefKey = Settings.SHOW_PODCAST_REFRESH_TOOLTIP,
-        defaultValue = true,
-        sharedPrefs = sharedPreferences,
-    )
-
     override val referralClaimCode = UserSetting.StringPref(
         sharedPrefKey = "referralCode",
         defaultValue = "",
@@ -1575,6 +1569,12 @@ class SettingsImpl @Inject constructor(
     override val useRealTimeForPlaybackRemaingTime = UserSetting.BoolPref(
         sharedPrefKey = "use_real_time_for_playback_remaining_time",
         defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val showPodcastHeaderChangesTooltip: UserSetting<Boolean> = UserSetting.BoolPref(
+        sharedPrefKey = "show_podcast_header_ui_changes_tooltip",
+        defaultValue = true,
         sharedPrefs = sharedPreferences,
     )
 }

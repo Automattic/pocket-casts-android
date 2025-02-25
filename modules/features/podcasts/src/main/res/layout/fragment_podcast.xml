@@ -96,11 +96,12 @@
             </FrameLayout>
 
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-        
+
         <androidx.compose.ui.platform.ComposeView
             android:id="@+id/composeTooltipHost"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
 
     </FrameLayout>
 

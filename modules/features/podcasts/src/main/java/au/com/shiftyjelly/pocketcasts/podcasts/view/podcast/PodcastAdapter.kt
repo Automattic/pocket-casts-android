@@ -21,8 +21,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.statusBars
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.text.AnnotatedString
@@ -87,6 +85,7 @@ import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelpe
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import java.util.Date
+import kotlinx.coroutines.CompletableDeferred
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -240,34 +239,44 @@ class PodcastAdapter(
         setHasStableIds(true)
     }
 
+    private val tooltipHeaderOffset = CompletableDeferred<Dp?>()
+
+    suspend fun awaitTooltipHeaderTopOffset() = tooltipHeaderOffset.await()
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             VIEW_TYPE_PODCAST_HEADER -> when (headerType) {
-                HeaderType.SolidColor -> PodcastViewHolder(AdapterPodcastHeaderBinding.inflate(inflater, parent, false), this)
-                HeaderType.Blur, HeaderType.Scrim -> PodcastHeaderViewHolder(
-                    context = parent.context,
-                    theme = theme,
-                    useBlurredArtwork = headerType == HeaderType.Blur,
-                    onClickRating = onClickRating,
-                    onClickFollow = onSubscribeClicked,
-                    onClickUnfollow = { onUnsubscribeClicked { } },
-                    onClickFolder = onFoldersClicked,
-                    onClickNotification = onNotificationsClicked,
-                    onClickSettings = onSettingsClicked,
-                    onClickWebsiteLink = ::onWebsiteLinkClicked,
-                    onToggleHeader = {
-                        onChangeHeaderExpanded(podcast.uuid, !podcast.isHeaderExpanded)
-                    },
-                    onToggleDescription = {
-                        isDescriptionExpanded = !isDescriptionExpanded
-                        notifyItemChanged(0)
-                    },
-                    onLongClickArtwork = {
-                        onArtworkLongClicked { notifyItemChanged(0) }
-                    },
-                    onArtworkAvailable = onArtworkAvailable,
-                )
+                HeaderType.SolidColor -> {
+                    tooltipHeaderOffset.complete(null)
+                    PodcastViewHolder(AdapterPodcastHeaderBinding.inflate(inflater, parent, false), this)
+                }
+                HeaderType.Blur, HeaderType.Scrim -> {
+                    PodcastHeaderViewHolder(
+                        context = parent.context,
+                        theme = theme,
+                        useBlurredArtwork = headerType == HeaderType.Blur,
+                        onClickRating = onClickRating,
+                        onClickFollow = onSubscribeClicked,
+                        onClickUnfollow = { onUnsubscribeClicked { } },
+                        onClickFolder = onFoldersClicked,
+                        onClickNotification = onNotificationsClicked,
+                        onClickSettings = onSettingsClicked,
+                        onClickWebsiteLink = ::onWebsiteLinkClicked,
+                        onToggleHeader = {
+                            onChangeHeaderExpanded(podcast.uuid, !podcast.isHeaderExpanded)
+                        },
+                        onToggleDescription = {
+                            isDescriptionExpanded = !isDescriptionExpanded
+                            notifyItemChanged(0)
+                        },
+                        onLongClickArtwork = {
+                            onArtworkLongClicked { notifyItemChanged(0) }
+                        },
+                        onArtworkAvailable = onArtworkAvailable,
+                        onTooltipOffsetMeasured = tooltipHeaderOffset::complete,
+                    )
+                }
             }
 
             VIEW_TYPE_TABS -> TabsViewHolder(ComposeView(parent.context), theme)
@@ -936,6 +945,7 @@ class PodcastAdapter(
         private val onToggleDescription: () -> Unit,
         private val onLongClickArtwork: () -> Unit,
         private val onArtworkAvailable: (Podcast) -> Unit,
+        private val onTooltipOffsetMeasured: (Dp) -> Unit,
     ) : RecyclerView.ViewHolder(ComposeView(context)) {
         private val composeView get() = itemView as ComposeView
 
@@ -999,6 +1009,7 @@ class PodcastAdapter(
                         onToggleDescription = onToggleDescription,
                         onLongClickArtwork = onLongClickArtwork,
                         onArtworkAvailable = { onArtworkAvailable(podcast) },
+                        onTooltipOffsetMeasured = onTooltipOffsetMeasured,
                     )
                 }
             }
