@@ -143,7 +143,7 @@ class DownloadManagerImpl @Inject constructor(
 
                                     // FIXME this is a hack to avoid an issue where this listener says downloads
                                     //  on the watch app are enqueued when they are actually still running.
-                                    val queriedState = workManager.getWorkInfoById(workInfo.id).get().state
+                                    val queriedState = workManager.getWorkInfoById(workInfo.id).get()?.state
                                     if (Util.isWearOs(context) && queriedState == WorkInfo.State.RUNNING) {
                                         getRequirementsAsync(episode)
                                     } else {
