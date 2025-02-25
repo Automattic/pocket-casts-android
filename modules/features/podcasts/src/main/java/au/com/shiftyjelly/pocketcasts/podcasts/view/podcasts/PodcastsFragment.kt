@@ -57,6 +57,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
@@ -240,9 +241,9 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.userSuggestedFoldersState.collect { (signInState, state) ->
+                viewModel.userSuggestedFoldersState.collectLatest { (signInState, state) ->
+                    val existingModal = parentFragmentManager.findFragmentByTag("suggested_folders_paywall")
                     if (state is PodcastsViewModel.SuggestedFoldersState.Loaded) {
-                        val existingModal = parentFragmentManager.findFragmentByTag("suggested_folders_paywall")
                         if (existingModal != null && existingModal is SuggestedFoldersPaywallBottomSheet && !signInState.isSignedInAsPlusOrPatron) {
                             // We don't want to close this modal for Paid users because this scenario might occur when the user upgrades their account
                             // after the modal has already been opened. In this case, we want to keep the modal open so the user can tap the button
@@ -251,6 +252,10 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
                         }
                         if (viewModel.showSuggestedFoldersPaywallOnOpen(signInState.isSignedInAsPlusOrPatron)) {
                             SuggestedFoldersPaywallBottomSheet.newInstance(state.folders()).show(parentFragmentManager, "suggested_folders_paywall")
+                        }
+                    } else if (state is PodcastsViewModel.SuggestedFoldersState.Empty) {
+                        if (existingModal != null && existingModal is SuggestedFoldersPaywallBottomSheet) {
+                            existingModal.dismiss()
                         }
                     }
                 }

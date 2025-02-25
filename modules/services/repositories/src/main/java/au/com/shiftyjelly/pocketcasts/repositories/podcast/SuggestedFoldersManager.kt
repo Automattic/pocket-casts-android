@@ -3,14 +3,17 @@ package au.com.shiftyjelly.pocketcasts.repositories.podcast
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.dao.SuggestedFoldersDao
 import au.com.shiftyjelly.pocketcasts.models.entity.SuggestedFolder
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.SuggestedFoldersRequest
+import au.com.shiftyjelly.pocketcasts.utils.extensions.md5
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import timber.log.Timber
 
 class SuggestedFoldersManager @Inject constructor(
     private val podcastCacheService: PodcastCacheServiceManager,
+    private val settings: Settings,
     appDatabase: AppDatabase,
 ) {
 
@@ -20,8 +23,17 @@ class SuggestedFoldersManager @Inject constructor(
 
     suspend fun refreshSuggestedFolders(podcastUuids: List<String>) {
         try {
-            val folders = podcastCacheService.suggestedFolders(SuggestedFoldersRequest(podcastUuids))
-            suggestedFoldersDao.deleteAndInsertAll(folders)
+            if (podcastUuids.isEmpty()) {
+                suggestedFoldersDao.deleteAll()
+                settings.followedPodcastsForSuggestedFoldersHash.set("", updateModifiedAt = false)
+            } else {
+                val currentHash = podcastUuids.sorted().md5()
+                if (currentHash != settings.followedPodcastsForSuggestedFoldersHash.value) {
+                    val folders = podcastCacheService.suggestedFolders(SuggestedFoldersRequest(podcastUuids))
+                    suggestedFoldersDao.deleteAndInsertAll(folders)
+                    currentHash?.let { settings.followedPodcastsForSuggestedFoldersHash.set(it, updateModifiedAt = false) }
+                }
+            }
         } catch (e: Exception) {
             Timber.e(e, "Refreshing suggested folders failed")
         }

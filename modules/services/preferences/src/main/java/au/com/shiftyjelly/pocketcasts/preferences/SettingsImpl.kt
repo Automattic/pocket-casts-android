@@ -1577,4 +1577,10 @@ class SettingsImpl @Inject constructor(
         defaultValue = true,
         sharedPrefs = sharedPreferences,
     )
+
+    override val followedPodcastsForSuggestedFoldersHash = UserSetting.StringPref(
+        sharedPrefKey = "followed_podcasts_hash_for_suggested_folders",
+        defaultValue = "",
+        sharedPrefs = sharedPreferences,
+    )
 }
