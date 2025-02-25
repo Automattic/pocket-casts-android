@@ -8,7 +8,6 @@ import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,27 +16,26 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.discover.databinding.FragmentDiscoverBinding
-import au.com.shiftyjelly.pocketcasts.discover.viewmodel.DiscoverState
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.DiscoverViewModel
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastFragment
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.categories.CategoriesManager
 import au.com.shiftyjelly.pocketcasts.search.SearchFragment
 import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServiceManagerImpl
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverEpisode
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRegion
-import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRow
 import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyle
-import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.asFlowable
 
 @AndroidEntryPoint
 class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectFragment.Listener {
@@ -117,7 +115,9 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         viewModel.stopPlayback()
     }
 
-    override fun onSearchClicked() {
+    @Inject lateinit var categoriesManager: CategoriesManager
+
+    override fun onClickSearch() {
         val searchFragment = SearchFragment.newInstance(
             floating = true,
             onlySearchRemote = true,
@@ -127,54 +127,33 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         binding?.recyclerView?.smoothScrollToPosition(0)
     }
 
-    override fun onCategoryClick(selectedCategory: CategoryPill, onCategorySelectionSuccess: () -> Unit) {
-        val categoryWithRegionUpdated =
-            viewModel.transformNetworkLoadableList(selectedCategory.discoverCategory, resources)
+    override fun onSelectCategory(category: DiscoverCategory) {
+        analyticsTracker.track(
+            AnalyticsEvent.DISCOVER_CATEGORIES_PILL_TAPPED,
+            mapOf("name" to category.name, "id" to category.id, "region" to viewModel.currentRegionCode.orEmpty()),
+        )
 
-        viewModel.filterPodcasts(categoryWithRegionUpdated.source) {
-            val podcasts = it.podcasts
-
-            val mostPopularPodcasts =
-                MostPopularPodcastsByCategoryRow(it.listId, it.title, podcasts.take(MOST_POPULAR_PODCASTS))
-
-            val remainingPodcasts =
-                RemainingPodcastsByCategoryRow(it.listId, it.title, podcasts.drop(MOST_POPULAR_PODCASTS))
-
-            updateDiscoverWithCategorySelected(selectedCategory.discoverCategory, mostPopularPodcasts, remainingPodcasts)
-
-            onCategorySelectionSuccess()
-        }
-
-        trackCategoryShownImpression(selectedCategory.discoverCategory)
+        categoriesManager.selectCategory(category.id)
     }
-    override fun onAllCategoriesClick(source: String, onCategorySelectionSuccess: (CategoryPill) -> Unit, onCategorySelectionCancel: () -> Unit) {
-        viewModel.loadCategories(source) { categories ->
-            CategoriesBottomSheet(
-                categories = categories,
-                onCategoryClick = {
-                    trackDropDownListCategoryPickImpression(it.discoverCategory.name, it.discoverCategory.id)
-                    this.onCategoryClick(it) { onCategorySelectionSuccess(it) }
-                },
-                onCategorySelectionCancel = onCategorySelectionCancel,
-            ).show(childFragmentManager, "categories_bottom_sheet")
-        }
+
+    override fun onDismissSelectedCategory(category: DiscoverCategory) {
+        analyticsTracker.track(
+            AnalyticsEvent.DISCOVER_CATEGORY_CLOSE_BUTTON_TAPPED,
+            mapOf("name" to category.name, "id" to category.id, "region" to viewModel.currentRegionCode.orEmpty()),
+        )
+
+        categoriesManager.dismissSelectedCategory()
     }
-    override fun onClearCategoryFilterClick(source: String, onCategoryClearSuccess: (List<CategoryPill>) -> Unit) {
-        viewModel.loadCategories(source) { categories ->
-            onCategoryClearSuccess(categories)
-            viewModel.loadData(resources) // Reload discover
-        }
+
+    override fun onShowAllCategories() {
+        CategoriesBottomSheet
+            .newInstance(viewModel.currentRegionCode.orEmpty())
+            .show(childFragmentManager, "categories_bottom_sheet")
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentDiscoverBinding.inflate(inflater, container, false)
-
-        if (viewModel.state.value !is DiscoverState.DataLoaded) {
-            viewModel.loadData(resources)
-        }
-
         viewModel.onShown()
-
         return binding?.root
     }
 
@@ -191,70 +170,79 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         if (adapter == null) {
             adapter = DiscoverAdapter(
                 context = requireContext(),
-                service = viewModel.repository,
                 staticServiceManager = staticServiceManager,
                 listener = this,
                 theme = theme,
                 loadPodcastList = viewModel::loadPodcastList,
                 loadCarouselSponsoredPodcastList = viewModel::loadCarouselSponsoredPodcasts,
-                loadCategories = viewModel::loadCategories,
+                categoriesState = { url, popularIds ->
+                    categoriesManager.setMostPopularCategories(popularIds)
+                    categoriesManager.loadCategories(url)
+                    categoriesManager.state.asFlowable()
+                },
                 analyticsTracker = analyticsTracker,
             )
         }
         recyclerView.adapter = adapter
         recyclerView.itemAnimator = null
 
-        viewModel.state.observe(
-            viewLifecycleOwner,
-            Observer { state ->
-                val binding = binding ?: return@Observer
-                when (state) {
-                    is DiscoverState.DataLoaded -> {
-                        binding.errorLayout.isVisible = false
-                        binding.recyclerView.isVisible = true
+        viewLifecycleOwner.lifecycleScope.launch {
+            val binding = binding ?: return@launch
+
+            var displayedCategoryId: Int? = null
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.state.collect { state ->
+                    if (state.isError) {
                         binding.loading.isVisible = false
-
-                        val content = state.data.plus(ChangeRegionRow(state.selectedRegion))
-                        val onChangeRegion: () -> Unit = {
-                            val fragment = RegionSelectFragment.newInstance(state.regionList, state.selectedRegion)
-                            (activity as FragmentHostListener).addFragment(fragment)
-                            fragment.listener = this
-                        }
-                        adapter?.onChangeRegion = onChangeRegion
-
-                        val updatedContent = updateDiscoverRowsAndRemoveCategoryAds(content, state.selectedRegion.code)
-
-                        adapter?.submitList(updatedContent)
-                    }
-                    is DiscoverState.Error -> {
                         binding.errorLayout.isVisible = true
                         binding.recyclerView.isVisible = false
-                        binding.loading.isVisible = false
 
-                        binding.btnRetry.setOnClickListener { viewModel.loadData(resources) }
+                        binding.btnRetry.setOnClickListener { viewModel.loadFeed(resources) }
+                        return@collect
                     }
-                    is DiscoverState.Loading -> {
-                        binding.errorLayout.isVisible = false
-                        binding.recyclerView.isVisible = false
-                        binding.loading.isVisible = true
+
+                    binding.loading.isVisible = state.isLoading
+                    binding.errorLayout.isVisible = false
+                    binding.recyclerView.isVisible = true
+
+                    if (state.rows != null) {
+                        adapter?.submitList(state.rows)
+
+                        val newCategoryId = state.categoryFeed?.category?.id
+                        if (displayedCategoryId != newCategoryId) {
+                            displayedCategoryId = newCategoryId
+                            if (newCategoryId != null) {
+                                trackCategoryShownImpression(state.categoryFeed.category)
+                            }
+                        }
                     }
-                    is DiscoverState.FilteringPodcastsByCategory -> {
-                        binding.loading.isVisible = true
-                        binding.errorLayout.isVisible = false
-                    }
-                    is DiscoverState.PodcastsFilteredByCategory -> {
-                        binding.errorLayout.isVisible = false
-                        binding.recyclerView.isVisible = true
-                        binding.loading.isVisible = false
+
+                    val feed = state.discoverFeed ?: return@collect
+                    adapter?.onChangeRegion = {
+                        val fragment = RegionSelectFragment.newInstance(feed.regionList, feed.selectedRegion)
+                        (activity as FragmentHostListener).addFragment(fragment)
+                        fragment.listener = this@DiscoverFragment
                     }
                 }
-            },
-        )
+            }
+        }
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 settings.bottomInset.collect {
                     binding?.recyclerView?.updatePadding(bottom = it)
+                }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                categoriesManager.selectedCategory.collect { category ->
+                    if (category == null) {
+                        viewModel.loadFeed(resources)
+                    } else {
+                        viewModel.loadCategory(category, resources)
+                    }
                 }
             }
         }
@@ -269,43 +257,6 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         binding?.recyclerView?.scrollToPosition(0)
     }
 
-    private fun updateDiscoverRowsAndRemoveCategoryAds(content: List<Any>, region: String): MutableList<Any> {
-        val mutableContentList = content.toMutableList()
-
-        val categoriesIndex = mutableContentList.indexOfFirst { it is DiscoverRow && it.type is ListType.Categories }
-
-        if (categoriesIndex != -1) {
-            val categoriesItem = mutableContentList[categoriesIndex] as DiscoverRow
-            mutableContentList[categoriesIndex] = categoriesItem.copy(regionCode = region)
-        }
-
-        mutableContentList.removeAll { it is DiscoverRow && it.categoryId != null } // Remove ads exclusive to category view
-
-        return mutableContentList
-    }
-
-    private fun updateDiscoverWithCategorySelected(
-        category: DiscoverCategory,
-        mostPopularPodcasts: MostPopularPodcastsByCategoryRow,
-        remainingPodcasts: RemainingPodcastsByCategoryRow,
-    ) {
-        adapter?.currentList?.let { discoverList ->
-            val updatedList = discoverList.filter { it is DiscoverRow && it.type is ListType.Categories }.toMutableList()
-
-            // First, we insert the most popular podcasts.
-            updatedList.add(mostPopularPodcasts)
-
-            // If there is ad, we add it.
-            viewModel.getAdForCategoryView(category.id)?.let {
-                updatedList.add(CategoryAdRow(categoryId = category.id, categoryName = category.name, region = viewModel.currentRegionCode, discoverRow = it))
-            }
-
-            // Lastly, we add the remaining podcast list.
-            updatedList.add(remainingPodcasts)
-
-            adapter?.submitList(updatedList)
-        }
-    }
     private fun trackCategoryShownImpression(category: DiscoverCategory) {
         viewModel.currentRegionCode?.let {
             analyticsTracker.track(
@@ -318,18 +269,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
             )
         }
     }
-    private fun trackDropDownListCategoryPickImpression(name: String, id: Int) {
-        viewModel.currentRegionCode?.let {
-            analyticsTracker.track(
-                AnalyticsEvent.DISCOVER_CATEGORIES_PICKER_PICK,
-                mapOf(
-                    NAME_KEY to name,
-                    REGION_KEY to it,
-                    ID_KEY to id,
-                ),
-            )
-        }
-    }
+
     companion object {
         private const val ID_KEY = "id"
         private const val NAME_KEY = "name"

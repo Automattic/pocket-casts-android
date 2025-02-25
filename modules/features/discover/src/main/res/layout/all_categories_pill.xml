@@ -18,4 +18,10 @@
         android:textAlignment="center"
         tools:text="Category" />
 
+    <ImageView
+        android:id="@+id/categoryIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="8dp" />
+
 </LinearLayout>

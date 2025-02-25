@@ -1741,6 +1741,8 @@
     <string name="discover_sponsored">Sponsored</string>
     <string name="discover_all_categories">All categories</string>
     <string name="discover_select_categories">Select a category</string>
+    <string name="discover_show_all_categories">Show all categories</string>
+    <string name="discover_dismiss_selected_category">Dismiss selected category</string>
 
     <!-- Server errors -->
 
