@@ -60,7 +60,7 @@ class UpdateEpisodeDetailsTest {
             onBlocking { findByUuid(episode.uuid) }.doReturn(episode)
         }
 
-        val episodeUuids = listOf(episode.uuid).toTypedArray()
+        val episodeUuids: Array<String?> = listOf(episode.uuid).toTypedArray()
         val data = Data.Builder().putStringArray(UpdateEpisodeDetailsTask.INPUT_EPISODE_UUIDS, episodeUuids).build()
         val worker = TestListenableWorkerBuilder<UpdateEpisodeDetailsTask>(context, inputData = data)
             .setWorkerFactory(TestWorkerFactory(episodeManager))
