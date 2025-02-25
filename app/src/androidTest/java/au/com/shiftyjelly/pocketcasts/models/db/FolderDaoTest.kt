@@ -155,22 +155,17 @@ class FolderDaoTest {
         )
         folderDao.insertAll(initialFolders)
 
-        var foundFolder1 = folderDao.findByUuid("uuid1")
-        var foundFolder2 = folderDao.findByUuid("uuid2")
-        assertNotNull(foundFolder1)
-        assertNotNull(foundFolder2)
-
         val newFolders = listOf(
             fakeFolder.copy(uuid = "uuid3"),
             fakeFolder.copy(uuid = "uuid4"),
         )
 
-        folderDao.replaceAllFolders(newFolders)
+        folderDao.replaceAllFolders(newFolders, System.currentTimeMillis())
 
-        foundFolder1 = folderDao.findByUuid("uuid1")
-        foundFolder2 = folderDao.findByUuid("uuid2")
-        assertNull(foundFolder1)
-        assertNull(foundFolder2)
+        val foundFolder1 = folderDao.findByUuid("uuid1")
+        val foundFolder2 = folderDao.findByUuid("uuid2")
+        assertEquals(true, foundFolder1!!.deleted)
+        assertEquals(true, foundFolder2!!.deleted)
 
         val foundFolder3 = folderDao.findByUuid("uuid3")
         val foundFolder4 = folderDao.findByUuid("uuid4")
