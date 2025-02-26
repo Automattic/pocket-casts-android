@@ -257,7 +257,7 @@ private fun PodcastControls(
                 text = text,
                 color = MaterialTheme.theme.colors.primaryText02,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(bottom = 16.dp),
+                modifier = Modifier.padding(bottom = 12.dp),
             )
         }
         val density = LocalDensity.current
@@ -326,7 +326,7 @@ private fun PodcastRatingOrSpacing(
             PodcastRating(
                 state = anyRating,
                 onClick = {},
-                modifier = Modifier.padding(vertical = 8.dp),
+                modifier = Modifier.padding(top = 2.dp, bottom = 6.dp),
             )
         }[0].measure(constraints)
 
@@ -338,7 +338,7 @@ private fun PodcastRatingOrSpacing(
                 is RatingState.Loaded -> PodcastRating(
                     state = rating,
                     onClick = onClickRating,
-                    modifier = Modifier.padding(vertical = 8.dp),
+                    modifier = Modifier.padding(top = 2.dp, bottom = 6.dp),
                 )
 
                 is RatingState.Error, is RatingState.Loading -> Spacer(
@@ -414,7 +414,7 @@ private fun PodcastActions(
         val dummyButton = subcompose("dummyButton") {
             TextH40(
                 text = stringResource(LR.string.subscribe),
-                modifier = Modifier.padding(horizontal = 60.dp, vertical = 12.dp),
+                modifier = Modifier.padding(horizontal = 52.dp, vertical = 10.dp),
             )
         }[0].measure(Constraints())
 
@@ -535,7 +535,7 @@ private fun ActionButton(
     Image(
         painter = painterResource(iconId),
         contentDescription = contentDescription,
-        colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.primaryIcon02),
+        colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.primaryIcon02Active),
         modifier = Modifier
             .padding(4.dp)
             .size(24.dp)
@@ -557,7 +557,7 @@ private fun PodcastDetails(
 ) {
     Column {
         Spacer(
-            modifier = Modifier.height(24.dp),
+            modifier = Modifier.height(16.dp),
         )
         ExpandableText(
             text = description,
