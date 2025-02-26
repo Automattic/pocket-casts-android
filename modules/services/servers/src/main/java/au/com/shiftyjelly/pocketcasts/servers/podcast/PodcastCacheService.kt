@@ -69,6 +69,7 @@ data class PodcastRatingsResponse(
 @JsonClass(generateAdapter = true)
 data class SuggestedFoldersRequest(
     @field:Json(name = "uuids") val uuids: List<String>,
+    @field:Json(name = "language") val language: String,
 )
 
 interface PodcastCacheService {

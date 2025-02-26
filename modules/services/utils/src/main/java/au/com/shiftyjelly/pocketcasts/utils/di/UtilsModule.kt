@@ -1,5 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.utils.di
 
+import au.com.shiftyjelly.pocketcasts.utils.LocaleUtil
+import au.com.shiftyjelly.pocketcasts.utils.LocaleUtilImpl
 import au.com.shiftyjelly.pocketcasts.utils.UUIDProvider
 import au.com.shiftyjelly.pocketcasts.utils.UUIDProviderImpl
 import dagger.Module
@@ -16,4 +18,7 @@ object UtilsModule {
 
     @Provides
     fun provideUuidProvider(): UUIDProvider = UUIDProviderImpl()
+
+    @Provides
+    fun provideLocaleUtil(): LocaleUtil = LocaleUtilImpl()
 }
