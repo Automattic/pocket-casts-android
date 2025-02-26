@@ -568,4 +568,6 @@ interface Settings {
     val useRealTimeForPlaybackRemaingTime: UserSetting<Boolean>
 
     val showPodcastHeaderChangesTooltip: UserSetting<Boolean>
+
+    val followedPodcastsForSuggestedFoldersHash: UserSetting<String>
 }

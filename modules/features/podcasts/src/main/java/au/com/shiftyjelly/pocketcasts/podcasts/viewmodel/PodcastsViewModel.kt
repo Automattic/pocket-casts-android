@@ -34,9 +34,11 @@ import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
@@ -300,14 +302,19 @@ class PodcastsViewModel
         }
     }
 
+    @OptIn(FlowPreview::class)
     suspend fun loadSuggestedFolders() {
         if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS)) {
             _suggestedFoldersState.emit(SuggestedFoldersState.Loading)
-            suggestedFoldersManager.getSuggestedFolders().collect { folders ->
-                if (!folders.isEmpty()) {
-                    _suggestedFoldersState.emit(SuggestedFoldersState.Loaded(folders))
+            suggestedFoldersManager.getSuggestedFolders()
+                .debounce(200)
+                .collect { folders ->
+                    if (folders.isEmpty()) {
+                        _suggestedFoldersState.emit(SuggestedFoldersState.Empty)
+                    } else {
+                        _suggestedFoldersState.emit(SuggestedFoldersState.Loaded(folders))
+                    }
                 }
-            }
         }
     }
 
@@ -333,6 +340,7 @@ class PodcastsViewModel
 
             fun folders(): List<SuggestedFolderModel> = convertedFolders
         }
+        data object Empty : SuggestedFoldersState()
     }
 
     companion object {

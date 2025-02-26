@@ -27,7 +27,7 @@ abstract class SuggestedFoldersDao {
     abstract suspend fun deleteFolder(folderName: String, podcastUuid: String)
 
     @Query("DELETE FROM suggested_folders")
-    protected abstract suspend fun deleteAll()
+    abstract suspend fun deleteAll()
 
     @Transaction
     open suspend fun deleteAndInsertAll(folders: List<SuggestedFolder>) {
