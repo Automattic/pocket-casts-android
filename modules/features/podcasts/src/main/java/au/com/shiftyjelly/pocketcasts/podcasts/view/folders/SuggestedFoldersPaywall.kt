@@ -62,9 +62,9 @@ fun SuggestedFoldersPaywall(
 
     Column(
         modifier = modifier
-            .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal))
+            .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom))
             .wrapContentSize()
-            .padding(top = 8.dp, bottom = 16.dp),
+            .padding(vertical = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         val isPortrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
