@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.podcasts.view.podcast
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -46,12 +47,12 @@ fun PodcastInfoView(
             .fillMaxWidth(),
     ) {
         Column(
+            verticalArrangement = Arrangement.spacedBy(12.dp),
             modifier = modifier.padding(16.dp),
         ) {
             PodcastInfoItem(
                 state.author,
                 IR.drawable.ic_author,
-                modifier = Modifier.padding(bottom = 12.dp),
             )
 
             if (!state.link.isNullOrEmpty()) {
@@ -60,7 +61,6 @@ fun PodcastInfoView(
                     icon = IR.drawable.ic_link,
                     isLink = true,
                     onWebsiteLinkClicked = onWebsiteLinkClicked,
-                    modifier = Modifier.padding(bottom = 12.dp),
                 )
             }
 
@@ -68,7 +68,6 @@ fun PodcastInfoView(
                 PodcastInfoItem(
                     text = state.schedule,
                     icon = IR.drawable.ic_schedule,
-                    modifier = Modifier.padding(bottom = 12.dp),
                 )
             }
 
