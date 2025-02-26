@@ -228,13 +228,13 @@ data class Podcast(
         KEEP_EPISODES, DELETE_EPISODES
     }
 
-    private fun getFirstCategory() = podcastCategory.split("\n").first()
+    fun getFirstCategoryUnlocalised() = podcastCategory.split("\n").first().trim()
 
     fun getFirstCategory(resources: Resources): String {
-        return getFirstCategory().tryToLocalise(resources)
+        return getFirstCategoryUnlocalised().tryToLocalise(resources)
     }
 
-    fun getFirstCategoryId() = getCategoryIdForName(getFirstCategory().trim().lowercase())
+    fun getFirstCategoryId() = getCategoryIdForName(getFirstCategoryUnlocalised().trim().lowercase())
 
     fun addEpisode(episode: PodcastEpisode) {
         this.episodes.add(episode)

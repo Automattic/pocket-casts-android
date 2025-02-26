@@ -794,6 +794,10 @@ class PodcastFragment : BaseFragment() {
             onClickCategory = { podcast ->
                 val categoryId = podcast.getFirstCategoryId()
                 if (categoryId != null) {
+                    analyticsTracker.track(
+                        AnalyticsEvent.PODCAST_SCREEN_CATEGORY_TAPPED,
+                        mapOf("category" to podcast.getFirstCategoryUnlocalised()),
+                    )
                     categoriesManager.selectCategory(categoryId)
                     val hostListener = (requireActivity() as FragmentHostListener)
                     hostListener.closeToRoot()
