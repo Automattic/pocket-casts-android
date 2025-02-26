@@ -86,6 +86,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.reimagine.podcast.SharePodcastFragment
 import au.com.shiftyjelly.pocketcasts.reimagine.timestamp.ShareEpisodeTimestampFragment
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
+import au.com.shiftyjelly.pocketcasts.repositories.categories.CategoriesManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageColorAnalyzer
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -134,7 +135,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asObservable
 import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
-import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -155,8 +155,6 @@ class PodcastFragment : BaseFragment() {
         private const val CHANGE = "change"
         private const val GO_TO = "go_to"
         private const val EPISODE_CARD = "episode_card"
-
-        private const val SCROLL_POSITION_STATE = "ScrollPositionState"
 
         fun newInstance(
             podcastUuid: String,
@@ -215,6 +213,9 @@ class PodcastFragment : BaseFragment() {
 
     @Inject
     lateinit var colorAnalyzer: PodcastImageColorAnalyzer
+
+    @Inject
+    lateinit var categoriesManager: CategoriesManager
 
     private val viewModel: PodcastViewModel by viewModels()
     private val ratingsViewModel: PodcastRatingsViewModel by viewModels()
@@ -793,7 +794,10 @@ class PodcastFragment : BaseFragment() {
             onClickCategory = { podcast ->
                 val categoryId = podcast.getFirstCategoryId()
                 if (categoryId != null) {
-                    Timber.tag("LOG_TAG").i("Category: $categoryId")
+                    categoriesManager.selectCategory(categoryId)
+                    val hostListener = (requireActivity() as FragmentHostListener)
+                    hostListener.closeToRoot()
+                    hostListener.openTab(VR.id.navigation_discover)
                 }
             },
             onArtworkAvailable = { podcast ->

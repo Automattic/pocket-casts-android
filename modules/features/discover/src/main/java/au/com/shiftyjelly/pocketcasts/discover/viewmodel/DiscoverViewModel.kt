@@ -32,6 +32,7 @@ import com.automattic.android.tracks.crashlogging.CrashLogging
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
@@ -69,7 +70,7 @@ class DiscoverViewModel @Inject constructor(
             discoverFeed = null,
             categoryFeed = null,
             isLoading = true,
-            isError = true,
+            isError = false,
         ),
     )
     internal val state = _state.asStateFlow()
@@ -85,34 +86,9 @@ class DiscoverViewModel @Inject constructor(
     }
 
     fun loadFeed(resources: Resources) {
-        val feed = repository.getDiscoverFeed()
-
-        feed.toFlowable()
+        loadDiscoverFeed(resources)
             .subscribeBy(
-                onNext = {
-                    val region = it.regions[currentRegionCode ?: it.defaultRegionCode] ?: it.regions[it.defaultRegionCode]
-                    if (region == null) {
-                        Timber.e("Could not get region $currentRegionCode")
-                        _state.update { it.copy(isLoading = false, isError = true) }
-                        return@subscribeBy
-                    }
-
-                    if (currentRegionCode == null) {
-                        currentRegionCode = it.defaultRegionCode
-                    }
-
-                    replacements = mapOf(
-                        it.regionCodeToken to region.code,
-                        it.regionNameToken to region.name,
-                    )
-
-                    // Update the list with the correct region substituted in where needed
-                    val updatedList = it.layout.transformWithRegion(region, replacements, resources)
-
-                    // Save ads to display in category view
-                    adsForCategoryView = updatedList.filter { discoverRow -> discoverRow.categoryId != null }
-                    val discoverFeed = DiscoverFeed(updatedList, region, it.regions.values.toList())
-
+                onSuccess = { discoverFeed ->
                     _state.update {
                         it.copy(discoverFeed = discoverFeed, categoryFeed = null, isLoading = false, isError = false)
                     }
@@ -123,6 +99,31 @@ class DiscoverViewModel @Inject constructor(
                 },
             )
             .addTo(disposables)
+    }
+
+    private fun loadDiscoverFeed(resources: Resources): Single<DiscoverFeed> {
+        return repository.getDiscoverFeed().map { discover ->
+            val defaultRegion = discover.defaultRegionCode
+            val region = discover.regions[currentRegionCode ?: defaultRegion] ?: discover.regions[defaultRegion]
+            if (region == null) {
+                error("Could not get region $currentRegionCode")
+            }
+
+            if (currentRegionCode == null) {
+                currentRegionCode = defaultRegion
+            }
+            replacements = mapOf(
+                discover.regionCodeToken to region.code,
+                discover.regionNameToken to region.name,
+            )
+
+            // Update the list with the correct region substituted in where needed
+            val updatedList = discover.layout.transformWithRegion(region, replacements, resources)
+
+            // Save ads to display in category view
+            adsForCategoryView = updatedList.filter { discoverRow -> discoverRow.categoryId != null }
+            DiscoverFeed(updatedList, region, discover.regions.values.toList())
+        }
     }
 
     fun changeRegion(region: DiscoverRegion, resources: Resources) {
@@ -155,22 +156,36 @@ class DiscoverViewModel @Inject constructor(
     fun loadCategory(category: DiscoverCategory, resources: Resources) {
         _state.update { it.copy(isLoading = true) }
 
-        val url = transformNetworkLoadableList(category, resources).source
-        loadPodcastList(url).subscribeBy(
-            onNext = { podcasts ->
-                val categoryFeed = CategoryFeed(
-                    category = category,
-                    podcastList = podcasts,
-                    adRow = getCategoryAdRow(category),
-                )
-                _state.update { it.copy(isLoading = false, categoryFeed = categoryFeed) }
-            },
-            onError = {
-                _state.update { it.copy(isLoading = false, isError = true) }
-                categoriesManager.dismissSelectedCategory()
-                Timber.e(it)
-            },
-        ).addTo(disposables)
+        val initialDiscoverFeed = state.value.discoverFeed
+        val feedInitialization = if (initialDiscoverFeed == null) {
+            loadDiscoverFeed(resources)
+        } else {
+            Single.just(initialDiscoverFeed)
+        }
+
+        feedInitialization
+            .flatMap { discoverFeed ->
+                val categoryUrl = transformNetworkLoadableList(category, resources).source
+                loadPodcastList(categoryUrl)
+                    .firstOrError()
+                    .map { discoverFeed to it }
+            }
+            .subscribeBy(
+                onSuccess = { (discoverFeed, podcasts) ->
+                    val categoryFeed = CategoryFeed(
+                        category = category,
+                        podcastList = podcasts,
+                        adRow = getCategoryAdRow(category),
+                    )
+                    _state.update { it.copy(isLoading = false, discoverFeed = discoverFeed, categoryFeed = categoryFeed) }
+                },
+                onError = {
+                    _state.update { it.copy(isLoading = false, isError = true) }
+                    categoriesManager.dismissSelectedCategory()
+                    Timber.e(it)
+                },
+            )
+            .addTo(disposables)
     }
 
     fun loadCarouselSponsoredPodcasts(
