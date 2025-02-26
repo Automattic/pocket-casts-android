@@ -6,6 +6,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SuggestedFoldersManager
 import au.com.shiftyjelly.pocketcasts.utils.UUIDProvider
 import java.util.UUID
@@ -37,6 +38,9 @@ class SuggestedFoldersViewModelTest {
     @Mock
     lateinit var suggestedFoldersManager: SuggestedFoldersManager
 
+    @Mock
+    lateinit var podcastManager: PodcastManager
+
     lateinit var viewModel: SuggestedFoldersViewModel
 
     private var mockedUUID = UUID.randomUUID()
@@ -50,7 +54,7 @@ class SuggestedFoldersViewModelTest {
         whenever(settings.podcastsSortType).thenReturn(mockedPodcastsSortType)
         whenever(uuidProvider.generateUUID()).thenReturn(mockedUUID)
 
-        viewModel = SuggestedFoldersViewModel(folderManager, suggestedFoldersManager, settings, analyticsTracker, uuidProvider)
+        viewModel = SuggestedFoldersViewModel(folderManager, suggestedFoldersManager, podcastManager, settings, analyticsTracker, uuidProvider)
     }
 
     @Ignore("This test is flaky and needs to be fixed")
