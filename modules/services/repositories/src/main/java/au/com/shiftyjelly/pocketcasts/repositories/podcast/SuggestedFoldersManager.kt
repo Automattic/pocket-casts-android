@@ -8,7 +8,9 @@ import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.SuggestedFoldersRequest
 import au.com.shiftyjelly.pocketcasts.utils.extensions.md5
 import jakarta.inject.Inject
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 class SuggestedFoldersManager @Inject constructor(
@@ -27,7 +29,9 @@ class SuggestedFoldersManager @Inject constructor(
                 suggestedFoldersDao.deleteAll()
                 settings.followedPodcastsForSuggestedFoldersHash.set("", updateModifiedAt = false)
             } else {
-                val currentHash = podcastUuids.sorted().md5()
+                val currentHash = withContext(Dispatchers.Default) {
+                    podcastUuids.sorted().md5()
+                }
                 if (currentHash != settings.followedPodcastsForSuggestedFoldersHash.value) {
                     val folders = podcastCacheService.suggestedFolders(SuggestedFoldersRequest(podcastUuids))
                     suggestedFoldersDao.deleteAndInsertAll(folders)
