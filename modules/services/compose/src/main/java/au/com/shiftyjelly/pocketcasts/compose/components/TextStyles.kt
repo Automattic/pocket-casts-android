@@ -393,6 +393,36 @@ fun TextP60(
 }
 
 @Composable
+fun TextP60(
+    text: AnnotatedString,
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.theme.colors.primaryText01,
+    textAlign: TextAlign? = null,
+    maxLines: Int = Int.MAX_VALUE,
+    fontWeight: FontWeight? = null,
+    fontSize: TextUnit? = null,
+    style: TextStyle = TextStyle(),
+    disableAutoScale: Boolean = false,
+    fontScale: Float = 1f,
+    letterSpacing: TextUnit = 0.sp,
+) {
+    val fontSizeUpdated = fontSize ?: 13.sp
+    Text(
+        text = text,
+        color = color,
+        fontSize = fontSizeUpdated.scaled(disableAutoScale, fontScale),
+        lineHeight = 15.sp.scaled(disableAutoScale, fontScale),
+        letterSpacing = letterSpacing,
+        maxLines = maxLines,
+        overflow = TextOverflow.Ellipsis,
+        textAlign = textAlign,
+        fontWeight = fontWeight,
+        style = style,
+        modifier = modifier,
+    )
+}
+
+@Composable
 fun TextH70(
     text: String,
     modifier: Modifier = Modifier,

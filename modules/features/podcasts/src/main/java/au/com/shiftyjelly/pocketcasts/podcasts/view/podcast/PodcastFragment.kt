@@ -134,6 +134,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asObservable
 import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -788,6 +789,12 @@ class PodcastFragment : BaseFragment() {
                     fragmentManager = parentFragmentManager,
                     source = source,
                 )
+            },
+            onClickCategory = { podcast ->
+                val categoryId = podcast.getFirstCategoryId()
+                if (categoryId != null) {
+                    Timber.tag("LOG_TAG").i("Category: $categoryId")
+                }
             },
             onArtworkAvailable = { podcast ->
                 viewLifecycleOwner.lifecycleScope.launch {
