@@ -11,6 +11,7 @@ import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -58,6 +59,7 @@ class SuggestedFolders : BaseFragment() {
 
             SuggestedFoldersPage(
                 folders = suggestedFolders,
+                useWhiteColorForHowItWorks = theme.activeTheme == Theme.ThemeType.ELECTRIC,
                 onShown = {
                     viewModel.onShown()
                 },

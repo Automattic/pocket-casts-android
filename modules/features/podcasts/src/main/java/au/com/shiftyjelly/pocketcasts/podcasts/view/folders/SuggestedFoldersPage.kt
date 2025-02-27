@@ -47,6 +47,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun SuggestedFoldersPage(
     folders: List<Folder>,
+    useWhiteColorForHowItWorks: Boolean,
     onShown: () -> Unit,
     onDismiss: () -> Unit,
     onUseTheseFolders: () -> Unit,
@@ -90,7 +91,11 @@ fun SuggestedFoldersPage(
                 )
             }
             item(span = { GridItemSpan(maxLineSpan) }) {
-                SuggestedFoldersDescription(modifier = Modifier.padding(bottom = 10.dp)) {
+                SuggestedFoldersDescription(
+                    textColor = MaterialTheme.theme.colors.primaryText02,
+                    secondTextColor = if (useWhiteColorForHowItWorks) Color.White else MaterialTheme.theme.colors.primaryInteractive01,
+                    modifier = Modifier.padding(bottom = 10.dp),
+                ) {
                     onHowItWorks.invoke()
                 }
             }
@@ -150,8 +155,8 @@ fun FolderItem(folderName: String, folderColor: Color, podcastUuids: List<String
 
 @Composable
 private fun SuggestedFoldersDescription(
-    textColor: Color = MaterialTheme.theme.colors.primaryText02,
-    secondTextColor: Color = MaterialTheme.theme.colors.primaryInteractive01,
+    textColor: Color,
+    secondTextColor: Color,
     modifier: Modifier = Modifier,
     onSecondTextClick: () -> Unit,
 ) {
@@ -196,6 +201,7 @@ private fun SuggestedFoldersPagePreview(@PreviewParameter(ThemePreviewParameterP
             onCreateCustomFolders = {},
             onShown = {},
             onHowItWorks = {},
+            useWhiteColorForHowItWorks = false,
             folders = listOf(
                 Folder("Folder 1", listOf("2e61ba20-50a9-0135-902b-63f4b61a9224", "2e61ba20-50a9-0135-902b-63f4b61a9224"), 1),
                 Folder("Folder 2", listOf("2e61ba20-50a9-0135-902b-63f4b61a9224", "2e61ba20-50a9-0135-902b-63f4b61a9224"), 2),
