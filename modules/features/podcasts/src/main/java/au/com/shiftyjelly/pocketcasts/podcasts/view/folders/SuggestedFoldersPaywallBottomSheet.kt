@@ -61,6 +61,7 @@ class SuggestedFoldersPaywallBottomSheet : BottomSheetDialogFragment() {
                     viewModel.onShown()
                 },
                 onUseTheseFolders = {
+                    viewModel.onUseTheseFolders()
                     if (signInState.value?.isSignedInAsPlusOrPatron == true) {
                         dismiss()
                         (activity as FragmentHostListener).showModal(SuggestedFolders.newInstance(suggestedFolders))
