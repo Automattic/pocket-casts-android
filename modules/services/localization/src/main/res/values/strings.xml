@@ -2281,7 +2281,6 @@
     <!-- Suggested Folders -->
     <string name="suggested_folders">Suggested Folders</string>
     <string name="suggested_folders_subtitle">We\'ve organized your podcasts into folders. Save them now and customize later to fit your style.</string>
-    <string name="suggested_folders_how_it_works">How it works.</string>
     <string name="suggested_folders_use_these_folders_button">Use these folders</string>
     <string name="suggested_folders_use_create_custom_folders_button">Create custom folders</string>
     <string name="folder_content_description">Folder %s</string>
@@ -2290,5 +2289,7 @@
     <string name="suggested_folders_replace_folders_button">Replace folders</string>
     <string name="suggested_folders_replace_folders_confirmation_tittle">Replace existing folders?</string>
     <string name="suggested_folders_replace_folders_confirmation_description">Accepting suggested folders will overwrite your current folders. This can\'t be undone.</string>
+    <string name="suggested_folders_how_it_works">How it works</string>
+    <string name="suggested_folders_how_it_works_description">Accepting suggested folders will replace your existing ones and can\'t be undone. You can edit them afterward to fit your preferences.</string>
 
 </resources>

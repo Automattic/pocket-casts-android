@@ -41,7 +41,6 @@ import au.com.shiftyjelly.pocketcasts.compose.folder.FolderImage
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -52,6 +51,7 @@ fun SuggestedFoldersPage(
     onDismiss: () -> Unit,
     onUseTheseFolders: () -> Unit,
     onCreateCustomFolders: () -> Unit,
+    onHowItWorks: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     CallOnce {
@@ -91,7 +91,7 @@ fun SuggestedFoldersPage(
             }
             item(span = { GridItemSpan(maxLineSpan) }) {
                 SuggestedFoldersDescription(modifier = Modifier.padding(bottom = 10.dp)) {
-                    Timber.i("@@@@@@@@@@@@")
+                    onHowItWorks.invoke()
                 }
             }
             items(
@@ -195,6 +195,7 @@ private fun SuggestedFoldersPagePreview(@PreviewParameter(ThemePreviewParameterP
             onUseTheseFolders = {},
             onCreateCustomFolders = {},
             onShown = {},
+            onHowItWorks = {},
             folders = listOf(
                 Folder("Folder 1", listOf("2e61ba20-50a9-0135-902b-63f4b61a9224", "2e61ba20-50a9-0135-902b-63f4b61a9224"), 1),
                 Folder("Folder 2", listOf("2e61ba20-50a9-0135-902b-63f4b61a9224", "2e61ba20-50a9-0135-902b-63f4b61a9224"), 2),

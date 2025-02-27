@@ -68,6 +68,10 @@ class SuggestedFolders : BaseFragment() {
                 onUseTheseFolders = {
                     viewModel.onUseTheseFolders(suggestedFolders)
                 },
+                onHowItWorks = {
+                    viewModel.onHowItWorksTapped()
+                    showHowItWorksDialog()
+                },
                 onCreateCustomFolders = {
                     viewModel.onCreateCustomFolders()
                     FolderCreateFragment.newInstance(source = "suggested_folders").show(parentFragmentManager, "create_folder_card")
@@ -90,5 +94,15 @@ class SuggestedFolders : BaseFragment() {
             .setIconId(VR.drawable.ic_replace)
             .setIconTint(UR.attr.primary_interactive_01)
             .show(childFragmentManager, "suggested-folders-confirmation-dialog")
+    }
+
+    private fun showHowItWorksDialog() {
+        val dialog = ConfirmationDialog()
+            .setButtonType(ConfirmationDialog.ButtonType.Normal(getString(LR.string.got_it)))
+            .setIconId(VR.drawable.ic_folder_plus)
+            .setTitle(getString(LR.string.suggested_folders_how_it_works))
+            .setSummary(getString(LR.string.suggested_folders_how_it_works_description))
+            .setOnConfirm { viewModel.onHowItWorksGotItTapped() }
+        dialog.show(parentFragmentManager, "suggested-folders-how-it-works-dialog")
     }
 }
