@@ -177,7 +177,7 @@ private fun SuggestedFoldersDescription(
             end = firstString.length + 1 + secondString.length,
         )
 
-        withStyle(style = SpanStyle(color = secondTextColor)) {
+        withStyle(style = SpanStyle(color = secondTextColor, fontWeight = FontWeight.W700)) {
             append(secondString)
         }
     }
