@@ -13,6 +13,7 @@ import android.text.style.URLSpan
 import android.text.style.UnderlineSpan
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
@@ -110,6 +111,7 @@ fun Spanned.toAnnotatedString(urlColor: Int? = null): AnnotatedString = buildAnn
                     start = start,
                     end = end,
                 )
+                addLink(LinkAnnotation.Url(span.url), start, end)
                 // Optional: add a style (color or underline) to make it look clickable
                 val color = if (urlColor != null) Color(urlColor) else Color.Blue
                 addStyle(
