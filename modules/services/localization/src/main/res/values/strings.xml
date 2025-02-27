@@ -189,6 +189,7 @@
     <string name="move_up">Move up</string>
     <string name="move_down">Move down</string>
     <string name="see_more">See more</string>
+    <string name="maybe_later">Maybe later</string>
 
     <string name="multiselect_actions_shown">Shortcut in toolbar</string>
     <string name="multiselect_actions_hidden">In overflow</string>
@@ -2234,7 +2235,6 @@
     <string name="need_to_free_up_space">Need to free up space?</string>
     <string name="save_space_by_managing_downloaded_episodes">Save %1$s – by managing downloaded episodes.</string>
     <string name="manage_downloads">Manage downloads</string>
-    <string name="maybe_later">Maybe Later</string>
     <string name="dismiss_manage_download_banner">Dismiss</string>
     <string name="manage_download_dismiss_content_description">Manage Download Banner Dismiss</string>
 
