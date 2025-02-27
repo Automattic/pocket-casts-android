@@ -1,6 +1,8 @@
 7.84
 -----
-
+*   New Features
+    *   Add Suggested Folders
+        ([#3670](https://github.com/Automattic/pocket-casts-android/pull/3670))
 
 7.83
 -----
