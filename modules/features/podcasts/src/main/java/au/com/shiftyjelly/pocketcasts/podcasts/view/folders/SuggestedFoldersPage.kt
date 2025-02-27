@@ -14,6 +14,7 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,7 +22,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -31,11 +37,11 @@ import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
-import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.folder.FolderImage
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -84,11 +90,9 @@ fun SuggestedFoldersPage(
                 )
             }
             item(span = { GridItemSpan(maxLineSpan) }) {
-                TextP40(
-                    text = stringResource(LR.string.suggested_folders_subtitle),
-                    color = MaterialTheme.theme.colors.primaryText02,
-                    modifier = Modifier.padding(bottom = 10.dp),
-                )
+                SuggestedFoldersDescription(modifier = Modifier.padding(bottom = 10.dp)) {
+                    Timber.i("@@@@@@@@@@@@")
+                }
             }
             items(
                 count = folders.size,
@@ -141,6 +145,44 @@ fun FolderItem(folderName: String, folderColor: Color, podcastUuids: List<String
         modifier = modifier.clearAndSetSemantics {
             contentDescription = stringResource
         },
+    )
+}
+
+@Composable
+private fun SuggestedFoldersDescription(
+    textColor: Color = MaterialTheme.theme.colors.primaryText02,
+    secondTextColor: Color = MaterialTheme.theme.colors.primaryInteractive01,
+    modifier: Modifier = Modifier,
+    onSecondTextClick: () -> Unit,
+) {
+    val firstString = stringResource(LR.string.suggested_folders_subtitle)
+    val secondString = stringResource(LR.string.suggested_folders_how_it_works)
+
+    val annotatedString = buildAnnotatedString {
+        append(firstString)
+        append(" ")
+        addLink(
+            url = LinkAnnotation.Url(
+                url = "",
+                styles = TextLinkStyles(style = SpanStyle(color = secondTextColor)),
+            ) {
+                onSecondTextClick.invoke()
+            },
+            start = firstString.length + 1,
+            end = firstString.length + 1 + secondString.length,
+        )
+
+        withStyle(style = SpanStyle(color = secondTextColor)) {
+            append(secondString)
+        }
+    }
+
+    Text(
+        text = annotatedString,
+        color = textColor,
+        modifier = modifier,
+        fontSize = 16.sp,
+        lineHeight = 22.sp,
     )
 }
 
