@@ -1,6 +1,8 @@
 7.84
 -----
-
+*   Bug Fixes
+    *   Fix issue with playback not resuming when using headphone actions.
+        ([#3665](https://github.com/Automattic/pocket-casts-android/pull/3665))
 
 7.83
 -----
