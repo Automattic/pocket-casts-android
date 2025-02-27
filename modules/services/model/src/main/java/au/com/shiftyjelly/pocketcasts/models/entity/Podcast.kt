@@ -228,9 +228,13 @@ data class Podcast(
         KEEP_EPISODES, DELETE_EPISODES
     }
 
+    fun getFirstCategoryUnlocalised() = podcastCategory.split("\n").first().trim()
+
     fun getFirstCategory(resources: Resources): String {
-        return podcastCategory.split(delimiters = arrayOf("\n")).first().tryToLocalise(resources)
+        return getFirstCategoryUnlocalised().tryToLocalise(resources)
     }
+
+    fun getFirstCategoryId() = getCategoryIdForName(getFirstCategoryUnlocalised().trim().lowercase())
 
     fun addEpisode(episode: PodcastEpisode) {
         this.episodes.add(episode)
@@ -335,3 +339,27 @@ private val DEFAULT_SERVER_LIGHT_TINT_COLOR = Color.parseColor("#F44336")
 private val DEFAULT_SERVER_DARK_TINT_COLOR = Color.parseColor("#C62828")
 private val DEFAULT_LIGHT_TINT = Color.parseColor("#1E1F1E")
 private val DEFAULT_DARK_TINT = Color.parseColor("#FFFFFF")
+
+private val KnownCategoryIds = mapOf(
+    "arts" to 1,
+    "business" to 2,
+    "comedy" to 3,
+    "education" to 4,
+    "leisure" to 5,
+    "government" to 6,
+    "health & fitness" to 7,
+    "kids & family" to 8,
+    "music" to 9,
+    "news" to 10,
+    "spirituality" to 11,
+    "science" to 12,
+    "society & culture" to 13,
+    "sports" to 14,
+    "tech" to 15,
+    "tv & film" to 16,
+    "fiction" to 17,
+    "history" to 18,
+    "true crime" to 19,
+)
+
+private fun getCategoryIdForName(name: String) = KnownCategoryIds[name.trim().lowercase()]

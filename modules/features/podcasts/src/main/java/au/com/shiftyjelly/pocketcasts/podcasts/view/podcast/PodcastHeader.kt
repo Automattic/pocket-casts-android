@@ -78,6 +78,8 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.LinkInteractionListener
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.TextStyle
@@ -128,6 +130,7 @@ internal fun PodcastHeader(
     isDescriptionExpanded: Boolean,
     contentPadding: PaddingValues,
     useBlurredArtwork: Boolean,
+    onClickCategory: () -> Unit,
     onClickRating: (RatingTappedSource) -> Unit,
     onClickFollow: () -> Unit,
     onClickUnfollow: () -> Unit,
@@ -192,6 +195,7 @@ internal fun PodcastHeader(
                 folderIcon = folderIcon,
                 isHeaderExpanded = isHeaderExpanded,
                 onClickTitle = onToggleHeader,
+                onClickCategory = onClickCategory,
                 onClickFollow = onClickFollow,
                 onClickUnfollow = onClickUnfollow,
                 onClickFolder = onClickFolder,
@@ -227,6 +231,7 @@ private fun PodcastControls(
     folderIcon: PodcastFolderIcon,
     isHeaderExpanded: Boolean,
     onClickTitle: () -> Unit,
+    onClickCategory: () -> Unit,
     onClickRating: (RatingTappedSource) -> Unit,
     onClickFollow: () -> Unit,
     onClickUnfollow: () -> Unit,
@@ -250,14 +255,10 @@ private fun PodcastControls(
             enter = categoriesEnterTransition,
             exit = categoriesExitTransition,
         ) {
-            val text = remember(category, author) {
-                listOf(category, author).filter(String::isNotBlank).joinToString(separator = " · ")
-            }
-            TextP60(
-                text = text,
-                color = MaterialTheme.theme.colors.primaryText02,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(bottom = 12.dp),
+            PodcastCategoriesLabel(
+                category = category,
+                author = author,
+                onClickCategory = onClickCategory,
             )
         }
         val density = LocalDensity.current
@@ -307,6 +308,37 @@ private fun PodcastControls(
             onClickSettings = onClickSettings,
         )
     }
+}
+
+@Composable
+private fun PodcastCategoriesLabel(
+    category: String,
+    author: String,
+    onClickCategory: () -> Unit,
+) {
+    val text = remember(category, author, onClickCategory) {
+        val text = listOf(category, author).filter(String::isNotBlank).joinToString(separator = " · ")
+        buildAnnotatedString {
+            append(text)
+            if (category.isNotBlank()) {
+                addLink(
+                    LinkAnnotation.Clickable(
+                        tag = "category",
+                        linkInteractionListener = LinkInteractionListener { onClickCategory() },
+                    ),
+                    start = 0,
+                    end = category.length + if (author.isNotBlank()) 2 else 0,
+                )
+            }
+        }
+    }
+
+    TextP60(
+        text = text,
+        color = MaterialTheme.theme.colors.primaryText02,
+        textAlign = TextAlign.Center,
+        modifier = Modifier.padding(bottom = 12.dp),
+    )
 }
 
 @Composable
@@ -820,6 +852,7 @@ private fun PodcastHeaderPreview() {
                     bottom = 16.dp,
                 ),
                 useBlurredArtwork = false,
+                onClickCategory = {},
                 onClickRating = {},
                 onClickFollow = { isFollowed = true },
                 onClickUnfollow = { isFollowed = false },

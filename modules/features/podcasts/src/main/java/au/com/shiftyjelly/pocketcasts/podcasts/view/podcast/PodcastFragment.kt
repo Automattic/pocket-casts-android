@@ -86,6 +86,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.reimagine.podcast.SharePodcastFragment
 import au.com.shiftyjelly.pocketcasts.reimagine.timestamp.ShareEpisodeTimestampFragment
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
+import au.com.shiftyjelly.pocketcasts.repositories.categories.CategoriesManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageColorAnalyzer
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -155,8 +156,6 @@ class PodcastFragment : BaseFragment() {
         private const val GO_TO = "go_to"
         private const val EPISODE_CARD = "episode_card"
 
-        private const val SCROLL_POSITION_STATE = "ScrollPositionState"
-
         fun newInstance(
             podcastUuid: String,
             sourceView: SourceView,
@@ -214,6 +213,9 @@ class PodcastFragment : BaseFragment() {
 
     @Inject
     lateinit var colorAnalyzer: PodcastImageColorAnalyzer
+
+    @Inject
+    lateinit var categoriesManager: CategoriesManager
 
     private val viewModel: PodcastViewModel by viewModels()
     private val ratingsViewModel: PodcastRatingsViewModel by viewModels()
@@ -788,6 +790,19 @@ class PodcastFragment : BaseFragment() {
                     fragmentManager = parentFragmentManager,
                     source = source,
                 )
+            },
+            onClickCategory = { podcast ->
+                val categoryId = podcast.getFirstCategoryId()
+                if (categoryId != null) {
+                    analyticsTracker.track(
+                        AnalyticsEvent.PODCAST_SCREEN_CATEGORY_TAPPED,
+                        mapOf("category" to podcast.getFirstCategoryUnlocalised()),
+                    )
+                    categoriesManager.selectCategory(categoryId)
+                    val hostListener = (requireActivity() as FragmentHostListener)
+                    hostListener.closeToRoot()
+                    hostListener.openTab(VR.id.navigation_discover)
+                }
             },
             onArtworkAvailable = { podcast ->
                 viewLifecycleOwner.lifecycleScope.launch {
