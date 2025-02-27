@@ -2285,7 +2285,7 @@
     <string name="suggested_folders_use_create_custom_folders_button">Create custom folders</string>
     <string name="folder_content_description">Folder %s</string>
     <string name="suggested_folders_paywall_tittle">Your podcasts, automatically organized</string>
-    <string name="suggested_folders_paywall_subtitle">We\'ve pre-made folders for your podcasts. Unlock this and features like bookmarks, transcripts, and more with Pocket Casts Plus.</string>
+    <string name="suggested_folders_paywall_subtitle">We\'ve created folders for your podcasts, making it easier than ever to keep your favorites organized and accessible.</string>
     <string name="suggested_folders_replace_folders_button">Replace folders</string>
     <string name="suggested_folders_replace_folders_confirmation_tittle">Replace existing folders?</string>
     <string name="suggested_folders_replace_folders_confirmation_description">Accepting suggested folders will overwrite your current folders. This can\'t be undone.</string>
