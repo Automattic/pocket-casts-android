@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.SuggestedFolderDetails
+import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -65,7 +66,7 @@ class SuggestedFoldersViewModel @Inject constructor(
                     podcasts = it.podcasts,
                 )
             }
-
+            settings.podcastsSortType.set(PodcastsSortType.NAME_A_TO_Z, updateModifiedAt = true)
             folderManager.overrideFoldersWithSuggested(newFolders)
             podcastManager.refreshPodcasts("suggested-folders")
             suggestedFoldersManager.deleteSuggestedFolders(folders.toSuggestedFolders())
