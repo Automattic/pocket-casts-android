@@ -518,7 +518,7 @@ class PodcastAdapter(
         this.podcastDescription = HtmlCompat.fromHtml(
             rawDescription,
             HtmlCompat.FROM_HTML_MODE_COMPACT and
-                    HtmlCompat.FROM_HTML_SEPARATOR_LINE_BREAK_PARAGRAPH.inv(), // keep the extra line break from paragraphs as it looks better
+                HtmlCompat.FROM_HTML_SEPARATOR_LINE_BREAK_PARAGRAPH.inv(), // keep the extra line break from paragraphs as it looks better
         ).toAnnotatedString(urlColor = ThemeColor.podcastText02(theme.activeTheme, tintColor))
 
         notifyDataSetChanged()
