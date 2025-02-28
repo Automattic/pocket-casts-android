@@ -1,5 +1,8 @@
 7.84
 -----
+*   New Features
+    *   Add Suggested Folders
+        ([#3670](https://github.com/Automattic/pocket-casts-android/pull/3670))
 *   Bug Fixes
     *   Fix link not being interactive in a podcast description.
         ([#3666](https://github.com/Automattic/pocket-casts-android/pull/3666))
