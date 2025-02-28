@@ -70,7 +70,7 @@ class SuggestedFoldersPaywallBottomSheet : BottomSheetDialogFragment() {
                     }
                 },
                 onMaybeLater = {
-                    viewModel.onMaybeLater()
+                    viewModel.onDismissed()
                     dismiss()
                 },
             )
@@ -79,6 +79,10 @@ class SuggestedFoldersPaywallBottomSheet : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        dialog?.setOnDismissListener {
+            viewModel.onDismissed()
+        }
 
         view.doOnLayout {
             val dialog = dialog as BottomSheetDialog
