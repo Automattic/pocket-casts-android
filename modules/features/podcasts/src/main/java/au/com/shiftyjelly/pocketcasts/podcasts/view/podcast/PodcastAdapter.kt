@@ -514,16 +514,12 @@ class PodcastAdapter(
         }
         this.podcast = podcast
         val isHtmlDescription = FeatureFlag.isEnabled(Feature.PODCAST_HTML_DESCRIPTION) && podcast.podcastHtmlDescription.isNotEmpty()
-        this.podcastDescription = if (isHtmlDescription) {
-            val ann = HtmlCompat.fromHtml(
-                podcast.podcastHtmlDescription,
-                HtmlCompat.FROM_HTML_MODE_COMPACT and
-                    HtmlCompat.FROM_HTML_SEPARATOR_LINE_BREAK_PARAGRAPH.inv(), // keep the extra line break from paragraphs as it looks better
-            ).toAnnotatedString(urlColor = ThemeColor.podcastText02(theme.activeTheme, tintColor))
-            ann
-        } else {
-            AnnotatedString(podcast.podcastDescription)
-        }
+        val rawDescription = if (isHtmlDescription) { podcast.podcastHtmlDescription } else { podcast.podcastDescription }
+        this.podcastDescription = HtmlCompat.fromHtml(
+            rawDescription,
+            HtmlCompat.FROM_HTML_MODE_COMPACT and
+                HtmlCompat.FROM_HTML_SEPARATOR_LINE_BREAK_PARAGRAPH.inv(), // keep the extra line break from paragraphs as it looks better
+        ).toAnnotatedString(urlColor = ThemeColor.podcastText02(theme.activeTheme, tintColor))
 
         notifyDataSetChanged()
     }
