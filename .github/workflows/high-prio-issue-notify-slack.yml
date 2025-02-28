@@ -1,0 +1,29 @@
+name: Notify Slack when "[Priority] High" label is applied to new or existing issue.
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  notify_slack:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for "[Priority] High" Label
+        id: check_label
+        run: |
+          if [[ "${{ github.event.label.name }}" == "[Priority] High" ]]; then
+            echo "SEND_SLACK=true" >> $GITHUB_ENV
+          else
+            echo "SEND_SLACK=false" >> $GITHUB_ENV
+          fi
+
+      - name: Send Slack Notification
+        if: env.SEND_SLACK == 'true'
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": ":pocket-casts::android: *High Priority Issue Alert!*\n\n*Issue:* <${{ github.event.issue.html_url }}|${{ github.event.issue.title }}>\n*Created By:* ${{ github.event.issue.user.login }}\n*Issue Number:* #${{ github.event.issue.number }}"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_NOTIFIER_WEBHOOK_URL }}
