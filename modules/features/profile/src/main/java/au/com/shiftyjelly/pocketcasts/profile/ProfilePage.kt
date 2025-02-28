@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -71,6 +73,7 @@ internal fun ProfilePage(
     onUpgradeProfileClick: () -> Unit,
     onCloseUpgradeProfileClick: () -> Unit,
     modifier: Modifier = Modifier,
+    listState: LazyListState = rememberLazyListState(),
 ) {
     val isPortrait = LocalConfiguration.current.orientation != Configuration.ORIENTATION_LANDSCAPE
     AppTheme(themeType) {
@@ -88,6 +91,7 @@ internal fun ProfilePage(
                 onSettingsClick = onSettingsClick,
             )
             LazyColumn(
+                state = listState,
                 modifier = modifier.fillMaxSize(),
             ) {
                 item {

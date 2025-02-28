@@ -39,9 +39,11 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.hideShadow
+import au.com.shiftyjelly.pocketcasts.views.extensions.quickScrollToTop
 import au.com.shiftyjelly.pocketcasts.views.extensions.tintIcons
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ChromeCastButton
+import au.com.shiftyjelly.pocketcasts.views.fragments.TopScrollable
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper.SwipeSource
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
@@ -63,7 +65,11 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
 
 @AndroidEntryPoint
-class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemTouchHelperAdapter {
+class UpNextFragment :
+    BaseFragment(),
+    UpNextListener,
+    UpNextTouchCallback.ItemTouchHelperAdapter,
+    TopScrollable {
     companion object {
         private const val ARG_EMBEDDED = "embedded"
         private const val ARG_SOURCE = "source"
@@ -507,6 +513,10 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         properties[SOURCE_KEY] = upNextSource.analyticsValue
         properties.putAll(props)
         analyticsTracker.track(event, properties)
+    }
+
+    override fun scrollToTop() {
+        binding.recyclerView.quickScrollToTop()
     }
 }
 
