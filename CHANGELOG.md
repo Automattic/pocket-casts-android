@@ -1,7 +1,7 @@
 7.84
 -----
 *   New Features
-    *   Add Suggested Folders
+    *   Add Smart Folders
         ([#3670](https://github.com/Automattic/pocket-casts-android/pull/3670))
     *   Redesign podcast header UI
         ([#3677](https://github.com/Automattic/pocket-casts-android/pull/3671))

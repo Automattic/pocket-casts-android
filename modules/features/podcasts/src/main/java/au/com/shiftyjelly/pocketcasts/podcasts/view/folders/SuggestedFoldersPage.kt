@@ -78,7 +78,7 @@ fun SuggestedFoldersPage(
         ) {
             item(span = { GridItemSpan(maxLineSpan) }) {
                 TextH10(
-                    text = stringResource(LR.string.suggested_folders),
+                    text = stringResource(LR.string.smart_folders),
                     lineHeight = 36.sp,
                     modifier = Modifier.padding(bottom = 2.dp),
                 )
