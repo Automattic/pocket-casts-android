@@ -2289,5 +2289,7 @@
     <string name="suggested_folders_replace_folders_button">Replace folders</string>
     <string name="suggested_folders_replace_folders_confirmation_tittle">Replace existing folders?</string>
     <string name="suggested_folders_replace_folders_confirmation_description">Accepting suggested folders will overwrite your current folders. This can\'t be undone.</string>
+    <string name="suggested_folders_how_it_works">How it works</string>
+    <string name="suggested_folders_how_it_works_description">Accepting suggested folders will replace your existing ones and can\'t be undone. You can edit them afterward to fit your preferences.</string>
 
 </resources>
