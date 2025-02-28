@@ -340,9 +340,7 @@ class SettingsImpl @Inject constructor(
     }
 
     override fun setDismissedSuggestedFolderPaywallTime() {
-        val editor = sharedPreferences.edit()
-        editor.putLong(Settings.LAST_DISMISS_SUGGESTED_FOLDER_PAYWALL_TIME, System.currentTimeMillis())
-        editor.apply()
+        sharedPreferences.edit { putLong(Settings.LAST_DISMISS_SUGGESTED_FOLDER_PAYWALL_TIME, System.currentTimeMillis()) }
     }
 
     override fun isEligibleToShowSuggestedFolderPaywall(): Boolean {
@@ -358,9 +356,7 @@ class SettingsImpl @Inject constructor(
 
     override fun updateDismissedSuggestedFolderPaywallCount() {
         val currentCount = sharedPreferences.getInt(Settings.DISMISS_SUGGESTED_FOLDER_PAYWALL_COUNT, 0)
-        val editor = sharedPreferences.edit()
-        editor.putInt(Settings.DISMISS_SUGGESTED_FOLDER_PAYWALL_COUNT, currentCount + 1)
-        editor.apply()
+        sharedPreferences.edit { putInt(Settings.DISMISS_SUGGESTED_FOLDER_PAYWALL_COUNT, currentCount + 1) }
     }
 
     override fun setDismissLowStorageBannerTime(lastUpdateTime: Long) {

@@ -18,17 +18,19 @@ class SuggestedFoldersPaywallViewModel @Inject constructor(
 
     val signInState = userManager.getSignInState().asFlow()
 
-    fun onDismissed() {
-        analyticsTracker.track(AnalyticsEvent.SUGGESTED_FOLDERS_PAYWALL_MODAL_MAYBE_LATER_TAPPED)
-        settings.setDismissedSuggestedFolderPaywallTime()
-        settings.updateDismissedSuggestedFolderPaywallCount()
+    fun onDismissed(source: String) {
+        analyticsTracker.track(AnalyticsEvent.SUGGESTED_FOLDERS_PAYWALL_MODAL_MAYBE_LATER_TAPPED, mapOf("source" to source))
+        if (source == SuggestedFoldersPaywallBottomSheet.PODCASTS_SOURCE) {
+            settings.setDismissedSuggestedFolderPaywallTime()
+            settings.updateDismissedSuggestedFolderPaywallCount()
+        }
     }
 
-    fun onShown() {
-        analyticsTracker.track(AnalyticsEvent.SUGGESTED_FOLDERS_PAYWALL_MODAL_SHOWN)
+    fun onShown(source: String) {
+        analyticsTracker.track(AnalyticsEvent.SUGGESTED_FOLDERS_PAYWALL_MODAL_SHOWN, mapOf("source" to source))
     }
 
-    fun onUseTheseFolders() {
-        analyticsTracker.track(AnalyticsEvent.SUGGESTED_FOLDERS_PAYWALL_MODAL_USE_THESE_FOLDERS_TAPPED)
+    fun onUseTheseFolders(source: String) {
+        analyticsTracker.track(AnalyticsEvent.SUGGESTED_FOLDERS_PAYWALL_MODAL_USE_THESE_FOLDERS_TAPPED, mapOf("source" to source))
     }
 }

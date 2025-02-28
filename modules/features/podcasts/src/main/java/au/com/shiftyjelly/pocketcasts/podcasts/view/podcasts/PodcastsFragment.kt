@@ -34,6 +34,8 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.FolderEditFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.FolderEditPodcastsFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.SuggestedFolders
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.SuggestedFoldersPaywallBottomSheet
+import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.SuggestedFoldersPaywallBottomSheet.Companion.CREATE_FOLDER_SOURCE
+import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.SuggestedFoldersPaywallBottomSheet.Companion.PODCASTS_SOURCE
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastsViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -204,7 +206,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
         toolbar.menu.findItem(R.id.folders_locked).setOnMenuItemClickListener {
             val state = viewModel.suggestedFoldersState
             if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS) && state is PodcastsViewModel.SuggestedFoldersState.Loaded) {
-                SuggestedFoldersPaywallBottomSheet.newInstance(state.folders()).show(childFragmentManager, "suggested_folders_paywall")
+                SuggestedFoldersPaywallBottomSheet.newInstance(state.folders(), CREATE_FOLDER_SOURCE).show(parentFragmentManager, SuggestedFoldersPaywallBottomSheet.TAG)
             } else {
                 OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.Upsell(OnboardingUpgradeSource.FOLDERS))
             }
@@ -242,7 +244,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.userSuggestedFoldersState.collectLatest { (signInState, state) ->
-                    val existingModal = parentFragmentManager.findFragmentByTag("suggested_folders_paywall")
+                    val existingModal = parentFragmentManager.findFragmentByTag(SuggestedFoldersPaywallBottomSheet.TAG)
                     if (state is PodcastsViewModel.SuggestedFoldersState.Loaded) {
                         if (existingModal != null && existingModal is SuggestedFoldersPaywallBottomSheet && !signInState.isSignedInAsPlusOrPatron) {
                             // We don't want to close this modal for Paid users because this scenario might occur when the user upgrades their account
@@ -251,7 +253,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
                             existingModal.dismiss()
                         }
                         if (viewModel.showSuggestedFoldersPaywallOnOpen(signInState.isSignedInAsPlusOrPatron)) {
-                            SuggestedFoldersPaywallBottomSheet.newInstance(state.folders()).show(parentFragmentManager, "suggested_folders_paywall")
+                            SuggestedFoldersPaywallBottomSheet.newInstance(state.folders(), PODCASTS_SOURCE).show(parentFragmentManager, SuggestedFoldersPaywallBottomSheet.TAG)
                         }
                     } else if (state is PodcastsViewModel.SuggestedFoldersState.Empty) {
                         if (existingModal != null && existingModal is SuggestedFoldersPaywallBottomSheet) {

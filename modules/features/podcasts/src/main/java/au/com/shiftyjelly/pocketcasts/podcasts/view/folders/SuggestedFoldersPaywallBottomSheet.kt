@@ -26,12 +26,17 @@ import javax.inject.Inject
 class SuggestedFoldersPaywallBottomSheet : BottomSheetDialogFragment() {
 
     companion object {
+        const val TAG = "suggested_folders_paywall"
+        const val PODCASTS_SOURCE = "podcasts"
+        const val CREATE_FOLDER_SOURCE = "create_folder"
         private const val FOLDERS_KEY = "folders_key"
+        private const val SOURCE_KEY = "source_key"
 
-        fun newInstance(folders: List<Folder>): SuggestedFoldersPaywallBottomSheet {
+        fun newInstance(folders: List<Folder>, source: String): SuggestedFoldersPaywallBottomSheet {
             return SuggestedFoldersPaywallBottomSheet().apply {
                 arguments = Bundle().apply {
                     putParcelableArrayList(FOLDERS_KEY, ArrayList(folders))
+                    putString(SOURCE_KEY, source)
                 }
             }
         }
@@ -44,7 +49,11 @@ class SuggestedFoldersPaywallBottomSheet : BottomSheetDialogFragment() {
 
     private val suggestedFolders
         get() = requireNotNull(BundleCompat.getParcelableArrayList(requireArguments(), FOLDERS_KEY, Folder::class.java)) {
-            "Missing input parameters"
+            "Missing folders parameter"
+        }
+    private val source: String
+        get() = requireNotNull(requireArguments().getString(SOURCE_KEY)) {
+            "Missing source parameter"
         }
 
     override fun onCreateView(
@@ -58,10 +67,10 @@ class SuggestedFoldersPaywallBottomSheet : BottomSheetDialogFragment() {
             SuggestedFoldersPaywall(
                 folders = suggestedFolders,
                 onShown = {
-                    viewModel.onShown()
+                    viewModel.onShown(source)
                 },
                 onUseTheseFolders = {
-                    viewModel.onUseTheseFolders()
+                    viewModel.onUseTheseFolders(source)
                     if (signInState.value?.isSignedInAsPlusOrPatron == true) {
                         dismiss()
                         (activity as FragmentHostListener).showModal(SuggestedFolders.newInstance(suggestedFolders))
@@ -70,7 +79,7 @@ class SuggestedFoldersPaywallBottomSheet : BottomSheetDialogFragment() {
                     }
                 },
                 onMaybeLater = {
-                    viewModel.onDismissed()
+                    viewModel.onDismissed(source)
                     dismiss()
                 },
             )
@@ -81,7 +90,7 @@ class SuggestedFoldersPaywallBottomSheet : BottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         dialog?.setOnDismissListener {
-            viewModel.onDismissed()
+            viewModel.onDismissed(source)
         }
 
         view.doOnLayout {
