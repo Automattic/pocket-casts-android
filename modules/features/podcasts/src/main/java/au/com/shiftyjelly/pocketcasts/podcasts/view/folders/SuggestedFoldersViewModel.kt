@@ -83,6 +83,14 @@ class SuggestedFoldersViewModel @Inject constructor(
         }
     }
 
+    fun onHowItWorksTapped() {
+        analyticsTracker.track(AnalyticsEvent.SUGGESTED_FOLDERS_HOW_IT_WORKS_TAPPED)
+    }
+
+    fun onHowItWorksGotItTapped() {
+        analyticsTracker.track(AnalyticsEvent.SUGGESTED_FOLDERS_HOW_IT_WORKS_GOT_IT_TAPPED)
+    }
+
     sealed class FoldersState {
         data object Idle : FoldersState()
         data object Creating : FoldersState()

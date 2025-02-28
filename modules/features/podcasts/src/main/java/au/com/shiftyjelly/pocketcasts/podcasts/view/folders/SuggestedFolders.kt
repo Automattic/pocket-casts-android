@@ -11,6 +11,7 @@ import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -58,6 +59,7 @@ class SuggestedFolders : BaseFragment() {
 
             SuggestedFoldersPage(
                 folders = suggestedFolders,
+                useWhiteColorForHowItWorks = theme.activeTheme == Theme.ThemeType.ELECTRIC,
                 onShown = {
                     viewModel.onShown()
                 },
@@ -67,6 +69,10 @@ class SuggestedFolders : BaseFragment() {
                 },
                 onUseTheseFolders = {
                     viewModel.onUseTheseFolders(suggestedFolders)
+                },
+                onHowItWorks = {
+                    viewModel.onHowItWorksTapped()
+                    showHowItWorksDialog()
                 },
                 onCreateCustomFolders = {
                     viewModel.onCreateCustomFolders()
@@ -90,5 +96,15 @@ class SuggestedFolders : BaseFragment() {
             .setIconId(VR.drawable.ic_replace)
             .setIconTint(UR.attr.primary_interactive_01)
             .show(childFragmentManager, "suggested-folders-confirmation-dialog")
+    }
+
+    private fun showHowItWorksDialog() {
+        val dialog = ConfirmationDialog()
+            .setButtonType(ConfirmationDialog.ButtonType.Normal(getString(LR.string.got_it)))
+            .setIconId(VR.drawable.ic_folder_plus)
+            .setTitle(getString(LR.string.suggested_folders_how_it_works))
+            .setSummary(getString(LR.string.suggested_folders_how_it_works_description))
+            .setOnConfirm { viewModel.onHowItWorksGotItTapped() }
+        dialog.show(parentFragmentManager, "suggested-folders-how-it-works-dialog")
     }
 }
