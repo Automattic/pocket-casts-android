@@ -204,6 +204,7 @@ subprojects {
     val SERVER_LIST_HOST_PROD = "\"lists.pocketcasts.com\""
     val SERVER_SHORT_URL_PROD = "\"https://pca.st\""
     val SERVER_SHORT_HOST_PROD = "\"pca.st\""
+    val SERVER_WEB_PLAYER_HOST_PROD = "\"play.pocketcasts.com\""
     val WEB_BASE_HOST_PROD = "\"pocketcasts.com\""
 
     plugins.withType<BasePlugin>().configureEach {
@@ -286,6 +287,7 @@ subprojects {
                     buildConfigField("String", "SERVER_SHARING_URL", "\"https://sharing.pocketcasts.net\"")
                     buildConfigField("String", "SERVER_SHORT_URL", "\"https://pcast.pocketcasts.net\"")
                     buildConfigField("String", "SERVER_SHORT_HOST", "\"pcast.pocketcasts.net\"")
+                    buildConfigField("String", "SERVER_WEB_PLAYER_HOST", "\"play.pocketcasts.net\"")
                     buildConfigField("String", "WEB_BASE_HOST", "\"pocket-casts-main-development.mystagingwebsite.com\"")
                     buildConfigField("String", "SERVER_LIST_URL", "\"https://lists.pocketcasts.net\"")
                     buildConfigField("String", "SERVER_LIST_HOST", "\"lists.pocketcasts.net\"")
@@ -308,6 +310,7 @@ subprojects {
                     buildConfigField("String", "SERVER_SHARING_URL", SERVER_SHARING_URL_PROD)
                     buildConfigField("String", "SERVER_SHORT_URL", SERVER_SHORT_URL_PROD)
                     buildConfigField("String", "SERVER_SHORT_HOST", SERVER_SHORT_HOST_PROD)
+                    buildConfigField("String", "SERVER_WEB_PLAYER_HOST", SERVER_WEB_PLAYER_HOST_PROD)
                     buildConfigField("String", "WEB_BASE_HOST", WEB_BASE_HOST_PROD)
                     buildConfigField("String", "SERVER_LIST_URL", SERVER_LIST_URL_PROD)
                     buildConfigField("String", "SERVER_LIST_HOST", SERVER_LIST_HOST_PROD)
@@ -325,6 +328,7 @@ subprojects {
                     buildConfigField("String", "SERVER_SHARING_URL", SERVER_SHARING_URL_PROD)
                     buildConfigField("String", "SERVER_SHORT_URL", SERVER_SHORT_URL_PROD)
                     buildConfigField("String", "SERVER_SHORT_HOST", SERVER_SHORT_HOST_PROD)
+                    buildConfigField("String", "SERVER_WEB_PLAYER_HOST", SERVER_WEB_PLAYER_HOST_PROD)
                     buildConfigField("String", "WEB_BASE_HOST", WEB_BASE_HOST_PROD)
                     buildConfigField("String", "SERVER_LIST_URL", SERVER_LIST_URL_PROD)
                     buildConfigField("String", "SERVER_LIST_HOST", SERVER_LIST_HOST_PROD)
