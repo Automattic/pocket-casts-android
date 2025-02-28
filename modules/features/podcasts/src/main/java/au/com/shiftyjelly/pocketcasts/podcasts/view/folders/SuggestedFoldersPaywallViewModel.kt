@@ -20,7 +20,8 @@ class SuggestedFoldersPaywallViewModel @Inject constructor(
 
     fun onDismissed() {
         analyticsTracker.track(AnalyticsEvent.SUGGESTED_FOLDERS_PAYWALL_MODAL_MAYBE_LATER_TAPPED)
-        settings.suggestedFolderPaywallDismissTime.set(System.currentTimeMillis(), updateModifiedAt = false)
+        settings.setDismissedSuggestedFolderPaywallTime()
+        settings.updateDismissedSuggestedFolderPaywallCount()
     }
 
     fun onShown() {

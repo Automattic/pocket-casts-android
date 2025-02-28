@@ -339,6 +339,30 @@ class SettingsImpl @Inject constructor(
         return timeSinceDismiss >= 7.days
     }
 
+    override fun setDismissedSuggestedFolderPaywallTime() {
+        val editor = sharedPreferences.edit()
+        editor.putLong(Settings.LAST_DISMISS_SUGGESTED_FOLDER_PAYWALL_TIME, System.currentTimeMillis())
+        editor.apply()
+    }
+
+    override fun isEligibleToShowSuggestedFolderPaywall(): Boolean {
+        val lastDismissedTime = sharedPreferences.getLong(Settings.LAST_DISMISS_SUGGESTED_FOLDER_PAYWALL_TIME, 0L)
+        val currentDismissedCount = sharedPreferences.getInt(Settings.DISMISS_SUGGESTED_FOLDER_PAYWALL_COUNT, 0)
+
+        if (lastDismissedTime == 0L) return true
+
+        val timeSinceDismiss = (System.currentTimeMillis() - lastDismissedTime).milliseconds
+
+        return timeSinceDismiss >= 7.days && currentDismissedCount < 2
+    }
+
+    override fun updateDismissedSuggestedFolderPaywallCount() {
+        val currentCount = sharedPreferences.getInt(Settings.DISMISS_SUGGESTED_FOLDER_PAYWALL_COUNT, 0)
+        val editor = sharedPreferences.edit()
+        editor.putInt(Settings.DISMISS_SUGGESTED_FOLDER_PAYWALL_COUNT, currentCount + 1)
+        editor.apply()
+    }
+
     override fun setDismissLowStorageBannerTime(lastUpdateTime: Long) {
         sharedPreferences.edit {
             putLong(Settings.LAST_DISMISS_LOW_STORAGE_BANNER_TIME, lastUpdateTime)
@@ -552,12 +576,6 @@ class SettingsImpl @Inject constructor(
     override val hideNotificationOnPause = UserSetting.BoolPref(
         sharedPrefKey = "hideNotificationOnPause",
         defaultValue = false,
-        sharedPrefs = sharedPreferences,
-    )
-
-    override val suggestedFolderPaywallDismissTime = UserSetting.LongPref(
-        sharedPrefKey = "suggestedFolderPaywallDismissTime",
-        defaultValue = 0L,
         sharedPrefs = sharedPreferences,
     )
 

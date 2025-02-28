@@ -331,7 +331,7 @@ class PodcastsViewModel
         val uuids = podcastManager.findSubscribedUuids()
         return FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS) &&
             !isSignedInAsPlusOrPatron &&
-            settings.suggestedFolderPaywallDismissTime.value == 0L &&
+            settings.isEligibleToShowSuggestedFolderPaywall() &&
             uuids.size >= FOLLOWED_PODCASTS_THRESHOLD
     }
 
