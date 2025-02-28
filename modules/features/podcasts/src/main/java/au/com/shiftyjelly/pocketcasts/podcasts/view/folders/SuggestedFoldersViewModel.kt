@@ -40,6 +40,7 @@ class SuggestedFoldersViewModel @Inject constructor(
 
     fun onReplaceExistingFoldersShown() {
         analyticsTracker.track(AnalyticsEvent.SUGGESTED_FOLDERS_REPLACE_EXISTING_FOLDERS_MODAL_SHOWN)
+        _state.value = FoldersState.Idle
     }
 
     fun onReplaceExistingFoldersTapped() {
