@@ -78,11 +78,15 @@ class SuggestedFolders : BaseFragment() {
     }
 
     private fun showConfirmationDialog() {
+        viewModel.onReplaceExistingFoldersShown()
         ConfirmationDialog()
             .setButtonType(ConfirmationDialog.ButtonType.Danger(getString(LR.string.suggested_folders_replace_folders_button)))
             .setTitle(getString(LR.string.suggested_folders_replace_folders_confirmation_tittle))
             .setSummary(getString(LR.string.suggested_folders_replace_folders_confirmation_description))
-            .setOnConfirm { viewModel.overrideFoldersWithSuggested(suggestedFolders) }
+            .setOnConfirm {
+                viewModel.onReplaceExistingFoldersTapped()
+                viewModel.overrideFoldersWithSuggested(suggestedFolders)
+            }
             .setIconId(VR.drawable.ic_replace)
             .setIconTint(UR.attr.primary_interactive_01)
             .show(childFragmentManager, "suggested-folders-confirmation-dialog")

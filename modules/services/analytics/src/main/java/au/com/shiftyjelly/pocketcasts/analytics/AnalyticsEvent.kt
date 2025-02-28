@@ -746,4 +746,6 @@ enum class AnalyticsEvent(val key: String) {
     SUGGESTED_FOLDERS_PAYWALL_MODAL_SHOWN("suggested_folders_paywall_modal_shown"),
     SUGGESTED_FOLDERS_PAYWALL_MODAL_USE_THESE_FOLDERS_TAPPED("suggested_folders_paywall_modal_use_these_folders_tapped"),
     SUGGESTED_FOLDERS_PAYWALL_MODAL_MAYBE_LATER_TAPPED("suggested_folders_paywall_modal_maybe_later_tapped"),
+    SUGGESTED_FOLDERS_REPLACE_EXISTING_FOLDERS_MODAL_SHOWN("suggested_folders_replace_existing_folders_modal_shown"),
+    SUGGESTED_FOLDERS_REPLACE_FOLDERS_TAPPED("suggested_folders_replace_folders_tapped"),
 }

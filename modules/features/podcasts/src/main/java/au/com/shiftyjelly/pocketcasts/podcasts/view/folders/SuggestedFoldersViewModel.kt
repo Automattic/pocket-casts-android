@@ -38,6 +38,14 @@ class SuggestedFoldersViewModel @Inject constructor(
         analyticsTracker.track(AnalyticsEvent.SUGGESTED_FOLDERS_MODAL_DISMISSED)
     }
 
+    fun onReplaceExistingFoldersShown() {
+        analyticsTracker.track(AnalyticsEvent.SUGGESTED_FOLDERS_REPLACE_EXISTING_FOLDERS_MODAL_SHOWN)
+    }
+
+    fun onReplaceExistingFoldersTapped() {
+        analyticsTracker.track(AnalyticsEvent.SUGGESTED_FOLDERS_REPLACE_FOLDERS_TAPPED)
+    }
+
     fun onUseTheseFolders(folders: List<Folder>) {
         analyticsTracker.track(AnalyticsEvent.SUGGESTED_FOLDERS_MODAL_USE_THESE_FOLDERS_TAPPED)
         viewModelScope.launch {
