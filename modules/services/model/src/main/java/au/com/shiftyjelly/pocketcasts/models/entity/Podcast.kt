@@ -356,6 +356,7 @@ private val KnownCategoryIds = mapOf(
     "society & culture" to 13,
     "sports" to 14,
     "tech" to 15,
+    "technology" to 15,
     "tv & film" to 16,
     "fiction" to 17,
     "history" to 18,
