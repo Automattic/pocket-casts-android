@@ -1,8 +1,13 @@
 7.84
 -----
+*   New Features
+    *   Add Suggested Folders
+        ([#3670](https://github.com/Automattic/pocket-casts-android/pull/3670))
 *   Bug Fixes
     *   Fix issue with playback not resuming when using headphone actions.
         ([#3665](https://github.com/Automattic/pocket-casts-android/pull/3665))
+    *   Fix link not being interactive in a podcast description.
+        ([#3666](https://github.com/Automattic/pocket-casts-android/pull/3666))
 
 7.83
 -----

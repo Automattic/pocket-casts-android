@@ -13,6 +13,7 @@ import android.text.style.URLSpan
 import android.text.style.UnderlineSpan
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
@@ -24,13 +25,16 @@ import androidx.compose.ui.unit.sp
 // See: https://iamjosephmj.medium.com/how-to-display-styled-strings-in-jetpack-compose-decd6b705746
 
 fun Spanned.toAnnotatedString(urlColor: Int? = null): AnnotatedString = buildAnnotatedString {
-    val timmedText = this@toAnnotatedString.toString().trim()
-    // Step 1: Copy over the raw text
-    append(timmedText)
-    // Step 2: Go through each span
-    getSpans(0, timmedText.length, Any::class.java).forEach { span ->
-        val start = getSpanStart(span)
-        val end = getSpanEnd(span)
+    // Step 1: Trim text and calculate span offsets due to trimming
+    val text = this@toAnnotatedString.toString()
+    val trimmedText = text.trim()
+    val startOffset = text.takeWhile(Char::isWhitespace).length
+    // Step 2: Copy over the raw text
+    append(trimmedText)
+    // Step 3: Go through each span
+    getSpans(0, length, Any::class.java).forEach { span ->
+        val start = getSpanStart(span) - startOffset
+        val end = (getSpanEnd(span) - startOffset).coerceAtMost(length)
         when (span) {
             // Bold, Italic, Bold-Italic
             is StyleSpan -> {
@@ -110,6 +114,7 @@ fun Spanned.toAnnotatedString(urlColor: Int? = null): AnnotatedString = buildAnn
                     start = start,
                     end = end,
                 )
+                addLink(LinkAnnotation.Url(span.url), start, end)
                 // Optional: add a style (color or underline) to make it look clickable
                 val color = if (urlColor != null) Color(urlColor) else Color.Blue
                 addStyle(
