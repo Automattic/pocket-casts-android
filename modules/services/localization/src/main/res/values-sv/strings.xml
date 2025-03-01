@@ -1,19 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-02-11 13:54:03+0000
+Translation-Revision-Date: 2025-02-26 14:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
-    <string name="suggested_folders_paywall_subtitle">Vi har skapat färdiga mappar för dina podcasts. Lås upp den här och andra funktioner, exempelvis bokmärken, transkriptioner med mera, med Pocket Casts Plus.</string>
+    <string name="see_more">Se mer</string>
+    <string name="podcast_artwork_description">Podcastomslag</string>
+    <string name="suggested_folders_replace_folders_confirmation_description">Om du godkänner de föreslagna mapparna skrivs dina befintliga mappar över. Det här kan inte ångras.</string>
+    <string name="suggested_folders_replace_folders_confirmation_tittle">Ersätt befintliga mappar?</string>
+    <string name="suggested_folders_replace_folders_button">Ersätt mappar</string>
+    <string name="suggested_folders_subtitle">Vi har organiserat dina podcasts i mappar. Spara dem nu och anpassa dem efter din stil senare.</string>
+    <string name="onboarding_plus_feature_up_next_shuffle_title">Slumpmässig Nästa-uppspelning</string>
+    <string name="suggested_folders_plus_prompt">Organisera dina shower och mer därtill med Pocket Casts Plus</string>
+    <string name="winback_cancel_subscription_header_title">Avsluta prenumeration</string>
+    <string name="onboarding_import_from_url_failed">OPML-importen misslyckades</string>
+    <string name="onboarding_import_from_url_error_message">Ogiltig URL</string>
+    <string name="onboarding_import_from_url_importing_message">OPML-import pågår Du kan gå tillbaka till din onboardingprocess.</string>
+    <string name="onboarding_import_from_url_description">Importera dina podcasts från en OPML-fil med hjälp av en URL.</string>
+    <string name="onboarding_import_from_url">Importera från URL</string>
     <string name="suggested_folders_paywall_tittle">Dina podcasts, organiserade automatiskt</string>
     <string name="podcast_feed_update_tooltip_subtitle">Dra nedåt eller använd den här menyn för att se om det finns något nytt.</string>
     <string name="podcast_feed_update_tooltip_title">Nya avsnitt, med en gång!</string>
     <string name="folder_content_description">Mappen %s</string>
     <string name="suggested_folders_use_create_custom_folders_button">Skapa anpassade mappar</string>
     <string name="suggested_folders_use_these_folders_button">Använd dessa mappar</string>
-    <string name="suggested_folders_subtitle">Vi har organiserat dina podcasts åt dig. Spara eller anpassa dem efter din stil.</string>
     <string name="suggested_folders">Föreslagna mappar</string>
     <string name="winback_claiming_offer">Utnyttjar erbjudande</string>
     <string name="winback_claimed_offer_message_3">50 % rabatt på ditt nästa år.</string>
@@ -158,60 +170,14 @@ Language: sv_SE
     <string name="move_up">Flytta upp</string>
     <string name="search_episodes_not_found_summary">Vi kunde inte hitta något avsnitt för denna sökning. Prova med ett annat nyckelord.</string>
     <string name="search_episodes_not_found_title">Inga avsnitt hittades</string>
-    <string name="paywall_layout_reviews_review_six_date">8 mar</string>
-    <string name="paywall_layout_reviews_review_six_message">PC har varit min favorit i flera år. Jag har provat andra podcast-appar men kommer alltid tillbaka till PC för enkelheten, Ul och supporten. Det är helt klart värt att prova, särskilt om du har tröttnat på din nuvarande podcast-app.</string>
-    <string name="paywall_layout_reviews_review_six_title">Den bästa podcast-appen</string>
-    <string name="paywall_layout_reviews_review_five_date">6 maj</string>
-    <string name="paywall_layout_reviews_review_five_message">Jag började med Android och nu har jag använt iOS i nästan ett år. Totalt har jag använt den här appen i minst 6 år. Fungerar lika bra på båda plattformarna. Det är enkelt att hitta nya podcaster att lyssna på, mycket trevlig Ul och man kan även lägga till podcaster via url för rss-flöde. Klockappen är funktionell, men jag använder den mest för att spela/pausa. Du kan logga in med ett konto för att synkronisera mellan enheter, men det är inget krav.</string>
-    <string name="paywall_layout_reviews_review_five_title">Fungerar fint och det är enkelt att hitta eller lägga till nya poddar</string>
-    <string name="paywall_layout_reviews_review_four_date">1 jun</string>
-    <string name="paywall_layout_reviews_review_four_message">Synkroniseringsfunktionen är magisk. Jag vet inte vilken slags speciell magi den här appen har, men den är bättre än alla andra appar jag har använt.</string>
-    <string name="paywall_layout_reviews_review_four_title">Fantastisk app</string>
-    <string name="paywall_layout_reviews_review_three_date">9 jun</string>
-    <string name="paywall_layout_reviews_review_three_message">Jag har använt Pocket Casts sedan 2017. \n\nDet här är utan tvekan den bästa appen för att lyssna på podcaster. Det har många funktioner och vidareutvecklas kontinuerligt. Det har förekommit en del klagomål på Ul-bytet, men jag har faktiskt inte märkt av det så mycket. \n\nAppen kan vara så enkel eller svår att använda som du själv vill att den ska vara. Så antingen använder du den bara för att ansluta and spela upp eller så ställer du in hoppa över outro- och intro-timers och alla andra små funktioner du vill aktivera.</string>
-    <string name="paywall_layout_reviews_review_three_title">Bästa podcast-appen där ute</string>
-    <string name="paywall_layout_reviews_review_two_date">15 jun</string>
-    <string name="paywall_layout_reviews_review_two_message">8 år av utmärkt kvalitet och ständiga förbättringar</string>
-    <string name="paywall_layout_reviews_review_two_title">Den oumbärliga podcast-appen</string>
-    <string name="paywall_layout_reviews_review_one_date">10 jul</string>
-    <string name="paywall_layout_reviews_review_one_message">Jag har använt appen länge och omfattningen av funktionalitet och anpassningsmöjligheter som du får med gratisversionen är häpnadsväckande. Jag älskar att den synkroniseras mellan enheter så att jag kan börja lyssna på min telefon och sedan fortsätta på en Alexa-enhet. Jag rekommenderar den till alla som lyssnar på podcaster. Jag älskar även statistiken!</string>
-    <string name="paywall_layout_reviews_review_one_title">Den överlägset bästa podcast-appen</string>
-    <string name="paywall_layout_reviews_see_all_reviews_in_store">Se alla recensioner i Play Store</string>
     <string name="player_time_remaining">Återstående tid %s</string>
     <string name="player_played_up_to">Spelades fram till %s</string>
-    <string name="paywall_layout_reviews_rating">4,1 i betyg (5,7 tusen recensioner)</string>
-    <string name="paywall_layout_reviews_stars_content_description">Stjärnor</string>
-    <string name="paywall_layout_reviews_subtitle">Se varför många har uppgraderat till Plus</string>
-    <string name="paywall_layout_reviews_title">\"Helt enkelt det bästa sättet att lyssna på podcaster\"</string>
     <string name="onboarding_plus_feature_dream_with_slumber_studios">&lt;a href=\"https://slumberstudios.com/\"&gt;Dröm med Slumber Studios-innehåll&lt;/a&gt;</string>
     <string name="gift">Gåva</string>
     <string name="got_it">Uppfattat</string>
     <string name="transcript_search">Sök kopia</string>
     <string name="transcript_close">Stäng kopia</string>
     <string name="onboarding_subscribe_to_plus">Prenumerera på Plus</string>
-    <string name="paywall_themes_content_description">Extra teman och ikoner – bild</string>
-    <string name="paywall_themes_description">Välj dina egna färger. Exklusiva ikoner och teman för våra prenumeranter.</string>
-    <string name="paywall_themes_title">Extra teman och ikoner</string>
-    <string name="paywall_storage_content_description">20 GB lagringsutrymme – bild</string>
-    <string name="paywall_storage_description">Ladda upp dina ljudfiler till molnlagringen och ha dem tillgängliga överallt.</string>
-    <string name="paywall_storage_title">20 GB lagringsutrymme</string>
-    <string name="paywall_slumber_studios_content_description">Dröm med Slumber Studios – bild</string>
-    <string name="paywall_slumber_studios_description">Få 1 år av premiuminnehåll från Slumber Studios.</string>
-    <string name="paywall_slumber_studios_title">Dröm med Slumber Studios</string>
-    <string name="paywall_watch_content_description">Apple Watch- och Wear OS-uppspelning – bild</string>
-    <string name="paywall_watch_description">Lämna telefonen hemma och ta en löptur.</string>
-    <string name="paywall_watch_title">Apple Watch- och Wear OS-uppspelning</string>
-    <string name="paywall_bookmarks_content_description">Bokmärken – bild</string>
-    <string name="paywall_bookmarks_description">Spara dina favoritdelar från avsnitt och återkom till dem.</string>
-    <string name="paywall_bookmarks_title">Bokmärken</string>
-    <string name="paywall_folders_content_description">Mappar – bild</string>
-    <string name="paywall_folders_description">Organisera dina podcasts i mappar och håll dem synkroniserade på alla dina enheter.</string>
-    <string name="paywall_folders_title">Mappar</string>
-    <string name="paywall_desktop_and_web_content_description">Dator- och webbappar – bild</string>
-    <string name="paywall_desktop_and_web_description">Lyssna på fler platser med våra Windows-, macOS- och webbappar.</string>
-    <string name="paywall_desktop_and_web_title">Dator- och webbappar</string>
-    <string name="paywall_free_1_month_trial">Gratis provperiod på 1 månad.</string>
-    <string name="paywall_save_50_off">Få 50 % rabatt på ditt första år.</string>
     <string name="error_transcript_failed_to_parse">Något gick tyvärr fel när kopian tolkades.</string>
     <string name="error_transcript_format_not_supported">Formatet på kopian stöds tyvärr inte: %s</string>
     <string name="error_transcript_failed_to_load">Något gick tyvärr fel när kopian laddades.</string>
@@ -355,8 +321,6 @@ Language: sv_SE
     <string name="onboarding_plus_recurring_after_intro_offer">Återkommande betalning på %s</string>
     <string name="half_price_first_year">50 % rabatt på ditt första år</string>
     <string name="plus_offer_duration">%s erbjudande</string>
-    <string name="report_subtitle">Rapportera olämpligt innehåll</string>
-    <string name="report">Rapportera</string>
     <string name="onboarding_plus_feature_watch_playback">Apple Watch- och Wear OS-appar</string>
     <string name="onboarding_plus_feature_folders_and_bookmarks_title">Mappar och bokmärken</string>
     <string name="settings_use_dynamic_colors_widget_details">När denna funktion är aktiverad ändras widgetens färger baserat på enhetens temafärger.</string>
@@ -673,7 +637,6 @@ Language: sv_SE
     <string name="onboarding_plus_feature_cloud_storage_title">20 GB molnlagring</string>
     <string name="onboarding_plus_feature_folders_text">Organisera dina podcasts i mappar och håll dem synkroniserade på alla dina enheter.</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Lyssna på fler med våra Windows-, macOS- och webbappar.</string>
-    <string name="onboarding_plus_feature_desktop_and_web_apps_title">Dator- och webbappar</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Allt du älskar med Pocket Casts och mer därtill</string>
     <string name="onboarding_recommendations_import">Importera</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">Gör Pocket Casts till ditt genom att välja dina favoritpodcasts eller importera dem från en annan podcastspelare. Du kan alltid göra detta senare.</string>

@@ -1,19 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-02-12 09:54:03+0000
+Translation-Revision-Date: 2025-02-25 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
-    <string name="suggested_folders_paywall_subtitle">ポッドキャスト用のフォルダーがあらかじめ作成されています。 Pocket Casts Plus を利用すると、この機能やブックマーク、トランスクリプトなどの機能が利用できるようになります。</string>
+    <string name="see_more">もっと見る</string>
+    <string name="podcast_artwork_description">ポッドキャストのアートワーク</string>
+    <string name="suggested_folders_replace_folders_confirmation_description">おすすめフォルダーを承認すると、現在のフォルダーが上書きされます。 この操作は元に戻すことができません。</string>
+    <string name="suggested_folders_replace_folders_confirmation_tittle">既存のフォルダーを置換しますか？</string>
+    <string name="suggested_folders_replace_folders_button">フォルダーを置換</string>
+    <string name="suggested_folders_subtitle">ポッドキャストをフォルダーにまとめました。 今すぐ保存するか、後でカスタマイズしてご自身のスタイルに合わせましょう。</string>
+    <string name="onboarding_plus_feature_up_next_shuffle_title">次のシャッフル</string>
+    <string name="suggested_folders_plus_prompt">Pocket Casts Plus で番組の整理などを利用しましょう</string>
+    <string name="winback_cancel_subscription_header_title">サブスクリプションをキャンセル</string>
+    <string name="onboarding_import_from_url_failed">OPML インポートに失敗しました</string>
+    <string name="onboarding_import_from_url_error_message">無効な URLです</string>
+    <string name="onboarding_import_from_url_importing_message">OPML インポートが進行中です。 オンボーディングプロセスに戻ることができます。</string>
+    <string name="onboarding_import_from_url_description">URL を使用して OPML ファイルからポッドキャストをインポートします。</string>
+    <string name="onboarding_import_from_url">URL からインポート</string>
     <string name="suggested_folders_paywall_tittle">ポッドキャストを自動で整理</string>
     <string name="podcast_feed_update_tooltip_subtitle">プルダウンまたはこちらのメニューを使って、新しいものがあるかを確認します。</string>
     <string name="podcast_feed_update_tooltip_title">最新エピソードがまもなく登場 !</string>
     <string name="folder_content_description">フォルダー %s</string>
     <string name="suggested_folders_use_create_custom_folders_button">カスタムフォルダーを作成</string>
     <string name="suggested_folders_use_these_folders_button">これらのフォルダーを使用</string>
-    <string name="suggested_folders_subtitle">ポッドキャストを整理しておきました。 保存するか、カスタマイズしてご自身のスタイルに合わせましょう。</string>
     <string name="suggested_folders">おすすめのフォルダー</string>
     <string name="winback_claiming_offer">オファーの獲得</string>
     <string name="winback_claimed_offer_message_3">次年度が50% オフ !</string>
@@ -158,60 +170,14 @@ Language: ja_JP
     <string name="move_up">上に移動</string>
     <string name="search_episodes_not_found_summary">その検索に該当するエピソードは見つかりませんでした。 別のキーワードを試してください。</string>
     <string name="search_episodes_not_found_title">エピソードがありません</string>
-    <string name="paywall_layout_reviews_review_six_date">3月8日</string>
-    <string name="paywall_layout_reviews_review_six_message">PC は長年のお気に入りです。 他のポッドキャストアプリも試しましたが、PC はシンプルさ、Ul、サポートが優れているため、いつも PC に戻ってきます。 特に、今使っているポッドキャストアプリに飽きてしまった人は、PC をチェックする価値があります。</string>
-    <string name="paywall_layout_reviews_review_six_title">お気に入りのポッドキャストアプリ</string>
-    <string name="paywall_layout_reviews_review_five_date">5月6日</string>
-    <string name="paywall_layout_reviews_review_five_message">このアプリを6年以上使っています。使い始めたのは Android 版で、今は iOS 版を1年近く使っています。 両方のプラットフォームで同じように動作します。 新しいポッドキャストを簡単に見つけて再生できます。Ul が使いやすく、RSS フィードの URL でもポッドキャストを追加できます。 Watch アプリも便利ですが、私はほとんど再生や一時停止のために使っています。 端末間での同期にはアカウントでサインインする必要がありますが、そうしなくても使えます。</string>
-    <string name="paywall_layout_reviews_review_five_title">使いやすく、新しいポッドキャストを簡単に見つけて再生できる</string>
-    <string name="paywall_layout_reviews_review_four_date">6月1日</string>
-    <string name="paywall_layout_reviews_review_four_message">同期機能は魔法のようです。 このアプリでどんな特別な魔法が使われているかはわかりませんが、今まで使ったどのアプリよりも優れています。</string>
-    <string name="paywall_layout_reviews_review_four_title">素晴らしいアプリ</string>
-    <string name="paywall_layout_reviews_review_three_date">6月9日</string>
-    <string name="paywall_layout_reviews_review_three_message">2017年から Pocket Casts のユーザーです。 \n\nPocket Casts は間違いなく、ポッドキャストを聴くための最高のアプリです。 機能が豊富で、積極的な開発が行われています。 Ul の変更について不満の声があるようですが、私はあまり気になっていません。 \n\nこのアプリは自分の思いどおりにシンプルにも複雑にもできます。 すぐに使い始めることも、アウトロのスキップやイントロのタイマーを設定することも、その他の細かい機能を有効にすることも可能です。</string>
-    <string name="paywall_layout_reviews_review_three_title">最高のポッドキャストアプリ</string>
-    <string name="paywall_layout_reviews_review_two_date">6月15日</string>
-    <string name="paywall_layout_reviews_review_two_message">8年間の卓越性と継続的な改善</string>
-    <string name="paywall_layout_reviews_review_two_title">必須のポッドキャストアプリ</string>
-    <string name="paywall_layout_reviews_review_one_date">7月10日</string>
-    <string name="paywall_layout_reviews_review_one_message">長い間愛用していますが、無料版の機能性とカスタマイズの多さには驚かされます。 端末間で同期されるので、スマートフォンで聴き始めたあとに Alexa 端末で続きを聴くことができるのも気に入っています。 ポッドキャストを聴く人全員におすすめのアプリです。 また、統計機能も気に入っています !</string>
-    <string name="paywall_layout_reviews_review_one_title">今までで一番のポッドキャストアプリ</string>
-    <string name="paywall_layout_reviews_see_all_reviews_in_store">Play ストアのレビューをすべて見る</string>
     <string name="player_time_remaining">残り時間 %s</string>
     <string name="player_played_up_to">%s まで再生</string>
-    <string name="paywall_layout_reviews_rating">評価4.1 (5,700件のレビュー)</string>
-    <string name="paywall_layout_reviews_stars_content_description">星</string>
-    <string name="paywall_layout_reviews_subtitle">Plus にアップグレードした理由を見る</string>
-    <string name="paywall_layout_reviews_title">「ポッドキャストを聴くのにまさに最適な方法」</string>
     <string name="onboarding_plus_feature_dream_with_slumber_studios">&lt;a href=\"https://slumberstudios.com/\"&gt;「Slumber Studios でぐっすり眠る」のコンテンツ&lt;/a&gt;</string>
     <string name="gift">ギフト</string>
     <string name="got_it">OK</string>
     <string name="transcript_search">トランスクリプトを検索</string>
     <string name="transcript_close">トランスクリプトを閉じる</string>
     <string name="onboarding_subscribe_to_plus">Plus に登録</string>
-    <string name="paywall_themes_content_description">追加のテーマとアイコン画像</string>
-    <string name="paywall_themes_description">あなたの個性を表現しましょう。 購読者限定のアイコンとテーマです。</string>
-    <string name="paywall_themes_title">追加のテーマとアイコン</string>
-    <string name="paywall_storage_content_description">20GB のストレージ画像</string>
-    <string name="paywall_storage_description">音声ファイルをクラウドストレージにアップロードしてどこからでも利用できるようにします。</string>
-    <string name="paywall_storage_title">20GB のストレージ</string>
-    <string name="paywall_slumber_studios_content_description">Dream with Slumber Studios の画像</string>
-    <string name="paywall_slumber_studios_description">Slumber Studios のプレミアムコンテンツ1年分をご利用ください。</string>
-    <string name="paywall_slumber_studios_title">Dream with Slumber Studios</string>
-    <string name="paywall_watch_content_description">Apple Watch と Wear OS での再生画像</string>
-    <string name="paywall_watch_description">スマートフォンを手放してランニングに出かけましょう。</string>
-    <string name="paywall_watch_title">Apple Watch と Wear OS での再生</string>
-    <string name="paywall_bookmarks_content_description">ブックマーク画像</string>
-    <string name="paywall_bookmarks_description">どのエピソードでもお気に入りの部分を保存して、後で見返すことができます。</string>
-    <string name="paywall_bookmarks_title">ブックマーク</string>
-    <string name="paywall_folders_content_description">フォルダー画像</string>
-    <string name="paywall_folders_description">ポッドキャストをフォルダーに整理し、すべてのデバイス間で同期させます。</string>
-    <string name="paywall_folders_title">フォルダー</string>
-    <string name="paywall_desktop_and_web_content_description">デスクトップアプリとウェブアプリの画像</string>
-    <string name="paywall_desktop_and_web_description">Pocket Casts の Windows 版、macOS 版、ウェブ版アプリでさらに多くの場所で聞きましょう。</string>
-    <string name="paywall_desktop_and_web_title">デスクトップアプリとウェブアプリ</string>
-    <string name="paywall_free_1_month_trial">1か月の無料トライアル。</string>
-    <string name="paywall_save_50_off">初年度は50% オフ。</string>
     <string name="error_transcript_failed_to_parse">申し訳ありません、このトランスクリプトの解析中に問題が発生しました。</string>
     <string name="error_transcript_format_not_supported">申し訳ありません、このトランスクリプトのフォーマットはサポートされていません: %s</string>
     <string name="error_transcript_failed_to_load">申し訳ありません、このトランスクリプトの読み込み中に問題が発生しました。</string>
@@ -355,8 +321,6 @@ Language: ja_JP
     <string name="onboarding_plus_recurring_after_intro_offer">%s に定期支払い</string>
     <string name="half_price_first_year">初年度は50% オフ</string>
     <string name="plus_offer_duration">%s のオファー</string>
-    <string name="report_subtitle">不適切なコンテンツを報告する</string>
-    <string name="report">報告</string>
     <string name="onboarding_plus_feature_watch_playback">Apple Watch アプリと Wear OS アプリ</string>
     <string name="onboarding_plus_feature_folders_and_bookmarks_title">フォルダーとブックマーク</string>
     <string name="settings_use_dynamic_colors_widget_details">有効化すると、端末のテーマカラーに合わせてウィジェットの色が変わります。</string>
@@ -673,7 +637,6 @@ Language: ja_JP
     <string name="onboarding_plus_feature_cloud_storage_title">20GB のクラウドストレージ</string>
     <string name="onboarding_plus_feature_folders_text">ポッドキャストをフォルダーに整理し、すべてのデバイス間で同期させます。</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Pocket Casts の Windows 版、macOS 版、ウェブ版アプリでさらに多くの場所で聞きましょう。</string>
-    <string name="onboarding_plus_feature_desktop_and_web_apps_title">デスクトップアプリとウェブアプリ</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">お気に入りの Pocket Casts の機能に加え、さらなる機能を利用できます</string>
     <string name="onboarding_recommendations_import">インポート</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">お気に入りのポッドキャストを選択するか、別のポッドキャストプレイヤーからインポートして、Pocket Casts を自分のものにしましょう。 この操作は後でいつでも実行できます。</string>

@@ -1,19 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-02-11 15:54:03+0000
+Translation-Revision-Date: 2025-02-25 14:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
-    <string name="suggested_folders_paywall_subtitle">Wir haben vorgefertigte Ordner für deine Podcasts. Nutze diese und weitere Funktionen wie Lesezeichen, Transkripte und mehr mit Pocket Casts Plus.</string>
+    <string name="see_more">Mehr anzeigen</string>
+    <string name="podcast_artwork_description">Podcast-Covers</string>
+    <string name="suggested_folders_replace_folders_confirmation_description">Wenn du vorgeschlagene Ordner akzeptierst, werden deine aktuellen Ordner überschrieben. Dies kann nicht rückgängig gemacht werden.</string>
+    <string name="suggested_folders_replace_folders_confirmation_tittle">Bestehende Ordner ersetzen?</string>
+    <string name="suggested_folders_replace_folders_button">Ordner ersetzen</string>
+    <string name="suggested_folders_subtitle">Wir haben deine Podcasts in Ordnern organisiert. Speichere sie jetzt oder passe sie später nach Belieben an.</string>
+    <string name="onboarding_plus_feature_up_next_shuffle_title">Mischen der Warteschlange</string>
+    <string name="suggested_folders_plus_prompt">Organisiere deine Shows mit Pocket Casts Plus und vieles mehr</string>
+    <string name="winback_cancel_subscription_header_title">Abonnement kündigen</string>
+    <string name="onboarding_import_from_url_failed">OPML-Import fehlgeschlagen</string>
+    <string name="onboarding_import_from_url_error_message">Ungültige URL</string>
+    <string name="onboarding_import_from_url_importing_message">OPML-Import läuft. Du kannst zum Onboarding-Prozess zurückkehren.</string>
+    <string name="onboarding_import_from_url_description">Importiere deine Podcasts von einer OPML-Datei mithilfe einer URL.</string>
+    <string name="onboarding_import_from_url">Von URL importieren</string>
     <string name="suggested_folders_paywall_tittle">Deine Podcasts, automatisch organisiert</string>
     <string name="podcast_feed_update_tooltip_subtitle">Ziehe nach unten oder schaue über dieses Menü nach, ob es etwas Neues gibt.</string>
     <string name="podcast_feed_update_tooltip_title">Neue Episoden bald verfügbar!</string>
     <string name="folder_content_description">Ordner %s</string>
     <string name="suggested_folders_use_create_custom_folders_button">Individuelle Ordner erstellen</string>
     <string name="suggested_folders_use_these_folders_button">Diese Ordner verwenden</string>
-    <string name="suggested_folders_subtitle">Wir haben deine Podcasts für dich organisiert. Speichere sie oder passe sie nach Belieben an.</string>
     <string name="suggested_folders">Vorgeschlagene Order</string>
     <string name="winback_claiming_offer">Angebot nutzen</string>
     <string name="winback_claimed_offer_message_3">50 % Rabatt auf das nächstes Jahr!</string>
@@ -158,60 +170,14 @@ Language: de
     <string name="move_up">Nach oben verschieben</string>
     <string name="search_episodes_not_found_summary">Wir konnten keine Folge für diese Suche finden. Versuche es mit einem anderen Stichwort.</string>
     <string name="search_episodes_not_found_title">Keine Folgen gefunden</string>
-    <string name="paywall_layout_reviews_review_six_date">8. März</string>
-    <string name="paywall_layout_reviews_review_six_message">Ich nutze seit Jahren Pocket Casts. Zwar habe ich andere Podcast-Apps ausprobiert, aber ich kehre immer wieder zu Pocket Casts zurück. Die App ist unkompliziert, die Benutzeroberfläche ansprechend und der Support hervorragend. Man sollte sich die App auf jeden Fall angesehen haben, besonders, wenn man mit der derzeitigen Podcast-App nicht zufrieden ist.</string>
-    <string name="paywall_layout_reviews_review_six_title">Die Go-To-Podcast-App</string>
-    <string name="paywall_layout_reviews_review_five_date">6. Mai</string>
-    <string name="paywall_layout_reviews_review_five_message">Ich benutze die App seit über 6 Jahren. Damals bin ich auf Android gestartet und seit knapp einem Jahr nutze ich sie auf iOS. Sie funktioniert auf beiden Betriebssystemen gleich. Es ist einfach, Podcasts zu finden, die man sich anhören will. Die Benutzeroberfläche ist ansprechend und man kann sogar Podcasts über RSS-Feed-URL hinzufügen. Die Watch-App ist praktisch, aber ich nutze sie eigentlich nur zum Abspielen/Anhalten. Man kann sich mit einem Konto anmelden und eine geräteübergreifende Synchronisation durchführen. Das ist aber kein Muss.</string>
-    <string name="paywall_layout_reviews_review_five_title">Die App funktioniert wunderbar und es ist einfach, neue Podcasts zu finden und hinzuzufügen</string>
-    <string name="paywall_layout_reviews_review_four_date">1. Juni</string>
-    <string name="paywall_layout_reviews_review_four_message">Die Synchronisationsfunktion ist unglaublich gut. Ich weiß wirklich nicht, welche Magie in dieser App steckt, aber es ist die beste App, die ich je benutzt habe.</string>
-    <string name="paywall_layout_reviews_review_four_title">Fantastische App</string>
-    <string name="paywall_layout_reviews_review_three_date">9. Juni</string>
-    <string name="paywall_layout_reviews_review_three_message">Ich benutze Pocket Casts seit 2017. \n\nPocket Casts ist mit Abstand die beste App zum Anhören von Podcasts. Sie bietet viele Funktionen und wird ständig weiterentwickelt. Es gab einige Beschwerden über die Änderungen an der Benutzeroberfläche, aber mir ist nichts Negatives aufgefallen. \n\nDie Nutzung dieser App kann ganz einfach oder sehr kompliziert sein – das hängt allein vom Benutzer ab. Entweder man nutzt sie einfach als „Plug &amp; Play“ oder man richtet verschiedene Funktionen ein, wie Timer für das Überspringen von Intros und Outros.</string>
-    <string name="paywall_layout_reviews_review_three_title">Die beste Podcast-App auf dem Markt</string>
-    <string name="paywall_layout_reviews_review_two_date">15. Juni</string>
-    <string name="paywall_layout_reviews_review_two_message">8 Jahre exzellente Erfahrungen und kontinuierliche Verbesserungen</string>
-    <string name="paywall_layout_reviews_review_two_title">Die essenzielle Podcast-App</string>
-    <string name="paywall_layout_reviews_review_one_date">10. Juli</string>
-    <string name="paywall_layout_reviews_review_one_message">Ich verwende die App schon lange. Es ist wirklich erstaunlich, wie viele Funktionen und Anpassungsoptionen auch in der kostenlosen Version zur Verfügung stehen. Ich bin begeistert davon, dass sie sich über mehrere Geräte hinweg synchronisieren lässt: Ich kann einen Podcast auf meinem Handy beginnen und ihn dann auf einem Alexa-Gerät weiterhören. Meine klare Empfehlung für jeden Podcast-Fan. Die Statistiken finde ich auch super!</string>
-    <string name="paywall_layout_reviews_review_one_title">Die BEI WEITEM beste Podcast-App</string>
-    <string name="paywall_layout_reviews_see_all_reviews_in_store">Schau dir alle Reviews im Play Store an</string>
     <string name="player_time_remaining">Verbleibende Zeit: %s</string>
     <string name="player_played_up_to">Abgespielt bis: %s</string>
-    <string name="paywall_layout_reviews_rating">Bewertung: 4,1 (5.700 Rezensionen)</string>
-    <string name="paywall_layout_reviews_stars_content_description">Sterne</string>
-    <string name="paywall_layout_reviews_subtitle">Erfahre, warum sich Benutzer zum Upgrade auf Plus entschieden haben</string>
-    <string name="paywall_layout_reviews_title">„Ganz einfach die beste Art und Weise, Podcasts zu hören“</string>
     <string name="onboarding_plus_feature_dream_with_slumber_studios">&lt;a href=\"https://slumberstudios.com/\"&gt;Erholsamer Schlaf mit Inhalten von Slumber Studios&lt;/a&gt;</string>
     <string name="gift">Geschenk</string>
     <string name="got_it">Verstanden</string>
     <string name="transcript_search">Transkript suchen</string>
     <string name="transcript_close">Transkript schließen</string>
     <string name="onboarding_subscribe_to_plus">Plus abonnieren</string>
-    <string name="paywall_themes_content_description">Zusätzliche Themes und Icon-Bilder</string>
-    <string name="paywall_themes_description">Zeit, Farbe zu bekennen. Exklusive Icons und Themes für unsere Abonnenten.</string>
-    <string name="paywall_themes_title">Zusätzliche Themes und Icons</string>
-    <string name="paywall_storage_content_description">Bild: 20 GB Speicher</string>
-    <string name="paywall_storage_description">Lade deine Audiodateien in den Cloud-Speicher. Dann kannst du von überall aus darauf zugreifen.</string>
-    <string name="paywall_storage_title">20 GB Speicher</string>
-    <string name="paywall_slumber_studios_content_description">Bild: Erholsamer Schlaf mit Slumber Studios</string>
-    <string name="paywall_slumber_studios_description">Genieße 1 Jahr lang Premium-Inhalte von Slumber Studios.</string>
-    <string name="paywall_slumber_studios_title">Erholsamer Schlaf mit Slumber Studios</string>
-    <string name="paywall_watch_content_description">Bild: Apple Watch- und Wear OS-Wiedergabe</string>
-    <string name="paywall_watch_description">Lass das Smartphone liegen und gehe joggen.</string>
-    <string name="paywall_watch_title">Apple Watch- und Wear OS-Wiedergabe</string>
-    <string name="paywall_bookmarks_content_description">Bild: Lesezeichen</string>
-    <string name="paywall_bookmarks_description">Speicher deine Lieblingsszenen aus beliebigen Folgen und sieh sie dir jederzeit an.</string>
-    <string name="paywall_bookmarks_title">Lesezeichen</string>
-    <string name="paywall_folders_content_description">Bild: Ordner</string>
-    <string name="paywall_folders_description">Verwalte deine Podcasts in Ordnern und halte sie auf all deinen Geräten synchron.</string>
-    <string name="paywall_folders_title">Ordner</string>
-    <string name="paywall_desktop_and_web_content_description">Bild: Desktop- und Web-Apps</string>
-    <string name="paywall_desktop_and_web_description">Mit unseren Windows-, macOS- und Web-Apps kannst du deine Podcasts jederzeit hören.</string>
-    <string name="paywall_desktop_and_web_title">Desktop- und Web-Apps</string>
-    <string name="paywall_free_1_month_trial">1-monatiger kostenloser Testzeitraum.</string>
-    <string name="paywall_save_50_off">50 % Rabatt auf dein erstes Jahr.</string>
     <string name="error_transcript_failed_to_parse">Leider ist beim Parsen dieses Transkripts ein Fehler aufgetreten.</string>
     <string name="error_transcript_format_not_supported">Dieses Transkriptformat wird nicht unterstützt: %s</string>
     <string name="error_transcript_failed_to_load">Leider ist beim Laden dieses Transkripts ein Fehler aufgetreten.</string>
@@ -355,8 +321,6 @@ Language: de
     <string name="onboarding_plus_recurring_after_intro_offer">Wiederkehrende Zahlung zum Preis von %s</string>
     <string name="half_price_first_year">50 % Rabatt auf dein erstes Jahr</string>
     <string name="plus_offer_duration">Angebot für %s</string>
-    <string name="report_subtitle">Unangemessenen Inhalt melden</string>
-    <string name="report">Melden</string>
     <string name="onboarding_plus_feature_watch_playback">Apple Watch- und Wear OS-Apps</string>
     <string name="onboarding_plus_feature_folders_and_bookmarks_title">Ordner und Lesezeichen</string>
     <string name="settings_use_dynamic_colors_widget_details">Nach dem Aktivieren ändern sich die Farben des Widgets basierend auf den Theme-Farben des Geräts.</string>
@@ -673,7 +637,6 @@ Language: de
     <string name="onboarding_plus_feature_cloud_storage_title">20 GB Cloud-Speicher</string>
     <string name="onboarding_plus_feature_folders_text">Verwalte deine Podcasts in Ordnern und halte sie auf all deinen Geräten synchron.</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Mit unseren Windows-, macOS- und Web-Apps kannst du deine Inhalte auf beliebigen Geräten anhören.</string>
-    <string name="onboarding_plus_feature_desktop_and_web_apps_title">Desktop- und Web-Apps</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Alles, was du an Pocket Casts liebst, und noch viel mehr</string>
     <string name="onboarding_recommendations_import">Importieren</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">Wähle deine Lieblings-Podcasts aus oder importiere sie aus einem anderen Podcast Player und gestalte Pocket Casts ganz individuell. Das kannst du auch jederzeit später erledigen.</string>

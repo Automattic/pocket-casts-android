@@ -1,19 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-02-11 09:54:08+0000
+Translation-Revision-Date: 2025-02-25 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
-    <string name="suggested_folders_paywall_subtitle">팟캐스트 폴더를 미리 만들었습니다. Pocket Casts Plus로 그 외에도 북마크, 대본 등의 다양한 기능을 이용하세요.</string>
+    <string name="see_more">더 보기</string>
+    <string name="podcast_artwork_description">팟캐스트 아트워크</string>
+    <string name="suggested_folders_replace_folders_confirmation_description">폴더 제안을 수락하면 현재 폴더를 덮어씁니다. 취소할 수 없습니다.</string>
+    <string name="suggested_folders_replace_folders_confirmation_tittle">기존 폴더를 교체할까요?</string>
+    <string name="suggested_folders_replace_folders_button">폴더 교체</string>
+    <string name="suggested_folders_subtitle">팟캐스트가 폴더로 구성되었습니다. 지금 저장하거나 나중에 원하는 형식으로 사용자 정의하세요.</string>
+    <string name="onboarding_plus_feature_up_next_shuffle_title">다음 순서 섞기</string>
+    <string name="suggested_folders_plus_prompt">Pocket Casts Plus로 방송 프로그램을 구성하고 더 많은 혜택을 누리세요.</string>
+    <string name="winback_cancel_subscription_header_title">구독 취소</string>
+    <string name="onboarding_import_from_url_failed">OPML 가져오기 실패</string>
+    <string name="onboarding_import_from_url_error_message">유효하지 않은 URL</string>
+    <string name="onboarding_import_from_url_importing_message">OPML 가져오기를 진행 중입니다. 온보딩 프로세스로 돌아갈 수 있습니다.</string>
+    <string name="onboarding_import_from_url_description">URL을 사용하여 OPML 파일에서 팟캐스트를 가져오세요.</string>
+    <string name="onboarding_import_from_url">URL에서 가져오기</string>
     <string name="suggested_folders_paywall_tittle">자동으로 정리되는 팟캐스트</string>
     <string name="podcast_feed_update_tooltip_subtitle">당기거나 이 메뉴를 사용하여 새로워진 점이 있는지 알아보세요.</string>
     <string name="podcast_feed_update_tooltip_title">새로운 에피소드가 곧 찾아옵니다!</string>
     <string name="folder_content_description">폴더 %s</string>
     <string name="suggested_folders_use_create_custom_folders_button">사용자 정의 폴더 생성</string>
     <string name="suggested_folders_use_these_folders_button">이대로 폴더 사용</string>
-    <string name="suggested_folders_subtitle">팟캐스트를 자동으로 정리했습니다. 이대로 저장하거나 원하는 형식으로 사용자 정의하세요.</string>
     <string name="suggested_folders">폴더 제안</string>
     <string name="winback_claiming_offer">혜택 받는 중</string>
     <string name="winback_claimed_offer_message_3">다음 해 50% 할인!</string>
@@ -158,60 +170,14 @@ Language: ko_KR
     <string name="move_up">위로 이동</string>
     <string name="search_episodes_not_found_summary">해당 검색에 대한 에피소드를 찾을 수 없습니다. 다른 키워드를 사용해 보세요.</string>
     <string name="search_episodes_not_found_title">에피소드를 찾을 수 없음</string>
-    <string name="paywall_layout_reviews_review_six_date">3월 8일</string>
-    <string name="paywall_layout_reviews_review_six_message">PC는 저의 오랜 동반자입니다. 다른 팟캐스트 앱을 사용하다가 언제나 단순성, Ul 및 지원 때문에 PC로 되돌아왔습니다. 특히 현재 팟캐스트 앱에 지쳤다면 분명히 확인해 볼 만한 가치가 있습니다.</string>
-    <string name="paywall_layout_reviews_review_six_title">Go-To 팟캐스트 앱</string>
-    <string name="paywall_layout_reviews_review_five_date">5월 6일</string>
-    <string name="paywall_layout_reviews_review_five_message">이 앱을 6년 넘게 사용하고 있으며, Android에서 시작하여 지금은 거의 1년 동안 iOS에 머물러 있습니다. 작업은 두 플랫폼에서 동일합니다. 청취할 새 팟캐스트를 찾기 쉽고, Ul가 아주 훌륭하고, RSS 피드 URL을 통해 팟캐스트를 추가할 수도 있습니다. 시계 앱 기능이 우수하지만, 저는 주로 재생/일시 중지를 사용합니다. 계정을 통해 로그인하여 전체 기기를 동기화하지만, 꼭 그렇게 할 필요는 없습니다.</string>
-    <string name="paywall_layout_reviews_review_five_title">훌륭하게 작동하며 쉽게 새 팟캐스트를 찾거나 추가</string>
-    <string name="paywall_layout_reviews_review_four_date">6월 1일</string>
-    <string name="paywall_layout_reviews_review_four_message">동기화 기능이 마법적입니다. 이 앱이 특별한 마법을 부리는지는 모르지만, 지금까지 사용한 그 어떤 앱보다도 좋습니다.</string>
-    <string name="paywall_layout_reviews_review_four_title">환상적인 앱</string>
-    <string name="paywall_layout_reviews_review_three_date">6월 9일</string>
-    <string name="paywall_layout_reviews_review_three_message">저는 2017년부터 Pocket Casts 사용자였습니다. \n\n분명히 팟캐스트를 청취하기에 가장 좋은 앱입니다. 기능이 풍부하고 적극적으로 개발되었습니다. Ul 변경에 대한 몇 가지 불만 사항이 있었다지만, 저에는 별로 눈에 띄지 않았습니다. \n\n이 앱은 원하는 대로 간단하거나 까다롭게 사용할 수 있습니다. 따라서 플러그 앤 플레이 방식으로 사용하거나 아웃트로 및 인트로 건너뛰기 타이머와 활성화하고 싶은 기타 소소한 기능을 설정할 수 있습니다.</string>
-    <string name="paywall_layout_reviews_review_three_title">현존 최고의 팟캐스트 앱</string>
-    <string name="paywall_layout_reviews_review_two_date">6월 15일</string>
-    <string name="paywall_layout_reviews_review_two_message">8년의 우수성과 지속적인 개선</string>
-    <string name="paywall_layout_reviews_review_two_title">필수 팟캐스트 앱</string>
-    <string name="paywall_layout_reviews_review_one_date">7월 10일</string>
-    <string name="paywall_layout_reviews_review_one_message">저는 오랫동안 사용자였으며, 무료 버전을 통해 이용할 수 있는 기능과 사용자 정의 기능의 양이 엄청납니다. 기기 사이에 동기화되어서 내 전화기에서 청취를 시작하고 Alexa 기기에서 계속 들을 수 있습니다. 팟캐스트를 청취하는 모든 사람에게 추천합니다. 통계도 마음에 듭니다!</string>
-    <string name="paywall_layout_reviews_review_one_title">지금껏 최고의 팟캐스트 앱</string>
-    <string name="paywall_layout_reviews_see_all_reviews_in_store">Play 스토어의 모든 리뷰 보기</string>
     <string name="player_time_remaining">남은 시간 %s</string>
     <string name="player_played_up_to">%s까지 재생됨</string>
-    <string name="paywall_layout_reviews_rating">4.1 평가(5,700개 리뷰)</string>
-    <string name="paywall_layout_reviews_stars_content_description">별</string>
-    <string name="paywall_layout_reviews_subtitle">사람들이 Plus로 업그레이드한 이유 참조</string>
-    <string name="paywall_layout_reviews_title">\"한마디로 팟캐스트를 청취하는 가장 좋은 방법\"</string>
     <string name="onboarding_plus_feature_dream_with_slumber_studios">&lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios 콘텐츠로 꿈꾸기&lt;/a&gt;</string>
     <string name="gift">선물</string>
     <string name="got_it">알겠습니다</string>
     <string name="transcript_search">대본 검색</string>
     <string name="transcript_close">대본 닫기</string>
     <string name="onboarding_subscribe_to_plus">Plus 구독</string>
-    <string name="paywall_themes_content_description">추가 테마 및 아이콘 이미지</string>
-    <string name="paywall_themes_description">트루 컬러를 이용하세요. 구독자에게는 전용 아이콘과 테마가 제공됩니다.</string>
-    <string name="paywall_themes_title">추가 테마 및 아이콘</string>
-    <string name="paywall_storage_content_description">20GB 저장 공간 이미지</string>
-    <string name="paywall_storage_description">오디오 파일을 클라우드 저장 공간으로 업로드하고 어디에서나 사용할 수 있습니다.</string>
-    <string name="paywall_storage_title">20GB 저장 공간</string>
-    <string name="paywall_slumber_studios_content_description">Slumber Studios로 꿈꾸는 이미지</string>
-    <string name="paywall_slumber_studios_description">Slumber Studios의 프리미엄 콘텐츠를 1년간 이용하세요.</string>
-    <string name="paywall_slumber_studios_title">Slumber Studios로 꿈꾸는 이미지</string>
-    <string name="paywall_watch_content_description">Apple Watch 및 Wear OS 재생 이미지</string>
-    <string name="paywall_watch_description">스마트폰은 두고 달려 나가세요.</string>
-    <string name="paywall_watch_title">Apple Watch 및 Wear OS 재생</string>
-    <string name="paywall_bookmarks_content_description">북마크 이미지</string>
-    <string name="paywall_bookmarks_description">특정 에피소드에서 마음에 드는 부분을 저장해 뒀다가 다시 돌려 보세요.</string>
-    <string name="paywall_bookmarks_title">북마크</string>
-    <string name="paywall_folders_content_description">폴더 이미지</string>
-    <string name="paywall_folders_description">팟캐스트를 폴더로 정리하고 모든 기기에서 동기화 상태를 유지하세요.</string>
-    <string name="paywall_folders_title">폴더</string>
-    <string name="paywall_desktop_and_web_content_description">데스크톱 및 웹 앱 이미지</string>
-    <string name="paywall_desktop_and_web_description">Windows, macOS 및 웹 앱으로 더 많은 곳에서 청취하세요.</string>
-    <string name="paywall_desktop_and_web_title">데스크톱 및 웹 앱</string>
-    <string name="paywall_free_1_month_trial">1개월간 무료로 체험해 보세요.</string>
-    <string name="paywall_save_50_off">첫해에 50%를 절약하세요.</string>
     <string name="error_transcript_failed_to_parse">죄송합니다. 이 대본의 구문 분석 중에 문제가 발생했습니다.</string>
     <string name="error_transcript_format_not_supported">죄송합니다. 이 대본 형식이 지원되지 않습니다: %s</string>
     <string name="error_transcript_failed_to_load">죄송합니다. 이 대본을 로드하는 중에 문제가 발생했습니다.</string>
@@ -355,8 +321,6 @@ Language: ko_KR
     <string name="onboarding_plus_recurring_after_intro_offer">반복 결제: %s</string>
     <string name="half_price_first_year">첫해 50% 할인</string>
     <string name="plus_offer_duration">%s 행사</string>
-    <string name="report_subtitle">부적절한 콘텐츠 신고</string>
-    <string name="report">보고서</string>
     <string name="onboarding_plus_feature_watch_playback">Apple Watch 및 Wear OS 앱</string>
     <string name="onboarding_plus_feature_folders_and_bookmarks_title">폴더 및 북마크</string>
     <string name="settings_use_dynamic_colors_widget_details">활성화하면 위젯 색상이 기기 테마 색상에 따라 변경됩니다.</string>
@@ -673,7 +637,6 @@ Language: ko_KR
     <string name="onboarding_plus_feature_cloud_storage_title">클라우드 저장 공간 20GB</string>
     <string name="onboarding_plus_feature_folders_text">팟캐스트를 폴더로 정리하고 모든 기기에서 동기화 상태를 유지하세요.</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Windows, macOS 및 웹 앱으로 더 많은 곳에서 청취하세요.</string>
-    <string name="onboarding_plus_feature_desktop_and_web_apps_title">데스크톱 및 웹 앱</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Pocket Casts에 대해 좋아하는 모든 것 이상</string>
     <string name="onboarding_recommendations_import">가져오기</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">좋아하는 팟캐스트를 선택하거나 다른 팟캐스트 플레이어에서 가져와서 나만의 Pocket Casts를 만드세요. 나중에 언제든지 이렇게 하실 수 있습니다.</string>
