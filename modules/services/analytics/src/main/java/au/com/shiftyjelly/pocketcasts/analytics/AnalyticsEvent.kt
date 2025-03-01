@@ -228,12 +228,10 @@ enum class AnalyticsEvent(val key: String) {
     PODCASTS_SCREEN_SORT_ORDER_CHANGED("podcasts_screen_sort_order_changed"),
     PODCASTS_SCREEN_EPISODE_GROUPING_CHANGED("podcasts_screen_episode_grouping_changed"),
     PODCASTS_SCREEN_TAB_TAPPED("podcasts_screen_tab_tapped"),
-    PODCAST_SCREEN_REPORT_TAPPED("podcast_screen_report_tapped"),
     PODCAST_SCREEN_REFRESH_EPISODE_LIST("podcast_screen_refresh_episode_list"),
     PODCAST_SCREEN_REFRESH_NEW_EPISODE_FOUND("podcast_screen_refresh_new_episode_found"),
     PODCAST_SCREEN_REFRESH_NO_EPISODES_FOUND("podcast_screen_refresh_no_episodes_found"),
-    PODCAST_REFRESH_EPISODE_TOOLTIP_SHOWN("podcast_refresh_episode_tooltip_shown"),
-    PODCAST_REFRESH_EPISODE_TOOLTIP_DISMISSED("podcast_refresh_episode_tooltip_dismissed"),
+    PODCAST_SCREEN_CATEGORY_TAPPED("podcast_screen_category_tapped"),
 
     /* Podcast Settings */
     PODCAST_SETTINGS_FEED_ERROR_TAPPED("podcast_settings_feed_error_tapped"),
@@ -748,4 +746,8 @@ enum class AnalyticsEvent(val key: String) {
     SUGGESTED_FOLDERS_PAYWALL_MODAL_SHOWN("suggested_folders_paywall_modal_shown"),
     SUGGESTED_FOLDERS_PAYWALL_MODAL_USE_THESE_FOLDERS_TAPPED("suggested_folders_paywall_modal_use_these_folders_tapped"),
     SUGGESTED_FOLDERS_PAYWALL_MODAL_MAYBE_LATER_TAPPED("suggested_folders_paywall_modal_maybe_later_tapped"),
+    SUGGESTED_FOLDERS_REPLACE_EXISTING_FOLDERS_MODAL_SHOWN("suggested_folders_replace_existing_folders_modal_shown"),
+    SUGGESTED_FOLDERS_REPLACE_FOLDERS_TAPPED("suggested_folders_replace_folders_tapped"),
+    SUGGESTED_FOLDERS_HOW_IT_WORKS_TAPPED("suggested_folders_how_it_works_tapped"),
+    SUGGESTED_FOLDERS_HOW_IT_WORKS_GOT_IT_TAPPED("suggested_folders_how_it_works_got_it_tapped"),
 }

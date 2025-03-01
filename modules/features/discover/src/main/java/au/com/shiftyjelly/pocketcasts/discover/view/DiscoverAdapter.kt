@@ -18,9 +18,6 @@ import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent.DISCOVER_AD_CATEGORY_SUBSCRIBED
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent.DISCOVER_AD_CATEGORY_TAPPED
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent.DISCOVER_CATEGORIES_PICKER_CLOSED
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent.DISCOVER_CATEGORIES_PICKER_SHOWN
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent.DISCOVER_CATEGORY_CLOSE_BUTTON_TAPPED
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowCarouselListBinding
@@ -47,12 +44,12 @@ import au.com.shiftyjelly.pocketcasts.discover.viewmodel.PodcastList
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.repositories.categories.CategoriesManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.servers.cdn.ArtworkColors
 import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServiceManagerImpl
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
-import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory.Companion.ALL_CATEGORIES_ID
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverEpisode
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRegion
@@ -61,7 +58,6 @@ import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
 import au.com.shiftyjelly.pocketcasts.servers.model.SponsoredPodcast
-import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.images.ThemedImageTintTransformation
@@ -104,17 +100,17 @@ internal data class MostPopularPodcastsByCategoryRow(val listId: String?, val ca
         const val TITLE_TEMPLATE = "most popular in $TITLE_CATEGORY_KEY"
     }
 }
+
 internal data class RemainingPodcastsByCategoryRow(val listId: String?, val category: String?, val podcasts: List<DiscoverPodcast>)
 internal data class CategoryAdRow(val categoryId: Int, val categoryName: String, val region: String?, val discoverRow: DiscoverRow)
 internal class DiscoverAdapter(
     val context: Context,
-    val service: ListRepository,
     val staticServiceManager: StaticServiceManagerImpl,
     val listener: Listener,
     val theme: Theme,
     loadPodcastList: (source: String) -> Flowable<PodcastList>,
     val loadCarouselSponsoredPodcastList: (List<SponsoredPodcast>) -> Flowable<List<CarouselSponsoredPodcast>>,
-    val loadCategories: (String) -> Flowable<List<CategoryPill>>,
+    private val categoriesState: (String, List<Int>) -> Flowable<CategoriesManager.State>,
     private val analyticsTracker: AnalyticsTracker,
 ) : ListAdapter<Any, RecyclerView.ViewHolder>(DiscoverRowDiffCallback()) {
     interface Listener {
@@ -124,10 +120,10 @@ internal class DiscoverAdapter(
         fun onEpisodeClicked(episode: DiscoverEpisode, listUuid: String?)
         fun onEpisodePlayClicked(episode: DiscoverEpisode)
         fun onEpisodeStopClicked()
-        fun onSearchClicked()
-        fun onCategoryClick(selectedCategory: CategoryPill, onCategorySelectionSuccess: () -> Unit)
-        fun onAllCategoriesClick(source: String, onCategorySelectionSuccess: (CategoryPill) -> Unit, onCategorySelectionCancel: () -> Unit)
-        fun onClearCategoryFilterClick(source: String, onCategoryClearSuccess: (List<CategoryPill>) -> Unit)
+        fun onClickSearch()
+        fun onSelectCategory(category: DiscoverCategory)
+        fun onDismissSelectedCategory(category: DiscoverCategory)
+        fun onShowAllCategories()
     }
 
     val loadPodcastList = { source: String ->
@@ -156,14 +152,6 @@ internal class DiscoverAdapter(
 
         val recyclerView: RecyclerView? = itemView.findViewById(R.id.rowRecyclerView)
         private var loadingDisposable: Disposable? = null
-
-        fun <T : Any> loadSingle(single: Single<T>, onSuccess: (T) -> (Unit), onError: (Throwable) -> Unit = DEFAULT_ERROR_HANDLER) {
-            cancelLoading()
-            loadingDisposable = single.observeOn(AndroidSchedulers.mainThread()).subscribeBy(
-                onSuccess = onSuccess,
-                onError = onError,
-            )
-        }
 
         fun <T : Any> loadFlowable(flowable: Flowable<T>, onNext: (T) -> (Unit), onError: (Throwable) -> Unit = DEFAULT_ERROR_HANDLER) {
             cancelLoading()
@@ -223,6 +211,7 @@ internal class DiscoverAdapter(
                         draggingStarted = true
                         autoScrollHelper?.stopAutoScrollTimer()
                     }
+
                     RecyclerView.SCROLL_STATE_IDLE -> {
                         if (draggingStarted) {
                             /* Start auto scroll with a delay after a manual swipe */
@@ -377,98 +366,37 @@ internal class DiscoverAdapter(
             recyclerView?.layoutManager = LinearLayoutManager(itemView.context, RecyclerView.VERTICAL, false)
         }
     }
-    inner class CategoryPillsViewHolder(val binding: RowCategoryPillsBinding) : NetworkLoadableViewHolder(binding.root) {
-        private lateinit var source: String
-        private lateinit var region: String
-        private lateinit var allCategories: CategoryPill
-        private var mostPopularCategoriesId: List<Int> = emptyList()
 
-        private val adapter = CategoryPillListAdapter(
-            onCategoryClick = { selectedCategory, onCategorySelectionSuccess ->
-                trackCategoryPillTapped(selectedCategory.discoverCategory.name, selectedCategory.discoverCategory.id)
-                listener.onCategoryClick(
-                    selectedCategory = selectedCategory,
-                    onCategorySelectionSuccess = {
-                        onCategorySelectionSuccess(listOf(allCategories.copy(isSelected = true), selectedCategory.copy(isSelected = true)))
-                    },
-                )
-            },
-            onAllCategoriesClick = { onCategorySelectionCancel, onCategorySelectionSuccess ->
-                analyticsTracker.track(DISCOVER_CATEGORIES_PICKER_SHOWN, mapOf("region" to region))
-                listener.onAllCategoriesClick(
-                    source = source,
-                    onCategorySelectionSuccess = {
-                        onCategorySelectionSuccess(listOf(allCategories.copy(isSelected = true), it.copy(isSelected = true)))
-                    },
-                    onCategorySelectionCancel = {
-                        analyticsTracker.track(DISCOVER_CATEGORIES_PICKER_CLOSED, mapOf("region" to region))
-                        onCategorySelectionCancel.invoke()
-                    },
-                )
-            },
-            onClearCategoryClick = { selectedCategory ->
-                selectedCategory?.let {
-                    analyticsTracker.track(
-                        DISCOVER_CATEGORY_CLOSE_BUTTON_TAPPED,
-                        mapOf("name" to it.name, "region" to region, "id" to it.id),
-                    )
-                }
-                listener.onClearCategoryFilterClick(
-                    source,
-                    onCategoryClearSuccess = {
-                        submitCategories(
-                            categories = it,
-                            source = source,
-                            context = binding.root.context,
-                            clearFilter = true,
-                        )
-                    },
-                )
-            },
+    class CategoryPillsViewHolder(
+        private val binding: RowCategoryPillsBinding,
+        onSearchClick: () -> Unit,
+        onCategoryClick: (DiscoverCategory) -> Unit,
+        onDismissClick: (DiscoverCategory) -> Unit,
+        onAllCategoriesClick: () -> Unit,
+    ) : NetworkLoadableViewHolder(binding.root) {
+        private val adapter = CategoryPillAdapter(
+            onCategoryClick = { category -> onCategoryClick(category) },
+            onDismissClick = { category -> onDismissClick(category) },
+            onAllCategoriesClick = onAllCategoriesClick,
         )
+
         init {
             recyclerView?.layoutManager = LinearLayoutManager(itemView.context, RecyclerView.HORIZONTAL, false)
             recyclerView?.adapter = adapter
-        }
-        fun submitCategories(categories: List<CategoryPill>, source: String, context: Context, clearFilter: Boolean = false, region: String? = null) {
-            this.source = source
-            this.allCategories = CategoryPill(DiscoverCategory(ALL_CATEGORIES_ID, context.getString(LR.string.discover_all_categories), icon = "", source = ""))
 
-            // Reset category list when the current list is empty
-            // or user asked to clear the category filter
-            // or after changing region
-            if (adapter.currentList.isEmpty() || clearFilter || this.region != region) {
-                region?.let { this.region = it }
-                val categoriesFilter = mutableListOf(allCategories)
-                categoriesFilter.addAll(getMostPopularCategories(categories))
-                adapter.loadCategories(categoriesFilter)
+            binding.layoutSearch.setOnClickListener {
+                onSearchClick()
             }
         }
-        fun setMostPopularCategoriesId(ids: List<Int>) {
-            this.mostPopularCategoriesId = ids
-        }
-        private fun getMostPopularCategories(categories: List<CategoryPill>): List<CategoryPill> {
-            if (mostPopularCategoriesId.isEmpty()) return categories
 
-            return categories
-                .filter { it.discoverCategory.id in mostPopularCategoriesId }
-                .sortedBy { mostPopularCategoriesId.indexOf(it.discoverCategory.id) }
-        }
-
-        private fun trackCategoryPillTapped(name: String, id: Int) {
-            analyticsTracker.track(
-                AnalyticsEvent.DISCOVER_CATEGORIES_PILL_TAPPED,
-                mapOf(
-                    "name" to name,
-                    "region" to region,
-                    "id" to id,
-                ),
-            )
+        fun submitState(state: CategoriesManager.State) {
+            adapter.submitState(state)
         }
     }
 
     inner class MostPopularPodcastsViewHolder(val binding: RowMostPopularPodcastsBinding) : NetworkLoadableViewHolder(binding.root) {
         val adapter = MostPopularPodcastsAdapter(listener::onPodcastClicked, listener::onPodcastSubscribe, analyticsTracker)
+
         init {
             recyclerView?.layoutManager = LinearLayoutManager(itemView.context, RecyclerView.HORIZONTAL, false)
             recyclerView?.adapter = adapter
@@ -485,6 +413,7 @@ internal class DiscoverAdapter(
                 listener.onPodcastSubscribe(podcast, listUuid)
             },
         )
+
         init {
             recyclerView?.layoutManager = LinearLayoutManager(itemView.context, RecyclerView.VERTICAL, false)
             recyclerView?.adapter = adapter
@@ -508,6 +437,7 @@ internal class DiscoverAdapter(
             listIdImpressionTracked.add(listId)
         }
     }
+
     class SinglePodcastViewHolder(val binding: RowSinglePodcastBinding) : NetworkLoadableViewHolder(binding.root)
     class SingleEpisodeViewHolder(val binding: RowSingleEpisodeBinding) : NetworkLoadableViewHolder(binding.root)
     class CollectionListViewHolder(val binding: RowCollectionListBinding) : NetworkLoadableViewHolder(binding.root)
@@ -521,7 +451,14 @@ internal class DiscoverAdapter(
             R.layout.row_error -> ErrorViewHolder(RowErrorBinding.inflate(inflater, parent, false))
             R.layout.row_change_region -> ChangeRegionViewHolder(RowChangeRegionBinding.inflate(inflater, parent, false))
             R.layout.row_categories -> CategoriesViewHolder(RowCategoriesBinding.inflate(inflater, parent, false))
-            R.layout.row_category_pills -> CategoryPillsViewHolder(RowCategoryPillsBinding.inflate(inflater, parent, false))
+            R.layout.row_category_pills -> CategoryPillsViewHolder(
+                binding = RowCategoryPillsBinding.inflate(inflater, parent, false),
+                onSearchClick = listener::onClickSearch,
+                onCategoryClick = listener::onSelectCategory,
+                onDismissClick = listener::onDismissSelectedCategory,
+                onAllCategoriesClick = listener::onShowAllCategories,
+            )
+
             R.layout.row_most_popular_podcasts -> MostPopularPodcastsViewHolder(RowMostPopularPodcastsBinding.inflate(inflater, parent, false))
             R.layout.row_remaining_podcasts_by_category -> RemainingPodcastsByCategoryViewHolder(RowRemainingPodcastsByCategoryBinding.inflate(inflater, parent, false))
             R.layout.row_category_ad -> CategoryAdViewHolder(RowCategoryAdBinding.inflate(inflater, parent, false))
@@ -562,6 +499,7 @@ internal class DiscoverAdapter(
                     return R.layout.row_categories
                 }
             }
+
             is ChangeRegionRow -> {
                 return R.layout.row_change_region
             }
@@ -598,6 +536,7 @@ internal class DiscoverAdapter(
                     )
                     row.listUuid?.let { trackListImpression(it) }
                 }
+
                 is CarouselListViewHolder -> {
                     val featuredLimit = 5
 
@@ -633,6 +572,7 @@ internal class DiscoverAdapter(
                         },
                     )
                 }
+
                 is SmallListViewHolder -> {
                     holder.binding.lblTitle.text = row.title.tryToLocalise(resources)
                     holder.loadFlowable(
@@ -646,33 +586,30 @@ internal class DiscoverAdapter(
                     )
                     row.listUuid?.let { trackListImpression(it) }
                 }
+
                 is CategoriesViewHolder -> {
                     holder.binding.lblTitle.text = row.title.tryToLocalise(resources)
                     val adapter = CategoriesListRowAdapter(listener::onPodcastListClicked)
                     holder.recyclerView?.adapter = adapter
-                    holder.loadSingle(
-                        service.getCategoriesList(row.source),
-                        onSuccess = { categories ->
-                            val sortedCategories = categories.map { it.copy(name = it.name.tryToLocalise(resources)) }.sortedBy { it.name }
-
-                            adapter.submitList(sortedCategories) {
+                    holder.loadFlowable(
+                        categoriesState(row.source, row.mostPopularCategoriesId.orEmpty()),
+                        onNext = { state ->
+                            adapter.submitList(state.allCategories.sortedBy { it.name.tryToLocalise(resources) }) {
                                 onRestoreInstanceState(holder)
                             }
                         },
                     )
                 }
+
                 is CategoryPillsViewHolder -> {
                     holder.loadFlowable(
-                        loadCategories(row.source),
-                        onNext = { categories ->
-                            val context = holder.itemView.context
-                            row.mostPopularCategoriesId?.let { holder.setMostPopularCategoriesId(it) }
-                            holder.submitCategories(categories, row.source, context, region = row.regionCode)
+                        categoriesState(row.source, row.mostPopularCategoriesId.orEmpty()),
+                        onNext = { state ->
+                            holder.submitState(state)
                         },
                     )
-
-                    holder.binding.layoutSearch.setOnClickListener { listener.onSearchClicked() }
                 }
+
                 is SinglePodcastViewHolder -> {
                     holder.loadFlowable(
                         loadPodcastList(row.source),
@@ -717,6 +654,7 @@ internal class DiscoverAdapter(
                         },
                     )
                 }
+
                 is SingleEpisodeViewHolder -> {
                     holder.loadFlowable(
                         loadPodcastList(row.source),
@@ -781,6 +719,7 @@ internal class DiscoverAdapter(
                         },
                     )
                 }
+
                 is CollectionListViewHolder -> {
                     holder.loadFlowable(
                         loadPodcastList(row.source),
@@ -930,6 +869,7 @@ internal class DiscoverAdapter(
     private fun onRestoreInstanceState(holder: NetworkLoadableViewHolder) {
         holder.onRestoreInstanceState(savedState[holder.itemId])
     }
+
     override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
         super.onViewRecycled(holder)
         when (holder) {
@@ -939,6 +879,7 @@ internal class DiscoverAdapter(
             }
         }
     }
+
     private fun trackListImpression(listUuid: String) {
         analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_IMPRESSION, mapOf(LIST_ID_KEY to listUuid))
     }

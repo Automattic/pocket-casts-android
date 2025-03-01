@@ -1000,10 +1000,6 @@ class SettingsImpl @Inject constructor(
         return getRemoteConfigLong(FirebaseConfig.EPISODE_SEARCH_DEBOUNCE_MS)
     }
 
-    override fun getReportViolationUrl(): String {
-        return firebaseRemoteConfig.getString(FirebaseConfig.REPORT_VIOLATION_URL)
-    }
-
     override fun getSlumberStudiosPromoCode(): String {
         return firebaseRemoteConfig.getString(FirebaseConfig.SLUMBER_STUDIOS_YEARLY_PROMO_CODE)
     }
@@ -1542,12 +1538,6 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override val showPodcastRefreshTooltip: UserSetting<Boolean> = UserSetting.BoolPref(
-        sharedPrefKey = Settings.SHOW_PODCAST_REFRESH_TOOLTIP,
-        defaultValue = true,
-        sharedPrefs = sharedPreferences,
-    )
-
     override val referralClaimCode = UserSetting.StringPref(
         sharedPrefKey = "referralCode",
         defaultValue = "",
@@ -1579,6 +1569,18 @@ class SettingsImpl @Inject constructor(
     override val useRealTimeForPlaybackRemaingTime = UserSetting.BoolPref(
         sharedPrefKey = "use_real_time_for_playback_remaining_time",
         defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val showPodcastHeaderChangesTooltip: UserSetting<Boolean> = UserSetting.BoolPref(
+        sharedPrefKey = "show_podcast_header_ui_changes_tooltip",
+        defaultValue = true,
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val followedPodcastsForSuggestedFoldersHash = UserSetting.StringPref(
+        sharedPrefKey = "followed_podcasts_hash_for_suggested_folders",
+        defaultValue = "",
         sharedPrefs = sharedPreferences,
     )
 }

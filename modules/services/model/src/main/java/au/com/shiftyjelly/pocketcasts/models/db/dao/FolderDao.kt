@@ -17,6 +17,9 @@ abstract class FolderDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insert(folder: Folder)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract suspend fun insertAll(folder: List<Folder>)
+
     @Query("DELETE FROM folders")
     abstract suspend fun deleteAll()
 
@@ -59,6 +62,9 @@ abstract class FolderDao {
     @Query("UPDATE folders SET deleted = :deleted, sync_modified = :syncModified WHERE uuid = :uuid")
     abstract suspend fun updateDeleted(uuid: String, deleted: Boolean, syncModified: Long)
 
+    @Query("UPDATE folders SET deleted = :deleted, sync_modified = :syncModified")
+    abstract suspend fun updateAllDeleted(deleted: Boolean, syncModified: Long)
+
     @Query("UPDATE folders SET sort_position = :sortPosition, sync_modified = :syncModified WHERE uuid = :uuid")
     abstract suspend fun updateSortPosition(sortPosition: Int, uuid: String, syncModified: Long)
 
@@ -70,6 +76,12 @@ abstract class FolderDao {
         for (folder in folders) {
             updateSortPosition(sortPosition = folder.sortPosition, uuid = folder.uuid, syncModified = syncModified)
         }
+    }
+
+    @Transaction
+    open suspend fun replaceAllFolders(folders: List<Folder>, syncModified: Long) {
+        updateAllDeleted(deleted = true, syncModified = syncModified)
+        insertAll(folders)
     }
 
     @Query("SELECT COUNT(*) FROM folders WHERE deleted = 0")

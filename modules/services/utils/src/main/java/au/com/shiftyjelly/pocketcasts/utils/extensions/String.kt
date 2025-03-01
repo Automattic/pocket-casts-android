@@ -78,6 +78,7 @@ fun String.removeAccents() =
 
 fun String.sha1(): String? = hashString("SHA-1")
 fun String.sha256(): String? = hashString("SHA-256")
+fun List<String>.md5(): String? = this.joinToString(",").hashString("MD5")
 
 /**
  * For information on permitted algorithms, see

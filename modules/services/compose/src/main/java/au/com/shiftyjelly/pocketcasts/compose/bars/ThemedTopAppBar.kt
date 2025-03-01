@@ -24,6 +24,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -65,6 +66,7 @@ fun ThemedTopAppBar(
         ThemedTopAppBar.Style.Immersive -> MaterialTheme.theme.colors.primaryUi01
     },
     bottomShadow: Boolean = false,
+    titleOverflow: TextOverflow = TextOverflow.Ellipsis,
     windowInsets: WindowInsets = AppBarDefaults.topAppBarWindowInsets,
     actions: @Composable RowScope.(Color) -> Unit = {},
     onNavigationClick: () -> Unit,
@@ -85,6 +87,7 @@ fun ThemedTopAppBar(
                     Text(
                         text = title,
                         color = textColor,
+                        overflow = titleOverflow,
                     )
                 }
             },

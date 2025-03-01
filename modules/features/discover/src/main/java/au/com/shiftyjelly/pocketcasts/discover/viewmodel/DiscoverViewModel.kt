@@ -1,14 +1,17 @@
 package au.com.shiftyjelly.pocketcasts.discover.viewmodel
 
 import android.content.res.Resources
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.discover.view.CategoryPill
+import au.com.shiftyjelly.pocketcasts.discover.view.CategoryAdRow
+import au.com.shiftyjelly.pocketcasts.discover.view.ChangeRegionRow
+import au.com.shiftyjelly.pocketcasts.discover.view.MostPopularPodcastsByCategoryRow
+import au.com.shiftyjelly.pocketcasts.discover.view.RemainingPodcastsByCategoryRow
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.categories.CategoriesManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -20,6 +23,7 @@ import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverFeedTintColors
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRegion
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRow
+import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
 import au.com.shiftyjelly.pocketcasts.servers.model.SponsoredPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.transformWithRegion
@@ -28,6 +32,7 @@ import com.automattic.android.tracks.crashlogging.CrashLogging
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
@@ -36,6 +41,9 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import java.io.InvalidObjectException
 import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import timber.log.Timber
 
 @HiltViewModel
@@ -46,16 +54,26 @@ class DiscoverViewModel @Inject constructor(
     val episodeManager: EpisodeManager,
     val playbackManager: PlaybackManager,
     val userManager: UserManager,
+    val categoriesManager: CategoriesManager,
     val analyticsTracker: AnalyticsTracker,
     val crashLogging: CrashLogging,
 ) : ViewModel() {
     private val disposables = CompositeDisposable()
     private val sourceView = SourceView.DISCOVER
-    val state = MutableLiveData<DiscoverState>().apply { value = DiscoverState.Loading }
     var currentRegionCode: String? = settings.discoverCountryCode.value
     private var replacements = emptyMap<String, String>()
     private var adsForCategoryView = emptyList<DiscoverRow>()
     private var isFragmentChangingConfigurations: Boolean = false
+
+    private val _state = MutableStateFlow(
+        DiscoverState(
+            discoverFeed = null,
+            categoryFeed = null,
+            isLoading = true,
+            isError = false,
+        ),
+    )
+    internal val state = _state.asStateFlow()
 
     fun onShown() {
         if (!isFragmentChangingConfigurations) {
@@ -67,49 +85,51 @@ class DiscoverViewModel @Inject constructor(
         isFragmentChangingConfigurations = isChangingConfigurations ?: false
     }
 
-    fun loadData(resources: Resources) {
-        val feed = repository.getDiscoverFeed()
-
-        feed.toFlowable()
+    fun loadFeed(resources: Resources) {
+        loadDiscoverFeed(resources)
             .subscribeBy(
-                onNext = {
-                    val region = it.regions[currentRegionCode ?: it.defaultRegionCode] ?: it.regions[it.defaultRegionCode]
-                    if (region == null) {
-                        val message = "Could not get region $currentRegionCode"
-                        Timber.e(message)
-                        state.value = DiscoverState.Error(IllegalStateException(message))
-                        return@subscribeBy
+                onSuccess = { discoverFeed ->
+                    _state.update {
+                        it.copy(discoverFeed = discoverFeed, categoryFeed = null, isLoading = false, isError = false)
                     }
-
-                    if (currentRegionCode == null) {
-                        currentRegionCode = it.defaultRegionCode
-                    }
-
-                    replacements = mapOf(
-                        it.regionCodeToken to region.code,
-                        it.regionNameToken to region.name,
-                    )
-
-                    // Update the list with the correct region substituted in where needed
-                    val updatedList = it.layout.transformWithRegion(region, replacements, resources)
-
-                    // Save ads to display in category view
-                    adsForCategoryView = updatedList.filter { discoverRow -> discoverRow.categoryId != null }
-
-                    state.postValue(DiscoverState.DataLoaded(updatedList, region, it.regions.values.toList()))
                 },
                 onError = { throwable ->
                     Timber.e(throwable)
-                    state.postValue(DiscoverState.Error(throwable))
+                    _state.update { it.copy(isLoading = false, isError = true) }
                 },
             )
             .addTo(disposables)
     }
 
+    private fun loadDiscoverFeed(resources: Resources): Single<DiscoverFeed> {
+        return repository.getDiscoverFeed().map { discover ->
+            val defaultRegion = discover.defaultRegionCode
+            val region = discover.regions[currentRegionCode ?: defaultRegion] ?: discover.regions[defaultRegion]
+            if (region == null) {
+                error("Could not get region $currentRegionCode")
+            }
+
+            if (currentRegionCode == null) {
+                currentRegionCode = defaultRegion
+            }
+            replacements = mapOf(
+                discover.regionCodeToken to region.code,
+                discover.regionNameToken to region.name,
+            )
+
+            // Update the list with the correct region substituted in where needed
+            val updatedList = discover.layout.transformWithRegion(region, replacements, resources)
+
+            // Save ads to display in category view
+            adsForCategoryView = updatedList.filter { discoverRow -> discoverRow.categoryId != null }
+            DiscoverFeed(updatedList, region, discover.regions.values.toList())
+        }
+    }
+
     fun changeRegion(region: DiscoverRegion, resources: Resources) {
         settings.discoverCountryCode.set(region.code, updateModifiedAt = false)
         currentRegionCode = region.code
-        loadData(resources)
+        loadFeed(resources)
     }
 
     fun loadPodcastList(source: String): Flowable<PodcastList> {
@@ -132,19 +152,40 @@ class DiscoverViewModel @Inject constructor(
                 addPlaybackStateToList(it)
             }
     }
-    fun filterPodcasts(source: String, onPodcastsLoaded: (PodcastList) -> Unit) {
-        state.postValue(DiscoverState.FilteringPodcastsByCategory)
 
-        loadPodcastList(source).subscribeBy(
-            onNext = {
-                state.postValue(DiscoverState.PodcastsFilteredByCategory)
-                onPodcastsLoaded(it)
-            },
-            onError = {
-                state.postValue(DiscoverState.Error(it))
-                Timber.e(it)
-            },
-        ).addTo(disposables)
+    fun loadCategory(category: DiscoverCategory, resources: Resources) {
+        _state.update { it.copy(isLoading = true) }
+
+        val initialDiscoverFeed = state.value.discoverFeed
+        val feedInitialization = if (initialDiscoverFeed == null) {
+            loadDiscoverFeed(resources)
+        } else {
+            Single.just(initialDiscoverFeed)
+        }
+
+        feedInitialization
+            .flatMap { discoverFeed ->
+                val categoryUrl = transformNetworkLoadableList(category, resources).source
+                loadPodcastList(categoryUrl)
+                    .firstOrError()
+                    .map { discoverFeed to it }
+            }
+            .subscribeBy(
+                onSuccess = { (discoverFeed, podcasts) ->
+                    val categoryFeed = CategoryFeed(
+                        category = category,
+                        podcastList = podcasts,
+                        adRow = getCategoryAdRow(category),
+                    )
+                    _state.update { it.copy(isLoading = false, discoverFeed = discoverFeed, categoryFeed = categoryFeed) }
+                },
+                onError = {
+                    _state.update { it.copy(isLoading = false, isError = true) }
+                    categoriesManager.dismissSelectedCategory()
+                    Timber.e(it)
+                },
+            )
+            .addTo(disposables)
     }
 
     fun loadCarouselSponsoredPodcasts(
@@ -182,45 +223,6 @@ class DiscoverViewModel @Inject constructor(
             Flowable.just(emptyList())
         }
     }
-    fun loadCategories(
-        url: String,
-        onSuccess: (List<CategoryPill>) -> Unit,
-    ) {
-        val categoriesList = repository.getCategoriesList(url)
-
-        categoriesList.subscribeBy(
-            onSuccess = {
-                val categoryPills = it.map { discoverCategory ->
-                    convertCategoryToPill(discoverCategory)
-                }
-                onSuccess(categoryPills)
-            },
-            onError = {
-                Timber.e(it)
-            },
-        ).addTo(disposables)
-    }
-    fun loadCategories(
-        url: String,
-    ): Flowable<List<CategoryPill>> {
-        val categoriesList: Flowable<List<DiscoverCategory>> = repository.getCategoriesList(url)
-            .toFlowable()
-
-        return categoriesList.map { discoverCategories ->
-            discoverCategories.map { discoverCategory ->
-                convertCategoryToPill(discoverCategory)
-            }
-        }
-    }
-    private fun convertCategoryToPill(category: DiscoverCategory): CategoryPill = CategoryPill(
-        discoverCategory = DiscoverCategory(
-            id = category.id,
-            name = category.name,
-            icon = category.icon,
-            curated = category.curated,
-            source = category.source,
-        ),
-    )
 
     private fun addSubscriptionStateToPodcasts(list: PodcastList): Flowable<PodcastList> {
         return podcastManager.getSubscribedPodcastUuidsRxSingle().toFlowable() // Get the current subscribed list
@@ -240,6 +242,7 @@ class DiscoverViewModel @Inject constructor(
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
     }
+
     private fun addPlaybackStateToList(list: PodcastList): Flowable<PodcastList> {
         return Flowable.just(list)
             .combineLatest(
@@ -303,17 +306,66 @@ class DiscoverViewModel @Inject constructor(
     fun stopPlayback() {
         playbackManager.stopAsync(sourceView = sourceView)
     }
-    fun getAdForCategoryView(categoryInt: Int): DiscoverRow? {
-        return adsForCategoryView.firstOrNull { it.categoryId == categoryInt }
+
+    internal fun getCategoryAdRow(category: DiscoverCategory): CategoryAdRow? {
+        return adsForCategoryView.firstOrNull { it.categoryId == category.id }?.let { row ->
+            CategoryAdRow(
+                categoryId = category.id,
+                categoryName = category.name,
+                region = currentRegionCode,
+                discoverRow = row,
+            )
+        }
     }
 }
 
-sealed class DiscoverState {
-    data object Loading : DiscoverState()
-    data class DataLoaded(val data: List<DiscoverRow>, val selectedRegion: DiscoverRegion, val regionList: List<DiscoverRegion>) : DiscoverState()
-    data object FilteringPodcastsByCategory : DiscoverState()
-    data object PodcastsFilteredByCategory : DiscoverState()
-    data class Error(val error: Throwable) : DiscoverState()
+internal data class DiscoverState(
+    val discoverFeed: DiscoverFeed?,
+    val categoryFeed: CategoryFeed?,
+    val isLoading: Boolean,
+    val isError: Boolean,
+) {
+    val rows: List<Any>? get() = discoverFeed?.let { discover ->
+        if (categoryFeed == null) {
+            discover.data.filter { it.categoryId == null } + ChangeRegionRow(discover.selectedRegion)
+        } else {
+            buildList {
+                val categoriesRow = discover.data.find { it.type is ListType.Categories }
+                if (categoriesRow != null) {
+                    add(categoriesRow)
+                }
+
+                add(categoryFeed.mostPopularPodcasts)
+                if (categoryFeed.adRow != null) {
+                    add(categoryFeed.adRow)
+                }
+                add(categoryFeed.remainingPodcasts)
+            }
+        }
+    }
+}
+
+internal data class DiscoverFeed(
+    val data: List<DiscoverRow>,
+    val selectedRegion: DiscoverRegion,
+    val regionList: List<DiscoverRegion>,
+)
+
+internal data class CategoryFeed(
+    val category: DiscoverCategory,
+    val podcastList: PodcastList,
+    val adRow: CategoryAdRow?,
+) {
+    val mostPopularPodcasts = MostPopularPodcastsByCategoryRow(
+        listId = podcastList.listId,
+        category = podcastList.title,
+        podcasts = podcastList.podcasts.take(5),
+    )
+    val remainingPodcasts = RemainingPodcastsByCategoryRow(
+        listId = podcastList.listId,
+        category = podcastList.title,
+        podcasts = podcastList.podcasts.drop(5),
+    )
 }
 
 data class PodcastList(

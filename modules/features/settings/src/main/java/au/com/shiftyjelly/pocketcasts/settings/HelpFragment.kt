@@ -7,17 +7,20 @@ import android.view.ViewGroup
 import android.webkit.WebView
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.fragment.compose.content
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
-import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.settings.status.StatusFragment
 import au.com.shiftyjelly.pocketcasts.ui.extensions.setupKeyboardModePan
@@ -25,7 +28,6 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.setupKeyboardModeResize
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
-import com.kevinnzou.web.WebView
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -45,7 +47,9 @@ class HelpFragment : BaseFragment(), HasBackstack {
             val bottomPadding by settings.bottomInset.collectAsState(0)
 
             Column(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom)),
             ) {
                 HelpPage(
                     activity = requireActivity(),

@@ -119,8 +119,6 @@ interface Settings {
         const val AUTOMOTIVE_CONNECTED_TO_MEDIA_SESSION = "automotive_connected_to_media_session"
 
         const val SHOW_REFERRALS_TOOLTIP = "show_referrals_tooltip"
-
-        const val SHOW_PODCAST_REFRESH_TOOLTIP = "show_podcast_refresh_tooltip"
     }
 
     enum class NotificationChannel(val id: String) {
@@ -409,7 +407,6 @@ interface Settings {
     fun getPlayerReleaseTimeOutMs(): Long
     fun getPodcastSearchDebounceMs(): Long
     fun getEpisodeSearchDebounceMs(): Long
-    fun getReportViolationUrl(): String
     fun getSlumberStudiosPromoCode(): String
     fun getSleepTimerDeviceShakeThreshold(): Long
     fun getRefreshPodcastsBatchSize(): Long
@@ -560,8 +557,6 @@ interface Settings {
 
     val showReferralsTooltip: UserSetting<Boolean>
 
-    val showPodcastRefreshTooltip: UserSetting<Boolean>
-
     val playerOrUpNextBottomSheetState: Flow<Int>
     fun updatePlayerOrUpNextBottomSheetState(state: Int)
 
@@ -571,4 +566,8 @@ interface Settings {
     val lastEoySyncTimestamp: UserSetting<Instant>
 
     val useRealTimeForPlaybackRemaingTime: UserSetting<Boolean>
+
+    val showPodcastHeaderChangesTooltip: UserSetting<Boolean>
+
+    val followedPodcastsForSuggestedFoldersHash: UserSetting<String>
 }

@@ -16,6 +16,8 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 import retrofit2.http.Url
 
+typealias SuggestedFoldersResponse = Map<String, List<String>>
+
 @JsonClass(generateAdapter = true)
 data class SearchBody(@field:Json(name = "podcastuuid") val podcastuuid: String, @field:Json(name = "searchterm") val searchterm: String)
 
@@ -64,6 +66,11 @@ data class PodcastRatingsResponse(
     )
 }
 
+@JsonClass(generateAdapter = true)
+data class SuggestedFoldersRequest(
+    @field:Json(name = "uuids") val uuids: List<String>,
+)
+
 interface PodcastCacheService {
     @GET("/mobile/podcast/full/{podcastUuid}")
     suspend fun getPodcastAndEpisodesRaw(@Path("podcastUuid") podcastUuid: String): Response<PodcastResponse>
@@ -109,4 +116,7 @@ interface PodcastCacheService {
     @GET("/podcast/rating/{podcastUuid}")
     @Headers("Cache-Control: no-cache")
     suspend fun getPodcastRatingsNoCache(@Path("podcastUuid") podcastUuid: String): PodcastRatingsResponse
+
+    @POST("/podcast/suggest_folders")
+    suspend fun suggestedFolders(@Body request: SuggestedFoldersRequest): SuggestedFoldersResponse
 }

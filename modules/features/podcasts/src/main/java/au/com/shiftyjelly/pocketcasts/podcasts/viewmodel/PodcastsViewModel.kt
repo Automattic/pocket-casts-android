@@ -3,19 +3,23 @@ package au.com.shiftyjelly.pocketcasts.podcasts.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
+import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.SuggestedFolder
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
+import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.toFolders
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.SuggestedFoldersManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
@@ -28,18 +32,19 @@ import java.util.Collections
 import java.util.Optional
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
-import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.rx2.asObservable
 import timber.log.Timber
+import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.Folder as SuggestedFolderModel
 
 @HiltViewModel
 class PodcastsViewModel
@@ -49,6 +54,7 @@ class PodcastsViewModel
     private val folderManager: FolderManager,
     private val settings: Settings,
     private val analyticsTracker: AnalyticsTracker,
+    private val suggestedFoldersManager: SuggestedFoldersManager,
     userManager: UserManager,
 ) : ViewModel(), CoroutineScope {
     var isFragmentChangingConfigurations: Boolean = false
@@ -62,8 +68,6 @@ class PodcastsViewModel
         val items: List<FolderItem>,
         val isSignedInAsPlusOrPatron: Boolean,
     )
-
-    val signInState: LiveData<SignInState> = userManager.getSignInState().toLiveData()
 
     val folderState: LiveData<FolderState> = combineLatest(
         // monitor all subscribed podcasts, get the podcast in 'Episode release date' as the rest can be done in memory
@@ -133,7 +137,9 @@ class PodcastsViewModel
     val folder: Folder?
         get() = folderState.value?.folder
 
-    private val _suggestedFoldersState = MutableSharedFlow<SuggestedFoldersState>()
+    private val _suggestedFoldersState = MutableStateFlow<SuggestedFoldersState>(SuggestedFoldersState.Idle)
+    val suggestedFoldersState: SuggestedFoldersState
+        get() = _suggestedFoldersState.value
 
     val userSuggestedFoldersState: Flow<Pair<SignInState, SuggestedFoldersState>> = userManager.getSignInState().asFlow()
         .combine(_suggestedFoldersState) { signIn, suggestedFolders ->
@@ -296,11 +302,28 @@ class PodcastsViewModel
         }
     }
 
-    suspend fun fetchSuggestedFolders() {
+    @OptIn(FlowPreview::class)
+    suspend fun loadSuggestedFolders() {
         if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS)) {
-            _suggestedFoldersState.emit(SuggestedFoldersState.Fetching)
-            delay(2.seconds)
-            _suggestedFoldersState.emit(SuggestedFoldersState.Loaded)
+            _suggestedFoldersState.emit(SuggestedFoldersState.Loading)
+            suggestedFoldersManager.getSuggestedFolders()
+                .debounce(200)
+                .collect { folders ->
+                    if (folders.isEmpty()) {
+                        _suggestedFoldersState.emit(SuggestedFoldersState.Empty)
+                    } else {
+                        _suggestedFoldersState.emit(SuggestedFoldersState.Loaded(folders))
+                    }
+                }
+        }
+    }
+
+    fun refreshSuggestedFolders() {
+        viewModelScope.launch {
+            if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS)) {
+                val uuids = podcastManager.findSubscribedUuids()
+                suggestedFoldersManager.refreshSuggestedFolders(uuids)
+            }
         }
     }
 
@@ -308,9 +331,16 @@ class PodcastsViewModel
         FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS) && !isSignedInAsPlusOrPatron && settings.suggestedFolderPaywallDismissTime.value == 0L
 
     sealed class SuggestedFoldersState {
-        data object Fetching : SuggestedFoldersState()
-        data object Loaded : SuggestedFoldersState()
-        data class Error(val message: String) : SuggestedFoldersState()
+        data object Idle : SuggestedFoldersState()
+        data object Loading : SuggestedFoldersState()
+        data class Loaded(private val folders: List<SuggestedFolder>) : SuggestedFoldersState() {
+            private val convertedFolders: List<SuggestedFolderModel> by lazy {
+                folders.toFolders()
+            }
+
+            fun folders(): List<SuggestedFolderModel> = convertedFolders
+        }
+        data object Empty : SuggestedFoldersState()
     }
 
     companion object {

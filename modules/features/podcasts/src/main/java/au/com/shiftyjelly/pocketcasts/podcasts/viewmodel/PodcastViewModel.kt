@@ -1,8 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.viewmodel
 
-import android.content.Context
 import android.content.res.Resources
-import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -60,7 +58,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
@@ -103,13 +100,10 @@ class PodcastViewModel
     private val _refreshState = MutableSharedFlow<RefreshState>()
     val refreshState = _refreshState.asSharedFlow()
 
-    val shouldShowPodcastTooltip = MutableStateFlow(settings.showPodcastRefreshTooltip.value)
-
     val groupedEpisodes: MutableLiveData<List<List<PodcastEpisode>>> = MutableLiveData()
     val signInState = userManager.getSignInState().toLiveData()
 
     val tintColor = MutableLiveData<Int>()
-    val observableHeaderExpanded = MutableLiveData<Boolean>()
 
     val castConnected = castManager.isConnectedObservable
         .toFlowable(BackpressureStrategy.LATEST)
@@ -161,7 +155,6 @@ class PodcastViewModel
             .doOnNext { newPodcast: Podcast ->
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Observing podcast $uuid changes")
                 tintColor.value = theme.getPodcastTintColor(newPodcast)
-                observableHeaderExpanded.value = !newPodcast.isSubscribed
                 podcast.postValue(newPodcast)
             }
             .switchMap {
@@ -223,6 +216,12 @@ class PodcastViewModel
         // Refresh the podcast application coroutine scope so the podcast continues to update if the view model is closed
         applicationScope.launch {
             podcastManager.refreshPodcast(existingPodcast, playbackManager)
+        }
+    }
+
+    fun updateIsHeaderExpanded(uuid: String, isExpanded: Boolean) {
+        viewModelScope.launch {
+            podcastManager.updateIsHeaderExpanded(uuid, isExpanded)
         }
     }
 
@@ -330,13 +329,10 @@ class PodcastViewModel
         }
     }
 
-    fun toggleNotifications(context: Context) {
-        val podcast = podcast.value ?: return
-        val showNotifications = !podcast.isShowNotifications
-        analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_NOTIFICATIONS_TAPPED, AnalyticsProp.notificationEnabled(showNotifications))
-        Toast.makeText(context, if (showNotifications) LR.string.podcast_notifications_on else LR.string.podcast_notifications_off, Toast.LENGTH_SHORT).show()
-        launch {
-            podcastManager.updateShowNotificationsBlocking(podcast, showNotifications)
+    fun showNotifications(podcastUuid: String, show: Boolean) {
+        analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_NOTIFICATIONS_TAPPED, AnalyticsProp.notificationEnabled(show))
+        viewModelScope.launch {
+            podcastManager.updateShowNotifications(podcastUuid, show)
         }
     }
 
@@ -593,11 +589,6 @@ class PodcastViewModel
             analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_REFRESH_NO_EPISODES_FOUND, mapOf("podcast_uuid" to podcast.uuid, "action" to refreshType.analyticsValue))
             _refreshState.emit(RefreshState.NoEpisodesFound)
         }
-    }
-
-    fun hidePodcastRefreshTooltip() {
-        settings.showPodcastRefreshTooltip.set(false, updateModifiedAt = false)
-        shouldShowPodcastTooltip.value = false
     }
 
     private fun trackEpisodeBulkEvent(event: AnalyticsEvent, count: Int) {

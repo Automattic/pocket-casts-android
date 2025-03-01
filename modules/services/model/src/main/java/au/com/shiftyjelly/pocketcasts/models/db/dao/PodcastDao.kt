@@ -9,6 +9,7 @@ import androidx.room.Transaction
 import androidx.room.Update
 import au.com.shiftyjelly.pocketcasts.models.entity.CuratedPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.SuggestedFolderDetails
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveLimit
@@ -157,6 +158,13 @@ abstract class PodcastDao {
     @Query("UPDATE podcasts SET folder_uuid = :folderUuid, sync_status = 0 WHERE uuid IN (:podcastUuids)")
     abstract suspend fun updateFolderUuid(folderUuid: String?, podcastUuids: List<String>)
 
+    @Transaction
+    open suspend fun updateFoldersUuid(folders: List<SuggestedFolderDetails>) {
+        for (folder in folders) {
+            updateFolderUuid(folder.uuid, folder.podcasts)
+        }
+    }
+
     fun updateSyncStatusRxCompletable(syncStatus: Int, uuid: String): Completable {
         return Completable.fromAction { updateSyncStatusBlocking(syncStatus, uuid) }
     }
@@ -297,7 +305,7 @@ abstract class PodcastDao {
     abstract fun updateEpisodesSortTypeBlocking(episodesSortType: EpisodesSortType, uuid: String, modified: Date = Date())
 
     @Query("UPDATE podcasts SET show_notifications = :show, show_notifications_modified = :modified, sync_status = 0 WHERE uuid = :uuid")
-    abstract fun updateShowNotificationsBlocking(show: Boolean, uuid: String, modified: Date = Date())
+    abstract suspend fun updateShowNotifications(uuid: String, show: Boolean, modified: Date = Date())
 
     @Query("UPDATE podcasts SET subscribed = :subscribed WHERE uuid = :uuid")
     abstract fun updateSubscribedBlocking(subscribed: Boolean, uuid: String)
@@ -381,4 +389,7 @@ abstract class PodcastDao {
         deleteAllCuratedPodcasts()
         insertAllCuratedPodcasts(podcasts)
     }
+
+    @Query("UPDATE podcasts SET is_header_expanded = :isExpanded WHERE uuid IS :uuid")
+    abstract suspend fun updateIsHeaderExpanded(uuid: String, isExpanded: Boolean)
 }

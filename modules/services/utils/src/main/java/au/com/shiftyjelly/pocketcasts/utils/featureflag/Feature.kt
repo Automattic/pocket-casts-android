@@ -27,14 +27,6 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = false,
     ),
-    REPORT_VIOLATION(
-        key = "report_violation",
-        title = "Report Violation",
-        defaultValue = false,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = false,
-    ),
     INTRO_PLUS_OFFER_ENABLED(
         key = "intro_plus_offer_enabled",
         title = "Intro Offer Plus",
@@ -217,6 +209,14 @@ enum class Feature(
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = false,
+        hasDevToggle = true,
+    ),
+    PODCAST_VIEW_CHANGES(
+        key = "podcast_view_changes_2025",
+        title = "Podcast View Changes",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
     ;

@@ -17,16 +17,20 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.TextView
-import androidx.compose.foundation.layout.padding
-import androidx.compose.ui.Modifier
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
-import androidx.fragment.app.FragmentManager
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -47,13 +51,15 @@ import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterEpisodeBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterEpisodeHeaderBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterPodcastHeaderBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
-import au.com.shiftyjelly.pocketcasts.podcasts.view.components.ratings.StarRatingView
+import au.com.shiftyjelly.pocketcasts.podcasts.view.components.ratings.PodcastRatingRow
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.BookmarkHeaderViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.BookmarkUpsellViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.BookmarkViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.NoBookmarkViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.TabsViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel
+import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel.RatingState
+import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel.RatingTappedSource
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastViewModel.PodcastTab
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
@@ -79,6 +85,7 @@ import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelpe
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import java.util.Date
+import kotlinx.coroutines.CompletableDeferred
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -119,13 +126,14 @@ private val differ: DiffUtil.ItemCallback<Any> = object : DiffUtil.ItemCallback<
 }
 
 class PodcastAdapter(
-    private val context: Context,
-    val downloadManager: DownloadManager,
-    val playbackManager: PlaybackManager,
-    val upNextQueue: UpNextQueue,
-    val settings: Settings,
-    val theme: Theme,
     var fromListUuid: String?,
+    private val headerType: PodcastAdapter.HeaderType,
+    private val context: Context,
+    private val downloadManager: DownloadManager,
+    private val playbackManager: PlaybackManager,
+    private val upNextQueue: UpNextQueue,
+    private val settings: Settings,
+    private val theme: Theme,
     private val podcastBookmarksObservable: Observable<List<Bookmark>>,
     private val onHeaderSummaryToggled: (Boolean, Boolean) -> Unit,
     private val onSubscribeClicked: () -> Unit,
@@ -136,7 +144,7 @@ class PodcastAdapter(
     private val onBookmarkRowLongPress: (Bookmark) -> Unit,
     private val onFoldersClicked: () -> Unit,
     private val onPodcastDescriptionClicked: () -> Unit,
-    private val onNotificationsClicked: () -> Unit,
+    private val onNotificationsClicked: (Podcast, Boolean) -> Unit,
     private val onSettingsClicked: () -> Unit,
     private val playButtonListener: PlayButton.OnClickListener,
     private val onRowClicked: (PodcastEpisode) -> Unit,
@@ -151,8 +159,11 @@ class PodcastAdapter(
     private val onTabClicked: (PodcastTab) -> Unit,
     private val onBookmarkPlayClicked: (Bookmark) -> Unit,
     private val onHeadsetSettingsClicked: () -> Unit,
+    private val onChangeHeaderExpanded: (String, Boolean) -> Unit,
+    private val onClickRating: (Podcast, RatingTappedSource) -> Unit,
+    private val onClickCategory: (Podcast) -> Unit,
+    private val onArtworkAvailable: (Podcast) -> Unit,
     private val sourceView: SourceView,
-    private val fragmentManager: FragmentManager,
 ) : LargeListAdapter<Any, RecyclerView.ViewHolder>(1500, differ) {
 
     data class EpisodeLimitRow(val episodeLimit: Int)
@@ -163,6 +174,7 @@ class PodcastAdapter(
         val selectedTab: PodcastTab,
         val onTabClicked: (PodcastTab) -> Unit,
     )
+
     data class BookmarkHeader(
         val bookmarksCount: Int,
         val searchTerm: String,
@@ -170,6 +182,7 @@ class PodcastAdapter(
         val onSearchQueryChanged: (String) -> Unit,
         val onOptionsClicked: () -> Unit,
     )
+
     data class BookmarkItemData(
         val bookmark: Bookmark,
         val episode: BaseEpisode,
@@ -180,8 +193,15 @@ class PodcastAdapter(
         val isMultiSelecting: () -> Boolean,
         val isSelected: (Bookmark) -> Boolean,
     )
+
     object BookmarkUpsell
     object NoBookmarkMessage
+
+    enum class HeaderType {
+        SolidColor,
+        Blur,
+        Scrim,
+    }
 
     companion object {
         private const val VIEW_TYPE_TABS = 100
@@ -198,10 +218,13 @@ class PodcastAdapter(
 
     private val disposables = CompositeDisposable()
     private var podcast: Podcast = Podcast()
+    private var podcastDescription = AnnotatedString("")
 
     private var headerExpanded: Boolean = false
+    private var isDescriptionExpanded = false
     private var tintColor: Int = 0x000000
     private var signInState: SignInState = SignInState.SignedOut
+    private var ratingState: RatingState = RatingState.Loading
 
     private var bookmarksAvailable: Boolean = false
 
@@ -217,10 +240,47 @@ class PodcastAdapter(
         setHasStableIds(true)
     }
 
+    private val tooltipHeaderOffset = CompletableDeferred<Dp?>()
+
+    suspend fun awaitTooltipHeaderTopOffset() = tooltipHeaderOffset.await()
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
-            VIEW_TYPE_PODCAST_HEADER -> PodcastViewHolder(AdapterPodcastHeaderBinding.inflate(inflater, parent, false), this)
+            VIEW_TYPE_PODCAST_HEADER -> when (headerType) {
+                HeaderType.SolidColor -> {
+                    tooltipHeaderOffset.complete(null)
+                    PodcastViewHolder(AdapterPodcastHeaderBinding.inflate(inflater, parent, false), this)
+                }
+                HeaderType.Blur, HeaderType.Scrim -> {
+                    PodcastHeaderViewHolder(
+                        context = parent.context,
+                        theme = theme,
+                        useBlurredArtwork = headerType == HeaderType.Blur,
+                        onClickCategory = onClickCategory,
+                        onClickRating = onClickRating,
+                        onClickFollow = onSubscribeClicked,
+                        onClickUnfollow = { onUnsubscribeClicked { } },
+                        onClickFolder = onFoldersClicked,
+                        onClickNotification = onNotificationsClicked,
+                        onClickSettings = onSettingsClicked,
+                        onClickWebsiteLink = ::onWebsiteLinkClicked,
+                        onToggleHeader = {
+                            onChangeHeaderExpanded(podcast.uuid, !podcast.isHeaderExpanded)
+                        },
+                        onToggleDescription = {
+                            isDescriptionExpanded = !isDescriptionExpanded
+                            notifyItemChanged(0)
+                        },
+                        onLongClickArtwork = {
+                            onArtworkLongClicked { notifyItemChanged(0) }
+                        },
+                        onArtworkAvailable = onArtworkAvailable,
+                        onTooltipOffsetMeasured = tooltipHeaderOffset::complete,
+                    )
+                }
+            }
+
             VIEW_TYPE_TABS -> TabsViewHolder(ComposeView(parent.context), theme)
             VIEW_TYPE_EPISODE_HEADER -> EpisodeHeaderViewHolder(AdapterEpisodeHeaderBinding.inflate(inflater, parent, false), onEpisodesOptionsClicked, onSearchFocus)
             VIEW_TYPE_EPISODE_LIMIT_ROW -> EpisodeLimitViewHolder(inflater.inflate(R.layout.adapter_episode_limit, parent, false))
@@ -250,6 +310,14 @@ class PodcastAdapter(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
+            is PodcastHeaderViewHolder -> holder.bind(
+                podcast,
+                podcastDescription,
+                isDescriptionExpanded,
+                ratingState,
+                signInState,
+            )
+
             is EpisodeViewHolder -> bindEpisodeViewHolder(holder, position, fromListUuid)
             is PodcastViewHolder -> bindPodcastViewHolder(holder)
             is TabsViewHolder -> holder.bind(getItem(position) as TabsHeader)
@@ -270,7 +338,7 @@ class PodcastAdapter(
     }
 
     private fun bindPodcastViewHolder(holder: PodcastViewHolder) {
-        bindHeaderBottom(holder)
+        bindHeaderBottom(holder, ratingState)
         bindHeaderTop(holder)
 
         val imageView = holder.binding.top.artwork
@@ -290,28 +358,15 @@ class PodcastAdapter(
         holder.binding.podcastHeader.contentDescription = podcast.title
     }
 
-    private fun bindHeaderBottom(holder: PodcastViewHolder) {
+    private fun bindHeaderBottom(holder: PodcastViewHolder, ratingState: RatingState) {
         holder.binding.bottom.root.isVisible = headerExpanded
-
-        val isHtmlDescription = FeatureFlag.isEnabled(Feature.PODCAST_HTML_DESCRIPTION) && podcast.podcastHtmlDescription.isNotEmpty()
-        val descriptionLinkColor: Int = ThemeColor.podcastText02(theme.activeTheme, tintColor)
-
-        val description = if (isHtmlDescription) {
-            HtmlCompat.fromHtml(
-                podcast.podcastHtmlDescription,
-                HtmlCompat.FROM_HTML_MODE_COMPACT and
-                    HtmlCompat.FROM_HTML_SEPARATOR_LINE_BREAK_PARAGRAPH.inv(), // keep the extra line break from paragraphs as it looks better
-            ).toAnnotatedString(urlColor = descriptionLinkColor)
-        } else {
-            AnnotatedString(podcast.podcastDescription)
-        }
 
         holder.binding.bottom.podcastHeaderBottom.setContent {
             AppTheme(theme.activeTheme) {
                 PodcastHeaderBottom(
                     title = podcast.title,
                     category = podcast.getFirstCategory(context.resources),
-                    description = description,
+                    description = podcastDescription,
                     podcastInfoContent = {
                         PodcastInfoView(
                             PodcastInfoState(
@@ -320,13 +375,16 @@ class PodcastAdapter(
                                 schedule = podcast.displayableFrequency(context.resources),
                                 next = podcast.displayableNextEpisodeDate(context),
                             ),
-                            onWebsiteLinkClicked = {
-                                onWebsiteLinkClicked(context)
-                            },
+                            onWebsiteLinkClicked = ::onWebsiteLinkClicked,
                         )
                     },
                     ratingsContent = {
-                        StarRatingView(fragmentManager, ratingsViewModel, Modifier.padding(top = 8.dp))
+                        if (ratingState is RatingState.Loaded) {
+                            PodcastRatingRow(
+                                state = ratingState,
+                                onClick = { source -> onClickRating(podcast, source) },
+                            )
+                        }
                     },
                     onDescriptionClicked = onPodcastDescriptionClicked,
                 )
@@ -358,7 +416,7 @@ class PodcastAdapter(
                 tooltipText = notificationsIconText
             }
             setImageResource(
-                if (podcast.isShowNotifications) R.drawable.ic_notifications_on else R.drawable.ic_notifications_off,
+                if (podcast.isShowNotifications) IR.drawable.ic_notifications_on else IR.drawable.ic_notifications_off,
             )
             isVisible = podcast.isSubscribed
         }
@@ -455,6 +513,14 @@ class PodcastAdapter(
             onHeaderSummaryToggled(headerExpanded, false)
         }
         this.podcast = podcast
+        val isHtmlDescription = FeatureFlag.isEnabled(Feature.PODCAST_HTML_DESCRIPTION) && podcast.podcastHtmlDescription.isNotEmpty()
+        val rawDescription = if (isHtmlDescription) { podcast.podcastHtmlDescription } else { podcast.podcastDescription }
+        this.podcastDescription = HtmlCompat.fromHtml(
+            rawDescription,
+            HtmlCompat.FROM_HTML_MODE_COMPACT and
+                HtmlCompat.FROM_HTML_SEPARATOR_LINE_BREAK_PARAGRAPH.inv(), // keep the extra line break from paragraphs as it looks better
+        ).toAnnotatedString(urlColor = ThemeColor.podcastText02(theme.activeTheme, tintColor))
+
         notifyDataSetChanged()
     }
 
@@ -464,6 +530,11 @@ class PodcastAdapter(
 
     fun setSignInState(signInState: SignInState) {
         this.signInState = signInState
+        notifyItemChanged(0)
+    }
+
+    fun setRatingState(state: RatingState) {
+        this.ratingState = state
         notifyItemChanged(0)
     }
 
@@ -675,7 +746,7 @@ class PodcastAdapter(
         onHeaderSummaryToggled(expanded, true)
     }
 
-    private fun onWebsiteLinkClicked(context: Context) {
+    private fun onWebsiteLinkClicked() {
         podcast.podcastUrl?.let { url ->
             if (url.isNotBlank()) {
                 try {
@@ -742,7 +813,7 @@ class PodcastAdapter(
                 adapter.onFoldersClicked()
             }
             binding.top.notifications.setOnClickListener {
-                adapter.onNotificationsClicked()
+                adapter.onNotificationsClicked(podcast, !podcast.isShowNotifications)
             }
             binding.top.settings.setOnClickListener {
                 adapter.onSettingsClicked()
@@ -857,5 +928,103 @@ class PodcastAdapter(
         }
     }
 
+    private inner class PodcastHeaderViewHolder(
+        context: Context,
+        private val theme: Theme,
+        private val useBlurredArtwork: Boolean,
+        private val onClickCategory: (Podcast) -> Unit,
+        private val onClickRating: (Podcast, RatingTappedSource) -> Unit,
+        private val onClickFollow: () -> Unit,
+        private val onClickUnfollow: () -> Unit,
+        private val onClickFolder: () -> Unit,
+        private val onClickNotification: (Podcast, Boolean) -> Unit,
+        private val onClickSettings: () -> Unit,
+        private val onClickWebsiteLink: () -> Unit,
+        private val onToggleHeader: () -> Unit,
+        private val onToggleDescription: () -> Unit,
+        private val onLongClickArtwork: () -> Unit,
+        private val onArtworkAvailable: (Podcast) -> Unit,
+        private val onTooltipOffsetMeasured: (Dp) -> Unit,
+    ) : RecyclerView.ViewHolder(ComposeView(context)) {
+        private val composeView get() = itemView as ComposeView
+
+        init {
+            composeView.setTag(UR.id.podcast_view_header_tag, true)
+            composeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+        }
+
+        fun bind(
+            podcast: Podcast,
+            podcastDescription: AnnotatedString,
+            isDescriptionExpanded: Boolean,
+            ratingState: RatingState,
+            signInState: SignInState,
+        ) {
+            composeView.setContent {
+                // See cachedStatusBarPadding for explanation.
+                val statusBarPadding = WindowInsets.statusBars.asPaddingValues()
+                    .calculateTopPadding()
+                    .coerceAtLeast(cachedStatusBarPadding)
+                cachedStatusBarPadding = statusBarPadding
+
+                AppTheme(theme.activeTheme) {
+                    PodcastHeader(
+                        uuid = podcast.uuid,
+                        title = podcast.title,
+                        category = podcast.getFirstCategory(itemView.context.resources),
+                        author = podcast.author,
+                        description = podcastDescription,
+                        podcastInfoState = PodcastInfoState(
+                            author = podcast.author,
+                            link = podcast.getShortUrl(),
+                            schedule = podcast.displayableFrequency(context.resources),
+                            next = podcast.displayableNextEpisodeDate(context),
+                        ),
+                        rating = ratingState,
+                        isFollowed = podcast.isSubscribed,
+                        areNotificationsEnabled = podcast.isShowNotifications,
+                        folderIcon = when {
+                            !signInState.isSignedInAsPlusOrPatron -> PodcastFolderIcon.BuyFolders
+                            podcast.folderUuid != null -> PodcastFolderIcon.AddedToFolder
+                            else -> PodcastFolderIcon.NotInFolder
+                        },
+                        isHeaderExpanded = podcast.isHeaderExpanded,
+                        isDescriptionExpanded = isDescriptionExpanded,
+                        contentPadding = PaddingValues(
+                            top = statusBarPadding + 40.dp, // Eyeball the position inside app bar
+                            start = 16.dp,
+                            end = 16.dp,
+                            bottom = 16.dp,
+                        ),
+                        useBlurredArtwork = useBlurredArtwork,
+                        onClickCategory = { onClickCategory(podcast) },
+                        onClickRating = { source -> onClickRating(podcast, source) },
+                        onClickFollow = onClickFollow,
+                        onClickUnfollow = onClickUnfollow,
+                        onClickFolder = onClickFolder,
+                        onClickNotification = { onClickNotification(podcast, !podcast.isShowNotifications) },
+                        onClickSettings = onClickSettings,
+                        onClickWebsiteLink = onClickWebsiteLink,
+                        onToggleHeader = onToggleHeader,
+                        onToggleDescription = onToggleDescription,
+                        onLongClickArtwork = onLongClickArtwork,
+                        onArtworkAvailable = { onArtworkAvailable(podcast) },
+                        onTooltipOffsetMeasured = onTooltipOffsetMeasured,
+                    )
+                }
+            }
+        }
+    }
+
     private val NoOpEpisode = PodcastEpisode(uuid = "", publishedDate = Date())
 }
+
+// We can't simply apply 'WindowInsets.statusBars' inset.
+// When navigating to this screen the inset isn't available before first layout
+// which can cause an ugly jump effect.
+//
+// I'm not exactly sure why it happens only in this scenario but I assume it has
+// something to do with mix of recycler view and compose.
+//
+// 48.dp is a standard status bar height and should be good enough for the initial pass.
+private var cachedStatusBarPadding: Dp = 48.dp
