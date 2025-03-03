@@ -155,6 +155,7 @@ import au.com.shiftyjelly.pocketcasts.views.activity.WebViewActivity
 import au.com.shiftyjelly.pocketcasts.views.extensions.setSystemWindowInsetToPadding
 import au.com.shiftyjelly.pocketcasts.views.extensions.showAllowingStateLoss
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
+import au.com.shiftyjelly.pocketcasts.views.fragments.TopScrollable
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
@@ -440,6 +441,12 @@ class MainActivity :
             defaultTab = selectedTab,
             activity = this,
         )
+
+        navigator.resetRootFragmentCommand()
+            .subscribe({ fragment ->
+                (fragment as? TopScrollable)?.scrollToTop()
+            })
+            .addTo(disposables)
 
         val showMiniPlayerImmediately = savedInstanceState?.getBoolean(SAVEDSTATE_MINIPLAYER_SHOWN, false) ?: false
         binding.playerBottomSheet.isVisible = showMiniPlayerImmediately

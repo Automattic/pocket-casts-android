@@ -20,8 +20,10 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
+import au.com.shiftyjelly.pocketcasts.views.extensions.quickScrollToTop
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ChromeCastButton.Shown
+import au.com.shiftyjelly.pocketcasts.views.fragments.TopScrollable
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.None
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -32,7 +34,11 @@ import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
-class FiltersFragment : BaseFragment(), CoroutineScope, Toolbar.OnMenuItemClickListener {
+class FiltersFragment :
+    BaseFragment(),
+    CoroutineScope,
+    Toolbar.OnMenuItemClickListener,
+    TopScrollable {
     @Inject lateinit var settings: Settings
 
     @Inject lateinit var playlistManager: PlaylistManager
@@ -175,6 +181,10 @@ class FiltersFragment : BaseFragment(), CoroutineScope, Toolbar.OnMenuItemClickL
         (activity as? FragmentHostListener)?.addFragment(playlistFragment)
 
         playlistFragment.view?.requestFocus() // Jump to new page for talk back
+    }
+
+    override fun scrollToTop() {
+        binding?.recyclerView?.quickScrollToTop()
     }
 }
 

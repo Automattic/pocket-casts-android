@@ -4,10 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
@@ -29,12 +32,18 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
+import au.com.shiftyjelly.pocketcasts.views.fragments.TopScrollable
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class ProfileFragment : BaseFragment() {
+class ProfileFragment : BaseFragment(), TopScrollable {
     private val profileViewModel by viewModels<ProfileViewModel>()
     private val referralsViewModel by viewModels<ReferralsViewModel>()
+
+    private val scrollToTopSignal = MutableSharedFlow<Unit>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -56,9 +65,18 @@ class ProfileFragment : BaseFragment() {
             refreshState = profileViewModel.refreshState.collectAsState().value,
         )
 
+        val listState = rememberLazyListState()
+
+        LaunchedEffect(listState) {
+            scrollToTopSignal.collectLatest {
+                listState.animateScrollToItem(0)
+            }
+        }
+
         ProfilePage(
             state = state,
             themeType = theme.activeTheme,
+            listState = listState,
             onSendReferralsClick = {
                 referralsViewModel.onIconClick()
                 fragmentHostListener.showBottomSheet(ReferralsGuestPassFragment.newInstance(ReferralsPageType.Send))
@@ -142,5 +160,11 @@ class ProfileFragment : BaseFragment() {
     override fun onBackPressed(): Boolean {
         profileViewModel.refreshStats()
         return super.onBackPressed()
+    }
+
+    override fun scrollToTop() {
+        lifecycleScope.launch {
+            scrollToTopSignal.emit(Unit)
+        }
     }
 }

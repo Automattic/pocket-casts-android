@@ -6,6 +6,8 @@
 *   Bug Fixes
     *   Fix link not being interactive in a podcast description.
         ([#3666](https://github.com/Automattic/pocket-casts-android/pull/3666))
+    *   Fix screen flickering when tapping on item in the navigation bar.
+        ([#3674](https://github.com/Automattic/pocket-casts-android/pull/3674))
 
 7.83
 -----

@@ -49,9 +49,11 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.hideShadow
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.adapter.PodcastTouchCallback
+import au.com.shiftyjelly.pocketcasts.views.extensions.quickScrollToTop
 import au.com.shiftyjelly.pocketcasts.views.extensions.showIf
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ChromeCastButton.Shown
+import au.com.shiftyjelly.pocketcasts.views.fragments.TopScrollable
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
 import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
@@ -63,11 +65,15 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
 
 @AndroidEntryPoint
-class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTouchCallback.ItemTouchHelperAdapter, Toolbar.OnMenuItemClickListener {
+class PodcastsFragment :
+    BaseFragment(),
+    FolderAdapter.ClickListener,
+    PodcastTouchCallback.ItemTouchHelperAdapter,
+    Toolbar.OnMenuItemClickListener,
+    TopScrollable {
 
     companion object {
         private const val LAST_ORIENTATION_NOT_SET = -1
-        private const val SOURCE_KEY = "source"
         private const val PODCASTS_LIST = "podcasts_list"
         private const val SORT_ORDER_KEY = "sort_order"
         private const val OPTION_KEY = "option"
@@ -426,6 +432,10 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
         }
         val fragment = newInstance(folderUuid = folderUuid)
         (activity as FragmentHostListener).addFragment(fragment)
+    }
+
+    override fun scrollToTop() {
+        binding.recyclerView.quickScrollToTop()
     }
 
     inner class SpaceItemDecoration : RecyclerView.ItemDecoration() {

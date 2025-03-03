@@ -31,14 +31,20 @@ import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRegion
 import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
+import au.com.shiftyjelly.pocketcasts.views.extensions.quickScrollToTop
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
+import au.com.shiftyjelly.pocketcasts.views.fragments.TopScrollable
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlowable
 
 @AndroidEntryPoint
-class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectFragment.Listener {
+class DiscoverFragment :
+    BaseFragment(),
+    DiscoverAdapter.Listener,
+    RegionSelectFragment.Listener,
+    TopScrollable {
 
     @Inject lateinit var settings: Settings
 
@@ -270,11 +276,14 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         }
     }
 
+    override fun scrollToTop() {
+        binding?.recyclerView?.quickScrollToTop()
+    }
+
     companion object {
         private const val ID_KEY = "id"
         private const val NAME_KEY = "name"
         private const val REGION_KEY = "region"
-        private const val MOST_POPULAR_PODCASTS = 5
         const val LIST_ID_KEY = "list_id"
         const val PODCAST_UUID_KEY = "podcast_uuid"
         const val EPISODE_UUID_KEY = "episode_uuid"
