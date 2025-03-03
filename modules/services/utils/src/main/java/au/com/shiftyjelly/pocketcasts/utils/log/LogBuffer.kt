@@ -10,6 +10,7 @@ import java.io.PrintWriter
 import java.io.StringWriter
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
 import timber.log.Timber
 import timber.log.Timber.Forest.tag
 
@@ -25,7 +26,7 @@ object LogBuffer {
     private const val LOG_FILE_NAME = "debug.log"
     private const val LOG_BACKUP_FILE_NAME = "debug.log.1"
 
-    private val LOG_FILE_DATE_FORMAT = SimpleDateFormat("dd/M HH:mm:ss")
+    private val LOG_FILE_DATE_FORMAT = SimpleDateFormat("dd/M HH:mm:ss.SSS", Locale.US)
     private const val FILE_MAX_SIZE_BYTES = (200 * 1024).toLong()
 
     private var logPath: String? = null
