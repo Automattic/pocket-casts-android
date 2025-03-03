@@ -1,4 +1,4 @@
-name: Notify Slack when "[Priority] High" label is applied to an Issue or PR.
+name: Notify Slack when "[Priority] High" label is applied to an Issue or PR..
 
 on:
   issues:
