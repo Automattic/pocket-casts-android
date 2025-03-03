@@ -327,8 +327,13 @@ class PodcastsViewModel
         }
     }
 
-    fun showSuggestedFoldersPaywallOnOpen(isSignedInAsPlusOrPatron: Boolean) =
-        FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS) && !isSignedInAsPlusOrPatron && settings.suggestedFolderPaywallDismissTime.value == 0L
+    suspend fun showSuggestedFoldersPaywallOnOpen(isSignedInAsPlusOrPatron: Boolean): Boolean {
+        val uuids = podcastManager.findSubscribedUuids()
+        return FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS) &&
+            !isSignedInAsPlusOrPatron &&
+            settings.isEligibleToShowSuggestedFolderPaywall() &&
+            uuids.size >= FOLLOWED_PODCASTS_THRESHOLD
+    }
 
     sealed class SuggestedFoldersState {
         data object Idle : SuggestedFoldersState()
@@ -349,5 +354,6 @@ class PodcastsViewModel
         private const val BADGE_TYPE_KEY = "badge_type"
         private const val LAYOUT_KEY = "layout"
         private const val SORT_ORDER_KEY = "sort_order"
+        private const val FOLLOWED_PODCASTS_THRESHOLD = 4
     }
 }
