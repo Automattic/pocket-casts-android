@@ -338,6 +338,8 @@ platform :android do
     UI.user_error!('None of the 3 app variants were found in Google Play Console. We expected at least one') if not_found_variants.count == APPS.count
   end
 
+  # Downloads the latest translations from GlotPress and creates a PR to integrate them into the current `release/*` branch
+  #
   lane :download_translations do
     version = release_version_current
     base_branch = "release/#{version}"
