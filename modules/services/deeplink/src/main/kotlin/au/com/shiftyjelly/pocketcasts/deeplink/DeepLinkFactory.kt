@@ -10,6 +10,7 @@ import android.provider.MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH
 import androidx.core.content.IntentCompat
 import au.com.shiftyjelly.pocketcasts.deeplink.BuildConfig.SERVER_LIST_HOST
 import au.com.shiftyjelly.pocketcasts.deeplink.BuildConfig.SERVER_SHORT_HOST
+import au.com.shiftyjelly.pocketcasts.deeplink.BuildConfig.SERVER_WEB_PLAYER_HOST
 import au.com.shiftyjelly.pocketcasts.deeplink.BuildConfig.WEB_BASE_HOST
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_ADD_BOOKMARK
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_BOOKMARK
@@ -31,6 +32,7 @@ class DeepLinkFactory(
     private val webBaseHost: String = WEB_BASE_HOST,
     private val listHost: String = SERVER_LIST_HOST,
     private val shareHost: String = SERVER_SHORT_HOST,
+    private val webPlayerHost: String = SERVER_WEB_PLAYER_HOST,
 ) {
     private val adapters = listOf(
         DownloadsAdapter(),
@@ -55,6 +57,7 @@ class DeepLinkFactory(
         ShareLinkNativeAdapter(),
         SignInAdapter(shareHost),
         ShareLinkAdapter(shareHost),
+        WebPlayerShareLinkAdapter(webPlayerHost),
         OpmlAdapter(listOf(listHost, shareHost)),
         PodcastUrlSchemeAdapter(listOf(listHost, shareHost, webBaseHost)),
         PlayFromSearchAdapter(),
@@ -422,6 +425,51 @@ private class ShareLinkAdapter(
             }
         } else {
             null
+        }
+    }
+}
+
+private class WebPlayerShareLinkAdapter(
+    private val webPlayerHost: String,
+) : DeepLinkAdapter {
+    private val timestampParser = SharingUrlTimestampParser()
+
+    override fun create(intent: Intent): DeepLink? {
+        val uriData = intent.data ?: return null
+        val scheme = uriData.scheme
+        val host = uriData.host
+
+        if (intent.action != ACTION_VIEW ||
+            scheme !in listOf("http", "https") ||
+            host != webPlayerHost ||
+            uriData.pathSegments.size <= 1 ||
+            uriData.pathSegments.first() != "podcasts"
+        ) {
+            return null
+        }
+
+        val podcastUuid = uriData.pathSegments[1]
+        val episodeUuid = uriData.pathSegments.getOrNull(2)
+        val timestamps = uriData.getQueryParameter("t")?.let(timestampParser::parseTimestamp)
+        val sourceView = uriData.getQueryParameter(EXTRA_SOURCE_VIEW)
+        val autoPlay = uriData.getQueryParameter(EXTRA_AUTO_PLAY)?.toBoolean() ?: false
+
+        return if (episodeUuid != null) {
+            // episode share link https://play.pocketcasts.com/podcasts/4eb5b260-c933-0134-10da-25324e2a541d/720079de-cce4-4b55-84d1-1be117ab1149?t=17s
+            ShowEpisodeDeepLink(
+                episodeUuid = episodeUuid,
+                podcastUuid = podcastUuid,
+                startTimestamp = timestamps?.first,
+                endTimestamp = timestamps?.second,
+                autoPlay = autoPlay,
+                sourceView = sourceView,
+            )
+        } else {
+            // podcast share link https://play.pocketcasts.com/podcasts/4eb5b260-c933-0134-10da-25324e2a541d
+            ShowPodcastDeepLink(
+                podcastUuid = podcastUuid,
+                sourceView = sourceView,
+            )
         }
     }
 }

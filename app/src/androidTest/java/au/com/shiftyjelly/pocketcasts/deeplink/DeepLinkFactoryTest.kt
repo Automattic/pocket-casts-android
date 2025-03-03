@@ -20,6 +20,7 @@ class DeepLinkFactoryTest {
         webBaseHost = "pocketcasts.com",
         listHost = "lists.pocketcasts.com",
         shareHost = "pca.st",
+        webPlayerHost = "play.pocketcasts.com",
     )
 
     @Test
@@ -733,6 +734,56 @@ class DeepLinkFactoryTest {
                 startTimestamp = 15.seconds,
                 endTimestamp = 55.seconds,
                 sourceView = null,
+                autoPlay = false,
+            ),
+            deepLink,
+        )
+    }
+
+    @Test
+    fun webPlayerSharePodcast() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("https://play.pocketcasts.com/podcasts/podcast-id?source_view=source"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(ShowPodcastDeepLink("podcast-id", sourceView = "source"), deepLink)
+    }
+
+    @Test
+    fun webPlayerShareEpisode() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("https://play.pocketcasts.com/podcasts/podcast-id/episode-id?source_view=source"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(
+            ShowEpisodeDeepLink(
+                episodeUuid = "episode-id",
+                podcastUuid = "podcast-id",
+                sourceView = "source",
+                autoPlay = false,
+            ),
+            deepLink,
+        )
+    }
+
+    @Test
+    fun webPlayerShareEpisodeWithStartTimestamp() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("https://play.pocketcasts.com/podcasts/podcast-id/episode-id?source_view=source&t=15"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(
+            ShowEpisodeDeepLink(
+                episodeUuid = "episode-id",
+                podcastUuid = "podcast-id",
+                startTimestamp = 15.seconds,
+                sourceView = "source",
                 autoPlay = false,
             ),
             deepLink,
