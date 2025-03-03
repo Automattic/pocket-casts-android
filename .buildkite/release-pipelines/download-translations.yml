@@ -4,7 +4,7 @@
 # This pipeline is meant to be triggered by the MC scenario in ReleasesV2
 
 steps:
-  - label: "🚂 Finalize Release"
+  - label: "🚂 Download Translations"
     command: |
       echo '--- 🤖 Use bot for Git operations'
       source use-bot-for-git
@@ -17,8 +17,8 @@ steps:
       echo '--- 🔐 Access Secrets'
       bundle exec fastlane run configure_apply
 
-      echo '--- 🚀 Finalize Release'
-      bundle exec fastlane finalize_release skip_confirm:true skip_translations_download:true
+      echo '--- 🚀 Download Translations'
+      bundle exec fastlane download_translations
     plugins: [$CI_TOOLKIT]
     agents:
       queue: "tumblr-metal"
