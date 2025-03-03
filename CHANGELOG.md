@@ -1,6 +1,8 @@
 7.85
 -----
-
+*   Updates
+    *   Remove file size limit for downloaded episodes.
+        ([#3686](https://github.com/Automattic/pocket-casts-android/pull/3686))
 
 7.84
 -----
