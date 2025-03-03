@@ -530,6 +530,7 @@ class MediaSessionManager(
                 val keyEvent = IntentCompat.getParcelableExtra(mediaButtonEvent, Intent.EXTRA_KEY_EVENT, KeyEvent::class.java) ?: return false
                 logEvent(keyEvent.toString())
                 if (keyEvent.action == KeyEvent.ACTION_DOWN) {
+                    LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media button Android event: ${keyEvent.action}")
                     val inputEvent = when (keyEvent.keyCode) {
                         /**
                          * KEYCODE_MEDIA_PLAY_PAUSE - called when the player audio has focus
@@ -541,10 +542,12 @@ class MediaSessionManager(
                         KeyEvent.KEYCODE_MEDIA_PREVIOUS -> MediaEvent.TripleTap
                         else -> null
                     }
+                    LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media button input event: ${keyEvent.action}")
 
                     if (inputEvent != null) {
                         launch {
                             val outputEvent = mediaEventQueue.consumeEvent(inputEvent)
+                            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media button output event: ${keyEvent.action}")
                             when (outputEvent) {
                                 MediaEvent.SingleTap -> handleMediaButtonSingleTap()
                                 MediaEvent.DoubleTap -> handleMediaButtonDoubleTap()
