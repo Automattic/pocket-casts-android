@@ -396,12 +396,14 @@ platform :android do
     UI.success("Done! New Release Version: #{release_version_current}. New Build Code: #{build_code_current}")
 
     # Download Localizations, unless we asked to skip it (e.g. `download_translations` lane was already run earlier)
-    android_download_translations(
-      res_dir: File.join('modules', 'services', 'localization', 'src', 'main', 'res'),
-      glotpress_url: GLOTPRESS_APP_STRINGS_PROJECT_URL,
-      locales: SUPPORTED_LOCALES
-      # Important: don't pass a `lint_task` here, because this lane runs on a dedicated trusted agent on CI, which is not intended to run gradle tasks
-    ) unless skip_translations_download
+    unless skip_translations_download
+      android_download_translations(
+        res_dir: File.join('modules', 'services', 'localization', 'src', 'main', 'res'),
+        glotpress_url: GLOTPRESS_APP_STRINGS_PROJECT_URL,
+        locales: SUPPORTED_LOCALES
+        # Important: don't pass a `lint_task` here, because this lane runs on a dedicated trusted agent on CI, which is not intended to run gradle tasks
+      )
+    end
 
     version = release_version_current
 
