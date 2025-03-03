@@ -375,6 +375,8 @@ platform :android do
   end
 
   # @param skip_confirm [Boolean] If true, avoids any interactive prompt
+  # @param skip_translations_download [Boolean] If true, skips downloading the latest translations from GlotPress
+  #        Typically set it to `true` if the `download_translations` lane was already run earlier
   #
   lane :finalize_release do |skip_confirm: false, skip_translations_download: false|
     UI.user_error!('Please use `finalize_hotfix_release` lane for hotfixes') if release_is_hotfix?
