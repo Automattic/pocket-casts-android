@@ -26,7 +26,6 @@ Language: ja_JP
     <string name="folder_content_description">フォルダー %s</string>
     <string name="suggested_folders_use_create_custom_folders_button">カスタムフォルダーを作成</string>
     <string name="suggested_folders_use_these_folders_button">これらのフォルダーを使用</string>
-    <string name="suggested_folders">おすすめのフォルダー</string>
     <string name="winback_claiming_offer">オファーの獲得</string>
     <string name="winback_claimed_offer_message_3">次年度が50% オフ !</string>
     <string name="winback_offer_free_offer_yearly_description">今すぐ%1$sを支払うと、もう1年が50%% オフになります。</string>

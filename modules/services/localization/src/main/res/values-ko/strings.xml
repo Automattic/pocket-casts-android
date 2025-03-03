@@ -26,7 +26,6 @@ Language: ko_KR
     <string name="folder_content_description">폴더 %s</string>
     <string name="suggested_folders_use_create_custom_folders_button">사용자 정의 폴더 생성</string>
     <string name="suggested_folders_use_these_folders_button">이대로 폴더 사용</string>
-    <string name="suggested_folders">폴더 제안</string>
     <string name="winback_claiming_offer">혜택 받는 중</string>
     <string name="winback_claimed_offer_message_3">다음 해 50% 할인!</string>
     <string name="winback_offer_free_offer_yearly_description">지금 %1$s을(를) 결제하고 다음 해에 50%% 할인을 받으세요.</string>

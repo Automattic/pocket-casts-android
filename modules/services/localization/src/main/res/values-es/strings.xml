@@ -26,7 +26,6 @@ Language: es
     <string name="folder_content_description">Carpeta %s</string>
     <string name="suggested_folders_use_create_custom_folders_button">Crear carpetas personalizadas</string>
     <string name="suggested_folders_use_these_folders_button">Usar estas carpetas</string>
-    <string name="suggested_folders">Carpetas sugeridas</string>
     <string name="winback_claiming_offer">Reclamar oferta</string>
     <string name="winback_claimed_offer_message_3">50 % de descuento el próximo año</string>
     <string name="winback_offer_free_offer_yearly_description">Paga %1$s ahora para obtener un año más al 50 %% de descuento.</string>

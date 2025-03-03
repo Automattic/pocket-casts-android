@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-02-26 14:54:03+0000
+Translation-Revision-Date: 2025-03-03 11:54:06+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="suggested_folders_how_it_works_description">Genom att acceptera föreslagna mappar ersätts dina befintliga mappar, och åtgärden kan inte ångras. Du kan redigera dem efteråt så att de passar dina önskemål.</string>
+    <string name="suggested_folders_how_it_works">Så fungerar det</string>
+    <string name="suggested_folders_paywall_subtitle">Vi har skapat mappar för dina podcaster, och det är nu enklare än någonsin att organisera och tillgängliggöra dina favoriter.</string>
+    <string name="discover_dismiss_selected_category">Avfärda vald kategori</string>
+    <string name="discover_show_all_categories">Visa alla kategorier</string>
+    <string name="podcast_header_redesign_message">Klicka på podcastens rubrik för att dölja beskrivningen och gå direkt till avsnittslistan.</string>
+    <string name="podcast_header_redesign_title">Vi har gjort några ändringar!</string>
+    <string name="notifications_enabled_message">Du får ett meddelande om nya avsnitt av %1$s.</string>
     <string name="see_more">Se mer</string>
     <string name="podcast_artwork_description">Podcastomslag</string>
     <string name="suggested_folders_replace_folders_confirmation_description">Om du godkänner de föreslagna mapparna skrivs dina befintliga mappar över. Det här kan inte ångras.</string>
@@ -26,7 +34,6 @@ Language: sv_SE
     <string name="folder_content_description">Mappen %s</string>
     <string name="suggested_folders_use_create_custom_folders_button">Skapa anpassade mappar</string>
     <string name="suggested_folders_use_these_folders_button">Använd dessa mappar</string>
-    <string name="suggested_folders">Föreslagna mappar</string>
     <string name="winback_claiming_offer">Utnyttjar erbjudande</string>
     <string name="winback_claimed_offer_message_3">50 % rabatt på ditt nästa år.</string>
     <string name="winback_offer_free_offer_yearly_description">Betala %1$s nu för ytterligare ett år med 50 %% rabatt.</string>
