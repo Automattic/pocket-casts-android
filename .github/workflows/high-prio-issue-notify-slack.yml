@@ -1,7 +1,9 @@
-name: Notify Slack when "[Priority] High" label is applied to new or existing issue.
+name: Notify Slack when "[Priority] High" label is applied to an Issue or PR.
 
 on:
   issues:
+    types: [labeled]
+  pull_request:
     types: [labeled]
 
 jobs:
@@ -13,6 +15,10 @@ jobs:
         run: |
           if [[ "${{ github.event.label.name }}" == "[Priority] High" ]]; then
             echo "SEND_SLACK=true" >> $GITHUB_ENV
+            echo "TYPE=${{ github.event_name == 'issues' && 'Issue' || 'Pull Request' }}" >> $GITHUB_ENV
+            echo "LINK=<${{ github.event.issue.html_url || github.event.pull_request.html_url }}|${{ github.event.issue.title || github.event.pull_request.title }}>" >> $GITHUB_ENV
+            echo "AUTHOR=${{ github.event.issue.user.login || github.event.pull_request.user.login }}" >> $GITHUB_ENV
+            echo "NUMBER=${{ github.event.issue.number || github.event.pull_request.number }}" >> $GITHUB_ENV
           else
             echo "SEND_SLACK=false" >> $GITHUB_ENV
           fi
@@ -23,7 +29,7 @@ jobs:
         with:
           payload: |
             {
-              "text": ":pocket-casts::android: *High Priority Issue Alert!*\n\n*Issue:* <${{ github.event.issue.html_url }}|${{ github.event.issue.title }}>\n*Created By:* ${{ github.event.issue.user.login }}\n*Issue Number:* #${{ github.event.issue.number }}"
+              "text": ":pocket-casts::android: *High Priority Alert!*\n\n*Type:* ${{ env.TYPE }}\n*Link:* ${{ env.LINK }}\n*Created By:* ${{ env.AUTHOR }}\n*Number:* ${{ env.NUMBER }}"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_NOTIFIER_WEBHOOK_URL }}
