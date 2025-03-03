@@ -376,7 +376,7 @@ class MainActivity :
 
         binding.root.setSystemWindowInsetToPadding(left = true, right = true)
 
-        binding.bottomNavigation.doOnLayout {
+        binding.bottomNavigation.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
             val miniPlayerHeight = miniPlayerHeight
             val bottomNavigationHeight = binding.bottomNavigation.height
             val bottomSheetBehavior = BottomSheetBehavior.from(binding.playerBottomSheet)
