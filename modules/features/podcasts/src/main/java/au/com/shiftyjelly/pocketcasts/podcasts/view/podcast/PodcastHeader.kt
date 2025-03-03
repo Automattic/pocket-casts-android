@@ -86,6 +86,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
@@ -101,6 +102,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
+import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.ratings.PodcastRating
@@ -567,7 +569,7 @@ private fun ActionButton(
     Image(
         painter = painterResource(iconId),
         contentDescription = contentDescription,
-        colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.primaryIcon02Active),
+        colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.primaryIcon03),
         modifier = Modifier
             .padding(4.dp)
             .size(24.dp)
@@ -806,12 +808,14 @@ private val previewColors = listOf(
 
 @Preview(device = Devices.PortraitRegular)
 @Composable
-private fun PodcastHeaderPreview() {
-    var isFollowed by remember { mutableStateOf(false) }
+private fun PodcastHeaderPreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
+) {
+    var isFollowed by remember { mutableStateOf(true) }
     var isHeaderExpanded by remember { mutableStateOf(true) }
     var isDescriptionExpanded by remember { mutableStateOf(false) }
 
-    AppThemeWithBackground(Theme.ThemeType.LIGHT) {
+    AppThemeWithBackground(themeType) {
         Column(
             modifier = Modifier.fillMaxSize(),
         ) {
