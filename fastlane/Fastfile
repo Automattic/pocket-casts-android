@@ -362,7 +362,8 @@ platform :android do
         head: pr_branch,
         title: "Download latest translations for `#{version}`",
         body: "This PR integrates the latest translations from GlotPress into the `#{base_branch}` branch.",
-        labels: ['releases', '[Area] Translations i18n']
+        labels: ['releases', '[Area] Translations i18n'],
+        api_token: ENV.fetch('GITHUB_TOKEN')
       )
 
       buildkite_annotate(context: 'translations-pr-url', message: "Translations PR: #{pr_url || 'Error creating PR'}") if is_ci?
