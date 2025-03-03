@@ -26,7 +26,6 @@ Language: ru
     <string name="folder_content_description">Папка %s</string>
     <string name="suggested_folders_use_create_custom_folders_button">Создать пользовательские папки</string>
     <string name="suggested_folders_use_these_folders_button">Использовать эти папки</string>
-    <string name="suggested_folders">Рекомендуемые папки</string>
     <string name="winback_claiming_offer">Предложение принимается</string>
     <string name="winback_claimed_offer_message_3">Скидка 50 % на следующий год!</string>
     <string name="winback_offer_free_offer_yearly_description">Уплатите %1$s за следующий год со скидкой 50 %% прямо сейчас.</string>

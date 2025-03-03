@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-02-25 14:54:03+0000
+Translation-Revision-Date: 2025-03-03 13:54:03+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="suggested_folders_how_it_works_description">Accepter les dossiers suggérés remplacera vos dossiers existants. Cette action est irréversible. Vous pourrez les modifier ultérieurement pour les adapter à vos préférences.</string>
+    <string name="suggested_folders_how_it_works">Comment ça marche</string>
+    <string name="suggested_folders_paywall_subtitle">Nous avons créé des dossiers pour vos podcasts, vos favoris sont plus organisés et accessibles que jamais.</string>
+    <string name="discover_dismiss_selected_category">Ignorer la catégorie sélectionnée</string>
+    <string name="discover_show_all_categories">Afficher toutes les catégories</string>
+    <string name="podcast_header_redesign_message">Appuyez sur le titre du podcast pour masquer sa description et aller directement à la liste des épisodes.</string>
+    <string name="podcast_header_redesign_title">Nous avons apporté quelques modifications !</string>
+    <string name="notifications_enabled_message">Nous vous avertirons de la diffusion de nouveaux épisodes de %1$s.</string>
     <string name="see_more">En savoir plus</string>
     <string name="podcast_artwork_description">Illustration du podcast</string>
     <string name="suggested_folders_replace_folders_confirmation_description">Accepter les dossiers suggérés écrasera vos dossiers actuels. Cette opération est irréversible.</string>
@@ -26,7 +34,6 @@ Language: fr
     <string name="folder_content_description">Dossier %s</string>
     <string name="suggested_folders_use_create_custom_folders_button">Créer des dossiers personnalisés</string>
     <string name="suggested_folders_use_these_folders_button">Utiliser ces dossiers</string>
-    <string name="suggested_folders">Dossiers suggérés</string>
     <string name="winback_claiming_offer">Profiter de l’offre</string>
     <string name="winback_claimed_offer_message_3">-50 % sur la prochaine année !</string>
     <string name="winback_offer_free_offer_yearly_description">Payez %1$s dès maintenant pour profiter d’une année supplémentaire à -50 %%.</string>

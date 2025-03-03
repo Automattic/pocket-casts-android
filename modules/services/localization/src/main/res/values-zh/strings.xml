@@ -26,7 +26,6 @@ Language: zh_CN
     <string name="folder_content_description">文件夹 %s</string>
     <string name="suggested_folders_use_create_custom_folders_button">创建自定义文件夹</string>
     <string name="suggested_folders_use_these_folders_button">使用这些文件夹</string>
-    <string name="suggested_folders">建议的文件夹</string>
     <string name="winback_claiming_offer">领取优惠</string>
     <string name="winback_claimed_offer_message_3">下一年享 5 折优惠！</string>
     <string name="winback_offer_free_offer_yearly_description">现在付款 %1$s 即可再享一年 5%% 折优惠。</string>

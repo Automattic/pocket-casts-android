@@ -26,7 +26,6 @@ Language: zh_TW
     <string name="folder_content_description">資料夾「%s」</string>
     <string name="suggested_folders_use_create_custom_folders_button">建立自訂資料夾</string>
     <string name="suggested_folders_use_these_folders_button">使用這些資料夾</string>
-    <string name="suggested_folders">建議資料夾</string>
     <string name="winback_claiming_offer">領取優惠</string>
     <string name="winback_claimed_offer_message_3">次年享五折優惠！</string>
     <string name="winback_offer_free_offer_yearly_description">立即支付「%1$s」，次年再享 50%% 優惠。</string>

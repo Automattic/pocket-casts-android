@@ -26,7 +26,6 @@ Language: pt_BR
     <string name="folder_content_description">Pasta %s</string>
     <string name="suggested_folders_use_create_custom_folders_button">Criar pastas personalizadas</string>
     <string name="suggested_folders_use_these_folders_button">Usar estas pastas</string>
-    <string name="suggested_folders">Pastas sugeridas</string>
     <string name="winback_claiming_offer">Aproveitando oferta</string>
     <string name="winback_claimed_offer_message_3">50% de desconto no próximo ano!</string>
     <string name="winback_offer_free_offer_yearly_description">Pague %1$s agora e tenha mais um ano com 50%% de desconto.</string>

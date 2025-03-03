@@ -26,7 +26,6 @@ Language: nl
     <string name="folder_content_description">Map %s</string>
     <string name="suggested_folders_use_create_custom_folders_button">Aangepaste mappen aanmaken</string>
     <string name="suggested_folders_use_these_folders_button">Deze mappen gebruiken</string>
-    <string name="suggested_folders">Voorgestelde mappen</string>
     <string name="winback_claiming_offer">Aanbieding claimen</string>
     <string name="winback_claimed_offer_message_3">50% korting op je eerste jaar!</string>
     <string name="winback_offer_free_offer_yearly_description">Betaal nu %1$s voor nog een jaar met 50%% korting.</string>

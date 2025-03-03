@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-02-25 14:54:03+0000
+Translation-Revision-Date: 2025-03-03 11:54:06+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="suggested_folders_how_it_works_description">Wenn du vorgeschlagene Ordner akzeptierst, werden deine bestehenden Ordner ersetzt. Diese Aktion kann nicht rückgängig gemacht werden. Du kannst die Ordner anschließend nach deinen Wünschen bearbeiten.</string>
+    <string name="suggested_folders_how_it_works">So funktioniert\'s</string>
+    <string name="suggested_folders_paywall_subtitle">Wir haben Ordner für deine Podcasts erstellt, damit du deine Favoriten einfacher denn je organisieren und darauf zugreifen kannst.</string>
+    <string name="discover_dismiss_selected_category">Ausgewählte Kategorie verwerfen</string>
+    <string name="discover_show_all_categories">Alle Kategorien anzeigen</string>
+    <string name="podcast_header_redesign_message">Tippe auf den Podcast-Titel, um seine Beschreibung auszublenden und direkt zur Folgenliste zu gelangen.</string>
+    <string name="podcast_header_redesign_title">Wir haben einige Änderungen vorgenommen!</string>
+    <string name="notifications_enabled_message">Wir benachrichtigen dich, wenn es neue Folgen von %1$s gibt.</string>
     <string name="see_more">Mehr anzeigen</string>
     <string name="podcast_artwork_description">Podcast-Covers</string>
     <string name="suggested_folders_replace_folders_confirmation_description">Wenn du vorgeschlagene Ordner akzeptierst, werden deine aktuellen Ordner überschrieben. Dies kann nicht rückgängig gemacht werden.</string>
@@ -26,7 +34,6 @@ Language: de
     <string name="folder_content_description">Ordner %s</string>
     <string name="suggested_folders_use_create_custom_folders_button">Individuelle Ordner erstellen</string>
     <string name="suggested_folders_use_these_folders_button">Diese Ordner verwenden</string>
-    <string name="suggested_folders">Vorgeschlagene Order</string>
     <string name="winback_claiming_offer">Angebot nutzen</string>
     <string name="winback_claimed_offer_message_3">50 % Rabatt auf das nächstes Jahr!</string>
     <string name="winback_offer_free_offer_yearly_description">Zahle jetzt %1$s und erhalte für ein weiteres Jahr 50 %% Rabatt.</string>
