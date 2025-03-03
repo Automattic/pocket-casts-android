@@ -4,6 +4,8 @@
     *   Redesign podcast header UI
         ([#3677](https://github.com/Automattic/pocket-casts-android/pull/3671))
 *   Bug Fixes
+    *   Fix issue with playback not resuming when using headphone actions.
+        ([#3665](https://github.com/Automattic/pocket-casts-android/pull/3665))
     *   Fix link not being interactive in a podcast description.
         ([#3666](https://github.com/Automattic/pocket-casts-android/pull/3666))
     *   Fix screen flickering when tapping on item in the navigation bar.

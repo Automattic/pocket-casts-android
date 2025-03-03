@@ -596,8 +596,18 @@ class MediaSessionManager(
         private fun handleMediaButtonAction(action: HeadphoneAction) {
             when (action) {
                 HeadphoneAction.ADD_BOOKMARK -> onAddBookmark()
-                HeadphoneAction.SKIP_FORWARD -> onSkipToNext()
-                HeadphoneAction.SKIP_BACK -> onSkipToPrevious()
+                HeadphoneAction.SKIP_FORWARD -> {
+                    onSkipToNext()
+                    if (!playbackManager.isPlaying()) {
+                        enqueueCommand("play") { playbackManager.playQueueSuspend(source) }
+                    }
+                }
+                HeadphoneAction.SKIP_BACK -> {
+                    onSkipToPrevious()
+                    if (!playbackManager.isPlaying()) {
+                        enqueueCommand("play") { playbackManager.playQueueSuspend(source) }
+                    }
+                }
                 HeadphoneAction.NEXT_CHAPTER,
                 HeadphoneAction.PREVIOUS_CHAPTER,
                 -> Timber.e(ACTION_NOT_SUPPORTED)
