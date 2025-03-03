@@ -1,19 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-02-11 09:54:08+0000
+Translation-Revision-Date: 2025-02-26 11:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
-    <string name="suggested_folders_paywall_subtitle">我们已为您的播客预设文件夹。 使用 Pocket Casts Plus 即可解锁这些文件夹，并享受书签、文字转录稿等更多功能。</string>
+    <string name="see_more">查看更多</string>
+    <string name="podcast_artwork_description">播客插图</string>
+    <string name="suggested_folders_replace_folders_confirmation_description">接受建议的文件夹后，您当前的文件夹将被覆盖。 此操作无法撤销。</string>
+    <string name="suggested_folders_replace_folders_confirmation_tittle">替换现有文件夹？</string>
+    <string name="suggested_folders_replace_folders_button">替换文件夹</string>
+    <string name="suggested_folders_subtitle">我们已将您的播客整理到文件夹中。 立即保存，稍后根据您的风格进行自定义。</string>
+    <string name="onboarding_plus_feature_up_next_shuffle_title">下一个随机播放</string>
+    <string name="suggested_folders_plus_prompt">通过 Pocket Casts Plus 整理您的节目，并享用更多功能</string>
+    <string name="winback_cancel_subscription_header_title">取消订阅</string>
+    <string name="onboarding_import_from_url_failed">OPML 导入失败</string>
+    <string name="onboarding_import_from_url_error_message">URL 无效</string>
+    <string name="onboarding_import_from_url_importing_message">正在导入 OPML。 您可以返回入门流程。</string>
+    <string name="onboarding_import_from_url_description">使用 URL 从 OPML 文件导入播客。</string>
+    <string name="onboarding_import_from_url">从 URL 导入</string>
     <string name="suggested_folders_paywall_tittle">自动整理您的播客</string>
     <string name="podcast_feed_update_tooltip_subtitle">下拉或使用此菜单查看是否有新内容。</string>
     <string name="podcast_feed_update_tooltip_title">精彩剧集，即将上线！</string>
     <string name="folder_content_description">文件夹 %s</string>
     <string name="suggested_folders_use_create_custom_folders_button">创建自定义文件夹</string>
     <string name="suggested_folders_use_these_folders_button">使用这些文件夹</string>
-    <string name="suggested_folders_subtitle">我们已为您整理播客。 保存或按照您的风格对其进行自定义。</string>
     <string name="suggested_folders">建议的文件夹</string>
     <string name="winback_claiming_offer">领取优惠</string>
     <string name="winback_claimed_offer_message_3">下一年享 5 折优惠！</string>
@@ -158,60 +170,14 @@ Language: zh_CN
     <string name="move_up">上移</string>
     <string name="search_episodes_not_found_summary">我们未搜索到任何相关剧集。 请尝试使用其他关键字。</string>
     <string name="search_episodes_not_found_title">未找到剧集</string>
-    <string name="paywall_layout_reviews_review_six_date">3 月 8 日</string>
-    <string name="paywall_layout_reviews_review_six_message">多年来，PC 一直是我的首选。 我也尝试过其他的播客应用程序，但因为它们在简洁性、Ul 和支持方面的不足，我最终总是会回到 PC。 如果您已经厌倦了当前所用的播客应用程序，这将尤其值得一试。</string>
-    <string name="paywall_layout_reviews_review_six_title">首选播客应用程序</string>
-    <string name="paywall_layout_reviews_review_five_date">5 月 6 日</string>
-    <string name="paywall_layout_reviews_review_five_message">我使用该应用程序至少有 6 年了，刚开始在安卓系统上使用，如今在 iOS 系统上也已经使用快一年。 在两个平台上，它都能提供同样卓越的性能。 我可以轻松找到要听的新播客，还可以通过 RSS 源 URL 添加播客，它的 UI 也非常好用。 Watch 应用程序很实用，但我主要用来进行播放/暂停。 使用账户登录即可在设备间同步，但这并非强制性要求。</string>
-    <string name="paywall_layout_reviews_review_five_title">不仅使用效果好，还易于查找或添加新的播客</string>
-    <string name="paywall_layout_reviews_review_four_date">6 月 1 日</string>
-    <string name="paywall_layout_reviews_review_four_message">同步功能非常神奇。 虽然不知道这个应用程序有什么特别的魔力，但它比我用过的其他任何应用程序都要好。</string>
-    <string name="paywall_layout_reviews_review_four_title">非常棒的应用程序</string>
-    <string name="paywall_layout_reviews_review_three_date">6 月 9 日</string>
-    <string name="paywall_layout_reviews_review_three_message">我从 2017 年开始使用 Pocket Casts。 \n\n毫无疑问，这是用来听播客的最佳应用程序。 它功能丰富，并且仍然在积极地开发完善。 有些人对 Ul 的改动表示不满，但对我来说好像没有太大影响。 \n\n根据你的需求，你可以采用简单或复杂的方式使用这款应用程序。 因此，你可以让它即插即用，也可以设置跳过结尾和开头计时器，以及任何其他您想启用的小功能。</string>
-    <string name="paywall_layout_reviews_review_three_title">最好用的播客应用程序</string>
-    <string name="paywall_layout_reviews_review_two_date">6 月 15 日</string>
-    <string name="paywall_layout_reviews_review_two_message">8 年来表现卓越且在持续改进</string>
-    <string name="paywall_layout_reviews_review_two_title">必不可少的播客应用程序</string>
-    <string name="paywall_layout_reviews_review_one_date">7 月 10 日</string>
-    <string name="paywall_layout_reviews_review_one_message">我是该应用程序的长期用户，免费版支持的功能和自定义设置之多令人震惊。 我喜欢它的设备间同步功能，这样即使我从手机切换到 Alexa 设备，也可以实现无缝收听。 我会向所有播客听众推荐这款应用程序。 我还很喜欢它的统计信息功能！</string>
-    <string name="paywall_layout_reviews_review_one_title">迄今为止最好的播客应用程序</string>
-    <string name="paywall_layout_reviews_see_all_reviews_in_store">查看 Play 商店中的所有评论</string>
     <string name="player_time_remaining">剩余时间为 %s</string>
     <string name="player_played_up_to">已播放到 %s</string>
-    <string name="paywall_layout_reviews_rating">4.1 评分（5700 条评论）</string>
-    <string name="paywall_layout_reviews_stars_content_description">星级</string>
-    <string name="paywall_layout_reviews_subtitle">了解用户升级到 Plus 的原因</string>
-    <string name="paywall_layout_reviews_title">“简直是收听播客的最佳方式”</string>
     <string name="onboarding_plus_feature_dream_with_slumber_studios">&lt;a href=\"https://slumberstudios.com/\"&gt;通过 Slumber Studios 的内容圆梦&lt;/a&gt;</string>
     <string name="gift">礼品</string>
     <string name="got_it">知道了</string>
     <string name="transcript_search">搜索文字转录稿</string>
     <string name="transcript_close">关闭文字转录稿</string>
     <string name="onboarding_subscribe_to_plus">订阅 Plus</string>
-    <string name="paywall_themes_content_description">其他主题和图标图片</string>
-    <string name="paywall_themes_description">表现出您的真实一面。 为我们的订阅者提供的独家图标和主题。</string>
-    <string name="paywall_themes_title">其他主题和图标</string>
-    <string name="paywall_storage_content_description">20GB 存储空间图片</string>
-    <string name="paywall_storage_description">将音频文件上传到云存储空间，以便随时随地访问。</string>
-    <string name="paywall_storage_title">20GB 存储空间</string>
-    <string name="paywall_slumber_studios_content_description">通过 Slumber Studios 圆梦图片</string>
-    <string name="paywall_slumber_studios_description">获得由 Slumber Studios 提供的 1 年高级版内容。</string>
-    <string name="paywall_slumber_studios_title">通过 Slumber Studios 圆梦</string>
-    <string name="paywall_watch_content_description">Apple Watch 和 Wear OS 播放功能图片</string>
-    <string name="paywall_watch_description">放下手机，出去跑步。</string>
-    <string name="paywall_watch_title">Apple Watch 和 Wear OS 播放功能</string>
-    <string name="paywall_bookmarks_content_description">书签图片</string>
-    <string name="paywall_bookmarks_description">保存任何剧集中的喜爱片段，然后回看。</string>
-    <string name="paywall_bookmarks_title">书签</string>
-    <string name="paywall_folders_content_description">文件夹图片</string>
-    <string name="paywall_folders_description">将播客整理到文件夹中，并让它们在所有设备中保持同步。</string>
-    <string name="paywall_folders_title">文件夹</string>
-    <string name="paywall_desktop_and_web_content_description">桌面和 Web 应用程序图片</string>
-    <string name="paywall_desktop_and_web_description">借助我们的 Windows、macOS 和 Web 应用程序，在更多地方收听播客。</string>
-    <string name="paywall_desktop_and_web_title">桌面和 Web 应用程序</string>
-    <string name="paywall_free_1_month_trial">免费试用 1 个月。</string>
-    <string name="paywall_save_50_off">首年享 5 折优惠。</string>
     <string name="error_transcript_failed_to_parse">很抱歉，解析此文字转录稿时出现错误。</string>
     <string name="error_transcript_format_not_supported">很抱歉，该文字转录稿格式不受支持：%s</string>
     <string name="error_transcript_failed_to_load">很抱歉，加载此文字转录稿时出现错误。</string>
@@ -671,7 +637,6 @@ Language: zh_CN
     <string name="onboarding_plus_feature_cloud_storage_title">20GB 云存储空间</string>
     <string name="onboarding_plus_feature_folders_text">将播客整理到文件夹中，让它们在所有设备中保持同步。</string>
     <string name="onboarding_plus_feature_desktop_apps_text">借助我们的 Windows、macOS 和 Web 应用程序，在更多位置收听播客。</string>
-    <string name="onboarding_plus_feature_desktop_and_web_apps_title">桌面和 Web 应用程序</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">您喜欢的 Pocket Casts 的一切，还有更多内容</string>
     <string name="onboarding_recommendations_import">导入</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">选择您喜欢的播客，或从其他播客播放器导入播客，定制您的 Pocket Casts。 您可以稍后完成此操作。</string>
