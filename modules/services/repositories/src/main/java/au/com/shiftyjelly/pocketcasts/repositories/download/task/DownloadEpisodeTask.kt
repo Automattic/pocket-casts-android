@@ -93,12 +93,6 @@ class DownloadEpisodeTask @AssistedInject constructor(
 
         private const val HTTP_RESUME_SUPPORTED = 206
 
-        // things smaller than 150kbs are suspect, probably text, xml or html error pages
-        private const val SUSPECT_EPISODE_SIZE = (150 * 1024).toLong()
-
-        // things smaller than 10kbs are not episodes, way too small and something has gone wrong
-        private const val BAD_EPISODE_SIZE = (10 * 1024).toLong()
-
         // the minimum amount of time between progress reports about the download to the app
         private const val MIN_TIME_BETWEEN_UPDATE_REPORTS: Long = 500 // ms;
 
@@ -383,8 +377,8 @@ class DownloadEpisodeTask @AssistedInject constructor(
                 episodeDownloadError.expectedContentLength = bytesRemaining
                 val contentType = body.contentType()
 
-                // basic sanity checks to make sure the file looks big enough and it's content type isn't text
-                if (bytesRemaining in 1..<BAD_EPISODE_SIZE || bytesRemaining in 1..<SUSPECT_EPISODE_SIZE && contentType?.toString().orEmpty().contains("text", ignoreCase = true)) {
+                // basic sanity check to make sure the content type isn't text
+                if (contentType?.toString().orEmpty().contains("text", ignoreCase = true)) {
                     episodeDownloadError.reason = EpisodeDownloadError.Reason.SuspiciousContent
                     if (!emitter.isDisposed) {
                         emitter.onError(DownloadFailed(FileNotFoundException(), "File not found. The podcast author may have moved or deleted this episode file.", false))
