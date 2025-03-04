@@ -4,7 +4,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.CuratedPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.SuggestedFolderDetails
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
@@ -93,7 +92,6 @@ interface PodcastManager {
     suspend fun updateShowArchived(podcast: Podcast, showArchived: Boolean)
     suspend fun updateAllShowArchived(showArchived: Boolean)
     suspend fun updateFolderUuid(folderUuid: String?, podcastUuids: List<String>)
-    suspend fun updateFoldersUuid(folders: List<SuggestedFolderDetails>)
     suspend fun updateIsHeaderExpanded(podcastUuid: String, isExpanded: Boolean)
 
     fun markPodcastUuidAsNotSyncedBlocking(podcastUuid: String)

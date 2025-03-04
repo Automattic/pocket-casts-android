@@ -28,7 +28,6 @@ import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.FragmentPodcastsBinding
-import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.Folder
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.FolderCreateFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.FolderCreateSharedViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.FolderEditFragment
@@ -226,8 +225,6 @@ class PodcastsFragment :
             FolderEditPodcastsFragment.newInstance(folderUuid = folder.uuid).show(parentFragmentManager, "add_podcasts_card")
         }
 
-        viewModel.refreshSuggestedFolders()
-
         return binding.root
     }
 
@@ -236,21 +233,16 @@ class PodcastsFragment :
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.loadSuggestedFolders()
-            }
-        }
+                viewModel.refreshSuggestedFolders()
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.suggestedFoldersState.collect { state ->
-                    when (state) {
-                        is SuggestedFoldersState.Loaded -> {
-                            if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS) && viewModel.isEligibleForSuggestedFoldersPopup()) {
-                                showSuggestedFoldersCreation(SuggestedFoldersFragment.Source.PodcastsPopup, state.folders())
-                            }
+                when (viewModel.suggestedFoldersState.value) {
+                    is SuggestedFoldersState.Available -> {
+                        if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS) && viewModel.isEligibleForSuggestedFoldersPopup()) {
+                            showSuggestedFoldersCreation(SuggestedFoldersFragment.Source.PodcastsPopup)
                         }
-                        is SuggestedFoldersState.Empty -> Unit
                     }
+
+                    is SuggestedFoldersState.Empty -> Unit
                 }
             }
         }
@@ -328,9 +320,9 @@ class PodcastsFragment :
             is SuggestedFoldersState.Empty -> {
                 showCustomFolderCreation()
             }
-            is SuggestedFoldersState.Loaded -> {
+            is SuggestedFoldersState.Available -> {
                 if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS)) {
-                    showSuggestedFoldersCreation(SuggestedFoldersFragment.Source.CreateFolderButton, state.folders())
+                    showSuggestedFoldersCreation(SuggestedFoldersFragment.Source.CreateFolderButton)
                 } else {
                     showCustomFolderCreation()
                 }
@@ -344,11 +336,10 @@ class PodcastsFragment :
 
     private fun showSuggestedFoldersCreation(
         source: SuggestedFoldersFragment.Source,
-        folders: List<Folder>,
     ) {
         if (parentFragmentManager.findFragmentByTag("suggested_folders") == null) {
             SuggestedFoldersFragment
-                .newInstance(source, folders)
+                .newInstance(source)
                 .show(parentFragmentManager, "suggested_folders")
         }
     }
