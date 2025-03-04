@@ -7,9 +7,14 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -27,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
+import androidx.fragment.compose.content
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -74,7 +80,7 @@ class SuggestedFoldersFragment : BaseDialogFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ) = contentWithoutConsumedInsets {
+    ) = content {
         val state by viewModel.state.collectAsState()
 
         LaunchedEffect(state.useFolderesState) {
@@ -91,8 +97,9 @@ class SuggestedFoldersFragment : BaseDialogFragment() {
             AppThemeWithBackground(theme.activeTheme) {
                 Column(
                     modifier = Modifier
+                        .nestedScroll(rememberNestedScrollInteropConnection())
                         .fillMaxSize()
-                        .nestedScroll(rememberNestedScrollInteropConnection()),
+                        .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)),
                 ) {
                     IconButton(
                         onClick = { dismiss() },
