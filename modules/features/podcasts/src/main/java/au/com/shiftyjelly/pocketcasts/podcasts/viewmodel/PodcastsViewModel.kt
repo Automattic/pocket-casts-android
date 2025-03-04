@@ -11,7 +11,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.SuggestedFolder
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
-import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.toFolders
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -35,13 +34,11 @@ import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.rx2.asObservable
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.Folder as SuggestedFolderModel
@@ -140,11 +137,6 @@ class PodcastsViewModel
     private val _suggestedFoldersState = MutableStateFlow<SuggestedFoldersState>(SuggestedFoldersState.Idle)
     val suggestedFoldersState: SuggestedFoldersState
         get() = _suggestedFoldersState.value
-
-    val userSuggestedFoldersState: Flow<Pair<SignInState, SuggestedFoldersState>> = userManager.getSignInState().asFlow()
-        .combine(_suggestedFoldersState) { signIn, suggestedFolders ->
-            Pair(signIn, suggestedFolders)
-        }
 
     private fun buildHomeFolderItems(podcasts: List<Podcast>, folders: List<FolderItem>, podcastSortType: PodcastsSortType): List<FolderItem> {
         if (podcastSortType == PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST) {

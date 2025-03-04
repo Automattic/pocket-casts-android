@@ -32,10 +32,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.FolderCreateFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.FolderCreateSharedViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.FolderEditFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.FolderEditPodcastsFragment
-import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.SuggestedFolders
-import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.SuggestedFoldersPaywallBottomSheet
-import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.SuggestedFoldersPaywallBottomSheet.Companion.CREATE_FOLDER_SOURCE
-import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.SuggestedFoldersPaywallBottomSheet.Companion.PODCASTS_SOURCE
+import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.SuggestedFoldersFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastsViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -61,7 +58,6 @@ import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
@@ -210,12 +206,7 @@ class PodcastsFragment :
         toolbar.setOnMenuItemClickListener(this)
 
         toolbar.menu.findItem(R.id.folders_locked).setOnMenuItemClickListener {
-            val state = viewModel.suggestedFoldersState
-            if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS) && state is PodcastsViewModel.SuggestedFoldersState.Loaded) {
-                SuggestedFoldersPaywallBottomSheet.newInstance(state.folders(), CREATE_FOLDER_SOURCE).show(parentFragmentManager, SuggestedFoldersPaywallBottomSheet.TAG)
-            } else {
-                OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.Upsell(OnboardingUpgradeSource.FOLDERS))
-            }
+            OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.Upsell(OnboardingUpgradeSource.FOLDERS))
             true
         }
 
@@ -244,29 +235,6 @@ class PodcastsFragment :
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.loadSuggestedFolders()
-            }
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.userSuggestedFoldersState.collectLatest { (signInState, state) ->
-                    val existingModal = parentFragmentManager.findFragmentByTag(SuggestedFoldersPaywallBottomSheet.TAG)
-                    if (state is PodcastsViewModel.SuggestedFoldersState.Loaded) {
-                        if (existingModal != null && existingModal is SuggestedFoldersPaywallBottomSheet && !signInState.isSignedInAsPlusOrPatron) {
-                            // We don't want to close this modal for Paid users because this scenario might occur when the user upgrades their account
-                            // after the modal has already been opened. In this case, we want to keep the modal open so the user can tap the button
-                            // to open the suggested folders screen.
-                            existingModal.dismiss()
-                        }
-                        if (viewModel.showSuggestedFoldersPaywallOnOpen(signInState.isSignedInAsPlusOrPatron)) {
-                            SuggestedFoldersPaywallBottomSheet.newInstance(state.folders(), PODCASTS_SOURCE).show(parentFragmentManager, SuggestedFoldersPaywallBottomSheet.TAG)
-                        }
-                    } else if (state is PodcastsViewModel.SuggestedFoldersState.Empty) {
-                        if (existingModal != null && existingModal is SuggestedFoldersPaywallBottomSheet) {
-                            existingModal.dismiss()
-                        }
-                    }
-                }
             }
         }
     }
@@ -340,7 +308,7 @@ class PodcastsFragment :
     private fun createFolder() {
         val state = viewModel.suggestedFoldersState
         if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS) && state is PodcastsViewModel.SuggestedFoldersState.Loaded) {
-            (activity as FragmentHostListener).showModal(SuggestedFolders.newInstance(state.folders()))
+            (activity as FragmentHostListener).showModal(SuggestedFoldersFragment.newInstance(state.folders()))
         } else {
             FolderCreateFragment.newInstance(PODCASTS_LIST).show(parentFragmentManager, "create_folder_card")
         }
