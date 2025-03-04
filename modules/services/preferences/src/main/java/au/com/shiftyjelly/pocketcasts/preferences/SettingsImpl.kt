@@ -339,26 +339,6 @@ class SettingsImpl @Inject constructor(
         return timeSinceDismiss >= 7.days
     }
 
-    override fun setDismissedSuggestedFolderPaywallTime() {
-        sharedPreferences.edit { putLong(Settings.LAST_DISMISS_SUGGESTED_FOLDER_PAYWALL_TIME, System.currentTimeMillis()) }
-    }
-
-    override fun isEligibleToShowSuggestedFolderPaywall(): Boolean {
-        val lastDismissedTime = sharedPreferences.getLong(Settings.LAST_DISMISS_SUGGESTED_FOLDER_PAYWALL_TIME, 0L)
-        val currentDismissedCount = sharedPreferences.getInt(Settings.DISMISS_SUGGESTED_FOLDER_PAYWALL_COUNT, 0)
-
-        if (lastDismissedTime == 0L) return true
-
-        val timeSinceDismiss = (System.currentTimeMillis() - lastDismissedTime).milliseconds
-
-        return timeSinceDismiss >= 7.days && currentDismissedCount < 2
-    }
-
-    override fun updateDismissedSuggestedFolderPaywallCount() {
-        val currentCount = sharedPreferences.getInt(Settings.DISMISS_SUGGESTED_FOLDER_PAYWALL_COUNT, 0)
-        sharedPreferences.edit { putInt(Settings.DISMISS_SUGGESTED_FOLDER_PAYWALL_COUNT, currentCount + 1) }
-    }
-
     override fun setDismissLowStorageBannerTime(lastUpdateTime: Long) {
         sharedPreferences.edit {
             putLong(Settings.LAST_DISMISS_LOW_STORAGE_BANNER_TIME, lastUpdateTime)
@@ -1592,8 +1572,22 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override val followedPodcastsForSuggestedFoldersHash = UserSetting.StringPref(
-        sharedPrefKey = "followed_podcasts_hash_for_suggested_folders",
+    override val suggestedFoldersDismissTimestamp = UserSetting.PrefFromString<Instant?>(
+        sharedPrefKey = "suggested_folders_dismiss_timestamp",
+        defaultValue = null,
+        fromString = { value -> runCatching { Instant.parse(value) }.getOrNull() },
+        toString = { value -> value.toString() },
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val suggestedFoldersDismissCount = UserSetting.IntPref(
+        sharedPrefKey = "suggested_folders_dismiss_count",
+        defaultValue = 0,
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val suggestedFoldersFollowedHash = UserSetting.StringPref(
+        sharedPrefKey = "suggested_folders_followed_hash",
         defaultValue = "",
         sharedPrefs = sharedPreferences,
     )

@@ -75,8 +75,6 @@ interface Settings {
         const val LAST_UPDATE_TIME = "LastUpdateTime"
         const val LAST_DISMISS_LOW_STORAGE_MODAL_TIME = "LastDismissLowStorageModalTime"
         const val LAST_DISMISS_LOW_STORAGE_BANNER_TIME = "LastDismissLowStorageBannerTime"
-        const val LAST_DISMISS_SUGGESTED_FOLDER_PAYWALL_TIME = "LastDismissSuggestedFolderPaywallTime"
-        const val DISMISS_SUGGESTED_FOLDER_PAYWALL_COUNT = "DismissSuggestedFolderPaywallCount"
         const val PREFERENCE_SKIP_FORWARD = "skipForward"
         const val PREFERENCE_SKIP_BACKWARD = "skipBack"
         const val PREFERENCE_STORAGE_CHOICE = "storageChoice"
@@ -335,10 +333,6 @@ interface Settings {
 
     val hideNotificationOnPause: UserSetting<Boolean>
 
-    fun setDismissedSuggestedFolderPaywallTime()
-    fun isEligibleToShowSuggestedFolderPaywall(): Boolean
-    fun updateDismissedSuggestedFolderPaywallCount()
-
     val streamingMode: UserSetting<Boolean>
     val keepScreenAwake: UserSetting<Boolean>
     val openPlayerAutomatically: UserSetting<Boolean>
@@ -573,5 +567,7 @@ interface Settings {
 
     val showPodcastHeaderChangesTooltip: UserSetting<Boolean>
 
-    val followedPodcastsForSuggestedFoldersHash: UserSetting<String>
+    val suggestedFoldersDismissTimestamp: UserSetting<Instant?>
+    val suggestedFoldersDismissCount: UserSetting<Int>
+    val suggestedFoldersFollowedHash: UserSetting<String>
 }
