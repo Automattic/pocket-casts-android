@@ -20,13 +20,13 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
-class SuggestedFolders : BaseFragment() {
+class SuggestedFoldersFragment : BaseFragment() {
 
     companion object {
         private const val FOLDERS_KEY = "folders_key"
 
-        fun newInstance(folders: List<Folder>): SuggestedFolders {
-            return SuggestedFolders().apply {
+        fun newInstance(folders: List<Folder>): SuggestedFoldersFragment {
+            return SuggestedFoldersFragment().apply {
                 arguments = Bundle().apply {
                     putParcelableArrayList(FOLDERS_KEY, ArrayList(folders))
                 }
@@ -51,7 +51,7 @@ class SuggestedFolders : BaseFragment() {
 
             LaunchedEffect(state) {
                 if (state is SuggestedFoldersViewModel.FoldersState.Created) {
-                    (activity as FragmentHostListener).closeModal(this@SuggestedFolders)
+                    (activity as FragmentHostListener).closeModal(this@SuggestedFoldersFragment)
                 } else if (state is SuggestedFoldersViewModel.FoldersState.ShowConfirmationDialog) {
                     showConfirmationDialog()
                 }
@@ -61,21 +61,16 @@ class SuggestedFolders : BaseFragment() {
                 folders = suggestedFolders,
                 useWhiteColorForHowItWorks = theme.activeTheme == Theme.ThemeType.ELECTRIC,
                 onShown = {
-                    viewModel.onShown()
                 },
                 onDismiss = {
-                    viewModel.onDismissed()
                     (activity as FragmentHostListener).closeModal(this)
                 },
                 onUseTheseFolders = {
                     viewModel.onUseTheseFolders(suggestedFolders)
                 },
                 onHowItWorks = {
-                    viewModel.onHowItWorksTapped()
-                    showHowItWorksDialog()
                 },
                 onCreateCustomFolders = {
-                    viewModel.onCreateCustomFolders()
                     FolderCreateFragment.newInstance(source = "suggested_folders").show(parentFragmentManager, "create_folder_card")
                     (activity as FragmentHostListener).closeModal(this)
                 },
@@ -90,21 +85,10 @@ class SuggestedFolders : BaseFragment() {
             .setTitle(getString(LR.string.suggested_folders_replace_folders_confirmation_tittle))
             .setSummary(getString(LR.string.suggested_folders_replace_folders_confirmation_description))
             .setOnConfirm {
-                viewModel.onReplaceExistingFoldersTapped()
                 viewModel.overrideFoldersWithSuggested(suggestedFolders)
             }
             .setIconId(VR.drawable.ic_replace)
             .setIconTint(UR.attr.primary_interactive_01)
             .show(childFragmentManager, "suggested-folders-confirmation-dialog")
-    }
-
-    private fun showHowItWorksDialog() {
-        val dialog = ConfirmationDialog()
-            .setButtonType(ConfirmationDialog.ButtonType.Normal(getString(LR.string.got_it)))
-            .setIconId(VR.drawable.ic_folder_plus)
-            .setTitle(getString(LR.string.suggested_folders_how_it_works))
-            .setSummary(getString(LR.string.suggested_folders_how_it_works_description))
-            .setOnConfirm { viewModel.onHowItWorksGotItTapped() }
-        dialog.show(parentFragmentManager, "suggested-folders-how-it-works-dialog")
     }
 }
