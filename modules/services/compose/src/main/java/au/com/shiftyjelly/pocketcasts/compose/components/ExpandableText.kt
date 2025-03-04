@@ -37,7 +37,7 @@ fun ExpandableText(
     modifier: Modifier = Modifier,
 ) {
     BoxWithConstraints(
-        modifier = modifier,
+        modifier = modifier.animateContentSize(),
     ) {
         val measurer = rememberTextMeasurer()
         val displayedText = remember(measurer, text, isExpanded) {
@@ -68,7 +68,6 @@ fun ExpandableText(
         Text(
             text = displayedText,
             style = style,
-            modifier = Modifier.animateContentSize(),
         )
     }
 }
