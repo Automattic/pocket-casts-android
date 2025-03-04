@@ -4,7 +4,7 @@
 # This pipeline is meant to be triggered by the MC scenario in ReleasesV2
 
 steps:
-  - label: "🚂 Code Freeze"
+  - label: "🚂 Download Translations"
     command: |
       echo '--- 🤖 Use bot for Git operations'
       source use-bot-for-git
@@ -15,8 +15,8 @@ steps:
       echo '--- 🔐 Access Secrets'
       bundle exec fastlane run configure_apply
 
-      echo '--- ❄️ Code Freeze'
-      bundle exec fastlane code_freeze skip_confirm:true
+      echo '--- 🚀 Download Translations'
+      bundle exec fastlane download_translations
     plugins: [$CI_TOOLKIT]
     agents:
       queue: "tumblr-metal"
