@@ -684,7 +684,7 @@
     <!-- %1$s is a podcast's title -->
     <string name="notifications_enabled_message">We’ll notify you with new episodes of %1$s.</string>
     <string name="podcast_header_redesign_title">We’ve made some changes!</string>
-    <string name="podcast_header_redesign_message">Tap on the podcast title to hide its description and go straight to the episode list.</string>
+    <string name="podcast_header_redesign_message">Tap on the podcast title to collapse or expand its description and details</string>
 
     <!-- Give Rating -->
 
