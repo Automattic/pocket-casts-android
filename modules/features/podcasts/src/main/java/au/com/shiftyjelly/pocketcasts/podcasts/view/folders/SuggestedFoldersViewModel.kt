@@ -3,18 +3,23 @@ package au.com.shiftyjelly.pocketcasts.podcasts.view.folders
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.models.entity.SuggestedFolderDetails
-import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
-import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SuggestedFoldersManager
-import au.com.shiftyjelly.pocketcasts.utils.UUIDProvider
+import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.reactive.asFlow
+import kotlinx.coroutines.withContext
+import au.com.shiftyjelly.pocketcasts.models.entity.SuggestedFolder as DbSuggestedFolder
 
 @HiltViewModel
 class SuggestedFoldersViewModel @Inject constructor(
@@ -22,46 +27,69 @@ class SuggestedFoldersViewModel @Inject constructor(
     private val suggestedFoldersManager: SuggestedFoldersManager,
     private val suggestedFoldersPopupPolicy: SuggestedFoldersPopupPolicy,
     private val podcastManager: PodcastManager,
-    private val settings: Settings,
+    private val userManager: UserManager,
     private val analyticsTracker: AnalyticsTracker,
-    private val uuidProvider: UUIDProvider,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow<FoldersState>(FoldersState.Idle)
-    val state: StateFlow<FoldersState> = _state
+    private val _state = MutableStateFlow(State.Empty)
+    val state = _state.asStateFlow()
 
-    fun onReplaceExistingFoldersShown() {
-        _state.value = FoldersState.Idle
-    }
-
-    fun onUseTheseFolders(folders: List<Folder>) {
+    init {
         viewModelScope.launch {
-            val currentFoldersCount = folderManager.countFolders()
-            if (currentFoldersCount > 0) {
-                _state.value = FoldersState.ShowConfirmationDialog
-            } else {
-                overrideFoldersWithSuggested(folders)
+            val folderCount = folderManager.countFolders()
+            val suggestedFolders = getSuggestedFolders()
+            _state.update { value ->
+                value.copy(
+                    existingFoldersCount = folderCount,
+                    suggestedFolders = suggestedFolders,
+                )
+            }
+        }
+        viewModelScope.launch {
+            userManager.getSignInState().asFlow().collect { signInState ->
+                _state.update { value ->
+                    value.copy(isUserPlusOrPatreon = signInState.isSignedInAsPlusOrPatron)
+                }
             }
         }
     }
 
-    fun overrideFoldersWithSuggested(folders: List<Folder>) {
-        _state.value = FoldersState.Creating
-        viewModelScope.launch {
-            val newFolders = folders.map {
-                SuggestedFolderDetails(
-                    uuid = uuidProvider.generateUUID().toString(),
-                    name = it.name,
-                    color = it.color,
-                    podcastsSortType = settings.podcastsSortType.value,
-                    podcasts = it.podcasts,
+    private suspend fun getSuggestedFolders(): List<SuggestedFolder> {
+        val dbFolders = suggestedFoldersManager.observeSuggestedFolders().first()
+        return withContext(Dispatchers.Default) {
+            val grouped = dbFolders.groupBy(DbSuggestedFolder::name).toList().sortedBy { it.first }
+            grouped.mapIndexed { index, (name, folders) ->
+                SuggestedFolder(
+                    name = name,
+                    colorIndex = index % 12,
+                    podcastIds = folders.map { it.podcastUuid },
                 )
             }
-            settings.podcastsSortType.set(PodcastsSortType.NAME_A_TO_Z, updateModifiedAt = true)
-            folderManager.overrideFoldersWithSuggested(newFolders)
+        }
+    }
+
+    private var suggestedFoldersJob: Job? = null
+
+    fun useSuggestedFolders() {
+        if (suggestedFoldersJob?.isActive == true) {
+            return
+        }
+        viewModelScope.launch(NonCancellable) {
+            _state.update { value ->
+                value.copy(useFolderesState = UseFoldersState.Applying)
+            }
+            val suggestedFolders = withContext(Dispatchers.Default) {
+                state.value.suggestedFolders.flatMap { folder ->
+                    folder.podcastIds.map { podcastId ->
+                        DbSuggestedFolder(folder.name, podcastId)
+                    }
+                }
+            }
+            suggestedFoldersManager.useSuggestedFolders(suggestedFolders)
+            _state.update { value ->
+                value.copy(useFolderesState = UseFoldersState.Applied)
+            }
             podcastManager.refreshPodcasts("suggested-folders")
-            suggestedFoldersManager.replaceSuggestedFolders(folders.toSuggestedFolders())
-            _state.value = FoldersState.Created
         }
     }
 
@@ -69,10 +97,36 @@ class SuggestedFoldersViewModel @Inject constructor(
         suggestedFoldersPopupPolicy.markPolicyUsed()
     }
 
-    sealed class FoldersState {
-        data object Idle : FoldersState()
-        data object Creating : FoldersState()
-        data object Created : FoldersState()
-        data object ShowConfirmationDialog : FoldersState()
+    data class State(
+        val isUserPlusOrPatreon: Boolean,
+        val existingFoldersCount: Int?,
+        val suggestedFolders: List<SuggestedFolder>,
+        val useFolderesState: UseFoldersState,
+    ) {
+        val action
+            get() = if (isUserPlusOrPatreon) {
+                when (existingFoldersCount) {
+                    null -> null
+                    0 -> SuggestedAction.UseFolders
+                    else -> SuggestedAction.ReplaceFolders
+                }
+            } else {
+                SuggestedAction.UseFolders
+            }
+
+        companion object {
+            val Empty = State(
+                isUserPlusOrPatreon = false,
+                existingFoldersCount = null,
+                suggestedFolders = emptyList(),
+                useFolderesState = UseFoldersState.Idle,
+            )
+        }
+    }
+
+    enum class UseFoldersState {
+        Idle,
+        Applying,
+        Applied,
     }
 }
