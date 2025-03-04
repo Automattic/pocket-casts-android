@@ -21,9 +21,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -632,7 +630,11 @@ class PodcastFragment : BaseFragment() {
 
     private val onSearchFocus: () -> Unit = {
         // scroll to episode search
-        binding?.episodesRecyclerView?.smoothScrollToTop(position = 1)
+        val toolbarHeight = when (binding?.headerType) {
+            null, HeaderType.SolidColor -> 0
+            HeaderType.Blur, HeaderType.Scrim -> binding?.toolbar?.height ?: 0
+        }
+        binding?.episodesRecyclerView?.smoothScrollToTop(1, offset = toolbarHeight)
     }
 
     private val onShowArchivedClicked: () -> Unit = {
@@ -1106,7 +1108,11 @@ class PodcastFragment : BaseFragment() {
                         }
                     }
                     if (state.searchTerm.isNotEmpty() && state.searchTerm != lastSearchTerm) {
-                        binding?.episodesRecyclerView?.smoothScrollToTop(1)
+                        val toolbarHeight = when (binding?.headerType) {
+                            null, HeaderType.SolidColor -> 0
+                            HeaderType.Blur, HeaderType.Scrim -> binding?.toolbar?.height ?: 0
+                        }
+                        binding?.episodesRecyclerView?.smoothScrollToTop(1, offset = toolbarHeight)
                     }
                     lastSearchTerm = state.searchTerm
                 }
