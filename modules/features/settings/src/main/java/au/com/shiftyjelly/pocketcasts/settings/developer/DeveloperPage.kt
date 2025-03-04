@@ -22,6 +22,7 @@ import androidx.compose.material.icons.outlined.BugReport
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Downloading
 import androidx.compose.material.icons.outlined.EditCalendar
+import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.HomeRepairService
 import androidx.compose.material.icons.outlined.NewReleases
 import androidx.compose.material.icons.outlined.Notifications
@@ -59,6 +60,7 @@ fun DeveloperPage(
     bottomInset: Dp,
     onSendCrash: (String) -> Unit,
     onShowWhatsNewClick: () -> Unit,
+    onResetSuggestedFoldersSuggestion: () -> Unit,
 ) {
     var openCrashMessageDialog by remember { mutableStateOf(false) }
     var crashMessage by remember { mutableStateOf("Test crash") }
@@ -96,6 +98,9 @@ fun DeveloperPage(
         }
         item {
             EndOfYear(onClick = onTriggerResetEoYModalProfileBadge)
+        }
+        item {
+            ResetSuggestedFoldersSuggestion(onClick = onResetSuggestedFoldersSuggestion)
         }
         item {
             ShowWhatsNew(onClick = onShowWhatsNewClick)
@@ -280,6 +285,19 @@ private fun ShowWhatsNew(
     )
 }
 
+@Composable
+private fun ResetSuggestedFoldersSuggestion(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingRow(
+        primaryText = "Reset Smart Folders",
+        secondaryText = "Allows to retrigger suggested folders",
+        icon = rememberVectorPainter(Icons.Outlined.Folder),
+        modifier = modifier.clickable { onClick() },
+    )
+}
+
 @Preview(name = "Light")
 @Composable
 private fun DeveloperPageLightPreview() {
@@ -309,6 +327,7 @@ private fun DeveloperPagePreview() {
         bottomInset = 0.dp,
         onSendCrash = {},
         onShowWhatsNewClick = {},
+        onResetSuggestedFoldersSuggestion = {},
     )
 }
 

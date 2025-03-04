@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.SuggestedFolder
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
+import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.SuggestedFoldersPopupPolicy
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.toFolders
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
@@ -35,6 +36,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.take
@@ -52,6 +54,7 @@ class PodcastsViewModel
     private val settings: Settings,
     private val analyticsTracker: AnalyticsTracker,
     private val suggestedFoldersManager: SuggestedFoldersManager,
+    private val suggestedFoldersPopupPolicy: SuggestedFoldersPopupPolicy,
     userManager: UserManager,
 ) : ViewModel(), CoroutineScope {
     var isFragmentChangingConfigurations: Boolean = false
@@ -134,9 +137,8 @@ class PodcastsViewModel
     val folder: Folder?
         get() = folderState.value?.folder
 
-    private val _suggestedFoldersState = MutableStateFlow<SuggestedFoldersState>(SuggestedFoldersState.Idle)
-    val suggestedFoldersState: SuggestedFoldersState
-        get() = _suggestedFoldersState.value
+    private val _suggestedFoldersState = MutableStateFlow<SuggestedFoldersState>(SuggestedFoldersState.Empty)
+    val suggestedFoldersState = _suggestedFoldersState.asStateFlow()
 
     private fun buildHomeFolderItems(podcasts: List<Podcast>, folders: List<FolderItem>, podcastSortType: PodcastsSortType): List<FolderItem> {
         if (podcastSortType == PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST) {
@@ -297,7 +299,6 @@ class PodcastsViewModel
     @OptIn(FlowPreview::class)
     suspend fun loadSuggestedFolders() {
         if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS)) {
-            _suggestedFoldersState.emit(SuggestedFoldersState.Loading)
             suggestedFoldersManager.getSuggestedFolders()
                 .debounce(200)
                 .collect { folders ->
@@ -319,17 +320,13 @@ class PodcastsViewModel
         }
     }
 
-    suspend fun showSuggestedFoldersPaywallOnOpen(isSignedInAsPlusOrPatron: Boolean): Boolean {
-        val uuids = podcastManager.findSubscribedUuids()
-        return FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS) &&
-            !isSignedInAsPlusOrPatron &&
-            settings.isEligibleToShowSuggestedFolderPaywall() &&
-            uuids.size >= FOLLOWED_PODCASTS_THRESHOLD
+    fun isEligibleForSuggestedFoldersPopup(): Boolean {
+        return suggestedFoldersPopupPolicy.isEligibleForPopup()
     }
 
     sealed class SuggestedFoldersState {
-        data object Idle : SuggestedFoldersState()
-        data object Loading : SuggestedFoldersState()
+        data object Empty : SuggestedFoldersState()
+
         data class Loaded(private val folders: List<SuggestedFolder>) : SuggestedFoldersState() {
             private val convertedFolders: List<SuggestedFolderModel> by lazy {
                 folders.toFolders()
@@ -337,7 +334,6 @@ class PodcastsViewModel
 
             fun folders(): List<SuggestedFolderModel> = convertedFolders
         }
-        data object Empty : SuggestedFoldersState()
     }
 
     companion object {
@@ -346,6 +342,5 @@ class PodcastsViewModel
         private const val BADGE_TYPE_KEY = "badge_type"
         private const val LAYOUT_KEY = "layout"
         private const val SORT_ORDER_KEY = "sort_order"
-        private const val FOLLOWED_PODCASTS_THRESHOLD = 4
     }
 }

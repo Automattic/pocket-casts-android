@@ -44,7 +44,7 @@ class SuggestedFoldersManagerTest {
     fun setup() {
         whenever(mockAppDatabase.suggestedFoldersDao()).thenReturn(mockSuggestedFoldersDao)
         whenever(hashMock.value).thenReturn("123")
-        whenever(settings.followedPodcastsForSuggestedFoldersHash).thenReturn(hashMock)
+        whenever(settings.suggestedFoldersFollowedHash).thenReturn(hashMock)
         suggestedFoldersManager = SuggestedFoldersManager(mockPodcastCacheService, settings, mockAppDatabase)
     }
 
@@ -81,7 +81,7 @@ class SuggestedFoldersManagerTest {
         val podcastUuids = listOf("podcastUuid")
 
         whenever(hashMock.value).thenReturn("different-hash")
-        whenever(settings.followedPodcastsForSuggestedFoldersHash).thenReturn(hashMock)
+        whenever(settings.suggestedFoldersFollowedHash).thenReturn(hashMock)
 
         suggestedFoldersManager.refreshSuggestedFolders(podcastUuids)
 
@@ -105,7 +105,7 @@ class SuggestedFoldersManagerTest {
             SuggestedFolder("uuid", "Folder1"),
         )
 
-        suggestedFoldersManager.deleteSuggestedFolders(folders)
+        suggestedFoldersManager.replaceSuggestedFolders(folders)
 
         verify(mockSuggestedFoldersDao).deleteFolders(folders)
     }
