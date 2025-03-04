@@ -20,6 +20,7 @@ import kotlinx.coroutines.launch
 class SuggestedFoldersViewModel @Inject constructor(
     private val folderManager: FolderManager,
     private val suggestedFoldersManager: SuggestedFoldersManager,
+    private val suggestedFoldersPopupPolicy: SuggestedFoldersPopupPolicy,
     private val podcastManager: PodcastManager,
     private val settings: Settings,
     private val analyticsTracker: AnalyticsTracker,
@@ -59,9 +60,13 @@ class SuggestedFoldersViewModel @Inject constructor(
             settings.podcastsSortType.set(PodcastsSortType.NAME_A_TO_Z, updateModifiedAt = true)
             folderManager.overrideFoldersWithSuggested(newFolders)
             podcastManager.refreshPodcasts("suggested-folders")
-            suggestedFoldersManager.deleteSuggestedFolders(folders.toSuggestedFolders())
+            suggestedFoldersManager.replaceSuggestedFolders(folders.toSuggestedFolders())
             _state.value = FoldersState.Created
         }
+    }
+
+    fun markPopupAsDismissed() {
+        suggestedFoldersPopupPolicy.markPolicyUsed()
     }
 
     sealed class FoldersState {

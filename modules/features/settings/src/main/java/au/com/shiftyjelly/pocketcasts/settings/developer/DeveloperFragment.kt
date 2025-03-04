@@ -44,6 +44,7 @@ class DeveloperFragment : BaseFragment() {
                 bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
                 onSendCrash = viewModel::onSendCrash,
                 onShowWhatsNewClick = ::onShowWhatsNewClick,
+                onResetSuggestedFoldersSuggestion = viewModel::resetSuggestedFoldersSuggestion,
             )
         }
     }

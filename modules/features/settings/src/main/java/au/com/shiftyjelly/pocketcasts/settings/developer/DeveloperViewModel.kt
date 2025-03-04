@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.UpdateEpisodeDetails
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.SuggestedFoldersManager
 import com.automattic.android.tracks.crashlogging.CrashLogging
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -29,6 +30,7 @@ class DeveloperViewModel
     private val podcastManager: PodcastManager,
     private val episodeManager: EpisodeManager,
     private val playbackManager: PlaybackManager,
+    private val suggestedFoldersManager: SuggestedFoldersManager,
     private val settings: Settings,
     @ApplicationContext private val context: Context,
     private val crashLogging: CrashLogging,
@@ -156,5 +158,14 @@ class DeveloperViewModel
     fun onSendCrash(crashMessage: String) {
         crashLogging.sendReport(Exception(crashMessage))
         Timber.d("Test crash message: \"$crashMessage\"")
+    }
+
+    fun resetSuggestedFoldersSuggestion() {
+        viewModelScope.launch {
+            suggestedFoldersManager.deleteAllSuggestedFolders()
+            settings.suggestedFoldersFollowedHash.set("", updateModifiedAt = false)
+            settings.suggestedFoldersDismissCount.set(0, updateModifiedAt = false)
+            settings.suggestedFoldersDismissTimestamp.set(null, updateModifiedAt = false)
+        }
     }
 }
