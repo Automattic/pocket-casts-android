@@ -25,17 +25,18 @@ class SuggestedFoldersManager @Inject constructor(
 
     suspend fun refreshSuggestedFolders(podcastUuids: List<String>) {
         try {
-            if (podcastUuids.isEmpty()) {
-                suggestedFoldersDao.deleteAll()
-                settings.followedPodcastsForSuggestedFoldersHash.set("", updateModifiedAt = false)
-            } else {
-                val currentHash = withContext(Dispatchers.Default) {
-                    podcastUuids.sorted().md5()
-                }
-                if (currentHash != settings.followedPodcastsForSuggestedFoldersHash.value) {
-                    val folders = podcastCacheService.suggestedFolders(SuggestedFoldersRequest(podcastUuids))
-                    suggestedFoldersDao.deleteAndInsertAll(folders)
-                    currentHash?.let { settings.followedPodcastsForSuggestedFoldersHash.set(it, updateModifiedAt = false) }
+            withContext(Dispatchers.IO) {
+                if (podcastUuids.isEmpty()) {
+                    suggestedFoldersDao.deleteAll()
+                    settings.followedPodcastsForSuggestedFoldersHash.set("", updateModifiedAt = false)
+                } else {
+                    val currentHash = podcastUuids.sorted().md5()
+
+                    if (currentHash != settings.followedPodcastsForSuggestedFoldersHash.value) {
+                        val folders = podcastCacheService.suggestedFolders(SuggestedFoldersRequest(podcastUuids))
+                        suggestedFoldersDao.deleteAndInsertAll(folders)
+                        currentHash?.let { settings.followedPodcastsForSuggestedFoldersHash.set(it, updateModifiedAt = false) }
+                    }
                 }
             }
         } catch (e: Exception) {

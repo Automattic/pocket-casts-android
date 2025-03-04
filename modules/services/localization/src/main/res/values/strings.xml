@@ -2279,7 +2279,7 @@
     <string name="winback_cancel_subscription_cancel_button_label">Yes, Cancel my Subscription</string>
 
     <!-- Suggested Folders -->
-    <string name="suggested_folders">Suggested Folders</string>
+    <string name="smart_folders">Smart folders</string>
     <string name="suggested_folders_subtitle">We\'ve organized your podcasts into folders. Save them now and customize later to fit your style.</string>
     <string name="suggested_folders_use_these_folders_button">Use these folders</string>
     <string name="suggested_folders_use_create_custom_folders_button">Create custom folders</string>
