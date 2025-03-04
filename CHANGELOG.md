@@ -1,6 +1,8 @@
 7.85
 -----
-
+*   Bug Fixes
+    *   Fixed an issue where the mini player could sometimes hide behind the navigation bar.
+        ([#3687](https://github.com/Automattic/pocket-casts-android/pull/3687))
 
 7.84
 -----
