@@ -363,8 +363,11 @@ platform :android do
     android_download_translations(
       res_dir: File.join('modules', 'services', 'localization', 'src', 'main', 'res'),
       glotpress_url: GLOTPRESS_APP_STRINGS_PROJECT_URL,
-      locales: SUPPORTED_LOCALES,
-      lint_task: 'aggregatedLintRelease'
+      locales: SUPPORTED_LOCALES
+      # FIXME: The `finalize_release` lane runs on `tumblr-metal` agent (needed as a trusted agent so we can git push), but that agent shouldn't be
+      #        used for running gradle task. Besides, it currently fails because that agent is behind a proxy but `-Dhttp.proxyHost` is not provided.
+      # FIXME: We should thus split the `finalize_release` lane into 2 lanes, one to download the translations + create a PR (in which the lint task will run), one to finalize the release.
+      # lint_task: 'aggregatedLintRelease'
     )
 
     version = release_version_current
