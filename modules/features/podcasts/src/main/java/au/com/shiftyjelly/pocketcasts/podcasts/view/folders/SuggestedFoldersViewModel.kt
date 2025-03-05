@@ -2,7 +2,10 @@ package au.com.shiftyjelly.pocketcasts.podcasts.view.folders
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.models.to.SignInState
+import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SuggestedFoldersManager
@@ -11,7 +14,6 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
@@ -52,7 +54,7 @@ class SuggestedFoldersViewModel @AssistedInject constructor(
         viewModelScope.launch {
             userManager.getSignInState().asFlow().collect { signInState ->
                 _state.update { value ->
-                    value.copy(isUserPlusOrPatreon = signInState.isSignedInAsPlusOrPatron)
+                    value.copy(signInState = signInState)
                 }
             }
         }
@@ -102,41 +104,81 @@ class SuggestedFoldersViewModel @AssistedInject constructor(
     }
 
     fun trackPageShown() {
-
+        analyticsTracker.track(
+            AnalyticsEvent.SUGGESTED_FOLDERS_PAGE_SHOWN,
+            mapOf(
+                "source" to source.analyticsValue,
+            ),
+        )
     }
 
     fun trackPageDismissed() {
-
+        analyticsTracker.track(
+            AnalyticsEvent.SUGGESTED_FOLDERS_PAGE_DISMISSED,
+            mapOf(
+                "source" to source.analyticsValue,
+                "user_type" to state.value.userTypeAnalyticsValue,
+            ),
+        )
     }
 
     fun trackUseSuggestedFoldersTapped() {
-
+        analyticsTracker.track(
+            AnalyticsEvent.SUGGESTED_FOLDERS_USE_SUGGESTED_FOLDERS_TAPPED,
+            mapOf(
+                "source" to source.analyticsValue,
+                "user_type" to state.value.userTypeAnalyticsValue,
+            ),
+        )
     }
 
     fun trackCreateCustomFolderTapped() {
-
+        analyticsTracker.track(
+            AnalyticsEvent.SUGGESTED_FOLDERS_CREATE_CUSTOM_FOLDER_TAPPED,
+            mapOf(
+                "source" to source.analyticsValue,
+                "user_type" to state.value.userTypeAnalyticsValue,
+            ),
+        )
     }
 
     fun trackReplaceFolderTapped() {
-
+        analyticsTracker.track(
+            AnalyticsEvent.SUGGESTED_FOLDERS_REPLACE_FOLDERS_TAPPED,
+            mapOf(
+                "source" to source.analyticsValue,
+            ),
+        )
     }
 
     fun trackReplaceFoldersConfirmationTapped() {
-
+        analyticsTracker.track(
+            AnalyticsEvent.SUGGESTED_FOLDERS_REPLACE_FOLDERS_CONFIRM_TAPPED,
+            mapOf(
+                "source" to source.analyticsValue,
+            ),
+        )
     }
 
-    fun trackPreviewFolderTapped() {
-
+    fun trackPreviewFolderTapped(folder: SuggestedFolder) {
+        analyticsTracker.track(
+            AnalyticsEvent.SUGGESTED_FOLDERS_PREVIEW_FOLDER_TAPPED,
+            mapOf(
+                "source" to source.analyticsValue,
+                "folder_name" to folder.name,
+                "podcast_count" to folder.podcastIds.size,
+            ),
+        )
     }
 
     data class State(
-        val isUserPlusOrPatreon: Boolean,
+        val signInState: SignInState,
         val existingFoldersCount: Int?,
         val suggestedFolders: List<SuggestedFolder>,
         val useFoldersState: UseFoldersState,
     ) {
         val action
-            get() = if (isUserPlusOrPatreon) {
+            get() = if (signInState.isSignedInAsPlusOrPatron) {
                 when (existingFoldersCount) {
                     null -> null
                     0 -> SuggestedAction.UseFolders
@@ -146,9 +188,18 @@ class SuggestedFoldersViewModel @AssistedInject constructor(
                 SuggestedAction.UseFolders
             }
 
+        val userTypeAnalyticsValue
+            get() = when (signInState) {
+                is SignInState.SignedOut -> "unsigned"
+                is SignInState.SignedIn -> when (signInState.subscriptionStatus) {
+                    is SubscriptionStatus.Free -> "free"
+                    is SubscriptionStatus.Paid -> "paid"
+                }
+            }
+
         companion object {
             val Empty = State(
-                isUserPlusOrPatreon = false,
+                signInState = SignInState.SignedOut,
                 existingFoldersCount = null,
                 suggestedFolders = emptyList(),
                 useFoldersState = UseFoldersState.Idle,
