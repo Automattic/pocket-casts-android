@@ -4,24 +4,21 @@
 # This pipeline is meant to be triggered by the MC scenario in ReleasesV2
 
 steps:
-  - label: "🚂 DEBUG: New Beta Release / Ruby Setup"
+  - label: "🚂 New Beta Release"
     command: |
       echo '--- 🤖 Use bot for Git operations'
       source use-bot-for-git
 
-      # .buildkite/commands/checkout-release-branch.sh "${RELEASE_VERSION}"
+      .buildkite/commands/checkout-release-branch.sh "${RELEASE_VERSION}"
 
       echo '--- :ruby: Setup Ruby Tools'
       install_gems
 
-      echo '--- :ruby: Show Gemfile.lock'
-      cat Gemfile.lock
-
       echo '--- 🔐 Access Secrets'
       bundle exec fastlane run configure_apply
 
-      # echo '--- 🚀 New Beta Release'
-      # bundle exec fastlane new_beta_release skip_confirm:true
+      echo '--- 🚀 New Beta Release'
+      bundle exec fastlane new_beta_release skip_confirm:true
     plugins: [$CI_TOOLKIT]
     agents:
       queue: "tumblr-metal"
