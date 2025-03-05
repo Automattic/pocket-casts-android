@@ -112,7 +112,7 @@ fun SuggestedFolderPodcastsPage(
 private fun SuggestedFolderPodcastsPagePreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
-    AppThemeWithBackground(Theme.ThemeType.LIGHT) {
+    AppThemeWithBackground(themeType) {
         SuggestedFolderPodcastsPage(
             folder = SuggestedFolder(
                 name = "Folder name",
