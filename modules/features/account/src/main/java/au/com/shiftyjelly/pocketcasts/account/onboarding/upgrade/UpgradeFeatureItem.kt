@@ -30,40 +30,39 @@ enum class PlusUpgradeFeatureItem(
     override val isMonthlyFeature: Boolean = true,
 ) : UpgradeFeatureItem {
     Folders(
-        image = IR.drawable.ic_folder,
-        title = LR.string.onboarding_plus_feature_folders_and_bookmarks_title,
+        image = IR.drawable.ic_plus_feature_folder,
+        title = LR.string.onboarding_plus_feature_folders_title,
     ),
     UpNextShuffle(
-        image = IR.drawable.shuffle,
+        image = IR.drawable.ic_plus_feature_shuffle,
         title = LR.string.onboarding_plus_feature_up_next_shuffle_title,
     ),
-    CloudStorage(
-        image = IR.drawable.ic_cloud_storage,
-        title = LR.string.onboarding_plus_feature_cloud_storage_title,
-    ),
-    WatchPlayback(
-        image = IR.drawable.ic_watch_play,
-        title = LR.string.onboarding_plus_feature_watch_playback,
-    ),
-    ThemesIcons(
-        image = IR.drawable.ic_themes,
-        title = LR.string.onboarding_plus_feature_extra_themes_icons_title,
+    Bookmarks(
+        image = IR.drawable.ic_plus_feature_bookmark,
+        title = LR.string.onboarding_plus_feature_bookmarks_title,
     ),
     SkipChapters(
-        image = IR.drawable.ic_tick_circle_filled,
-        title = LR.string.skip_chapters,
+        image = IR.drawable.ic_plus_feature_chapters,
+        title = LR.string.onboarding_plus_feature_chapters_title,
         isYearlyFeature = FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS) &&
             SubscriptionTier.fromFeatureTier(Feature.DESELECT_CHAPTERS) == SubscriptionTier.PLUS,
         isMonthlyFeature = FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS) &&
             SubscriptionTier.fromFeatureTier(Feature.DESELECT_CHAPTERS) == SubscriptionTier.PLUS,
     ),
-    UndyingGratitude(
-        image = IR.drawable.ic_heart,
-        title = LR.string.onboarding_plus_feature_gratitude_title,
-        isYearlyFeature = !FeatureFlag.isEnabled(Feature.SLUMBER_STUDIOS_YEARLY_PROMO),
+    CloudStorage(
+        image = IR.drawable.ic_plus_feature_cloud_storage,
+        title = LR.string.onboarding_plus_feature_cloud_storage_title,
+    ),
+    WatchPlayback(
+        image = IR.drawable.ic_plus_feature_wearable,
+        title = LR.string.onboarding_plus_feature_watch_playback,
+    ),
+    ThemesIcons(
+        image = IR.drawable.ic_plus_feature_themes,
+        title = LR.string.onboarding_plus_feature_extra_themes_icons_title,
     ),
     SlumberStudiosPromo(
-        image = IR.drawable.ic_slumber_studios,
+        image = IR.drawable.ic_plus_feature_slumber_studios,
         title = LR.string.onboarding_plus_feature_slumber_studios_title,
         isMonthlyFeature = false,
         isYearlyFeature = FeatureFlag.isEnabled(Feature.SLUMBER_STUDIOS_YEARLY_PROMO),
