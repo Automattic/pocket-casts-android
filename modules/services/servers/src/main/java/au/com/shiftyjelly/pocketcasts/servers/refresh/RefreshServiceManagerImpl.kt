@@ -3,6 +3,8 @@ package au.com.shiftyjelly.pocketcasts.servers.refresh
 import android.os.Build
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.di.RefreshServiceRetrofit
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import java.io.IOException
 import java.util.Locale
 import javax.inject.Inject
 import retrofit2.Response
@@ -26,12 +28,38 @@ class RefreshServiceManagerImpl @Inject constructor(
         return service.importOpml(request)
     }
 
-    override suspend fun updatePodcast(podcastUuid: String, lastEpisodeUuid: String?): Response<Unit> {
-        return service.updatePodcast(podcastUuid = podcastUuid, lastEpisodeUuid = lastEpisodeUuid)
+    override suspend fun updatePodcast(podcastUuid: String, lastEpisodeUuid: String?): UpdatePodcastResponse {
+        return tryHandlePodcastUpdateResponse {
+            service.updatePodcast(podcastUuid = podcastUuid, lastEpisodeUuid = lastEpisodeUuid)
+        }
     }
 
-    override suspend fun pollUpdatePodcast(url: String): Response<Unit> {
-        return service.pollUpdatePodcast(url)
+    override suspend fun pollUpdatePodcast(url: String): UpdatePodcastResponse {
+        return tryHandlePodcastUpdateResponse {
+            service.pollUpdatePodcast(url)
+        }
+    }
+
+    private suspend fun tryHandlePodcastUpdateResponse(block: suspend () -> Response<Unit>): UpdatePodcastResponse {
+        return try {
+            val response = block()
+            when (response.code()) {
+                202 -> {
+                    val location = response.headers()["Location"]
+                    val retryAfter = response.headers()["Retry-After"]?.toIntOrNull()
+                    if (location != null && retryAfter != null) {
+                        UpdatePodcastResponse.Retry(location = location, retryAfter = retryAfter)
+                    } else {
+                        UpdatePodcastResponse.NoEpisodeFound
+                    }
+                }
+                200 -> UpdatePodcastResponse.EpisodeFound
+                else -> UpdatePodcastResponse.NoEpisodeFound
+            }
+        } catch (e: IOException) {
+            LogBuffer.e(LogBuffer.TAG_CRASH, e, "Failed to update podcast feed")
+            UpdatePodcastResponse.Failure
+        }
     }
 
     private fun addDeviceParameters(request: BaseRequest) {
@@ -43,4 +71,11 @@ class RefreshServiceManagerImpl @Inject constructor(
         request.language = Locale.getDefault().language
         request.model = Build.MODEL
     }
+}
+
+sealed class UpdatePodcastResponse {
+    data class Retry(val location: String, val retryAfter: Int) : UpdatePodcastResponse()
+    data object EpisodeFound : UpdatePodcastResponse()
+    data object NoEpisodeFound : UpdatePodcastResponse()
+    data object Failure : UpdatePodcastResponse()
 }

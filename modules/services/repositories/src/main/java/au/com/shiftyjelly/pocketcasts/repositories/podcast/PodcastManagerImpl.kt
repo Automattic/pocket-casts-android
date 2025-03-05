@@ -30,6 +30,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsThread
 import au.com.shiftyjelly.pocketcasts.repositories.sync.PodcastRefresher
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.refresh.RefreshServiceManager
+import au.com.shiftyjelly.pocketcasts.servers.refresh.UpdatePodcastResponse.EpisodeFound
+import au.com.shiftyjelly.pocketcasts.servers.refresh.UpdatePodcastResponse.Retry
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jakewharton.rxrelay2.PublishRelay
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -41,6 +43,7 @@ import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -655,21 +658,15 @@ class PodcastManagerImpl @Inject constructor(
             podcastUuid = podcast.uuid,
             lastEpisodeUuid = podcast.latestEpisodeUuid,
         )
-        LogBuffer.i(TAG, "Refresh podcast feed: ${response.code()}")
+        LogBuffer.i(TAG, "Refresh podcast feed: $response")
 
-        while (response.code() == 202) {
-            val location = response.headers()["Location"]
-            val retryAfter = response.headers()["Retry-After"]?.toIntOrNull()
-            if (location != null && retryAfter != null) {
-                delay(retryAfter * 1000L)
-                response = refreshServiceManager.pollUpdatePodcast(location)
-                LogBuffer.i(TAG, "Refresh podcast feed poll: ${response.code()}")
-            } else {
-                return false
-            }
+        while (response is Retry) {
+            delay(response.retryAfter.seconds)
+            response = refreshServiceManager.pollUpdatePodcast(response.location)
+            LogBuffer.i(TAG, "Refresh podcast feed poll: $response")
         }
 
-        if (response.code() == 200) {
+        if (response is EpisodeFound) {
             refreshPodcasts("Refresh podcast feed")
             return true
         } else {
