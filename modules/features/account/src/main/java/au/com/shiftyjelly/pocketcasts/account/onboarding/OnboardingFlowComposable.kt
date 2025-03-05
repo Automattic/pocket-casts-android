@@ -85,18 +85,30 @@ private fun Content(
         -> OnboardingNavRoute.welcome
     }
 
-    val onAccountCreated = {
-        if (flow is OnboardingFlow.ReferralLoginOrSignUp) {
-            exitOnboarding(OnboardingExitInfo(showWelcomeInReferralFlow = true))
-        } else {
-            navController.navigate(OnboardingRecommendationsFlow.route) {
-                // clear backstack after account is created
-                popUpTo(OnboardingNavRoute.logInOrSignUp) {
-                    inclusive = true
+    val onAccountCreated: () -> Unit = {
+        when {
+            flow is OnboardingFlow.ReferralLoginOrSignUp -> {
+                exitOnboarding(OnboardingExitInfo(showWelcomeInReferralFlow = true))
+            }
+            flow is OnboardingFlow.Upsell && flow.source == OnboardingUpgradeSource.SUGGESTED_FOLDERS -> {
+                navController.navigate(OnboardingNavRoute.PlusUpgrade.routeWithSource(OnboardingUpgradeSource.SUGGESTED_FOLDERS, forcePurchase = true)) {
+                    // clear backstack after account is created
+                    popUpTo(OnboardingNavRoute.logInOrSignUp) {
+                        inclusive = true
+                    }
+                }
+            }
+            else -> {
+                navController.navigate(OnboardingRecommendationsFlow.route) {
+                    // clear backstack after account is created
+                    popUpTo(OnboardingNavRoute.logInOrSignUp) {
+                        inclusive = true
+                    }
                 }
             }
         }
     }
+
 
     NavHost(navController, startDestination) {
         importFlowGraph(theme, navController, flow, onUpdateSystemBars)
@@ -201,20 +213,19 @@ private fun Content(
                         else -> Unit // Not a startDestination, default value should not be set.
                     }
                 },
-                navArgument(OnboardingNavRoute.PlusUpgrade.showPatronOnlyArgumentKey) {
+                navArgument(OnboardingNavRoute.PlusUpgrade.forcePurchaseArgumentKey) {
                     type = NavType.BoolType
-                    defaultValue = when (flow) {
-                        is OnboardingFlow.Upsell -> flow.showPatronOnly
-                        else -> false
-                    }
+                    defaultValue = false
                 },
             ),
         ) { navBackStackEntry ->
-
             val upgradeSource = navBackStackEntry.arguments
                 ?.getSerializableCompat(OnboardingNavRoute.PlusUpgrade.sourceArgumentKey, OnboardingUpgradeSource::class.java)
-                // upgradeSource should always be present. If startDestination, it is passed as a default argument.
-                ?: throw IllegalStateException("upgradeSource not set")
+                ?: throw IllegalStateException("Missing upgrade source argument")
+
+            val forcePurchase = navBackStackEntry.arguments
+                ?.getBoolean(OnboardingNavRoute.PlusUpgrade.forcePurchaseArgumentKey)
+                ?: throw IllegalStateException("Missing force purchase argument")
 
             val userCreatedNewAccount = when (upgradeSource) {
                 OnboardingUpgradeSource.ACCOUNT_DETAILS,
@@ -249,6 +260,7 @@ private fun Content(
                 flow = flow,
                 source = upgradeSource,
                 isLoggedIn = signInState.isSignedIn,
+                forcePurchase = forcePurchase,
                 onBackPressed = {
                     if (userCreatedNewAccount) {
                         navController.popBackStack()
@@ -258,7 +270,7 @@ private fun Content(
                 },
                 onNeedLogin = { navController.navigate(OnboardingNavRoute.logInOrSignUp) },
                 onProceed = {
-                    if (userCreatedNewAccount) {
+                    if (userCreatedNewAccount || forcePurchase) {
                         navController.navigate(OnboardingNavRoute.welcome)
                     } else {
                         exitOnboarding(OnboardingExitInfo())
@@ -329,14 +341,18 @@ object OnboardingNavRoute {
         private const val routeBase = "plus_upgrade"
 
         const val sourceArgumentKey = "source"
-        const val showPatronOnlyArgumentKey = "show_patron_only"
+        const val forcePurchaseArgumentKey = "force_purchase"
 
         // The route variable should only be used to navigate to the PlusUpgrade screens
         // when they are the startDestination and the args for these startDestinations are set using default values.
         // They are parsed based on this deep-link-like route by the navigation component.
         // For more details check here: https://developer.android.com/jetpack/compose/navigation#nav-with-args
         // In all other cases, use the routeWithSource function.
-        const val route = "$routeBase/{$sourceArgumentKey}?{$showPatronOnlyArgumentKey}={$showPatronOnlyArgumentKey}"
-        fun routeWithSource(source: OnboardingUpgradeSource) = "$routeBase/$source"
+        const val route = "$routeBase/{$sourceArgumentKey}?$forcePurchaseArgumentKey={$forcePurchaseArgumentKey}"
+
+        fun routeWithSource(
+            source: OnboardingUpgradeSource,
+            forcePurchase: Boolean = false,
+        ) = "$routeBase/$source?$forcePurchaseArgumentKey=$forcePurchase"
     }
 }

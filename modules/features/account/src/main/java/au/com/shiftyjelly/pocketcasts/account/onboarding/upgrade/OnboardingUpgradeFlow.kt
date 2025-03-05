@@ -39,6 +39,7 @@ fun OnboardingUpgradeFlow(
     flow: OnboardingFlow,
     source: OnboardingUpgradeSource,
     isLoggedIn: Boolean,
+    forcePurchase: Boolean,
     onBackPressed: () -> Unit,
     onNeedLogin: () -> Unit,
     onProceed: () -> Unit,
@@ -52,10 +53,10 @@ fun OnboardingUpgradeFlow(
     val coroutineScope = rememberCoroutineScope()
     val activity = LocalContext.current.getActivity()
 
-    val userSignedInOrSignedUpInUpsellFlow = flow is OnboardingFlow.Upsell &&
-        (source == OnboardingUpgradeSource.RECOMMENDATIONS || source == OnboardingUpgradeSource.LOGIN)
+    val forceAutoPurchase = forcePurchase ||
+            (flow is OnboardingFlow.Upsell && (source == OnboardingUpgradeSource.RECOMMENDATIONS || source == OnboardingUpgradeSource.LOGIN))
 
-    if (userSignedInOrSignedUpInUpsellFlow) {
+    if (forceAutoPurchase) {
         activity?.let {
             LaunchedEffect(Unit) {
                 mainSheetViewModel.onClickSubscribe(
