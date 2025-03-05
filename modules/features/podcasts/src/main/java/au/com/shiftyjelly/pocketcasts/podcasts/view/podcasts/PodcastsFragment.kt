@@ -28,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.FragmentPodcastsBinding
+import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.Folder
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.FolderCreateFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.FolderCreateSharedViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.FolderEditFragment
@@ -35,6 +36,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.FolderEditPodcastsFr
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.SuggestedFoldersFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastsViewModel
+import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastsViewModel.SuggestedFoldersState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
@@ -237,6 +239,21 @@ class PodcastsFragment :
                 viewModel.loadSuggestedFolders()
             }
         }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.suggestedFoldersState.collect { state ->
+                    when (state) {
+                        is SuggestedFoldersState.Loaded -> {
+                            if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS) && viewModel.isEligibleForSuggestedFoldersPopup()) {
+                                showSuggestedFoldersCreation(SuggestedFoldersFragment.Source.PodcastsPopup, state.folders())
+                            }
+                        }
+                        is SuggestedFoldersState.Empty -> Unit
+                    }
+                }
+            }
+        }
     }
 
     override fun onDestroyView() {
@@ -260,7 +277,7 @@ class PodcastsFragment :
             }
             R.id.create_folder -> {
                 analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_FOLDER_BUTTON_TAPPED)
-                createFolder()
+                handleFolderCreation()
                 true
             }
             else -> false
@@ -305,12 +322,34 @@ class PodcastsFragment :
         }
     }
 
-    private fun createFolder() {
-        val state = viewModel.suggestedFoldersState
-        if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS) && state is PodcastsViewModel.SuggestedFoldersState.Loaded) {
-            (activity as FragmentHostListener).showModal(SuggestedFoldersFragment.newInstance(state.folders()))
-        } else {
-            FolderCreateFragment.newInstance(PODCASTS_LIST).show(parentFragmentManager, "create_folder_card")
+    private fun handleFolderCreation() {
+        val state = viewModel.suggestedFoldersState.value
+        when (state) {
+            is SuggestedFoldersState.Empty -> {
+                showCustomFolderCreation()
+            }
+            is SuggestedFoldersState.Loaded -> {
+                if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS)) {
+                    showSuggestedFoldersCreation(SuggestedFoldersFragment.Source.CreateFolderButton, state.folders())
+                } else {
+                    showCustomFolderCreation()
+                }
+            }
+        }
+    }
+
+    private fun showCustomFolderCreation() {
+        FolderCreateFragment.newInstance(PODCASTS_LIST).show(parentFragmentManager, "create_folder_card")
+    }
+
+    private fun showSuggestedFoldersCreation(
+        source: SuggestedFoldersFragment.Source,
+        folders: List<Folder>,
+    ) {
+        if (parentFragmentManager.findFragmentByTag("suggested_folders") == null) {
+            SuggestedFoldersFragment
+                .newInstance(source, folders)
+                .show(parentFragmentManager, "suggested_folders")
         }
     }
 
