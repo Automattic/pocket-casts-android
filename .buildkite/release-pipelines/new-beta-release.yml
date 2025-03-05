@@ -4,7 +4,7 @@
 # This pipeline is meant to be triggered by the MC scenario in ReleasesV2
 
 steps:
-  - label: "🚂 New Beta Release"
+  - label: "🚂 DEBUG: New Beta Release / Ruby Setup"
     command: |
       echo '--- 🤖 Use bot for Git operations'
       source use-bot-for-git
