@@ -338,9 +338,48 @@ platform :android do
     UI.user_error!('None of the 3 app variants were found in Google Play Console. We expected at least one') if not_found_variants.count == APPS.count
   end
 
-  # @param skip_confirm [Boolean] If true, avoids any interactive prompt
+  # Downloads the latest translations from GlotPress and creates a PR to integrate them into the current `release/*` branch
   #
-  lane :finalize_release do |skip_confirm: false|
+  lane :download_translations do
+    version = release_version_current
+    base_branch = "release/#{version}"
+    pr_branch = "translations/release-#{version}"
+
+    Fastlane::Helper::GitHelper.create_branch(pr_branch, from: base_branch)
+
+    commit_created = android_download_translations(
+      res_dir: File.join('modules', 'services', 'localization', 'src', 'main', 'res'),
+      glotpress_url: GLOTPRESS_APP_STRINGS_PROJECT_URL,
+      locales: SUPPORTED_LOCALES
+      # Important: don't pass a `lint_task` here, because this lane runs on a dedicated trusted agent on CI which is not intended to run gradle tasks
+    )
+
+    if commit_created
+      push_to_git_remote(tags: false, set_upstream: true)
+      pr_url = create_pull_request(
+        repo: GITHUB_REPO,
+        base: base_branch,
+        head: pr_branch,
+        title: "Download latest translations for `#{version}`",
+        body: "This PR integrates the latest translations from GlotPress into the `#{base_branch}` branch.",
+        labels: ['releases', '[Area] Translations i18n'],
+        api_token: ENV.fetch('GITHUB_TOKEN')
+      )
+
+      buildkite_annotate(context: 'translations-pr-url', message: "Translations PR: #{pr_url || 'Error creating PR'}") if is_ci?
+    else
+      UI.important('No translations were downloaded, so no PR was created')
+      buildkite_annotate(context: 'translations-pr-url', message: 'No translations were downloaded, so no PR was created') if is_ci?
+      Fastlane::Helper::GitHelper.checkout_and_pull(base_branch)
+      Fastlane::Helper::GitHelper.delete_local_branch_if_exists!(pr_branch)
+    end
+  end
+
+  # @param skip_confirm [Boolean] If true, avoids any interactive prompt
+  # @param skip_translations_download [Boolean] If true, skips downloading the latest translations from GlotPress
+  #        Typically set it to `true` if the `download_translations` lane was already run earlier
+  #
+  lane :finalize_release do |skip_confirm: false, skip_translations_download: false|
     UI.user_error!('Please use `finalize_hotfix_release` lane for hotfixes') if release_is_hotfix?
     ensure_git_branch(branch: '^release/') # Match branch names that begin with `release/`
     ensure_git_status_clean
@@ -359,16 +398,15 @@ platform :android do
     commit_version_bump
     UI.success("Done! New Release Version: #{release_version_current}. New Build Code: #{build_code_current}")
 
-    # Download Localizations
-    android_download_translations(
-      res_dir: File.join('modules', 'services', 'localization', 'src', 'main', 'res'),
-      glotpress_url: GLOTPRESS_APP_STRINGS_PROJECT_URL,
-      locales: SUPPORTED_LOCALES
-      # FIXME: The `finalize_release` lane runs on `tumblr-metal` agent (needed as a trusted agent so we can git push), but that agent shouldn't be
-      #        used for running gradle task. Besides, it currently fails because that agent is behind a proxy but `-Dhttp.proxyHost` is not provided.
-      # FIXME: We should thus split the `finalize_release` lane into 2 lanes, one to download the translations + create a PR (in which the lint task will run), one to finalize the release.
-      # lint_task: 'aggregatedLintRelease'
-    )
+    # Download Localizations, unless we asked to skip it (e.g. `download_translations` lane was already run earlier)
+    unless skip_translations_download
+      android_download_translations(
+        res_dir: File.join('modules', 'services', 'localization', 'src', 'main', 'res'),
+        glotpress_url: GLOTPRESS_APP_STRINGS_PROJECT_URL,
+        locales: SUPPORTED_LOCALES
+        # Important: don't pass a `lint_task` here, because this lane runs on a dedicated trusted agent on CI, which is not intended to run gradle tasks
+      )
+    end
 
     version = release_version_current
 

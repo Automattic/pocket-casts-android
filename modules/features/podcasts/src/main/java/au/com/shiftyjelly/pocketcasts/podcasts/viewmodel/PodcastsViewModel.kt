@@ -8,12 +8,10 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
-import au.com.shiftyjelly.pocketcasts.models.entity.SuggestedFolder
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
-import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
-import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.toFolders
+import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.SuggestedFoldersPopupPolicy
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -34,17 +32,13 @@ import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.rx2.asObservable
 import timber.log.Timber
-import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.Folder as SuggestedFolderModel
 
 @HiltViewModel
 class PodcastsViewModel
@@ -55,6 +49,7 @@ class PodcastsViewModel
     private val settings: Settings,
     private val analyticsTracker: AnalyticsTracker,
     private val suggestedFoldersManager: SuggestedFoldersManager,
+    private val suggestedFoldersPopupPolicy: SuggestedFoldersPopupPolicy,
     userManager: UserManager,
 ) : ViewModel(), CoroutineScope {
     var isFragmentChangingConfigurations: Boolean = false
@@ -62,6 +57,18 @@ class PodcastsViewModel
         get() = Dispatchers.Default
 
     private val folderUuidObservable = BehaviorRelay.create<Optional<String>>().apply { accept(Optional.empty()) }
+
+    init {
+        viewModelScope.launch {
+            suggestedFoldersManager.observeSuggestedFolders().collect { folders ->
+                _suggestedFoldersState.value = if (folders.isEmpty()) {
+                    SuggestedFoldersState.Empty
+                } else {
+                    SuggestedFoldersState.Available
+                }
+            }
+        }
+    }
 
     data class FolderState(
         val folder: Folder?,
@@ -137,14 +144,8 @@ class PodcastsViewModel
     val folder: Folder?
         get() = folderState.value?.folder
 
-    private val _suggestedFoldersState = MutableStateFlow<SuggestedFoldersState>(SuggestedFoldersState.Idle)
-    val suggestedFoldersState: SuggestedFoldersState
-        get() = _suggestedFoldersState.value
-
-    val userSuggestedFoldersState: Flow<Pair<SignInState, SuggestedFoldersState>> = userManager.getSignInState().asFlow()
-        .combine(_suggestedFoldersState) { signIn, suggestedFolders ->
-            Pair(signIn, suggestedFolders)
-        }
+    private val _suggestedFoldersState = MutableStateFlow<SuggestedFoldersState>(SuggestedFoldersState.Empty)
+    val suggestedFoldersState = _suggestedFoldersState.asStateFlow()
 
     private fun buildHomeFolderItems(podcasts: List<Podcast>, folders: List<FolderItem>, podcastSortType: PodcastsSortType): List<FolderItem> {
         if (podcastSortType == PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST) {
@@ -302,45 +303,20 @@ class PodcastsViewModel
         }
     }
 
-    @OptIn(FlowPreview::class)
-    suspend fun loadSuggestedFolders() {
+    suspend fun refreshSuggestedFolders() {
         if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS)) {
-            _suggestedFoldersState.emit(SuggestedFoldersState.Loading)
-            suggestedFoldersManager.getSuggestedFolders()
-                .debounce(200)
-                .collect { folders ->
-                    if (folders.isEmpty()) {
-                        _suggestedFoldersState.emit(SuggestedFoldersState.Empty)
-                    } else {
-                        _suggestedFoldersState.emit(SuggestedFoldersState.Loaded(folders))
-                    }
-                }
+            suggestedFoldersManager.refreshSuggestedFolders()
         }
     }
 
-    fun refreshSuggestedFolders() {
-        viewModelScope.launch {
-            if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS)) {
-                val uuids = podcastManager.findSubscribedUuids()
-                suggestedFoldersManager.refreshSuggestedFolders(uuids)
-            }
-        }
+    fun isEligibleForSuggestedFoldersPopup(): Boolean {
+        return suggestedFoldersPopupPolicy.isEligibleForPopup()
     }
-
-    fun showSuggestedFoldersPaywallOnOpen(isSignedInAsPlusOrPatron: Boolean) =
-        FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS) && !isSignedInAsPlusOrPatron && settings.suggestedFolderPaywallDismissTime.value == 0L
 
     sealed class SuggestedFoldersState {
-        data object Idle : SuggestedFoldersState()
-        data object Loading : SuggestedFoldersState()
-        data class Loaded(private val folders: List<SuggestedFolder>) : SuggestedFoldersState() {
-            private val convertedFolders: List<SuggestedFolderModel> by lazy {
-                folders.toFolders()
-            }
-
-            fun folders(): List<SuggestedFolderModel> = convertedFolders
-        }
         data object Empty : SuggestedFoldersState()
+
+        data object Available : SuggestedFoldersState()
     }
 
     companion object {

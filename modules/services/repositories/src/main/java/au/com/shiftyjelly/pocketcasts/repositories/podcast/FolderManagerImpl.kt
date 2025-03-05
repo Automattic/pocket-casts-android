@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.repositories.podcast
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
-import au.com.shiftyjelly.pocketcasts.models.entity.SuggestedFolderDetails
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST
@@ -57,11 +56,6 @@ class FolderManagerImpl @Inject constructor(
         updateSortPosition(newList)
 
         return newFolder
-    }
-
-    override suspend fun overrideFoldersWithSuggested(folders: List<SuggestedFolderDetails>) {
-        folderDao.replaceAllFolders(folders.toFolders(), syncModified = System.currentTimeMillis())
-        podcastManager.updateFoldersUuid(folders)
     }
 
     override suspend fun upsertSynced(folder: Folder): Folder {
@@ -217,19 +211,4 @@ class FolderManagerImpl @Inject constructor(
     }
 
     override suspend fun countFolders() = folderDao.count()
-
-    private fun List<SuggestedFolderDetails>.toFolders(): List<Folder> {
-        return this.map { suggestedFolder ->
-            Folder(
-                uuid = suggestedFolder.uuid,
-                name = suggestedFolder.name,
-                color = suggestedFolder.color,
-                addedDate = Date(),
-                sortPosition = 0,
-                podcastsSortType = suggestedFolder.podcastsSortType,
-                deleted = false,
-                syncModified = System.currentTimeMillis(),
-            )
-        }
-    }
 }
