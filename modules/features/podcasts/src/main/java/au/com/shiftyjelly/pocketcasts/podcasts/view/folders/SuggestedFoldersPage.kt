@@ -11,10 +11,13 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
@@ -32,85 +35,100 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.folder.FolderImage
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun SuggestedFoldersPage(
-    action: SuggestedAction,
+    action: SuggestedAction?,
     folders: List<SuggestedFolder>,
     onActionClick: () -> Unit,
     onCreateCustomFolderClick: () -> Unit,
     onFolderClick: (SuggestedFolder) -> Unit,
+    onCloseClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier,
     ) {
-        LazyVerticalGrid(
-            columns = GridCells.Adaptive(110.dp),
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
-            modifier = Modifier
-                .weight(1f)
-                .padding(bottom = 8.dp)
-                .padding(horizontal = 16.dp),
+        IconButton(
+            onClick = onCloseClick,
         ) {
-            item(span = { GridItemSpan(maxLineSpan) }) {
-                SmartFoldersHeader(action)
-            }
-            item(span = { GridItemSpan(maxLineSpan) }) {
-                Spacer(
-                    modifier = Modifier.height(10.dp),
-                )
-            }
-            items(folders) { folder ->
-                val color = MaterialTheme.theme.colors.getFolderColor(folder.colorIndex)
-                val description = stringResource(LR.string.suggested_folder_content_description, folder.name)
-
-                FolderImage(
-                    name = folder.name,
-                    color = color,
-                    podcastUuids = folder.podcastIds,
-                    textSpacing = true,
-                    modifier = Modifier
-                        .clickable(onClick = { onFolderClick(folder) })
-                        .clearAndSetSemantics {
-                            contentDescription = description
-                        },
-                )
-            }
+            Icon(
+                painter = painterResource(R.drawable.ic_close),
+                contentDescription = stringResource(LR.string.close),
+                tint = MaterialTheme.theme.colors.primaryInteractive01,
+                modifier = Modifier.padding(16.dp),
+            )
         }
 
-        RowButton(
-            text = when (action) {
-                SuggestedAction.UseFolders -> stringResource(LR.string.suggested_folders_use_these_folders_button)
-                SuggestedAction.ReplaceFolders -> stringResource(LR.string.suggested_folders_replace_folders_button)
-            },
-            modifier = Modifier
-                .padding(bottom = 16.dp)
-                .padding(horizontal = 16.dp),
-            textColor = MaterialTheme.theme.colors.primaryInteractive02,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.W600,
-            colors = ButtonDefaults.buttonColors(
-                backgroundColor = MaterialTheme.theme.colors.primaryInteractive01,
-            ),
-            includePadding = false,
-            onClick = onActionClick,
-        )
+        if (action != null) {
+            LazyVerticalGrid(
+                columns = GridCells.Adaptive(110.dp),
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(bottom = 8.dp)
+                    .padding(horizontal = 16.dp),
+            ) {
+                item(span = { GridItemSpan(maxLineSpan) }) {
+                    SmartFoldersHeader(action)
+                }
+                item(span = { GridItemSpan(maxLineSpan) }) {
+                    Spacer(
+                        modifier = Modifier.height(10.dp),
+                    )
+                }
+                items(folders) { folder ->
+                    val color = MaterialTheme.theme.colors.getFolderColor(folder.colorIndex)
+                    val description = stringResource(LR.string.suggested_folder_content_description, folder.name)
 
-        RowOutlinedButton(
-            text = stringResource(LR.string.suggested_folders_create_custom_folder_button),
-            onClick = onCreateCustomFolderClick,
-            includePadding = false,
-            colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.theme.colors.primaryIcon01, backgroundColor = Color.Transparent),
-            fontSize = 18.sp,
-            fontWeight = FontWeight.W600,
-            modifier = Modifier
-                .padding(bottom = 16.dp)
-                .padding(horizontal = 16.dp),
-        )
+                    FolderImage(
+                        name = folder.name,
+                        color = color,
+                        podcastUuids = folder.podcastIds,
+                        textSpacing = true,
+                        modifier = Modifier
+                            .clickable(onClick = { onFolderClick(folder) })
+                            .clearAndSetSemantics {
+                                contentDescription = description
+                            },
+                    )
+                }
+            }
+
+            RowButton(
+                text = when (action) {
+                    SuggestedAction.UseFolders -> stringResource(LR.string.suggested_folders_use_these_folders_button)
+                    SuggestedAction.ReplaceFolders -> stringResource(LR.string.suggested_folders_replace_folders_button)
+                },
+                modifier = Modifier
+                    .padding(bottom = 16.dp)
+                    .padding(horizontal = 16.dp),
+                textColor = MaterialTheme.theme.colors.primaryInteractive02,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.W600,
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = MaterialTheme.theme.colors.primaryInteractive01,
+                ),
+                includePadding = false,
+                onClick = onActionClick,
+            )
+
+            RowOutlinedButton(
+                text = stringResource(LR.string.suggested_folders_create_custom_folder_button),
+                onClick = onCreateCustomFolderClick,
+                includePadding = false,
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.theme.colors.primaryIcon01, backgroundColor = Color.Transparent),
+                fontSize = 18.sp,
+                fontWeight = FontWeight.W600,
+                modifier = Modifier
+                    .padding(bottom = 16.dp)
+                    .padding(horizontal = 16.dp),
+            )
+        }
     }
 }
 
@@ -160,6 +178,7 @@ private fun SuggestedFoldersPagePreview() {
             onActionClick = {},
             onCreateCustomFolderClick = {},
             onFolderClick = {},
+            onCloseClick = {},
         )
     }
 }
@@ -182,6 +201,7 @@ private fun SuggestedFoldersPagePreview(
             onActionClick = {},
             onCreateCustomFolderClick = {},
             onFolderClick = {},
+            onCloseClick = {},
         )
     }
 }

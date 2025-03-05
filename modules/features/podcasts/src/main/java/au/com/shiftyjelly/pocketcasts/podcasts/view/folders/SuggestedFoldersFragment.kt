@@ -5,37 +5,39 @@ import android.os.Bundle
 import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.only
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
-import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.SuggestedFoldersViewModel.UseFoldersState.Applied
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
@@ -44,7 +46,6 @@ import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.parcelize.Parcelize
-import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as VR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -82,60 +83,68 @@ class SuggestedFoldersFragment : BaseDialogFragment() {
     ) = content {
         val state by viewModel.state.collectAsState()
 
-        LaunchedEffect(state.useFolderesState) {
-            if (state.useFolderesState == Applied) {
-                finalizeAndDismiss()
-            }
-        }
-
         Box(
             modifier = Modifier
                 .fillMaxHeight(0.93f)
                 .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)),
         ) {
             AppThemeWithBackground(theme.activeTheme) {
-                Column(
+                Box(
                     modifier = Modifier
                         .nestedScroll(rememberNestedScrollInteropConnection())
                         .fillMaxSize()
                         .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)),
                 ) {
-                    IconButton(
-                        onClick = { dismiss() },
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_close),
-                            contentDescription = stringResource(LR.string.close),
-                            tint = MaterialTheme.theme.colors.primaryInteractive01,
-                            modifier = Modifier.padding(16.dp),
-                        )
-                    }
+                    val navController = rememberNavController()
 
-                    val action = state.action
-                    if (action != null) {
-                        SuggestedFoldersPage(
-                            folders = state.suggestedFolders,
-                            action = action,
-                            onActionClick = {
-                                if (state.isUserPlusOrPatreon) {
-                                    when (action) {
-                                        SuggestedAction.UseFolders -> viewModel.useSuggestedFolders()
-                                        SuggestedAction.ReplaceFolders -> showConfirmationDialog()
-                                    }
-                                } else {
-                                    OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.Upsell(OnboardingUpgradeSource.SUGGESTED_FOLDERS))
-                                }
-                            },
-                            onCreateCustomFolderClick = {
-                                FolderCreateFragment
-                                    .newInstance(source = "suggested_folders")
-                                    .show(parentFragmentManager, "create_folder_card")
-                                finalizeAndDismiss()
-                            },
-                            onFolderClick = { Timber.i("Clicked folder: ${it.name}") },
-                        )
+                    NavHost(
+                        navController = navController,
+                        startDestination = SuggestedFoldersNavRoutes.SuggestedFolders,
+                        enterTransition = { slideInToStart() },
+                        exitTransition = { slideOutToStart() },
+                        popEnterTransition = { slideInToEnd() },
+                        popExitTransition = { slideOutToEnd() },
+                        modifier = Modifier.fillMaxSize(),
+                    ) {
+                        composable(SuggestedFoldersNavRoutes.SuggestedFolders) {
+                            SuggestedFoldersPage(
+                                folders = state.suggestedFolders,
+                                action = state.action,
+                                onActionClick = { state.action?.let { handleSuggestedAction(it, state.isUserPlusOrPatreon) } },
+                                onCreateCustomFolderClick = ::goToCustomFolderCreation,
+                                onFolderClick = { folder ->
+                                    navController.navigate(SuggestedFoldersNavRoutes.folderDetailsDestination(folder.name))
+                                },
+                                onCloseClick = ::dismiss,
+                            )
+                        }
+                        composable(
+                            SuggestedFoldersNavRoutes.folderDetailsRoute(),
+                            listOf(
+                                navArgument(SuggestedFoldersNavRoutes.SuggestedFolderNameArgument) {
+                                    type = NavType.StringType
+                                },
+                            ),
+                        ) { backStackEntry ->
+                            val arguments = requireNotNull(backStackEntry.arguments) { "Missing back stack entry arguments" }
+                            val folderName = requireNotNull(arguments.getString(SuggestedFoldersNavRoutes.SuggestedFolderNameArgument)) {
+                                "Missing folder name period argument"
+                            }
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier.fillMaxSize(),
+                            ) {
+                                Text(folderName)
+                            }
+                        }
                     }
                 }
+            }
+        }
+
+        LaunchedEffect(state.useFoldersState) {
+            if (state.useFoldersState == Applied) {
+                finalizeAndDismiss()
             }
         }
     }
@@ -156,6 +165,24 @@ class SuggestedFoldersFragment : BaseDialogFragment() {
         !requireActivity().isChangingConfigurations &&
             !isFinalizingActionUsed &&
             args.source == Source.PodcastsPopup
+
+    private fun goToCustomFolderCreation() {
+        FolderCreateFragment
+            .newInstance(source = "suggested_folders")
+            .show(parentFragmentManager, "create_folder_card")
+        finalizeAndDismiss()
+    }
+
+    private fun handleSuggestedAction(action: SuggestedAction, isUserPlusOrPatreon: Boolean) {
+        if (isUserPlusOrPatreon) {
+            when (action) {
+                SuggestedAction.UseFolders -> viewModel.useSuggestedFolders()
+                SuggestedAction.ReplaceFolders -> showConfirmationDialog()
+            }
+        } else {
+            OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.Upsell(OnboardingUpgradeSource.SUGGESTED_FOLDERS))
+        }
+    }
 
     private fun showConfirmationDialog() {
         ConfirmationDialog()
@@ -178,3 +205,35 @@ class SuggestedFoldersFragment : BaseDialogFragment() {
         val source: Source,
     ) : Parcelable
 }
+
+private object SuggestedFoldersNavRoutes {
+    const val SuggestedFolders = "main"
+    private const val FolderDetails = "suggested_folder_details"
+
+    const val SuggestedFolderNameArgument = "folderName"
+
+    fun folderDetailsRoute() = "$FolderDetails/{$SuggestedFolderNameArgument}"
+
+    fun folderDetailsDestination(folderName: String) = "$FolderDetails/$folderName"
+}
+
+private val intOffsetAnimationSpec = tween<IntOffset>(350)
+private fun AnimatedContentTransitionScope<NavBackStackEntry>.slideInToStart() = slideIntoContainer(
+    towards = AnimatedContentTransitionScope.SlideDirection.Start,
+    animationSpec = intOffsetAnimationSpec,
+)
+
+private fun AnimatedContentTransitionScope<NavBackStackEntry>.slideOutToStart() = slideOutOfContainer(
+    towards = AnimatedContentTransitionScope.SlideDirection.Start,
+    animationSpec = intOffsetAnimationSpec,
+)
+
+private fun AnimatedContentTransitionScope<NavBackStackEntry>.slideInToEnd() = slideIntoContainer(
+    towards = AnimatedContentTransitionScope.SlideDirection.End,
+    animationSpec = intOffsetAnimationSpec,
+)
+
+private fun AnimatedContentTransitionScope<NavBackStackEntry>.slideOutToEnd() = slideOutOfContainer(
+    towards = AnimatedContentTransitionScope.SlideDirection.End,
+    animationSpec = intOffsetAnimationSpec,
+)
