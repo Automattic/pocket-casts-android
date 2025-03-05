@@ -32,6 +32,7 @@ import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
@@ -303,9 +304,13 @@ class PodcastsViewModel
         }
     }
 
-    suspend fun refreshSuggestedFolders() {
-        if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS)) {
-            suggestedFoldersManager.refreshSuggestedFolders()
+    private var refreshSuggestedFoldersJob: Job? = null
+
+    fun refreshSuggestedFolders() {
+        if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS) && refreshSuggestedFoldersJob?.isActive != true) {
+            refreshSuggestedFoldersJob = viewModelScope.launch {
+                suggestedFoldersManager.refreshSuggestedFolders()
+            }
         }
     }
 
