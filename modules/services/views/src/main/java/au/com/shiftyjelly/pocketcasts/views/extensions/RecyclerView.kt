@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.views.extensions
 
 import android.util.DisplayMetrics
+import android.view.View
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
 
@@ -8,10 +9,14 @@ import androidx.recyclerview.widget.RecyclerView
  * Scrolls the adapter position to the top of the screen.
  * Unlike smoothScrollToPosition which just scrolls the position into view.
  */
-fun RecyclerView.smoothScrollToTop(position: Int) {
+fun RecyclerView.smoothScrollToTop(position: Int, offset: Int = 0) {
     val smoothScroller = object : LinearSmoothScroller(context) {
         override fun getVerticalSnapPreference(): Int {
             return LinearSmoothScroller.SNAP_TO_START
+        }
+
+        override fun calculateDyToMakeVisible(view: View, snapPreference: Int): Int {
+            return super.calculateDyToMakeVisible(view, snapPreference) + offset
         }
     }
     smoothScroller.targetPosition = position
