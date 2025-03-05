@@ -210,7 +210,20 @@ class PodcastsFragment :
         toolbar.setOnMenuItemClickListener(this)
 
         toolbar.menu.findItem(R.id.folders_locked).setOnMenuItemClickListener {
-            OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.Upsell(OnboardingUpgradeSource.FOLDERS))
+            if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS)) {
+                val state = viewModel.suggestedFoldersState.value
+                when (state) {
+                    is SuggestedFoldersState.Empty -> {
+                        OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.Upsell(OnboardingUpgradeSource.FOLDERS))
+                    }
+
+                    is SuggestedFoldersState.Available -> {
+                        showSuggestedFoldersCreation(SuggestedFoldersFragment.Source.CreateFolderButton)
+                    }
+                }
+            } else {
+                OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.Upsell(OnboardingUpgradeSource.FOLDERS))
+            }
             true
         }
 
