@@ -44,6 +44,7 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSourc
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.withCreationCallback
 import kotlinx.parcelize.Parcelize
 import au.com.shiftyjelly.pocketcasts.images.R as VR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -66,12 +67,18 @@ class SuggestedFoldersFragment : BaseDialogFragment() {
         }
     }
 
-    private val viewModel by viewModels<SuggestedFoldersViewModel>()
-
     private val args
         get() = requireNotNull(BundleCompat.getParcelable(requireArguments(), ARGS_KEY, Args::class.java)) {
             "Missing input parameters"
         }
+
+    private val viewModel by viewModels<SuggestedFoldersViewModel>(
+        extrasProducer = {
+            defaultViewModelCreationExtras.withCreationCallback<SuggestedFoldersViewModel.Factory> { factory ->
+                factory.crate(args.source)
+            }
+        }
+    )
 
     private var isFinalizingActionUsed = false
 
@@ -198,9 +205,15 @@ class SuggestedFoldersFragment : BaseDialogFragment() {
             .show(childFragmentManager, "suggested-folders-confirmation-dialog")
     }
 
-    enum class Source {
-        PodcastsPopup,
-        CreateFolderButton,
+    enum class Source(
+        val analyticsValue: String,
+    ) {
+        PodcastsPopup(
+            analyticsValue = "podcasts",
+        ),
+        CreateFolderButton(
+            analyticsValue = "create_folder"
+        ),
     }
 
     @Parcelize

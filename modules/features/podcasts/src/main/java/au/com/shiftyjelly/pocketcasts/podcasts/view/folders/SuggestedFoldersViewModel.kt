@@ -7,6 +7,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SuggestedFoldersManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -21,8 +24,9 @@ import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.withContext
 import au.com.shiftyjelly.pocketcasts.models.entity.SuggestedFolder as DbSuggestedFolder
 
-@HiltViewModel
-class SuggestedFoldersViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = SuggestedFoldersViewModel.Factory::class)
+class SuggestedFoldersViewModel @AssistedInject constructor(
+    @Assisted private val source: SuggestedFoldersFragment.Source,
     private val folderManager: FolderManager,
     private val suggestedFoldersManager: SuggestedFoldersManager,
     private val suggestedFoldersPopupPolicy: SuggestedFoldersPopupPolicy,
@@ -97,6 +101,34 @@ class SuggestedFoldersViewModel @Inject constructor(
         suggestedFoldersPopupPolicy.markPolicyUsed()
     }
 
+    fun trackPageShown() {
+
+    }
+
+    fun trackPageDismissed() {
+
+    }
+
+    fun trackUseSuggestedFoldersTapped() {
+
+    }
+
+    fun trackCreateCustomFolderTapped() {
+
+    }
+
+    fun trackReplaceFolderTapped() {
+
+    }
+
+    fun trackReplaceFoldersConfirmationTapped() {
+
+    }
+
+    fun trackPreviewFolderTapped() {
+
+    }
+
     data class State(
         val isUserPlusOrPatreon: Boolean,
         val existingFoldersCount: Int?,
@@ -128,5 +160,10 @@ class SuggestedFoldersViewModel @Inject constructor(
         Idle,
         Applying,
         Applied,
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun crate(source: SuggestedFoldersFragment.Source): SuggestedFoldersViewModel
     }
 }
