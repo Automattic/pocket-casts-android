@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -25,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.Devices
@@ -54,14 +56,18 @@ fun SuggestedFoldersPage(
     ) {
         IconButton(
             onClick = onCloseClick,
+            modifier = Modifier.heightIn(min = 64.dp),
         ) {
             Icon(
                 painter = painterResource(R.drawable.ic_close),
                 contentDescription = stringResource(LR.string.close),
                 tint = MaterialTheme.theme.colors.primaryInteractive01,
-                modifier = Modifier.padding(16.dp),
             )
         }
+
+        Spacer(
+            modifier = Modifier.height(4.dp),
+        )
 
         if (action != null) {
             LazyVerticalGrid(
