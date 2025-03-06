@@ -146,4 +146,5 @@ dependencies {
     testImplementation(libs.turbine)
 
     testImplementation(projects.modules.services.sharedtest)
+    implementation(libs.singular)
 }
