@@ -54,7 +54,7 @@ fun OnboardingUpgradeFlow(
     val activity = LocalContext.current.getActivity()
 
     val forceAutoPurchase = forcePurchase ||
-            (flow is OnboardingFlow.Upsell && (source == OnboardingUpgradeSource.RECOMMENDATIONS || source == OnboardingUpgradeSource.LOGIN))
+        (flow is OnboardingFlow.Upsell && (source == OnboardingUpgradeSource.RECOMMENDATIONS || source == OnboardingUpgradeSource.LOGIN))
 
     if (forceAutoPurchase) {
         activity?.let {
