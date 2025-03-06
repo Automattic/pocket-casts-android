@@ -315,8 +315,6 @@
     <string name="player_chapters" translatable="false">@string/chapters</string>
     <string name="player_close">Close player</string>
     <string name="player_effects">Player effects</string>
-    <string name="player_effects_clear">CLEAR</string>
-    <string name="player_effects_custom_effects_applied">Custom effects applied</string>
     <string name="player_effects_speed">Speed</string>
     <string name="player_effects_speed_down">Speed Down</string>
     <string name="player_effects_speed_up">Speed Up</string>
