@@ -22,7 +22,6 @@ import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewViewModel.Naviga
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -100,7 +99,7 @@ class WhatsNewFragment : BaseFragment() {
         val onboardingFlow = OnboardingFlow.Upsell(
             source = source,
             showPatronOnly = when (source) {
-                OnboardingUpgradeSource.WHATS_NEW_SKIP_CHAPTERS -> FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS) &&
+                OnboardingUpgradeSource.WHATS_NEW_SKIP_CHAPTERS ->
                     SubscriptionTier.fromFeatureTier(Feature.DESELECT_CHAPTERS) == SubscriptionTier.PATRON
 
                 else -> false

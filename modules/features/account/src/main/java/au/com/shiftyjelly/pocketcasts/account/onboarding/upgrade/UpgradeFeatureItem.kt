@@ -44,10 +44,8 @@ enum class PlusUpgradeFeatureItem(
     SkipChapters(
         image = IR.drawable.ic_plus_feature_chapters,
         title = LR.string.onboarding_plus_feature_chapters_title,
-        isYearlyFeature = FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS) &&
-            SubscriptionTier.fromFeatureTier(Feature.DESELECT_CHAPTERS) == SubscriptionTier.PLUS,
-        isMonthlyFeature = FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS) &&
-            SubscriptionTier.fromFeatureTier(Feature.DESELECT_CHAPTERS) == SubscriptionTier.PLUS,
+        isYearlyFeature = SubscriptionTier.fromFeatureTier(Feature.DESELECT_CHAPTERS) == SubscriptionTier.PLUS,
+        isMonthlyFeature = SubscriptionTier.fromFeatureTier(Feature.DESELECT_CHAPTERS) == SubscriptionTier.PLUS,
     ),
     CloudStorage(
         image = IR.drawable.ic_plus_feature_cloud_storage,

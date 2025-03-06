@@ -8,7 +8,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -40,7 +39,6 @@ sealed class UpgradeFeatureCard(
         ) = when {
             (
                 source in listOf(OnboardingUpgradeSource.SKIP_CHAPTERS, OnboardingUpgradeSource.WHATS_NEW_SKIP_CHAPTERS) &&
-                    FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS) &&
                     SubscriptionTier.fromFeatureTier(Feature.DESELECT_CHAPTERS) == SubscriptionTier.PLUS
                 )
             -> LR.string.skip_chapters_plus_prompt
@@ -82,7 +80,6 @@ sealed class UpgradeFeatureCard(
         ) = when {
             (
                 source in listOf(OnboardingUpgradeSource.SKIP_CHAPTERS, OnboardingUpgradeSource.WHATS_NEW_SKIP_CHAPTERS) &&
-                    FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS) &&
                     SubscriptionTier.fromFeatureTier(Feature.DESELECT_CHAPTERS) == SubscriptionTier.PATRON
                 )
             -> LR.string.skip_chapters_patron_prompt
