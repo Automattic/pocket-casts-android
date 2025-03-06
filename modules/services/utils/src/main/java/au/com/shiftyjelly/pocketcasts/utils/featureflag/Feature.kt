@@ -75,14 +75,6 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
-    TRANSCRIPTS(
-        key = "transcripts",
-        title = "Transcripts",
-        defaultValue = true,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
-    ),
     EXPLAT_EXPERIMENT(
         key = "explat_experiment",
         title = "ExPlat Experiment",

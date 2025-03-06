@@ -21,8 +21,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.DeleteState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -91,12 +89,6 @@ class ShelfSharedViewModel @Inject constructor(
         val episode = (shelfUpNext as? UpNextQueue.State.Loaded)?.episode
         return uiState.value.copy(
             shelfItems = shelfItems
-                .filter { item ->
-                    when (item) {
-                        ShelfItem.Transcript -> FeatureFlag.isEnabled(Feature.TRANSCRIPTS)
-                        else -> true
-                    }
-                }
                 .filter { it.showIf(episode) },
             episode = episode,
         )
