@@ -110,7 +110,7 @@ class SuggestedFoldersFragment : BaseDialogFragment() {
                                 folders = state.suggestedFolders,
                                 action = state.action,
                                 onActionClick = { state.action?.let { handleSuggestedAction(it, state.isUserPlusOrPatreon) } },
-                                onCreateCustomFolderClick = ::goToCustomFolderCreation,
+                                onCreateCustomFolderClick = { handleCustomFolderCreation(state.isUserPlusOrPatreon) },
                                 onFolderClick = { folder ->
                                     navController.navigate(SuggestedFoldersNavRoutes.folderDetailsDestination(folder.name))
                                 },
@@ -165,11 +165,15 @@ class SuggestedFoldersFragment : BaseDialogFragment() {
             !isFinalizingActionUsed &&
             args.source == Source.PodcastsPopup
 
-    private fun goToCustomFolderCreation() {
-        FolderCreateFragment
-            .newInstance(source = "suggested_folders")
-            .show(parentFragmentManager, "create_folder_card")
-        finalizeAndDismiss()
+    private fun handleCustomFolderCreation(isUserPlusOrPatreon: Boolean) {
+        if (isUserPlusOrPatreon) {
+            FolderCreateFragment
+                .newInstance(source = "suggested_folders")
+                .show(parentFragmentManager, "create_folder_card")
+            finalizeAndDismiss()
+        } else {
+            OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.Upsell(OnboardingUpgradeSource.FOLDERS))
+        }
     }
 
     private fun handleSuggestedAction(action: SuggestedAction, isUserPlusOrPatreon: Boolean) {
