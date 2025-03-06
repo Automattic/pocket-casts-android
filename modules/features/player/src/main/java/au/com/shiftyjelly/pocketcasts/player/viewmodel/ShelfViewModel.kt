@@ -12,8 +12,6 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfRowItem
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfTitle
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptsManager
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -160,7 +158,7 @@ class ShelfViewModel @AssistedInject constructor(
         val transcript: Transcript? = null,
     ) {
         val isTranscriptAvailable: Boolean
-            get() = FeatureFlag.isEnabled(Feature.TRANSCRIPTS) && transcript != null
+            get() = transcript != null
     }
 
     companion object {

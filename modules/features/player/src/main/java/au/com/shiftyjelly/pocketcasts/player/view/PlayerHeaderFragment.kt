@@ -47,8 +47,6 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSourc
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog.ButtonType.Danger
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -124,10 +122,8 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         binding.videoView.playbackManager = playbackManager
         binding.videoView.setOnClickListener { onFullScreenVideoClick() }
 
-        if (FeatureFlag.isEnabled(Feature.TRANSCRIPTS)) {
-            setupTranscriptPage()
-            observeTranscriptPageTransition()
-        }
+        setupTranscriptPage()
+        observeTranscriptPageTransition()
 
         setupUpNextDrag(binding)
 
