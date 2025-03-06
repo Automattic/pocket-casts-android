@@ -35,12 +35,14 @@ steps:
     command: ".buildkite/commands/run-unit-tests.sh"
     plugins: [$CI_TOOLKIT]
 
-  - label: 'Dependency diff'
-    if: build.pull_request.id != null
-    command: comment_with_dependency_diff 'app' 'releaseRuntimeClasspath'
-    plugins: [$CI_TOOLKIT]
-    artifact_paths:
-      - "**/build/reports/diff/*"
+  - group: "Diff Reports"
+    steps:
+      - label: 'Dependency diff'
+        if: build.pull_request.id != null
+        command: comment_with_dependency_diff 'app' 'releaseRuntimeClasspath'
+        plugins: [$CI_TOOLKIT]
+        artifact_paths:
+          - "**/build/reports/diff/*"
 
   - label: 'Spotless formatting check'
     command: |
