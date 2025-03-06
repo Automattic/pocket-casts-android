@@ -161,4 +161,5 @@ dependencies {
     androidTestImplementation(libs.work.test)
 
     androidTestImplementation(projects.modules.services.sharedtest)
+    implementation(libs.singular)
 }

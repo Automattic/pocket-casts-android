@@ -32,6 +32,9 @@ dependencyResolutionManagement {
                 includeGroupByRegex("org.wordpress.*")
             }
         }
+        maven {
+            setUrl("https://maven.singular.net")
+        }
     }
 }
 
