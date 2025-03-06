@@ -8,7 +8,6 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListFragment.M
 import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListViewModel.State
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
@@ -29,9 +28,6 @@ import org.mockito.kotlin.whenever
 class ProfileEpisodeListViewModelTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule()
-
-    @get:Rule
-    val featureFlagRule = InMemoryFeatureFlagRule()
 
     private val episodeManager: EpisodeManager = mock()
     private val playbackManager: PlaybackManager = mock()
@@ -90,6 +86,17 @@ class ProfileEpisodeListViewModelTest {
                     summaryRes = R.string.profile_empty_history_summary,
                 ),
             )
+        }
+    }
+
+    @Test
+    fun `search bar is shown for listening history`() = runTest {
+        initViewModel()
+
+        viewModel.setup(Mode.History)
+
+        viewModel.state.test {
+            assertEquals(true, (awaitItem() as State.Loaded).showSearchBar)
         }
     }
 
