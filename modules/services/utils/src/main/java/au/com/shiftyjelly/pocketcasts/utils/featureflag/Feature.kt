@@ -123,14 +123,6 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
-    CUSTOM_PLAYBACK_SETTINGS(
-        key = "custom_playback_settings",
-        title = "Custom playback settings",
-        defaultValue = BuildConfig.DEBUG,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
-    ),
     MANAGE_DOWNLOADED_EPISODES(
         key = "manage_downloaded_episodes",
         title = "Manage Downloaded Episodes",
