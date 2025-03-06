@@ -89,11 +89,14 @@ class PodcastsFragment :
         }
     }
 
-    @Inject lateinit var settings: Settings
+    @Inject
+    lateinit var settings: Settings
 
-    @Inject lateinit var castManager: CastManager
+    @Inject
+    lateinit var castManager: CastManager
 
-    @Inject lateinit var analyticsTracker: AnalyticsTracker
+    @Inject
+    lateinit var analyticsTracker: AnalyticsTracker
 
     private var podcastOptionsDialog: PodcastsOptionsDialog? = null
     private var folderOptionsDialog: FolderOptionsDialog? = null
@@ -234,15 +237,21 @@ class PodcastsFragment :
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.refreshSuggestedFolders()
+            }
+        }
 
-                when (viewModel.suggestedFoldersState.value) {
-                    is SuggestedFoldersState.Available -> {
-                        if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS) && viewModel.isEligibleForSuggestedFoldersPopup()) {
-                            showSuggestedFoldersCreation(SuggestedFoldersFragment.Source.PodcastsPopup)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.suggestedFoldersState.collect { state ->
+                    when (state) {
+                        is SuggestedFoldersState.Available -> {
+                            if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS) && viewModel.isEligibleForSuggestedFoldersPopup()) {
+                                showSuggestedFoldersCreation(SuggestedFoldersFragment.Source.PodcastsPopup)
+                            }
                         }
-                    }
 
-                    is SuggestedFoldersState.Empty -> Unit
+                        is SuggestedFoldersState.Empty -> Unit
+                    }
                 }
             }
         }
@@ -263,15 +272,18 @@ class PodcastsFragment :
                 openOptions()
                 true
             }
+
             R.id.search_podcasts -> {
                 search()
                 true
             }
+
             R.id.create_folder -> {
                 analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_FOLDER_BUTTON_TAPPED)
                 handleFolderCreation()
                 true
             }
+
             else -> false
         }
     }
@@ -320,6 +332,7 @@ class PodcastsFragment :
             is SuggestedFoldersState.Empty -> {
                 showCustomFolderCreation()
             }
+
             is SuggestedFoldersState.Available -> {
                 if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS)) {
                     showSuggestedFoldersCreation(SuggestedFoldersFragment.Source.CreateFolderButton)

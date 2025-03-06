@@ -76,7 +76,7 @@ class SuggestedFoldersViewModel @Inject constructor(
         }
         viewModelScope.launch(NonCancellable) {
             _state.update { value ->
-                value.copy(useFolderesState = UseFoldersState.Applying)
+                value.copy(useFoldersState = UseFoldersState.Applying)
             }
             val suggestedFolders = withContext(Dispatchers.Default) {
                 state.value.suggestedFolders.flatMap { folder ->
@@ -87,7 +87,7 @@ class SuggestedFoldersViewModel @Inject constructor(
             }
             suggestedFoldersManager.useSuggestedFolders(suggestedFolders)
             _state.update { value ->
-                value.copy(useFolderesState = UseFoldersState.Applied)
+                value.copy(useFoldersState = UseFoldersState.Applied)
             }
             podcastManager.refreshPodcasts("suggested-folders")
         }
@@ -101,7 +101,7 @@ class SuggestedFoldersViewModel @Inject constructor(
         val isUserPlusOrPatreon: Boolean,
         val existingFoldersCount: Int?,
         val suggestedFolders: List<SuggestedFolder>,
-        val useFolderesState: UseFoldersState,
+        val useFoldersState: UseFoldersState,
     ) {
         val action
             get() = if (isUserPlusOrPatreon) {
@@ -119,7 +119,7 @@ class SuggestedFoldersViewModel @Inject constructor(
                 isUserPlusOrPatreon = false,
                 existingFoldersCount = null,
                 suggestedFolders = emptyList(),
-                useFolderesState = UseFoldersState.Idle,
+                useFoldersState = UseFoldersState.Idle,
             )
         }
     }
