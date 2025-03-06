@@ -737,4 +737,13 @@ enum class AnalyticsEvent(val key: String) {
     WINBACK_AVAILABLE_PLANS_NEW_PLAN_PURCHASE_SUCCESSFUL("winback_available_plans_new_plan_purchase_successful"),
     WINBACK_CANCEL_CONFIRMATION_STAY_BUTTON_TAPPED("winback_cancel_confirmation_stay_button_tapped"),
     WINBACK_CANCEL_CONFIRMATION_CANCEL_BUTTON_TAPPED("winback_cancel_confirmation_cancel_button_tapped"),
+
+    /* Suggested Folders */
+    SUGGESTED_FOLDERS_PAGE_SHOWN("suggested_folders_page_shown"),
+    SUGGESTED_FOLDERS_PAGE_DISMISSED("suggested_folders_page_dismissed"),
+    SUGGESTED_FOLDERS_USE_SUGGESTED_FOLDERS_TAPPED("suggested_folders_use_suggested_folders_tapped"),
+    SUGGESTED_FOLDERS_CREATE_CUSTOM_FOLDER_TAPPED("suggested_folders_create_custom_folder_tapped"),
+    SUGGESTED_FOLDERS_REPLACE_FOLDERS_TAPPED("suggested_folders_replace_folders_tapped"),
+    SUGGESTED_FOLDERS_REPLACE_FOLDERS_CONFIRM_TAPPED("suggested_folders_replace_folders_confirm_tapped"),
+    SUGGESTED_FOLDERS_PREVIEW_FOLDER_TAPPED("suggested_folders_preview_folder_tapped"),
 }

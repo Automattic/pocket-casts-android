@@ -37,6 +37,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
+import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.SuggestedFoldersViewModel.UseFoldersState.Applied
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
@@ -44,6 +46,7 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSourc
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.withCreationCallback
 import kotlinx.parcelize.Parcelize
 import au.com.shiftyjelly.pocketcasts.images.R as VR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -66,12 +69,18 @@ class SuggestedFoldersFragment : BaseDialogFragment() {
         }
     }
 
-    private val viewModel by viewModels<SuggestedFoldersViewModel>()
-
     private val args
         get() = requireNotNull(BundleCompat.getParcelable(requireArguments(), ARGS_KEY, Args::class.java)) {
             "Missing input parameters"
         }
+
+    private val viewModel by viewModels<SuggestedFoldersViewModel>(
+        extrasProducer = {
+            defaultViewModelCreationExtras.withCreationCallback<SuggestedFoldersViewModel.Factory> { factory ->
+                factory.crate(args.source)
+            }
+        },
+    )
 
     private var isFinalizingActionUsed = false
 
@@ -80,6 +89,10 @@ class SuggestedFoldersFragment : BaseDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = content {
+        CallOnce {
+            viewModel.trackPageShown()
+        }
+
         val state by viewModel.state.collectAsState()
 
         Box(
@@ -109,9 +122,10 @@ class SuggestedFoldersFragment : BaseDialogFragment() {
                             SuggestedFoldersPage(
                                 folders = state.suggestedFolders,
                                 action = state.action,
-                                onActionClick = { state.action?.let { handleSuggestedAction(it, state.isUserPlusOrPatreon) } },
-                                onCreateCustomFolderClick = { handleCustomFolderCreation(state.isUserPlusOrPatreon) },
+                                onActionClick = { state.action?.let { handleSuggestedAction(it, state.signInState.isSignedInAsPlusOrPatron) } },
+                                onCreateCustomFolderClick = { handleCustomFolderCreation(state.signInState.isSignedInAsPlusOrPatron) },
                                 onFolderClick = { folder ->
+                                    viewModel.trackPreviewFolderTapped(folder)
                                     navController.navigate(SuggestedFoldersNavRoutes.folderDetailsDestination(folder.name))
                                 },
                                 onCloseClick = ::dismiss,
@@ -150,8 +164,12 @@ class SuggestedFoldersFragment : BaseDialogFragment() {
 
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
-        if (isDismissingPopupWithoutAction()) {
-            viewModel.markPopupAsDismissed()
+        if (isDismissingWithoutAction()) {
+            viewModel.trackPageDismissed()
+
+            if (args.source == Source.PodcastsPopup) {
+                viewModel.markPopupAsDismissed()
+            }
         }
     }
 
@@ -160,12 +178,10 @@ class SuggestedFoldersFragment : BaseDialogFragment() {
         dismiss()
     }
 
-    private fun isDismissingPopupWithoutAction() =
-        !requireActivity().isChangingConfigurations &&
-            !isFinalizingActionUsed &&
-            args.source == Source.PodcastsPopup
+    private fun isDismissingWithoutAction() = !requireActivity().isChangingConfigurations && !isFinalizingActionUsed
 
     private fun handleCustomFolderCreation(isUserPlusOrPatreon: Boolean) {
+        viewModel.trackCreateCustomFolderTapped()
         if (isUserPlusOrPatreon) {
             FolderCreateFragment
                 .newInstance(source = "suggested_folders")
@@ -179,10 +195,17 @@ class SuggestedFoldersFragment : BaseDialogFragment() {
     private fun handleSuggestedAction(action: SuggestedAction, isUserPlusOrPatreon: Boolean) {
         if (isUserPlusOrPatreon) {
             when (action) {
-                SuggestedAction.UseFolders -> viewModel.useSuggestedFolders()
-                SuggestedAction.ReplaceFolders -> showConfirmationDialog()
+                SuggestedAction.UseFolders -> {
+                    viewModel.trackUseSuggestedFoldersTapped()
+                    viewModel.useSuggestedFolders()
+                }
+                SuggestedAction.ReplaceFolders -> {
+                    viewModel.trackReplaceFolderTapped()
+                    showConfirmationDialog()
+                }
             }
         } else {
+            viewModel.trackUseSuggestedFoldersTapped()
             OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.Upsell(OnboardingUpgradeSource.SUGGESTED_FOLDERS))
         }
     }
@@ -192,15 +215,24 @@ class SuggestedFoldersFragment : BaseDialogFragment() {
             .setButtonType(ConfirmationDialog.ButtonType.Danger(getString(LR.string.suggested_folders_replace_folders_button)))
             .setTitle(getString(LR.string.suggested_folders_replace_folders_confirmation_tittle))
             .setSummary(getString(LR.string.suggested_folders_replace_folders_confirmation_description))
-            .setOnConfirm { viewModel.useSuggestedFolders() }
+            .setOnConfirm {
+                viewModel.trackReplaceFoldersConfirmationTapped()
+                viewModel.useSuggestedFolders()
+            }
             .setIconId(VR.drawable.ic_replace)
             .setIconTint(UR.attr.primary_interactive_01)
             .show(childFragmentManager, "suggested-folders-confirmation-dialog")
     }
 
-    enum class Source {
-        PodcastsPopup,
-        CreateFolderButton,
+    enum class Source(
+        val analyticsValue: String,
+    ) {
+        PodcastsPopup(
+            analyticsValue = "podcasts",
+        ),
+        CreateFolderButton(
+            analyticsValue = "create_folder",
+        ),
     }
 
     @Parcelize
