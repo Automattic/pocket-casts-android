@@ -208,7 +208,7 @@ enum class Feature(
         title = "Suggested Folders",
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
     PODCAST_VIEW_CHANGES(
