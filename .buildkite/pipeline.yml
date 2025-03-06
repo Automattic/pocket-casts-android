@@ -44,6 +44,13 @@ steps:
         artifact_paths:
           - "**/build/reports/diff/*"
 
+      - label: "Merged Manifest Diff"
+        command: ".buildkite/commands/diff-merged-manifest.sh release"
+        if: build.pull_request.id != null
+        plugins: [$CI_TOOLKIT]
+        artifact_paths:
+          - "**/build/reports/diff_manifest/**/**/*"
+
   - label: 'Spotless formatting check'
     command: |
       echo "--- 🔎 Checking formatting with Spotless"
