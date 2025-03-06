@@ -218,7 +218,7 @@ class PodcastsFragment :
                     }
 
                     is SuggestedFoldersState.Available -> {
-                        showSuggestedFoldersCreation(SuggestedFoldersFragment.Source.CreateFolderButton)
+                        showSuggestedFoldersCreation(SuggestedFoldersFragment.Source.ToolbarButton)
                     }
                 }
             } else {
@@ -259,7 +259,7 @@ class PodcastsFragment :
                     when (state) {
                         is SuggestedFoldersState.Available -> {
                             if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS) && viewModel.isEligibleForSuggestedFoldersPopup()) {
-                                showSuggestedFoldersCreation(SuggestedFoldersFragment.Source.PodcastsPopup)
+                                showSuggestedFoldersCreation(SuggestedFoldersFragment.Source.Popup)
                             }
                         }
 
@@ -348,7 +348,7 @@ class PodcastsFragment :
 
             is SuggestedFoldersState.Available -> {
                 if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS)) {
-                    showSuggestedFoldersCreation(SuggestedFoldersFragment.Source.CreateFolderButton)
+                    showSuggestedFoldersCreation(SuggestedFoldersFragment.Source.ToolbarButton)
                 } else {
                     showCustomFolderCreation()
                 }

@@ -166,7 +166,7 @@ class SuggestedFoldersFragment : BaseDialogFragment() {
         if (isDismissingWithoutAction()) {
             viewModel.trackPageDismissed()
 
-            if (args.source == Source.PodcastsPopup) {
+            if (args.source == Source.Popup) {
                 viewModel.markPopupAsDismissed()
             }
         }
@@ -226,11 +226,11 @@ class SuggestedFoldersFragment : BaseDialogFragment() {
     enum class Source(
         val analyticsValue: String,
     ) {
-        PodcastsPopup(
-            analyticsValue = "podcasts",
+        Popup(
+            analyticsValue = "popup",
         ),
-        CreateFolderButton(
-            analyticsValue = "create_folder",
+        ToolbarButton(
+            analyticsValue = "podcasts",
         ),
     }
 
