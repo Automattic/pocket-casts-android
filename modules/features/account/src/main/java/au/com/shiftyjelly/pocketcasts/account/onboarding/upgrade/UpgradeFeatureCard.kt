@@ -38,8 +38,7 @@ sealed class UpgradeFeatureCard(
             source: OnboardingUpgradeSource,
         ) = when {
             (
-                source in listOf(OnboardingUpgradeSource.SKIP_CHAPTERS, OnboardingUpgradeSource.WHATS_NEW_SKIP_CHAPTERS) &&
-                    SubscriptionTier.fromFeatureTier(Feature.DESELECT_CHAPTERS) == SubscriptionTier.PLUS
+                source in listOf(OnboardingUpgradeSource.SKIP_CHAPTERS, OnboardingUpgradeSource.WHATS_NEW_SKIP_CHAPTERS)
                 )
             -> LR.string.skip_chapters_plus_prompt
 
@@ -73,19 +72,7 @@ sealed class UpgradeFeatureCard(
         },
         subscriptionTier = SubscriptionTier.PATRON,
     ) {
-        override val titleRes: (OnboardingUpgradeSource) -> Int = { source -> getTitleForSource(source) }
-
-        private fun getTitleForSource(
-            source: OnboardingUpgradeSource,
-        ) = when {
-            (
-                source in listOf(OnboardingUpgradeSource.SKIP_CHAPTERS, OnboardingUpgradeSource.WHATS_NEW_SKIP_CHAPTERS) &&
-                    SubscriptionTier.fromFeatureTier(Feature.DESELECT_CHAPTERS) == SubscriptionTier.PATRON
-                )
-            -> LR.string.skip_chapters_patron_prompt
-
-            else -> LR.string.onboarding_patron_features_title
-        }
+        override val titleRes: (OnboardingUpgradeSource) -> Int = { _ -> LR.string.onboarding_patron_features_title }
     }
 }
 

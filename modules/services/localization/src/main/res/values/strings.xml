@@ -422,7 +422,6 @@
     <string name="number_of_chapters_summary_plural">%1$d chapters &#x2022; %2$d hidden</string>
     <string name="number_of_chapters_summary_singular">1 chapter &#x2022; %d hidden</string>
     <string name="skip_chapters_plus_prompt">Preselect chapters and more with Pocket Casts Plus</string>
-    <string name="skip_chapters_patron_prompt">Preselect chapters and more with Pocket Casts Patron</string>
     <!-- %1$d is the current selected chapter. %2$d is the total number of chapters. -->
     <string name="chapter_count_summary">%1$d of %2$d</string>
     <plurals name="chapter">
