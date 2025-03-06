@@ -37,10 +37,8 @@ sealed class UpgradeFeatureCard(
         private fun getTitleForSource(
             source: OnboardingUpgradeSource,
         ) = when {
-            (
-                source in listOf(OnboardingUpgradeSource.SKIP_CHAPTERS, OnboardingUpgradeSource.WHATS_NEW_SKIP_CHAPTERS)
-                )
-            -> LR.string.skip_chapters_plus_prompt
+            source == OnboardingUpgradeSource.SKIP_CHAPTERS
+                -> LR.string.skip_chapters_plus_prompt
 
             source == OnboardingUpgradeSource.UP_NEXT_SHUFFLE &&
                 SubscriptionTier.fromFeatureTier(Feature.UP_NEXT_SHUFFLE) == SubscriptionTier.PLUS
