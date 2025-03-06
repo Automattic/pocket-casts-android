@@ -111,6 +111,7 @@ dependencies {
     androidTestImplementation(libs.junit)
     androidTestImplementation(libs.mockito.core)
     androidTestImplementation(libs.mockito.kotlin)
+    implementation(libs.singular)
 }
 
 apply(plugin = "com.google.gms.google-services")
