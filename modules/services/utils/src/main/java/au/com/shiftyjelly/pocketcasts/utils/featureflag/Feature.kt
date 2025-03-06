@@ -115,14 +115,6 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
-    SEARCH_IN_LISTENING_HISTORY(
-        key = "search_in_listening_history",
-        title = "Search in listening history",
-        defaultValue = true,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
-    ),
     AUTO_DOWNLOAD(
         key = "auto_download",
         title = "Auto download episodes after subscribing to a podcast",

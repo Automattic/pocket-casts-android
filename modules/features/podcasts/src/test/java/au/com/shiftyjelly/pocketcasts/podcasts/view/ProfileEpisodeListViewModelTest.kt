@@ -8,16 +8,12 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListFragment.M
 import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListViewModel.State
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.rx2.asFlowable
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -33,9 +29,6 @@ class ProfileEpisodeListViewModelTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule()
 
-    @get:Rule
-    val featureFlagRule = InMemoryFeatureFlagRule()
-
     private val episodeManager: EpisodeManager = mock()
     private val playbackManager: PlaybackManager = mock()
     private val analyticsTracker: AnalyticsTracker = mock()
@@ -45,11 +38,6 @@ class ProfileEpisodeListViewModelTest {
     private val listeningHistoryEpisodesMock = listOf(mock<PodcastEpisode>())
 
     private lateinit var viewModel: ProfileEpisodeListViewModel
-
-    @Before
-    fun setUp() {
-        FeatureFlag.setEnabled(Feature.SEARCH_IN_LISTENING_HISTORY, true)
-    }
 
     @Test
     fun `setup with Downloaded mode updates state with downloaded episodes`() = runTest {
@@ -102,20 +90,7 @@ class ProfileEpisodeListViewModelTest {
     }
 
     @Test
-    fun `search bar not shown for listening history when feature flag is false`() = runTest {
-        FeatureFlag.setEnabled(Feature.SEARCH_IN_LISTENING_HISTORY, false)
-        initViewModel()
-
-        viewModel.setup(Mode.History)
-
-        viewModel.state.test {
-            assertEquals(false, (awaitItem() as State.Loaded).showSearchBar)
-        }
-    }
-
-    @Test
-    fun `search bar is shown for listening history when feature flag is true`() = runTest {
-        FeatureFlag.setEnabled(Feature.SEARCH_IN_LISTENING_HISTORY, true)
+    fun `search bar is shown for listening history`() = runTest {
         initViewModel()
 
         viewModel.setup(Mode.History)
