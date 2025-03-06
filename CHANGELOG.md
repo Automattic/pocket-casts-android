@@ -1,7 +1,7 @@
 7.85
 -----
 *   New Features
-    *   Add amart folders support.
+    *   Add smart folders support.
         ([#3720](https://github.com/Automattic/pocket-casts-android/pull/3720))
 *   Bug Fixes
     *   Fixed an issue where the mini player could sometimes hide behind the navigation bar.
