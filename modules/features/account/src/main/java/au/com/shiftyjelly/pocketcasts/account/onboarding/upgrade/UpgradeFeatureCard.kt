@@ -38,7 +38,7 @@ sealed class UpgradeFeatureCard(
             source: OnboardingUpgradeSource,
         ) = when {
             source == OnboardingUpgradeSource.SKIP_CHAPTERS
-                -> LR.string.skip_chapters_plus_prompt
+            -> LR.string.skip_chapters_plus_prompt
 
             source == OnboardingUpgradeSource.UP_NEXT_SHUFFLE &&
                 SubscriptionTier.fromFeatureTier(Feature.UP_NEXT_SHUFFLE) == SubscriptionTier.PLUS

@@ -18,7 +18,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import java.util.Date
 import kotlin.time.Duration.Companion.milliseconds
@@ -47,9 +46,6 @@ class ChaptersViewModelTest {
 
     @get:Rule
     val coroutineRule = MainCoroutineRule(testDispatcher)
-
-    @get:Rule
-    val featureFlagRule = InMemoryFeatureFlagRule()
 
     private val chapterManager = mock<ChapterManager>()
     private val playbackManager = mock<PlaybackManager>()
