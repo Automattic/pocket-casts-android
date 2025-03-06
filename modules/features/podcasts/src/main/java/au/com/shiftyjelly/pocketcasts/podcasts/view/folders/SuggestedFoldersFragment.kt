@@ -230,7 +230,7 @@ class SuggestedFoldersFragment : BaseDialogFragment() {
             analyticsValue = "popup",
         ),
         ToolbarButton(
-            analyticsValue = "podcasts",
+            analyticsValue = "podcasts_list",
         ),
     }
 
