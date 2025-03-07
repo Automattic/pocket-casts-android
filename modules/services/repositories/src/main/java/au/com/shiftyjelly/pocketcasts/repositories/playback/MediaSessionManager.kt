@@ -607,9 +607,6 @@ class MediaSessionManager(
                 }
                 HeadphoneAction.SKIP_BACK -> {
                     onSkipToPrevious()
-                    if (!playbackManager.isPlaying()) {
-                        enqueueCommand("play") { playbackManager.playQueueSuspend(source) }
-                    }
                 }
                 HeadphoneAction.NEXT_CHAPTER,
                 HeadphoneAction.PREVIOUS_CHAPTER,
