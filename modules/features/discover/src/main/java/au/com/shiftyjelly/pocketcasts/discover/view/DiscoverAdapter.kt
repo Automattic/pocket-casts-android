@@ -447,7 +447,7 @@ internal class DiscoverAdapter(
     class CollectionListDeprecatedViewHolder(val binding: RowCollectionListDeprecatedBinding) : NetworkLoadableViewHolder(binding.root)
 
     inner class CollectionListViewHolder(val binding: RowCollectionListBinding) : NetworkLoadableViewHolder(binding.root), ShowAllRow {
-        val adapter = SmallListRowAdapter(listener::onPodcastClicked, listener::onPodcastSubscribe, analyticsTracker)
+        val adapter = CollectionListRowAdapter(listener::onPodcastClicked, listener::onPodcastSubscribe, analyticsTracker)
 
         override val showAllButton: TextView
             get() = binding.btnShowAll
@@ -827,7 +827,7 @@ internal class DiscoverAdapter(
                         loadPodcastList(row.source),
                         onNext = {
                             val podcasts = it.podcasts.subList(0, MAX_ROWS_SMALL_LIST.coerceAtMost(it.podcasts.count()))
-                            holder.binding.pageIndicatorView.count = ceil(podcasts.count().toDouble() / SmallListRowAdapter.SmallListViewHolder.NUMBER_OF_ROWS_PER_PAGE.toDouble()).toInt()
+                            holder.binding.pageIndicatorView.count = ceil(podcasts.count().toDouble() / CollectionListRowAdapter.CollectionListViewHolder.NUMBER_OF_ROWS_PER_PAGE.toDouble()).toInt()
                             row.listUuid?.let { listUuid -> holder.adapter.setFromListId(listUuid) }
                             holder.adapter.submitPodcastList(podcasts) { onRestoreInstanceState(holder) }
                         },
