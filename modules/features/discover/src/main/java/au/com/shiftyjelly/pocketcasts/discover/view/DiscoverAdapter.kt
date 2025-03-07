@@ -467,7 +467,7 @@ internal class DiscoverAdapter(
                 val row = getItem(bindingAdapterPosition) as? DiscoverRow
                 row?.let {
                     analyticsTracker.track(
-                        AnalyticsEvent.DISCOVER_SMALL_LIST_PAGE_CHANGED,
+                        AnalyticsEvent.DISCOVER_COLLECTION_LIST_PAGE_CHANGED,
                         mapOf(CURRENT_PAGE to position, TOTAL_PAGES to adapter.itemCount, LIST_ID_KEY to it.inferredId()),
                     )
                 }
