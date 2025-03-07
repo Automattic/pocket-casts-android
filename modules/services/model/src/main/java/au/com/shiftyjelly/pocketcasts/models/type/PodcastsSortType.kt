@@ -22,13 +22,13 @@ enum class PodcastsSortType(
     val folderComparator: Comparator<FolderItem>,
     val analyticsValue: String,
 ) {
-    NAME_A_TO_Z(
-        clientId = 2,
-        serverId = 1,
-        labelId = R.string.name,
-        podcastComparator = compareBy { cleanStringForSortInternal(it.title) },
-        folderComparator = compareBy { cleanStringForSortInternal(it.title) },
-        analyticsValue = "name",
+    DATE_ADDED_NEWEST_TO_OLDEST(
+        clientId = 0,
+        serverId = 0,
+        labelId = R.string.podcasts_sort_by_date_added,
+        podcastComparator = compareByDescending { it.addedDate },
+        folderComparator = compareByDescending { it.addedDate },
+        analyticsValue = "date_added",
     ),
     EPISODE_DATE_NEWEST_TO_OLDEST(
         clientId = 5,
@@ -39,13 +39,13 @@ enum class PodcastsSortType(
         folderComparator = Comparator { _, _ -> 0 },
         analyticsValue = "episode_release_date",
     ),
-    DATE_ADDED_NEWEST_TO_OLDEST(
-        clientId = 0,
-        serverId = 0,
-        labelId = R.string.podcasts_sort_by_date_added,
-        podcastComparator = compareByDescending { it.addedDate },
-        folderComparator = compareByDescending { it.addedDate },
-        analyticsValue = "date_added",
+    NAME_A_TO_Z(
+        clientId = 2,
+        serverId = 1,
+        labelId = R.string.name,
+        podcastComparator = compareBy { cleanStringForSortInternal(it.title) },
+        folderComparator = compareBy { cleanStringForSortInternal(it.title) },
+        analyticsValue = "name",
     ),
     DRAG_DROP(
         clientId = 6,
