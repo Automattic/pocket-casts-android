@@ -13,57 +13,28 @@ steps:
   # Wait for Gradle Wrapper to be validated before running any other jobs
   - wait
 
-  - group: "Linters"
+  - group: "📲 Prototype Builds"
     steps:
-      - label: "☢️ Danger - PR Check"
-        command: danger
-        key: danger
-        if: "build.pull_request.id != null"
-        retry:
-          manual:
-            permit_on_passed: true
-        agents:
-          queue: "linter"
+      - label: ":android: No CC Build"
+        command: |
+          echo "--- :rubygems: Setting up Gems"
+          install_gems
 
-      - label: 'Lint'
-        command: ".buildkite/commands/lint.sh"
+          echo "--- :closed_lock_with_key: Installing Secrets"
+          bundle exec fastlane run configure_apply
+
+          echo "--- :android: Building without configuration cache"
+          ./gradlew assembleDebug --no-configuration-cache --no-build-cache
         plugins: [$CI_TOOLKIT]
-        artifact_paths:
-          - "**/build/reports/lint-results*.*"
 
-  - label: 'Unit tests'
-    command: ".buildkite/commands/run-unit-tests.sh"
-    plugins: [$CI_TOOLKIT]
+      - label: ":android: CC Build"
+        command: |
+          echo "--- :rubygems: Setting up Gems"
+          install_gems
 
-  - label: 'Dependency diff'
-    if: build.pull_request.id != null
-    command: comment_with_dependency_diff 'app' 'releaseRuntimeClasspath'
-    plugins: [$CI_TOOLKIT]
-    artifact_paths:
-      - "**/build/reports/diff/*"
+          echo "--- :closed_lock_with_key: Installing Secrets"
+          bundle exec fastlane run configure_apply
 
-  - label: 'Spotless formatting check'
-    command: |
-      echo "--- 🔎 Checking formatting with Spotless"
-      ./gradlew spotlessCheck
-    plugins: [$CI_TOOLKIT]
-
-  - label: "Instrumented tests"
-    command: ".buildkite/commands/run-instrumented-tests.sh"
-    plugins: [$CI_TOOLKIT]
-    artifact_paths:
-      - "**/build/instrumented-tests/**/*"
-
-  - label: "Assemble release APK"
-    command: ".buildkite/commands/assemble-release-apk.sh"
-    plugins: [ $CI_TOOLKIT ]
-    artifact_paths:
-      - "**/build/outputs/apk/**/*"
-
-  - label: "Prototype Builds"
-    if: "build.pull_request.id != null"
-    command: |
-      ".buildkite/commands/prototype-build.sh"
-    plugins: [ $CI_TOOLKIT ]
-    artifact_paths:
-      - "**/build/outputs/apk/**/*"
+          echo "--- :android: Building without configuration cache"
+          ./gradlew assembleDebug --no-build-cache
+        plugins: [$CI_TOOLKIT]
