@@ -822,13 +822,16 @@ internal class DiscoverAdapter(
                     )
                 }
                 is CollectionListViewHolder -> {
-                    holder.binding.lblTitle.text = row.title.tryToLocalise(resources)
                     holder.loadFlowable(
                         loadPodcastList(row.source),
                         onNext = {
                             val podcasts = it.podcasts.subList(0, MAX_ROWS_SMALL_LIST.coerceAtMost(it.podcasts.count()))
                             holder.binding.pageIndicatorView.count = ceil(podcasts.count().toDouble() / CollectionListRowAdapter.CollectionListViewHolder.NUMBER_OF_ROWS_PER_PAGE.toDouble()).toInt()
+
                             row.listUuid?.let { listUuid -> holder.adapter.setFromListId(listUuid) }
+
+                            holder.binding.lblTitle.text = it.subtitle?.tryToLocalise(resources)
+
                             holder.adapter.submitPodcastList(podcasts) { onRestoreInstanceState(holder) }
                         },
                     )

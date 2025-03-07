@@ -17,9 +17,8 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
-            style="?attr/textH3"
+            android:textAppearance="@style/H20"
             android:textColor="?attr/primary_text_01"
-            android:letterSpacing="0.005"
             tools:text="Popular"/>
 
         <TextView

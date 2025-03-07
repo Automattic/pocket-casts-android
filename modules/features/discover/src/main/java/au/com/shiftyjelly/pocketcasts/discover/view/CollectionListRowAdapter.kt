@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.discover.view
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
@@ -15,13 +16,33 @@ internal class CollectionListRowAdapter(
     val onPodcastSubscribe: (DiscoverPodcast, String?) -> Unit,
     val analyticsTracker: AnalyticsTracker,
 ) : ListAdapter<List<Any>, CollectionListRowAdapter.CollectionListViewHolder>(SmallListDiffer) {
-    class CollectionListViewHolder(val binding: ItemCollectionListBinding) : RecyclerView.ViewHolder(binding.root) {
+
+    class CollectionListViewHolder(val binding: ItemCollectionListBinding, onItemClicked: (Int, Int) -> Unit) : RecyclerView.ViewHolder(binding.root) {
 
         companion object {
             const val NUMBER_OF_ROWS_PER_PAGE = 2
         }
 
+        init {
+            binding.row0.setOnClickListener {
+                onItemClicked(bindingAdapterPosition, 0)
+            }
+            binding.row1.setOnClickListener {
+                onItemClicked(bindingAdapterPosition, 1)
+            }
+        }
+
         val rows = listOf(binding.row0, binding.row1)
+
+        fun bind(podcastSublist: List<Any>) {
+            rows.forEachIndexed { index, row ->
+                row.clear()
+                row.isVisible = index < podcastSublist.size
+
+                val podcast = podcastSublist.getOrNull(index) as? DiscoverPodcast
+                row.podcast = podcast
+            }
+        }
     }
 
     private var fromListId: String? = null
@@ -38,49 +59,31 @@ internal class CollectionListRowAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CollectionListViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ItemCollectionListBinding.inflate(inflater, parent, false)
-        return CollectionListViewHolder(binding)
+
+        return CollectionListViewHolder(binding) { pageIndex, podcastIndex ->
+            val podcastSublist = getItem(pageIndex)
+            val podcast = podcastSublist.getOrNull(podcastIndex) as? DiscoverPodcast
+
+            if (podcast == null) return@CollectionListViewHolder
+
+            fromListId?.let {
+                analyticsTracker.track(
+                    AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED,
+                    mapOf(
+                        DiscoverFragment.Companion.LIST_ID_KEY to it,
+                        DiscoverFragment.Companion.PODCAST_UUID_KEY to podcast.uuid,
+                    ),
+                )
+            }
+            onPodcastClicked(podcast, fromListId)
+        }
     }
 
     override fun onBindViewHolder(holder: CollectionListViewHolder, position: Int) {
         val podcastSublist = getItem(position)
-        holder.rows.forEach {
-            it.clear()
-        }
-
-        podcastSublist.forEachIndexed { index, podcast ->
-            val podcastRow = holder.rows[index]
-            if (podcast is DiscoverPodcast) {
-                podcastRow.podcast = podcast
-                podcastRow.isClickable = true
-                podcastRow.setOnClickListener {
-                    fromListId?.let {
-                        analyticsTracker.track(
-                            AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED,
-                            mapOf(
-                                DiscoverFragment.Companion.LIST_ID_KEY to it,
-                                DiscoverFragment.Companion.PODCAST_UUID_KEY to podcast.uuid,
-                            ),
-                        )
-                    }
-                    onPodcastClicked(podcast, fromListId)
-                }
-                podcastRow.onSubscribeClicked = {
-                    fromListId?.let {
-                        analyticsTracker.track(
-                            AnalyticsEvent.DISCOVER_LIST_PODCAST_SUBSCRIBED,
-                            mapOf(
-                                DiscoverFragment.Companion.LIST_ID_KEY to it, DiscoverFragment.Companion.PODCAST_UUID_KEY to podcast.uuid,
-                            ),
-                        )
-                    }
-                    onPodcastSubscribe(podcast, fromListId)
-                }
-            } else {
-                podcastRow.podcast = null
-                podcastRow.isClickable = false
-            }
-        }
+        holder.bind(podcastSublist)
     }
+
     fun setFromListId(value: String) {
         this.fromListId = value
     }
