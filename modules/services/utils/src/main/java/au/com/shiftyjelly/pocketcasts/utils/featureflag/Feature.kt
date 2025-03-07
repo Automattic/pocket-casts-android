@@ -195,6 +195,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
+    PODCASTS_SORT_CHANGES(
+        key = "podcasts_sort_changes",
+        title = "Podcasts Sort Changes",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = true,
+    ),
     ;
 
     companion object {
