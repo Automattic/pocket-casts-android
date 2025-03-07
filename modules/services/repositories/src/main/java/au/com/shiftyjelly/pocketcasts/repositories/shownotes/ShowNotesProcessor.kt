@@ -12,8 +12,6 @@ import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheService
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ShowNotesChapter
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ShowNotesResponse
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ShowNotesTranscript
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
@@ -35,9 +33,7 @@ class ShowNotesProcessor @Inject constructor(
         updateImageUrls(showNotes)
         updateChapters(episodeUuid, showNotes)
         updateChapterFromLink(episodeUuid, showNotes)
-        if (FeatureFlag.isEnabled(Feature.TRANSCRIPTS)) {
-            updateTranscripts(episodeUuid, showNotes, loadTranscriptSource)
-        }
+        updateTranscripts(episodeUuid, showNotes, loadTranscriptSource)
     }
 
     private fun updateImageUrls(showNotes: ShowNotesResponse) = scope.launch {

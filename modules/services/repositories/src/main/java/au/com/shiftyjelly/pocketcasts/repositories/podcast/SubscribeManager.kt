@@ -187,12 +187,10 @@ class SubscribeManager @Inject constructor(
                 podcast.isSubscribed = subscribed
                 podcast.grouping = settings.podcastGroupingDefault.value
                 podcast.showArchived = settings.showArchivedDefault.value
-                if (FeatureFlag.isEnabled(Feature.CUSTOM_PLAYBACK_SETTINGS)) {
-                    podcastDao.findByUuidBlocking(podcastUuid)?.let { localPodcast ->
-                        podcast.copyPlaybackEffects(
-                            sourcePodcast = localPodcast,
-                        )
-                    }
+                podcastDao.findByUuidBlocking(podcastUuid)?.let { localPodcast ->
+                    podcast.copyPlaybackEffects(
+                        sourcePodcast = localPodcast,
+                    )
                 }
                 if (canDownloadEpisodesAfterFollowPodcast(subscribed, shouldAutoDownload)) {
                     LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Update auto download status for $podcastUuid")

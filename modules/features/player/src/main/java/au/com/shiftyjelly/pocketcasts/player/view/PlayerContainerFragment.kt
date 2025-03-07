@@ -38,8 +38,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.NavigationBarColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import au.com.shiftyjelly.pocketcasts.views.tour.TourStep
@@ -246,10 +244,8 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
     }
 
     fun updateTabsVisibility(show: Boolean) {
-        if (FeatureFlag.isEnabled(Feature.TRANSCRIPTS)) {
-            binding?.tabHolder?.isVisible = show
-            binding?.viewPager?.isUserInputEnabled = show
-        }
+        binding?.tabHolder?.isVisible = show
+        binding?.viewPager?.isUserInputEnabled = show
     }
 
     fun onPlayerOpen() {

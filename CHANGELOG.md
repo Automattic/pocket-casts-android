@@ -1,6 +1,11 @@
 7.85
 -----
-
+*   Bug Fixes
+    *   Fixed an issue where the mini player could sometimes hide behind the navigation bar.
+        ([#3687](https://github.com/Automattic/pocket-casts-android/pull/3687))
+*   Updates
+    *   Close episode details screen when archiving an episode. This reverts [#3473](https://github.com/Automattic/pocket-casts-android/pull/3473). 
+        ([#3718](https://github.com/Automattic/pocket-casts-android/pull/3718))
 
 7.84
 -----

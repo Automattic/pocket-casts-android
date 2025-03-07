@@ -333,8 +333,6 @@ interface Settings {
 
     val hideNotificationOnPause: UserSetting<Boolean>
 
-    val suggestedFolderPaywallDismissTime: UserSetting<Long>
-
     val streamingMode: UserSetting<Boolean>
     val keepScreenAwake: UserSetting<Boolean>
     val openPlayerAutomatically: UserSetting<Boolean>
@@ -569,5 +567,7 @@ interface Settings {
 
     val showPodcastHeaderChangesTooltip: UserSetting<Boolean>
 
-    val followedPodcastsForSuggestedFoldersHash: UserSetting<String>
+    val suggestedFoldersDismissTimestamp: UserSetting<Instant?>
+    val suggestedFoldersDismissCount: UserSetting<Int>
+    val suggestedFoldersFollowedHash: UserSetting<String>
 }
