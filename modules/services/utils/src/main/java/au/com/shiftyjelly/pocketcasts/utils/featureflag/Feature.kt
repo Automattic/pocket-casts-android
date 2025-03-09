@@ -203,6 +203,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
     ),
+    GUEST_LISTS_NETWORK_HIGHLIGHTS_REDESIGN(
+        key = "guest_lists_network_highlights_redesign",
+        title = "Guest Lists and Network Highlights Redesign",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = true,
+    ),
     ;
 
     companion object {

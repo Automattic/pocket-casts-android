@@ -12,7 +12,7 @@ import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.L
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.PODCAST_UUID_KEY
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 
-private val SmallListDiffer = object : DiffUtil.ItemCallback<List<Any>>() {
+val SmallListDiffer = object : DiffUtil.ItemCallback<List<Any>>() {
     override fun areItemsTheSame(oldItem: List<Any>, newItem: List<Any>): Boolean {
         return oldItem.filterIsInstance(DiscoverPodcast::class.java)
             .map { it.uuid }
