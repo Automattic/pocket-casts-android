@@ -38,7 +38,16 @@ interface RowSwipeable {
     val swipeButtonLayout: SwipeButtonLayout
 }
 
-class EpisodeItemTouchHelper constructor() : MultiSwipeHelper(object : SwipeToArchiveCallback() {
+enum class EpisodeItemSwipeState {
+    IDLE,
+    SWIPING,
+}
+
+class EpisodeItemTouchHelper(
+    private val onSwipeStateChanged: ((swipeState: EpisodeItemSwipeState) -> Unit)? = null,
+) : MultiSwipeHelper(object : SwipeToArchiveCallback(
+    onSwipeStateChanged = onSwipeStateChanged,
+) {
     override fun onSwiped(
         recyclerView: RecyclerView,
         viewHolder: RecyclerView.ViewHolder,
@@ -162,8 +171,18 @@ class EpisodeItemTouchHelper constructor() : MultiSwipeHelper(object : SwipeToAr
     }
 }
 
-private abstract class SwipeToArchiveCallback : MultiSwipeHelper.SimpleCallback(0, ItemTouchHelper.LEFT.or(ItemTouchHelper.RIGHT)) {
+private abstract class SwipeToArchiveCallback(
+    val onSwipeStateChanged: ((swipeState: EpisodeItemSwipeState) -> Unit)? = null,
+) : MultiSwipeHelper.SimpleCallback(0, ItemTouchHelper.LEFT.or(ItemTouchHelper.RIGHT)) {
     var swipeDirection: Int? = 0
+
+    private var swipeState: EpisodeItemSwipeState = EpisodeItemSwipeState.IDLE
+        set(value) {
+            if (field != value) {
+                field = value
+                onSwipeStateChanged?.invoke(value)
+            }
+        }
 
     companion object {
         private const val maxButtonWidth = 140
@@ -179,6 +198,10 @@ private abstract class SwipeToArchiveCallback : MultiSwipeHelper.SimpleCallback(
 
     override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
         super.onSelectedChanged(viewHolder, actionState)
+        swipeState = when (actionState) {
+            ItemTouchHelper.ACTION_STATE_SWIPE -> EpisodeItemSwipeState.SWIPING
+            else -> EpisodeItemSwipeState.IDLE
+        }
 
         val episodeViewHolder = viewHolder as? RowSwipeable
             ?: return
