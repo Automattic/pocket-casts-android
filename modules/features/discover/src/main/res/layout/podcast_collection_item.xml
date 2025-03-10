@@ -36,7 +36,8 @@
             android:id="@+id/lblTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:maxLines="1"
+            android:maxLines="2"
+            android:ellipsize="end"
             android:textAppearance="@style/H40"
             tools:text="Title" />
 
@@ -45,6 +46,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAppearance="@style/H50"
+            android:maxLines="1"
+            android:ellipsize="end"
             android:textColor="?attr/primary_text_02"
             tools:text="Author" />
     </LinearLayout>
