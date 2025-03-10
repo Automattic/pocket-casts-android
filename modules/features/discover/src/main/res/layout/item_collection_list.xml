@@ -5,10 +5,10 @@
 
     <au.com.shiftyjelly.pocketcasts.discover.view.PodcastCollectionItem
         android:id="@+id/row0"
-        android:layout_width="wrap_content"
+        android:layout_width="371dp"
         android:layout_height="wrap_content" />
     <au.com.shiftyjelly.pocketcasts.discover.view.PodcastCollectionItem
         android:id="@+id/row1"
-        android:layout_width="wrap_content"
+        android:layout_width="371dp"
         android:layout_height="wrap_content" />
 </LinearLayout>
