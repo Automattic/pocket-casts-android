@@ -9,6 +9,8 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.discover.databinding.ItemCollectionListBinding
 import au.com.shiftyjelly.pocketcasts.discover.view.CollectionListRowAdapter.CollectionListViewHolder.Companion.NUMBER_OF_ROWS_PER_PAGE
+import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.LIST_ID_KEY
+import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.PODCAST_UUID_KEY
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 
 internal class CollectionListRowAdapter(
@@ -70,8 +72,8 @@ internal class CollectionListRowAdapter(
                 analyticsTracker.track(
                     AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED,
                     mapOf(
-                        DiscoverFragment.Companion.LIST_ID_KEY to it,
-                        DiscoverFragment.Companion.PODCAST_UUID_KEY to podcast.uuid,
+                        LIST_ID_KEY to it,
+                        PODCAST_UUID_KEY to podcast.uuid,
                     ),
                 )
             }

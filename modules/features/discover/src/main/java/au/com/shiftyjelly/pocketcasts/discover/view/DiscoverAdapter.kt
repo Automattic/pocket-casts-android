@@ -66,7 +66,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatPattern
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature.GUEST_LISTS_NETWORK_HIGHLIGHTS_REDESIGN
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
 import au.com.shiftyjelly.pocketcasts.views.extensions.showIf
@@ -530,20 +530,14 @@ internal class DiscoverAdapter(
                         is DisplayStyle.SmallList -> R.layout.row_podcast_small_list
                         is DisplayStyle.SinglePodcast -> R.layout.row_single_podcast
                         is DisplayStyle.CollectionList ->
-                            when {
-                                FeatureFlag.isEnabled(Feature.GUEST_LISTS_NETWORK_HIGHLIGHTS_REDESIGN) -> R.layout.row_collection_list
-                                else -> R.layout.row_collection_list_deprecated
-                            }
+                            if (FeatureFlag.isEnabled(GUEST_LISTS_NETWORK_HIGHLIGHTS_REDESIGN)) R.layout.row_collection_list else R.layout.row_collection_list_deprecated
                         else -> R.layout.row_error
                     }
                 } else if (row.type is ListType.EpisodeList) {
                     return when (row.displayStyle) {
                         is DisplayStyle.SingleEpisode -> R.layout.row_single_episode
                         is DisplayStyle.CollectionList ->
-                            when {
-                                FeatureFlag.isEnabled(Feature.GUEST_LISTS_NETWORK_HIGHLIGHTS_REDESIGN) -> R.layout.row_collection_list
-                                else -> R.layout.row_collection_list_deprecated
-                            }
+                            if (FeatureFlag.isEnabled(GUEST_LISTS_NETWORK_HIGHLIGHTS_REDESIGN)) R.layout.row_collection_list else R.layout.row_collection_list_deprecated
                         else -> R.layout.row_error
                     }
                 } else if (row.type is ListType.Categories && row.displayStyle is DisplayStyle.Pills) {
