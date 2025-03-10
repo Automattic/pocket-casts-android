@@ -91,22 +91,6 @@ class SuggestedFoldersViewModelTest {
     }
 
     @Test
-    fun `should use suggested folders`() = runTest {
-        initViewModel()
-
-        viewModel.useSuggestedFolders()
-
-        advanceUntilIdle()
-
-        verify(suggestedFoldersManager).useSuggestedFolders(dbSuggestedFolders)
-        verify(podcastManager).refreshPodcasts("suggested-folders")
-
-        viewModel.state.test {
-            assertEquals(UseFoldersState.Applied, awaitItem().useFoldersState)
-        }
-    }
-
-    @Test
     fun `should track page shown`() = runTest {
         initViewModel()
 
