@@ -7,4 +7,5 @@
     <dimen name="episode_card_action_middle_padding">20dp</dimen>
     <dimen name="episode_card_image_size">96dp</dimen>
     <dimen name="podcast_header_height">113dp</dimen>
+    <dimen name="podcast_view_swipe_refresh_distance">120dp</dimen>
 </resources>

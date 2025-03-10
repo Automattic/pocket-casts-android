@@ -718,6 +718,7 @@ class PodcastFragment : BaseFragment() {
         ).also { binding = it }
 
         binding.swipeRefreshLayout.isEnabled = FeatureFlag.isEnabled(Feature.PODCAST_FEED_UPDATE)
+        binding.swipeRefreshLayout.setDistanceToTriggerSync(resources.getDimensionPixelSize(R.dimen.podcast_view_swipe_refresh_distance).toInt())
         binding.setToolbarStaticColor(requireContext().getThemeColor(UR.attr.support_09))
         binding.setUpToolbar(
             theme = theme,
