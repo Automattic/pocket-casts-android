@@ -21,6 +21,8 @@
         ([#3666](https://github.com/Automattic/pocket-casts-android/pull/3666))
     *   Fix screen flickering when tapping on item in the navigation bar.
         ([#3674](https://github.com/Automattic/pocket-casts-android/pull/3674))
+    *   Fix crash with podcast update when offline.
+        ([#3718](https://github.com/Automattic/pocket-casts-android/pull/3718))
 
 7.83
 -----
