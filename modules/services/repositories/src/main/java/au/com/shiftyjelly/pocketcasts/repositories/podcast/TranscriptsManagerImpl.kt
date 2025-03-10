@@ -21,6 +21,7 @@ import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.CacheControl
@@ -65,18 +66,19 @@ class TranscriptsManagerImpl @Inject constructor(
         }
     }
 
-    override fun observerTranscriptForEpisode(episodeUuid: String) =
-        transcriptDao.observerTranscriptForEpisode(episodeUuid)
+    override fun observeTranscriptForEpisode(episodeUuid: String) = transcriptDao
+        .observeTranscriptForEpisode(episodeUuid)
+        .map { transcript ->
+            if (FeatureFlag.isEnabled(Feature.GENERATED_TRANSCRIPTS)) {
+                transcript
+            } else {
+                transcript?.takeIf { !it.isGenerated }
+            }
+        }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     fun findBestTranscript(transcripts: List<Transcript>): Transcript? {
-        val availableTranscripts = buildList {
-            val (generated, regular) = transcripts.partition { it.isGenerated }
-            addAll(regular)
-            if (FeatureFlag.isEnabled(Feature.GENERATED_TRANSCRIPTS)) {
-                addAll(generated)
-            }
-        }
+        val availableTranscripts = transcripts.sortedBy { it.isGenerated }
         for (format in supportedFormats) {
             val transcript = availableTranscripts.firstOrNull { it.type in format.possibleMimeTypes() }
             if (transcript != null) {

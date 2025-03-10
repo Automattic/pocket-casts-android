@@ -59,7 +59,7 @@ class TranscriptViewModel @Inject constructor(
     }
 
     private fun transcriptFlow(podcastAndEpisode: PodcastAndEpisode) =
-        transcriptsManager.observerTranscriptForEpisode(podcastAndEpisode.episodeUuid)
+        transcriptsManager.observeTranscriptForEpisode(podcastAndEpisode.episodeUuid)
             .distinctUntilChanged { t1, t2 -> t1?.episodeUuid == t2?.episodeUuid && t1?.type == t2?.type }
             .map { transcript ->
                 transcript?.let {
