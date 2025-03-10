@@ -40,7 +40,7 @@ class TranscriptViewModelTest {
     private val transcriptsManager: TranscriptsManager = mock()
     private val playbackManager: PlaybackManager = mock()
     private val podcastId = "podcast_id"
-    private val transcript: Transcript = Transcript("episode_id", "url", "type")
+    private val transcript: Transcript = Transcript("episode_id", "url", "type", isGenerated = false)
     private val playbackStateFlow = MutableStateFlow(PlaybackState(podcast = Podcast("podcast_id"), episodeUuid = "episode_id"))
     private lateinit var viewModel: TranscriptViewModel
 

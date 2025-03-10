@@ -129,6 +129,7 @@ private fun ErrorPreview() {
                     episodeUuid = "uuid",
                     type = TranscriptFormat.HTML.mimeType,
                     url = "url",
+                    isGenerated = false,
                 ),
             ),
             onRetry = {},

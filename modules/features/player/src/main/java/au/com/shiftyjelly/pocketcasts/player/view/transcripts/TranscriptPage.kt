@@ -450,6 +450,7 @@ private fun TranscriptContentPreview(
                     episodeUuid = "uuid",
                     type = TranscriptFormat.HTML.mimeType,
                     url = "url",
+                    isGenerated = false,
                 ),
                 cuesInfo = ImmutableList.of(
                     TranscriptCuesInfo(
@@ -494,6 +495,7 @@ private fun TranscriptEmptyContentPreview() {
                     episodeUuid = "uuid",
                     type = TranscriptFormat.HTML.mimeType,
                     url = "url",
+                    isGenerated = false,
                 ),
                 cuesInfo = emptyList(),
                 displayInfo = DisplayInfo(

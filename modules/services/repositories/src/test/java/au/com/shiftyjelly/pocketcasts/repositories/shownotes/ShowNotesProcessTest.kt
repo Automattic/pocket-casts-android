@@ -465,12 +465,14 @@ class ShowNotesProcessTest {
                 url = "Url 1",
                 type = "Type 1",
                 language = "Language 1",
+                isGenerated = false,
             ),
             Transcript(
                 episodeUuid = "episode-id",
                 url = "Url 2",
                 type = "Type 2",
                 language = "Language 2",
+                isGenerated = false,
             ),
         )
         verify(transcriptsManager).updateTranscripts("podcast-id", "episode-id", expected1, LoadTranscriptSource.DEFAULT)

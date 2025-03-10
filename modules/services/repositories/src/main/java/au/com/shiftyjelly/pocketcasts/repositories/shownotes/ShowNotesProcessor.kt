@@ -104,14 +104,18 @@ class ShowNotesProcessor @Inject constructor(
 
 internal fun ShowNotesResponse.findTranscripts(episodeUuid: String): List<Transcript> {
     val episode = podcast?.episodes?.firstOrNull { it.uuid == episodeUuid } ?: return emptyList()
-    return episode.transcripts?.mapNotNull { it.toTranscript(episodeUuid) }.orEmpty()
+    return episode.transcripts?.mapNotNull { it.toTranscript(episodeUuid, isGenerated = false) }.orEmpty()
 }
 
-private fun ShowNotesTranscript.toTranscript(episodeUuid: String) = if (url != null && type != null) {
+private fun ShowNotesTranscript.toTranscript(
+    episodeUuid: String,
+    isGenerated: Boolean,
+) = if (url != null && type != null) {
     Transcript(
         episodeUuid = episodeUuid,
         url = requireNotNull(url),
         type = requireNotNull(type),
+        isGenerated = isGenerated,
         language = language,
     )
 } else {

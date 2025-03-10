@@ -48,8 +48,8 @@ class TranscriptsManagerImplTest {
     private val transcriptCuesInfoBuilder: TranscriptCuesInfoBuilder = mock()
     private val showNotesServiceManager: ShowNotesServiceManager = mock()
     private val podcastId = "podcast_id"
-    private val transcript = Transcript("1", "url_1", "application/srt")
-    private val alternateTranscript = Transcript("1", "url_2", "application/json")
+    private val transcript = Transcript("1", "url_1", "application/srt", isGenerated = false)
+    private val alternateTranscript = Transcript("1", "url_2", "application/json", isGenerated = false)
 
     private val transcriptsManager = TranscriptsManagerImpl(
         transcriptDao = transcriptDao,
@@ -95,9 +95,9 @@ class TranscriptsManagerImplTest {
     @Test
     fun `findBestTranscript returns first supported transcript`() = runTest {
         val transcripts = listOf(
-            Transcript("1", "url_0", "un-supported"),
-            Transcript("1", "url_1", "application/srt"),
-            Transcript("1", "url_2", "text/vtt"),
+            Transcript("1", "url_0", "un-supported", isGenerated = false),
+            Transcript("1", "url_1", "application/srt", isGenerated = false),
+            Transcript("1", "url_2", "text/vtt", isGenerated = false),
         )
         val result = transcriptsManager.findBestTranscript(transcripts)
 
@@ -107,8 +107,8 @@ class TranscriptsManagerImplTest {
     @Test
     fun `findBestTranscript returns first supported transcript for a format with multiple mimetypes`() = runTest {
         val transcripts = listOf(
-            Transcript("1", "url_1", "application/x-subrip"),
-            Transcript("1", "url_2", "application/srt"),
+            Transcript("1", "url_1", "application/x-subrip", isGenerated = false),
+            Transcript("1", "url_2", "application/srt", isGenerated = false),
         )
         val result = transcriptsManager.findBestTranscript(transcripts)
 
@@ -127,8 +127,8 @@ class TranscriptsManagerImplTest {
     @Test
     fun `findBestTranscript returns first un-supported transcript when no other transcript is supported`() = runTest {
         val transcripts = listOf(
-            Transcript("1", "url_1", "un-supported"),
-            Transcript("1", "url_2", "un-supported"),
+            Transcript("1", "url_1", "un-supported", isGenerated = false),
+            Transcript("1", "url_2", "un-supported", isGenerated = false),
         )
 
         val result = transcriptsManager.findBestTranscript(transcripts)
@@ -139,8 +139,8 @@ class TranscriptsManagerImplTest {
     @Test
     fun `updateTranscripts inserts best transcript when available`() = runTest {
         val transcripts = listOf(
-            Transcript("1", "url_1", "application/srt"),
-            Transcript("1", "url_2", "text/vtt"),
+            Transcript("1", "url_1", "application/srt", isGenerated = false),
+            Transcript("1", "url_2", "text/vtt", isGenerated = false),
         )
 
         transcriptsManager.updateTranscripts(podcastId, "1", transcripts, LoadTranscriptSource.DEFAULT)
@@ -213,7 +213,7 @@ class TranscriptsManagerImplTest {
     fun `updateTranscripts loads transcript if the source is download episode`() = runTest {
         whenever(networkWrapper.isConnected()).thenReturn(true)
         val transcripts = listOf(
-            Transcript("1", "url_1", "application/srt"),
+            Transcript("1", "url_1", "application/srt", isGenerated = false),
         )
 
         transcriptsManager.updateTranscripts(podcastId, "1", transcripts, LoadTranscriptSource.DOWNLOAD_EPISODE)
@@ -225,7 +225,7 @@ class TranscriptsManagerImplTest {
     fun `updateTranscripts does not load transcript if the source is not download episode`() = runTest {
         whenever(networkWrapper.isConnected()).thenReturn(true)
         val transcripts = listOf(
-            Transcript("1", "url_1", "application/srt"),
+            Transcript("1", "url_1", "application/srt", isGenerated = false),
         )
 
         transcriptsManager.updateTranscripts(podcastId, "1", transcripts, LoadTranscriptSource.DEFAULT)
