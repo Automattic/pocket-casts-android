@@ -139,6 +139,12 @@ class ShelfSharedViewModel @Inject constructor(
         }
     }
 
+    fun showUpsell() {
+        viewModelScope.launch {
+            _transitionState.emit(TransitionState.UpsellTranscript)
+        }
+    }
+
     fun closeTranscript(
         podcast: Podcast?,
         episode: BaseEpisode?,
@@ -359,6 +365,7 @@ class ShelfSharedViewModel @Inject constructor(
 
     sealed class TransitionState {
         data object OpenTranscript : TransitionState()
+        data object UpsellTranscript : TransitionState()
         data class CloseTranscript(val withTransition: Boolean) : TransitionState()
     }
 

@@ -215,7 +215,7 @@ class ShelfViewModelTest {
     ) {
         val episodeId = "testEpisodeId"
         val transcript = mock<Transcript>()
-        whenever(transcriptsManager.observerTranscriptForEpisode(episodeId)).thenReturn(flowOf(transcript))
+        whenever(transcriptsManager.observeTranscriptForEpisode(episodeId)).thenReturn(flowOf(transcript))
         val userSetting = mock<UserSetting<List<ShelfItem>>>()
         whenever(settings.shelfItems).thenReturn(userSetting)
 

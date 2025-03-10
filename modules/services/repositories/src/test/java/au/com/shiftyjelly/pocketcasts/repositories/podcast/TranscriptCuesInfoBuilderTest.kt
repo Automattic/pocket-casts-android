@@ -20,7 +20,7 @@ import org.mockito.kotlin.whenever
 class TranscriptCuesInfoBuilderTest {
     private val subtitleParserFactory: SubtitleParser.Factory = mock()
     private val transcriptJsonConverter: TranscriptJsonConverter = mock()
-    private val transcript: Transcript = Transcript("episode_id", "url", "type")
+    private val transcript: Transcript = Transcript("episode_id", "url", "type", isGenerated = false)
     private lateinit var transcriptCuesInfoBuilder: TranscriptCuesInfoBuilder
 
     @Before

@@ -86,6 +86,7 @@ fun TranscriptPageWrapper(
 
         val configuration = LocalConfiguration.current
 
+        var showPaywall by remember { mutableStateOf(false) }
         var showSearch by remember { mutableStateOf(false) }
         var expandSearch by remember { mutableStateOf(false) }
         when (transitionState.value) {
@@ -111,6 +112,10 @@ fun TranscriptPageWrapper(
                 modifier = Modifier
                     .height(configuration.screenHeightDp.dp),
             )
+
+            if (showPaywall) {
+                TranscriptsPaywall()
+            }
 
             TranscriptToolbar(
                 onCloseClick = {
@@ -141,7 +146,16 @@ fun TranscriptPageWrapper(
 
         LaunchedEffect(transcriptUiState.value) {
             showSearch = (transcriptUiState.value as? TranscriptViewModel.UiState.TranscriptLoaded)?.showSearch == true
-            if (!showSearch) expandSearch = false
+            if (!showSearch) {
+                expandSearch = false
+            }
+        }
+
+        LaunchedEffect(transcriptUiState.value, transitionState.value) {
+            showPaywall = (transcriptUiState.value as? TranscriptViewModel.UiState.TranscriptLoaded)?.showPaywall == true
+            if (transitionState.value is TransitionState.OpenTranscript) {
+                shelfSharedViewModel.showUpsell()
+            }
         }
     }
 }

@@ -6,21 +6,22 @@ import androidx.media3.common.util.UnstableApi
 import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
-import au.com.shiftyjelly.pocketcasts.repositories.shownotes.toTranscript
+import au.com.shiftyjelly.pocketcasts.repositories.shownotes.findTranscripts
 import au.com.shiftyjelly.pocketcasts.servers.ShowNotesServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptCacheService
 import au.com.shiftyjelly.pocketcasts.utils.NetworkWrapper
 import au.com.shiftyjelly.pocketcasts.utils.exception.EmptyDataException
 import au.com.shiftyjelly.pocketcasts.utils.exception.NoNetworkException
 import au.com.shiftyjelly.pocketcasts.utils.exception.ParsingException
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import java.net.UnknownHostException
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.CacheControl
@@ -37,8 +38,7 @@ class TranscriptsManagerImpl @Inject constructor(
     private val transcriptCuesInfoBuilder: TranscriptCuesInfoBuilder,
 ) : TranscriptsManager {
     private val supportedFormats = listOf(TranscriptFormat.SRT, TranscriptFormat.VTT, TranscriptFormat.JSON_PODCAST_INDEX, TranscriptFormat.HTML)
-    private val _failedTranscriptFormats = MutableStateFlow(emptyMap<String, List<TranscriptFormat>>())
-    val failedTranscriptFormats = _failedTranscriptFormats.asStateFlow()
+    private val invalidTranscriptUrls = ConcurrentHashMap<String, Set<String>>()
 
     override suspend fun updateTranscripts(
         podcastUuid: String,
@@ -49,7 +49,7 @@ class TranscriptsManagerImpl @Inject constructor(
     ) {
         if (transcripts.isEmpty()) return
         if (!fromUpdateAlternativeTranscript) {
-            _failedTranscriptFormats.update { it.minus(episodeUuid) }
+            invalidTranscriptUrls.remove(episodeUuid)
         }
 
         findBestTranscript(transcripts)?.let { bestTranscript ->
@@ -66,11 +66,19 @@ class TranscriptsManagerImpl @Inject constructor(
         }
     }
 
-    override fun observerTranscriptForEpisode(episodeUuid: String) =
-        transcriptDao.observerTranscriptForEpisode(episodeUuid)
+    override fun observeTranscriptForEpisode(episodeUuid: String) = transcriptDao
+        .observeTranscriptForEpisode(episodeUuid)
+        .map { transcript ->
+            if (FeatureFlag.isEnabled(Feature.GENERATED_TRANSCRIPTS)) {
+                transcript
+            } else {
+                transcript?.takeIf { !it.isGenerated }
+            }
+        }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    fun findBestTranscript(availableTranscripts: List<Transcript>): Transcript? {
+    fun findBestTranscript(transcripts: List<Transcript>): Transcript? {
+        val availableTranscripts = transcripts.sortedBy { it.isGenerated }
         for (format in supportedFormats) {
             val transcript = availableTranscripts.firstOrNull { it.type in format.possibleMimeTypes() }
             if (transcript != null) {
@@ -145,28 +153,23 @@ class TranscriptsManagerImpl @Inject constructor(
         source: LoadTranscriptSource,
     ) {
         try {
-            _failedTranscriptFormats.update { currentMap ->
-                val format = TranscriptFormat.fromType(transcript.type) ?: return@update currentMap
-                currentMap + (transcript.episodeUuid to (currentMap[transcript.episodeUuid]?.plus(format)?.distinct() ?: listOf(format)))
-            }
-            val episodeFailedFormats = _failedTranscriptFormats.value[transcript.episodeUuid]
-            if (!episodeFailedFormats.isNullOrEmpty()) {
+            val invalidUrls = invalidTranscriptUrls.merge(transcript.episodeUuid, setOf(transcript.url)) { old, new -> old + new }
+
+            if (!invalidUrls.isNullOrEmpty()) {
                 // Get available transcripts from show notes
                 showNotesServiceManager.loadShowNotes(
                     podcastUuid = podcastUuid,
                     episodeUuid = transcript.episodeUuid,
                 ) { showNotes ->
-                    val transcriptsAvailable = showNotes.podcast?.episodes
-                        ?.firstOrNull { it.uuid == transcript.episodeUuid }
-                        ?.transcripts
-                        ?.mapNotNull { it.takeIf { it.url != null && it.type != null }?.toTranscript(transcript.episodeUuid) } ?: emptyList()
-                    // Try alternative from filtered transcripts
-                    val filteredTranscripts = transcriptsAvailable.filter { it.type !in episodeFailedFormats.flatMap { format -> format.possibleMimeTypes() } }
+                    val availableTranscripts = showNotes
+                        .findTranscripts(transcript.episodeUuid)
+                        ?.filter { it.url !in invalidUrls }
+                        .orEmpty()
                     scope.launch {
                         updateTranscripts(
                             podcastUuid = podcastUuid,
                             episodeUuid = transcript.episodeUuid,
-                            transcripts = filteredTranscripts,
+                            transcripts = availableTranscripts,
                             loadTranscriptSource = source,
                             fromUpdateAlternativeTranscript = true,
                         )
