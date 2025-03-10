@@ -139,6 +139,12 @@ class ShelfSharedViewModel @Inject constructor(
         }
     }
 
+    fun showUpsell() {
+        viewModelScope.launch {
+            _transitionState.emit(TransitionState.UpsellTranscript)
+        }
+    }
+
     fun closeTranscript(
         podcast: Podcast?,
         episode: BaseEpisode?,
