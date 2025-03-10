@@ -253,11 +253,7 @@ class TranscriptsManagerImplTest {
             assertTrue(e is EmptyDataException)
         }
 
-        transcriptsManager.failedTranscriptFormats.test {
-            awaitItem()
-            verify(transcriptDao).insertBlocking(alternateTranscript)
-            cancelAndIgnoreRemainingEvents()
-        }
+        verify(transcriptDao).insertBlocking(alternateTranscript)
     }
 
     @Test
@@ -270,11 +266,7 @@ class TranscriptsManagerImplTest {
             assertTrue(e is ParsingException)
         }
 
-        transcriptsManager.failedTranscriptFormats.test {
-            awaitItem()
-            verify(transcriptDao).insertBlocking(alternateTranscript)
-            cancelAndIgnoreRemainingEvents()
-        }
+        verify(transcriptDao).insertBlocking(alternateTranscript)
     }
 
     @Test
@@ -283,11 +275,7 @@ class TranscriptsManagerImplTest {
 
         transcriptsManager.loadTranscriptCuesInfo(podcastId, transcript, LoadTranscriptSource.DOWNLOAD_EPISODE)
 
-        transcriptsManager.failedTranscriptFormats.test {
-            awaitItem()
-            verify(transcriptDao).insertBlocking(alternateTranscript)
-            cancelAndConsumeRemainingEvents()
-        }
+        verify(transcriptDao).insertBlocking(alternateTranscript)
     }
 
     @Test
@@ -296,10 +284,6 @@ class TranscriptsManagerImplTest {
 
         transcriptsManager.loadTranscriptCuesInfo(podcastId, transcript, LoadTranscriptSource.DOWNLOAD_EPISODE)
 
-        transcriptsManager.failedTranscriptFormats.test {
-            awaitItem()
-            verify(transcriptDao).insertBlocking(alternateTranscript)
-            cancelAndIgnoreRemainingEvents()
-        }
+        verify(transcriptDao).insertBlocking(alternateTranscript)
     }
 }

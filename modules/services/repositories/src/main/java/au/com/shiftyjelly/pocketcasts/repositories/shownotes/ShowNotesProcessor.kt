@@ -82,11 +82,8 @@ class ShowNotesProcessor @Inject constructor(
         showNotes: ShowNotesResponse,
         loadTranscriptSource: LoadTranscriptSource,
     ) = scope.launch {
-        val transcripts = showNotes.podcast?.episodes
-            ?.firstOrNull { it.uuid == episodeUuid }
-            ?.transcripts
-            ?.mapNotNull { it.takeIf { it.url != null && it.type != null }?.toTranscript(episodeUuid) }
-        transcripts?.let { transcriptsManager.updateTranscripts(showNotes.podcast?.uuid.orEmpty(), episodeUuid, it, loadTranscriptSource) }
+        val transcripts = showNotes.findTranscripts(episodeUuid)
+        transcriptsManager.updateTranscripts(showNotes.podcast?.uuid.orEmpty(), episodeUuid, transcripts, loadTranscriptSource)
     }
 
     private fun ShowNotesChapter.toDbChapter(index: Int, episodeUuid: String) = if (useInTableOfContents != false) {
@@ -105,9 +102,18 @@ class ShowNotesProcessor @Inject constructor(
     }
 }
 
-fun ShowNotesTranscript.toTranscript(episodeUuid: String) = Transcript(
-    episodeUuid = episodeUuid,
-    url = requireNotNull(url),
-    type = requireNotNull(type),
-    language = language,
-)
+internal fun ShowNotesResponse.findTranscripts(episodeUuid: String): List<Transcript> {
+    val episode = podcast?.episodes?.firstOrNull { it.uuid == episodeUuid } ?: return emptyList()
+    return episode.transcripts?.mapNotNull { it.toTranscript(episodeUuid) }.orEmpty()
+}
+
+private fun ShowNotesTranscript.toTranscript(episodeUuid: String) = if (url != null && type != null) {
+    Transcript(
+        episodeUuid = episodeUuid,
+        url = requireNotNull(url),
+        type = requireNotNull(type),
+        language = language,
+    )
+} else {
+    null
+}
