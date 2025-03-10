@@ -376,6 +376,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 shelfSharedViewModel.transitionState.collect { transitionState ->
                     when (transitionState) {
                         is TransitionState.OpenTranscript -> binding?.openTranscript()
+                        is TransitionState.UpsellTranscript -> TODO()
                         is TransitionState.CloseTranscript -> binding?.closeTranscript(transitionState.withTransition)
                     }
                 }

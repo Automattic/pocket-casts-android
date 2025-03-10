@@ -10,11 +10,14 @@ import au.com.shiftyjelly.pocketcasts.servers.podcast.ShowNotesPodcast
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ShowNotesResponse
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ShowNotesTranscript
 import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptCacheService
+import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.NetworkWrapper
 import au.com.shiftyjelly.pocketcasts.utils.exception.EmptyDataException
 import au.com.shiftyjelly.pocketcasts.utils.exception.NoNetworkException
 import au.com.shiftyjelly.pocketcasts.utils.exception.ParsingException
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
@@ -42,6 +45,10 @@ import retrofit2.Response
 class TranscriptsManagerImplTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule()
+
+    @get:Rule
+    val featureFlagRule = InMemoryFeatureFlagRule()
+
     private val transcriptDao: TranscriptDao = mock()
     private val transcriptCacheService: TranscriptCacheService = mock()
     private val networkWrapper: NetworkWrapper = mock()
@@ -134,6 +141,43 @@ class TranscriptsManagerImplTest {
         val result = transcriptsManager.findBestTranscript(transcripts)
 
         assertEquals(transcripts[0], result)
+    }
+
+    @Test
+    fun `findBestTranscript uses generated transcripts with feature flag enabled`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_TRANSCRIPTS, true)
+        val transcripts = listOf(
+            Transcript("1", "url_1", "application/srt", isGenerated = true),
+        )
+
+        val result = transcriptsManager.findBestTranscript(transcripts)
+
+        assertEquals(transcripts[0], result)
+    }
+
+    @Test
+    fun `findBestTranscript does not use generated transcripts with feature flag disabled`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_TRANSCRIPTS, false)
+        val transcripts = listOf(
+            Transcript("1", "url_1", "application/srt", isGenerated = true),
+        )
+
+        val result = transcriptsManager.findBestTranscript(transcripts)
+
+        assertNull(result)
+    }
+
+    @Test
+    fun `findBestTranscript uses non-generated transcripts first`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_TRANSCRIPTS, true)
+        val transcripts = listOf(
+            Transcript("1", "url_1", "application/srt", isGenerated = true),
+            Transcript("1", "url_2", "application/srt", isGenerated = false),
+        )
+
+        val result = transcriptsManager.findBestTranscript(transcripts)
+
+        assertEquals(transcripts[1], result)
     }
 
     @Test

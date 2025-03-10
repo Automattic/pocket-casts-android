@@ -83,7 +83,9 @@ class ShowNotesProcessor @Inject constructor(
         loadTranscriptSource: LoadTranscriptSource,
     ) = scope.launch {
         val transcripts = showNotes.findTranscripts(episodeUuid)
-        transcriptsManager.updateTranscripts(showNotes.podcast?.uuid.orEmpty(), episodeUuid, transcripts, loadTranscriptSource)
+        if (transcripts != null) {
+            transcriptsManager.updateTranscripts(showNotes.podcast?.uuid.orEmpty(), episodeUuid, transcripts, loadTranscriptSource)
+        }
     }
 
     private fun ShowNotesChapter.toDbChapter(index: Int, episodeUuid: String) = if (useInTableOfContents != false) {
@@ -102,9 +104,11 @@ class ShowNotesProcessor @Inject constructor(
     }
 }
 
-internal fun ShowNotesResponse.findTranscripts(episodeUuid: String): List<Transcript> {
-    val episode = podcast?.episodes?.firstOrNull { it.uuid == episodeUuid } ?: return emptyList()
-    return episode.transcripts?.mapNotNull { it.toTranscript(episodeUuid, isGenerated = false) }.orEmpty()
+internal fun ShowNotesResponse.findTranscripts(episodeUuid: String): List<Transcript>? {
+    val episode = podcast?.episodes?.firstOrNull { it.uuid == episodeUuid } ?: return null
+    val transcripts = episode.transcripts?.mapNotNull { it.toTranscript(episodeUuid, isGenerated = false) }.orEmpty()
+    val pocketCastsTranscripts = episode.pocketCastsTranscripts?.mapNotNull { it.toTranscript(episodeUuid, isGenerated = true) }.orEmpty()
+    return transcripts + pocketCastsTranscripts
 }
 
 private fun ShowNotesTranscript.toTranscript(

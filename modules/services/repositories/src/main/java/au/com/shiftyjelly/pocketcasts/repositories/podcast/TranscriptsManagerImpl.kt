@@ -13,6 +13,8 @@ import au.com.shiftyjelly.pocketcasts.utils.NetworkWrapper
 import au.com.shiftyjelly.pocketcasts.utils.exception.EmptyDataException
 import au.com.shiftyjelly.pocketcasts.utils.exception.NoNetworkException
 import au.com.shiftyjelly.pocketcasts.utils.exception.ParsingException
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import java.net.UnknownHostException
 import java.util.concurrent.ConcurrentHashMap
@@ -67,7 +69,14 @@ class TranscriptsManagerImpl @Inject constructor(
         transcriptDao.observerTranscriptForEpisode(episodeUuid)
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    fun findBestTranscript(availableTranscripts: List<Transcript>): Transcript? {
+    fun findBestTranscript(transcripts: List<Transcript>): Transcript? {
+        val availableTranscripts = buildList {
+            val (generated, regular) = transcripts.partition { it.isGenerated }
+            addAll(regular)
+            if (FeatureFlag.isEnabled(Feature.GENERATED_TRANSCRIPTS)) {
+                addAll(generated)
+            }
+        }
         for (format in supportedFormats) {
             val transcript = availableTranscripts.firstOrNull { it.type in format.possibleMimeTypes() }
             if (transcript != null) {
@@ -152,7 +161,8 @@ class TranscriptsManagerImpl @Inject constructor(
                 ) { showNotes ->
                     val availableTranscripts = showNotes
                         .findTranscripts(transcript.episodeUuid)
-                        .filter { it.url !in invalidUrls }
+                        ?.filter { it.url !in invalidUrls }
+                        .orEmpty()
                     scope.launch {
                         updateTranscripts(
                             podcastUuid = podcastUuid,
