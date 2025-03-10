@@ -184,7 +184,7 @@ private fun TranscriptContent(
         Box(
             modifier = if (state.showPaywall) {
                 if (Build.VERSION.SDK_INT >= 31) {
-                    Modifier.blur(4.dp)
+                    Modifier.blur(8.dp)
                 } else {
                     Modifier.alpha(0f)
                 }
