@@ -126,7 +126,7 @@ sealed interface FadeSize {
         val value: Dp,
     ) : FadeSize {
         init {
-            check(value > 0.dp) { "Fade threshold must be positive: $value" }
+            check(value > 0.dp) { "Fade size must be positive: $value" }
         }
     }
 
@@ -136,7 +136,7 @@ sealed interface FadeSize {
     ) : FadeSize {
         init {
             check(value > 0.0f && value <= 1.0f) {
-                "Fade threshold must be between 0.0 (exclusive) and 1.0 (inclusive): $value"
+                "Fade size must be between 0.0 (exclusive) and 1.0 (inclusive): $value"
             }
         }
     }
@@ -150,7 +150,7 @@ private class FadedEdgeState(
 ) {
     private val layoutInfo get() = listState.layoutInfo
 
-    val boxSize by derivedStateOf {
+    private val boxSize by derivedStateOf {
         val viewportSize = layoutInfo.viewportSize.toSize()
         when (layoutInfo.orientation) {
             Orientation.Vertical -> viewportSize.copy(
@@ -168,7 +168,7 @@ private class FadedEdgeState(
         }
     }
 
-    val startAlpha by derivedStateOf {
+    private val startAlpha by derivedStateOf {
         val firstItemInfo = layoutInfo.visibleItemsInfo.firstOrNull() ?: return@derivedStateOf 0f
         val lastItemInfo = layoutInfo.visibleItemsInfo.lastOrNull() ?: return@derivedStateOf 0f
 
@@ -199,7 +199,7 @@ private class FadedEdgeState(
         }
     }
 
-    val endAlpha by derivedStateOf {
+    private val endAlpha by derivedStateOf {
         val firstItemInfo = layoutInfo.visibleItemsInfo.firstOrNull() ?: return@derivedStateOf 0f
         val lastItemInfo = layoutInfo.visibleItemsInfo.lastOrNull() ?: return@derivedStateOf 0f
 

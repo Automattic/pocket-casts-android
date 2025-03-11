@@ -40,11 +40,6 @@ fun Modifier.brush(brush: Brush) = this
         }
     }
 
-fun Modifier.ifThen(
-    predicate: Boolean,
-    then: () -> Modifier,
-) = then(if (predicate) then() else Modifier)
-
 /**
  * When the user presses enter run the action.
  */
