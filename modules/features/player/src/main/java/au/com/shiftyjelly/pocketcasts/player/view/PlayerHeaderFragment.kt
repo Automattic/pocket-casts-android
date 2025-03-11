@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.runtime.LaunchedEffect
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -376,6 +377,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 shelfSharedViewModel.transitionState.collect { transitionState ->
                     when (transitionState) {
                         is TransitionState.OpenTranscript -> binding?.openTranscript()
+                        is TransitionState.UpsellTranscript -> binding?.hidePlaybackControls()
                         is TransitionState.CloseTranscript -> binding?.closeTranscript(transitionState.withTransition)
                     }
                 }
@@ -400,6 +402,12 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         val containerFragment = parentFragment as? PlayerContainerFragment
         containerFragment?.updateTabsVisibility(false)
         root.setScrollingEnabled(false)
+    }
+
+    private fun AdapterPlayerHeaderBinding.hidePlaybackControls() {
+        playerGroup.layoutTransition = LayoutTransition()
+        seekBar.isInvisible = true
+        playerControlsComposeView.isInvisible = true
     }
 
     private fun AdapterPlayerHeaderBinding.closeTranscript(

@@ -40,7 +40,7 @@ class ShelfViewModel @AssistedInject constructor(
 
     init {
         viewModelScope.launch {
-            transcriptsManager.observerTranscriptForEpisode(episodeId)
+            transcriptsManager.observeTranscriptForEpisode(episodeId)
                 .distinctUntilChangedBy { it?.episodeUuid }
                 .stateIn(viewModelScope)
                 .collectLatest { transcript ->
