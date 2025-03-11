@@ -524,6 +524,7 @@
     <string name="go_to_folder">Go to folder</string>
     <string name="number_stepper_plus_content_description">Plus</string>
     <string name="number_stepper_minus_content_description">Minus</string>
+    <string name="discover_collection_header_content_description_suffix">header</string>
 
     <!-- Podcast -->
 

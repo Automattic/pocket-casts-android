@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.L
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.PODCAST_UUID_KEY
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import coil.load
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 internal class CollectionListRowAdapter(
     val onPodcastClicked: ((DiscoverPodcast, String?) -> Unit),
@@ -106,6 +107,8 @@ internal class CollectionListRowAdapter(
                 holder.binding.header.lblTitle.text = it.title
                 holder.binding.header.lblSubtitle.text = it.subtitle
                 holder.binding.header.imageHeader.load(it.imageUrl)
+                holder.binding.header.root.contentDescription =
+                    it.title + " " + holder.binding.root.context.getString(LR.string.discover_collection_header_content_description_suffix)
 
                 val height = getPodcastsHeight(holder.binding.podcasts)
                 val layoutParams = holder.binding.root.layoutParams
