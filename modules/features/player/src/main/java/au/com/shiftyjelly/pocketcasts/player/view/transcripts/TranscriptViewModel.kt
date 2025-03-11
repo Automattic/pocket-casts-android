@@ -32,7 +32,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 
 @kotlin.OptIn(ExperimentalCoroutinesApi::class)
 @OptIn(UnstableApi::class)
