@@ -80,9 +80,10 @@ fun TranscriptPageWrapper(
     transcriptViewModel: TranscriptViewModel,
     searchViewModel: TranscriptSearchViewModel,
     theme: Theme,
+    onClickSubscribe: () -> Unit,
 ) {
     AppTheme(Theme.ThemeType.DARK) {
-        val transitionState = shelfSharedViewModel.transitionState.collectAsStateWithLifecycle(null)
+        val transitionState by shelfSharedViewModel.transitionState.collectAsStateWithLifecycle(null)
         val uiState by transcriptViewModel.uiState.collectAsStateWithLifecycle()
         val searchState by searchViewModel.searchState.collectAsStateWithLifecycle()
         val searchQuery by searchViewModel.searchQueryFlow.collectAsStateWithLifecycle()
@@ -92,7 +93,7 @@ fun TranscriptPageWrapper(
         var showPaywall by remember { mutableStateOf(false) }
         var showSearch by remember { mutableStateOf(false) }
         var expandSearch by remember { mutableStateOf(false) }
-        when (transitionState.value) {
+        when (transitionState) {
             is TransitionState.CloseTranscript -> {
                 if (expandSearch) {
                     expandSearch = false
@@ -148,7 +149,7 @@ fun TranscriptPageWrapper(
 
                 if (showPaywall) {
                     TranscriptsPaywall(
-                        onClickSubscribe = {},
+                        onClickSubscribe = onClickSubscribe,
                         modifier = Modifier.verticalScroll(rememberScrollState()),
                     )
                 }
@@ -163,11 +164,10 @@ fun TranscriptPageWrapper(
             }
         }
 
-
-        LaunchedEffect(uiState.showPaywall) {
+        LaunchedEffect(uiState.showPaywall, transitionState) {
             showPaywall = uiState.showPaywall
 
-            when (transitionState.value) {
+            when (transitionState) {
                 is TransitionState.OpenTranscript -> {
                     if (showPaywall) {
                         shelfSharedViewModel.showUpsell()

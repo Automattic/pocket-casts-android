@@ -27,13 +27,14 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 @kotlin.OptIn(ExperimentalCoroutinesApi::class)
 @OptIn(UnstableApi::class)
@@ -53,28 +54,27 @@ class TranscriptViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             playbackManager.playbackStateFlow
+                .distinctUntilChangedBy { it.episodeUuid }
                 .map { PodcastAndEpisode(it.podcast, it.episodeUuid) }
                 .onEach { _uiState.update { value -> value.copy(podcastAndEpisode = it) } }
-                .flatMapLatest(::transcriptFlow)
-                .collect { _uiState.update { value -> value.copy(transcriptState = it) } }
+                .flatMapLatest { transcriptsManager.observeTranscriptForEpisode(it.episodeUuid) }
+                .distinctUntilChangedBy { it?.url }
+                .collect { transcript ->
+                    val state = if (transcript != null) {
+                        TranscriptState.Found(transcript)
+                    } else {
+                        TranscriptState.Empty
+                    }
+                    _uiState.update { value -> value.copy(transcriptState = state) }
+                }
         }
+
         viewModelScope.launch {
             subscriptionManager.subscriptionTier().collect { tier ->
                 _uiState.update { value -> value.copy(subscriptionTier = tier) }
             }
         }
     }
-
-    private fun transcriptFlow(podcastAndEpisode: PodcastAndEpisode) =
-        transcriptsManager.observeTranscriptForEpisode(podcastAndEpisode.episodeUuid)
-            .distinctUntilChanged { t1, t2 -> t1?.episodeUuid == t2?.episodeUuid && t1?.url == t2?.url }
-            .map { transcript ->
-                if (transcript != null) {
-                    TranscriptState.Found(transcript)
-                } else {
-                    TranscriptState.Empty
-                }
-            }
 
     fun parseAndLoadTranscript(
         pulledToRefresh: Boolean = false,
@@ -143,6 +143,7 @@ class TranscriptViewModel @Inject constructor(
                         }
                     }
                 }
+                Timber.tag("LOG_TAG").i("Update 2")
                 _uiState.update { value -> value.copy(transcriptState = newTranscriptState) }
 
                 if (pulledToRefresh) {
@@ -233,7 +234,7 @@ class TranscriptViewModel @Inject constructor(
 
         val showPaywall = (transcriptState as? TranscriptState.Loaded)?.isTranscriptEmpty == false && isSubscriptionRequired
 
-        val showSearch = (transcriptState as? TranscriptState.Loaded)?.showAsWebPage == true && !isSubscriptionRequired
+        val showSearch = (transcriptState as? TranscriptState.Loaded)?.showAsWebPage == false && !isSubscriptionRequired
 
         companion object {
             val Empty = UiState(
