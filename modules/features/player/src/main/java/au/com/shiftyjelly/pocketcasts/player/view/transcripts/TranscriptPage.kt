@@ -202,7 +202,7 @@ private fun TranscriptContent(
                             )
                         }
                 } else {
-                    Modifier.alpha(0f)
+                    Modifier.alpha(0.1f)
                 }
             } else {
                 Modifier
