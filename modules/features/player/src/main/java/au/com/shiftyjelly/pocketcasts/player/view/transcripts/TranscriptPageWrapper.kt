@@ -153,7 +153,7 @@ fun TranscriptPageWrapper(
 
         LaunchedEffect(transcriptUiState.value, transitionState.value) {
             showPaywall = (transcriptUiState.value as? TranscriptViewModel.UiState.TranscriptLoaded)?.showPaywall == true
-            if (transitionState.value is TransitionState.OpenTranscript) {
+            if (transitionState.value is TransitionState.OpenTranscript && showPaywall) {
                 shelfSharedViewModel.showUpsell()
             }
         }
