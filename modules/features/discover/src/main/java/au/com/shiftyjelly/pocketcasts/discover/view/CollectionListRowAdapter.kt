@@ -1,9 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.discover.view
 
+import android.content.res.Configuration
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
@@ -16,14 +18,36 @@ import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import coil.load
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
+private val differ = object : DiffUtil.ItemCallback<List<Any>>() {
+    override fun areItemsTheSame(oldItem: List<Any>, newItem: List<Any>): Boolean {
+        return oldItem.filterIsInstance<DiscoverPodcast>()
+            .map { it.uuid }
+            .toTypedArray()
+            .contentDeepEquals(
+                newItem
+                    .filterIsInstance<DiscoverPodcast>()
+                    .map { it.uuid }.toTypedArray(),
+            )
+    }
+
+    override fun areContentsTheSame(oldItem: List<Any>, newItem: List<Any>): Boolean {
+        return oldItem.filterIsInstance<DiscoverPodcast>().toTypedArray().contentDeepEquals(newItem.filterIsInstance<DiscoverPodcast>().toTypedArray())
+    }
+}
+
 internal class CollectionListRowAdapter(
     val onPodcastClicked: ((DiscoverPodcast, String?) -> Unit),
     val onPodcastSubscribe: (DiscoverPodcast, String?) -> Unit,
     val onHeaderClicked: () -> Unit,
     val analyticsTracker: AnalyticsTracker,
-) : ListAdapter<List<Any>, CollectionListRowAdapter.CollectionListViewHolder>(SmallListDiffer) {
+) : ListAdapter<List<Any>, CollectionListRowAdapter.CollectionListViewHolder>(differ) {
 
-    class CollectionListViewHolder(val binding: ItemCollectionListBinding, onItemClicked: (Int, Int) -> Unit, onHeaderClicked: () -> Unit) : RecyclerView.ViewHolder(binding.root) {
+    class CollectionListViewHolder(
+        val binding: ItemCollectionListBinding,
+        onItemClicked: (Int, Int) -> Unit,
+        onHeaderClicked: () -> Unit,
+        onPodcastSubscribe: (Int, Int) -> Unit,
+    ) : RecyclerView.ViewHolder(binding.root) {
 
         companion object {
             const val NUMBER_OF_ROWS_PER_PAGE = 2
@@ -40,17 +64,26 @@ internal class CollectionListRowAdapter(
             binding.header.root.setOnClickListener {
                 onHeaderClicked()
             }
+            binding.row0.onSubscribeClicked = {
+                onPodcastSubscribe(bindingAdapterPosition, 0)
+            }
+            binding.row1.onSubscribeClicked = {
+                onPodcastSubscribe(bindingAdapterPosition, 1)
+            }
         }
 
         val rows = listOf(binding.row0, binding.row1)
 
-        fun bind(podcastSublist: List<Any>) {
+        fun bind(podcastSublist: List<Any>, isSubscribeButtonVisible: Boolean) {
             rows.forEachIndexed { index, row ->
                 row.clear()
                 row.isVisible = index < podcastSublist.size
 
                 val podcast = podcastSublist.getOrNull(index) as? DiscoverPodcast
                 row.podcast = podcast
+
+                val isLandscape = row.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+                row.setSubscribeButtonVisibility(isSubscribeButtonVisible || isLandscape)
             }
         }
     }
@@ -102,13 +135,18 @@ internal class CollectionListRowAdapter(
             onHeaderClicked = {
                 onHeaderClicked()
             },
+            onPodcastSubscribe = { pageIndex, podcastIndex ->
+                val podcastSublist = getItem(pageIndex)
+                val podcast = podcastSublist.getOrNull(podcastIndex) as? DiscoverPodcast
+                podcast?.let { onPodcastSubscribe(it, fromListId) }
+            },
         )
     }
 
     override fun onBindViewHolder(holder: CollectionListViewHolder, position: Int) {
         val podcastSublist = getItem(position)
 
-        holder.bind(podcastSublist)
+        holder.bind(podcastSublist, isSubscribeButtonVisible = position != 0)
 
         if (position == 0) {
             this.header?.let {

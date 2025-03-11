@@ -452,7 +452,10 @@ internal class DiscoverAdapter(
     inner class CollectionListViewHolder(val binding: RowCollectionListBinding) : NetworkLoadableViewHolder(binding.root), ShowAllRow {
         val adapter = CollectionListRowAdapter(
             listener::onPodcastClicked,
-            listener::onPodcastSubscribe,
+            onPodcastSubscribe = { podcast, listId ->
+                listId?.let { analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_SUBSCRIBED, mapOf(LIST_ID_KEY to it, PODCAST_UUID_KEY to podcast.uuid)) }
+                listener.onPodcastSubscribe(podcast, listId)
+            },
             onHeaderClicked = {
                 collectionList?.let { listener.onCollectionHeaderClicked(it) }
             },
