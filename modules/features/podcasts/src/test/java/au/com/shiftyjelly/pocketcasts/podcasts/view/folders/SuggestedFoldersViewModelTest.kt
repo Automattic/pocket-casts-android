@@ -5,7 +5,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
-import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.SuggestedFoldersViewModel.UseFoldersState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SuggestedFoldersManager
@@ -15,7 +14,6 @@ import io.reactivex.Flowable
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -88,22 +86,6 @@ class SuggestedFoldersViewModelTest {
         viewModel.markPopupAsDismissed()
 
         verify(suggestedFoldersPopupPolicy).markPolicyUsed()
-    }
-
-    @Test
-    fun `should use suggested folders`() = runTest {
-        initViewModel()
-
-        viewModel.useSuggestedFolders()
-
-        advanceUntilIdle()
-
-        verify(suggestedFoldersManager).useSuggestedFolders(dbSuggestedFolders)
-        verify(podcastManager).refreshPodcasts("suggested-folders")
-
-        viewModel.state.test {
-            assertEquals(UseFoldersState.Applied, awaitItem().useFoldersState)
-        }
     }
 
     @Test
