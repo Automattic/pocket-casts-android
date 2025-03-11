@@ -6,11 +6,13 @@ import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptCuesInfo
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.TranscriptError
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptsManager
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.exception.EmptyDataException
 import au.com.shiftyjelly.pocketcasts.utils.exception.NoNetworkException
@@ -39,14 +41,15 @@ class TranscriptViewModelTest {
 
     private val transcriptsManager: TranscriptsManager = mock()
     private val playbackManager: PlaybackManager = mock()
+    private val subscriptionManager: SubscriptionManager = mock()
     private val podcastId = "podcast_id"
-    private val transcript: Transcript = Transcript("episode_id", "url", "type")
+    private val transcript: Transcript = Transcript("episode_id", "url", "type", isGenerated = false)
     private val playbackStateFlow = MutableStateFlow(PlaybackState(podcast = Podcast("podcast_id"), episodeUuid = "episode_id"))
     private lateinit var viewModel: TranscriptViewModel
 
     @Test
     fun `given no transcript available, then Empty state is returned`() = runTest {
-        whenever(transcriptsManager.observerTranscriptForEpisode(any())).thenReturn(flowOf(null))
+        whenever(transcriptsManager.observeTranscriptForEpisode(any())).thenReturn(flowOf(null))
 
         initViewModel()
 
@@ -57,7 +60,7 @@ class TranscriptViewModelTest {
 
     @Test
     fun `given transcript is available, then transcript found state is returned`() = runTest {
-        whenever(transcriptsManager.observerTranscriptForEpisode(any())).thenReturn(flowOf(transcript))
+        whenever(transcriptsManager.observeTranscriptForEpisode(any())).thenReturn(flowOf(transcript))
 
         initViewModel()
 
@@ -68,10 +71,10 @@ class TranscriptViewModelTest {
 
     @Test
     fun `given transcript view is open, when transcript load invoked, then transcript is loaded`() = runTest {
-        whenever(transcriptsManager.observerTranscriptForEpisode(any())).thenReturn(flowOf(transcript))
+        whenever(transcriptsManager.observeTranscriptForEpisode(any())).thenReturn(flowOf(transcript))
         initViewModel()
 
-        viewModel.parseAndLoadTranscript(isTranscriptViewOpen = true)
+        viewModel.parseAndLoadTranscript()
 
         viewModel.uiState.test {
             assertTrue(awaitItem() is UiState.TranscriptLoaded)
@@ -81,10 +84,10 @@ class TranscriptViewModelTest {
 
     @Test
     fun `given transcript is supported but blank, when transcript load invoked, then Empty error is returned`() = runTest {
-        whenever(transcriptsManager.observerTranscriptForEpisode(any())).thenReturn(flowOf(transcript))
+        whenever(transcriptsManager.observeTranscriptForEpisode(any())).thenReturn(flowOf(transcript))
         initViewModel(transcriptLoadException = EmptyDataException(""))
 
-        viewModel.parseAndLoadTranscript(isTranscriptViewOpen = true)
+        viewModel.parseAndLoadTranscript()
 
         viewModel.uiState.test {
             assertEquals((awaitItem() as UiState.Error).error, TranscriptError.Empty)
@@ -93,10 +96,10 @@ class TranscriptViewModelTest {
 
     @Test
     fun `given transcript is not supported, when transcript load invoked, then NotSupported error is returned`() = runTest {
-        whenever(transcriptsManager.observerTranscriptForEpisode(any())).thenReturn(flowOf(transcript))
+        whenever(transcriptsManager.observeTranscriptForEpisode(any())).thenReturn(flowOf(transcript))
         initViewModel(transcriptLoadException = UnsupportedOperationException())
 
-        viewModel.parseAndLoadTranscript(isTranscriptViewOpen = true)
+        viewModel.parseAndLoadTranscript()
 
         viewModel.uiState.test {
             assertTrue((awaitItem() as UiState.Error).error is TranscriptError.NotSupported)
@@ -105,10 +108,10 @@ class TranscriptViewModelTest {
 
     @Test
     fun `given transcript type supported but content not valid, then FailedToLoad error is returned`() = runTest {
-        whenever(transcriptsManager.observerTranscriptForEpisode(any())).thenReturn(flowOf(transcript))
+        whenever(transcriptsManager.observeTranscriptForEpisode(any())).thenReturn(flowOf(transcript))
         initViewModel(transcriptLoadException = RuntimeException())
 
-        viewModel.parseAndLoadTranscript(isTranscriptViewOpen = true)
+        viewModel.parseAndLoadTranscript()
 
         viewModel.uiState.test {
             assertTrue((awaitItem() as UiState.Error).error is TranscriptError.FailedToLoad)
@@ -117,10 +120,10 @@ class TranscriptViewModelTest {
 
     @Test
     fun `given error due to no internet, then NoNetwork error is returned`() = runTest {
-        whenever(transcriptsManager.observerTranscriptForEpisode(any())).thenReturn(flowOf(transcript))
+        whenever(transcriptsManager.observeTranscriptForEpisode(any())).thenReturn(flowOf(transcript))
         initViewModel(transcriptLoadException = NoNetworkException())
 
-        viewModel.parseAndLoadTranscript(isTranscriptViewOpen = true)
+        viewModel.parseAndLoadTranscript()
 
         viewModel.uiState.test {
             assertTrue((awaitItem() as UiState.Error).error is TranscriptError.NoNetwork)
@@ -129,30 +132,30 @@ class TranscriptViewModelTest {
 
     @Test
     fun `given force refresh, when transcript load invoked, then transcript is refreshed`() = runTest {
-        whenever(transcriptsManager.observerTranscriptForEpisode(any())).thenReturn(flowOf(transcript))
+        whenever(transcriptsManager.observeTranscriptForEpisode(any())).thenReturn(flowOf(transcript))
         initViewModel()
 
-        viewModel.parseAndLoadTranscript(isTranscriptViewOpen = true, pulledToRefresh = true)
+        viewModel.parseAndLoadTranscript(pulledToRefresh = true)
 
         verify(transcriptsManager).loadTranscriptCuesInfo(podcastId, transcript, forceRefresh = true)
     }
 
     @Test
     fun `given no force refresh, when transcript load invoked, then transcript is not refreshed`() = runTest {
-        whenever(transcriptsManager.observerTranscriptForEpisode(any())).thenReturn(flowOf(transcript))
+        whenever(transcriptsManager.observeTranscriptForEpisode(any())).thenReturn(flowOf(transcript))
         initViewModel()
 
-        viewModel.parseAndLoadTranscript(isTranscriptViewOpen = true, pulledToRefresh = false)
+        viewModel.parseAndLoadTranscript(pulledToRefresh = false)
 
         verify(transcriptsManager).loadTranscriptCuesInfo(podcastId, transcript, forceRefresh = false)
     }
 
     @Test
     fun `given html transcript with javascript, when transcript load invoked, then transcript is shown in webview`() = runTest {
-        whenever(transcriptsManager.observerTranscriptForEpisode(any())).thenReturn(flowOf(transcript.copy(type = "text/html")))
+        whenever(transcriptsManager.observeTranscriptForEpisode(any())).thenReturn(flowOf(transcript.copy(type = "text/html")))
         initViewModel(content = "<html><script type=\"text/javascript\"></html>")
 
-        viewModel.parseAndLoadTranscript(isTranscriptViewOpen = true)
+        viewModel.parseAndLoadTranscript()
 
         viewModel.uiState.test {
             assertTrue((awaitItem() as UiState.TranscriptLoaded).showAsWebPage)
@@ -162,10 +165,10 @@ class TranscriptViewModelTest {
 
     @Test
     fun `given html transcript without javascript, when transcript load invoked, then transcript is not shown in webview`() = runTest {
-        whenever(transcriptsManager.observerTranscriptForEpisode(any())).thenReturn(flowOf(transcript.copy(type = "text/html")))
+        whenever(transcriptsManager.observeTranscriptForEpisode(any())).thenReturn(flowOf(transcript.copy(type = "text/html")))
         initViewModel(content = "<html></html>")
 
-        viewModel.parseAndLoadTranscript(isTranscriptViewOpen = true)
+        viewModel.parseAndLoadTranscript()
 
         viewModel.uiState.test {
             assertFalse((awaitItem() as UiState.TranscriptLoaded).showAsWebPage)
@@ -175,10 +178,10 @@ class TranscriptViewModelTest {
 
     @Test
     fun `given html transcript with javascript, when transcript load invoked, then search is not shown`() = runTest {
-        whenever(transcriptsManager.observerTranscriptForEpisode(any())).thenReturn(flowOf(transcript.copy(type = "text/html")))
+        whenever(transcriptsManager.observeTranscriptForEpisode(any())).thenReturn(flowOf(transcript.copy(type = "text/html")))
         initViewModel(content = "<html><script type=\"text/javascript\"></html>")
 
-        viewModel.parseAndLoadTranscript(isTranscriptViewOpen = true)
+        viewModel.parseAndLoadTranscript()
 
         viewModel.uiState.test {
             assertFalse((awaitItem() as UiState.TranscriptLoaded).showSearch)
@@ -188,13 +191,73 @@ class TranscriptViewModelTest {
 
     @Test
     fun `given html transcript without javascript, when transcript load invoked, then search is shown`() = runTest {
-        whenever(transcriptsManager.observerTranscriptForEpisode(any())).thenReturn(flowOf(transcript.copy(type = "text/html")))
+        whenever(transcriptsManager.observeTranscriptForEpisode(any())).thenReturn(flowOf(transcript.copy(type = "text/html")))
         initViewModel(content = "<html></html>")
 
-        viewModel.parseAndLoadTranscript(isTranscriptViewOpen = true)
+        viewModel.parseAndLoadTranscript()
 
         viewModel.uiState.test {
             assertTrue((awaitItem() as UiState.TranscriptLoaded).showSearch)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `given generated transcript, when user is not subscribed, then show paywall`() = runTest {
+        whenever(transcriptsManager.observeTranscriptForEpisode(any())).thenReturn(flowOf(transcript.copy(isGenerated = true)))
+        whenever(subscriptionManager.subscriptionTier()).thenReturn(flowOf(SubscriptionTier.NONE))
+        initViewModel(content = "Hello")
+
+        viewModel.parseAndLoadTranscript()
+
+        viewModel.uiState.test {
+            val state = awaitItem() as UiState.TranscriptLoaded
+            assertTrue(state.showPaywall)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `given generated transcript, when user is Plus, then do not show paywall`() = runTest {
+        whenever(transcriptsManager.observeTranscriptForEpisode(any())).thenReturn(flowOf(transcript.copy(isGenerated = true)))
+        whenever(subscriptionManager.subscriptionTier()).thenReturn(flowOf(SubscriptionTier.PLUS))
+        initViewModel(content = "Hello")
+
+        viewModel.parseAndLoadTranscript()
+
+        viewModel.uiState.test {
+            val state = awaitItem() as UiState.TranscriptLoaded
+            assertFalse(state.showPaywall)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `given generated transcript, when user is Patron, then do not show paywall`() = runTest {
+        whenever(transcriptsManager.observeTranscriptForEpisode(any())).thenReturn(flowOf(transcript.copy(isGenerated = true)))
+        whenever(subscriptionManager.subscriptionTier()).thenReturn(flowOf(SubscriptionTier.PATRON))
+        initViewModel(content = "Hello")
+
+        viewModel.parseAndLoadTranscript()
+
+        viewModel.uiState.test {
+            val state = awaitItem() as UiState.TranscriptLoaded
+            assertFalse(state.showPaywall)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `given generated transcript, when user is not subscribed and there is no transcript content, then do not show paywall`() = runTest {
+        whenever(transcriptsManager.observeTranscriptForEpisode(any())).thenReturn(flowOf(transcript.copy(isGenerated = true)))
+        whenever(subscriptionManager.subscriptionTier()).thenReturn(flowOf(SubscriptionTier.NONE))
+        initViewModel(content = null)
+
+        viewModel.parseAndLoadTranscript()
+
+        viewModel.uiState.test {
+            val state = awaitItem() as UiState.TranscriptLoaded
+            assertFalse(state.showPaywall)
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -227,6 +290,7 @@ class TranscriptViewModelTest {
             playbackManager = playbackManager,
             ioDispatcher = UnconfinedTestDispatcher(),
             analyticsTracker = mock(),
+            subscriptionManager = subscriptionManager,
         )
     }
 }

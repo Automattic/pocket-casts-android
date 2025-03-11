@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.runtime.LaunchedEffect
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -47,8 +48,6 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSourc
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog.ButtonType.Danger
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -124,10 +123,8 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         binding.videoView.playbackManager = playbackManager
         binding.videoView.setOnClickListener { onFullScreenVideoClick() }
 
-        if (FeatureFlag.isEnabled(Feature.TRANSCRIPTS)) {
-            setupTranscriptPage()
-            observeTranscriptPageTransition()
-        }
+        setupTranscriptPage()
+        observeTranscriptPageTransition()
 
         setupUpNextDrag(binding)
 
@@ -380,6 +377,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 shelfSharedViewModel.transitionState.collect { transitionState ->
                     when (transitionState) {
                         is TransitionState.OpenTranscript -> binding?.openTranscript()
+                        is TransitionState.UpsellTranscript -> binding?.hidePlaybackControls()
                         is TransitionState.CloseTranscript -> binding?.closeTranscript(transitionState.withTransition)
                     }
                 }
@@ -404,6 +402,12 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         val containerFragment = parentFragment as? PlayerContainerFragment
         containerFragment?.updateTabsVisibility(false)
         root.setScrollingEnabled(false)
+    }
+
+    private fun AdapterPlayerHeaderBinding.hidePlaybackControls() {
+        playerGroup.layoutTransition = LayoutTransition()
+        seekBar.isInvisible = true
+        playerControlsComposeView.isInvisible = true
     }
 
     private fun AdapterPlayerHeaderBinding.closeTranscript(

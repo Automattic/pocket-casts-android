@@ -1,7 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.models.to
 
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import kotlin.time.Duration
 
 data class Chapters(
@@ -12,7 +10,7 @@ data class Chapters(
 
     fun getNextSelectedChapter(time: Duration): Chapter? {
         val currentTimeFinal = time.coerceAtLeast(Duration.ZERO)
-        val items = if (FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS)) selectedItems else items
+        val items = selectedItems
         for (chapter in items) {
             if (chapter.startTime > currentTimeFinal) {
                 return chapter
@@ -27,7 +25,7 @@ data class Chapters(
         }
         var foundChapter: Chapter? = null
         var lastChapter: Chapter? = null
-        val items = if (FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS)) selectedItems else items
+        val items = selectedItems
         for (chapter in items) {
             if (time in chapter) {
                 if (foundChapter != null) {
@@ -67,19 +65,15 @@ data class Chapters(
     }
 
     fun skippedChaptersDuration(time: Duration): Duration {
-        return if (FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS)) {
-            items
-                .filter { !it.selected && it.endTime > time }
-                .fold(Duration.ZERO) { duration, chapter ->
-                    duration + if (time in chapter) {
-                        chapter.endTime - time
-                    } else {
-                        chapter.duration
-                    }
+        return items
+            .filter { !it.selected && it.endTime > time }
+            .fold(Duration.ZERO) { duration, chapter ->
+                duration + if (time in chapter) {
+                    chapter.endTime - time
+                } else {
+                    chapter.duration
                 }
-        } else {
-            Duration.ZERO
-        }
+            }
     }
 }
 

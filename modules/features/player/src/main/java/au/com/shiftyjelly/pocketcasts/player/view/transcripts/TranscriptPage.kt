@@ -25,6 +25,8 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalConfiguration
@@ -92,7 +94,7 @@ fun TranscriptPage(
     val searchState = searchViewModel.searchState.collectAsStateWithLifecycle()
     val refreshing = transcriptViewModel.isRefreshing.collectAsStateWithLifecycle()
     val pullRefreshState = rememberPullRefreshState(refreshing.value, {
-        transcriptViewModel.parseAndLoadTranscript(isTranscriptViewOpen = true, pulledToRefresh = true)
+        transcriptViewModel.parseAndLoadTranscript(pulledToRefresh = true)
     })
     val playerBackgroundColor = Color(theme.playerBackgroundColor(uiState.value.podcastAndEpisode?.podcast))
     val colors = TranscriptColors(playerBackgroundColor)
@@ -120,7 +122,6 @@ fun TranscriptPage(
                     state = loadedState,
                     searchState = searchState.value,
                     colors = colors,
-                    modifier = modifier,
                     transitionState = transitionState.value,
                 )
 
@@ -138,10 +139,7 @@ fun TranscriptPage(
                 TranscriptError(
                     state = errorState,
                     onRetry = {
-                        transcriptViewModel.parseAndLoadTranscript(
-                            isTranscriptViewOpen = true,
-                            retryOnFail = true,
-                        )
+                        transcriptViewModel.parseAndLoadTranscript(retryOnFail = true)
                     },
                     colors = colors,
                     modifier = modifier,
@@ -151,7 +149,9 @@ fun TranscriptPage(
     }
 
     LaunchedEffect(uiState.value.transcript?.episodeUuid, uiState.value.transcript?.type, transitionState.value) {
-        transcriptViewModel.parseAndLoadTranscript(transitionState.value is TransitionState.OpenTranscript)
+        if (transitionState.value is TransitionState.OpenTranscript) {
+            transcriptViewModel.parseAndLoadTranscript()
+        }
     }
 
     if (uiState.value is UiState.TranscriptLoaded) {
@@ -174,44 +174,55 @@ private fun TranscriptContent(
     state: UiState.TranscriptLoaded,
     searchState: SearchUiState,
     colors: TranscriptColors,
-    modifier: Modifier,
     transitionState: TransitionState?,
 ) {
     Box(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
             .background(colors.backgroundColor()),
     ) {
-        if (state.isTranscriptEmpty) {
-            TextP40(
-                text = stringResource(LR.string.transcript_empty),
-                color = TranscriptColors.textColor(),
+        Box(
+            modifier = if (state.showPaywall) {
+                if (Build.VERSION.SDK_INT >= 31) {
+                    Modifier.blur(8.dp)
+                } else {
+                    Modifier.alpha(0f)
+                }
+            } else {
+                Modifier
+            },
+        ) {
+            if (state.isTranscriptEmpty) {
+                TextP40(
+                    text = stringResource(LR.string.transcript_empty),
+                    color = TranscriptColors.textColor(),
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .padding(top = 60.dp),
+                )
+            } else {
+                ScrollableTranscriptView(
+                    state = state,
+                    searchState = searchState,
+                    transitionState = transitionState,
+                )
+            }
+
+            GradientView(
+                baseColor = colors.backgroundColor(),
                 modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .padding(top = 60.dp),
+                    .align(Alignment.TopCenter),
+                fadeDirection = FadeDirection.TopToBottom,
             )
-        } else {
-            ScrollableTranscriptView(
-                state = state,
-                searchState = searchState,
-                transitionState = transitionState,
+
+            GradientView(
+                baseColor = colors.backgroundColor(),
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = bottomPadding()),
+                fadeDirection = FadeDirection.BottomToTop,
             )
         }
-
-        GradientView(
-            baseColor = colors.backgroundColor(),
-            modifier = Modifier
-                .align(Alignment.TopCenter),
-            fadeDirection = FadeDirection.TopToBottom,
-        )
-
-        GradientView(
-            baseColor = colors.backgroundColor(),
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = bottomPadding()),
-            fadeDirection = FadeDirection.BottomToTop,
-        )
     }
 }
 
@@ -450,6 +461,7 @@ private fun TranscriptContentPreview(
                     episodeUuid = "uuid",
                     type = TranscriptFormat.HTML.mimeType,
                     url = "url",
+                    isGenerated = false,
                 ),
                 cuesInfo = ImmutableList.of(
                     TranscriptCuesInfo(
@@ -473,11 +485,11 @@ private fun TranscriptContentPreview(
                         DisplayItem("Maecenas fermentum senectus penatibus tenectus integer per vulputate tellus ted.", false, 115, 195),
                     ),
                 ),
+                isSubscriptionRequired = false,
             ),
             searchState = searchState,
             transitionState = null,
             colors = TranscriptColors(Color.Black),
-            modifier = Modifier.fillMaxSize(),
         )
     }
 }
@@ -494,17 +506,18 @@ private fun TranscriptEmptyContentPreview() {
                     episodeUuid = "uuid",
                     type = TranscriptFormat.HTML.mimeType,
                     url = "url",
+                    isGenerated = false,
                 ),
                 cuesInfo = emptyList(),
                 displayInfo = DisplayInfo(
                     text = "",
                     items = emptyList(),
                 ),
+                isSubscriptionRequired = false,
             ),
             searchState = SearchUiState(),
             transitionState = null,
             colors = TranscriptColors(Color.Black),
-            modifier = Modifier.fillMaxSize(),
         )
     }
 }
