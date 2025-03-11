@@ -449,6 +449,7 @@ private fun ScrollToHighlightedTextEffect(
 private fun TranscriptPhonePreview() {
     TranscriptContentPreview(searchState = SearchUiState())
 }
+
 @Preview(name = "Generated")
 @Composable
 private fun TranscriptGenereatedPreview() {
