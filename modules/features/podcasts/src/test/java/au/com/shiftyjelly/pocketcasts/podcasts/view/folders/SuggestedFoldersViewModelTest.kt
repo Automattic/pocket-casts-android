@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.folders
 
-import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
@@ -11,7 +10,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.SuggestedFoldersManag
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import io.reactivex.Flowable
-import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
