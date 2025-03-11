@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptCuesInfo
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptFormat
@@ -24,12 +25,13 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -43,28 +45,35 @@ class TranscriptViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val subscriptionManager: SubscriptionManager,
 ) : ViewModel() {
-    private var _uiState: MutableStateFlow<UiState> = MutableStateFlow(UiState.Empty())
-    val uiState: StateFlow<UiState> = _uiState
-    private var _isRefreshing: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    val isRefreshing: StateFlow<Boolean> = _isRefreshing
+    private var _uiState = MutableStateFlow<UiState>(UiState.Empty)
+    val uiState = _uiState.asStateFlow()
+    private var _isRefreshing = MutableStateFlow(false)
+    val isRefreshing = _isRefreshing.asStateFlow()
 
     init {
         viewModelScope.launch {
             playbackManager.playbackStateFlow
                 .map { PodcastAndEpisode(it.podcast, it.episodeUuid) }
-                .stateIn(viewModelScope)
+                .onEach { _uiState.update { value -> value.copy(podcastAndEpisode = it) } }
                 .flatMapLatest(::transcriptFlow)
-                .collect { _uiState.value = it }
+                .collect { _uiState.update { value -> value.copy(transcriptState = it) } }
+        }
+        viewModelScope.launch {
+            subscriptionManager.subscriptionTier().collect { tier ->
+                _uiState.update { value -> value.copy(subscriptionTier = tier) }
+            }
         }
     }
 
     private fun transcriptFlow(podcastAndEpisode: PodcastAndEpisode) =
         transcriptsManager.observeTranscriptForEpisode(podcastAndEpisode.episodeUuid)
-            .distinctUntilChanged { t1, t2 -> t1?.episodeUuid == t2?.episodeUuid && t1?.type == t2?.type }
+            .distinctUntilChanged { t1, t2 -> t1?.episodeUuid == t2?.episodeUuid && t1?.url == t2?.url }
             .map { transcript ->
-                transcript?.let {
-                    UiState.TranscriptFound(podcastAndEpisode, transcript)
-                } ?: UiState.Empty(podcastAndEpisode)
+                if (transcript != null) {
+                    TranscriptState.Found(transcript)
+                } else {
+                    TranscriptState.Empty
+                }
             }
 
     fun parseAndLoadTranscript(
@@ -76,10 +85,11 @@ class TranscriptViewModel @Inject constructor(
             _isRefreshing.value = true
             podcastAndEpisode?.let { track(AnalyticsEvent.TRANSCRIPT_PULLED_TO_REFRESH, it) }
         }
-        _uiState.value.transcript?.let { transcript ->
+        _uiState.value.transcriptState.transcript?.let { transcript ->
             clearErrorsIfFound(transcript)
+
             viewModelScope.launch {
-                _uiState.value = try {
+                val newTranscriptState = try {
                     val forceRefresh = pulledToRefresh || retryOnFail
                     val cuesInfo = transcriptsManager.loadTranscriptCuesInfo(
                         podcastUuid = podcastAndEpisode?.podcast?.uuid.orEmpty(),
@@ -92,16 +102,10 @@ class TranscriptViewModel @Inject constructor(
                         transcriptFormat = TranscriptFormat.fromType(transcript.type),
                     )
 
-                    val loaded = UiState.TranscriptLoaded(
+                    val loaded = TranscriptState.Loaded(
                         transcript = transcript,
-                        podcastAndEpisode = podcastAndEpisode,
                         displayInfo = displayInfo,
                         cuesInfo = cuesInfo,
-                        isSubscriptionRequired = if (transcript.isGenerated) {
-                            !subscriptionManager.subscriptionTier().first().isPaid
-                        } else {
-                            false
-                        },
                     )
 
                     if (!pulledToRefresh) {
@@ -122,24 +126,28 @@ class TranscriptViewModel @Inject constructor(
                     track(AnalyticsEvent.TRANSCRIPT_ERROR, podcastAndEpisode, mapOf("error" to e.message.orEmpty()))
                     when (e) {
                         is EmptyDataException ->
-                            UiState.Error(TranscriptError.Empty, transcript, podcastAndEpisode)
+                            TranscriptState.Error(TranscriptError.Empty, transcript)
 
                         is UnsupportedOperationException ->
-                            UiState.Error(TranscriptError.NotSupported(transcript.type), transcript, podcastAndEpisode)
+                            TranscriptState.Error(TranscriptError.NotSupported(transcript.type), transcript)
 
                         is NoNetworkException ->
-                            UiState.Error(TranscriptError.NoNetwork, transcript, podcastAndEpisode)
+                            TranscriptState.Error(TranscriptError.NoNetwork, transcript)
 
                         is ParsingException ->
-                            UiState.Error(TranscriptError.FailedToParse, transcript, podcastAndEpisode)
+                            TranscriptState.Error(TranscriptError.FailedToParse, transcript)
 
                         else -> {
                             LogBuffer.e(LogBuffer.TAG_INVALID_STATE, e, "Failed to load transcript: ${transcript.url}")
-                            UiState.Error(TranscriptError.FailedToLoad, transcript, podcastAndEpisode)
+                            TranscriptState.Error(TranscriptError.FailedToLoad, transcript)
                         }
                     }
                 }
-                if (pulledToRefresh) _isRefreshing.value = false
+                _uiState.update { value -> value.copy(transcriptState = newTranscriptState) }
+
+                if (pulledToRefresh) {
+                    _isRefreshing.value = false
+                }
             }
         }
     }
@@ -190,11 +198,12 @@ class TranscriptViewModel @Inject constructor(
     }
 
     private fun clearErrorsIfFound(transcript: Transcript) {
-        if (_uiState.value is UiState.Error) {
-            _uiState.value = UiState.TranscriptFound(
-                podcastAndEpisode = _uiState.value.podcastAndEpisode,
-                transcript = transcript,
-            )
+        if (_uiState.value.transcriptState is TranscriptState.Error) {
+            _uiState.update { value ->
+                value.copy(
+                    transcriptState = TranscriptState.Found(transcript = transcript),
+                )
+            }
         }
     }
 
@@ -211,50 +220,65 @@ class TranscriptViewModel @Inject constructor(
         )
     }
 
-    data class PodcastAndEpisode(
-        val podcast: Podcast?,
-        val episodeUuid: String,
-    )
+    data class UiState(
+        val subscriptionTier: SubscriptionTier,
+        val podcastAndEpisode: PodcastAndEpisode?,
+        val transcriptState: TranscriptState,
+    ) {
+        private val isSubscriptionRequired = if (transcriptState.transcript?.isGenerated == true) {
+            !subscriptionTier.isPaid
+        } else {
+            false
+        }
 
-    sealed class UiState {
-        open val transcript: Transcript? = null
-        open val podcastAndEpisode: PodcastAndEpisode? = null
+        val showPaywall = (transcriptState as? TranscriptState.Loaded)?.isTranscriptEmpty == false && isSubscriptionRequired
 
-        data class Empty(
-            override val podcastAndEpisode: PodcastAndEpisode? = null,
-        ) : UiState()
+        val showSearch = (transcriptState as? TranscriptState.Loaded)?.showAsWebPage == true && !isSubscriptionRequired
 
-        data class TranscriptFound(
-            override val podcastAndEpisode: PodcastAndEpisode? = null,
+        companion object {
+            val Empty = UiState(
+                subscriptionTier = SubscriptionTier.NONE,
+                podcastAndEpisode = null,
+                transcriptState = TranscriptState.Empty,
+            )
+        }
+    }
+
+    sealed interface TranscriptState {
+        val transcript: Transcript?
+
+        data object Empty : TranscriptState {
+            override val transcript get() = null
+        }
+
+        data class Found(
             override val transcript: Transcript,
-        ) : UiState()
+        ) : TranscriptState
 
-        data class TranscriptLoaded(
-            override val podcastAndEpisode: PodcastAndEpisode? = null,
+        data class Loaded(
             override val transcript: Transcript,
             val displayInfo: DisplayInfo,
             val cuesInfo: List<TranscriptCuesInfo>,
-            val isSubscriptionRequired: Boolean,
-        ) : UiState() {
+        ) : TranscriptState {
             val isTranscriptEmpty: Boolean = cuesInfo.isEmpty()
-
-            val showPaywall = isSubscriptionRequired && !isTranscriptEmpty
 
             val showAsWebPage: Boolean
                 get() = transcript.type == TranscriptFormat.HTML.mimeType &&
                     cuesInfo.isNotEmpty() && cuesInfo[0].cuesWithTiming.cues.any {
                         it.text?.contains("<script type=\"text/javascript\">") ?: false
                     }
-
-            val showSearch = !showAsWebPage && !isSubscriptionRequired
         }
 
         data class Error(
             val error: TranscriptError,
             override val transcript: Transcript,
-            override val podcastAndEpisode: PodcastAndEpisode? = null,
-        ) : UiState()
+        ) : TranscriptState
     }
+
+    data class PodcastAndEpisode(
+        val podcast: Podcast?,
+        val episodeUuid: String,
+    )
 
     data class DisplayInfo(
         val text: String,
