@@ -10,7 +10,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptCuesInfo
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
-import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptFormat
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptsManager
@@ -22,7 +21,7 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.splitIgnoreEmpty
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -30,7 +29,6 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -43,7 +41,6 @@ class TranscriptViewModel @Inject constructor(
     private val transcriptsManager: TranscriptsManager,
     private val playbackManager: PlaybackManager,
     private val analyticsTracker: AnalyticsTracker,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val subscriptionManager: SubscriptionManager,
 ) : ViewModel() {
     private var _uiState = MutableStateFlow<UiState>(UiState.Empty)
@@ -55,17 +52,24 @@ class TranscriptViewModel @Inject constructor(
         viewModelScope.launch {
             playbackManager.playbackStateFlow
                 .distinctUntilChangedBy { it.episodeUuid }
-                .map { PodcastAndEpisode(it.podcast, it.episodeUuid) }
-                .onEach { _uiState.update { value -> value.copy(podcastAndEpisode = it) } }
-                .flatMapLatest { transcriptsManager.observeTranscriptForEpisode(it.episodeUuid) }
-                .distinctUntilChangedBy { it?.url }
-                .collect { transcript ->
+                .flatMapLatest { playbackState ->
+                    transcriptsManager
+                        .observeTranscriptForEpisode(playbackState.episodeUuid)
+                        .map { transcript -> transcript to playbackState }
+                }
+                .distinctUntilChangedBy { (transcript, _) -> transcript?.url }
+                .collect { (transcript, playbackState) ->
                     val state = if (transcript != null) {
                         TranscriptState.Found(transcript)
                     } else {
                         TranscriptState.Empty
                     }
-                    _uiState.update { value -> value.copy(transcriptState = state) }
+                    _uiState.update { value ->
+                        value.copy(
+                            podcastAndEpisode = PodcastAndEpisode(playbackState.podcast, playbackState.episodeUuid),
+                            transcriptState = state,
+                        )
+                    }
                 }
         }
 
@@ -143,7 +147,6 @@ class TranscriptViewModel @Inject constructor(
                         }
                     }
                 }
-                Timber.tag("LOG_TAG").i("Update 2")
                 _uiState.update { value -> value.copy(transcriptState = newTranscriptState) }
 
                 if (pulledToRefresh) {
@@ -156,7 +159,7 @@ class TranscriptViewModel @Inject constructor(
     private suspend fun buildDisplayInfo(
         cuesInfo: List<TranscriptCuesInfo>,
         transcriptFormat: TranscriptFormat?,
-    ) = withContext(ioDispatcher) {
+    ) = withContext(Dispatchers.Default) {
         var previousSpeaker = ""
         val speakerIndices = mutableListOf<Int>()
         val formattedText = buildString {
