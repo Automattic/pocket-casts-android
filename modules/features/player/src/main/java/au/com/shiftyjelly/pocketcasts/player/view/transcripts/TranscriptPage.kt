@@ -9,8 +9,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -55,8 +55,6 @@ import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.components.FadedLazyColumn
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
-import au.com.shiftyjelly.pocketcasts.compose.extensions.FadeDirection
-import au.com.shiftyjelly.pocketcasts.compose.extensions.gradientBackground
 import au.com.shiftyjelly.pocketcasts.compose.extensions.verticalScrollBar
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.compose.toolbars.textselection.CustomMenuItemOption
@@ -233,73 +231,29 @@ private fun ScrollableTranscriptView(
     searchState: SearchUiState,
     transitionState: TransitionState?,
 ) {
-    val screenWidthDp = LocalConfiguration.current.screenWidthDp
-    val displayWidthPercent = if (Util.isTablet(LocalContext.current)) 0.8f else 1f
-    val horizontalContentPadding = ((1 - displayWidthPercent) * screenWidthDp).dp / 2
+    val lazyListState = rememberLazyListState()
 
-    val scrollState = rememberLazyListState()
-    val scrollableContentModifier = Modifier
-        .padding(bottom = bottomPadding())
-        .verticalScrollBar(
-            thumbColor = TranscriptColors.textColor(),
-            scrollState = scrollState,
-            contentPadding = PaddingValues(top = TranscriptDefaults.ContentOffsetTop, bottom = TranscriptDefaults.ContentOffsetBottom),
-        )
-
-    val customMenu = buildList {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-            add(CustomMenuItemOption.Share)
-        }
-    }
     CompositionLocalProvider(
         LocalTextToolbar provides CustomTextToolbar(
-            LocalView.current,
-            customMenu,
-            LocalClipboardManager.current,
+            view = LocalView.current,
+            customMenuItems = buildList {
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+                    add(CustomMenuItemOption.Share)
+                }
+            },
+            clipboardManager = LocalClipboardManager.current,
         ),
     ) {
         SelectionContainer {
             if (state.showAsWebPage) {
                 TranscriptWebView(state, transitionState)
             } else {
-                FadedLazyColumn(
-                    state = scrollState,
-                    modifier = scrollableContentModifier,
-                    contentPadding = PaddingValues(
-                        start = horizontalContentPadding,
-                        end = horizontalContentPadding,
-                        top = TranscriptDefaults.ContentOffsetTop,
-                        bottom = TranscriptDefaults.ContentOffsetBottom,
-                    ),
-                ) {
-                    items(state.displayInfo.items) { item ->
-                        TranscriptItem(
-                            item = item,
-                            searchState = searchState,
-                        )
-                    }
-                }
+                TranscriptItems(state, searchState, lazyListState)
             }
         }
     }
 
-    // Scroll to highlighted text
-    if (searchState.searchResultIndices.isNotEmpty()) {
-        val density = LocalDensity.current
-        val scrollToHighlightedTextOffset = density.run { scrollToHighlightedTextOffset().roundToPx() }
-        LaunchedEffect(searchState.searchTerm, searchState.currentSearchIndex) {
-            val displayItems = state.displayInfo.items
-            val targetSearchResultIndexIndex = searchState.searchResultIndices[searchState.currentSearchIndex]
-            displayItems.find { item ->
-                targetSearchResultIndexIndex in item.startIndex until item.endIndex
-            }?.let { displayItemWithCurrentSearchText ->
-                scrollState.animateScrollToItem(
-                    displayItems.indexOf(displayItemWithCurrentSearchText),
-                    scrollOffset = -scrollToHighlightedTextOffset,
-                )
-            }
-        }
-    }
+    ScrollToHighlightedTextEffect(state, searchState, lazyListState)
 }
 
 @Composable
@@ -346,6 +300,41 @@ private fun TranscriptWebView(
     }
     LaunchedEffect(transitionState, webViewState.viewState) {
         if (!isRootUrl) navigator.navigateBack()
+    }
+}
+
+@Composable
+private fun TranscriptItems(
+    state: UiState.TranscriptLoaded,
+    searchState: SearchUiState,
+    listState: LazyListState,
+) {
+    val screenWidthDp = LocalConfiguration.current.screenWidthDp
+    val displayWidthPercent = if (Util.isTablet(LocalContext.current)) 0.8f else 1f
+    val horizontalContentPadding = ((1 - displayWidthPercent) * screenWidthDp).dp / 2
+
+    FadedLazyColumn(
+        state = listState,
+        contentPadding = PaddingValues(
+            start = horizontalContentPadding,
+            end = horizontalContentPadding,
+            top = TranscriptDefaults.ContentOffsetTop,
+            bottom = TranscriptDefaults.ContentOffsetBottom,
+        ),
+        modifier = Modifier
+            .padding(bottom = bottomPadding())
+            .verticalScrollBar(
+                thumbColor = TranscriptColors.textColor(),
+                scrollState = listState,
+                contentPadding = PaddingValues(top = TranscriptDefaults.ContentOffsetTop, bottom = TranscriptDefaults.ContentOffsetBottom),
+            ),
+    ) {
+        items(state.displayInfo.items) { item ->
+            TranscriptItem(
+                item = item,
+                searchState = searchState,
+            )
+        }
     }
 }
 
@@ -397,25 +386,28 @@ private fun TranscriptItem(
 }
 
 @Composable
-private fun GradientView(
-    baseColor: Color,
-    modifier: Modifier = Modifier,
-    fadeDirection: FadeDirection,
+private fun ScrollToHighlightedTextEffect(
+    state: UiState.TranscriptLoaded,
+    searchState: SearchUiState,
+    lazyListState: LazyListState,
 ) {
-    val screenHeight = LocalConfiguration.current.screenHeightDp
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .height((screenHeight * 0.1).dp)
-            .gradientBackground(
-                baseColor = baseColor,
-                colorStops = listOf(
-                    Color.Black,
-                    Color.Transparent,
-                ),
-                direction = fadeDirection,
-            ),
-    )
+    if (searchState.searchResultIndices.isNotEmpty()) {
+        val density = LocalDensity.current
+        val scrollToHighlightedTextOffset = density.run { scrollToHighlightedTextOffset().roundToPx() }
+
+        LaunchedEffect(searchState.searchTerm, searchState.currentSearchIndex) {
+            val displayItems = state.displayInfo.items
+            val targetSearchResultIndexIndex = searchState.searchResultIndices[searchState.currentSearchIndex]
+            displayItems
+                .find { item -> targetSearchResultIndexIndex in item.startIndex until item.endIndex }
+                ?.let { displayItemWithCurrentSearchText ->
+                    lazyListState.animateScrollToItem(
+                        index = displayItems.indexOf(displayItemWithCurrentSearchText),
+                        scrollOffset = -scrollToHighlightedTextOffset,
+                    )
+                }
+        }
+    }
 }
 
 @Preview(name = "Phone")
