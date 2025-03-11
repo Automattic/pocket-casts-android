@@ -112,7 +112,7 @@ internal class CollectionListRowAdapter(
 
         if (position == 0) {
             this.header?.let {
-                holder.binding.header.root.visibility = View.VISIBLE
+                holder.binding.header.root.isVisible = true
                 holder.binding.header.lblTitle.text = it.title
                 holder.binding.header.lblSubtitle.text = it.subtitle
                 holder.binding.header.imageHeader.load(it.imageUrl)
@@ -125,7 +125,7 @@ internal class CollectionListRowAdapter(
                 holder.binding.root.layoutParams = layoutParams
             }
         } else {
-            holder.binding.header.root.visibility = View.GONE
+            holder.binding.header.root.isVisible = false
         }
     }
 
