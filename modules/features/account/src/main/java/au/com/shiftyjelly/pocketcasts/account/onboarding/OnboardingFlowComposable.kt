@@ -248,6 +248,7 @@ private fun Content(
                 OnboardingUpgradeSource.SETTINGS,
                 OnboardingUpgradeSource.SLUMBER_STUDIOS,
                 OnboardingUpgradeSource.UP_NEXT_SHUFFLE,
+                OnboardingUpgradeSource.GENERATED_TRANSCRIPTS,
                 OnboardingUpgradeSource.UNKNOWN,
                 -> false
 
