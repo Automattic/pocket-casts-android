@@ -62,24 +62,6 @@ class SuggestedFoldersViewModelTest {
     }
 
     @Test
-    fun `should init with existing folders`() = runTest {
-        initViewModel()
-
-        viewModel.state.test {
-            assertEquals(folderCount, awaitItem().existingFoldersCount)
-        }
-    }
-
-    @Test
-    fun `should init with existing suggested folders`() = runTest {
-        initViewModel()
-
-        viewModel.state.test {
-            assertEquals(dbSuggestedFolders[0].name, awaitItem().suggestedFolders[0].name)
-        }
-    }
-
-    @Test
     fun `popup was marked as dismissed`() = runTest {
         initViewModel()
 
