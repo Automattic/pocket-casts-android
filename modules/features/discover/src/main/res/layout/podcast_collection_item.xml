@@ -7,9 +7,7 @@
     android:background="?attr/selectableItemBackground"
     android:clipChildren="false"
     android:clipToPadding="false"
-    android:orientation="horizontal"
-    android:padding="8dp"
-    tools:parentTag="android.widget.LinearLayout">
+    android:orientation="horizontal">
 
     <androidx.cardview.widget.CardView
         android:layout_width="100dp"
@@ -23,6 +21,7 @@
             android:id="@+id/imageView"
             android:layout_width="100dp"
             android:layout_height="100dp"
+            android:background="?attr/defaultArtwork"
             tools:ignore="ContentDescription" />
     </androidx.cardview.widget.CardView>
 

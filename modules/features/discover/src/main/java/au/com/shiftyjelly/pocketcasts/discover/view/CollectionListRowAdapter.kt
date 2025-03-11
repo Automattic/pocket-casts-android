@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.discover.view
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ListAdapter
@@ -12,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.discover.view.CollectionListRowAdapter.Col
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.LIST_ID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.PODCAST_UUID_KEY
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
+import coil.load
 
 internal class CollectionListRowAdapter(
     val onPodcastClicked: ((DiscoverPodcast, String?) -> Unit),
@@ -48,8 +50,10 @@ internal class CollectionListRowAdapter(
     }
 
     private var fromListId: String? = null
+    private var header: CollectionHeader? = null
 
-    fun submitPodcastList(list: List<DiscoverPodcast>, commitCallback: Runnable?) {
+    fun submitPodcastList(list: List<DiscoverPodcast>, header: CollectionHeader, commitCallback: Runnable?) {
+        this.header = header
         submitList(list.chunked(NUMBER_OF_ROWS_PER_PAGE), commitCallback)
     }
 
@@ -83,10 +87,34 @@ internal class CollectionListRowAdapter(
 
     override fun onBindViewHolder(holder: CollectionListViewHolder, position: Int) {
         val podcastSublist = getItem(position)
+
         holder.bind(podcastSublist)
+
+        if (position == 0) {
+            this.header?.let {
+                holder.binding.header.root.visibility = View.VISIBLE
+                holder.binding.header.lblTitle.text = it.title
+                holder.binding.header.lblSubtitle.text = it.subtitle
+                holder.binding.header.imageHeader.load(it.imageUrl)
+
+                val height = getPodcastsHeight(holder.binding.podcasts)
+                val layoutParams = holder.binding.root.layoutParams
+                layoutParams.height = height
+                holder.binding.root.layoutParams = layoutParams
+            }
+        } else {
+            holder.binding.header.root.visibility = View.GONE
+        }
+    }
+
+    fun getPodcastsHeight(view: View): Int {
+        view.measure(0, 0)
+        return view.measuredHeight
     }
 
     fun setFromListId(value: String) {
         this.fromListId = value
     }
+
+    data class CollectionHeader(val imageUrl: String?, val title: String?, val subtitle: String?)
 }
