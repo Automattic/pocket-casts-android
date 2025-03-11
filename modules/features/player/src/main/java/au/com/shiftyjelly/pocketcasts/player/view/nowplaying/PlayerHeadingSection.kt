@@ -99,7 +99,7 @@ fun PlayerHeadingSection(
 
     LaunchedEffect(Unit) {
         shelfSharedViewModel.transitionState.collect {
-            disableAccessibility = it is TransitionState.OpenTranscript || it is TransitionState.UpsellTranscript
+            disableAccessibility = it is TransitionState.OpenTranscript
         }
     }
 }

@@ -125,39 +125,26 @@ class ShelfSharedViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             if (isTranscriptAvailable) {
-                openTranscript(source)
+                trackShelfAction(ShelfItem.Transcript, source)
+                openTranscript(showPlayerControls = true)
             } else {
                 _snackbarMessages.emit(SnackbarMessage.TranscriptNotAvailable)
             }
         }
     }
 
-    fun openTranscript(source: ShelfItemSource) {
-        trackShelfAction(ShelfItem.Transcript, source)
+    fun openTranscript(showPlayerControls: Boolean) {
         viewModelScope.launch {
-            _transitionState.emit(TransitionState.OpenTranscript)
-        }
-    }
-
-    fun showUpsell() {
-        viewModelScope.launch {
-            _transitionState.emit(TransitionState.UpsellTranscript)
-        }
-    }
-
-    fun closeUpsell() {
-        viewModelScope.launch {
-            _transitionState.emit(TransitionState.OpenTranscript)
+            _transitionState.emit(TransitionState.OpenTranscript(showPlayerControls))
         }
     }
 
     fun closeTranscript(
         podcast: Podcast?,
         episode: BaseEpisode?,
-        withTransition: Boolean = false,
     ) {
         viewModelScope.launch {
-            _transitionState.emit(TransitionState.CloseTranscript(withTransition))
+            _transitionState.emit(TransitionState.CloseTranscript)
             analyticsTracker.track(
                 AnalyticsEvent.TRANSCRIPT_DISMISSED,
                 AnalyticsProp.transcriptDismissed(
@@ -370,9 +357,8 @@ class ShelfSharedViewModel @Inject constructor(
     }
 
     sealed class TransitionState {
-        data object OpenTranscript : TransitionState()
-        data object UpsellTranscript : TransitionState()
-        data class CloseTranscript(val withTransition: Boolean) : TransitionState()
+        data class OpenTranscript(val showPlayerControls: Boolean) : TransitionState()
+        data object CloseTranscript : TransitionState()
     }
 
     enum class ShelfItemSource {
