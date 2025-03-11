@@ -18,10 +18,11 @@ import coil.load
 internal class CollectionListRowAdapter(
     val onPodcastClicked: ((DiscoverPodcast, String?) -> Unit),
     val onPodcastSubscribe: (DiscoverPodcast, String?) -> Unit,
+    val onHeaderClicked: () -> Unit,
     val analyticsTracker: AnalyticsTracker,
 ) : ListAdapter<List<Any>, CollectionListRowAdapter.CollectionListViewHolder>(SmallListDiffer) {
 
-    class CollectionListViewHolder(val binding: ItemCollectionListBinding, onItemClicked: (Int, Int) -> Unit) : RecyclerView.ViewHolder(binding.root) {
+    class CollectionListViewHolder(val binding: ItemCollectionListBinding, onItemClicked: (Int, Int) -> Unit, onHeaderClicked: () -> Unit) : RecyclerView.ViewHolder(binding.root) {
 
         companion object {
             const val NUMBER_OF_ROWS_PER_PAGE = 2
@@ -33,6 +34,9 @@ internal class CollectionListRowAdapter(
             }
             binding.row1.setOnClickListener {
                 onItemClicked(bindingAdapterPosition, 1)
+            }
+            binding.header.root.setOnClickListener {
+                onHeaderClicked()
             }
         }
 
@@ -66,23 +70,29 @@ internal class CollectionListRowAdapter(
         val inflater = LayoutInflater.from(parent.context)
         val binding = ItemCollectionListBinding.inflate(inflater, parent, false)
 
-        return CollectionListViewHolder(binding) { pageIndex, podcastIndex ->
-            val podcastSublist = getItem(pageIndex)
-            val podcast = podcastSublist.getOrNull(podcastIndex) as? DiscoverPodcast
+        return CollectionListViewHolder(
+            binding,
+            onItemClicked = { pageIndex, podcastIndex ->
+                val podcastSublist = getItem(pageIndex)
+                val podcast = podcastSublist.getOrNull(podcastIndex) as? DiscoverPodcast
 
-            if (podcast == null) return@CollectionListViewHolder
+                if (podcast == null) return@CollectionListViewHolder
 
-            fromListId?.let {
-                analyticsTracker.track(
-                    AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED,
-                    mapOf(
-                        LIST_ID_KEY to it,
-                        PODCAST_UUID_KEY to podcast.uuid,
-                    ),
-                )
-            }
-            onPodcastClicked(podcast, fromListId)
-        }
+                fromListId?.let {
+                    analyticsTracker.track(
+                        AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED,
+                        mapOf(
+                            LIST_ID_KEY to it,
+                            PODCAST_UUID_KEY to podcast.uuid,
+                        ),
+                    )
+                }
+                onPodcastClicked(podcast, fromListId)
+            },
+            onHeaderClicked = {
+                onHeaderClicked()
+            },
+        )
     }
 
     override fun onBindViewHolder(holder: CollectionListViewHolder, position: Int) {

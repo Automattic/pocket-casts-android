@@ -4,7 +4,9 @@
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
     android:layout_marginVertical="8dp"
-    android:layout_marginLeft="8dp">
+    android:layout_marginLeft="8dp"
+    android:clickable="true"
+    android:focusable="true">
 
     <com.google.android.material.card.MaterialCardView
         android:layout_width="179dp"

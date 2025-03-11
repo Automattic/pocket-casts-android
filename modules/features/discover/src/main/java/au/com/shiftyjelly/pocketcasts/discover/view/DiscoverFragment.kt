@@ -101,6 +101,18 @@ class DiscoverFragment :
         }
     }
 
+    override fun onCollectionHeaderClicked(list: NetworkLoadableList) {
+        val transformedList = viewModel.transformNetworkLoadableList(list, resources)
+        val listId = list.listUuid
+        if (listId != null) {
+            analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_COLLECTION_HEADER_TAPPED, mapOf(LIST_ID_KEY to listId))
+        }
+        if (list.expandedStyle is ExpandedStyle.GridList) {
+            val fragment = PodcastGridFragment.newInstance(transformedList)
+            (activity as FragmentHostListener).addFragment(fragment)
+        }
+    }
+
     override fun onEpisodeClicked(episode: DiscoverEpisode, listUuid: String?) {
         val fragment = EpisodeContainerFragment.newInstance(
             episodeUuid = episode.uuid,

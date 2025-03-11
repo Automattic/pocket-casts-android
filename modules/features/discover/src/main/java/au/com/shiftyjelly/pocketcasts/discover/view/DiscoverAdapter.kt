@@ -121,6 +121,7 @@ internal class DiscoverAdapter(
         fun onPodcastClicked(podcast: DiscoverPodcast, listUuid: String?, isFeatured: Boolean = false)
         fun onPodcastSubscribe(podcast: DiscoverPodcast, listUuid: String?)
         fun onPodcastListClicked(list: NetworkLoadableList)
+        fun onCollectionHeaderClicked(list: NetworkLoadableList)
         fun onEpisodeClicked(episode: DiscoverEpisode, listUuid: String?)
         fun onEpisodePlayClicked(episode: DiscoverEpisode)
         fun onEpisodeStopClicked()
@@ -447,7 +448,14 @@ internal class DiscoverAdapter(
     class CollectionListDeprecatedViewHolder(val binding: RowCollectionListDeprecatedBinding) : NetworkLoadableViewHolder(binding.root)
 
     inner class CollectionListViewHolder(val binding: RowCollectionListBinding) : NetworkLoadableViewHolder(binding.root), ShowAllRow {
-        val adapter = CollectionListRowAdapter(listener::onPodcastClicked, listener::onPodcastSubscribe, analyticsTracker)
+        val adapter = CollectionListRowAdapter(
+            listener::onPodcastClicked,
+            listener::onPodcastSubscribe,
+            onHeaderClicked = {
+                collectionList?.let { listener.onCollectionHeaderClicked(it) }
+            },
+            analyticsTracker,
+        )
 
         override val showAllButton: TextView
             get() = binding.btnShowAll
@@ -456,6 +464,8 @@ internal class DiscoverAdapter(
             LinearLayoutManager(itemView.context, RecyclerView.HORIZONTAL, false).apply {
                 initialPrefetchItemCount = 2
             }
+
+        private var collectionList: NetworkLoadableList? = null
 
         init {
             recyclerView?.layoutManager = linearLayoutManager
@@ -483,6 +493,10 @@ internal class DiscoverAdapter(
             recyclerView?.post {
                 binding.pageIndicatorView.position = linearLayoutManager.findFirstVisibleItemPosition()
             }
+        }
+
+        fun setCollectionList(list: NetworkLoadableList) {
+            collectionList = list
         }
     }
 
@@ -823,6 +837,8 @@ internal class DiscoverAdapter(
                             holder.binding.pageIndicatorView.count = ceil(podcasts.count().toDouble() / CollectionListRowAdapter.CollectionListViewHolder.NUMBER_OF_ROWS_PER_PAGE.toDouble()).toInt()
 
                             row.listUuid?.let { listUuid -> holder.adapter.setFromListId(listUuid) }
+
+                            holder.setCollectionList(row)
 
                             holder.binding.lblTitle.text = it.subtitle?.tryToLocalise(resources)
 
