@@ -4,12 +4,17 @@ import android.os.Build
 import android.view.KeyEvent
 import android.view.View
 import androidx.annotation.OptIn
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -303,6 +308,7 @@ private fun TranscriptWebView(
     }
 }
 
+@kotlin.OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun TranscriptItems(
     state: UiState.TranscriptLoaded,
@@ -313,27 +319,55 @@ private fun TranscriptItems(
     val displayWidthPercent = if (Util.isTablet(LocalContext.current)) 0.8f else 1f
     val horizontalContentPadding = ((1 - displayWidthPercent) * screenWidthDp).dp / 2
 
-    FadedLazyColumn(
-        state = listState,
-        contentPadding = PaddingValues(
-            start = horizontalContentPadding,
-            end = horizontalContentPadding,
-            top = TranscriptDefaults.ContentOffsetTop,
-            bottom = TranscriptDefaults.ContentOffsetBottom,
-        ),
-        modifier = Modifier
-            .padding(bottom = bottomPadding())
-            .verticalScrollBar(
-                thumbColor = TranscriptColors.textColor(),
-                scrollState = listState,
-                contentPadding = PaddingValues(top = TranscriptDefaults.ContentOffsetTop, bottom = TranscriptDefaults.ContentOffsetBottom),
-            ),
+    Column(
+        modifier = Modifier.padding(horizontal = horizontalContentPadding),
     ) {
-        items(state.displayInfo.items) { item ->
-            TranscriptItem(
-                item = item,
-                searchState = searchState,
+        if (state.transcript.isGenerated) {
+            Text(
+                text = stringResource(LR.string.transcript_generated_header),
+                fontSize = 12.sp,
+                lineHeight = 18.sp,
+                color = TranscriptColors.textColor(),
+                modifier = Modifier.padding(horizontal = 32.dp, vertical = 16.dp),
             )
+            Box(
+                modifier = Modifier
+                    .padding(horizontal = 32.dp)
+                    .background(TranscriptColors.accentColor())
+                    .width(48.dp)
+                    .height(1.dp),
+            )
+        }
+
+        FadedLazyColumn(
+            state = listState,
+            modifier = Modifier
+                .padding(bottom = bottomPadding())
+                .verticalScrollBar(
+                    thumbColor = TranscriptColors.accentColor(),
+                    scrollState = listState,
+                    contentPadding = PaddingValues(bottom = TranscriptDefaults.ContentOffsetBottom),
+                ),
+        ) {
+            item(contentType = "padding") {
+                Spacer(
+                    modifier = Modifier.height(16.dp),
+                )
+            }
+            items(
+                items = state.displayInfo.items,
+                contentType = { "transcript" },
+            ) { item ->
+                TranscriptItem(
+                    item = item,
+                    searchState = searchState,
+                )
+            }
+            item(contentType = "padding") {
+                Spacer(
+                    modifier = Modifier.height(16.dp),
+                )
+            }
         }
     }
 }
@@ -415,6 +449,11 @@ private fun ScrollToHighlightedTextEffect(
 private fun TranscriptPhonePreview() {
     TranscriptContentPreview(searchState = SearchUiState())
 }
+@Preview(name = "Generated")
+@Composable
+private fun TranscriptGenereatedPreview() {
+    TranscriptContentPreview(searchState = SearchUiState(), isGenerated = true)
+}
 
 @Preview(name = "PortraitFoldable", device = Devices.PortraitFoldable)
 @Composable
@@ -444,6 +483,7 @@ private fun TranscriptWithSearchContentPreview() {
 @Composable
 private fun TranscriptContentPreview(
     searchState: SearchUiState,
+    isGenerated: Boolean = false,
 ) {
     AppThemeWithBackground(Theme.ThemeType.DARK) {
         TranscriptContent(
@@ -453,7 +493,7 @@ private fun TranscriptContentPreview(
                     episodeUuid = "uuid",
                     type = TranscriptFormat.HTML.mimeType,
                     url = "url",
-                    isGenerated = false,
+                    isGenerated = isGenerated,
                 ),
                 cuesInfo = ImmutableList.of(
                     TranscriptCuesInfo(
@@ -471,8 +511,8 @@ private fun TranscriptContentPreview(
                 displayInfo = DisplayInfo(
                     text = "",
                     items = listOf(
-                        DisplayItem("Speaker 1", true, 0, 8),
                         DisplayItem("Lorem ipsum odor amet, consectetuer adipiscing elit.", false, 0, 52),
+                        DisplayItem("Speaker 1", true, 0, 8),
                         DisplayItem("Sodales sem fusce elementum commodo risus purus auctor neque.", false, 53, 114),
                         DisplayItem("Maecenas fermentum senectus penatibus tenectus integer per vulputate tellus ted.", false, 115, 195),
                     ),
