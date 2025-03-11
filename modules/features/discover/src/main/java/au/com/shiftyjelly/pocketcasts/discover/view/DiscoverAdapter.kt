@@ -37,6 +37,8 @@ import au.com.shiftyjelly.pocketcasts.discover.databinding.RowSinglePodcastBindi
 import au.com.shiftyjelly.pocketcasts.discover.extensions.updateSubscribeButtonIcon
 import au.com.shiftyjelly.pocketcasts.discover.util.AutoScrollHelper
 import au.com.shiftyjelly.pocketcasts.discover.util.ScrollingLinearLayoutManager
+import au.com.shiftyjelly.pocketcasts.discover.view.CollectionListRowAdapter.CollectionListViewHolder.Companion.NUMBER_OF_PODCASTS_TO_DISPLAY_TWICE
+import au.com.shiftyjelly.pocketcasts.discover.view.CollectionListRowAdapter.CollectionListViewHolder.Companion.NUMBER_OF_ROWS_PER_PAGE
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.EPISODE_UUID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.LIST_ID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.PODCAST_UUID_KEY
@@ -834,7 +836,8 @@ internal class DiscoverAdapter(
                         loadPodcastList(row.source),
                         onNext = {
                             val podcasts = it.podcasts.subList(0, MAX_ROWS_SMALL_LIST.coerceAtMost(it.podcasts.count()))
-                            holder.binding.pageIndicatorView.count = ceil(podcasts.count().toDouble() / CollectionListRowAdapter.CollectionListViewHolder.NUMBER_OF_ROWS_PER_PAGE.toDouble()).toInt()
+                            val podcastsCount = podcasts.count().toDouble() + NUMBER_OF_PODCASTS_TO_DISPLAY_TWICE
+                            holder.binding.pageIndicatorView.count = ceil(podcastsCount / NUMBER_OF_ROWS_PER_PAGE.toDouble()).toInt()
 
                             row.listUuid?.let { listUuid -> holder.adapter.setFromListId(listUuid) }
 

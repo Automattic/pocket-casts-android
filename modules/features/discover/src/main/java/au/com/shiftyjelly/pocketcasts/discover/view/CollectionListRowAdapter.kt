@@ -27,6 +27,7 @@ internal class CollectionListRowAdapter(
 
         companion object {
             const val NUMBER_OF_ROWS_PER_PAGE = 2
+            const val NUMBER_OF_PODCASTS_TO_DISPLAY_TWICE = 2
         }
 
         init {
@@ -59,7 +60,15 @@ internal class CollectionListRowAdapter(
 
     fun submitPodcastList(list: List<DiscoverPodcast>, header: CollectionHeader, commitCallback: Runnable?) {
         this.header = header
-        submitList(list.chunked(NUMBER_OF_ROWS_PER_PAGE), commitCallback)
+        val chunkedList = list.chunked(NUMBER_OF_ROWS_PER_PAGE)
+
+        // We want to display the first two podcasts on the next page as well, without the header. That's why we duplicate them in the list.
+        val modifiedList = if (chunkedList.isNotEmpty()) {
+            listOf(chunkedList[0]) + chunkedList
+        } else {
+            chunkedList
+        }
+        submitList(modifiedList, commitCallback)
     }
 
     fun showLoadingList() {
