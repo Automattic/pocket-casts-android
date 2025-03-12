@@ -119,8 +119,10 @@ fun TranscriptPage(
 
             is TranscriptState.Found -> {
                 LoadingView(
-                    modifier = Modifier.background(colors.backgroundColor()),
                     color = TranscriptColors.textColor(),
+                    modifier = Modifier
+                        .background(colors.backgroundColor())
+                        .padding(bottom = bottomPadding()),
                 )
             }
 

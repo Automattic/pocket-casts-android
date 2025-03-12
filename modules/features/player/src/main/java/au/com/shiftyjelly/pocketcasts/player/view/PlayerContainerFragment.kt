@@ -324,7 +324,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
 
             isTranscriptVisible -> {
                 updateTabsVisibility(true)
-                shelfSharedViewModel.closeTranscript(viewModel.podcast, viewModel.episode, withTransition = true)
+                shelfSharedViewModel.closeTranscript(viewModel.podcast, viewModel.episode)
                 true
             }
 

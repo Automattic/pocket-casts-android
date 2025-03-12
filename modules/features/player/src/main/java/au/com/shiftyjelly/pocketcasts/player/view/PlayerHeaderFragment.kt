@@ -14,6 +14,8 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.runtime.LaunchedEffect
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+import androidx.core.view.marginTop
+import androidx.dynamicanimation.animation.SpringAnimation
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -48,8 +50,10 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSourc
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
+import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog.ButtonType.Danger
+import au.com.shiftyjelly.pocketcasts.views.extensions.spring
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
@@ -379,55 +383,52 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 shelfSharedViewModel.transitionState.collect { transitionState ->
                     when (transitionState) {
-                        is TransitionState.OpenTranscript -> binding?.openTranscript()
-                        is TransitionState.UpsellTranscript -> binding?.hidePlaybackControls()
-                        is TransitionState.CloseTranscript -> binding?.closeTranscript(transitionState.withTransition)
+                        is TransitionState.OpenTranscript -> binding?.openTranscript(
+                            hidePlayerControls = !transitionState.showPlayerControls || !resources.getBoolean(R.bool.transcript_show_seekbar_and_player_controls),
+                        )
+                        is TransitionState.CloseTranscript -> binding?.closeTranscript()
                     }
                 }
             }
         }
     }
 
-    private fun AdapterPlayerHeaderBinding.openTranscript() {
-        playerGroup.layoutTransition = LayoutTransition()
-        transcriptPage.isVisible = true
-        shelfComposeView.isVisible = false
-        val transcriptShowSeekbarAndPlayerControls = resources.getBoolean(R.bool.transcript_show_seekbar_and_player_controls)
-        seekBar.isVisible = transcriptShowSeekbarAndPlayerControls
-        with(playerControlsComposeView) {
-            isVisible = transcriptShowSeekbarAndPlayerControls
-            scaleX = 0.6f
-            scaleY = 0.6f
+    private fun AdapterPlayerHeaderBinding.openTranscript(
+        hidePlayerControls: Boolean,
+    ) {
+        if (playerGroup.layoutTransition == null) {
+            playerGroup.layoutTransition = LayoutTransition()
         }
-        if (transcriptShowSeekbarAndPlayerControls) {
-            (seekBar.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin = resources.getDimensionPixelSize(R.dimen.seekbar_margin_bottom_transcript)
+        transcriptPage.isVisible = true
+        shelfComposeView.isInvisible = true
+        val shelfOffset = shelfComposeView.height + shelfComposeView.marginTop
+        with(seekBar) {
+            isInvisible = hidePlayerControls
+            spring(SpringAnimation.TRANSLATION_Y).animateToFinalPosition(shelfOffset.toFloat() + 32.dpToPx(context))
+        }
+        with(playerControlsComposeView) {
+            isInvisible = hidePlayerControls
+            spring(SpringAnimation.SCALE_X).animateToFinalPosition(0.6f)
+            spring(SpringAnimation.SCALE_Y).animateToFinalPosition(0.6f)
+            spring(SpringAnimation.TRANSLATION_Y).animateToFinalPosition(shelfOffset.toFloat())
         }
         val containerFragment = parentFragment as? PlayerContainerFragment
         containerFragment?.updateTabsVisibility(false)
         root.setScrollingEnabled(false)
     }
 
-    private fun AdapterPlayerHeaderBinding.hidePlaybackControls() {
-        playerGroup.layoutTransition = LayoutTransition()
-        seekBar.isInvisible = true
-        playerControlsComposeView.isInvisible = true
-    }
-
-    private fun AdapterPlayerHeaderBinding.closeTranscript(
-        withTransition: Boolean,
-    ) {
-        playerGroup.layoutTransition = if (withTransition) LayoutTransition() else null
+    private fun AdapterPlayerHeaderBinding.closeTranscript() {
         shelfComposeView.isVisible = true
         transcriptPage.isVisible = false
-        seekBar.isVisible = true
+        with(seekBar) {
+            isVisible = true
+            spring(SpringAnimation.TRANSLATION_Y).animateToFinalPosition(0f)
+        }
         with(playerControlsComposeView) {
             isVisible = true
-            scaleX = 1f
-            scaleY = 1f
-        }
-        val transcriptShowSeekbarAndPlayerControls = resources.getBoolean(R.bool.transcript_show_seekbar_and_player_controls)
-        if (transcriptShowSeekbarAndPlayerControls) {
-            (seekBar.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin = resources.getDimensionPixelSize(R.dimen.seekbar_margin_bottom)
+            spring(SpringAnimation.SCALE_X).animateToFinalPosition(1f)
+            spring(SpringAnimation.SCALE_Y).animateToFinalPosition(1f)
+            spring(SpringAnimation.TRANSLATION_Y).animateToFinalPosition(0f)
         }
         val containerFragment = parentFragment as? PlayerContainerFragment
         containerFragment?.updateTabsVisibility(true)

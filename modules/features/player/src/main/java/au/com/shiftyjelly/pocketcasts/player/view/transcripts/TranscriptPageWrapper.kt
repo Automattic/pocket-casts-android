@@ -116,7 +116,6 @@ fun TranscriptPageWrapper(
                     shelfSharedViewModel.closeTranscript(
                         playerViewModel.podcast,
                         playerViewModel.episode,
-                        withTransition = true,
                     )
                 },
                 showSearch = showSearch,
@@ -167,15 +166,16 @@ fun TranscriptPageWrapper(
         LaunchedEffect(uiState.showPaywall, transitionState) {
             showPaywall = uiState.showPaywall
 
-            when (transitionState) {
+            when (val state = transitionState) {
                 is TransitionState.OpenTranscript -> {
-                    if (showPaywall) {
-                        shelfSharedViewModel.showUpsell()
-                    }
-                }
-                is TransitionState.UpsellTranscript -> {
-                    if (!showPaywall) {
-                        shelfSharedViewModel.closeUpsell()
+                    if (state.showPlayerControls) {
+                        if (showPaywall) {
+                            shelfSharedViewModel.openTranscript(showPlayerControls = false)
+                        }
+                    } else {
+                        if (!showPaywall) {
+                            shelfSharedViewModel.openTranscript(showPlayerControls = true)
+                        }
                     }
                 }
                 is TransitionState.CloseTranscript, null -> Unit

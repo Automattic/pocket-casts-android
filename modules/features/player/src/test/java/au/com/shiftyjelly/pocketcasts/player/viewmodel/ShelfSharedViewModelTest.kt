@@ -119,7 +119,7 @@ class ShelfSharedViewModelTest {
 
             shelfSharedViewModel.transitionState.test {
                 shelfSharedViewModel.onTranscriptClick(true, ShelfItemSource.Shelf)
-                assertEquals(TransitionState.OpenTranscript, awaitItem())
+                assertEquals(TransitionState.OpenTranscript(showPlayerControls = true), awaitItem())
             }
         }
 
@@ -135,28 +135,15 @@ class ShelfSharedViewModelTest {
         }
 
     @Test
-    fun `given with transition true, when close transcript called, then transcript is closed with transition`() =
+    fun `when close transcript called, then transcript is closed with transition`() =
         runTest {
             val podcast = Podcast("podcastUuid")
             val episode = PodcastEpisode("episodeUuid", publishedDate = Date())
             initViewModel()
 
             shelfSharedViewModel.transitionState.test {
-                shelfSharedViewModel.closeTranscript(podcast, episode, true)
-                assertEquals(TransitionState.CloseTranscript(true), awaitItem())
-            }
-        }
-
-    @Test
-    fun `given with transition false, when close transcript called, then transcript is closed without transition`() =
-        runTest {
-            val podcast = Podcast("podcastUuid")
-            val episode = PodcastEpisode("episodeUuid", publishedDate = Date())
-            initViewModel()
-
-            shelfSharedViewModel.transitionState.test {
-                shelfSharedViewModel.closeTranscript(podcast, episode, false)
-                assertEquals(TransitionState.CloseTranscript(false), awaitItem())
+                shelfSharedViewModel.closeTranscript(podcast, episode)
+                assertEquals(TransitionState.CloseTranscript, awaitItem())
             }
         }
 
