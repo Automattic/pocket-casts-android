@@ -9,9 +9,10 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -102,29 +103,13 @@ fun TranscriptPageWrapper(
             else -> Unit
         }
 
-        Box(
+        val playerBackgroundColor = Color(theme.playerBackgroundColor(transcriptUiState.value.podcastAndEpisode?.podcast))
+        Column(
             modifier = Modifier
-                .fillMaxSize(),
+                .fillMaxWidth()
+                .height(configuration.screenHeightDp.dp)
+                .background(playerBackgroundColor),
         ) {
-            TranscriptPage(
-                shelfSharedViewModel = shelfSharedViewModel,
-                transcriptViewModel = transcriptViewModel,
-                searchViewModel = searchViewModel,
-                theme = theme,
-                modifier = Modifier
-                    .height(configuration.screenHeightDp.dp),
-            )
-
-            if (showPaywall) {
-                TranscriptsPaywall(
-                    onClickSubscribe = {},
-                    modifier = Modifier
-                        .padding(top = 56.dp)
-                        .height(configuration.screenHeightDp.dp)
-                        .verticalScroll(rememberScrollState()),
-                )
-            }
-
             TranscriptToolbar(
                 onCloseClick = {
                     shelfSharedViewModel.closeTranscript(
@@ -150,6 +135,24 @@ fun TranscriptPageWrapper(
                 onSearchQueryChanged = searchViewModel::onSearchQueryChanged,
                 expandSearch = expandSearch,
             )
+
+            Box(
+                modifier = Modifier.weight(1f),
+            ) {
+                TranscriptPage(
+                    shelfSharedViewModel = shelfSharedViewModel,
+                    transcriptViewModel = transcriptViewModel,
+                    searchViewModel = searchViewModel,
+                    theme = theme,
+                )
+
+                if (showPaywall) {
+                    TranscriptsPaywall(
+                        onClickSubscribe = {},
+                        modifier = Modifier.verticalScroll(rememberScrollState()),
+                    )
+                }
+            }
         }
 
         LaunchedEffect(transcriptUiState.value) {
@@ -191,7 +194,7 @@ fun TranscriptToolbar(
             contentAlignment = Alignment.TopEnd,
             modifier = Modifier
                 .padding(top = 8.dp)
-                .fillMaxSize(),
+                .fillMaxWidth(),
         ) {
             val transition = updateTransition(expandSearch, label = "Searchbar transition")
             CompositionLocalProvider(LocalRippleConfiguration provides ToolbarRippleConfiguration) {

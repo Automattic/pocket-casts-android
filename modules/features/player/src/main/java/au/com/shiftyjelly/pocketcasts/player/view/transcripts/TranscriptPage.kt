@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -54,6 +53,7 @@ import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.Devices
+import au.com.shiftyjelly.pocketcasts.compose.components.FadedLazyColumn
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.extensions.FadeDirection
 import au.com.shiftyjelly.pocketcasts.compose.extensions.gradientBackground
@@ -90,7 +90,7 @@ fun TranscriptPage(
     transcriptViewModel: TranscriptViewModel,
     searchViewModel: TranscriptSearchViewModel,
     theme: Theme,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
 ) {
     val uiState = transcriptViewModel.uiState.collectAsStateWithLifecycle()
     val transitionState = shelfSharedViewModel.transitionState.collectAsStateWithLifecycle(null)
@@ -103,7 +103,7 @@ fun TranscriptPage(
     val colors = TranscriptColors(playerBackgroundColor)
     Box(
         modifier = modifier
-            .fillMaxWidth()
+            .fillMaxSize()
             .pullRefresh(pullRefreshState),
     ) {
         when (uiState.value) {
@@ -145,7 +145,6 @@ fun TranscriptPage(
                         transcriptViewModel.parseAndLoadTranscript(retryOnFail = true)
                     },
                     colors = colors,
-                    modifier = modifier,
                 )
             }
         }
@@ -223,21 +222,6 @@ private fun TranscriptContent(
                     transitionState = transitionState,
                 )
             }
-
-            GradientView(
-                baseColor = colors.backgroundColor(),
-                modifier = Modifier
-                    .align(Alignment.TopCenter),
-                fadeDirection = FadeDirection.TopToBottom,
-            )
-
-            GradientView(
-                baseColor = colors.backgroundColor(),
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = bottomPadding()),
-                fadeDirection = FadeDirection.BottomToTop,
-            )
         }
     }
 }
@@ -278,14 +262,14 @@ private fun ScrollableTranscriptView(
             if (state.showAsWebPage) {
                 TranscriptWebView(state, transitionState)
             } else {
-                LazyColumn(
+                FadedLazyColumn(
                     state = scrollState,
                     modifier = scrollableContentModifier,
                     contentPadding = PaddingValues(
                         start = horizontalContentPadding,
                         end = horizontalContentPadding,
-                        top = 64.dp,
-                        bottom = 80.dp,
+                        top = TranscriptDefaults.ContentOffsetTop,
+                        bottom = TranscriptDefaults.ContentOffsetBottom,
                     ),
                 ) {
                     items(state.displayInfo.items) { item ->
