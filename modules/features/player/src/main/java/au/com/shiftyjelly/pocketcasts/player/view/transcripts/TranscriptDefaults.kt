@@ -17,7 +17,6 @@ import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 object TranscriptDefaults {
-    val ContentOffsetTop = 8.dp
     val ContentOffsetBottom = 80.dp
     val TranscriptFontFamily = FontFamily(listOf(Font(UR.font.roboto_serif)))
     val SearchOccurrenceDefaultSpanStyle = SpanStyle(fontSize = 16.sp, fontWeight = FontWeight.W500, fontFamily = TranscriptFontFamily, background = Color.White.copy(alpha = .2f), color = Color.White)
@@ -44,6 +43,9 @@ object TranscriptDefaults {
 
             @Composable
             fun iconColor() = MaterialTheme.theme.colors.playerContrast02
+
+            @Composable
+            fun accentColor() = MaterialTheme.theme.colors.playerContrast05
         }
     }
 }
