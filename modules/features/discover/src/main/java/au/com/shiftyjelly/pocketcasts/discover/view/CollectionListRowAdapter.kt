@@ -155,7 +155,7 @@ internal class CollectionListRowAdapter(
                 holder.binding.header.lblSubtitle.text = it.subtitle
                 holder.binding.header.imageHeader.load(it.imageUrl)
                 holder.binding.header.root.contentDescription =
-                    it.title + " " + holder.binding.root.context.getString(LR.string.discover_collection_header_content_description_suffix)
+                    holder.binding.root.context.getString(LR.string.discover_collection_header_content_description, it.title)
 
                 val height = getPodcastsHeight(holder.binding.podcasts)
                 val layoutParams = holder.binding.root.layoutParams
