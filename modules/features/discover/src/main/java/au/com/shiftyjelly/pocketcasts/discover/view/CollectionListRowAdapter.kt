@@ -14,8 +14,11 @@ import au.com.shiftyjelly.pocketcasts.discover.databinding.ItemCollectionListBin
 import au.com.shiftyjelly.pocketcasts.discover.view.CollectionListRowAdapter.CollectionListViewHolder.Companion.NUMBER_OF_ROWS_PER_PAGE
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.LIST_ID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.PODCAST_UUID_KEY
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory.PlaceholderType
+import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
-import coil.load
+import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private val differ = object : DiffUtil.ItemCallback<List<Any>>() {
@@ -49,6 +52,11 @@ internal class CollectionListRowAdapter(
         onPodcastSubscribe: (Int, Int) -> Unit,
     ) : RecyclerView.ViewHolder(binding.root) {
 
+        private val imageRequestFactory = PocketCastsImageRequestFactory(
+            binding.root.context,
+            placeholderType = PlaceholderType.Large,
+        ).themed()
+
         companion object {
             const val NUMBER_OF_ROWS_PER_PAGE = 2
             const val NUMBER_OF_PODCASTS_TO_DISPLAY_TWICE = 2
@@ -74,7 +82,7 @@ internal class CollectionListRowAdapter(
 
         val rows = listOf(binding.row0, binding.row1)
 
-        fun bind(podcastSublist: List<Any>, isSubscribeButtonVisible: Boolean) {
+        fun bindPodcasts(podcastSublist: List<Any>, isSubscribeButtonVisible: Boolean) {
             rows.forEachIndexed { index, row ->
                 row.clear()
                 row.isVisible = index < podcastSublist.size
@@ -86,12 +94,31 @@ internal class CollectionListRowAdapter(
                 row.setSubscribeButtonVisibility(isSubscribeButtonVisible || isLandscape)
             }
         }
+
+        fun bindHeader(header: CollectionHeader) {
+            binding.header.root.isVisible = true
+            binding.header.lblTitle.text = header.title
+            binding.header.lblSubtitle.text = header.subtitle
+            imageRequestFactory.createForFileOrUrl(header.imageUrl).loadInto(binding.header.imageHeader)
+            binding.header.root.contentDescription =
+                binding.root.context.getString(LR.string.discover_collection_header_content_description, header.title)
+
+            val height = getPodcastsHeight(binding.podcasts)
+            val layoutParams = binding.root.layoutParams
+            layoutParams.height = height
+            binding.root.layoutParams = layoutParams
+        }
+
+        private fun getPodcastsHeight(view: View): Int {
+            view.measure(0, 0)
+            return view.measuredHeight
+        }
     }
 
     private var fromListId: String? = null
     private var header: CollectionHeader? = null
 
-    fun submitPodcastList(list: List<DiscoverPodcast>, header: CollectionHeader, commitCallback: Runnable?) {
+    fun submitPodcastList(list: List<DiscoverPodcast>, header: CollectionHeader?, commitCallback: Runnable?) {
         this.header = header
         val chunkedList = list.chunked(NUMBER_OF_ROWS_PER_PAGE)
 
@@ -146,35 +173,18 @@ internal class CollectionListRowAdapter(
     override fun onBindViewHolder(holder: CollectionListViewHolder, position: Int) {
         val podcastSublist = getItem(position)
 
-        holder.bind(podcastSublist, isSubscribeButtonVisible = position != 0)
+        holder.bindPodcasts(podcastSublist, isSubscribeButtonVisible = position != 0)
 
         if (position == 0) {
-            this.header?.let {
-                holder.binding.header.root.isVisible = true
-                holder.binding.header.lblTitle.text = it.title
-                holder.binding.header.lblSubtitle.text = it.subtitle
-                holder.binding.header.imageHeader.load(it.imageUrl)
-                holder.binding.header.root.contentDescription =
-                    holder.binding.root.context.getString(LR.string.discover_collection_header_content_description, it.title)
-
-                val height = getPodcastsHeight(holder.binding.podcasts)
-                val layoutParams = holder.binding.root.layoutParams
-                layoutParams.height = height
-                holder.binding.root.layoutParams = layoutParams
-            }
+            this.header?.let { holder.bindHeader(it) }
         } else {
             holder.binding.header.root.isVisible = false
         }
-    }
-
-    fun getPodcastsHeight(view: View): Int {
-        view.measure(0, 0)
-        return view.measuredHeight
     }
 
     fun setFromListId(value: String) {
         this.fromListId = value
     }
 
-    data class CollectionHeader(val imageUrl: String?, val title: String?, val subtitle: String?)
+    data class CollectionHeader(val imageUrl: String, val title: String?, val subtitle: String?)
 }

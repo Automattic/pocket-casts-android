@@ -18,7 +18,6 @@
             android:id="@+id/imageHeader"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="?attr/defaultArtwork"
             android:scaleType="centerCrop"
             tools:ignore="ContentDescription" />
 
