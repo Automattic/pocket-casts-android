@@ -139,19 +139,9 @@ class ShelfSharedViewModel @Inject constructor(
         }
     }
 
-    fun closeTranscript(
-        podcast: Podcast?,
-        episode: BaseEpisode?,
-    ) {
+    fun closeTranscript() {
         viewModelScope.launch {
             _transitionState.emit(TransitionState.CloseTranscript)
-            analyticsTracker.track(
-                AnalyticsEvent.TRANSCRIPT_DISMISSED,
-                AnalyticsProp.transcriptDismissed(
-                    episodeId = episode?.uuid.orEmpty(),
-                    podcastId = podcast?.uuid.orEmpty(),
-                ),
-            )
         }
     }
 

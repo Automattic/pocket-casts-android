@@ -113,10 +113,7 @@ fun TranscriptPageWrapper(
         ) {
             TranscriptToolbar(
                 onCloseClick = {
-                    shelfSharedViewModel.closeTranscript(
-                        playerViewModel.podcast,
-                        playerViewModel.episode,
-                    )
+                    shelfSharedViewModel.closeTranscript()
                 },
                 showSearch = showSearch,
                 onSearchDoneClicked = {
