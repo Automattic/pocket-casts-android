@@ -27,7 +27,7 @@
             android:layout_gravity="bottom|center_horizontal"
             android:gravity="center_horizontal"
             android:orientation="vertical"
-            android:paddingHorizontal="2dp"
+            android:paddingHorizontal="12dp"
             android:paddingBottom="12dp">
 
             <TextView
