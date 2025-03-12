@@ -80,19 +80,20 @@ fun TranscriptPageWrapper(
     transcriptViewModel: TranscriptViewModel,
     searchViewModel: TranscriptSearchViewModel,
     theme: Theme,
+    onClickSubscribe: () -> Unit,
 ) {
     AppTheme(Theme.ThemeType.DARK) {
-        val transitionState = shelfSharedViewModel.transitionState.collectAsStateWithLifecycle(null)
-        val transcriptUiState = transcriptViewModel.uiState.collectAsStateWithLifecycle()
-        val searchState = searchViewModel.searchState.collectAsStateWithLifecycle()
-        val searchQueryFlow = searchViewModel.searchQueryFlow.collectAsStateWithLifecycle()
+        val transitionState by shelfSharedViewModel.transitionState.collectAsStateWithLifecycle(null)
+        val uiState by transcriptViewModel.uiState.collectAsStateWithLifecycle()
+        val searchState by searchViewModel.searchState.collectAsStateWithLifecycle()
+        val searchQuery by searchViewModel.searchQueryFlow.collectAsStateWithLifecycle()
 
         val configuration = LocalConfiguration.current
 
         var showPaywall by remember { mutableStateOf(false) }
         var showSearch by remember { mutableStateOf(false) }
         var expandSearch by remember { mutableStateOf(false) }
-        when (transitionState.value) {
+        when (transitionState) {
             is TransitionState.CloseTranscript -> {
                 if (expandSearch) {
                     expandSearch = false
@@ -103,7 +104,7 @@ fun TranscriptPageWrapper(
             else -> Unit
         }
 
-        val playerBackgroundColor = Color(theme.playerBackgroundColor(transcriptUiState.value.podcastAndEpisode?.podcast))
+        val playerBackgroundColor = Color(theme.playerBackgroundColor(uiState.podcastAndEpisode?.podcast))
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -127,8 +128,8 @@ fun TranscriptPageWrapper(
                     expandSearch = true
                     searchViewModel.onSearchButtonClicked()
                 },
-                searchText = searchQueryFlow.value,
-                searchState = searchState.value,
+                searchText = searchQuery,
+                searchState = searchState,
                 onSearchCleared = { searchViewModel.onSearchCleared() },
                 onSearchPreviousClicked = { searchViewModel.onSearchPrevious() },
                 onSearchNextClicked = { searchViewModel.onSearchNext() },
@@ -148,24 +149,36 @@ fun TranscriptPageWrapper(
 
                 if (showPaywall) {
                     TranscriptsPaywall(
-                        onClickSubscribe = {},
+                        onClickSubscribe = onClickSubscribe,
                         modifier = Modifier.verticalScroll(rememberScrollState()),
                     )
                 }
             }
         }
 
-        LaunchedEffect(transcriptUiState.value) {
-            showSearch = (transcriptUiState.value as? TranscriptViewModel.UiState.TranscriptLoaded)?.showSearch == true
+        LaunchedEffect(uiState.showSearch) {
+            showSearch = uiState.showSearch
+
             if (!showSearch) {
                 expandSearch = false
             }
         }
 
-        LaunchedEffect(transcriptUiState.value, transitionState.value) {
-            showPaywall = (transcriptUiState.value as? TranscriptViewModel.UiState.TranscriptLoaded)?.showPaywall == true
-            if (transitionState.value is TransitionState.OpenTranscript && showPaywall) {
-                shelfSharedViewModel.showUpsell()
+        LaunchedEffect(uiState.showPaywall, transitionState) {
+            showPaywall = uiState.showPaywall
+
+            when (transitionState) {
+                is TransitionState.OpenTranscript -> {
+                    if (showPaywall) {
+                        shelfSharedViewModel.showUpsell()
+                    }
+                }
+                is TransitionState.UpsellTranscript -> {
+                    if (!showPaywall) {
+                        shelfSharedViewModel.closeUpsell()
+                    }
+                }
+                is TransitionState.CloseTranscript, null -> Unit
             }
         }
     }

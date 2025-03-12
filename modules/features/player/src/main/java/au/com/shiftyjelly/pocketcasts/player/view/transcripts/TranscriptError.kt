@@ -30,7 +30,7 @@ import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults.TranscriptFontFamily
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults.bottomPadding
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.TranscriptError
-import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.UiState
+import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.TranscriptState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptFormat
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -38,7 +38,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun TranscriptError(
-    state: UiState.Error,
+    state: TranscriptState.Error,
     colors: TranscriptColors,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
@@ -116,7 +116,7 @@ private fun ErrorTabletPreview() = ErrorPreview()
 private fun ErrorPreview() {
     AppThemeWithBackground(Theme.ThemeType.DARK) {
         TranscriptError(
-            state = UiState.Error(
+            state = TranscriptState.Error(
                 error = TranscriptError.NotSupported(TranscriptFormat.HTML.mimeType),
                 transcript = Transcript(
                     episodeUuid = "uuid",

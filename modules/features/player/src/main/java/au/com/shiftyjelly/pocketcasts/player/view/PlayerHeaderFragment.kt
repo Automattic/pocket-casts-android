@@ -367,6 +367,9 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 transcriptViewModel = transcriptViewModel,
                 searchViewModel = transcriptSearchViewModel,
                 theme = theme,
+                onClickSubscribe = {
+                    OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.Upsell(OnboardingUpgradeSource.GENERATED_TRANSCRIPTS))
+                },
             )
         }
     }
