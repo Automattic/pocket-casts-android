@@ -110,6 +110,9 @@ internal class CollectionListRowAdapter(
         }
 
         private fun getPodcastsHeight(view: View): Int {
+            // It's necessary because it performs the calculation of the view's width and height based on its internal properties.
+            // Without calling it, the measuredHeight and measuredWidth properties wouldn't be correctly defined,
+            // as these properties are calculated after the view is measured.
             view.measure(0, 0)
             return view.measuredHeight
         }
