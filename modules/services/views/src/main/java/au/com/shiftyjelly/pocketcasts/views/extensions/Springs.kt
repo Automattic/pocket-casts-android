@@ -44,4 +44,3 @@ private fun getTagId(property: ViewProperty) = when (property) {
     SpringAnimation.SCROLL_Y -> R.id.spring_animation_id_scroll_y
     else -> error("Unknown view property: $property")
 }
-
