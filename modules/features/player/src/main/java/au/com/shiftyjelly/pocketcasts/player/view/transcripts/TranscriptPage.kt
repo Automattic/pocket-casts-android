@@ -27,6 +27,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalConfiguration
@@ -184,9 +187,22 @@ private fun TranscriptContent(
         Box(
             modifier = if (state.showPaywall) {
                 if (Build.VERSION.SDK_INT >= 31) {
-                    Modifier.blur(8.dp)
+                    Modifier
+                        .blur(8.dp)
+                        .drawWithContent {
+                            drawContent()
+                            drawRect(
+                                brush = Brush.verticalGradient(
+                                    0f to Color.Black,
+                                    0.2f to Color.Black,
+                                    0.3f to Color.Transparent,
+                                    1f to Color.Transparent,
+                                ),
+                                blendMode = BlendMode.DstOut,
+                            )
+                        }
                 } else {
-                    Modifier.alpha(0f)
+                    Modifier.alpha(0.1f)
                 }
             } else {
                 Modifier
