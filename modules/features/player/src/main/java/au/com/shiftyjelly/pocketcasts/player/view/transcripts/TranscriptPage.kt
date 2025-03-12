@@ -145,7 +145,6 @@ fun TranscriptPage(
                         transcriptViewModel.parseAndLoadTranscript(retryOnFail = true)
                     },
                     colors = colors,
-                    modifier = modifier,
                 )
             }
         }

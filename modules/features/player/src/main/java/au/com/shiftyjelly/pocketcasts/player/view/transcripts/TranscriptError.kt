@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -42,7 +41,7 @@ fun TranscriptError(
     state: UiState.Error,
     colors: TranscriptColors,
     onRetry: () -> Unit,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
 ) {
     val errorMessage = when (val error = state.error) {
         is TranscriptError.Empty ->
@@ -62,47 +61,41 @@ fun TranscriptError(
     }
 
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(colors.backgroundColor())
-            .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .background(colors.backgroundColor())
+            .padding(horizontal = 16.dp)
+            .padding(bottom = bottomPadding()),
     ) {
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .padding(bottom = bottomPadding()),
+        Icon(
+            painter = painterResource(IR.drawable.ic_warning),
+            contentDescription = null,
+            tint = TranscriptColors.iconColor().copy(alpha = 0.5f),
+        )
+        TextP40(
+            text = errorMessage,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(top = 12.dp),
+            color = TranscriptColors.textColor(),
+            fontFamily = TranscriptFontFamily,
+            fontWeight = FontWeight.W500,
+            lineHeight = 24.sp,
+        )
+        Button(
+            onClick = onRetry,
+            modifier = Modifier.padding(top = 16.dp),
+            shape = RoundedCornerShape(40.dp),
+            colors = ButtonDefaults.buttonColors(backgroundColor = TranscriptColors.contentColor()),
         ) {
-            Icon(
-                painter = painterResource(IR.drawable.ic_warning),
-                contentDescription = null,
-                tint = TranscriptColors.iconColor().copy(alpha = 0.5f),
-            )
             TextP40(
-                text = errorMessage,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(top = 12.dp),
-                color = TranscriptColors.textColor(),
-                fontFamily = TranscriptFontFamily,
-                fontWeight = FontWeight.W500,
-                lineHeight = 24.sp,
+                text = stringResource(LR.string.try_again),
+                color = Color.White,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.W400,
             )
-            Button(
-                onClick = onRetry,
-                modifier = Modifier.padding(top = 16.dp),
-                shape = RoundedCornerShape(40.dp),
-                colors = ButtonDefaults.buttonColors(backgroundColor = TranscriptColors.contentColor()),
-            ) {
-                TextP40(
-                    text = stringResource(LR.string.try_again),
-                    color = Color.White,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.W400,
-                )
-            }
         }
     }
 }
@@ -134,7 +127,6 @@ private fun ErrorPreview() {
             ),
             onRetry = {},
             colors = TranscriptColors(Color.Black),
-            modifier = Modifier.fillMaxSize(),
         )
     }
 }
