@@ -137,12 +137,10 @@ class ShelfSharedViewModelTest {
     @Test
     fun `when close transcript called, then transcript is closed with transition`() =
         runTest {
-            val podcast = Podcast("podcastUuid")
-            val episode = PodcastEpisode("episodeUuid", publishedDate = Date())
             initViewModel()
 
             shelfSharedViewModel.transitionState.test {
-                shelfSharedViewModel.closeTranscript(podcast, episode)
+                shelfSharedViewModel.closeTranscript()
                 assertEquals(TransitionState.CloseTranscript, awaitItem())
             }
         }

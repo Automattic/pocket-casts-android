@@ -25,7 +25,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -111,19 +110,6 @@ class TranscriptViewModel @Inject constructor(
                         cuesInfo = cuesInfo,
                     )
 
-                    if (!pulledToRefresh) {
-                        podcastAndEpisode?.let {
-                            track(
-                                event = AnalyticsEvent.TRANSCRIPT_SHOWN,
-                                podcastAndEpisode = it,
-                                analyticsProp = buildMap {
-                                    put("type", transcript.type)
-                                    put("show_as_webpage", loaded.showAsWebPage.toString())
-                                },
-                            )
-                        }
-                    }
-
                     loaded
                 } catch (e: Exception) {
                     track(AnalyticsEvent.TRANSCRIPT_ERROR, podcastAndEpisode, mapOf("error" to e.message.orEmpty()))
@@ -147,6 +133,20 @@ class TranscriptViewModel @Inject constructor(
                     }
                 }
                 _uiState.update { value -> value.copy(transcriptState = newTranscriptState) }
+
+                val uiState = _uiState.value
+                if (!pulledToRefresh && !uiState.showPaywall && uiState.transcriptState is TranscriptState.Loaded) {
+                    podcastAndEpisode?.let {
+                        track(
+                            event = AnalyticsEvent.TRANSCRIPT_SHOWN,
+                            podcastAndEpisode = it,
+                            analyticsProp = buildMap {
+                                put("type", transcript.type)
+                                put("show_as_webpage", uiState.transcriptState.showAsWebPage.toString())
+                            },
+                        )
+                    }
+                }
 
                 if (pulledToRefresh) {
                     _isRefreshing.value = false

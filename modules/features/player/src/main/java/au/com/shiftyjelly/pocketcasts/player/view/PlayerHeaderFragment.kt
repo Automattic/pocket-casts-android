@@ -22,6 +22,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
@@ -372,6 +373,8 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 searchViewModel = transcriptSearchViewModel,
                 theme = theme,
                 onClickSubscribe = {
+                    val uiState = transcriptViewModel.uiState.value
+                    transcriptViewModel.track(AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_SUBSCRIBE_TAPPED, uiState.podcastAndEpisode)
                     OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.Upsell(OnboardingUpgradeSource.GENERATED_TRANSCRIPTS))
                 },
             )
@@ -382,11 +385,26 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 shelfSharedViewModel.transitionState.collect { transitionState ->
+                    val uiState = transcriptViewModel.uiState.value
+
                     when (transitionState) {
-                        is TransitionState.OpenTranscript -> binding?.openTranscript(
-                            hidePlayerControls = !transitionState.showPlayerControls || !resources.getBoolean(R.bool.transcript_show_seekbar_and_player_controls),
-                        )
-                        is TransitionState.CloseTranscript -> binding?.closeTranscript()
+                        is TransitionState.OpenTranscript -> {
+                            if (uiState.showPaywall) {
+                                transcriptViewModel.track(AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_SHOWN, uiState.podcastAndEpisode)
+                            }
+                            binding?.openTranscript(
+                                hidePlayerControls = !transitionState.showPlayerControls || !resources.getBoolean(R.bool.transcript_show_seekbar_and_player_controls),
+                            )
+                        }
+                        is TransitionState.CloseTranscript -> {
+                            val event = if (uiState.showPaywall) {
+                                AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_DISMISSED
+                            } else {
+                                AnalyticsEvent.TRANSCRIPT_DISMISSED
+                            }
+                            transcriptViewModel.track(event, uiState.podcastAndEpisode)
+                            binding?.closeTranscript()
+                        }
                     }
                 }
             }
