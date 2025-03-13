@@ -522,6 +522,7 @@
     <string name="remove_from_folder">Remove from folder</string>
     <string name="change_folder">Change folder</string>
     <string name="go_to_folder">Go to folder</string>
+    <string name="go_to_discover">Go to Discover</string>
     <string name="number_stepper_plus_content_description">Plus</string>
     <string name="number_stepper_minus_content_description">Minus</string>
 

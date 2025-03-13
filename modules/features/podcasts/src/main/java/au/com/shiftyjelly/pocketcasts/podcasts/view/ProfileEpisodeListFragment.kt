@@ -420,13 +420,17 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
         if (state is State.Empty) {
             binding?.emptyLayout?.setContentWithViewCompositionStrategy {
                 AppTheme(theme.activeTheme) {
-                    val title = stringResource(state.titleRes)
-                    val subtitle = stringResource(state.summaryRes)
+                    val buttonText = if (mode is Mode.History) stringResource(LR.string.go_to_discover) else null
 
                     EmptyState(
-                        title = title,
-                        subtitle = subtitle,
+                        title = stringResource(state.titleRes),
+                        subtitle = stringResource(state.summaryRes),
                         iconResourcerId = state.iconRes,
+                        buttonText = buttonText,
+                        onButtonClick = {
+                            analyticsTracker.track(AnalyticsEvent.LISTENING_HISTORY_DISCOVER_BUTTON_TAPPED)
+                            (activity as FragmentHostListener).openTab(VR.id.navigation_discover)
+                        },
                     )
                 }
             }
