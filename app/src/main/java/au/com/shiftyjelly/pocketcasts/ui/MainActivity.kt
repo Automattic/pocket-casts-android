@@ -443,7 +443,7 @@ class MainActivity :
             .addTo(disposables)
 
         setupPlayerViews(
-            animateMiniPlayer = savedInstanceState == null
+            animateMiniPlayer = savedInstanceState == null,
         )
 
         if (savedInstanceState == null) {
