@@ -184,8 +184,6 @@ import android.provider.Settings as AndroidProviderSettings
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
 
-private const val SAVEDSTATE_PLAYER_OPEN = "player_open"
-private const val SAVEDSTATE_MINIPLAYER_SHOWN = "miniplayer_shown"
 private const val SAVEDSTATE_BOTTOM_SHEET_TAG = "bottom_sheet_tag"
 private const val EXTRA_LONG_SNACKBAR_DURATION_MS: Int = 5000
 
@@ -444,23 +442,11 @@ class MainActivity :
             })
             .addTo(disposables)
 
-        val showMiniPlayerImmediately = savedInstanceState?.getBoolean(SAVEDSTATE_MINIPLAYER_SHOWN, false) ?: false
-        binding.playerBottomSheet.isVisible = showMiniPlayerImmediately
-        settings.updateBottomInset(if (showMiniPlayerImmediately) miniPlayerHeight else 0)
+        setupPlayerViews(
+            animateMiniPlayer = savedInstanceState == null
+        )
 
-        setupPlayerViews(showMiniPlayerImmediately)
-
-        if (savedInstanceState != null) {
-            val videoComingToPortrait =
-                (playbackManager.isPlaying() && playbackManager.getCurrentEpisode()?.isVideo == true && resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT && viewModel.isPlayerOpen)
-            if (savedInstanceState.getBoolean(
-                    SAVEDSTATE_PLAYER_OPEN,
-                    false,
-                ) && !playbackManager.upNextQueue.isEmpty || videoComingToPortrait
-            ) {
-                binding.playerBottomSheet.openPlayer()
-            }
-        } else {
+        if (savedInstanceState == null) {
             trackTabOpened(selectedTab, isInitial = true)
         }
         navigator.infoStream()
@@ -558,8 +544,6 @@ class MainActivity :
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putBoolean(SAVEDSTATE_PLAYER_OPEN, binding.playerBottomSheet.isPlayerOpen)
-        outState.putBoolean(SAVEDSTATE_MINIPLAYER_SHOWN, binding.playerBottomSheet.isShown)
         outState.putString(SAVEDSTATE_BOTTOM_SHEET_TAG, bottomSheetTag)
     }
 
@@ -788,8 +772,9 @@ class MainActivity :
     }
 
     @Suppress("DEPRECATION")
-    private fun setupPlayerViews(showMiniPlayerImmediately: Boolean) {
+    private fun setupPlayerViews(animateMiniPlayer: Boolean) {
         binding.playerBottomSheet.listener = this
+        binding.playerBottomSheet.initializeBottomSheetBehavior()
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -836,7 +821,7 @@ class MainActivity :
                 binding.playerBottomSheet.setUpNext(
                     upNext = upNextQueue,
                     theme = theme,
-                    shouldAnimateOnAttach = !showMiniPlayerImmediately,
+                    shouldAnimateOnAttach = animateMiniPlayer,
                     useEpisodeArtwork = artworkConfiguration.useEpisodeArtwork,
                 )
             }

@@ -45,19 +45,17 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
 
     private val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
     private val binding = ViewPlayerBottomSheetBinding.inflate(inflater, this)
-    var sheetBehavior: BottomSheetBehavior<PlayerBottomSheet>? = null
-    private var bottomSheetCallback: BottomSheetBehavior.BottomSheetCallback? = null
     private var animations: Array<BottomSheetAnimation>? = null
-    private var rootView: CoordinatorLayout? = null
 
-    var isPlayerOpen = false
-    var shouldPlayerOpenOnAttach = false
-    var hasLoadedFirstTime = false
-
+    var sheetBehavior: BottomSheetBehavior<PlayerBottomSheet>? = null
+        private set
+    val isPlayerOpen get() = sheetBehavior?.state == BottomSheetBehavior.STATE_EXPANDED
     var listener: PlayerBottomSheetListener? = null
     var isDragEnabled: Boolean
-        get() = sheetBehavior?.isDraggable ?: false
+        get() = sheetBehavior?.isDraggable == true
         set(value) { sheetBehavior?.isDraggable = value }
+
+    private var hasLoadedFirstTime = false
 
     init {
         settings.updatePlayerOrUpNextBottomSheetState(BottomSheetBehavior.STATE_COLLAPSED)
@@ -94,6 +92,19 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
         }
     }
 
+    fun initializeBottomSheetBehavior() {
+        sheetBehavior = BottomSheetBehavior.from(this).apply {
+            val callback = createBottomSheetCallback(rootView = parent as CoordinatorLayout)
+            addBottomSheetCallback(callback)
+            doOnLayout {
+                if (state == BottomSheetBehavior.STATE_EXPANDED) {
+                    callback.onSlide(this@PlayerBottomSheet, 1f)
+                    listener?.onPlayerBottomSheetSlide(this@PlayerBottomSheet, 1f)
+                }
+            }
+        }
+    }
+
     interface PlayerBottomSheetListener {
         fun onMiniPlayerHidden()
         fun onMiniPlayerVisible()
@@ -110,25 +121,7 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-
-        rootView = parent as CoordinatorLayout
-
         binding.player.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
-
-        bottomSheetCallback = createBottomSheetCallback()
-        sheetBehavior = BottomSheetBehavior.from(this).apply {
-            addBottomSheetCallback(bottomSheetCallback!!)
-        }
-
-        if (shouldPlayerOpenOnAttach) {
-            shouldPlayerOpenOnAttach = false
-
-            doOnLayout {
-                sheetBehavior?.apply {
-                    state = BottomSheetBehavior.STATE_EXPANDED
-                }
-            }
-        }
     }
 
     fun setPlaybackState(playbackState: PlaybackState) {
@@ -142,7 +135,7 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
         if (upNext is UpNextQueue.State.Loaded) {
             if ((isHidden() || !hasLoadedFirstTime)) {
                 show()
-                if (!shouldPlayerOpenOnAttach && shouldAnimateOnAttach) {
+                if (shouldAnimateOnAttach) {
                     translationY = 68.dpToPx(context).toFloat()
                     animate().translationY(0f).setListener(object : AnimatorListenerAdapter() {
                         override fun onAnimationEnd(animation: Animator) {
@@ -167,7 +160,9 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
         }
     }
 
-    private fun createBottomSheetCallback(): BottomSheetBehavior.BottomSheetCallback {
+    private fun createBottomSheetCallback(
+        rootView: CoordinatorLayout,
+    ): BottomSheetBehavior.BottomSheetCallback {
         val miniPlayButtonScale = BottomSheetAnimation(
             viewId = R.id.miniPlayButton,
             rootView = rootView,
@@ -223,7 +218,6 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
     }
 
     private fun onCollapsed() {
-        isPlayerOpen = false
         listener?.onPlayerClosed()
         animations?.forEach { it.onCollapsed() }
         analyticsTracker.track(AnalyticsEvent.PLAYER_DISMISSED)
@@ -241,7 +235,6 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
     }
 
     private fun onExpanded() {
-        isPlayerOpen = true
         listener?.onPlayerOpen()
         animations?.forEach { it.onExpanded() }
         analyticsTracker.track(AnalyticsEvent.PLAYER_SHOWN)
@@ -252,21 +245,11 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
 
     fun openPlayer() {
         doOnLayout {
-            // If bottom sheet isn't laid out yet it will never call it's callback
-            // Seems like a bug in bottom sheet but not sure.
-            // Just to be sure we wrap this in doOnLayout
-            sheetBehavior?.let { bottomSheet ->
-                bottomSheet.state = BottomSheetBehavior.STATE_EXPANDED
-            }
-
-            if (sheetBehavior == null) {
-                shouldPlayerOpenOnAttach = true
-            }
+            sheetBehavior?.state = BottomSheetBehavior.STATE_EXPANDED
         }
     }
 
     fun closePlayer() {
-        isPlayerOpen = false
         sheetBehavior?.state = BottomSheetBehavior.STATE_COLLAPSED
     }
 }
