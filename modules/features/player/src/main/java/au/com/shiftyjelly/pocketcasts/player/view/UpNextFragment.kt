@@ -8,6 +8,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.Toolbar
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
@@ -23,6 +26,9 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.components.EmptyState
+import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.player.R
@@ -298,6 +304,12 @@ class UpNextFragment :
         recyclerView.adapter = adapter
         playerViewModel.upNextLive.observe(viewLifecycleOwner) {
             if (userRearrangingFrom == null) {
+                val upNextSummary = it.filterIsInstance<PlayerViewModel.UpNextSummary>().firstOrNull()
+                if (upNextSummary?.episodeCount == 0) {
+                    setupEmptyUpNext(true)
+                } else {
+                    setupEmptyUpNext(false)
+                }
                 adapter.submitList(it)
                 upNextItems = it
             }
@@ -382,6 +394,25 @@ class UpNextFragment :
 
     fun onCollapsed() {
         multiSelectHelper.listener = null
+    }
+
+    private fun setupEmptyUpNext(isVisible: Boolean) {
+        binding.emptyUpNextComposeView.setContentWithViewCompositionStrategy {
+            AppTheme(theme.activeTheme) {
+                AnimatedVisibility(
+                    visible = isVisible,
+                    enter = fadeIn(),
+                    exit = fadeOut(),
+                ) {
+                    EmptyState(
+                        title = resources.getString(LR.string.player_up_next_empty_title),
+                        subtitle = resources.getString(LR.string.player_up_next_empty_subtitle),
+                        iconResourcerId = IR.drawable.ic_upnext,
+                        buttonText = resources.getString(LR.string.go_to_discover),
+                    )
+                }
+            }
+        }
     }
 
     private fun startTour() {
