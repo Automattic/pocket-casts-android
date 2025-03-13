@@ -9,6 +9,9 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import androidx.annotation.ColorInt
 import androidx.appcompat.widget.TooltipCompat
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.DiffUtil
@@ -16,6 +19,9 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.components.EmptyState
+import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
@@ -178,7 +184,23 @@ class UpNextAdapter(
 
         fun bind(header: PlayerViewModel.UpNextSummary) {
             with(binding) {
-                emptyUpNextContainer.isVisible = header.episodeCount == 0
+                binding.emptyUpNextComposeView.setContentWithViewCompositionStrategy {
+                    AppTheme(theme) {
+                        AnimatedVisibility(
+                            visible = header.episodeCount == 0,
+                            enter = fadeIn(),
+                            exit = fadeOut(),
+                        ) {
+                            EmptyState(
+                                title = root.resources.getString(LR.string.player_up_next_empty_title),
+                                subtitle = root.resources.getString(LR.string.player_up_next_empty_subtitle),
+                                iconResourcerId = IR.drawable.ic_upnext,
+                                buttonText = root.resources.getString(LR.string.go_to_discover),
+                            )
+                        }
+                    }
+                }
+
                 val time = TimeHelper.getTimeDurationShortString(timeMs = (header.totalTimeSecs * 1000).toLong(), context = root.context)
                 lblUpNextTime.isVisible = hasEpisodeInProgress()
                 lblUpNextTime.text = if (header.episodeCount == 0) {

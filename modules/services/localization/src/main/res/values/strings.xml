@@ -378,6 +378,8 @@
     <string name="player_up_next_empty">Nothing in Up Next</string>
     <string name="player_up_next_empty_desc">You can queue episodes to play next by swiping right on episode rows, or tapping the icon on an episode card.</string>
     <string name="player_up_next_empty_desc_watch">You can queue episodes to play next in the episode details screen.</string>
+    <string name="player_up_next_empty_title">Curate your listening session</string>
+    <string name="player_up_next_empty_subtitle">You can queue episodes to play next by swiping right on episode rows, or tapping the icon on an episode card.</string>
     <string name="player_up_next_move_to_bottom">Move to bottom</string>
     <string name="player_up_next_move_to_top">Move to top</string>
     <string name="player_up_next_select">Select</string>
@@ -522,6 +524,7 @@
     <string name="remove_from_folder">Remove from folder</string>
     <string name="change_folder">Change folder</string>
     <string name="go_to_folder">Go to folder</string>
+    <string name="go_to_discover">Go to Discover</string>
     <string name="number_stepper_plus_content_description">Plus</string>
     <string name="number_stepper_minus_content_description">Minus</string>
 
