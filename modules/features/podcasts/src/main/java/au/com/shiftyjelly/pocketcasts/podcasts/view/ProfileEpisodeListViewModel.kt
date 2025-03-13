@@ -72,7 +72,7 @@ class ProfileEpisodeListViewModel @Inject constructor(
                     (results.isNotEmpty() || searchQuery.isNotEmpty())
                 _state.value = if (results.isEmpty()) {
                     State.Empty(
-                        icon = State.Empty.iconRes(mode),
+                        iconRes = State.Empty.iconRes(mode),
                         titleRes = State.Empty.titleRes(mode, searchQuery.isNotEmpty()),
                         summaryRes = State.Empty.summaryRes(mode, searchQuery.isNotEmpty()),
                         showSearchBar = showSearchBar,
@@ -115,7 +115,7 @@ class ProfileEpisodeListViewModel @Inject constructor(
         ) : State()
 
         data class Empty(
-            @DrawableRes val icon: Int,
+            @DrawableRes val iconRes: Int,
             @StringRes val titleRes: Int,
             @StringRes val summaryRes: Int,
             override val showSearchBar: Boolean = false,

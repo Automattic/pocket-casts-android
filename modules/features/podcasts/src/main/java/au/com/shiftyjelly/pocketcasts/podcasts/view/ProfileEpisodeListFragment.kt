@@ -8,9 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
@@ -297,7 +294,6 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
                                 top = if (state.showSearchBar) 0 else 16.dpToPx(requireContext()),
                             )
                             binding?.recyclerView?.isVisible = true
-                            binding?.emptyLayout?.isVisible = false
                             adapter.submitList(state.results)
                         }
                     }
@@ -424,20 +420,14 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
         if (state is State.Empty) {
             binding?.emptyLayout?.setContentWithViewCompositionStrategy {
                 AppTheme(theme.activeTheme) {
-                    AnimatedVisibility(
-                        visible = isVisible,
-                        enter = fadeIn(),
-                        exit = fadeOut(),
-                    ) {
-                        val title = stringResource(state.titleRes)
-                        val subtitle = stringResource(state.summaryRes)
+                    val title = stringResource(state.titleRes)
+                    val subtitle = stringResource(state.summaryRes)
 
-                        EmptyState(
-                            title = title,
-                            subtitle = subtitle,
-                            iconResourcerId = state.icon,
-                        )
-                    }
+                    EmptyState(
+                        title = title,
+                        subtitle = subtitle,
+                        iconResourcerId = state.iconRes,
+                    )
                 }
             }
         }
