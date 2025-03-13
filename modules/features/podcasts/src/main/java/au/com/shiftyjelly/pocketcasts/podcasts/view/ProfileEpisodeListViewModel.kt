@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view
 
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -24,6 +25,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
@@ -70,6 +72,7 @@ class ProfileEpisodeListViewModel @Inject constructor(
                     (results.isNotEmpty() || searchQuery.isNotEmpty())
                 _state.value = if (results.isEmpty()) {
                     State.Empty(
+                        icon = State.Empty.iconRes(mode),
                         titleRes = State.Empty.titleRes(mode, searchQuery.isNotEmpty()),
                         summaryRes = State.Empty.summaryRes(mode, searchQuery.isNotEmpty()),
                         showSearchBar = showSearchBar,
@@ -112,6 +115,7 @@ class ProfileEpisodeListViewModel @Inject constructor(
         ) : State()
 
         data class Empty(
+            @DrawableRes val icon: Int,
             @StringRes val titleRes: Int,
             @StringRes val summaryRes: Int,
             override val showSearchBar: Boolean = false,
@@ -136,6 +140,13 @@ class ProfileEpisodeListViewModel @Inject constructor(
                         is Mode.History -> LR.string.profile_empty_history_summary
                     }
                 }
+
+                fun iconRes(mode: Mode): Int =
+                    when (mode) {
+                        is Mode.Downloaded -> IR.drawable.ic_download
+                        is Mode.Starred -> IR.drawable.ic_starred
+                        is Mode.History -> IR.drawable.ic_listen_history
+                    }
             }
         }
 
