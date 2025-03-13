@@ -7,22 +7,6 @@
     android:background="?attr/primary_ui_02"
     android:orientation="vertical">
 
-    <au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectToolbar
-        android:id="@+id/multiSelectEpisodesToolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="?android:attr/actionBarSize"
-        android:visibility="gone"
-        app:navigationIcon="?attr/homeAsUpIndicator" />
-
-    <au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectToolbar
-        android:id="@+id/multiSelectBookmarksToolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="?android:attr/actionBarSize"
-        android:visibility="gone"
-        app:navigationIcon="?attr/homeAsUpIndicator" />
-
     <FrameLayout
         android:id="@+id/podcastContentWrapper"
         android:layout_width="match_parent"
@@ -86,6 +70,22 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
+
+        <au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectToolbar
+            android:id="@+id/multiSelectEpisodesToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="?android:attr/actionBarSize"
+            android:visibility="gone"
+            app:navigationIcon="?attr/homeAsUpIndicator" />
+
+        <au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectToolbar
+            android:id="@+id/multiSelectBookmarksToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="?android:attr/actionBarSize"
+            android:visibility="gone"
+            app:navigationIcon="?attr/homeAsUpIndicator" />
 
         <androidx.compose.ui.platform.ComposeView
             android:id="@+id/composeTooltipHost"
