@@ -409,6 +409,15 @@ class UpNextFragment :
                         subtitle = resources.getString(LR.string.player_up_next_empty_subtitle),
                         iconResourcerId = IR.drawable.ic_upnext,
                         buttonText = resources.getString(LR.string.go_to_discover),
+                        onButtonClick = {
+                            if (upNextSource == UpNextSource.NOW_PLAYING) {
+                                (activity as FragmentHostListener).closePlayer()
+                            } else if (upNextSource == UpNextSource.MINI_PLAYER) {
+                                close()
+                            }
+                            analyticsTracker.track(AnalyticsEvent.UP_NEXT_DISCOVER_BUTTON_TAPPED, mapOf("source" to upNextSource))
+                            (activity as FragmentHostListener).openTab(VR.id.navigation_discover)
+                        },
                     )
                 }
             }
