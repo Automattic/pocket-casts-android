@@ -196,6 +196,9 @@ class UpNextAdapter(
                                 subtitle = root.resources.getString(LR.string.player_up_next_empty_subtitle),
                                 iconResourcerId = IR.drawable.ic_upnext,
                                 buttonText = root.resources.getString(LR.string.go_to_discover),
+                                onButtonClick = {
+                                    listener.onDiscoverTapped()
+                                },
                             )
                         }
                     }

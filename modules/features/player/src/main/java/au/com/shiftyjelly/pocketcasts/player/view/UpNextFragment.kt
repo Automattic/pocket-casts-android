@@ -410,6 +410,16 @@ class UpNextFragment :
             .showClearUpNextConfirmationDialog(parentFragmentManager, tag = "up_next_clear_dialog")
     }
 
+    override fun onDiscoverTapped() {
+        if (upNextSource == UpNextSource.NOW_PLAYING) {
+            (activity as FragmentHostListener).closePlayer()
+        } else if (upNextSource == UpNextSource.MINI_PLAYER) {
+            close()
+        }
+        analyticsTracker.track(AnalyticsEvent.UP_NEXT_DISCOVER_BUTTON_TAPPED, mapOf("source" to upNextSource))
+        (activity as FragmentHostListener).openTab(VR.id.navigation_discover)
+    }
+
     override fun onUpNextEpisodeStartDrag(viewHolder: RecyclerView.ViewHolder) {
         val recyclerView = realBinding?.recyclerView ?: return
         val itemTouchHelper = itemTouchHelper ?: return
