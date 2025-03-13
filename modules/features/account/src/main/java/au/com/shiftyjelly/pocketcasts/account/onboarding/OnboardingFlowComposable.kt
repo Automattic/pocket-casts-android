@@ -90,8 +90,8 @@ private fun Content(
             flow is OnboardingFlow.ReferralLoginOrSignUp -> {
                 exitOnboarding(OnboardingExitInfo(showWelcomeInReferralFlow = true))
             }
-            flow is OnboardingFlow.Upsell && flow.source == OnboardingUpgradeSource.SUGGESTED_FOLDERS -> {
-                navController.navigate(OnboardingNavRoute.PlusUpgrade.routeWithSource(OnboardingUpgradeSource.SUGGESTED_FOLDERS, forcePurchase = true)) {
+            flow is OnboardingFlow.Upsell && flow.source in forcedPurchaseSources -> {
+                navController.navigate(OnboardingNavRoute.PlusUpgrade.routeWithSource(flow.source, forcePurchase = true)) {
                     // clear backstack after account is created
                     popUpTo(OnboardingNavRoute.logInOrSignUp) {
                         inclusive = true
@@ -355,3 +355,8 @@ object OnboardingNavRoute {
         ) = "$routeBase/$source?$forcePurchaseArgumentKey=$forcePurchase"
     }
 }
+
+private val forcedPurchaseSources = listOf(
+    OnboardingUpgradeSource.SUGGESTED_FOLDERS,
+    OnboardingUpgradeSource.GENERATED_TRANSCRIPTS,
+)
