@@ -6,8 +6,6 @@ import android.animation.AnimatorSet
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.text.Spannable
 import android.text.SpannableString
@@ -86,7 +84,6 @@ import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import java.util.Date
 import kotlinx.coroutines.CompletableDeferred
-import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -162,6 +159,7 @@ class PodcastAdapter(
     private val onChangeHeaderExpanded: (String, Boolean) -> Unit,
     private val onClickRating: (Podcast, RatingTappedSource) -> Unit,
     private val onClickCategory: (Podcast) -> Unit,
+    private val onClickWebsite: (Podcast) -> Unit,
     private val onArtworkAvailable: (Podcast) -> Unit,
     private val sourceView: SourceView,
 ) : LargeListAdapter<Any, RecyclerView.ViewHolder>(1500, differ) {
@@ -264,7 +262,7 @@ class PodcastAdapter(
                         onClickFolder = onFoldersClicked,
                         onClickNotification = onNotificationsClicked,
                         onClickSettings = onSettingsClicked,
-                        onClickWebsiteLink = ::onWebsiteLinkClicked,
+                        onClickWebsiteLink = onClickWebsite,
                         onToggleHeader = {
                             onChangeHeaderExpanded(podcast.uuid, !podcast.isHeaderExpanded)
                         },
@@ -375,7 +373,7 @@ class PodcastAdapter(
                                 schedule = podcast.displayableFrequency(context.resources),
                                 next = podcast.displayableNextEpisodeDate(context),
                             ),
-                            onWebsiteLinkClicked = ::onWebsiteLinkClicked,
+                            onWebsiteLinkClicked = { onClickWebsite(podcast) },
                         )
                     },
                     ratingsContent = {
@@ -746,27 +744,6 @@ class PodcastAdapter(
         onHeaderSummaryToggled(expanded, true)
     }
 
-    private fun onWebsiteLinkClicked() {
-        podcast.podcastUrl?.let { url ->
-            if (url.isNotBlank()) {
-                try {
-                    context.startActivity(webUrlToIntent(url), null)
-                } catch (e: Exception) {
-                    Timber.e(e, "Failed to open podcast web page.")
-                }
-            }
-        }
-    }
-
-    private fun webUrlToIntent(url: String): Intent {
-        var uri = Uri.parse(url)
-        // fix for podcast web pages that don't start with http://
-        if (uri.scheme.isNullOrBlank() && !url.contains("://")) {
-            uri = Uri.parse("http://$url")
-        }
-        return Intent(Intent.ACTION_VIEW, uri)
-    }
-
     internal class EpisodeHeaderViewHolder(val binding: AdapterEpisodeHeaderBinding, val onEpisodesOptionsClicked: () -> Unit, val onSearchFocus: () -> Unit) : RecyclerView.ViewHolder(binding.root) {
         init {
             binding.btnEpisodeOptions.setOnClickListener {
@@ -939,7 +916,7 @@ class PodcastAdapter(
         private val onClickFolder: () -> Unit,
         private val onClickNotification: (Podcast, Boolean) -> Unit,
         private val onClickSettings: () -> Unit,
-        private val onClickWebsiteLink: () -> Unit,
+        private val onClickWebsiteLink: (Podcast) -> Unit,
         private val onToggleHeader: () -> Unit,
         private val onToggleDescription: () -> Unit,
         private val onLongClickArtwork: () -> Unit,
@@ -1004,7 +981,7 @@ class PodcastAdapter(
                         onClickFolder = onClickFolder,
                         onClickNotification = { onClickNotification(podcast, !podcast.isShowNotifications) },
                         onClickSettings = onClickSettings,
-                        onClickWebsiteLink = onClickWebsiteLink,
+                        onClickWebsiteLink = { onClickWebsiteLink(podcast) },
                         onToggleHeader = onToggleHeader,
                         onToggleDescription = onToggleDescription,
                         onLongClickArtwork = onLongClickArtwork,
