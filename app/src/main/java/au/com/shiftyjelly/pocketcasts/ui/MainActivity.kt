@@ -246,9 +246,6 @@ class MainActivity :
 
     @Inject lateinit var crashLogging: CrashLogging
 
-    private lateinit var bottomNavHideManager: BottomNavHideManager
-    private lateinit var observeUpNext: LiveData<UpNextQueue.State>
-
     private val viewModel: MainActivityViewModel by viewModels()
     private val disposables = CompositeDisposable()
     private var videoPlayerShown: Boolean = false
@@ -940,8 +937,6 @@ class MainActivity :
             }
         }
 
-        bottomNavHideManager =
-            BottomNavHideManager(findViewById(R.id.root), binding.bottomNavigation)
         frameBottomSheetBehavior.setBottomSheetCallback(object :
             BottomSheetBehavior.BottomSheetCallback() {
             override fun onSlide(bottomSheet: View, slideOffset: Float) {}
@@ -1029,8 +1024,8 @@ class MainActivity :
         }
     }
 
-    override fun onPlayerBottomSheetSlide(slideOffset: Float) {
-        bottomNavHideManager.onSlide(slideOffset)
+    override fun onPlayerBottomSheetSlide(bottomSheetView: View, slideOffset: Float) {
+        binding.bottomNavigation.translationY = bottomSheetView.height * slideOffset
     }
 
     override fun updateSystemColors() {

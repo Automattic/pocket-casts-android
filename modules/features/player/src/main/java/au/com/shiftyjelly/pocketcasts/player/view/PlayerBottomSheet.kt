@@ -98,7 +98,7 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
         fun onMiniPlayerHidden()
         fun onMiniPlayerVisible()
         fun onPlayerOpen()
-        fun onPlayerBottomSheetSlide(slideOffset: Float)
+        fun onPlayerBottomSheetSlide(bottomSheetView: View, slideOffset: Float)
         fun onPlayerClosed()
         fun onPlayClicked()
         fun onPauseClicked()
@@ -205,7 +205,7 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
         return object : BottomSheetBehavior.BottomSheetCallback() {
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
                 // remove bottom navigation view
-                listener?.onPlayerBottomSheetSlide(slideOffset)
+                listener?.onPlayerBottomSheetSlide(bottomSheet, slideOffset)
 
                 animations?.forEach { it.onSlide(slideOffset) }
             }
