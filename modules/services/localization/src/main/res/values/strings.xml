@@ -956,7 +956,7 @@
     <string name="profile_files_delete" translatable="false">@string/delete</string>
     <string name="profile_files_edit" translatable="false">@string/edit</string>
     <string name="profile_files_empty_summary">Want to listen to your own files?\nTap the + button to open them in Pocket Casts, and they&#x2019;ll appear here.</string>
-    <string name="profile_files_empty_title">No Files</string>
+    <string name="profile_files_empty_title">Listen or watch your own files</string>
     <string name="profile_files_mark_as_played" translatable="false">@string/mark_as_played</string>
     <string name="profile_files_options" translatable="false">@string/options</string>
     <string name="profile_files_remove_image">Replace Image</string>
