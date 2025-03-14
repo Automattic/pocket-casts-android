@@ -7,4 +7,5 @@
     android:updatePeriodMillis="1000"
     android:initialLayout="@layout/widget_default_theme"
     android:previewImage="@drawable/widget_old_preview"
-    android:resizeMode="horizontal"/>
+    android:resizeMode="horizontal"
+    android:description="@string/medium_player_widget_description" />
