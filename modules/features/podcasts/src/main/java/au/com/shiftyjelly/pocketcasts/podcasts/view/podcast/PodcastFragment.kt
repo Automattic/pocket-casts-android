@@ -115,6 +115,7 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.setupChromeCastButton
 import au.com.shiftyjelly.pocketcasts.views.extensions.smoothScrollToTop
 import au.com.shiftyjelly.pocketcasts.views.extensions.tintIcons
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
+import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemSwipeState
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutViewModel
@@ -825,7 +826,9 @@ class PodcastFragment : BaseFragment() {
             it.addOnScrollListener(onScrollListener)
         }
 
-        itemTouchHelper = EpisodeItemTouchHelper().apply {
+        itemTouchHelper = EpisodeItemTouchHelper(
+            onSwipeStateChanged = { state -> binding.updateSwipeRefreshLayout(state) },
+        ).apply {
             attachToRecyclerView(binding.episodesRecyclerView)
         }
 
@@ -1326,6 +1329,15 @@ class PodcastFragment : BaseFragment() {
         val featuredPodcast: Boolean,
         val isHeaderRedesigned: Boolean,
     ) : Parcelable
+}
+
+private fun BindingWrapper.updateSwipeRefreshLayout(
+    episodeItemSwipeState: EpisodeItemSwipeState,
+) {
+    when (episodeItemSwipeState) {
+        EpisodeItemSwipeState.SWIPING -> swipeRefreshLayout.isEnabled = false
+        EpisodeItemSwipeState.IDLE -> swipeRefreshLayout.isEnabled = true
+    }
 }
 
 private sealed interface BindingWrapper {

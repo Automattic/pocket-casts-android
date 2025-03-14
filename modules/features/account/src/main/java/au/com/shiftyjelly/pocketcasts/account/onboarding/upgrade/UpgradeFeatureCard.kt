@@ -8,7 +8,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -38,11 +37,7 @@ sealed class UpgradeFeatureCard(
         private fun getTitleForSource(
             source: OnboardingUpgradeSource,
         ) = when {
-            (
-                source in listOf(OnboardingUpgradeSource.SKIP_CHAPTERS, OnboardingUpgradeSource.WHATS_NEW_SKIP_CHAPTERS) &&
-                    FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS) &&
-                    SubscriptionTier.fromFeatureTier(Feature.DESELECT_CHAPTERS) == SubscriptionTier.PLUS
-                )
+            source == OnboardingUpgradeSource.SKIP_CHAPTERS
             -> LR.string.skip_chapters_plus_prompt
 
             source == OnboardingUpgradeSource.UP_NEXT_SHUFFLE &&
@@ -75,20 +70,7 @@ sealed class UpgradeFeatureCard(
         },
         subscriptionTier = SubscriptionTier.PATRON,
     ) {
-        override val titleRes: (OnboardingUpgradeSource) -> Int = { source -> getTitleForSource(source) }
-
-        private fun getTitleForSource(
-            source: OnboardingUpgradeSource,
-        ) = when {
-            (
-                source in listOf(OnboardingUpgradeSource.SKIP_CHAPTERS, OnboardingUpgradeSource.WHATS_NEW_SKIP_CHAPTERS) &&
-                    FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS) &&
-                    SubscriptionTier.fromFeatureTier(Feature.DESELECT_CHAPTERS) == SubscriptionTier.PATRON
-                )
-            -> LR.string.skip_chapters_patron_prompt
-
-            else -> LR.string.onboarding_patron_features_title
-        }
+        override val titleRes: (OnboardingUpgradeSource) -> Int = { _ -> LR.string.onboarding_patron_features_title }
     }
 }
 

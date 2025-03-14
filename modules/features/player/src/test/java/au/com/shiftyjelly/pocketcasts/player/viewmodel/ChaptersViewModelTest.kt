@@ -18,10 +18,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import java.util.Date
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -49,9 +46,6 @@ class ChaptersViewModelTest {
 
     @get:Rule
     val coroutineRule = MainCoroutineRule(testDispatcher)
-
-    @get:Rule
-    val featureFlagRule = InMemoryFeatureFlagRule()
 
     private val chapterManager = mock<ChapterManager>()
     private val playbackManager = mock<PlaybackManager>()
@@ -92,8 +86,6 @@ class ChaptersViewModelTest {
         whenever(userSetting.flow).thenReturn(subscriptionStatusFlow)
         whenever(settings.cachedSubscriptionStatus).thenReturn(userSetting)
 
-        FeatureFlag.setEnabled(Feature.DESELECT_CHAPTERS, true)
-
         chaptersViewModel = ChaptersViewModel(
             Mode.Episode(episode.uuid),
             chapterManager,
@@ -109,15 +101,6 @@ class ChaptersViewModelTest {
     fun `paid user can skip chapters`() = runTest {
         chaptersViewModel.uiState.test {
             assertTrue(awaitItem().canSkipChapters)
-        }
-    }
-
-    @Test
-    fun `paid user cant skip chapters if feature is disabled`() = runTest {
-        FeatureFlag.setEnabled(Feature.DESELECT_CHAPTERS, false)
-
-        chaptersViewModel.uiState.test {
-            assertFalse(awaitItem().canSkipChapters)
         }
     }
 
@@ -156,15 +139,6 @@ class ChaptersViewModelTest {
     fun `show header for podcast episode`() = runTest {
         chaptersViewModel.uiState.test {
             assertTrue(awaitItem().showHeader)
-        }
-    }
-
-    @Test
-    fun `do not show header when feature is disabled`() = runTest {
-        FeatureFlag.setEnabled(Feature.DESELECT_CHAPTERS, false)
-
-        chaptersViewModel.uiState.test {
-            assertFalse(awaitItem().showHeader)
         }
     }
 

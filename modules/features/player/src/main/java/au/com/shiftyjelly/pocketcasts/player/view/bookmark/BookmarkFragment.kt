@@ -5,6 +5,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -44,7 +47,9 @@ class BookmarkFragment : Fragment() {
                 onTitleChange = { viewModel.changeTitle(it) },
                 onSave = ::saveBookmark,
                 onClose = ::close,
-                modifier = Modifier.background(uiState.backgroundColor),
+                modifier = Modifier
+                    .background(uiState.backgroundColor)
+                    .windowInsetsPadding(WindowInsets.ime),
             )
         }
     }

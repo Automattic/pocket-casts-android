@@ -12,13 +12,17 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.runtime.LaunchedEffect
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+import androidx.core.view.marginTop
+import androidx.dynamicanimation.animation.SpringAnimation
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
@@ -47,10 +51,10 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSourc
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog.ButtonType.Danger
+import au.com.shiftyjelly.pocketcasts.views.extensions.spring
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
@@ -124,10 +128,8 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         binding.videoView.playbackManager = playbackManager
         binding.videoView.setOnClickListener { onFullScreenVideoClick() }
 
-        if (FeatureFlag.isEnabled(Feature.TRANSCRIPTS)) {
-            setupTranscriptPage()
-            observeTranscriptPageTransition()
-        }
+        setupTranscriptPage()
+        observeTranscriptPageTransition()
 
         setupUpNextDrag(binding)
 
@@ -370,6 +372,11 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 transcriptViewModel = transcriptViewModel,
                 searchViewModel = transcriptSearchViewModel,
                 theme = theme,
+                onClickSubscribe = {
+                    val uiState = transcriptViewModel.uiState.value
+                    transcriptViewModel.track(AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_SUBSCRIBE_TAPPED, uiState.podcastAndEpisode)
+                    OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.Upsell(OnboardingUpgradeSource.GENERATED_TRANSCRIPTS))
+                },
             )
         }
     }
@@ -378,49 +385,68 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 shelfSharedViewModel.transitionState.collect { transitionState ->
+                    val uiState = transcriptViewModel.uiState.value
+
                     when (transitionState) {
-                        is TransitionState.OpenTranscript -> binding?.openTranscript()
-                        is TransitionState.CloseTranscript -> binding?.closeTranscript(transitionState.withTransition)
+                        is TransitionState.OpenTranscript -> {
+                            if (uiState.showPaywall) {
+                                transcriptViewModel.track(AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_SHOWN, uiState.podcastAndEpisode)
+                            }
+                            binding?.openTranscript(
+                                hidePlayerControls = !transitionState.showPlayerControls || !resources.getBoolean(R.bool.transcript_show_seekbar_and_player_controls),
+                            )
+                        }
+                        is TransitionState.CloseTranscript -> {
+                            val event = if (uiState.showPaywall) {
+                                AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_DISMISSED
+                            } else {
+                                AnalyticsEvent.TRANSCRIPT_DISMISSED
+                            }
+                            transcriptViewModel.track(event, uiState.podcastAndEpisode)
+                            binding?.closeTranscript()
+                        }
                     }
                 }
             }
         }
     }
 
-    private fun AdapterPlayerHeaderBinding.openTranscript() {
-        playerGroup.layoutTransition = LayoutTransition()
-        transcriptPage.isVisible = true
-        shelfComposeView.isVisible = false
-        val transcriptShowSeekbarAndPlayerControls = resources.getBoolean(R.bool.transcript_show_seekbar_and_player_controls)
-        seekBar.isVisible = transcriptShowSeekbarAndPlayerControls
-        with(playerControlsComposeView) {
-            isVisible = transcriptShowSeekbarAndPlayerControls
-            scaleX = 0.6f
-            scaleY = 0.6f
+    private fun AdapterPlayerHeaderBinding.openTranscript(
+        hidePlayerControls: Boolean,
+    ) {
+        if (playerGroup.layoutTransition == null) {
+            playerGroup.layoutTransition = LayoutTransition()
         }
-        if (transcriptShowSeekbarAndPlayerControls) {
-            (seekBar.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin = resources.getDimensionPixelSize(R.dimen.seekbar_margin_bottom_transcript)
+        transcriptPage.isVisible = true
+        shelfComposeView.isInvisible = true
+        val shelfOffset = shelfComposeView.height + shelfComposeView.marginTop
+        with(seekBar) {
+            isInvisible = hidePlayerControls
+            spring(SpringAnimation.TRANSLATION_Y).animateToFinalPosition(shelfOffset.toFloat() + 32.dpToPx(context))
+        }
+        with(playerControlsComposeView) {
+            isInvisible = hidePlayerControls
+            spring(SpringAnimation.SCALE_X).animateToFinalPosition(0.6f)
+            spring(SpringAnimation.SCALE_Y).animateToFinalPosition(0.6f)
+            spring(SpringAnimation.TRANSLATION_Y).animateToFinalPosition(shelfOffset.toFloat())
         }
         val containerFragment = parentFragment as? PlayerContainerFragment
         containerFragment?.updateTabsVisibility(false)
         root.setScrollingEnabled(false)
     }
 
-    private fun AdapterPlayerHeaderBinding.closeTranscript(
-        withTransition: Boolean,
-    ) {
-        playerGroup.layoutTransition = if (withTransition) LayoutTransition() else null
+    private fun AdapterPlayerHeaderBinding.closeTranscript() {
         shelfComposeView.isVisible = true
         transcriptPage.isVisible = false
-        seekBar.isVisible = true
+        with(seekBar) {
+            isVisible = true
+            spring(SpringAnimation.TRANSLATION_Y).animateToFinalPosition(0f)
+        }
         with(playerControlsComposeView) {
             isVisible = true
-            scaleX = 1f
-            scaleY = 1f
-        }
-        val transcriptShowSeekbarAndPlayerControls = resources.getBoolean(R.bool.transcript_show_seekbar_and_player_controls)
-        if (transcriptShowSeekbarAndPlayerControls) {
-            (seekBar.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin = resources.getDimensionPixelSize(R.dimen.seekbar_margin_bottom)
+            spring(SpringAnimation.SCALE_X).animateToFinalPosition(1f)
+            spring(SpringAnimation.SCALE_Y).animateToFinalPosition(1f)
+            spring(SpringAnimation.TRANSLATION_Y).animateToFinalPosition(0f)
         }
         val containerFragment = parentFragment as? PlayerContainerFragment
         containerFragment?.updateTabsVisibility(true)
