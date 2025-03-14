@@ -12,6 +12,8 @@
 *   Updates
     *   Close episode details screen when archiving an episode. This reverts [#3473](https://github.com/Automattic/pocket-casts-android/pull/3473). 
         ([#3718](https://github.com/Automattic/pocket-casts-android/pull/3718))
+    *   Update widget titles and add descriptions.
+        ([#3769](https://github.com/Automattic/pocket-casts-android/pull/3769))
     *   Reorder podcasts sorting order based on their popularity. 
         ([#3733](https://github.com/Automattic/pocket-casts-android/pull/3733))
 

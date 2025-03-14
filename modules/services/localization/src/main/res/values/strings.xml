@@ -173,10 +173,13 @@
     <string name="got_it">Got it</string>
     <string name="submit">Submit</string>
     <string name="widget">Widget</string>
-    <string name="medium_player_classic_widget_label">Medium Player (Classic)</string>
-    <string name="small_player_widget_label">Small Player</string>
-    <string name="medium_player_widget_label">Medium Player</string>
-    <string name="large_player_widget_label">Large Player</string>
+    <string name="medium_player_classic_widget_label">Podcast Playback Controls (Classic)</string>
+    <string name="small_player_widget_label">Podcast Play Button</string>
+    <string name="small_player_widget_description">Play or pause your episode with one tap</string>
+    <string name="medium_player_widget_label">Podcast Playback Controls</string>
+    <string name="medium_player_widget_description">Play, pause, or skip through your episode</string>
+    <string name="large_player_widget_label">Podcast Controls &amp; Up Next Queue</string>
+    <string name="large_player_widget_description">Control playback or switch episodes</string>
     <string name="widget_no_episode_playing">No episode playing</string>
     <string name="widget_nothing_in_up_next">Nothing in Up Next</string>
     <string name="widget_check_out_discover">Check out Discover for more</string>
