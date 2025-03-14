@@ -486,6 +486,14 @@ internal class DiscoverAdapter(
                         mapOf(CURRENT_PAGE to position, TOTAL_PAGES to adapter.itemCount, LIST_ID_KEY to it.inferredId()),
                     )
                 }
+                // Adds extra right padding starting from page 1 to preview the next page, except for the last page
+                if (position == 0) {
+                    recyclerView?.setPadding(8.dpToPx(itemView.context), 0, 0, 0)
+                } else if (position == adapter.itemCount - 1) {
+                    recyclerView?.setPadding(8.dpToPx(itemView.context), 0, 0, 0)
+                } else {
+                    recyclerView?.setPadding(8.dpToPx(itemView.context), 0, 20.dpToPx(itemView.context), 0)
+                }
             }
 
             recyclerView?.adapter = adapter

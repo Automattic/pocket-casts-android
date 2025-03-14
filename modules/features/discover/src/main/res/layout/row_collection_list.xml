@@ -35,11 +35,9 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rowRecyclerView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
-        android:clipToPadding="false"
-        tools:listItem="@layout/item_small_list"/>
+        android:layout_height="match_parent"
+        android:paddingHorizontal="8dp"
+        android:clipToPadding="false"/>
 
     <au.com.shiftyjelly.pocketcasts.views.component.PagerIndicator
         android:id="@+id/pageIndicatorView"
