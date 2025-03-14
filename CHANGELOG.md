@@ -12,6 +12,8 @@
         ([#3687](https://github.com/Automattic/pocket-casts-android/pull/3687))
     *   Fixed an issue where bookmark confirmation button was obstructed by keyboard.
         ([#3761](https://github.com/Automattic/pocket-casts-android/pull/3761))
+    *   Fix issues with Classic widget not syncing its state in some scenarios.
+        ([#3761](https://github.com/Automattic/pocket-casts-android/pull/3761))
 *   Updates
     *   Close episode details screen when archiving an episode. This reverts [#3473](https://github.com/Automattic/pocket-casts-android/pull/3473). 
         ([#3718](https://github.com/Automattic/pocket-casts-android/pull/3718))
