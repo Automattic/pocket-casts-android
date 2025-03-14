@@ -195,7 +195,7 @@ private fun NoContent(
         contentAlignment = Alignment.Center,
         modifier = GlanceModifier
             .fillMaxSize()
-            .clickable(OpenPocketCastsAction.action())
+            .clickable(OpenPocketCastsAction.action()),
     ) {
         AndroidRemoteViews(
             remoteViews = RemoteViews(
