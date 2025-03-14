@@ -5,6 +5,6 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:alpha="0.4"
-    android:src="@drawable/widget_old_nothing_loaded"
+    android:src="@drawable/widget_classic_nothing_loaded"
     android:tint="#FFFFFF"
     tools:ignore="ContentDescription,UseAppTint" />

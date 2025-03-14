@@ -44,7 +44,6 @@ import au.com.shiftyjelly.pocketcasts.widget.data.PlayerWidgetEpisode
 import coil.imageLoader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 @Composable
 internal fun ClassicPlayer(state: ClassicPlayerWidgetState) {
@@ -111,7 +110,7 @@ private fun Content(
                 modifier = GlanceModifier.padding(top = 4.dp, start = 2.dp),
             )
             Image(
-                provider = ImageProvider(IR.drawable.widget_old_skip_backward),
+                provider = ImageProvider(R.drawable.widget_classic_skip_backward),
                 colorFilter = ColorFilter.tint(LocalWidgetTheme.current.iconClassic),
                 contentDescription = null,
             )
@@ -125,7 +124,7 @@ private fun Content(
                 .semantics { contentDescription = if (state.isPlaying) "Pause" else "Play" },
         ) {
             Image(
-                provider = ImageProvider(if (state.isPlaying) IR.drawable.widget_old_pause else IR.drawable.widget_old_play),
+                provider = ImageProvider(if (state.isPlaying) R.drawable.widget_classic_pause else R.drawable.widget_classic_play),
                 colorFilter = ColorFilter.tint(LocalWidgetTheme.current.iconClassic),
                 contentDescription = null,
             )
@@ -146,7 +145,7 @@ private fun Content(
                 modifier = GlanceModifier.padding(top = 4.dp, end = 2.dp),
             )
             Image(
-                provider = ImageProvider(IR.drawable.widget_old_skip_forward),
+                provider = ImageProvider(R.drawable.widget_classic_skip_forward),
                 colorFilter = ColorFilter.tint(LocalWidgetTheme.current.iconClassic),
                 contentDescription = null,
             )
@@ -192,11 +191,18 @@ private fun Cover(
 private fun NoContent(
     useDynamicColors: Boolean,
 ) {
-    AndroidRemoteViews(
-        remoteViews = RemoteViews(
-            LocalContext.current.packageName,
-            if (useDynamicColors) R.layout.classic_no_content_dynamic else R.layout.classic_no_content_default,
-        ),
-        modifier = GlanceModifier.wrapContentSize(),
-    )
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = GlanceModifier
+            .fillMaxSize()
+            .clickable(OpenPocketCastsAction.action())
+    ) {
+        AndroidRemoteViews(
+            remoteViews = RemoteViews(
+                LocalContext.current.packageName,
+                if (useDynamicColors) R.layout.classic_no_content_dynamic else R.layout.classic_no_content_default,
+            ),
+            modifier = GlanceModifier.wrapContentSize(),
+        )
+    }
 }

@@ -8,4 +8,4 @@
     android:resizeMode="horizontal"
     android:targetCellWidth="5"
     android:targetCellHeight="1"
-    android:previewImage="@drawable/widget_old_preview" />
+    android:previewImage="@drawable/widget_classic_preview" />
