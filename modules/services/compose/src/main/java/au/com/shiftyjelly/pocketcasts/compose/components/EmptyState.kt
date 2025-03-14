@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -78,6 +79,7 @@ fun EmptyState(
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = MaterialTheme.theme.colors.primaryInteractive01,
                 ),
+                modifier = Modifier.widthIn(max = 330.dp),
             )
         }
     }
