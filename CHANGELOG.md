@@ -1,5 +1,8 @@
 7.85
 -----
+*   New Features
+    *   Add generated transcripts support.
+        ([#3772](https://github.com/Automattic/pocket-casts-android/pull/3772))
 *   Bug Fixes
     *   Fixed an issue where the Up Next queue obstructed the bottom navigation bar in some cases.
         ([#3762](https://github.com/Automattic/pocket-casts-android/pull/3762))
