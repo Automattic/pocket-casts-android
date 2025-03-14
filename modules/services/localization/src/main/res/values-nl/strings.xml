@@ -1,17 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-02-25 12:54:06+0000
+Translation-Revision-Date: 2025-03-12 09:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="onboarding_plus_feature_chapters_title">Hoofdstukken voorselecteren</string>
+    <string name="onboarding_plus_feature_bookmarks_title">Bladwijzers</string>
+    <string name="podcast_header_redesign_message">Tik op de podcasttitel om de beschrijving en details in te klappen of uit te vouwen</string>
+    <string name="suggested_folder_content_description">Voorbeeld %1$s map weergeven</string>
+    <string name="suggested_folders_replace_subtitle">We hebben je podcasts in mappen geordend. Sla ze nu op en pas ze later naar eigen smaak aan. Dit vervangt alle bestaande mappen.</string>
+    <string name="suggested_folders_title">Slimme mappen</string>
+    <string name="discover_dismiss_selected_category">Geselecteerde categorie negeren</string>
+    <string name="discover_show_all_categories">Categorieën weergeven</string>
+    <string name="podcast_header_redesign_title">We hebben wat wijzigingen aangebracht!</string>
+    <string name="notifications_enabled_message">We sturen je een bericht met nieuwe afleveringen van %1$s.</string>
     <string name="see_more">Meer zien</string>
     <string name="podcast_artwork_description">Podcast-illustratie</string>
     <string name="suggested_folders_replace_folders_confirmation_description">Als je de aanbevolen mappen accepteert, worden je huidige mappen overschreven. Dit kan niet ongedaan worden gemaakt.</string>
     <string name="suggested_folders_replace_folders_confirmation_tittle">Bestaande mappen vervangen?</string>
     <string name="suggested_folders_replace_folders_button">Mappen vervangen</string>
-    <string name="suggested_folders_subtitle">We hebben je podcasts in mappen geordend. Sla ze nu op en pas ze later naar eigen smaak aan.</string>
+    <string name="suggested_folders_use_subtitle">We hebben je podcasts in mappen geordend. Sla ze nu op en pas ze later naar eigen smaak aan.</string>
     <string name="onboarding_plus_feature_up_next_shuffle_title">Hierna shuffelen</string>
     <string name="suggested_folders_plus_prompt">Orden je podcasts met Pocket Casts Plus en meer</string>
     <string name="winback_cancel_subscription_header_title">Abonnement annuleren</string>
@@ -20,13 +30,10 @@ Language: nl
     <string name="onboarding_import_from_url_importing_message">OPML-import bezig. Je kan teruggaan naar je onboardingproces.</string>
     <string name="onboarding_import_from_url_description">Importeer je podcasts vanuit een OPML-bestand met een URL.</string>
     <string name="onboarding_import_from_url">Importeren vanuit URL</string>
-    <string name="suggested_folders_paywall_tittle">Jouw podcasts, automatisch geordend</string>
     <string name="podcast_feed_update_tooltip_subtitle">Vouw uit of gebruik dit menu om te zien of er iets nieuws is.</string>
     <string name="podcast_feed_update_tooltip_title">Nieuwe afleveringen staan voor je klaar!</string>
-    <string name="folder_content_description">Map %s</string>
-    <string name="suggested_folders_use_create_custom_folders_button">Aangepaste mappen aanmaken</string>
+    <string name="suggested_folders_create_custom_folder_button">Aangepaste mappen aanmaken</string>
     <string name="suggested_folders_use_these_folders_button">Deze mappen gebruiken</string>
-    <string name="suggested_folders">Voorgestelde mappen</string>
     <string name="winback_claiming_offer">Aanbieding claimen</string>
     <string name="winback_claimed_offer_message_3">50% korting op je eerste jaar!</string>
     <string name="winback_offer_free_offer_yearly_description">Betaal nu %1$s voor nog een jaar met 50%% korting.</string>
@@ -267,7 +274,6 @@ Language: nl
     <string name="settings_storage_fix_downloads">Downloads herstellen</string>
     <string name="nova_launcher_new_releases">Nieuwe releases</string>
     <string name="nova_launcher_subscribed_podcasts">Geen podcast-abonnementen</string>
-    <string name="medium_player_classic_widget_label">Medium Player (Classic)</string>
     <string name="widget_preview_time_left_4">nog 1u 36m</string>
     <string name="widget_preview_time_left_3">nog 55m</string>
     <string name="widget_preview_time_left_2">nog 12m</string>
@@ -294,9 +300,6 @@ Language: nl
     <string name="widget_check_out_discover">Bekijk Ontdekken voor nog meer</string>
     <string name="widget_nothing_in_up_next">Niets in Hierna</string>
     <string name="widget_no_episode_playing">Er wordt geen aflevering afgespeeld</string>
-    <string name="large_player_widget_label">Grote speler</string>
-    <string name="medium_player_widget_label">Middelgrote speler</string>
-    <string name="small_player_widget_label">Kleine speler</string>
     <string name="clear_search">Zoekopdracht wissen</string>
     <string name="bookmarks_search_results_not_found">We kunnen geen bladwijzer vinden voor die zoekopdracht.</string>
     <string name="podcast_and_episode">Podcast en aflevering</string>
@@ -310,7 +313,6 @@ Language: nl
     <string name="discover_all_categories">Alle categorieën</string>
     <string name="upgrade_to_patron">Upgrade naar Patron</string>
     <string name="upgrade_to_plus">Upgraden naar Plus</string>
-    <string name="skip_chapters_patron_prompt">Selecteer hoofdstukken voor en geniet van extra functies met Pocket Casts Patron</string>
     <string name="skip_chapters_plus_prompt">Selecteer hoofdstukken voor en geniet van extra functies met Pocket Casts Plus</string>
     <string name="number_of_chapters_summary_singular">1 hoofdstuk • %d verborgen</string>
     <string name="number_of_chapters_summary_plural">%1$d hoofdstukken • %2$d verborgen</string>
@@ -322,7 +324,6 @@ Language: nl
     <string name="half_price_first_year">50% korting op je eerste jaar</string>
     <string name="plus_offer_duration">%s aanbieding</string>
     <string name="onboarding_plus_feature_watch_playback">Apple Watch- en Wear OS-apps</string>
-    <string name="onboarding_plus_feature_folders_and_bookmarks_title">Mappen en bladwijzers</string>
     <string name="settings_use_dynamic_colors_widget_details">Wanneer deze instelling is ingeschakeld, veranderen de widgetkleuren op basis van de themakleuren van het apparaat.</string>
     <string name="settings_use_dynamic_colors_widget">Dynamische kleuren gebruiken voor widgets</string>
     <string name="widget">Widget</string>
@@ -432,7 +433,7 @@ Language: nl
     <string name="settings_autoplay">Automatisch afspelen</string>
     <string name="player_sleep_add_1_minute">+ 1 minuut</string>
     <string name="player_sleep_1_minute">1 minuut</string>
-    <string name="onboarding_plus_feature_extra_themes_icons_title">Extra thema\'s en app-pictogrammen</string>
+    <string name="onboarding_plus_feature_extra_themes_icons_title">Extra thema\'s en pictogrammen</string>
     <string name="onboarding_patron_feature_early_access_title">Vroegtijdige toegang tot functies</string>
     <string name="settings_continuous_playback_summary">Als je wachtrij Hierna leeg is, zullen we afleveringen afspelen van dezelfde podcast of uit dezelfde lijst waar je op dat moment naar aan het luisteren bent.</string>
     <string name="renew_your_subscription">Verleng je abonnement</string>
@@ -636,6 +637,7 @@ Language: nl
     <string name="onboarding_plus_feature_cloud_storage_text">Wanneer je je bestanden naar een cloudopslag uploadt, zijn ze overal beschikbaar.</string>
     <string name="onboarding_plus_feature_cloud_storage_title">20 GB cloudopslag</string>
     <string name="onboarding_plus_feature_folders_text">Organiseer je podcasts in mappen en synchroniseer ze op al je apparaten.</string>
+    <string name="onboarding_plus_feature_folders_title">Mappen</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Luister overal met onze apps voor Windows en macOS en de online apps.</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Alles wat je geweldig vindt aan Pocket Casts en meer</string>
     <string name="onboarding_recommendations_import">Importeren</string>
@@ -1724,8 +1726,6 @@ Language: nl
     <string name="player_effects_speed_up">Versnellen</string>
     <string name="player_effects_speed_down">Vertragen</string>
     <string name="player_effects_speed">Snelheid</string>
-    <string name="player_effects_custom_effects_applied">Speciale effecten toegepast</string>
-    <string name="player_effects_clear">Wissen</string>
     <string name="player_effects">Speler effecten</string>
     <string name="player_close">Speler sluiten</string>
     <string name="player_chapter_url">Hoofdstuk-URL</string>

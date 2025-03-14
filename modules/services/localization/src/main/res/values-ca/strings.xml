@@ -196,7 +196,6 @@ Language: ca
     <string name="settings_storage_fix_downloads">Arreglar les descàrregues</string>
     <string name="nova_launcher_new_releases">Novetats</string>
     <string name="nova_launcher_subscribed_podcasts">Pòdcasts subscrits</string>
-    <string name="medium_player_classic_widget_label">Reproductor mèdia (Clàssic)</string>
     <string name="widget_preview_time_left_4">Queda 1h 36min</string>
     <string name="widget_preview_time_left_3">Queden 55 min</string>
     <string name="widget_preview_time_left_2">Queden 12 min</string>
@@ -223,9 +222,6 @@ Language: ca
     <string name="widget_check_out_discover">Mira a Descobrir per a veure\'n més</string>
     <string name="widget_nothing_in_up_next">No hi ha res a la cua de \'Tot seguit\'</string>
     <string name="widget_no_episode_playing">No s\'està reproduint cap episodi</string>
-    <string name="large_player_widget_label">Reproductor gran</string>
-    <string name="medium_player_widget_label">Reproductor mitjà</string>
-    <string name="small_player_widget_label">Reproductor petit</string>
     <string name="clear_search">Esborrar la cerca</string>
     <string name="bookmarks_search_results_not_found">No hem pogut trobar cap marcador per aquesta cerca.</string>
     <string name="podcast_and_episode">Pòdcast i episodi</string>
@@ -239,7 +235,6 @@ Language: ca
     <string name="discover_all_categories">Totes les categories</string>
     <string name="upgrade_to_patron">Actualitza a Patron</string>
     <string name="upgrade_to_plus">Actualitzar a Plus</string>
-    <string name="skip_chapters_patron_prompt">Salta capítols i més amb Pocket Casts Patron</string>
     <string name="skip_chapters_plus_prompt">Salta capítols i més amb Pocket Casts Plus</string>
     <string name="number_of_chapters_summary_singular">1 capítol • %d amagat</string>
     <string name="number_of_chapters_summary_plural">%1$d capítols • %2$d amagats</string>
@@ -250,7 +245,6 @@ Language: ca
     <string name="onboarding_plus_recurring_after_intro_offer">Pagament recurrent a %s</string>
     <string name="half_price_first_year">50% de descompte en el teu primer any</string>
     <string name="plus_offer_duration">Oferta %s</string>
-    <string name="onboarding_plus_feature_folders_and_bookmarks_title">Carpetes i marcadors</string>
     <string name="onboarding_plus_feature_watch_playback">Aplicacions d\'Apple Watch i de Wear OS</string>
     <string name="settings_use_dynamic_colors_widget_details">Quan està activat, els colors del giny canviaran segons els colors del tema del dispositiu.</string>
     <string name="settings_use_dynamic_colors_widget">Utilitza colors dinàmics per al giny</string>
@@ -361,7 +355,6 @@ Language: ca
     <string name="settings_autoplay">Reproducció automàtica</string>
     <string name="player_sleep_add_1_minute">Més d\'un minut</string>
     <string name="player_sleep_1_minute">Un minut</string>
-    <string name="onboarding_plus_feature_extra_themes_icons_title">Més temes i icones de l\'aplicació</string>
     <string name="onboarding_patron_feature_early_access_title">Accés anticipat a les funcions</string>
     <string name="settings_continuous_playback_summary">Si no tens cap episodi a la cua, es reproduirà els del pòdcast o llista que estiguis escoltant en aquell moment.</string>
     <string name="renew_your_subscription">Renova la teva subscripció</string>
@@ -1653,8 +1646,6 @@ Language: ca
     <string name="player_effects_speed_up">Accelerar</string>
     <string name="player_effects_speed_down">Alentir</string>
     <string name="player_effects_speed">Velocitat</string>
-    <string name="player_effects_custom_effects_applied">Efectes personalitzats aplicats</string>
-    <string name="player_effects_clear">ESBORRAR</string>
     <string name="player_effects">Efectes de reproducció</string>
     <string name="player_close">Tancar el reproductor</string>
     <string name="player_chapter_url">URL del capítol</string>
