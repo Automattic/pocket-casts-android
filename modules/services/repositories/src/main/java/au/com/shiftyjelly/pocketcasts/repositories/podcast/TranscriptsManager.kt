@@ -15,7 +15,7 @@ interface TranscriptsManager {
         fromUpdateAlternativeTranscript: Boolean = false,
     )
 
-    fun observerTranscriptForEpisode(episodeUuid: String): Flow<Transcript?>
+    fun observeTranscriptForEpisode(episodeUuid: String): Flow<Transcript?>
 
     @OptIn(UnstableApi::class)
     suspend fun loadTranscriptCuesInfo(

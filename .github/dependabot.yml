@@ -20,6 +20,14 @@ updates:
     labels:
       - "[Type] Tech Debt"
       - "[Area] Dependencies"
+    groups:
+      kotlin-ksp:
+        applies-to: version-updates
+        patterns:
+          - "org.jetbrains.kotlin*"
+          - "com.google.devtools.ksp*"
+        exclude-patterns:
+          - "org.jetbrains.kotlinx*"
     ignore:
       # Automattic libraries have a custom versioning scheme which doesn't work with Dependabot.
       - dependency-name: "com.automattic:Automattic-Tracks-Android"
@@ -45,5 +53,3 @@ updates:
       - dependency-name: "androidx.wear.compose:compose-foundation"
       - dependency-name: "androidx.wear.compose:compose-material"
       - dependency-name: "androidx.wear.compose:compose-navigation"
-      # Ignore KSP as it needs to be updated together with Kotlin
-      - dependency-name: "com.google.devtools.ksp"

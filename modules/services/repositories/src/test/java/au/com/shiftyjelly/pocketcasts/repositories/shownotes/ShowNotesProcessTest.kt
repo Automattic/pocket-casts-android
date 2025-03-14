@@ -447,6 +447,12 @@ class ShowNotesProcessTest {
                     language = "Language 2",
                 ),
             ),
+            pocketCastsTranscripts = listOf(
+                ShowNotesTranscript(
+                    url = "Url 3",
+                    type = "Type 3",
+                ),
+            ),
         )
         val showNotes = ShowNotesResponse(
             podcast = ShowNotesPodcast(
@@ -465,12 +471,20 @@ class ShowNotesProcessTest {
                 url = "Url 1",
                 type = "Type 1",
                 language = "Language 1",
+                isGenerated = false,
             ),
             Transcript(
                 episodeUuid = "episode-id",
                 url = "Url 2",
                 type = "Type 2",
                 language = "Language 2",
+                isGenerated = false,
+            ),
+            Transcript(
+                episodeUuid = "episode-id",
+                url = "Url 3",
+                type = "Type 3",
+                isGenerated = true,
             ),
         )
         verify(transcriptsManager).updateTranscripts("podcast-id", "episode-id", expected1, LoadTranscriptSource.DEFAULT)
@@ -482,6 +496,14 @@ class ShowNotesProcessTest {
         val episodeWithTranscripts2 = ShowNotesEpisode(
             uuid = "episode-id",
             transcripts = listOf(
+                ShowNotesTranscript(
+                    url = "Url",
+                ),
+                ShowNotesTranscript(
+                    type = "Type",
+                ),
+            ),
+            pocketCastsTranscripts = listOf(
                 ShowNotesTranscript(
                     url = "Url",
                 ),
@@ -510,6 +532,7 @@ class ShowNotesProcessTest {
         val episodeWithTranscripts = ShowNotesEpisode(
             uuid = "episode-id",
             transcripts = null,
+            pocketCastsTranscripts = null,
         )
         val showNotes = ShowNotesResponse(
             podcast = ShowNotesPodcast(
@@ -522,7 +545,7 @@ class ShowNotesProcessTest {
         processor.process("episode-id", showNotes)
 
         val expected2 = emptyList<Transcript>()
-        verify(transcriptsManager, never()).updateTranscripts("podcast-id", "episode-id", expected2, LoadTranscriptSource.DEFAULT)
+        verify(transcriptsManager).updateTranscripts("podcast-id", "episode-id", expected2, LoadTranscriptSource.DEFAULT)
     }
 
     @Test

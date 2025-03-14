@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 110,
-    "identityHash": "c491d631af3dc5c496a2e66e2d3dec81",
+    "identityHash": "53a6c3f5c60a6282e82e8a186799fccc",
     "entities": [
       {
         "tableName": "bump_stats",
@@ -1821,7 +1821,7 @@
       },
       {
         "tableName": "episode_transcript",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`episode_uuid` TEXT NOT NULL, `url` TEXT NOT NULL, `type` TEXT NOT NULL, `language` TEXT, PRIMARY KEY(`episode_uuid`, `url`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`episode_uuid` TEXT NOT NULL, `url` TEXT NOT NULL, `type` TEXT NOT NULL, `is_generated` INTEGER NOT NULL, `language` TEXT, PRIMARY KEY(`episode_uuid`, `url`))",
         "fields": [
           {
             "fieldPath": "episodeUuid",
@@ -1839,6 +1839,12 @@
             "fieldPath": "type",
             "columnName": "type",
             "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isGenerated",
+            "columnName": "is_generated",
+            "affinity": "INTEGER",
             "notNull": true
           },
           {
@@ -1904,7 +1910,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c491d631af3dc5c496a2e66e2d3dec81')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '53a6c3f5c60a6282e82e8a186799fccc')"
     ]
   }
 }

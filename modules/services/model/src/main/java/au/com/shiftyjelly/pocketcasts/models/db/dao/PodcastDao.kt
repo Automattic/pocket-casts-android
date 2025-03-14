@@ -9,7 +9,6 @@ import androidx.room.Transaction
 import androidx.room.Update
 import au.com.shiftyjelly.pocketcasts.models.entity.CuratedPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
-import au.com.shiftyjelly.pocketcasts.models.entity.SuggestedFolderDetails
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveLimit
@@ -157,13 +156,6 @@ abstract class PodcastDao {
 
     @Query("UPDATE podcasts SET folder_uuid = :folderUuid, sync_status = 0 WHERE uuid IN (:podcastUuids)")
     abstract suspend fun updateFolderUuid(folderUuid: String?, podcastUuids: List<String>)
-
-    @Transaction
-    open suspend fun updateFoldersUuid(folders: List<SuggestedFolderDetails>) {
-        for (folder in folders) {
-            updateFolderUuid(folder.uuid, folder.podcasts)
-        }
-    }
 
     fun updateSyncStatusRxCompletable(syncStatus: Int, uuid: String): Completable {
         return Completable.fromAction { updateSyncStatusBlocking(syncStatus, uuid) }
