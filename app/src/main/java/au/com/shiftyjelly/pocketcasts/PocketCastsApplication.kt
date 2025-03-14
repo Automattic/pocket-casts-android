@@ -31,7 +31,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.support.DatabaseExportHelper
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
-import au.com.shiftyjelly.pocketcasts.repositories.widget.WidgetManager
 import au.com.shiftyjelly.pocketcasts.shared.AppLifecycleObserver
 import au.com.shiftyjelly.pocketcasts.shared.DownloadStatisticsReporter
 import au.com.shiftyjelly.pocketcasts.ui.helper.AppIcon
@@ -103,8 +102,6 @@ class PocketCastsApplication : Application(), Configuration.Provider {
     @Inject lateinit var analyticsTracker: AnalyticsTracker
 
     @Inject lateinit var syncManager: SyncManager
-
-    @Inject lateinit var widgetManager: WidgetManager
 
     @Inject lateinit var downloadStatisticsReporter: DownloadStatisticsReporter
 
@@ -269,12 +266,6 @@ class PocketCastsApplication : Application(), Configuration.Provider {
         CuratedPodcastsSyncWorker.enqueuPeriodicWork(this)
         engageSdkBridge.registerIntegration()
 
-        settings.useDynamicColorsForWidget.flow
-            .onEach { widgetManager.updateWidgetFromSettings(playbackManager) }
-            .launchIn(applicationScope)
-        settings.artworkConfiguration.flow
-            .onEach { widgetManager.updateWidgetEpisodeArtwork(playbackManager) }
-            .launchIn(applicationScope)
         keepPlayerWidgetsUpdated()
 
         if (FeatureFlag.isEnabled(Feature.SYNC_EOY_DATA_ON_STARTUP)) {
@@ -290,6 +281,12 @@ class PocketCastsApplication : Application(), Configuration.Provider {
             .launchIn(applicationScope)
         settings.useDynamicColorsForWidget.flow
             .onEach(playerWidgetManager::updateUseDynamicColors)
+            .launchIn(applicationScope)
+        settings.skipBackInSecs.flow
+            .onEach(playerWidgetManager::updateSkipBackwardDuration)
+            .launchIn(applicationScope)
+        settings.skipForwardInSecs.flow
+            .onEach(playerWidgetManager::updateSkipForwardDuration)
             .launchIn(applicationScope)
         playbackManager.playbackStateRelay.asFlow()
             .map { state -> state.isPlaying }
