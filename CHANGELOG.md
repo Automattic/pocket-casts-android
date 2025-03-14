@@ -1,6 +1,8 @@
 7.85
 -----
 *   New Features
+    *   Add smart folders support.
+        ([#3720](https://github.com/Automattic/pocket-casts-android/pull/3720))
     *   Add generated transcripts support.
         ([#3772](https://github.com/Automattic/pocket-casts-android/pull/3772))
 *   Bug Fixes
