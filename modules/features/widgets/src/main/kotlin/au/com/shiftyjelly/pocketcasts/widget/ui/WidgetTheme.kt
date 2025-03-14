@@ -30,6 +30,7 @@ internal fun WidgetTheme(
             text = glanceColors.onSecondaryContainer,
             buttonBackground = glanceColors.onSecondary,
             icon = glanceColors.secondary,
+            iconClassic = glanceColors.onPrimaryContainer,
             logoBackground = if (useDynamicColors) glanceColors.secondary else glanceColors.tertiary,
             logoLines = if (useDynamicColors) glanceColors.onSecondary else glanceColors.onTertiary,
         )
@@ -46,6 +47,7 @@ internal data class WidgetTheme(
     val icon: ColorProvider,
     val logoBackground: ColorProvider,
     val logoLines: ColorProvider,
+    val iconClassic: ColorProvider,
 )
 
 private val UndefinedColor = Color.Magenta
@@ -55,7 +57,8 @@ private val DefaultColors = ColorProviders(
         primary = UndefinedColor,
         onPrimary = UndefinedColor,
         primaryContainer = UndefinedColor,
-        onPrimaryContainer = UndefinedColor,
+        // Used for old widget icon colors in non-dynamic theme.
+        onPrimaryContainer = Color(0xFFFFFFFF),
         inversePrimary = UndefinedColor,
         secondary = Color(0xFF292B2E),
         onSecondary = Color(0xFFE0E6EA),
@@ -94,7 +97,8 @@ private val DefaultColors = ColorProviders(
         primary = UndefinedColor,
         onPrimary = UndefinedColor,
         primaryContainer = UndefinedColor,
-        onPrimaryContainer = UndefinedColor,
+        // Used for old widget icon colors in non-dynamic theme.
+        onPrimaryContainer = Color(0xFFFFFFFF),
         inversePrimary = UndefinedColor,
         secondary = Color(0xFFFFFFFF),
         onSecondary = Color(0xFF333438),

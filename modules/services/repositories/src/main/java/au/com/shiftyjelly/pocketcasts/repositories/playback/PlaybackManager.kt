@@ -57,7 +57,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.NotificationBroadcastReceiver
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
-import au.com.shiftyjelly.pocketcasts.repositories.widget.WidgetManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.EpisodeSyncRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.EpisodeSyncResponse
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
@@ -122,7 +121,6 @@ open class PlaybackManager @Inject constructor(
     private val playerManager: PlayerFactory,
     private var castManager: CastManager,
     @ApplicationContext private val application: Context,
-    private val widgetManager: WidgetManager,
     private val playlistManager: PlaylistManager,
     private val downloadManager: DownloadManager,
     val upNextQueue: UpNextQueue,
@@ -228,10 +226,6 @@ open class PlaybackManager @Inject constructor(
 
     @SuppressLint("CheckResult")
     fun setup() {
-        if (!Util.isAutomotive(application)) {
-            widgetManager.updateWidgetFromPlaybackState(this)
-        }
-
         // load an initial playback state
         upNextQueue.setupBlocking()
         mediaSessionManager.startObserving()
@@ -807,7 +801,6 @@ open class PlaybackManager @Inject constructor(
             playbackStateRelay.accept(PlaybackState(state = PlaybackState.State.EMPTY, lastChangeFrom = LastChangeFrom.OnShutdown.value))
         }
         castManager.endSession()
-        widgetManager.updateWidgetNotPlaying()
     }
 
     suspend fun hibernatePlayback() {
@@ -1218,8 +1211,6 @@ open class PlaybackManager @Inject constructor(
         setupUpdateTimer()
         setupBufferUpdateTimer(episode)
         cancelPauseTimer()
-
-        widgetManager.updateWidget(podcast, true, episode)
     }
 
     fun markPodcastNeedsUpdating(podcastUuid: String) {
@@ -1257,10 +1248,6 @@ open class PlaybackManager @Inject constructor(
         }
 
         cancelUpdateTimer()
-
-        val podcast = if (episode == null) null else findPodcastByEpisode(episode)
-        widgetManager.updateWidget(podcast, false, episode)
-
         setupPauseTimer()
     }
 
@@ -1930,8 +1917,6 @@ open class PlaybackManager @Inject constructor(
         player?.setPlaybackEffects(playbackEffects)
 
         episodeManager.updatePlaybackInteractionDate(episode)
-
-        widgetManager.updateWidget(podcast, play, episode)
 
         if (play) {
             if (sameEpisode && currentPositionMs != null) {
