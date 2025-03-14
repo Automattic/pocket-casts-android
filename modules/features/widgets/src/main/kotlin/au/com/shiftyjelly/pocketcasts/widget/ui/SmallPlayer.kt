@@ -7,7 +7,6 @@ import androidx.compose.ui.unit.min
 import androidx.glance.GlanceModifier
 import androidx.glance.LocalContext
 import androidx.glance.LocalSize
-import androidx.glance.action.clickable
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.fillMaxSize
@@ -36,9 +35,7 @@ internal fun SmallPlayer(state: SmallPlayerWidgetState) {
     WidgetTheme(state.useDynamicColors) {
         Box(
             contentAlignment = Alignment.Center,
-            modifier = GlanceModifier
-                .fillMaxSize()
-                .clickable(controlPlayback),
+            modifier = GlanceModifier.fillMaxSize(),
         ) {
             EpisodeImage(
                 episode = state.episode,

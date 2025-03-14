@@ -14,6 +14,8 @@
         ([#3718](https://github.com/Automattic/pocket-casts-android/pull/3718))
     *   Reorder podcasts sorting order based on their popularity. 
         ([#3733](https://github.com/Automattic/pocket-casts-android/pull/3733))
+    *   Improve small widget accessibility.
+        ([#3770](https://github.com/Automattic/pocket-casts-android/pull/3770))
 
 7.84
 -----
