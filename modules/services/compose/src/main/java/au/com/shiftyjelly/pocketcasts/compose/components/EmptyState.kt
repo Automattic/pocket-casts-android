@@ -1,9 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.compose.components
 
+import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -36,28 +37,31 @@ fun EmptyState(
     buttonText: String? = null,
     onButtonClick: () -> Unit = {},
 ) {
+    val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+    val heightPadding = if (isLandscape) 8.dp else 16.dp
+
     Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp),
+        modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        Image(
-            painter = painterResource(id = iconResourcerId),
-            contentDescription = null,
-            modifier = Modifier
-                .padding(bottom = 16.dp)
-                .size(32.dp),
-            colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.primaryIcon02),
-        )
+        if (!isLandscape) {
+            Image(
+                painter = painterResource(id = iconResourcerId),
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(bottom = heightPadding)
+                    .size(32.dp),
+                colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.primaryIcon02),
+            )
+        }
 
         TextH30(
             text = title,
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.W500,
             modifier = Modifier
-                .padding(bottom = 16.dp),
+                .padding(bottom = heightPadding),
         )
 
         TextP40(
@@ -67,7 +71,7 @@ fun EmptyState(
             fontSize = 15.sp,
             fontWeight = FontWeight.W400,
             modifier = Modifier
-                .padding(bottom = 16.dp),
+                .padding(bottom = heightPadding),
         )
 
         buttonText?.let {
