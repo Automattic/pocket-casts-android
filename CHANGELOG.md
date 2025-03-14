@@ -1,6 +1,10 @@
 7.85
 -----
 *   Bug Fixes
+    *   Fixed an issue where the Up Next queue obstructed the bottom navigation bar in some cases.
+        ([#3762](https://github.com/Automattic/pocket-casts-android/pull/3762))
+    *   Fixed an issue where the navigation bar was drawn over the player in some cases.
+        ([#3762](https://github.com/Automattic/pocket-casts-android/pull/3762))
     *   Fixed an issue where the mini player could sometimes hide behind the navigation bar.
         ([#3687](https://github.com/Automattic/pocket-casts-android/pull/3687))
     *   Fixed an issue where bookmark confirmation button was obstructed by keyboard.
