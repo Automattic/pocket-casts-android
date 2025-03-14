@@ -1,17 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-02-25 08:10:08+0000
+Translation-Revision-Date: 2025-03-10 15:54:03+0000
 Plural-Forms: nplurals=2; plural=(n > 1);
 Generator: GlotPress/2.4.0-alpha
 Language: pt_BR
 -->
 <resources>
+    <string name="onboarding_plus_feature_chapters_title">Pré-selecionar capítulos</string>
+    <string name="onboarding_plus_feature_bookmarks_title">Favoritos</string>
+    <string name="podcast_header_redesign_message">Toque no título do podcast para recolher ou expandir a descrição e os detalhes</string>
+    <string name="suggested_folder_content_description">Visualizar pasta %1$s</string>
+    <string name="suggested_folders_replace_subtitle">Organizamos seus podcasts em pastas. Salve agora e personalize depois conforme o seu estilo. Isso substituirá todas as pastas existentes.</string>
+    <string name="suggested_folders_title">Pastas inteligentes</string>
+    <string name="discover_dismiss_selected_category">Dispensar categoria selecionada</string>
+    <string name="discover_show_all_categories">Mostrar todas as categorias</string>
+    <string name="podcast_header_redesign_title">Fizemos algumas alterações!</string>
+    <string name="notifications_enabled_message">Notificaremos você com novos episódios de %1$s.</string>
     <string name="see_more">Ver mais</string>
     <string name="podcast_artwork_description">Arte do podcast</string>
     <string name="suggested_folders_replace_folders_confirmation_description">Se você aceitar as pastas sugeridas, elas substituirão suas pastas atuais. Esta ação não pode ser desfeita.</string>
     <string name="suggested_folders_replace_folders_confirmation_tittle">Substituir pastas existentes?</string>
     <string name="suggested_folders_replace_folders_button">Substituir pastas</string>
-    <string name="suggested_folders_subtitle">Organizamos seus podcasts em pastas. Salve agora e personalize depois conforme o seu estilo.</string>
+    <string name="suggested_folders_use_subtitle">Organizamos seus podcasts em pastas. Salve agora e personalize depois conforme o seu estilo.</string>
     <string name="onboarding_plus_feature_up_next_shuffle_title">Próximo aleatório</string>
     <string name="suggested_folders_plus_prompt">Organize seus programas e muito mais com o Pocket Casts Plus</string>
     <string name="winback_cancel_subscription_header_title">Cancelar assinatura</string>
@@ -20,13 +30,10 @@ Language: pt_BR
     <string name="onboarding_import_from_url_importing_message">Importação de OPML em andamento. Você pode voltar para o seu processo de integração.</string>
     <string name="onboarding_import_from_url_description">Importe seus podcasts de um arquivo OPML usando uma URL.</string>
     <string name="onboarding_import_from_url">Importar da URL</string>
-    <string name="suggested_folders_paywall_tittle">Seus podcasts organizados automaticamente</string>
     <string name="podcast_feed_update_tooltip_subtitle">Deslize a tela para baixo ou use este menu para saber se tem alguma novidade.</string>
     <string name="podcast_feed_update_tooltip_title">Em breve, episódios inéditos!</string>
-    <string name="folder_content_description">Pasta %s</string>
-    <string name="suggested_folders_use_create_custom_folders_button">Criar pastas personalizadas</string>
+    <string name="suggested_folders_create_custom_folder_button">Criar pasta personalizada</string>
     <string name="suggested_folders_use_these_folders_button">Usar estas pastas</string>
-    <string name="suggested_folders">Pastas sugeridas</string>
     <string name="winback_claiming_offer">Aproveitando oferta</string>
     <string name="winback_claimed_offer_message_3">50% de desconto no próximo ano!</string>
     <string name="winback_offer_free_offer_yearly_description">Pague %1$s agora e tenha mais um ano com 50%% de desconto.</string>
@@ -267,7 +274,6 @@ Language: pt_BR
     <string name="settings_storage_fix_downloads">Corrigir downloads</string>
     <string name="nova_launcher_new_releases">Novos lançamentos</string>
     <string name="nova_launcher_subscribed_podcasts">Podcasts assinados</string>
-    <string name="medium_player_classic_widget_label">Reprodutor médio (clássico)</string>
     <string name="widget_preview_time_left_4">1h36 restante</string>
     <string name="widget_preview_time_left_3">55min restantes</string>
     <string name="widget_preview_time_left_2">12min restantes</string>
@@ -294,9 +300,6 @@ Language: pt_BR
     <string name="widget_check_out_discover">Confira \"Explorar\" para ver mais</string>
     <string name="widget_nothing_in_up_next">Nada na fila de Próximos</string>
     <string name="widget_no_episode_playing">Nenhum episódio em reprodução</string>
-    <string name="large_player_widget_label">Reprodutor grande</string>
-    <string name="medium_player_widget_label">Reprodutor médio</string>
-    <string name="small_player_widget_label">Reprodutor pequeno</string>
     <string name="clear_search">Limpar pesquisa</string>
     <string name="bookmarks_search_results_not_found">Não encontramos nenhum favorito para essa pesquisa.</string>
     <string name="podcast_and_episode">Podcast e episódio</string>
@@ -310,7 +313,6 @@ Language: pt_BR
     <string name="discover_all_categories">Todas as categorias</string>
     <string name="upgrade_to_patron">Faça upgrade para o Patron</string>
     <string name="upgrade_to_plus">Faça upgrade para o Plus</string>
-    <string name="skip_chapters_patron_prompt">Pré-selecione capítulos e muito mais com o Pocket Casts Patron</string>
     <string name="skip_chapters_plus_prompt">Pré-selecione capítulos e muito mais com o Pocket Casts Plus</string>
     <string name="number_of_chapters_summary_singular">1 capítulo • %d oculto</string>
     <string name="number_of_chapters_summary_plural">%1$d capítulos • %2$d oculto</string>
@@ -322,7 +324,6 @@ Language: pt_BR
     <string name="half_price_first_year">50% de desconto no primeiro ano</string>
     <string name="plus_offer_duration">%s de desconto</string>
     <string name="onboarding_plus_feature_watch_playback">Aplicativos para Wear OS e Apple Watch</string>
-    <string name="onboarding_plus_feature_folders_and_bookmarks_title">Pastas e favoritos</string>
     <string name="settings_use_dynamic_colors_widget_details">Quando essa opção está ativada, as cores do widget mudam com base nas cores do tema do dispositivo.</string>
     <string name="settings_use_dynamic_colors_widget">Usar cores dinâmicas no widget</string>
     <string name="widget">Widget</string>
@@ -432,7 +433,7 @@ Language: pt_BR
     <string name="settings_autoplay">Reprodução automática</string>
     <string name="player_sleep_add_1_minute">+ 1 minuto</string>
     <string name="player_sleep_1_minute">1 minuto</string>
-    <string name="onboarding_plus_feature_extra_themes_icons_title">Ícones de aplicativo e temas extras</string>
+    <string name="onboarding_plus_feature_extra_themes_icons_title">Ícones e temas extras</string>
     <string name="onboarding_patron_feature_early_access_title">Acesso antecipado a funcionalidades</string>
     <string name="settings_continuous_playback_summary">Se a fila de Próximos estiver vazia, vamos reproduzir os episódios do mesmo podcast ou da lista que você está ouvindo.</string>
     <string name="renew_your_subscription">Renove sua assinatura</string>
@@ -636,6 +637,7 @@ Language: pt_BR
     <string name="onboarding_plus_feature_cloud_storage_text">Faça upload dos seus arquivos na nuvem para acessá-los em qualquer lugar.</string>
     <string name="onboarding_plus_feature_cloud_storage_title">20 GB de armazenamento na nuvem</string>
     <string name="onboarding_plus_feature_folders_text">Organize seus podcasts em pastas e mantenha a sincronização em todos os seus dispositivos.</string>
+    <string name="onboarding_plus_feature_folders_title">Pastas</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Ouça seus podcasts em mais lugares com os apps para Windows, macOS e Web.</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Tudo o que você adora no Pocket Casts e muito mais</string>
     <string name="onboarding_recommendations_import">Importar</string>
@@ -1724,8 +1726,6 @@ Language: pt_BR
     <string name="player_effects_speed_up">Aumentar velocidade</string>
     <string name="player_effects_speed_down">Diminuir velocidade</string>
     <string name="player_effects_speed">Velocidade</string>
-    <string name="player_effects_custom_effects_applied">Efeitos personalizados aplicados</string>
-    <string name="player_effects_clear">LIMPAR</string>
     <string name="player_effects">Efeitos do reprodutor</string>
     <string name="player_close">Fechar reprodutor</string>
     <string name="player_chapter_url">URL do capítulo</string>

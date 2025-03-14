@@ -1,17 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-02-26 11:54:03+0000
+Translation-Revision-Date: 2025-03-11 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="onboarding_plus_feature_chapters_title">预选章节</string>
+    <string name="onboarding_plus_feature_bookmarks_title">书签</string>
+    <string name="podcast_header_redesign_message">轻点播客标题即可收起或展开其描述和详细信息</string>
+    <string name="suggested_folder_content_description">预览 %1$s 文件夹</string>
+    <string name="suggested_folders_replace_subtitle">我们已将您的播客整理到文件夹中。 立即保存，稍后根据您的风格进行自定义。 这将替换任何现有文件夹。</string>
+    <string name="suggested_folders_title">智能文件夹</string>
+    <string name="discover_dismiss_selected_category">忽略所选分类</string>
+    <string name="discover_show_all_categories">显示全部分类</string>
+    <string name="podcast_header_redesign_title">我们进行了一些更改！</string>
+    <string name="notifications_enabled_message">我们会向您通知 %1$s 的剧集更新。</string>
     <string name="see_more">查看更多</string>
     <string name="podcast_artwork_description">播客插图</string>
     <string name="suggested_folders_replace_folders_confirmation_description">接受建议的文件夹后，您当前的文件夹将被覆盖。 此操作无法撤销。</string>
     <string name="suggested_folders_replace_folders_confirmation_tittle">替换现有文件夹？</string>
     <string name="suggested_folders_replace_folders_button">替换文件夹</string>
-    <string name="suggested_folders_subtitle">我们已将您的播客整理到文件夹中。 立即保存，稍后根据您的风格进行自定义。</string>
+    <string name="suggested_folders_use_subtitle">我们已将您的播客整理到文件夹中。 立即保存，稍后根据您的风格进行自定义。</string>
     <string name="onboarding_plus_feature_up_next_shuffle_title">下一个随机播放</string>
     <string name="suggested_folders_plus_prompt">通过 Pocket Casts Plus 整理您的节目，并享用更多功能</string>
     <string name="winback_cancel_subscription_header_title">取消订阅</string>
@@ -20,13 +30,10 @@ Language: zh_CN
     <string name="onboarding_import_from_url_importing_message">正在导入 OPML。 您可以返回入门流程。</string>
     <string name="onboarding_import_from_url_description">使用 URL 从 OPML 文件导入播客。</string>
     <string name="onboarding_import_from_url">从 URL 导入</string>
-    <string name="suggested_folders_paywall_tittle">自动整理您的播客</string>
     <string name="podcast_feed_update_tooltip_subtitle">下拉或使用此菜单查看是否有新内容。</string>
     <string name="podcast_feed_update_tooltip_title">精彩剧集，即将上线！</string>
-    <string name="folder_content_description">文件夹 %s</string>
-    <string name="suggested_folders_use_create_custom_folders_button">创建自定义文件夹</string>
+    <string name="suggested_folders_create_custom_folder_button">创建自定义文件夹</string>
     <string name="suggested_folders_use_these_folders_button">使用这些文件夹</string>
-    <string name="suggested_folders">建议的文件夹</string>
     <string name="winback_claiming_offer">领取优惠</string>
     <string name="winback_claimed_offer_message_3">下一年享 5 折优惠！</string>
     <string name="winback_offer_free_offer_yearly_description">现在付款 %1$s 即可再享一年 5%% 折优惠。</string>
@@ -267,7 +274,6 @@ Language: zh_CN
     <string name="settings_storage_fix_downloads">修复下载程序</string>
     <string name="nova_launcher_new_releases">新发布</string>
     <string name="nova_launcher_subscribed_podcasts">已订阅的播客</string>
-    <string name="medium_player_classic_widget_label">中型播放器（经典）</string>
     <string name="widget_preview_time_left_4">剩余 1 小时 36 分钟</string>
     <string name="widget_preview_time_left_3">剩余 55 分钟</string>
     <string name="widget_preview_time_left_2">剩余 12 分钟</string>
@@ -294,9 +300,6 @@ Language: zh_CN
     <string name="widget_check_out_discover">查看“发现”，了解更多信息</string>
     <string name="widget_nothing_in_up_next">“接下来播放”列表无内容</string>
     <string name="widget_no_episode_playing">未播放剧集</string>
-    <string name="large_player_widget_label">大型播放器</string>
-    <string name="medium_player_widget_label">中型播放器</string>
-    <string name="small_player_widget_label">小型播放器</string>
     <string name="clear_search">清除搜索</string>
     <string name="bookmarks_search_results_not_found">我们未搜索到任何相关书签。</string>
     <string name="podcast_and_episode">播客与剧集</string>
@@ -310,7 +313,6 @@ Language: zh_CN
     <string name="discover_all_categories">所有分类</string>
     <string name="upgrade_to_patron">升级至 Patron</string>
     <string name="upgrade_to_plus">升级至 Plus</string>
-    <string name="skip_chapters_patron_prompt">使用 Pocket Casts Patron，享受预选章节等更多功能</string>
     <string name="skip_chapters_plus_prompt">使用 Pocket Casts Plus，享受预选章节等更多功能</string>
     <string name="number_of_chapters_summary_singular">1 个章节 • %d 已隐藏</string>
     <string name="number_of_chapters_summary_plural">%1$d 个章节 • %2$d 已隐藏</string>
@@ -322,7 +324,6 @@ Language: zh_CN
     <string name="half_price_first_year">首年享 5 折优惠</string>
     <string name="plus_offer_duration">%s 优惠</string>
     <string name="onboarding_plus_feature_watch_playback">Apple Watch &amp; Wear OS 应用程序</string>
-    <string name="onboarding_plus_feature_folders_and_bookmarks_title">文件夹和书签</string>
     <string name="settings_use_dynamic_colors_widget_details">启用后，小工具的颜色会跟随设备主题颜色而改变。</string>
     <string name="settings_use_dynamic_colors_widget">为小工具使用动态颜色</string>
     <string name="widget">小工具</string>
@@ -432,7 +433,7 @@ Language: zh_CN
     <string name="settings_autoplay">自动播放</string>
     <string name="player_sleep_add_1_minute">+ 1 分钟</string>
     <string name="player_sleep_1_minute">1 分钟</string>
-    <string name="onboarding_plus_feature_extra_themes_icons_title">其他主题和应用图标</string>
+    <string name="onboarding_plus_feature_extra_themes_icons_title">其他主题和图标</string>
     <string name="onboarding_patron_feature_early_access_title">抢先体验功能</string>
     <string name="settings_continuous_playback_summary">如果您的“接下来播放”队列中没有内容，我们会播放您目前正在收听的同一播客或列表中的剧集。</string>
     <string name="renew_your_subscription">续订您的订阅</string>
@@ -636,6 +637,7 @@ Language: zh_CN
     <string name="onboarding_plus_feature_cloud_storage_text">将文件上传到云存储空间，在任何地方都能访问这些文件。</string>
     <string name="onboarding_plus_feature_cloud_storage_title">20GB 云存储空间</string>
     <string name="onboarding_plus_feature_folders_text">将播客整理到文件夹中，让它们在所有设备中保持同步。</string>
+    <string name="onboarding_plus_feature_folders_title">文件夹</string>
     <string name="onboarding_plus_feature_desktop_apps_text">借助我们的 Windows、macOS 和 Web 应用程序，在更多位置收听播客。</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">您喜欢的 Pocket Casts 的一切，还有更多内容</string>
     <string name="onboarding_recommendations_import">导入</string>
@@ -1724,8 +1726,6 @@ Language: zh_CN
     <string name="player_effects_speed_up">加速</string>
     <string name="player_effects_speed_down">减速</string>
     <string name="player_effects_speed">速度</string>
-    <string name="player_effects_custom_effects_applied">已应用自定义效果</string>
-    <string name="player_effects_clear">清除</string>
     <string name="player_effects">播放器效果</string>
     <string name="player_close">关闭播放器</string>
     <string name="player_chapter_url">章节 URL</string>

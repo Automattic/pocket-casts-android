@@ -1,17 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-02-25 09:54:03+0000
+Translation-Revision-Date: 2025-03-12 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="onboarding_plus_feature_chapters_title">챕터 미리 선택</string>
+    <string name="onboarding_plus_feature_bookmarks_title">북마크</string>
+    <string name="podcast_header_redesign_message">팟캐스트 제목을 눌러 설명과 상세 정보를 축소하거나 확장하세요.</string>
+    <string name="suggested_folder_content_description">%1$s 폴더 미리보기</string>
+    <string name="suggested_folders_replace_subtitle">팟캐스트가 폴더로 구성되었습니다. 지금 저장하거나 나중에 원하는 형식으로 사용자 정의하세요. 그러면 기존 폴더가 대체됩니다.</string>
+    <string name="suggested_folders_title">스마트 폴더</string>
+    <string name="discover_dismiss_selected_category">선택한 카테고리 해제</string>
+    <string name="discover_show_all_categories">모든 카테고리 표시</string>
+    <string name="podcast_header_redesign_title">몇 가지 변경 사항이 있습니다.</string>
+    <string name="notifications_enabled_message">%1$s의 새로운 에피소드 알림을 보내드리겠습니다.</string>
     <string name="see_more">더 보기</string>
     <string name="podcast_artwork_description">팟캐스트 아트워크</string>
     <string name="suggested_folders_replace_folders_confirmation_description">폴더 제안을 수락하면 현재 폴더를 덮어씁니다. 취소할 수 없습니다.</string>
     <string name="suggested_folders_replace_folders_confirmation_tittle">기존 폴더를 교체할까요?</string>
     <string name="suggested_folders_replace_folders_button">폴더 교체</string>
-    <string name="suggested_folders_subtitle">팟캐스트가 폴더로 구성되었습니다. 지금 저장하거나 나중에 원하는 형식으로 사용자 정의하세요.</string>
+    <string name="suggested_folders_use_subtitle">팟캐스트가 폴더로 구성되었습니다. 지금 저장하거나 나중에 원하는 형식으로 사용자 정의하세요.</string>
     <string name="onboarding_plus_feature_up_next_shuffle_title">다음 순서 섞기</string>
     <string name="suggested_folders_plus_prompt">Pocket Casts Plus로 방송 프로그램을 구성하고 더 많은 혜택을 누리세요.</string>
     <string name="winback_cancel_subscription_header_title">구독 취소</string>
@@ -20,13 +30,10 @@ Language: ko_KR
     <string name="onboarding_import_from_url_importing_message">OPML 가져오기를 진행 중입니다. 온보딩 프로세스로 돌아갈 수 있습니다.</string>
     <string name="onboarding_import_from_url_description">URL을 사용하여 OPML 파일에서 팟캐스트를 가져오세요.</string>
     <string name="onboarding_import_from_url">URL에서 가져오기</string>
-    <string name="suggested_folders_paywall_tittle">자동으로 정리되는 팟캐스트</string>
     <string name="podcast_feed_update_tooltip_subtitle">당기거나 이 메뉴를 사용하여 새로워진 점이 있는지 알아보세요.</string>
     <string name="podcast_feed_update_tooltip_title">새로운 에피소드가 곧 찾아옵니다!</string>
-    <string name="folder_content_description">폴더 %s</string>
-    <string name="suggested_folders_use_create_custom_folders_button">사용자 정의 폴더 생성</string>
+    <string name="suggested_folders_create_custom_folder_button">사용자 정의 폴더 생성</string>
     <string name="suggested_folders_use_these_folders_button">이대로 폴더 사용</string>
-    <string name="suggested_folders">폴더 제안</string>
     <string name="winback_claiming_offer">혜택 받는 중</string>
     <string name="winback_claimed_offer_message_3">다음 해 50% 할인!</string>
     <string name="winback_offer_free_offer_yearly_description">지금 %1$s을(를) 결제하고 다음 해에 50%% 할인을 받으세요.</string>
@@ -267,7 +274,6 @@ Language: ko_KR
     <string name="settings_storage_fix_downloads">다운로드 문제 해결하기</string>
     <string name="nova_launcher_new_releases">새 릴리스</string>
     <string name="nova_launcher_subscribed_podcasts">구독한 팟캐스트</string>
-    <string name="medium_player_classic_widget_label">중형 플레이어(클래식)</string>
     <string name="widget_preview_time_left_4">1시간 36분 남음</string>
     <string name="widget_preview_time_left_3">55분 남음</string>
     <string name="widget_preview_time_left_2">12분 남음</string>
@@ -294,9 +300,6 @@ Language: ko_KR
     <string name="widget_check_out_discover">발견에서 자세히 알아보기</string>
     <string name="widget_nothing_in_up_next">다음 차례에 아무것도 없음</string>
     <string name="widget_no_episode_playing">재생 중인 에피소드 없음</string>
-    <string name="large_player_widget_label">대형 플레이어</string>
-    <string name="medium_player_widget_label">중형 플레이어</string>
-    <string name="small_player_widget_label">소형 플레이어</string>
     <string name="clear_search">검색 지우기</string>
     <string name="bookmarks_search_results_not_found">해당 검색에 대한 북마크를 찾을 수 없습니다.</string>
     <string name="podcast_and_episode">팟캐스트 &amp; 에피소드</string>
@@ -310,7 +313,6 @@ Language: ko_KR
     <string name="discover_all_categories">모든 카테고리</string>
     <string name="upgrade_to_patron">Patron으로 업그레이드</string>
     <string name="upgrade_to_plus">Plus로 업그레이드</string>
-    <string name="skip_chapters_patron_prompt">Pocket Casts Patron으로 챕터 미리 선택 등</string>
     <string name="skip_chapters_plus_prompt">Pocket Casts Plus로 챕터 미리 선택 등</string>
     <string name="number_of_chapters_summary_singular">1개 챕터 • %d개 숨김</string>
     <string name="number_of_chapters_summary_plural">%1$d개 챕터 • %2$d개 숨김</string>
@@ -322,7 +324,6 @@ Language: ko_KR
     <string name="half_price_first_year">첫해 50% 할인</string>
     <string name="plus_offer_duration">%s 행사</string>
     <string name="onboarding_plus_feature_watch_playback">Apple Watch 및 Wear OS 앱</string>
-    <string name="onboarding_plus_feature_folders_and_bookmarks_title">폴더 및 북마크</string>
     <string name="settings_use_dynamic_colors_widget_details">활성화하면 위젯 색상이 기기 테마 색상에 따라 변경됩니다.</string>
     <string name="settings_use_dynamic_colors_widget">위젯에 동적 색상 사용</string>
     <string name="widget">위젯</string>
@@ -432,7 +433,7 @@ Language: ko_KR
     <string name="settings_autoplay">자동 재생</string>
     <string name="player_sleep_add_1_minute">1분</string>
     <string name="player_sleep_1_minute">1분</string>
-    <string name="onboarding_plus_feature_extra_themes_icons_title">추가 테마 및 앱 아이콘</string>
+    <string name="onboarding_plus_feature_extra_themes_icons_title">추가 테마 및 아이콘</string>
     <string name="onboarding_patron_feature_early_access_title">기능 조기 접근</string>
     <string name="settings_continuous_playback_summary">다음 큐가 비어 있으면 현재 듣고 있는 것과 동일한 팟캐스트 또는 목록의 에피소드를 재생합니다.</string>
     <string name="renew_your_subscription">구독 갱신</string>
@@ -636,6 +637,7 @@ Language: ko_KR
     <string name="onboarding_plus_feature_cloud_storage_text">파일을 클라우드 저장 공간으로 업로드하고 어디에서나 사용할 수 있습니다.</string>
     <string name="onboarding_plus_feature_cloud_storage_title">클라우드 저장 공간 20GB</string>
     <string name="onboarding_plus_feature_folders_text">팟캐스트를 폴더로 정리하고 모든 기기에서 동기화 상태를 유지하세요.</string>
+    <string name="onboarding_plus_feature_folders_title">폴더</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Windows, macOS 및 웹 앱으로 더 많은 곳에서 청취하세요.</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Pocket Casts에 대해 좋아하는 모든 것 이상</string>
     <string name="onboarding_recommendations_import">가져오기</string>
@@ -1724,8 +1726,6 @@ Language: ko_KR
     <string name="player_effects_speed_up">Speed Up</string>
     <string name="player_effects_speed_down">Speed Down</string>
     <string name="player_effects_speed">속도</string>
-    <string name="player_effects_custom_effects_applied">사용자 정의 효과 적용됨</string>
-    <string name="player_effects_clear">CLEAR</string>
     <string name="player_effects">플레이어 효과</string>
     <string name="player_close">플레이어 닫기</string>
     <string name="player_chapter_url">챕터 URL</string>

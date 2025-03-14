@@ -64,7 +64,6 @@ Language: ar
     <string name="player_sleep_add_1_minute">أكثر من دقيقة واحدة</string>
     <string name="settings_autoplay">التشغيل التلقائي</string>
     <string name="onboarding_patron_feature_early_access_title">الوصول إلى الميزات مبكرًا</string>
-    <string name="onboarding_plus_feature_extra_themes_icons_title">أيقونات القوالب والتطبيقات الإضافية</string>
     <string name="settings_continuous_playback_summary">في حال كانت قائمة انتظار العناصر التالية لديك فارغة، سنقوم بتشغيل حلقات من البودكاست أو القائمة نفسها التي تستمع إليه حاليًا.</string>
     <string name="renew_your_subscription">تجديد الاشتراك الخاص بك</string>
     <string name="log_in_free_acccount">يستخدم %s حسابًا مجانيًا</string>
@@ -265,6 +264,7 @@ Language: ar
     <string name="onboarding_recommendations_import">استيراد</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">كل شيء تحبه بشأن Pocket Casts، إلى جانب المزيد</string>
     <string name="onboarding_plus_feature_desktop_apps_text">يمكنك الاستماع في مزيد من الأماكن من خلال تطبيقاتنا التي تعمل بنظامَي التشغيل Windows وmacOS وتطبيقات الويب.</string>
+    <string name="onboarding_plus_feature_folders_title">المجلدات</string>
     <string name="onboarding_plus_feature_folders_text">يمكنك تنظيم حلقات البودكاست الخاصة بك في المجلدات وحافظ عليها قيد المزامنة عبر كل أجهزتك.</string>
     <string name="onboarding_plus_feature_cloud_storage_text">ارفع ملفاتك إلى مساحة التخزين على السحابة واجعلها متوافرة في كل مكان.</string>
     <string name="onboarding_plus_feature_themes_icons_title">القوالب والأيقونات</string>
@@ -1325,8 +1325,6 @@ Language: ar
     <string name="player_effects_speed_up">زيادة السرعة</string>
     <string name="player_effects_speed_down">تقليل السرعة</string>
     <string name="player_effects_speed">السرعة</string>
-    <string name="player_effects_custom_effects_applied">تم تطبيق تأثيرات مخصصة</string>
-    <string name="player_effects_clear">مسح</string>
     <string name="player_effects">تأثيرات المُشغِّل</string>
     <string name="player_close">إغلاق المُشغِّل</string>
     <string name="player_chapter_url">عنوان URL الخاص بالفصل</string>

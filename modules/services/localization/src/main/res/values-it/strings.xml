@@ -1,17 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-02-25 09:54:03+0000
+Translation-Revision-Date: 2025-03-11 09:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
+    <string name="onboarding_plus_feature_chapters_title">Preseleziona i capitoli</string>
+    <string name="onboarding_plus_feature_bookmarks_title">Segnalibri</string>
+    <string name="podcast_header_redesign_message">Tocca il titolo del podcast per comprimere o espandere la descrizione e i dettagli</string>
+    <string name="suggested_folder_content_description">Anteprima cartella %1$s</string>
+    <string name="suggested_folders_replace_subtitle">Abbiamo organizzato i tuoi podcast in cartelle. Salvali adesso o personalizzali a tuo piacimento in seguito. Questa azione sostituirà tutte le cartelle esistenti.</string>
+    <string name="suggested_folders_title">Cartelle intelligenti</string>
+    <string name="discover_dismiss_selected_category">Ignora la categoria selezionata</string>
+    <string name="discover_show_all_categories">Mostra tutte le categorie</string>
+    <string name="podcast_header_redesign_title">Abbiamo apportato alcune modifiche.</string>
+    <string name="notifications_enabled_message">Ti invieremo una notifica con i nuovi episodi di %1$s.</string>
     <string name="see_more">Scopri di più</string>
     <string name="podcast_artwork_description">Illustrazione del podcast</string>
     <string name="suggested_folders_replace_folders_confirmation_description">Accettando le cartelle suggerite, verranno sovrascritte le cartelle attuali. Questa operazione non può essere annullata.</string>
     <string name="suggested_folders_replace_folders_confirmation_tittle">Sostituire le cartelle esistenti?</string>
     <string name="suggested_folders_replace_folders_button">Sostituisci cartelle</string>
-    <string name="suggested_folders_subtitle">Abbiamo organizzato i tuoi podcast in cartelle. Salvali adesso o personalizzali a tuo piacimento in seguito.</string>
+    <string name="suggested_folders_use_subtitle">Abbiamo organizzato i tuoi podcast in cartelle. Salvali adesso o personalizzali a tuo piacimento in seguito.</string>
     <string name="onboarding_plus_feature_up_next_shuffle_title">Riproduzione casuale successivo</string>
     <string name="suggested_folders_plus_prompt">Organizza i tuoi show con Pocket Casts Plus e molto altro ancora</string>
     <string name="winback_cancel_subscription_header_title">Annulla l\'abbonamento</string>
@@ -20,13 +30,10 @@ Language: it
     <string name="onboarding_import_from_url_importing_message">Importazione di OPML in corso. Puoi tornare al processo di avviamento.</string>
     <string name="onboarding_import_from_url_description">Importa i podcast da un file OPML usando un URL.</string>
     <string name="onboarding_import_from_url">Importa da URL</string>
-    <string name="suggested_folders_paywall_tittle">I tuoi podcast, organizzati automaticamente</string>
     <string name="podcast_feed_update_tooltip_subtitle">Fai scorrere il dito verso il basso o utilizza questo menu per non perderti le novità.</string>
     <string name="podcast_feed_update_tooltip_title">Nuovissimi episodi in arrivo!</string>
-    <string name="folder_content_description">Cartella %s</string>
-    <string name="suggested_folders_use_create_custom_folders_button">Crea cartelle personalizzate</string>
+    <string name="suggested_folders_create_custom_folder_button">Crea una cartella personalizzata</string>
     <string name="suggested_folders_use_these_folders_button">Utilizza queste cartelle</string>
-    <string name="suggested_folders">Cartelle suggerite</string>
     <string name="winback_claiming_offer">Riscatto dell\'offerta</string>
     <string name="winback_claimed_offer_message_3">Sconto del 50% sul prossimo anno!</string>
     <string name="winback_offer_free_offer_yearly_description">Paga %1$s ora per un ulteriore anno con uno sconto del 50%%.</string>
@@ -267,7 +274,6 @@ Language: it
     <string name="settings_storage_fix_downloads">Correggi i download</string>
     <string name="nova_launcher_new_releases">Nuove versioni</string>
     <string name="nova_launcher_subscribed_podcasts">Iscrizione ai podcast</string>
-    <string name="medium_player_classic_widget_label">Lettore multimediale (classico)</string>
     <string name="widget_preview_time_left_4">1h 36m rimanenti</string>
     <string name="widget_preview_time_left_3">55m rimanenti</string>
     <string name="widget_preview_time_left_2">12m rimanenti</string>
@@ -294,9 +300,6 @@ Language: it
     <string name="widget_check_out_discover">Visita Scopri per altro</string>
     <string name="widget_nothing_in_up_next">Nulla in Prossimo</string>
     <string name="widget_no_episode_playing">Nessun episodio in riproduzione</string>
-    <string name="large_player_widget_label">Player grande</string>
-    <string name="medium_player_widget_label">Player medio</string>
-    <string name="small_player_widget_label">Player piccolo</string>
     <string name="clear_search">Cancella la ricerca</string>
     <string name="bookmarks_search_results_not_found">Non abbiamo trovato alcun segnalibro per la ricerca.</string>
     <string name="podcast_and_episode">Podcast ed episodio</string>
@@ -310,7 +313,6 @@ Language: it
     <string name="discover_all_categories">Tutte le categorie</string>
     <string name="upgrade_to_patron">Esegui l\'aggiornamento a Patron</string>
     <string name="upgrade_to_plus">Esegui l\'aggiornamento a Plus</string>
-    <string name="skip_chapters_patron_prompt">Preseleziona capitoli e altro ancora con Pocket Casts Patron</string>
     <string name="skip_chapters_plus_prompt">Preseleziona capitoli e altro ancora con Pocket Casts Plus</string>
     <string name="number_of_chapters_summary_singular">1 capitolo • %d nascosto</string>
     <string name="number_of_chapters_summary_plural">%1$d capitoli • %2$d nascosto</string>
@@ -322,7 +324,6 @@ Language: it
     <string name="half_price_first_year">Sconto del 50% sul primo anno</string>
     <string name="plus_offer_duration">%s offerta</string>
     <string name="onboarding_plus_feature_watch_playback">App Apple Watch e Wear OS</string>
-    <string name="onboarding_plus_feature_folders_and_bookmarks_title">Cartelle e segnalibri</string>
     <string name="settings_use_dynamic_colors_widget_details">Se attivato, i colori dei widget cambieranno in base ai colori del tema del dispositivo.</string>
     <string name="settings_use_dynamic_colors_widget">Usa colori dinamici per il widget</string>
     <string name="widget">Widget</string>
@@ -432,7 +433,7 @@ Language: it
     <string name="settings_autoplay">Riproduzione automatica</string>
     <string name="player_sleep_add_1_minute">+ 1 minuto</string>
     <string name="player_sleep_1_minute">1 minuto</string>
-    <string name="onboarding_plus_feature_extra_themes_icons_title">Temi aggiuntivi e icone delle app</string>
+    <string name="onboarding_plus_feature_extra_themes_icons_title">Temi e icone aggiuntivi</string>
     <string name="onboarding_patron_feature_early_access_title">Accesso anticipato alle funzionalità</string>
     <string name="settings_continuous_playback_summary">Se la coda Successivo è vuota, riprodurremo gli episodi dello stesso podcast o l\'elenco che stai ascoltando.</string>
     <string name="renew_your_subscription">Rinnova il tuo abbonamento</string>
@@ -636,6 +637,7 @@ Language: it
     <string name="onboarding_plus_feature_cloud_storage_text">Carica i tuoi file sull\'archiviazione su cloud e rendili disponibili per qualsiasi postazione.</string>
     <string name="onboarding_plus_feature_cloud_storage_title">20 GB di archiviazione su cloud</string>
     <string name="onboarding_plus_feature_folders_text">Organizza i tuoi podcast in cartelle e sincronizzali su tutti i dispositivi.</string>
+    <string name="onboarding_plus_feature_folders_title">Cartelle</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Ascolta da più postazioni con le app per Windows, macOS e web.</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Tutto ciò che ti piace di Pocket Casts e molto altro</string>
     <string name="onboarding_recommendations_import">Importa</string>
@@ -1724,8 +1726,6 @@ Language: it
     <string name="player_effects_speed_up">Velocizza</string>
     <string name="player_effects_speed_down">Riduci la velocità</string>
     <string name="player_effects_speed">Velocità</string>
-    <string name="player_effects_custom_effects_applied">Effetti personalizzati in uso</string>
-    <string name="player_effects_clear">CANCELLA</string>
     <string name="player_effects">Effetti del lettore</string>
     <string name="player_close">Chiudi lettore</string>
     <string name="player_chapter_url">URL del capitolo</string>

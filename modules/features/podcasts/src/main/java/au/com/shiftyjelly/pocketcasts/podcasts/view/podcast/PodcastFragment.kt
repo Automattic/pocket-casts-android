@@ -1,5 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.podcast
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
@@ -134,6 +136,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asObservable
 import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -805,6 +808,25 @@ class PodcastFragment : BaseFragment() {
                     val hostListener = (requireActivity() as FragmentHostListener)
                     hostListener.closeToRoot()
                     hostListener.openTab(VR.id.navigation_discover)
+                }
+            },
+            onClickWebsite = { podcast ->
+                podcast.podcastUrl?.let { url ->
+                    if (url.isNotBlank()) {
+                        analyticsTracker.track(
+                            AnalyticsEvent.PODCAST_SCREEN_PODCAST_DETAILS_LINK_TAPPED,
+                            mapOf("podcast_uuid" to podcast.uuid),
+                        )
+                        try {
+                            var uri = Uri.parse(url)
+                            if (uri.scheme.isNullOrBlank() && !url.contains("://")) {
+                                uri = Uri.parse("http://$url")
+                            }
+                            startActivity(Intent(Intent.ACTION_VIEW, uri), null)
+                        } catch (e: Exception) {
+                            Timber.e(e, "Failed to open podcast web page.")
+                        }
+                    }
                 }
             },
             onArtworkAvailable = { podcast ->

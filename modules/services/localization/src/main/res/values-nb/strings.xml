@@ -59,7 +59,6 @@ Language: nb_NO
     <string name="player_sleep_add_1_minute">+ 1 minutt</string>
     <string name="settings_autoplay">Automatisk avspilling</string>
     <string name="onboarding_patron_feature_early_access_title">Tidlig tilgang til funksjoner</string>
-    <string name="onboarding_plus_feature_extra_themes_icons_title">Ekstra temaer og appikoner</string>
     <string name="settings_continuous_playback_summary">Hvis Neste-køen er tom, spiller vi av episoder fra samme podcast eller liste som du lytter til nå.</string>
     <string name="renew_your_subscription">Forny abonnementet</string>
     <string name="log_in_free_acccount">%s bruker en gratiskonto</string>
@@ -260,6 +259,7 @@ Language: nb_NO
     <string name="onboarding_recommendations_import">Importer</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Alt du liker med Pocket Casts, pluss mye mer</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Lytt på flere steder med appene våre for Windows, macOS og nett.</string>
+    <string name="onboarding_plus_feature_folders_title">Mapper</string>
     <string name="onboarding_plus_feature_folders_text">Ordne podcastene i mapper og synkroniser dem mellom alle enhetene dine.</string>
     <string name="onboarding_plus_feature_cloud_storage_text">Last opp filene til skylageret, slik at du har dem tilgjengelig overalt.</string>
     <string name="onboarding_plus_feature_themes_icons_title">Temaer og ikoner</string>
@@ -1320,8 +1320,6 @@ Language: nb_NO
     <string name="player_effects_speed_up">Raskere</string>
     <string name="player_effects_speed_down">Tregere</string>
     <string name="player_effects_speed">Hastighet</string>
-    <string name="player_effects_custom_effects_applied">Egendefinerte effekter brukt</string>
-    <string name="player_effects_clear">TØM</string>
     <string name="player_effects">Effekter i avspiller</string>
     <string name="player_close">Velg avspiller</string>
     <string name="player_chapter_url">URL for kapittel</string>
