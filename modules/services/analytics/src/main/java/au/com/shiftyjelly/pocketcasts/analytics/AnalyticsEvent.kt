@@ -157,6 +157,7 @@ enum class AnalyticsEvent(val key: String) {
     LISTENING_HISTORY_MULTI_SELECT_EXITED("listening_history_multi_select_exited"),
     LISTENING_HISTORY_CLEAR_HISTORY_BUTTON_TAPPED("listening_history_clear_history_button_tapped"),
     LISTENING_HISTORY_CLEARED("listening_history_cleared"),
+    LISTENING_HISTORY_DISCOVER_BUTTON_TAPPED("listening_history_discover_button_tapped"),
 
     /* Uploaded Files */
     UPLOADED_FILES_SHOWN("uploaded_files_shown"),

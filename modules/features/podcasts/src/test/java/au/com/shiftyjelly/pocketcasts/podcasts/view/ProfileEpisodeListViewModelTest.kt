@@ -23,6 +23,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ProfileEpisodeListViewModelTest {
@@ -84,6 +85,7 @@ class ProfileEpisodeListViewModelTest {
                 State.Empty(
                     titleRes = R.string.profile_empty_history,
                     summaryRes = R.string.profile_empty_history_summary,
+                    iconRes = IR.drawable.ic_listen_history,
                 ),
             )
         }
@@ -173,6 +175,7 @@ class ProfileEpisodeListViewModelTest {
                     titleRes = R.string.search_episodes_not_found_title,
                     summaryRes = R.string.search_episodes_not_found_summary,
                     showSearchBar = true,
+                    iconRes = IR.drawable.ic_listen_history,
                 ),
             )
         }

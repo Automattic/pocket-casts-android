@@ -10,9 +10,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
@@ -29,6 +33,8 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
+import au.com.shiftyjelly.pocketcasts.compose.components.EmptyState
+import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -276,13 +282,12 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.state.collect { state ->
+                    updateEmptyStateView(state)
+
                     when (state) {
                         is State.Empty -> {
                             binding?.recyclerView?.isVisible = false
                             binding?.manageDownloadsCard?.isVisible = false
-                            binding?.emptyLayout?.isVisible = true
-                            binding?.lblEmptyTitle?.setText(state.titleRes)
-                            binding?.lblEmptySummary?.setText(state.summaryRes)
                         }
 
                         State.Loading -> Unit
@@ -292,7 +297,6 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
                                 top = if (state.showSearchBar) 0 else 16.dpToPx(requireContext()),
                             )
                             binding?.recyclerView?.isVisible = true
-                            binding?.emptyLayout?.isVisible = false
                             adapter.submitList(state.results)
                         }
                     }
@@ -408,6 +412,34 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 settings.bottomInset.collect {
                     binding?.recyclerView?.updatePadding(bottom = it)
+                }
+            }
+        }
+    }
+
+    private fun updateEmptyStateView(state: State) {
+        binding?.emptyLayout?.isVisible = state is State.Empty
+
+        if (state is State.Empty) {
+            binding?.emptyLayout?.setContentWithViewCompositionStrategy {
+                AppTheme(theme.activeTheme) {
+                    val buttonText = if (mode is Mode.History) stringResource(LR.string.go_to_discover) else null
+
+                    EmptyState(
+                        title = stringResource(state.titleRes),
+                        subtitle = stringResource(state.summaryRes),
+                        iconResourcerId = state.iconRes,
+                        buttonText = buttonText,
+                        onButtonClick = {
+                            analyticsTracker.track(AnalyticsEvent.LISTENING_HISTORY_DISCOVER_BUTTON_TAPPED)
+                            (activity as FragmentHostListener).openTab(VR.id.navigation_discover)
+                        },
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 32.dp)
+                            .padding(vertical = 8.dp)
+                            .verticalScroll(rememberScrollState()),
+                    )
                 }
             }
         }
