@@ -24,14 +24,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
-import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commitNow
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -120,7 +118,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelp
 import au.com.shiftyjelly.pocketcasts.repositories.opml.OpmlImportTask
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
-import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
@@ -149,7 +146,6 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.observeOnce
-import au.com.shiftyjelly.pocketcasts.view.BottomNavHideManager
 import au.com.shiftyjelly.pocketcasts.view.LockableBottomSheetBehavior
 import au.com.shiftyjelly.pocketcasts.views.activity.WebViewActivity
 import au.com.shiftyjelly.pocketcasts.views.extensions.setSystemWindowInsetToPadding
@@ -188,8 +184,7 @@ import android.provider.Settings as AndroidProviderSettings
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
 
-private const val SAVEDSTATE_PLAYER_OPEN = "player_open"
-private const val SAVEDSTATE_MINIPLAYER_SHOWN = "miniplayer_shown"
+private const val SAVEDSTATE_BOTTOM_SHEET_TAG = "bottom_sheet_tag"
 private const val EXTRA_LONG_SNACKBAR_DURATION_MS: Int = 5000
 
 @AndroidEntryPoint
@@ -247,9 +242,6 @@ class MainActivity :
 
     @Inject lateinit var crashLogging: CrashLogging
 
-    private lateinit var bottomNavHideManager: BottomNavHideManager
-    private lateinit var observeUpNext: LiveData<UpNextQueue.State>
-
     private val viewModel: MainActivityViewModel by viewModels()
     private val disposables = CompositeDisposable()
     private var videoPlayerShown: Boolean = false
@@ -264,8 +256,9 @@ class MainActivity :
     private val childrenWithBackStack: List<HasBackstack>
         get() = supportFragmentManager.fragments.filterIsInstance<HasBackstack>()
 
+    @Suppress("UNCHECKED_CAST")
     private val frameBottomSheetBehavior: LockableBottomSheetBehavior<View>
-        get() = getBottomSheetBehavior()
+        get() = BottomSheetBehavior.from(binding.frameBottomSheet) as LockableBottomSheetBehavior<View>
 
     private val miniPlayerHeight: Int
         get() = resources.getDimension(R.dimen.miniPlayerHeight).toInt()
@@ -360,6 +353,7 @@ class MainActivity :
         super.onCreate(savedInstanceState)
         theme.setupThemeForConfig(this, resources.configuration)
         enableEdgeToEdge(navigationBarStyle = theme.getNavigationBarStyle(this))
+        bottomSheetTag = savedInstanceState?.getString(SAVEDSTATE_BOTTOM_SHEET_TAG)
 
         playbackManager.setNotificationPermissionChecker(this)
 
@@ -376,7 +370,7 @@ class MainActivity :
 
         binding.root.setSystemWindowInsetToPadding(left = true, right = true)
 
-        binding.bottomNavigation.doOnLayout {
+        binding.bottomNavigation.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
             val miniPlayerHeight = miniPlayerHeight
             val bottomNavigationHeight = binding.bottomNavigation.height
             val bottomSheetBehavior = BottomSheetBehavior.from(binding.playerBottomSheet)
@@ -448,23 +442,11 @@ class MainActivity :
             })
             .addTo(disposables)
 
-        val showMiniPlayerImmediately = savedInstanceState?.getBoolean(SAVEDSTATE_MINIPLAYER_SHOWN, false) ?: false
-        binding.playerBottomSheet.isVisible = showMiniPlayerImmediately
-        settings.updateBottomInset(if (showMiniPlayerImmediately) miniPlayerHeight else 0)
+        setupPlayerViews(
+            animateMiniPlayer = savedInstanceState == null,
+        )
 
-        setupPlayerViews(showMiniPlayerImmediately)
-
-        if (savedInstanceState != null) {
-            val videoComingToPortrait =
-                (playbackManager.isPlaying() && playbackManager.getCurrentEpisode()?.isVideo == true && resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT && viewModel.isPlayerOpen)
-            if (savedInstanceState.getBoolean(
-                    SAVEDSTATE_PLAYER_OPEN,
-                    false,
-                ) && !playbackManager.upNextQueue.isEmpty || videoComingToPortrait
-            ) {
-                binding.playerBottomSheet.openPlayer()
-            }
-        } else {
+        if (savedInstanceState == null) {
             trackTabOpened(selectedTab, isInitial = true)
         }
         navigator.infoStream()
@@ -562,8 +544,7 @@ class MainActivity :
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putBoolean(SAVEDSTATE_PLAYER_OPEN, binding.playerBottomSheet.isPlayerOpen)
-        outState.putBoolean(SAVEDSTATE_MINIPLAYER_SHOWN, binding.playerBottomSheet.isShown)
+        outState.putString(SAVEDSTATE_BOTTOM_SHEET_TAG, bottomSheetTag)
     }
 
     override fun overrideNextRefreshTimer() {
@@ -791,8 +772,9 @@ class MainActivity :
     }
 
     @Suppress("DEPRECATION")
-    private fun setupPlayerViews(showMiniPlayerImmediately: Boolean) {
+    private fun setupPlayerViews(animateMiniPlayer: Boolean) {
         binding.playerBottomSheet.listener = this
+        binding.playerBottomSheet.initializeBottomSheetBehavior()
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -839,7 +821,7 @@ class MainActivity :
                 binding.playerBottomSheet.setUpNext(
                     upNext = upNextQueue,
                     theme = theme,
-                    shouldAnimateOnAttach = !showMiniPlayerImmediately,
+                    shouldAnimateOnAttach = animateMiniPlayer,
                     useEpisodeArtwork = artworkConfiguration.useEpisodeArtwork,
                 )
             }
@@ -941,8 +923,6 @@ class MainActivity :
             }
         }
 
-        bottomNavHideManager =
-            BottomNavHideManager(findViewById(R.id.root), binding.bottomNavigation)
         frameBottomSheetBehavior.setBottomSheetCallback(object :
             BottomSheetBehavior.BottomSheetCallback() {
             override fun onSlide(bottomSheet: View, slideOffset: Float) {}
@@ -1030,8 +1010,8 @@ class MainActivity :
         }
     }
 
-    override fun onPlayerBottomSheetSlide(slideOffset: Float) {
-        bottomNavHideManager.onSlide(slideOffset)
+    override fun onPlayerBottomSheetSlide(bottomSheetView: View, slideOffset: Float) {
+        binding.bottomNavigation.translationY = bottomSheetView.height * slideOffset
     }
 
     override fun updateSystemColors() {
@@ -1072,27 +1052,14 @@ class MainActivity :
     }
 
     override fun showBottomSheet(fragment: Fragment) {
-        showBottomSheet(fragment, showImmediate = true, swipeEnabled = true)
-    }
-
-    private fun showBottomSheet(
-        fragment: Fragment,
-        showImmediate: Boolean = true,
-        swipeEnabled: Boolean = true,
-    ) {
-        if (bottomSheetTag != null && !showImmediate) {
-            bottomSheetQueue.add { showBottomSheet(fragment) }
-            return
-        }
-
         supportFragmentManager.commitNow {
             bottomSheetTag = fragment::class.java.name
             replace(R.id.frameBottomSheet, fragment, bottomSheetTag)
         }
 
         frameBottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+        frameBottomSheetBehavior.swipeEnabled = true
         binding.frameBottomSheet.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_YES
-        frameBottomSheetBehavior.swipeEnabled = swipeEnabled
     }
 
     override fun bottomSheetClosePressed(fragment: Fragment) {
@@ -1594,11 +1561,6 @@ class MainActivity :
             val message = data?.getStringExtra(AccountActivity.PROMO_CODE_RETURN_DESCRIPTION)
             showUpgradedFromPromoCode(message ?: "")
         }
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    private fun getBottomSheetBehavior(): LockableBottomSheetBehavior<View> {
-        return (BottomSheetBehavior.from(binding.frameBottomSheet) as LockableBottomSheetBehavior<View>)
     }
 
     private fun trackTabOpened(tab: Int, isInitial: Boolean = false) {
