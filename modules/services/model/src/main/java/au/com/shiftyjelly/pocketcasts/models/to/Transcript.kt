@@ -11,9 +11,10 @@ import androidx.room.Index
         Index(name = "transcript_episode_uuid_index", value = ["episode_uuid"], unique = true),
     ],
 )
-data class Transcript(
+data class Transcript constructor(
     @ColumnInfo(name = "episode_uuid") val episodeUuid: String,
     @ColumnInfo(name = "url") val url: String,
     @ColumnInfo(name = "type") val type: String,
+    @ColumnInfo(name = "is_generated") val isGenerated: Boolean,
     @ColumnInfo(name = "language") val language: String? = null,
 )

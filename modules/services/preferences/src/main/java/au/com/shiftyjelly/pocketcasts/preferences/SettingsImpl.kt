@@ -555,12 +555,6 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override val suggestedFolderPaywallDismissTime = UserSetting.LongPref(
-        sharedPrefKey = "suggestedFolderPaywallDismissTime",
-        defaultValue = 0L,
-        sharedPrefs = sharedPreferences,
-    )
-
     override val streamingMode: UserSetting<Boolean> = UserSetting.BoolPref(
         sharedPrefKey = Settings.PREFERENCE_GLOBAL_STREAMING_MODE,
         defaultValue = true,
@@ -1578,8 +1572,22 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override val followedPodcastsForSuggestedFoldersHash = UserSetting.StringPref(
-        sharedPrefKey = "followed_podcasts_hash_for_suggested_folders",
+    override val suggestedFoldersDismissTimestamp = UserSetting.PrefFromString<Instant?>(
+        sharedPrefKey = "suggested_folders_dismiss_timestamp",
+        defaultValue = null,
+        fromString = { value -> runCatching { Instant.parse(value) }.getOrNull() },
+        toString = { value -> value.toString() },
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val suggestedFoldersDismissCount = UserSetting.IntPref(
+        sharedPrefKey = "suggested_folders_dismiss_count",
+        defaultValue = 0,
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val suggestedFoldersFollowedHash = UserSetting.StringPref(
+        sharedPrefKey = "suggested_folders_followed_hash",
         defaultValue = "",
         sharedPrefs = sharedPreferences,
     )

@@ -4,96 +4,217 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.models.entity.SuggestedFolderDetails
-import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
-import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.models.to.SignInState
+import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SuggestedFoldersManager
-import au.com.shiftyjelly.pocketcasts.utils.UUIDProvider
+import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.reactive.asFlow
+import kotlinx.coroutines.withContext
+import au.com.shiftyjelly.pocketcasts.models.entity.SuggestedFolder as DbSuggestedFolder
 
-@HiltViewModel
-class SuggestedFoldersViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = SuggestedFoldersViewModel.Factory::class)
+class SuggestedFoldersViewModel @AssistedInject constructor(
+    @Assisted private val source: SuggestedFoldersFragment.Source,
     private val folderManager: FolderManager,
     private val suggestedFoldersManager: SuggestedFoldersManager,
+    private val suggestedFoldersPopupPolicy: SuggestedFoldersPopupPolicy,
     private val podcastManager: PodcastManager,
-    private val settings: Settings,
+    private val userManager: UserManager,
     private val analyticsTracker: AnalyticsTracker,
-    private val uuidProvider: UUIDProvider,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow<FoldersState>(FoldersState.Idle)
-    val state: StateFlow<FoldersState> = _state
+    private val _state = MutableStateFlow(State.Empty)
+    val state = _state.asStateFlow()
 
-    fun onShown() {
-        analyticsTracker.track(AnalyticsEvent.SUGGESTED_FOLDERS_MODAL_SHOWN)
-    }
-
-    fun onDismissed() {
-        analyticsTracker.track(AnalyticsEvent.SUGGESTED_FOLDERS_MODAL_DISMISSED)
-    }
-
-    fun onReplaceExistingFoldersShown() {
-        analyticsTracker.track(AnalyticsEvent.SUGGESTED_FOLDERS_REPLACE_EXISTING_FOLDERS_MODAL_SHOWN)
-    }
-
-    fun onReplaceExistingFoldersTapped() {
-        analyticsTracker.track(AnalyticsEvent.SUGGESTED_FOLDERS_REPLACE_FOLDERS_TAPPED)
-    }
-
-    fun onUseTheseFolders(folders: List<Folder>) {
-        analyticsTracker.track(AnalyticsEvent.SUGGESTED_FOLDERS_MODAL_USE_THESE_FOLDERS_TAPPED)
+    init {
         viewModelScope.launch {
-            val currentFoldersCount = folderManager.countFolders()
-            if (currentFoldersCount > 0) {
-                _state.value = FoldersState.ShowConfirmationDialog
-            } else {
-                overrideFoldersWithSuggested(folders)
-            }
-        }
-    }
-
-    fun onCreateCustomFolders() {
-        analyticsTracker.track(AnalyticsEvent.SUGGESTED_FOLDERS_MODAL_CREATE_CUSTOM_FOLDERS_TAPPED)
-    }
-
-    fun overrideFoldersWithSuggested(folders: List<Folder>) {
-        _state.value = FoldersState.Creating
-        viewModelScope.launch {
-            val newFolders = folders.map {
-                SuggestedFolderDetails(
-                    uuid = uuidProvider.generateUUID().toString(),
-                    name = it.name,
-                    color = it.color,
-                    podcastsSortType = settings.podcastsSortType.value,
-                    podcasts = it.podcasts,
+            val folderCount = folderManager.countFolders()
+            val suggestedFolders = getSuggestedFolders()
+            _state.update { value ->
+                value.copy(
+                    existingFoldersCount = folderCount,
+                    suggestedFolders = suggestedFolders,
                 )
             }
-            settings.podcastsSortType.set(PodcastsSortType.NAME_A_TO_Z, updateModifiedAt = true)
-            folderManager.overrideFoldersWithSuggested(newFolders)
-            podcastManager.refreshPodcasts("suggested-folders")
-            suggestedFoldersManager.deleteSuggestedFolders(folders.toSuggestedFolders())
-            _state.value = FoldersState.Created
+        }
+        viewModelScope.launch {
+            userManager.getSignInState().asFlow().collect { signInState ->
+                _state.update { value ->
+                    value.copy(signInState = signInState)
+                }
+            }
         }
     }
 
-    fun onHowItWorksTapped() {
-        analyticsTracker.track(AnalyticsEvent.SUGGESTED_FOLDERS_HOW_IT_WORKS_TAPPED)
+    private suspend fun getSuggestedFolders(): List<SuggestedFolder> {
+        val dbFolders = suggestedFoldersManager.observeSuggestedFolders().first()
+        return withContext(Dispatchers.Default) {
+            val grouped = dbFolders.groupBy(DbSuggestedFolder::name).toList().sortedBy { it.first }
+            grouped.mapIndexed { index, (name, folders) ->
+                SuggestedFolder(
+                    name = name,
+                    colorIndex = index % 12,
+                    podcastIds = folders.map { it.podcastUuid },
+                )
+            }
+        }
     }
 
-    fun onHowItWorksGotItTapped() {
-        analyticsTracker.track(AnalyticsEvent.SUGGESTED_FOLDERS_HOW_IT_WORKS_GOT_IT_TAPPED)
+    private var suggestedFoldersJob: Job? = null
+
+    fun useSuggestedFolders() {
+        if (suggestedFoldersJob?.isActive == true) {
+            return
+        }
+        viewModelScope.launch(NonCancellable) {
+            _state.update { value ->
+                value.copy(useFoldersState = UseFoldersState.Applying)
+            }
+            val suggestedFolders = withContext(Dispatchers.Default) {
+                state.value.suggestedFolders.flatMap { folder ->
+                    folder.podcastIds.map { podcastId ->
+                        DbSuggestedFolder(folder.name, podcastId)
+                    }
+                }
+            }
+            suggestedFoldersManager.useSuggestedFolders(suggestedFolders)
+            _state.update { value ->
+                value.copy(useFoldersState = UseFoldersState.Applied)
+            }
+            podcastManager.refreshPodcasts("suggested-folders")
+        }
     }
 
-    sealed class FoldersState {
-        data object Idle : FoldersState()
-        data object Creating : FoldersState()
-        data object Created : FoldersState()
-        data object ShowConfirmationDialog : FoldersState()
+    fun markPopupAsDismissed() {
+        suggestedFoldersPopupPolicy.markPolicyUsed()
+    }
+
+    fun trackPageShown() {
+        analyticsTracker.track(
+            AnalyticsEvent.SUGGESTED_FOLDERS_PAGE_SHOWN,
+            mapOf(
+                "source" to source.analyticsValue,
+            ),
+        )
+    }
+
+    fun trackPageDismissed() {
+        analyticsTracker.track(
+            AnalyticsEvent.SUGGESTED_FOLDERS_PAGE_DISMISSED,
+            mapOf(
+                "source" to source.analyticsValue,
+                "user_type" to state.value.userTypeAnalyticsValue,
+            ),
+        )
+    }
+
+    fun trackUseSuggestedFoldersTapped() {
+        analyticsTracker.track(
+            AnalyticsEvent.SUGGESTED_FOLDERS_USE_SUGGESTED_FOLDERS_TAPPED,
+            mapOf(
+                "source" to source.analyticsValue,
+                "user_type" to state.value.userTypeAnalyticsValue,
+            ),
+        )
+    }
+
+    fun trackCreateCustomFolderTapped() {
+        analyticsTracker.track(
+            AnalyticsEvent.SUGGESTED_FOLDERS_CREATE_CUSTOM_FOLDER_TAPPED,
+            mapOf(
+                "source" to source.analyticsValue,
+                "user_type" to state.value.userTypeAnalyticsValue,
+            ),
+        )
+    }
+
+    fun trackReplaceFolderTapped() {
+        analyticsTracker.track(
+            AnalyticsEvent.SUGGESTED_FOLDERS_REPLACE_FOLDERS_TAPPED,
+            mapOf(
+                "source" to source.analyticsValue,
+            ),
+        )
+    }
+
+    fun trackReplaceFoldersConfirmationTapped() {
+        analyticsTracker.track(
+            AnalyticsEvent.SUGGESTED_FOLDERS_REPLACE_FOLDERS_CONFIRM_TAPPED,
+            mapOf(
+                "source" to source.analyticsValue,
+            ),
+        )
+    }
+
+    fun trackPreviewFolderTapped(folder: SuggestedFolder) {
+        analyticsTracker.track(
+            AnalyticsEvent.SUGGESTED_FOLDERS_PREVIEW_FOLDER_TAPPED,
+            mapOf(
+                "source" to source.analyticsValue,
+                "folder_name" to folder.name,
+                "podcast_count" to folder.podcastIds.size,
+            ),
+        )
+    }
+
+    data class State(
+        val signInState: SignInState,
+        val existingFoldersCount: Int?,
+        val suggestedFolders: List<SuggestedFolder>,
+        val useFoldersState: UseFoldersState,
+    ) {
+        val action
+            get() = if (signInState.isSignedInAsPlusOrPatron) {
+                when (existingFoldersCount) {
+                    null -> null
+                    0 -> SuggestedAction.UseFolders
+                    else -> SuggestedAction.ReplaceFolders
+                }
+            } else {
+                SuggestedAction.UseFolders
+            }
+
+        val userTypeAnalyticsValue
+            get() = when (signInState) {
+                is SignInState.SignedOut -> "unsigned"
+                is SignInState.SignedIn -> when (signInState.subscriptionStatus) {
+                    is SubscriptionStatus.Free -> "free"
+                    is SubscriptionStatus.Paid -> "paid"
+                }
+            }
+
+        companion object {
+            val Empty = State(
+                signInState = SignInState.SignedOut,
+                existingFoldersCount = null,
+                suggestedFolders = emptyList(),
+                useFoldersState = UseFoldersState.Idle,
+            )
+        }
+    }
+
+    enum class UseFoldersState {
+        Idle,
+        Applying,
+        Applied,
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun crate(source: SuggestedFoldersFragment.Source): SuggestedFoldersViewModel
     }
 }

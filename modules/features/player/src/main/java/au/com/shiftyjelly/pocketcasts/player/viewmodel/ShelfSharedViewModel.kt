@@ -21,8 +21,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.DeleteState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -91,12 +89,6 @@ class ShelfSharedViewModel @Inject constructor(
         val episode = (shelfUpNext as? UpNextQueue.State.Loaded)?.episode
         return uiState.value.copy(
             shelfItems = shelfItems
-                .filter { item ->
-                    when (item) {
-                        ShelfItem.Transcript -> FeatureFlag.isEnabled(Feature.TRANSCRIPTS)
-                        else -> true
-                    }
-                }
                 .filter { it.showIf(episode) },
             episode = episode,
         )
@@ -133,34 +125,23 @@ class ShelfSharedViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             if (isTranscriptAvailable) {
-                openTranscript(source)
+                trackShelfAction(ShelfItem.Transcript, source)
+                openTranscript(showPlayerControls = true)
             } else {
                 _snackbarMessages.emit(SnackbarMessage.TranscriptNotAvailable)
             }
         }
     }
 
-    fun openTranscript(source: ShelfItemSource) {
-        trackShelfAction(ShelfItem.Transcript, source)
+    fun openTranscript(showPlayerControls: Boolean) {
         viewModelScope.launch {
-            _transitionState.emit(TransitionState.OpenTranscript)
+            _transitionState.emit(TransitionState.OpenTranscript(showPlayerControls))
         }
     }
 
-    fun closeTranscript(
-        podcast: Podcast?,
-        episode: BaseEpisode?,
-        withTransition: Boolean = false,
-    ) {
+    fun closeTranscript() {
         viewModelScope.launch {
-            _transitionState.emit(TransitionState.CloseTranscript(withTransition))
-            analyticsTracker.track(
-                AnalyticsEvent.TRANSCRIPT_DISMISSED,
-                AnalyticsProp.transcriptDismissed(
-                    episodeId = episode?.uuid.orEmpty(),
-                    podcastId = podcast?.uuid.orEmpty(),
-                ),
-            )
+            _transitionState.emit(TransitionState.CloseTranscript)
         }
     }
 
@@ -366,8 +347,8 @@ class ShelfSharedViewModel @Inject constructor(
     }
 
     sealed class TransitionState {
-        data object OpenTranscript : TransitionState()
-        data class CloseTranscript(val withTransition: Boolean) : TransitionState()
+        data class OpenTranscript(val showPlayerControls: Boolean) : TransitionState()
+        data object CloseTranscript : TransitionState()
     }
 
     enum class ShelfItemSource {

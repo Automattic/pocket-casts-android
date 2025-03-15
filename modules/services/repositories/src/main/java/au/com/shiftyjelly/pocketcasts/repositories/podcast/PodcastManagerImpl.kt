@@ -7,7 +7,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.CuratedPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.SuggestedFolderDetails
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
@@ -626,11 +625,6 @@ class PodcastManagerImpl @Inject constructor(
             return
         }
         podcastDao.updateFolderUuid(folderUuid, podcastUuids)
-    }
-
-    override suspend fun updateFoldersUuid(folders: List<SuggestedFolderDetails>) {
-        if (folders.isEmpty()) return
-        podcastDao.updateFoldersUuid(folders)
     }
 
     override suspend fun updateIsHeaderExpanded(podcastUuid: String, isExpanded: Boolean) {

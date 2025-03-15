@@ -1,0 +1,26 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
+---
+
+# This pipeline is meant to be triggered by the MC scenario in ReleasesV2
+
+steps:
+  - label: "🚂 Download Translations"
+    command: |
+      echo '--- 🤖 Use bot for Git operations'
+      source use-bot-for-git
+
+      echo '--- :ruby: Setup Ruby Tools'
+      install_gems
+
+      echo '--- 🔐 Access Secrets'
+      bundle exec fastlane run configure_apply
+
+      echo '--- 🚀 Download Translations'
+      bundle exec fastlane download_translations
+    plugins: [$CI_TOOLKIT]
+    agents:
+      queue: "tumblr-metal"
+    retry:
+      manual:
+        allowed: false
+        reason: "Always prefer re-triggering a new build from ReleaseV2 rather than retrying the individual job from Buildkite"

@@ -9,13 +9,16 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -77,18 +80,20 @@ fun TranscriptPageWrapper(
     transcriptViewModel: TranscriptViewModel,
     searchViewModel: TranscriptSearchViewModel,
     theme: Theme,
+    onClickSubscribe: () -> Unit,
 ) {
     AppTheme(Theme.ThemeType.DARK) {
-        val transitionState = shelfSharedViewModel.transitionState.collectAsStateWithLifecycle(null)
-        val transcriptUiState = transcriptViewModel.uiState.collectAsStateWithLifecycle()
-        val searchState = searchViewModel.searchState.collectAsStateWithLifecycle()
-        val searchQueryFlow = searchViewModel.searchQueryFlow.collectAsStateWithLifecycle()
+        val transitionState by shelfSharedViewModel.transitionState.collectAsStateWithLifecycle(null)
+        val uiState by transcriptViewModel.uiState.collectAsStateWithLifecycle()
+        val searchState by searchViewModel.searchState.collectAsStateWithLifecycle()
+        val searchQuery by searchViewModel.searchQueryFlow.collectAsStateWithLifecycle()
 
         val configuration = LocalConfiguration.current
 
+        var showPaywall by remember { mutableStateOf(false) }
         var showSearch by remember { mutableStateOf(false) }
         var expandSearch by remember { mutableStateOf(false) }
-        when (transitionState.value) {
+        when (transitionState) {
             is TransitionState.CloseTranscript -> {
                 if (expandSearch) {
                     expandSearch = false
@@ -99,26 +104,16 @@ fun TranscriptPageWrapper(
             else -> Unit
         }
 
-        Box(
+        val playerBackgroundColor = Color(theme.playerBackgroundColor(uiState.podcastAndEpisode?.podcast))
+        Column(
             modifier = Modifier
-                .fillMaxSize(),
+                .fillMaxWidth()
+                .height(configuration.screenHeightDp.dp)
+                .background(playerBackgroundColor),
         ) {
-            TranscriptPage(
-                shelfSharedViewModel = shelfSharedViewModel,
-                transcriptViewModel = transcriptViewModel,
-                searchViewModel = searchViewModel,
-                theme = theme,
-                modifier = Modifier
-                    .height(configuration.screenHeightDp.dp),
-            )
-
             TranscriptToolbar(
                 onCloseClick = {
-                    shelfSharedViewModel.closeTranscript(
-                        playerViewModel.podcast,
-                        playerViewModel.episode,
-                        withTransition = true,
-                    )
+                    shelfSharedViewModel.closeTranscript()
                 },
                 showSearch = showSearch,
                 onSearchDoneClicked = {
@@ -129,19 +124,59 @@ fun TranscriptPageWrapper(
                     expandSearch = true
                     searchViewModel.onSearchButtonClicked()
                 },
-                searchText = searchQueryFlow.value,
-                searchState = searchState.value,
+                searchText = searchQuery,
+                searchState = searchState,
                 onSearchCleared = { searchViewModel.onSearchCleared() },
                 onSearchPreviousClicked = { searchViewModel.onSearchPrevious() },
                 onSearchNextClicked = { searchViewModel.onSearchNext() },
                 onSearchQueryChanged = searchViewModel::onSearchQueryChanged,
                 expandSearch = expandSearch,
             )
+
+            Box(
+                modifier = Modifier.weight(1f),
+            ) {
+                TranscriptPage(
+                    shelfSharedViewModel = shelfSharedViewModel,
+                    transcriptViewModel = transcriptViewModel,
+                    searchViewModel = searchViewModel,
+                    theme = theme,
+                )
+
+                if (showPaywall) {
+                    TranscriptsPaywall(
+                        onClickSubscribe = onClickSubscribe,
+                        modifier = Modifier.verticalScroll(rememberScrollState()),
+                    )
+                }
+            }
         }
 
-        LaunchedEffect(transcriptUiState.value) {
-            showSearch = (transcriptUiState.value as? TranscriptViewModel.UiState.TranscriptLoaded)?.showSearch == true
-            if (!showSearch) expandSearch = false
+        LaunchedEffect(uiState.showSearch) {
+            showSearch = uiState.showSearch
+
+            if (!showSearch) {
+                expandSearch = false
+            }
+        }
+
+        LaunchedEffect(uiState.showPaywall, transitionState) {
+            showPaywall = uiState.showPaywall
+
+            when (val state = transitionState) {
+                is TransitionState.OpenTranscript -> {
+                    if (state.showPlayerControls) {
+                        if (showPaywall) {
+                            shelfSharedViewModel.openTranscript(showPlayerControls = false)
+                        }
+                    } else {
+                        if (!showPaywall) {
+                            shelfSharedViewModel.openTranscript(showPlayerControls = true)
+                        }
+                    }
+                }
+                is TransitionState.CloseTranscript, null -> Unit
+            }
         }
     }
 }
@@ -169,7 +204,7 @@ fun TranscriptToolbar(
             contentAlignment = Alignment.TopEnd,
             modifier = Modifier
                 .padding(top = 8.dp)
-                .fillMaxSize(),
+                .fillMaxWidth(),
         ) {
             val transition = updateTransition(expandSearch, label = "Searchbar transition")
             CompositionLocalProvider(LocalRippleConfiguration provides ToolbarRippleConfiguration) {
