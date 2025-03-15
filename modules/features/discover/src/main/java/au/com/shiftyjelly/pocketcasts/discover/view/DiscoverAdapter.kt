@@ -37,6 +37,8 @@ import au.com.shiftyjelly.pocketcasts.discover.databinding.RowSinglePodcastBindi
 import au.com.shiftyjelly.pocketcasts.discover.extensions.updateSubscribeButtonIcon
 import au.com.shiftyjelly.pocketcasts.discover.util.AutoScrollHelper
 import au.com.shiftyjelly.pocketcasts.discover.util.ScrollingLinearLayoutManager
+import au.com.shiftyjelly.pocketcasts.discover.view.CollectionListRowAdapter.CollectionListViewHolder.Companion.NUMBER_OF_PODCASTS_TO_DISPLAY_TWICE
+import au.com.shiftyjelly.pocketcasts.discover.view.CollectionListRowAdapter.CollectionListViewHolder.Companion.NUMBER_OF_ROWS_PER_PAGE
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.EPISODE_UUID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.LIST_ID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.PODCAST_UUID_KEY
@@ -121,6 +123,7 @@ internal class DiscoverAdapter(
         fun onPodcastClicked(podcast: DiscoverPodcast, listUuid: String?, isFeatured: Boolean = false)
         fun onPodcastSubscribe(podcast: DiscoverPodcast, listUuid: String?)
         fun onPodcastListClicked(list: NetworkLoadableList)
+        fun onCollectionHeaderClicked(list: NetworkLoadableList)
         fun onEpisodeClicked(episode: DiscoverEpisode, listUuid: String?)
         fun onEpisodePlayClicked(episode: DiscoverEpisode)
         fun onEpisodeStopClicked()
@@ -447,7 +450,17 @@ internal class DiscoverAdapter(
     class CollectionListDeprecatedViewHolder(val binding: RowCollectionListDeprecatedBinding) : NetworkLoadableViewHolder(binding.root)
 
     inner class CollectionListViewHolder(val binding: RowCollectionListBinding) : NetworkLoadableViewHolder(binding.root), ShowAllRow {
-        val adapter = CollectionListRowAdapter(listener::onPodcastClicked, listener::onPodcastSubscribe, analyticsTracker)
+        val adapter = CollectionListRowAdapter(
+            listener::onPodcastClicked,
+            onPodcastSubscribe = { podcast, listId ->
+                listId?.let { analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_SUBSCRIBED, mapOf(LIST_ID_KEY to it, PODCAST_UUID_KEY to podcast.uuid)) }
+                listener.onPodcastSubscribe(podcast, listId)
+            },
+            onHeaderClicked = {
+                collectionList?.let { listener.onCollectionHeaderClicked(it) }
+            },
+            analyticsTracker,
+        )
 
         override val showAllButton: TextView
             get() = binding.btnShowAll
@@ -456,6 +469,8 @@ internal class DiscoverAdapter(
             LinearLayoutManager(itemView.context, RecyclerView.HORIZONTAL, false).apply {
                 initialPrefetchItemCount = 2
             }
+
+        private var collectionList: NetworkLoadableList? = null
 
         init {
             recyclerView?.layoutManager = linearLayoutManager
@@ -471,6 +486,14 @@ internal class DiscoverAdapter(
                         mapOf(CURRENT_PAGE to position, TOTAL_PAGES to adapter.itemCount, LIST_ID_KEY to it.inferredId()),
                     )
                 }
+                // Adds extra right padding starting from page 1 to preview the next page, except for the last page
+                if (position == 0) {
+                    recyclerView?.setPadding(8.dpToPx(itemView.context), 0, 0, 0)
+                } else if (position == adapter.itemCount - 1) {
+                    recyclerView?.setPadding(8.dpToPx(itemView.context), 0, 0, 0)
+                } else {
+                    recyclerView?.setPadding(8.dpToPx(itemView.context), 0, 20.dpToPx(itemView.context), 0)
+                }
             }
 
             recyclerView?.adapter = adapter
@@ -483,6 +506,10 @@ internal class DiscoverAdapter(
             recyclerView?.post {
                 binding.pageIndicatorView.position = linearLayoutManager.findFirstVisibleItemPosition()
             }
+        }
+
+        fun setCollectionList(list: NetworkLoadableList) {
+            collectionList = list
         }
     }
 
@@ -820,13 +847,19 @@ internal class DiscoverAdapter(
                         loadPodcastList(row.source),
                         onNext = {
                             val podcasts = it.podcasts.subList(0, MAX_ROWS_SMALL_LIST.coerceAtMost(it.podcasts.count()))
-                            holder.binding.pageIndicatorView.count = ceil(podcasts.count().toDouble() / CollectionListRowAdapter.CollectionListViewHolder.NUMBER_OF_ROWS_PER_PAGE.toDouble()).toInt()
+                            val podcastsCount = podcasts.count().toDouble() + NUMBER_OF_PODCASTS_TO_DISPLAY_TWICE
+                            holder.binding.pageIndicatorView.count = ceil(podcastsCount / NUMBER_OF_ROWS_PER_PAGE.toDouble()).toInt()
 
                             row.listUuid?.let { listUuid -> holder.adapter.setFromListId(listUuid) }
 
+                            holder.setCollectionList(row)
+
                             holder.binding.lblTitle.text = it.subtitle?.tryToLocalise(resources)
 
-                            holder.adapter.submitPodcastList(podcasts) { onRestoreInstanceState(holder) }
+                            val collectionHeader =
+                                it.collectionImageUrl?.let { imageUrl -> CollectionListRowAdapter.CollectionHeader(imageUrl, it.title, it.description) }
+
+                            holder.adapter.submitPodcastList(podcasts, collectionHeader) { onRestoreInstanceState(holder) }
                         },
                     )
                 }

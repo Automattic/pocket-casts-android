@@ -4,7 +4,9 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
+import androidx.core.view.isVisible
 import au.com.shiftyjelly.pocketcasts.discover.databinding.PodcastCollectionItemBinding
+import au.com.shiftyjelly.pocketcasts.discover.extensions.updateSubscribeButtonIcon
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
@@ -35,8 +37,18 @@ class PodcastCollectionItem @JvmOverloads constructor(
                 binding.lblTitle.text = value.title
                 binding.lblSubtitle.text = value.author
                 imageRequestFactory.createForPodcast(podcast?.uuid).loadInto(binding.imageView)
+                binding.btnSubscribe.updateSubscribeButtonIcon(value.isSubscribed)
             } else {
                 clear()
+            }
+        }
+
+    var onSubscribeClicked: (() -> Unit)? = null
+        set(value) {
+            field = value
+            binding?.btnSubscribe?.setOnClickListener {
+                binding?.btnSubscribe?.updateSubscribeButtonIcon(true)
+                onSubscribeClicked?.invoke()
             }
         }
 
@@ -46,5 +58,10 @@ class PodcastCollectionItem @JvmOverloads constructor(
         binding.lblTitle.text = null
         binding.lblSubtitle.text = null
         binding.imageView.setImageResource(binding.imageView.context.getThemeDrawable(UR.attr.defaultArtworkSmall))
+    }
+
+    fun setSubscribeButtonVisibility(isVisible: Boolean) {
+        val binding = binding ?: return
+        binding.btnSubscribe.isVisible = isVisible
     }
 }
