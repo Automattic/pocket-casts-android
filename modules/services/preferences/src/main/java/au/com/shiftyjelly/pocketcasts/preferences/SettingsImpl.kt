@@ -1311,13 +1311,13 @@ class SettingsImpl @Inject constructor(
 
     override val collectAnalytics = UserSetting.BoolPref(
         sharedPrefKey = "SendUsageStatsKey",
-        defaultValue = true,
+        defaultValue = BuildConfig.DATA_COLLECTION_DEFAULT_VALUE ?: true,
         sharedPrefs = sharedPreferences,
     )
 
     override val sendCrashReports = UserSetting.BoolPref(
         sharedPrefKey = "SendCrashReportsKey",
-        defaultValue = true,
+        defaultValue = BuildConfig.DATA_COLLECTION_DEFAULT_VALUE ?: true,
         sharedPrefs = sharedPreferences,
     )
 
