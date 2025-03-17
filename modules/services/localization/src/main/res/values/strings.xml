@@ -1084,6 +1084,7 @@
     <string name="profile_stats_skipping">Skipping</string>
     <string name="profile_stats_time_saved_by">Time Saved By</string>
     <string name="profile_stats_total">TOTAL</string>
+    <string name="profile_stats_achievements">Achievements</string>
     <string name="profile_stats_variable_speed">Variable Speed</string>
     <string name="profile_status_error_internet">🤔\n\nUnable to load stats,\ncheck your internet connection.</string>
     <string name="profile_start_free_trial">Start free trial</string>
