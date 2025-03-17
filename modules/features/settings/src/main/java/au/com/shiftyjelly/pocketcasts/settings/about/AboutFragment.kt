@@ -9,7 +9,10 @@ import android.view.ViewGroup
 import androidx.annotation.AttrRes
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -29,8 +32,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -73,6 +78,7 @@ import au.com.shiftyjelly.pocketcasts.utils.rateUs
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import kotlinx.coroutines.delay
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -399,7 +405,20 @@ fun AutomatticFamilyRow(
         )
 
         val circleWidth = appIconViewWidth / 5.5
-        icons.forEach { icon ->
+        icons.forEachIndexed { index, icon ->
+
+            val targetY = (180 - circleWidth - (if (icon.y == 0.0) 0.0 else appIconViewWidth / icon.y)).toFloat()
+            val startY = targetY - 100f
+            val animatedY = remember { Animatable(startY) }
+
+            LaunchedEffect(Unit) {
+                delay(index * 50L)
+                animatedY.animateTo(
+                    targetValue = targetY,
+                    animationSpec = bounceAnimationSpec,
+                )
+            }
+
             AppLogoImage(
                 width = circleWidth.dp,
                 image = painterResource(context.getThemeDrawable(icon.image)),
@@ -409,7 +428,7 @@ fun AutomatticFamilyRow(
                 onClick = { openUrl(icon.url, context) },
                 modifier = Modifier.offset(
                     x = (if (icon.x == 0.0) 0.0 else appIconViewWidth / icon.x).dp,
-                    y = (180 - circleWidth - (if (icon.y == 0.0) 0.0 else appIconViewWidth / icon.y)).dp,
+                    y = animatedY.value.dp,
                 ),
             )
         }
@@ -526,3 +545,5 @@ private fun AboutPagePreview() {
         onWorkWithUsTapped = {},
     )
 }
+
+private val bounceAnimationSpec = spring<Float>(stiffness = Spring.StiffnessLow, dampingRatio = Spring.DampingRatioMediumBouncy)
