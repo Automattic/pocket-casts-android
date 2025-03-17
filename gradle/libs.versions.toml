@@ -54,7 +54,7 @@ tasker-plugin = "0.4.10"
 test = "1.6.1"
 tracks = "6.0.3"
 wear-compose = "1.4.1"
-webkit = "1.12.1"
+webkit = "1.13.0"
 work = "2.10.0"
 
 [libraries]
