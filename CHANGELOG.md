@@ -10,6 +10,8 @@
         ([#3761](https://github.com/Automattic/pocket-casts-android/pull/3761))
     *   Fix issues with Classic widget not syncing its state in some scenarios.
         ([#3777](https://github.com/Automattic/pocket-casts-android/pull/3777))
+    *   Fix podcast grid padding
+        ([#3781](https://github.com/Automattic/pocket-casts-android/pull/3781))
 *   Updates
     *   Close episode details screen when archiving an episode. This reverts [#3473](https://github.com/Automattic/pocket-casts-android/pull/3473). 
         ([#3718](https://github.com/Automattic/pocket-casts-android/pull/3718))

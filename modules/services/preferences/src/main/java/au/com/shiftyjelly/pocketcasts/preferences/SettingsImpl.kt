@@ -68,7 +68,9 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import timber.log.Timber
 
@@ -1508,9 +1510,9 @@ class SettingsImpl @Inject constructor(
         _themeReconfigurationEvents.tryEmit(Unit)
     }
 
-    private val _bottomInset = MutableSharedFlow<Int>(onBufferOverflow = BufferOverflow.DROP_OLDEST, replay = 1)
+    private val _bottomInset = MutableStateFlow(0)
     override val bottomInset: Flow<Int>
-        get() = _bottomInset.asSharedFlow()
+        get() = _bottomInset.asStateFlow()
 
     override fun updateBottomInset(height: Int) {
         _bottomInset.tryEmit(height)
