@@ -70,6 +70,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.onStart
 import timber.log.Timber
 
 class SettingsImpl @Inject constructor(
@@ -1510,7 +1511,7 @@ class SettingsImpl @Inject constructor(
 
     private val _bottomInset = MutableSharedFlow<Int>(onBufferOverflow = BufferOverflow.DROP_OLDEST, replay = 1)
     override val bottomInset: Flow<Int>
-        get() = _bottomInset.asSharedFlow()
+        get() = _bottomInset.asSharedFlow().onStart { emit(0) }
 
     override fun updateBottomInset(height: Int) {
         _bottomInset.tryEmit(height)
