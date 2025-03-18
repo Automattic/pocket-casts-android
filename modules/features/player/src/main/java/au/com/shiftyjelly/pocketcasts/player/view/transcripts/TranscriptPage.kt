@@ -245,6 +245,7 @@ private fun ScrollableTranscriptView(
         LocalTextToolbar provides CustomTextToolbar(
             view = LocalView.current,
             customMenuItems = buildList {
+                // Only show the share option on older versions of Android, as the new versions have a share feature built into the copy
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
                     add(CustomMenuItemOption.Share)
                 }

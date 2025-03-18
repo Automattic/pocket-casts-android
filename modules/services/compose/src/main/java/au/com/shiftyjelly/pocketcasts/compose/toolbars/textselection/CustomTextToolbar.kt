@@ -42,7 +42,12 @@ class CustomTextToolbar(
         textActionModeCallback.onPasteRequested = onPasteRequested
         textActionModeCallback.onSelectAllRequested = onSelectAllRequested
         textActionModeCallback.customMenuItems = customMenuItems
-        textActionModeCallback.onCustomMenuActionRequested = { onCustomMenuItemClicked(it) }
+        textActionModeCallback.onCustomMenuActionRequested = { item ->
+            // Workaround until Google exposes the selected text from the SelectionContainer. Issue: https://issuetracker.google.com/issues/142551575
+            onCopyRequested?.invoke()
+            val text = clipboardManager.getText().toString()
+            onCustomMenuItemClicked(item = item, text = text)
+        }
         if (actionMode == null) {
             status = TextToolbarStatus.Shown
             actionMode =
@@ -62,9 +67,8 @@ class CustomTextToolbar(
         actionMode = null
     }
 
-    private fun onCustomMenuItemClicked(item: CustomMenuItemOption) {
+    private fun onCustomMenuItemClicked(item: CustomMenuItemOption, text: String) {
         try {
-            val text = clipboardManager.getText()
             when (item) {
                 CustomMenuItemOption.Share -> {
                     val context = view.context
