@@ -17,7 +17,7 @@
     *   Fix podcast grid padding
         ([#3781](https://github.com/Automattic/pocket-casts-android/pull/3781))
     *   Fix multi-select toolbar being drawn behind the status bar on older Android versions.
-        ([#3789](https://github.com/Automattic/pocket-casts-android/pull/3789))
+        ([#3792](https://github.com/Automattic/pocket-casts-android/pull/3792))
 *   Updates
     *   Close episode details screen when archiving an episode. This reverts [#3473](https://github.com/Automattic/pocket-casts-android/pull/3473). 
         ([#3718](https://github.com/Automattic/pocket-casts-android/pull/3718))
