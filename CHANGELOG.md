@@ -1,6 +1,8 @@
 7.86
 -----
-
+*   Bug Fixes
+    *   Fix share transcript text when API less than 33.
+        ([#3789](https://github.com/Automattic/pocket-casts-android/pull/3789))
 
 7.85
 -----
