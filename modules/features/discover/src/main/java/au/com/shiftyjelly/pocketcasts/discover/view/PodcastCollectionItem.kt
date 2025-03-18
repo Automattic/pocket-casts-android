@@ -4,7 +4,6 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
-import androidx.core.view.isVisible
 import au.com.shiftyjelly.pocketcasts.discover.databinding.PodcastCollectionItemBinding
 import au.com.shiftyjelly.pocketcasts.discover.extensions.updateSubscribeButtonIcon
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
@@ -58,10 +57,5 @@ class PodcastCollectionItem @JvmOverloads constructor(
         binding.lblTitle.text = null
         binding.lblSubtitle.text = null
         binding.imageView.setImageResource(binding.imageView.context.getThemeDrawable(UR.attr.defaultArtworkSmall))
-    }
-
-    fun setSubscribeButtonVisibility(isVisible: Boolean) {
-        val binding = binding ?: return
-        binding.btnSubscribe.isVisible = isVisible
     }
 }

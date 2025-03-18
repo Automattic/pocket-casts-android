@@ -1,18 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal" android:layout_width="match_parent"
+    android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginBottom="24dp">
-
-    <include
-        android:id="@+id/header"
-        layout="@layout/collection_header" />
-
-    <LinearLayout
-        android:id="@+id/podcasts"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
 
         <au.com.shiftyjelly.pocketcasts.discover.view.PodcastCollectionItem
             android:id="@+id/row0"
@@ -25,6 +15,4 @@
             android:padding="8dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
-
-    </LinearLayout>
 </LinearLayout>
