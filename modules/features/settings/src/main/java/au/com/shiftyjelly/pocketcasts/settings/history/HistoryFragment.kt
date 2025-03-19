@@ -15,6 +15,7 @@ import androidx.navigation.compose.rememberNavController
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.settings.history.upnext.UpNextHistoryPage
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
@@ -50,7 +51,16 @@ class HistoryFragment : BaseFragment(), HasBackstack {
                             onBackClick()
                         },
                         onUpNextHistoryClick = {
+                            navController.navigate(HistoryNavRoutes.UpNextHistory)
                         },
+                        bottomInset = bottomInsetDp,
+                    )
+                }
+                composable(HistoryNavRoutes.UpNextHistory) {
+                    UpNextHistoryPage(
+                        onHistoryEntryClick = { date ->
+                        },
+                        onBackClick = navController::popBackStack,
                         bottomInset = bottomInsetDp,
                     )
                 }
@@ -72,5 +82,6 @@ class HistoryFragment : BaseFragment(), HasBackstack {
 
     object HistoryNavRoutes {
         const val History = "main"
+        const val UpNextHistory = "up_next_history"
     }
 }

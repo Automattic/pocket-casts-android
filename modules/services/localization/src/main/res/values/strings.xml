@@ -2298,4 +2298,5 @@
     <!-- Restore from local history -->
     <string name="restore_from_local_history">Restore from local history</string>
     <string name="up_next_history">Up Next History</string>
+    <string name="up_next_history_explanation">A list of recent updates to Up Next due to changes on other devices. To view the episodes and have the option to restore them, tap any entry.</string>
 </resources>
