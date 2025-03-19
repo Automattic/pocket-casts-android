@@ -416,7 +416,7 @@ class UpNextFragment :
         } else if (upNextSource == UpNextSource.MINI_PLAYER) {
             close()
         }
-        analyticsTracker.track(AnalyticsEvent.UP_NEXT_DISCOVER_BUTTON_TAPPED, mapOf("source" to upNextSource))
+        analyticsTracker.track(AnalyticsEvent.UP_NEXT_DISCOVER_BUTTON_TAPPED, mapOf("source" to upNextSource.analyticsValue))
         (activity as FragmentHostListener).openTab(VR.id.navigation_discover)
     }
 
