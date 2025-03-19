@@ -13,7 +13,7 @@ import au.com.shiftyjelly.pocketcasts.discover.databinding.ItemCollectionListBin
 import au.com.shiftyjelly.pocketcasts.discover.view.CollectionListRowAdapter.CollectionItem
 import au.com.shiftyjelly.pocketcasts.discover.view.CollectionListRowAdapter.CollectionItem.CollectionHeader
 import au.com.shiftyjelly.pocketcasts.discover.view.CollectionListRowAdapter.CollectionItem.CollectionPodcast
-import au.com.shiftyjelly.pocketcasts.discover.view.CollectionListRowAdapter.CollectionListViewHolder.Companion.NUMBER_OF_ROWS_PER_PAGE
+import au.com.shiftyjelly.pocketcasts.discover.view.CollectionListRowAdapter.PodcastsViewHolder.Companion.NUMBER_OF_ROWS_PER_PAGE
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.LIST_ID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.PODCAST_UUID_KEY
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
@@ -59,7 +59,7 @@ class CollectionListRowAdapter(
         private const val TYPE_PODCAST = 1
     }
 
-    class CollectionListViewHolder(
+    class PodcastsViewHolder(
         val binding: ItemCollectionListBinding,
         onItemClicked: (Int, Int) -> Unit,
         onPodcastSubscribe: (Int, Int) -> Unit,
@@ -95,7 +95,7 @@ class CollectionListRowAdapter(
         }
     }
 
-    class CollectionHeaderViewHolder(
+    class HeaderViewHolder(
         val binding: CollectionHeaderBinding,
         onHeaderClicked: () -> Unit,
     ) : RecyclerView.ViewHolder(binding.root) {
@@ -132,14 +132,14 @@ class CollectionListRowAdapter(
 
         when (viewType) {
             TYPE_PODCAST -> {
-                return CollectionListViewHolder(
+                return PodcastsViewHolder(
                     ItemCollectionListBinding.inflate(inflater, parent, false),
                     onItemClicked = { pageIndex, podcastIndex ->
                         val items = getItem(pageIndex)
                         val podcasts = items.filterIsInstance<CollectionPodcast>().map { it.podcast }
                         val podcast = podcasts.getOrNull(podcastIndex) as? DiscoverPodcast
 
-                        if (podcast == null) return@CollectionListViewHolder
+                        if (podcast == null) return@PodcastsViewHolder
 
                         fromListId?.let {
                             analyticsTracker.track(
@@ -162,7 +162,7 @@ class CollectionListRowAdapter(
             }
 
             TYPE_HEADER -> {
-                return CollectionHeaderViewHolder(CollectionHeaderBinding.inflate(inflater, parent, false)) {
+                return HeaderViewHolder(CollectionHeaderBinding.inflate(inflater, parent, false)) {
                     onHeaderClicked()
                 }
             }
@@ -174,10 +174,10 @@ class CollectionListRowAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val items = getItem(position) ?: emptyList()
         when (val collectionItem = items.firstOrNull()) {
-            is CollectionHeader -> (holder as CollectionHeaderViewHolder).bind(collectionItem)
+            is CollectionHeader -> (holder as HeaderViewHolder).bind(collectionItem)
             is CollectionPodcast -> {
                 val podcasts = items.filterIsInstance<CollectionPodcast>().map { it.podcast }
-                (holder as CollectionListViewHolder).bindPodcasts(podcasts)
+                (holder as PodcastsViewHolder).bindPodcasts(podcasts)
             }
 
             else -> throw IllegalArgumentException("Unknown item type at position $position")
