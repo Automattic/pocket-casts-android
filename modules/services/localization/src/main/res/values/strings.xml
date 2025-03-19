@@ -2295,4 +2295,7 @@
     <string name="suggested_folders_replace_folders_confirmation_tittle">Replace existing folders?</string>
     <string name="suggested_folders_replace_folders_confirmation_description">Accepting suggested folders will overwrite your current folders. This can\'t be undone.</string>
 
+    <!-- Restore from local history -->
+    <string name="restore_from_local_history">Restore from local history</string>
+    <string name="up_next_history">Up Next History</string>
 </resources>
