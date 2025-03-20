@@ -83,6 +83,10 @@ internal enum class ProfileSection(
     @DrawableRes val iconId: Int,
     @StringRes val labelId: Int,
 ) {
+    Achievements(
+        iconId = IR.drawable.ic_trophy,
+        labelId = LR.string.profile_navigation_achievements,
+    ),
     Stats(
         iconId = IR.drawable.ic_stats,
         labelId = LR.string.profile_navigation_stats,

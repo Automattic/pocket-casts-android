@@ -157,6 +157,7 @@ class ProfileViewModel @Inject constructor(
     internal fun onSectionClick(section: ProfileSection) {
         val event = when (section) {
             ProfileSection.Stats -> AnalyticsEvent.STATS_SHOWN
+            ProfileSection.Achievements -> AnalyticsEvent.STATS_SHOWN
             ProfileSection.Downloads -> AnalyticsEvent.DOWNLOADS_SHOWN
             ProfileSection.CloudFiles -> AnalyticsEvent.UPLOADED_FILES_SHOWN
             ProfileSection.Starred -> AnalyticsEvent.STARRED_SHOWN

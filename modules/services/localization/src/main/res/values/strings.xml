@@ -973,6 +973,7 @@
     <string name="profile_navigation_listening_history">Listening History</string>
     <string name="profile_navigation_starred" translatable="false">@string/starred</string>
     <string name="profile_navigation_stats">Stats</string>
+    <string name="profile_navigation_achievements">Achievements</string>
     <string name="profile_new_email_address">New Email Address</string>
     <string name="profile_new_password">New Password</string>
     <string name="profile_newsletter_detail">Receive news, app updates, themed playlists, interviews, and more.</string>

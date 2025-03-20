@@ -147,6 +147,7 @@ class ProfileFragment : BaseFragment(), TopScrollable {
         profileViewModel.onSectionClick(section)
         val fragment = when (section) {
             ProfileSection.Stats -> StatsFragment()
+            ProfileSection.Achievements -> StatsFragment()
             ProfileSection.Downloads -> ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.Downloaded)
             ProfileSection.CloudFiles -> CloudFilesFragment()
             ProfileSection.Starred -> ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.Starred)
