@@ -9,6 +9,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.mock
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.verify
 
 @ExperimentalCoroutinesApi
@@ -29,9 +30,9 @@ class UpNextHistoryManagerImplTest {
         val expectedDate = Date.from(now)
         val expectedDeletionDate = Date.from(now.minus(periodOfSnapshot))
 
-        upNextHistoryManager.snapshotUpNext()
+        upNextHistoryManager.snapshotUpNext(Date.from(now))
 
-        verify(upNextHistoryDao).insertHistoryForDate(expectedDate)
-        verify(upNextHistoryDao).deleteHistoryOnOrBeforeDate(expectedDeletionDate)
+        verify(upNextHistoryDao).insertHistoryForDate(eq(expectedDate))
+        verify(upNextHistoryDao).deleteHistoryOnOrBeforeDate(eq(expectedDeletionDate))
     }
 }
