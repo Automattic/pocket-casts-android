@@ -3,11 +3,13 @@ package au.com.shiftyjelly.pocketcasts.settings.history.upnext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextHistoryEntry
+import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.history.upnext.UpNextHistoryManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.Date
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,6 +22,7 @@ import timber.log.Timber
 @HiltViewModel
 class UpNextHistoryViewModel @Inject constructor(
     private val upNextHistoryManager: UpNextHistoryManager,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
@@ -33,7 +36,7 @@ class UpNextHistoryViewModel @Inject constructor(
     }
 
     private fun loadHistoryEntries() {
-        viewModelScope.launch {
+        viewModelScope.launch(ioDispatcher) {
             try {
                 val entries = upNextHistoryManager.findAllHistoryEntries()
                 _uiState.update { state ->
