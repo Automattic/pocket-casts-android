@@ -541,6 +541,7 @@ open class PlaybackManager @Inject constructor(
             SourceView.TASKER,
             SourceView.UNKNOWN,
             SourceView.UP_NEXT,
+            SourceView.UP_NEXT_HISTORY,
             SourceView.FILES_SETTINGS,
             SourceView.STATS,
             SourceView.WHATS_NEW,
