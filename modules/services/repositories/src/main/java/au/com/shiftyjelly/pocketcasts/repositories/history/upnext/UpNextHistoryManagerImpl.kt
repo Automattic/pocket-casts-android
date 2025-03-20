@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.repositories.history.upnext
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextHistoryDao
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import java.time.Duration
-import java.time.Instant
 import java.util.Date
 import javax.inject.Inject
 import timber.log.Timber
@@ -13,11 +12,10 @@ class UpNextHistoryManagerImpl @Inject constructor(
 ) : UpNextHistoryManager {
     private val periodOfSnapshot: Duration = Duration.ofDays(14)
 
-    override suspend fun snapshotUpNext() {
+    override suspend fun snapshotUpNext(date: Date) {
         try {
-            val now = Instant.now()
-            upNextHistoryDao.insertHistoryForDate(Date.from(now))
-            upNextHistoryDao.deleteHistoryOnOrBeforeDate(Date.from(now.minus(periodOfSnapshot)))
+            upNextHistoryDao.insertHistoryForDate(date)
+            upNextHistoryDao.deleteHistoryOnOrBeforeDate(Date.from(date.toInstant().minus(periodOfSnapshot)))
         } catch (e: Exception) {
             val message = "Could not snapshot up next."
             Timber.e(e, message)
