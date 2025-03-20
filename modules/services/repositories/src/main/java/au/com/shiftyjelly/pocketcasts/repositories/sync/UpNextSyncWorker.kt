@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextChange
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
+import au.com.shiftyjelly.pocketcasts.repositories.history.upnext.UpNextHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -51,6 +52,7 @@ class UpNextSyncWorker @AssistedInject constructor(
     private val syncManager: SyncManager,
     private val upNextQueue: UpNextQueue,
     private val userEpisodeManager: UserEpisodeManager,
+    private val upNextHistoryManager: UpNextHistoryManager,
 ) : CoroutineWorker(context, workerParams) {
 
     companion object {
@@ -196,6 +198,22 @@ class UpNextSyncWorker @AssistedInject constructor(
                 null
             }
         } ?: emptyList()
+
+        val localEpisodes = listOfNotNull(upNextQueue.currentEpisode)
+            .plus(upNextQueue.queueEpisodes)
+            .distinct()
+        val allMatch = response.episodes?.let { episodes ->
+            episodes.size == localEpisodes.size && episodes.all { episode ->
+                localEpisodes.any { queueEpisode ->
+                    episode.uuid == queueEpisode.uuid
+                }
+            }
+        } == true
+
+        if (!allMatch) {
+            // if the server up next episodes not match local up next episodes, snapshot local up next queue
+            upNextHistoryManager.snapshotUpNext()
+        }
 
         // import the server Up Next into the database
         upNextQueue.importServerChangesBlocking(episodes, playbackManager, downloadManager)
