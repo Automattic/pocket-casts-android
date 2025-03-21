@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <queries>
         <package android:name="com.dayoneapp.dayone" />
+        <package android:name="com.dayoneapp.dayone.debug" />
         <package android:name="com.instagram.android" />
         <package android:name="com.whatsapp" />
         <package android:name="org.telegram.messenger" />

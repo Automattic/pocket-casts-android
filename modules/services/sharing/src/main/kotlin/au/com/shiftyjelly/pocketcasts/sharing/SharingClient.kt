@@ -29,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.sharing.BuildConfig.META_APP_ID
 import au.com.shiftyjelly.pocketcasts.sharing.BuildConfig.SERVER_SHORT_URL
 import au.com.shiftyjelly.pocketcasts.sharing.BuildConfig.WEB_BASE_HOST
 import au.com.shiftyjelly.pocketcasts.sharing.SocialPlatform.DayOne
+import au.com.shiftyjelly.pocketcasts.sharing.SocialPlatform.DayOneDebug
 import au.com.shiftyjelly.pocketcasts.sharing.SocialPlatform.Instagram
 import au.com.shiftyjelly.pocketcasts.sharing.SocialPlatform.More
 import au.com.shiftyjelly.pocketcasts.sharing.SocialPlatform.PocketCasts
@@ -112,12 +113,13 @@ class SharingClient(
                 )
             }
 
-            DayOne, WhatsApp, Telegram, X, Tumblr, More -> {
+            DayOne, DayOneDebug, WhatsApp, Telegram, X, Tumblr, More -> {
                 val intent = Intent()
                     .setAction(Intent.ACTION_SEND)
                     .setType("text/plain")
                     .putExtra(EXTRA_TEXT, data.sharingUrl(hostUrl))
                     .putExtra(EXTRA_TITLE, data.sharingTitle())
+                    .putExtra("APP_CODE", "PCASTS")
                     .setPackage(platform.packageId)
                     .addFlags(FLAG_GRANT_READ_URI_PERMISSION)
                 data.podcast?.let {
@@ -185,7 +187,7 @@ class SharingClient(
                 )
             }
 
-            DayOne, Instagram, WhatsApp, Telegram, X, Tumblr, More -> {
+            DayOne, DayOneDebug, Instagram, WhatsApp, Telegram, X, Tumblr, More -> {
                 Intent()
                     .setAction(Intent.ACTION_SEND)
                     .setType("text/plain")
@@ -236,7 +238,7 @@ class SharingClient(
                 )
             }
 
-            DayOne, WhatsApp, Telegram, X, Tumblr, PocketCasts, More -> {
+            DayOne, DayOneDebug, WhatsApp, Telegram, X, Tumblr, PocketCasts, More -> {
                 val backgroundImage = requireNotNull(backgroundImage) { "Sharing a video requires a background image" }
                 val cardType = requireNotNull(cardType as VisualCardType) { "Video must be shared with a visual card" }
                 val file = mediaService.clipVideo(data.podcast, data.episode, data.range, cardType, backgroundImage).getOrThrow()
@@ -487,6 +489,7 @@ data class SharingRequest internal constructor(
 
         private val SocialPlatform.analyticsValue get() = when (this) {
             DayOne -> "day_one"
+            DayOneDebug -> "day_one_debug"
             Instagram -> "ig_story"
             WhatsApp -> "whats_app"
             Telegram -> "telegram"

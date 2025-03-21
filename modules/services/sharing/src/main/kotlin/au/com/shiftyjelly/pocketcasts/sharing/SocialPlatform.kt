@@ -22,6 +22,11 @@ enum class SocialPlatform(
         nameId = LR.string.settings_about_dayone,
         packageId = "com.dayoneapp.dayone",
     ),
+    DayOneDebug(
+        logoId = IR.drawable.ic_share_logo_dayone,
+        nameId = LR.string.settings_about_dayone,
+        packageId = "com.dayoneapp.dayone.debug",
+    ),
     WhatsApp(
         logoId = IR.drawable.ic_share_logo_whats_app,
         nameId = LR.string.share_label_whats_app,
