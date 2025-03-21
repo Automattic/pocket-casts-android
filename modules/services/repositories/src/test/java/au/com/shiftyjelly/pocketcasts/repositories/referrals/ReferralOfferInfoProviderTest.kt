@@ -95,7 +95,7 @@ class ReferralOfferInfoProviderTest {
         whenever(productDetails.subscriptionOfferDetails).thenReturn(listOf(subscriptionOfferDetails))
         whenever(subscription.productDetails).thenReturn(productDetails)
         whenever(subscriptionOfferDetails.offerId).thenReturn(offerId)
-        whenever(subscriptionMapper.mapFromProductDetails(eq(productDetails), anyBoolean(), any())).thenReturn(subscription)
+        whenever(subscriptionMapper.mapFromProductDetails(eq(productDetails), anyBoolean(), any(), any())).thenReturn(subscription)
 
         return ProductDetailsState.Loaded(listOf(productDetails))
     }
