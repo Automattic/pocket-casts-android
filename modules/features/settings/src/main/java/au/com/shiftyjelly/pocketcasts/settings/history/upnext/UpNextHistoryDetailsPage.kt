@@ -11,33 +11,41 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.EpisodeImage
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
+import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
+import au.com.shiftyjelly.pocketcasts.compose.components.TextC70
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
+import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.repositories.extensions.getSummaryText
 import au.com.shiftyjelly.pocketcasts.settings.history.upnext.UpNextHistoryDetailsViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import java.text.DateFormat
@@ -105,8 +113,7 @@ private fun UpNextHistoryEpisodes(
 ) {
     LazyColumn(
         modifier
-            .fillMaxHeight()
-            .padding(16.dp),
+            .fillMaxHeight(),
         contentPadding = PaddingValues(bottom = bottomInset),
     ) {
         items(state.episodes) { episode ->
@@ -138,22 +145,33 @@ private fun EpisodeRow(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
-    val formattedDuration = remember(episode.durationMs) {
-        TimeHelper.getTimeDurationMediumString(
-            episode.durationMs,
-            context,
-        )
+    val formattedDuration = remember(episode.durationMs, episode.playedUpToMs, episode.isInProgress) {
+        TimeHelper
+            .getTimeLeft(
+                episode.playedUpToMs,
+                episode.durationMs.toLong(),
+                episode.isInProgress,
+                context,
+            )
+            .text
     }
-    val published = remember(episode.durationMs) {
+
+    val tintColor = MaterialTheme.theme.colors.primaryText02.toArgb()
+    val summary = remember(episode.durationMs) {
         val dateFormatter = RelativeDateFormatter(context)
-        dateFormatter.format(episode.publishedDate)
+        episode.getSummaryText(
+            dateFormatter = dateFormatter,
+            tintColor = tintColor,
+            showDuration = false,
+            context = context,
+        )
     }
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp),
+            .padding(horizontal = 16.dp, vertical = 12.dp),
     ) {
         EpisodeImage(
             episode = episode,
@@ -166,24 +184,26 @@ private fun EpisodeRow(
                 .weight(1f)
                 .padding(start = 16.dp),
         ) {
-            TextH70(
-                text = published,
+            TextC70(
+                text = summary.toString(),
                 maxLines = 1,
-                modifier = Modifier.padding(bottom = 4.dp),
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Normal,
             )
 
-            TextH40(
+            TextP40(
                 text = episode.title,
-                maxLines = 1,
+                maxLines = 2,
             )
 
-            TextH70(
+            TextP60(
                 text = formattedDuration,
                 maxLines = 1,
-                modifier = Modifier.padding(top = 4.dp),
+                color = MaterialTheme.theme.colors.primaryText02,
             )
         }
     }
+    HorizontalDivider()
 }
 
 @Composable
