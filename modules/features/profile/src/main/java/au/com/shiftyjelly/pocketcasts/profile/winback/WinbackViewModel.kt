@@ -261,7 +261,7 @@ class WinbackViewModel @Inject constructor(
             .await()
     }
 
-    private fun List<ProductDetails>.toSubscriptionPlans() = map(subscriptionMapper::mapFromProductDetails)
+    private fun List<ProductDetails>.toSubscriptionPlans() = map { productDetails -> subscriptionMapper.mapFromProductDetails(productDetails, removeWinbackOffer = false) }
         .filterIsInstance<Subscription.Simple>()
         .map(Subscription.Simple::toPlan)
         .sortedWith(PlanComparator)
