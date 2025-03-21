@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.StatsBundle
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.settings.util.FunnyTimeConverter
@@ -33,6 +34,7 @@ class StatsViewModel @Inject constructor(
     val settings: Settings,
     val syncManager: SyncManager,
     val application: Application,
+    private val ratingsManager: RatingsManager,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val inAppReviewHelper: InAppReviewHelper,
 ) : ViewModel() {
@@ -47,6 +49,7 @@ class StatsViewModel @Inject constructor(
             val trimSilence: Long,
             val autoSkipping: Long,
             val totalSaved: Long,
+            val totalRatings: Int,
             val funnyText: String,
             val startedAt: Date?,
             val showAppReviewDialog: Boolean = false,
@@ -69,6 +72,7 @@ class StatsViewModel @Inject constructor(
                     null
                 }
                 val stats = statsManager.mergeStats(serverStats?.values, statsManager.localStatsInServerFormat)
+                val ratingsCount = ratingsManager.count()
 
                 val totalListened = stats[StatsBundle.SERVER_KEY_TOTAL_LISTENED] ?: 0
                 val skipping = stats[StatsBundle.SERVER_KEY_SKIPPING] ?: 0
@@ -86,6 +90,7 @@ class StatsViewModel @Inject constructor(
                     autoSkipping = autoSkipping,
                     totalSaved = skipping + variableSpeed + trimSilence + autoSkipping,
                     funnyText = funnyText,
+                    totalRatings = ratingsCount,
                     startedAt = serverStats?.startedAt,
                 )
                 withContext(ioDispatcher) {

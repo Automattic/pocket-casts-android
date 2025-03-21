@@ -10,4 +10,5 @@ interface RatingsManager {
     suspend fun getPodcastRating(podcastUuid: String): PodcastRatingResult
     suspend fun submitPodcastRating(rating: UserPodcastRating): PodcastRatingResult
     suspend fun updateUserRatings(ratings: List<UserPodcastRating>)
+    suspend fun count(): Int
 }

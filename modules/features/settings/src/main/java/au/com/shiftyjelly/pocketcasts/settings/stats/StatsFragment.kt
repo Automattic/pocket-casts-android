@@ -65,7 +65,6 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Date
 import javax.inject.Inject
-import kotlin.time.Duration.Companion.hours
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
@@ -167,12 +166,6 @@ private fun StatsPageLoaded(
     bottomInset: Dp,
 ) {
     val context = LocalContext.current
-    val timeSpentList = listOf(
-        TimeSpent("Casual Tuner", 10.hours),
-        TimeSpent("The Audio Addict", 50.hours),
-        TimeSpent("Master of Podcasts", 500.hours),
-        TimeSpent("The Podcast Deity", 1000.hours),
-    )
 
     Column(
         modifier = Modifier
@@ -347,6 +340,7 @@ private fun StatsPageLoadedPreview(@PreviewParameter(ThemePreviewParameterProvid
         totalSaved = 3443,
         funnyText = "During which time you blinked 637 times. Heyooo!",
         startedAt = Date(),
+        totalRatings = 1,
     )
     AppThemeWithBackground(themeType) {
         StatsPage(

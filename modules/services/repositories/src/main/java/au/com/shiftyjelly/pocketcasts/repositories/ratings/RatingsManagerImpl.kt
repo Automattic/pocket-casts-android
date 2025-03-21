@@ -76,6 +76,8 @@ class RatingsManagerImpl @Inject constructor(
         podcastRatingsDao.updateUserRatings(ratings)
     }
 
+    override suspend fun count(): Int = podcastRatingsDao.count()
+
     companion object {
         private fun noRatings(podcastUuid: String) = PodcastRatings(
             podcastUuid = podcastUuid,

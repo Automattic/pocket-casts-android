@@ -62,6 +62,8 @@ import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedI
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.settings.stats.StatGroup.StatItem.Rating
+import au.com.shiftyjelly.pocketcasts.settings.stats.StatGroup.StatItem.TimeSpent
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -163,14 +165,23 @@ private fun StatsPageError(onRetryClick: () -> Unit, modifier: Modifier = Modifi
 private fun StatsPageLoaded(
     state: StatsViewModel.State.Loaded,
 ) {
-    val groupedTimeSpentList = listOf(
-        TimeSpentGroup(
+    val statsGroups = listOf(
+        StatGroup.TimeSpentGroup(
             "Total Listen Time",
             listOf(
                 TimeSpent("Casual Tuner", 10.hours),
                 TimeSpent("The Audio Addict", 50.hours),
                 TimeSpent("Master of Podcasts", 500.hours),
                 TimeSpent("The Podcast Deity", 1000.hours),
+            ),
+        ),
+        StatGroup.RatingGroup(
+            "Total Ratings given",
+            listOf(
+                Rating("Quick Judge", 1),
+                Rating("The Pod Rater", 5),
+                Rating("The Critic", 20),
+                Rating("The Pod Expert", 50),
             ),
         ),
     )
@@ -180,7 +191,7 @@ private fun StatsPageLoaded(
             .fillMaxSize()
             .padding(16.dp),
     ) {
-        groupedTimeSpentList.forEach { group ->
+        statsGroups.forEach { group ->
             item {
                 Text(
                     text = group.header,
@@ -189,10 +200,11 @@ private fun StatsPageLoaded(
                     modifier = Modifier.padding(vertical = 8.dp),
                 )
             }
+
             items(
                 count = group.items.chunked(2).size,
                 key = { index -> group.header + index },
-                contentType = { "TimeSpentRow" },
+                contentType = { "StatRow" },
             ) { rowIndex ->
 
                 val rowItems = group.items.chunked(2)[rowIndex]
@@ -200,16 +212,25 @@ private fun StatsPageLoaded(
                     horizontalArrangement = Arrangement.spacedBy(4.dp),
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    rowItems.forEach { timeSpentItem ->
+                    rowItems.forEach { statItem ->
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier
                                 .weight(1f)
                                 .padding(4.dp),
                         ) {
-                            Badge(isAchieved = state.totalListened.seconds >= timeSpentItem.time)
-                            TextP40(timeSpentItem.title, fontWeight = FontWeight.W500, modifier = Modifier.padding(top = 4.dp))
-                            TextC70("Listen for ${timeSpentItem.time.inWholeHours} hours", modifier = Modifier.padding(top = 4.dp))
+                            when (statItem) {
+                                is TimeSpent -> {
+                                    Badge(isAchieved = state.totalListened.seconds >= statItem.time, icon = R.drawable.ic_filters_headphones)
+                                    TextP40(statItem.title, fontWeight = FontWeight.W500, modifier = Modifier.padding(top = 4.dp))
+                                    TextC70("Listen for ${statItem.time.inWholeHours} hours", modifier = Modifier.padding(top = 4.dp))
+                                }
+                                is Rating -> {
+                                    Badge(isAchieved = state.totalRatings >= statItem.count, icon = R.drawable.ic_starred)
+                                    TextP40(statItem.title, fontWeight = FontWeight.W500, modifier = Modifier.padding(top = 4.dp))
+                                    TextC70("Rated by You: ${statItem.count}", modifier = Modifier.padding(top = 4.dp))
+                                }
+                            }
                         }
                     }
                     if (rowItems.size < 2) {
@@ -225,6 +246,7 @@ private fun StatsPageLoaded(
 private fun Badge(
     modifier: Modifier = Modifier,
     isAchieved: Boolean,
+    icon: Int,
     size: Dp = 80.dp,
 ) {
     var hasAnimated by remember { mutableStateOf(false) }
@@ -303,7 +325,7 @@ private fun Badge(
                 )
             }
             Icon(
-                painter = painterResource(R.drawable.ic_filters_headphones),
+                painter = painterResource(icon),
                 contentDescription = null,
                 tint = iconColor,
             )
@@ -311,5 +333,19 @@ private fun Badge(
     }
 }
 
-data class TimeSpent(val title: String, val time: Duration)
-data class TimeSpentGroup(val header: String, val items: List<TimeSpent>)
+sealed class StatGroup(open val header: String, open val items: List<StatItem>) {
+    data class TimeSpentGroup(
+        override val header: String,
+        override val items: List<TimeSpent>,
+    ) : StatGroup(header, items)
+
+    data class RatingGroup(
+        override val header: String,
+        override val items: List<Rating>,
+    ) : StatGroup(header, items)
+
+    sealed class StatItem {
+        data class TimeSpent(val title: String, val time: Duration) : StatItem()
+        data class Rating(val title: String, val count: Int) : StatItem()
+    }
+}

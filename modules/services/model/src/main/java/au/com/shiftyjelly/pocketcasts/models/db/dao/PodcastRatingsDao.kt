@@ -20,6 +20,9 @@ abstract class PodcastRatingsDao {
     @Query("SELECT * FROM user_podcast_ratings")
     abstract suspend fun getAllUserRatings(): List<UserPodcastRating>
 
+    @Query("SELECT COUNT(*) FROM user_podcast_ratings")
+    abstract suspend fun count(): Int
+
     @Insert(onConflict = REPLACE)
     abstract suspend fun insertOrReplaceUserRatings(ratings: List<UserPodcastRating>)
 
