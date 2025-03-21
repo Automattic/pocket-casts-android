@@ -73,7 +73,6 @@ private fun UpNextHistoryDetailsView(
     Column {
         ThemedTopAppBar(
             title = formatDate(date),
-            bottomShadow = true,
             onNavigationClick = onBackClick,
             actions = { iconColor ->
                 TextButton(
