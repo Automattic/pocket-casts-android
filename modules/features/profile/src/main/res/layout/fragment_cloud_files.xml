@@ -106,6 +106,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/divider_height"
                 android:background="?attr/primary_ui_05" />
+
+            <androidx.compose.ui.platform.ComposeView
+                android:id="@+id/emptyLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                />
+
             <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
                 android:id="@+id/swipeRefreshLayout"
                 android:layout_width="match_parent"
@@ -119,44 +127,6 @@
                     android:background="?attr/primary_ui_02"
                     android:paddingBottom="64dp" />
             </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/emptyLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="90dp"
-            android:orientation="vertical"
-            android:visibility="gone"
-            tools:visibility="visible">
-
-            <au.com.shiftyjelly.pocketcasts.views.component.GradientIcon
-                android:layout_width="160dp"
-                android:layout_height="160dp"
-                android:layout_gravity="center_horizontal|top"
-                android:layout_marginTop="32dp"
-                app:src="@drawable/ic_no_files"
-                app:gradient="gradient_2" />
-
-            <TextView
-                android:id="@+id/lblEmptyTitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="16dp"
-                android:gravity="center"
-                android:textAppearance="@style/H20"
-                android:textColor="?attr/primary_text_01" />
-
-            <TextView
-                android:id="@+id/lblEmptySummary"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:gravity="center"
-                android:textAppearance="@style/H40"
-                android:textColor="?attr/primary_text_02" />
         </LinearLayout>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton

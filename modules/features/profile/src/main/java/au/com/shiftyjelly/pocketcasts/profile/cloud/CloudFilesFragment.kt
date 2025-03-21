@@ -7,6 +7,13 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.Toolbar
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
@@ -21,6 +28,9 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.components.EmptyState
+import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
@@ -166,8 +176,20 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         super.onViewCreated(view, savedInstanceState)
 
         binding?.emptyLayout?.isVisible = false
-        binding?.lblEmptyTitle?.text = getString(LR.string.profile_files_empty_title)
-        binding?.lblEmptySummary?.text = getString(LR.string.profile_files_empty_summary)
+        binding?.emptyLayout?.setContentWithViewCompositionStrategy {
+            AppTheme(theme.activeTheme) {
+                EmptyState(
+                    title = stringResource(LR.string.profile_files_empty_title),
+                    subtitle = stringResource(LR.string.profile_files_empty_summary),
+                    iconResourcerId = IR.drawable.ic_file,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 32.dp)
+                        .padding(vertical = 8.dp)
+                        .verticalScroll(rememberScrollState()),
+                )
+            }
+        }
 
         binding?.toolbar?.setup(
             title = getString(LR.string.profile_navigation_files),
