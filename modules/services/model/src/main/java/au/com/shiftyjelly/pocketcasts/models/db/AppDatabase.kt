@@ -33,7 +33,6 @@ import au.com.shiftyjelly.pocketcasts.models.converter.SafeDateTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.SyncStatusConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.TrimModeTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.UserEpisodeServerStatusConverter
-import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase.Companion.decrement
 import au.com.shiftyjelly.pocketcasts.models.db.dao.BookmarkDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.BumpStatsDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.ChapterDao
@@ -49,6 +48,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.SuggestedFoldersDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextChangeDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextDao
+import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextHistoryDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UserEpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.entity.AnonymousBumpStat
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
@@ -64,6 +64,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.SearchHistoryItem
 import au.com.shiftyjelly.pocketcasts.models.entity.SuggestedFolder
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextChange
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.UpNextHistory
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserPodcastRating
 import au.com.shiftyjelly.pocketcasts.models.to.DbChapter
@@ -92,8 +93,9 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         CuratedPodcast::class,
         Transcript::class,
         UserPodcastRating::class,
+        UpNextHistory::class,
     ],
-    version = 111,
+    version = 112,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 81, to = 82, spec = AppDatabase.Companion.DeleteSilenceRemovedMigration::class),
@@ -139,6 +141,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun transcriptDao(): TranscriptDao
     abstract fun externalDataDao(): ExternalDataDao
     abstract fun endOfYearDao(): EndOfYearDao
+    abstract fun upNextHistoryDao(): UpNextHistoryDao
 
     fun databaseFiles() =
         openHelper.readableDatabase.path?.let {
@@ -964,6 +967,24 @@ abstract class AppDatabase : RoomDatabase() {
             database.execSQL("ALTER TABLE episode_transcript ADD COLUMN is_generated INTEGER NOT NULL DEFAULT 0")
         }
 
+        val MIGRATION_111_112 = addMigration(111, 112) { database ->
+            database.execSQL(
+                """
+                    CREATE TABLE IF NOT EXISTS `up_next_history` (
+                        `episodeUuid` TEXT NOT NULL,
+                        `position` INTEGER NOT NULL,
+                        `playlistId` INTEGER,
+                        `title` TEXT NOT NULL,
+                        `publishedDate` INTEGER,
+                        `downloadUrl` TEXT,
+                        `podcastUuid` TEXT,
+                        'addedDate' INTEGER NOT NULL,
+                         PRIMARY KEY (`episodeUuid`, `addedDate`)
+                        );
+                """.trimIndent(),
+            )
+        }
+
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
             databaseBuilder.addMigrations(
                 addMigration(1, 2) { },
@@ -1365,6 +1386,7 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_108_109,
                 MIGRATION_109_110,
                 MIGRATION_110_111,
+                MIGRATION_111_112,
             )
         }
 

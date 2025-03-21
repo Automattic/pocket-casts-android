@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.ExternalDataDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextDao
+import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextHistoryDao
 import au.com.shiftyjelly.pocketcasts.models.entity.AnonymousBumpStat
 import com.squareup.moshi.Moshi
 import dagger.Module
@@ -56,6 +57,9 @@ object ModelModule {
 
     @Provides
     fun provideUpNextDao(database: AppDatabase): UpNextDao = database.upNextDao()
+
+    @Provides
+    fun provideUpNextHistoryDao(database: AppDatabase): UpNextHistoryDao = database.upNextHistoryDao()
 
     @Provides
     fun providePodcastDao(database: AppDatabase): PodcastDao = database.podcastDao()
