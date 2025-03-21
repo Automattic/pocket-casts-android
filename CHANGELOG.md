@@ -1,7 +1,12 @@
 7.86
 -----
-
-
+*   Bug Fixes
+    *   Fix share transcript text when API less than 33.
+        ([#3789](https://github.com/Automattic/pocket-casts-android/pull/3789))
+*   Updates
+    *   Show a confirmation dialog when deleting more than three episode downloads.
+        ([#3800](https://github.com/Automattic/pocket-casts-android/pull/3800))
+        
 7.85
 -----
 *   New Features

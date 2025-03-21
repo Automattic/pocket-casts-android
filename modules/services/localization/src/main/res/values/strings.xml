@@ -254,6 +254,10 @@
     <string name="download_warning_title">Download All</string>
     <string name="download_warning_limit_summary">Bulk downloads are limited to %1$d.</string>
 
+    <string name="delete_download_warning_button">Remove %1$d downloads</string>
+    <string name="delete_download_warning_title">Remove downloaded episodes</string>
+    <string name="delete_download_warning_summary">Are you sure you want to remove these downloads? You won\'t be able to play offline.</string>
+
     <string name="episode_was_removed">Episode was removed</string>
     <string name="episode_queued_for_download">Episode queued for download</string>
 
@@ -525,6 +529,7 @@
     <string name="remove_from_folder">Remove from folder</string>
     <string name="change_folder">Change folder</string>
     <string name="go_to_folder">Go to folder</string>
+    <string name="go_to_discover">Go to Discover</string>
     <string name="number_stepper_plus_content_description">Plus</string>
     <string name="number_stepper_minus_content_description">Minus</string>
 
@@ -934,12 +939,12 @@
     <string name="profile_email">Email</string>
     <string name="profile_email_address">Email Address</string>
     <string name="profile_email_address_changed">Email Address Changed</string>
-    <string name="profile_empty_downloaded">No Downloaded Episodes</string>
-    <string name="profile_empty_downloaded_summary">Oh no! You’re fresh out of downloads. Download some more and they’ll show up here.</string>
-    <string name="profile_empty_history">Nothing Played</string>
-    <string name="profile_empty_history_summary">You haven\'t listened to any episodes yet.</string>
-    <string name="profile_empty_starred">Nothing Starred</string>
-    <string name="profile_empty_starred_summary">You haven\'t starred any episodes yet.</string>
+    <string name="profile_empty_downloaded">Enjoy offline listening</string>
+    <string name="profile_empty_downloaded_summary">Save episodes for offline listening and never miss a moment.</string>
+    <string name="profile_empty_history">Let\'s get you listening!</string>
+    <string name="profile_empty_history_summary">Start listening to podcasts and revisit your listening history here.</string>
+    <string name="profile_empty_starred">Save your favorites</string>
+    <string name="profile_empty_starred_summary">Star episodes you love and come back to them at anytime.</string>
     <string name="profile_end_tour">END TOUR</string>
     <string name="profile_ended">Ended %s</string>
     <string name="profile_ends">Ends %s</string>
@@ -955,7 +960,7 @@
     <string name="profile_files_delete" translatable="false">@string/delete</string>
     <string name="profile_files_edit" translatable="false">@string/edit</string>
     <string name="profile_files_empty_summary">Want to listen to your own files?\nTap the + button to open them in Pocket Casts, and they&#x2019;ll appear here.</string>
-    <string name="profile_files_empty_title">No Files</string>
+    <string name="profile_files_empty_title">Listen or watch your own files</string>
     <string name="profile_files_mark_as_played" translatable="false">@string/mark_as_played</string>
     <string name="profile_files_options" translatable="false">@string/options</string>
     <string name="profile_files_remove_image">Replace Image</string>
