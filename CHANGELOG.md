@@ -1,6 +1,32 @@
-7.85
+7.86
 -----
 
+
+7.85
+-----
+*   New Features
+    *   Add smart folders support.
+        ([#3720](https://github.com/Automattic/pocket-casts-android/pull/3720))
+    *   Add generated transcripts support.
+        ([#3772](https://github.com/Automattic/pocket-casts-android/pull/3772))
+*   Bug Fixes
+    *   Fixed an issue where bookmark confirmation button was obstructed by keyboard.
+        ([#3761](https://github.com/Automattic/pocket-casts-android/pull/3761))
+    *   Fix issues with Classic widget not syncing its state in some scenarios.
+        ([#3777](https://github.com/Automattic/pocket-casts-android/pull/3777))
+    *   Fix podcast grid padding
+        ([#3781](https://github.com/Automattic/pocket-casts-android/pull/3781))
+    *   Fix multi-select toolbar being drawn behind the status bar on older Android versions.
+        ([#3792](https://github.com/Automattic/pocket-casts-android/pull/3792))
+*   Updates
+    *   Close episode details screen when archiving an episode. This reverts [#3473](https://github.com/Automattic/pocket-casts-android/pull/3473). 
+        ([#3718](https://github.com/Automattic/pocket-casts-android/pull/3718))
+    *   Update widget titles and add descriptions.
+        ([#3769](https://github.com/Automattic/pocket-casts-android/pull/3769))
+    *   Reorder podcasts sorting order based on their popularity. 
+        ([#3733](https://github.com/Automattic/pocket-casts-android/pull/3733))
+    *   Improve small widget accessibility.
+        ([#3770](https://github.com/Automattic/pocket-casts-android/pull/3770))
 
 7.84.1
 -----

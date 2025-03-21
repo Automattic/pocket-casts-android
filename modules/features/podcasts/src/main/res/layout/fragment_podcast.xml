@@ -34,7 +34,6 @@
         app:navigationIcon="?attr/homeAsUpIndicator" />
 
     <FrameLayout
-        android:id="@+id/podcastContentWrapper"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 

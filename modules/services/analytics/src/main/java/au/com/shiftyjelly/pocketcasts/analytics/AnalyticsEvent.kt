@@ -319,6 +319,7 @@ enum class AnalyticsEvent(val key: String) {
     DISCOVER_LIST_PODCAST_SUBSCRIBED("discover_list_podcast_subscribed"),
     DISCOVER_FEATURED_PAGE_CHANGED("discover_featured_page_changed"),
     DISCOVER_SMALL_LIST_PAGE_CHANGED("discover_small_list_page_changed"),
+    DISCOVER_COLLECTION_LIST_PAGE_CHANGED("discover_collection_list_page_changed"),
     DISCOVER_REGION_CHANGED("discover_region_changed"),
     DISCOVER_COLLECTION_LINK_TAPPED("discover_collection_link_tapped"),
 
@@ -702,6 +703,9 @@ enum class AnalyticsEvent(val key: String) {
     TRANSCRIPT_SEARCH_SHOWN("transcript_search_shown"),
     TRANSCRIPT_SEARCH_NEXT_RESULT("transcript_search_next_result"),
     TRANSCRIPT_SEARCH_PREVIOUS_RESULT("transcript_search_previous_result"),
+    TRANSCRIPT_GENERATED_PAYWALL_SHOWN("transcript_generated_paywall_shown"),
+    TRANSCRIPT_GENERATED_PAYWALL_DISMISSED("transcript_generated_paywall_dismissed"),
+    TRANSCRIPT_GENERATED_PAYWALL_SUBSCRIBE_TAPPED("transcript_generated_paywall_subscribe_tapped"),
 
     /* Referrals */
     REFERRAL_TOOLTIP_SHOWN("referral_tooltip_shown"),
@@ -740,15 +744,11 @@ enum class AnalyticsEvent(val key: String) {
     WINBACK_CANCEL_CONFIRMATION_CANCEL_BUTTON_TAPPED("winback_cancel_confirmation_cancel_button_tapped"),
 
     /* Suggested Folders */
-    SUGGESTED_FOLDERS_MODAL_SHOWN("suggested_folders_modal_shown"),
-    SUGGESTED_FOLDERS_MODAL_DISMISSED("suggested_folders_modal_dismissed"),
-    SUGGESTED_FOLDERS_MODAL_USE_THESE_FOLDERS_TAPPED("suggested_folders_modal_use_these_folders_tapped"),
-    SUGGESTED_FOLDERS_MODAL_CREATE_CUSTOM_FOLDERS_TAPPED("suggested_folders_modal_create_custom_folders_tapped"),
-    SUGGESTED_FOLDERS_PAYWALL_MODAL_SHOWN("suggested_folders_paywall_modal_shown"),
-    SUGGESTED_FOLDERS_PAYWALL_MODAL_USE_THESE_FOLDERS_TAPPED("suggested_folders_paywall_modal_use_these_folders_tapped"),
-    SUGGESTED_FOLDERS_PAYWALL_MODAL_MAYBE_LATER_TAPPED("suggested_folders_paywall_modal_maybe_later_tapped"),
-    SUGGESTED_FOLDERS_REPLACE_EXISTING_FOLDERS_MODAL_SHOWN("suggested_folders_replace_existing_folders_modal_shown"),
+    SUGGESTED_FOLDERS_PAGE_SHOWN("suggested_folders_page_shown"),
+    SUGGESTED_FOLDERS_PAGE_DISMISSED("suggested_folders_page_dismissed"),
+    SUGGESTED_FOLDERS_USE_SUGGESTED_FOLDERS_TAPPED("suggested_folders_use_suggested_folders_tapped"),
+    SUGGESTED_FOLDERS_CREATE_CUSTOM_FOLDER_TAPPED("suggested_folders_create_custom_folder_tapped"),
     SUGGESTED_FOLDERS_REPLACE_FOLDERS_TAPPED("suggested_folders_replace_folders_tapped"),
-    SUGGESTED_FOLDERS_HOW_IT_WORKS_TAPPED("suggested_folders_how_it_works_tapped"),
-    SUGGESTED_FOLDERS_HOW_IT_WORKS_GOT_IT_TAPPED("suggested_folders_how_it_works_got_it_tapped"),
+    SUGGESTED_FOLDERS_REPLACE_FOLDERS_CONFIRM_TAPPED("suggested_folders_replace_folders_confirm_tapped"),
+    SUGGESTED_FOLDERS_PREVIEW_FOLDER_TAPPED("suggested_folders_preview_folder_tapped"),
 }

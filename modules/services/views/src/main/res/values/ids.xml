@@ -1,4 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <item name="multi_swipe_helper_previous_elevation" type="id"/>
+
+    <item name="spring_animation_id_translation_x" type="id" />
+    <item name="spring_animation_id_translation_y" type="id" />
+    <item name="spring_animation_id_translation_z" type="id" />
+    <item name="spring_animation_id_scale_x" type="id" />
+    <item name="spring_animation_id_scale_y" type="id" />
+    <item name="spring_animation_id_rotation" type="id" />
+    <item name="spring_animation_id_rotation_x" type="id" />
+    <item name="spring_animation_id_rotation_y" type="id" />
+    <item name="spring_animation_id_x" type="id" />
+    <item name="spring_animation_id_y" type="id" />
+    <item name="spring_animation_id_z" type="id" />
+    <item name="spring_animation_id_alpha" type="id" />
+    <item name="spring_animation_id_scroll_x" type="id" />
+    <item name="spring_animation_id_scroll_y" type="id" />
+    <item name="spring_animation_id_end_listener" type="id" />
 </resources>

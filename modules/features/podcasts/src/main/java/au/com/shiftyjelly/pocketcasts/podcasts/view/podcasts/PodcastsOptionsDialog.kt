@@ -104,7 +104,7 @@ class PodcastsOptionsDialog(
         val sortOrder = settings.podcastsSortType.value
         val title = fragment.getString(LR.string.sort_by)
         val dialog = OptionsDialog().setTitle(title)
-        for (order in PodcastsSortType.values()) {
+        for (order in PodcastsSortType.entries) {
             dialog.addCheckedOption(
                 titleId = order.labelId,
                 checked = order.clientId == sortOrder.clientId,

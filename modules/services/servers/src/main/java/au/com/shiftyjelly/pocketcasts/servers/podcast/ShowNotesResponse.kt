@@ -31,6 +31,7 @@ data class ShowNotesEpisode(
     @Json(name = "chapters") val chapters: List<ShowNotesChapter>? = null,
     @Json(name = "chapters_url") val chaptersUrl: String? = null,
     @Json(name = "transcripts") val transcripts: List<ShowNotesTranscript>? = null,
+    @Json(name = "pocket_casts_transcripts") val pocketCastsTranscripts: List<ShowNotesTranscript>? = null,
 )
 
 @JsonClass(generateAdapter = true)

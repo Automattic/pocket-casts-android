@@ -9,8 +9,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListFragment.Mode
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -69,7 +67,6 @@ class ProfileEpisodeListViewModel @Inject constructor(
                 val searchQuery = searchQueryFlow.value
                 val results = if (searchQuery.isNotEmpty()) searchResults else episodeList
                 val showSearchBar = mode.showSearch &&
-                    FeatureFlag.isEnabled(Feature.SEARCH_IN_LISTENING_HISTORY) &&
                     (results.isNotEmpty() || searchQuery.isNotEmpty())
                 _state.value = if (results.isEmpty()) {
                     State.Empty(

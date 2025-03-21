@@ -68,7 +68,9 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import timber.log.Timber
 
@@ -552,12 +554,6 @@ class SettingsImpl @Inject constructor(
     override val hideNotificationOnPause = UserSetting.BoolPref(
         sharedPrefKey = "hideNotificationOnPause",
         defaultValue = false,
-        sharedPrefs = sharedPreferences,
-    )
-
-    override val suggestedFolderPaywallDismissTime = UserSetting.LongPref(
-        sharedPrefKey = "suggestedFolderPaywallDismissTime",
-        defaultValue = 0L,
         sharedPrefs = sharedPreferences,
     )
 
@@ -1317,13 +1313,13 @@ class SettingsImpl @Inject constructor(
 
     override val collectAnalytics = UserSetting.BoolPref(
         sharedPrefKey = "SendUsageStatsKey",
-        defaultValue = true,
+        defaultValue = BuildConfig.DATA_COLLECTION_DEFAULT_VALUE ?: true,
         sharedPrefs = sharedPreferences,
     )
 
     override val sendCrashReports = UserSetting.BoolPref(
         sharedPrefKey = "SendCrashReportsKey",
-        defaultValue = true,
+        defaultValue = BuildConfig.DATA_COLLECTION_DEFAULT_VALUE ?: true,
         sharedPrefs = sharedPreferences,
     )
 
@@ -1514,9 +1510,9 @@ class SettingsImpl @Inject constructor(
         _themeReconfigurationEvents.tryEmit(Unit)
     }
 
-    private val _bottomInset = MutableSharedFlow<Int>(onBufferOverflow = BufferOverflow.DROP_OLDEST, replay = 1)
+    private val _bottomInset = MutableStateFlow(0)
     override val bottomInset: Flow<Int>
-        get() = _bottomInset.asSharedFlow()
+        get() = _bottomInset.asStateFlow()
 
     override fun updateBottomInset(height: Int) {
         _bottomInset.tryEmit(height)
@@ -1578,8 +1574,22 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override val followedPodcastsForSuggestedFoldersHash = UserSetting.StringPref(
-        sharedPrefKey = "followed_podcasts_hash_for_suggested_folders",
+    override val suggestedFoldersDismissTimestamp = UserSetting.PrefFromString<Instant?>(
+        sharedPrefKey = "suggested_folders_dismiss_timestamp",
+        defaultValue = null,
+        fromString = { value -> runCatching { Instant.parse(value) }.getOrNull() },
+        toString = { value -> value.toString() },
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val suggestedFoldersDismissCount = UserSetting.IntPref(
+        sharedPrefKey = "suggested_folders_dismiss_count",
+        defaultValue = 0,
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val suggestedFoldersFollowedHash = UserSetting.StringPref(
+        sharedPrefKey = "suggested_folders_followed_hash",
         defaultValue = "",
         sharedPrefs = sharedPreferences,
     )

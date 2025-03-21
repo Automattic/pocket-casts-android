@@ -1363,7 +1363,7 @@ private fun BindingWrapper.updateSwipeRefreshLayout(
 }
 
 private sealed interface BindingWrapper {
-    val root: LinearLayout
+    val root: ViewGroup
     val multiSelectEpisodesToolbar: MultiSelectToolbar
     val multiSelectBookmarksToolbar: MultiSelectToolbar
     val toolbar: View
@@ -1573,7 +1573,7 @@ private sealed interface BindingWrapper {
 
         override fun showBackgroundPlaceholder(show: Boolean) = Unit
 
-        override val root: LinearLayout
+        override val root: ViewGroup
             get() = binding.root
 
         override val toolbar: View

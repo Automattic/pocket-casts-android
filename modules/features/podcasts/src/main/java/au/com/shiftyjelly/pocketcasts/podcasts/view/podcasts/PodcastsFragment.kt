@@ -32,10 +32,10 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.FolderCreateFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.FolderCreateSharedViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.FolderEditFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.FolderEditPodcastsFragment
-import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.SuggestedFolders
-import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.SuggestedFoldersPaywallBottomSheet
+import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.SuggestedFoldersFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastsViewModel
+import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastsViewModel.SuggestedFoldersState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
@@ -59,7 +59,6 @@ import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
@@ -90,11 +89,14 @@ class PodcastsFragment :
         }
     }
 
-    @Inject lateinit var settings: Settings
+    @Inject
+    lateinit var settings: Settings
 
-    @Inject lateinit var castManager: CastManager
+    @Inject
+    lateinit var castManager: CastManager
 
-    @Inject lateinit var analyticsTracker: AnalyticsTracker
+    @Inject
+    lateinit var analyticsTracker: AnalyticsTracker
 
     private var podcastOptionsDialog: PodcastsOptionsDialog? = null
     private var folderOptionsDialog: FolderOptionsDialog? = null
@@ -132,6 +134,56 @@ class PodcastsFragment :
             ItemTouchHelper(PodcastTouchCallback(this, context)).attachToRecyclerView(it)
         }
 
+        if (!viewModel.isFragmentChangingConfigurations) {
+            folderUuid?.let { viewModel.trackFolderShown(it) } ?: viewModel.trackPodcastsListShown()
+        }
+
+        val toolbar = binding.toolbar
+        setupToolbarAndStatusBar(
+            toolbar = toolbar,
+            menu = R.menu.podcasts_menu,
+            chromeCastButton = Shown(chromeCastAnalytics),
+        )
+        toolbar.setOnMenuItemClickListener(this)
+
+        toolbar.menu.findItem(R.id.folders_locked).setOnMenuItemClickListener {
+            if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS)) {
+                val state = viewModel.suggestedFoldersState.value
+                when (state) {
+                    is SuggestedFoldersState.Empty -> {
+                        OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.Upsell(OnboardingUpgradeSource.FOLDERS))
+                    }
+
+                    is SuggestedFoldersState.Available -> {
+                        showSuggestedFoldersCreation(SuggestedFoldersFragment.Source.ToolbarButton)
+                    }
+                }
+            } else {
+                OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.Upsell(OnboardingUpgradeSource.FOLDERS))
+            }
+            true
+        }
+
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            viewModel.refreshPodcasts()
+        }
+
+        binding.btnDiscover.setOnClickListener {
+            analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_DISCOVER_BUTTON_TAPPED)
+            (activity as FragmentHostListener).openTab(VR.id.navigation_discover)
+        }
+
+        binding.addToFolderButton.setOnClickListener {
+            val folder = viewModel.folder ?: return@setOnClickListener
+            FolderEditPodcastsFragment.newInstance(folderUuid = folder.uuid).show(parentFragmentManager, "add_podcasts_card")
+        }
+
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         viewModel.folderState.observe(viewLifecycleOwner) { folderState ->
             if (folderUuid != null && folderState.folder == null) {
                 return@observe
@@ -144,10 +196,10 @@ class PodcastsFragment :
             val toolbarColors: ToolbarColors
             val navigationIcon: NavigationIcon
             if (folder == null) {
-                toolbarColors = ToolbarColors.theme(theme = theme, context = context, excludeMenuItems = listOf(R.id.folders_locked))
+                toolbarColors = ToolbarColors.theme(theme = theme, context = requireContext(), excludeMenuItems = listOf(R.id.folders_locked))
                 navigationIcon = NavigationIcon.None
             } else {
-                toolbarColors = ToolbarColors.user(color = folder.getColor(context), theme = theme)
+                toolbarColors = ToolbarColors.user(color = folder.getColor(requireContext()), theme = theme)
                 navigationIcon = NavigationIcon.BackArrow
             }
             setupToolbarAndStatusBar(
@@ -195,74 +247,23 @@ class PodcastsFragment :
             }
         }
 
-        if (!viewModel.isFragmentChangingConfigurations) {
-            folderUuid?.let { viewModel.trackFolderShown(it) } ?: viewModel.trackPodcastsListShown()
-        }
-
-        val toolbar = binding.toolbar
-        setupToolbarAndStatusBar(
-            toolbar = toolbar,
-            menu = R.menu.podcasts_menu,
-            chromeCastButton = Shown(chromeCastAnalytics),
-        )
-        toolbar.setOnMenuItemClickListener(this)
-
-        toolbar.menu.findItem(R.id.folders_locked).setOnMenuItemClickListener {
-            val state = viewModel.suggestedFoldersState
-            if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS) && state is PodcastsViewModel.SuggestedFoldersState.Loaded) {
-                SuggestedFoldersPaywallBottomSheet.newInstance(state.folders()).show(childFragmentManager, "suggested_folders_paywall")
-            } else {
-                OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.Upsell(OnboardingUpgradeSource.FOLDERS))
-            }
-            true
-        }
-
-        binding.swipeRefreshLayout.setOnRefreshListener {
-            viewModel.refreshPodcasts()
-        }
-
-        binding.btnDiscover.setOnClickListener {
-            analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_DISCOVER_BUTTON_TAPPED)
-            (activity as FragmentHostListener).openTab(VR.id.navigation_discover)
-        }
-
-        binding.addToFolderButton.setOnClickListener {
-            val folder = viewModel.folder ?: return@setOnClickListener
-            FolderEditPodcastsFragment.newInstance(folderUuid = folder.uuid).show(parentFragmentManager, "add_podcasts_card")
-        }
-
-        viewModel.refreshSuggestedFolders()
-
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.loadSuggestedFolders()
+                viewModel.refreshSuggestedFolders()
             }
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.userSuggestedFoldersState.collectLatest { (signInState, state) ->
-                    val existingModal = parentFragmentManager.findFragmentByTag("suggested_folders_paywall")
-                    if (state is PodcastsViewModel.SuggestedFoldersState.Loaded) {
-                        if (existingModal != null && existingModal is SuggestedFoldersPaywallBottomSheet && !signInState.isSignedInAsPlusOrPatron) {
-                            // We don't want to close this modal for Paid users because this scenario might occur when the user upgrades their account
-                            // after the modal has already been opened. In this case, we want to keep the modal open so the user can tap the button
-                            // to open the suggested folders screen.
-                            existingModal.dismiss()
+                viewModel.suggestedFoldersState.collect { state ->
+                    when (state) {
+                        is SuggestedFoldersState.Available -> {
+                            if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS) && viewModel.isEligibleForSuggestedFoldersPopup()) {
+                                showSuggestedFoldersCreation(SuggestedFoldersFragment.Source.Popup)
+                            }
                         }
-                        if (viewModel.showSuggestedFoldersPaywallOnOpen(signInState.isSignedInAsPlusOrPatron)) {
-                            SuggestedFoldersPaywallBottomSheet.newInstance(state.folders()).show(parentFragmentManager, "suggested_folders_paywall")
-                        }
-                    } else if (state is PodcastsViewModel.SuggestedFoldersState.Empty) {
-                        if (existingModal != null && existingModal is SuggestedFoldersPaywallBottomSheet) {
-                            existingModal.dismiss()
-                        }
+
+                        is SuggestedFoldersState.Empty -> Unit
                     }
                 }
             }
@@ -284,15 +285,18 @@ class PodcastsFragment :
                 openOptions()
                 true
             }
+
             R.id.search_podcasts -> {
                 search()
                 true
             }
+
             R.id.create_folder -> {
                 analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_FOLDER_BUTTON_TAPPED)
-                createFolder()
+                handleFolderCreation()
                 true
             }
+
             else -> false
         }
     }
@@ -335,12 +339,34 @@ class PodcastsFragment :
         }
     }
 
-    private fun createFolder() {
-        val state = viewModel.suggestedFoldersState
-        if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS) && state is PodcastsViewModel.SuggestedFoldersState.Loaded) {
-            (activity as FragmentHostListener).showModal(SuggestedFolders.newInstance(state.folders()))
-        } else {
-            FolderCreateFragment.newInstance(PODCASTS_LIST).show(parentFragmentManager, "create_folder_card")
+    private fun handleFolderCreation() {
+        val state = viewModel.suggestedFoldersState.value
+        when (state) {
+            is SuggestedFoldersState.Empty -> {
+                showCustomFolderCreation()
+            }
+
+            is SuggestedFoldersState.Available -> {
+                if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS)) {
+                    showSuggestedFoldersCreation(SuggestedFoldersFragment.Source.ToolbarButton)
+                } else {
+                    showCustomFolderCreation()
+                }
+            }
+        }
+    }
+
+    private fun showCustomFolderCreation() {
+        FolderCreateFragment.newInstance(PODCASTS_LIST).show(parentFragmentManager, "create_folder_card")
+    }
+
+    private fun showSuggestedFoldersCreation(
+        source: SuggestedFoldersFragment.Source,
+    ) {
+        if (parentFragmentManager.findFragmentByTag("suggested_folders") == null) {
+            SuggestedFoldersFragment
+                .newInstance(source)
+                .show(parentFragmentManager, "suggested_folders")
         }
     }
 

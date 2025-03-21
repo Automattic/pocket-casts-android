@@ -13,5 +13,5 @@ abstract class TranscriptDao {
     abstract fun insertBlocking(transcript: Transcript)
 
     @Query("SELECT * FROM episode_transcript WHERE episode_uuid IS :episodeUuid")
-    abstract fun observerTranscriptForEpisode(episodeUuid: String): Flow<Transcript?>
+    abstract fun observeTranscriptForEpisode(episodeUuid: String): Flow<Transcript?>
 }
