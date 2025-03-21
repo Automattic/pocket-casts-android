@@ -134,69 +134,6 @@ class PodcastsFragment :
             ItemTouchHelper(PodcastTouchCallback(this, context)).attachToRecyclerView(it)
         }
 
-        viewModel.folderState.observe(viewLifecycleOwner) { folderState ->
-            if (folderUuid != null && folderState.folder == null) {
-                return@observe
-            }
-            val folder = folderState.folder
-            val rootFolder = folder == null
-            val isSignedInAsPlusOrPatron = folderState.isSignedInAsPlusOrPatron
-            val toolbar = binding.toolbar
-
-            val toolbarColors: ToolbarColors
-            val navigationIcon: NavigationIcon
-            if (folder == null) {
-                toolbarColors = ToolbarColors.theme(theme = theme, context = context, excludeMenuItems = listOf(R.id.folders_locked))
-                navigationIcon = NavigationIcon.None
-            } else {
-                toolbarColors = ToolbarColors.user(color = folder.getColor(context), theme = theme)
-                navigationIcon = NavigationIcon.BackArrow
-            }
-            setupToolbarAndStatusBar(
-                toolbar = toolbar,
-                title = folder?.name ?: getString(LR.string.podcasts),
-                toolbarColors = toolbarColors,
-                navigationIcon = navigationIcon,
-            )
-
-            toolbar.menu.findItem(R.id.folders_locked)?.isVisible = !isSignedInAsPlusOrPatron
-            toolbar.menu.findItem(R.id.create_folder)?.isVisible = rootFolder && isSignedInAsPlusOrPatron
-            toolbar.menu.findItem(R.id.search_podcasts)?.isVisible = rootFolder
-
-            adapter?.setFolderItems(folderState.items)
-
-            val isEmpty = folderState.items.isEmpty()
-            binding.emptyViewPodcasts.showIf(isEmpty && rootFolder)
-            binding.emptyViewFolders.showIf(isEmpty && !rootFolder)
-            binding.swipeRefreshLayout.showIf(!isEmpty)
-        }
-
-        viewModel.layoutChangedLiveData.observe(viewLifecycleOwner) {
-            setupGridView()
-        }
-
-        viewModel.podcastUuidToBadge.observe(viewLifecycleOwner) { podcastUuidToBadge ->
-            adapter?.badgeType = settings.podcastBadgeType.value
-            adapter?.setBadges(podcastUuidToBadge)
-        }
-
-        viewModel.refreshObservable.observe(viewLifecycleOwner) {
-            // Once the refresh is complete stop the swipe to refresh animation
-            if (it !is RefreshState.Refreshing) {
-                realBinding?.swipeRefreshLayout?.isRefreshing = false
-            }
-        }
-
-        sharedViewModel.folderUuidLive.observe(viewLifecycleOwner) { newFolderUuid ->
-            // after creating a folder open it
-            val inRootFolder = folderUuid == null
-
-            if (inRootFolder && newFolderUuid != null) {
-                sharedViewModel.folderUuid = null
-                onFolderClick(newFolderUuid, isUserInitiated = false)
-            }
-        }
-
         if (!viewModel.isFragmentChangingConfigurations) {
             folderUuid?.let { viewModel.trackFolderShown(it) } ?: viewModel.trackPodcastsListShown()
         }
@@ -246,6 +183,69 @@ class PodcastsFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        viewModel.folderState.observe(viewLifecycleOwner) { folderState ->
+            if (folderUuid != null && folderState.folder == null) {
+                return@observe
+            }
+            val folder = folderState.folder
+            val rootFolder = folder == null
+            val isSignedInAsPlusOrPatron = folderState.isSignedInAsPlusOrPatron
+            val toolbar = binding.toolbar
+
+            val toolbarColors: ToolbarColors
+            val navigationIcon: NavigationIcon
+            if (folder == null) {
+                toolbarColors = ToolbarColors.theme(theme = theme, context = requireContext(), excludeMenuItems = listOf(R.id.folders_locked))
+                navigationIcon = NavigationIcon.None
+            } else {
+                toolbarColors = ToolbarColors.user(color = folder.getColor(requireContext()), theme = theme)
+                navigationIcon = NavigationIcon.BackArrow
+            }
+            setupToolbarAndStatusBar(
+                toolbar = toolbar,
+                title = folder?.name ?: getString(LR.string.podcasts),
+                toolbarColors = toolbarColors,
+                navigationIcon = navigationIcon,
+            )
+
+            toolbar.menu.findItem(R.id.folders_locked)?.isVisible = !isSignedInAsPlusOrPatron
+            toolbar.menu.findItem(R.id.create_folder)?.isVisible = rootFolder && isSignedInAsPlusOrPatron
+            toolbar.menu.findItem(R.id.search_podcasts)?.isVisible = rootFolder
+
+            adapter?.setFolderItems(folderState.items)
+
+            val isEmpty = folderState.items.isEmpty()
+            binding.emptyViewPodcasts.showIf(isEmpty && rootFolder)
+            binding.emptyViewFolders.showIf(isEmpty && !rootFolder)
+            binding.swipeRefreshLayout.showIf(!isEmpty)
+        }
+
+        viewModel.layoutChangedLiveData.observe(viewLifecycleOwner) {
+            setupGridView()
+        }
+
+        viewModel.podcastUuidToBadge.observe(viewLifecycleOwner) { podcastUuidToBadge ->
+            adapter?.badgeType = settings.podcastBadgeType.value
+            adapter?.setBadges(podcastUuidToBadge)
+        }
+
+        viewModel.refreshObservable.observe(viewLifecycleOwner) {
+            // Once the refresh is complete stop the swipe to refresh animation
+            if (it !is RefreshState.Refreshing) {
+                realBinding?.swipeRefreshLayout?.isRefreshing = false
+            }
+        }
+
+        sharedViewModel.folderUuidLive.observe(viewLifecycleOwner) { newFolderUuid ->
+            // after creating a folder open it
+            val inRootFolder = folderUuid == null
+
+            if (inRootFolder && newFolderUuid != null) {
+                sharedViewModel.folderUuid = null
+                onFolderClick(newFolderUuid, isUserInitiated = false)
+            }
+        }
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
