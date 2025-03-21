@@ -104,7 +104,7 @@ class SuggestedFoldersFragment : BaseDialogFragment() {
                     modifier = Modifier
                         .nestedScroll(rememberNestedScrollInteropConnection())
                         .fillMaxSize()
-                        .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)),
+                        .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)),
                 ) {
                     val navController = rememberNavController()
 
