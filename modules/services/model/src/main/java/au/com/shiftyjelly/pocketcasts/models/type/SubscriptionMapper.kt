@@ -13,11 +13,13 @@ class SubscriptionMapper @Inject constructor() {
         productDetails: ProductDetails,
         isOfferEligible: Boolean = false,
         referralProductDetails: ReferralProductDetails? = null,
+        removeWinbackOffer: Boolean = true,
     ): Subscription? {
         val matchingSubscriptionOfferDetails = if (isOfferEligible || referralProductDetails != null) {
             productDetails
                 .subscriptionOfferDetails
                 ?.filter { referralProductDetails == null && !it.offerTags.contains(REFERRAL_OFFER_TAG) } // get SubscriptionOfferDetails with offers
+                ?.filter { if (removeWinbackOffer) !it.offerTags.contains(WINBACK_OFFER_TAG) else true }
                 ?.filter { it.offerSubscriptionPricingPhase != null } // get SubscriptionOfferDetails with offers
                 ?.ifEmpty { productDetails.subscriptionOfferDetails } // if no special offers, return all offers available
                 ?: productDetails.subscriptionOfferDetails // if null, return all offers
@@ -32,6 +34,7 @@ class SubscriptionMapper @Inject constructor() {
         } else {
             matchingSubscriptionOfferDetails
                 .filter { !it.offerTags.contains(REFERRAL_OFFER_TAG) }
+                .filter { if (removeWinbackOffer) !it.offerTags.contains(WINBACK_OFFER_TAG) else true }
                 // This assumes that base plan has lowest number of pricing phases,
                 // and if something else has the same number of phases,
                 // base plan will be the first one
@@ -163,5 +166,6 @@ class SubscriptionMapper @Inject constructor() {
 
     companion object {
         private const val REFERRAL_OFFER_TAG = "referral-offer"
+        private const val WINBACK_OFFER_TAG = "winback"
     }
 }
