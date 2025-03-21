@@ -52,6 +52,7 @@ class UpNextHistoryDetailsViewModel @Inject constructor(
                 _state.update {
                     UiState.Loaded(
                         episodes = episodeUuids.mapNotNull { episodeUuid -> episodeMap[episodeUuid] },
+                        isUpNextQueueEmpty = playbackManager.upNextQueue.queueEpisodes.isEmpty(),
                         useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork(Element.UpNext),
                     )
                 }
@@ -81,6 +82,7 @@ class UpNextHistoryDetailsViewModel @Inject constructor(
         data object Loading : UiState()
         data class Loaded(
             val episodes: List<BaseEpisode>,
+            val isUpNextQueueEmpty: Boolean = false,
             val useEpisodeArtwork: Boolean = false,
         ) : UiState()
         data object Error : UiState()

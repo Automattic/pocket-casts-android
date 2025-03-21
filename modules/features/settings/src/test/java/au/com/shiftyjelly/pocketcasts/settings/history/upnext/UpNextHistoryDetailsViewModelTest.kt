@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.repositories.history.upnext.UpNextHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.settings.history.upnext.UpNextHistoryDetailsViewModel.UiState
 import java.util.Date
@@ -61,6 +62,9 @@ class UpNextHistoryDetailsViewModelTest {
         whenever(userSettingsArtworkConfigurationMock.value).thenReturn(ArtworkConfiguration(true, emptySet()))
         whenever(settings.artworkConfiguration).thenReturn(userSettingsArtworkConfigurationMock)
         whenever(savedStateHandle.get<Long>(anyString())).thenReturn(123456789L)
+        val upNextQueue = mock<UpNextQueue>()
+        whenever(upNextQueue.queueEpisodes).thenReturn(emptyList<BaseEpisode>())
+        whenever(playbackManager.upNextQueue).thenReturn(upNextQueue)
     }
 
     @Test

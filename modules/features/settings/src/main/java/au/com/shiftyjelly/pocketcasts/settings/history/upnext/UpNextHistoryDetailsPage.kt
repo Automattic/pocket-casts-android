@@ -56,7 +56,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun UpNextHistoryDetailsPage(
     viewModel: UpNextHistoryDetailsViewModel = hiltViewModel(),
     date: Long,
-    onRestoreClick: (restoreUpNext: () -> Unit) -> Unit,
+    onRestoreClick: (UiState, restoreUpNext: () -> Unit) -> Unit,
     onBackClick: () -> Unit,
     bottomInset: Dp,
 ) {
@@ -64,7 +64,7 @@ fun UpNextHistoryDetailsPage(
     UpNextHistoryDetailsView(
         date = date,
         state = state,
-        onRestoreClick = { onRestoreClick { viewModel.restoreUpNext() } },
+        onRestoreClick = { onRestoreClick(state) { viewModel.restoreUpNext() } },
         onBackClick = onBackClick,
         bottomInset = bottomInset,
     )

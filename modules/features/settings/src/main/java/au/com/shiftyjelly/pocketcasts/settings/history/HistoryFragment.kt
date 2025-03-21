@@ -18,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.settings.history.upnext.UpNextHistoryDetailsPage
+import au.com.shiftyjelly.pocketcasts.settings.history.upnext.UpNextHistoryDetailsViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.settings.history.upnext.UpNextHistoryPage
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
@@ -92,13 +93,22 @@ class HistoryFragment : BaseFragment(), HasBackstack {
                         }
                     UpNextHistoryDetailsPage(
                         date = date,
-                        onRestoreClick = ::showUpNextRestoreConfirmationDialog,
+                        onRestoreClick = ::onRestoreClick,
                         onBackClick = navController::popBackStack,
                         bottomInset = bottomInsetDp,
                     )
                 }
             }
         }
+    }
+
+    private fun onRestoreClick(state: UiState, restoreUpNext: () -> Unit) {
+        if (state !is UiState.Loaded) return
+        if (state.isUpNextQueueEmpty) {
+            restoreUpNext()
+            return
+        }
+        showUpNextRestoreConfirmationDialog(restoreUpNext)
     }
 
     private fun showUpNextRestoreConfirmationDialog(onRestoreConfirm: () -> Unit) {
