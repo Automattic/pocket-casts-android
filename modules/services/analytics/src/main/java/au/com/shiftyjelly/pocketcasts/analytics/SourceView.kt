@@ -51,6 +51,7 @@ enum class SourceView(val analyticsValue: String) {
     TASKER("tasker"),
     UNKNOWN("unknown"),
     UP_NEXT("up_next"),
+    UP_NEXT_HISTORY("up_next_history"),
     WHATS_NEW("whats_new"),
     ABOUT("about"),
     APPEARANCE("appearance_settings"),
