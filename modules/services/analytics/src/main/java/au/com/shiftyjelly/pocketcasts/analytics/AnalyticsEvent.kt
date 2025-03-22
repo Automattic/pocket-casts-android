@@ -341,6 +341,7 @@ enum class AnalyticsEvent(val key: String) {
     UP_NEXT_QUEUE_REORDERED("up_next_queue_reordered"),
     UP_NEXT_DISMISSED("up_next_dismissed"),
     UP_NEXT_SHUFFLE_ENABLED("up_next_shuffle_enabled"),
+    UP_NEXT_DISCOVER_BUTTON_TAPPED("up_next_discover_button_tapped"),
 
     /* Player */
     PLAYER_SHOWN("player_shown"),
