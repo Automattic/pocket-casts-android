@@ -6,6 +6,8 @@
 *   Updates
     *   Show a confirmation dialog when deleting more than three episode downloads.
         ([#3800](https://github.com/Automattic/pocket-casts-android/pull/3800))
+    *   Add settings option to restore up next from local history.
+        ([#3797](https://github.com/Automattic/pocket-casts-android/pull/3797))
         
 7.85
 -----
