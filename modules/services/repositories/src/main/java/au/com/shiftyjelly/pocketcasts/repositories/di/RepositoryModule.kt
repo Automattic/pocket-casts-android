@@ -16,6 +16,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearSync
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearSyncImpl
+import au.com.shiftyjelly.pocketcasts.repositories.history.upnext.UpNextHistoryManager
+import au.com.shiftyjelly.pocketcasts.repositories.history.upnext.UpNextHistoryManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationDrawer
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationDrawerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
@@ -191,4 +193,7 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun provideWinbackManager(manager: WinbackManagerImpl): WinbackManager
+
+    @Binds
+    abstract fun provideUpNextHistoryManager(upNextHistoryManagerImpl: UpNextHistoryManagerImpl): UpNextHistoryManager
 }
