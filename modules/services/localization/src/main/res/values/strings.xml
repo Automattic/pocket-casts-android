@@ -255,6 +255,10 @@
     <string name="download_warning_title">Download All</string>
     <string name="download_warning_limit_summary">Bulk downloads are limited to %1$d.</string>
 
+    <string name="delete_download_warning_button">Remove %1$d downloads</string>
+    <string name="delete_download_warning_title">Remove downloaded episodes</string>
+    <string name="delete_download_warning_summary">Are you sure you want to remove these downloads? You won\'t be able to play offline.</string>
+
     <string name="episode_was_removed">Episode was removed</string>
     <string name="episode_queued_for_download">Episode queued for download</string>
 

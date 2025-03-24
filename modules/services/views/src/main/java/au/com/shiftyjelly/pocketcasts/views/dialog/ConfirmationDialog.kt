@@ -81,6 +81,20 @@ open class ConfirmationDialog : BottomSheetDialogFragment() {
                     .setOnConfirm(onConfirm)
             }
         }
+
+        fun deleteDownloadWarningDialog(episodeCount: Int, warningLimit: Int, resources: Resources, onConfirm: () -> Unit): ConfirmationDialog? {
+            return if (episodeCount <= warningLimit) {
+                onConfirm()
+                null
+            } else {
+                ConfirmationDialog()
+                    .setIconId(IR.drawable.ic_delete)
+                    .setTitle(resources.getString(LR.string.delete_download_warning_title))
+                    .setSummary(resources.getString(LR.string.delete_download_warning_summary))
+                    .setButtonType(ButtonType.Danger(resources.getString(LR.string.delete_download_warning_button, episodeCount)))
+                    .setOnConfirm(onConfirm)
+            }
+        }
     }
 
     fun setForceDarkTheme(force: Boolean): ConfirmationDialog {

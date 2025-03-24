@@ -3,7 +3,10 @@
 *   Bug Fixes
     *   Fix share transcript text when API less than 33.
         ([#3789](https://github.com/Automattic/pocket-casts-android/pull/3789))
-
+*   Updates
+    *   Show a confirmation dialog when deleting more than three episode downloads.
+        ([#3800](https://github.com/Automattic/pocket-casts-android/pull/3800))
+        
 7.85
 -----
 *   New Features
@@ -18,6 +21,8 @@
         ([#3777](https://github.com/Automattic/pocket-casts-android/pull/3777))
     *   Fix podcast grid padding
         ([#3781](https://github.com/Automattic/pocket-casts-android/pull/3781))
+    *   Fix multi-select toolbar being drawn behind the status bar on older Android versions.
+        ([#3792](https://github.com/Automattic/pocket-casts-android/pull/3792))
 *   Updates
     *   Close episode details screen when archiving an episode. This reverts [#3473](https://github.com/Automattic/pocket-casts-android/pull/3473). 
         ([#3718](https://github.com/Automattic/pocket-casts-android/pull/3718))

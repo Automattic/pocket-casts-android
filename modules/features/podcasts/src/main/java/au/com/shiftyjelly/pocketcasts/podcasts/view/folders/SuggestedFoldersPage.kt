@@ -153,6 +153,7 @@ private fun SmartFoldersHeader(
                 SuggestedAction.UseFolders -> stringResource(LR.string.suggested_folders_use_subtitle)
                 SuggestedAction.ReplaceFolders -> stringResource(LR.string.suggested_folders_replace_subtitle)
             },
+            color = MaterialTheme.theme.colors.primaryText02,
         )
     }
 }
