@@ -108,6 +108,12 @@ class FiltersFragment :
             previousLastFilter = it.lastOrNull()
             viewModel.adapterState = it.toMutableList()
             adapter.submitList(it)
+
+            viewLifecycleOwner.lifecycleScope.launch {
+                if (viewModel.shouldShowTooltip(adapter.currentList)) {
+                    // show tooltip here
+                }
+            }
         }
 
         val touchHelperCallback = FiltersListItemTouchCallback({ from, to ->

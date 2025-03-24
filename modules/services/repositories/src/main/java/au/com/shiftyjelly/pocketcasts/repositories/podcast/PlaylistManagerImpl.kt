@@ -40,9 +40,9 @@ class PlaylistManagerImpl @Inject constructor(
 ) : PlaylistManager, CoroutineScope {
 
     companion object {
-        private const val NEW_RELEASE_UUID = "2797DCF8-1C93-4999-B52A-D1849736FA2C"
+        const val NEW_RELEASE_UUID = "2797DCF8-1C93-4999-B52A-D1849736FA2C"
+        const val IN_PROGRESS_UUID = "D89A925C-5CE1-41A4-A879-2751838CE5CE"
         private const val NEW_RELEASE_TITLE = "New Releases"
-        private const val IN_PROGRESS_UUID = "D89A925C-5CE1-41A4-A879-2751838CE5CE"
         private const val IN_PROGRESS_TITLE = "In Progress"
         private const val CREATED_DEFAULT_PLAYLISTS = "createdDefaultPlaylists"
     }
