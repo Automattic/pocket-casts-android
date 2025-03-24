@@ -80,6 +80,7 @@
     <string name="remove_from_up_next">Remove from Up Next</string>
     <string name="renew_your_subscription">Renew your Subscription</string>
     <string name="removed">Removed</string>
+    <string name="restore">Restore</string>
     <string name="search">Search</string>
     <string name="search_episodes_not_found_title">No episodes found</string>
     <string name="search_episodes_not_found_summary">We couldn\'t find any episode for that search. Try another keyword.</string>
@@ -2303,4 +2304,7 @@
     <string name="restore_from_local_history">Restore from local history</string>
     <string name="up_next_history">Up Next History</string>
     <string name="up_next_history_explanation">A list of recent updates to Up Next due to changes on other devices. To view the episodes and have the option to restore them, tap any entry.</string>
+    <string name="up_next_history_restore_button">@string/restore</string>
+    <string name="up_next_history_restore_confirmation_title">Restore Up Next?</string>
+    <string name="up_next_history_restore_confirmation_description">These episodes will be added to the bottom of your current Up Next.</string>
 </resources>

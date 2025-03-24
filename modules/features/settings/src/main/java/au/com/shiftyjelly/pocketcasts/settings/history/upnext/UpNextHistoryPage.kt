@@ -77,7 +77,6 @@ private fun UpNextHistoryPageView(
     Column {
         ThemedTopAppBar(
             title = stringResource(LR.string.up_next_history),
-            bottomShadow = true,
             onNavigationClick = onBackClick,
         )
 
