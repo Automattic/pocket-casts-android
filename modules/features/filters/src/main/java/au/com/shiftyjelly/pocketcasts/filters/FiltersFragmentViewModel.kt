@@ -98,6 +98,10 @@ class FiltersFragmentViewModel @Inject constructor(
         analyticsTracker.track(AnalyticsEvent.FILTER_CREATE_BUTTON_TAPPED)
     }
 
+    fun trackTooltipShown() {
+        analyticsTracker.track(AnalyticsEvent.FILTER_TOOLTIP_SHOWN)
+    }
+
     suspend fun shouldShowTooltip(filters: List<Playlist>): Boolean {
         if (!settings.showEmptyFiltersListTooltip.value) return false
         if (filters.size > 2) return false
@@ -117,5 +121,6 @@ class FiltersFragmentViewModel @Inject constructor(
 
     fun onTooltipClosed() {
         settings.showEmptyFiltersListTooltip.set(false, updateModifiedAt = false)
+        analyticsTracker.track(AnalyticsEvent.FILTER_TOOLTIP_CLOSED)
     }
 }

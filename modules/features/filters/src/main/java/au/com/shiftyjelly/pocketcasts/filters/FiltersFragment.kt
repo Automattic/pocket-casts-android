@@ -35,6 +35,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.filters.databinding.FragmentFiltersBinding
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
@@ -221,6 +222,10 @@ class FiltersFragment :
                 AppTheme(theme.activeTheme) {
                     val configuration = LocalConfiguration.current
                     var toolbarY by remember { mutableFloatStateOf(0f) }
+
+                    CallOnce {
+                        viewModel.trackTooltipShown()
+                    }
 
                     LaunchedEffect(configuration) {
                         val location = IntArray(2)
