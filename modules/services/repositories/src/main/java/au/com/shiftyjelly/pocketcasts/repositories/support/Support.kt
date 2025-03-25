@@ -459,7 +459,6 @@ class Support @Inject constructor(
             Podcast.AutoAddUpNext.OFF -> "off"
             Podcast.AutoAddUpNext.PLAY_NEXT -> "to top (play next)"
             Podcast.AutoAddUpNext.PLAY_LAST -> "to bottom (play last)"
-            else -> "unknown value $autoAddToUpNext"
         }
     }
 

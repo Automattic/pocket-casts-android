@@ -107,9 +107,9 @@ class UpdateEpisodeTaskTest {
     }
 
     class TestWorkerFactory(private val podcastCacheServiceManager: PodcastCacheServiceManager, private val appDatabase: AppDatabase) : WorkerFactory() {
-        override fun createWorker(context: Context, workerClassName: String, workerParameters: WorkerParameters): ListenableWorker? {
+        override fun createWorker(appContext: Context, workerClassName: String, workerParameters: WorkerParameters): ListenableWorker? {
             return UpdateEpisodeTask(
-                context = context,
+                context = appContext,
                 params = workerParameters,
                 podcastCacheServiceManager = podcastCacheServiceManager,
                 appDatabase = appDatabase,
