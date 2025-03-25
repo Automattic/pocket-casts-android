@@ -18,7 +18,6 @@ fun BaseEpisode.getSummaryText(dateFormatter: RelativeDateFormatter, @ColorInt t
     return when (this) {
         is PodcastEpisode -> episodeSummaryText(episode = this, dateFormatter = dateFormatter, tintColor = tintColor, showDuration = showDuration, context = context)
         is UserEpisode -> userEpisodeSummaryText(userEpisode = this, dateFormatter = dateFormatter)
-        else -> "".toSpannable()
     }
 }
 
