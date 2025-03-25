@@ -6,6 +6,26 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.Toolbar
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.MeasurePolicy
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.semantics.invisibleToUser
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.dp
+import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -14,6 +34,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.filters.databinding.FragmentFiltersBinding
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -111,7 +133,9 @@ class FiltersFragment :
 
             viewLifecycleOwner.lifecycleScope.launch {
                 if (viewModel.shouldShowTooltip(adapter.currentList)) {
-                    // show tooltip here
+                    binding.toolbar.post {
+                        showTooltip()
+                    }
                 }
             }
         }
@@ -187,6 +211,66 @@ class FiltersFragment :
         (activity as? FragmentHostListener)?.addFragment(playlistFragment)
 
         playlistFragment.view?.requestFocus() // Jump to new page for talk back
+    }
+
+    private fun showTooltip() {
+        val toolbar = binding?.toolbar ?: return
+        binding?.tooltipComposeView?.isVisible = true
+        binding?.tooltipComposeView?.apply {
+            setContentWithViewCompositionStrategy {
+                AppTheme(theme.activeTheme) {
+                    val configuration = LocalConfiguration.current
+                    var toolbarY by remember { mutableFloatStateOf(0f) }
+
+                    LaunchedEffect(configuration) {
+                        val location = IntArray(2)
+                        toolbar.getLocationOnScreen(location)
+                        toolbarY = (location[1] + toolbar.height).toFloat()
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.Black.copy(alpha = 0.4f))
+                            .clickable(
+                                interactionSource = null,
+                                indication = null,
+                                onClick = { closeTooltip() },
+                            )
+                            .semantics {
+                                invisibleToUser()
+                            },
+                    ) {
+                        Layout(
+                            content = {
+                                FiltersTooltip(
+                                    onClickClose = { closeTooltip() },
+                                    modifier = Modifier.widthIn(max = 326.dp).padding(horizontal = 16.dp),
+                                )
+                            },
+                            modifier = Modifier,
+                            measurePolicy = MeasurePolicy { measures, constraints ->
+                                val tooltip = measures[0].measure(constraints)
+                                val parentWidth = constraints.maxWidth
+                                val horizontalOffset = parentWidth - tooltip.width
+
+                                layout(tooltip.width, tooltip.height) {
+                                    tooltip.place(
+                                        x = horizontalOffset,
+                                        y = toolbarY.toInt(),
+                                    )
+                                }
+                            },
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun closeTooltip() {
+        binding?.tooltipComposeView?.isVisible = false
+        viewModel.onTooltipClosed()
     }
 
     override fun scrollToTop() {

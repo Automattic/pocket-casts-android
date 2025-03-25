@@ -114,4 +114,8 @@ class FiltersFragmentViewModel @Inject constructor(
             }
         }
     }
+
+    fun onTooltipClosed() {
+        settings.showEmptyFiltersListTooltip.set(false, updateModifiedAt = false)
+    }
 }
