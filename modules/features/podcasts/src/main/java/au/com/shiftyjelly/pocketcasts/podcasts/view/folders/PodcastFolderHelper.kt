@@ -42,7 +42,9 @@ object PodcastFolderHelper {
         }
         val podcastComparator: Comparator<PodcastFolder>? = when (sortType) {
             PodcastsSortType.DATE_ADDED_NEWEST_TO_OLDEST -> addDateComparator
-            PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST -> null
+            PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST,
+            PodcastsSortType.RECENTLY_PLAYED,
+            -> null
             else -> aToZComparator
         }
         val comparator = if (podcastComparator == null) folderComparator else folderComparator.then(podcastComparator)

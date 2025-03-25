@@ -154,6 +154,7 @@ class FolderEditViewModel
             PodcastsSortType.DATE_ADDED_NEWEST_TO_OLDEST -> podcasts.sortedWith(compareBy { it.addedDate })
             PodcastsSortType.DRAG_DROP -> podcasts.sortedWith(compareBy { it.sortPosition })
             PodcastsSortType.NAME_A_TO_Z -> podcasts.sortedWith(compareBy { PodcastsSortType.cleanStringForSort(it.title) })
+            PodcastsSortType.RECENTLY_PLAYED -> podcastsSortedByReleaseDate // TODO: Feature.PODCASTS_SORT_CHANGES - sort by recently played
         }
     }
 

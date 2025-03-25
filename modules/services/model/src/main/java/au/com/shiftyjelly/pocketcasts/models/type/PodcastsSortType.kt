@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.models.type
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
+import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType.entries
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonReader
@@ -38,6 +39,15 @@ enum class PodcastsSortType(
         podcastComparator = Comparator { _, _ -> 0 },
         folderComparator = Comparator { _, _ -> 0 },
         analyticsValue = "episode_release_date",
+    ),
+    RECENTLY_PLAYED(
+        clientId = 7,
+        serverId = 4,
+        labelId = R.string.podcasts_sort_by_recently_played,
+        // use a query to get the podcasts ordered by recently played episodes
+        podcastComparator = Comparator { _, _ -> 0 },
+        folderComparator = Comparator { _, _ -> 0 },
+        analyticsValue = "episode_recently_played",
     ),
     NAME_A_TO_Z(
         clientId = 2,
