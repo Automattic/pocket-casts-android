@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,6 +17,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionIconForTier
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
@@ -47,9 +47,8 @@ fun ChaptersHeader(
         showSubscriptionIcon = showSubscriptionIcon,
         onClick = { onSkipChaptersClick(!isTogglingChapters) },
     )
-    Divider(
+    HorizontalDivider(
         color = LocalChaptersTheme.current.divider,
-        thickness = 1.dp,
     )
 }
 

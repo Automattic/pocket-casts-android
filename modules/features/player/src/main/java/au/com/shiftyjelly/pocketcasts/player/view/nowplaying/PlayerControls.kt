@@ -11,11 +11,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.LocalRippleConfiguration
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.RippleConfiguration
-import androidx.compose.material.RippleDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LocalRippleConfiguration
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RippleConfiguration
+import androidx.compose.material3.RippleDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -83,7 +83,6 @@ fun PlayerControls(
     )
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun Content(
     playerControlsData: PlayerControlsData,
@@ -134,7 +133,7 @@ private fun Content(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun SkipButton(
     modifier: Modifier = Modifier,
@@ -161,7 +160,7 @@ private fun SkipButton(
         LocalRippleConfiguration provides
             RippleConfiguration(
                 color = Color.White,
-                rippleAlpha = RippleDefaults.rippleAlpha(Color.White, true),
+                rippleAlpha = RippleDefaults.RippleAlpha,
             ),
     ) {
         Box(

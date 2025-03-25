@@ -29,7 +29,7 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.compose.activity)
     implementation(libs.compose.animation)
-    implementation(libs.compose.material)
+    implementation(libs.compose.material3)
     implementation(libs.compose.material.icons.extended)
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.tooling.preview)

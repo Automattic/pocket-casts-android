@@ -8,9 +8,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -107,7 +108,7 @@ private fun TrialFinishedFooter(
     modifier: Modifier = Modifier,
 ) {
     Card(
-        elevation = 8.dp,
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         modifier = modifier.fillMaxWidth(),
     ) {
         Column(
@@ -127,7 +128,7 @@ private fun TrialFinishedFooter(
                 border = null,
                 fullWidth = false,
                 colors = ButtonDefaults.outlinedButtonColors(
-                    backgroundColor = Color.Transparent,
+                    containerColor = Color.Transparent,
                     contentColor = MaterialTheme.theme.colors.primaryInteractive01,
                 ),
                 modifier = Modifier.padding(vertical = 8.dp),
@@ -140,7 +141,7 @@ private fun TrialFinishedFooter(
                 fontSize = 18.sp,
                 textColor = MaterialTheme.theme.colors.primaryInteractive02,
                 colors = ButtonDefaults.buttonColors(
-                    backgroundColor = MaterialTheme.theme.colors.primaryInteractive01,
+                    containerColor = MaterialTheme.theme.colors.primaryInteractive01,
                 ),
                 modifier = Modifier.padding(top = 16.dp),
             )

@@ -36,12 +36,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.material.AppBarDefaults
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ripple
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -86,6 +87,7 @@ import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HelpPage(
     activity: Activity,
@@ -93,7 +95,7 @@ fun HelpPage(
     onShowStatusPage: () -> Unit,
     onGoBack: () -> Unit,
     modifier: Modifier = Modifier,
-    appBarInsets: WindowInsets = AppBarDefaults.topAppBarWindowInsets,
+    appBarInsets: WindowInsets = TopAppBarDefaults.windowInsets,
     viewModel: HelpViewModel = hiltViewModel(),
     onWebViewCreated: (WebView) -> Unit = {},
     onWebViewDisposed: (WebView) -> Unit = {},

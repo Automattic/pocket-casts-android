@@ -4,8 +4,9 @@ import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
@@ -36,7 +37,7 @@ fun PodcastCover(
 fun RectangleCover(
     coverWidth: Dp,
     modifier: Modifier = Modifier,
-    backgroundColor: Color = MaterialTheme.colors.surface,
+    backgroundColor: Color = MaterialTheme.colorScheme.surface,
     @DrawableRes imageResId: Int? = null,
     cornerRadius: Dp? = null,
     coverSize: CoverSize = CoverSize.BIG,
@@ -44,9 +45,13 @@ fun RectangleCover(
     val elevation = if (coverSize == CoverSize.SMALL) 4.dp else 8.dp
     val cornerRadiusSize = cornerRadius ?: if (coverSize == CoverSize.SMALL) 4.dp else 8.dp
     Card(
-        elevation = elevation,
+        colors = CardDefaults.cardColors(
+            containerColor = backgroundColor,
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = elevation,
+        ),
         shape = RoundedCornerShape(cornerRadiusSize),
-        backgroundColor = backgroundColor,
         modifier = modifier.size(coverWidth),
     ) {
         imageResId?.let {

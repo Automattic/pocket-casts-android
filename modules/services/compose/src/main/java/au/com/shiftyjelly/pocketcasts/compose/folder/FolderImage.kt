@@ -16,9 +16,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.LocalTextStyle
-import androidx.compose.material.Text
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -67,9 +68,13 @@ fun FolderImage(
     ) {
         val constraints = this
         Card(
-            elevation = 1.dp,
             shape = RoundedCornerShape(4.dp),
-            backgroundColor = color,
+            colors = CardDefaults.cardColors(
+                containerColor = color,
+            ),
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = 1.dp,
+            ),
             modifier = Modifier
                 .fillMaxSize()
                 .aspectRatio(1f),
@@ -187,20 +192,25 @@ private fun FolderPodcastImage(
                 maxWidth <= 200.dp -> 2.dp
                 else -> 4.dp
             }
+            val boxMaxWidth = maxWidth
             Card(
-                elevation = elevation,
                 shape = RoundedCornerShape(corners),
-                backgroundColor = color,
+                colors = CardDefaults.cardColors(
+                    containerColor = color,
+                ),
+                elevation = CardDefaults.cardElevation(
+                    defaultElevation = elevation,
+                ),
                 modifier = modifier,
             ) {
                 Box(
                     modifier = Modifier
-                        .size(maxWidth)
+                        .size(boxMaxWidth)
                         .background(brush = Brush.verticalGradient(colors = gradientColor)),
                 ) {}
                 Box(
                     modifier = Modifier
-                        .size(maxWidth)
+                        .size(boxMaxWidth)
                         .background(color = Color(0x19000000)),
                 ) {}
             }

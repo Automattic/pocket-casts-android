@@ -25,10 +25,10 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.LinearProgressIndicator
-import androidx.compose.material.ripple
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -331,7 +331,7 @@ private fun ErrorMessage(
         Button(
             onClick = onRetry,
             shape = RoundedCornerShape(20.dp),
-            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFEEB1F4)),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEEB1F4)),
             modifier = Modifier.padding(top = 20.dp),
         ) {
             TextP40(

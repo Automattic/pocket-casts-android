@@ -37,9 +37,9 @@ fun PodcastControlButtonsStyled(
     pauseIcon: ImageVector = Icons.Default.Pause,
     seekIconSize: Dp = 30.dp,
     seekIconAlign: Alignment.Horizontal = Alignment.Start,
-    progressColor: Color = MaterialTheme.colors.primary,
-    trackColor: Color = MaterialTheme.colors.onSurface.copy(alpha = 0.10f),
-    backgroundColor: Color = MaterialTheme.colors.onBackground.copy(alpha = 0.10f),
+    progressColor: Color = MaterialTheme.colorScheme.primary,
+    trackColor: Color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.10f),
+    backgroundColor: Color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.10f),
     sidePadding: Dp = 17.dp,
 ) {
     ControlButtonLayoutStyled(

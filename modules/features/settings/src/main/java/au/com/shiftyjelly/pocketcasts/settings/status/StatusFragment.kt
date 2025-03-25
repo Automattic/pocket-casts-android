@@ -15,15 +15,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.AppBarDefaults
-import androidx.compose.material.Button
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
@@ -77,11 +78,12 @@ class StatusFragment : BaseFragment() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StatusPage(
     bottomInset: Dp,
     onBackPressed: () -> Unit,
-    appBarInsets: WindowInsets = AppBarDefaults.topAppBarWindowInsets,
+    appBarInsets: WindowInsets = TopAppBarDefaults.windowInsets,
     viewModel: StatusViewModel = hiltViewModel(),
 ) {
     LazyColumn(
@@ -110,7 +112,7 @@ fun StatusPageContent(viewModel: StatusViewModel) {
         Text(
             text = stringResource(LR.string.settings_status_description),
             color = MaterialTheme.theme.colors.primaryText01,
-            style = MaterialTheme.typography.body1.copy(lineHeight = 20.sp),
+            style = MaterialTheme.typography.bodyLarge.copy(lineHeight = 20.sp),
             modifier = Modifier.padding(bottom = 16.dp),
         )
         when (val state = viewModel.uiState.collectAsState().value) {
@@ -212,7 +214,7 @@ fun ServiceStatusRow(title: String, summary: String, help: String, status: Servi
         Column {
             Text(
                 text = title,
-                style = MaterialTheme.typography.h6,
+                style = MaterialTheme.typography.headlineMedium,
                 color = MaterialTheme.theme.colors.primaryText01,
             )
             if (status is ServiceStatus.Failed) {
@@ -220,19 +222,19 @@ fun ServiceStatusRow(title: String, summary: String, help: String, status: Servi
                     Text(
                         text = status.userMessage,
                         color = MaterialTheme.theme.colors.support05,
-                        style = MaterialTheme.typography.body1.copy(lineHeight = 20.sp),
+                        style = MaterialTheme.typography.bodyLarge.copy(lineHeight = 20.sp),
                     )
                 }
                 Text(
                     text = help,
                     color = MaterialTheme.theme.colors.primaryText02,
-                    style = MaterialTheme.typography.body1.copy(lineHeight = 20.sp),
+                    style = MaterialTheme.typography.bodyLarge.copy(lineHeight = 20.sp),
                 )
             } else {
                 Text(
                     text = summary,
                     color = MaterialTheme.theme.colors.primaryText02,
-                    style = MaterialTheme.typography.body1.copy(lineHeight = 20.sp),
+                    style = MaterialTheme.typography.bodyLarge.copy(lineHeight = 20.sp),
                 )
             }
         }

@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.player.view.transcripts
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.fadeIn
@@ -19,19 +18,19 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.LocalRippleConfiguration
-import androidx.compose.material.RippleConfiguration
-import androidx.compose.material.Text
-import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.ripple.RippleAlpha
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalRippleConfiguration
+import androidx.compose.material3.RippleConfiguration
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -181,7 +180,7 @@ fun TranscriptPageWrapper(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TranscriptToolbar(
     onCloseClick: () -> Unit,
@@ -274,10 +273,10 @@ fun TranscriptToolbar(
                             disabledTrailingIconColor = SearchBarIconColor.copy(alpha = 0.7f),
                             placeholderColor = SearchBarPlaceholderColor,
                         ),
-                        contentPadding = TextFieldDefaults.textFieldWithoutLabelPadding(
+                        contentPadding = TextFieldDefaults.contentPaddingWithoutLabel(
+                            start = 0.dp,
                             top = 0.dp,
                             bottom = 0.dp,
-                            start = 0.dp,
                         ),
                     )
                 }
@@ -364,7 +363,7 @@ private fun SearchBarTrailingIcons(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 private val ToolbarRippleConfiguration = RippleConfiguration(
     color = Color.White,
     rippleAlpha = RippleAlpha(

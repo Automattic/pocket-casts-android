@@ -89,14 +89,14 @@ private fun EmptyQueueState() {
         Text(
             text = stringResource(LR.string.player_up_next_empty),
             textAlign = TextAlign.Center,
-            color = MaterialTheme.colors.onPrimary,
+            color = MaterialTheme.colorScheme.onPrimary,
             style = MaterialTheme.typography.title2,
         )
         Spacer(Modifier.height(8.dp))
         Text(
             text = stringResource(LR.string.player_up_next_empty_desc_watch),
             textAlign = TextAlign.Center,
-            color = MaterialTheme.colors.onPrimary,
+            color = MaterialTheme.colorScheme.onPrimary,
             style = MaterialTheme.typography.body1,
         )
     }

@@ -44,7 +44,7 @@ fun ObtainConfirmationScreen(
             TextH30(
                 text = text,
                 textAlign = TextAlign.Center,
-                color = MaterialTheme.colors.onPrimary,
+                color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
                     .fillMaxWidth(),
@@ -61,7 +61,7 @@ fun ObtainConfirmationScreen(
                     Box(
                         contentAlignment = Alignment.Center,
                         modifier = Modifier
-                            .background(color = MaterialTheme.colors.surface)
+                            .background(color = MaterialTheme.colorScheme.surface)
                             .clip(CircleShape)
                             .fillMaxSize(),
                     ) {

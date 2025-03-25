@@ -14,14 +14,15 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material.AppBarDefaults
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CopyAll
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.VerticalAlignBottom
 import androidx.compose.material.icons.filled.VerticalAlignTop
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -83,10 +84,11 @@ class LogsFragment : BaseFragment() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LogsPage(
     bottomInset: Dp,
-    appBarInsets: WindowInsets = AppBarDefaults.topAppBarWindowInsets,
+    appBarInsets: WindowInsets = TopAppBarDefaults.windowInsets,
     onBackPressed: () -> Unit,
 ) {
     val viewModel = hiltViewModel<LogsViewModel>()
@@ -238,6 +240,7 @@ private fun AppBarWithShare(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview
 private fun LogsContentPreview(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
@@ -253,11 +256,12 @@ private fun LogsContentPreview(@PreviewParameter(ThemePreviewParameterProvider::
             ),
             includeAppBar = true,
             bottomInset = 0.dp,
-            appBarInsets = AppBarDefaults.topAppBarWindowInsets,
+            appBarInsets = TopAppBarDefaults.windowInsets,
         )
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview
 private fun LogsContentLoadingPreview(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
@@ -269,7 +273,7 @@ private fun LogsContentLoadingPreview(@PreviewParameter(ThemePreviewParameterPro
             logLines = emptyList(),
             includeAppBar = true,
             bottomInset = 0.dp,
-            appBarInsets = AppBarDefaults.topAppBarWindowInsets,
+            appBarInsets = TopAppBarDefaults.windowInsets,
         )
     }
 }

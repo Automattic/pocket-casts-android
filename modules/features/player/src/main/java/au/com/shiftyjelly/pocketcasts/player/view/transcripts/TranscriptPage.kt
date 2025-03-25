@@ -19,11 +19,11 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Text
-import androidx.compose.material.pullrefresh.PullRefreshIndicator
-import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
+import androidx.compose.material3.pulltorefresh.pullToRefresh
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -87,7 +87,7 @@ import com.kevinnzou.web.rememberWebViewNavigator
 import com.kevinnzou.web.rememberWebViewState
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-@kotlin.OptIn(ExperimentalMaterialApi::class)
+@kotlin.OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TranscriptPage(
     shelfSharedViewModel: ShelfSharedViewModel,
@@ -101,16 +101,18 @@ fun TranscriptPage(
     val transitionState by shelfSharedViewModel.transitionState.collectAsStateWithLifecycle(null)
     val searchState by searchViewModel.searchState.collectAsStateWithLifecycle()
     val refreshing by transcriptViewModel.isRefreshing.collectAsStateWithLifecycle()
-    val pullRefreshState = rememberPullRefreshState(refreshing, {
-        transcriptViewModel.parseAndLoadTranscript(pulledToRefresh = true)
-    })
+    val pullRefreshState = rememberPullToRefreshState()
     val playerBackgroundColor = Color(theme.playerBackgroundColor(uiState.podcastAndEpisode?.podcast))
     val colors = TranscriptColors(playerBackgroundColor)
 
     Box(
         modifier = modifier
             .fillMaxSize()
-            .pullRefresh(pullRefreshState),
+            .pullToRefresh(
+                isRefreshing = refreshing,
+                state = pullRefreshState,
+                onRefresh = { transcriptViewModel.parseAndLoadTranscript(pulledToRefresh = true) },
+            ),
     ) {
         when (transcriptState) {
             is TranscriptState.Empty -> {
@@ -135,12 +137,10 @@ fun TranscriptPage(
                     showPaywall = uiState.showPaywall,
                 )
 
-                PullRefreshIndicator(
-                    refreshing = refreshing,
-                    state = pullRefreshState,
-                    backgroundColor = TranscriptColors.contentColor(),
-                    contentColor = TranscriptColors.iconColor(),
+                Indicator(
                     modifier = Modifier.align(Alignment.TopCenter),
+                    isRefreshing = refreshing,
+                    state = pullRefreshState,
                 )
             }
 

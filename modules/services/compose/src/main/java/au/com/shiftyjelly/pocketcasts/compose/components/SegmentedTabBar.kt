@@ -10,15 +10,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.LocalMinimumInteractiveComponentEnforcement
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedButton
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -37,7 +34,6 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SegmentedTabBar(
     items: List<String>,
@@ -60,19 +56,19 @@ fun SegmentedTabBar(
             horizontalArrangement = Arrangement.Absolute.SpaceBetween,
         ) {
             items.forEachIndexed { index, text ->
-                CompositionLocalProvider(
-                    LocalMinimumInteractiveComponentEnforcement provides false,
-                ) {
-                    SegmentedTab(
-                        isSelected = selectedIndex == index,
-                        text = text,
-                        textStyle = textStyle,
-                        colors = colors,
-                        onItemSelected = {
-                            onItemSelected(index)
-                        },
-                    )
-                }
+//                CompositionLocalProvider(
+//                    androidx.compose.material3.LocalMinimumInteractiveComponentEnforcement provides false,
+//                ) {
+                SegmentedTab(
+                    isSelected = selectedIndex == index,
+                    text = text,
+                    textStyle = textStyle,
+                    colors = colors,
+                    onItemSelected = {
+                        onItemSelected(index)
+                    },
+                )
+//                }
             }
         }
     }
@@ -90,7 +86,7 @@ private fun RowScope.SegmentedTab(
         shape = RectangleShape,
         border = null,
         colors = ButtonDefaults.buttonColors(
-            backgroundColor = if (isSelected) colors.selectedTabBackgroundColor else colors.unSelectedTabBackgroundColor,
+            containerColor = if (isSelected) colors.selectedTabBackgroundColor else colors.unSelectedTabBackgroundColor,
         ),
         onClick = onItemSelected,
         modifier = Modifier.Companion
@@ -102,7 +98,7 @@ private fun RowScope.SegmentedTab(
         Text(
             text = text,
             color = if (isSelected) colors.selectedTabTextColor else colors.unSelectedTabTextColor,
-            style = MaterialTheme.typography.button,
+            style = MaterialTheme.typography.labelLarge,
             fontSize = textStyle.fontSize,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,

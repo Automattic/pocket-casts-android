@@ -190,7 +190,7 @@
     <color name="colorMessageStrokeLight">#DCE1E4</color>
     <color name="colorIconMessageLight">#B8C3C9</color>
 
-    <style name="ThemeBaseLight" parent="Theme.MaterialComponents.Light.NoActionBar" tools:ignore="NewApi">
+    <style name="ThemeBaseLight" parent="Theme.Material3.Light.NoActionBar" tools:ignore="NewApi">
         <item name="preferenceTheme">@style/AppPreferenceTheme</item>
         <item name="isDark">false</item>
         <item name="isImageTintEnabled">false</item>
@@ -402,7 +402,7 @@
     <color name="colorMessageStrokeDark">#979797</color>
     <color name="colorIconMessageDark">#626262</color>
 
-    <style name="ThemeBaseDark" parent="Theme.MaterialComponents.NoActionBar" tools:ignore="NewApi">
+    <style name="ThemeBaseDark" parent="Theme.Material3.Dark.NoActionBar" tools:ignore="NewApi">
         <item name="preferenceTheme">@style/AppPreferenceTheme</item>
         <item name="toolbarTheme">@style/DarkToolbarTheme</item>
         <item name="isDark">true</item>

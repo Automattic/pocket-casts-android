@@ -6,8 +6,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -110,7 +111,9 @@ private fun FolderEditColorForm(
                 )
             }
             // only elevate the bottom button if the content will go under it
-            Card(elevation = if (maxHeight > 600.dp) 0.dp else 6.dp) {
+            Card(
+                elevation = CardDefaults.cardElevation(defaultElevation = if (maxHeight > 600.dp) 0.dp else 6.dp),
+            ) {
                 RowButton(
                     text = stringResource(LR.string.save_folder),
                     onClick = { onSaveClick() },
@@ -136,7 +139,9 @@ private fun FolderPreview(layout: PodcastGridLayoutType, name: String, colorId: 
         else -> {
             Card(
                 modifier = modifier.padding(all = 16.dp),
-                elevation = 4.dp,
+                elevation = CardDefaults.cardElevation(
+                    defaultElevation = 4.dp,
+                ),
             ) {
                 FolderImage(
                     name = name,

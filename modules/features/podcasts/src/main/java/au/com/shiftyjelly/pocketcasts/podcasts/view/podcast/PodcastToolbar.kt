@@ -14,13 +14,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.AppBarDefaults
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.LocalRippleConfiguration
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.RippleConfiguration
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LocalRippleConfiguration
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RippleConfiguration
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -51,7 +51,7 @@ import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun PodcastToolbar(
     title: String,
@@ -122,9 +122,11 @@ internal fun PodcastToolbar(
                     )
                 }
             },
-            backgroundColor = colors.backgroundColor,
-            elevation = 0.dp,
-            windowInsets = AppBarDefaults.topAppBarWindowInsets,
+            colors = TopAppBarDefaults.topAppBarColors().copy(
+                containerColor = colors.backgroundColor,
+            ),
+            scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(),
+            windowInsets = TopAppBarDefaults.windowInsets,
             modifier = modifier.fillMaxWidth(),
         )
     }

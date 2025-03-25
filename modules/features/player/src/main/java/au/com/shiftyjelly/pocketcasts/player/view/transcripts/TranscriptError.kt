@@ -8,9 +8,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Icon
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -88,7 +88,7 @@ fun TranscriptError(
             onClick = onRetry,
             modifier = Modifier.padding(top = 16.dp),
             shape = RoundedCornerShape(40.dp),
-            colors = ButtonDefaults.buttonColors(backgroundColor = TranscriptColors.contentColor()),
+            colors = ButtonDefaults.buttonColors(containerColor = TranscriptColors.contentColor()),
         ) {
             TextP40(
                 text = stringResource(LR.string.try_again),

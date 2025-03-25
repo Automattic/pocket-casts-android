@@ -11,8 +11,8 @@ fun LoadingSpinner(
     modifier: Modifier = Modifier,
 ) {
     CircularProgressIndicator(
-        indicatorColor = MaterialTheme.colors.onPrimary.copy(alpha = 0.9f),
-        trackColor = MaterialTheme.colors.onBackground.copy(alpha = 0.1f),
+        indicatorColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.9f),
+        trackColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f),
         strokeWidth = 5.dp,
         modifier = modifier,
     )

@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.player.view.transcripts
 
 import android.content.res.Configuration
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration

@@ -102,15 +102,15 @@ private fun Content(
             backgroundImageScrimBrush = if (episode != null) {
                 Brush.linearGradient(
                     colors = listOf(
-                        MaterialTheme.colors.surface,
-                        MaterialTheme.colors.surface.copy(alpha = 0f),
+                        MaterialTheme.colorScheme.surface,
+                        MaterialTheme.colorScheme.surface.copy(alpha = 0f),
                     ),
                 )
             } else {
-                SolidColor(MaterialTheme.colors.surface)
+                SolidColor(MaterialTheme.colorScheme.surface)
             },
-            contentColor = MaterialTheme.colors.onPrimary,
-            secondaryContentColor = MaterialTheme.colors.onSecondary,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
+            secondaryContentColor = MaterialTheme.colorScheme.onSecondary,
         ),
         onClick = onClick,
         modifier = Modifier

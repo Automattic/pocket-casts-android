@@ -69,7 +69,7 @@ fun ExpandableText(
 
         if (showCollapsedState) {
             val gradientBrush = Brush.verticalGradient(
-                listOf(Color.Transparent, MaterialTheme.colors.background),
+                listOf(Color.Transparent, MaterialTheme.colorScheme.background),
             )
             Box(
                 Modifier

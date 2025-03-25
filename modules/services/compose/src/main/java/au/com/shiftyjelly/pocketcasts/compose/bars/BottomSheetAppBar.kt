@@ -4,8 +4,9 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.only
-import androidx.compose.material.AppBarDefaults
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
@@ -17,11 +18,12 @@ import com.airbnb.android.showkase.annotation.ShowkaseComposable
 /**
  * A styled App Bar that works in a Bottom Sheet component. It keeps the page background one color.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BottomSheetAppBar(
     title: String? = null,
     navigationButton: NavigationButton = NavigationButton.Back,
-    windowInsets: WindowInsets = AppBarDefaults.topAppBarWindowInsets.only(WindowInsetsSides.Horizontal),
+    windowInsets: WindowInsets = TopAppBarDefaults.windowInsets.only(WindowInsetsSides.Horizontal),
     actions: @Composable RowScope.(Color) -> Unit = {},
     onNavigationClick: () -> Unit,
 ) {

@@ -30,9 +30,9 @@ fun PlayPauseProgressButtonStyled(
     iconSize: Dp = 30.dp,
     tapTargetSize: DpSize = DpSize(60.dp, 60.dp),
     progressStrokeWidth: Dp = 4.dp,
-    progressColor: Color = MaterialTheme.colors.primary,
-    trackColor: Color = MaterialTheme.colors.onSurface.copy(alpha = 0.10f),
-    backgroundColor: Color = MaterialTheme.colors.onBackground.copy(alpha = 0.10f),
+    progressColor: Color = MaterialTheme.colorScheme.primary,
+    trackColor: Color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.10f),
+    backgroundColor: Color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.10f),
     playIcon: ImageVector = Icons.Default.PlayArrow,
     pauseIcon: ImageVector = Icons.Default.Pause,
 ) {

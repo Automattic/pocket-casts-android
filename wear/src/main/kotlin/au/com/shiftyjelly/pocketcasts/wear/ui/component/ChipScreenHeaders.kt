@@ -61,7 +61,7 @@ private fun Header(
 ) {
     Text(
         text = text,
-        color = textColor ?: MaterialTheme.colors.onSecondary,
+        color = textColor ?: MaterialTheme.colorScheme.onSecondary,
         textAlign = TextAlign.Center,
         style = MaterialTheme.typography.button,
         modifier = modifier.fillMaxWidth(),

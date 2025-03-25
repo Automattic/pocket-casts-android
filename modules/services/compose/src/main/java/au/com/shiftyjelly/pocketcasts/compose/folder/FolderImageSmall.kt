@@ -12,7 +12,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,9 +41,13 @@ fun FolderImageSmall(
     podcastImageSize: Dp = PodcastImageSize,
 ) {
     Card(
-        elevation = 2.dp,
         shape = RoundedCornerShape(4.dp),
-        backgroundColor = color,
+        colors = CardDefaults.cardColors(
+            containerColor = color,
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 2.dp,
+        ),
         modifier = modifier.size(folderImageSize),
     ) {
         Box(
@@ -108,20 +113,25 @@ private fun FolderPodcastImage(
 ) {
     if (uuid == null) {
         BoxWithConstraints(modifier) {
+            val boxMaxWidth = maxWidth
             Card(
-                elevation = 1.dp,
                 shape = RoundedCornerShape(3.dp),
-                backgroundColor = color,
+                colors = CardDefaults.cardColors(
+                    containerColor = color,
+                ),
+                elevation = CardDefaults.cardElevation(
+                    defaultElevation = 1.dp,
+                ),
                 modifier = Modifier.fillMaxSize(),
             ) {
                 Box(
                     modifier = Modifier
-                        .size(maxWidth)
+                        .size(boxMaxWidth)
                         .background(brush = Brush.verticalGradient(colors = gradientColor)),
                 ) {}
                 Box(
                     modifier = Modifier
-                        .size(maxWidth)
+                        .size(boxMaxWidth)
                         .background(color = Color(0x19000000)),
                 ) {}
             }

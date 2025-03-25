@@ -9,9 +9,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,8 +37,12 @@ fun PodcastInfoView(
 ) {
     Card(
         shape = RoundedCornerShape(8.dp),
-        elevation = 0.dp,
-        backgroundColor = MaterialTheme.theme.colors.primaryUi02,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.theme.colors.primaryUi02,
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 0.dp,
+        ),
         modifier = Modifier
             .border(
                 width = 1.dp,

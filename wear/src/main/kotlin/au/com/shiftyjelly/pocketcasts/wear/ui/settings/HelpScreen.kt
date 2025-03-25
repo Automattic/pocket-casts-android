@@ -60,7 +60,7 @@ private fun ScalingLazyListScope.phoneAvailableContent(
             text = stringResource(id = LR.string.settings_help_contact_support_wear_requires_nearby_phone),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.caption3,
-            color = MaterialTheme.colors.onSecondary,
+            color = MaterialTheme.colorScheme.onSecondary,
         )
     }
 

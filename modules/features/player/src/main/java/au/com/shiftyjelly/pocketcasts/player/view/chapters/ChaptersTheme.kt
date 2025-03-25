@@ -1,8 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.player.view.chapters
 
-import androidx.compose.material.CheckboxColors
-import androidx.compose.material.CheckboxDefaults
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.CheckboxColors
+import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
@@ -27,13 +27,14 @@ fun ChaptersTheme(
         chapterTogglingSelected = MaterialTheme.theme.colors.primaryText01,
         chapterTogglingDeselected = MaterialTheme.theme.colors.primaryText02.copy(alpha = 0.4f),
         checkbox = CheckboxDefaults.colors(
-            checkedColor = MaterialTheme.colors.secondary,
-            uncheckedColor = MaterialTheme.colors.onSurface.copy(alpha = 0.6f),
-            disabledColor = MaterialTheme.colors.secondary.copy(alpha = 0.6f),
+            checkedColor = MaterialTheme.colorScheme.secondary,
+            uncheckedColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+            disabledCheckedColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.6f),
+            disabledUncheckedColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.6f),
         ),
-        progress = MaterialTheme.colors.primary.copy(alpha = 0.4f),
-        progressBackground = MaterialTheme.colors.secondary.copy(alpha = 0.2f),
-        linkIconBackground = MaterialTheme.colors.secondary.copy(alpha = 0.2f),
+        progress = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
+        progressBackground = MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f),
+        linkIconBackground = MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f),
     )
     ChaptersTheme(chaptersTheme, content)
 }
@@ -56,7 +57,8 @@ fun ChaptersThemeForPlayer(
         checkbox = CheckboxDefaults.colors(
             checkedColor = MaterialTheme.theme.colors.playerContrast01,
             uncheckedColor = MaterialTheme.theme.colors.playerContrast02,
-            disabledColor = MaterialTheme.theme.colors.playerContrast02,
+            disabledCheckedColor = MaterialTheme.theme.colors.playerContrast02,
+            disabledUncheckedColor = MaterialTheme.theme.colors.playerContrast02,
         ),
         progress = MaterialTheme.theme.colors.playerContrast05,
         progressBackground = MaterialTheme.theme.colors.playerContrast06,

@@ -1,19 +1,19 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.ui
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Text
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
@@ -107,12 +107,10 @@ internal fun OutlinedEoyButton(
         text = text,
         fontSize = 18.nonScaledSp,
         colors = ButtonDefaults.outlinedButtonColors(
-            backgroundColor = Color.Transparent,
+            containerColor = Color.Transparent,
             contentColor = colorResource(UR.color.coolgrey_90),
         ),
-        border = ButtonDefaults.outlinedBorder.copy(
-            brush = SolidColor(colorResource(UR.color.coolgrey_90)),
-        ),
+        border = BorderStroke(2.dp, colorResource(UR.color.coolgrey_90)),
         onClick = onClick,
         includePadding = false,
         modifier = modifier.padding(horizontal = 24.dp, vertical = 16.dp),

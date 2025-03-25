@@ -1,10 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.compose.buttons
 
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -92,7 +92,7 @@ private fun CircleIconButtonPreview() {
         size = 50.dp,
         icon = Icons.Default.Add,
         contentDescription = "Add",
-        backgroundColor = MaterialTheme.colors.primary,
+        backgroundColor = MaterialTheme.colorScheme.primary,
         onClick = {},
     )
 }

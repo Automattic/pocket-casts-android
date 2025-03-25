@@ -55,7 +55,7 @@ dependencies {
     implementation(libs.androidx.webkit)
     implementation(libs.compose.animation)
     implementation(libs.compose.livedata)
-    implementation(libs.compose.material)
+    implementation(libs.compose.material3)
     implementation(libs.compose.material.icons.core)
     implementation(libs.compose.material3.window.size)
     implementation(libs.compose.ui)

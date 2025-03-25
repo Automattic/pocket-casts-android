@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -76,7 +76,7 @@ class LicensesFragment : BaseFragment() {
                 showVersion = false,
                 showLicenseBadges = true,
                 colors = LibraryDefaults.libraryColors(
-                    backgroundColor = MaterialTheme.colors.background,
+                    backgroundColor = MaterialTheme.colorScheme.background,
                     contentColor = MaterialTheme.theme.colors.primaryText01,
                 ),
                 librariesBlock = { context ->

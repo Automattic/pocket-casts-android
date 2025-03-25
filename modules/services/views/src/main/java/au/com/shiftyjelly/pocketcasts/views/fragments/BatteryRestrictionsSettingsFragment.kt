@@ -14,9 +14,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.toggleable
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Switch
-import androidx.compose.material.SwitchDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -217,7 +217,7 @@ private fun Page(
                                 append(learnMoreString)
                             }
                         },
-                        style = MaterialTheme.typography.body1,
+                        style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.theme.colors.primaryText02,
                     )
                 }
@@ -228,7 +228,7 @@ private fun Page(
                             LR.string.settings_battery_update_message,
                             stringResource(LR.string.settings_battery_unrestricted),
                         ),
-                        style = MaterialTheme.typography.body1,
+                        style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.theme.colors.primaryText02,
                         modifier = Modifier.padding(
                             start = startPadding,

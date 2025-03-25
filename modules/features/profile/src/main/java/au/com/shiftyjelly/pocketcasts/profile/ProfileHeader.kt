@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.profile
 
 import android.content.Context
 import android.content.res.Configuration
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -14,9 +15,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedButton
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -136,12 +137,12 @@ fun VerticalProfileHeader(
             )
         }
         OutlinedButton(
-            border = ButtonDefaults.outlinedBorder.copy(
+            border = BorderStroke(
                 brush = SolidColor(MaterialTheme.theme.colors.primaryUi05),
                 width = 2.dp,
             ),
             colors = ButtonDefaults.outlinedButtonColors(
-                backgroundColor = Color.Transparent,
+                containerColor = Color.Transparent,
             ),
             shape = RoundedCornerShape(10.dp),
             onClick = onClick,
@@ -212,12 +213,12 @@ fun HorizontalProfileHeader(
                 )
             }
             OutlinedButton(
-                border = ButtonDefaults.outlinedBorder.copy(
+                border = BorderStroke(
                     brush = SolidColor(MaterialTheme.theme.colors.primaryUi05),
                     width = 2.dp,
                 ),
                 colors = ButtonDefaults.outlinedButtonColors(
-                    backgroundColor = Color.Transparent,
+                    containerColor = Color.Transparent,
                 ),
                 shape = RoundedCornerShape(10.dp),
                 onClick = onClick,

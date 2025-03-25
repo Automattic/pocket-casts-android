@@ -17,7 +17,8 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Card
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
@@ -94,9 +95,13 @@ private fun ReferralsInvalidOfferPageContent(
         }
 
         Card(
-            elevation = 8.dp,
             shape = RoundedCornerShape(pageCornerRadius(showFullScreen)),
-            backgroundColor = Color.Black,
+            colors = CardDefaults.cardColors(
+                containerColor = Color.Black,
+            ),
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = 8.dp,
+            ),
             modifier = pageModifier
                 .clickable(
                     indication = null,

@@ -118,7 +118,7 @@ private fun Content(
             Text(
                 text = stringResource(LR.string.profile_logging_in),
                 textAlign = TextAlign.Center,
-                color = MaterialTheme.colors.onPrimary,
+                color = MaterialTheme.colorScheme.onPrimary,
                 style = MaterialTheme.typography.title2,
             )
         }
@@ -130,12 +130,12 @@ private fun Content(
                     .fillMaxWidth(),
             ) {
                 val widthPx = with(LocalDensity.current) { maxWidth.toPx() }
-                val background = MaterialTheme.colors.background
+                val background = MaterialTheme.colorScheme.background
 
                 if (email != null) {
                     Text(
                         text = email,
-                        color = MaterialTheme.colors.onPrimary,
+                        color = MaterialTheme.colorScheme.onPrimary,
                         style = MaterialTheme.typography.body1,
                         // Turn off softWrap to make sure the text doesn't get truncated if it runs long.
                         // Without this if "xxxx@gmail.com" ran just a bit long, it would get shortened

@@ -33,8 +33,9 @@ import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -318,8 +319,12 @@ private fun FeatureCard(
 ) {
     Card(
         shape = RoundedCornerShape(24.dp),
-        elevation = 8.dp,
-        backgroundColor = Color.White,
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 8.dp,
+        ),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White,
+        ),
         modifier = modifier
             .padding(8.dp)
             .fillMaxWidth(),

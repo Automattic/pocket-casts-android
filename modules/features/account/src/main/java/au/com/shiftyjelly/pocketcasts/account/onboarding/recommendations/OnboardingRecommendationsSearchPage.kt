@@ -15,10 +15,9 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Divider
-import androidx.compose.material.LinearProgressIndicator
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -39,6 +38,7 @@ import au.com.shiftyjelly.pocketcasts.compose.bars.SystemBarsStyles
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.bars.singleAuto
 import au.com.shiftyjelly.pocketcasts.compose.bars.transparent
+import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastItem
 import au.com.shiftyjelly.pocketcasts.compose.components.SearchBar
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
@@ -100,12 +100,12 @@ fun OnboardingRecommendationsSearchPage(
         )
 
         Box(Modifier.height(2.dp)) {
-            Divider(color = MaterialTheme.theme.colors.secondaryUi02)
+            HorizontalDivider(color = MaterialTheme.theme.colors.secondaryUi02)
             if (state.loading && state.results.isNotEmpty()) {
                 // Provide a subtle loading indicator when results are displayed, but being updated
                 LinearProgressIndicator(
                     color = MaterialTheme.theme.colors.secondaryUi01,
-                    backgroundColor = MaterialTheme.theme.colors.secondaryUi02,
+                    trackColor = MaterialTheme.theme.colors.secondaryUi02,
                     modifier = Modifier.matchParentSize(),
                 )
             }

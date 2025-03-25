@@ -64,7 +64,7 @@ fun NotificationScreen(
             TextH30(
                 text = text,
                 textAlign = TextAlign.Center,
-                color = MaterialTheme.colors.onPrimary,
+                color = MaterialTheme.colorScheme.onPrimary,
             )
         }
     }

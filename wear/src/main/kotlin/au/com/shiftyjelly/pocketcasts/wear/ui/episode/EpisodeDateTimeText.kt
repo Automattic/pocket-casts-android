@@ -50,12 +50,12 @@ private fun LayoutContent(
         Text(
             text = "$shortDate • $timeLeft",
             style = MaterialTheme.typography.body2,
-            color = MaterialTheme.colors.onPrimary,
+            color = MaterialTheme.colorScheme.onPrimary,
         )
         Text(
             text = downloadSize,
             style = MaterialTheme.typography.body2,
-            color = MaterialTheme.colors.onPrimary,
+            color = MaterialTheme.colorScheme.onPrimary,
         )
     }
 }

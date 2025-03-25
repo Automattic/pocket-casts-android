@@ -11,10 +11,10 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -117,7 +117,7 @@ fun SuggestedFoldersPage(
                 fontSize = 18.sp,
                 fontWeight = FontWeight.W600,
                 colors = ButtonDefaults.buttonColors(
-                    backgroundColor = MaterialTheme.theme.colors.primaryInteractive01,
+                    containerColor = MaterialTheme.theme.colors.primaryInteractive01,
                 ),
                 includePadding = false,
                 onClick = onActionClick,
@@ -127,7 +127,7 @@ fun SuggestedFoldersPage(
                 text = stringResource(LR.string.suggested_folders_create_custom_folder_button),
                 onClick = onCreateCustomFolderClick,
                 includePadding = false,
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.theme.colors.primaryIcon01, backgroundColor = Color.Transparent),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.theme.colors.primaryIcon01, containerColor = Color.Transparent),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.W600,
                 modifier = Modifier

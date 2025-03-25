@@ -66,7 +66,7 @@ fun WatchListChip(
     icon: (@Composable BoxScope.() -> Unit)? = null,
     secondaryLabel: String? = null,
     colors: ChipColors = ChipDefaults.secondaryChipColors(
-        secondaryContentColor = MaterialTheme.colors.onPrimary,
+        secondaryContentColor = MaterialTheme.colorScheme.onPrimary,
     ),
 ) {
     Chip(
@@ -74,7 +74,7 @@ fun WatchListChip(
             Text(
                 text = title,
                 style = MaterialTheme.typography.button,
-                color = MaterialTheme.colors.onPrimary,
+                color = MaterialTheme.colorScheme.onPrimary,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = if (secondaryLabel != null) 1 else 2,
             )
@@ -86,7 +86,7 @@ fun WatchListChip(
             if (secondaryLabel != null) {
                 Text(
                     text = secondaryLabel,
-                    color = MaterialTheme.colors.onSecondary,
+                    color = MaterialTheme.colorScheme.onSecondary,
                     overflow = TextOverflow.Ellipsis,
                 )
             }

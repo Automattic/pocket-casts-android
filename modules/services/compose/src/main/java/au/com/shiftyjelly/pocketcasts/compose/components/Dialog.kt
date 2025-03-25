@@ -15,11 +15,12 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Card
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.RadioButton
-import androidx.compose.material.TextButton
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -62,8 +63,12 @@ fun DialogFrame(
 ) {
     Dialog(onDismissRequest = onDismissRequest) {
         Card(
-            backgroundColor = MaterialTheme.theme.colors.primaryUi01,
-            elevation = 10.dp,
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.theme.colors.primaryUi01,
+            ),
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = 10.dp,
+            ),
         ) {
             Column {
                 DialogTitle(title)

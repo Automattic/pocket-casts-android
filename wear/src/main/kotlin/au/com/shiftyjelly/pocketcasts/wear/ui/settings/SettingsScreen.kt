@@ -117,7 +117,7 @@ private fun Content(
             Text(
                 text = stringResource(backgroundRefreshStringRes),
                 style = MaterialTheme.typography.caption3,
-                color = MaterialTheme.colors.onSecondary,
+                color = MaterialTheme.colorScheme.onSecondary,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(8.dp),
             )
@@ -235,7 +235,7 @@ fun ToggleChip(
     checked: Boolean,
     onCheckedChanged: (Boolean) -> Unit,
 ) {
-    val color = MaterialTheme.colors.error
+    val color = MaterialTheme.colorScheme.error
     ToggleChip(
         checked = checked,
         onCheckedChanged = { onCheckedChanged(it) },

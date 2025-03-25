@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -41,7 +41,7 @@ class AutomotiveLicensesFragment : Fragment() {
             showVersion = false,
             showLicenseBadges = false,
             colors = LibraryDefaults.libraryColors(
-                backgroundColor = MaterialTheme.colors.background,
+                backgroundColor = MaterialTheme.colorScheme.background,
                 contentColor = MaterialTheme.theme.colors.primaryText01,
             ),
             itemContentPadding = PaddingValues(horizontal = 32.dp, vertical = 16.dp),

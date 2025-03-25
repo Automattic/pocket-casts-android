@@ -11,8 +11,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -78,7 +78,7 @@ fun BottomSheetContent(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colors.background)
+            .background(MaterialTheme.colorScheme.background)
             .padding(ContentPadding),
         contentAlignment = Alignment.TopCenter,
     ) {
@@ -146,7 +146,7 @@ private fun ConfirmButton(
     RowButton(
         text = primaryButton.label,
         colors = ButtonDefaults.buttonColors(
-            backgroundColor = MaterialTheme.theme.colors.primaryText01,
+            containerColor = MaterialTheme.theme.colors.primaryText01,
             contentColor = MaterialTheme.theme.colors.primaryInteractive02,
         ),
         includePadding = false,
@@ -166,7 +166,7 @@ private fun DismissButton(
         text = secondaryButton.label,
         border = OutlinedBorder,
         colors = ButtonDefaults.outlinedButtonColors(
-            backgroundColor = MaterialTheme.theme.colors.primaryUi01,
+            containerColor = MaterialTheme.theme.colors.primaryUi01,
             contentColor = MaterialTheme.theme.colors.primaryText01,
         ),
         includePadding = false,

@@ -4,7 +4,7 @@ import android.text.method.LinkMovementMethod
 import android.view.Gravity
 import android.widget.TextView
 import androidx.annotation.StyleRes
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color

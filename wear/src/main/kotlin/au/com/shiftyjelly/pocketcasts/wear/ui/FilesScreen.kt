@@ -69,7 +69,7 @@ private fun EmptyState() {
         Text(
             text = stringResource(LR.string.profile_cloud_no_files_uploaded),
             textAlign = TextAlign.Center,
-            color = MaterialTheme.colors.onPrimary,
+            color = MaterialTheme.colorScheme.onPrimary,
             style = MaterialTheme.typography.title3,
         )
     }

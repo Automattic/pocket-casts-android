@@ -17,10 +17,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.AppBarDefaults
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -173,7 +174,7 @@ internal fun ProfilePage(
                         onClick = onUpgradeProfileClick,
                         onCloseClick = onCloseUpgradeProfileClick,
                         modifier = Modifier
-                            .background(MaterialTheme.colors.background)
+                            .background(MaterialTheme.colorScheme.background)
                             .fillMaxWidth(),
                     )
                 }
@@ -210,6 +211,7 @@ private fun VerticalSpacer() {
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Toolbar(
     showReferralsIcon: Boolean,
@@ -225,7 +227,7 @@ private fun Toolbar(
         modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.theme.colors.secondaryUi01)
-            .windowInsetsPadding(AppBarDefaults.topAppBarWindowInsets)
+            .windowInsetsPadding(TopAppBarDefaults.windowInsets)
             .height(56.dp)
             .padding(horizontal = horizontalPadding),
     ) {
@@ -316,7 +318,7 @@ private fun MiniPlayerPadding(
 ) {
     Box(
         modifier = Modifier
-            .background(if (isUpgradeBannerVisible) MaterialTheme.colors.background else Color.Transparent)
+            .background(if (isUpgradeBannerVisible) MaterialTheme.colorScheme.background else Color.Transparent)
             .fillMaxWidth()
             .height(padding),
     )

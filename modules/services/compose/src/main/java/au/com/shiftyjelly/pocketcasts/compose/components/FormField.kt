@@ -7,10 +7,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.VisualTransformation
@@ -43,11 +43,11 @@ fun FormField(
         value = value,
         onValueChange = { onValueChange(if (singleLine) it.removeNewLines() else it) },
         isError = isError,
-        colors = TextFieldDefaults.outlinedTextFieldColors(
-            textColor = MaterialTheme.theme.colors.primaryText01,
-            placeholderColor = MaterialTheme.theme.colors.primaryText02,
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedTextColor = MaterialTheme.theme.colors.primaryText01,
+            unfocusedTextColor = MaterialTheme.theme.colors.primaryText02,
             unfocusedBorderColor = if (isError) MaterialTheme.theme.colors.support05 else MaterialTheme.theme.colors.primaryField03,
-            errorTrailingIconColor = MaterialTheme.colors.onSurface.copy(alpha = TextFieldDefaults.IconOpacity), // Keep trailing icon the same color in error states
+            errorTrailingIconColor = MaterialTheme.theme.colors.primaryIcon01.copy(alpha = 0.8f), // Keep trailing icon the same color in error states
         ),
         enabled = enabled,
         placeholder = { Text(placeholder) },

@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.compose.components
 
 import androidx.compose.foundation.text.BasicText
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color

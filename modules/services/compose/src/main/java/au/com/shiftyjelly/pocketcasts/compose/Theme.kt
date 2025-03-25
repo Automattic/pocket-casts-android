@@ -1,10 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.compose
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.background
-import androidx.compose.material.Colors
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
+import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
@@ -26,7 +26,7 @@ fun AppThemeWithBackground(
 ) {
     AppTheme(themeType) {
         // Use surface so Material uses appropraite tinting for icons etc.
-        Surface(color = MaterialTheme.colors.background) {
+        Surface(color = MaterialTheme.colorScheme.background) {
             content()
         }
     }
@@ -42,7 +42,7 @@ fun AppTheme(
 
     CompositionLocalProvider(LocalColors provides theme) {
         MaterialTheme(
-            colors = buildMaterialColors(colors, theme.isLight),
+            colorScheme = buildMaterialColors(colors, theme.isLight),
             content = content,
         )
     }
@@ -70,21 +70,23 @@ fun AutomotiveTheme(content: @Composable () -> Unit) {
     // Increase the size of the fonts on Automotive to match the system
     CompositionLocalProvider(LocalColors provides theme) {
         MaterialTheme(
-            colors = buildMaterialColors(colors = theme.colors, isLight = theme.isLight),
-            typography = typography.copy(
-                h1 = typography.h1.copy(fontSize = 144.sp),
-                h2 = typography.h2.copy(fontSize = 90.sp),
-                h3 = typography.h3.copy(fontSize = 72.sp),
-                h4 = typography.h4.copy(fontSize = 51.sp),
-                h5 = typography.h5.copy(fontSize = 36.sp),
-                h6 = typography.h6.copy(fontSize = 30.sp),
-                body1 = typography.body1.copy(fontSize = 24.sp),
-                body2 = typography.body2.copy(fontSize = 21.sp),
-                subtitle1 = typography.subtitle1.copy(fontSize = 24.sp),
-                subtitle2 = typography.subtitle2.copy(fontSize = 21.sp),
-                button = typography.button.copy(fontSize = 21.sp),
-                caption = typography.caption.copy(fontSize = 18.sp),
-                overline = typography.overline.copy(fontSize = 15.sp),
+            colorScheme = buildMaterialColors(colors = theme.colors, isLight = theme.isLight),
+            typography = Typography(
+                displayLarge = typography.displayLarge.copy(fontSize = 144.sp),
+                displayMedium = typography.displayMedium.copy(fontSize = 90.sp),
+                displaySmall = typography.displaySmall.copy(fontSize = 72.sp),
+                headlineLarge = typography.headlineLarge.copy(fontSize = 51.sp),
+                headlineMedium = typography.headlineMedium.copy(fontSize = 36.sp),
+                headlineSmall = typography.headlineSmall.copy(fontSize = 30.sp),
+                bodyLarge = typography.bodyLarge.copy(fontSize = 24.sp),
+                bodyMedium = typography.bodyMedium.copy(fontSize = 21.sp),
+                bodySmall = typography.bodySmall.copy(fontSize = 18.sp),
+                titleLarge = typography.titleLarge.copy(fontSize = 24.sp),
+                titleMedium = typography.titleMedium.copy(fontSize = 21.sp),
+                titleSmall = typography.titleSmall.copy(fontSize = 18.sp),
+                labelLarge = typography.labelLarge.copy(fontSize = 21.sp),
+                labelMedium = typography.labelMedium.copy(fontSize = 18.sp),
+                labelSmall = typography.labelSmall.copy(fontSize = 15.sp),
             ),
             content = content,
         )
@@ -100,21 +102,44 @@ data class PocketCastsTheme(
 }
 
 @SuppressLint("ConflictingOnColor")
-private fun buildMaterialColors(colors: ThemeColors, isLight: Boolean): Colors {
-    return Colors(
+private fun buildMaterialColors(colors: ThemeColors, isLight: Boolean): ColorScheme {
+    return ColorScheme(
         primary = colors.primaryInteractive01,
-        primaryVariant = colors.primaryInteractive01,
-        secondary = colors.primaryInteractive01,
-        secondaryVariant = colors.primaryInteractive01,
-        background = colors.primaryUi01,
-        surface = colors.primaryUi01,
-        error = colors.support05,
         onPrimary = colors.primaryInteractive02,
+        primaryContainer = colors.primaryUi02,
+        onPrimaryContainer = colors.primaryText01,
+        inversePrimary = colors.primaryInteractive02,
+        secondary = colors.primaryInteractive01,
         onSecondary = colors.primaryInteractive02,
+        secondaryContainer = colors.primaryUi02,
+        onSecondaryContainer = colors.primaryText01,
+        tertiary = colors.primaryInteractive03,
+        onTertiary = colors.primaryText02,
+        tertiaryContainer = colors.primaryUi03,
+        onTertiaryContainer = colors.primaryText02,
+        background = colors.primaryUi01,
         onBackground = colors.secondaryIcon01,
+        surface = colors.primaryUi01,
         onSurface = colors.primaryInteractive01,
+        surfaceVariant = colors.primaryUi02,
+        onSurfaceVariant = colors.primaryText02,
+        surfaceTint = colors.primaryInteractive01,
+        inverseSurface = colors.primaryUi01, // if (isLight) colors.primaryUi05 else colors.primaryUi01,
+        inverseOnSurface = colors.primaryText01, // if (isLight) colors.primaryText01Light else colors.primaryText01,
+        error = colors.support05,
         onError = colors.secondaryIcon01,
-        isLight = isLight,
+        errorContainer = colors.support05.copy(alpha = 0.2f),
+        onErrorContainer = colors.support05,
+        outline = colors.primaryField01,
+        outlineVariant = colors.primaryField02,
+        scrim = colors.primaryUi05.copy(alpha = 0.5f),
+        surfaceBright = colors.primaryUi01,
+        surfaceDim = colors.primaryUi05,
+        surfaceContainer = colors.primaryUi02,
+        surfaceContainerHigh = colors.primaryUi03,
+        surfaceContainerHighest = colors.primaryUi04,
+        surfaceContainerLow = colors.primaryUi01,
+        surfaceContainerLowest = colors.primaryUi01,
     )
 }
 

@@ -14,9 +14,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,7 +48,6 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.type.BillingPeriod
 import au.com.shiftyjelly.pocketcasts.models.type.WinbackOfferDetails
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import androidx.compose.material.Divider as MaterialDivider
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -297,10 +297,9 @@ private fun ChevronRow(
 private fun Divider(
     modifier: Modifier = Modifier,
 ) {
-    MaterialDivider(
+    HorizontalDivider(
         color = MaterialTheme.theme.colors.primaryUi05,
-        startIndent = 16.dp,
-        modifier = modifier,
+        modifier = modifier.padding(horizontal = 16.dp),
     )
 }
 

@@ -81,7 +81,7 @@ fun EpisodeScreen(
                 fontWeight = W700,
                 lineHeight = headingLineHeight,
                 textAlign = TextAlign.Center,
-                color = MaterialTheme.colors.onPrimary,
+                color = MaterialTheme.colorScheme.onPrimary,
                 style = MaterialTheme.typography.title3,
                 modifier = Modifier.padding(horizontal = 8.dp),
             )
@@ -92,7 +92,7 @@ fun EpisodeScreen(
                 TextP50(
                     text = podcast.title,
                     maxLines = 1,
-                    color = MaterialTheme.colors.onSecondary,
+                    color = MaterialTheme.colorScheme.onSecondary,
                     style = MaterialTheme.typography.body1,
                     lineHeight = headingLineHeight,
                     textAlign = TextAlign.Center,
@@ -116,7 +116,7 @@ fun EpisodeScreen(
                 val downloadSize = Util.formattedBytes(episode.sizeInBytes, context)
                     .replace("-", stringResource(LR.string.podcasts_download_download))
 
-                val tintColor = state.tintColor ?: MaterialTheme.colors.primary
+                val tintColor = state.tintColor ?: MaterialTheme.colorScheme.primary
 
                 DownloadButton(
                     tint = tintColor,
@@ -309,7 +309,7 @@ private fun EpisodeErrorDetails(
         modifier = Modifier
             .padding(start = padding, end = padding, bottom = padding)
             .background(
-                color = MaterialTheme.colors.secondary,
+                color = MaterialTheme.colorScheme.secondary,
                 shape = RoundedCornerShape(10.dp),
             ),
     ) {
@@ -324,14 +324,14 @@ private fun EpisodeErrorDetails(
         if (errorData.errorDescription == null) {
             Text(
                 text = stringResource(errorData.errorTitleRes),
-                color = MaterialTheme.colors.onSecondary,
+                color = MaterialTheme.colorScheme.onSecondary,
                 style = MaterialTheme.typography.caption2,
                 modifier = Modifier.padding(padding),
             )
         } else {
             Text(
                 text = errorData.errorDescription,
-                color = MaterialTheme.colors.onSecondary,
+                color = MaterialTheme.colorScheme.onSecondary,
                 style = MaterialTheme.typography.caption3,
                 modifier = Modifier.padding(padding),
             )

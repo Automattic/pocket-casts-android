@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.Icon
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
@@ -62,14 +62,14 @@ fun PodcastsScreen(
                 Text(
                     text = stringResource(LR.string.podcasts_no_subscriptions),
                     textAlign = TextAlign.Center,
-                    color = MaterialTheme.colors.onPrimary,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     style = MaterialTheme.typography.title2,
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
                     text = stringResource(LR.string.podcasts_subscribe_on_phone),
                     textAlign = TextAlign.Center,
-                    color = MaterialTheme.colors.onPrimary,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     style = MaterialTheme.typography.body1,
                 )
             }
@@ -108,7 +108,7 @@ fun PodcastsScreen(
                 Text(
                     text = stringResource(LR.string.podcast_loading),
                     textAlign = TextAlign.Center,
-                    color = MaterialTheme.colors.onPrimary,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     style = MaterialTheme.typography.body1,
                 )
             }
@@ -150,7 +150,7 @@ private fun PodcastChip(
         onClick = { onClick(podcast.uuid) },
         colors = ChipDefaults.gradientBackgroundChipColors(
             startBackgroundColor = Color(podcast.podcast.tintColorForDarkBg).darker(0.5f),
-            endBackgroundColor = MaterialTheme.colors.surface,
+            endBackgroundColor = MaterialTheme.colorScheme.surface,
         ),
         label = {
             ChipText(podcast.title)
@@ -173,6 +173,6 @@ private fun ChipText(title: String) {
         maxLines = 2,
         overflow = TextOverflow.Ellipsis,
         style = MaterialTheme.typography.button,
-        color = MaterialTheme.colors.onPrimary,
+        color = MaterialTheme.colorScheme.onPrimary,
     )
 }

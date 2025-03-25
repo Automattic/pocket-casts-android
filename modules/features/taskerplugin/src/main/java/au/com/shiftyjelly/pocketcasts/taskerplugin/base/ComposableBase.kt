@@ -10,14 +10,14 @@ import androidx.compose.foundation.layout.requiredSizeIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Button
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -135,11 +135,12 @@ fun <T> ComposableTaskerInputField(content: TaskerInputFieldState.Content<T>) {
                     properties = PopupProperties(focusable = false),
                 ) {
                     content.taskerVariables.forEach {
-                        DropdownMenuItem(onClick = {
-                            finishSelecting(it)
-                        }) {
-                            Text(it)
-                        }
+                        DropdownMenuItem(
+                            text = { Text(it) },
+                            onClick = {
+                                finishSelecting(it)
+                            },
+                        )
                     }
                 }
             }
@@ -151,11 +152,14 @@ fun <T> ComposableTaskerInputField(content: TaskerInputFieldState.Content<T>) {
                     properties = PopupProperties(focusable = false),
                 ) {
                     possibleItems.forEach {
-                        DropdownMenuItem(onClick = {
-                            finishSelecting(content.itemToString(it))
-                        }) {
-                            content.itemContent(it)
-                        }
+                        DropdownMenuItem(
+                            text = {
+                                content.itemContent(it)
+                            },
+                            onClick = {
+                                finishSelecting(content.itemToString(it))
+                            },
+                        )
                     }
                 }
             }

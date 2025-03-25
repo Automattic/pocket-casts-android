@@ -42,7 +42,7 @@ fun WearAboutScreen(
                 Text(
                     text = stringResource(LR.string.settings_version, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE.toString()),
                     style = MaterialTheme.typography.body1,
-                    color = MaterialTheme.colors.onSecondary,
+                    color = MaterialTheme.colorScheme.onSecondary,
                     textAlign = TextAlign.Center,
                 )
             }

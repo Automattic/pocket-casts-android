@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts.taskerplugin.base
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.material.Text
+import androidx.compose.material3.Text
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.taskerplugin.base.hilt.appTheme
 

@@ -55,7 +55,7 @@ fun EpisodeChip(
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .clip(RoundedCornerShape(24.dp))
-            .background(MaterialTheme.colors.surface)
+            .background(MaterialTheme.colorScheme.surface)
             .clickable { onClick() }
             .padding(horizontal = 10.dp)
             .fillMaxWidth()
@@ -108,7 +108,7 @@ fun EpisodeChip(
                     text = episode.title,
                     lineHeight = 16.sp,
                     overflow = TextOverflow.Ellipsis,
-                    color = MaterialTheme.colors.onPrimary,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     style = MaterialTheme.typography.button.merge(
                         TextStyle(
                             platformStyle = PlatformTextStyle(
@@ -139,7 +139,7 @@ fun EpisodeChip(
                     }
                     Text(
                         text = "$shortDate • $timeLeft",
-                        color = MaterialTheme.colors.onSecondary,
+                        color = MaterialTheme.colorScheme.onSecondary,
                         style = MaterialTheme.typography.caption2,
                     )
                 }
@@ -151,13 +151,13 @@ fun EpisodeChip(
                             painter = painterResource(IR.drawable.ic_alert_small),
                             contentDescription = stringResource(LR.string.podcast_episode_playback_error),
                             modifier = Modifier.size(14.dp),
-                            tint = MaterialTheme.colors.onSecondary,
+                            tint = MaterialTheme.colorScheme.onSecondary,
                         )
                         Text(
                             text = it,
                             overflow = TextOverflow.Ellipsis,
                             maxLines = 1,
-                            color = MaterialTheme.colors.onSecondary,
+                            color = MaterialTheme.colorScheme.onSecondary,
                             style = MaterialTheme.typography.caption3,
                             modifier = Modifier.padding(start = 5.dp),
                         )

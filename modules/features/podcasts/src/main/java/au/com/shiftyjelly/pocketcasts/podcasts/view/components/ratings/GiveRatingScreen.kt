@@ -11,8 +11,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -103,8 +103,8 @@ fun GiveRatingScreen(
                 onClick = submitRating,
                 enabled = state.currentSelectedRate != GiveRatingViewModel.State.Loaded.Stars.Zero,
                 colors = ButtonDefaults.buttonColors(
-                    backgroundColor = MaterialTheme.theme.colors.primaryText01,
-                    disabledBackgroundColor = MaterialTheme.theme.colors.primaryInteractive03,
+                    containerColor = MaterialTheme.theme.colors.primaryText01,
+                    disabledContainerColor = MaterialTheme.theme.colors.primaryInteractive03,
                 ),
                 modifier = Modifier.alpha(submitButtonAlphaAnimation),
             )

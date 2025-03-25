@@ -108,7 +108,7 @@ private fun DescriptionText(@StringRes text: Int) {
     Text(
         text = stringResource(text),
         style = MaterialTheme.typography.caption3,
-        color = MaterialTheme.colors.onSecondary,
+        color = MaterialTheme.colorScheme.onSecondary,
         textAlign = TextAlign.Center,
         modifier = Modifier.padding(8.dp),
     )

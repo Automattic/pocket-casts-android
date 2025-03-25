@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.reimagine.podcast
 
 import android.content.res.Configuration
-import androidx.compose.material.SnackbarHostState
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope

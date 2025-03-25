@@ -50,7 +50,7 @@ dependencies {
     implementation(libs.aboutlibraries.core)
     implementation(libs.androidx.core.ktx)
     implementation(libs.compose.animation)
-    implementation(libs.compose.material)
+    implementation(libs.compose.material3)
     implementation(libs.compose.material.icons.extended)
     implementation(libs.compose.rxjava2)
     implementation(libs.compose.ui)

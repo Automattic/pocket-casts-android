@@ -26,8 +26,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -234,7 +234,7 @@ private fun AboutPage(
             item {
                 Text(
                     text = stringResource(LR.string.settings_version, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE.toString()),
-                    style = MaterialTheme.typography.body1,
+                    style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.padding(top = 8.dp),
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.theme.colors.primaryText02,
@@ -329,7 +329,7 @@ private fun AboutPage(
                     Text(
                         text = stringResource(LR.string.settings_about_work_from_anywhere),
                         fontSize = 14.sp,
-                        style = MaterialTheme.typography.body1,
+                        style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.theme.colors.primaryText02,
                     )
                 }

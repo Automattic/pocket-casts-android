@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.Surface
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
@@ -75,7 +75,7 @@ private fun Content(
                             val elevation by animateDpAsState(if (isDragging) 4.dp else 0.dp)
                             val color = if (isDragging) selectedBackgroundColor else normalBackgroundColor
                             val rowDraggableModifier = if (state.isEditable) Modifier.longPressDraggableHandle() else Modifier
-                            Surface(elevation = elevation, color = color) {
+                            Surface(shadowElevation = elevation, color = color) {
                                 ShelfItemRow(
                                     episode = state.episode,
                                     item = listItem,

@@ -8,9 +8,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.ContentAlpha
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -97,8 +96,8 @@ private fun ManageDownloadsView(
             text = stringResource(LR.string.settings_downloads_clean_up),
             enabled = state.deleteButton.isEnabled,
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = deleteButtonColor,
-                disabledBackgroundColor = deleteButtonColor.copy(alpha = ContentAlpha.disabled),
+                containerColor = deleteButtonColor,
+                disabledContainerColor = deleteButtonColor.copy(alpha = 0.8f),
             ),
             onClick = onDeleteButtonClicked,
         )

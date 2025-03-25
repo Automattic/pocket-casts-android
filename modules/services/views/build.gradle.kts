@@ -26,7 +26,7 @@ dependencies {
     api(libs.androidx.preference.ktx)
     api(libs.androidx.recyclerview)
     api(libs.automattic.crashlogging)
-    api(libs.compose.material)
+    api(libs.compose.material3)
     api(libs.dagger.hilt.android)
     api(libs.lottie)
     api(libs.material)

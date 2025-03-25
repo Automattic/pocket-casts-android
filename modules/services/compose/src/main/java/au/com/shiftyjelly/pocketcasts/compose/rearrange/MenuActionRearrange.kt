@@ -16,11 +16,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -124,7 +124,7 @@ fun MenuActionRearrange(
                     val elevation by animateDpAsState(if (isDragging) 4.dp else 0.dp)
                     val color = if (isDragging) hoverColor else Color.Transparent
                     val resources = LocalContext.current.resources
-                    Surface(elevation = elevation, color = color) {
+                    Surface(shadowElevation = elevation, color = color) {
                         val rowDraggableModifier = if (enabled) Modifier.longPressDraggableHandle().clickable {} else Modifier
                         Row(
                             verticalAlignment = Alignment.CenterVertically,

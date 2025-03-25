@@ -23,7 +23,7 @@ dependencies {
 
     api(libs.androidx.appcompat)
     api(libs.androidx.constraintlayout)
-    api(libs.compose.material)
+    api(libs.compose.material3)
     api(libs.dagger.hilt.android)
     api(libs.horologist.auth.data.phone)
     api(libs.horologist.datalayer)

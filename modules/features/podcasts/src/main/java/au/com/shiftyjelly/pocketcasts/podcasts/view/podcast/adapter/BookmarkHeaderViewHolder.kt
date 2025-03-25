@@ -8,10 +8,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,7 +43,7 @@ class BookmarkHeaderViewHolder(
                         .background(MaterialTheme.theme.colors.primaryUi02),
                 ) {
                     SearchHeader(bookmarkHeader)
-                    Divider(color = MaterialTheme.theme.colors.primaryUi05)
+                    HorizontalDivider(color = MaterialTheme.theme.colors.primaryUi05)
                     if (bookmarkHeader.bookmarksCount > 0) {
                         BookmarksCountView(bookmarkHeader)
                     }

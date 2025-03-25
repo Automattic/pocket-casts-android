@@ -1,22 +1,20 @@
-@file:OptIn(ExperimentalMaterialApi::class)
-
 package au.com.shiftyjelly.pocketcasts.compose.bars
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.material.AppBarDefaults
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.LocalRippleConfiguration
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.RippleConfiguration
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalRippleConfiguration
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RippleConfiguration
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
@@ -47,6 +45,7 @@ object ThemedTopAppBar {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ThemedTopAppBar(
     modifier: Modifier = Modifier,
@@ -67,7 +66,7 @@ fun ThemedTopAppBar(
     },
     bottomShadow: Boolean = false,
     titleOverflow: TextOverflow = TextOverflow.Ellipsis,
-    windowInsets: WindowInsets = AppBarDefaults.topAppBarWindowInsets,
+    windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
     actions: @Composable RowScope.(Color) -> Unit = {},
     onNavigationClick: () -> Unit,
 ) {
@@ -92,8 +91,9 @@ fun ThemedTopAppBar(
                 }
             },
             actions = { actions(iconColor) },
-            backgroundColor = backgroundColor,
-            elevation = 0.dp,
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = backgroundColor,
+            ),
             windowInsets = windowInsets,
             modifier = if (bottomShadow) {
                 modifier

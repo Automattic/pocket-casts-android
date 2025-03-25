@@ -7,8 +7,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.IconButton
-import androidx.compose.material.Text
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -176,7 +176,7 @@ private fun SpeedChip(
                     }
                     TextH30(
                         text = String.format("%.1fx", state.playbackEffects.playbackSpeed),
-                        color = MaterialTheme.colors.onPrimary,
+                        color = MaterialTheme.colorScheme.onPrimary,
                     )
                     IconButton(onClick = onPlusClicked) {
                         Icon(
@@ -212,7 +212,7 @@ fun TrimSilenceSlider(
             TextH50(
                 text = stringResource(id = LR.string.player_effects_trim_silence),
                 fontWeight = FontWeight.W700,
-                color = MaterialTheme.colors.onPrimary,
+                color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.padding(start = 8.dp),
             )
         }
@@ -236,7 +236,7 @@ fun TrimSilenceSlider(
             steps = 2,
             segmented = true,
             colors = InlineSliderDefaults.colors(
-                selectedBarColor = MaterialTheme.colors.onSurface,
+                selectedBarColor = MaterialTheme.colorScheme.onSurface,
             ),
         )
     }

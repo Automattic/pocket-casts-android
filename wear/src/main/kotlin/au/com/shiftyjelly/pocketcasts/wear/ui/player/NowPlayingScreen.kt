@@ -3,8 +3,8 @@ package au.com.shiftyjelly.pocketcasts.wear.ui.player
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -136,8 +136,8 @@ fun NowPlayingScreen(
                             pauseIcon = ImageVector.vectorResource(IR.drawable.wear_pause),
                             seekIconSize = 35.dp,
                             seekIconAlign = Alignment.CenterHorizontally,
-                            progressColor = MaterialTheme.colors.onPrimary,
-                            trackColor = MaterialTheme.colors.onPrimary.copy(alpha = 0.2f),
+                            progressColor = MaterialTheme.colorScheme.onPrimary,
+                            trackColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.2f),
                             backgroundColor = Color.Transparent,
                             sidePadding = 12.dp,
                         )

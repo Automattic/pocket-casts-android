@@ -11,12 +11,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.LocalTextStyle
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -78,7 +78,7 @@ fun BookmarkPage(isNewBookmark: Boolean, title: TextFieldValue, tintColor: Color
 @Composable
 private fun Content(isNewBookmark: Boolean, title: TextFieldValue, tintColor: Color, backgroundColor: Color, onTitleChange: (TextFieldValue) -> Unit, onSave: () -> Unit, modifier: Modifier = Modifier) {
     val focusRequester = remember { FocusRequester() }
-    val buttonColor = if (tintColor == Color.White) MaterialTheme.colors.primary else tintColor
+    val buttonColor = if (tintColor == Color.White) MaterialTheme.colorScheme.primary else tintColor
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
@@ -109,9 +109,9 @@ private fun Content(isNewBookmark: Boolean, title: TextFieldValue, tintColor: Co
                     fontSize = if (title.text.length > 20) 18.sp else 26.sp,
                     fontWeight = FontWeight.Bold,
                 ),
-                colors = TextFieldDefaults.textFieldColors(
-                    textColor = Color.White,
-                    backgroundColor = Color.Transparent,
+                colors = TextFieldDefaults.colors(
+                    focusedTextColor = Color.White,
+                    focusedContainerColor = Color.Transparent,
                     cursorColor = buttonColor,
                     focusedIndicatorColor = Color(0x33FFFFFF),
                     unfocusedIndicatorColor = Color(0x33FFFFFF),
@@ -129,7 +129,7 @@ private fun Content(isNewBookmark: Boolean, title: TextFieldValue, tintColor: Co
         val isTitleBlank = title.text.isBlank()
         RowButton(
             text = stringResource(if (isNewBookmark) R.string.save_bookmark else R.string.change_title),
-            colors = ButtonDefaults.buttonColors(backgroundColor = buttonColor),
+            colors = ButtonDefaults.buttonColors(containerColor = buttonColor),
             enabled = !isTitleBlank,
             // if the tint color is too light use the background color for the text
             textColor = if (buttonColor.luminance() > 0.5) backgroundColor else Color.White,

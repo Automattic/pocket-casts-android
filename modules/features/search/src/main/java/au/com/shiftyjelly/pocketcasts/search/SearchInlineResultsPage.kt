@@ -15,8 +15,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -195,8 +195,7 @@ private fun SearchResultsView(
         if (state.podcasts.isNotEmpty() && state.episodes.isNotEmpty()) {
             item {
                 HorizontalDivider(
-                    startIndent = 16.dp,
-                    modifier = modifier.padding(top = 20.dp, bottom = 4.dp),
+                    modifier = modifier.padding(top = 20.dp, bottom = 4.dp, start = 16.dp, end = 16.dp),
                 )
             }
         }

@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -58,7 +58,7 @@ fun ChaptersPage(
                 modifier = Modifier.animateItem(),
             )
             if (index < chapters.lastIndex) {
-                Divider(
+                HorizontalDivider(
                     color = LocalChaptersTheme.current.divider,
                     thickness = 1.dp,
                     modifier = Modifier.padding(horizontal = 20.dp),

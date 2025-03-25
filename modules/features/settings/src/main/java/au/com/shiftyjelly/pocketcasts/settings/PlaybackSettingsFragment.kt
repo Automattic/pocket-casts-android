@@ -16,10 +16,10 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -570,10 +570,10 @@ class PlaybackSettingsFragment : BaseFragment() {
                                 }
                             }
                         },
-                        colors = TextFieldDefaults.textFieldColors(
-                            textColor = MaterialTheme.theme.colors.primaryText01,
-                            placeholderColor = MaterialTheme.theme.colors.primaryText02,
-                            backgroundColor = MaterialTheme.theme.colors.primaryUi01,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = MaterialTheme.theme.colors.primaryText01,
+                            unfocusedTextColor = MaterialTheme.theme.colors.primaryText02,
+                            focusedContainerColor = MaterialTheme.theme.colors.primaryUi01,
                         ),
                         label = {
                             Text(stringResource(LR.string.seconds_label))

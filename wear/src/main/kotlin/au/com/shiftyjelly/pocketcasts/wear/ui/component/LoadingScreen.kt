@@ -13,8 +13,8 @@ import androidx.wear.compose.material.MaterialTheme
 fun LoadingScreen(modifier: Modifier = Modifier) {
     Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         CircularProgressIndicator(
-            indicatorColor = MaterialTheme.colors.onPrimary,
-            trackColor = MaterialTheme.colors.onBackground.copy(alpha = 0.2f),
+            indicatorColor = MaterialTheme.colorScheme.onPrimary,
+            trackColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f),
             strokeWidth = 3.dp,
         )
     }

@@ -8,12 +8,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.LocalRippleConfiguration
-import androidx.compose.material.RippleConfiguration
-import androidx.compose.material.RippleDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalRippleConfiguration
+import androidx.compose.material3.RippleConfiguration
+import androidx.compose.material3.RippleDefaults
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
@@ -85,7 +85,7 @@ fun ArtworkSection(
     )
 }
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3WindowSizeClassApi::class)
+@OptIn(ExperimentalMaterial3WindowSizeClassApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun Content(
     state: ArtworkSectionState,
@@ -149,7 +149,7 @@ private fun Content(
             CompositionLocalProvider(
                 LocalRippleConfiguration provides RippleConfiguration(
                     Color.White,
-                    RippleDefaults.rippleAlpha(Color.White, true),
+                    RippleDefaults.RippleAlpha,
                 ),
             ) {
                 IconButton(

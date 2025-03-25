@@ -3,10 +3,10 @@ package au.com.shiftyjelly.pocketcasts.compose.bottomsheet
 import android.view.ViewGroup
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ModalBottomSheetLayout
-import androidx.compose.material.ModalBottomSheetState
-import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SheetState
+import androidx.compose.material3.SheetValue
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -20,15 +20,15 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ModalBottomSheet(
     parent: ViewGroup,
     onExpanded: () -> Unit,
     shouldShow: Boolean,
     content: BottomSheetContentState.Content,
-    sheetState: ModalBottomSheetState = rememberModalBottomSheetState(
-        initialValue = ModalBottomSheetValue.Hidden,
-        skipHalfExpanded = true,
+    sheetState: SheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true,
     ),
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -38,9 +38,14 @@ fun ModalBottomSheet(
         hideBottomSheet(coroutineScope, sheetState)
     }
 
-    ModalBottomSheetLayout(
+    androidx.compose.material3.ModalBottomSheet(
         sheetState = sheetState,
-        sheetContent = {
+        onDismissRequest = {
+            hideBottomSheet(coroutineScope, sheetState)
+        },
+        shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
+        scrimColor = Color.Black.copy(alpha = .25f),
+        content = {
             BottomSheetContent(
                 state = BottomSheetContentState(content),
                 onDismiss = {
@@ -48,17 +53,14 @@ fun ModalBottomSheet(
                 },
             )
         },
-        sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
-        scrimColor = Color.Black.copy(alpha = .25f),
-        content = {},
     )
 
     LaunchedEffect(Unit) {
         snapshotFlow { sheetState.currentValue }
             .collect {
-                if (sheetState.currentValue == ModalBottomSheetValue.Expanded) {
+                if (sheetState.currentValue == SheetValue.Expanded) {
                     onExpanded.invoke()
-                } else if (sheetState.currentValue == ModalBottomSheetValue.Hidden) {
+                } else if (sheetState.currentValue == SheetValue.Hidden) {
                     if (isSheetShown) {
                         /* Remove bottom sheet from parent view when bottom sheet is hidden
                         on dismiss or back action for talkback to function properly. */
@@ -75,13 +77,15 @@ fun ModalBottomSheet(
     }
 }
 
-private fun hideBottomSheet(coroutineScope: CoroutineScope, sheetState: ModalBottomSheetState) {
+@OptIn(ExperimentalMaterial3Api::class)
+private fun hideBottomSheet(coroutineScope: CoroutineScope, sheetState: SheetState) {
     coroutineScope.launch {
         sheetState.hide()
     }
 }
 
-private fun displayBottomSheet(coroutineScope: CoroutineScope, sheetState: ModalBottomSheetState) {
+@OptIn(ExperimentalMaterial3Api::class)
+private fun displayBottomSheet(coroutineScope: CoroutineScope, sheetState: SheetState) {
     coroutineScope.launch {
         sheetState.show()
     }

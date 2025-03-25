@@ -96,7 +96,7 @@ private fun Content(
                     Text(
                         modifier = modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center,
-                        color = MaterialTheme.colors.onPrimary,
+                        color = MaterialTheme.colorScheme.onPrimary,
                         text = podcast.title,
                         style = MaterialTheme.typography.button,
                     )
@@ -105,7 +105,7 @@ private fun Content(
                             .fillMaxWidth()
                             .padding(bottom = 8.dp),
                         textAlign = TextAlign.Center,
-                        color = MaterialTheme.colors.onSecondary,
+                        color = MaterialTheme.colorScheme.onSecondary,
                         text = podcast.author,
                         style = MaterialTheme.typography.body2.merge(
                             TextStyle(

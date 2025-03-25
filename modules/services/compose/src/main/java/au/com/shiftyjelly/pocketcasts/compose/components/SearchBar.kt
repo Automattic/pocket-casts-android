@@ -14,14 +14,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.LocalTextStyle
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextFieldColors
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -68,24 +69,30 @@ object SearchBarDefaults {
         unfocusedBorderColor: Color = Color.Transparent,
         disabledBorderColorColor: Color = Color.Transparent,
 
-    ) = TextFieldDefaults.outlinedTextFieldColors(
+    ) = TextFieldDefaults.colors(
         cursorColor = cursorColor,
-        textColor = textColor,
+        focusedTextColor = textColor,
+        unfocusedTextColor = textColor,
         disabledTextColor = disabledTextColor,
-        placeholderColor = placeholderColor,
+        focusedPlaceholderColor = placeholderColor,
+        unfocusedPlaceholderColor = placeholderColor,
         disabledPlaceholderColor = disabledPlaceholderColor,
-        leadingIconColor = leadingIconColor,
+        focusedLeadingIconColor = leadingIconColor,
+        unfocusedLeadingIconColor = leadingIconColor,
         disabledLeadingIconColor = disabledLeadingIconColor,
-        trailingIconColor = trailingIconColor,
+        focusedTrailingIconColor = trailingIconColor,
+        unfocusedTrailingIconColor = trailingIconColor,
         disabledTrailingIconColor = disabledTrailingIconColor,
-        backgroundColor = backgroundColor,
-        focusedBorderColor = focusedBorderColor,
-        unfocusedBorderColor = unfocusedBorderColor,
-        disabledBorderColor = disabledBorderColorColor,
+        focusedContainerColor = backgroundColor,
+        unfocusedContainerColor = backgroundColor,
+        disabledContainerColor = backgroundColor,
+        focusedIndicatorColor = focusedBorderColor,
+        unfocusedIndicatorColor = unfocusedBorderColor,
+        disabledIndicatorColor = disabledBorderColorColor,
     )
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchBar(
     text: String,
@@ -100,14 +107,14 @@ fun SearchBar(
     textStyle: TextStyle = LocalTextStyle.current,
     cornerRadius: Dp = 10.dp,
     colors: TextFieldColors = SearchBarDefaults.colors(),
-    contentPadding: PaddingValues = TextFieldDefaults.textFieldWithoutLabelPadding(
+    contentPadding: PaddingValues = TextFieldDefaults.contentPaddingWithoutLabel(
         top = 0.dp,
         bottom = 0.dp,
     ),
 ) {
     val focusManager = LocalFocusManager.current
     val textColor = textStyle.color.takeOrElse {
-        colors.textColor(enabled).value
+        colors.focusedTextColor
     }
     val mergedTextStyle = textStyle.merge(TextStyle(color = textColor))
 
@@ -127,7 +134,7 @@ fun SearchBar(
         maxLines = 1,
         enabled = enabled,
         textStyle = mergedTextStyle,
-        cursorBrush = SolidColor(colors.cursorColor(false).value),
+        cursorBrush = SolidColor(colors.cursorColor),
         modifier = modifier
             .onKeyEvent {
                 // close the keyboard on enter
@@ -138,13 +145,13 @@ fun SearchBar(
                     false
                 }
             }
-            .background(colors.backgroundColor(enabled).value, shape)
+            .background(colors.focusedContainerColor, shape)
             .defaultMinSize(
                 minWidth = TextFieldDefaults.MinWidth,
                 minHeight = 42.dp,
             ),
         decorationBox = @Composable { innerTextField ->
-            TextFieldDefaults.OutlinedTextFieldDecorationBox(
+            OutlinedTextFieldDefaults.DecorationBox(
                 value = text,
                 innerTextField = innerTextField,
                 placeholder = {

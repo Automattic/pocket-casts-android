@@ -4,10 +4,12 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetLayout
-import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SheetValue
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -34,6 +36,7 @@ import kotlinx.coroutines.launch
 
 private const val NULL_ACTIVITY_ERROR = "Activity is null when attempting subscription"
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OnboardingUpgradeFlow(
     flow: OnboardingFlow,
@@ -76,20 +79,20 @@ fun OnboardingUpgradeFlow(
                 flow is OnboardingFlow.PlusAccountUpgrade
             )
     val initialValue = if (startSelectPaymentFrequencyInExpandedState) {
-        ModalBottomSheetValue.Expanded
+        SheetValue.Expanded
     } else {
-        ModalBottomSheetValue.Hidden
+        SheetValue.Hidden
     }
     val sheetState = rememberModalBottomSheetState(
-        initialValue = initialValue,
-        skipHalfExpanded = true,
+        skipPartiallyExpanded = true,
+        confirmValueChange = { true },
     )
 
     LaunchedEffect(sheetState.targetValue) {
         when (sheetState.targetValue) {
-            ModalBottomSheetValue.Hidden -> {
+            SheetValue.Hidden -> {
                 // Don't fire event when initially loading the screen and both current and target are "Hidden"
-                if (sheetState.currentValue == ModalBottomSheetValue.Expanded) {
+                if (sheetState.currentValue == SheetValue.Expanded) {
                     bottomSheetViewModel.onSelectPaymentFrequencyDismissed(flow, source)
                     if (flow is OnboardingFlow.PlusAccountUpgrade) {
                         mainSheetViewModel.onDismiss(flow, source)
@@ -97,7 +100,7 @@ fun OnboardingUpgradeFlow(
                     }
                 }
             }
-            ModalBottomSheetValue.Expanded -> bottomSheetViewModel.onSelectPaymentFrequencyShown(flow, source)
+            SheetValue.Expanded -> bottomSheetViewModel.onSelectPaymentFrequencyShown(flow, source)
             else -> {}
         }
     }
@@ -106,7 +109,7 @@ fun OnboardingUpgradeFlow(
         // We need to check if the screen was initialized with the expanded state.
         // Otherwise, the sheet will never be shown since the initial state is Hidden.
         // This will trigger this event, and onBackPressed will be called.
-        if (sheetState.currentValue == ModalBottomSheetValue.Hidden && startSelectPaymentFrequencyInExpandedState) {
+        if (sheetState.currentValue == SheetValue.Hidden && startSelectPaymentFrequencyInExpandedState) {
             onBackPressed()
         }
     }
@@ -120,68 +123,73 @@ fun OnboardingUpgradeFlow(
         }
     }
 
-    @OptIn(ExperimentalMaterialApi::class)
-    ModalBottomSheetLayout(
-        sheetState = sheetState,
-        scrimColor = Color.Black.copy(alpha = 0.5f),
-        sheetShape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
-        content = {
-            if (flow !is OnboardingFlow.PlusAccountUpgrade) {
-                OnboardingUpgradeFeaturesPage(
-                    flow = flow,
-                    source = source,
-                    onBackPressed = onBackPressed,
-                    onClickSubscribe = { showUpgradeBottomSheet ->
+    if (sheetState.isVisible) {
+        ModalBottomSheet(
+            onDismissRequest = {
+                coroutineScope.launch { sheetState.hide() }
+            },
+            sheetState = sheetState,
+            shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+            dragHandle = { BottomSheetDefaults.DragHandle() },
+            containerColor = MaterialTheme.colorScheme.surface,
+            scrimColor = Color.Black.copy(alpha = 0.5f),
+            content = {
+                OnboardingUpgradeBottomSheet(
+                    onClickSubscribe = {
                         if (activity != null) {
-                            if (isLoggedIn) {
-                                if (showUpgradeBottomSheet) {
-                                    coroutineScope.launch {
-                                        sheetState.show()
-                                    }
-                                } else {
-                                    mainSheetViewModel.onClickSubscribe(
-                                        activity = activity,
-                                        flow = flow,
-                                        source = source,
-                                        onComplete = onProceed,
-                                    )
-                                }
-                            } else {
-                                onNeedLogin()
-                            }
+                            bottomSheetViewModel.onClickSubscribe(
+                                activity = activity,
+                                flow = flow,
+                                source = source,
+                                onComplete = onProceed,
+                            )
                         } else {
                             LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, NULL_ACTIVITY_ERROR)
                         }
                     },
-                    onNotNowPressed = onProceed,
-                    canUpgrade = hasSubscriptions,
-                    onUpdateSystemBars = onUpdateSystemBars,
+                    onPrivacyPolicyClick = {
+                        mainSheetViewModel.onPrivacyPolicyPressed()
+                    },
+                    onTermsAndConditionsClick = {
+                        mainSheetViewModel.onTermsAndConditionsPressed()
+                    },
                 )
-            }
-        },
-        sheetContent = {
-            OnboardingUpgradeBottomSheet(
-                onClickSubscribe = {
-                    if (activity != null) {
-                        bottomSheetViewModel.onClickSubscribe(
-                            activity = activity,
-                            flow = flow,
-                            source = source,
-                            onComplete = onProceed,
-                        )
+            },
+        )
+    }
+
+    if (flow !is OnboardingFlow.PlusAccountUpgrade) {
+        OnboardingUpgradeFeaturesPage(
+            flow = flow,
+            source = source,
+            onBackPressed = onBackPressed,
+            onClickSubscribe = { showUpgradeBottomSheet ->
+                if (activity != null) {
+                    if (isLoggedIn) {
+                        if (showUpgradeBottomSheet) {
+                            coroutineScope.launch {
+                                sheetState.show()
+                            }
+                        } else {
+                            mainSheetViewModel.onClickSubscribe(
+                                activity = activity,
+                                flow = flow,
+                                source = source,
+                                onComplete = onProceed,
+                            )
+                        }
                     } else {
-                        LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, NULL_ACTIVITY_ERROR)
+                        onNeedLogin()
                     }
-                },
-                onPrivacyPolicyClick = {
-                    mainSheetViewModel.onPrivacyPolicyPressed()
-                },
-                onTermsAndConditionsClick = {
-                    mainSheetViewModel.onTermsAndConditionsPressed()
-                },
-            )
-        },
-    )
+                } else {
+                    LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, NULL_ACTIVITY_ERROR)
+                }
+            },
+            onNotNowPressed = onProceed,
+            canUpgrade = hasSubscriptions,
+            onUpdateSystemBars = onUpdateSystemBars,
+        )
+    }
 }
 
 @Preview

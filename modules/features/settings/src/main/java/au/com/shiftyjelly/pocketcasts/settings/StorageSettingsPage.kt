@@ -13,9 +13,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -305,10 +305,10 @@ private fun StorageFolderRow(
                         onValueChange = {
                             value = it
                         },
-                        colors = TextFieldDefaults.textFieldColors(
-                            textColor = MaterialTheme.theme.colors.primaryText01,
-                            placeholderColor = MaterialTheme.theme.colors.primaryText02,
-                            backgroundColor = MaterialTheme.theme.colors.primaryUi01,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = MaterialTheme.theme.colors.primaryText01,
+                            unfocusedTextColor = MaterialTheme.theme.colors.primaryText02,
+                            focusedContainerColor = MaterialTheme.theme.colors.primaryUi01,
                         ),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                         keyboardActions = KeyboardActions { onFinish() },
@@ -354,7 +354,7 @@ private fun StorageDataWarningRow(
     ) {
         TextP50(
             text = stringResource(LR.string.settings_storage_data_warning_car),
-            style = MaterialTheme.typography.body1,
+            style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.theme.colors.primaryText02,
             modifier = modifier
                 .padding(top = 16.dp),

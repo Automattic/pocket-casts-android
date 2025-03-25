@@ -8,12 +8,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ButtonColors
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,7 +39,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private val outlinedBorder: BorderStroke
     @Composable
-    get() = BorderStroke(2.dp, MaterialTheme.colors.primary)
+    get() = BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
 
 @Composable
 fun RowOutlinedButton(
@@ -89,7 +89,7 @@ fun RowOutlinedButton(
                     )
                     TextH30(
                         text = text,
-                        color = colors.contentColor(enabled = true).value,
+                        color = colors.contentColor,
                         textAlign = TextAlign.Center,
                         fontFamily = fontFamily,
                         fontWeight = fontWeight,
@@ -108,7 +108,7 @@ private fun RowOutlinedImage(image: Painter?, colors: ButtonColors, tintIcon: Bo
     Image(
         painter = image,
         contentDescription = null,
-        colorFilter = if (tintIcon) ColorFilter.tint(colors.contentColor(enabled = true).value) else null,
+        colorFilter = if (tintIcon) ColorFilter.tint(colors.contentColor) else null,
         modifier = modifier,
     )
 }

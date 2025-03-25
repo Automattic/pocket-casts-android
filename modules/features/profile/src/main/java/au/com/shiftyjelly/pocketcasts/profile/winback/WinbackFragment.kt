@@ -19,11 +19,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.AppBarDefaults
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Snackbar
-import androidx.compose.material.SnackbarHost
-import androidx.compose.material.SnackbarHostState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -76,6 +77,7 @@ class WinbackFragment : BaseDialogFragment() {
 
     override val includeNavigationBarPadding = false
 
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -178,7 +180,7 @@ class WinbackFragment : BaseDialogFragment() {
                         composable(WinbackNavRoutes.HelpAndFeedback) {
                             HelpPage(
                                 activity = requireActivity(),
-                                appBarInsets = AppBarDefaults.topAppBarWindowInsets.only(WindowInsetsSides.Horizontal),
+                                appBarInsets = TopAppBarDefaults.windowInsets.only(WindowInsetsSides.Horizontal),
                                 onShowLogs = { navController.navigate(WinbackNavRoutes.SupportLogs) },
                                 onShowStatusPage = { navController.navigate(WinbackNavRoutes.StatusCheck) },
                                 onGoBack = { navController.popBackStack() },
@@ -187,14 +189,14 @@ class WinbackFragment : BaseDialogFragment() {
                         composable(WinbackNavRoutes.SupportLogs) {
                             LogsPage(
                                 bottomInset = 0.dp,
-                                appBarInsets = AppBarDefaults.topAppBarWindowInsets.only(WindowInsetsSides.Horizontal),
+                                appBarInsets = TopAppBarDefaults.windowInsets.only(WindowInsetsSides.Horizontal),
                                 onBackPressed = { navController.popBackStack() },
                             )
                         }
                         composable(WinbackNavRoutes.StatusCheck) {
                             StatusPage(
                                 bottomInset = 0.dp,
-                                appBarInsets = AppBarDefaults.topAppBarWindowInsets.only(WindowInsetsSides.Horizontal),
+                                appBarInsets = TopAppBarDefaults.windowInsets.only(WindowInsetsSides.Horizontal),
                                 onBackPressed = { navController.popBackStack() },
                             )
                         }
@@ -263,8 +265,8 @@ class WinbackFragment : BaseDialogFragment() {
                         snackbar = { data ->
                             val isLightTheme = MaterialTheme.theme.isLight
                             Snackbar(
-                                backgroundColor = if (isLightTheme) Color.Black else Color.White,
-                                content = { TextH50(data.message, color = if (isLightTheme) Color.White else Color.Black) },
+                                containerColor = if (isLightTheme) Color.Black else Color.White,
+                                content = { TextH50(data.visuals.message, color = if (isLightTheme) Color.White else Color.Black) },
                             )
                         },
                         modifier = Modifier

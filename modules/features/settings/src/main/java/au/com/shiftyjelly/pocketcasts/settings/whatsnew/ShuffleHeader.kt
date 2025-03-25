@@ -5,8 +5,8 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -39,7 +39,7 @@ fun ShuffleHeader(modifier: Modifier = Modifier) {
     Icon(
         painter = painterResource(id = IR.drawable.shuffle),
         contentDescription = stringResource(LR.string.up_next_shuffle_button_content_description),
-        tint = MaterialTheme.colors.primary.copy(alpha = animatedAlpha),
+        tint = MaterialTheme.colorScheme.primary.copy(alpha = animatedAlpha),
         modifier = modifier
             .size(if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) 120.dp else 80.dp),
     )

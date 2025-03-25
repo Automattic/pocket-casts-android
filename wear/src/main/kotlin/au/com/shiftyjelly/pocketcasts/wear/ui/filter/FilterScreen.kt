@@ -65,7 +65,7 @@ fun FilterScreen(
                         text = stringResource(LR.string.filters_no_episodes),
                         modifier = Modifier.padding(16.dp),
                         textAlign = TextAlign.Center,
-                        color = MaterialTheme.colors.onPrimary,
+                        color = MaterialTheme.colorScheme.onPrimary,
                         style = MaterialTheme.typography.body1,
                     )
                 } ?: run {
@@ -73,7 +73,7 @@ fun FilterScreen(
                         text = stringResource(LR.string.filters_not_found),
                         modifier = Modifier.padding(16.dp),
                         textAlign = TextAlign.Center,
-                        color = MaterialTheme.colors.onPrimary,
+                        color = MaterialTheme.colorScheme.onPrimary,
                         style = MaterialTheme.typography.body1,
                     )
                 }
