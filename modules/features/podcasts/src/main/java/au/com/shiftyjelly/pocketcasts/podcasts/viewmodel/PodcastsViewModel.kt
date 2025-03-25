@@ -83,8 +83,8 @@ class PodcastsViewModel
             .toFlowable(BackpressureStrategy.LATEST)
             .switchMap { sortType ->
                 when (sortType) {
-                    PodcastsSortType.RECENTLY_PLAYED -> podcastManager.podcastsOrderByRecentlyPlayedEpisodeRxFlowable()
-                    else -> podcastManager.podcastsOrderByLatestEpisodeRxFlowable()
+                    PodcastsSortType.RECENTLY_PLAYED -> podcastManager.podcastsOrderByRecentlyPlayedEpisodeRxFlowable().distinctByPodcastDetails()
+                    else -> podcastManager.podcastsOrderByLatestEpisodeRxFlowable().distinctByPodcastDetails()
                 }
             },
         // monitor all the folders
@@ -97,6 +97,7 @@ class PodcastsViewModel
                     val observeFolderPodcasts = folders.map { folder ->
                         podcastManager
                             .podcastsInFolderOrderByUserChoiceRxFlowable(folder)
+                            .distinctByPodcastDetails()
                             .map { podcasts ->
                                 FolderItem.Folder(
                                     folder = folder,
@@ -330,6 +331,18 @@ class PodcastsViewModel
 
     fun isEligibleForSuggestedFoldersPopup(): Boolean {
         return suggestedFoldersPopupPolicy.isEligibleForPopup()
+    }
+
+    private fun Flowable<List<Podcast>>.distinctByPodcastDetails() = this.distinctUntilChanged { old, new ->
+        if (old.size != new.size) return@distinctUntilChanged false
+
+        old.zip(new).all { (oldPodcast, newPodcast) ->
+            oldPodcast.uuid == newPodcast.uuid &&
+                oldPodcast.title == newPodcast.title &&
+                oldPodcast.author == newPodcast.author &&
+                oldPodcast.podcastCategory == newPodcast.podcastCategory &&
+                oldPodcast.folderUuid == newPodcast.folderUuid
+        }
     }
 
     sealed class SuggestedFoldersState {
