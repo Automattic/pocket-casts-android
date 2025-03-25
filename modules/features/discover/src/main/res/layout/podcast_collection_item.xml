@@ -3,19 +3,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:background="?attr/selectableItemBackground"
     android:clipChildren="false"
     android:clipToPadding="false"
-    android:orientation="horizontal"
-    android:padding="8dp"
-    tools:parentTag="android.widget.LinearLayout">
+    android:orientation="horizontal">
 
     <androidx.cardview.widget.CardView
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_gravity="center_vertical"
         android:layout_marginRight="12dp"
+        android:layout_marginVertical="2dp"
+        android:layout_marginStart="2dp"
         android:elevation="2dp"
         app:cardCornerRadius="4dp">
 
@@ -23,12 +23,17 @@
             android:id="@+id/imageView"
             android:layout_width="100dp"
             android:layout_height="100dp"
+            android:background="?attr/defaultArtwork"
             tools:ignore="ContentDescription" />
     </androidx.cardview.widget.CardView>
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:id="@+id/textsLayout"
+        android:layout_width="0dp"
         android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:clipChildren="false"
+        android:clipToPadding="false"
         android:gravity="center_vertical"
         android:orientation="vertical">
 
@@ -36,7 +41,8 @@
             android:id="@+id/lblTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:maxLines="1"
+            android:maxLines="2"
+            android:ellipsize="end"
             android:textAppearance="@style/H40"
             tools:text="Title" />
 
@@ -45,7 +51,23 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAppearance="@style/H50"
+            android:maxLines="2"
+            android:ellipsize="end"
             android:textColor="?attr/primary_text_02"
             tools:text="Author" />
     </LinearLayout>
+
+    <ImageView
+        android:id="@+id/btnSubscribe"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="center_vertical|end"
+        android:background="?android:attr/actionBarItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        android:scaleType="centerInside"
+        android:layout_marginEnd="8dp"
+        android:contentDescription="@string/subscribe"
+        app:tint="?attr/primary_icon_02" />
+
 </LinearLayout>

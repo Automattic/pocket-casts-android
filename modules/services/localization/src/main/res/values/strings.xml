@@ -535,6 +535,7 @@
     <string name="go_to_discover">Go to Discover</string>
     <string name="number_stepper_plus_content_description">Plus</string>
     <string name="number_stepper_minus_content_description">Minus</string>
+    <string name="discover_collection_header_content_description">%s header</string>
 
     <!-- Podcast -->
 
