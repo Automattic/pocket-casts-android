@@ -2045,6 +2045,7 @@
     <string name="bookmarks_empty_state_title">Bookmark that moment</string>
     <string name="bookmarks_free_user_empty_state_message">You can save timestamps of important moments in an episode.</string>
     <string name="bookmarks_free_user_empty_state_button">Get Bookmarks</string>
+    <string name="bookmarks_paid_user_empty_state_message">You can save timestamps of episodes from the actions menu in the player or by configuring an action with your headphones.</string>
 
     <!-- Transcripts -->
     <string name="error_transcript_failed_to_load">Sorry, but something went wrong while loading this transcript.</string>

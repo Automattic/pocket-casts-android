@@ -151,6 +151,9 @@ class BookmarksFragment : BaseFragment() {
                     onSearchBarClearButtonTapped = {
                         bookmarksViewModel.searchBarClearButtonTapped()
                     },
+                    onHeadphoneControlsButtonTapped = {
+                        bookmarksViewModel.onHeadphoneControlsButtonTapped()
+                    },
                     bottomInset = if (sourceView == SourceView.PROFILE) {
                         0.dp + bottomInset.value.pxToDp(LocalContext.current).dp
                     } else {

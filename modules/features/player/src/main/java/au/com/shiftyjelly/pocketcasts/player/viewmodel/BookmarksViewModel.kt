@@ -360,6 +360,13 @@ class BookmarksViewModel
         analyticsTracker.track(AnalyticsEvent.BOOKMARKS_SEARCHBAR_CLEAR_BUTTON_TAPPED)
     }
 
+    fun onHeadphoneControlsButtonTapped() {
+        analyticsTracker.track(
+            AnalyticsEvent.BOOKMARKS_EMPTY_GO_TO_HEADPHONE_SETTINGS,
+            mapOf("source" to sourceView.analyticsValue),
+        )
+    }
+
     fun onShare(podcastUuid: String, episodeUuid: String, source: SourceView) {
         analyticsTracker.track(AnalyticsEvent.BOOKMARK_SHARE_TAPPED, mapOf("podcast_uuid" to podcastUuid, "episode_uuid" to episodeUuid, "source" to source.analyticsValue))
     }
