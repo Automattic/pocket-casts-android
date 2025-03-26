@@ -243,6 +243,7 @@ class BookmarksFragment : BaseFragment() {
     }
 
     private fun onUpgradeClicked() {
+        bookmarksViewModel.onGetBookmarksButtonTapped()
         val onboardingFlow = OnboardingFlow.Upsell(
             source = OnboardingUpgradeSource.BOOKMARKS,
         )

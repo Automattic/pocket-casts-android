@@ -367,6 +367,13 @@ class BookmarksViewModel
         )
     }
 
+    fun onGetBookmarksButtonTapped() {
+        analyticsTracker.track(
+            AnalyticsEvent.BOOKMARKS_GET_BOOKMARKS_BUTTON_TAPPED,
+            mapOf("source" to sourceView.analyticsValue),
+        )
+    }
+
     fun onShare(podcastUuid: String, episodeUuid: String, source: SourceView) {
         analyticsTracker.track(AnalyticsEvent.BOOKMARK_SHARE_TAPPED, mapOf("podcast_uuid" to podcastUuid, "episode_uuid" to episodeUuid, "source" to source.analyticsValue))
     }
