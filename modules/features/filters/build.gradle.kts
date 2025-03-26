@@ -51,6 +51,5 @@ dependencies {
     implementation(projects.modules.services.localization)
     implementation(projects.modules.services.utils)
 
-    debugImplementation(libs.compose.ui.tooling)
-    debugProdImplementation(libs.compose.ui.tooling)
+    implementation(libs.compose.ui.tooling.preview)
 }
