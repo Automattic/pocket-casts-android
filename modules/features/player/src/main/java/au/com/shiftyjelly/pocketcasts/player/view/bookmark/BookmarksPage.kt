@@ -34,6 +34,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.bookmark.BookmarkRow
 import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButtonColors
+import au.com.shiftyjelly.pocketcasts.compose.components.EmptyState
 import au.com.shiftyjelly.pocketcasts.compose.components.SearchBar
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
@@ -42,7 +43,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.HeaderRow
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.NoBookmarksInSearchView
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.NoBookmarksView
-import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.UpsellView
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel.BookmarkMessage
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel.UiState
@@ -52,6 +52,7 @@ import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelp
 import java.util.Date
 import java.util.UUID
 import kotlinx.coroutines.flow.collectLatest
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -172,12 +173,17 @@ private fun Content(
                     .fillMaxHeight()
                     .verticalScroll(rememberScrollState()),
             )
-            is UiState.Upsell -> UpsellView(
-                style = state.colors,
-                onClick = onUpgradeClicked,
-                sourceView = sourceView,
+            is UiState.Upsell -> EmptyState(
+                title = stringResource(LR.string.bookmarks_empty_state_title),
+                subtitle = stringResource(LR.string.bookmarks_free_user_empty_state_message),
+                iconResourcerId = IR.drawable.ic_bookmark,
+                buttonText = stringResource(LR.string.bookmarks_free_user_empty_state_button),
+                onButtonClick = {
+                    onUpgradeClicked.invoke()
+                },
                 modifier = Modifier
-                    .fillMaxHeight()
+                    .fillMaxSize()
+                    .padding(horizontal = 32.dp)
                     .verticalScroll(rememberScrollState()),
             )
         }

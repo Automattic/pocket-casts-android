@@ -2042,6 +2042,9 @@
     <string name="bookmarks_upsell_instructions">Save timestamps of your favorite episodes and unlock many more features with Pocket&#160;Casts Plus.</string>
     <string name="bookmarks_upsell_instructions_early_access">Get early access to this feature with Pocket&#160;Casts Patron and save timestamps of your favorite episodes. Available for Plus subscribers soon.</string>
     <string name="bookmarks_search_results_not_found">We couldn\'t find any bookmark for that search.</string>
+    <string name="bookmarks_empty_state_title">Bookmark that moment</string>
+    <string name="bookmarks_free_user_empty_state_message">You can save timestamps of important moments in an episode.</string>
+    <string name="bookmarks_free_user_empty_state_button">Get Bookmarks</string>
 
     <!-- Transcripts -->
     <string name="error_transcript_failed_to_load">Sorry, but something went wrong while loading this transcript.</string>
