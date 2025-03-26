@@ -90,10 +90,10 @@ class FolderEditViewModel
                     .asObservable(coroutineContext)
                     .toFlowable(BackpressureStrategy.LATEST)
                     .switchMap { podcastSortOrder ->
-                        if (podcastSortOrder == PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST) {
-                            podcastManager.podcastsOrderByLatestEpisodeRxFlowable()
-                        } else {
-                            podcastManager.subscribedRxFlowable()
+                        when (podcastSortOrder) {
+                            PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST -> podcastManager.podcastsOrderByLatestEpisodeRxFlowable()
+                            PodcastsSortType.RECENTLY_PLAYED -> podcastManager.podcastsOrderByRecentlyPlayedEpisodeRxFlowable()
+                            else -> podcastManager.subscribedRxFlowable()
                         }
                     }
                     .asFlow<List<Podcast>>(),
@@ -130,7 +130,7 @@ class FolderEditViewModel
                         podcastsSortedByReleaseDate = podcastsWithFolders,
                         currentFolderUuid = folder?.uuid,
                     ),
-                    selectedUuids = sortPodcasts(podcastsSortedByReleaseDate = podcastsSelected).map { it.uuid },
+                    selectedUuids = sortPodcasts(defaultSortedPodcasts = podcastsSelected).map { it.uuid },
                     searchText = searchText,
                     folders = folders,
                     folder = folder,
@@ -147,14 +147,14 @@ class FolderEditViewModel
         return PodcastFolderHelper.sortForSelectingPodcasts(sortType = sortType, podcastsSortedByReleaseDate = filtered, currentFolderUuid = currentFolderUuid)
     }
 
-    private fun sortPodcasts(podcastsSortedByReleaseDate: List<Podcast>): List<Podcast> {
-        val podcasts = podcastsSortedByReleaseDate
+    private fun sortPodcasts(defaultSortedPodcasts: List<Podcast>): List<Podcast> {
+        val podcasts = defaultSortedPodcasts
         return when (settings.podcastsSortType.value) {
-            PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST -> podcastsSortedByReleaseDate
+            PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST -> defaultSortedPodcasts
             PodcastsSortType.DATE_ADDED_NEWEST_TO_OLDEST -> podcasts.sortedWith(compareBy { it.addedDate })
             PodcastsSortType.DRAG_DROP -> podcasts.sortedWith(compareBy { it.sortPosition })
             PodcastsSortType.NAME_A_TO_Z -> podcasts.sortedWith(compareBy { PodcastsSortType.cleanStringForSort(it.title) })
-            PodcastsSortType.RECENTLY_PLAYED -> podcastsSortedByReleaseDate // TODO: Feature.PODCASTS_SORT_CHANGES - sort by recently played
+            PodcastsSortType.RECENTLY_PLAYED -> defaultSortedPodcasts
         }
     }
 
