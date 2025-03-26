@@ -16,7 +16,6 @@ import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkArguments
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.HeaderRowColors
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.MessageViewColors
-import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.NoBookmarksViewColors
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.search.BookmarkSearchHandler
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
@@ -379,14 +378,7 @@ class BookmarksViewModel
     }
 
     sealed class UiState {
-        data class Empty(val sourceView: SourceView) : UiState() {
-            val colors: NoBookmarksViewColors
-                get() = when (sourceView) {
-                    SourceView.PLAYER -> NoBookmarksViewColors.Player
-                    else -> NoBookmarksViewColors.Default
-                }
-        }
-
+        data class Empty(val sourceView: SourceView) : UiState()
         data object Loading : UiState()
         data class Loaded(
             val bookmarks: List<Bookmark> = emptyList(),

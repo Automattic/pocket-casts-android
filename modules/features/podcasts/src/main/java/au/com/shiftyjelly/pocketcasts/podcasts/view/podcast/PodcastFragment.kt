@@ -670,6 +670,7 @@ class PodcastFragment : BaseFragment() {
 
     private fun onHeadsetSettingsClicked() {
         val fragmentHostListener = (activity as? FragmentHostListener)
+        viewModel.onHeadsetSettingsClicked()
         fragmentHostListener?.apply {
             openTab(VR.id.navigation_profile)
             addFragment(SettingsFragment())
