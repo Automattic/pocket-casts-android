@@ -678,6 +678,10 @@ class PodcastFragment : BaseFragment() {
         }
     }
 
+    private fun onGetBookmarksClicked() {
+        viewModel.onGetBookmarksClicked()
+    }
+
     private val args: PodcastFragmentArgs
         get() = extractArgs(arguments) ?: error("$NEW_INSTANCE_ARGS argument is missing. Fragment must be created using newInstance function")
 
@@ -780,7 +784,7 @@ class PodcastFragment : BaseFragment() {
                 swipeSource = EpisodeItemTouchHelper.SwipeSource.PODCAST_DETAILS,
             ),
             onHeadsetSettingsClicked = ::onHeadsetSettingsClicked,
-            sourceView = SourceView.PODCAST_SCREEN,
+            onGetBookmarksClicked = ::onGetBookmarksClicked,
             podcastBookmarksObservable = bookmarkManager.findPodcastBookmarksFlow(
                 podcastUuid = podcastUuid,
                 sortType = settings.podcastBookmarksSortType.flow.value,

@@ -609,6 +609,13 @@ class PodcastViewModel
         )
     }
 
+    fun onGetBookmarksClicked() {
+        analyticsTracker.track(
+            AnalyticsEvent.BOOKMARKS_GET_BOOKMARKS_BUTTON_TAPPED,
+            mapOf("source" to SourceView.PODCAST_SCREEN.analyticsValue),
+        )
+    }
+
     enum class PodcastTab(@StringRes val labelResId: Int, val analyticsValue: String) {
         EPISODES(LR.string.episodes, "episodes"),
         BOOKMARKS(LR.string.bookmarks, "bookmarks"),
