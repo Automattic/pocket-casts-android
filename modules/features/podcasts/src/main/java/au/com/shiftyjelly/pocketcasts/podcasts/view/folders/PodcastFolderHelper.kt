@@ -19,7 +19,7 @@ object PodcastFolderHelper {
         }
     }
 
-    fun sortForSelectingPodcasts(sortType: PodcastsSortType, podcastsSortedByReleaseDate: List<PodcastFolder>, currentFolderUuid: String?): List<PodcastFolder> {
+    fun sortForSelectingPodcasts(sortType: PodcastsSortType, defaultSortedPodcasts: List<PodcastFolder>, currentFolderUuid: String?): List<PodcastFolder> {
         val folderComparator: Comparator<PodcastFolder> = Comparator { itemOne, itemTwo ->
             var folderOne = itemOne.folder
             var folderTwo = itemTwo.folder
@@ -50,6 +50,6 @@ object PodcastFolderHelper {
         val comparator = if (podcastComparator == null) folderComparator else folderComparator.then(podcastComparator)
 
         // move the folders to the bottom of the list
-        return podcastsSortedByReleaseDate.sortedWith(comparator)
+        return defaultSortedPodcasts.sortedWith(comparator)
     }
 }

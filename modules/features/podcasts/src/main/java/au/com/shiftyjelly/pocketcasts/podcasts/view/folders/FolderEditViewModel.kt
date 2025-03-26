@@ -127,7 +127,7 @@ class FolderEditViewModel
                     filteredPodcasts = filterSortPodcasts(
                         searchText = searchText,
                         sortType = sortOrder,
-                        podcastsSortedByReleaseDate = podcastsWithFolders,
+                        defaultSortedPodcasts = podcastsWithFolders,
                         currentFolderUuid = folder?.uuid,
                     ),
                     selectedUuids = sortPodcasts(defaultSortedPodcasts = podcastsSelected).map { it.uuid },
@@ -142,9 +142,9 @@ class FolderEditViewModel
         }
     }
 
-    private fun filterSortPodcasts(searchText: String, sortType: PodcastsSortType, podcastsSortedByReleaseDate: List<PodcastFolder>, currentFolderUuid: String?): List<PodcastFolder> {
-        val filtered = PodcastFolderHelper.filter(searchText = searchText, list = podcastsSortedByReleaseDate)
-        return PodcastFolderHelper.sortForSelectingPodcasts(sortType = sortType, podcastsSortedByReleaseDate = filtered, currentFolderUuid = currentFolderUuid)
+    private fun filterSortPodcasts(searchText: String, sortType: PodcastsSortType, defaultSortedPodcasts: List<PodcastFolder>, currentFolderUuid: String?): List<PodcastFolder> {
+        val filtered = PodcastFolderHelper.filter(searchText = searchText, list = defaultSortedPodcasts)
+        return PodcastFolderHelper.sortForSelectingPodcasts(sortType = sortType, defaultSortedPodcasts = filtered, currentFolderUuid = currentFolderUuid)
     }
 
     private fun sortPodcasts(defaultSortedPodcasts: List<Podcast>): List<Podcast> {

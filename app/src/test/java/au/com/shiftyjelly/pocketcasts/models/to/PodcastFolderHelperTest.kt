@@ -102,7 +102,7 @@ class PodcastFolderHelperTest {
     fun sort() {
         PodcastFolderHelper.sortForSelectingPodcasts(
             sortType = PodcastsSortType.NAME_A_TO_Z,
-            podcastsSortedByReleaseDate = list,
+            defaultSortedPodcasts = list,
             currentFolderUuid = null,
         ).let {
             assertEquals("Stuff You Should Know", it[0].podcast.title)
@@ -114,7 +114,7 @@ class PodcastFolderHelperTest {
 
         PodcastFolderHelper.sortForSelectingPodcasts(
             sortType = PodcastsSortType.DATE_ADDED_NEWEST_TO_OLDEST,
-            podcastsSortedByReleaseDate = list,
+            defaultSortedPodcasts = list,
             currentFolderUuid = null,
         ).let {
             assertEquals("The World Today", it[0].podcast.title)
@@ -126,7 +126,7 @@ class PodcastFolderHelperTest {
 
         PodcastFolderHelper.sortForSelectingPodcasts(
             sortType = PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST,
-            podcastsSortedByReleaseDate = list,
+            defaultSortedPodcasts = list,
             currentFolderUuid = null,
         ).let {
             assertEquals("Stuff You Should Know", it[0].podcast.title)
@@ -138,7 +138,7 @@ class PodcastFolderHelperTest {
 
         PodcastFolderHelper.sortForSelectingPodcasts(
             sortType = PodcastsSortType.NAME_A_TO_Z,
-            podcastsSortedByReleaseDate = list,
+            defaultSortedPodcasts = list,
             currentFolderUuid = folderNews.uuid,
         ).let {
             assertEquals("The Daily", it[0].podcast.title)
