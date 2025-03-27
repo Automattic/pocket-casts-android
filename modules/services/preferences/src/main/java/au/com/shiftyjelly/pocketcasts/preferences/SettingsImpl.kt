@@ -1574,6 +1574,12 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
+    override val showPodcastsRecentlyPlayedSortOrderTooltip: UserSetting<Boolean> = UserSetting.BoolPref(
+        sharedPrefKey = "show_podcasts_recently_played_sort_order_tooltip",
+        defaultValue = true,
+        sharedPrefs = sharedPreferences,
+    )
+
     override val suggestedFoldersDismissTimestamp = UserSetting.PrefFromString<Instant?>(
         sharedPrefKey = "suggested_folders_dismiss_timestamp",
         defaultValue = null,
