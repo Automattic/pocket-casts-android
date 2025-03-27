@@ -333,8 +333,12 @@ class PodcastsViewModel
         return suggestedFoldersPopupPolicy.isEligibleForPopup()
     }
 
-    fun isEligibleForRecentlyPlayedSortOrderTooltip() =
+    fun shouldShowTooltip() =
         FeatureFlag.isEnabled(Feature.PODCASTS_SORT_CHANGES) && settings.showPodcastsRecentlyPlayedSortOrderTooltip.value
+
+    fun onTooltipClosed() {
+        settings.showPodcastsRecentlyPlayedSortOrderTooltip.set(false, updateModifiedAt = false)
+    }
 
     private fun Flowable<List<Podcast>>.distinctByPodcastDetails() = this.distinctUntilChanged { old, new ->
         if (old.size != new.size) return@distinctUntilChanged false

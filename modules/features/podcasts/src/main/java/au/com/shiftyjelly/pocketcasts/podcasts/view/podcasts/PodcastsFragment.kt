@@ -9,7 +9,27 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.Toolbar
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.invisibleToUser
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -23,6 +43,8 @@ import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
@@ -176,6 +198,14 @@ class PodcastsFragment :
         binding.addToFolderButton.setOnClickListener {
             val folder = viewModel.folder ?: return@setOnClickListener
             FolderEditPodcastsFragment.newInstance(folderUuid = folder.uuid).show(parentFragmentManager, "add_podcasts_card")
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            if (viewModel.shouldShowTooltip()) {
+                binding.toolbar.post {
+                    showTooltip()
+                }
+            }
         }
 
         return binding.root
@@ -462,6 +492,53 @@ class PodcastsFragment :
 
     override fun scrollToTop() {
         binding.recyclerView.quickScrollToTop()
+    }
+
+    private fun showTooltip() {
+        binding.tooltipComposeView.apply {
+            isVisible = true
+            setContentWithViewCompositionStrategy {
+                AppTheme(theme.activeTheme) {
+                    val configuration = LocalConfiguration.current
+                    var toolbarY by remember { mutableIntStateOf(0) }
+
+                    LaunchedEffect(configuration) {
+                        with(binding.toolbar) {
+                            val location = IntArray(2)
+                            getLocationOnScreen(location)
+                            toolbarY = location[1] + height
+                        }
+                    }
+
+                    Box(
+                        contentAlignment = Alignment.TopEnd,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.Black.copy(alpha = 0.4f))
+                            .clickable(
+                                interactionSource = null,
+                                indication = null,
+                                onClick = ::closeTooltip,
+                            )
+                            .semantics { invisibleToUser() },
+                    ) {
+                        val density = LocalDensity.current
+                        val yOffset = with(density) { toolbarY.toDp() - 16.dp }
+                        RecentlyPlayedSortOptionTooltip(
+                            onClickClose = ::closeTooltip,
+                            modifier = Modifier
+                                .offset(y = yOffset),
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun closeTooltip() {
+        binding.tooltipComposeView.isGone = true
+        binding.tooltipComposeView.disposeComposition()
+        viewModel.onTooltipClosed()
     }
 
     inner class SpaceItemDecoration : RecyclerView.ItemDecoration() {
