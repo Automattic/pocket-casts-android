@@ -318,6 +318,17 @@ class PodcastsViewModel
         return suggestedFoldersPopupPolicy.isEligibleForPopup()
     }
 
+    fun shouldShowTooltip() =
+        FeatureFlag.isEnabled(Feature.PODCASTS_SORT_CHANGES) && settings.showPodcastsRecentlyPlayedSortOrderTooltip.value
+
+    fun onTooltipShown() {
+        analyticsTracker.track(AnalyticsEvent.EPISODE_RECENTLY_PLAYED_SORT_OPTION_TOOLTIP_SHOWN)
+    }
+    fun onTooltipClosed() {
+        settings.showPodcastsRecentlyPlayedSortOrderTooltip.set(false, updateModifiedAt = false)
+        analyticsTracker.track(AnalyticsEvent.EPISODE_RECENTLY_PLAYED_SORT_OPTION_TOOLTIP_DISMISSED)
+    }
+
     sealed class SuggestedFoldersState {
         data object Empty : SuggestedFoldersState()
 
