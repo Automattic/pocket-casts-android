@@ -11,26 +11,25 @@ import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.BundleCompat
 import androidx.core.view.isVisible
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralPodcastsSelected
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
-import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.views.databinding.SettingsFragmentPodcastSelectBinding
 import au.com.shiftyjelly.pocketcasts.views.databinding.SettingsRowPodcastBinding
+import au.com.shiftyjelly.pocketcasts.views.viewmodels.PodcastSelectViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.disposables.CompositeDisposable
 import javax.inject.Inject
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -74,10 +73,9 @@ class PodcastSelectFragment : BaseFragment() {
 
     private var userChanged = false
 
-    @Inject lateinit var podcastManager: PodcastManager
-
     @Inject lateinit var analyticsTracker: AnalyticsTracker
-    private val disposables = CompositeDisposable()
+
+    private val viewModel: PodcastSelectViewModel by viewModels()
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -113,53 +111,53 @@ class PodcastSelectFragment : BaseFragment() {
         if (args.tintColor != null) {
             binding.btnSelect.setTextColor(args.tintColor)
         }
+
+        val selectedUuids = listener.podcastSelectFragmentGetCurrentSelection()
+        viewModel.loadSelectablePodcasts(selectedUuids)
+
         viewLifecycleOwner.lifecycleScope.launch {
-            val podcasts = withContext(Dispatchers.IO) {
-                podcastManager.findSubscribedBlocking()
-            }
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.selectablePodcasts.collect { podcastList ->
+                        val adapter = PodcastSelectAdapter(
+                            podcastList,
+                            args.tintColor,
+                            imageRequestFactory,
+                            onPodcastToggled = { podcastUuid, enabled ->
+                                analyticsTracker.track(AnalyticsEvent.SETTINGS_SELECT_PODCASTS_PODCAST_TOGGLED, source.toEventProperty() + mapOf("uuid" to podcastUuid, "enabled" to enabled))
+                            },
+                            onSelectionChanged = {
+                                val selectedList = it.map { it.uuid }
+                                binding.lblPodcastsChosen.text =
+                                    resources.getStringPluralPodcastsSelected(selectedList.size)
+                                listener.podcastSelectFragmentSelectionChanged(selectedList)
+                                userChanged = true
+                            },
+                        )
 
-            val selected = listener.podcastSelectFragmentGetCurrentSelection()
+                        val selectedCount = podcastList.count { it.selected }
+                        binding.lblPodcastsChosen.text =
+                            resources.getStringPluralPodcastsSelected(selectedCount)
+                        binding.recyclerView.layoutManager = layoutManager
+                        binding.recyclerView.adapter = adapter
 
-            val sortedSelectable = podcasts
-                .sortedBy { PodcastsSortType.cleanStringForSort(it.title) }
-                .map { SelectablePodcast(it, selected.contains(it.uuid)) }
+                        updateSelectButtonText(adapter.selectedPodcasts.size, adapter.list.size)
+                        binding.btnSelect.setOnClickListener {
+                            if (adapter.selectedPodcasts.size == adapter.list.size) {
+                                analyticsTracker.track(AnalyticsEvent.SETTINGS_SELECT_PODCASTS_SELECT_NONE_TAPPED, source.toEventProperty())
+                                adapter.deselectAll()
+                            } else {
+                                analyticsTracker.track(AnalyticsEvent.SETTINGS_SELECT_PODCASTS_SELECT_ALL_TAPPED, source.toEventProperty())
+                                adapter.selectAll()
+                            }
 
-            val adapter = PodcastSelectAdapter(
-                sortedSelectable,
-                args.tintColor,
-                imageRequestFactory,
-                onPodcastToggled = { podcastUuid, enabled ->
-                    analyticsTracker.track(AnalyticsEvent.SETTINGS_SELECT_PODCASTS_PODCAST_TOGGLED, source.toEventProperty() + mapOf("uuid" to podcastUuid, "enabled" to enabled))
-                },
-                onSelectionChanged = {
-                    val selectedList = it.map { it.uuid }
-                    binding.lblPodcastsChosen.text =
-                        resources.getStringPluralPodcastsSelected(selectedList.size)
-                    listener.podcastSelectFragmentSelectionChanged(selectedList)
-                    userChanged = true
-                },
-            )
+                            updateSelectButtonText(adapter.selectedPodcasts.size, adapter.list.size)
+                        }
 
-            val selectedCount = sortedSelectable.count { it.selected }
-            binding.lblPodcastsChosen.text =
-                resources.getStringPluralPodcastsSelected(selectedCount)
-            binding.recyclerView.layoutManager = layoutManager
-            binding.recyclerView.adapter = adapter
-
-            updateSelectButtonText(adapter.selectedPodcasts.size, adapter.list.size)
-            binding.btnSelect.setOnClickListener {
-                if (adapter.selectedPodcasts.size == adapter.list.size) {
-                    analyticsTracker.track(AnalyticsEvent.SETTINGS_SELECT_PODCASTS_SELECT_NONE_TAPPED, source.toEventProperty())
-                    adapter.deselectAll()
-                } else {
-                    analyticsTracker.track(AnalyticsEvent.SETTINGS_SELECT_PODCASTS_SELECT_ALL_TAPPED, source.toEventProperty())
-                    adapter.selectAll()
+                        this@PodcastSelectFragment.adapter = adapter
+                    }
                 }
-
-                updateSelectButtonText(adapter.selectedPodcasts.size, adapter.list.size)
             }
-
-            this@PodcastSelectFragment.adapter = adapter
         }
     }
 
@@ -175,7 +173,6 @@ class PodcastSelectFragment : BaseFragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         analyticsTracker.track(AnalyticsEvent.SETTINGS_SELECT_PODCASTS_DISMISSED, source.toEventProperty())
-        disposables.clear()
         trackChange()
         binding = null
     }
