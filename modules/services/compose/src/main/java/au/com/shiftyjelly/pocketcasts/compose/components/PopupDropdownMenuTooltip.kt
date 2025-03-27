@@ -56,7 +56,7 @@ import com.airbnb.android.showkase.annotation.ShowkaseComposable
  */
 
 @Composable
-fun Tooltip(
+fun PopupDropdownMenuTooltip(
     show: Boolean,
     modifier: Modifier = Modifier,
     offset: DpOffset = TooltipDefaults.tooltipOffset(),

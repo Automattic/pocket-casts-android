@@ -9,7 +9,6 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -23,7 +22,7 @@ import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.LocalColors
 import au.com.shiftyjelly.pocketcasts.compose.ThemeColors
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
-import au.com.shiftyjelly.pocketcasts.compose.components.Tooltip
+import au.com.shiftyjelly.pocketcasts.compose.components.PopupDropdownMenuTooltip
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfo
@@ -68,7 +67,7 @@ private fun ReferralsIconWithTooltip(
                 colors = LocalColors.current.colors,
             )
 
-            Tooltip(
+            PopupDropdownMenuTooltip(
                 show = state.showTooltip,
             ) {
                 state.referralsOfferInfo?.let {
