@@ -44,6 +44,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
@@ -498,6 +499,9 @@ class PodcastsFragment :
         binding.tooltipComposeView.apply {
             isVisible = true
             setContentWithViewCompositionStrategy {
+                CallOnce {
+                    viewModel.onTooltipShown()
+                }
                 AppTheme(theme.activeTheme) {
                     val configuration = LocalConfiguration.current
                     var toolbarY by remember { mutableIntStateOf(0) }

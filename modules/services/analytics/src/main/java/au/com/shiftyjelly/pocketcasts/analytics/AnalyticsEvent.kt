@@ -111,6 +111,8 @@ enum class AnalyticsEvent(val key: String) {
     PODCASTS_LIST_LAYOUT_CHANGED("podcasts_list_layout_changed"),
     PODCASTS_LIST_BADGES_CHANGED("podcasts_list_badges_changed"),
     PODCASTS_LIST_DISCOVER_BUTTON_TAPPED("podcasts_list_discover_button_tapped"),
+    EPISODE_RECENTLY_PLAYED_SORT_OPTION_TOOLTIP_SHOWN("episode_recently_played_sort_option_tooltip_shown"),
+    EPISODE_RECENTLY_PLAYED_SORT_OPTION_TOOLTIP_DISMISSED("episode_recently_played_sort_option_tooltip_dismissed"),
 
     /* Tab bar items */
     PODCASTS_TAB_OPENED("podcasts_tab_opened"),
