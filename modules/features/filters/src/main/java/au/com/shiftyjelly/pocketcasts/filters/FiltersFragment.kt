@@ -10,21 +10,21 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.layout.MeasurePolicy
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.invisibleToUser
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
@@ -221,7 +221,7 @@ class FiltersFragment :
             setContentWithViewCompositionStrategy {
                 AppTheme(theme.activeTheme) {
                     val configuration = LocalConfiguration.current
-                    var toolbarY by remember { mutableFloatStateOf(0f) }
+                    var toolbarY by remember { mutableIntStateOf(0) }
 
                     CallOnce {
                         viewModel.trackTooltipShown()
@@ -230,42 +230,27 @@ class FiltersFragment :
                     LaunchedEffect(configuration) {
                         val location = IntArray(2)
                         toolbar.getLocationOnScreen(location)
-                        toolbarY = (location[1] + toolbar.height).toFloat()
+                        toolbarY = (location[1] + toolbar.height)
                     }
 
                     Box(
+                        contentAlignment = Alignment.TopEnd,
                         modifier = Modifier
                             .fillMaxSize()
                             .background(Color.Black.copy(alpha = 0.4f))
                             .clickable(
                                 interactionSource = null,
                                 indication = null,
-                                onClick = { closeTooltip() },
+                                onClick = ::closeTooltip,
                             )
-                            .semantics {
-                                invisibleToUser()
-                            },
+                            .semantics { invisibleToUser() },
                     ) {
-                        Layout(
-                            content = {
-                                FiltersTooltip(
-                                    onClickClose = { closeTooltip() },
-                                    modifier = Modifier.widthIn(max = 326.dp).padding(horizontal = 16.dp),
-                                )
-                            },
-                            modifier = Modifier,
-                            measurePolicy = MeasurePolicy { measures, constraints ->
-                                val tooltip = measures[0].measure(constraints)
-                                val parentWidth = constraints.maxWidth
-                                val horizontalOffset = parentWidth - tooltip.width
-
-                                layout(tooltip.width, tooltip.height) {
-                                    tooltip.place(
-                                        x = horizontalOffset,
-                                        y = toolbarY.toInt(),
-                                    )
-                                }
-                            },
+                        val density = LocalDensity.current
+                        val yOffset = with(density) { toolbarY.toDp() - 16.dp }
+                        FiltersTooltip(
+                            onClickClose = ::closeTooltip,
+                            modifier = Modifier
+                                .offset(y = yOffset),
                         )
                     }
                 }
@@ -274,7 +259,8 @@ class FiltersFragment :
     }
 
     private fun closeTooltip() {
-        binding?.tooltipComposeView?.isVisible = false
+        binding?.tooltipComposeView?.isGone = true
+        binding?.tooltipComposeView?.disposeComposition()
         viewModel.onTooltipClosed()
     }
 

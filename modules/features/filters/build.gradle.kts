@@ -35,6 +35,7 @@ dependencies {
     api(projects.modules.services.repositories)
     api(projects.modules.services.ui)
     api(projects.modules.services.views)
+    api(projects.modules.services.compose)
 
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.core.ktx)
