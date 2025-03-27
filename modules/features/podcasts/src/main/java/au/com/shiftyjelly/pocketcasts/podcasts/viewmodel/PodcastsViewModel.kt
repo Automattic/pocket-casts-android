@@ -336,8 +336,12 @@ class PodcastsViewModel
     fun shouldShowTooltip() =
         FeatureFlag.isEnabled(Feature.PODCASTS_SORT_CHANGES) && settings.showPodcastsRecentlyPlayedSortOrderTooltip.value
 
+    fun onTooltipShown() {
+        analyticsTracker.track(AnalyticsEvent.EPISODE_RECENTLY_PLAYED_SORT_OPTION_TOOLTIP_SHOWN)
+    }
     fun onTooltipClosed() {
         settings.showPodcastsRecentlyPlayedSortOrderTooltip.set(false, updateModifiedAt = false)
+        analyticsTracker.track(AnalyticsEvent.EPISODE_RECENTLY_PLAYED_SORT_OPTION_TOOLTIP_DISMISSED)
     }
 
     private fun Flowable<List<Podcast>>.distinctByPodcastDetails() = this.distinctUntilChanged { old, new ->
