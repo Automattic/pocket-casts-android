@@ -321,6 +321,9 @@ class PodcastsViewModel
     fun shouldShowTooltip() =
         FeatureFlag.isEnabled(Feature.PODCASTS_SORT_CHANGES) && settings.showPodcastsRecentlyPlayedSortOrderTooltip.value
 
+    fun onTooltipClosed() {
+        settings.showPodcastsRecentlyPlayedSortOrderTooltip.set(false, updateModifiedAt = false)
+    }
 
     sealed class SuggestedFoldersState {
         data object Empty : SuggestedFoldersState()

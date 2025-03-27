@@ -501,6 +501,8 @@
     <string name="podcasts_sort_by_duration_asc">"Shortest to longest"</string>
     <string name="podcasts_sort_by_release_date">Episode release date</string>
     <string name="podcasts_sort_by_title">"Title (A - Z)"</string>
+    <string name="podcasts_sort_by_tooltip_title">Sort by \“Recently Played\”</string>
+    <string name="podcasts_sort_by_tooltip_message">You can now sort by Recently Played and quickly pick up where you left off.</string>
     <string name="podcasts_sort_order">Sort order</string>
     <string name="podcasts_subscribe_on_phone">Follow podcasts on your phone and they\'ll appear here.</string>
     <string name="podcasts_time_to_add_some_podcasts">Time to add some Podcasts!</string>
