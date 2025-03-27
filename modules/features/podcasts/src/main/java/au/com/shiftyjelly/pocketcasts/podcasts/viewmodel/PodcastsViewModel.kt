@@ -340,6 +340,7 @@ class PodcastsViewModel
             oldPodcast.uuid == newPodcast.uuid &&
                 oldPodcast.title == newPodcast.title &&
                 oldPodcast.author == newPodcast.author &&
+                oldPodcast.addedDate == newPodcast.addedDate &&
                 oldPodcast.podcastCategory == newPodcast.podcastCategory &&
                 oldPodcast.folderUuid == newPodcast.folderUuid
         }
