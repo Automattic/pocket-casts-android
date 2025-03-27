@@ -318,6 +318,10 @@ class PodcastsViewModel
         return suggestedFoldersPopupPolicy.isEligibleForPopup()
     }
 
+    fun shouldShowTooltip() =
+        FeatureFlag.isEnabled(Feature.PODCASTS_SORT_CHANGES) && settings.showPodcastsRecentlyPlayedSortOrderTooltip.value
+
+
     sealed class SuggestedFoldersState {
         data object Empty : SuggestedFoldersState()
 

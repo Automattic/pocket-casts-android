@@ -43,6 +43,8 @@ class AppLifecycleObserverTest {
 
     @Mock private lateinit var showPodcastHeaderChangesSetting: UserSetting<Boolean>
 
+    @Mock private lateinit var showPodcastsRecentlyPlayedSortOrderSetting: UserSetting<Boolean>
+
     @Mock private lateinit var autoDownloadOnFollowPodcastSetting: UserSetting<Boolean>
 
     @Mock private lateinit var appLifecycleAnalytics: AppLifecycleAnalytics
@@ -67,6 +69,7 @@ class AppLifecycleObserverTest {
         whenever(settings.autoDownloadOnFollowPodcast).thenReturn(autoDownloadOnFollowPodcastSetting)
         whenever(settings.useDarkUpNextTheme).thenReturn(useUpNextDarkThemeSetting)
         whenever(settings.showPodcastHeaderChangesTooltip).thenReturn(showPodcastHeaderChangesSetting)
+        whenever(settings.showPodcastsRecentlyPlayedSortOrderTooltip).thenReturn(showPodcastsRecentlyPlayedSortOrderSetting)
 
         whenever(appLifecycleOwner.lifecycle).thenReturn(appLifecycle)
 
