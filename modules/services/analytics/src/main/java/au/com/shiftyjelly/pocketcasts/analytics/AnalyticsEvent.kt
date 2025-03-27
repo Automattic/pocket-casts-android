@@ -25,6 +25,7 @@ enum class AnalyticsEvent(val key: String) {
     BOOKMARK_EDIT_FORM_SUBMITTED("bookmark_edit_form_submitted"),
     BOOKMARK_SHARE_TAPPED("bookmark_share_tapped"),
     PROFILE_BOOKMARKS_SHOWN("profile_bookmarks_shown"),
+    BOOKMARKS_GET_BOOKMARKS_BUTTON_TAPPED("bookmarks_get_bookmarks_button_tapped"),
 
     /* User lifecycle events */
     USER_SIGNED_IN("user_signed_in"),
