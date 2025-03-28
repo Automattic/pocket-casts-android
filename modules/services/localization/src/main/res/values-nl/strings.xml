@@ -1,11 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-03-12 09:54:03+0000
+Translation-Revision-Date: 2025-03-25 11:54:04+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="restore">Herstellen</string>
+    <string name="up_next_history_explanation">Een lijst met recente updates over Hierna dankzij wijzigingen aangebracht aan andere apparaten. Klik op een bericht om de afleveringen te bekijken en ze mogelijk te herstellen.</string>
+    <string name="up_next_history">Geschiedenis van Hierna</string>
+    <string name="delete_download_warning_summary">Weet je zeker dat je deze downloads wilt verwijderen? Je kan dan niet offline afspelen.</string>
+    <string name="delete_download_warning_title">Gedownloade afleveringen verwijderen</string>
+    <string name="delete_download_warning_button">%1$d downloads verwijderen</string>
+    <string name="profile_files_empty_title">Luister of bekijk je eigen bestanden</string>
+    <string name="profile_empty_starred_summary">Geef afleveringen die je leuk vindt een ster en kom er op elk gewenst moment naar terug.</string>
+    <string name="profile_empty_starred">Sla je favorieten op</string>
+    <string name="profile_empty_history_summary">Luister naar podcasts en bekijk hier je luistergeschiedenis.</string>
+    <string name="profile_empty_history">Laten we je aan het luisteren zetten!</string>
+    <string name="profile_empty_downloaded_summary">Sla afleveringen op om offline te luisteren en mis geen enkel moment.</string>
+    <string name="profile_empty_downloaded">Geniet van offline luisteren</string>
+    <string name="go_to_discover">Ga naar Ontdekken</string>
+    <string name="large_player_widget_description">Afspelen regelen of van aflevering wisselen</string>
+    <string name="large_player_widget_label">Podcast-besturingselementen en Hierna in de wachtrij</string>
+    <string name="medium_player_widget_description">Speel je aflevering af, pauzeer hem of sla er stukken in over</string>
+    <string name="medium_player_widget_label">Bedieningselementen voor podcasts afspelen</string>
+    <string name="small_player_widget_description">Speel of pauzeer je aflevering met één tik</string>
+    <string name="small_player_widget_label">Knop Podcast afspelen</string>
+    <string name="medium_player_classic_widget_label">Podcast-besturingselementen (klassiek)</string>
+    <string name="transcript_generated_header">Deze transcriptie is automatisch gegenereerd en is alleen beschikbaar voor Plus-abonnees.</string>
+    <string name="transcript_generated_paywall_description">Abonneer je op Plus om er toegang tot te krijgen en tot andere Premium-functies zoals bladwijzers en mappen.</string>
+    <string name="transcript_generated_paywall_title">Deze transcriptie is automatisch gegenereerd door Pocket Casts.</string>
     <string name="onboarding_plus_feature_chapters_title">Hoofdstukken voorselecteren</string>
     <string name="onboarding_plus_feature_bookmarks_title">Bladwijzers</string>
     <string name="podcast_header_redesign_message">Tik op de podcasttitel om de beschrijving en details in te klappen of uit te vouwen</string>
@@ -424,8 +448,6 @@ Language: nl
     <string name="settings_headphone_controls_action_previous">Vorige actie</string>
     <string name="settings_headphone_controls_action_next">Nieuwe actie</string>
     <string name="bookmarks_headphone_settings">Instellingen koptelefoon</string>
-    <string name="bookmarks_not_found">Nog geen bladwijzers</string>
-    <string name="bookmarks_create_instructions">Je kan tijdstempels van afleveringen opslaan in het actiemenu van de speler of door een actie te configureren met je koptelefoon.</string>
     <string name="bookmark_play">Afspelen bij positie bladwijzer %s</string>
     <string name="bookmarks_plural">%d bladwijzers</string>
     <string name="bookmarks_singular">1 bladwijzer</string>
@@ -1350,7 +1372,6 @@ Language: nl
     <string name="profile_free_account">Gratis account</string>
     <string name="profile_forgot_your_password">Ik ben mijn wachtwoord vergeten</string>
     <string name="profile_files_remove_image">Afbeelding vervangen</string>
-    <string name="profile_files_empty_title">Geen bestanden</string>
     <string name="profile_files_empty_summary">Wil je naar je eigen bestanden luisteren?\nTik op de knop + om ze te openen in Pocket Casts en ze verschijnen hier.</string>
     <string name="profile_files_addfile_save">Opslaan</string>
     <string name="profile_files_add_filename">Naam</string>
@@ -1361,12 +1382,6 @@ Language: nl
     <string name="profile_ends">Eindigt %s</string>
     <string name="profile_ended">Beëindigd %s</string>
     <string name="profile_end_tour">EINDE RONDLEIDING</string>
-    <string name="profile_empty_starred_summary">Je hebt nog geen aflevering aan favorieten toegevoegd.</string>
-    <string name="profile_empty_starred">Geen favorieten</string>
-    <string name="profile_empty_history_summary">Je hebt nog geen afleveringen geluisterd.</string>
-    <string name="profile_empty_history">Niets afgespeeld</string>
-    <string name="profile_empty_downloaded_summary">O nee! Je hebt geen downloads meer. Download meer afleveringen en ze verschijnen hier.</string>
-    <string name="profile_empty_downloaded">Geen gedownloade afleveringen</string>
     <string name="profile_email_address_changed">E-mailadres is veranderd</string>
     <string name="profile_email_address">E-mailadres</string>
     <string name="profile_email">E-mailadres</string>

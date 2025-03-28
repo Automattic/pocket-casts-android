@@ -1,11 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-03-12 11:54:03+0000
+Translation-Revision-Date: 2025-03-25 15:54:02+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+    <string name="restore">Restaurar</string>
+    <string name="up_next_history_explanation">Una lista de las últimas actualizaciones en Próximamente debido a cambios en otros dispositivos. Para ver los episodios y poder restaurarlos, pulsa en cualquier entrada.</string>
+    <string name="up_next_history">Historial de Próximamente</string>
+    <string name="delete_download_warning_summary">¿Seguro que quieres eliminar estas descargas? No podrás reproducir los episodios sin conexión.</string>
+    <string name="delete_download_warning_title">Eliminar episodios descargados</string>
+    <string name="delete_download_warning_button">Eliminar %1$d descargas</string>
+    <string name="profile_files_empty_title">Escucha o mira tus propios archivos</string>
+    <string name="profile_empty_starred_summary">Marca como favoritos los episodios que te gusten y vuelve a verlos cuando quieras.</string>
+    <string name="profile_empty_starred">Guarda tus favoritos</string>
+    <string name="profile_empty_history_summary">Empieza a escuchar podcasts y consulta tu historial de escucha aquí.</string>
+    <string name="profile_empty_history">Y ahora… ¡a escuchar!</string>
+    <string name="profile_empty_downloaded_summary">Guarda episodios para escucharlos sin conexión y no te pierdas nada.</string>
+    <string name="profile_empty_downloaded">Escucha episodios sin conexión</string>
+    <string name="go_to_discover">Ir a Descubrir</string>
+    <string name="large_player_widget_description">Controla la reproducción o cambia de episodio</string>
+    <string name="large_player_widget_label">Controles de podcasts y lista «A continuación»</string>
+    <string name="medium_player_widget_description">Reproduce, pausa u omite el episodio</string>
+    <string name="medium_player_widget_label">Controles de reproducción de podcasts</string>
+    <string name="small_player_widget_description">Reproduce o pausa tu episodio con un solo toque</string>
+    <string name="small_player_widget_label">Botón de reproducción del podcast</string>
+    <string name="medium_player_classic_widget_label">Controles de reproducción de podcasts (clásicos)</string>
+    <string name="transcript_generated_header">Esta transcripción se genera automáticamente y solo está disponible para los suscriptores de Plus.</string>
+    <string name="transcript_generated_paywall_description">Suscríbete a Plus para acceder a ella y a otras funciones Premium, como los marcadores y las carpetas.</string>
+    <string name="transcript_generated_paywall_title">Pocket Casts genera automáticamente esta transcripción.</string>
     <string name="onboarding_plus_feature_chapters_title">Preselección de capítulos</string>
     <string name="onboarding_plus_feature_bookmarks_title">Marcadores</string>
     <string name="podcast_header_redesign_message">Toca el título del podcast para contraer o ampliar la descripción y los detalles</string>
@@ -424,8 +448,6 @@ Language: es
     <string name="settings_headphone_controls_action_previous">Acción anterior</string>
     <string name="settings_headphone_controls_action_next">Acción siguiente</string>
     <string name="bookmarks_headphone_settings">Ajustes de los auriculares</string>
-    <string name="bookmarks_not_found">Todavía no hay marcadores</string>
-    <string name="bookmarks_create_instructions">Para guardar las marcas de tiempo de los episodios, ve al menú de acciones del reproductor o configura una acción con los auriculares.</string>
     <string name="bookmark_play">Reproducir en la posición del marcador %s</string>
     <string name="bookmarks_plural">%d marcadores</string>
     <string name="bookmarks_singular">1 marcador</string>
@@ -1350,7 +1372,6 @@ Language: es
     <string name="profile_free_account">Cuenta gratuita</string>
     <string name="profile_forgot_your_password">He olvidado mi contraseña</string>
     <string name="profile_files_remove_image">Reemplazar imagen</string>
-    <string name="profile_files_empty_title">Sin archivos</string>
     <string name="profile_files_empty_summary">¿Quieres escuchar tus propios archivos?\nToca el botón con el signo + para abrirlos en Pocket Casts y aparecerán ahí.</string>
     <string name="profile_files_addfile_save">Guardar</string>
     <string name="profile_files_add_filename">Nombre</string>
@@ -1361,12 +1382,6 @@ Language: es
     <string name="profile_ends">Finaliza %s</string>
     <string name="profile_ended">Finalizó el %s</string>
     <string name="profile_end_tour">FINALIZAR RECORRIDO</string>
-    <string name="profile_empty_starred_summary">Todavía no has destacado ningún episodio.</string>
-    <string name="profile_empty_starred">No se ha destacado nada</string>
-    <string name="profile_empty_history_summary">Todavía no has escuchado ningún episodio.</string>
-    <string name="profile_empty_history">No se ha reproducido nada</string>
-    <string name="profile_empty_downloaded_summary">¡Vaya! Ya no te quedan descargas. Descarga algunos más y aparecerán aquí.</string>
-    <string name="profile_empty_downloaded">Sin episodios descargados</string>
     <string name="profile_email_address_changed">Dirección de correo electrónico cambiada</string>
     <string name="profile_email_address">Dirección de correo electrónico</string>
     <string name="profile_email">Correo electrónico</string>

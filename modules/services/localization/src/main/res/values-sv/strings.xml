@@ -1,11 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-03-05 14:40:54+0000
+Translation-Revision-Date: 2025-03-27 09:01:54+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="restore">Återställ</string>
+    <string name="up_next_history_explanation">En lista över de senaste uppdateringarna av Up Next som gjorts på grund av ändringar på andra enheter. Tryck på valfritt inlägg för att titta på avsnitten och få möjlighet att återställa dem.</string>
+    <string name="up_next_history">Up Next-historik</string>
+    <string name="delete_download_warning_summary">Är du säker på att du vill ta bort dessa nedladdningar? Du kommer inte att kunna spela upp offline.</string>
+    <string name="delete_download_warning_title">Inga nedladdade avsnitt</string>
+    <string name="delete_download_warning_button">Ta bort %1$d nedladdningar</string>
+    <string name="profile_files_empty_title">Lyssna eller titta på dina egna filer</string>
+    <string name="profile_empty_starred_summary">Stjärnmärk avsnitt du älskar och kom tillbaka till dem när du vill.</string>
+    <string name="profile_empty_starred">Spara dina favoriter</string>
+    <string name="profile_empty_history_summary">Börja lyssna på podcasts och se tillbaka på din lyssningshistorik här.</string>
+    <string name="profile_empty_history">Nu kan du börja lyssna.</string>
+    <string name="profile_empty_downloaded_summary">Spara avsnitt för lyssning offline och missa aldrig ett ögonblick.</string>
+    <string name="profile_empty_downloaded">Njut av lyssning offline</string>
+    <string name="go_to_discover">Gå till Upptäck</string>
+    <string name="large_player_widget_description">Styr uppspelningen eller byt avsnitt</string>
+    <string name="large_player_widget_label">Podcastreglage och Nästa-kö</string>
+    <string name="medium_player_widget_description">Spela upp, pausa eller hoppa i ditt avsnitt</string>
+    <string name="medium_player_widget_label">Uppspelningsreglage för podcast</string>
+    <string name="small_player_widget_description">Spela upp eller pausa ditt avsnitt med ett tryck</string>
+    <string name="small_player_widget_label">Uppspelningsknapp för podcast</string>
+    <string name="medium_player_classic_widget_label">Uppspelningsreglage för podcast (klassiska)</string>
+    <string name="transcript_generated_header">Denna transkription genereras automatiskt och är endast tillgänglig för Plus-prenumeranter.</string>
+    <string name="transcript_generated_paywall_description">Prenumerera på Plus för att få åtkomst till den och andra Premium-funktioner som bokmärken och mappar.</string>
+    <string name="transcript_generated_paywall_title">Den här transkriptionen genereras automatiskt av Pocket Casts.</string>
+    <string name="onboarding_plus_feature_chapters_title">Välj kapitel i förväg</string>
+    <string name="onboarding_plus_feature_bookmarks_title">Bokmärken</string>
+    <string name="podcast_header_redesign_message">Tryck på podcastens rubrik för att minimera eller expandera dess beskrivning och detaljer</string>
+    <string name="suggested_folder_content_description">Förhandsgranska %1$s mapp</string>
+    <string name="suggested_folders_replace_subtitle">Vi har organiserat dina podcasts i mappar. Spara dem nu och anpassa dem efter din stil senare. Detta kommer att ersätta befintliga mappar.</string>
+    <string name="suggested_folders_title">Smarta mappar</string>
     <string name="discover_dismiss_selected_category">Avfärda vald kategori</string>
     <string name="discover_show_all_categories">Visa alla kategorier</string>
     <string name="podcast_header_redesign_title">Vi har gjort några ändringar!</string>
@@ -15,6 +45,7 @@ Language: sv_SE
     <string name="suggested_folders_replace_folders_confirmation_description">Om du godkänner de föreslagna mapparna skrivs dina befintliga mappar över. Det här kan inte ångras.</string>
     <string name="suggested_folders_replace_folders_confirmation_tittle">Ersätt befintliga mappar?</string>
     <string name="suggested_folders_replace_folders_button">Ersätt mappar</string>
+    <string name="suggested_folders_use_subtitle">Vi har organiserat dina podcasts i mappar. Spara dem nu och anpassa dem efter din stil senare.</string>
     <string name="onboarding_plus_feature_up_next_shuffle_title">Slumpmässig Nästa-uppspelning</string>
     <string name="suggested_folders_plus_prompt">Organisera dina shower och mer därtill med Pocket Casts Plus</string>
     <string name="winback_cancel_subscription_header_title">Avsluta prenumeration</string>
@@ -417,8 +448,7 @@ Language: sv_SE
     <string name="settings_headphone_controls_action_previous">Föregående åtgärd</string>
     <string name="settings_headphone_controls_action_next">Nästa åtgärd</string>
     <string name="bookmarks_headphone_settings">Hörlursinställningar</string>
-    <string name="bookmarks_not_found">Inga bokmärken än</string>
-    <string name="bookmarks_create_instructions">Du kan spara tidsstämplar för avsnitt från åtgärdsmenyn i spelaren eller genom att konfigurera en åtgärd med dina hörlurar.</string>
+    <string name="bookmarks_paid_user_empty_state_message">Du kan spara tidsstämplar för avsnitt från åtgärdsmenyn i spelaren eller genom att konfigurera en åtgärd med dina hörlurar.</string>
     <string name="bookmark_play">Spela upp från bokmärkesposition %s</string>
     <string name="bookmarks_plural">%d bokmärken</string>
     <string name="bookmarks_singular">1 bokmärke</string>
@@ -1343,7 +1373,6 @@ Language: sv_SE
     <string name="profile_free_account">Gratis konto</string>
     <string name="profile_forgot_your_password">Jag har glömt lösenordet</string>
     <string name="profile_files_remove_image">Byt bild</string>
-    <string name="profile_files_empty_title">Inga filer</string>
     <string name="profile_files_empty_summary">Vill du lyssna på dina egna filer?\nTryck på knappen + för att öppna dem i Pocket Casts så visas de här.</string>
     <string name="profile_files_addfile_save">Spara</string>
     <string name="profile_files_add_filename">Namn</string>
@@ -1354,12 +1383,6 @@ Language: sv_SE
     <string name="profile_ends">Slutar %s</string>
     <string name="profile_ended">Slutade %s</string>
     <string name="profile_end_tour">AVSLUTA RUNDTUR</string>
-    <string name="profile_empty_starred_summary">Du har inte stjärnmärkt några avsnitt än.</string>
-    <string name="profile_empty_starred">Inget stjärnmärkt</string>
-    <string name="profile_empty_history_summary">Du har inte lyssnat på några avsnitt än.</string>
-    <string name="profile_empty_history">Inget uppspelat</string>
-    <string name="profile_empty_downloaded_summary">Åh nej! Du har slut på nedladdningar. Ladda ner fler avsnitt så visas de här.</string>
-    <string name="profile_empty_downloaded">Inga nedladdade avsnitt</string>
     <string name="profile_email_address_changed">E-postadressen har ändrats</string>
     <string name="profile_email_address">E-postadress</string>
     <string name="profile_email">E-post</string>

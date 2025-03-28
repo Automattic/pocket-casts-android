@@ -1,11 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-03-12 09:54:03+0000
+Translation-Revision-Date: 2025-03-25 09:54:04+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="restore">복원</string>
+    <string name="up_next_history_explanation">다른 기기의 변경 사항으로 인한 변경 예정 사항의 최근 업데이트 목록입니다. 에피소드를 보고 복원하려면 아무 항목이나 누르세요.</string>
+    <string name="up_next_history">변경 예정 사항 내역</string>
+    <string name="delete_download_warning_summary">이러한 다운로드 항목을 제거하시겠습니까? 오프라인으로 재생할 수 없게 됩니다.</string>
+    <string name="delete_download_warning_title">다운로드한 에피소드 제거</string>
+    <string name="delete_download_warning_button">다운로드 항목 %1$d개 제거</string>
+    <string name="profile_files_empty_title">나만의 파일 듣기 또는 보기</string>
+    <string name="profile_empty_starred_summary">좋아하는 에피소드에 별을 표시하고 언제든지 다시 방문하세요.</string>
+    <string name="profile_empty_starred">즐겨찾기 항목 저장</string>
+    <string name="profile_empty_history_summary">팟캐스트 청취를 시작하고 여기에서 청취 기록을 다시 방문하세요.</string>
+    <string name="profile_empty_history">들려드리겠습니다!</string>
+    <string name="profile_empty_downloaded_summary">오프라인 청취를 위해 에피소드를 저장하고 한순간도 놓치지 마세요.</string>
+    <string name="profile_empty_downloaded">오프라인 청취 즐기기</string>
+    <string name="go_to_discover">둘러보기로 이동</string>
+    <string name="large_player_widget_description">컨트롤 재생 또는 에피소드 전환</string>
+    <string name="large_player_widget_label">팟캐스트 컨트롤 및 다음 차례 대기열</string>
+    <string name="medium_player_widget_description">에피소드 재생, 일시 중지 또는 건너뛰기</string>
+    <string name="medium_player_widget_label">팟캐스트 재생 컨트롤</string>
+    <string name="small_player_widget_description">한 번 탭하여 에피소드 재생 또는 일시 중지</string>
+    <string name="small_player_widget_label">팟캐스트 재생 버튼</string>
+    <string name="medium_player_classic_widget_label">팟캐스트 재생 컨트롤(클래식)</string>
+    <string name="transcript_generated_header">이 대본은 자동으로 생성되었으며 Plus 구독자만 사용할 수 있습니다.</string>
+    <string name="transcript_generated_paywall_description">Plus를 구독하여 북마크, 폴더와 같은 기타 프리미엄 기능을 이용하세요.</string>
+    <string name="transcript_generated_paywall_title">이 대본은 Pocket Casts에서 자동으로 생성되었습니다.</string>
     <string name="onboarding_plus_feature_chapters_title">챕터 미리 선택</string>
     <string name="onboarding_plus_feature_bookmarks_title">북마크</string>
     <string name="podcast_header_redesign_message">팟캐스트 제목을 눌러 설명과 상세 정보를 축소하거나 확장하세요.</string>
@@ -424,8 +448,6 @@ Language: ko_KR
     <string name="settings_headphone_controls_action_previous">이전 작업</string>
     <string name="settings_headphone_controls_action_next">다음 작업</string>
     <string name="bookmarks_headphone_settings">헤드폰 설정</string>
-    <string name="bookmarks_not_found">아직 북마크가 없습니다.</string>
-    <string name="bookmarks_create_instructions">플레이어의 작업 메뉴에서 또는 헤드폰으로 작업을 구성하여 에피소드의 타임스탬프를 저장할 수 있습니다.</string>
     <string name="bookmark_play">북마크 위치에서 재생 %s</string>
     <string name="bookmarks_plural">북마크 %d개</string>
     <string name="bookmarks_singular">북마크 1개</string>
@@ -1350,7 +1372,6 @@ Language: ko_KR
     <string name="profile_free_account">무료 계정</string>
     <string name="profile_forgot_your_password">비밀번호를 잊었음</string>
     <string name="profile_files_remove_image">이미지 교체</string>
-    <string name="profile_files_empty_title">파일 없음</string>
     <string name="profile_files_empty_summary">자신의 파일을 청취하시겠나요?\n+ 버튼을 눌러 Pocket Casts에서 열면 여기에 표시됩니다.</string>
     <string name="profile_files_addfile_save">저장</string>
     <string name="profile_files_add_filename">이름</string>
@@ -1361,12 +1382,6 @@ Language: ko_KR
     <string name="profile_ends">%s 종료</string>
     <string name="profile_ended">%s 종료됨</string>
     <string name="profile_end_tour">둘러보기 종료</string>
-    <string name="profile_empty_starred_summary">아직 별을 표시한 에피소드가 없습니다.</string>
-    <string name="profile_empty_starred">별 표시 없음</string>
-    <string name="profile_empty_history_summary">아직 청취한 에피소드가 없습니다.</string>
-    <string name="profile_empty_history">재생한 적 없음</string>
-    <string name="profile_empty_downloaded_summary">이런! 방금 다운로드를 마치셨습니다. 조금 더 다운로드하면 여기에 표시됩니다.</string>
-    <string name="profile_empty_downloaded">다운로드한 에피소드 없음</string>
     <string name="profile_email_address_changed">이메일 주소 변경됨</string>
     <string name="profile_email_address">이메일 주소</string>
     <string name="profile_email">이메일</string>

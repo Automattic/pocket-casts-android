@@ -1,11 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-03-10 15:54:03+0000
+Translation-Revision-Date: 2025-03-25 15:54:03+0000
 Plural-Forms: nplurals=2; plural=(n > 1);
 Generator: GlotPress/2.4.0-alpha
 Language: pt_BR
 -->
 <resources>
+    <string name="restore">Recuperação</string>
+    <string name="up_next_history_explanation">Uma lista de atualizações recentes na lista de Próximos devido a alterações em outros dispositivos. Para ver os episódios e poder restaurá-los, toque em alguma entrada.</string>
+    <string name="up_next_history">Histórico de Próximos</string>
+    <string name="delete_download_warning_summary">Tem certeza de que deseja remover estes downloads? Você não poderá reproduzir offline.</string>
+    <string name="delete_download_warning_title">Remover episódios baixados</string>
+    <string name="delete_download_warning_button">Remover %1$d downloads</string>
+    <string name="profile_files_empty_title">Ouça ou assista a seus próprios arquivos</string>
+    <string name="profile_empty_starred_summary">Marque episódios que você ama com uma estrela e volte a eles quando quiser.</string>
+    <string name="profile_empty_starred">Salve seus favoritos</string>
+    <string name="profile_empty_history_summary">Comece a ouvir podcasts e reveja seu histórico de reprodução aqui.</string>
+    <string name="profile_empty_history">Solta o som!</string>
+    <string name="profile_empty_downloaded_summary">Salve episódios para ouvir offline e não perder nada.</string>
+    <string name="profile_empty_downloaded">Aproveite a reprodução offline</string>
+    <string name="go_to_discover">Ir para Explorar</string>
+    <string name="large_player_widget_description">Controle a reprodução ou alterne entre episódios</string>
+    <string name="large_player_widget_label">Controles de podcast e fila de Próximos</string>
+    <string name="medium_player_widget_description">Reproduza, pause ou pule partes do episódio</string>
+    <string name="medium_player_widget_label">Controles de reprodução de podcast</string>
+    <string name="small_player_widget_description">Reproduza ou pause o episódio com um toque</string>
+    <string name="small_player_widget_label">Botão de reprodução de podcast</string>
+    <string name="medium_player_classic_widget_label">Controles de reprodução de podcast (clássicos)</string>
+    <string name="transcript_generated_header">Esta transcrição é gerada automaticamente e está disponível apenas para assinantes do Plus.</string>
+    <string name="transcript_generated_paywall_description">Assine o Plus para ter acesso a essa e outras funcionalidades premium, como favoritos e pastas.</string>
+    <string name="transcript_generated_paywall_title">Esta transcrição é gerada automaticamente pelo Pocket Casts.</string>
     <string name="onboarding_plus_feature_chapters_title">Pré-selecionar capítulos</string>
     <string name="onboarding_plus_feature_bookmarks_title">Favoritos</string>
     <string name="podcast_header_redesign_message">Toque no título do podcast para recolher ou expandir a descrição e os detalhes</string>
@@ -424,8 +448,6 @@ Language: pt_BR
     <string name="settings_headphone_controls_action_previous">Ação anterior</string>
     <string name="settings_headphone_controls_action_next">Próxima ação</string>
     <string name="bookmarks_headphone_settings">Configurações do headset</string>
-    <string name="bookmarks_not_found">Ainda sem favoritos</string>
-    <string name="bookmarks_create_instructions">Você pode salvar a data/hora dos episódios pelo menu de ações do reprodutor ou configurando uma ação com seu headset.</string>
     <string name="bookmark_play">Reproduzir na posição %s do favorito</string>
     <string name="bookmarks_plural">%d favoritos</string>
     <string name="bookmarks_singular">1 favorito</string>
@@ -1350,7 +1372,6 @@ Language: pt_BR
     <string name="profile_free_account">Conta gratuita</string>
     <string name="profile_forgot_your_password">Esqueci minha senha</string>
     <string name="profile_files_remove_image">Trocar imagem</string>
-    <string name="profile_files_empty_title">Nenhum arquivo</string>
     <string name="profile_files_empty_summary">Quer ouvir seus próprios arquivos?\nClique no botão + para abri-los no Pocket Casts e eles aparecerão aqui.</string>
     <string name="profile_files_addfile_save">Salvar</string>
     <string name="profile_files_add_filename">Nome</string>
@@ -1361,12 +1382,6 @@ Language: pt_BR
     <string name="profile_ends">Termina em %s</string>
     <string name="profile_ended">Terminou em %s</string>
     <string name="profile_end_tour">FINALIZAR TOUR</string>
-    <string name="profile_empty_starred_summary">Você ainda não favoritou nenhum episódio.</string>
-    <string name="profile_empty_starred">Nenhum favorito</string>
-    <string name="profile_empty_history_summary">Você ainda não ouviu nenhum episódio.</string>
-    <string name="profile_empty_history">Nada em reprodução</string>
-    <string name="profile_empty_downloaded_summary">Ah, não! Não há nada baixado. Faça download de algum conteúdo e ele aparecerá aqui.</string>
-    <string name="profile_empty_downloaded">Nenhum episódio baixado</string>
     <string name="profile_email_address_changed">Endereço de e-mail alterado</string>
     <string name="profile_email_address">Endereço de e-mail</string>
     <string name="profile_email">E-mail</string>

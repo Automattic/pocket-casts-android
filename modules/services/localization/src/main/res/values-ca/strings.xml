@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-12-05 23:54:14+0000
+Translation-Revision-Date: 2025-03-24 14:10:07+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: ca
 -->
 <resources>
+    <string name="restore">Restaurar</string>
+    <string name="up_next_history_explanation">Una llista d\'actualitzacions recents a «Tot seguit» a causa de canvis a altres dispositius. Per veure els episodis i tenir l\'opció de restaurar-los, toca qualsevol entrada.</string>
+    <string name="up_next_history">Historial de «Tot seguit»</string>
     <string name="number_stepper_minus_content_description">Menys</string>
     <string name="number_stepper_plus_content_description">Més</string>
     <string name="player_sleep_episode_plus">Augmentar el nombre d\'episodis</string>
@@ -346,8 +349,6 @@ Language: ca
     <string name="settings_headphone_controls_action_previous">Acció anterior</string>
     <string name="settings_headphone_controls_action_next">Acció següent</string>
     <string name="bookmarks_headphone_settings">Configuració dels auriculars</string>
-    <string name="bookmarks_not_found">Encara no hi ha marcadors</string>
-    <string name="bookmarks_create_instructions">Per desar les marques de temps dels episodis, aneu al menú d\'accions del reproductor o configureu una acció amb els auriculars.</string>
     <string name="bookmark_play">Reproduir a la posició del marcador %s</string>
     <string name="bookmarks_plural">%d marcadors</string>
     <string name="bookmarks_singular">1 marcador</string>
@@ -1270,7 +1271,6 @@ Language: ca
     <string name="profile_free_account">Compte gratuït</string>
     <string name="profile_forgot_your_password">He oblidat la contrasenya</string>
     <string name="profile_files_remove_image">Canviar la imatge</string>
-    <string name="profile_files_empty_title">No hi ha arxius</string>
     <string name="profile_files_empty_summary">Vols escoltar els teus propis fitxers? \nToca el botó + per obrir-los a Pocket Casts, i apareixeran aquí.</string>
     <string name="profile_files_addfile_save">Desar</string>
     <string name="profile_files_add_filename">Nom</string>
@@ -1281,12 +1281,6 @@ Language: ca
     <string name="profile_ends">Acaba %s</string>
     <string name="profile_ended">Ha acabat  %s</string>
     <string name="profile_end_tour">ACABAR RECORREGUT</string>
-    <string name="profile_empty_starred_summary">Encara no has destacat encara cap capítol.</string>
-    <string name="profile_empty_starred">No hi ha res destacat</string>
-    <string name="profile_empty_history_summary">Encara no has escoltat cap episodi.</string>
-    <string name="profile_empty_history">No s\'ha reproduït res</string>
-    <string name="profile_empty_downloaded_summary">Vaja! No tens més descàrregues. Descàrrega\'ns algunes més i apareixeran aquí.</string>
-    <string name="profile_empty_downloaded">No hi ha episodis descarregats</string>
     <string name="profile_email_address_changed">Adreça de correu electrònic canviada</string>
     <string name="profile_email_address">Adreça de correu electrònic</string>
     <string name="profile_email">Correu electrònic</string>
