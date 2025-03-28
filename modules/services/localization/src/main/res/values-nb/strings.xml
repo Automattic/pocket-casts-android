@@ -48,8 +48,6 @@ Language: nb_NO
     <string name="settings_headphone_controls_confirmation_sound_summary">Spill av en bekreftelseslyd når du har opprettet et bokmerke med hodetelefonene.</string>
     <string name="settings_headphone_controls_summary">Tilpass handlingene som utføres av de vanligste hodetelefonkontrollene.</string>
     <string name="settings_title_headphone_controls">Hodetelefonkontroller</string>
-    <string name="bookmarks_create_instructions">Du kan lagre tidsstempler i episoder fra handlingsmenyen i avspilleren, eller ved å konfigurere en handling med hodetelefonene.</string>
-    <string name="bookmarks_not_found">Ingen bokmerker ennå</string>
     <string name="bookmarks_headphone_settings">Hodetelefoninnstillinger</string>
     <string name="bookmarks_singular">1 bokmerke</string>
     <string name="bookmarks_plural">%d bokmerker</string>
@@ -950,7 +948,6 @@ Language: nb_NO
     <string name="profile_free_account">Gratis konto</string>
     <string name="profile_forgot_your_password">Jeg har glemt passordet mitt</string>
     <string name="profile_files_remove_image">Erstatt bilde</string>
-    <string name="profile_files_empty_title">Ingen filer</string>
     <string name="profile_files_empty_summary">Vil du lytte til dine egne filer?\nTrykk på +-knappen for å åpne dem i Pocket Casts, så vises de her.</string>
     <string name="profile_files_addfile_save">Lagre</string>
     <string name="profile_files_add_filename">Navn</string>
@@ -961,12 +958,6 @@ Language: nb_NO
     <string name="profile_ends">Avsluttes %s</string>
     <string name="profile_ended">Avsluttet %s</string>
     <string name="profile_end_tour">AVSLUTT OMVISNING</string>
-    <string name="profile_empty_starred_summary">Du har ikke gitt stjerner til noen episoder ennå.</string>
-    <string name="profile_empty_starred">Ingenting har fått stjerner</string>
-    <string name="profile_empty_history_summary">Du har ikke lyttet til noen episoder ennå.</string>
-    <string name="profile_empty_history">Ingenting spilt av</string>
-    <string name="profile_empty_downloaded_summary">Å nei! Du er tom for nedlastinger. Last ned noen flere, så vises de her.</string>
-    <string name="profile_empty_downloaded">Ingen nedlastede episoder</string>
     <string name="profile_email_address_changed">E-postadresse endret</string>
     <string name="profile_email_address">E-postadresse</string>
     <string name="profile_email">E-post</string>

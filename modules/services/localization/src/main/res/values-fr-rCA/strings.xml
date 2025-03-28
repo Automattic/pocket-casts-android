@@ -1,11 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-03-11 15:54:03+0000
+Translation-Revision-Date: 2025-03-25 13:54:03+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="restore">Rétablir</string>
+    <string name="up_next_history_explanation">Liste des mises à jour récentes apportées à la file d’attente à la suite de modifications sur d’autres appareils. Pour afficher les épisodes et avoir la possibilité de les rétablir, appuyez sur n’importe quelle entrée.</string>
+    <string name="up_next_history">Historique de la file d’attente</string>
+    <string name="delete_download_warning_summary">Voulez-vous vraiment supprimer ces téléchargements ? Vous ne pourrez pas écouter en étant hors ligne.</string>
+    <string name="delete_download_warning_title">Supprimer les épisodes téléchargés</string>
+    <string name="delete_download_warning_button">Supprimer %1$d téléchargements</string>
+    <string name="profile_files_empty_title">Écouter ou regarder vos propres fichiers</string>
+    <string name="profile_empty_starred_summary">Appuyez sur l’étoile pour les épisodes que vous aimez et revenez vers eux à tout moment.</string>
+    <string name="profile_empty_starred">Enregistrer vos favoris</string>
+    <string name="profile_empty_history_summary">Commencez à écouter des podcasts et consultez votre historique d’écoute ici.</string>
+    <string name="profile_empty_history">Commencez à écouter du contenu !</string>
+    <string name="profile_empty_downloaded_summary">Enregistrez des épisodes pour une écoute hors ligne et ne manquez rien.</string>
+    <string name="profile_empty_downloaded">Profiter d’une écoute hors ligne</string>
+    <string name="go_to_discover">Aller à Découvrir</string>
+    <string name="large_player_widget_description">Contrôler la lecture ou changer d’épisode</string>
+    <string name="large_player_widget_label">Contrôles du podcast et file d’attente</string>
+    <string name="medium_player_widget_description">Lire, mettre en pause ou passer une partie de votre épisode</string>
+    <string name="medium_player_widget_label">Contrôles de lecture du podcast</string>
+    <string name="small_player_widget_description">Lire ou mettre en pause votre épisode en appuyant une fois</string>
+    <string name="small_player_widget_label">Bouton de lecture du podcast</string>
+    <string name="medium_player_classic_widget_label">Contrôles de lecture du podcast (Classique)</string>
+    <string name="transcript_generated_header">Cette transcription est générée automatiquement et n’est disponible que pour les abonnés Plus.</string>
+    <string name="transcript_generated_paywall_description">Abonnez-vous à Plus pour y avoir accès ainsi qu’à d’autres fonctionnalités Premium comme les signets et les dossiers.</string>
+    <string name="transcript_generated_paywall_title">Cette transcription est générée automatiquement par Pocket Casts.</string>
     <string name="onboarding_plus_feature_chapters_title">Présélectionner des chapitres</string>
     <string name="onboarding_plus_feature_bookmarks_title">Signets</string>
     <string name="podcast_header_redesign_message">Appuyez sur le titre du podcast pour réduire ou développer sa description et ses détails</string>
@@ -424,8 +448,6 @@ Language: fr
     <string name="settings_headphone_controls_action_previous">Action précédente</string>
     <string name="settings_headphone_controls_action_next">Action suivante</string>
     <string name="bookmarks_headphone_settings">Réglages des écouteurs</string>
-    <string name="bookmarks_not_found">Aucun signet pour l’instant</string>
-    <string name="bookmarks_create_instructions">Vous pouvez enregistrer les horodatages des épisodes à partir du menu Actions du lecteur ou en configurant une action avec vos écouteurs.</string>
     <string name="bookmark_play">Lire à la position du signet %s</string>
     <string name="bookmarks_plural">%d signets</string>
     <string name="bookmarks_singular">1 signet</string>
@@ -1350,7 +1372,6 @@ Language: fr
     <string name="profile_free_account">Compte gratuit</string>
     <string name="profile_forgot_your_password">J’ai oublié mon mot de passe</string>
     <string name="profile_files_remove_image">Remplacer l’image</string>
-    <string name="profile_files_empty_title">Aucun fichier</string>
     <string name="profile_files_empty_summary">Vous souhaitez écouter vos propres fichiers ?\nAppuyez sur le bouton + pour les ouvrir dans Pocket Casts, et ils apparaîtront ici.</string>
     <string name="profile_files_addfile_save">Enregistrer</string>
     <string name="profile_files_add_filename">Nom</string>
@@ -1361,12 +1382,6 @@ Language: fr
     <string name="profile_ends">Se termine %s</string>
     <string name="profile_ended">S’est terminé %s</string>
     <string name="profile_end_tour">FIN DE LA VISITE</string>
-    <string name="profile_empty_starred_summary">Vous n’avez encore mis aucun épisode en favori.</string>
-    <string name="profile_empty_starred">Aucun favori</string>
-    <string name="profile_empty_history_summary">Vous n’avez encore écouté aucun épisode.</string>
-    <string name="profile_empty_history">Aucune lecture</string>
-    <string name="profile_empty_downloaded_summary">Oh non ! Vous n’avez plus de téléchargements. Téléchargez quelques épisodes et ils apparaîtront ici.</string>
-    <string name="profile_empty_downloaded">Aucun épisode téléchargé</string>
     <string name="profile_email_address_changed">Adresse e-mail modifiée.</string>
     <string name="profile_email_address">Adresse e-mail</string>
     <string name="profile_email">Adresse e-mail</string>

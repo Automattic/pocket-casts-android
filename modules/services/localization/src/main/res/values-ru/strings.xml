@@ -1,11 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-03-11 09:54:03+0000
+Translation-Revision-Date: 2025-03-25 15:54:02+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="restore">Восстановление</string>
+    <string name="up_next_history_explanation">Список последних обновлений Up Next, вызванных изменениями на других устройствах. Нажмите любую запись, чтобы просмотреть и при желании восстановить выпуски.</string>
+    <string name="up_next_history">История Up Next</string>
+    <string name="delete_download_warning_summary">Вы уверены, что хотите удалить эти загрузки? Воспроизведение в автономном режиме будет невозможно.</string>
+    <string name="delete_download_warning_title">Удалить загруженные выпуски</string>
+    <string name="delete_download_warning_button">Удалить загрузки: %1$d</string>
+    <string name="profile_files_empty_title">Слушайте или смотрите свои файлы</string>
+    <string name="profile_empty_starred_summary">Отмечайте понравившиеся выпуски и возвращайтесь к ним, когда захотите.</string>
+    <string name="profile_empty_starred">Сохраняйте избранное</string>
+    <string name="profile_empty_history_summary">Начните слушать подкасты и просматривайте здесь свою историю прослушивания.</string>
+    <string name="profile_empty_history">Давайте что-нибудь послушаем!</string>
+    <string name="profile_empty_downloaded_summary">Сохраняйте выпуски для офлайн-прослушивания и не пропускайте ни секунды.</string>
+    <string name="profile_empty_downloaded">Наслаждайтесь офлайн-прослушиванием</string>
+    <string name="go_to_discover">Перейти к рекомендациям</string>
+    <string name="large_player_widget_description">Управляйте воспроизведением или переключайте выпуски</string>
+    <string name="large_player_widget_label">Элементы управления подкастами и очередь «Следующие»</string>
+    <string name="medium_player_widget_description">Воспроизведение, пауза или пропуск выпуска</string>
+    <string name="medium_player_widget_label">Контроль воспроизведения подкаста</string>
+    <string name="small_player_widget_description">Воспроизведение или приостановка выпуска одним нажатием</string>
+    <string name="small_player_widget_label">Кнопка воспроизведения подкаста</string>
+    <string name="medium_player_classic_widget_label">Элементы управления воспроизведением подкастов (классический вариант)</string>
+    <string name="transcript_generated_header">Эта расшифровка генерируется автоматически и доступна только подписчикам Plus.</string>
+    <string name="transcript_generated_paywall_description">Подпишитесь на Plus, чтобы пользоваться ею и другими премиум-функциями, такими как закладки и папки.</string>
+    <string name="transcript_generated_paywall_title">Pocket Casts автоматически генерирует эту расшифровку.</string>
     <string name="onboarding_plus_feature_chapters_title">Предварительный выбор глав</string>
     <string name="onboarding_plus_feature_bookmarks_title">Закладки</string>
     <string name="podcast_header_redesign_message">Нажмите название подкаста, чтобы свернуть или развернуть его описание и сведения о нём</string>
@@ -424,8 +448,6 @@ Language: ru
     <string name="settings_headphone_controls_action_previous">Предыдущее действие</string>
     <string name="settings_headphone_controls_action_next">Следующее действие</string>
     <string name="bookmarks_headphone_settings">Настройки наушников</string>
-    <string name="bookmarks_not_found">Пока нет закладок.</string>
-    <string name="bookmarks_create_instructions">Вы можете сохранять отметки времени выпусков, используя меню действий проигрывателя или настроив действие с наушниками.</string>
     <string name="bookmark_play">Воспроизвести с закладки %s</string>
     <string name="bookmarks_plural">Закладки: %d</string>
     <string name="bookmarks_singular">1  закладка</string>
@@ -1350,7 +1372,6 @@ Language: ru
     <string name="profile_free_account">Бесплатная учётная запись</string>
     <string name="profile_forgot_your_password">Я не помню свой пароль</string>
     <string name="profile_files_remove_image">Заменить</string>
-    <string name="profile_files_empty_title">Нет файлов</string>
     <string name="profile_files_empty_summary">Хотите слушать собственные файлы?\nКоснитесь кнопки +, чтобы открыть их в Pocket Casts, и они появятся здесь.</string>
     <string name="profile_files_addfile_save">Сохранить</string>
     <string name="profile_files_add_filename">Имя</string>
@@ -1361,12 +1382,6 @@ Language: ru
     <string name="profile_ends">Завершение: %s</string>
     <string name="profile_ended">Завершено %s</string>
     <string name="profile_end_tour">ЗАВЕРШИТЬ ОЗНАКОМИТЕЛЬНЫЙ ТУР</string>
-    <string name="profile_empty_starred_summary">Вы ещё не добавили ни одного выпуска в избранное.</string>
-    <string name="profile_empty_starred">В вашем избранном пусто</string>
-    <string name="profile_empty_history_summary">Вы ещё не прослушали ни один выпуск.</string>
-    <string name="profile_empty_history">Ничего не воспроизводилось</string>
-    <string name="profile_empty_downloaded_summary">О нет! У вас совсем нет загрузок. Скачайте несколько файлов, и они появятся здесь.</string>
-    <string name="profile_empty_downloaded">Нет загруженных выпусков</string>
     <string name="profile_email_address_changed">Адрес эл. почты изменен</string>
     <string name="profile_email_address">Адрес электронной почты</string>
     <string name="profile_email">E-mail</string>

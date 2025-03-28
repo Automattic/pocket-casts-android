@@ -1,11 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-03-12 18:54:03+0000
+Translation-Revision-Date: 2025-03-25 09:54:04+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="restore">復元する</string>
+    <string name="up_next_history_explanation">他端末での変更により、「次に再生」に生じた最近の更新のリスト。 エピソードを表示し、それらを復元するオプションを利用するには、任意のエントリーをタップします。</string>
+    <string name="up_next_history">「次に再生」履歴</string>
+    <string name="delete_download_warning_summary">これらのダウンロードを削除してもよいですか ? オフラインで再生できなくなります。</string>
+    <string name="delete_download_warning_title">ダウンロード済みエピソードを削除</string>
+    <string name="delete_download_warning_button">%1$d件のダウンロードを削除</string>
+    <string name="profile_files_empty_title">自分のファイルを聴取または視聴する</string>
+    <string name="profile_empty_starred_summary">お気に入りのエピソードに星を付けると、いつでも戻ることができます。</string>
+    <string name="profile_empty_starred">お気に入りを保存</string>
+    <string name="profile_empty_history_summary">ポッドキャストを聴き始めると、こちらから聴取履歴に再アクセスできます。</string>
+    <string name="profile_empty_history">どうぞお聴きください !</string>
+    <string name="profile_empty_downloaded_summary">エピソードを保存するとオフラインで、一瞬たりとも逃さずに聴けます。</string>
+    <string name="profile_empty_downloaded">オフラインで聴く</string>
+    <string name="go_to_discover">「見つける」に移動</string>
+    <string name="large_player_widget_description">再生を制御、またはエピソードを切り替え</string>
+    <string name="large_player_widget_label">ポッドキャスト制御 &amp; 次のエピソード待機リスト</string>
+    <string name="medium_player_widget_description">エピソードを再生、一時停止、スキップ</string>
+    <string name="medium_player_widget_label">ポッドキャスト再生制御</string>
+    <string name="small_player_widget_description">ワンタップでエピソードを再生または一時停止</string>
+    <string name="small_player_widget_label">ポッドキャスト再生ボタン</string>
+    <string name="medium_player_classic_widget_label">ポッドキャスト再生制御 (クラシック)</string>
+    <string name="transcript_generated_header">こちらのトランスクリプトは自動的に生成され、Plus サブスクリプションの登録者のみが利用できます。</string>
+    <string name="transcript_generated_paywall_description">Plus サブスクリプションに登録すると、Plus にアクセスし、ブックマークやフォルダーなどのその他のプレミアム機能もご利用いただけます。</string>
+    <string name="transcript_generated_paywall_title">こちらのトランスクリプトは Pocket Casts によって自動的に生成されます。</string>
     <string name="onboarding_plus_feature_chapters_title">チャプターを事前に選択</string>
     <string name="onboarding_plus_feature_bookmarks_title">ブックマーク</string>
     <string name="podcast_header_redesign_message">ポッドキャストのタイトルをタップすると、説明と詳細を折りたたんだり展開したりできます</string>
@@ -424,8 +448,6 @@ Language: ja_JP
     <string name="settings_headphone_controls_action_previous">前のアクション</string>
     <string name="settings_headphone_controls_action_next">次のアクション</string>
     <string name="bookmarks_headphone_settings">ヘッドフォン設定</string>
-    <string name="bookmarks_not_found">まだブックマークはありません</string>
-    <string name="bookmarks_create_instructions">プレーヤーのアクションメニューから、またはヘッドフォンでアクションを設定して、エピソードのタイムスタンプを保存できます。</string>
     <string name="bookmark_play">ブックマーク位置で再生%s</string>
     <string name="bookmarks_plural">%d件のブックマーク</string>
     <string name="bookmarks_singular">1件のブックマーク</string>
@@ -1350,7 +1372,6 @@ Language: ja_JP
     <string name="profile_free_account">無料アカウント</string>
     <string name="profile_forgot_your_password">パスワードを忘れた場合</string>
     <string name="profile_files_remove_image">画像を置換</string>
-    <string name="profile_files_empty_title">ファイルなし</string>
     <string name="profile_files_empty_summary">自身のファイルを聴きたい場合は、\n+ ボタンをタップして Pocket Casts で開くとここに表示されます。</string>
     <string name="profile_files_addfile_save">保存</string>
     <string name="profile_files_add_filename">名前</string>
@@ -1361,12 +1382,6 @@ Language: ja_JP
     <string name="profile_ends">終了 %s</string>
     <string name="profile_ended">%sに終了</string>
     <string name="profile_end_tour">ツアーを終了</string>
-    <string name="profile_empty_starred_summary">星を付けているエピソードがありません。</string>
-    <string name="profile_empty_starred">星付きのエピソードがありません</string>
-    <string name="profile_empty_history_summary">聴取済みのエピソードがありません。</string>
-    <string name="profile_empty_history">再生済みのエピソードがありません</string>
-    <string name="profile_empty_downloaded_summary">ご注意ください。 ダウンロード数が足りていません。 あと数回ダウンロードするとここに表示されます。</string>
-    <string name="profile_empty_downloaded">ダウンロード済みのエピソードがありません</string>
     <string name="profile_email_address_changed">メールアドレスを変更済み</string>
     <string name="profile_email_address">メールアドレス</string>
     <string name="profile_email">メール</string>
