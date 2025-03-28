@@ -17,8 +17,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralPodcastsSelected
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
@@ -28,10 +26,8 @@ import au.com.shiftyjelly.pocketcasts.views.databinding.SettingsFragmentPodcastS
 import au.com.shiftyjelly.pocketcasts.views.databinding.SettingsRowPodcastBinding
 import au.com.shiftyjelly.pocketcasts.views.viewmodels.PodcastSelectViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
-import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
@@ -70,10 +66,7 @@ class PodcastSelectFragment : BaseFragment() {
     private var adapter: PodcastSelectAdapter? = null
     private var binding: SettingsFragmentPodcastSelectBinding? = null
     private var source: PodcastSelectFragmentSource? = null
-
     private var userChanged = false
-
-    @Inject lateinit var analyticsTracker: AnalyticsTracker
 
     private val viewModel: PodcastSelectViewModel by viewModels()
 
@@ -101,7 +94,7 @@ class PodcastSelectFragment : BaseFragment() {
 
         source = args.source
 
-        analyticsTracker.track(AnalyticsEvent.SETTINGS_SELECT_PODCASTS_SHOWN, source.toEventProperty())
+        source?.let { viewModel.trackOnShown(it) }
 
         val imageRequestFactory = PocketCastsImageRequestFactory(requireContext()).themed()
         binding.toolbarLayout.isVisible = args.showToolbar
@@ -124,7 +117,7 @@ class PodcastSelectFragment : BaseFragment() {
                             args.tintColor,
                             imageRequestFactory,
                             onPodcastToggled = { podcastUuid, enabled ->
-                                analyticsTracker.track(AnalyticsEvent.SETTINGS_SELECT_PODCASTS_PODCAST_TOGGLED, source.toEventProperty() + mapOf("uuid" to podcastUuid, "enabled" to enabled))
+                                source?.let { viewModel.trackOnPodcastToggled(it, podcastUuid, enabled) }
                             },
                             onSelectionChanged = {
                                 val selectedList = it.map { it.uuid }
@@ -144,10 +137,10 @@ class PodcastSelectFragment : BaseFragment() {
                         updateSelectButtonText(adapter.selectedPodcasts.size, adapter.list.size)
                         binding.btnSelect.setOnClickListener {
                             if (adapter.selectedPodcasts.size == adapter.list.size) {
-                                analyticsTracker.track(AnalyticsEvent.SETTINGS_SELECT_PODCASTS_SELECT_NONE_TAPPED, source.toEventProperty())
+                                source?.let { viewModel.trackOnSelectNoneTapped(it) }
                                 adapter.deselectAll()
                             } else {
-                                analyticsTracker.track(AnalyticsEvent.SETTINGS_SELECT_PODCASTS_SELECT_ALL_TAPPED, source.toEventProperty())
+                                source?.let { viewModel.trackOnSelectAllTapped(it) }
                                 adapter.selectAll()
                             }
 
@@ -172,40 +165,16 @@ class PodcastSelectFragment : BaseFragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        analyticsTracker.track(AnalyticsEvent.SETTINGS_SELECT_PODCASTS_DISMISSED, source.toEventProperty())
-        trackChange()
-        binding = null
-    }
-
-    private fun trackChange() {
+        source?.let { viewModel.trackOnDismissed(it) }
         if (userChanged) {
             val props = buildMap {
                 adapter?.selectedPodcasts?.size?.let {
                     put("number_selected", it)
                 }
             }
-            when (source) {
-                PodcastSelectFragmentSource.AUTO_ADD -> {
-                    analyticsTracker.track(AnalyticsEvent.SETTINGS_AUTO_ADD_UP_NEXT_PODCASTS_CHANGED, props)
-                }
-
-                PodcastSelectFragmentSource.NOTIFICATIONS -> {
-                    analyticsTracker.track(AnalyticsEvent.SETTINGS_NOTIFICATIONS_PODCASTS_CHANGED, props)
-                }
-
-                PodcastSelectFragmentSource.DOWNLOADS -> {
-                    analyticsTracker.track(AnalyticsEvent.SETTINGS_AUTO_DOWNLOAD_PODCASTS_CHANGED, props)
-                }
-
-                PodcastSelectFragmentSource.FILTERS -> {
-                    // Do not track because the filter_updated event was tracked when the change was persisted
-                }
-
-                null -> {
-                    Timber.e("No source set for ${this::class.java.simpleName}")
-                }
-            }
+            viewModel.trackChange(source, props)
         }
+        binding = null
     }
 
     fun selectAll() {
@@ -279,10 +248,6 @@ private class PodcastSelectAdapter(val list: List<SelectablePodcast>, @ColorInt 
         notifyDataSetChanged()
         onSelectionChanged(selectedPodcasts)
     }
-}
-
-private fun PodcastSelectFragmentSource?.toEventProperty(): Map<String, String> {
-    return this?.analyticsValue?.let { mapOf("source" to it) } ?: emptyMap()
 }
 
 @Parcelize
