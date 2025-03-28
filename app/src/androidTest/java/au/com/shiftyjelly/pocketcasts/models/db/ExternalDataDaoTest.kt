@@ -233,6 +233,24 @@ class ExternalDataDaoTest {
     }
 
     @Test
+    fun sortSubscribedPodcastsByRecentlyPlayedEpisodes() = runTest {
+        podcastDao.insertBlocking(Podcast(uuid = "id-1", title = "title-1", isSubscribed = true))
+        podcastEpisodeDao.insertBlocking(PodcastEpisode(uuid = "id-1", publishedDate = Date(), lastPlaybackInteraction = 1000L, podcastUuid = "id-1"))
+
+        podcastDao.insertBlocking(Podcast(uuid = "id-2", title = "title-2", isSubscribed = true))
+        podcastEpisodeDao.insertBlocking(PodcastEpisode(uuid = "id-2", publishedDate = Date(), lastPlaybackInteraction = 2000L, podcastUuid = "id-2"))
+
+        podcastDao.insertBlocking(Podcast(uuid = "id-3", title = "title-3", isSubscribed = true))
+
+        podcastDao.insertBlocking(Podcast(uuid = "id-4", title = "title-4", isSubscribed = true))
+        podcastEpisodeDao.insertBlocking(PodcastEpisode(uuid = "id-3", publishedDate = Date(), lastPlaybackInteraction = 3000L, podcastUuid = "id-4"))
+
+        val podcastIds = externalDataDao.getSubscribedPodcasts(PodcastsSortType.RECENTLY_PLAYED, limit = 100).map { it.id }
+
+        assertEquals(listOf("id-4", "id-2", "id-1", "id-3"), podcastIds)
+    }
+
+    @Test
     fun sortSubscribedPodcastsByCustomSortOrder() = runTest {
         podcastDao.insertBlocking(Podcast(uuid = "id-1", title = "title-1", isSubscribed = true, sortPosition = 3))
         podcastDao.insertBlocking(Podcast(uuid = "id-2", title = "title-2", isSubscribed = true, sortPosition = 1))
