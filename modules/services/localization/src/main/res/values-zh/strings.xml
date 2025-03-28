@@ -1,11 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-03-11 09:54:03+0000
+Translation-Revision-Date: 2025-03-25 09:54:04+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="restore">还原</string>
+    <string name="up_next_history_explanation">由于其他设备上的更改而处于“即将播出”状态的最新更新列表。 要查看剧集并选择恢复，请轻点任意条目。</string>
+    <string name="up_next_history">“即将播出”历史</string>
+    <string name="delete_download_warning_summary">是否确定要删除这些下载内容？ 您将无法离线播放。</string>
+    <string name="delete_download_warning_title">删除已下载的剧集</string>
+    <string name="delete_download_warning_button">删除 %1$d 下载内容</string>
+    <string name="profile_files_empty_title">收听或观看您自己的文件</string>
+    <string name="profile_empty_starred_summary">为您喜爱的剧集添加星标，以便随时重温。</string>
+    <string name="profile_empty_starred">保存您喜爱的剧集</string>
+    <string name="profile_empty_history_summary">在此开始收听播客并重温收听记录。</string>
+    <string name="profile_empty_history">现在开始收听吧！</string>
+    <string name="profile_empty_downloaded_summary">保存剧集以便离线收听，不错过任何精彩时刻。</string>
+    <string name="profile_empty_downloaded">享受离线收听</string>
+    <string name="go_to_discover">前往探索</string>
+    <string name="large_player_widget_description">控制播放或切换剧集</string>
+    <string name="large_player_widget_label">播客控件和“接下来播放”队列</string>
+    <string name="medium_player_widget_description">播放、暂停或跳过您的剧集</string>
+    <string name="medium_player_widget_label">播客播放控件</string>
+    <string name="small_player_widget_description">轻点一下即可播放或暂停您的剧集</string>
+    <string name="small_player_widget_label">播客播放按钮</string>
+    <string name="medium_player_classic_widget_label">播客播放控件（经典）</string>
+    <string name="transcript_generated_header">此文字转录稿为自动生成，仅供 Plus 订阅者使用。</string>
+    <string name="transcript_generated_paywall_description">订阅 Plus 以使用此功能和其他高级功能（如书签和文件夹）。</string>
+    <string name="transcript_generated_paywall_title">此文字转录稿由 Pocket Casts 自动生成。</string>
     <string name="onboarding_plus_feature_chapters_title">预选章节</string>
     <string name="onboarding_plus_feature_bookmarks_title">书签</string>
     <string name="podcast_header_redesign_message">轻点播客标题即可收起或展开其描述和详细信息</string>
@@ -424,8 +448,6 @@ Language: zh_CN
     <string name="settings_headphone_controls_action_previous">上一步操作</string>
     <string name="settings_headphone_controls_action_next">下一步操作</string>
     <string name="bookmarks_headphone_settings">耳机设置</string>
-    <string name="bookmarks_not_found">尚无书签</string>
-    <string name="bookmarks_create_instructions">您可以从播放器的“操作”菜单中或通过使用耳机配置操作来保存剧集的时间戳。</string>
     <string name="bookmark_play">在书签位置 %s 播放</string>
     <string name="bookmarks_plural">%d 个书签</string>
     <string name="bookmarks_singular">1 个书签</string>
@@ -1350,7 +1372,6 @@ Language: zh_CN
     <string name="profile_free_account">免费账户</string>
     <string name="profile_forgot_your_password">我忘记了密码</string>
     <string name="profile_files_remove_image">更换图片</string>
-    <string name="profile_files_empty_title">无文件</string>
     <string name="profile_files_empty_summary">想要收听您自己的文件？\n点按 + 按钮以在 Pocket Casts 中打开这些文件，它们将在此处显示。</string>
     <string name="profile_files_addfile_save">保存</string>
     <string name="profile_files_add_filename">名称</string>
@@ -1361,12 +1382,6 @@ Language: zh_CN
     <string name="profile_ends">结束 %s</string>
     <string name="profile_ended">已结束 %s</string>
     <string name="profile_end_tour">结束浏览</string>
-    <string name="profile_empty_starred_summary">您尚未对任何剧集添加星标。</string>
-    <string name="profile_empty_starred">未对任何内容加星标</string>
-    <string name="profile_empty_history_summary">您尚未收听任何剧集。</string>
-    <string name="profile_empty_history">未播放任何内容</string>
-    <string name="profile_empty_downloaded_summary">糟糕！ 下载文件没有了。 下载更多文件，这些文件将显示在此处。</string>
-    <string name="profile_empty_downloaded">没有已下载剧集</string>
     <string name="profile_email_address_changed">电子邮件地址已更改</string>
     <string name="profile_email_address">电子邮件地址</string>
     <string name="profile_email">电子邮件</string>
