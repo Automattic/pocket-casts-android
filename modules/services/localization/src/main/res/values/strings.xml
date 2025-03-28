@@ -80,6 +80,7 @@
     <string name="remove_from_up_next">Remove from Up Next</string>
     <string name="renew_your_subscription">Renew your Subscription</string>
     <string name="removed">Removed</string>
+    <string name="restore">Restore</string>
     <string name="search">Search</string>
     <string name="search_episodes_not_found_title">No episodes found</string>
     <string name="search_episodes_not_found_summary">We couldn\'t find any episode for that search. Try another keyword.</string>
@@ -254,6 +255,10 @@
     <string name="download_warning_title">Download All</string>
     <string name="download_warning_limit_summary">Bulk downloads are limited to %1$d.</string>
 
+    <string name="delete_download_warning_button">Remove %1$d downloads</string>
+    <string name="delete_download_warning_title">Remove downloaded episodes</string>
+    <string name="delete_download_warning_summary">Are you sure you want to remove these downloads? You won\'t be able to play offline.</string>
+
     <string name="episode_was_removed">Episode was removed</string>
     <string name="episode_queued_for_download">Episode queued for download</string>
 
@@ -381,6 +386,8 @@
     <string name="player_up_next_empty">Nothing in Up Next</string>
     <string name="player_up_next_empty_desc">You can queue episodes to play next by swiping right on episode rows, or tapping the icon on an episode card.</string>
     <string name="player_up_next_empty_desc_watch">You can queue episodes to play next in the episode details screen.</string>
+    <string name="player_up_next_empty_title">Curate your listening session</string>
+    <string name="player_up_next_empty_subtitle">You can queue episodes to play next by swiping right on episode rows, or tapping the icon on an episode card.</string>
     <string name="player_up_next_move_to_bottom">Move to bottom</string>
     <string name="player_up_next_move_to_top">Move to top</string>
     <string name="player_up_next_select">Select</string>
@@ -492,8 +499,11 @@
     <string name="podcasts_sort_by_date_added">Date added</string>
     <string name="podcasts_sort_by_drag_drop">Drag &amp; Drop</string>
     <string name="podcasts_sort_by_duration_asc">"Shortest to longest"</string>
+    <string name="podcasts_sort_by_recently_played">Recently played</string>
     <string name="podcasts_sort_by_release_date">Episode release date</string>
     <string name="podcasts_sort_by_title">"Title (A - Z)"</string>
+    <string name="podcasts_sort_by_tooltip_title">Sort by \“Recently Played\”</string>
+    <string name="podcasts_sort_by_tooltip_message">You can now sort by Recently Played and quickly pick up where you left off.</string>
     <string name="podcasts_sort_order">Sort order</string>
     <string name="podcasts_subscribe_on_phone">Follow podcasts on your phone and they\'ll appear here.</string>
     <string name="podcasts_time_to_add_some_podcasts">Time to add some Podcasts!</string>
@@ -525,8 +535,10 @@
     <string name="remove_from_folder">Remove from folder</string>
     <string name="change_folder">Change folder</string>
     <string name="go_to_folder">Go to folder</string>
+    <string name="go_to_discover">Go to Discover</string>
     <string name="number_stepper_plus_content_description">Plus</string>
     <string name="number_stepper_minus_content_description">Minus</string>
+    <string name="discover_collection_header_content_description">%s header</string>
 
     <!-- Podcast -->
 
@@ -934,12 +946,12 @@
     <string name="profile_email">Email</string>
     <string name="profile_email_address">Email Address</string>
     <string name="profile_email_address_changed">Email Address Changed</string>
-    <string name="profile_empty_downloaded">No Downloaded Episodes</string>
-    <string name="profile_empty_downloaded_summary">Oh no! You’re fresh out of downloads. Download some more and they’ll show up here.</string>
-    <string name="profile_empty_history">Nothing Played</string>
-    <string name="profile_empty_history_summary">You haven\'t listened to any episodes yet.</string>
-    <string name="profile_empty_starred">Nothing Starred</string>
-    <string name="profile_empty_starred_summary">You haven\'t starred any episodes yet.</string>
+    <string name="profile_empty_downloaded">Enjoy offline listening</string>
+    <string name="profile_empty_downloaded_summary">Save episodes for offline listening and never miss a moment.</string>
+    <string name="profile_empty_history">Let\'s get you listening!</string>
+    <string name="profile_empty_history_summary">Start listening to podcasts and revisit your listening history here.</string>
+    <string name="profile_empty_starred">Save your favorites</string>
+    <string name="profile_empty_starred_summary">Star episodes you love and come back to them at anytime.</string>
     <string name="profile_end_tour">END TOUR</string>
     <string name="profile_ended">Ended %s</string>
     <string name="profile_ends">Ends %s</string>
@@ -955,7 +967,7 @@
     <string name="profile_files_delete" translatable="false">@string/delete</string>
     <string name="profile_files_edit" translatable="false">@string/edit</string>
     <string name="profile_files_empty_summary">Want to listen to your own files?\nTap the + button to open them in Pocket Casts, and they&#x2019;ll appear here.</string>
-    <string name="profile_files_empty_title">No Files</string>
+    <string name="profile_files_empty_title">Listen or watch your own files</string>
     <string name="profile_files_mark_as_played" translatable="false">@string/mark_as_played</string>
     <string name="profile_files_options" translatable="false">@string/options</string>
     <string name="profile_files_remove_image">Replace Image</string>
@@ -2008,8 +2020,6 @@
     <!-- Bookmarks -->
 
     <string name="bookmark_play">Play at bookmark position %s</string>
-    <string name="bookmarks_create_instructions">You can save timestamps of episodes from the actions menu in the player or by configuring an action with your headphones.</string>
-    <string name="bookmarks_not_found">No bookmarks yet</string>
     <string name="bookmarks_headphone_settings">Headphone settings</string>
     <string name="bookmarks_plural">%d bookmarks</string>
     <string name="bookmarks_singular">1 bookmark</string>
@@ -2033,6 +2043,10 @@
     <string name="bookmarks_upsell_instructions">Save timestamps of your favorite episodes and unlock many more features with Pocket&#160;Casts Plus.</string>
     <string name="bookmarks_upsell_instructions_early_access">Get early access to this feature with Pocket&#160;Casts Patron and save timestamps of your favorite episodes. Available for Plus subscribers soon.</string>
     <string name="bookmarks_search_results_not_found">We couldn\'t find any bookmark for that search.</string>
+    <string name="bookmarks_empty_state_title">Bookmark that moment</string>
+    <string name="bookmarks_free_user_empty_state_message">You can save timestamps of important moments in an episode.</string>
+    <string name="bookmarks_free_user_empty_state_button">Get Bookmarks</string>
+    <string name="bookmarks_paid_user_empty_state_message">You can save timestamps of episodes from the actions menu in the player or by configuring an action with your headphones.</string>
 
     <!-- Transcripts -->
     <string name="error_transcript_failed_to_load">Sorry, but something went wrong while loading this transcript.</string>
@@ -2294,4 +2308,11 @@
     <string name="suggested_folders_replace_folders_confirmation_tittle">Replace existing folders?</string>
     <string name="suggested_folders_replace_folders_confirmation_description">Accepting suggested folders will overwrite your current folders. This can\'t be undone.</string>
 
+    <!-- Restore from local history -->
+    <string name="restore_from_local_history">Restore from local history</string>
+    <string name="up_next_history">Up Next History</string>
+    <string name="up_next_history_explanation">A list of recent updates to Up Next due to changes on other devices. To view the episodes and have the option to restore them, tap any entry.</string>
+    <string name="up_next_history_restore_button">@string/restore</string>
+    <string name="up_next_history_restore_confirmation_title">Restore Up Next?</string>
+    <string name="up_next_history_restore_confirmation_description">These episodes will be added to the bottom of your current Up Next.</string>
 </resources>

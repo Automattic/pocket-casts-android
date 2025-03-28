@@ -221,9 +221,6 @@ class DownloadManagerImpl @Inject constructor(
                                 }
                             }
                         }
-                        else -> {
-                            Timber.d("Work manager update: $episodeUUID is ${workInfo.state}")
-                        }
                     }
                 }
             }

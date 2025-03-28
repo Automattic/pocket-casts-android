@@ -13,6 +13,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
@@ -37,6 +38,11 @@ import au.com.shiftyjelly.pocketcasts.discover.databinding.RowSinglePodcastBindi
 import au.com.shiftyjelly.pocketcasts.discover.extensions.updateSubscribeButtonIcon
 import au.com.shiftyjelly.pocketcasts.discover.util.AutoScrollHelper
 import au.com.shiftyjelly.pocketcasts.discover.util.ScrollingLinearLayoutManager
+import au.com.shiftyjelly.pocketcasts.discover.view.CollectionListRowAdapter.CollectionItem.CollectionHeader
+import au.com.shiftyjelly.pocketcasts.discover.view.CollectionListRowAdapter.CollectionItem.CollectionPodcast
+import au.com.shiftyjelly.pocketcasts.discover.view.CollectionListRowAdapter.Companion.HEADER_OFFSET
+import au.com.shiftyjelly.pocketcasts.discover.view.CollectionListRowAdapter.HeaderViewHolder
+import au.com.shiftyjelly.pocketcasts.discover.view.CollectionListRowAdapter.PodcastsViewHolder.Companion.NUMBER_OF_ROWS_PER_PAGE
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.EPISODE_UUID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.LIST_ID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.PODCAST_UUID_KEY
@@ -121,6 +127,7 @@ internal class DiscoverAdapter(
         fun onPodcastClicked(podcast: DiscoverPodcast, listUuid: String?, isFeatured: Boolean = false)
         fun onPodcastSubscribe(podcast: DiscoverPodcast, listUuid: String?)
         fun onPodcastListClicked(list: NetworkLoadableList)
+        fun onCollectionHeaderClicked(list: NetworkLoadableList)
         fun onEpisodeClicked(episode: DiscoverEpisode, listUuid: String?)
         fun onEpisodePlayClicked(episode: DiscoverEpisode)
         fun onEpisodeStopClicked()
@@ -447,7 +454,17 @@ internal class DiscoverAdapter(
     class CollectionListDeprecatedViewHolder(val binding: RowCollectionListDeprecatedBinding) : NetworkLoadableViewHolder(binding.root)
 
     inner class CollectionListViewHolder(val binding: RowCollectionListBinding) : NetworkLoadableViewHolder(binding.root), ShowAllRow {
-        val adapter = CollectionListRowAdapter(listener::onPodcastClicked, listener::onPodcastSubscribe, analyticsTracker)
+        val adapter = CollectionListRowAdapter(
+            listener::onPodcastClicked,
+            onPodcastSubscribe = { podcast, listId ->
+                listId?.let { analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_SUBSCRIBED, mapOf(LIST_ID_KEY to it, PODCAST_UUID_KEY to podcast.uuid)) }
+                listener.onPodcastSubscribe(podcast, listId)
+            },
+            onHeaderClicked = {
+                collectionList?.let { listener.onCollectionHeaderClicked(it) }
+            },
+            analyticsTracker,
+        )
 
         override val showAllButton: TextView
             get() = binding.btnShowAll
@@ -457,32 +474,91 @@ internal class DiscoverAdapter(
                 initialPrefetchItemCount = 2
             }
 
+        private var collectionList: NetworkLoadableList? = null
+
         init {
             recyclerView?.layoutManager = linearLayoutManager
             recyclerView?.itemAnimator = null
-            val snapHelper = HorizontalPeekSnapHelper(0.dpToPx(itemView.context))
+            val snapHelper = PagerSnapHelper()
             snapHelper.attachToRecyclerView(recyclerView)
-            snapHelper.onSnapPositionChanged = { position ->
-                binding.pageIndicatorView.position = position
-                val row = getItem(bindingAdapterPosition) as? DiscoverRow
-                row?.let {
-                    analyticsTracker.track(
-                        AnalyticsEvent.DISCOVER_COLLECTION_LIST_PAGE_CHANGED,
-                        mapOf(CURRENT_PAGE to position, TOTAL_PAGES to adapter.itemCount, LIST_ID_KEY to it.inferredId()),
-                    )
+            recyclerView?.addOnScrollListener(object : OnScrollListener() {
+                private var lastTrackedPosition: Int? = null
+
+                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                        val position = linearLayoutManager.getCurrentPosition()
+
+                        updateHeader(recyclerView, position)
+
+                        // Adds extra right padding starting from page 1 to preview the next page, except for the first page
+                        if (position == 0) {
+                            recyclerView.setPadding(8.dpToPx(itemView.context), 0, 0, 0)
+                        } else if (position != adapter.itemCount - 1) {
+                            recyclerView.setPadding(8.dpToPx(itemView.context), 0, 20.dpToPx(itemView.context), 0)
+                        }
+
+                        binding.pageIndicatorView.position = position
+
+                        // Ensures that swiping back to page 0 works correctly.
+                        // The RecyclerView was forcing a snap back to page 1
+                        // because podcasts from page 1 are also visible on page 0.
+                        if (position == 0) {
+                            recyclerView.post {
+                                recyclerView.smoothScrollToPosition(0)
+                            }
+                        }
+                        trackPageChangedEvent(position)
+                    } else if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
+                        val beforeFinalPosition = linearLayoutManager.findFirstVisibleItemPosition()
+                        val finalPosition = beforeFinalPosition + 1
+
+                        // Removes right padding from the last item while scrolling to avoid glitches.
+                        if (finalPosition == adapter.itemCount - 1) {
+                            recyclerView.setPadding(8.dpToPx(itemView.context), 0, 0, 0)
+                        }
+                    }
                 }
-            }
 
+                private fun updateHeader(
+                    recyclerView: RecyclerView,
+                    position: Int,
+                ) {
+                    val headerViewHolder = recyclerView.findViewHolderForAdapterPosition(0) as? HeaderViewHolder
+                    headerViewHolder?.updateVisibility(position != 1)
+                }
+
+                private fun trackPageChangedEvent(position: Int) {
+                    if (lastTrackedPosition != position) {
+                        adapter.getListId()?.let {
+                            analyticsTracker.track(
+                                AnalyticsEvent.DISCOVER_COLLECTION_LIST_PAGE_CHANGED,
+                                mapOf(CURRENT_PAGE to position, TOTAL_PAGES to adapter.itemCount, LIST_ID_KEY to it),
+                            )
+                        }
+                        lastTrackedPosition = position
+                    }
+                }
+            })
             recyclerView?.adapter = adapter
-
-            adapter.showLoadingList()
         }
 
-        override fun onRestoreInstanceState(state: Parcelable?) {
-            super.onRestoreInstanceState(state)
-            recyclerView?.post {
-                binding.pageIndicatorView.position = linearLayoutManager.findFirstVisibleItemPosition()
+        /**
+         * Returns the most accurate current position in the LinearLayoutManager.
+         * This considers that a header and podcasts can be present on the same page.
+         */
+        private fun LinearLayoutManager.getCurrentPosition(): Int {
+            val firstCompletelyVisible = findFirstCompletelyVisibleItemPosition()
+            val firstVisible = findFirstVisibleItemPosition()
+
+            return if (firstCompletelyVisible != RecyclerView.NO_POSITION) {
+                firstCompletelyVisible
+            } else {
+                firstVisible
             }
+        }
+
+        fun setCollectionList(list: NetworkLoadableList) {
+            collectionList = list
         }
     }
 
@@ -820,13 +896,21 @@ internal class DiscoverAdapter(
                         loadPodcastList(row.source),
                         onNext = {
                             val podcasts = it.podcasts.subList(0, MAX_ROWS_SMALL_LIST.coerceAtMost(it.podcasts.count()))
-                            holder.binding.pageIndicatorView.count = ceil(podcasts.count().toDouble() / CollectionListRowAdapter.CollectionListViewHolder.NUMBER_OF_ROWS_PER_PAGE.toDouble()).toInt()
+                            val podcastsCount = podcasts.count().toDouble() + HEADER_OFFSET
+                            holder.binding.pageIndicatorView.count = ceil(podcastsCount / NUMBER_OF_ROWS_PER_PAGE.toDouble()).toInt()
 
                             row.listUuid?.let { listUuid -> holder.adapter.setFromListId(listUuid) }
 
+                            holder.setCollectionList(row)
+
                             holder.binding.lblTitle.text = it.subtitle?.tryToLocalise(resources)
 
-                            holder.adapter.submitPodcastList(podcasts) { onRestoreInstanceState(holder) }
+                            val collectionHeader =
+                                it.collectionImageUrl?.let { imageUrl -> CollectionHeader(imageUrl, it.title, it.description) }
+
+                            val collectionPodcasts: List<CollectionPodcast> = podcasts.map { CollectionPodcast(it) }
+
+                            holder.adapter.submitPodcastList(collectionPodcasts, collectionHeader) { onRestoreInstanceState(holder) }
                         },
                     )
                 }

@@ -151,6 +151,9 @@ class BookmarksFragment : BaseFragment() {
                     onSearchBarClearButtonTapped = {
                         bookmarksViewModel.searchBarClearButtonTapped()
                     },
+                    onHeadphoneControlsButtonTapped = {
+                        bookmarksViewModel.onHeadphoneControlsButtonTapped()
+                    },
                     bottomInset = if (sourceView == SourceView.PROFILE) {
                         0.dp + bottomInset.value.pxToDp(LocalContext.current).dp
                     } else {
@@ -240,6 +243,7 @@ class BookmarksFragment : BaseFragment() {
     }
 
     private fun onUpgradeClicked() {
+        bookmarksViewModel.onGetBookmarksButtonTapped()
         val onboardingFlow = OnboardingFlow.Upsell(
             source = OnboardingUpgradeSource.BOOKMARKS,
         )

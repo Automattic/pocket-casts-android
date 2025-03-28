@@ -97,7 +97,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
                 true
             }
             UR.id.menu_undownload -> {
-                deleteDownload()
+                deleteDownload(resources, fragmentManager)
                 true
             }
             R.id.menu_mark_played -> {
@@ -345,13 +345,23 @@ class MultiSelectEpisodesHelper @Inject constructor(
         }?.show(fragmentManager, "multiselect_download")
     }
 
-    private fun deleteDownload() {
+    private fun deleteDownload(resources: Resources, fragmentManager: FragmentManager) {
         if (selectedList.isEmpty()) {
             closeMultiSelect()
             return
         }
 
         val list = selectedList.toList()
+        ConfirmationDialog.deleteDownloadWarningDialog(
+            episodeCount = list.size,
+            warningLimit = WARNING_LIMIT,
+            resources = resources,
+        ) {
+            performDeleteDownload(list)
+        }?.show(fragmentManager, "confirm_delete_downloads")
+    }
+
+    private fun performDeleteDownload(list: List<BaseEpisode>) {
         launch {
             val episodes = list.filterIsInstance<PodcastEpisode>()
             episodeManager.deleteEpisodeFiles(episodes, playbackManager)

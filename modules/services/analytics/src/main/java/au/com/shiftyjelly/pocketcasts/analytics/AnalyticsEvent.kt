@@ -25,6 +25,7 @@ enum class AnalyticsEvent(val key: String) {
     BOOKMARK_EDIT_FORM_SUBMITTED("bookmark_edit_form_submitted"),
     BOOKMARK_SHARE_TAPPED("bookmark_share_tapped"),
     PROFILE_BOOKMARKS_SHOWN("profile_bookmarks_shown"),
+    BOOKMARKS_GET_BOOKMARKS_BUTTON_TAPPED("bookmarks_get_bookmarks_button_tapped"),
 
     /* User lifecycle events */
     USER_SIGNED_IN("user_signed_in"),
@@ -110,6 +111,8 @@ enum class AnalyticsEvent(val key: String) {
     PODCASTS_LIST_LAYOUT_CHANGED("podcasts_list_layout_changed"),
     PODCASTS_LIST_BADGES_CHANGED("podcasts_list_badges_changed"),
     PODCASTS_LIST_DISCOVER_BUTTON_TAPPED("podcasts_list_discover_button_tapped"),
+    EPISODE_RECENTLY_PLAYED_SORT_OPTION_TOOLTIP_SHOWN("episode_recently_played_sort_option_tooltip_shown"),
+    EPISODE_RECENTLY_PLAYED_SORT_OPTION_TOOLTIP_DISMISSED("episode_recently_played_sort_option_tooltip_dismissed"),
 
     /* Tab bar items */
     PODCASTS_TAB_OPENED("podcasts_tab_opened"),
@@ -157,6 +160,7 @@ enum class AnalyticsEvent(val key: String) {
     LISTENING_HISTORY_MULTI_SELECT_EXITED("listening_history_multi_select_exited"),
     LISTENING_HISTORY_CLEAR_HISTORY_BUTTON_TAPPED("listening_history_clear_history_button_tapped"),
     LISTENING_HISTORY_CLEARED("listening_history_cleared"),
+    LISTENING_HISTORY_DISCOVER_BUTTON_TAPPED("listening_history_discover_button_tapped"),
 
     /* Uploaded Files */
     UPLOADED_FILES_SHOWN("uploaded_files_shown"),
@@ -311,6 +315,7 @@ enum class AnalyticsEvent(val key: String) {
     DISCOVER_FEATURED_PODCAST_SUBSCRIBED("discover_featured_podcast_subscribed"),
     DISCOVER_SHOW_ALL_TAPPED("discover_show_all_tapped"),
     DISCOVER_LIST_SHOW_ALL_TAPPED("discover_list_show_all_tapped"),
+    DISCOVER_LIST_COLLECTION_HEADER_TAPPED("discover_list_collection_header_tapped"),
     DISCOVER_LIST_IMPRESSION("discover_list_impression"),
     DISCOVER_LIST_EPISODE_TAPPED("discover_list_episode_tapped"),
     DISCOVER_LIST_EPISODE_PLAY("discover_list_episode_play"),
@@ -340,6 +345,7 @@ enum class AnalyticsEvent(val key: String) {
     UP_NEXT_QUEUE_REORDERED("up_next_queue_reordered"),
     UP_NEXT_DISMISSED("up_next_dismissed"),
     UP_NEXT_SHUFFLE_ENABLED("up_next_shuffle_enabled"),
+    UP_NEXT_DISCOVER_BUTTON_TAPPED("up_next_discover_button_tapped"),
 
     /* Player */
     PLAYER_SHOWN("player_shown"),

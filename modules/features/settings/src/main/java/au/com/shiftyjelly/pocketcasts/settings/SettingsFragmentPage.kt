@@ -26,6 +26,7 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.settings.about.AboutFragment
 import au.com.shiftyjelly.pocketcasts.settings.developer.DeveloperFragment
+import au.com.shiftyjelly.pocketcasts.settings.history.HistoryFragment
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
@@ -116,6 +117,9 @@ fun SettingsFragmentPage(
             }
             item {
                 ImportAndExportOpmlRow(onClick = { openFragment(ExportSettingsFragment()) })
+            }
+            item {
+                RestoreFromLocalHistoryRow(onClick = { openFragment(HistoryFragment()) })
             }
             item {
                 AdvancedRow(onClick = { openFragment(AdvancedSettingsFragment()) })
@@ -278,6 +282,15 @@ private fun AboutRow(onClick: () -> Unit) {
     SettingRow(
         primaryText = stringResource(LR.string.settings_title_about),
         icon = painterResource(SR.drawable.settings_about),
+        modifier = Modifier.rowModifier(onClick),
+    )
+}
+
+@Composable
+private fun RestoreFromLocalHistoryRow(onClick: () -> Unit) {
+    SettingRow(
+        primaryText = stringResource(LR.string.restore_from_local_history),
+        icon = painterResource(IR.drawable.ic_history),
         modifier = Modifier.rowModifier(onClick),
     )
 }

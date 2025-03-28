@@ -1,14 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:layout_marginBottom="24dp">
 
-    <au.com.shiftyjelly.pocketcasts.discover.view.PodcastCollectionItem
-        android:id="@+id/row0"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-    <au.com.shiftyjelly.pocketcasts.discover.view.PodcastCollectionItem
-        android:id="@+id/row1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        <au.com.shiftyjelly.pocketcasts.discover.view.PodcastCollectionItem
+            android:id="@+id/row0"
+            android:paddingLeft="6dp"
+            android:paddingRight="8dp"
+            android:paddingTop="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <au.com.shiftyjelly.pocketcasts.discover.view.PodcastCollectionItem
+            android:id="@+id/row1"
+            android:paddingTop="6dp"
+            android:paddingBottom="8dp"
+            android:paddingLeft="6dp"
+            android:paddingRight="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 </LinearLayout>

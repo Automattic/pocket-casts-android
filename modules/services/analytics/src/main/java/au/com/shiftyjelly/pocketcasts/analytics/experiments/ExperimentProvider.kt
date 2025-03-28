@@ -48,7 +48,6 @@ class ExperimentProvider @Inject constructor(
         return when (val variation = repository.getVariation(Experiment(experiment.identifier))) {
             is Control -> Variation.Control
             is Treatment -> Variation.Treatment(variation.name)
-            else -> null
         }
     }
 

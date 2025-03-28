@@ -5,15 +5,12 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
-import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import io.reactivex.Flowable
 import io.reactivex.Single
 import java.util.Date
 import java.util.UUID
 import javax.inject.Inject
-import kotlin.collections.plus
-import kotlin.collections.sortedBy
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -164,18 +161,19 @@ class FolderManagerImpl @Inject constructor(
     override suspend fun getHomeFolder(): List<FolderItem> {
         val sortType = settings.podcastsSortType.value
 
-        val podcasts = if (sortType == EPISODE_DATE_NEWEST_TO_OLDEST) {
-            podcastManager.findPodcastsOrderByLatestEpisode(orderAsc = false)
-        } else {
-            podcastManager.findSubscribedNoOrder()
+        val podcasts = when (sortType) {
+            PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST -> podcastManager.findPodcastsOrderByLatestEpisode(orderAsc = false)
+            PodcastsSortType.RECENTLY_PLAYED -> podcastManager.findPodcastsOrderByRecentlyPlayedEpisode()
+            else -> podcastManager.findSubscribedNoOrder()
         }
         val folders = folderDao.findFolders()
         val folderItems = combineFoldersPodcasts(folders, podcasts)
 
-        return if (sortType == EPISODE_DATE_NEWEST_TO_OLDEST) {
-            folderItems
-        } else {
-            folderItems.sortedWith(sortType.folderComparator)
+        return when (sortType) {
+            PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST,
+            PodcastsSortType.RECENTLY_PLAYED,
+            -> folderItems
+            else -> folderItems.sortedWith(sortType.folderComparator)
         }
     }
 
@@ -203,11 +201,14 @@ class FolderManagerImpl @Inject constructor(
     override suspend fun findFolderPodcastsSorted(folderUuid: String): List<Podcast> {
         val folder = findByUuid(folderUuid) ?: return emptyList()
         // use a query to get the podcasts ordered by episode release date
-        if (folder.podcastsSortType == EPISODE_DATE_NEWEST_TO_OLDEST) {
-            return podcastManager.findFolderPodcastsOrderByLatestEpisode(folderUuid = folderUuid)
+        return when (folder.podcastsSortType) {
+            PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST -> podcastManager.findFolderPodcastsOrderByLatestEpisode(folderUuid = folderUuid)
+            PodcastsSortType.RECENTLY_PLAYED -> podcastManager.findFolderPodcastsOrderByRecentlyPlayedEpisode(folderUuid = folderUuid)
+            else -> {
+                val podcasts = podcastManager.findPodcastsInFolder(folderUuid = folderUuid)
+                podcasts.sortedWith(folder.podcastsSortType.podcastComparator)
+            }
         }
-        val podcasts = podcastManager.findPodcastsInFolder(folderUuid = folderUuid)
-        return podcasts.sortedWith(folder.podcastsSortType.podcastComparator)
     }
 
     override suspend fun countFolders() = folderDao.count()

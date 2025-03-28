@@ -44,11 +44,14 @@ interface PodcastManager {
     suspend fun findSubscribedUuids(): List<String>
 
     fun podcastsOrderByLatestEpisodeRxFlowable(): Flowable<List<Podcast>>
+    fun podcastsOrderByRecentlyPlayedEpisodeRxFlowable(): Flowable<List<Podcast>>
     fun subscribedRxFlowable(): Flowable<List<Podcast>>
     suspend fun findPodcastsOrderByTitle(): List<Podcast>
     fun findPodcastsToSyncBlocking(): List<Podcast>
     suspend fun findPodcastsOrderByLatestEpisode(orderAsc: Boolean): List<Podcast>
     suspend fun findFolderPodcastsOrderByLatestEpisode(folderUuid: String): List<Podcast>
+    suspend fun findPodcastsOrderByRecentlyPlayedEpisode(): List<Podcast>
+    suspend fun findFolderPodcastsOrderByRecentlyPlayedEpisode(folderUuid: String): List<Podcast>
 
     fun findPodcastsAutodownloadBlocking(): List<Podcast>
 

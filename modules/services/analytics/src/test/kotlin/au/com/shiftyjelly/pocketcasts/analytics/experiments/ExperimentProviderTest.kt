@@ -129,18 +129,6 @@ class ExperimentProviderTest {
     }
 
     @Test
-    fun `getVariation should return null when repository returns null`() {
-        FeatureFlag.setEnabled(Feature.EXPLAT_EXPERIMENT, true)
-
-        val experiment = DummyExperiment.DUMMY_EXPERIMENT
-        `when`(repository.getVariation(Experiment(experiment.identifier))).thenReturn(null)
-
-        val variation = experimentProvider.getVariation(experiment)
-
-        assertNull(variation)
-    }
-
-    @Test
     fun `should not initialize when feature flag is disabled`() {
         FeatureFlag.setEnabled(Feature.EXPLAT_EXPERIMENT, false)
 
