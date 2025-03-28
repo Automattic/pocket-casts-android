@@ -85,8 +85,8 @@ class UpdateEpisodeDetailsTest {
     }
 
     class TestWorkerFactory(private val episodeManager: EpisodeManager) : WorkerFactory() {
-        override fun createWorker(context: Context, workerClassName: String, workerParameters: WorkerParameters): ListenableWorker? {
-            return UpdateEpisodeDetailsTask(context, workerParameters, episodeManager, OkHttpClient())
+        override fun createWorker(appContext: Context, workerClassName: String, workerParameters: WorkerParameters): ListenableWorker? {
+            return UpdateEpisodeDetailsTask(appContext, workerParameters, episodeManager, OkHttpClient())
         }
     }
 }

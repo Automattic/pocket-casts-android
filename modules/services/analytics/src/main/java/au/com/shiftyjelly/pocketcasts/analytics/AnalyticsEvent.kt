@@ -25,6 +25,7 @@ enum class AnalyticsEvent(val key: String) {
     BOOKMARK_EDIT_FORM_SUBMITTED("bookmark_edit_form_submitted"),
     BOOKMARK_SHARE_TAPPED("bookmark_share_tapped"),
     PROFILE_BOOKMARKS_SHOWN("profile_bookmarks_shown"),
+    BOOKMARKS_GET_BOOKMARKS_BUTTON_TAPPED("bookmarks_get_bookmarks_button_tapped"),
 
     /* User lifecycle events */
     USER_SIGNED_IN("user_signed_in"),
@@ -110,6 +111,8 @@ enum class AnalyticsEvent(val key: String) {
     PODCASTS_LIST_LAYOUT_CHANGED("podcasts_list_layout_changed"),
     PODCASTS_LIST_BADGES_CHANGED("podcasts_list_badges_changed"),
     PODCASTS_LIST_DISCOVER_BUTTON_TAPPED("podcasts_list_discover_button_tapped"),
+    EPISODE_RECENTLY_PLAYED_SORT_OPTION_TOOLTIP_SHOWN("episode_recently_played_sort_option_tooltip_shown"),
+    EPISODE_RECENTLY_PLAYED_SORT_OPTION_TOOLTIP_DISMISSED("episode_recently_played_sort_option_tooltip_dismissed"),
 
     /* Tab bar items */
     PODCASTS_TAB_OPENED("podcasts_tab_opened"),
@@ -312,6 +315,7 @@ enum class AnalyticsEvent(val key: String) {
     DISCOVER_FEATURED_PODCAST_SUBSCRIBED("discover_featured_podcast_subscribed"),
     DISCOVER_SHOW_ALL_TAPPED("discover_show_all_tapped"),
     DISCOVER_LIST_SHOW_ALL_TAPPED("discover_list_show_all_tapped"),
+    DISCOVER_LIST_COLLECTION_HEADER_TAPPED("discover_list_collection_header_tapped"),
     DISCOVER_LIST_IMPRESSION("discover_list_impression"),
     DISCOVER_LIST_EPISODE_TAPPED("discover_list_episode_tapped"),
     DISCOVER_LIST_EPISODE_PLAY("discover_list_episode_play"),

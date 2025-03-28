@@ -13,6 +13,8 @@ import au.com.shiftyjelly.pocketcasts.models.type.AutoDownloadLimitSetting
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.preferences.Settings.CloudSortOrder.entries
+import au.com.shiftyjelly.pocketcasts.preferences.Settings.UpNextAction.entries
 import au.com.shiftyjelly.pocketcasts.preferences.model.AppIconSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
@@ -566,6 +568,7 @@ interface Settings {
     val useRealTimeForPlaybackRemaingTime: UserSetting<Boolean>
 
     val showPodcastHeaderChangesTooltip: UserSetting<Boolean>
+    val showPodcastsRecentlyPlayedSortOrderTooltip: UserSetting<Boolean>
 
     val suggestedFoldersDismissTimestamp: UserSetting<Instant?>
     val suggestedFoldersDismissCount: UserSetting<Int>

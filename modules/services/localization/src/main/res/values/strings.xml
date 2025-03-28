@@ -502,6 +502,8 @@
     <string name="podcasts_sort_by_recently_played">Recently played</string>
     <string name="podcasts_sort_by_release_date">Episode release date</string>
     <string name="podcasts_sort_by_title">"Title (A - Z)"</string>
+    <string name="podcasts_sort_by_tooltip_title">Sort by \“Recently Played\”</string>
+    <string name="podcasts_sort_by_tooltip_message">You can now sort by Recently Played and quickly pick up where you left off.</string>
     <string name="podcasts_sort_order">Sort order</string>
     <string name="podcasts_subscribe_on_phone">Follow podcasts on your phone and they\'ll appear here.</string>
     <string name="podcasts_time_to_add_some_podcasts">Time to add some Podcasts!</string>
@@ -536,6 +538,7 @@
     <string name="go_to_discover">Go to Discover</string>
     <string name="number_stepper_plus_content_description">Plus</string>
     <string name="number_stepper_minus_content_description">Minus</string>
+    <string name="discover_collection_header_content_description">%s header</string>
 
     <!-- Podcast -->
 
@@ -2017,8 +2020,6 @@
     <!-- Bookmarks -->
 
     <string name="bookmark_play">Play at bookmark position %s</string>
-    <string name="bookmarks_create_instructions">You can save timestamps of episodes from the actions menu in the player or by configuring an action with your headphones.</string>
-    <string name="bookmarks_not_found">No bookmarks yet</string>
     <string name="bookmarks_headphone_settings">Headphone settings</string>
     <string name="bookmarks_plural">%d bookmarks</string>
     <string name="bookmarks_singular">1 bookmark</string>
@@ -2042,6 +2043,10 @@
     <string name="bookmarks_upsell_instructions">Save timestamps of your favorite episodes and unlock many more features with Pocket&#160;Casts Plus.</string>
     <string name="bookmarks_upsell_instructions_early_access">Get early access to this feature with Pocket&#160;Casts Patron and save timestamps of your favorite episodes. Available for Plus subscribers soon.</string>
     <string name="bookmarks_search_results_not_found">We couldn\'t find any bookmark for that search.</string>
+    <string name="bookmarks_empty_state_title">Bookmark that moment</string>
+    <string name="bookmarks_free_user_empty_state_message">You can save timestamps of important moments in an episode.</string>
+    <string name="bookmarks_free_user_empty_state_button">Get Bookmarks</string>
+    <string name="bookmarks_paid_user_empty_state_message">You can save timestamps of episodes from the actions menu in the player or by configuring an action with your headphones.</string>
 
     <!-- Transcripts -->
     <string name="error_transcript_failed_to_load">Sorry, but something went wrong while loading this transcript.</string>

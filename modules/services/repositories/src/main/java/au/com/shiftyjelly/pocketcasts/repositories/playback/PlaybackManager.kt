@@ -1938,7 +1938,6 @@ open class PlaybackManager @Inject constructor(
         return when (episode) {
             is PodcastEpisode -> podcastManager.findPodcastByUuidBlocking(episode.podcastUuid)
             is UserEpisode -> podcastManager.buildUserEpisodePodcast(episode)
-            else -> null
         }
     }
 

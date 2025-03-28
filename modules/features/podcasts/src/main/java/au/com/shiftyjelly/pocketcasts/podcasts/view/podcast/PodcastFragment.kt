@@ -670,11 +670,16 @@ class PodcastFragment : BaseFragment() {
 
     private fun onHeadsetSettingsClicked() {
         val fragmentHostListener = (activity as? FragmentHostListener)
+        viewModel.onHeadsetSettingsClicked()
         fragmentHostListener?.apply {
             openTab(VR.id.navigation_profile)
             addFragment(SettingsFragment())
             addFragment(HeadphoneControlsSettingsFragment())
         }
+    }
+
+    private fun onGetBookmarksClicked() {
+        viewModel.onGetBookmarksClicked()
     }
 
     private val args: PodcastFragmentArgs
@@ -779,7 +784,7 @@ class PodcastFragment : BaseFragment() {
                 swipeSource = EpisodeItemTouchHelper.SwipeSource.PODCAST_DETAILS,
             ),
             onHeadsetSettingsClicked = ::onHeadsetSettingsClicked,
-            sourceView = SourceView.PODCAST_SCREEN,
+            onGetBookmarksClicked = ::onGetBookmarksClicked,
             podcastBookmarksObservable = bookmarkManager.findPodcastBookmarksFlow(
                 podcastUuid = podcastUuid,
                 sortType = settings.podcastBookmarksSortType.flow.value,
