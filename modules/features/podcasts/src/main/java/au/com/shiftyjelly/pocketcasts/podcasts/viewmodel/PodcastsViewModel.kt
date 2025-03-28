@@ -78,8 +78,15 @@ class PodcastsViewModel
     )
 
     val folderState: LiveData<FolderState> = combineLatest(
-        // monitor all subscribed podcasts, get the podcast in 'Episode release date' as the rest can be done in memory
-        podcastManager.podcastsOrderByLatestEpisodeRxFlowable(),
+        // monitor all subscribed podcasts, get the podcasts ordered by 'Recently played' or 'Episode release date' by default as the rest can be done in memory
+        settings.podcastsSortType.flow.asObservable(coroutineContext)
+            .toFlowable(BackpressureStrategy.LATEST)
+            .switchMap { sortType ->
+                when (sortType) {
+                    PodcastsSortType.RECENTLY_PLAYED -> podcastManager.podcastsOrderByRecentlyPlayedEpisodeRxFlowable().distinctByPodcastDetails()
+                    else -> podcastManager.podcastsOrderByLatestEpisodeRxFlowable().distinctByPodcastDetails()
+                }
+            },
         // monitor all the folders
         folderManager.observeFolders()
             .switchMap { folders ->
@@ -90,6 +97,7 @@ class PodcastsViewModel
                     val observeFolderPodcasts = folders.map { folder ->
                         podcastManager
                             .podcastsInFolderOrderByUserChoiceRxFlowable(folder)
+                            .distinctByPodcastDetails()
                             .map { podcasts ->
                                 FolderItem.Folder(
                                     folder = folder,
@@ -148,8 +156,10 @@ class PodcastsViewModel
     private val _suggestedFoldersState = MutableStateFlow<SuggestedFoldersState>(SuggestedFoldersState.Empty)
     val suggestedFoldersState = _suggestedFoldersState.asStateFlow()
 
-    private fun buildHomeFolderItems(podcasts: List<Podcast>, folders: List<FolderItem>, podcastSortType: PodcastsSortType): List<FolderItem> {
-        if (podcastSortType == PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST) {
+    private fun buildHomeFolderItems(podcasts: List<Podcast>, folders: List<FolderItem>, podcastSortType: PodcastsSortType) = when (podcastSortType) {
+        PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST,
+        PodcastsSortType.RECENTLY_PLAYED,
+        -> {
             val folderUuids = folders.mapTo(mutableSetOf()) { it.uuid }
             val items = mutableListOf<FolderItem>()
             val uuidToFolder = folders.associateByTo(mutableMapOf(), FolderItem::uuid)
@@ -157,7 +167,7 @@ class PodcastsViewModel
                 if (podcast.folderUuid == null || !folderUuids.contains(podcast.folderUuid)) {
                     items.add(FolderItem.Podcast(podcast))
                 } else {
-                    // add the folder in the position of the podcast with the latest release date
+                    // add the folder in the position of the default sorted podcasts
                     val folder = uuidToFolder.remove(podcast.folderUuid)
                     if (folder != null) {
                         items.add(folder)
@@ -167,8 +177,10 @@ class PodcastsViewModel
             if (uuidToFolder.isNotEmpty()) {
                 items.addAll(uuidToFolder.values)
             }
-            return items
-        } else {
+            items
+        }
+
+        else -> {
             val folderUuids = folders.map { it.uuid }.toHashSet()
             val items = podcasts
                 // add the podcasts not in a folder or if the folder doesn't exist
@@ -178,14 +190,17 @@ class PodcastsViewModel
                 // add the folders
                 .apply { addAll(folders) }
 
-            return items.sortedWith(podcastSortType.folderComparator)
+            items.sortedWith(podcastSortType.folderComparator)
         }
     }
 
     private fun buildPodcastItems(podcasts: List<Podcast>, podcastSortType: PodcastsSortType): List<FolderItem> {
         val items = podcasts.map { podcast -> FolderItem.Podcast(podcast) }
         return when (podcastSortType) {
-            PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST -> items
+            PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST,
+            PodcastsSortType.RECENTLY_PLAYED,
+            -> items
+
             else -> items.sortedWith(podcastSortType.folderComparator)
         }
     }
@@ -316,6 +331,19 @@ class PodcastsViewModel
 
     fun isEligibleForSuggestedFoldersPopup(): Boolean {
         return suggestedFoldersPopupPolicy.isEligibleForPopup()
+    }
+
+    private fun Flowable<List<Podcast>>.distinctByPodcastDetails() = this.distinctUntilChanged { old, new ->
+        if (old.size != new.size) return@distinctUntilChanged false
+
+        old.zip(new).all { (oldPodcast, newPodcast) ->
+            oldPodcast.uuid == newPodcast.uuid &&
+                oldPodcast.title == newPodcast.title &&
+                oldPodcast.author == newPodcast.author &&
+                oldPodcast.addedDate == newPodcast.addedDate &&
+                oldPodcast.podcastCategory == newPodcast.podcastCategory &&
+                oldPodcast.folderUuid == newPodcast.folderUuid
+        }
     }
 
     fun shouldShowTooltip() =

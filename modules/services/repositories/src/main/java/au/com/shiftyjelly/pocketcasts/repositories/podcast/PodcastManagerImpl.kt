@@ -330,11 +330,12 @@ class PodcastManagerImpl @Inject constructor(
 
     override suspend fun findSubscribedSorted(): List<Podcast> {
         val sortType = settings.podcastsSortType.value
-        // use a query to get the podcasts ordered by episode release date
-        if (sortType == PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST) {
-            return findPodcastsOrderByLatestEpisode(orderAsc = false)
+        return when (sortType) {
+            // use a query to get the podcasts ordered by episode release date or recently played episodes
+            PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST -> findPodcastsOrderByLatestEpisode(orderAsc = false)
+            PodcastsSortType.RECENTLY_PLAYED -> findPodcastsOrderByRecentlyPlayedEpisode()
+            else -> podcastDao.findSubscribedNoOrder().sortedWith(sortType.podcastComparator)
         }
-        return podcastDao.findSubscribedNoOrder().sortedWith(sortType.podcastComparator)
     }
 
     override fun findSubscribedRxSingle(): Single<List<Podcast>> {
@@ -349,11 +350,16 @@ class PodcastManagerImpl @Inject constructor(
         return podcastDao.findSubscribedOrderByLatestEpisodeRxFlowable(orderAsc = false)
     }
 
+    override fun podcastsOrderByRecentlyPlayedEpisodeRxFlowable(): Flowable<List<Podcast>> {
+        return podcastDao.findPodcastsOrderByRecentlyPlayedEpisodeRxFlowable()
+    }
+
     override fun podcastsInFolderOrderByUserChoiceRxFlowable(folder: Folder): Flowable<List<Podcast>> {
         val sort = folder.podcastsSortType
         return when (sort) {
             PodcastsSortType.DATE_ADDED_NEWEST_TO_OLDEST -> podcastDao.findFolderOrderByAddedDateRxFlowable(folder.uuid, sort.isAsc())
             PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST -> podcastDao.findFolderOrderByLatestEpisodeRxFlowable(folder.uuid, sort.isAsc())
+            PodcastsSortType.RECENTLY_PLAYED -> podcastDao.findPodcastsOrderByRecentlyPlayedEpisodeRxFlowable(folder.uuid)
             PodcastsSortType.DRAG_DROP -> podcastDao.findFolderOrderByUserSortRxFlowable(folder.uuid)
             else -> podcastDao.findFolderOrderByNameRxFlowable(folder.uuid, sort.isAsc())
         }
@@ -369,6 +375,14 @@ class PodcastManagerImpl @Inject constructor(
 
     override suspend fun findFolderPodcastsOrderByLatestEpisode(folderUuid: String): List<Podcast> {
         return podcastDao.findFolderPodcastsOrderByLatestEpisodeBlocking(folderUuid)
+    }
+
+    override suspend fun findPodcastsOrderByRecentlyPlayedEpisode(): List<Podcast> {
+        return podcastDao.findPodcastsOrderByRecentlyPlayedEpisode()
+    }
+
+    override suspend fun findFolderPodcastsOrderByRecentlyPlayedEpisode(folderUuid: String): List<Podcast> {
+        return podcastDao.findPodcastsOrderByRecentlyPlayedEpisode(folderUuid)
     }
 
     override suspend fun findPodcastsOrderByTitle(): List<Podcast> {

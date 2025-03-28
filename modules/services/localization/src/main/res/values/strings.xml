@@ -499,6 +499,7 @@
     <string name="podcasts_sort_by_date_added">Date added</string>
     <string name="podcasts_sort_by_drag_drop">Drag &amp; Drop</string>
     <string name="podcasts_sort_by_duration_asc">"Shortest to longest"</string>
+    <string name="podcasts_sort_by_recently_played">Recently played</string>
     <string name="podcasts_sort_by_release_date">Episode release date</string>
     <string name="podcasts_sort_by_title">"Title (A - Z)"</string>
     <string name="podcasts_sort_by_tooltip_title">Sort by \“Recently Played\”</string>
