@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
@@ -10,7 +11,7 @@ android {
     buildFeatures {
         buildConfig = true
         viewBinding = true
-        compose = false
+        compose = true
     }
 }
 
@@ -34,6 +35,7 @@ dependencies {
     api(projects.modules.services.repositories)
     api(projects.modules.services.ui)
     api(projects.modules.services.views)
+    api(projects.modules.services.compose)
 
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.core.ktx)
@@ -49,4 +51,6 @@ dependencies {
     implementation(projects.modules.services.images)
     implementation(projects.modules.services.localization)
     implementation(projects.modules.services.utils)
+
+    implementation(libs.compose.ui.tooling.preview)
 }

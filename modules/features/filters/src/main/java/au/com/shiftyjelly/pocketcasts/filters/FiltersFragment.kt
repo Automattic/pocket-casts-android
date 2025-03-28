@@ -6,6 +6,26 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.Toolbar
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.invisibleToUser
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.dp
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -14,6 +34,9 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
+import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.filters.databinding.FragmentFiltersBinding
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -108,6 +131,14 @@ class FiltersFragment :
             previousLastFilter = it.lastOrNull()
             viewModel.adapterState = it.toMutableList()
             adapter.submitList(it)
+
+            viewLifecycleOwner.lifecycleScope.launch {
+                if (viewModel.shouldShowTooltip(adapter.currentList)) {
+                    binding.toolbar.post {
+                        showTooltip()
+                    }
+                }
+            }
         }
 
         val touchHelperCallback = FiltersListItemTouchCallback({ from, to ->
@@ -181,6 +212,56 @@ class FiltersFragment :
         (activity as? FragmentHostListener)?.addFragment(playlistFragment)
 
         playlistFragment.view?.requestFocus() // Jump to new page for talk back
+    }
+
+    private fun showTooltip() {
+        val toolbar = binding?.toolbar ?: return
+        binding?.tooltipComposeView?.isVisible = true
+        binding?.tooltipComposeView?.apply {
+            setContentWithViewCompositionStrategy {
+                AppTheme(theme.activeTheme) {
+                    val configuration = LocalConfiguration.current
+                    var toolbarY by remember { mutableIntStateOf(0) }
+
+                    CallOnce {
+                        viewModel.trackTooltipShown()
+                    }
+
+                    LaunchedEffect(configuration) {
+                        val location = IntArray(2)
+                        toolbar.getLocationOnScreen(location)
+                        toolbarY = (location[1] + toolbar.height)
+                    }
+
+                    Box(
+                        contentAlignment = Alignment.TopEnd,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.Black.copy(alpha = 0.4f))
+                            .clickable(
+                                interactionSource = null,
+                                indication = null,
+                                onClick = ::closeTooltip,
+                            )
+                            .semantics { invisibleToUser() },
+                    ) {
+                        val density = LocalDensity.current
+                        val yOffset = with(density) { toolbarY.toDp() - 16.dp }
+                        FiltersTooltip(
+                            onClickClose = ::closeTooltip,
+                            modifier = Modifier
+                                .offset(y = yOffset),
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun closeTooltip() {
+        binding?.tooltipComposeView?.isGone = true
+        binding?.tooltipComposeView?.disposeComposition()
+        viewModel.onTooltipClosed()
     }
 
     override fun scrollToTop() {

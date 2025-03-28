@@ -570,6 +570,8 @@ interface Settings {
     val showPodcastHeaderChangesTooltip: UserSetting<Boolean>
     val showPodcastsRecentlyPlayedSortOrderTooltip: UserSetting<Boolean>
 
+    val showEmptyFiltersListTooltip: UserSetting<Boolean>
+
     val suggestedFoldersDismissTimestamp: UserSetting<Instant?>
     val suggestedFoldersDismissCount: UserSetting<Int>
     val suggestedFoldersFollowedHash: UserSetting<String>

@@ -9,7 +9,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.calculateCombinedIconId
@@ -31,19 +30,22 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-private const val NEWRELEASE_UUID = "2797DCF8-1C93-4999-B52A-D1849736FA2C"
-private const val INPROGRESS_UUID = "D89A925C-5CE1-41A4-A879-2751838CE5CE"
-private const val CREATED_DEFAULT_PLAYLISTS = "createdDefaultPlaylists"
-
 class PlaylistManagerImpl @Inject constructor(
     private val settings: Settings,
     private val downloadManager: DownloadManager,
     private val playlistUpdateAnalytics: PlaylistUpdateAnalytics,
     private val syncManager: SyncManager,
     @ApplicationContext private val context: Context,
-    @ApplicationScope private val applicationScope: CoroutineScope,
     appDatabase: AppDatabase,
 ) : PlaylistManager, CoroutineScope {
+
+    companion object {
+        const val NEW_RELEASE_UUID = "2797DCF8-1C93-4999-B52A-D1849736FA2C"
+        const val IN_PROGRESS_UUID = "D89A925C-5CE1-41A4-A879-2751838CE5CE"
+        private const val NEW_RELEASE_TITLE = "New Releases"
+        private const val IN_PROGRESS_TITLE = "In Progress"
+        private const val CREATED_DEFAULT_PLAYLISTS = "createdDefaultPlaylists"
+    }
 
     private val playlistDao = appDatabase.playlistDao()
 
@@ -57,7 +59,7 @@ class PlaylistManagerImpl @Inject constructor(
         get() = Dispatchers.Default
 
     private fun setupDefaultPlaylists() {
-        val existingNewRelease = playlistDao.findByUuidBlocking(NEWRELEASE_UUID)
+        val existingNewRelease = playlistDao.findByUuidBlocking(NEW_RELEASE_UUID)
         if (existingNewRelease == null) {
             val newRelease = Playlist()
             newRelease.apply {
@@ -66,11 +68,11 @@ class PlaylistManagerImpl @Inject constructor(
                 audioVideo = Playlist.AUDIO_VIDEO_FILTER_ALL
                 allPodcasts = true
                 sortPosition = 0
-                title = "New Releases"
+                title = NEW_RELEASE_TITLE
                 downloaded = true
                 notDownloaded = true
                 filterHours = Playlist.LAST_2_WEEKS
-                uuid = NEWRELEASE_UUID
+                uuid = NEW_RELEASE_UUID
                 syncStatus = Playlist.SYNC_STATUS_SYNCED
                 iconId = Playlist.calculateCombinedIconId(colorIndex = 0, iconIndex = 2) // Red clock
             }
@@ -80,21 +82,21 @@ class PlaylistManagerImpl @Inject constructor(
             playlistDao.updateBlocking(existingNewRelease)
         }
 
-        val existingInProgress = playlistDao.findByUuidBlocking(INPROGRESS_UUID)
+        val existingInProgress = playlistDao.findByUuidBlocking(IN_PROGRESS_UUID)
         if (existingInProgress == null) {
             val inProgress = Playlist()
             inProgress.apply {
                 allPodcasts = true
                 audioVideo = Playlist.AUDIO_VIDEO_FILTER_ALL
                 sortPosition = 2
-                title = "In Progress"
+                title = IN_PROGRESS_TITLE
                 downloaded = true
                 notDownloaded = true
                 unplayed = false
                 partiallyPlayed = true
                 finished = false
                 filterHours = Playlist.LAST_MONTH
-                uuid = INPROGRESS_UUID
+                uuid = IN_PROGRESS_UUID
                 syncStatus = Playlist.SYNC_STATUS_SYNCED
                 iconId = Playlist.calculateCombinedIconId(colorIndex = 3, iconIndex = 4) // Purple play
             }
