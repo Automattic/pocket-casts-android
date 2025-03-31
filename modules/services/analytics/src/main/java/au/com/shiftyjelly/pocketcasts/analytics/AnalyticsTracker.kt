@@ -1,5 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.analytics
 
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+
 open class AnalyticsTracker(
     val trackers: List<Tracker>,
     val isFirstPartyTrackingEnabled: () -> Boolean,
@@ -11,7 +14,7 @@ open class AnalyticsTracker(
         trackers.forEach { tracker ->
             if (
                 (tracker.getTrackerType() == TrackerType.FirstParty && isFirstPartyEnabled) ||
-                (tracker.getTrackerType() == TrackerType.ThirdParty && isThirdPartyEnabled)
+                (tracker.getTrackerType() == TrackerType.ThirdParty && isThirdPartyEnabled && FeatureFlag.isEnabled(Feature.APPSFLYER_ANALYTICS))
             ) {
                 tracker.track(event, properties)
             }

@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.analytics
 
 import android.content.SharedPreferences
 import au.com.shiftyjelly.pocketcasts.preferences.di.PublicSharedPreferences
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
@@ -59,9 +60,13 @@ class AppsFlyerAnalyticsTracker @Inject constructor(
         }
 
         launch {
-            val userId = anonID ?: generateNewAnonID()
-            appsFlyerAnalytics.logEvent(event.key, properties, userId)
-            Timber.i("AppsFlyer analytic event: ${event.key} properties: $properties")
+            try {
+                val userId = anonID ?: generateNewAnonID()
+                appsFlyerAnalytics.logEvent(event.key, properties, userId)
+                Timber.i("AppsFlyer analytic event: ${event.key} properties: $properties")
+            } catch (e: Exception) {
+                LogBuffer.e("AppsFlyer", e, "Error tracking event: ${event.key}")
+            }
         }
     }
 

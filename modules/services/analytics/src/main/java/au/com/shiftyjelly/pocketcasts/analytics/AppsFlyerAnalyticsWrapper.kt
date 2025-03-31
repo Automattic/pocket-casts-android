@@ -1,8 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.analytics
 
 import android.content.Context
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.appsflyer.AppsFlyerLib
 import com.appsflyer.attribution.AppsFlyerRequestListener
@@ -11,7 +9,6 @@ import timber.log.Timber
 
 open class AppsFlyerAnalyticsWrapper(
     private val appsFlyerLib: AppsFlyerLib?,
-    private val isTrackingEnabled: () -> Boolean,
     private val context: Context,
 ) {
     private val started = AtomicBoolean(false)
@@ -35,17 +32,19 @@ open class AppsFlyerAnalyticsWrapper(
     }
 
     open fun logEvent(name: String, params: Map<String, Any>, userId: String) {
-        val isDisabled = !FeatureFlag.isEnabled(Feature.APPSFLYER_ANALYTICS)
-        if (isDisabled || appsFlyerLib == null || !isTrackingEnabled()) {
+        if (appsFlyerLib == null) {
             return
         }
         if (!started.get()) {
-            startAppsFlyer(appsFlyerLib, context, userId)
+            startAppsFlyer(context, userId)
         }
         appsFlyerLib.logEvent(context, name, params, logEventListener)
     }
 
-    private fun startAppsFlyer(appsFlyerLib: AppsFlyerLib, context: Context, userId: String) {
+    open fun startAppsFlyer(context: Context, userId: String) {
+        if (appsFlyerLib == null) {
+            return
+        }
         appsFlyerLib.start(context, BuildConfig.APPS_FLYER_KEY, launchEventListener)
         appsFlyerLib.setCustomerIdAndLogSession(userId, context)
         started.set(true)

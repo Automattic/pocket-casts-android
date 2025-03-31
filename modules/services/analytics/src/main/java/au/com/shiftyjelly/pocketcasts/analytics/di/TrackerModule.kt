@@ -53,7 +53,6 @@ object TrackerModule {
 
         return AppsFlyerAnalyticsWrapper(
             appsFlyerLib = appsFlyerLib,
-            isTrackingEnabled = { settings.collectAnalyticsThirdParty.value },
             context = context,
         )
     }
