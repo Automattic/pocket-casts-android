@@ -276,6 +276,8 @@ enum class AnalyticsEvent(val key: String) {
     PRIVACY_SHOWN("privacy_shown"),
     ANALYTICS_OPT_IN("analytics_opt_in"),
     ANALYTICS_OPT_OUT("analytics_opt_out"),
+    ANALYTICS_THIRD_PARTY_OPT_IN("analytics_third_party_opt_in"),
+    ANALYTICS_THIRD_PARTY_OPT_OUT("analytics_third_party_opt_out"),
     CRASH_REPORTS_TOGGLED("crash_reports_toggled"),
     SETTINGS_SHOW_PRIVACY_POLICY("settings_show_privacy_policy"),
 

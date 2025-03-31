@@ -477,6 +477,7 @@ interface Settings {
     // Only the AnalyticsTracker object should update SendUsageState directly. Everything else
     // should update this setting through the AnalyticsTracker.
     val collectAnalytics: UserSetting<Boolean>
+    val collectAnalyticsThirdParty: UserSetting<Boolean>
     val sendCrashReports: UserSetting<Boolean>
     val linkCrashReportsToUser: UserSetting<Boolean>
 
