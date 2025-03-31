@@ -37,7 +37,7 @@
             android:allowBackup="false"
             android:usesCleartextTraffic="true"
             android:supportsRtl="false"
-            tools:replace="android:supportsRtl,android:allowBackup"
+            tools:replace="android:supportsRtl"
             android:theme="@style/ThemeDark"
             android:localeConfig="@xml/locales_config"
             tools:ignore="UnusedAttribute">
