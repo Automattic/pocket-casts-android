@@ -233,6 +233,7 @@ subprojects {
                 buildConfigField("String", "ENCRYPTION_KEY", "\"${project.property("encryptionKey")}\"")
                 buildConfigField("String", "APP_SECRET", "\"${project.property("appSecret")}\"")
                 buildConfigField("String", "META_APP_ID", "\"${project.property("metaAppId")}\"")
+                buildConfigField("String", "APPS_FLYER_KEY", "\"${project.property("appsFlyerKey")}\"")
 
                 testInstrumentationRunner = project.property("testInstrumentationRunner") as String
                 testApplicationId = "au.com.shiftyjelly.pocketcasts.test${project.name.replace("-", "_")}"

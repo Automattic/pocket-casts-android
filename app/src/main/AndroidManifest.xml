@@ -37,7 +37,7 @@
             android:allowBackup="false"
             android:usesCleartextTraffic="true"
             android:supportsRtl="false"
-            tools:replace="android:supportsRtl"
+            tools:replace="android:supportsRtl,android:allowBackup"
             android:theme="@style/ThemeDark"
             android:localeConfig="@xml/locales_config"
             tools:ignore="UnusedAttribute">
@@ -661,6 +661,9 @@
 
         <!-- Disable Sentry exception tracking so we can turn it on based on the user preference -->
         <meta-data android:name="io.sentry.auto-init" android:value="false" />
+
+        <!-- AppsFlyer -->
+        <meta-data android:name="com.appsflyer.FacebookApplicationId" android:value="584627164037183" />
     </application>
 
 </manifest>

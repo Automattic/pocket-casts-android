@@ -84,7 +84,7 @@ class WinbackViewModelTest {
         viewModel = WinbackViewModel(
             winbackManager,
             settings,
-            AnalyticsTracker.test(tracker, isEnabled = true),
+            AnalyticsTracker.test(tracker, isFirstPartyEnabled = true),
         )
     }
 
