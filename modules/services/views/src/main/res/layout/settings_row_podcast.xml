@@ -13,10 +13,11 @@
     android:paddingBottom="8dp">
     <androidx.cardview.widget.CardView
         android:layout_width="56dp"
-        android:layout_height="56dp"
+        android:layout_height="wrap_content"
+        android:minHeight="56dp"
         android:elevation="2dp"
         app:cardCornerRadius="4dp"
-        android:layout_marginRight="8dp">
+        android:layout_marginEnd="8dp">
         <ImageView
             android:id="@+id/imageView"
             android:layout_width="56dp"
@@ -26,14 +27,15 @@
 
     <LinearLayout
         android:layout_width="0dp"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_weight="1"
         android:orientation="vertical"
-        android:gravity="center">
+        android:gravity="center_vertical">
         <TextView
             android:id="@+id/lblTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:includeFontPadding="true"
             android:maxLines="1"
             style="@style/row_podcast_title"
             android:textColor="?attr/primary_text_01"
@@ -42,6 +44,7 @@
             android:id="@+id/lblSubtitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:includeFontPadding="true"
             style="@style/row_podcast_subtitle"
             android:textColor="?attr/primary_text_02"
             tools:text="Author" />
@@ -49,8 +52,8 @@
 
     <CheckBox
         android:id="@+id/checkbox"
-        android:paddingRight="16dp"
+        android:paddingEnd="16dp"
         android:layout_width="44dp"
-        android:layout_height="44dp"
+        android:layout_height="wrap_content"
         android:layout_gravity="center_vertical" />
 </LinearLayout>
