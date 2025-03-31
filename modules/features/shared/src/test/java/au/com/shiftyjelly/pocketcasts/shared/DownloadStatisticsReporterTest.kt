@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.Tracker
+import au.com.shiftyjelly.pocketcasts.analytics.TrackerType
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeDownloadFailureStatistics
 import java.time.Instant
@@ -132,6 +133,8 @@ class DownloadStatisticsReporterTest {
         }
 
         override fun refreshMetadata() = Unit
+
+        override fun getTrackerType() = TrackerType.FirstParty
 
         override fun flush() = Unit
 
