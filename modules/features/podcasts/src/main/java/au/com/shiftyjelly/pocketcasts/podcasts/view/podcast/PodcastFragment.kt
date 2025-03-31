@@ -627,8 +627,11 @@ class PodcastFragment : BaseFragment() {
     }
 
     private val onDonateClicked: (Uri?) -> Unit = { uri ->
+        viewModel.onDonateClicked()
         uri?.let {
             openUrl(it.toString())
+        } ?: run {
+            Timber.e("Donate URI is null")
         }
     }
 
