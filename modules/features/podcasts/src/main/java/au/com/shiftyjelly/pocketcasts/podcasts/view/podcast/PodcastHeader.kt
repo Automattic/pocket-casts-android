@@ -143,6 +143,7 @@ internal fun PodcastHeader(
     onClickUnfollow: () -> Unit,
     onClickFolder: () -> Unit,
     onClickNotification: () -> Unit,
+    onClickDonate: () -> Unit,
     onClickSettings: () -> Unit,
     onClickWebsiteLink: () -> Unit,
     onToggleHeader: () -> Unit,
@@ -208,6 +209,7 @@ internal fun PodcastHeader(
                 onClickUnfollow = onClickUnfollow,
                 onClickFolder = onClickFolder,
                 onClickNotification = onClickNotification,
+                onClickDonate = onClickDonate,
                 onClickSettings = onClickSettings,
                 onTooltipOffsetMeasured = onTooltipOffsetMeasured,
             )
@@ -246,6 +248,7 @@ private fun PodcastControls(
     onClickUnfollow: () -> Unit,
     onClickFolder: () -> Unit,
     onClickNotification: () -> Unit,
+    onClickDonate: () -> Unit,
     onClickSettings: () -> Unit,
     onTooltipOffsetMeasured: (Dp) -> Unit,
 ) {
@@ -315,6 +318,7 @@ private fun PodcastControls(
             onClickUnfollow = onClickUnfollow,
             onClickFolder = onClickFolder,
             onClickNotification = onClickNotification,
+            onClickDonate = onClickDonate,
             onClickSettings = onClickSettings,
         )
     }
@@ -405,6 +409,7 @@ private fun PodcastActions(
     onClickUnfollow: () -> Unit,
     onClickFolder: () -> Unit,
     onClickNotification: () -> Unit,
+    onClickDonate: () -> Unit,
     onClickSettings: () -> Unit,
 ) {
     val transition = updateTransition(targetState = isFollowed)
@@ -543,7 +548,7 @@ private fun PodcastActions(
                     .clickable(
                         indication = if (isFollowed) controlActionRipple else buttonRipple,
                         interactionSource = null,
-                        onClick = { /* handle donate click */ },
+                        onClick = onClickDonate,
                     )
                     .clearAndSetSemantics {
                         role = Role.Button
@@ -965,6 +970,7 @@ private fun PodcastHeaderPreview(
                 onClickUnfollow = { isFollowed = false },
                 onClickFolder = {},
                 onClickNotification = {},
+                onClickDonate = {},
                 onClickSettings = {},
                 onClickWebsiteLink = {},
                 onToggleHeader = { isHeaderExpanded = !isHeaderExpanded },
