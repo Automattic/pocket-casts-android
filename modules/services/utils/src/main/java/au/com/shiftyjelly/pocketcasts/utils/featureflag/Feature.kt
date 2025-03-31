@@ -222,9 +222,9 @@ enum class Feature(
     APPSFLYER_ANALYTICS(
         key = "appsflyer_analytics",
         title = "AppsFlyer Analytics",
-        defaultValue = BuildConfig.DEBUG,
+        defaultValue = true,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
     ;
