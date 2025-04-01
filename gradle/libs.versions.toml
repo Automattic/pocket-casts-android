@@ -20,6 +20,7 @@ aboutlibraries = "11.6.3"
 android-gradle-plugin = "8.9.0"
 billing = "7.0.0"
 coil = "2.7.0"
+develocity-plugin = "3.19.2"
 compose = "2024.10.00" # https://developer.android.com/jetpack/compose/bom/bom-mapping
 dependency-analysis = "2.13.0"
 espresso = "3.6.1"
@@ -285,6 +286,9 @@ reorderable = "sh.calvin.reorderable:reorderable:2.4.3"
 security-lint = { module = "com.android.security.lint:lint", version.ref = "security-lint" }
 timber = "com.jakewharton.timber:timber:5.0.1"
 turbine = "app.cash.turbine:turbine:1.2.0"
+
+# Build dependencies
+gradle-develocity = { module = "com.gradle.develocity:com.gradle.develocity.gradle.plugin", version.ref = "develocity-plugin" }
 
 [plugins]
 aboutlibraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "aboutlibraries" }

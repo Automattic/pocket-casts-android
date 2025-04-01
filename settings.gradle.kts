@@ -1,4 +1,5 @@
 pluginManagement {
+    includeBuild("build-logic")
     repositories {
         google()
         mavenCentral()
@@ -15,8 +16,9 @@ pluginManagement {
 
 plugins {
     id("com.gradle.develocity").version("3.19")
+    id("remote-build-cache-plugin")
 }
-apply(from = File("./config/gradle/gradle_build_cache.gradle.kts"))
+
 apply(from = File("./config/gradle/gradle_build_scan.gradle"))
 
 dependencyResolutionManagement {
