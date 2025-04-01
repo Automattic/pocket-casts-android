@@ -65,3 +65,5 @@ sentry.properties
 
 # Kotlin
 .kotlin
+
+developer.properties
