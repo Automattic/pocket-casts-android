@@ -13,10 +13,23 @@ class UserAnalyticsSettings @Inject constructor(
     fun updateAnalyticsSetting(enabled: Boolean) {
         if (enabled) {
             settings.collectAnalytics.set(true, updateModifiedAt = true)
+            settings.collectAnalyticsThirdParty.set(true, updateModifiedAt = true)
             analyticsTracker.track(AnalyticsEvent.ANALYTICS_OPT_IN)
         } else {
             analyticsTracker.track(AnalyticsEvent.ANALYTICS_OPT_OUT)
             settings.collectAnalytics.set(false, updateModifiedAt = false)
+            settings.collectAnalyticsThirdParty.set(false, updateModifiedAt = false)
+            analyticsTracker.clearAllData()
+        }
+    }
+
+    fun updateAnalyticsThirdPartySetting(enabled: Boolean) {
+        if (enabled) {
+            settings.collectAnalyticsThirdParty.set(true, updateModifiedAt = true)
+            analyticsTracker.track(AnalyticsEvent.ANALYTICS_THIRD_PARTY_OPT_IN)
+        } else {
+            analyticsTracker.track(AnalyticsEvent.ANALYTICS_THIRD_PARTY_OPT_OUT)
+            settings.collectAnalyticsThirdParty.set(false, updateModifiedAt = false)
             analyticsTracker.clearAllData()
         }
     }

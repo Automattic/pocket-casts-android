@@ -37,6 +37,8 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.ui.extensions.startActivityViewUrl
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -71,6 +73,9 @@ class PrivacyFragment : BaseFragment() {
                 onAnalyticsClick = {
                     viewModel.updateAnalyticsSetting(it)
                 },
+                onAnalyticsThirdPartyClick = {
+                    viewModel.updateAnalyticsThirdPartySetting(it)
+                },
                 onCrashReportsClick = {
                     viewModel.updateCrashReportsSetting(it)
                 },
@@ -99,6 +104,7 @@ class PrivacyFragment : BaseFragment() {
     private fun PrivacySettings(
         state: PrivacyViewModel.UiState,
         onAnalyticsClick: (Boolean) -> Unit,
+        onAnalyticsThirdPartyClick: (Boolean) -> Unit,
         onCrashReportsClick: (Boolean) -> Unit,
         onLinkAccountClick: (Boolean) -> Unit,
         onPrivacyPolicyClick: () -> Unit,
@@ -128,8 +134,9 @@ class PrivacyFragment : BaseFragment() {
 
                 if (state is PrivacyViewModel.UiState.Loaded) {
                     item {
+                        val primaryText = if (FeatureFlag.isEnabled(Feature.APPSFLYER_ANALYTICS)) LR.string.settings_privacy_analytics_first_party else LR.string.settings_privacy_analytics
                         SettingRow(
-                            primaryText = stringResource(LR.string.settings_privacy_analytics),
+                            primaryText = stringResource(primaryText),
                             secondaryText = stringResource(LR.string.settings_privacy_analytics_summary),
                             toggle = SettingRowToggle.Switch(checked = state.analytics),
                             modifier = Modifier.toggleable(
@@ -138,6 +145,20 @@ class PrivacyFragment : BaseFragment() {
                             ) { onAnalyticsClick(!state.analytics) },
                             indent = false,
                         )
+                    }
+                    if (FeatureFlag.isEnabled(Feature.APPSFLYER_ANALYTICS)) {
+                        item {
+                            SettingRow(
+                                primaryText = stringResource(LR.string.settings_privacy_analytics_third_party),
+                                secondaryText = stringResource(LR.string.settings_privacy_analytics_third_party_summary),
+                                toggle = SettingRowToggle.Switch(checked = state.analyticsThirdParty),
+                                modifier = Modifier.toggleable(
+                                    value = state.analyticsThirdParty,
+                                    role = Role.Switch,
+                                ) { onAnalyticsThirdPartyClick(!state.analyticsThirdParty) },
+                                indent = false,
+                            )
+                        }
                     }
                     item {
                         SettingRow(
