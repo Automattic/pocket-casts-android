@@ -4,6 +4,9 @@
 
 7.86
 -----
+*   New Features
+    *   Add Creator Funding Support
+        ([#3840](https://github.com/Automattic/pocket-casts-ios/pull/3840))
 *   Bug Fixes
     *   Fix share transcript text when API less than 33.
         ([#3789](https://github.com/Automattic/pocket-casts-android/pull/3789))
