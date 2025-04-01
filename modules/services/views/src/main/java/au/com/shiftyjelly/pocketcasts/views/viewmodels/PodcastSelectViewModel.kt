@@ -13,6 +13,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -37,6 +38,30 @@ class PodcastSelectViewModel @Inject constructor(
                 .map { SelectablePodcast(it, selectedUuids.contains(it.uuid)) }
 
             _selectablePodcasts.value = sortedSelectable
+        }
+    }
+
+    fun togglePodcastSelection(uuid: String) {
+        _selectablePodcasts.update { currentList ->
+            currentList.map { podcast ->
+                if (podcast.podcast.uuid == uuid) {
+                    podcast.copy(selected = !podcast.selected)
+                } else {
+                    podcast
+                }
+            }
+        }
+    }
+
+    fun selectAll() {
+        _selectablePodcasts.update { currentList ->
+            currentList.map { it.copy(selected = true) }
+        }
+    }
+
+    fun deselectAll() {
+        _selectablePodcasts.update { currentList ->
+            currentList.map { it.copy(selected = false) }
         }
     }
 
