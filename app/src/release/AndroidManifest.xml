@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <application
-        tools:replace="android:allowBackup"
+        tools:replace="android:allowBackup,android:fullBackupContent"
         android:allowBackup="true"
         android:fullBackupContent="@xml/backup_scheme" />
 </manifest>

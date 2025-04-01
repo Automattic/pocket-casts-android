@@ -73,7 +73,7 @@ class ShareClipViewModelTest {
                 clipId = "clip-id",
                 source = SourceView.PLAYER,
                 initialClipRange = clipRange,
-                analyticsTracker = AnalyticsTracker.test(tracker, isEnabled = true),
+                analyticsTracker = AnalyticsTracker.test(tracker, isFirstPartyEnabled = true),
             ),
             episodeManager,
             podcastManager,

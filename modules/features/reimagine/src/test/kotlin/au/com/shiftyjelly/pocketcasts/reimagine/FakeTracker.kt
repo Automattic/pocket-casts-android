@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.reimagine
 
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.Tracker
+import au.com.shiftyjelly.pocketcasts.analytics.TrackerType
 
 class FakeTracker : Tracker {
     private val _events = mutableListOf<TrackEvent>()
@@ -13,6 +14,8 @@ class FakeTracker : Tracker {
     }
 
     override fun refreshMetadata() = Unit
+
+    override fun getTrackerType() = TrackerType.FirstParty
 
     override fun flush() = Unit
 
