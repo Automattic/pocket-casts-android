@@ -959,6 +959,7 @@ class PodcastAdapter(
                         rating = ratingState,
                         isFollowed = podcast.isSubscribed,
                         areNotificationsEnabled = podcast.isShowNotifications,
+                        isFundingUrlAvailable = podcast.fundingUrl != null,
                         folderIcon = when {
                             !signInState.isSignedInAsPlusOrPatron -> PodcastFolderIcon.BuyFolders
                             podcast.folderUuid != null -> PodcastFolderIcon.AddedToFolder

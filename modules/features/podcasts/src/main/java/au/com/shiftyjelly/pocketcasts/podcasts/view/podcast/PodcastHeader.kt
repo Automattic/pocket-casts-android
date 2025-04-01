@@ -41,10 +41,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -67,6 +69,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.layout.positionOnScreen
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -105,6 +108,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
+import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.ratings.PodcastRating
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel.RatingState
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel.RatingTappedSource
@@ -127,6 +131,7 @@ internal fun PodcastHeader(
     rating: RatingState,
     isFollowed: Boolean,
     areNotificationsEnabled: Boolean,
+    isFundingUrlAvailable: Boolean,
     folderIcon: PodcastFolderIcon,
     isHeaderExpanded: Boolean,
     isDescriptionExpanded: Boolean,
@@ -194,6 +199,7 @@ internal fun PodcastHeader(
                 onClickRating = onClickRating,
                 isFollowed = isFollowed,
                 areNotificationsEnabled = areNotificationsEnabled,
+                isFundingUrlAvailable = isFundingUrlAvailable,
                 folderIcon = folderIcon,
                 isHeaderExpanded = isHeaderExpanded,
                 onClickTitle = onToggleHeader,
@@ -230,6 +236,7 @@ private fun PodcastControls(
     rating: RatingState,
     isFollowed: Boolean,
     areNotificationsEnabled: Boolean,
+    isFundingUrlAvailable: Boolean,
     folderIcon: PodcastFolderIcon,
     isHeaderExpanded: Boolean,
     onClickTitle: () -> Unit,
@@ -302,6 +309,7 @@ private fun PodcastControls(
         PodcastActions(
             isFollowed = isFollowed,
             areNotificationsEnabled = areNotificationsEnabled,
+            isFundingUrlAvailable = isFundingUrlAvailable,
             folderIcon = folderIcon,
             onClickFollow = onClickFollow,
             onClickUnfollow = onClickUnfollow,
@@ -391,6 +399,7 @@ private fun PodcastRatingOrSpacing(
 private fun PodcastActions(
     isFollowed: Boolean,
     areNotificationsEnabled: Boolean,
+    isFundingUrlAvailable: Boolean,
     folderIcon: PodcastFolderIcon,
     onClickFollow: () -> Unit,
     onClickUnfollow: () -> Unit,
@@ -399,7 +408,7 @@ private fun PodcastActions(
     onClickSettings: () -> Unit,
 ) {
     val transition = updateTransition(targetState = isFollowed)
-
+    var notificationButtonPositionX by remember { mutableIntStateOf(0) }
     SubcomposeLayout { constraints ->
         val controls = subcompose("controls") {
             val alpha by transition.animateFloat(
@@ -427,12 +436,20 @@ private fun PodcastActions(
                 ActionButton(
                     iconId = if (areNotificationsEnabled) IR.drawable.ic_notifications_on else IR.drawable.ic_notifications_off,
                     contentDescription = stringResource(LR.string.podcast_notifications),
+                    modifier = Modifier.onGloballyPositioned { coordinates ->
+                        notificationButtonPositionX = coordinates.positionInParent().x.roundToInt()
+                    },
                     onClick = {
                         if (!transition.isRunning) {
                             onClickNotification()
                         }
                     },
                 )
+                if (isFundingUrlAvailable) {
+                    Spacer(
+                        modifier = Modifier.size(24.dp),
+                    )
+                }
                 ActionButton(
                     iconId = IR.drawable.ic_profile_settings,
                     contentDescription = stringResource(LR.string.podcast_settings),
@@ -466,6 +483,82 @@ private fun PodcastActions(
 
         val dummyButtonWidthDp = dummyButton.width.toDp()
         val dummyButtonHeightDp = dummyButton.height.toDp()
+
+        val donateButton = subcompose("donateButton") {
+            val backgroundColor = Color.Transparent
+            val iconColor by transition.animateColor(
+                label = "donateButtonIconColor",
+                transitionSpec = { followColorSpec },
+                targetValueByState = { followed -> if (followed) MaterialTheme.theme.colors.primaryIcon03 else MaterialTheme.theme.colors.primaryIcon02 },
+            )
+            val cornerRadius by transition.animateDp(
+                label = "donateButtonCornerRadius",
+                transitionSpec = { followDpSpec },
+                targetValueByState = { followed -> if (followed) 12.dp else 8.dp },
+            )
+            val description = stringResource(LR.string.donate)
+
+            val borderColor by transition.animateColor(
+                label = "donateButtonBorderColor",
+                transitionSpec = { followColorSpec },
+                targetValueByState = { followed -> if (followed) Color.Transparent else MaterialTheme.theme.colors.primaryIcon02 },
+            )
+
+            val buttonOffset by transition.animateIntOffset(
+                label = "donateButtonOffset",
+                transitionSpec = { followIntOffsetSpec },
+                targetValueByState = { followed ->
+                    if (followed) {
+                        IntOffset(16.dp.roundToPx(), 4.dp.roundToPx())
+                    } else {
+                        IntOffset(8.dp.roundToPx(), 0)
+                    }
+                },
+            )
+
+            val buttonSize by transition.animateDp(
+                label = "donateButtonSize",
+                transitionSpec = { followDpSpec },
+                targetValueByState = { followed -> if (followed) 24.dp else dummyButtonHeightDp },
+            )
+
+            val iconSize by transition.animateDp(
+                label = "donateButtonIconSize",
+                transitionSpec = { followDpSpec },
+                targetValueByState = { followed -> if (followed) 24.dp else 20.dp },
+            )
+
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .offset { buttonOffset }
+                    .size(buttonSize)
+                    .background(backgroundColor, RoundedCornerShape(cornerRadius))
+                    .border(
+                        width = if (isFollowed) 0.dp else 2.dp,
+                        color = borderColor,
+                        shape = RoundedCornerShape(cornerRadius),
+                    )
+                    .clip(RoundedCornerShape(cornerRadius))
+                    .clickable(
+                        indication = if (isFollowed) controlActionRipple else buttonRipple,
+                        interactionSource = null,
+                        onClick = { /* handle donate click */ },
+                    )
+                    .clearAndSetSemantics {
+                        role = Role.Button
+                        contentDescription = description
+                    },
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_donate_coin),
+                    contentDescription = null,
+                    tint = iconColor,
+                    modifier = Modifier
+                        .size(iconSize),
+                )
+            }
+        }[0].measure(constraints)
 
         val followButton = subcompose("followButton") {
             val backgroundColor by transition.animateColor(
@@ -555,7 +648,15 @@ private fun PodcastActions(
 
         layout(width, height) {
             controls.place(x = controlsOffsetX, y = controlsOffsetY)
-            followButton.place(x = ((width - followButton.width) / 2f).roundToInt(), y = ((height - followButton.height) / 2f).roundToInt())
+            val donateButtonWidth = if (isFollowed || !isFundingUrlAvailable) 0 else donateButton.width
+            val followButtonX = ((width - (followButton.width + donateButtonWidth)) / 2f).roundToInt()
+            val followButtonY = ((height - followButton.height) / 2f).roundToInt()
+            // Donate button relative to notification button when podcast is followed and relative to follow button when podcast is not followed
+            val donateButtonX = if (isFollowed) notificationButtonPositionX + 24.dp.roundToPx() else followButtonX + followButton.width
+            followButton.place(x = followButtonX, y = followButtonY)
+            if (isFundingUrlAvailable) {
+                donateButton.place(x = donateButtonX, y = followButtonY)
+            }
         }
     }
 }
@@ -565,12 +666,13 @@ private fun ActionButton(
     @DrawableRes iconId: Int,
     contentDescription: String,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Image(
         painter = painterResource(iconId),
         contentDescription = contentDescription,
         colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.primaryIcon03),
-        modifier = Modifier
+        modifier = modifier
             .padding(4.dp)
             .size(24.dp)
             .clickable(
@@ -811,7 +913,7 @@ private val previewColors = listOf(
 private fun PodcastHeaderPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
-    var isFollowed by remember { mutableStateOf(true) }
+    var isFollowed by remember { mutableStateOf(false) }
     var isHeaderExpanded by remember { mutableStateOf(true) }
     var isDescriptionExpanded by remember { mutableStateOf(false) }
 
@@ -846,6 +948,7 @@ private fun PodcastHeaderPreview(
                 ),
                 isFollowed = isFollowed,
                 areNotificationsEnabled = true,
+                isFundingUrlAvailable = true,
                 folderIcon = PodcastFolderIcon.BuyFolders,
                 isHeaderExpanded = isHeaderExpanded,
                 isDescriptionExpanded = isDescriptionExpanded,
