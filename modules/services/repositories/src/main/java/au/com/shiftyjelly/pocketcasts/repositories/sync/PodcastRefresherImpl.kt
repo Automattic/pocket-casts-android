@@ -28,13 +28,15 @@ class PodcastRefresherImpl @Inject constructor(
     override suspend fun refreshPodcast(existingPodcast: Podcast, playbackManager: PlaybackManager) {
         try {
             val podcastResponse = cacheServiceManager.getPodcastResponse(existingPodcast.uuid)
+            val updatedPodcast = podcastResponse.body()?.toPodcast()
+            val isFundingUrlSame = updatedPodcast?.fundingUrl == existingPodcast.fundingUrl
+
             // unsubscribed podcasts have episodes removed, so always refresh them
-            if (existingPodcast.isSubscribed && (podcastResponse.wasCached() || podcastResponse.notModified())) {
+            if (existingPodcast.isSubscribed && isFundingUrlSame && (podcastResponse.wasCached() || podcastResponse.notModified())) {
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refreshing podcast ${existingPodcast.uuid} not required as cached")
                 return
             }
 
-            val updatedPodcast = podcastResponse.body()?.toPodcast()
             if (updatedPodcast == null) {
                 LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Refreshing podcast ${existingPodcast.uuid} not required as no response")
                 return
@@ -50,6 +52,7 @@ class PodcastRefresherImpl @Inject constructor(
             existingPodcast.estimatedNextEpisode = updatedPodcast.estimatedNextEpisode
             existingPodcast.episodeFrequency = updatedPodcast.episodeFrequency
             existingPodcast.refreshAvailable = updatedPodcast.refreshAvailable
+            existingPodcast.fundingUrl = updatedPodcast.fundingUrl
             val existingEpisodes = episodeManager.findEpisodesByPodcastOrderedByPublishDate(existingPodcast)
             val mostRecentEpisode = existingEpisodes.firstOrNull()
             val insertEpisodes = mutableListOf<PodcastEpisode>()
