@@ -490,18 +490,20 @@ private fun PodcastActions(
         val dummyButtonHeightDp = dummyButton.height.toDp()
 
         val donateButton = subcompose("donateButton") {
+            val description = stringResource(LR.string.donate)
+
             val backgroundColor = Color.Transparent
             val iconColor by transition.animateColor(
                 label = "donateButtonIconColor",
                 transitionSpec = { followColorSpec },
                 targetValueByState = { followed -> if (followed) MaterialTheme.theme.colors.primaryIcon03 else MaterialTheme.theme.colors.primaryIcon02 },
             )
+
             val cornerRadius by transition.animateDp(
                 label = "donateButtonCornerRadius",
                 transitionSpec = { followDpSpec },
-                targetValueByState = { followed -> if (followed) 12.dp else 8.dp },
+                targetValueByState = { followed -> if (followed) 0.dp else 8.dp },
             )
-            val description = stringResource(LR.string.donate)
 
             val borderColor by transition.animateColor(
                 label = "donateButtonBorderColor",
@@ -533,6 +535,12 @@ private fun PodcastActions(
                 targetValueByState = { followed -> if (followed) 24.dp else 20.dp },
             )
 
+            val borderWidth by transition.animateDp(
+                label = "donateButtonBorderWidth",
+                transitionSpec = { followDpSpec },
+                targetValueByState = { followed -> if (followed) 0.dp else 2.dp },
+            )
+
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
@@ -540,7 +548,7 @@ private fun PodcastActions(
                     .size(buttonSize)
                     .background(backgroundColor, RoundedCornerShape(cornerRadius))
                     .border(
-                        width = if (isFollowed) 0.dp else 2.dp,
+                        width = borderWidth,
                         color = borderColor,
                         shape = RoundedCornerShape(cornerRadius),
                     )
@@ -918,7 +926,7 @@ private val previewColors = listOf(
 private fun PodcastHeaderPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
-    var isFollowed by remember { mutableStateOf(false) }
+    var isFollowed by remember { mutableStateOf(true) }
     var isHeaderExpanded by remember { mutableStateOf(true) }
     var isDescriptionExpanded by remember { mutableStateOf(false) }
 
