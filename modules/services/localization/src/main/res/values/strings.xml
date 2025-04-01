@@ -843,6 +843,8 @@
     <string name="filters_warning_delete_summary">This cannot be undone.</string>
     <string name="filters_release_date">Release Date</string>
     <string name="filters_download_options">Download Options</string>
+    <string name="filters_tooltip_title">Organize your episodes</string>
+    <string name="filters_tooltip_subtitle">Create smart filters to organize your episodes. Filter by duration, release date, media type, and more.</string>
 
     <!-- Profile -->
 

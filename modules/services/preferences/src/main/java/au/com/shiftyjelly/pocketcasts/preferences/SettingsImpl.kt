@@ -1573,6 +1573,11 @@ class SettingsImpl @Inject constructor(
         defaultValue = true,
         sharedPrefs = sharedPreferences,
     )
+    override val showEmptyFiltersListTooltip: UserSetting<Boolean> = UserSetting.BoolPref(
+        sharedPrefKey = "show_empty_filters_list_tooltip",
+        defaultValue = true,
+        sharedPrefs = sharedPreferences,
+    )
 
     override val showPodcastsRecentlyPlayedSortOrderTooltip: UserSetting<Boolean> = UserSetting.BoolPref(
         sharedPrefKey = "show_podcasts_recently_played_sort_order_tooltip",
