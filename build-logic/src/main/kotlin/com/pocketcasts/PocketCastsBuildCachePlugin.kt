@@ -16,6 +16,7 @@ class PocketCastsBuildCachePlugin : Plugin<Settings> {
         val secretProperties = loadPropertiesFromFile(File("${target.rootDir.path}/secret.properties"))
 
         target.buildCache {
+            local.directory = File("${System.getProperty("user.home")}/build-cache-test")
             if (System.getenv("CI")?.toBoolean() == true) {
                 remote<HttpBuildCache> {
                     url = URI.create("http://10.0.2.214:5071/cache/")
