@@ -17,8 +17,8 @@ open class AppsFlyerAnalyticsWrapper(
             Timber.i("AppsFlyer event logged successfully")
         }
 
-        override fun onError(code: Int, descrption: String) {
-            LogBuffer.e("AppsFlyer", "AppsFlyer event logging failed. Error code: $code, description: $descrption")
+        override fun onError(code: Int, description: String) {
+            LogBuffer.e("AppsFlyer", "AppsFlyer event logging failed. Error code: $code, description: $description")
         }
     }
     private val launchEventListener = object : AppsFlyerRequestListener {
@@ -26,8 +26,8 @@ open class AppsFlyerAnalyticsWrapper(
             Timber.i("AppsFlyer launch successful")
         }
 
-        override fun onError(code: Int, descrption: String) {
-            LogBuffer.e("AppsFlyer", "AppsFlyer launch failed. Error code: $code, description: $descrption")
+        override fun onError(code: Int, description: String) {
+            LogBuffer.e("AppsFlyer", "AppsFlyer launch failed. Error code: $code, description: $description")
         }
     }
 
@@ -36,12 +36,12 @@ open class AppsFlyerAnalyticsWrapper(
             return
         }
         if (!started.get()) {
-            startAppsFlyer(context, userId)
+            startAppsFlyer(userId)
         }
         appsFlyerLib.logEvent(context, name, params, logEventListener)
     }
 
-    open fun startAppsFlyer(context: Context, userId: String) {
+    open fun startAppsFlyer(userId: String) {
         if (appsFlyerLib == null) {
             return
         }
