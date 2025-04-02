@@ -576,4 +576,6 @@ interface Settings {
     val suggestedFoldersDismissTimestamp: UserSetting<Instant?>
     val suggestedFoldersDismissCount: UserSetting<Int>
     val suggestedFoldersFollowedHash: UserSetting<String>
+
+    val isTrackingConsentRequired: UserSetting<Boolean>
 }
