@@ -21,6 +21,7 @@
         android:layout_gravity="bottom|center_horizontal"
         android:gravity="center_horizontal"
         android:orientation="vertical"
+        android:background="@drawable/header_text_linear_gradient"
         android:paddingHorizontal="12dp"
         android:paddingBottom="12dp">
 
