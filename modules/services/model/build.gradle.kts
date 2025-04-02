@@ -36,7 +36,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
             return "N/A"
         }
 
-        val inputFile = project.file("build/task-inputs-${name}.txt")
+        val inputFile = project.file("build/${project.name}-task-inputs-${name}.txt")
         inputFile.writeText("Task: $name\nInputs:\n")
 
         // Save input files with relative paths
