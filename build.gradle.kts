@@ -6,6 +6,7 @@ import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import com.automattic.android.measure.reporters.InternalA8cCiReporter
+import com.automattic.android.measure.reporters.RemoteBuildCacheMetricsReporter
 import com.automattic.android.measure.reporters.SlowSlowTasksMetricsReporter
 import com.diffplug.gradle.spotless.SpotlessTask
 import com.google.devtools.ksp.gradle.KspExtension
@@ -44,6 +45,7 @@ measureBuilds {
     onBuildMetricsReadyListener {
         val report = this@onBuildMetricsReadyListener
         SlowSlowTasksMetricsReporter.report(report)
+        RemoteBuildCacheMetricsReporter.report(report)
         InternalA8cCiReporter.reportBlocking(
             metricsReport = report,
             projectName = "pocketcasts",
