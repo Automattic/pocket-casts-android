@@ -8,4 +8,4 @@ install_gems
 echo "--- :closed_lock_with_key: Installing Secrets"
 bundle exec fastlane run configure_apply
 
-./gradlew :modules:services:model:assembleDebugProd --rerun-tasks
+./gradlew :modules:services:model:assembleDebugProd --rerun-tasks -i
