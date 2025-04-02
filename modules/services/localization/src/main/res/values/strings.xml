@@ -313,6 +313,11 @@
     <string name="time_short_seconds">%ds</string>
     <string name="time_left">%s left</string>
 
+    <string name="tracking_consent_dialog_title">Allow "Pocket Casts" to track your activity across other companies\' apps and websites?</string>
+    <string name="tracking_consent_dialog_message">We use analytics to make the app better and to measure if our ad campaigns are successful.</string>
+    <string name="tracking_consent_dialog_allow">Allow</string>
+    <string name="tracking_consent_dialog_reject">Ask App Not to Track</string>
+
     <!-- Player -->
 
     <string name="player_action_next_chapter">Next chapter</string>

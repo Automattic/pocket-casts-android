@@ -1610,4 +1610,10 @@ class SettingsImpl @Inject constructor(
         defaultValue = "",
         sharedPrefs = sharedPreferences,
     )
+
+    override val isTrackingConsentRequired = UserSetting.BoolPref(
+        sharedPrefKey = "tracking_consent_required",
+        defaultValue = true,
+        sharedPrefs = sharedPreferences,
+    )
 }
