@@ -17,7 +17,8 @@ pluginManagement {
 }
 
 plugins {
-    id("com.gradle.develocity").version("3.19")
+    id("com.gradle.develocity").version("3.19.2")
+    id("com.gradle.common-custom-user-data-gradle-plugin").version("2.2.1")
 }
 
 apply(from = File("./config/gradle/gradle_build_scan.gradle"))
