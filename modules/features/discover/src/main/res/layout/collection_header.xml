@@ -1,7 +1,7 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="179dp"
-    android:layout_height="212dp"
+    android:layout_height="210dp"
     android:layout_marginTop="8dp"
     android:layout_marginBottom="24dp"
     android:layout_marginLeft="8dp"
