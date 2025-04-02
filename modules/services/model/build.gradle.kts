@@ -19,6 +19,55 @@ android {
     }
 }
 
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    doFirst {
+        fun computeMD5(file: File): String {
+            if (file.exists() && file.isFile) {
+                val md5Digest = MessageDigest.getInstance("MD5")
+                file.inputStream().use { stream ->
+                    val buffer = ByteArray(8192)
+                    var bytesRead: Int
+                    while (stream.read(buffer).also { bytesRead = it } != -1) {
+                        md5Digest.update(buffer, 0, bytesRead)
+                    }
+                }
+                return md5Digest.digest().joinToString("") { "%02x".format(it) }
+            }
+            return "N/A"
+        }
+
+        val inputFile = project.file("build/task-inputs-${name}.txt")
+        inputFile.writeText("Task: $name\nInputs:\n")
+
+        // Save input files with relative paths
+        inputs.files.sorted().forEach { file ->
+            inputFile.appendText("Input File: ${project.relativePath(file)} (MD5: ${computeMD5(file)})\n")
+        }
+
+        // Save input properties with proper casting
+        inputFile.appendText("\n=== Input Properties ===\n")
+        inputs.properties.toSortedMap().forEach { (key, value) ->
+            val valueString = when (value) {
+                is org.jetbrains.kotlin.gradle.tasks.CompilerPluginOptions ->
+                    value.arguments.toString()
+                is org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions ->
+                    """
+                    jvmTarget: ${value.jvmTarget}
+                    apiVersion: ${value.apiVersion}
+                    freeCompilerArgs: ${value.freeCompilerArgs.get().joinToString(", ")}
+                    allWarningsAsErrors: ${value.allWarningsAsErrors}
+                    """.trimIndent()
+                is org.jetbrains.kotlin.gradle.tasks.KotlinJavaToolchain ->
+                    "Java Version: ${value.javaVersion}"
+                null -> "null"
+                else -> value.toString()
+            }
+            inputFile.appendText("$key = $valueString\n")
+        }
+    }
+}
+
+
 tasks.withType<JavaCompile>().configureEach {
     doFirst {
         val inputFile = project.file("build/${project.name}-task-inputs-${name}.txt")
