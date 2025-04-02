@@ -37,6 +37,7 @@ dependencies {
     implementation(libs.fragment.compose)
     implementation(libs.lottie)
     implementation(libs.lottie.compose)
+    implementation(libs.navigation.compose)
     implementation(libs.reorderable)
 
     implementation(projects.modules.services.images)

@@ -16,6 +16,10 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
+import au.com.shiftyjelly.pocketcasts.compose.extensions.slideInToEnd
+import au.com.shiftyjelly.pocketcasts.compose.extensions.slideInToStart
+import au.com.shiftyjelly.pocketcasts.compose.extensions.slideOutToEnd
+import au.com.shiftyjelly.pocketcasts.compose.extensions.slideOutToStart
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.settings.history.upnext.UpNextHistoryDetailsPage
 import au.com.shiftyjelly.pocketcasts.settings.history.upnext.UpNextHistoryDetailsViewModel.UiState
@@ -50,6 +54,10 @@ class HistoryFragment : BaseFragment(), HasBackstack {
             NavHost(
                 navController = navController,
                 startDestination = HistoryNavRoutes.History,
+                enterTransition = { slideInToStart() },
+                exitTransition = { slideOutToStart() },
+                popEnterTransition = { slideInToEnd() },
+                popExitTransition = { slideOutToEnd() },
                 modifier = Modifier.fillMaxSize(),
             ) {
                 composable(HistoryNavRoutes.History) {
