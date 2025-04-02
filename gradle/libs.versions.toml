@@ -287,9 +287,6 @@ security-lint = { module = "com.android.security.lint:lint", version.ref = "secu
 timber = "com.jakewharton.timber:timber:5.0.1"
 turbine = "app.cash.turbine:turbine:1.2.0"
 
-# Build dependencies
-gradle-develocity = { module = "com.gradle.develocity:com.gradle.develocity.gradle.plugin", version.ref = "develocity-plugin" }
-
 [plugins]
 aboutlibraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "aboutlibraries" }
 android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }

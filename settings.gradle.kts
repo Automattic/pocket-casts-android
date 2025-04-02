@@ -1,5 +1,7 @@
+import java.net.URI
+import java.util.Properties
+
 pluginManagement {
-    includeBuild("build-logic")
     repositories {
         google()
         mavenCentral()
@@ -16,7 +18,6 @@ pluginManagement {
 
 plugins {
     id("com.gradle.develocity").version("3.19")
-    id("remote-build-cache-plugin")
 }
 
 apply(from = File("./config/gradle/gradle_build_scan.gradle"))
@@ -83,3 +84,41 @@ include(":modules:services:ui")
 include(":modules:services:utils")
 include(":modules:services:views")
 include(":modules:services:sharedtest")
+
+val developerProperties = loadPropertiesFromFile(File("${rootDir.path}/developer.properties"))
+val secretProperties = loadPropertiesFromFile(File("${rootDir.path}/secret.properties"))
+val USE_REMOTE_BUILD_CACHE_LOCALLY = "use_remote_build_cache_locally"
+
+buildCache {
+    if (System.getenv("CI")?.toBoolean() == true) {
+        remote<HttpBuildCache> {
+            url = URI.create("http://10.0.2.214:5071/cache/")
+            isAllowUntrustedServer = true
+            isAllowInsecureProtocol = true
+            isPush = true
+            credentials {
+                username = "ci-user"
+                password = System.getenv("GRADLE_CACHE_NODE_PASSWORD")
+            }
+        }
+    } else if (developerProperties.getProperty(USE_REMOTE_BUILD_CACHE_LOCALLY).toBoolean()) {
+        remote<HttpBuildCache> {
+            url = URI.create(secretProperties.getProperty("gradleCacheNodeUrl").ifEmpty { throw IllegalArgumentException("Gradle Cache Node URL is missing. Make sure to apply secrets `bundle exec fastlane run configure_apply`.") })
+            isPush = false
+            credentials {
+                username = "developer"
+                password = secretProperties.getProperty("gradleCacheNodePassword")
+            }
+        }
+    }
+}
+
+private fun loadPropertiesFromFile(file: File): Properties {
+    val properties = Properties()
+    if (file.exists()) {
+        file.inputStream().use { stream ->
+            properties.load(stream)
+        }
+    }
+    return properties
+}
