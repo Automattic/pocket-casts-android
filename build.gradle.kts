@@ -35,6 +35,7 @@ plugins {
     alias(libs.plugins.protobuf) apply false
     alias(libs.plugins.compose.compiler) apply false
     alias(libs.plugins.dependency.analysis)
+    alias(libs.plugins.room) apply false
 }
 
 apply(from = rootProject.file("dependencies.gradle.kts"))
