@@ -95,7 +95,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         UserPodcastRating::class,
         UpNextHistory::class,
     ],
-    version = 112,
+    version = 113,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 81, to = 82, spec = AppDatabase.Companion.DeleteSilenceRemovedMigration::class),
@@ -985,6 +985,10 @@ abstract class AppDatabase : RoomDatabase() {
             )
         }
 
+        val MIGRATION_112_113 = addMigration(112, 113) { database ->
+            database.execSQL("ALTER TABLE podcasts ADD COLUMN funding_url TEXT")
+        }
+
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
             databaseBuilder.addMigrations(
                 addMigration(1, 2) { },
@@ -1387,6 +1391,7 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_109_110,
                 MIGRATION_110_111,
                 MIGRATION_111_112,
+                MIGRATION_112_113,
             )
         }
 

@@ -237,6 +237,7 @@ enum class AnalyticsEvent(val key: String) {
     PODCAST_SCREEN_REFRESH_NO_EPISODES_FOUND("podcast_screen_refresh_no_episodes_found"),
     PODCAST_SCREEN_CATEGORY_TAPPED("podcast_screen_category_tapped"),
     PODCAST_SCREEN_PODCAST_DETAILS_LINK_TAPPED("podcast_screen_podcast_details_link_tapped"),
+    PODCAST_SCREEN_FUNDING_TAPPED("podcast_screen_funding_tapped"),
 
     /* Podcast Settings */
     PODCAST_SETTINGS_FEED_ERROR_TAPPED("podcast_settings_feed_error_tapped"),
@@ -276,6 +277,8 @@ enum class AnalyticsEvent(val key: String) {
     PRIVACY_SHOWN("privacy_shown"),
     ANALYTICS_OPT_IN("analytics_opt_in"),
     ANALYTICS_OPT_OUT("analytics_opt_out"),
+    ANALYTICS_THIRD_PARTY_OPT_IN("analytics_third_party_opt_in"),
+    ANALYTICS_THIRD_PARTY_OPT_OUT("analytics_third_party_opt_out"),
     CRASH_REPORTS_TOGGLED("crash_reports_toggled"),
     SETTINGS_SHOW_PRIVACY_POLICY("settings_show_privacy_policy"),
 

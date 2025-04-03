@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.privacy.UserAnalyticsSettings
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isGooglePlayServicesAvailableSuccess
 import com.google.android.gms.common.GoogleApiAvailability
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,6 +27,8 @@ class OnboardingLoginOrSignUpViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTracker,
     @ApplicationContext context: Context,
     private val podcastManager: PodcastManager,
+    private val userAnalyticsSettings: UserAnalyticsSettings,
+    settings: Settings,
 ) : AndroidViewModel(context as Application) {
 
     val showContinueWithGoogleButton =
@@ -34,6 +37,7 @@ class OnboardingLoginOrSignUpViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     val uiState: StateFlow<UiState> = _uiState
+    val isTrackingConsentRequired: StateFlow<Boolean> = settings.isTrackingConsentRequired.flow
 
     sealed class UiState {
         object Loading : UiState()
@@ -74,6 +78,10 @@ class OnboardingLoginOrSignUpViewModel @Inject constructor(
             AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED,
             mapOf(AnalyticsProp.flow(flow), AnalyticsProp.ButtonTapped.signIn),
         )
+    }
+
+    fun updateTrackingConsent(consent: Boolean) {
+        userAnalyticsSettings.updateAnalyticsThirdPartySetting(consent)
     }
 
     companion object {

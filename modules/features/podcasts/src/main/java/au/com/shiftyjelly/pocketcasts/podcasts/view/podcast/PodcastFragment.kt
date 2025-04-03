@@ -101,6 +101,7 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSourc
 import au.com.shiftyjelly.pocketcasts.sharing.SharingClient
 import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
+import au.com.shiftyjelly.pocketcasts.ui.extensions.openUrl
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.images.CoilManager
@@ -625,6 +626,15 @@ class PodcastFragment : BaseFragment() {
         }
     }
 
+    private val onDonateClicked: (Uri?) -> Unit = { uri ->
+        viewModel.onDonateClicked()
+        uri?.let {
+            openUrl(it.toString())
+        } ?: run {
+            Timber.e("Donate URI is null")
+        }
+    }
+
     private val onSettingsClicked: () -> Unit = {
         analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_SETTINGS_TAPPED)
         (activity as FragmentHostListener).addFragment(PodcastSettingsFragment.newInstance(viewModel.podcastUuid))
@@ -764,6 +774,7 @@ class PodcastFragment : BaseFragment() {
             onBookmarkRowLongPress = onRowLongPress(),
             onFoldersClicked = onFoldersClicked,
             onNotificationsClicked = onNotificationsClicked,
+            onDonateClicked = onDonateClicked,
             onSettingsClicked = onSettingsClicked,
             playButtonListener = playButtonListener,
             onRowClicked = onRowClicked,

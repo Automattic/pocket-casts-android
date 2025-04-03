@@ -36,6 +36,7 @@
     <string name="close">Close</string>
     <string name="create_account">Create account</string>
     <string name="delete">Delete</string>
+    <string name="donate">Donate</string>
     <string name="done">Done</string>
     <string name="download">Download</string>
     <string name="downloads">Downloads</string>
@@ -311,6 +312,11 @@
     <string name="time_short_minutes">%dm</string>
     <string name="time_short_seconds">%ds</string>
     <string name="time_left">%s left</string>
+
+    <string name="tracking_consent_dialog_title">Allow "Pocket Casts" to track your activity across other companies\' apps and websites?</string>
+    <string name="tracking_consent_dialog_message">We use analytics to make the app better and to measure if our ad campaigns are successful.</string>
+    <string name="tracking_consent_dialog_allow">Allow</string>
+    <string name="tracking_consent_dialog_reject">Ask App Not to Track</string>
 
     <!-- Player -->
 
@@ -1619,7 +1625,10 @@
     <string name="settings_about_privacy_policy_available_at">Our Privacy policy is available at %s</string>
     <string name="settings_privacy_summary">Allowing us to collect analytics and crash reports helps us build a better app. We understand if you would prefer not to share this information.</string>
     <string name="settings_privacy_analytics">Analytics</string>
+    <string name="settings_privacy_analytics_first_party">First-party analytics</string>
     <string name="settings_privacy_analytics_summary">Allow us to collect analytics.</string>
+    <string name="settings_privacy_analytics_third_party">Third-party analytics</string>
+    <string name="settings_privacy_analytics_third_party_summary">Allow us to use trusted third-party services to collect anonymous data.</string>
     <string name="settings_privacy_crash">Crash reports</string>
     <string name="settings_privacy_crash_summary">Allow us to collect crash reports.</string>
     <string name="settings_privacy_crash_link">Link your account to crashes</string>

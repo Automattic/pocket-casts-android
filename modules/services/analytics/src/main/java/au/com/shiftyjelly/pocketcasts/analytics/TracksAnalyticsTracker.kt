@@ -95,6 +95,8 @@ class TracksAnalyticsTracker @Inject constructor(
         ).mapKeys { it.key.analyticsKey }
     }
 
+    override fun getTrackerType() = TrackerType.FirstParty
+
     override fun refreshMetadata() {
         val uuid = accountStatusInfo.getUuid()
         if (!uuid.isNullOrEmpty()) {
