@@ -79,6 +79,7 @@ class NotificationsSettingsFragment :
     private var notificationActions: PreferenceScreen? = null
     private var playOverNotificationPreference: ListPreference? = null
     private var hidePlaybackNotificationsPreference: SwitchPreference? = null
+    private var dailyRemindersPreference: SwitchPreference? = null
 
     private val toolbar
         get() = view?.findViewById<Toolbar>(R.id.toolbar)
@@ -113,6 +114,7 @@ class NotificationsSettingsFragment :
         systemSettingsPreference = manager.findPreference("openSystemSettings")
         playOverNotificationPreference = manager.findPreference("overrideNotificationAudio")
         hidePlaybackNotificationsPreference = manager.findPreference("hideNotificationOnPause")
+        dailyRemindersPreference = manager.findPreference("dailyRemindersNotification")
 
         // turn preferences off by default, because they are enable async, we don't want this view to remove them from the screen after it loads as it looks jarring
         enabledPreferences(false)
@@ -169,6 +171,13 @@ class NotificationsSettingsFragment :
 
             true
         }
+
+        dailyRemindersPreference?.setOnPreferenceChangeListener { _, newValue ->
+            val newBool = (newValue as? Boolean) ?: throw IllegalStateException("Invalid value for hide notification on pause preference: $newValue")
+            settings.dailyRemindersNotification.set(newBool, updateModifiedAt = true)
+            true
+        }
+
         changePodcastsSummary()
     }
 
@@ -383,6 +392,7 @@ class NotificationsSettingsFragment :
         setupEnabledNotifications()
         setupNotificationVibrate()
         setupHidePlaybackNotifications()
+        setupDailyRemindersNotification()
         setupPlayOverNotifications()
     }
 
@@ -484,6 +494,10 @@ class NotificationsSettingsFragment :
 
     private fun setupHidePlaybackNotifications() {
         hidePlaybackNotificationsPreference?.isChecked = settings.hideNotificationOnPause.value
+    }
+
+    private fun setupDailyRemindersNotification() {
+        dailyRemindersPreference?.isChecked = settings.dailyRemindersNotification.value
     }
 
     private fun setupPlayOverNotifications() {
