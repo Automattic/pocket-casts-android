@@ -41,7 +41,7 @@
             android:title="@string/settings_notification_advanced" />
     </PreferenceCategory>
 
-    <PreferenceCategory>
+    <PreferenceCategory android:key="general_notifications">
         <SwitchPreference
             android:key="dailyRemindersNotification"
             android:persistent="false"
