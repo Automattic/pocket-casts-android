@@ -610,6 +610,7 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_NOTIFICATIONS_HIDE_PLAYBACK_NOTIFICATION_ON_PAUSE("settings_notifications_hide_playback_notification_on_pause"),
     SETTINGS_NOTIFICATIONS_SOUND_CHANGED("settings_notifications_sound_changed"),
     SETTINGS_NOTIFICATIONS_VIBRATION_CHANGED("settings_notifications_vibration_changed"),
+    SETTINGS_NOTIFICATIONS_DAILY_REMINDERS_TOGGLED("settings_notifications_daily_reminders_toggled"),
 
     /* Settings - Storage & Data Use */
     SETTINGS_STORAGE_SHOWN("settings_storage_shown"),
