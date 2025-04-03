@@ -25,6 +25,8 @@ import au.com.shiftyjelly.pocketcasts.models.converter.EpisodePlayingStatusConve
 import au.com.shiftyjelly.pocketcasts.models.converter.EpisodeStatusEnumConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.EpisodesSortTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.InstantConverter
+import au.com.shiftyjelly.pocketcasts.models.converter.NotificationCategoryConverter
+import au.com.shiftyjelly.pocketcasts.models.converter.NotificationTriggerRuleConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.PodcastAutoUpNextConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.PodcastGroupingTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.PodcastLicensingEnumConverter
@@ -55,6 +57,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.CuratedPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
+import au.com.shiftyjelly.pocketcasts.models.entity.Notification
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -66,6 +69,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UpNextChange
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextHistory
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.UserNotifications
 import au.com.shiftyjelly.pocketcasts.models.entity.UserPodcastRating
 import au.com.shiftyjelly.pocketcasts.models.to.DbChapter
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
@@ -94,8 +98,10 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         Transcript::class,
         UserPodcastRating::class,
         UpNextHistory::class,
+        Notification::class,
+        UserNotifications::class,
     ],
-    version = 113,
+    version = 114,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 81, to = 82, spec = AppDatabase.Companion.DeleteSilenceRemovedMigration::class),
@@ -123,6 +129,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
     PodcastGroupingTypeConverter::class,
     ChapterIndicesConverter::class,
     InstantConverter::class,
+    NotificationCategoryConverter::class,
+    NotificationTriggerRuleConverter::class,
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun podcastDao(): PodcastDao
@@ -989,6 +997,45 @@ abstract class AppDatabase : RoomDatabase() {
             database.execSQL("ALTER TABLE podcasts ADD COLUMN funding_url TEXT")
         }
 
+        val MIGRATION_113_114 = addMigration(113, 114) { database ->
+            with(database) {
+                beginTransaction()
+                try {
+                    database.execSQL(
+                        """
+                        CREATE TABLE IF NOT EXISTS notification(
+                            _id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            category INTEGER NOT NULL,
+                            subcategory TEXT NOT NULL,
+                            deeplink TEXT NOT NULL,
+                            trigger_rule INTEGER NOT NULL,
+                            trigger_value TEXT
+                        )
+                        """.trimIndent(),
+                    )
+                    database.execSQL(
+                        """
+                        CREATE UNIQUE INDEX IF NOT EXISTS index_notification_category_subcategory ON notification (category, subcategory)
+                        """.trimIndent(),
+                    )
+                    database.execSQL(
+                        """
+                        CREATE TABLE IF NOT EXISTS user_notifications (
+                            user_id TEXT NOT NULL PRIMARY KEY,
+                            notification_id INTEGER NOT NULL,
+                            notifications_sent_this_week INTEGER NOT NULL,
+                            last_notification_sent_at INTEGER NOT NULL,
+                            interacted_at INTEGER
+                        )
+                        """.trimIndent(),
+                    )
+                    setTransactionSuccessful()
+                } finally {
+                    endTransaction()
+                }
+            }
+        }
+
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
             databaseBuilder.addMigrations(
                 addMigration(1, 2) { },
@@ -1392,6 +1439,7 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_110_111,
                 MIGRATION_111_112,
                 MIGRATION_112_113,
+                MIGRATION_113_114,
             )
         }
 
