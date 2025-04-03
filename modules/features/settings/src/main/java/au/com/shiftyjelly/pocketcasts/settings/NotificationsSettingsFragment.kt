@@ -4,7 +4,9 @@ import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.IntentCompat.getParcelableExtra
 import androidx.core.view.updatePadding
@@ -27,6 +29,8 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSett
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.extensions.findToolbar
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.fragments.PodcastSelectFragment
@@ -86,6 +90,19 @@ class NotificationsSettingsFragment :
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        val view = super.onCreateView(inflater, container, savedInstanceState)
+
+        if (!FeatureFlag.isEnabled(Feature.NOTIFICATIONS_REVAMP)) {
+            val generalNotificationsCategory = findPreference<PreferenceCategory>("general_notifications")
+            generalNotificationsCategory?.let { category ->
+                preferenceScreen.removePreference(category)
+            }
+        }
+
+        return view
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
