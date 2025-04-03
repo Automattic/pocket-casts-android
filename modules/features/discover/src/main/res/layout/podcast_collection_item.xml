@@ -10,19 +10,21 @@
     android:orientation="horizontal">
 
     <androidx.cardview.widget.CardView
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="101dp"
+        android:layout_height="101dp"
         android:layout_gravity="center_vertical"
-        android:layout_marginRight="12dp"
+        android:layout_marginRight="10dp"
+        android:elevation="1dp"
+        app:cardElevation="1dp"
+        app:contentPadding="0dp"
         android:layout_marginVertical="2dp"
         android:layout_marginStart="2dp"
-        android:elevation="2dp"
         app:cardCornerRadius="4dp">
 
         <ImageView
             android:id="@+id/imageView"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="101dp"
+            android:layout_height="101dp"
             android:background="?attr/defaultArtwork"
             tools:ignore="ContentDescription" />
     </androidx.cardview.widget.CardView>
