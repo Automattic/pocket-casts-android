@@ -117,6 +117,7 @@ class NotificationsSettingsFragment :
                 }
             }
         }
+        setDivider(null)
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
