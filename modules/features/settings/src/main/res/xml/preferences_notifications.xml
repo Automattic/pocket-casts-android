@@ -41,11 +41,13 @@
             android:title="@string/settings_notification_advanced" />
     </PreferenceCategory>
 
-    <PreferenceCategory android:key="general_notifications">
+    <PreferenceCategory android:key="daily_reminders_category" android:title="@string/settings_notification_daily_reminders">
         <SwitchPreference
-            android:key="dailyRemindersNotification"
+            android:defaultValue="false"
+            android:key="notifyDailyReminders"
             android:persistent="false"
-            android:title="@string/settings_notification_daily_reminders" />
+            android:minHeight="72dp"
+            android:title="@string/settings_notification_notify_me" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/settings" >

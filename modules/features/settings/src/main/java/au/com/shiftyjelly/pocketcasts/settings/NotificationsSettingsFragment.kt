@@ -83,7 +83,7 @@ class NotificationsSettingsFragment :
     private var notificationActions: PreferenceScreen? = null
     private var playOverNotificationPreference: ListPreference? = null
     private var hidePlaybackNotificationsPreference: SwitchPreference? = null
-    private var dailyRemindersPreference: SwitchPreference? = null
+    private var notifyDailyRemindersPreference: SwitchPreference? = null
 
     private val toolbar
         get() = view?.findViewById<Toolbar>(R.id.toolbar)
@@ -95,7 +95,7 @@ class NotificationsSettingsFragment :
         val view = super.onCreateView(inflater, container, savedInstanceState)
 
         if (!FeatureFlag.isEnabled(Feature.NOTIFICATIONS_REVAMP)) {
-            val generalNotificationsCategory = findPreference<PreferenceCategory>("general_notifications")
+            val generalNotificationsCategory = findPreference<PreferenceCategory>("daily_reminders_category")
             generalNotificationsCategory?.let { category ->
                 preferenceScreen.removePreference(category)
             }
@@ -131,7 +131,7 @@ class NotificationsSettingsFragment :
         systemSettingsPreference = manager.findPreference("openSystemSettings")
         playOverNotificationPreference = manager.findPreference("overrideNotificationAudio")
         hidePlaybackNotificationsPreference = manager.findPreference("hideNotificationOnPause")
-        dailyRemindersPreference = manager.findPreference("dailyRemindersNotification")
+        notifyDailyRemindersPreference = manager.findPreference("notifyDailyReminders")
 
         // turn preferences off by default, because they are enable async, we don't want this view to remove them from the screen after it loads as it looks jarring
         enabledPreferences(false)
@@ -189,7 +189,7 @@ class NotificationsSettingsFragment :
             true
         }
 
-        dailyRemindersPreference?.setOnPreferenceChangeListener { _, newValue ->
+        notifyDailyRemindersPreference?.setOnPreferenceChangeListener { _, newValue ->
             val newBool = (newValue as? Boolean) ?: throw IllegalStateException("Invalid value for daily reminders preference: $newValue")
             settings.dailyRemindersNotification.set(newBool, updateModifiedAt = true)
             analyticsTracker.track(
@@ -518,7 +518,7 @@ class NotificationsSettingsFragment :
     }
 
     private fun setupDailyRemindersNotification() {
-        dailyRemindersPreference?.isChecked = settings.dailyRemindersNotification.value
+        notifyDailyRemindersPreference?.isChecked = settings.dailyRemindersNotification.value
     }
 
     private fun setupPlayOverNotifications() {
