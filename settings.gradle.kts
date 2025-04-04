@@ -87,7 +87,8 @@ include(":modules:services:views")
 include(":modules:services:sharedtest")
 
 val developerProperties = loadPropertiesFromFile(File("${rootDir.path}/developer.properties"))
-val secretProperties = loadPropertiesFromFile(File("${rootDir.path}/secret.properties"))
+val secretsFile = File("${rootDir.path}/secret.properties")
+val secretProperties = loadPropertiesFromFile(secretsFile)
 val USE_REMOTE_BUILD_CACHE_LOCALLY = "use_remote_build_cache_locally"
 
 buildCache {
@@ -104,6 +105,9 @@ buildCache {
             }
         }
     } else if (developerProperties.getProperty(USE_REMOTE_BUILD_CACHE_LOCALLY).toBoolean()) {
+
+        checkForRemoteBuildCacheOptimizedExperience()
+
         remote<HttpBuildCache> {
             url = URI.create(secretProperties.getProperty("gradleCacheNodeUrl").ifEmpty { throw IllegalArgumentException("Gradle Cache Node URL is missing. Make sure to apply secrets `bundle exec fastlane run configure_apply`.") })
             isPush = false
@@ -112,6 +116,28 @@ buildCache {
                 password = secretProperties.getProperty("gradleCacheNodePassword")
             }
         }
+    }
+}
+
+private fun checkForRemoteBuildCacheOptimizedExperience() {
+    assertSecretsApplied()
+    assertJava17Amazon()
+}
+
+private fun assertSecretsApplied() {
+    if (!secretsFile.exists()) {
+        throw GradleException("The build requested remote build cache, but secrets file is not found. Please run `bundle exec fastlane run configure_apply` to apply secrets.")
+    }
+}
+
+private fun assertJava17Amazon() {
+    val version = System.getProperty("java.version")
+    val vendor = System.getProperty("java.vendor")
+    val expectedJdkVersion = "17.0.14"
+
+    if (!(version.contains(expectedJdkVersion) && vendor.contains("amazon", ignoreCase = true))) {
+        logger.error("Java version: $version, vendor: $vendor")
+        throw GradleException("Java version is not $expectedJdkVersion or vendor is not Amazon Corretto. This significantly reduces efficiency of remote build cache. Please set up the matching JDK.")
     }
 }
 
