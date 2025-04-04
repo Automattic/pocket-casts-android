@@ -334,6 +334,7 @@ interface Settings {
     fun shouldShowLowStorageBannerAfterSnooze(): Boolean
 
     val hideNotificationOnPause: UserSetting<Boolean>
+    val dailyRemindersNotification: UserSetting<Boolean>
 
     val streamingMode: UserSetting<Boolean>
     val keepScreenAwake: UserSetting<Boolean>

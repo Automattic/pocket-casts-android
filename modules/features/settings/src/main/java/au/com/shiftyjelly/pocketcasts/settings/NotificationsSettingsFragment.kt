@@ -4,7 +4,9 @@ import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.IntentCompat.getParcelableExtra
 import androidx.core.view.updatePadding
@@ -27,6 +29,8 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSett
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.extensions.findToolbar
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.fragments.PodcastSelectFragment
@@ -76,15 +80,30 @@ class NotificationsSettingsFragment :
     private var vibratePreference: ListPreference? = null
     private var enabledPreference: SwitchPreference? = null
     private var systemSettingsPreference: Preference? = null
+    private var dailyRemindersSettings: Preference? = null
     private var notificationActions: PreferenceScreen? = null
     private var playOverNotificationPreference: ListPreference? = null
     private var hidePlaybackNotificationsPreference: SwitchPreference? = null
+    private var notifyDailyRemindersPreference: SwitchPreference? = null
 
     private val toolbar
         get() = view?.findViewById<Toolbar>(R.id.toolbar)
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        val view = super.onCreateView(inflater, container, savedInstanceState)
+
+        if (!FeatureFlag.isEnabled(Feature.NOTIFICATIONS_REVAMP)) {
+            val generalNotificationsCategory = findPreference<PreferenceCategory>("daily_reminders_category")
+            generalNotificationsCategory?.let { category ->
+                preferenceScreen.removePreference(category)
+            }
+        }
+
+        return view
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -98,6 +117,7 @@ class NotificationsSettingsFragment :
                 }
             }
         }
+        setDivider(null)
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -111,17 +131,24 @@ class NotificationsSettingsFragment :
         vibratePreference = manager.findPreference("notificationVibrate")
         notificationActions = manager.findPreference("notificationActions")
         systemSettingsPreference = manager.findPreference("openSystemSettings")
+        dailyRemindersSettings = manager.findPreference("dailyRemindersSettings")
         playOverNotificationPreference = manager.findPreference("overrideNotificationAudio")
         hidePlaybackNotificationsPreference = manager.findPreference("hideNotificationOnPause")
+        notifyDailyRemindersPreference = manager.findPreference("notifyDailyReminders")
 
         // turn preferences off by default, because they are enable async, we don't want this view to remove them from the screen after it loads as it looks jarring
         enabledPreferences(false)
+        updateDailyReminders(false)
 
         // add a listener for this preference if the SDK we're on supports it
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             systemSettingsPreference?.setOnPreferenceClickListener {
                 analyticsTracker.track(AnalyticsEvent.SETTINGS_NOTIFICATIONS_ADVANCED_SETTINGS_TAPPED)
                 notificationHelper.openEpisodeNotificationSettings(activity)
+                true
+            }
+            dailyRemindersSettings?.setOnPreferenceClickListener {
+                analyticsTracker.track(AnalyticsEvent.SETTINGS_DAILY_REMINDERS_ADVANCED_SETTINGS_TOGGLED)
                 true
             }
         }
@@ -169,6 +196,18 @@ class NotificationsSettingsFragment :
 
             true
         }
+
+        notifyDailyRemindersPreference?.setOnPreferenceChangeListener { _, newValue ->
+            val newBool = (newValue as? Boolean) ?: throw IllegalStateException("Invalid value for daily reminders preference: $newValue")
+            settings.dailyRemindersNotification.set(newBool, updateModifiedAt = true)
+            analyticsTracker.track(
+                AnalyticsEvent.SETTINGS_NOTIFICATIONS_DAILY_REMINDERS_TOGGLED,
+                mapOf("enabled" to newBool),
+            )
+            updateDailyReminders(newBool)
+            true
+        }
+
         changePodcastsSummary()
     }
 
@@ -383,6 +422,7 @@ class NotificationsSettingsFragment :
         setupEnabledNotifications()
         setupNotificationVibrate()
         setupHidePlaybackNotifications()
+        setupDailyRemindersNotification()
         setupPlayOverNotifications()
     }
 
@@ -486,6 +526,11 @@ class NotificationsSettingsFragment :
         hidePlaybackNotificationsPreference?.isChecked = settings.hideNotificationOnPause.value
     }
 
+    private fun setupDailyRemindersNotification() {
+        notifyDailyRemindersPreference?.isChecked = settings.dailyRemindersNotification.value
+        updateDailyReminders(settings.dailyRemindersNotification.value)
+    }
+
     private fun setupPlayOverNotifications() {
         playOverNotificationPreference?.apply {
             val options = listOf(
@@ -506,5 +551,17 @@ class NotificationsSettingsFragment :
 
     override fun getBackstackCount(): Int {
         return childFragmentManager.backStackEntryCount
+    }
+
+    private fun updateDailyReminders(enabled: Boolean) {
+        val dailyRemindersSettings = dailyRemindersSettings ?: return
+        val category = findPreference<PreferenceCategory>("daily_reminders_category") ?: return
+        if (enabled && FeatureFlag.isEnabled(Feature.NOTIFICATIONS_REVAMP)) {
+            if (findPreference<PreferenceScreen>("dailyRemindersSettings") == null) {
+                category.addPreference(dailyRemindersSettings)
+            }
+        } else {
+            category.removePreference(dailyRemindersSettings)
+        }
     }
 }
