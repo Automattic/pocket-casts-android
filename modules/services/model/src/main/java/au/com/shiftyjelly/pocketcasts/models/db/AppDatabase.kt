@@ -1023,8 +1023,8 @@ abstract class AppDatabase : RoomDatabase() {
                         CREATE TABLE IF NOT EXISTS user_notifications (
                             user_id TEXT NOT NULL PRIMARY KEY,
                             notification_id INTEGER NOT NULL,
-                            notifications_sent_this_week INTEGER NOT NULL,
-                            last_notification_sent_at INTEGER NOT NULL,
+                            sent_this_week INTEGER NOT NULL,
+                            last_sent_at INTEGER NOT NULL,
                             interacted_at INTEGER
                         )
                         """.trimIndent(),
