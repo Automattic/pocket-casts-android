@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
+import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.repositories.playback.EXTRA_CONTENT_STYLE_GROUP_TITLE_HINT
 import au.com.shiftyjelly.pocketcasts.repositories.playback.FOLDER_ROOT_PREFIX
 import au.com.shiftyjelly.pocketcasts.repositories.playback.MEDIA_ID_ROOT
@@ -30,7 +31,6 @@ import au.com.shiftyjelly.pocketcasts.servers.model.Discover
 import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.servers.model.transformWithRegion
-import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -181,7 +181,10 @@ class AutoPlaybackService : PlaybackService() {
             .filter { it.type is ListType.PodcastList && it.displayStyle !is DisplayStyle.CollectionList && !it.sponsored && it.displayStyle !is DisplayStyle.SinglePodcast }
             .map { discoverItem ->
                 Log.d(Settings.LOG_TAG_AUTO, "Loading discover feed ${discoverItem.source}")
-                val listFeed = listSource.getListFeedSuspend(discoverItem.source)
+                val listFeed = listSource.getListFeedSuspend(
+                    url = discoverItem.source,
+                    authenticated = discoverItem.authenticated,
+                )
                 Pair(discoverItem.title, listFeed.podcasts?.take(6) ?: emptyList())
             }
             .flatMap { (title, podcasts) ->

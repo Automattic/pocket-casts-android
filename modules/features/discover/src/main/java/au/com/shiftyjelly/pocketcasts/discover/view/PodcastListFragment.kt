@@ -70,7 +70,11 @@ class PodcastListFragment : PodcastGridListFragment() {
 
         this.binding = binding
 
-        viewModel.load(arguments?.getString(ARG_SOURCE_URL), expandedStyle)
+        viewModel.load(
+            sourceUrl = arguments?.getString(ARG_SOURCE_URL),
+            listStyle = expandedStyle,
+            authenticated = arguments?.getBoolean(ARG_AUTHENTICATED),
+        )
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is PodcastListViewState.Loading -> {}

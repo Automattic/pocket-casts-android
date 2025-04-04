@@ -20,6 +20,7 @@ interface NetworkLoadableList {
     val expandedTopItemLabel: String?
     val listUuid: String?
     val curated: Boolean
+    val authenticated: Boolean?
 
     fun transformWithReplacements(replacements: Map<String, String>, resources: Resources): NetworkLoadableList
 
@@ -64,6 +65,7 @@ data class DiscoverRow(
     @field:Json(name = "regions") val regions: List<String>,
     @field:Json(name = "sponsored") val sponsored: Boolean = false,
     @field:Json(name = "curated") override val curated: Boolean = false,
+    @field:Json(name = "authenticated") override val authenticated: Boolean? = false,
     @field:Json(name = "sponsored_podcasts") val sponsoredPodcasts: List<SponsoredPodcast> = emptyList(),
     @field:Json(name = "popular") val mostPopularCategoriesId: List<Int>?,
 ) : NetworkLoadableList {
@@ -259,6 +261,7 @@ data class DiscoverCategory(
         get() = null
     override val listUuid: String?
         get() = null
+    override val authenticated: Boolean = false
 
     override fun transformWithReplacements(replacements: Map<String, String>, resources: Resources): NetworkLoadableList {
         var newTitle = title
