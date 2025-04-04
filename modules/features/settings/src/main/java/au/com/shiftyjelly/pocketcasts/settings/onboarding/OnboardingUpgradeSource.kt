@@ -24,5 +24,6 @@ enum class OnboardingUpgradeSource(val analyticsValue: String) {
     SLUMBER_STUDIOS("slumber_studios"),
     UP_NEXT_SHUFFLE("up_next_shuffle"),
     GENERATED_TRANSCRIPTS("generated_transcripts"),
+    DEEP_LINK("deep_link"),
     UNKNOWN("unknown"),
 }

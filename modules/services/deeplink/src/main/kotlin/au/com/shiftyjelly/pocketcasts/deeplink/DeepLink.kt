@@ -202,6 +202,11 @@ data object CloudFilesDeepLink : IntentableDeepLink {
         .setData(Uri.parse("pktc://cloudfiles"))
 }
 
+data object UpsellDeepLink : IntentableDeepLink {
+    override fun toIntent(context: Context) = Intent(ACTION_VIEW)
+        .setData(Uri.parse("pktc://upsell"))
+}
+
 data object UpgradeAccountDeepLink : DeepLink
 
 data class PromoCodeDeepLink(
