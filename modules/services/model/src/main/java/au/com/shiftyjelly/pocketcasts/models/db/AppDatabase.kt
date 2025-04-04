@@ -26,7 +26,6 @@ import au.com.shiftyjelly.pocketcasts.models.converter.EpisodeStatusEnumConverte
 import au.com.shiftyjelly.pocketcasts.models.converter.EpisodesSortTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.InstantConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.NotificationCategoryConverter
-import au.com.shiftyjelly.pocketcasts.models.converter.NotificationTriggerRuleConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.PodcastAutoUpNextConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.PodcastGroupingTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.PodcastLicensingEnumConverter
@@ -57,7 +56,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.CuratedPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
-import au.com.shiftyjelly.pocketcasts.models.entity.Notification
+import au.com.shiftyjelly.pocketcasts.models.entity.Notifications
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -98,7 +97,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         Transcript::class,
         UserPodcastRating::class,
         UpNextHistory::class,
-        Notification::class,
+        Notifications::class,
         UserNotifications::class,
     ],
     version = 114,
@@ -130,7 +129,6 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
     ChapterIndicesConverter::class,
     InstantConverter::class,
     NotificationCategoryConverter::class,
-    NotificationTriggerRuleConverter::class,
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun podcastDao(): PodcastDao
@@ -1001,24 +999,21 @@ abstract class AppDatabase : RoomDatabase() {
             with(database) {
                 beginTransaction()
                 try {
-                    database.execSQL(
+                    execSQL(
                         """
-                        CREATE TABLE IF NOT EXISTS notification(
+                        CREATE TABLE IF NOT EXISTS notifications(
                             _id INTEGER PRIMARY KEY AUTOINCREMENT,
                             category INTEGER NOT NULL,
-                            subcategory TEXT NOT NULL,
-                            deeplink TEXT NOT NULL,
-                            trigger_rule INTEGER NOT NULL,
-                            trigger_value TEXT
+                            subcategory TEXT NOT NULL
                         )
                         """.trimIndent(),
                     )
-                    database.execSQL(
+                    execSQL(
                         """
-                        CREATE UNIQUE INDEX IF NOT EXISTS index_notification_category_subcategory ON notification (category, subcategory)
+                        CREATE UNIQUE INDEX IF NOT EXISTS index_notification_category_subcategory ON notifications (category, subcategory)
                         """.trimIndent(),
                     )
-                    database.execSQL(
+                    execSQL(
                         """
                         CREATE TABLE IF NOT EXISTS user_notifications (
                             user_id TEXT NOT NULL PRIMARY KEY,

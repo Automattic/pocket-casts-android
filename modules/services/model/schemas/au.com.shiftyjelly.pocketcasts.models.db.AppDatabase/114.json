@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 114,
-    "identityHash": "fce3dc53a01e0cbb56c950e0955092aa",
+    "identityHash": "12cf19c9c954786046a7cea285e748ce",
     "entities": [
       {
         "tableName": "bump_stats",
@@ -1976,8 +1976,8 @@
         "foreignKeys": []
       },
       {
-        "tableName": "notification",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` INTEGER PRIMARY KEY AUTOINCREMENT, `category` INTEGER NOT NULL, `subcategory` TEXT NOT NULL, `deeplink` TEXT NOT NULL, `trigger_rule` INTEGER NOT NULL, `trigger_value` TEXT)",
+        "tableName": "notifications",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` INTEGER PRIMARY KEY AUTOINCREMENT, `category` INTEGER NOT NULL, `subcategory` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -1996,24 +1996,6 @@
             "columnName": "subcategory",
             "affinity": "TEXT",
             "notNull": true
-          },
-          {
-            "fieldPath": "deeplink",
-            "columnName": "deeplink",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "triggerRule",
-            "columnName": "trigger_rule",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "ruleValue",
-            "columnName": "trigger_value",
-            "affinity": "TEXT",
-            "notNull": false
           }
         ],
         "primaryKey": {
@@ -2024,21 +2006,21 @@
         },
         "indices": [
           {
-            "name": "index_notification_category_subcategory",
+            "name": "index_notifications_category_subcategory",
             "unique": true,
             "columnNames": [
               "category",
               "subcategory"
             ],
             "orders": [],
-            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_notification_category_subcategory` ON `${TABLE_NAME}` (`category`, `subcategory`)"
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_notifications_category_subcategory` ON `${TABLE_NAME}` (`category`, `subcategory`)"
           }
         ],
         "foreignKeys": []
       },
       {
         "tableName": "user_notifications",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`user_id` TEXT NOT NULL, `notification_id` INTEGER NOT NULL, `notifications_sent_this_week` INTEGER NOT NULL, `last_notification_sent_at` INTEGER NOT NULL, `interacted_at` INTEGER, PRIMARY KEY(`user_id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`user_id` TEXT NOT NULL, `notification_id` INTEGER NOT NULL, `sent_this_week` INTEGER NOT NULL, `last_sent_at` INTEGER NOT NULL, `interacted_at` INTEGER, PRIMARY KEY(`user_id`))",
         "fields": [
           {
             "fieldPath": "userId",
@@ -2053,14 +2035,14 @@
             "notNull": true
           },
           {
-            "fieldPath": "notificationsSentThisWeek",
-            "columnName": "notifications_sent_this_week",
+            "fieldPath": "sentThisWeek",
+            "columnName": "sent_this_week",
             "affinity": "INTEGER",
             "notNull": true
           },
           {
-            "fieldPath": "lastNotificationSentAt",
-            "columnName": "last_notification_sent_at",
+            "fieldPath": "lastSentAt",
+            "columnName": "last_sent_at",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -2084,7 +2066,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'fce3dc53a01e0cbb56c950e0955092aa')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '12cf19c9c954786046a7cea285e748ce')"
     ]
   }
 }
