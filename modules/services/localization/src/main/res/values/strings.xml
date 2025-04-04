@@ -1355,6 +1355,7 @@
     <string name="settings_notification_actions">Actions</string>
     <string name="settings_notification_advanced">Advanced settings</string>
     <string name="settings_notification_advanced_summary">Choose sounds and other system options</string>
+    <string name="settings_notification_advanced_summary_for_daily_reminders">Choose sounds and other system options for daily reminders</string>
     <string name="settings_notification_choose_podcasts">Choose podcasts</string>
     <string name="settings_notification_hide_on_pause">Hide playback notification on pause</string>
     <string name="settings_notification_notify_me">Notify me</string>

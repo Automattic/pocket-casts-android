@@ -80,6 +80,7 @@ class NotificationsSettingsFragment :
     private var vibratePreference: ListPreference? = null
     private var enabledPreference: SwitchPreference? = null
     private var systemSettingsPreference: Preference? = null
+    private var dailyRemindersSettings: Preference? = null
     private var notificationActions: PreferenceScreen? = null
     private var playOverNotificationPreference: ListPreference? = null
     private var hidePlaybackNotificationsPreference: SwitchPreference? = null
@@ -129,18 +130,24 @@ class NotificationsSettingsFragment :
         vibratePreference = manager.findPreference("notificationVibrate")
         notificationActions = manager.findPreference("notificationActions")
         systemSettingsPreference = manager.findPreference("openSystemSettings")
+        dailyRemindersSettings = manager.findPreference("dailyRemindersSettings")
         playOverNotificationPreference = manager.findPreference("overrideNotificationAudio")
         hidePlaybackNotificationsPreference = manager.findPreference("hideNotificationOnPause")
         notifyDailyRemindersPreference = manager.findPreference("notifyDailyReminders")
 
         // turn preferences off by default, because they are enable async, we don't want this view to remove them from the screen after it loads as it looks jarring
         enabledPreferences(false)
+        updateDailyReminders(false)
 
         // add a listener for this preference if the SDK we're on supports it
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             systemSettingsPreference?.setOnPreferenceClickListener {
                 analyticsTracker.track(AnalyticsEvent.SETTINGS_NOTIFICATIONS_ADVANCED_SETTINGS_TAPPED)
                 notificationHelper.openEpisodeNotificationSettings(activity)
+                true
+            }
+            dailyRemindersSettings?.setOnPreferenceClickListener {
+                analyticsTracker.track(AnalyticsEvent.SETTINGS_DAILY_REMINDERS_ADVANCED_SETTINGS_TOGGLED)
                 true
             }
         }
@@ -196,6 +203,7 @@ class NotificationsSettingsFragment :
                 AnalyticsEvent.SETTINGS_NOTIFICATIONS_DAILY_REMINDERS_TOGGLED,
                 mapOf("enabled" to newBool),
             )
+            updateDailyReminders(newBool)
             true
         }
 
@@ -519,6 +527,7 @@ class NotificationsSettingsFragment :
 
     private fun setupDailyRemindersNotification() {
         notifyDailyRemindersPreference?.isChecked = settings.dailyRemindersNotification.value
+        updateDailyReminders(settings.dailyRemindersNotification.value)
     }
 
     private fun setupPlayOverNotifications() {
@@ -541,5 +550,17 @@ class NotificationsSettingsFragment :
 
     override fun getBackstackCount(): Int {
         return childFragmentManager.backStackEntryCount
+    }
+
+    private fun updateDailyReminders(enabled: Boolean) {
+        val dailyRemindersSettings = dailyRemindersSettings ?: return
+        val category = findPreference<PreferenceCategory>("daily_reminders_category") ?: return
+        if (enabled && FeatureFlag.isEnabled(Feature.NOTIFICATIONS_REVAMP)) {
+            if (findPreference<PreferenceScreen>("dailyRemindersSettings") == null) {
+                category.addPreference(dailyRemindersSettings)
+            }
+        } else {
+            category.removePreference(dailyRemindersSettings)
+        }
     }
 }
