@@ -65,6 +65,7 @@ interface SyncManager : NamedSettingsCaller {
     suspend fun emailChange(newEmail: String, password: String): UserChangeResponse
     fun deleteAccountRxSingle(): Single<UserChangeResponse>
     suspend fun updatePassword(newPassword: String, oldPassword: String)
+    suspend fun <T> getCacheTokenOrLogin(serverCall: suspend (token: AccessToken) -> T): T
 
     // User Episodes / Files
     fun getFilesRxSingle(): Single<Response<FilesResponse>>
