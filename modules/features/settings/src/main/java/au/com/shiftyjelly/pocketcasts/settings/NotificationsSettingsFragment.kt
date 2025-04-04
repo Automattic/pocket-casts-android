@@ -190,7 +190,7 @@ class NotificationsSettingsFragment :
         }
 
         dailyRemindersPreference?.setOnPreferenceChangeListener { _, newValue ->
-            val newBool = (newValue as? Boolean) ?: throw IllegalStateException("Invalid value for hide notification on pause preference: $newValue")
+            val newBool = (newValue as? Boolean) ?: throw IllegalStateException("Invalid value for daily reminders preference: $newValue")
             settings.dailyRemindersNotification.set(newBool, updateModifiedAt = true)
             analyticsTracker.track(
                 AnalyticsEvent.SETTINGS_NOTIFICATIONS_DAILY_REMINDERS_TOGGLED,
