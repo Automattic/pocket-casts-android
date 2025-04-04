@@ -50,7 +50,7 @@
             android:title="@string/settings_notification_notify_me" />
         <Preference
             android:key="dailyRemindersSettings"
-            android:summary="@string/settings_notification_advanced_summary_for_daily_reminders"
+            android:summary="@string/settings_notification_advanced_summary"
             android:title="@string/settings_notification_advanced" />
     </PreferenceCategory>
 
