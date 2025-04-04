@@ -258,6 +258,11 @@ data class ReferralsDeepLink(
     }
 }
 
+data object ThemesDeepLink : IntentableDeepLink {
+    override fun toIntent(context: Context) = Intent(ACTION_VIEW)
+        .setData(Uri.parse("pktc://settings/themes"))
+}
+
 private val Context.launcherIntent get() = requireNotNull(packageManager.getLaunchIntentForPackage(packageName)) {
     "Missing launcher intent for $packageName"
 }
