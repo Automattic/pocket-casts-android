@@ -5,21 +5,17 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import au.com.shiftyjelly.pocketcasts.models.type.NotificationCategory
-import au.com.shiftyjelly.pocketcasts.models.type.NotificationTriggerRule
 
 @Entity(
-    tableName = "notification",
+    tableName = "notifications",
     indices = [
         Index(value = ["category", "subcategory"], unique = true),
     ],
 )
-data class Notification(
+data class Notifications(
     @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "_id") var id: Long? = null,
     @ColumnInfo(name = "category") var category: NotificationCategory,
     @ColumnInfo(name = "subcategory") val subcategory: String,
-    @ColumnInfo(name = "deeplink") val deeplink: String,
-    @ColumnInfo(name = "trigger_rule") val triggerRule: NotificationTriggerRule,
-    @ColumnInfo(name = "trigger_value") val ruleValue: String?,
 )
 
 sealed class NotificationSubcategory(val value: String) {
