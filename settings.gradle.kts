@@ -92,7 +92,6 @@ val secretProperties = loadPropertiesFromFile(secretsFile)
 val USE_REMOTE_BUILD_CACHE_LOCALLY = "use_remote_build_cache_locally"
 
 buildCache {
-    local.directory = file("${System.getProperty("user.home")}/build-cache-test")
     if (System.getenv("CI")?.toBoolean() == true) {
         remote<HttpBuildCache> {
             url = URI.create("http://10.0.2.214:5071/cache/")
