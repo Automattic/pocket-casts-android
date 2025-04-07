@@ -178,6 +178,11 @@ data object ShowFiltersDeepLink : IntentableDeepLink {
         .setData(Uri.parse("pktc://filters"))
 }
 
+data object ShowUpNextTabDeepLink : IntentableDeepLink {
+    override fun toIntent(context: Context) = Intent(ACTION_VIEW)
+        .setData(Uri.parse("pktc://upnext?location=tab"))
+}
+
 data object PocketCastsWebsiteGetDeepLink : DeepLink
 
 data class ShowPodcastFromUrlDeepLink(

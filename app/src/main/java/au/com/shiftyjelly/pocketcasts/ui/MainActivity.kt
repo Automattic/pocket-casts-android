@@ -75,6 +75,7 @@ import au.com.shiftyjelly.pocketcasts.deeplink.ShowPodcastDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowPodcastFromUrlDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowPodcastsDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowUpNextModalDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.ShowUpNextTabDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.SignInDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.SonosDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ThemesDeepLink
@@ -1290,6 +1291,10 @@ class MainActivity :
                 }
                 is ShowUpNextModalDeepLink -> {
                     // Do nothig, handled in onMiniPlayerVisible()
+                }
+                is ShowUpNextTabDeepLink -> {
+                    closePlayer()
+                    openTab(VR.id.navigation_upnext)
                 }
                 is ShowFilterDeepLink -> {
                     launch(Dispatchers.Default) {
