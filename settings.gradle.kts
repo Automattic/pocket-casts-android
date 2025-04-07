@@ -108,7 +108,7 @@ buildCache {
         checkForRemoteBuildCacheOptimizedExperience()
 
         remote<HttpBuildCache> {
-            url = URI.create(secretProperties.getProperty("gradleCacheNodeUrl").ifEmpty { throw IllegalArgumentException("Gradle Cache Node URL is missing. Make sure to apply secrets `bundle exec fastlane run configure_apply`.") })
+            url = URI.create(secretProperties.getProperty("gradleCacheNodeUrl"))
             isPush = false
             credentials {
                 username = "developer"
