@@ -41,7 +41,7 @@ class SharePodcastViewModelTest {
             podcast.uuid,
             SourceView.PLAYER,
             podcastManager,
-            AnalyticsTracker.test(tracker, isEnabled = true),
+            AnalyticsTracker.test(tracker, isFirstPartyEnabled = true),
         )
     }
 

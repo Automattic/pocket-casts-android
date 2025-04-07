@@ -11,6 +11,7 @@ import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast.AutoAddUpNext.values
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveLimit
@@ -119,6 +120,7 @@ data class Podcast(
     @ColumnInfo(name = "isPaid") var isPaid: Boolean = false,
     @ColumnInfo(name = "is_private") var isPrivate: Boolean = false,
     @ColumnInfo(name = "is_header_expanded", defaultValue = "1") var isHeaderExpanded: Boolean = true,
+    @ColumnInfo(name = "funding_url") var fundingUrl: String? = null,
     @Embedded(prefix = "bundle") var singleBundle: Bundle? = null,
     @Ignore val episodes: MutableList<PodcastEpisode> = mutableListOf(),
 ) : Serializable {

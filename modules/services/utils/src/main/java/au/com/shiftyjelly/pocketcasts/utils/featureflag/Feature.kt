@@ -219,6 +219,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
+    APPSFLYER_ANALYTICS(
+        key = "appsflyer_analytics",
+        title = "AppsFlyer Analytics",
+        defaultValue = true,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    ),
     ;
 
     companion object {

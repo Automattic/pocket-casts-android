@@ -5,8 +5,6 @@ import android.os.Bundle
 import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.compose.animation.AnimatedContentTransitionScope
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -24,13 +22,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
-import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -38,6 +34,10 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
+import au.com.shiftyjelly.pocketcasts.compose.extensions.slideInToEnd
+import au.com.shiftyjelly.pocketcasts.compose.extensions.slideInToStart
+import au.com.shiftyjelly.pocketcasts.compose.extensions.slideOutToEnd
+import au.com.shiftyjelly.pocketcasts.compose.extensions.slideOutToStart
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.SuggestedFoldersViewModel.UseFoldersState.Applied
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
@@ -250,24 +250,3 @@ private object SuggestedFoldersNavRoutes {
 
     fun folderDetailsDestination(folderName: String) = "$FolderDetails/$folderName"
 }
-
-private val intOffsetAnimationSpec = tween<IntOffset>(350)
-private fun AnimatedContentTransitionScope<NavBackStackEntry>.slideInToStart() = slideIntoContainer(
-    towards = AnimatedContentTransitionScope.SlideDirection.Start,
-    animationSpec = intOffsetAnimationSpec,
-)
-
-private fun AnimatedContentTransitionScope<NavBackStackEntry>.slideOutToStart() = slideOutOfContainer(
-    towards = AnimatedContentTransitionScope.SlideDirection.Start,
-    animationSpec = intOffsetAnimationSpec,
-)
-
-private fun AnimatedContentTransitionScope<NavBackStackEntry>.slideInToEnd() = slideIntoContainer(
-    towards = AnimatedContentTransitionScope.SlideDirection.End,
-    animationSpec = intOffsetAnimationSpec,
-)
-
-private fun AnimatedContentTransitionScope<NavBackStackEntry>.slideOutToEnd() = slideOutOfContainer(
-    towards = AnimatedContentTransitionScope.SlideDirection.End,
-    animationSpec = intOffsetAnimationSpec,
-)

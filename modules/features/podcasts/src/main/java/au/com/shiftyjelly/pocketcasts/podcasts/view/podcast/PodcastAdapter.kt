@@ -6,6 +6,7 @@ import android.animation.AnimatorSet
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
+import android.net.Uri
 import android.os.Build
 import android.text.Spannable
 import android.text.SpannableString
@@ -27,6 +28,7 @@ import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
@@ -141,6 +143,7 @@ class PodcastAdapter(
     private val onFoldersClicked: () -> Unit,
     private val onPodcastDescriptionClicked: () -> Unit,
     private val onNotificationsClicked: (Podcast, Boolean) -> Unit,
+    private val onDonateClicked: (Uri?) -> Unit,
     private val onSettingsClicked: () -> Unit,
     private val playButtonListener: PlayButton.OnClickListener,
     private val onRowClicked: (PodcastEpisode) -> Unit,
@@ -260,6 +263,7 @@ class PodcastAdapter(
                         onClickUnfollow = { onUnsubscribeClicked { } },
                         onClickFolder = onFoldersClicked,
                         onClickNotification = onNotificationsClicked,
+                        onClickDonate = onDonateClicked,
                         onClickSettings = onSettingsClicked,
                         onClickWebsiteLink = onClickWebsite,
                         onToggleHeader = {
@@ -914,6 +918,7 @@ class PodcastAdapter(
         private val onClickUnfollow: () -> Unit,
         private val onClickFolder: () -> Unit,
         private val onClickNotification: (Podcast, Boolean) -> Unit,
+        private val onClickDonate: (Uri?) -> Unit,
         private val onClickSettings: () -> Unit,
         private val onClickWebsiteLink: (Podcast) -> Unit,
         private val onToggleHeader: () -> Unit,
@@ -959,6 +964,7 @@ class PodcastAdapter(
                         rating = ratingState,
                         isFollowed = podcast.isSubscribed,
                         areNotificationsEnabled = podcast.isShowNotifications,
+                        isFundingUrlAvailable = podcast.fundingUrl != null,
                         folderIcon = when {
                             !signInState.isSignedInAsPlusOrPatron -> PodcastFolderIcon.BuyFolders
                             podcast.folderUuid != null -> PodcastFolderIcon.AddedToFolder
@@ -979,6 +985,7 @@ class PodcastAdapter(
                         onClickUnfollow = onClickUnfollow,
                         onClickFolder = onClickFolder,
                         onClickNotification = { onClickNotification(podcast, !podcast.isShowNotifications) },
+                        onClickDonate = { onClickDonate(podcast.fundingUrl?.toUri()) },
                         onClickSettings = onClickSettings,
                         onClickWebsiteLink = { onClickWebsiteLink(podcast) },
                         onToggleHeader = onToggleHeader,

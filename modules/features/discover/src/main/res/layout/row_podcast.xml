@@ -25,7 +25,8 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:orientation="vertical"
-        android:gravity="center">
+        android:paddingEnd="4dp"
+        android:layout_gravity="center_vertical">
         <TextView
             android:id="@+id/lblTitle"
             android:layout_width="match_parent"

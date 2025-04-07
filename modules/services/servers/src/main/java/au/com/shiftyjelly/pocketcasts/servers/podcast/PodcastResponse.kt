@@ -47,6 +47,7 @@ data class PodcastInfo(
     @field:Json(name = "audio") val audio: Boolean?,
     @field:Json(name = "episodes") val episodes: List<EpisodeInfo>?,
     @field:Json(name = "is_private") val isPrivate: Boolean?,
+    @field:Json(name = "fundings") val fundings: List<Funding>?,
 ) {
 
     fun toPodcast(): Podcast {
@@ -65,9 +66,16 @@ data class PodcastInfo(
             podcast.episodes.addAll(episodes)
         }
         podcast.isPrivate = isPrivate ?: false
+        podcast.fundingUrl = fundings?.firstOrNull()?.url
         return podcast
     }
 }
+
+@JsonClass(generateAdapter = true)
+data class Funding(
+    @field:Json(name = "url") val url: String,
+    @field:Json(name = "title") val title: String?,
+)
 
 @JsonClass(generateAdapter = true)
 data class EpisodeInfo(

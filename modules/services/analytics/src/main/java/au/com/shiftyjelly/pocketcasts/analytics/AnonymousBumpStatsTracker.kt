@@ -41,6 +41,7 @@ class AnonymousBumpStatsTracker @Inject constructor(
         }
     }
 
+    override fun getTrackerType() = TrackerType.FirstParty
     override fun refreshMetadata() {}
     override fun flush() {}
     override fun clearAllData() {}

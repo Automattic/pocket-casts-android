@@ -1317,6 +1317,12 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
+    override val collectAnalyticsThirdParty = UserSetting.BoolPref(
+        sharedPrefKey = "SendUsageStatsThirdPartyKey",
+        defaultValue = false, // Ask for consent before sending third party analytics
+        sharedPrefs = sharedPreferences,
+    )
+
     override val sendCrashReports = UserSetting.BoolPref(
         sharedPrefKey = "SendCrashReportsKey",
         defaultValue = BuildConfig.DATA_COLLECTION_DEFAULT_VALUE ?: true,
@@ -1602,6 +1608,12 @@ class SettingsImpl @Inject constructor(
     override val suggestedFoldersFollowedHash = UserSetting.StringPref(
         sharedPrefKey = "suggested_folders_followed_hash",
         defaultValue = "",
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val isTrackingConsentRequired = UserSetting.BoolPref(
+        sharedPrefKey = "tracking_consent_required",
+        defaultValue = true,
         sharedPrefs = sharedPreferences,
     )
 }
