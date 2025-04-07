@@ -116,6 +116,8 @@ buildCache {
                 password = secretProperties.getProperty("gradleCacheNodePassword")
             }
         }
+    } else {
+        logger.warn("\nℹ️ Remote build cache is disabled. If you have stable internet connection, consider enabling it via `developer.properties`.")
     }
 }
 
