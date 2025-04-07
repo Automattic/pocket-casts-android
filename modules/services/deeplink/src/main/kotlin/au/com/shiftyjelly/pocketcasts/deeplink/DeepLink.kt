@@ -160,7 +160,7 @@ data object ShowDiscoverDeepLink : ShowPageDeepLink {
     override val pageId = "search"
 }
 
-data object ShowUpNextDeepLink : ShowPageDeepLink {
+data object ShowUpNextModalDeepLink : ShowPageDeepLink {
     override val pageId = "upnext"
 }
 

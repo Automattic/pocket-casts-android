@@ -175,7 +175,7 @@ private class ShowPageAdapter : DeepLinkAdapter {
         when (intent.getStringExtra(EXTRA_PAGE)) {
             "podcasts" -> ShowPodcastsDeepLink
             "search" -> ShowDiscoverDeepLink
-            "upnext" -> ShowUpNextDeepLink
+            "upnext" -> ShowUpNextModalDeepLink
             "playlist" -> ShowFilterDeepLink(filterId = intent.getLongExtra(EXTRA_FILTER_ID, -1))
             else -> null
         }
