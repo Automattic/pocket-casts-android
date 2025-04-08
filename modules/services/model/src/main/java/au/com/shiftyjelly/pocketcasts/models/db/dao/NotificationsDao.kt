@@ -9,5 +9,5 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Notifications
 abstract class NotificationsDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    abstract suspend fun insert(notifications: List<Notifications>)
+    abstract suspend fun insert(notifications: List<Notifications>): List<Long>
 }

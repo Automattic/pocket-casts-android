@@ -1,12 +1,15 @@
 package au.com.shiftyjelly.pocketcasts.repositories.notification
 
 import au.com.shiftyjelly.pocketcasts.models.db.dao.NotificationsDao
+import au.com.shiftyjelly.pocketcasts.models.db.dao.UserNotificationsDao
 import au.com.shiftyjelly.pocketcasts.models.entity.Notifications
+import au.com.shiftyjelly.pocketcasts.models.entity.UserNotifications
 import au.com.shiftyjelly.pocketcasts.models.type.NotificationCategory
 import javax.inject.Inject
 
 class NotificationManagerImpl @Inject constructor(
     private val notificationsDao: NotificationsDao,
+    private val userNotificationsDao: UserNotificationsDao,
 ) : NotificationManager {
 
     companion object {
@@ -29,6 +32,13 @@ class NotificationManagerImpl @Inject constructor(
             Notifications(category = NotificationCategory.ONBOARDING, subcategory = SUBCATEGORY_STAFF_PICKS),
             Notifications(category = NotificationCategory.ONBOARDING, subcategory = SUBCATEGORY_PLUS_UP_SELL),
         )
-        notificationsDao.insert(notifications)
+
+        val insertedIds: List<Long> = notificationsDao.insert(notifications)
+
+        val userNotifications = insertedIds.map { id ->
+            UserNotifications(notificationId = id.toInt())
+        }
+
+        userNotificationsDao.insert(userNotifications)
     }
 }
