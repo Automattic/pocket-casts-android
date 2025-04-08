@@ -42,8 +42,6 @@
         android:id="@+id/emptyUpNextComposeView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:layout_marginBottom="4dp"
-        />
+        android:gravity="center_vertical" />
 
 </LinearLayout>

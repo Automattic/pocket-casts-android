@@ -22,7 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -55,7 +55,7 @@ fun EmptyState(
                 modifier = Modifier
                     .padding(bottom = heightPadding)
                     .size(32.dp),
-                colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.primaryIcon02),
+                colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.primaryIcon03),
             )
         }
 
@@ -73,7 +73,7 @@ fun EmptyState(
             color = MaterialTheme.theme.colors.primaryText02,
             fontSize = 15.sp,
             fontWeight = FontWeight.W400,
-            modifier = Modifier
+            modifier = Modifier.widthIn(max = 330.dp)
                 .padding(bottom = heightPadding),
         )
 
@@ -97,7 +97,7 @@ fun EmptyState(
 fun EmptyStatePreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
-    AppTheme(themeType) {
+    AppThemeWithBackground(themeType = themeType) {
         EmptyState(
             title = "Time to add some podcasts",
             subtitle = "Discover and subscribe to your favorite podcasts.",
