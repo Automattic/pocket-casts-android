@@ -71,6 +71,7 @@ import au.com.shiftyjelly.pocketcasts.deeplink.ShowBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowDiscoverDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowEpisodeDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowFilterDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.ShowFiltersDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowPodcastDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowPodcastFromUrlDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowPodcastsDeepLink
@@ -1329,6 +1330,10 @@ class MainActivity :
                             }
                         }
                     }
+                }
+                is ShowFiltersDeepLink -> {
+                    closePlayer()
+                    openTab(VR.id.navigation_filters)
                 }
                 is PocketCastsWebsiteGetDeepLink -> {
                     // Do nothing when the user goes to https://pocketcasts.com/get it should either open the play store or the user's app

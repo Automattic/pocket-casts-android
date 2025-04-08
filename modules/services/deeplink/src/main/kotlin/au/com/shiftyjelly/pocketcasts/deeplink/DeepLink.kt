@@ -173,6 +173,11 @@ data class ShowFilterDeepLink(
         .putExtra(EXTRA_FILTER_ID, filterId)
 }
 
+data object ShowFiltersDeepLink : IntentableDeepLink {
+    override fun toIntent(context: Context) = Intent(ACTION_VIEW)
+        .setData(Uri.parse("pktc://filters"))
+}
+
 data object PocketCastsWebsiteGetDeepLink : DeepLink
 
 data class ShowPodcastFromUrlDeepLink(
