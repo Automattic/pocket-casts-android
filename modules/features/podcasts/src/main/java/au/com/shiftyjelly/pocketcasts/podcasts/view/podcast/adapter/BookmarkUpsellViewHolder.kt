@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter
 
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
@@ -30,7 +29,7 @@ class BookmarkUpsellViewHolder(
                 EmptyState(
                     title = stringResource(LR.string.bookmarks_empty_state_title),
                     subtitle = stringResource(LR.string.bookmarks_free_user_empty_state_message),
-                    iconResourcerId = IR.drawable.ic_bookmark,
+                    iconResourceId = IR.drawable.ic_bookmark,
                     buttonText = stringResource(LR.string.bookmarks_free_user_empty_state_button),
                     onButtonClick = {
                         onGetBookmarksClicked()
@@ -39,10 +38,7 @@ class BookmarkUpsellViewHolder(
                         )
                         OnboardingLauncher.openOnboardingFlow(context.getActivity(), onboardingFlow)
                     },
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 16.dp)
-                        .padding(vertical = 8.dp),
+                    modifier = Modifier.padding(vertical = 24.dp),
                 )
             }
         }

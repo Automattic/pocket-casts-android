@@ -4,6 +4,8 @@ import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -34,38 +36,41 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 fun EmptyState(
     title: String,
     subtitle: String,
-    iconResourcerId: Int,
+    iconResourceId: Int,
     modifier: Modifier = Modifier,
     buttonText: String? = null,
     onButtonClick: () -> Unit = {},
 ) {
     val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     val isTablet = Util.isTablet(LocalContext.current)
-    val heightPadding = if (isLandscape) 8.dp else 16.dp
+    val isPortraitOrTablet = isTablet || !isLandscape
+    val heightPadding = if (isPortraitOrTablet) 16.dp else 8.dp
 
     Column(
-        modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
+        modifier = modifier.padding(horizontal = 32.dp),
     ) {
-        if (isTablet || !isLandscape) {
+        if (isPortraitOrTablet) {
+            Spacer(Modifier.height(heightPadding))
+
             Image(
-                painter = painterResource(id = iconResourcerId),
+                painter = painterResource(id = iconResourceId),
                 contentDescription = null,
-                modifier = Modifier
-                    .padding(bottom = heightPadding)
-                    .size(32.dp),
+                modifier = Modifier.size(32.dp),
                 colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.primaryIcon03),
             )
         }
+
+        Spacer(Modifier.height(heightPadding))
 
         TextH30(
             text = title,
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.W500,
-            modifier = Modifier
-                .padding(bottom = heightPadding),
         )
+
+        Spacer(Modifier.height(heightPadding))
 
         TextP40(
             text = subtitle,
@@ -73,11 +78,12 @@ fun EmptyState(
             color = MaterialTheme.theme.colors.primaryText02,
             fontSize = 15.sp,
             fontWeight = FontWeight.W400,
-            modifier = Modifier.widthIn(max = 330.dp)
-                .padding(bottom = heightPadding),
+            modifier = Modifier.widthIn(max = 330.dp),
         )
 
         buttonText?.let {
+            Spacer(Modifier.height(heightPadding))
+
             RowButton(
                 text = it,
                 onClick = { onButtonClick() },
@@ -89,6 +95,8 @@ fun EmptyState(
                 modifier = Modifier.widthIn(max = 330.dp),
             )
         }
+
+        Spacer(Modifier.height(heightPadding))
     }
 }
 
@@ -101,7 +109,7 @@ fun EmptyStatePreview(
         EmptyState(
             title = "Time to add some podcasts",
             subtitle = "Discover and subscribe to your favorite podcasts.",
-            iconResourcerId = IR.drawable.ic_podcasts,
+            iconResourceId = IR.drawable.ic_podcasts,
             buttonText = "Discover",
             onButtonClick = { },
         )
