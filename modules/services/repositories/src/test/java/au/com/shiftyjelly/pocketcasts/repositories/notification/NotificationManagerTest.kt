@@ -7,6 +7,8 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UserNotifications
 import au.com.shiftyjelly.pocketcasts.models.type.NotificationCategory
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -56,5 +58,65 @@ class NotificationManagerTest {
 
         val expectedUserNotifications = insertedIds.map { UserNotifications(notificationId = it.toInt()) }
         assertEquals(expectedUserNotifications, capturedUserNotifications)
+    }
+
+    @Test
+    fun `should update interacted_at when tracking filters interaction`() = runTest {
+        val filterNotification = Notifications(
+            category = NotificationCategory.ONBOARDING,
+            subcategory = OnboardingNotificationType.SUBCATEGORY_FILTERS,
+        ).apply {
+            id = 4L
+        }
+        whenever(notificationsDao.getNotificationBySubcategory(OnboardingNotificationType.SUBCATEGORY_FILTERS))
+            .thenReturn(filterNotification)
+
+        notificationManager.trackFiltersInteractionFeature()
+
+        val idCaptor = argumentCaptor<Int>()
+        val timestampCaptor = argumentCaptor<Long>()
+        verify(userNotificationsDao).updateInteractedAt(idCaptor.capture(), timestampCaptor.capture())
+        assertEquals(4, idCaptor.firstValue)
+    }
+
+    @Test
+    fun `should return false when user has not interacted with filters`() = runTest {
+        val filterNotification = Notifications(
+            category = NotificationCategory.ONBOARDING,
+            subcategory = OnboardingNotificationType.SUBCATEGORY_FILTERS,
+        ).apply {
+            id = 4L
+        }
+        whenever(notificationsDao.getNotificationBySubcategory(OnboardingNotificationType.SUBCATEGORY_FILTERS))
+            .thenReturn(filterNotification)
+
+        val userNotification = UserNotifications(notificationId = 4, interactedAt = null)
+        whenever(userNotificationsDao.getUserNotification(4)).thenReturn(userNotification)
+
+        val hasInteracted = notificationManager.hasUserInteractedWithFiltersFeature()
+
+        assertFalse(hasInteracted)
+    }
+
+    @Test
+    fun `should return true when user has interacted with filters`() = runTest {
+        val filterNotification = Notifications(
+            category = NotificationCategory.ONBOARDING,
+            subcategory = OnboardingNotificationType.SUBCATEGORY_FILTERS,
+        ).apply {
+            id = 4L
+        }
+        whenever(notificationsDao.getNotificationBySubcategory(OnboardingNotificationType.SUBCATEGORY_FILTERS))
+            .thenReturn(filterNotification)
+
+        val userNotification = UserNotifications(
+            notificationId = 4,
+            interactedAt = System.currentTimeMillis(),
+        )
+        whenever(userNotificationsDao.getUserNotification(4)).thenReturn(userNotification)
+
+        val hasInteracted = notificationManager.hasUserInteractedWithFiltersFeature()
+
+        assertTrue(hasInteracted)
     }
 }

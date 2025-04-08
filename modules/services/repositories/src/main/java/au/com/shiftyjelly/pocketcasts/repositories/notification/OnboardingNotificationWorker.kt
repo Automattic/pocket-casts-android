@@ -9,7 +9,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.hilt.work.HiltWorker
-import androidx.work.Worker
+import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowFiltersDeepLink
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -24,14 +24,19 @@ class OnboardingNotificationWorker @AssistedInject constructor(
     @Assisted params: WorkerParameters,
     private val settings: Settings,
     private val notificationHelper: NotificationHelper,
-) : Worker(context, params) {
-    override fun doWork(): Result {
+    private val notificationManager: NotificationManager,
+) : CoroutineWorker(context, params) {
+    override suspend fun doWork(): Result {
         if (!settings.dailyRemindersNotification.value) {
             return Result.failure()
         }
 
         val subcategory = inputData.getString("subcategory") ?: return Result.failure()
         val type = OnboardingNotificationType.fromSubcategory(subcategory) ?: return Result.failure()
+
+        if (!canShowNotification(type)) {
+            return Result.failure()
+        }
 
         val notification = getNotificationBuilder(type).build()
 
@@ -40,6 +45,13 @@ class OnboardingNotificationWorker @AssistedInject constructor(
         }
 
         return Result.success()
+    }
+
+    private suspend fun canShowNotification(type: OnboardingNotificationType): Boolean {
+        return when (type.subcategory) {
+            OnboardingNotificationType.SUBCATEGORY_FILTERS -> !notificationManager.hasUserInteractedWithFiltersFeature()
+            else -> false
+        }
     }
 
     private fun getNotificationBuilder(type: OnboardingNotificationType): NotificationCompat.Builder {
