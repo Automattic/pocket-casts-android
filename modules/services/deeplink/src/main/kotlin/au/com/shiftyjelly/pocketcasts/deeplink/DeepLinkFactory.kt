@@ -60,6 +60,7 @@ class DeepLinkFactory(
         ShareLinkAdapter(shareHost),
         WebPlayerShareLinkAdapter(webBaseHost = webBaseHost, webPlayerHost = webPlayerHost),
         OpmlAdapter(listOf(listHost, shareHost)),
+        ImportAdapter(),
         PodcastUrlSchemeAdapter(listOf(listHost, shareHost, webBaseHost)),
         PlayFromSearchAdapter(),
         AssistantAdapter(),
@@ -526,7 +527,23 @@ private class OpmlAdapter(
             "settings",
             "subscribeonandroid.com",
             "www.subscribeonandroid.com",
+            "settings",
         )
+    }
+}
+
+private class ImportAdapter : DeepLinkAdapter {
+    override fun create(intent: Intent): DeepLink? {
+        val uriData = intent.data ?: return null
+        val scheme = uriData.scheme
+        val host = uriData.host
+        val path = uriData.path
+
+        return if (intent.action == ACTION_VIEW && scheme == "pktc" && host == "settings" && path == "/import") {
+            ImportDeepLink
+        } else {
+            null
+        }
     }
 }
 

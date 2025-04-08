@@ -573,6 +573,17 @@ class DeepLinkFactoryTest {
     }
 
     @Test
+    fun import() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("pktc://settings/import"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(ImportDeepLink, deepLink)
+    }
+
+    @Test
     fun nativeShare() {
         val intent = Intent()
             .setAction(ACTION_VIEW)
