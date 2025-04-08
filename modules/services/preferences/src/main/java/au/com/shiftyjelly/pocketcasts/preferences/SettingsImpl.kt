@@ -557,6 +557,12 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
+    override val dailyRemindersNotification = UserSetting.BoolPref(
+        sharedPrefKey = "dailyRemindersNotification",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
+
     override val streamingMode: UserSetting<Boolean> = UserSetting.BoolPref(
         sharedPrefKey = Settings.PREFERENCE_GLOBAL_STREAMING_MODE,
         defaultValue = true,
