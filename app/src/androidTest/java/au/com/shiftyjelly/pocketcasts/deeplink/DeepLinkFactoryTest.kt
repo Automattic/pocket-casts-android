@@ -1022,4 +1022,15 @@ class DeepLinkFactoryTest {
 
         assertEquals(ReferralsDeepLink(code = "abc"), deepLink)
     }
+
+    @Test
+    fun themes() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("pktc://settings/themes"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(ThemesDeepLink, deepLink)
+    }
 }
