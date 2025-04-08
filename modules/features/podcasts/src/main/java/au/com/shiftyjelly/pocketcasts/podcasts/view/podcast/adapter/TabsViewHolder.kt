@@ -21,12 +21,14 @@ class TabsViewHolder(
     private val theme: Theme,
 ) : RecyclerView.ViewHolder(composeView) {
     fun bind(tabsHeader: TabsHeader) {
-        val tabs = PodcastTab.values().map {
-            ButtonTab(
-                labelResId = it.labelResId,
-                onClick = { tabsHeader.onTabClicked(it) },
-            )
-        }
+        val tabs = PodcastTab.entries
+            .filter { it.isVisible() }
+            .map {
+                ButtonTab(
+                    labelResId = it.labelResId,
+                    onClick = { tabsHeader.onTabClicked(it) },
+                )
+            }
         composeView.setContent {
             AppTheme(theme.activeTheme) {
                 ButtonTabs(

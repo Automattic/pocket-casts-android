@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.lists
 
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.model.Discover
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
@@ -47,7 +48,7 @@ class ListRepository(
     suspend fun getListFeedSuspend(url: String, authenticated: Boolean?): ListFeed {
         return if (authenticated == true) {
             syncManager.getCacheTokenOrLogin { token ->
-                listWebService.getListFeedAuthenticated(url, "Bearer $token")
+                listWebService.getListFeedAuthenticated(url, "Bearer ${token.value}")
             }
         } else {
             listWebService.getListFeedSuspend(url)
@@ -60,8 +61,10 @@ class ListRepository(
             .observeOn(AndroidSchedulers.mainThread())
     }
 
-    private suspend fun getAccessToken(): String {
-        // TODO: Implement token retrieval from your token handler
-        return ""
+    suspend fun getSimilarPodcasts(podcastUuid: String): ListFeed {
+        return getListFeedSuspend(
+            url = "${Settings.SERVER_API_URL}/recommendations/social?podcast_uuid=$podcastUuid",
+            authenticated = false,
+        )
     }
 }

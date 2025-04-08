@@ -55,6 +55,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.BookmarkHead
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.BookmarkUpsellViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.BookmarkViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.NoBookmarkViewHolder
+import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.SimilarPodcastViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.TabsViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel.RatingState
@@ -67,6 +68,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageReques
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
+import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
@@ -164,6 +166,8 @@ class PodcastAdapter(
     private val onClickCategory: (Podcast) -> Unit,
     private val onClickWebsite: (Podcast) -> Unit,
     private val onArtworkAvailable: (Podcast) -> Unit,
+    private val onSimilarPodcastClicked: (String) -> Unit,
+    private val onSimilarPodcastSubscribeClicked: (String) -> Unit,
 ) : LargeListAdapter<Any, RecyclerView.ViewHolder>(1500, differ) {
 
     data class EpisodeLimitRow(val episodeLimit: Int)
@@ -197,6 +201,12 @@ class PodcastAdapter(
     object BookmarkUpsell
     object NoBookmarkMessage
 
+    data class SimilarPodcast(
+        val podcast: DiscoverPodcast,
+        val onRowClick: (String) -> Unit,
+        val onSubscribeClick: (String) -> Unit,
+    )
+
     enum class HeaderType {
         SolidColor,
         Blur,
@@ -209,6 +219,7 @@ class PodcastAdapter(
         private const val VIEW_TYPE_BOOKMARK_HEADER = 102
         private const val VIEW_TYPE_BOOKMARK_UPSELL = 103
         private const val VIEW_TYPE_NO_BOOKMARK = 104
+        private const val VIEW_TYPE_SIMILAR_PODCAST = 105
         val VIEW_TYPE_EPISODE_HEADER = R.layout.adapter_episode_header
         val VIEW_TYPE_PODCAST_HEADER = R.layout.adapter_podcast_header
         val VIEW_TYPE_EPISODE_LIMIT_ROW = R.layout.adapter_episode_limit
@@ -291,6 +302,7 @@ class PodcastAdapter(
             VIEW_TYPE_BOOKMARK_HEADER -> BookmarkHeaderViewHolder(ComposeView(parent.context), theme)
             VIEW_TYPE_BOOKMARK_UPSELL -> BookmarkUpsellViewHolder(ComposeView(parent.context), onGetBookmarksClicked, theme)
             VIEW_TYPE_NO_BOOKMARK -> NoBookmarkViewHolder(ComposeView(parent.context), theme, onHeadsetSettingsClicked)
+            VIEW_TYPE_SIMILAR_PODCAST -> SimilarPodcastViewHolder(ComposeView(parent.context), theme)
             else -> EpisodeViewHolder(
                 binding = AdapterEpisodeBinding.inflate(inflater, parent, false),
                 viewMode = if (settings.artworkConfiguration.value.useEpisodeArtwork(Element.Podcasts)) {
@@ -677,6 +689,21 @@ class PodcastAdapter(
         submitList(content)
     }
 
+    fun setSimilarPodcasts(podcasts: List<DiscoverPodcast>) {
+        val content = buildList {
+            add(Podcast())
+            add(TabsHeader(PodcastTab.SIMILAR_SHOWS, onTabClicked))
+            podcasts.map {
+                SimilarPodcast(
+                    podcast = it,
+                    onRowClick = onSimilarPodcastClicked,
+                    onSubscribeClick = onSimilarPodcastSubscribeClicked,
+                )
+            }
+        }
+        submitList(content)
+    }
+
     fun setBookmarksAvailable(bookmarksAvailable: Boolean) {
         this.bookmarksAvailable = bookmarksAvailable
     }
@@ -698,6 +725,7 @@ class PodcastAdapter(
             is BookmarkHeader -> VIEW_TYPE_BOOKMARK_HEADER
             is BookmarkUpsell -> VIEW_TYPE_BOOKMARK_UPSELL
             is NoBookmarkMessage -> VIEW_TYPE_NO_BOOKMARK
+            is SimilarPodcast -> VIEW_TYPE_SIMILAR_PODCAST
             else -> R.layout.adapter_episode
         }
     }

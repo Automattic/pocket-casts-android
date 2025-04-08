@@ -103,6 +103,7 @@ data class DiscoverRow(
             categoryId = categoryId,
             sponsoredPodcasts = sponsoredPodcasts,
             mostPopularCategoriesId = mostPopularCategoriesId,
+            authenticated = authenticated,
         )
     }
 }
