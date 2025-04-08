@@ -529,6 +529,17 @@ class DeepLinkFactoryTest {
     }
 
     @Test
+    fun filtersTab() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("pktc://filters"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(ShowFiltersDeepLink, deepLink)
+    }
+
+    @Test
     fun upgradeAccount() {
         val intent = Intent()
             .setAction(ACTION_VIEW)
