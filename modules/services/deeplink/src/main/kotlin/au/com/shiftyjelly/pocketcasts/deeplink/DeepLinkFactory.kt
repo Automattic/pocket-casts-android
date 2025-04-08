@@ -43,6 +43,7 @@ class DeepLinkFactory(
         ShowPodcastAdapter(),
         ShowEpisodeAdapter(),
         ShowPageAdapter(),
+        ShowFiltersAdapter(),
         PocketCastsWebsiteGetAdapter(webBaseHost),
         ReferralsAdapter(webBaseHost),
         PodloveAdapter(),
@@ -177,6 +178,20 @@ private class ShowPageAdapter : DeepLinkAdapter {
         }
     } else {
         null
+    }
+}
+
+private class ShowFiltersAdapter : DeepLinkAdapter {
+    override fun create(intent: Intent): DeepLink? {
+        val uriData = intent.data
+        val scheme = uriData?.scheme
+        val host = uriData?.host
+
+        return if (intent.action == ACTION_VIEW && scheme == "pktc" && host == "filters") {
+            ShowFiltersDeepLink
+        } else {
+            null
+        }
     }
 }
 
