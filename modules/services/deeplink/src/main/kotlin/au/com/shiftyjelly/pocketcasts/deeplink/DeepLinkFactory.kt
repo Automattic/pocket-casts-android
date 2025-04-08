@@ -63,6 +63,7 @@ class DeepLinkFactory(
         PodcastUrlSchemeAdapter(listOf(listHost, shareHost, webBaseHost)),
         PlayFromSearchAdapter(),
         AssistantAdapter(),
+        ThemesAdapter(),
     )
 
     fun create(intent: Intent): DeepLink? {
@@ -401,6 +402,7 @@ private class ShareLinkNativeAdapter : DeepLinkAdapter {
             "cloudfiles",
             "upgrade",
             "redeem",
+            "settings",
         )
     }
 }
@@ -521,6 +523,7 @@ private class OpmlAdapter(
             "cloudfiles",
             "upgrade",
             "redeem",
+            "settings",
             "subscribeonandroid.com",
             "www.subscribeonandroid.com",
         )
@@ -594,6 +597,21 @@ private class SignInAdapter(
 
         return if (intent.action == ACTION_VIEW && scheme in listOf("http", "https") && host == webBaseHost && path == "/sign-in") {
             SignInDeepLink(source)
+        } else {
+            null
+        }
+    }
+}
+
+private class ThemesAdapter : DeepLinkAdapter {
+    override fun create(intent: Intent): DeepLink? {
+        val uriData = intent.data ?: return null
+        val scheme = uriData.scheme
+        val host = uriData.host
+        val path = uriData.path
+
+        return if (intent.action == ACTION_VIEW && scheme == "pktc" && host == "settings" && path == "/themes") {
+            ThemesDeepLink
         } else {
             null
         }
