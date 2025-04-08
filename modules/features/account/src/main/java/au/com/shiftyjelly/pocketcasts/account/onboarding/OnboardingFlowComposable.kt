@@ -311,6 +311,7 @@ private fun Content(
                 OnboardingUpgradeSource.SLUMBER_STUDIOS,
                 OnboardingUpgradeSource.UP_NEXT_SHUFFLE,
                 OnboardingUpgradeSource.GENERATED_TRANSCRIPTS,
+                OnboardingUpgradeSource.DEEP_LINK,
                 OnboardingUpgradeSource.UNKNOWN,
                 -> false
 

@@ -53,6 +53,7 @@ class DeepLinkFactory(
         SubscribeOnAndroidAdapter(),
         AppleAdapter(),
         CloudFilesAdapter(),
+        UpsellAdapter(),
         UpgradeAccountAdapter(),
         PromoCodeAdapter(),
         ShareLinkNativeAdapter(),
@@ -339,6 +340,20 @@ private class CloudFilesAdapter : DeepLinkAdapter {
 
         return if (intent.action == ACTION_VIEW && scheme == "pktc" && host == "cloudfiles") {
             CloudFilesDeepLink
+        } else {
+            null
+        }
+    }
+}
+
+private class UpsellAdapter : DeepLinkAdapter {
+    override fun create(intent: Intent): DeepLink? {
+        val uriData = intent.data
+        val scheme = uriData?.scheme
+        val host = uriData?.host
+
+        return if (intent.action == ACTION_VIEW && scheme == "pktc" && host == "upsell") {
+            UpsellDeepLink
         } else {
             null
         }
