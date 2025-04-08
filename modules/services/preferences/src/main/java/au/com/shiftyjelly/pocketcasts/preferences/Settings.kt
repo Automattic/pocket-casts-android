@@ -144,6 +144,7 @@ interface Settings {
         BOOKMARK(21483650),
         FIX_DOWNLOADS(21483651),
         FIX_DOWNLOADS_COMPLETE(21483652),
+        ONBOARDING_FILTERS(21483653),
     }
 
     enum class UpNextAction(val serverId: Int) {

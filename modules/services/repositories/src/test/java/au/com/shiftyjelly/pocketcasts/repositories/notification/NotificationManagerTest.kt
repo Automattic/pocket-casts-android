@@ -40,13 +40,13 @@ class NotificationManagerTest {
         val insertedNotifications = notificationsCaptor.firstValue
 
         val expectedNotifications = listOf(
-            Notifications(category = NotificationCategory.ONBOARDING, subcategory = NotificationManagerImpl.SUBCATEGORY_SYNC),
-            Notifications(category = NotificationCategory.ONBOARDING, subcategory = NotificationManagerImpl.SUBCATEGORY_IMPORT),
-            Notifications(category = NotificationCategory.ONBOARDING, subcategory = NotificationManagerImpl.SUBCATEGORY_UP_NEXT),
-            Notifications(category = NotificationCategory.ONBOARDING, subcategory = NotificationManagerImpl.SUBCATEGORY_FILTERS),
-            Notifications(category = NotificationCategory.ONBOARDING, subcategory = NotificationManagerImpl.SUBCATEGORY_THEMES),
-            Notifications(category = NotificationCategory.ONBOARDING, subcategory = NotificationManagerImpl.SUBCATEGORY_STAFF_PICKS),
-            Notifications(category = NotificationCategory.ONBOARDING, subcategory = NotificationManagerImpl.SUBCATEGORY_PLUS_UP_SELL),
+            Notifications(category = NotificationCategory.ONBOARDING, subcategory = OnboardingNotificationType.SUBCATEGORY_SYNC),
+            Notifications(category = NotificationCategory.ONBOARDING, subcategory = OnboardingNotificationType.SUBCATEGORY_IMPORT),
+            Notifications(category = NotificationCategory.ONBOARDING, subcategory = OnboardingNotificationType.SUBCATEGORY_UP_NEXT),
+            Notifications(category = NotificationCategory.ONBOARDING, subcategory = OnboardingNotificationType.SUBCATEGORY_FILTERS),
+            Notifications(category = NotificationCategory.ONBOARDING, subcategory = OnboardingNotificationType.SUBCATEGORY_THEMES),
+            Notifications(category = NotificationCategory.ONBOARDING, subcategory = OnboardingNotificationType.SUBCATEGORY_STAFF_PICKS),
+            Notifications(category = NotificationCategory.ONBOARDING, subcategory = OnboardingNotificationType.SUBCATEGORY_PLUS_UP_SELL),
         )
         assertEquals(expectedNotifications, insertedNotifications)
 

@@ -2328,4 +2328,27 @@
     <string name="up_next_history_restore_button">@string/restore</string>
     <string name="up_next_history_restore_confirmation_title">Restore Up Next?</string>
     <string name="up_next_history_restore_confirmation_description">These episodes will be added to the bottom of your current Up Next.</string>
+
+    <!-- Notifications -->
+    <string name="notification_sync_title">Your shows, on any device!</string>
+    <string name="notification_sync_message">Create a free account to sync your shows and listen anywhere.</string>
+
+    <string name="notification_import_title">Easily import your podcasts</string>
+    <string name="notification_import_message">Switching from another app? Bring all your favorite shows to Pocket Casts.</string>
+
+    <string name="notification_up_next_title">Simplify your queue</string>
+    <string name="notification_up_next_message">Build a playback queue and say goodbye to jumping around between episodes.</string>
+
+    <string name="notification_filters_title">Organize your episodes</string>
+    <string name="notification_filters_message">Create smart filters to organize your episodes.</string>
+
+    <string name="notification_themes_title">Time for a new look</string>
+    <string name="notification_themes_message">Browse our themes and find the one that suits your style.</string>
+
+    <string name="notification_staff_picks_title">Explore our Staff Picks</string>
+    <string name="notification_staff_picks_message">Perfectly ripe podcasts, picked just for you by real, podcast-loving humans.</string>
+
+    <string name="notification_plus_upsell_title">Level up your podcast game</string>
+    <string name="notification_plus_upsell_message">Unlock exclusive features like folders, bookmarks, and more with Plus!</string>
+
 </resources>
