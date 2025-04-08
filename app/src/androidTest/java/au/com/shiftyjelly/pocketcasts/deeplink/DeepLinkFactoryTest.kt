@@ -602,6 +602,17 @@ class DeepLinkFactoryTest {
     }
 
     @Test
+    fun upsell() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("pktc://upsell"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(UpsellDeepLink, deepLink)
+    }
+
+    @Test
     fun nativeShareWithStartTimestamp() {
         val intent = Intent()
             .setAction(ACTION_VIEW)
