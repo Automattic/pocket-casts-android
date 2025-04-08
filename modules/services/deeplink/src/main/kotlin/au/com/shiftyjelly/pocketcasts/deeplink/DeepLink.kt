@@ -230,6 +230,11 @@ data class OpmlImportDeepLink(
     val uri: Uri,
 ) : DeepLink
 
+data object ImportDeepLink : IntentableDeepLink {
+    override fun toIntent(context: Context) = Intent(ACTION_VIEW)
+        .setData(Uri.parse("pktc://settings/import"))
+}
+
 data class PlayFromSearchDeepLink(
     val query: String,
 ) : DeepLink
