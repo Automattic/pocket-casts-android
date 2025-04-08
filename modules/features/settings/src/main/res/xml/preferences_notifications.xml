@@ -41,6 +41,19 @@
             android:title="@string/settings_notification_advanced" />
     </PreferenceCategory>
 
+    <PreferenceCategory android:key="daily_reminders_category" android:title="@string/settings_notification_daily_reminders">
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="notifyDailyReminders"
+            android:persistent="false"
+            android:minHeight="72dp"
+            android:title="@string/settings_notification_notify_me" />
+        <Preference
+            android:key="dailyRemindersSettings"
+            android:summary="@string/settings_notification_advanced_summary"
+            android:title="@string/settings_notification_advanced" />
+    </PreferenceCategory>
+
     <PreferenceCategory android:title="@string/settings" >
         <ListPreference
             android:key="overrideNotificationAudio"
