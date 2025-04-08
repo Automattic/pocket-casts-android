@@ -17,6 +17,6 @@ class ImportDeepLinkTest {
         val intent = ImportDeepLink.toIntent(context)
 
         assertEquals(ACTION_VIEW, intent.action)
-        assertEquals(Uri.parse("pktc://import"), intent.data)
+        assertEquals(Uri.parse("pktc://settings/import"), intent.data)
     }
 }

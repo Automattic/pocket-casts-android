@@ -526,7 +526,7 @@ private class OpmlAdapter(
             "settings",
             "subscribeonandroid.com",
             "www.subscribeonandroid.com",
-            "import",
+            "settings",
         )
     }
 }
@@ -536,7 +536,9 @@ private class ImportAdapter : DeepLinkAdapter {
         val uriData = intent.data ?: return null
         val scheme = uriData.scheme
         val host = uriData.host
-        return if (intent.action == ACTION_VIEW && scheme == "pktc" && host == "import") {
+        val path = uriData.path
+
+        return if (intent.action == ACTION_VIEW && scheme == "pktc" && host == "settings" && path == "/import") {
             ImportDeepLink
         } else {
             null

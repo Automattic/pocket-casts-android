@@ -232,7 +232,7 @@ data class OpmlImportDeepLink(
 
 data object ImportDeepLink : IntentableDeepLink {
     override fun toIntent(context: Context) = Intent(ACTION_VIEW)
-        .setData(Uri.parse("pktc://import"))
+        .setData(Uri.parse("pktc://settings/import"))
 }
 
 data class PlayFromSearchDeepLink(
