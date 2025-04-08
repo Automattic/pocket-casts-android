@@ -133,6 +133,7 @@ interface Settings {
         NOTIFICATION_CHANNEL_ID_BOOKMARK("bookmark"),
         NOTIFICATION_CHANNEL_ID_FIX_DOWNLOADS("fixDownloads"),
         NOTIFICATION_CHANNEL_ID_FIX_DOWNLOADS_COMPLETE("fixDownloadsComplete"),
+        NOTIFICATION_CHANNEL_ID_ONBOARDING("onboarding"),
     }
 
     enum class NotificationId(val value: Int) {

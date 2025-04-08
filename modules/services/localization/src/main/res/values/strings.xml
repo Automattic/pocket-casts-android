@@ -2028,6 +2028,7 @@
     <string name="notification_channel_description_bookmark">Shows when bookmark is added using headphones</string>
     <string name="notification_channel_description_fix_downloads">Shows when downloads fix is triggered</string>
     <string name="notification_channel_description_fix_downloads_complete">Shows when downloads fix is complete</string>
+    <string name="notification_channel_description_onboarding">Shows daily tips to get you started during your first week.</string>
 
     <!-- Bookmarks -->
 

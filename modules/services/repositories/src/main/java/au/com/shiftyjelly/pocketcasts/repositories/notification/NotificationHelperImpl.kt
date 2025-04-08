@@ -105,6 +105,14 @@ class NotificationHelperImpl @Inject constructor(@ApplicationContext private val
         }
         channelList.add(fixDownloadsCompleteChannel)
 
+        val onboardingChannel = NotificationChannel(Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_ONBOARDING.id, "Onboarding", NotificationManager.IMPORTANCE_DEFAULT).apply {
+            description = context.getString(LR.string.notification_channel_description_onboarding)
+            setShowBadge(false)
+            enableVibration(true)
+            lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+        }
+        channelList.add(onboardingChannel)
+
         notificationManager.createNotificationChannels(channelList)
     }
 
