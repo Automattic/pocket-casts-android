@@ -22,6 +22,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationDraw
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationDrawerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelperImpl
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManager
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.nova.ExternalDataManager
 import au.com.shiftyjelly.pocketcasts.repositories.nova.ExternalDataManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayerFactory
@@ -196,4 +198,7 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun provideUpNextHistoryManager(upNextHistoryManagerImpl: UpNextHistoryManagerImpl): UpNextHistoryManager
+
+    @Binds
+    abstract fun provideNotificationManager(notificationManagerImpl: NotificationManagerImpl): NotificationManager
 }
