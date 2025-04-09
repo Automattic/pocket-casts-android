@@ -49,4 +49,19 @@ class NotificationManagerImpl @Inject constructor(
 
         return userNotification.interactedAt != null
     }
+
+    override suspend fun trackOnboardingNotificationSent(type: OnboardingNotificationType) {
+        val filterNotification = notificationsDao.getNotificationBySubcategory(type.subcategory)
+        if (filterNotification != null && filterNotification.id != null) {
+            val notifId = filterNotification.id!!.toInt()
+
+            val userNotification = userNotificationsDao.getUserNotification(notifId)
+            if (userNotification != null) {
+                userNotification.sentThisWeek += 1
+                userNotification.lastSentAt = System.currentTimeMillis()
+
+                userNotificationsDao.update(userNotification)
+            }
+        }
+    }
 }

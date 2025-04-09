@@ -4,4 +4,5 @@ interface NotificationManager {
     suspend fun setupOnboardingNotificationsChannels()
     suspend fun trackFiltersInteractionFeature()
     suspend fun hasUserInteractedWithFiltersFeature(): Boolean
+    suspend fun trackOnboardingNotificationSent(type: OnboardingNotificationType)
 }

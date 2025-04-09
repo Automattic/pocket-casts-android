@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import au.com.shiftyjelly.pocketcasts.models.entity.UserNotifications
 
 @Dao
@@ -17,4 +18,7 @@ abstract class UserNotificationsDao {
 
     @Query("SELECT * FROM user_notifications WHERE notification_id = :notificationId LIMIT 1")
     abstract suspend fun getUserNotification(notificationId: Int): UserNotifications?
+
+    @Update
+    abstract suspend fun update(userNotifications: UserNotifications)
 }

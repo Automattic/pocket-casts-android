@@ -14,6 +14,7 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -118,5 +119,61 @@ class NotificationManagerTest {
         val hasInteracted = notificationManager.hasUserInteractedWithFiltersFeature()
 
         assertTrue(hasInteracted)
+    }
+
+    @Test
+    fun `should update sentThisWeek and lastSentAt when tracking notification sent`() = runTest {
+        val filterNotification = Notifications(
+            category = NotificationCategory.ONBOARDING,
+            subcategory = OnboardingNotificationType.SUBCATEGORY_FILTERS,
+        ).apply {
+            id = 4L
+        }
+        whenever(notificationsDao.getNotificationBySubcategory(OnboardingNotificationType.SUBCATEGORY_FILTERS))
+            .thenReturn(filterNotification)
+
+        val initialUserNotification = UserNotifications(
+            notificationId = 4,
+            sentThisWeek = 0,
+            lastSentAt = 0,
+        )
+        whenever(userNotificationsDao.getUserNotification(4)).thenReturn(initialUserNotification)
+
+        notificationManager.trackOnboardingNotificationSent(OnboardingNotificationType.Filters)
+
+        val userNotificationCaptor = argumentCaptor<UserNotifications>()
+        verify(userNotificationsDao).update(userNotificationCaptor.capture())
+        val updatedUserNotification = userNotificationCaptor.firstValue
+
+        assertEquals(1, updatedUserNotification.sentThisWeek)
+        assertTrue(updatedUserNotification.lastSentAt > 0)
+    }
+
+    @Test
+    fun `should not update notification sent when notification is null`() = runTest {
+        whenever(notificationsDao.getNotificationBySubcategory(OnboardingNotificationType.SUBCATEGORY_FILTERS))
+            .thenReturn(null)
+
+        notificationManager.trackOnboardingNotificationSent(OnboardingNotificationType.Filters)
+
+        verify(userNotificationsDao, never()).update(any())
+    }
+
+    @Test
+    fun `should not update notification sent when user notification is null`() = runTest {
+        val filterNotification = Notifications(
+            category = NotificationCategory.ONBOARDING,
+            subcategory = OnboardingNotificationType.SUBCATEGORY_FILTERS,
+        ).apply {
+            id = 4L
+        }
+        whenever(notificationsDao.getNotificationBySubcategory(OnboardingNotificationType.SUBCATEGORY_FILTERS))
+            .thenReturn(filterNotification)
+
+        whenever(userNotificationsDao.getUserNotification(4)).thenReturn(null)
+
+        notificationManager.trackOnboardingNotificationSent(OnboardingNotificationType.Filters)
+
+        verify(userNotificationsDao, never()).update(any())
     }
 }
