@@ -160,7 +160,7 @@ data object ShowDiscoverDeepLink : ShowPageDeepLink {
     override val pageId = "search"
 }
 
-data object ShowUpNextDeepLink : ShowPageDeepLink {
+data object ShowUpNextModalDeepLink : ShowPageDeepLink {
     override val pageId = "upnext"
 }
 
@@ -176,6 +176,11 @@ data class ShowFilterDeepLink(
 data object ShowFiltersDeepLink : IntentableDeepLink {
     override fun toIntent(context: Context) = Intent(ACTION_VIEW)
         .setData(Uri.parse("pktc://filters"))
+}
+
+data object ShowUpNextTabDeepLink : IntentableDeepLink {
+    override fun toIntent(context: Context) = Intent(ACTION_VIEW)
+        .setData(Uri.parse("pktc://upnext?location=tab"))
 }
 
 data object PocketCastsWebsiteGetDeepLink : DeepLink

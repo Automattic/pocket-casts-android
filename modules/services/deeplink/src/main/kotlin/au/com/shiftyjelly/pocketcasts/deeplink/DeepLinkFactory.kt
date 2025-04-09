@@ -44,6 +44,7 @@ class DeepLinkFactory(
         ShowEpisodeAdapter(),
         ShowPageAdapter(),
         ShowFiltersAdapter(),
+        UpNextAdapter(),
         PocketCastsWebsiteGetAdapter(webBaseHost),
         ReferralsAdapter(webBaseHost),
         PodloveAdapter(),
@@ -175,7 +176,7 @@ private class ShowPageAdapter : DeepLinkAdapter {
         when (intent.getStringExtra(EXTRA_PAGE)) {
             "podcasts" -> ShowPodcastsDeepLink
             "search" -> ShowDiscoverDeepLink
-            "upnext" -> ShowUpNextDeepLink
+            "upnext" -> ShowUpNextModalDeepLink
             "playlist" -> ShowFilterDeepLink(filterId = intent.getLongExtra(EXTRA_FILTER_ID, -1))
             else -> null
         }
@@ -195,6 +196,20 @@ private class ShowFiltersAdapter : DeepLinkAdapter {
         } else {
             null
         }
+    }
+}
+
+private class UpNextAdapter : DeepLinkAdapter {
+    override fun create(intent: Intent): DeepLink? {
+        val uriData = intent.data ?: return null
+        val scheme = uriData.scheme
+        val host = uriData.host
+        val location = uriData.getQueryParameter("location")
+
+        if (intent.action == ACTION_VIEW && scheme == "pktc" && host == "upnext" && location == "tab") {
+            return ShowUpNextTabDeepLink
+        }
+        return null
     }
 }
 
@@ -541,7 +556,6 @@ private class OpmlAdapter(
             "settings",
             "subscribeonandroid.com",
             "www.subscribeonandroid.com",
-            "settings",
         )
     }
 }
