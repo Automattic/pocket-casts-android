@@ -223,14 +223,25 @@ class DeepLinkFactoryTest {
     }
 
     @Test
-    fun showUpNext() {
+    fun showUpNextModal() {
         val intent = Intent()
             .setAction(ACTION_VIEW)
             .putExtra("launch-page", "upnext")
 
         val deepLink = factory.create(intent)
 
-        assertEquals(ShowUpNextDeepLink, deepLink)
+        assertEquals(ShowUpNextModalDeepLink, deepLink)
+    }
+
+    @Test
+    fun showUpNextTab() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("pktc://upnext?location=tab"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(ShowUpNextTabDeepLink, deepLink)
     }
 
     @Test
