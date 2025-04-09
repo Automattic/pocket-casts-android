@@ -11,6 +11,7 @@ import androidx.work.workDataOf
 import au.com.shiftyjelly.pocketcasts.analytics.AppLifecycleAnalytics
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationDelayCalculator
 import au.com.shiftyjelly.pocketcasts.repositories.notification.OnboardingNotificationType
 import au.com.shiftyjelly.pocketcasts.repositories.notification.OnboardingNotificationWorker
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
@@ -142,13 +143,30 @@ class AppLifecycleObserver constructor(
     fun getAppPlatform() = Util.getAppPlatform(appContext)
 
     private fun scheduleOnboardingNotifications(context: Context) {
-        val workData = workDataOf("subcategory" to OnboardingNotificationType.SUBCATEGORY_FILTERS)
+        val delayCalculator = NotificationDelayCalculator()
 
-        val notificationWork: OneTimeWorkRequest =
-            OneTimeWorkRequest.Builder(OnboardingNotificationWorker::class.java)
-                .setInitialDelay(10, TimeUnit.SECONDS) // This is temporary
+        listOf(
+            OnboardingNotificationType.Sync,
+            OnboardingNotificationType.Import,
+            OnboardingNotificationType.UpNext,
+            OnboardingNotificationType.Filters,
+            OnboardingNotificationType.Themes,
+            OnboardingNotificationType.StaffPicks,
+            OnboardingNotificationType.PlusUpsell,
+        ).forEach { type ->
+            val delay = delayCalculator.calculateDelayForOnboardingNotification(type)
+
+            val workData = workDataOf(
+                "subcategory" to type.subcategory,
+            )
+
+            val notificationWork = OneTimeWorkRequest.Builder(OnboardingNotificationWorker::class.java)
                 .setInputData(workData)
+                .setInitialDelay(delay, TimeUnit.MILLISECONDS)
+                .addTag("onboarding_notification_${type.subcategory}")
                 .build()
-        WorkManager.getInstance(context).enqueue(notificationWork)
+
+            WorkManager.getInstance(context).enqueue(notificationWork)
+        }
     }
 }
