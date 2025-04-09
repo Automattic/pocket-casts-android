@@ -62,7 +62,7 @@ class NotificationManagerTest {
     }
 
     @Test
-    fun `should update interacted_at when tracking filters interaction`() = runTest {
+    fun `should update interacted_at when tracking user interaction feature`() = runTest {
         val filterNotification = Notifications(
             category = NotificationCategory.ONBOARDING,
             subcategory = OnboardingNotificationType.SUBCATEGORY_FILTERS,
@@ -72,7 +72,7 @@ class NotificationManagerTest {
         whenever(notificationsDao.getNotificationBySubcategory(OnboardingNotificationType.SUBCATEGORY_FILTERS))
             .thenReturn(filterNotification)
 
-        notificationManager.trackFiltersInteractionFeature()
+        notificationManager.trackUserInteractedWithFeature(OnboardingNotificationType.Filters)
 
         val idCaptor = argumentCaptor<Int>()
         val timestampCaptor = argumentCaptor<Long>()
@@ -81,7 +81,7 @@ class NotificationManagerTest {
     }
 
     @Test
-    fun `should return false when user has not interacted with filters`() = runTest {
+    fun `should return false when user has not interacted with feature`() = runTest {
         val filterNotification = Notifications(
             category = NotificationCategory.ONBOARDING,
             subcategory = OnboardingNotificationType.SUBCATEGORY_FILTERS,
@@ -94,13 +94,13 @@ class NotificationManagerTest {
         val userNotification = UserNotifications(notificationId = 4, interactedAt = null)
         whenever(userNotificationsDao.getUserNotification(4)).thenReturn(userNotification)
 
-        val hasInteracted = notificationManager.hasUserInteractedWithFiltersFeature()
+        val hasInteracted = notificationManager.hasUserInteractedWithFeature(OnboardingNotificationType.Filters)
 
         assertFalse(hasInteracted)
     }
 
     @Test
-    fun `should return true when user has interacted with filters`() = runTest {
+    fun `should return true when user has interacted with feature`() = runTest {
         val filterNotification = Notifications(
             category = NotificationCategory.ONBOARDING,
             subcategory = OnboardingNotificationType.SUBCATEGORY_FILTERS,
@@ -116,7 +116,7 @@ class NotificationManagerTest {
         )
         whenever(userNotificationsDao.getUserNotification(4)).thenReturn(userNotification)
 
-        val hasInteracted = notificationManager.hasUserInteractedWithFiltersFeature()
+        val hasInteracted = notificationManager.hasUserInteractedWithFeature(OnboardingNotificationType.Filters)
 
         assertTrue(hasInteracted)
     }

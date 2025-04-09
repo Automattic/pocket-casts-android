@@ -6,6 +6,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManager
+import au.com.shiftyjelly.pocketcasts.repositories.notification.OnboardingNotificationType
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
@@ -91,7 +92,7 @@ class FolderEditViewModelTest {
 
         advanceUntilIdle()
 
-        verify(notificationManager).trackFiltersInteractionFeature()
+        verify(notificationManager).trackUserInteractedWithFeature(OnboardingNotificationType.Filters)
     }
 
     @Test
@@ -100,6 +101,6 @@ class FolderEditViewModelTest {
 
         advanceUntilIdle()
 
-        verify(notificationManager, never()).trackFiltersInteractionFeature()
+        verify(notificationManager, never()).trackUserInteractedWithFeature(OnboardingNotificationType.Filters)
     }
 }

@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManager
+import au.com.shiftyjelly.pocketcasts.repositories.notification.OnboardingNotificationType
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
@@ -311,7 +312,7 @@ class FolderEditViewModel
         analyticsTracker.track(analyticsEvent, properties)
         viewModelScope.launch {
             if (analyticsEvent == AnalyticsEvent.FOLDER_SAVED) {
-                notificationManager.trackFiltersInteractionFeature()
+                notificationManager.trackUserInteractedWithFeature(OnboardingNotificationType.Filters)
             }
         }
     }

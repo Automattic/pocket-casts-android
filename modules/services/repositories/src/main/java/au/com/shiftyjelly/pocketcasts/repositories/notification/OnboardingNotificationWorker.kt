@@ -34,7 +34,7 @@ class OnboardingNotificationWorker @AssistedInject constructor(
         val subcategory = inputData.getString("subcategory") ?: return Result.failure()
         val type = OnboardingNotificationType.fromSubcategory(subcategory) ?: return Result.failure()
 
-        if (!canShowNotification(type)) {
+        if (!notificationManager.hasUserInteractedWithFeature(type)) {
             return Result.failure()
         }
 
@@ -46,13 +46,6 @@ class OnboardingNotificationWorker @AssistedInject constructor(
         }
 
         return Result.success()
-    }
-
-    private suspend fun canShowNotification(type: OnboardingNotificationType): Boolean {
-        return when (type.subcategory) {
-            OnboardingNotificationType.SUBCATEGORY_FILTERS -> !notificationManager.hasUserInteractedWithFiltersFeature()
-            else -> false
-        }
     }
 
     private fun getNotificationBuilder(type: OnboardingNotificationType): NotificationCompat.Builder {
