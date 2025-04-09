@@ -12,7 +12,7 @@ class NotificationManagerImpl @Inject constructor(
     private val userNotificationsDao: UserNotificationsDao,
 ) : NotificationManager {
 
-    override suspend fun setupOnboardingNotifications() {
+    override suspend fun setupOnboardingNotificationsChannels() {
         val notifications = listOf(
             Notifications(category = NotificationCategory.ONBOARDING, subcategory = OnboardingNotificationType.SUBCATEGORY_SYNC),
             Notifications(category = NotificationCategory.ONBOARDING, subcategory = OnboardingNotificationType.SUBCATEGORY_IMPORT),

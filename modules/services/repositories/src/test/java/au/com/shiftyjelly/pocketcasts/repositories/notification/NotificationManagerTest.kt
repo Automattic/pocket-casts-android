@@ -35,7 +35,7 @@ class NotificationManagerTest {
         val insertedIds = listOf(1L, 2L, 3L, 4L, 5L, 6L, 7L)
         whenever(notificationsDao.insert(any())).thenReturn(insertedIds)
 
-        notificationManager.setupOnboardingNotifications()
+        notificationManager.setupOnboardingNotificationsChannels()
 
         val notificationsCaptor = argumentCaptor<List<Notifications>>()
         verify(notificationsDao).insert(notificationsCaptor.capture())
