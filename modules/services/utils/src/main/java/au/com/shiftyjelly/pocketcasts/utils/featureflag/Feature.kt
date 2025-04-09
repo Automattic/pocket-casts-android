@@ -227,6 +227,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
+    LIBRO_FM(
+        key = "libro_fm",
+        title = "Libro FM in Upsell",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Plus(null),
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    ),
     ;
 
     companion object {
