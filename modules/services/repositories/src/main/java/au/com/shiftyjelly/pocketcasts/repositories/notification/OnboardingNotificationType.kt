@@ -10,7 +10,7 @@ sealed class OnboardingNotificationType(
     val dayOffset: Int,
 ) {
     object Sync : OnboardingNotificationType(
-        notificationId = NotificationId.ONBOARDING_FILTERS.value,
+        notificationId = NotificationId.ONBOARDING_SYNC.value,
         subcategory = SUBCATEGORY_SYNC,
         titleRes = LR.string.notification_sync_title,
         messageRes = LR.string.notification_sync_message,
@@ -18,7 +18,7 @@ sealed class OnboardingNotificationType(
     )
 
     object Import : OnboardingNotificationType(
-        notificationId = NotificationId.ONBOARDING_FILTERS.value,
+        notificationId = NotificationId.ONBOARDING_IMPORT.value,
         subcategory = SUBCATEGORY_IMPORT,
         titleRes = LR.string.notification_import_title,
         messageRes = LR.string.notification_import_message,
@@ -26,7 +26,7 @@ sealed class OnboardingNotificationType(
     )
 
     object UpNext : OnboardingNotificationType(
-        notificationId = NotificationId.ONBOARDING_FILTERS.value,
+        notificationId = NotificationId.ONBOARDING_UPNEXT.value,
         subcategory = SUBCATEGORY_UP_NEXT,
         titleRes = LR.string.notification_up_next_title,
         messageRes = LR.string.notification_up_next_message,
@@ -42,7 +42,7 @@ sealed class OnboardingNotificationType(
     )
 
     object Themes : OnboardingNotificationType(
-        notificationId = NotificationId.ONBOARDING_FILTERS.value,
+        notificationId = NotificationId.ONBOARDING_THEMES.value,
         subcategory = SUBCATEGORY_THEMES,
         titleRes = LR.string.notification_themes_title,
         messageRes = LR.string.notification_themes_message,
@@ -50,7 +50,7 @@ sealed class OnboardingNotificationType(
     )
 
     object StaffPicks : OnboardingNotificationType(
-        notificationId = NotificationId.ONBOARDING_FILTERS.value,
+        notificationId = NotificationId.ONBOARDING_STAFF_PICKS.value,
         subcategory = SUBCATEGORY_STAFF_PICKS,
         titleRes = LR.string.notification_staff_picks_title,
         messageRes = LR.string.notification_staff_picks_message,
@@ -58,7 +58,7 @@ sealed class OnboardingNotificationType(
     )
 
     object PlusUpsell : OnboardingNotificationType(
-        notificationId = NotificationId.ONBOARDING_FILTERS.value,
+        notificationId = NotificationId.ONBOARDING_UPSELL.value,
         subcategory = SUBCATEGORY_PLUS_UP_SELL,
         titleRes = LR.string.notification_plus_upsell_title,
         messageRes = LR.string.notification_plus_upsell_message,
