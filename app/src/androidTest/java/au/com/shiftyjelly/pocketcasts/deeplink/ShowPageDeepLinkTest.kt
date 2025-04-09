@@ -29,7 +29,7 @@ class ShowPageDeepLinkTest {
 
     @Test
     fun createShowUpNextIntent() {
-        val intent = ShowUpNextDeepLink.toIntent(context)
+        val intent = ShowUpNextModalDeepLink.toIntent(context)
 
         assertEquals(ACTION_VIEW, intent.action)
         assertEquals("upnext", intent.getStringExtra("launch-page"))
