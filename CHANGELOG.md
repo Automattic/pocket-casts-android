@@ -2,7 +2,7 @@
 -----
 *   Bug Fixes
     *   Fix episode sometimes not updating their metadata.
-        ([#3789](https://github.com/Automattic/pocket-casts-android/pull/3789))
+        ([#3867](https://github.com/Automattic/pocket-casts-android/pull/3867))
 
 7.86
 -----
