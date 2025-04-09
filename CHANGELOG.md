@@ -1,5 +1,8 @@
 7.87
 -----
+*   New Features
+    *   Add Greek locale support
+        ([#3864](https://github.com/Automattic/pocket-casts-android/pull/3864))
 *   Bug Fixes
     *   Fix episode sometimes not updating their metadata.
         ([#3867](https://github.com/Automattic/pocket-casts-android/pull/3867))
@@ -8,7 +11,7 @@
 -----
 *   New Features
     *   Add Creator Funding Support
-        ([#3840](https://github.com/Automattic/pocket-casts-ios/pull/3840))
+        ([#3840](https://github.com/Automattic/pocket-casts-android/pull/3840))
 *   Bug Fixes
     *   Fix share transcript text when API less than 33.
         ([#3789](https://github.com/Automattic/pocket-casts-android/pull/3789))
