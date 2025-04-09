@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.PodcastFolder
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
@@ -40,6 +41,7 @@ class FolderEditViewModel
     private val folderManager: FolderManager,
     private val settings: Settings,
     private val analyticsTracker: AnalyticsTracker,
+    private val notificationManager: NotificationManager,
 ) : ViewModel(), CoroutineScope {
 
     data class State(
@@ -307,6 +309,11 @@ class FolderEditViewModel
         properties[NUMBER_OF_PODCASTS_KEY] = state.value.selectedCount
         properties.putAll(props)
         analyticsTracker.track(analyticsEvent, properties)
+        viewModelScope.launch {
+            if (analyticsEvent == AnalyticsEvent.FOLDER_SAVED) {
+                notificationManager.trackFiltersInteractionFeature()
+            }
+        }
     }
 
     fun trackDismiss() {
