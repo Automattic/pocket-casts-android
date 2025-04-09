@@ -14,6 +14,8 @@ import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowFiltersDeepLink
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.R
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -34,13 +36,13 @@ class OnboardingNotificationWorker @AssistedInject constructor(
         val subcategory = inputData.getString("subcategory") ?: return Result.failure()
         val type = OnboardingNotificationType.fromSubcategory(subcategory) ?: return Result.failure()
 
-        if (!notificationManager.hasUserInteractedWithFeature(type)) {
+        if (notificationManager.hasUserInteractedWithFeature(type)) {
             return Result.failure()
         }
 
         val notification = getNotificationBuilder(type).build()
 
-        if (ActivityCompat.checkSelfPermission(applicationContext, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(applicationContext, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED && FeatureFlag.isEnabled(Feature.NOTIFICATIONS_REVAMP)) {
             NotificationManagerCompat.from(applicationContext).notify(type.notificationId, notification)
             notificationManager.trackOnboardingNotificationSent(type)
         }
