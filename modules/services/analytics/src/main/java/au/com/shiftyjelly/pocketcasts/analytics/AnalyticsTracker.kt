@@ -21,10 +21,6 @@ open class AnalyticsTracker(
         }
     }
 
-    fun newAbiChangeToTriggerRebuild() {
-        println("New ABI change to trigger rebuild")
-    }
-
     fun refreshMetadata() {
         trackers.forEach(Tracker::refreshMetadata)
     }
