@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.OrientationPreview
+import au.com.shiftyjelly.pocketcasts.compose.components.Banner
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -53,6 +54,8 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import java.util.Date
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
+import au.com.shiftyjelly.pocketcasts.images.R as IR
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 internal fun ProfilePage(
@@ -63,6 +66,8 @@ internal fun ProfilePage(
     onReferralsTooltipShown: () -> Unit,
     onSettingsClick: () -> Unit,
     onHeaderClick: () -> Unit,
+    onCreateFreeAccountBannerClick: () -> Unit,
+    onDismissCreateFreeAccountBannerClick: () -> Unit,
     onPlaybackClick: () -> Unit,
     onClaimReferralsClick: () -> Unit,
     onHideReferralsCardClick: () -> Unit,
@@ -105,6 +110,24 @@ internal fun ProfilePage(
                 )
                 item {
                     VerticalSpacer()
+                }
+                if (state.isFreeAccountBannerVisible) {
+                    item {
+                        Banner(
+                            title = stringResource(LR.string.encourage_account_sync_banner_title),
+                            description = stringResource(LR.string.encourage_account_sync_banner_description),
+                            actionLabel = stringResource(LR.string.encourage_account_banner_action_label),
+                            icon = painterResource(IR.drawable.ic_heart_2),
+                            onActionClick = onCreateFreeAccountBannerClick,
+                            onDismiss = onDismissCreateFreeAccountBannerClick,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = horizontalPadding),
+                        )
+                    }
+                    item {
+                        VerticalSpacer()
+                    }
                 }
                 if (state.isPlaybackEnabled) {
                     item {
@@ -192,6 +215,7 @@ internal data class ProfilePageState(
     val isSendReferralsEnabled: Boolean,
     val isPlaybackEnabled: Boolean,
     val isClaimReferralsEnabled: Boolean,
+    val isFreeAccountBannerVisible: Boolean,
     val isUpgradeBannerVisible: Boolean,
     val miniPlayerPadding: Dp,
     val headerState: ProfileHeaderState,
@@ -346,6 +370,7 @@ private fun ProfilePageStub(
             isPlaybackEnabled = true,
             isClaimReferralsEnabled = true,
             isUpgradeBannerVisible = true,
+            isFreeAccountBannerVisible = true,
             miniPlayerPadding = 64.dp,
             headerState = ProfileHeaderState(
                 email = "noreply@pocketcasts.com",
@@ -373,6 +398,8 @@ private fun ProfilePageStub(
         onReferralsTooltipShown = {},
         onSettingsClick = {},
         onHeaderClick = {},
+        onCreateFreeAccountBannerClick = {},
+        onDismissCreateFreeAccountBannerClick = {},
         onPlaybackClick = {},
         onSendReferralsClick = {},
         onHideReferralsCardClick = {},

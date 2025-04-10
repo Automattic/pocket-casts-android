@@ -57,6 +57,7 @@ class ProfileFragment : BaseFragment(), TopScrollable {
             isSendReferralsEnabled = FeatureFlag.isEnabled(Feature.REFERRALS_SEND),
             isPlaybackEnabled = profileViewModel.isPlaybackAvailable.collectAsState().value,
             isClaimReferralsEnabled = FeatureFlag.isEnabled(Feature.REFERRALS_CLAIM),
+            isFreeAccountBannerVisible = profileViewModel.isFreeAccountBannerVisible.collectAsState().value,
             isUpgradeBannerVisible = profileViewModel.showUpgradeBanner.collectAsState(false).value,
             miniPlayerPadding = profileViewModel.miniPlayerInset.collectAsState().value.pxToDp(requireContext()).dp,
             headerState = profileViewModel.profileHeaderState.collectAsState().value,
@@ -98,6 +99,15 @@ class ProfileFragment : BaseFragment(), TopScrollable {
                 } else {
                     OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.LoggedOut)
                 }
+            },
+            onCreateFreeAccountBannerClick = {
+                OnboardingLauncher.openOnboardingFlow(
+                    activity = requireActivity(),
+                    onboardingFlow = OnboardingFlow.Upsell(OnboardingUpgradeSource.PROFILE),
+                )
+            },
+            onDismissCreateFreeAccountBannerClick = {
+                profileViewModel.dismissFreeAccountBanner()
             },
             onPlaybackClick = {
                 profileViewModel.onPlaybackClick()
