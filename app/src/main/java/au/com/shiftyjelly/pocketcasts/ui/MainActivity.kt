@@ -1354,8 +1354,11 @@ class MainActivity :
                     openImport()
                 }
                 is StaffPicksDeepLink -> {
-                    closeToRoot()
-                    openTab(VR.id.navigation_discover)
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        openTab(VR.id.navigation_discover)
+                        val discoverFragment = supportFragmentManager.fragments.find { it is DiscoverFragment } as? DiscoverFragment
+                        discoverFragment?.openStaffPicks()
+                    }
                 }
                 is PlayFromSearchDeepLink -> {
                     playbackManager.mediaSessionManager.playFromSearchExternal(deepLink.query)

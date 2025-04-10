@@ -135,6 +135,7 @@ internal class DiscoverAdapter(
         fun onSelectCategory(category: DiscoverCategory)
         fun onDismissSelectedCategory(category: DiscoverCategory)
         fun onShowAllCategories()
+        fun openStaffPicks()
     }
 
     val loadPodcastList = { source: String ->

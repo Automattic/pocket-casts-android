@@ -28,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverEpisode
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRegion
+import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRow
 import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -169,6 +170,10 @@ class DiscoverFragment :
             .show(childFragmentManager, "categories_bottom_sheet")
     }
 
+    override fun openStaffPicks() {
+        viewModel.updateOpenStaffPicks(open = true)
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentDiscoverBinding.inflate(inflater, container, false)
         viewModel.onShown()
@@ -240,6 +245,19 @@ class DiscoverFragment :
                         val fragment = RegionSelectFragment.newInstance(feed.regionList, feed.selectedRegion)
                         (activity as FragmentHostListener).addFragment(fragment)
                         fragment.listener = this@DiscoverFragment
+                    }
+
+                    if (state.openStaffPicks) {
+                        val discoverRows = adapter?.currentList?.filterIsInstance<DiscoverRow>()
+                        val staffPicksRow: DiscoverRow? = discoverRows?.firstOrNull { it.listUuid == "staff-picks" }
+                        staffPicksRow?.let {
+                            view.post {
+                                val transformedList = viewModel.transformNetworkLoadableList(it, resources)
+                                val fragment = PodcastListFragment.newInstance(transformedList)
+                                (activity as FragmentHostListener).addFragment(fragment)
+                                viewModel.updateOpenStaffPicks(open = false)
+                            }
+                        }
                     }
                 }
             }
