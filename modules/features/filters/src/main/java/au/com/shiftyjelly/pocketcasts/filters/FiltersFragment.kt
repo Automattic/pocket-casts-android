@@ -49,7 +49,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
-import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.extensions.quickScrollToTop
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -130,7 +129,7 @@ class FiltersFragment :
                     onActionClick = {
                         OnboardingLauncher.openOnboardingFlow(
                             activity = requireActivity(),
-                            onboardingFlow = OnboardingFlow.Upsell(OnboardingUpgradeSource.FILTERS),
+                            onboardingFlow = OnboardingFlow.LoggedOut,
                         )
                     },
                     onDismiss = {

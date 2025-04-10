@@ -235,7 +235,6 @@ private fun Content(
                 OnboardingUpgradeSource.BOOKMARKS_SHELF_ACTION,
                 OnboardingUpgradeSource.END_OF_YEAR,
                 OnboardingUpgradeSource.FILES,
-                OnboardingUpgradeSource.FILTERS,
                 OnboardingUpgradeSource.FOLDERS,
                 OnboardingUpgradeSource.SUGGESTED_FOLDERS,
                 OnboardingUpgradeSource.FOLDERS_PODCAST_SCREEN,

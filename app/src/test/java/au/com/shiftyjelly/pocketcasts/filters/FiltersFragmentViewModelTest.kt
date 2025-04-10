@@ -8,7 +8,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManagerImpl.Companion.IN_PROGRESS_UUID
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManagerImpl.Companion.NEW_RELEASE_UUID
+import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import io.reactivex.Flowable
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -72,9 +74,14 @@ class FiltersFragmentViewModelTest {
         val episodeManager = mock<EpisodeManager>()
         val playbackManager = mock<PlaybackManager>()
         val tooltipMock = mock<UserSetting<Boolean>>()
+        val userManager = mock<UserManager>()
+        val bannerSetting = mock<UserSetting<Boolean>>()
 
         whenever(tooltipMock.flow).thenReturn(MutableStateFlow(tooltipValue))
         whenever(tooltipMock.value).thenReturn(tooltipValue)
+        whenever(userManager.getSignInState()).thenReturn(Flowable.empty())
+        whenever(settings.isFreeAccountFiltersBannerDismissed).thenReturn(bannerSetting)
+        whenever(bannerSetting.flow).thenReturn(MutableStateFlow(false))
 
         whenever(settings.showEmptyFiltersListTooltip).thenReturn(tooltipMock)
 
@@ -85,6 +92,6 @@ class FiltersFragmentViewModelTest {
             whenever(playlistManager.countEpisodesBlocking(1, episodeManager, playbackManager)).thenReturn(5)
         }
 
-        return FiltersFragmentViewModel(playlistManager, mock(), settings, episodeManager, playbackManager, mock())
+        return FiltersFragmentViewModel(playlistManager, mock(), settings, episodeManager, playbackManager, userManager)
     }
 }
