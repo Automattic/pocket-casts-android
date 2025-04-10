@@ -239,6 +239,7 @@ private fun Content(
                 OnboardingUpgradeSource.SUGGESTED_FOLDERS,
                 OnboardingUpgradeSource.FOLDERS_PODCAST_SCREEN,
                 OnboardingUpgradeSource.HEADPHONE_CONTROLS_SETTINGS,
+                OnboardingUpgradeSource.LISTENING_HISTORY,
                 OnboardingUpgradeSource.LOGIN,
                 OnboardingUpgradeSource.LOGIN_PLUS_PROMOTION,
                 OnboardingUpgradeSource.OVERFLOW_MENU,
