@@ -39,6 +39,7 @@ SUPPORTED_LOCALES = [
   { glotpress: 'ar', android: 'ar', promo_config: {} },
   { glotpress: 'ca', android: 'ca', promo_config: {} },
   { glotpress: 'de', android: 'de', promo_config: {} },
+  { glotpress: 'el', android: 'el', promo_config: {} },
   { glotpress: 'es', android: 'es', promo_config: {} },
   { glotpress: 'es', android: 'es-rMX', promo_config: {} },
   { glotpress: 'en-gb', android: 'en-rGB', promo_config: {} },
