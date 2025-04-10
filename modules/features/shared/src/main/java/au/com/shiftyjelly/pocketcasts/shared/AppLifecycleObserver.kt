@@ -5,15 +5,10 @@ import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
-import androidx.work.OneTimeWorkRequest
-import androidx.work.WorkManager
-import androidx.work.workDataOf
 import au.com.shiftyjelly.pocketcasts.analytics.AppLifecycleAnalytics
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
-import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationDelayCalculator
-import au.com.shiftyjelly.pocketcasts.repositories.notification.OnboardingNotificationType
-import au.com.shiftyjelly.pocketcasts.repositories.notification.OnboardingNotificationWorker
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationScheduler
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
@@ -22,12 +17,11 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.FirebaseRemote
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.PreferencesFeatureProvider
 import au.com.shiftyjelly.pocketcasts.utils.getVersionCode
 import dagger.hilt.android.qualifiers.ApplicationContext
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 
-class AppLifecycleObserver constructor(
+class AppLifecycleObserver(
     @ApplicationContext private val appContext: Context,
     private val appLifecycleAnalytics: AppLifecycleAnalytics,
     private val appLifecycleOwner: LifecycleOwner = ProcessLifecycleOwner.get(),
@@ -38,6 +32,7 @@ class AppLifecycleObserver constructor(
     private val versionCode: Int,
     private val preferencesFeatureProvider: PreferencesFeatureProvider,
     private val settings: Settings,
+    private val notificationScheduler: NotificationScheduler,
 ) : DefaultLifecycleObserver {
 
     @Inject
@@ -50,6 +45,7 @@ class AppLifecycleObserver constructor(
         firebaseRemoteFeatureProvider: FirebaseRemoteFeatureProvider,
         preferencesFeatureProvider: PreferencesFeatureProvider,
         settings: Settings,
+        notificationScheduler: NotificationScheduler,
     ) : this(
         appContext = appContext,
         applicationScope = applicationScope,
@@ -61,6 +57,7 @@ class AppLifecycleObserver constructor(
         versionCode = appContext.getVersionCode(),
         preferencesFeatureProvider = preferencesFeatureProvider,
         settings = settings,
+        notificationScheduler = notificationScheduler,
     )
 
     fun setup() {
@@ -131,7 +128,7 @@ class AppLifecycleObserver constructor(
                     // For new users we want to enable the daily reminders notification by default
                     settings.dailyRemindersNotification.set(true, updateModifiedAt = false)
 
-                    scheduleOnboardingNotifications(appContext)
+                    notificationScheduler.setupOnboardingNotifications()
                 }
             }
         } else if (previousVersionCode < versionCode) {
@@ -141,32 +138,4 @@ class AppLifecycleObserver constructor(
 
     @VisibleForTesting
     fun getAppPlatform() = Util.getAppPlatform(appContext)
-
-    private fun scheduleOnboardingNotifications(context: Context) {
-        val delayCalculator = NotificationDelayCalculator()
-
-        listOf(
-            OnboardingNotificationType.Sync,
-            OnboardingNotificationType.Import,
-            OnboardingNotificationType.UpNext,
-            OnboardingNotificationType.Filters,
-            OnboardingNotificationType.Themes,
-            OnboardingNotificationType.StaffPicks,
-            OnboardingNotificationType.PlusUpsell,
-        ).forEach { type ->
-            val delay = delayCalculator.calculateDelayForOnboardingNotification(type)
-
-            val workData = workDataOf(
-                "subcategory" to type.subcategory,
-            )
-
-            val notificationWork = OneTimeWorkRequest.Builder(OnboardingNotificationWorker::class.java)
-                .setInputData(workData)
-                .setInitialDelay(delay, TimeUnit.MILLISECONDS)
-                .addTag("onboarding_notification_${type.subcategory}")
-                .build()
-
-            WorkManager.getInstance(context).enqueue(notificationWork)
-        }
-    }
 }

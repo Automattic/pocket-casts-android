@@ -24,6 +24,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelp
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelperImpl
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManagerImpl
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationScheduler
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationSchedulerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.nova.ExternalDataManager
 import au.com.shiftyjelly.pocketcasts.repositories.nova.ExternalDataManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayerFactory
@@ -201,4 +203,7 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun provideNotificationManager(notificationManagerImpl: NotificationManagerImpl): NotificationManager
+
+    @Binds
+    abstract fun provideNotificationScheduler(notificationSchedulerImpl: NotificationSchedulerImpl): NotificationScheduler
 }
