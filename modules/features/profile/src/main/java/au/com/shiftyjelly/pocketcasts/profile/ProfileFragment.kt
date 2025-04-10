@@ -103,7 +103,7 @@ class ProfileFragment : BaseFragment(), TopScrollable {
             onCreateFreeAccountBannerClick = {
                 OnboardingLauncher.openOnboardingFlow(
                     activity = requireActivity(),
-                    onboardingFlow = OnboardingFlow.Upsell(OnboardingUpgradeSource.PROFILE),
+                    onboardingFlow = OnboardingFlow.LoggedOut,
                 )
             },
             onDismissCreateFreeAccountBannerClick = {
