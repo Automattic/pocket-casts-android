@@ -26,6 +26,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -35,6 +40,7 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.images.R as IR
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -96,7 +102,10 @@ fun Banner(
                         modifier = Modifier
                             .offset(x = -6.dp)
                             .clip(RoundedCornerShape(4.dp))
-                            .clickable(onClick = onActionClick)
+                            .clickable(
+                                onClick = onActionClick,
+                                role = Role.Button,
+                            )
                             .padding(6.dp),
                     )
                 }
@@ -117,6 +126,7 @@ fun Banner(
         CompositionLocalProvider(
             LocalRippleConfiguration provides RippleConfiguration(color = iconTint),
         ) {
+            val dismissText = stringResource(LR.string.dismiss)
             Box(
                 modifier = Modifier
                     .offset(x = 12.dp, y = -12.dp)
@@ -124,11 +134,12 @@ fun Banner(
                     .size(48.dp)
                     .clickable(
                         onClick = onDismiss,
+                        role = Role.Button,
                         indication = dismissRipple,
                         interactionSource = null,
-                    ),
-
-            )
+                    )
+                    .semantics { contentDescription = dismissText },
+                )
         }
     }
 }
