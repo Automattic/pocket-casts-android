@@ -139,7 +139,7 @@ fun Banner(
                         interactionSource = null,
                     )
                     .semantics { contentDescription = dismissText },
-                )
+            )
         }
     }
 }
