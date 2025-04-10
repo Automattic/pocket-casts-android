@@ -85,6 +85,6 @@ class FiltersFragmentViewModelTest {
             whenever(playlistManager.countEpisodesBlocking(1, episodeManager, playbackManager)).thenReturn(5)
         }
 
-        return FiltersFragmentViewModel(playlistManager, mock(), settings, episodeManager, playbackManager)
+        return FiltersFragmentViewModel(playlistManager, mock(), settings, episodeManager, playbackManager, mock())
     }
 }

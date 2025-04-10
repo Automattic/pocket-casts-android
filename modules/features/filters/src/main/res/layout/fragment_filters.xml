@@ -7,13 +7,20 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:importantForAccessibility="no">
+        android:importantForAccessibility="no"
+        android:orientation="vertical">
+
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?attr/secondary_ui_01" />
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/freeAccountBanner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"

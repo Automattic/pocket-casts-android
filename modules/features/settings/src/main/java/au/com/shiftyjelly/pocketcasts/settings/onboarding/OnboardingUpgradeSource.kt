@@ -9,6 +9,7 @@ enum class OnboardingUpgradeSource(val analyticsValue: String) {
     BOOKMARKS_SHELF_ACTION("bookmarks_shelf_action"),
     END_OF_YEAR("end_of_year"),
     FILES("files"),
+    FILTERS("filters"),
     FOLDERS("folders"),
     SUGGESTED_FOLDERS("suggested_folders"),
     FOLDERS_PODCAST_SCREEN("folders_podcast_screen"),

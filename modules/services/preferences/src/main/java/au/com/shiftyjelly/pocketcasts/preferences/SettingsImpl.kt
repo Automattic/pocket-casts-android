@@ -1622,4 +1622,10 @@ class SettingsImpl @Inject constructor(
         defaultValue = false,
         sharedPrefs = sharedPreferences,
     )
+
+    override val isFreeAccountFiltersBannerDismissed = UserSetting.BoolPref(
+        sharedPrefKey = "free_account_banner_dismissed_filters",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
 }

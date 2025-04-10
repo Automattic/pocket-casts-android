@@ -10,7 +10,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -21,6 +23,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.invisibleToUser
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
@@ -36,12 +40,16 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
+import au.com.shiftyjelly.pocketcasts.compose.components.Banner
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.filters.databinding.FragmentFiltersBinding
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.extensions.quickScrollToTop
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -54,6 +62,7 @@ import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
@@ -108,6 +117,38 @@ class FiltersFragment :
             navigationIcon = None,
         )
         binding.toolbar.setOnMenuItemClickListener(this)
+
+        binding.freeAccountBanner.setContentWithViewCompositionStrategy {
+            AppTheme(
+                themeType = theme.activeTheme,
+            ) {
+                Banner(
+                    title = stringResource(LR.string.encourage_account_filters_banner_title),
+                    description = stringResource(LR.string.encourage_account_filters_banner_description),
+                    actionLabel = stringResource(LR.string.encourage_account_banner_action_label),
+                    icon = painterResource(IR.drawable.ic_refresh),
+                    onActionClick = {
+                        OnboardingLauncher.openOnboardingFlow(
+                            activity = requireActivity(),
+                            onboardingFlow = OnboardingFlow.Upsell(OnboardingUpgradeSource.FILTERS),
+                        )
+                    },
+                    onDismiss = {
+                        viewModel.dismissFreeAccountBanner()
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                )
+            }
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.isFreeAccountBannerVisible.collect {
+                    binding.freeAccountBanner.isVisible = it
+                }
+            }
+        }
 
         val recyclerView = binding.recyclerView
         recyclerView.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
