@@ -62,10 +62,10 @@ import au.com.shiftyjelly.pocketcasts.settings.AutoDownloadSettingsFragment
 import au.com.shiftyjelly.pocketcasts.settings.ManualCleanupFragment
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
-import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.ManualCleanupViewModel
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
+import au.com.shiftyjelly.pocketcasts.utils.extensions.combine
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
@@ -82,6 +82,9 @@ import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelpe
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -288,8 +291,14 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
         if (mode is Mode.History) {
             viewLifecycleOwner.lifecycleScope.launch {
                 viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    viewModel.isFreeAccountBannerVisible.collect {
-                        binding?.freeAccountBanner?.isVisible = it
+                    combine(
+                        viewModel.isFreeAccountBannerVisible,
+                        viewModel.state.filterIsInstance<State.Loaded>().map {
+                            !it.results.isNullOrEmpty()
+                        },
+                        ::Pair,
+                    ).collect { (showBanner, hasAnyEpisodes) ->
+                        binding?.freeAccountBanner?.isVisible = showBanner && hasAnyEpisodes
                     }
                 }
             }
@@ -305,7 +314,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
                         onActionClick = {
                             OnboardingLauncher.openOnboardingFlow(
                                 activity = requireActivity(),
-                                onboardingFlow = OnboardingFlow.Upsell(OnboardingUpgradeSource.LISTENING_HISTORY),
+                                onboardingFlow = OnboardingFlow.LoggedOut,
                             )
                         },
                         onDismiss = {
