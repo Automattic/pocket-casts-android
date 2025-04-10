@@ -78,6 +78,7 @@ import au.com.shiftyjelly.pocketcasts.deeplink.ShowUpNextModalDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowUpNextTabDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.SignInDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.SonosDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.StaffPicksDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ThemesDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.UpgradeAccountDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.UpsellDeepLink
@@ -1351,6 +1352,10 @@ class MainActivity :
                 }
                 is ImportDeepLink -> {
                     openImport()
+                }
+                is StaffPicksDeepLink -> {
+                    closeToRoot()
+                    openTab(VR.id.navigation_discover)
                 }
                 is PlayFromSearchDeepLink -> {
                     playbackManager.mediaSessionManager.playFromSearchExternal(deepLink.query)
