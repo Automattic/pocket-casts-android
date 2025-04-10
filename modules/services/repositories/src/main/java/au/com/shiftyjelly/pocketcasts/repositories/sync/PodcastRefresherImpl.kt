@@ -8,8 +8,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import au.com.shiftyjelly.pocketcasts.servers.extensions.notModified
-import au.com.shiftyjelly.pocketcasts.servers.extensions.wasCached
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import au.com.shiftyjelly.pocketcasts.utils.DateUtil
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -29,13 +27,6 @@ class PodcastRefresherImpl @Inject constructor(
         try {
             val podcastResponse = cacheServiceManager.getPodcastResponse(existingPodcast.uuid)
             val updatedPodcast = podcastResponse.body()?.toPodcast()
-            val isFundingUrlSame = updatedPodcast?.fundingUrl == existingPodcast.fundingUrl
-
-            // unsubscribed podcasts have episodes removed, so always refresh them
-            if (existingPodcast.isSubscribed && isFundingUrlSame && (podcastResponse.wasCached() || podcastResponse.notModified())) {
-                LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refreshing podcast ${existingPodcast.uuid} not required as cached")
-                return
-            }
 
             if (updatedPodcast == null) {
                 LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Refreshing podcast ${existingPodcast.uuid} not required as no response")
@@ -62,16 +53,9 @@ class PodcastRefresherImpl @Inject constructor(
                     val originalEpisode = existingEpisode.copy()
                     existingEpisode.title = newEpisode.title
                     existingEpisode.downloadUrl = newEpisode.downloadUrl
-                    // as new episodes are added a task is run to get the content type and file size from the server file as it is more reliable
-                    if (existingEpisode.fileType.isNullOrBlank()) {
-                        existingEpisode.fileType = newEpisode.fileType
-                    }
-                    if (existingEpisode.sizeInBytes <= 0) {
-                        existingEpisode.sizeInBytes = newEpisode.sizeInBytes
-                    }
-                    if (existingEpisode.duration <= 0) {
-                        existingEpisode.duration = newEpisode.duration
-                    }
+                    existingEpisode.fileType = newEpisode.fileType
+                    existingEpisode.sizeInBytes = newEpisode.sizeInBytes
+                    existingEpisode.duration = newEpisode.duration
                     existingEpisode.publishedDate = newEpisode.publishedDate
                     existingEpisode.season = newEpisode.season
                     existingEpisode.number = newEpisode.number
