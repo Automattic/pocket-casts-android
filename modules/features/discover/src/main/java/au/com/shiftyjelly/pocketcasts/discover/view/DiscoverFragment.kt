@@ -22,12 +22,15 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFrag
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastFragment
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.categories.CategoriesManager
+import au.com.shiftyjelly.pocketcasts.repositories.discover.DiscoverDeepLinkNavigation
+import au.com.shiftyjelly.pocketcasts.repositories.discover.DiscoverDeepLinkNavigation.Destination
 import au.com.shiftyjelly.pocketcasts.search.SearchFragment
 import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServiceManagerImpl
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverEpisode
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRegion
+import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRow
 import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -51,6 +54,8 @@ class DiscoverFragment :
     @Inject lateinit var staticServiceManager: StaticServiceManagerImpl
 
     @Inject lateinit var analyticsTracker: AnalyticsTracker
+
+    @Inject lateinit var discoverDeepLinkNavigation: DiscoverDeepLinkNavigation
 
     private val viewModel: DiscoverViewModel by viewModels()
     private var adapter: DiscoverAdapter? = null
@@ -231,6 +236,18 @@ class DiscoverFragment :
                             displayedCategoryId = newCategoryId
                             if (newCategoryId != null) {
                                 trackCategoryShownImpression(state.categoryFeed.category)
+                            }
+                        }
+
+                        discoverDeepLinkNavigation.pendingDestination.collect { list ->
+                            if (list == Destination.StaffPicks) {
+                                val discoverRows = adapter?.currentList?.filterIsInstance<DiscoverRow>()
+                                val staffPicksRow = discoverRows?.firstOrNull { it.listUuid == "staff-picks" }
+                                staffPicksRow?.let {
+                                    val transformedList = viewModel.transformNetworkLoadableList(it, resources)
+                                    val fragment = PodcastListFragment.newInstance(transformedList)
+                                    (activity as FragmentHostListener).addFragment(fragment)
+                                }
                             }
                         }
                     }

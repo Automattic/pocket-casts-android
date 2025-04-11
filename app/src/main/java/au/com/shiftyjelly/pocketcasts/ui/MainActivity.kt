@@ -78,6 +78,7 @@ import au.com.shiftyjelly.pocketcasts.deeplink.ShowUpNextModalDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowUpNextTabDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.SignInDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.SonosDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.StaffPicksDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ThemesDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.UpgradeAccountDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.UpsellDeepLink
@@ -118,6 +119,8 @@ import au.com.shiftyjelly.pocketcasts.referrals.ReferralsGuestPassFragment
 import au.com.shiftyjelly.pocketcasts.repositories.bumpstats.BumpStatsTask
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.di.NotificationPermissionChecker
+import au.com.shiftyjelly.pocketcasts.repositories.discover.DiscoverDeepLinkNavigation
+import au.com.shiftyjelly.pocketcasts.repositories.discover.DiscoverDeepLinkNavigation.Destination
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.opml.OpmlImportTask
@@ -249,6 +252,8 @@ class MainActivity :
     lateinit var applicationScope: CoroutineScope
 
     @Inject lateinit var crashLogging: CrashLogging
+
+    @Inject lateinit var discoverDeepLinkNavigation: DiscoverDeepLinkNavigation
 
     private val viewModel: MainActivityViewModel by viewModels()
     private val disposables = CompositeDisposable()
@@ -1351,6 +1356,10 @@ class MainActivity :
                 }
                 is ImportDeepLink -> {
                     openImport()
+                }
+                is StaffPicksDeepLink -> {
+                    openTab(VR.id.navigation_discover)
+                    discoverDeepLinkNavigation.navigateTo(Destination.StaffPicks)
                 }
                 is PlayFromSearchDeepLink -> {
                     playbackManager.mediaSessionManager.playFromSearchExternal(deepLink.query)
