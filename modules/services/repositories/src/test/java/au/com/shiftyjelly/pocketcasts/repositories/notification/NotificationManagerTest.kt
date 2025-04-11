@@ -32,7 +32,7 @@ class NotificationManagerTest {
     fun `should setup onboarding notifications`() = runTest {
         val insertedIds = OnboardingNotificationType.values.map { it.notificationId }
 
-        notificationManager.setupOnboardingNotificationsChannels()
+        notificationManager.setupOnboardingNotifications()
 
         val userNotificationsCaptor = argumentCaptor<List<UserNotifications>>()
         verify(userNotificationsDao).insert(userNotificationsCaptor.capture())

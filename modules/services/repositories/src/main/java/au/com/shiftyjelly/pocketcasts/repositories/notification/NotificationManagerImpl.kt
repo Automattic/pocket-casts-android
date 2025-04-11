@@ -8,7 +8,7 @@ class NotificationManagerImpl @Inject constructor(
     private val userNotificationsDao: UserNotificationsDao,
 ) : NotificationManager {
 
-    override suspend fun setupOnboardingNotificationsChannels() {
+    override suspend fun setupOnboardingNotifications() {
         val userNotifications = OnboardingNotificationType.values.map { notification ->
             UserNotifications(notificationId = notification.notificationId)
         }

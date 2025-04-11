@@ -187,7 +187,7 @@ class PocketCastsApplication : Application(), Configuration.Provider {
             appIcon.enableSelectedAlias(appIcon.activeAppIcon)
 
             notificationHelper.setupNotificationChannels()
-            notificationManager.setupOnboardingNotificationsChannels()
+            notificationManager.setupOnboardingNotifications()
             appLifecycleObserver.setup()
 
             Coil.setImageLoader(coilImageLoader)
