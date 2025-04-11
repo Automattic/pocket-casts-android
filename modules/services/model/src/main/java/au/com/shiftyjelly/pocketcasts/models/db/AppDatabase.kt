@@ -25,7 +25,6 @@ import au.com.shiftyjelly.pocketcasts.models.converter.EpisodePlayingStatusConve
 import au.com.shiftyjelly.pocketcasts.models.converter.EpisodeStatusEnumConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.EpisodesSortTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.InstantConverter
-import au.com.shiftyjelly.pocketcasts.models.converter.NotificationCategoryConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.PodcastAutoUpNextConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.PodcastGroupingTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.PodcastLicensingEnumConverter
@@ -56,7 +55,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.CuratedPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
-import au.com.shiftyjelly.pocketcasts.models.entity.Notifications
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -97,7 +95,6 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         Transcript::class,
         UserPodcastRating::class,
         UpNextHistory::class,
-        Notifications::class,
         UserNotifications::class,
     ],
     version = 114,
@@ -128,7 +125,6 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
     PodcastGroupingTypeConverter::class,
     ChapterIndicesConverter::class,
     InstantConverter::class,
-    NotificationCategoryConverter::class,
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun podcastDao(): PodcastDao
@@ -1001,25 +997,10 @@ abstract class AppDatabase : RoomDatabase() {
                 try {
                     execSQL(
                         """
-                        CREATE TABLE IF NOT EXISTS notifications(
-                            _id INTEGER PRIMARY KEY AUTOINCREMENT,
-                            category INTEGER NOT NULL,
-                            subcategory TEXT NOT NULL
-                        )
-                        """.trimIndent(),
-                    )
-                    execSQL(
-                        """
-                        CREATE UNIQUE INDEX IF NOT EXISTS index_notification_category_subcategory ON notifications (category, subcategory)
-                        """.trimIndent(),
-                    )
-                    execSQL(
-                        """
                         CREATE TABLE IF NOT EXISTS user_notifications (
-                            user_id TEXT NOT NULL PRIMARY KEY,
-                            notification_id INTEGER NOT NULL,
-                            sent_this_week INTEGER NOT NULL,
-                            last_sent_at INTEGER NOT NULL,
+                            notification_id INTEGER NOT NULL PRIMARY KEY,
+                            sent_this_week INTEGER NOT NULL DEFAULT 0,
+                            last_sent_at INTEGER NOT NULL DEFAULT 0,
                             interacted_at INTEGER
                         )
                         """.trimIndent(),
