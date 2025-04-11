@@ -50,6 +50,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextChangeDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextHistoryDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UserEpisodeDao
+import au.com.shiftyjelly.pocketcasts.models.db.dao.UserNotificationsDao
 import au.com.shiftyjelly.pocketcasts.models.entity.AnonymousBumpStat
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
@@ -144,6 +145,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun externalDataDao(): ExternalDataDao
     abstract fun endOfYearDao(): EndOfYearDao
     abstract fun upNextHistoryDao(): UpNextHistoryDao
+    abstract fun userNotificationsDao(): UserNotificationsDao
 
     fun databaseFiles() =
         openHelper.readableDatabase.path?.let {

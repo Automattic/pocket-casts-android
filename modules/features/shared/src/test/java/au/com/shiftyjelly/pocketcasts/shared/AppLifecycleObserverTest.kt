@@ -6,6 +6,7 @@ import androidx.lifecycle.LifecycleOwner
 import au.com.shiftyjelly.pocketcasts.analytics.AppLifecycleAnalytics
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationScheduler
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.DefaultReleaseFeatureProvider
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.FirebaseRemoteFeatureProvider
@@ -22,6 +23,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.never
 import org.mockito.kotlin.spy
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -63,6 +65,8 @@ class AppLifecycleObserverTest {
 
     @Mock private lateinit var networkConnectionWatcher: NetworkConnectionWatcherImpl
 
+    @Mock private lateinit var notificationScheduler: NotificationScheduler
+
     lateinit var appLifecycleObserver: AppLifecycleObserver
 
     @Before
@@ -87,6 +91,7 @@ class AppLifecycleObserverTest {
             settings = settings,
             networkConnectionWatcher = networkConnectionWatcher,
             applicationScope = CoroutineScope(Dispatchers.Default),
+            notificationScheduler = notificationScheduler,
         )
     }
 
@@ -108,6 +113,7 @@ class AppLifecycleObserverTest {
         verify(useUpNextDarkThemeSetting).set(false, updateModifiedAt = false)
 
         verify(appLifecycleAnalytics, never()).onApplicationUpgrade(any())
+        verify(notificationScheduler, times(1)).setupOnboardingNotifications()
     }
 
     @Test
@@ -126,6 +132,7 @@ class AppLifecycleObserverTest {
         verify(dailyRemindersNotificationSetting, never()).set(any(), any(), any(), any())
         verify(useUpNextDarkThemeSetting).set(false, updateModifiedAt = false)
         verify(appLifecycleAnalytics, never()).onApplicationUpgrade(any())
+        verify(notificationScheduler, never()).setupOnboardingNotifications()
     }
 
     @Test
@@ -144,6 +151,7 @@ class AppLifecycleObserverTest {
         verify(dailyRemindersNotificationSetting, never()).set(any(), any(), any(), any())
         verify(useUpNextDarkThemeSetting).set(false, updateModifiedAt = false)
         verify(appLifecycleAnalytics, never()).onApplicationUpgrade(any())
+        verify(notificationScheduler, never()).setupOnboardingNotifications()
     }
 
     /* UPGRADE */
@@ -161,5 +169,6 @@ class AppLifecycleObserverTest {
         verify(autoDownloadOnFollowPodcastSetting, never()).set(any(), any(), any(), any())
         verify(dailyRemindersNotificationSetting, never()).set(any(), any(), any(), any())
         verify(useUpNextDarkThemeSetting, never()).set(any(), any(), any(), any())
+        verify(notificationScheduler, never()).setupOnboardingNotifications()
     }
 }
