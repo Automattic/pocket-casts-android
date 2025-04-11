@@ -71,7 +71,6 @@ class DiscoverViewModel @Inject constructor(
             categoryFeed = null,
             isLoading = true,
             isError = false,
-            openStaffPicks = false,
         ),
     )
     internal val state = _state.asStateFlow()
@@ -308,10 +307,6 @@ class DiscoverViewModel @Inject constructor(
         playbackManager.stopAsync(sourceView = sourceView)
     }
 
-    fun updateOpenStaffPicks(open: Boolean) {
-        _state.update { it.copy(openStaffPicks = open) }
-    }
-
     internal fun getCategoryAdRow(category: DiscoverCategory): CategoryAdRow? {
         return adsForCategoryView.firstOrNull { it.categoryId == category.id }?.let { row ->
             CategoryAdRow(
@@ -329,7 +324,6 @@ internal data class DiscoverState(
     val categoryFeed: CategoryFeed?,
     val isLoading: Boolean,
     val isError: Boolean,
-    val openStaffPicks: Boolean,
 ) {
     val rows: List<Any>? get() = discoverFeed?.let { discover ->
         if (categoryFeed == null) {

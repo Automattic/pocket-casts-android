@@ -22,6 +22,8 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFrag
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastFragment
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.categories.CategoriesManager
+import au.com.shiftyjelly.pocketcasts.repositories.discover.DiscoverDeepLinkNavigation
+import au.com.shiftyjelly.pocketcasts.repositories.discover.DiscoverDeepLinkNavigation.Destination
 import au.com.shiftyjelly.pocketcasts.search.SearchFragment
 import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServiceManagerImpl
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
@@ -52,6 +54,8 @@ class DiscoverFragment :
     @Inject lateinit var staticServiceManager: StaticServiceManagerImpl
 
     @Inject lateinit var analyticsTracker: AnalyticsTracker
+
+    @Inject lateinit var discoverDeepLinkNavigation: DiscoverDeepLinkNavigation
 
     private val viewModel: DiscoverViewModel by viewModels()
     private var adapter: DiscoverAdapter? = null
@@ -170,10 +174,6 @@ class DiscoverFragment :
             .show(childFragmentManager, "categories_bottom_sheet")
     }
 
-    override fun openStaffPicks() {
-        viewModel.updateOpenStaffPicks(open = true)
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentDiscoverBinding.inflate(inflater, container, false)
         viewModel.onShown()
@@ -238,6 +238,18 @@ class DiscoverFragment :
                                 trackCategoryShownImpression(state.categoryFeed.category)
                             }
                         }
+
+                        discoverDeepLinkNavigation.pendingDestination.collect { list ->
+                            if (list == Destination.StaffPicks) {
+                                val discoverRows = adapter?.currentList?.filterIsInstance<DiscoverRow>()
+                                val staffPicksRow = discoverRows?.firstOrNull { it.listUuid == "staff-picks" }
+                                staffPicksRow?.let {
+                                    val transformedList = viewModel.transformNetworkLoadableList(it, resources)
+                                    val fragment = PodcastListFragment.newInstance(transformedList)
+                                    (activity as FragmentHostListener).addFragment(fragment)
+                                }
+                            }
+                        }
                     }
 
                     val feed = state.discoverFeed ?: return@collect
@@ -245,19 +257,6 @@ class DiscoverFragment :
                         val fragment = RegionSelectFragment.newInstance(feed.regionList, feed.selectedRegion)
                         (activity as FragmentHostListener).addFragment(fragment)
                         fragment.listener = this@DiscoverFragment
-                    }
-
-                    if (state.openStaffPicks) {
-                        val discoverRows = adapter?.currentList?.filterIsInstance<DiscoverRow>()
-                        val staffPicksRow: DiscoverRow? = discoverRows?.firstOrNull { it.listUuid == "staff-picks" }
-                        staffPicksRow?.let {
-                            view.post {
-                                val transformedList = viewModel.transformNetworkLoadableList(it, resources)
-                                val fragment = PodcastListFragment.newInstance(transformedList)
-                                (activity as FragmentHostListener).addFragment(fragment)
-                                viewModel.updateOpenStaffPicks(open = false)
-                            }
-                        }
                     }
                 }
             }

@@ -119,6 +119,8 @@ import au.com.shiftyjelly.pocketcasts.referrals.ReferralsGuestPassFragment
 import au.com.shiftyjelly.pocketcasts.repositories.bumpstats.BumpStatsTask
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.di.NotificationPermissionChecker
+import au.com.shiftyjelly.pocketcasts.repositories.discover.DiscoverDeepLinkNavigation
+import au.com.shiftyjelly.pocketcasts.repositories.discover.DiscoverDeepLinkNavigation.Destination
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.opml.OpmlImportTask
@@ -250,6 +252,8 @@ class MainActivity :
     lateinit var applicationScope: CoroutineScope
 
     @Inject lateinit var crashLogging: CrashLogging
+
+    @Inject lateinit var discoverDeepLinkNavigation: DiscoverDeepLinkNavigation
 
     private val viewModel: MainActivityViewModel by viewModels()
     private val disposables = CompositeDisposable()
@@ -1354,11 +1358,8 @@ class MainActivity :
                     openImport()
                 }
                 is StaffPicksDeepLink -> {
-                    lifecycleScope.launch(Dispatchers.Main) {
-                        openTab(VR.id.navigation_discover)
-                        val discoverFragment = supportFragmentManager.fragments.find { it is DiscoverFragment } as? DiscoverFragment
-                        discoverFragment?.openStaffPicks()
-                    }
+                    openTab(VR.id.navigation_discover)
+                    discoverDeepLinkNavigation.navigateTo(Destination.StaffPicks)
                 }
                 is PlayFromSearchDeepLink -> {
                     playbackManager.mediaSessionManager.playFromSearchExternal(deepLink.query)
