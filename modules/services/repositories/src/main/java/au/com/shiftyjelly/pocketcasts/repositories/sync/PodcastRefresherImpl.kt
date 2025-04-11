@@ -27,13 +27,6 @@ class PodcastRefresherImpl @Inject constructor(
         try {
             val podcastResponse = cacheServiceManager.getPodcastResponse(existingPodcast.uuid)
             val updatedPodcast = podcastResponse.body()?.toPodcast()
-            val isFundingUrlSame = updatedPodcast?.fundingUrl == existingPodcast.fundingUrl
-
-            // unsubscribed podcasts have episodes removed, so always refresh them
-            if (existingPodcast.isSubscribed && isFundingUrlSame && (podcastResponse.wasCached() || podcastResponse.notModified())) {
-                LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refreshing podcast ${existingPodcast.uuid} not required as cached")
-                return
-            }
 
             if (updatedPodcast == null) {
                 LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Refreshing podcast ${existingPodcast.uuid} not required as no response")
