@@ -7,13 +7,10 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.Toolbar
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
@@ -181,12 +178,8 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                 EmptyState(
                     title = stringResource(LR.string.profile_files_empty_title),
                     subtitle = stringResource(LR.string.profile_files_empty_summary),
-                    iconResourcerId = IR.drawable.ic_file,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 32.dp)
-                        .padding(vertical = 8.dp)
-                        .verticalScroll(rememberScrollState()),
+                    iconResourceId = IR.drawable.ic_file,
+                    modifier = Modifier.verticalScroll(rememberScrollState()),
                 )
             }
         }

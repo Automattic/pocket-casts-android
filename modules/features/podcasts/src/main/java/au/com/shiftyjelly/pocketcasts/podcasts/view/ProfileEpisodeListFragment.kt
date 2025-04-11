@@ -10,7 +10,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -478,17 +477,13 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
                     EmptyState(
                         title = stringResource(state.titleRes),
                         subtitle = stringResource(state.summaryRes),
-                        iconResourcerId = state.iconRes,
+                        iconResourceId = state.iconRes,
                         buttonText = buttonText,
                         onButtonClick = {
                             analyticsTracker.track(AnalyticsEvent.LISTENING_HISTORY_DISCOVER_BUTTON_TAPPED)
                             (activity as FragmentHostListener).openTab(VR.id.navigation_discover)
                         },
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = 32.dp)
-                            .padding(vertical = 8.dp)
-                            .verticalScroll(rememberScrollState()),
+                        modifier = Modifier.verticalScroll(rememberScrollState()),
                     )
                 }
             }

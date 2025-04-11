@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -148,6 +149,7 @@ private fun Content(
     isDarkTheme: Boolean,
 ) {
     Box(
+        contentAlignment = Alignment.Center,
         modifier = Modifier
             .background(color = backgroundColor)
             .padding(bottom = if (sourceView == SourceView.PROFILE) 0.dp else 28.dp),
@@ -170,29 +172,23 @@ private fun Content(
             is UiState.Empty -> EmptyState(
                 title = stringResource(LR.string.bookmarks_empty_state_title),
                 subtitle = stringResource(LR.string.bookmarks_paid_user_empty_state_message),
-                iconResourcerId = IR.drawable.ic_bookmark,
+                iconResourceId = IR.drawable.ic_bookmark,
                 buttonText = stringResource(LR.string.bookmarks_headphone_settings),
                 onButtonClick = {
                     onHeadphoneControlsButtonTapped()
                     openFragment(HeadphoneControlsSettingsFragment())
                 },
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 32.dp)
-                    .verticalScroll(rememberScrollState()),
+                modifier = Modifier.verticalScroll(rememberScrollState()),
             )
             is UiState.Upsell -> EmptyState(
                 title = stringResource(LR.string.bookmarks_empty_state_title),
                 subtitle = stringResource(LR.string.bookmarks_free_user_empty_state_message),
-                iconResourcerId = IR.drawable.ic_bookmark,
+                iconResourceId = IR.drawable.ic_bookmark,
                 buttonText = stringResource(LR.string.bookmarks_free_user_empty_state_button),
                 onButtonClick = {
                     onUpgradeClicked.invoke()
                 },
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 32.dp)
-                    .verticalScroll(rememberScrollState()),
+                modifier = Modifier.verticalScroll(rememberScrollState()),
             )
         }
     }
