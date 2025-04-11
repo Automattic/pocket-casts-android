@@ -43,7 +43,10 @@ class NotificationManagerImpl @Inject constructor(
         val filtersNotification = notificationsDao.getNotificationBySubcategory(type.subcategory)
             ?: return false
 
-        val userNotification = userNotificationsDao.getUserNotification(filtersNotification.id!!.toInt())
+        val notificationId = filtersNotification.id?.toInt()
+            ?: return false
+
+        val userNotification = userNotificationsDao.getUserNotification(notificationId)
             ?: return false
 
         return userNotification.interactedAt != null
@@ -51,16 +54,15 @@ class NotificationManagerImpl @Inject constructor(
 
     override suspend fun updateOnboardingNotificationSent(type: OnboardingNotificationType) {
         val filterNotification = notificationsDao.getNotificationBySubcategory(type.subcategory)
-        if (filterNotification != null && filterNotification.id != null) {
-            val notifId = filterNotification.id!!.toInt()
 
-            val userNotification = userNotificationsDao.getUserNotification(notifId)
-            if (userNotification != null) {
-                userNotification.sentThisWeek += 1
-                userNotification.lastSentAt = System.currentTimeMillis()
+        val notificationId = filterNotification?.id?.toInt()
+            ?: return
 
-                userNotificationsDao.update(userNotification)
+        userNotificationsDao.getUserNotification(notificationId)
+            ?.apply {
+                sentThisWeek++
+                lastSentAt = System.currentTimeMillis()
             }
-        }
+            ?.let { userNotificationsDao.update(it) }
     }
 }
