@@ -8,6 +8,7 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import au.com.shiftyjelly.pocketcasts.analytics.AppLifecycleAnalytics
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationScheduler
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
@@ -20,7 +21,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 
-class AppLifecycleObserver constructor(
+class AppLifecycleObserver(
     @ApplicationContext private val appContext: Context,
     private val appLifecycleAnalytics: AppLifecycleAnalytics,
     private val appLifecycleOwner: LifecycleOwner = ProcessLifecycleOwner.get(),
@@ -31,6 +32,7 @@ class AppLifecycleObserver constructor(
     private val versionCode: Int,
     private val preferencesFeatureProvider: PreferencesFeatureProvider,
     private val settings: Settings,
+    private val notificationScheduler: NotificationScheduler,
 ) : DefaultLifecycleObserver {
 
     @Inject
@@ -43,6 +45,7 @@ class AppLifecycleObserver constructor(
         firebaseRemoteFeatureProvider: FirebaseRemoteFeatureProvider,
         preferencesFeatureProvider: PreferencesFeatureProvider,
         settings: Settings,
+        notificationScheduler: NotificationScheduler,
     ) : this(
         appContext = appContext,
         applicationScope = applicationScope,
@@ -54,6 +57,7 @@ class AppLifecycleObserver constructor(
         versionCode = appContext.getVersionCode(),
         preferencesFeatureProvider = preferencesFeatureProvider,
         settings = settings,
+        notificationScheduler = notificationScheduler,
     )
 
     fun setup() {
@@ -123,6 +127,8 @@ class AppLifecycleObserver constructor(
 
                     // For new users we want to enable the daily reminders notification by default
                     settings.dailyRemindersNotification.set(true, updateModifiedAt = false)
+
+                    notificationScheduler.setupOnboardingNotifications()
                 }
             }
         } else if (previousVersionCode < versionCode) {
