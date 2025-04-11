@@ -132,12 +132,8 @@ class FiltersFragment :
             viewModel.adapterState = it.toMutableList()
             adapter.submitList(it)
 
-            viewLifecycleOwner.lifecycleScope.launch {
-                if (viewModel.shouldShowTooltip(adapter.currentList)) {
-                    binding.toolbar.post {
-                        showTooltip()
-                    }
-                }
+            viewModel.shouldShowTooltip(adapter.currentList) {
+                showTooltip()
             }
         }
 

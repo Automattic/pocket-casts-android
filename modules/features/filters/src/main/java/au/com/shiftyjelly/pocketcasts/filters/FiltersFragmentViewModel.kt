@@ -102,19 +102,30 @@ class FiltersFragmentViewModel @Inject constructor(
         analyticsTracker.track(AnalyticsEvent.FILTER_TOOLTIP_SHOWN)
     }
 
-    suspend fun shouldShowTooltip(filters: List<Playlist>): Boolean {
-        if (!settings.showEmptyFiltersListTooltip.value) return false
-        if (filters.size > 2) return false
+    fun shouldShowTooltip(filters: List<Playlist>, onShowTooltip: () -> Unit) {
+        viewModelScope.launch {
+            shouldShowTooltipSuspend(filters, onShowTooltip)
+        }
+    }
+
+    suspend fun shouldShowTooltipSuspend(filters: List<Playlist>, onShowTooltip: () -> Unit) {
+        if (!settings.showEmptyFiltersListTooltip.value) return
+        if (filters.size > 2) return
 
         val requiredUuids = setOf(NEW_RELEASE_UUID, IN_PROGRESS_UUID)
         val filterUuids = filters.map { it.uuid }.toSet()
 
-        if (filterUuids != requiredUuids) return false
+        if (filterUuids != requiredUuids) return
 
-        return withContext(Dispatchers.IO) {
-            filters.all { playlist ->
+        withContext(Dispatchers.IO) {
+            val showTooltip = filters.all { playlist ->
                 val episodeCount = playlistManager.countEpisodesBlocking(playlist.id, episodeManager, playbackManager)
                 episodeCount == 0
+            }
+            if (showTooltip) {
+                withContext(Dispatchers.Main) {
+                    onShowTooltip()
+                }
             }
         }
     }
