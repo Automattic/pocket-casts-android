@@ -6,6 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.AppsFlyerAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -28,6 +29,7 @@ class OnboardingLoginOrSignUpViewModel @Inject constructor(
     @ApplicationContext context: Context,
     private val podcastManager: PodcastManager,
     private val userAnalyticsSettings: UserAnalyticsSettings,
+    private val appsFlyerAnalyticsTracker: AppsFlyerAnalyticsTracker,
     settings: Settings,
 ) : AndroidViewModel(context as Application) {
 
@@ -82,6 +84,10 @@ class OnboardingLoginOrSignUpViewModel @Inject constructor(
 
     fun updateTrackingConsent(consent: Boolean) {
         userAnalyticsSettings.updateAnalyticsThirdPartySetting(consent)
+        // As we need consent to be set before we start tracking, we need to track the install event here
+        if (consent) {
+            appsFlyerAnalyticsTracker.track(AnalyticsEvent.APPLICATION_INSTALLED)
+        }
     }
 
     companion object {
