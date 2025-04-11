@@ -44,7 +44,7 @@ class OnboardingNotificationWorker @AssistedInject constructor(
 
         if (ActivityCompat.checkSelfPermission(applicationContext, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED && FeatureFlag.isEnabled(Feature.NOTIFICATIONS_REVAMP)) {
             NotificationManagerCompat.from(applicationContext).notify(type.notificationId, notification)
-            notificationManager.trackOnboardingNotificationSent(type)
+            notificationManager.updateOnboardingNotificationSent(type)
         }
 
         return Result.success()

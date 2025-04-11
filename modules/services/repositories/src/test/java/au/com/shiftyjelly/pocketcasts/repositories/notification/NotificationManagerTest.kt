@@ -139,7 +139,7 @@ class NotificationManagerTest {
         )
         whenever(userNotificationsDao.getUserNotification(4)).thenReturn(initialUserNotification)
 
-        notificationManager.trackOnboardingNotificationSent(OnboardingNotificationType.Filters)
+        notificationManager.updateOnboardingNotificationSent(OnboardingNotificationType.Filters)
 
         val userNotificationCaptor = argumentCaptor<UserNotifications>()
         verify(userNotificationsDao).update(userNotificationCaptor.capture())
@@ -154,7 +154,7 @@ class NotificationManagerTest {
         whenever(notificationsDao.getNotificationBySubcategory(OnboardingNotificationType.SUBCATEGORY_FILTERS))
             .thenReturn(null)
 
-        notificationManager.trackOnboardingNotificationSent(OnboardingNotificationType.Filters)
+        notificationManager.updateOnboardingNotificationSent(OnboardingNotificationType.Filters)
 
         verify(userNotificationsDao, never()).update(any())
     }
@@ -172,7 +172,7 @@ class NotificationManagerTest {
 
         whenever(userNotificationsDao.getUserNotification(4)).thenReturn(null)
 
-        notificationManager.trackOnboardingNotificationSent(OnboardingNotificationType.Filters)
+        notificationManager.updateOnboardingNotificationSent(OnboardingNotificationType.Filters)
 
         verify(userNotificationsDao, never()).update(any())
     }
