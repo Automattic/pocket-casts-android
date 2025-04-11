@@ -36,6 +36,7 @@
     <string name="close">Close</string>
     <string name="create_account">Create account</string>
     <string name="delete">Delete</string>
+    <string name="dismiss">Dismiss</string>
     <string name="donate">Donate</string>
     <string name="done">Done</string>
     <string name="download">Download</string>
@@ -2326,4 +2327,13 @@
     <string name="up_next_history_restore_button">@string/restore</string>
     <string name="up_next_history_restore_confirmation_title">Restore Up Next?</string>
     <string name="up_next_history_restore_confirmation_description">These episodes will be added to the bottom of your current Up Next.</string>
+
+    <!-- Encourage account creation -->
+    <string name="encourage_account_banner_action_label">Create a free account</string>
+    <string name="encourage_account_sync_banner_title">Your shows, on any device</string>
+    <string name="encourage_account_sync_banner_description">Create a free account to sync your shows and listen anywhere.</string>
+    <string name="encourage_account_filters_banner_title">Keep your filters in sync</string>
+    <string name="encourage_account_filters_banner_description">Create a free account to sync your filters on any device.</string>
+    <string name="encourage_account_history_banner_title">Keep track of what you’ve played</string>
+    <string name="encourage_account_history_banner_description">Create a free account to sync your listening history everywhere.</string>
 </resources>
