@@ -12,7 +12,6 @@ import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
@@ -36,27 +35,10 @@ class PlaylistManagerImplTest {
     private val appDatabase: AppDatabase = mock()
     private val playlistDao: PlaylistDao = mock()
 
-    private lateinit var playlistManager: PlaylistManagerImpl
-
-    @Before
-    fun setUp() {
-        whenever(appDatabase.playlistDao()).thenReturn(playlistDao)
-        whenever(playlistDao.updateBlocking(any())).then { }
-        whenever(playlistUpdateAnalytics.update(any(), any(), any())).then { }
-
-        playlistManager = PlaylistManagerImpl(
-            settings,
-            downloadManager,
-            playlistUpdateAnalytics,
-            syncManager,
-            notificationManager,
-            context,
-            appDatabase,
-        )
-    }
-
     @Test
     fun `should mark the user as having interacted with the feature when creating a filter`() = runTest {
+        val playlistManager = initViewModel()
+
         playlistManager.updateBlocking(mock(), mock(), isCreatingFilter = true)
 
         advanceUntilIdle()
@@ -66,10 +48,28 @@ class PlaylistManagerImplTest {
 
     @Test
     fun `should not mark the user as having interacted with the feature when a filter is not being created`() = runTest {
+        val playlistManager = initViewModel()
+
         playlistManager.updateBlocking(mock(), mock(), isCreatingFilter = false)
 
         advanceUntilIdle()
 
         verify(notificationManager, never()).trackUserInteractedWithFeature(OnboardingNotificationType.Filters)
+    }
+
+    private fun initViewModel(): PlaylistManagerImpl {
+        whenever(appDatabase.playlistDao()).thenReturn(playlistDao)
+        whenever(playlistDao.updateBlocking(any())).then { }
+        whenever(playlistUpdateAnalytics.update(any(), any(), any())).then { }
+
+        return PlaylistManagerImpl(
+            settings,
+            downloadManager,
+            playlistUpdateAnalytics,
+            syncManager,
+            notificationManager,
+            context,
+            appDatabase,
+        )
     }
 }
