@@ -56,7 +56,7 @@ class OnboardingNotificationWorker @AssistedInject constructor(
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setContentTitle(applicationContext.resources.getString(type.titleRes))
             .setContentText(applicationContext.resources.getString(type.messageRes))
-            .setColor(ContextCompat.getColor(this.applicationContext, R.color.notification_color))
+            .setColor(ContextCompat.getColor(applicationContext, R.color.notification_color))
             .setContentIntent(openPageIntent())
     }
 
