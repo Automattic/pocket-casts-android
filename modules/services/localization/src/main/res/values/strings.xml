@@ -1973,6 +1973,8 @@
     <string name="onboarding_plus_feature_themes_icons_title">Themes &amp; Icons</string>
     <string name="onboarding_plus_feature_themes_icons_text">Fly your true colors. Exclusive icons and themes for the Plus club only.</string>
     <string name="onboarding_plus_feature_gratitude_title">The undying gratitude of everyone here at Pocket Casts</string>
+    <string name="onboarding_plus_feature_libro_title">Free audiobook from %1$s</string>
+    <string name="libro_fm" translatable="false"><![CDATA[<a href="https://libro.fm/">Libro.fm</a>]]></string>
     <!-- Do not translate Slumber Studios -->
     <string name="onboarding_plus_feature_slumber_studios_title"><![CDATA[1 year of exclusive content from <a href="https://slumberstudios.com/">Slumber&#160;Studios</a>]]></string>
     <string name="onboarding_plus_feature_dream_with_slumber_studios"><![CDATA[<a href="https://slumberstudios.com/">Dream with Slumber Studios content</a>]]></string>

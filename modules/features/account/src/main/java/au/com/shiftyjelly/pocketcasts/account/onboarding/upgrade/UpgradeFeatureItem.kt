@@ -62,6 +62,12 @@ enum class PlusUpgradeFeatureItem(
         isMonthlyFeature = false,
         isYearlyFeature = FeatureFlag.isEnabled(Feature.SLUMBER_STUDIOS_YEARLY_PROMO),
     ),
+    LibroFm(
+        image = IR.drawable.ic_plus_feature_libro,
+        title = LR.string.onboarding_plus_feature_libro_title,
+        isMonthlyFeature = FeatureFlag.isEnabled(Feature.LIBRO_FM),
+        isYearlyFeature = FeatureFlag.isEnabled(Feature.LIBRO_FM),
+    ),
 }
 
 enum class PatronUpgradeFeatureItem(
