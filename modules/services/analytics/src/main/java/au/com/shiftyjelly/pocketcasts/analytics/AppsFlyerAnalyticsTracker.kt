@@ -17,6 +17,8 @@ class AppsFlyerAnalyticsTracker @Inject constructor(
     companion object {
         private const val ANON_ID = "anon_id_apps_flyer_anon_id"
         private val EVENTS = listOf(
+            AnalyticsEvent.APPLICATION_INSTALLED,
+            AnalyticsEvent.APPLICATION_OPENED,
             AnalyticsEvent.USER_SIGNED_IN,
             AnalyticsEvent.USER_ACCOUNT_CREATED,
             AnalyticsEvent.SSO_STARTED,
