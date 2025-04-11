@@ -580,4 +580,5 @@ interface Settings {
     val isTrackingConsentRequired: UserSetting<Boolean>
 
     val isFreeAccountProfileBannerDismissed: UserSetting<Boolean>
+    val isFreeAccountFiltersBannerDismissed: UserSetting<Boolean>
 }
