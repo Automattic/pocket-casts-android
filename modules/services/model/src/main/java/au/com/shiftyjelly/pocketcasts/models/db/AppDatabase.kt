@@ -40,7 +40,6 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.EndOfYearDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.ExternalDataDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.FolderDao
-import au.com.shiftyjelly.pocketcasts.models.db.dao.NotificationsDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PlaylistDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastRatingsDao
@@ -146,7 +145,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun externalDataDao(): ExternalDataDao
     abstract fun endOfYearDao(): EndOfYearDao
     abstract fun upNextHistoryDao(): UpNextHistoryDao
-    abstract fun notificationsDao(): NotificationsDao
     abstract fun userNotificationsDao(): UserNotificationsDao
 
     fun databaseFiles() =
