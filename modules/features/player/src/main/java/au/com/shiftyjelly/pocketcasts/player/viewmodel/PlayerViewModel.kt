@@ -150,7 +150,7 @@ class PlayerViewModel @Inject constructor(
         }
     }
 
-    data class UpNextSummary(val episodeCount: Int, val totalTimeSecs: Double)
+    data class UpNextSummary(val episodeCount: Int, val totalTimeSecs: Double, val episodePlaying: Boolean)
 
     data class ListData(
         var podcastHeader: PlayerHeader,
@@ -170,7 +170,7 @@ class PlayerViewModel @Inject constructor(
 
     private val playbackStateObservable: Observable<PlaybackState> = playbackManager.playbackStateRelay
         .observeOn(Schedulers.io())
-    private val upNextStateObservable: Observable<UpNextQueue.State> = playbackManager.upNextQueue.getChangesObservableWithLiveCurrentEpisode(episodeManager, podcastManager)
+    val upNextStateObservable: Observable<UpNextQueue.State> = playbackManager.upNextQueue.getChangesObservableWithLiveCurrentEpisode(episodeManager, podcastManager)
         .observeOn(Schedulers.io())
 
     private val upNextExpandedObservable = BehaviorRelay.create<Boolean>().apply { accept(upNextExpanded) }
@@ -224,7 +224,7 @@ class PlayerViewModel @Inject constructor(
             null
         }
 
-        val upNextSummary = UpNextSummary(episodeCount = episodeCount, totalTimeSecs = totalTime)
+        val upNextSummary = UpNextSummary(episodeCount = episodeCount, totalTimeSecs = totalTime, episodePlaying = upNextState is UpNextQueue.State.Loaded)
 
         return@map listOfNotNull(nowPlayingInfo, upNextSummary) + upNextEpisodes
     }
@@ -402,7 +402,7 @@ class PlayerViewModel @Inject constructor(
                 }
             }
         }
-        val upNextFooter = UpNextSummary(episodeCount = episodeCount, totalTimeSecs = totalTime)
+        val upNextFooter = UpNextSummary(episodeCount = episodeCount, totalTimeSecs = totalTime, episodePlaying = upNextState is UpNextQueue.State.Loaded)
 
         return ListData(
             podcastHeader = podcastHeader,

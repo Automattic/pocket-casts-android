@@ -235,6 +235,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
+    ENCOURAGE_ACCOUNT_CREATION(
+        key = "encourage_account_creation",
+        title = "Account creation encouragement",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = true,
+    ),
     ;
 
     companion object {

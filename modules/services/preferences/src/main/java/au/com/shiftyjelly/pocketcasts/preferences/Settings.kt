@@ -578,4 +578,8 @@ interface Settings {
     val suggestedFoldersFollowedHash: UserSetting<String>
 
     val isTrackingConsentRequired: UserSetting<Boolean>
+
+    val isFreeAccountProfileBannerDismissed: UserSetting<Boolean>
+    val isFreeAccountFiltersBannerDismissed: UserSetting<Boolean>
+    val isFreeAccountHistoryBannerDismissed: UserSetting<Boolean>
 }

@@ -1,3 +1,6 @@
+import java.net.URI
+import java.util.Properties
+
 pluginManagement {
     repositories {
         google()
@@ -14,9 +17,10 @@ pluginManagement {
 }
 
 plugins {
-    id("com.gradle.develocity").version("3.19")
+    id("com.gradle.develocity").version("3.19.2")
+    id("com.gradle.common-custom-user-data-gradle-plugin").version("2.2.1")
 }
-apply(from = File("./config/gradle/gradle_build_cache.gradle.kts"))
+
 apply(from = File("./config/gradle/gradle_build_scan.gradle"))
 
 dependencyResolutionManagement {
@@ -81,3 +85,69 @@ include(":modules:services:ui")
 include(":modules:services:utils")
 include(":modules:services:views")
 include(":modules:services:sharedtest")
+
+val developerProperties = loadPropertiesFromFile(File("${rootDir.path}/developer.properties"))
+val secretsFile = File("${rootDir.path}/secret.properties")
+val secretProperties = loadPropertiesFromFile(secretsFile)
+val USE_REMOTE_BUILD_CACHE_LOCALLY = "use_remote_build_cache_locally"
+
+buildCache {
+    if (System.getenv("CI")?.toBoolean() == true) {
+        remote<HttpBuildCache> {
+            url = URI.create("http://10.0.2.214:5071/cache/")
+            isAllowUntrustedServer = true
+            isAllowInsecureProtocol = true
+            isPush = true
+            credentials {
+                username = "ci-user"
+                password = System.getenv("GRADLE_CACHE_NODE_PASSWORD")
+            }
+        }
+    } else if (developerProperties.getProperty(USE_REMOTE_BUILD_CACHE_LOCALLY).toBoolean()) {
+
+        checkForRemoteBuildCacheOptimizedExperience()
+
+        remote<HttpBuildCache> {
+            url = URI.create(secretProperties.getProperty("gradleCacheNodeUrl"))
+            isPush = false
+            credentials {
+                username = "developer"
+                password = secretProperties.getProperty("gradleCacheNodePassword")
+            }
+        }
+    } else {
+        logger.warn("\nℹ️ Remote build cache is disabled. If you have stable internet connection, consider enabling it via `developer.properties`.")
+    }
+}
+
+private fun checkForRemoteBuildCacheOptimizedExperience() {
+    assertSecretsApplied()
+    assertJava17Amazon()
+}
+
+private fun assertSecretsApplied() {
+    if (!secretsFile.exists()) {
+        throw GradleException("The build requested remote build cache, but secrets file is not found. Please run `bundle exec fastlane run configure_apply` to apply secrets.")
+    }
+}
+
+private fun assertJava17Amazon() {
+    val version = System.getProperty("java.version")
+    val vendor = System.getProperty("java.vendor")
+    val expectedJdkVersion = "17.0.14"
+
+    if (!(version.contains(expectedJdkVersion) && vendor.contains("amazon", ignoreCase = true))) {
+        logger.error("Java version: $version, vendor: $vendor")
+        throw GradleException("Java version is not $expectedJdkVersion or vendor is not Amazon Corretto. This significantly reduces efficiency of remote build cache. Please set up the matching JDK.")
+    }
+}
+
+private fun loadPropertiesFromFile(file: File): Properties {
+    val properties = Properties()
+    if (file.exists()) {
+        file.inputStream().use { stream ->
+            properties.load(stream)
+        }
+    }
+    return properties
+}

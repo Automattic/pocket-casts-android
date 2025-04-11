@@ -19,6 +19,7 @@ import org.junit.runner.Description
 class MainCoroutineRule(
     val testDispatcher: TestDispatcher = UnconfinedTestDispatcher(),
 ) : TestWatcher() {
+
     // This is needed due to RxJava and Coroutines interop
     private val immediateScheduler = Schedulers.trampoline()
     private val androidSchedulerHandler = Function<Callable<Scheduler>, Scheduler> { immediateScheduler }

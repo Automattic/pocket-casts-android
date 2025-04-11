@@ -12,4 +12,4 @@ bundle exec fastlane run configure_apply
 
 echo "--- ⚙️ Building release variant"
 
-./gradlew assembleRelease -PskipSentryProguardMappingUpload=true
+./gradlew "$1:assembleRelease" -PskipSentryProguardMappingUpload=true

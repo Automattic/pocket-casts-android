@@ -13,13 +13,21 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManagerImpl.Companion.IN_PROGRESS_UUID
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManagerImpl.Companion.NEW_RELEASE_UUID
+import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.Collections
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
@@ -30,6 +38,7 @@ class FiltersFragmentViewModel @Inject constructor(
     private val settings: Settings,
     private val episodeManager: EpisodeManager,
     private val playbackManager: PlaybackManager,
+    private val userManager: UserManager,
 ) : ViewModel(), CoroutineScope {
 
     companion object {
@@ -133,5 +142,20 @@ class FiltersFragmentViewModel @Inject constructor(
     fun onTooltipClosed() {
         settings.showEmptyFiltersListTooltip.set(false, updateModifiedAt = false)
         analyticsTracker.track(AnalyticsEvent.FILTER_TOOLTIP_CLOSED)
+    }
+
+    internal val isFreeAccountBannerVisible = combine(
+        userManager.getSignInState().asFlow().map { it.isSignedIn },
+        settings.isFreeAccountFiltersBannerDismissed.flow,
+    ) { isSignedIn, isBannerDismissed ->
+        !isSignedIn && !isBannerDismissed && FeatureFlag.isEnabled(Feature.ENCOURAGE_ACCOUNT_CREATION)
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = false,
+    )
+
+    internal fun dismissFreeAccountBanner() {
+        settings.isFreeAccountFiltersBannerDismissed.set(true, updateModifiedAt = true)
     }
 }
