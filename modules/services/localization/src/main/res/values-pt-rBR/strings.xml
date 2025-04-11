@@ -1,14 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-03-25 15:54:03+0000
+Translation-Revision-Date: 2025-04-11 08:10:10+0000
 Plural-Forms: nplurals=2; plural=(n > 1);
 Generator: GlotPress/2.4.0-alpha
 Language: pt_BR
 -->
 <resources>
+    <string name="dismiss">Fechar</string>
+    <string name="settings_privacy_analytics_third_party_summary">Permita-nos usar serviços de terceiros confiáveis para coletar dados anônimos.</string>
+    <string name="settings_privacy_analytics_third_party">Análises de terceiros</string>
+    <string name="settings_privacy_analytics_first_party">Análises próprias</string>
+    <string name="tracking_consent_dialog_reject">Pedir ao aplicativo para não rastrear</string>
+    <string name="tracking_consent_dialog_allow">Permitir</string>
+    <string name="tracking_consent_dialog_message">Usamos análises para melhorar o aplicativo e avaliar se nossas campanhas publicitárias estão se saindo bem.</string>
+    <string name="tracking_consent_dialog_title">Permitir que o \"Pocket Casts\" rastreie sua atividade nos aplicativos e sites de outras empresas?</string>
+    <string name="donate">Doar</string>
+    <string name="filters_tooltip_subtitle">Crie filtros inteligentes para organizar seus episódios. Filtre por duração, data de lançamento, tipo de mídia e muito mais.</string>
+    <string name="filters_tooltip_title">Organize seus episódios</string>
+    <string name="podcasts_sort_by_recently_played">Reproduzidos recentemente</string>
+    <string name="podcasts_sort_by_tooltip_message">Agora você pode ordenar por \"Reproduzidos recentemente\" e continuar rapidamente de onde parou.</string>
+    <string name="podcasts_sort_by_tooltip_title">Ordenar por \"Reproduzidos recentemente\"</string>
+    <string name="bookmarks_free_user_empty_state_button">Buscar favoritos</string>
+    <string name="bookmarks_free_user_empty_state_message">Você pode salvar a data/hora de momentos importantes em um episódio.</string>
+    <string name="bookmarks_empty_state_title">Marque aquele momento como favorito</string>
+    <string name="discover_collection_header_content_description">Cabeçalho de %s</string>
+    <string name="up_next_history_restore_confirmation_description">Esses episódios serão adicionados ao final da sua lista Próximos atual.</string>
+    <string name="up_next_history_restore_confirmation_title">Restaurar Próximos?</string>
+    <string name="up_next_history_restore_button">@string/restore</string>
+    <string name="player_up_next_empty_subtitle">Você pode colocar episódios na fila de reprodução arrastando-os para a direita nas linhas de episódios ou tocando no respectivo ícone no cartão de um episódio.</string>
+    <string name="player_up_next_empty_title">Organize sua sessão de streaming</string>
     <string name="restore">Recuperação</string>
     <string name="up_next_history_explanation">Uma lista de atualizações recentes na lista de Próximos devido a alterações em outros dispositivos. Para ver os episódios e poder restaurá-los, toque em alguma entrada.</string>
     <string name="up_next_history">Histórico de Próximos</string>
+    <string name="restore_from_local_history">Restaurar do histórico local</string>
     <string name="delete_download_warning_summary">Tem certeza de que deseja remover estes downloads? Você não poderá reproduzir offline.</string>
     <string name="delete_download_warning_title">Remover episódios baixados</string>
     <string name="delete_download_warning_button">Remover %1$d downloads</string>
@@ -448,6 +472,7 @@ Language: pt_BR
     <string name="settings_headphone_controls_action_previous">Ação anterior</string>
     <string name="settings_headphone_controls_action_next">Próxima ação</string>
     <string name="bookmarks_headphone_settings">Configurações do headset</string>
+    <string name="bookmarks_paid_user_empty_state_message">Você pode salvar a data/hora dos episódios pelo menu de ações do reprodutor ou configurando uma ação com seu headset.</string>
     <string name="bookmark_play">Reproduzir na posição %s do favorito</string>
     <string name="bookmarks_plural">%d favoritos</string>
     <string name="bookmarks_singular">1 favorito</string>

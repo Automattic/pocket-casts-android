@@ -1,14 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-03-25 09:54:04+0000
+Translation-Revision-Date: 2025-04-11 08:10:10+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="dismiss">非表示</string>
+    <string name="settings_privacy_analytics_third_party_summary">信頼できるサードパーティのサービスを使用した当社による匿名のデータ収集を許可します。</string>
+    <string name="settings_privacy_analytics_third_party">サードパーティのアナリティクス</string>
+    <string name="settings_privacy_analytics_first_party">ファーストパーティのアナリティクス</string>
+    <string name="tracking_consent_dialog_reject">トラッキングを拒否</string>
+    <string name="tracking_consent_dialog_allow">許可</string>
+    <string name="tracking_consent_dialog_message">当社ではアナリティクスを使用して、アプリの改良や、広告キャンペーンが成功したかどうかの測定を行っています。</string>
+    <string name="tracking_consent_dialog_title">「Pocket Casts」が他社のアプリやサイトでのアクティビティを追跡することを許可しますか ?</string>
+    <string name="donate">寄付</string>
+    <string name="filters_tooltip_subtitle">スマートフィルターを作成してエピソードを整理します。 期間、リリース日、メディアタイプなどで絞り込みます。</string>
+    <string name="filters_tooltip_title">エピソードを整理</string>
+    <string name="podcasts_sort_by_recently_played">最近再生済み</string>
+    <string name="podcasts_sort_by_tooltip_message">「最近再生済み」で並べ替えて、中断したところをすばやく確認できるようになりました。</string>
+    <string name="podcasts_sort_by_tooltip_title">「最近再生済み」で並べ替え</string>
+    <string name="bookmarks_free_user_empty_state_button">ブックマークを取得</string>
+    <string name="bookmarks_free_user_empty_state_message">エピソード中の大切な瞬間のタイムスタンプを保存できます。</string>
+    <string name="bookmarks_empty_state_title">瞬間をブックマーク</string>
+    <string name="discover_collection_header_content_description">%s ヘッダー</string>
+    <string name="up_next_history_restore_confirmation_description">これらのエピソードは、現在の「次に再生」の一番下に追加されます。</string>
+    <string name="up_next_history_restore_confirmation_title">「次に再生」を復元しますか ?</string>
+    <string name="up_next_history_restore_button">@string/restore</string>
+    <string name="player_up_next_empty_subtitle">エピソード行を右にスワイプするか、エピソードカードのアイコンをタップすることで、次に再生するエピソードを待機リストに追加できます。</string>
+    <string name="player_up_next_empty_title">聴取セッションを厳選</string>
     <string name="restore">復元する</string>
     <string name="up_next_history_explanation">他端末での変更により、「次に再生」に生じた最近の更新のリスト。 エピソードを表示し、それらを復元するオプションを利用するには、任意のエントリーをタップします。</string>
     <string name="up_next_history">「次に再生」履歴</string>
+    <string name="restore_from_local_history">ローカル履歴から復元</string>
     <string name="delete_download_warning_summary">これらのダウンロードを削除してもよいですか ? オフラインで再生できなくなります。</string>
     <string name="delete_download_warning_title">ダウンロード済みエピソードを削除</string>
     <string name="delete_download_warning_button">%1$d件のダウンロードを削除</string>
@@ -448,6 +472,7 @@ Language: ja_JP
     <string name="settings_headphone_controls_action_previous">前のアクション</string>
     <string name="settings_headphone_controls_action_next">次のアクション</string>
     <string name="bookmarks_headphone_settings">ヘッドフォン設定</string>
+    <string name="bookmarks_paid_user_empty_state_message">プレーヤーのアクションメニューから、またはヘッドフォンでアクションを設定して、エピソードのタイムスタンプを保存できます。</string>
     <string name="bookmark_play">ブックマーク位置で再生%s</string>
     <string name="bookmarks_plural">%d件のブックマーク</string>
     <string name="bookmarks_singular">1件のブックマーク</string>
