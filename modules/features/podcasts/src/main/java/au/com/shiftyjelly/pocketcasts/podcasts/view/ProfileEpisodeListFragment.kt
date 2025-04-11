@@ -11,11 +11,13 @@ import androidx.appcompat.widget.Toolbar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.view.isVisible
@@ -33,6 +35,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
+import au.com.shiftyjelly.pocketcasts.compose.components.Banner
 import au.com.shiftyjelly.pocketcasts.compose.components.EmptyState
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -57,9 +60,12 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.settings.AutoDownloadSettingsFragment
 import au.com.shiftyjelly.pocketcasts.settings.ManualCleanupFragment
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.ManualCleanupViewModel
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
+import au.com.shiftyjelly.pocketcasts.utils.extensions.combine
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
@@ -76,6 +82,9 @@ import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelpe
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -277,6 +286,47 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
             }
         } else {
             binding?.manageDownloadsCard?.isVisible = false
+        }
+
+        if (mode is Mode.History) {
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    combine(
+                        viewModel.isFreeAccountBannerVisible,
+                        viewModel.state.filterIsInstance<State.Loaded>().map {
+                            !it.results.isNullOrEmpty()
+                        },
+                        ::Pair,
+                    ).collect { (showBanner, hasAnyEpisodes) ->
+                        binding?.freeAccountBanner?.isVisible = showBanner && hasAnyEpisodes
+                    }
+                }
+            }
+            binding?.freeAccountBanner?.setContentWithViewCompositionStrategy {
+                AppTheme(
+                    themeType = theme.activeTheme,
+                ) {
+                    Banner(
+                        title = stringResource(LR.string.encourage_account_history_banner_title),
+                        description = stringResource(LR.string.encourage_account_history_banner_description),
+                        actionLabel = stringResource(LR.string.encourage_account_banner_action_label),
+                        icon = painterResource(IR.drawable.ic_filters_clock),
+                        onActionClick = {
+                            OnboardingLauncher.openOnboardingFlow(
+                                activity = requireActivity(),
+                                onboardingFlow = OnboardingFlow.LoggedOut,
+                            )
+                        },
+                        onDismiss = {
+                            viewModel.dismissFreeAccountBanner()
+                        },
+                        modifier = Modifier
+                            .background(MaterialTheme.theme.colors.primaryUi02)
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                    )
+                }
+            }
         }
 
         viewLifecycleOwner.lifecycleScope.launch {

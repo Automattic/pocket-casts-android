@@ -1628,4 +1628,10 @@ class SettingsImpl @Inject constructor(
         defaultValue = false,
         sharedPrefs = sharedPreferences,
     )
+
+    override val isFreeAccountHistoryBannerDismissed = UserSetting.BoolPref(
+        sharedPrefKey = "free_account_banner_dismissed_history",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
 }

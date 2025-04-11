@@ -6,10 +6,15 @@ import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListFragment.Mode
 import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListViewModel.State
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import io.reactivex.Flowable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.rx2.asFlowable
 import kotlinx.coroutines.test.runTest
@@ -186,16 +191,25 @@ class ProfileEpisodeListViewModelTest {
         starredEpisodes: List<PodcastEpisode> = starredEpisodesMock,
         listeningHistoryEpisodes: List<PodcastEpisode> = listeningHistoryEpisodesMock,
     ) {
+        val settings = mock<Settings>()
+        val userManager = mock<UserManager>()
+        val bannerSetting = mock<UserSetting<Boolean>>()
+
         whenever(episodeManager.findDownloadEpisodesRxFlowable()).thenReturn(flowOf(downloadedEpisodes).asFlowable())
         whenever(episodeManager.findStarredEpisodesRxFlowable()).thenReturn(flowOf(starredEpisodes).asFlowable())
         whenever(episodeManager.findPlaybackHistoryEpisodesRxFlowable()).thenReturn(flowOf(listeningHistoryEpisodes).asFlowable())
         whenever(episodeManager.filteredPlaybackHistoryEpisodesFlow(anyOrNull())).thenReturn(flowOf(emptyList()))
+        whenever(userManager.getSignInState()).thenReturn(Flowable.empty())
+        whenever(settings.isFreeAccountHistoryBannerDismissed).thenReturn(bannerSetting)
+        whenever(bannerSetting.flow).thenReturn(MutableStateFlow(false))
         doNothing().whenever(analyticsTracker).track(any(), any())
 
         viewModel = ProfileEpisodeListViewModel(
             episodeManager = episodeManager,
             playbackManager = playbackManager,
             analyticsTracker = analyticsTracker,
+            settings = settings,
+            userManager = userManager,
         )
     }
 }
