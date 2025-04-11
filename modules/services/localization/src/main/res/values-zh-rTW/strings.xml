@@ -1,14 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-03-26 10:54:04+0000
+Translation-Revision-Date: 2025-04-11 08:10:11+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="dismiss">關閉</string>
+    <string name="settings_privacy_analytics_third_party_summary">允許我們使用信任的第三方服務來收集匿名資料。</string>
+    <string name="settings_privacy_analytics_third_party">第三方分析工具</string>
+    <string name="settings_privacy_analytics_first_party">第一方分析工具</string>
+    <string name="tracking_consent_dialog_reject">要求應用程式不要追蹤</string>
+    <string name="tracking_consent_dialog_allow">允許</string>
+    <string name="tracking_consent_dialog_message">我們使用分析工具來改善應用程式，並衡量廣告行銷活動是否成功。</string>
+    <string name="tracking_consent_dialog_title">是否允許 Pocket Casts 追蹤你在其他公司的應用程式和網站上的活動？</string>
+    <string name="donate">捐贈</string>
+    <string name="filters_tooltip_subtitle">建立用來整理單集的智慧篩選條件。 依期間、發佈日期與媒體類型加以篩選。</string>
+    <string name="filters_tooltip_title">整理你的單集</string>
+    <string name="podcasts_sort_by_recently_played">最近播放</string>
+    <string name="podcasts_sort_by_tooltip_message">你現在可依「最近播放」排序，並從上次進度迅速接續播放。</string>
+    <string name="podcasts_sort_by_tooltip_title">依「最近播放」排序</string>
+    <string name="bookmarks_free_user_empty_state_button">取得書籤</string>
+    <string name="bookmarks_free_user_empty_state_message">你可以儲存單集中重要時刻的時間戳記。</string>
+    <string name="bookmarks_empty_state_title">將該時刻加入書籤</string>
+    <string name="discover_collection_header_content_description">「%s」頁首</string>
+    <string name="up_next_history_restore_confirmation_description">系統會將這些節目新增至目前「接下來播放」的底部。</string>
+    <string name="up_next_history_restore_confirmation_title">要還原「接下來播放」嗎？</string>
+    <string name="up_next_history_restore_button">\@字串/還原</string>
+    <string name="player_up_next_empty_subtitle">在單集列向右滑動或點選單集卡上的圖示，即可將單集排入佇列接續播放。</string>
+    <string name="player_up_next_empty_title">精心策劃你的聆聽階段</string>
     <string name="restore">恢復</string>
     <string name="up_next_history_explanation">因其他裝置變更，因此在「接下來播放」進行的近期更新清單。 若要檢視單集並提供還原選項，請點選任意條目。</string>
     <string name="up_next_history">「接下來播放」紀錄</string>
+    <string name="restore_from_local_history">從本機記錄還原</string>
     <string name="delete_download_warning_summary">你確定要移除這些下載項目嗎？ 移除後就無法離線播放。</string>
     <string name="delete_download_warning_title">移除下載的單集</string>
     <string name="delete_download_warning_button">移除 %1$d 個下載項目</string>
@@ -448,6 +472,7 @@ Language: zh_TW
     <string name="settings_headphone_controls_action_previous">上一個動作</string>
     <string name="settings_headphone_controls_action_next">下一個動作</string>
     <string name="bookmarks_headphone_settings">耳機設定</string>
+    <string name="bookmarks_paid_user_empty_state_message">若你想儲存單集的時間戳記，可以透過播放器的動作選單或設定耳機動作來進行。</string>
     <string name="bookmark_play">播放書籤位置 %s</string>
     <string name="bookmarks_plural">%d 個書籤</string>
     <string name="bookmarks_singular">1 個書籤</string>

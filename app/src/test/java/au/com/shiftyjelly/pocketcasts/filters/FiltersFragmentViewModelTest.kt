@@ -39,34 +39,44 @@ class FiltersFragmentViewModelTest {
 
     @Test
     fun `should show tooltip`() = runTest {
-        val result = viewModel.shouldShowTooltip(defaultFilters)
-
-        assertEquals(true, result)
+        var showTooltip = false
+        viewModel.shouldShowTooltipSuspend(defaultFilters) {
+            showTooltip = true
+        }
+        assertEquals(true, showTooltip)
     }
 
     @Test
     fun `should not show tooltip if setting is disabled`() = runTest {
         val viewModel = initViewModel(tooltipValue = false)
 
-        val result = viewModel.shouldShowTooltip(emptyList())
-
-        assertEquals(false, result)
+        var showTooltip = false
+        viewModel.shouldShowTooltip(emptyList()) {
+            showTooltip = true
+        }
+        assertEquals(false, showTooltip)
     }
 
     @Test
     fun `should not show tooltip if created custom filter`() = runTest {
-        val result = viewModel.shouldShowTooltip(defaultFilters + listOf(Playlist(id = 3, uuid = "custom")))
+        var showTooltip = false
+        viewModel.shouldShowTooltip(defaultFilters + listOf(Playlist(id = 3, uuid = "custom"))) {
+            showTooltip = true
+        }
 
-        assertEquals(false, result)
+        assertEquals(false, showTooltip)
     }
 
     @Test
     fun `should return false when at least one playlist has episodes`() = runTest {
         val viewModel = initViewModel(tooltipValue = false, shouldMockEpisodeForFirstFilter = true)
 
-        val result = viewModel.shouldShowTooltip(defaultFilters)
+        var showTooltip = false
+        viewModel.shouldShowTooltip(defaultFilters) {
+            showTooltip = true
+        }
 
-        assertEquals(false, result)
+        assertEquals(false, showTooltip)
     }
 
     private fun initViewModel(tooltipValue: Boolean, shouldMockEpisodeForFirstFilter: Boolean = false): FiltersFragmentViewModel {

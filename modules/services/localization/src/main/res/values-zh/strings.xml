@@ -1,14 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-03-25 09:54:04+0000
+Translation-Revision-Date: 2025-04-11 08:10:10+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="dismiss">消除</string>
+    <string name="settings_privacy_analytics_third_party_summary">允许我们使用可信的第三方服务来收集匿名数据。</string>
+    <string name="settings_privacy_analytics_third_party">第三方分析</string>
+    <string name="settings_privacy_analytics_first_party">第一方分析</string>
+    <string name="tracking_consent_dialog_reject">要求应用程序不跟踪</string>
+    <string name="tracking_consent_dialog_allow">允许</string>
+    <string name="tracking_consent_dialog_message">我们使用分析功能来改进应用程序以及衡量广告活动的成功与否。</string>
+    <string name="tracking_consent_dialog_title">允许“Pocket Casts”跟踪您在其他公司的应用程序和网站上的活动吗？</string>
+    <string name="donate">捐赠</string>
+    <string name="filters_tooltip_subtitle">创建智能筛选条件来整理您的剧集。 按时长、发布日期、媒体类型等进行筛选。</string>
+    <string name="filters_tooltip_title">整理您的剧集</string>
+    <string name="podcasts_sort_by_recently_played">最近播放</string>
+    <string name="podcasts_sort_by_tooltip_message">您现在可以按“最近播放”排序，并快速接续上次播放进度。</string>
+    <string name="podcasts_sort_by_tooltip_title">按“最近播放”排序</string>
+    <string name="bookmarks_free_user_empty_state_button">获取书签</string>
+    <string name="bookmarks_free_user_empty_state_message">您可以保存剧集中重要时刻的时间戳。</string>
+    <string name="bookmarks_empty_state_title">将该时刻加入书签</string>
+    <string name="discover_collection_header_content_description">%s 页眉</string>
+    <string name="up_next_history_restore_confirmation_description">这些剧集将添加到当前“接下来播放”列表的底部。</string>
+    <string name="up_next_history_restore_confirmation_title">是否要恢复“接下来播放”列表？</string>
+    <string name="up_next_history_restore_button">@string/restore</string>
+    <string name="player_up_next_empty_subtitle">您可以向右滑动剧集行或点按剧集卡上的图标，将剧集加入队列以供接下来播放。</string>
+    <string name="player_up_next_empty_title">自主编排收听流程</string>
     <string name="restore">还原</string>
     <string name="up_next_history_explanation">由于其他设备上的更改而处于“即将播出”状态的最新更新列表。 要查看剧集并选择恢复，请轻点任意条目。</string>
     <string name="up_next_history">“即将播出”历史</string>
+    <string name="restore_from_local_history">从本地历史记录中恢复</string>
     <string name="delete_download_warning_summary">是否确定要删除这些下载内容？ 您将无法离线播放。</string>
     <string name="delete_download_warning_title">删除已下载的剧集</string>
     <string name="delete_download_warning_button">删除 %1$d 下载内容</string>
@@ -448,6 +472,7 @@ Language: zh_CN
     <string name="settings_headphone_controls_action_previous">上一步操作</string>
     <string name="settings_headphone_controls_action_next">下一步操作</string>
     <string name="bookmarks_headphone_settings">耳机设置</string>
+    <string name="bookmarks_paid_user_empty_state_message">您可以使用播放器的操作菜单或配置耳机的操作程序来保存剧集的时间戳。</string>
     <string name="bookmark_play">在书签位置 %s 播放</string>
     <string name="bookmarks_plural">%d 个书签</string>
     <string name="bookmarks_singular">1 个书签</string>

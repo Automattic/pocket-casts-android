@@ -1,14 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-03-27 09:01:54+0000
+Translation-Revision-Date: 2025-04-11 08:10:09+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="dismiss">Stäng</string>
+    <string name="settings_privacy_analytics_third_party_summary">Tillåt oss att använda betrodda tjänster från tredje part för att samla in anonyma data.</string>
+    <string name="settings_privacy_analytics_third_party">Analyser från tredje part</string>
+    <string name="settings_privacy_analytics_first_party">Analyser från första part</string>
+    <string name="tracking_consent_dialog_reject">Be appen att inte spåra</string>
+    <string name="tracking_consent_dialog_allow">Tillåt</string>
+    <string name="tracking_consent_dialog_message">Vi använder analyser för att göra appen bättre och för att mäta om våra annonskampanjer är framgångsrika.</string>
+    <string name="tracking_consent_dialog_title">Tillåt \"Pocket Casts\" att spåra din aktivitet i andra företags appar och webbplatser?</string>
+    <string name="donate">Donera</string>
+    <string name="filters_tooltip_subtitle">Skapa smarta filter för att organisera dina avsnitt. Filtrera efter varaktighet, utgivningsdatum, mediatyp med mera.</string>
+    <string name="filters_tooltip_title">Organisera dina avsnitt</string>
+    <string name="podcasts_sort_by_recently_played">Senast spelade</string>
+    <string name="podcasts_sort_by_tooltip_message">Nu kan du sortera efter \"senast spelade\" och snabbt fortsätta där du slutade.</string>
+    <string name="podcasts_sort_by_tooltip_title">Sortera efter \"senast spelade\"</string>
+    <string name="bookmarks_free_user_empty_state_button">Hämta bokmärken</string>
+    <string name="bookmarks_free_user_empty_state_message">Du kan spara tidsstämplar för viktiga ögonblick i ett avsnitt.</string>
+    <string name="bookmarks_empty_state_title">Bokmärk det ögonblicket</string>
+    <string name="discover_collection_header_content_description">%s sidhuvud</string>
+    <string name="up_next_history_restore_confirmation_description">De här avsnitten kommer att läggas till längst ner i din nuvarande lista för Up Next.</string>
+    <string name="up_next_history_restore_confirmation_title">Återställ Up Next?</string>
+    <string name="up_next_history_restore_button">\@sträng/återställ</string>
+    <string name="player_up_next_empty_subtitle">Du kan placera avsnitt i kö för uppspelning genom att svepa åt höger på avsnittsraden, eller genom att trycka på ikonen på ett avsnittskort.</string>
+    <string name="player_up_next_empty_title">Sammanställ din lyssningssession</string>
     <string name="restore">Återställ</string>
     <string name="up_next_history_explanation">En lista över de senaste uppdateringarna av Up Next som gjorts på grund av ändringar på andra enheter. Tryck på valfritt inlägg för att titta på avsnitten och få möjlighet att återställa dem.</string>
     <string name="up_next_history">Up Next-historik</string>
+    <string name="restore_from_local_history">Återställ från lokal historik</string>
     <string name="delete_download_warning_summary">Är du säker på att du vill ta bort dessa nedladdningar? Du kommer inte att kunna spela upp offline.</string>
     <string name="delete_download_warning_title">Inga nedladdade avsnitt</string>
     <string name="delete_download_warning_button">Ta bort %1$d nedladdningar</string>

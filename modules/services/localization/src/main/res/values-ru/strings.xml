@@ -1,14 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-03-25 15:54:02+0000
+Translation-Revision-Date: 2025-04-11 08:10:10+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="dismiss">Отклонить</string>
+    <string name="settings_privacy_analytics_third_party_summary">Разрешите нам использовать доверенные сторонние службы для сбора анонимных данных.</string>
+    <string name="settings_privacy_analytics_third_party">Сторонняя аналитика</string>
+    <string name="settings_privacy_analytics_first_party">Собственная аналитика</string>
+    <string name="tracking_consent_dialog_reject">Попросить приложение не отслеживать</string>
+    <string name="tracking_consent_dialog_allow">Разрешить</string>
+    <string name="tracking_consent_dialog_message">Пользуясь аналитическими данными, мы улучшаем приложение и оцениваем успешность рекламных кампаний.</string>
+    <string name="tracking_consent_dialog_title">Разрешить Pocket Casts отслеживать вашу деятельность в приложениях и на веб-сайтах других компаний?</string>
+    <string name="donate">Пожертвовать</string>
+    <string name="filters_tooltip_subtitle">Создавайте умные фильтры, чтобы упорядочивать выпуски Фильтрация по продолжительности, дате выпуска, типу медиафайла и др.</string>
+    <string name="filters_tooltip_title">Упорядочивайте выпуски</string>
+    <string name="podcasts_sort_by_recently_played">Недавно прослушанные</string>
+    <string name="podcasts_sort_by_tooltip_message">Теперь вы можете упорядочивать записи по дате прослушивания и сразу начинать воспроизведение с того места, на котором остановились.</string>
+    <string name="podcasts_sort_by_tooltip_title">Сортировать по категории «Недавно прослушанные»</string>
+    <string name="bookmarks_free_user_empty_state_button">Пользуйтесь закладками</string>
+    <string name="bookmarks_free_user_empty_state_message">Вы можете сохранять отметки времени важных моментов выпуска.</string>
+    <string name="bookmarks_empty_state_title">Поставьте закладку на этом моменте</string>
+    <string name="discover_collection_header_content_description">Заголовок %s</string>
+    <string name="up_next_history_restore_confirmation_description">Эти выпуски будут добавлены в конце вашего текущего списка «Далее».</string>
+    <string name="up_next_history_restore_confirmation_title">Восстановить список «Далее»?</string>
+    <string name="up_next_history_restore_button">@string/restore</string>
+    <string name="player_up_next_empty_subtitle">Вы можете помещать выпуски в очередь на воспроизведение, проводя пальцем вправо по строкам выпусков или касаясь значка на карточке выпуска.</string>
+    <string name="player_up_next_empty_title">Настройте сеанс прослушивания</string>
     <string name="restore">Восстановление</string>
     <string name="up_next_history_explanation">Список последних обновлений Up Next, вызванных изменениями на других устройствах. Нажмите любую запись, чтобы просмотреть и при желании восстановить выпуски.</string>
     <string name="up_next_history">История Up Next</string>
+    <string name="restore_from_local_history">Восстановить из локального журнала</string>
     <string name="delete_download_warning_summary">Вы уверены, что хотите удалить эти загрузки? Воспроизведение в автономном режиме будет невозможно.</string>
     <string name="delete_download_warning_title">Удалить загруженные выпуски</string>
     <string name="delete_download_warning_button">Удалить загрузки: %1$d</string>
@@ -448,6 +472,7 @@ Language: ru
     <string name="settings_headphone_controls_action_previous">Предыдущее действие</string>
     <string name="settings_headphone_controls_action_next">Следующее действие</string>
     <string name="bookmarks_headphone_settings">Настройки наушников</string>
+    <string name="bookmarks_paid_user_empty_state_message">Вы можете сохранять отметки времени выпусков в меню действий проигрывателя или настроив действие с наушниками.</string>
     <string name="bookmark_play">Воспроизвести с закладки %s</string>
     <string name="bookmarks_plural">Закладки: %d</string>
     <string name="bookmarks_singular">1  закладка</string>

@@ -1,14 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-03-25 15:54:02+0000
+Translation-Revision-Date: 2025-04-11 08:10:11+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+    <string name="dismiss">Descartar </string>
+    <string name="settings_privacy_analytics_third_party_summary">Permítenos utilizar servicios de terceros de confianza para recopilar datos anónimos.</string>
+    <string name="settings_privacy_analytics_third_party">Análisis de terceros</string>
+    <string name="settings_privacy_analytics_first_party">Análisis propios</string>
+    <string name="tracking_consent_dialog_reject">Pedir a la aplicación que no rastree</string>
+    <string name="tracking_consent_dialog_allow">Permitir</string>
+    <string name="tracking_consent_dialog_message">Utilizamos los análisis para mejorar la aplicación y medir si nuestras campañas publicitarias tienen éxito.</string>
+    <string name="tracking_consent_dialog_title">¿Permitir que «Pocket Casts» rastree tu actividad en las aplicaciones y webs de otras empresas?</string>
+    <string name="donate">Contribuir</string>
+    <string name="filters_tooltip_subtitle">Crea filtros inteligentes para organizar tus episodios. Filtra por duración, fecha de lanzamiento, tipo de medio y más.</string>
+    <string name="filters_tooltip_title">Organiza tus episodios</string>
+    <string name="podcasts_sort_by_recently_played">Reproducido recientemente</string>
+    <string name="podcasts_sort_by_tooltip_message">Ahora puedes ordenar por Reproducido recientemente y seguir por donde lo dejaste sin perder tiempo.</string>
+    <string name="podcasts_sort_by_tooltip_title">Ordenar por «Reproducido recientemente»</string>
+    <string name="bookmarks_free_user_empty_state_button">Obtener marcadores</string>
+    <string name="bookmarks_free_user_empty_state_message">Puedes guardar las marcas de tiempo de los momentos importantes de un episodio.</string>
+    <string name="bookmarks_empty_state_title">Marca ese momento como favorito</string>
+    <string name="discover_collection_header_content_description">Cabecera %s</string>
+    <string name="up_next_history_restore_confirmation_description">Estos episodios se añadirán al final de tu lista actual de Siguiente.</string>
+    <string name="up_next_history_restore_confirmation_title">¿Restaurar Siguiente?</string>
+    <string name="up_next_history_restore_button">@string/restore</string>
+    <string name="player_up_next_empty_subtitle">Puedes poner en cola los episodios para que se reproduzcan a continuación si deslizas hacia la derecha en las filas de los episodios o si tocas el icono en la tarjeta del episodio.</string>
+    <string name="player_up_next_empty_title">Prepara tu sesión de escucha</string>
     <string name="restore">Restaurar</string>
     <string name="up_next_history_explanation">Una lista de las últimas actualizaciones en Próximamente debido a cambios en otros dispositivos. Para ver los episodios y poder restaurarlos, pulsa en cualquier entrada.</string>
     <string name="up_next_history">Historial de Próximamente</string>
+    <string name="restore_from_local_history">Restaurar a partir del historial local</string>
     <string name="delete_download_warning_summary">¿Seguro que quieres eliminar estas descargas? No podrás reproducir los episodios sin conexión.</string>
     <string name="delete_download_warning_title">Eliminar episodios descargados</string>
     <string name="delete_download_warning_button">Eliminar %1$d descargas</string>
@@ -448,6 +472,7 @@ Language: es
     <string name="settings_headphone_controls_action_previous">Acción anterior</string>
     <string name="settings_headphone_controls_action_next">Acción siguiente</string>
     <string name="bookmarks_headphone_settings">Ajustes de los auriculares</string>
+    <string name="bookmarks_paid_user_empty_state_message">Para guardar las marcas de tiempo de los episodios, ve al menú de acciones del reproductor o configura una acción con los auriculares.</string>
     <string name="bookmark_play">Reproducir en la posición del marcador %s</string>
     <string name="bookmarks_plural">%d marcadores</string>
     <string name="bookmarks_singular">1 marcador</string>

@@ -1,14 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-03-25 13:54:03+0000
+Translation-Revision-Date: 2025-04-11 08:10:10+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="dismiss">ignorer</string>
+    <string name="settings_privacy_analytics_third_party_summary">Autorisez-nous à utiliser des services tiers de confiance pour collecter des données anonymes.</string>
+    <string name="settings_privacy_analytics_third_party">Statistiques tierces</string>
+    <string name="settings_privacy_analytics_first_party">Statistiques internes</string>
+    <string name="tracking_consent_dialog_reject">Demander à l’application de ne pas suivre</string>
+    <string name="tracking_consent_dialog_allow">Autoriser</string>
+    <string name="tracking_consent_dialog_message">Nous utilisons les statistiques pour améliorer l’application et mesurer le succès de nos campagnes publicitaires.</string>
+    <string name="tracking_consent_dialog_title">Autoriser « Pocket Casts » à suivre votre activité sur les applications et sites Web d’autres entreprises ?</string>
+    <string name="donate">Faire un don</string>
+    <string name="filters_tooltip_subtitle">Créez des filtres intelligents pour organiser vos épisodes. Filtrez par durée, date de sortie, type de média, etc.</string>
+    <string name="filters_tooltip_title">Organiser vos épisodes</string>
+    <string name="podcasts_sort_by_recently_played">Lectures récentes</string>
+    <string name="podcasts_sort_by_tooltip_message">Vous pouvez désormais trier par Lectures récentes et reprendre rapidement là où vous en étiez.</string>
+    <string name="podcasts_sort_by_tooltip_title">Trier par « Lectures récentes »</string>
+    <string name="bookmarks_free_user_empty_state_button">Mettre des signets</string>
+    <string name="bookmarks_free_user_empty_state_message">Vous pouvez enregistrer les horodatages des moments importants d’un épisode.</string>
+    <string name="bookmarks_empty_state_title">Ajouter ce moment à vos signets</string>
+    <string name="discover_collection_header_content_description">En-tête %s</string>
+    <string name="up_next_history_restore_confirmation_description">Ces épisodes seront ajoutés au bas de votre file d’attente actuelle.</string>
+    <string name="up_next_history_restore_confirmation_title">Rétablir la file d’attente ?</string>
+    <string name="up_next_history_restore_button">@string/restore</string>
+    <string name="player_up_next_empty_subtitle">Vous pouvez mettre en file d’attente des épisodes à lire par la suite en faisant glisser les lignes d’épisodes vers la droite ou en appuyant sur l’icône d’une carte d’épisode.</string>
+    <string name="player_up_next_empty_title">Organiser votre session d’écoute</string>
     <string name="restore">Rétablir</string>
     <string name="up_next_history_explanation">Liste des mises à jour récentes apportées à la file d’attente à la suite de modifications sur d’autres appareils. Pour afficher les épisodes et avoir la possibilité de les rétablir, appuyez sur n’importe quelle entrée.</string>
     <string name="up_next_history">Historique de la file d’attente</string>
+    <string name="restore_from_local_history">Rétablir à partir de l’historique local</string>
     <string name="delete_download_warning_summary">Voulez-vous vraiment supprimer ces téléchargements ? Vous ne pourrez pas écouter en étant hors ligne.</string>
     <string name="delete_download_warning_title">Supprimer les épisodes téléchargés</string>
     <string name="delete_download_warning_button">Supprimer %1$d téléchargements</string>
@@ -448,6 +472,7 @@ Language: fr
     <string name="settings_headphone_controls_action_previous">Action précédente</string>
     <string name="settings_headphone_controls_action_next">Action suivante</string>
     <string name="bookmarks_headphone_settings">Réglages des écouteurs</string>
+    <string name="bookmarks_paid_user_empty_state_message">Vous pouvez enregistrer les horodatages des épisodes à partir du menu d’actions du lecteur ou en configurant une action avec vos écouteurs.</string>
     <string name="bookmark_play">Lire à la position du signet %s</string>
     <string name="bookmarks_plural">%d signets</string>
     <string name="bookmarks_singular">1 signet</string>

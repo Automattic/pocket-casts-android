@@ -1,14 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-03-25 09:54:04+0000
+Translation-Revision-Date: 2025-04-11 08:10:10+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
+    <string name="dismiss">Chiudi</string>
+    <string name="settings_privacy_analytics_third_party_summary">Consentici di utilizzare servizi di terze parti affidabili per raccogliere dati anonimi.</string>
+    <string name="settings_privacy_analytics_third_party">Analisi di terze parti</string>
+    <string name="settings_privacy_analytics_first_party">Analisi di prima parte</string>
+    <string name="tracking_consent_dialog_reject">Chiedi all\'app di non tenere traccia</string>
+    <string name="tracking_consent_dialog_allow">Consenti</string>
+    <string name="tracking_consent_dialog_message">Utilizziamo l\'analisi per migliorare l\'app e per misurare il successo delle nostre campagne pubblicitarie.</string>
+    <string name="tracking_consent_dialog_title">Consenti a \"Pocket Casts\" di tenere traccia della tua attività su app e siti web di altre aziende?</string>
+    <string name="donate">Fai una donazione</string>
+    <string name="filters_tooltip_subtitle">Crea filtri intelligenti per organizzare gli episodi. Filtra per durata, data di rilascio, tipo di elemento multimediale e altro ancora.</string>
+    <string name="filters_tooltip_title">Organizza gli episodi</string>
+    <string name="podcasts_sort_by_recently_played">Riprodotti di recente</string>
+    <string name="podcasts_sort_by_tooltip_message">Ora puoi ordinare per Riprodotti di recente e riprendere rapidamente da dove eri rimasto.</string>
+    <string name="podcasts_sort_by_tooltip_title">Ordina per \"Riprodotti di recente\"</string>
+    <string name="bookmarks_free_user_empty_state_button">Ottieni Segnalibri</string>
+    <string name="bookmarks_free_user_empty_state_message">Puoi salvare i timestamp dei momenti importanti di un episodio.</string>
+    <string name="bookmarks_empty_state_title">Inserisci momento nei segnalibri</string>
+    <string name="discover_collection_header_content_description">Intestazione %s</string>
+    <string name="up_next_history_restore_confirmation_description">Questi episodi verranno aggiunti in fondo alla pagina Up Next corrente.</string>
+    <string name="up_next_history_restore_confirmation_title">Ripristinare Up Next?</string>
+    <string name="up_next_history_restore_button">@string/restore</string>
+    <string name="player_up_next_empty_subtitle">Puoi mettere in coda gli episodi per la riproduzione scorrendo verso destra sulle righe degli episodi o toccando l\'icona sulla scheda di un episodio.</string>
+    <string name="player_up_next_empty_title">Cura la tua sessione di ascolto</string>
     <string name="restore">Ripristino</string>
     <string name="up_next_history_explanation">Un elenco degli aggiornamenti recenti di Up Next a seguito di modifiche su altri dispositivi. Per visualizzare gli episodi e avere la possibilità di ripristinarli, toccare una voce qualsiasi.</string>
     <string name="up_next_history">Cronologia Up Next</string>
+    <string name="restore_from_local_history">Ripristina dalla cronologia locale</string>
     <string name="delete_download_warning_summary">Desideri rimuovere questi download? Non potrai riprodurre gli episodi offline.</string>
     <string name="delete_download_warning_title">Rimuovi gli episodi scaricati</string>
     <string name="delete_download_warning_button">Rimuovi %1$d download</string>
@@ -448,6 +472,7 @@ Language: it
     <string name="settings_headphone_controls_action_previous">Azione precedente</string>
     <string name="settings_headphone_controls_action_next">Azione successiva</string>
     <string name="bookmarks_headphone_settings">Impostazioni delle cuffie</string>
+    <string name="bookmarks_paid_user_empty_state_message">Puoi salvare i timestamp degli episodi dal menu delle azioni nel lettore o configurando un\'azione con le cuffie.</string>
     <string name="bookmark_play">Riproduci alla posizione del segnalibro %s</string>
     <string name="bookmarks_plural">%d segnalibri</string>
     <string name="bookmarks_singular">1 segnalibro</string>

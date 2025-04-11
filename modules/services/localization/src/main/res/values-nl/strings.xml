@@ -1,14 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-03-25 11:54:04+0000
+Translation-Revision-Date: 2025-04-11 08:10:10+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="dismiss">Afsluiten</string>
+    <string name="settings_privacy_analytics_third_party_summary">Sta ons toe om vertrouwde diensten van derden te gebruiken om anonieme gegevens te verzamelen.</string>
+    <string name="settings_privacy_analytics_third_party">Analyses van derden</string>
+    <string name="settings_privacy_analytics_first_party">Eigen analyses</string>
+    <string name="tracking_consent_dialog_reject">Vraag de app om niet te volgen</string>
+    <string name="tracking_consent_dialog_allow">Toestaan</string>
+    <string name="tracking_consent_dialog_message">We gebruiken analyses om de app te verbeteren en bij te houden of onze advertentiecampagnes werken.</string>
+    <string name="tracking_consent_dialog_title">\'Pocket Casts\' toestaan om je activiteit in de apps en websites van andere bedrijven te volgen?</string>
+    <string name="donate">Doneren</string>
+    <string name="filters_tooltip_subtitle">Maak slimme filters aan om je afleveringen te organiseren. Filter op duur, uitgavedatum, mediatype en meer.</string>
+    <string name="filters_tooltip_title">Organiseer je afleveringen</string>
+    <string name="podcasts_sort_by_recently_played">Recent afgespeeld</string>
+    <string name="podcasts_sort_by_tooltip_message">Je kan nu sorteren op Recent afgespeeld en snel doorgaan naar waar je gebleven was.</string>
+    <string name="podcasts_sort_by_tooltip_title">Sorteren op \'Recent afgespeeld\'</string>
+    <string name="bookmarks_free_user_empty_state_button">Gebruik Bladwijzers</string>
+    <string name="bookmarks_free_user_empty_state_message">Je kan tijdstempels van belangrijke momenten in een aflevering opslaan.</string>
+    <string name="bookmarks_empty_state_title">Maak een bladwijzer van dat moment</string>
+    <string name="discover_collection_header_content_description">%s koptekst</string>
+    <string name="up_next_history_restore_confirmation_description">Deze afleveringen worden toegevoegd onderaan je huidige Hierna-lijst.</string>
+    <string name="up_next_history_restore_confirmation_title">Hierna herstellen?</string>
+    <string name="up_next_history_restore_button">@string/restore</string>
+    <string name="player_up_next_empty_subtitle">Je kan afleveringen in de wachtrij zetten door naar rechts te swipen in afleveringrijen of door op het pictogram op een afleveringkaart te tikken.</string>
+    <string name="player_up_next_empty_title">Je luistersessie beheren</string>
     <string name="restore">Herstellen</string>
     <string name="up_next_history_explanation">Een lijst met recente updates over Hierna dankzij wijzigingen aangebracht aan andere apparaten. Klik op een bericht om de afleveringen te bekijken en ze mogelijk te herstellen.</string>
     <string name="up_next_history">Geschiedenis van Hierna</string>
+    <string name="restore_from_local_history">Herstellen vanuit lokale geschiedenis</string>
     <string name="delete_download_warning_summary">Weet je zeker dat je deze downloads wilt verwijderen? Je kan dan niet offline afspelen.</string>
     <string name="delete_download_warning_title">Gedownloade afleveringen verwijderen</string>
     <string name="delete_download_warning_button">%1$d downloads verwijderen</string>
@@ -448,6 +472,7 @@ Language: nl
     <string name="settings_headphone_controls_action_previous">Vorige actie</string>
     <string name="settings_headphone_controls_action_next">Nieuwe actie</string>
     <string name="bookmarks_headphone_settings">Instellingen koptelefoon</string>
+    <string name="bookmarks_paid_user_empty_state_message">Je kan tijdstempels van afleveringen opslaan in het actiemenu van de speler of door een actie te configureren met je koptelefoon.</string>
     <string name="bookmark_play">Afspelen bij positie bladwijzer %s</string>
     <string name="bookmarks_plural">%d bladwijzers</string>
     <string name="bookmarks_singular">1 bladwijzer</string>
