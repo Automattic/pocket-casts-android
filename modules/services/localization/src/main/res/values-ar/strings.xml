@@ -1,12 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-03-24 23:54:03+0000
+Translation-Revision-Date: 2025-04-11 08:10:11+0000
 Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;
 Generator: GlotPress/2.4.0-alpha
 Language: ar
 -->
 <resources>
+    <string name="dismiss">تجاهل</string>
+    <string name="settings_privacy_analytics_third_party_summary">اسمح لنا باستخدام خدمات موثوق بها تابعة لأطراف ثالثة لجمع بيانات مجهولة الهوية.</string>
+    <string name="settings_privacy_analytics_third_party">تحليلات تابعة للأطراف الثالثة</string>
+    <string name="settings_privacy_analytics_first_party">تحليلات تابعة للأطراف الأولى</string>
+    <string name="tracking_consent_dialog_reject">طلب عدم التعقب من التطبيق</string>
+    <string name="tracking_consent_dialog_allow">السماح</string>
+    <string name="tracking_consent_dialog_message">نستخدم التحليلات لجعل التطبيق أفضل ولقياس ما إذا كانت حملاتنا الإعلانية ناجحة أم لا.</string>
+    <string name="tracking_consent_dialog_title">هل تسمح لـ \"Pocket Casts\" بتتبع نشاطك عبر تطبيقات الشركات الأخرى ومواقعها الإلكتروني؟</string>
+    <string name="donate">تبرع</string>
+    <string name="filters_tooltip_subtitle">أنشئ عوامل تصفية ذكية لتنظيم حلقاتك. قم بالتصفية حسب المدة وتاريخ الإصدار ونوع الوسائط والمزيد.</string>
+    <string name="filters_tooltip_title">تنظيم حلقاتك</string>
+    <string name="podcasts_sort_by_recently_played">تم التشغيل مؤخرًا</string>
+    <string name="podcasts_sort_by_tooltip_message">يمكنك الآن الفرز حسب \"تم التشغيل مؤخرًا\" والاستمرار بسرعة من حيث توقفت.</string>
+    <string name="podcasts_sort_by_tooltip_title">فرز حسب \"تم التشغيل مؤخرًا\"</string>
+    <string name="bookmarks_free_user_empty_state_button">الحصول على إشارات مرجعية</string>
+    <string name="bookmarks_free_user_empty_state_message">يمكنك حفظ التاريخ للحظات المهمة في إحدى الحلقات.</string>
+    <string name="bookmarks_empty_state_title">وضع إشارة مرجعية في تلك اللحظة</string>
+    <string name="discover_collection_header_content_description">%s ترويسة</string>
+    <string name="up_next_history_restore_confirmation_description">ستتم إضافة هذه الحلقات إلى أسفل صفحة \"التالي\" الحالية.</string>
+    <string name="up_next_history_restore_confirmation_title">استعادة \"التالي\"؟</string>
+    <string name="up_next_history_restore_button">@string/restore</string>
+    <string name="player_up_next_empty_subtitle">يمكنك إدراج الحلقات في قائمة الانتظار لتشغيلها بعد ذلك عن طريق التمرير إلى اليمين في صفوف الحلقة، أو النقر على الأيقونة الموجودة على بطاقة الحلقة.</string>
+    <string name="player_up_next_empty_title">إدارة جلسة الاستماع الخاصة بك</string>
     <string name="restore">يعيد</string>
+    <string name="up_next_history_explanation">قائمة بأحدث التحديثات إلى قائمة \"التالي\" بسبب التغييرات على الأجهزة الأخرى. لعرض الحلقات وللحصول على خيار لاستعادتها، اضغط على أي إدخال.</string>
+    <string name="up_next_history">سجل \"التالي\"</string>
+    <string name="restore_from_local_history">استعادة من السجل المحلي</string>
     <string name="delete_download_warning_summary">هل أنت متأكد من رغبتك في إزالة هذه التنزيلات؟ لن تتمكن من التشغيل من دون اتصال بالإنترنت.</string>
     <string name="delete_download_warning_title">إزالة الحلقات التي تم تنزيلها</string>
     <string name="delete_download_warning_button">إزالة ⁦%1$d⁩ من التنزيلات</string>
@@ -446,6 +472,7 @@ Language: ar
     <string name="settings_headphone_controls_action_previous">الإجراء السابق</string>
     <string name="settings_headphone_controls_action_next">الإجراء التالي</string>
     <string name="bookmarks_headphone_settings">إعدادات سماعة الرأس</string>
+    <string name="bookmarks_paid_user_empty_state_message">يمكنك حفظ تاريخ الحلقات من قائمة الإجراءات في المشغل أو من خلال تكوين إجراء باستخدام سماعات الرأس الخاصة بك.</string>
     <string name="bookmark_play">التشغيل في موضع الإشارات المرجعية %s</string>
     <string name="bookmarks_plural">%d من الإشارات المرجعية</string>
     <string name="bookmarks_singular">إشارة مرجعية واحدة</string>

@@ -1,14 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-03-25 09:54:04+0000
+Translation-Revision-Date: 2025-04-11 08:10:10+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="dismiss">해제</string>
+    <string name="settings_privacy_analytics_third_party_summary">신뢰할 수 있는 서드파티 서비스를 사용하여 익명 데이터를 수집하도록 허용합니다.</string>
+    <string name="settings_privacy_analytics_third_party">서드파티 분석</string>
+    <string name="settings_privacy_analytics_first_party">퍼스트파티 분석</string>
+    <string name="tracking_consent_dialog_reject">앱에 추적 안 함 요청</string>
+    <string name="tracking_consent_dialog_allow">허용</string>
+    <string name="tracking_consent_dialog_message">분석을 통해 앱을 개선하고 광고 캠페인이 성공적인지 측정합니다.</string>
+    <string name="tracking_consent_dialog_title">\"Pocket Casts\"에서 타사 앱과 웹사이트에서 회원님의 활동을 추적하도록 허용할까요?</string>
+    <string name="donate">기부</string>
+    <string name="filters_tooltip_subtitle">스마트 필터를 생성하여 에피소드를 정리하세요. 기간, 릴리스 날짜, 미디어 유형 등으로 필터링합니다.</string>
+    <string name="filters_tooltip_title">에피소드 정리</string>
+    <string name="podcasts_sort_by_recently_played">최근 재생</string>
+    <string name="podcasts_sort_by_tooltip_message">이제 최근 재생순으로 정렬하여 이전에 중단한 지점부터 이어서 들을 수 있습니다.</string>
+    <string name="podcasts_sort_by_tooltip_title">최근 재생순으로 정렬</string>
+    <string name="bookmarks_free_user_empty_state_button">북마크 저장</string>
+    <string name="bookmarks_free_user_empty_state_message">에피소드의 중요한 순간에 대한 타임스탬프를 저장할 수 있습니다.</string>
+    <string name="bookmarks_empty_state_title">해당 순간 북마크</string>
+    <string name="discover_collection_header_content_description">%s 헤더</string>
+    <string name="up_next_history_restore_confirmation_description">해당 에피소드는 현재 다음 차례 아래에 추가됩니다.</string>
+    <string name="up_next_history_restore_confirmation_title">다음 차례를 복원할까요?</string>
+    <string name="up_next_history_restore_button">\@문자열/복원</string>
+    <string name="player_up_next_empty_subtitle">에피소드 행에서 오른쪽으로 살짝 밀거나 에피소드 카드의 아이콘을 눌러 다음에 재생할 에피소드를 대기열에 추가할 수 있습니다.</string>
+    <string name="player_up_next_empty_title">청취 세션 큐레이션</string>
     <string name="restore">복원</string>
     <string name="up_next_history_explanation">다른 기기의 변경 사항으로 인한 변경 예정 사항의 최근 업데이트 목록입니다. 에피소드를 보고 복원하려면 아무 항목이나 누르세요.</string>
     <string name="up_next_history">변경 예정 사항 내역</string>
+    <string name="restore_from_local_history">로컬 기록에서 복원</string>
     <string name="delete_download_warning_summary">이러한 다운로드 항목을 제거하시겠습니까? 오프라인으로 재생할 수 없게 됩니다.</string>
     <string name="delete_download_warning_title">다운로드한 에피소드 제거</string>
     <string name="delete_download_warning_button">다운로드 항목 %1$d개 제거</string>
@@ -448,6 +472,7 @@ Language: ko_KR
     <string name="settings_headphone_controls_action_previous">이전 작업</string>
     <string name="settings_headphone_controls_action_next">다음 작업</string>
     <string name="bookmarks_headphone_settings">헤드폰 설정</string>
+    <string name="bookmarks_paid_user_empty_state_message">플레이어의 작업 메뉴에서 또는 헤드폰으로 작업을 구성하여 에피소드의 타임스탬프를 저장할 수 있습니다.</string>
     <string name="bookmark_play">북마크 위치에서 재생 %s</string>
     <string name="bookmarks_plural">북마크 %d개</string>
     <string name="bookmarks_singular">북마크 1개</string>
