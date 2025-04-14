@@ -22,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
+import au.com.shiftyjelly.pocketcasts.repositories.notification.OnboardingNotificationType
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.servers.di.Downloads
 import au.com.shiftyjelly.pocketcasts.servers.refresh.ImportOpmlResponse
@@ -48,6 +49,8 @@ import okio.source
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
+typealias OnboardingNotificationManager = au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManager
+
 @HiltWorker
 class OpmlImportTask @AssistedInject constructor(
     @Assisted context: Context,
@@ -57,6 +60,7 @@ class OpmlImportTask @AssistedInject constructor(
     @Downloads private val httpClient: OkHttpClient,
     private val notificationHelper: NotificationHelper,
     private val analyticsTracker: AnalyticsTracker,
+    private val onboardingNotificationManager: OnboardingNotificationManager,
 ) : CoroutineWorker(context, parameters) {
 
     companion object {
@@ -97,6 +101,7 @@ class OpmlImportTask @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
         try {
+            onboardingNotificationManager.updateUserFeatureInteraction(OnboardingNotificationType.Import)
             analyticsTracker.track(AnalyticsEvent.OPML_IMPORT_STARTED)
             val url = inputData.getString(INPUT_URL)?.toHttpUrlOrNull()
             val uri = inputData.getString(INPUT_URI)?.toUri()
