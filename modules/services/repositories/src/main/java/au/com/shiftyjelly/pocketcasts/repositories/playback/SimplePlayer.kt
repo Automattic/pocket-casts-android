@@ -212,8 +212,7 @@ class SimplePlayer(
             .setSeekBackIncrementMs(settings.skipBackInSecs.value * 1000L)
             .build()
         player.addListener(WearUnsuitableOutputPlaybackSuppressionResolverListener(context))
-
-        renderer.onAudioSessionId(player.audioSessionId)
+        player.addAnalyticsListener(renderer)
 
         handleStop()
         this.player = player
