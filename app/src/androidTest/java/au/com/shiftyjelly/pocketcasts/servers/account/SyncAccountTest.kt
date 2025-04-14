@@ -56,6 +56,7 @@ internal class SyncAccountTest {
             syncAccountManager = syncAccountManager,
             syncServiceManager = syncServiceManager,
             moshi = moshi,
+            notificationManager = mock(),
         )
         syncManager.signOut()
     }
