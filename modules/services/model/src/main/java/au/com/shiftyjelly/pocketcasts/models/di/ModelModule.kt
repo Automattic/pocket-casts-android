@@ -42,7 +42,7 @@ object ModelModule {
         val databaseBuilder = Room.databaseBuilder(application, AppDatabase::class.java, "pocketcasts")
         AppDatabase.addMigrations(databaseBuilder, application)
         if (BuildConfig.DEBUG) {
-            databaseBuilder.fallbackToDestructiveMigration()
+            databaseBuilder.fallbackToDestructiveMigration(dropAllTables = true)
         }
         return databaseBuilder
             .addTypeConverters(converters)

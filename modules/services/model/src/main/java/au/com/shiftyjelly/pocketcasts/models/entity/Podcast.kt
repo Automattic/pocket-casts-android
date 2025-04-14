@@ -78,25 +78,10 @@ data class Podcast(
     @ColumnInfo(name = "exclude_from_auto_archive") var excludeFromAutoArchive: Boolean = false, // Not used anymore
     @ColumnInfo(name = "override_global_archive") var overrideGlobalArchive: Boolean = false,
     @ColumnInfo(name = "override_global_archive_modified") var overrideGlobalArchiveModified: Date? = null,
-    @Deprecated(
-        message = "This property doesn't account for global override. Use 'autoArchiveAfterPlaying' instead.",
-        level = DeprecationLevel.ERROR,
-        replaceWith = ReplaceWith(expression = "autoArchiveAfterPlaying"),
-    )
     @ColumnInfo(name = "auto_archive_played_after") internal var rawAutoArchiveAfterPlaying: AutoArchiveAfterPlaying = AutoArchiveAfterPlaying.Never,
     @ColumnInfo(name = "auto_archive_played_after_modified") var autoArchiveAfterPlayingModified: Date? = null,
-    @Deprecated(
-        message = "This property doesn't account for global override. Use 'autoArchiveInactive' instead.",
-        level = DeprecationLevel.ERROR,
-        replaceWith = ReplaceWith(expression = "autoArchiveInactive"),
-    )
     @ColumnInfo(name = "auto_archive_inactive_after") internal var rawAutoArchiveInactive: AutoArchiveInactive = AutoArchiveInactive.Default,
     @ColumnInfo(name = "auto_archive_inactive_after_modified") var autoArchiveInactiveModified: Date? = null,
-    @Deprecated(
-        message = "This property doesn't account for global override. Use 'autoArchiveEpisodeLimit' instead.",
-        level = DeprecationLevel.ERROR,
-        replaceWith = ReplaceWith(expression = "autoArchiveEpisodeLimit"),
-    )
     @ColumnInfo(name = "auto_archive_episode_limit") internal var rawAutoArchiveEpisodeLimit: AutoArchiveLimit = AutoArchiveLimit.None,
     @ColumnInfo(name = "auto_archive_episode_limit_modified") var autoArchiveEpisodeLimitModified: Date? = null,
     @ColumnInfo(name = "estimated_next_episode") var estimatedNextEpisode: Date? = null,
@@ -110,11 +95,6 @@ data class Podcast(
     @ColumnInfo(name = "trim_silence_level") var trimMode: TrimMode = TrimMode.OFF,
     @ColumnInfo(name = "trim_silence_level_modified") var trimModeModified: Date? = null,
     @ColumnInfo(name = "refresh_available") var refreshAvailable: Boolean = false,
-    @Deprecated(
-        message = "This property doesn't account for home folder. Use 'folderUuid' instead.",
-        level = DeprecationLevel.ERROR,
-        replaceWith = ReplaceWith(expression = "folderUuid"),
-    )
     @ColumnInfo(name = "folder_uuid") internal var rawFolderUuid: String? = null,
     @ColumnInfo(name = "licensing") var licensing: Licensing = Licensing.KEEP_EPISODES,
     @ColumnInfo(name = "isPaid") var isPaid: Boolean = false,
