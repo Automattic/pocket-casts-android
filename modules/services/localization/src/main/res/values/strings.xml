@@ -1928,6 +1928,7 @@
     <string name="onboarding_welcome_back">Welcome Back</string>
     <string name="not_now">Not now</string>
     <string name="onboarding_log_in">Log in</string>
+    <string name="onboarding_get_started">Get started</string>
     <string name="onboarding_sign_up">Sign up</string>
     <string name="onboarding_continue_with_google">Continue with Google</string>
     <string name="onboarding_continue_with_google_error">Unable to launch Google sign in.</string>
@@ -2018,6 +2019,15 @@
     <string name="onboarding_can_import_from_opml">Pocket Casts can import podcasts from OPML files, so if your current app can export an OPML file, you can follow these steps:</string>
     <string name="onboarding_import_from_other_apps_step_1">Find the other app\’s export option and export an OPML file.</string>
     <string name="onboarding_import_from_other_apps_step_2">Use your phone\’s \“Share\” menu to send the file to Pocket Casts. Alternatively, import the file from Pocket Casts\’ \“Import &amp; export OPML\” settings menu.</string>
+    <string name="account_encourage_title">We noticed you’re not logged&#160;in</string>
+    <string name="account_encourage_description">Create an account or log in to enjoy Pocket&#160;Casts to the fullest.</string>
+    <string name="account_encourage_benefits_title">Account Benefits</string>
+    <string name="account_benefit_sync_title">Sync across devices</string>
+    <string name="account_benefit_sync_description">Sync your progress, and shows across all your devices.</string>
+    <string name="account_benefit_backups_title">Reliable backups</string>
+    <string name="account_benefit_backups_description">Your library and preferences are securely saved.</string>
+    <string name="account_benefit_recommendations_title">Personalized recommendations</string>
+    <string name="account_benefit_recommendations_description">Get tailored podcast suggestions based on your listening habits.</string>
 
     <!-- Notification channel -->
 
