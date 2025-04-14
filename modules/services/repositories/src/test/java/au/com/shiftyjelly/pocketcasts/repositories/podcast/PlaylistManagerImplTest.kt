@@ -43,7 +43,7 @@ class PlaylistManagerImplTest {
 
         advanceUntilIdle()
 
-        verify(notificationManager).trackUserInteractedWithFeature(OnboardingNotificationType.Filters)
+        verify(notificationManager).updateUserFeatureInteraction(OnboardingNotificationType.Filters)
     }
 
     @Test
@@ -54,7 +54,7 @@ class PlaylistManagerImplTest {
 
         advanceUntilIdle()
 
-        verify(notificationManager, never()).trackUserInteractedWithFeature(OnboardingNotificationType.Filters)
+        verify(notificationManager, never()).updateUserFeatureInteraction(OnboardingNotificationType.Filters)
     }
 
     private fun initViewModel(): PlaylistManagerImpl {

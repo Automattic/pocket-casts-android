@@ -44,7 +44,7 @@ class NotificationManagerTest {
 
     @Test
     fun `should update interacted_at when tracking user interaction feature`() = runTest {
-        notificationManager.trackUserInteractedWithFeature(Filters)
+        notificationManager.updateUserFeatureInteraction(Filters)
 
         val idCaptor = argumentCaptor<Int>()
         val timestampCaptor = argumentCaptor<Long>()

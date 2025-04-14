@@ -224,7 +224,7 @@ class PlaylistManagerImpl @Inject constructor(
     ) {
         if (isCreatingFilter) {
             launch(Dispatchers.IO) {
-                notificationManager.trackUserInteractedWithFeature(OnboardingNotificationType.Filters)
+                notificationManager.updateUserFeatureInteraction(OnboardingNotificationType.Filters)
             }
         }
         playlistDao.updateBlocking(playlist)
