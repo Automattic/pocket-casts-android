@@ -15,6 +15,8 @@ import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.preferences.AccountConstants
 import au.com.shiftyjelly.pocketcasts.preferences.RefreshToken
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManager
+import au.com.shiftyjelly.pocketcasts.repositories.notification.OnboardingNotificationType
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UploadProgressManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.toUploadData
 import au.com.shiftyjelly.pocketcasts.servers.model.AuthResultModel
@@ -78,6 +80,7 @@ class SyncManagerImpl @Inject constructor(
     private val syncAccountManager: SyncAccountManager,
     private val syncServiceManager: SyncServiceManager,
     private val moshi: Moshi,
+    private val notificationManager: NotificationManager,
 ) : NamedSettingsCaller, SyncManager {
 
     override val isLoggedInObservable = BehaviorRelay.create<Boolean>().apply {
@@ -490,7 +493,7 @@ class SyncManagerImpl @Inject constructor(
         return LoginResult.Failed(message = message, messageId = messageId)
     }
 
-    private fun trackSignIn(
+    private suspend fun trackSignIn(
         loginResult: LoginResult,
         signInSource: SignInSource,
         loginIdentity: LoginIdentity,
@@ -505,7 +508,7 @@ class SyncManagerImpl @Inject constructor(
                     SignInSource.WatchPhoneSync ->
                         analyticsTracker.track(AnalyticsEvent.USER_SIGNED_IN_WATCH_FROM_PHONE)
 
-                    is SignInSource.UserInitiated ->
+                    is SignInSource.UserInitiated -> {
                         analyticsTracker.track(
                             event = if (loginResult.result.isNewAccount) {
                                 AnalyticsEvent.USER_ACCOUNT_CREATED
@@ -517,6 +520,10 @@ class SyncManagerImpl @Inject constructor(
                                 TRACKS_KEY_SOURCE_IN_CODE to signInSource.analyticsValue,
                             ),
                         )
+                        if (loginResult.result.isNewAccount) {
+                            notificationManager.updateUserFeatureInteraction(OnboardingNotificationType.Sync)
+                        }
+                    }
                 }
             }
             is LoginResult.Failed -> {
@@ -544,13 +551,14 @@ class SyncManagerImpl @Inject constructor(
         }
     }
 
-    private fun trackRegister(loginResult: LoginResult) {
+    private suspend fun trackRegister(loginResult: LoginResult) {
         when (loginResult) {
             is LoginResult.Success -> {
                 analyticsTracker.track(
                     AnalyticsEvent.USER_ACCOUNT_CREATED,
                     mapOf(TRACKS_KEY_SOURCE to "password"), // This method is only used when creating an account with a password
                 )
+                notificationManager.updateUserFeatureInteraction(OnboardingNotificationType.Sync)
             }
             is LoginResult.Failed -> {
                 val errorCodeValue = loginResult.messageId ?: TracksAnalyticsTracker.INVALID_OR_NULL_VALUE
