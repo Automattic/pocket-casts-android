@@ -582,4 +582,5 @@ interface Settings {
     val isFreeAccountProfileBannerDismissed: UserSetting<Boolean>
     val isFreeAccountFiltersBannerDismissed: UserSetting<Boolean>
     val isFreeAccountHistoryBannerDismissed: UserSetting<Boolean>
+    val showFreeAccountEncouragement: UserSetting<Boolean>
 }

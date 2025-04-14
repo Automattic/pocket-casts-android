@@ -31,6 +31,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.commitNow
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
+import androidx.lifecycle.asFlow
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.mediarouter.media.MediaControlIntent
@@ -175,6 +176,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -477,6 +479,8 @@ class MainActivity :
         mediaRouter = MediaRouter.getInstance(this)
 
         ThemeSettingObserver(this, theme, settings.themeReconfigurationEvents).observeThemeChanges()
+
+        encourageAccountCreation()
     }
 
     private fun resetEoYBadgeIfNeeded() {
@@ -485,6 +489,22 @@ class MainActivity :
         ) {
             binding.bottomNavigation.removeBadge(VR.id.navigation_profile)
             settings.setEndOfYearShowBadge2023(false)
+        }
+    }
+
+    private fun encourageAccountCreation() {
+        if (FeatureFlag.isEnabled(Feature.ENCOURAGE_ACCOUNT_CREATION)) {
+            lifecycleScope.launch {
+                repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    val encourageAccountCreation = settings.showFreeAccountEncouragement.value
+                    if (encourageAccountCreation) {
+                        settings.showFreeAccountEncouragement.set(false, updateModifiedAt = true)
+                        if (!viewModel.signInState.asFlow().first().isSignedIn) {
+                            openOnboardingFlow(OnboardingFlow.AccountEncouragement)
+                        }
+                    }
+                }
+            }
         }
     }
 

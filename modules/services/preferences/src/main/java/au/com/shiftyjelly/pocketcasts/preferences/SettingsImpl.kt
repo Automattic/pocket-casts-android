@@ -1634,4 +1634,10 @@ class SettingsImpl @Inject constructor(
         defaultValue = false,
         sharedPrefs = sharedPreferences,
     )
+
+    override val showFreeAccountEncouragement = UserSetting.BoolPref(
+        sharedPrefKey = "show_free_account_encouragement",
+        defaultValue = true,
+        sharedPrefs = sharedPreferences,
+    )
 }
