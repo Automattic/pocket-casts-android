@@ -29,4 +29,6 @@ sealed class OnboardingFlow(val analyticsValue: String) : Parcelable {
     }
 
     @Parcelize data object Welcome : OnboardingFlow("welcome")
+
+    @Parcelize data object AccountEncouragement : OnboardingFlow("account_encouragement")
 }
