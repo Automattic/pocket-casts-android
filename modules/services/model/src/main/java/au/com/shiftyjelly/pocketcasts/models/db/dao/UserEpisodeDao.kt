@@ -67,7 +67,7 @@ abstract class UserEpisodeDao {
     abstract fun findEpisodeRxFlowable(uuid: String): Flowable<UserEpisode>
 
     @Query("SELECT * FROM user_episodes WHERE uuid = :uuid")
-    abstract fun findEpisodeFlow(uuid: String): Flow<UserEpisode>
+    abstract fun findEpisodeFlow(uuid: String): Flow<UserEpisode?>
 
     @Query("SELECT * FROM user_episodes WHERE uuid = :uuid")
     abstract fun findEpisodeByUuidRxMaybe(uuid: String): Maybe<UserEpisode>

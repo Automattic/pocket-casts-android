@@ -68,7 +68,7 @@ interface UserEpisodeManager {
     suspend fun deleteAll(episodes: List<UserEpisode>, playbackManager: PlaybackManager)
     suspend fun findUserEpisodes(): List<UserEpisode>
     fun episodeRxFlowable(uuid: String): Flowable<UserEpisode>
-    fun episodeFlow(uuid: String): Flow<UserEpisode>
+    fun episodeFlow(uuid: String): Flow<UserEpisode?>
     fun findEpisodeByUuidRxMaybe(uuid: String): Maybe<UserEpisode>
     suspend fun findEpisodeByUuid(uuid: String): UserEpisode?
     suspend fun findEpisodesByUuids(episodeUuids: List<String>): List<UserEpisode>
@@ -230,7 +230,7 @@ class UserEpisodeManagerImpl @Inject constructor(
         return userEpisodeDao.findEpisodeRxFlowable(uuid)
     }
 
-    override fun episodeFlow(uuid: String): Flow<UserEpisode> {
+    override fun episodeFlow(uuid: String): Flow<UserEpisode?> {
         return userEpisodeDao.findEpisodeFlow(uuid)
     }
 
