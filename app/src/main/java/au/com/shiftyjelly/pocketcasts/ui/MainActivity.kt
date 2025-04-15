@@ -80,6 +80,7 @@ import au.com.shiftyjelly.pocketcasts.deeplink.SignInDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.SonosDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.StaffPicksDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ThemesDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.TrendingDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.UpgradeAccountDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.UpsellDeepLink
 import au.com.shiftyjelly.pocketcasts.discover.util.DiscoverDeepLinkManager
@@ -1368,6 +1369,8 @@ class MainActivity :
                             addFragment(fragment)
                         }
                     }
+                }
+                is TrendingDeepLink -> {
                 }
                 is PlayFromSearchDeepLink -> {
                     playbackManager.mediaSessionManager.playFromSearchExternal(deepLink.query)

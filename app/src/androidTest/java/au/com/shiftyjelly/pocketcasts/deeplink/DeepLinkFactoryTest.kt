@@ -606,6 +606,17 @@ class DeepLinkFactoryTest {
     }
 
     @Test
+    fun trending() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("pktc://discover/trending"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(TrendingDeepLink, deepLink)
+    }
+
+    @Test
     fun nativeShare() {
         val intent = Intent()
             .setAction(ACTION_VIEW)
