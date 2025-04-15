@@ -15,6 +15,8 @@ import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManager
+import au.com.shiftyjelly.pocketcasts.repositories.notification.OnboardingNotificationType
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchaseEvent
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
@@ -40,6 +42,7 @@ class OnboardingUpgradeBottomSheetViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTracker,
     private val settings: Settings,
     private val subscriptionMapper: SubscriptionMapper,
+    private val notificationManager: NotificationManager,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -127,6 +130,7 @@ class OnboardingUpgradeBottomSheetViewModel @Inject constructor(
 
                 when (purchaseEvent) {
                     PurchaseEvent.Success -> {
+                        notificationManager.updateUserFeatureInteraction(OnboardingNotificationType.PlusUpsell)
                         onComplete()
                     }
                     is PurchaseEvent.Cancelled -> {
