@@ -4,6 +4,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -15,8 +16,10 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.import.OnboardingImport
 import au.com.shiftyjelly.pocketcasts.account.onboarding.recommendations.OnboardingRecommendationsFlow
 import au.com.shiftyjelly.pocketcasts.account.onboarding.recommendations.OnboardingRecommendationsFlow.onboardingRecommendationsFlowGraph
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeFlow
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingAccountBenefitsViewModel
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.SystemBarsStyles
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingExitInfo
@@ -136,17 +139,33 @@ private fun Content(
         )
 
         composable(OnboardingNavRoute.encourageFreeAccount) {
+            val viewModel = hiltViewModel<OnboardingAccountBenefitsViewModel>()
+
+            CallOnce {
+                viewModel.onScreenShown()
+            }
+
             AppTheme(theme) {
                 AccountBenefitsPage(
                     onGetStarted = {
+                        viewModel.onGetStartedClick()
                         navController.navigate(OnboardingNavRoute.logInOrSignUp) {
                             popUpTo(OnboardingNavRoute.encourageFreeAccount) {
                                 inclusive = true
                             }
                         }
                     },
-                    onLogIn = { navController.navigate(OnboardingNavRoute.logIn) },
-                    onClose = { exitOnboarding(OnboardingExitInfo()) },
+                    onLogIn = {
+                        viewModel.onLogInClick()
+                        navController.navigate(OnboardingNavRoute.logIn)
+                    },
+                    onClose = {
+                        viewModel.onDismissClick()
+                        exitOnboarding(OnboardingExitInfo())
+                    },
+                    onBenefitShown = { benefit ->
+                        viewModel.onBenefitShown(benefit.analyticsValue)
+                    },
                     modifier = Modifier.fillMaxSize(),
                 )
             }

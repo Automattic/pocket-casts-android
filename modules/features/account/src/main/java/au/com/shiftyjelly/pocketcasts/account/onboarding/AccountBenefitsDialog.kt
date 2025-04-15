@@ -18,6 +18,8 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -47,6 +49,7 @@ internal fun AccountBenefitsDialog(
     onGetStarted: () -> Unit,
     onLogIn: () -> Unit,
     onDismiss: () -> Unit,
+    onBenefitShown: (AccountBenefit) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Dialog(
@@ -71,7 +74,9 @@ internal fun AccountBenefitsDialog(
                 modifier = Modifier.height(20.dp),
             )
 
-            BenefitsPager()
+            BenefitsPager(
+                onBenefitShown = onBenefitShown,
+            )
 
             Spacer(
                 modifier = Modifier.height(32.dp),
@@ -147,10 +152,17 @@ private fun HeaderTexts(
 
 @Composable
 private fun BenefitsPager(
+    onBenefitShown: (AccountBenefit) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val benefits = AccountBenefit.entries
     val pagerState = PagerState { benefits.size }
+
+    LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.currentPage }.collect { page ->
+            onBenefitShown(benefits[page])
+        }
+    }
 
     HorizontalPager(
         state = pagerState,
@@ -244,6 +256,7 @@ private fun AccountBenefitsDialogPreview(
             onGetStarted = {},
             onLogIn = {},
             onDismiss = {},
+            onBenefitShown = {},
         )
     }
 }
