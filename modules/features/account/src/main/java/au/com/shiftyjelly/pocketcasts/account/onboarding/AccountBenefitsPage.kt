@@ -1,7 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding
 
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -54,7 +52,6 @@ import au.com.shiftyjelly.pocketcasts.compose.images.HorizontalLogo
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -199,7 +196,7 @@ private fun BenefitsAdaptiveContent(
                 Box(
                     modifier = Modifier.padding(start = 48.dp, end = 56.dp),
                 ) {
-                    Benefit.entries.forEach { benefit ->
+                    AccountBenefit.entries.forEach { benefit ->
                         BenefitCardText(benefit)
                     }
                 }
@@ -239,7 +236,7 @@ private fun BenefitsAdaptiveContent(
                             text = stringResource(LR.string.account_encourage_benefits_title),
                         )
                     }
-                    items(Benefit.entries) { benefit ->
+                    items(AccountBenefit.entries) { benefit ->
                         BenefitEntry(benefit)
                     }
                 }
@@ -262,7 +259,7 @@ private fun BenefitPager(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier,
     ) {
-        val benefits = Benefit.entries
+        val benefits = AccountBenefit.entries
         val pagerState = PagerState { benefits.size }
 
         HorizontalPager(
@@ -297,7 +294,7 @@ private fun BenefitPager(
 
 @Composable
 private fun BenefitCard(
-    benefit: Benefit,
+    benefit: AccountBenefit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -325,7 +322,7 @@ private fun BenefitCard(
 
 @Composable
 private fun BenefitCardText(
-    benefit: Benefit,
+    benefit: AccountBenefit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -348,7 +345,7 @@ private fun BenefitCardText(
 
 @Composable
 private fun BenefitEntry(
-    benefit: Benefit,
+    benefit: AccountBenefit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -382,32 +379,6 @@ private fun BenefitEntry(
             )
         }
     }
-}
-
-private enum class Benefit(
-    @StringRes val title: Int,
-    @StringRes val description: Int,
-    @DrawableRes val cardImage: Int,
-    @DrawableRes val listIcon: Int,
-) {
-    Sync(
-        title = LR.string.account_benefit_sync_title,
-        description = LR.string.account_benefit_sync_description,
-        cardImage = IR.drawable.account_benefit_sync,
-        listIcon = IR.drawable.ic_account_benefit_sync,
-    ),
-    Backups(
-        title = LR.string.account_benefit_backups_title,
-        description = LR.string.account_benefit_backups_description,
-        cardImage = IR.drawable.account_benefit_backups,
-        listIcon = IR.drawable.ic_account_benefit_backups,
-    ),
-    Recommendations(
-        title = LR.string.account_benefit_recommendations_title,
-        description = LR.string.account_benefit_recommendations_description,
-        cardImage = IR.drawable.account_benefit_recommendations,
-        listIcon = IR.drawable.ic_account_benefit_recommendations,
-    ),
 }
 
 @Preview(device = Devices.PortraitRegular)
