@@ -261,6 +261,11 @@ data object RecommendationsDeepLink : IntentableDeepLink {
         .setData(Uri.parse("pktc://discover/recommendations"))
 }
 
+data object AppOpenDeepLink : IntentableDeepLink {
+    override fun toIntent(context: Context) = Intent(ACTION_VIEW)
+        .setData(Uri.parse("pktc://open"))
+}
+
 data class PlayFromSearchDeepLink(
     val query: String,
 ) : DeepLink

@@ -553,6 +553,17 @@ class DeepLinkFactoryTest {
     }
 
     @Test
+    fun openApp() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("pktc://open"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(AppOpenDeepLink, deepLink)
+    }
+
+    @Test
     fun upgradeAccount() {
         val intent = Intent()
             .setAction(ACTION_VIEW)

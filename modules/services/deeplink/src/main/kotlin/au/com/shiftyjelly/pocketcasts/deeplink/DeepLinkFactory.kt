@@ -68,6 +68,7 @@ class DeepLinkFactory(
         PlayFromSearchAdapter(),
         AssistantAdapter(),
         ThemesAdapter(),
+        AppOpenAdapter(),
     )
 
     fun create(intent: Intent): DeepLink? {
@@ -569,6 +570,7 @@ private class OpmlAdapter(
             "subscribeonandroid.com",
             "www.subscribeonandroid.com",
             "discover",
+            "open",
         )
     }
 }
@@ -582,6 +584,20 @@ private class ImportAdapter : DeepLinkAdapter {
 
         return if (intent.action == ACTION_VIEW && scheme == "pktc" && host == "settings" && path == "/import") {
             ImportDeepLink
+        } else {
+            null
+        }
+    }
+}
+
+private class AppOpenAdapter : DeepLinkAdapter {
+    override fun create(intent: Intent): DeepLink? {
+        val uriData = intent.data ?: return null
+        val scheme = uriData.scheme
+        val host = uriData.host
+
+        return if (intent.action == ACTION_VIEW && scheme == "pktc" && host == "open") {
+            AppOpenDeepLink
         } else {
             null
         }

@@ -51,6 +51,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.databinding.ActivityMainBinding
 import au.com.shiftyjelly.pocketcasts.deeplink.AddBookmarkDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.AppOpenDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.AssistantDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ChangeBookmarkTitleDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.CloudFilesDeepLink
@@ -1257,6 +1258,9 @@ class MainActivity :
             val safeUri = intent.data?.buildUpon()?.clearQuery()?.build() // Remove query parameters from logging
             LogBuffer.i("DeepLink", "Opening deep link: $intent. Safe URI: $safeUri")
             when (val deepLink = deepLinkFactory.create(intent)) {
+                is AppOpenDeepLink -> {
+                    closeToRoot()
+                }
                 is DownloadsDeepLink -> {
                     closeToRoot()
                     addFragment(ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.Downloaded))
