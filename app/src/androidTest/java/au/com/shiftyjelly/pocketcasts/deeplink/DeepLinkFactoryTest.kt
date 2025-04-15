@@ -595,6 +595,17 @@ class DeepLinkFactoryTest {
     }
 
     @Test
+    fun staffPicks() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("pktc://discover/staffpicks"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(StaffPicksDeepLink, deepLink)
+    }
+
+    @Test
     fun nativeShare() {
         val intent = Intent()
             .setAction(ACTION_VIEW)
