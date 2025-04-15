@@ -134,7 +134,7 @@ class MainActivityTest {
         takeScreenshot()
 
         // open settings page
-        clickOn(PR.id.settings)
+        clickOnSettings()
         sleepSecs(1)
         takeScreenshot()
 
@@ -209,8 +209,8 @@ class MainActivityTest {
         onView(anyOf(withContentDescription(text))).perform(click())
     }
 
-    private fun clickOnUp() {
-        onView(anyOf(withContentDescription("Back"))).perform(click())
+    private fun clickOnSettings() {
+        onView(anyOf(withContentDescription("Podcast settings"))).perform(click())
     }
 
     private fun composeOptionsDialog(index: Int): SemanticsNodeInteraction {
