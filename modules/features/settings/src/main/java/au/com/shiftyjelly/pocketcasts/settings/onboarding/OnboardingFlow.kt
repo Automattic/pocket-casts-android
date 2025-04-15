@@ -19,7 +19,6 @@ sealed class OnboardingFlow(val analyticsValue: String) : Parcelable {
 
     @Parcelize class Upsell(
         override val source: OnboardingUpgradeSource,
-        val showPatronOnly: Boolean = false,
     ) : PlusFlow, OnboardingFlow("plus_upsell")
 
     @Parcelize class PatronAccountUpgrade(override val source: OnboardingUpgradeSource) : PlusFlow, OnboardingFlow("patron_account_upgrade")
