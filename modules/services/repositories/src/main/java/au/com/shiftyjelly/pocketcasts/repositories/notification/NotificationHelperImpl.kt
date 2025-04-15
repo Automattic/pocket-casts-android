@@ -176,6 +176,18 @@ class NotificationHelperImpl @Inject constructor(@ApplicationContext private val
         return NotificationCompat.Builder(context, Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_DAILY_REMINDERS.id)
     }
 
+    override fun trendingAndRecommendationsChannelBuilder(): NotificationCompat.Builder {
+        return NotificationCompat.Builder(context, Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_TRENDING_AND_RECOMMENDATIONS.id)
+    }
+
+    override fun featuresAndTipsChannelBuilder(): NotificationCompat.Builder {
+        return NotificationCompat.Builder(context, Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_NEW_FEATURES_AND_TIPS.id)
+    }
+
+    override fun offersChannelBuilder(): NotificationCompat.Builder {
+        return NotificationCompat.Builder(context, Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_OFFERS.id)
+    }
+
     /**
      * Opens the system notification activity for the episode channel.
      */
