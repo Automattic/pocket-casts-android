@@ -16,7 +16,7 @@ class NotificationManagerImpl @Inject constructor(
         userNotificationsDao.insert(userNotifications)
     }
 
-    override suspend fun trackUserInteractedWithFeature(type: OnboardingNotificationType) {
+    override suspend fun updateUserFeatureInteraction(type: OnboardingNotificationType) {
         userNotificationsDao.updateInteractedAt(type.notificationId, System.currentTimeMillis())
     }
 

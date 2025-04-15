@@ -92,7 +92,7 @@ class FolderEditViewModelTest {
 
         advanceUntilIdle()
 
-        verify(notificationManager).trackUserInteractedWithFeature(OnboardingNotificationType.Filters)
+        verify(notificationManager).updateUserFeatureInteraction(OnboardingNotificationType.Filters)
     }
 
     @Test
@@ -101,6 +101,6 @@ class FolderEditViewModelTest {
 
         advanceUntilIdle()
 
-        verify(notificationManager, never()).trackUserInteractedWithFeature(OnboardingNotificationType.Filters)
+        verify(notificationManager, never()).updateUserFeatureInteraction(OnboardingNotificationType.Filters)
     }
 }
