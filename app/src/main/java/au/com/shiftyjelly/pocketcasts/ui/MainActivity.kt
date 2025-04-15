@@ -64,6 +64,7 @@ import au.com.shiftyjelly.pocketcasts.deeplink.OpmlImportDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.PlayFromSearchDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.PocketCastsWebsiteGetDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.PromoCodeDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.RecommendationsDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ReferralsDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShareListDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowBookmarkDeepLink
@@ -1372,6 +1373,8 @@ class MainActivity :
                     if (podcastListFragment?.inferredId != TRENDING) {
                         openDiscoverListDeeplink(TRENDING)
                     }
+                }
+                is RecommendationsDeepLink -> {
                 }
                 is PlayFromSearchDeepLink -> {
                     playbackManager.mediaSessionManager.playFromSearchExternal(deepLink.query)

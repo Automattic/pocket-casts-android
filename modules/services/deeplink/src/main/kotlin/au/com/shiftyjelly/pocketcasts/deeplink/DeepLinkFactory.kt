@@ -593,6 +593,9 @@ private class DiscoverAdapter : DeepLinkAdapter {
                 "/trending" -> {
                     TrendingDeepLink
                 }
+                "/recommendations" -> {
+                    RecommendationsDeepLink
+                }
                 else -> { null }
             }
         } else { null }
