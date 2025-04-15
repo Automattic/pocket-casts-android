@@ -15,5 +15,6 @@ class DownloadsDeepLinkTest {
         val intent = DownloadsDeepLink.toIntent(context)
 
         assertEquals("INTENT_OPEN_APP_DOWNLOADING", intent.action)
+        assertEquals(Uri.parse("pktc://profile/downloads"), intent.data)
     }
 }

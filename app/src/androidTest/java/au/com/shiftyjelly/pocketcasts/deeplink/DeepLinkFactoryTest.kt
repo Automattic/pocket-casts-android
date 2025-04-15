@@ -25,7 +25,9 @@ class DeepLinkFactoryTest {
 
     @Test
     fun downloads() {
-        val intent = Intent().setAction("INTENT_OPEN_APP_DOWNLOADING")
+        val intent = Intent()
+            .setAction("INTENT_OPEN_APP_DOWNLOADING")
+            .setData(Uri.parse("pktc://profile/downloads"))
 
         val deepLink = factory.create(intent)
 

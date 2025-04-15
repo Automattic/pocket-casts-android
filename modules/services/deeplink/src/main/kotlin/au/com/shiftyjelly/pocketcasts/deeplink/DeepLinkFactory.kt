@@ -100,10 +100,20 @@ private interface DeepLinkAdapter {
 }
 
 private class DownloadsAdapter : DeepLinkAdapter {
-    override fun create(intent: Intent) = if (intent.action == ACTION_OPEN_DOWNLOADS) {
-        DownloadsDeepLink
-    } else {
-        null
+    override fun create(intent: Intent): DeepLink? {
+        return when {
+            isUriMatch(intent) -> DownloadsDeepLink
+            intent.action == ACTION_OPEN_DOWNLOADS -> DownloadsDeepLink
+            else -> null
+        }
+    }
+
+    private fun isUriMatch(intent: Intent): Boolean {
+        val uri = intent.data ?: return false
+        return intent.action == ACTION_VIEW &&
+            uri.scheme == "pktc" &&
+            uri.host == "profile" &&
+            uri.path == "/downloads"
     }
 }
 
