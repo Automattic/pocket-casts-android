@@ -142,6 +142,7 @@ class PodcastSyncProcessTest {
                 syncAccountManager = syncAccountManager,
                 syncServiceManager = syncServiceManager,
                 moshi = moshi,
+                notificationManager = mock(),
             )
 
             val syncProcess = PodcastSyncProcess(

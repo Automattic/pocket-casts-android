@@ -74,6 +74,7 @@ class PocketCastsAccountAuthenticatorTest {
             syncAccountManager = syncAccountManager,
             syncServiceManager = syncServiceManager,
             moshi = moshi,
+            notificationManager = mock(),
         )
         // make sure the test device is signed out
         syncManager.signOut()

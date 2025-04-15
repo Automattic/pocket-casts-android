@@ -312,7 +312,7 @@ class FolderEditViewModel
         analyticsTracker.track(analyticsEvent, properties)
         viewModelScope.launch {
             if (analyticsEvent == AnalyticsEvent.FOLDER_SAVED) {
-                notificationManager.trackUserInteractedWithFeature(OnboardingNotificationType.Filters)
+                notificationManager.updateUserFeatureInteraction(OnboardingNotificationType.Filters)
             }
         }
     }

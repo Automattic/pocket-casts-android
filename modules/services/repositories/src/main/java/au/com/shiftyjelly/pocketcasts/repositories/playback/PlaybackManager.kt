@@ -46,6 +46,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.file.CloudFilesManager
 import au.com.shiftyjelly.pocketcasts.repositories.history.upnext.UpNextHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManager
+import au.com.shiftyjelly.pocketcasts.repositories.notification.OnboardingNotificationType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.LocalPlayer.Companion.VOLUME_DUCK
 import au.com.shiftyjelly.pocketcasts.repositories.playback.LocalPlayer.Companion.VOLUME_NORMAL
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
@@ -138,6 +140,7 @@ open class PlaybackManager @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val crashLogging: CrashLogging,
     private val upNextHistoryManager: UpNextHistoryManager,
+    private val notificationManager: NotificationManager,
 ) : FocusManager.FocusChangeListener, AudioNoisyManager.AudioBecomingNoisyListener, CoroutineScope {
 
     companion object {
@@ -609,6 +612,7 @@ open class PlaybackManager @Inject constructor(
         upNextQueue.playNextBlocking(episode, downloadManager, null)
         if (userInitiated) {
             episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ADDED_TO_UP_NEXT, source, true, episode)
+            notificationManager.updateUserFeatureInteraction(OnboardingNotificationType.UpNext)
         }
         if (wasEmpty) {
             loadCurrentEpisode(play = false)
@@ -624,6 +628,7 @@ open class PlaybackManager @Inject constructor(
         upNextQueue.playLastBlocking(episode, downloadManager, null)
         if (userInitiated) {
             episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ADDED_TO_UP_NEXT, source, false, episode)
+            notificationManager.updateUserFeatureInteraction(OnboardingNotificationType.UpNext)
         }
         if (wasEmpty) {
             loadCurrentEpisode(play = false)
@@ -699,6 +704,7 @@ open class PlaybackManager @Inject constructor(
                 toTop = false,
                 source = source,
             )
+            notificationManager.updateUserFeatureInteraction(OnboardingNotificationType.UpNext)
             if (wasEmpty) {
                 loadCurrentEpisode(play = false)
             }
@@ -720,6 +726,7 @@ open class PlaybackManager @Inject constructor(
                 toTop = true,
                 source = source,
             )
+            notificationManager.updateUserFeatureInteraction(OnboardingNotificationType.UpNext)
             if (wasEmpty) {
                 loadCurrentEpisode(play = false)
             }
