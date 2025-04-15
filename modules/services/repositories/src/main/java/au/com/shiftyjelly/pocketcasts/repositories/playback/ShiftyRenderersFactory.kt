@@ -6,6 +6,7 @@ import androidx.annotation.OptIn
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.Renderer
+import androidx.media3.exoplayer.analytics.AnalyticsListener
 import androidx.media3.exoplayer.audio.AudioRendererEventListener
 import androidx.media3.exoplayer.audio.AudioSink
 import androidx.media3.exoplayer.audio.DefaultAudioSink
@@ -18,7 +19,11 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
  * PCM.
  */
 @OptIn(UnstableApi::class)
-class ShiftyRenderersFactory(context: Context?, statsManager: StatsManager, private var boostVolume: Boolean) : DefaultRenderersFactory(context!!) {
+class ShiftyRenderersFactory(
+    context: Context,
+    statsManager: StatsManager,
+    private var boostVolume: Boolean,
+) : DefaultRenderersFactory(context), AnalyticsListener {
     private var playbackSpeed = 0f
     private var internalRenderer: ShiftyAudioRendererV2? = null
     private var audioSink: AudioSink? = null
@@ -74,7 +79,7 @@ class ShiftyRenderersFactory(context: Context?, statsManager: StatsManager, priv
         }
     }
 
-    fun onAudioSessionId(audioSessionId: Int) {
+    override fun onAudioSessionIdChanged(eventTime: AnalyticsListener.EventTime, audioSessionId: Int) {
         customAudio.setupVolumeBoost(audioSessionId)
     }
 }
