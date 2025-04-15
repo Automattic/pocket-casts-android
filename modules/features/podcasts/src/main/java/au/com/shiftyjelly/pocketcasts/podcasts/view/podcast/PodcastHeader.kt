@@ -58,7 +58,6 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -70,7 +69,6 @@ import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
-import androidx.compose.ui.layout.positionOnScreen
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalInspectionMode
@@ -150,7 +148,6 @@ internal fun PodcastHeader(
     onToggleDescription: () -> Unit,
     onLongClickArtwork: () -> Unit,
     onArtworkAvailable: () -> Unit,
-    onTooltipOffsetMeasured: (Dp) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     BoxWithConstraints(
@@ -211,7 +208,6 @@ internal fun PodcastHeader(
                 onClickNotification = onClickNotification,
                 onClickDonate = onClickDonate,
                 onClickSettings = onClickSettings,
-                onTooltipOffsetMeasured = onTooltipOffsetMeasured,
             )
             AnimatedVisibility(
                 visible = isHeaderExpanded,
@@ -250,7 +246,6 @@ private fun PodcastControls(
     onClickNotification: () -> Unit,
     onClickDonate: () -> Unit,
     onClickSettings: () -> Unit,
-    onTooltipOffsetMeasured: (Dp) -> Unit,
 ) {
     val chevronRotation by animateFloatAsState(
         targetValue = if (isHeaderExpanded) 0f else 180f,
@@ -273,7 +268,6 @@ private fun PodcastControls(
                 onClickCategory = onClickCategory,
             )
         }
-        val density = LocalDensity.current
         TextH20(
             text = buildAnnotatedString {
                 append(title)
@@ -297,13 +291,7 @@ private fun PodcastControls(
                     indication = null,
                     interactionSource = null,
                     onClick = onClickTitle,
-                )
-                .onGloballyPositioned { coordinates ->
-                    val offset = coordinates.positionOnScreen()
-                    if (offset.isSpecified) {
-                        onTooltipOffsetMeasured(density.run { offset.y.toDp() })
-                    }
-                },
+                ),
         )
         PodcastRatingOrSpacing(
             rating = rating,
@@ -985,7 +973,6 @@ private fun PodcastHeaderPreview(
                 onToggleDescription = { isDescriptionExpanded = !isDescriptionExpanded },
                 onLongClickArtwork = {},
                 onArtworkAvailable = {},
-                onTooltipOffsetMeasured = {},
             )
         }
     }
