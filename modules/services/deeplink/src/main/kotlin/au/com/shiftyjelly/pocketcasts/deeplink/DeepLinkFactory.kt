@@ -63,6 +63,7 @@ class DeepLinkFactory(
         WebPlayerShareLinkAdapter(webBaseHost = webBaseHost, webPlayerHost = webPlayerHost),
         OpmlAdapter(listOf(listHost, shareHost)),
         ImportAdapter(),
+        StaffPicksAdapter(),
         PodcastUrlSchemeAdapter(listOf(listHost, shareHost, webBaseHost)),
         PlayFromSearchAdapter(),
         AssistantAdapter(),
@@ -434,6 +435,7 @@ private class ShareLinkNativeAdapter : DeepLinkAdapter {
             "upgrade",
             "redeem",
             "settings",
+            "discover",
         )
     }
 }
@@ -557,6 +559,7 @@ private class OpmlAdapter(
             "settings",
             "subscribeonandroid.com",
             "www.subscribeonandroid.com",
+            "discover",
         )
     }
 }
@@ -570,6 +573,21 @@ private class ImportAdapter : DeepLinkAdapter {
 
         return if (intent.action == ACTION_VIEW && scheme == "pktc" && host == "settings" && path == "/import") {
             ImportDeepLink
+        } else {
+            null
+        }
+    }
+}
+
+private class StaffPicksAdapter : DeepLinkAdapter {
+    override fun create(intent: Intent): DeepLink? {
+        val uriData = intent.data ?: return null
+        val scheme = uriData.scheme
+        val host = uriData.host
+        val path = uriData.path
+
+        return if (intent.action == ACTION_VIEW && scheme == "pktc" && host == "discover" && path == "/staffpicks") {
+            StaffPicksDeepLink
         } else {
             null
         }

@@ -65,4 +65,6 @@ dependencies {
     testImplementation(libs.okhttp)
     testImplementation(libs.retrofit)
     testImplementation(libs.retrofit.moshi)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(projects.modules.services.sharedtest)
 }

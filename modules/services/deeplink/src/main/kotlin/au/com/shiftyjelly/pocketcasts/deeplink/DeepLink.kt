@@ -245,6 +245,11 @@ data object ImportDeepLink : IntentableDeepLink {
         .setData(Uri.parse("pktc://settings/import"))
 }
 
+data object StaffPicksDeepLink : IntentableDeepLink {
+    override fun toIntent(context: Context) = Intent(ACTION_VIEW)
+        .setData(Uri.parse("pktc://discover/staffpicks"))
+}
+
 data class PlayFromSearchDeepLink(
     val query: String,
 ) : DeepLink

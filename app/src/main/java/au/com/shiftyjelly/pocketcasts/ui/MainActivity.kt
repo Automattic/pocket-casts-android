@@ -80,10 +80,14 @@ import au.com.shiftyjelly.pocketcasts.deeplink.ShowUpNextModalDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowUpNextTabDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.SignInDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.SonosDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.StaffPicksDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ThemesDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.UpgradeAccountDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.UpsellDeepLink
+import au.com.shiftyjelly.pocketcasts.discover.util.DiscoverDeepLinkManager
+import au.com.shiftyjelly.pocketcasts.discover.util.DiscoverDeepLinkManager.Companion.STAFF_PICKS_LIST_ID
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment
+import au.com.shiftyjelly.pocketcasts.discover.view.PodcastListFragment
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesActivity
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesActivity.StoriesSource
 import au.com.shiftyjelly.pocketcasts.endofyear.ui.EndOfYearLaunchBottomSheet
@@ -246,6 +250,8 @@ class MainActivity :
     @Inject lateinit var watchSync: WatchSync
 
     @Inject lateinit var notificationHelper: NotificationHelper
+
+    @Inject lateinit var discoverDeepLinkManager: DiscoverDeepLinkManager
 
     @Inject @ApplicationScope
     lateinit var applicationScope: CoroutineScope
@@ -1384,6 +1390,17 @@ class MainActivity :
                 }
                 is ImportDeepLink -> {
                     openImport()
+                }
+                is StaffPicksDeepLink -> {
+                    val podcastListFragment = supportFragmentManager.fragments.find { it is PodcastListFragment } as? PodcastListFragment
+                    if (podcastListFragment?.listUuid != STAFF_PICKS_LIST_ID) {
+                        openTab(VR.id.navigation_discover)
+                        lifecycleScope.launch {
+                            val staffPicksList = discoverDeepLinkManager.getDiscoverList(STAFF_PICKS_LIST_ID, resources) ?: return@launch
+                            val fragment = PodcastListFragment.newInstance(staffPicksList)
+                            addFragment(fragment)
+                        }
+                    }
                 }
                 is PlayFromSearchDeepLink -> {
                     playbackManager.mediaSessionManager.playFromSearchExternal(deepLink.query)
