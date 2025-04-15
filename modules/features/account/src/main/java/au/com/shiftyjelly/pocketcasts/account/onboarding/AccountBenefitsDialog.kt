@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.Devices
+import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowTextButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
@@ -212,12 +213,8 @@ private fun ActionButtons(
     Column(
         modifier = modifier,
     ) {
-        RowTextButton(
+        RowButton(
             text = stringResource(au.com.shiftyjelly.pocketcasts.localization.R.string.onboarding_get_started),
-            colors = ButtonDefaults.buttonColors(
-                backgroundColor = MaterialTheme.theme.colors.primaryText01,
-                contentColor = MaterialTheme.theme.colors.primaryUi01,
-            ),
             includePadding = false,
             onClick = onGetStarted,
         )
