@@ -113,6 +113,14 @@ class NotificationHelperImpl @Inject constructor(@ApplicationContext private val
         }
         channelList.add(onboardingChannel)
 
+        val trendingAndRecommendationsChannel = NotificationChannel(Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_TRENDING_AND_RECOMMENDATIONS.id, "Trending & Recommendations", NotificationManager.IMPORTANCE_DEFAULT).apply {
+            description = context.getString(LR.string.notification_channel_description_trending_and_recommendations)
+            setShowBadge(false)
+            enableVibration(true)
+            lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+        }
+        channelList.add(trendingAndRecommendationsChannel)
+
         notificationManager.createNotificationChannels(channelList)
     }
 

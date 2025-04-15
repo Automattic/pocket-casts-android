@@ -134,6 +134,7 @@ interface Settings {
         NOTIFICATION_CHANNEL_ID_FIX_DOWNLOADS("fixDownloads"),
         NOTIFICATION_CHANNEL_ID_FIX_DOWNLOADS_COMPLETE("fixDownloadsComplete"),
         NOTIFICATION_CHANNEL_ID_ONBOARDING("onboarding"),
+        NOTIFICATION_CHANNEL_ID_TRENDING_AND_RECOMMENDATIONS("trendingAndRecommendations"),
     }
 
     enum class NotificationId(val value: Int) {
