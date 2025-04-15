@@ -17,7 +17,7 @@ interface NotificationHelper {
     fun downloadsFixChannelBuilder(): NotificationCompat.Builder
     fun downloadsFixCompleteChannelBuilder(): NotificationCompat.Builder
     fun openEpisodeNotificationSettings(activity: Activity?)
-    fun onboardingChannelBuilder(): NotificationCompat.Builder
+    fun dailyRemindersChannelBuilder(): NotificationCompat.Builder
     fun isShowing(notificationId: Int): Boolean
     fun removeNotification(intentExtras: Bundle?, notificationId: Int)
 }
