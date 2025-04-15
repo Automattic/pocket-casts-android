@@ -1864,12 +1864,6 @@
         <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 
-    <style name="LightPopupTheme" parent="ThemeOverlay.AppCompat.Light">
-        <item name="android:backgroundTint">@android:color/white</item>
-        <item name="android:elevation">0dp</item>
-    </style>
-
-    <!-- Clip sharing theme to enable content resisign -->
     <style name="Theme.ClipSharing" parent="Theme.Design.BottomSheetDialog">
         <item name="android:windowIsFloating">false</item>
         <item name="android:windowSoftInputMode">adjustResize</item>
