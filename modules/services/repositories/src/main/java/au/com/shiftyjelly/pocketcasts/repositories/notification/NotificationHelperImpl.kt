@@ -121,6 +121,14 @@ class NotificationHelperImpl @Inject constructor(@ApplicationContext private val
         }
         channelList.add(trendingAndRecommendationsChannel)
 
+        val newFeaturesAndTipsChannel = NotificationChannel(Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_NEW_FEATURES_AND_TIPS.id, "New Features & Tips", NotificationManager.IMPORTANCE_DEFAULT).apply {
+            description = context.getString(LR.string.notification_channel_description_new_features_and_tips)
+            setShowBadge(false)
+            enableVibration(true)
+            lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+        }
+        channelList.add(newFeaturesAndTipsChannel)
+
         notificationManager.createNotificationChannels(channelList)
     }
 
