@@ -2034,6 +2034,7 @@
     <string name="notification_channel_description_daily_reminders">Shows daily tips to get you started during your first week.</string>
     <string name="notification_channel_description_trending_and_recommendations">Shows trending podcasts and curated recommendations to help you discover new favorites</string>
     <string name="notification_channel_description_new_features_and_tips">Shows notifications about new features, updates, and handy tips to help you optimize your Pocket Casts experience</string>
+    <string name="notification_channel_description_offers">Shows notifications about exclusive offers, discounts, and promotions to help you make the most of your Pocket Casts experience</string>
 
     <!-- Bookmarks -->
 

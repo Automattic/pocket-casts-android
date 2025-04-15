@@ -134,6 +134,7 @@ interface Settings {
         NOTIFICATION_CHANNEL_ID_DAILY_REMINDERS("dailyReminders"),
         NOTIFICATION_CHANNEL_ID_TRENDING_AND_RECOMMENDATIONS("trendingAndRecommendations"),
         NOTIFICATION_CHANNEL_ID_NEW_FEATURES_AND_TIPS("newFeaturesAndTips"),
+        NOTIFICATION_CHANNEL_ID_OFFERS("offers"),
     }
 
     enum class NotificationId(val value: Int) {
