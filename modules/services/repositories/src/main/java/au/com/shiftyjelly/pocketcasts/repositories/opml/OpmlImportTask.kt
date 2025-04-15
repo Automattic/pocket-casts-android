@@ -48,8 +48,7 @@ import okio.Source
 import okio.source
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-
-typealias OnboardingNotificationManager = au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManager
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManager as OnboardingNotificationManager
 
 @HiltWorker
 class OpmlImportTask @AssistedInject constructor(
