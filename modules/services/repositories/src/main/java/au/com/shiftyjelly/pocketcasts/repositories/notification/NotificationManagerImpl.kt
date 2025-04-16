@@ -9,11 +9,11 @@ class NotificationManagerImpl @Inject constructor(
 ) : NotificationManager {
 
     override suspend fun setupOnboardingNotifications() {
-        val userNotifications = OnboardingNotificationType.values.map { notification ->
-            UserNotifications(notificationId = notification.notificationId)
-        }
+        setupNotificationsForType(OnboardingNotificationType.values) { it.notificationId }
+    }
 
-        userNotificationsDao.insert(userNotifications)
+    override suspend fun setupReEngagementNotifications() {
+        setupNotificationsForType(ReEngagementNotificationType.values) { it.notificationId }
     }
 
     override suspend fun updateUserFeatureInteraction(type: NotificationType) {
@@ -34,5 +34,15 @@ class NotificationManagerImpl @Inject constructor(
                 lastSentAt = System.currentTimeMillis()
             }
             ?.let { userNotificationsDao.update(it) }
+    }
+
+    private suspend fun <T> setupNotificationsForType(
+        values: Iterable<T>,
+        getId: (T) -> Int,
+    ) {
+        val userNotifications = values.map { notification ->
+            UserNotifications(notificationId = getId(notification))
+        }
+        userNotificationsDao.insert(userNotifications)
     }
 }

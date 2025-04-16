@@ -188,6 +188,7 @@ class PocketCastsApplication : Application(), Configuration.Provider {
 
             notificationHelper.setupNotificationChannels()
             notificationManager.setupOnboardingNotifications()
+            notificationManager.setupReEngagementNotifications()
             appLifecycleObserver.setup()
 
             Coil.setImageLoader(coilImageLoader)

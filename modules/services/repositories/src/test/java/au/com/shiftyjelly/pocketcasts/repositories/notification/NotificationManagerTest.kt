@@ -43,6 +43,20 @@ class NotificationManagerTest {
     }
 
     @Test
+    fun `should setup re-engagement notifications`() = runTest {
+        val insertedIds = ReEngagementNotificationType.values.map { it.notificationId }
+
+        notificationManager.setupReEngagementNotifications()
+
+        val userNotificationsCaptor = argumentCaptor<List<UserNotifications>>()
+        verify(userNotificationsDao).insert(userNotificationsCaptor.capture())
+        val capturedUserNotifications = userNotificationsCaptor.firstValue
+
+        val expectedUserNotifications = insertedIds.map { UserNotifications(notificationId = it.toInt()) }
+        assertEquals(expectedUserNotifications, capturedUserNotifications)
+    }
+
+    @Test
     fun `should update interacted_at when tracking user interaction feature`() = runTest {
         notificationManager.updateUserFeatureInteraction(Filters)
 
