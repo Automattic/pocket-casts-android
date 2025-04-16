@@ -311,6 +311,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
                         actionLabel = stringResource(LR.string.encourage_account_banner_action_label),
                         icon = painterResource(IR.drawable.ic_filters_clock),
                         onActionClick = {
+                            viewModel.onCreateFreeAccountClick()
                             OnboardingLauncher.openOnboardingFlow(
                                 activity = requireActivity(),
                                 onboardingFlow = OnboardingFlow.LoggedOut,

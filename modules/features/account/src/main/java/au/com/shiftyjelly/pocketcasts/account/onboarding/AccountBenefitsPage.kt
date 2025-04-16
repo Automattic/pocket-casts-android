@@ -24,6 +24,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -59,6 +61,7 @@ internal fun AccountBenefitsPage(
     onGetStarted: () -> Unit,
     onLogIn: () -> Unit,
     onClose: () -> Unit,
+    onBenefitShown: (AccountBenefit) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -72,6 +75,7 @@ internal fun AccountBenefitsPage(
         )
 
         BenefitsAdaptiveContent(
+            onBenefitShown = onBenefitShown,
             modifier = Modifier.weight(1f),
         )
 
@@ -180,6 +184,7 @@ private fun ActionButtons(
 
 @Composable
 private fun BenefitsAdaptiveContent(
+    onBenefitShown: (AccountBenefit) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     SubcomposeLayout(
@@ -214,6 +219,7 @@ private fun BenefitsAdaptiveContent(
                         modifier = Modifier.padding(24.dp),
                     )
                     BenefitPager(
+                        onBenefitShown = onBenefitShown,
                         contentPadding = PaddingValues(horizontal = 24.dp),
                         contentSpacing = 16.dp,
                         modifier = Modifier.padding(vertical = 20.dp),
@@ -251,6 +257,7 @@ private fun BenefitsAdaptiveContent(
 
 @Composable
 private fun BenefitPager(
+    onBenefitShown: (AccountBenefit) -> Unit,
     contentPadding: PaddingValues,
     contentSpacing: Dp,
     modifier: Modifier = Modifier,
@@ -261,6 +268,12 @@ private fun BenefitPager(
     ) {
         val benefits = AccountBenefit.entries
         val pagerState = PagerState { benefits.size }
+
+        LaunchedEffect(pagerState) {
+            snapshotFlow { pagerState.currentPage }.collect { page ->
+                onBenefitShown(benefits[page])
+            }
+        }
 
         HorizontalPager(
             state = pagerState,
@@ -392,6 +405,7 @@ private fun AccountBenefitsPagePreview(
             onGetStarted = {},
             onLogIn = {},
             onClose = {},
+            onBenefitShown = {},
         )
     }
 }

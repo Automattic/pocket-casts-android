@@ -197,7 +197,12 @@ class ProfileViewModel @Inject constructor(
         settings.upgradeProfileClosed.set(true, updateModifiedAt = false)
     }
 
+    internal fun onCreateFreeAccountClick() {
+        tracker.track(AnalyticsEvent.INFORMATIONAL_BANNER_VIEW_CREATE_ACCOUNT_TAP, mapOf("source" to "profile"))
+    }
+
     internal fun dismissFreeAccountBanner() {
+        tracker.track(AnalyticsEvent.INFORMATIONAL_BANNER_VIEW_DISMISSED, mapOf("source" to "profile"))
         settings.isFreeAccountProfileBannerDismissed.set(true, updateModifiedAt = true)
     }
 }

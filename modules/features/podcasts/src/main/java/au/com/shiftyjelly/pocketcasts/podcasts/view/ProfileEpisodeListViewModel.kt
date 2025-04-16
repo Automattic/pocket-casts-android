@@ -125,7 +125,12 @@ class ProfileEpisodeListViewModel @Inject constructor(
         initialValue = false,
     )
 
+    internal fun onCreateFreeAccountClick() {
+        analyticsTracker.track(AnalyticsEvent.INFORMATIONAL_BANNER_VIEW_CREATE_ACCOUNT_TAP, mapOf("source" to "listening_history"))
+    }
+
     internal fun dismissFreeAccountBanner() {
+        analyticsTracker.track(AnalyticsEvent.INFORMATIONAL_BANNER_VIEW_DISMISSED, mapOf("source" to "listening_history"))
         settings.isFreeAccountHistoryBannerDismissed.set(true, updateModifiedAt = true)
     }
 

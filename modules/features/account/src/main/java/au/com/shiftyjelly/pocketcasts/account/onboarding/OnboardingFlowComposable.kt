@@ -4,6 +4,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -15,8 +16,10 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.import.OnboardingImport
 import au.com.shiftyjelly.pocketcasts.account.onboarding.recommendations.OnboardingRecommendationsFlow
 import au.com.shiftyjelly.pocketcasts.account.onboarding.recommendations.OnboardingRecommendationsFlow.onboardingRecommendationsFlowGraph
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeFlow
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingAccountBenefitsViewModel
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.SystemBarsStyles
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingExitInfo
@@ -78,8 +81,6 @@ private fun Content(
         is OnboardingFlow.ReferralLoginOrSignUp,
         -> OnboardingNavRoute.logInOrSignUp
 
-        is OnboardingFlow.LogIn -> OnboardingNavRoute.logIn
-
         // Cannot use OnboardingNavRoute.PlusUpgrade.routeWithSource here, it is set as a defaultValue in the PlusUpgrade composable,
         // see https://stackoverflow.com/a/70410872/1910286
         is OnboardingFlow.PlusAccountUpgrade,
@@ -136,17 +137,37 @@ private fun Content(
         )
 
         composable(OnboardingNavRoute.encourageFreeAccount) {
+            val viewModel = hiltViewModel<OnboardingAccountBenefitsViewModel>()
+
+            CallOnce {
+                viewModel.onScreenShown()
+            }
+
             AppTheme(theme) {
                 AccountBenefitsPage(
                     onGetStarted = {
+                        viewModel.onGetStartedClick()
                         navController.navigate(OnboardingNavRoute.logInOrSignUp) {
                             popUpTo(OnboardingNavRoute.encourageFreeAccount) {
                                 inclusive = true
                             }
                         }
                     },
-                    onLogIn = { navController.navigate(OnboardingNavRoute.logIn) },
-                    onClose = { exitOnboarding(OnboardingExitInfo()) },
+                    onLogIn = {
+                        viewModel.onLogInClick()
+                        navController.navigate(OnboardingNavRoute.logInOrSignUp) {
+                            popUpTo(OnboardingNavRoute.encourageFreeAccount) {
+                                inclusive = true
+                            }
+                        }
+                    },
+                    onClose = {
+                        viewModel.onDismissClick()
+                        exitOnboarding(OnboardingExitInfo())
+                    },
+                    onBenefitShown = { benefit ->
+                        viewModel.onBenefitShown(benefit.analyticsValue)
+                    },
                     modifier = Modifier.fillMaxSize(),
                 )
             }
@@ -176,7 +197,6 @@ private fun Content(
 
                         is OnboardingFlow.InitialOnboarding,
                         is OnboardingFlow.LoggedOut,
-                        is OnboardingFlow.LogIn,
                         is OnboardingFlow.EngageSdk,
                         is OnboardingFlow.ReferralLoginOrSignUp,
                         -> exitOnboarding(OnboardingExitInfo())
@@ -207,16 +227,7 @@ private fun Content(
         composable(OnboardingNavRoute.logIn) {
             OnboardingLoginPage(
                 theme = theme,
-                onBackPressed = {
-                    val popped = navController.popBackStack()
-                    if (!popped) {
-                        navController.navigate(OnboardingNavRoute.logInOrSignUp) {
-                            popUpTo(OnboardingNavRoute.logIn) {
-                                inclusive = true
-                            }
-                        }
-                    }
-                },
+                onBackPressed = { navController.popBackStack() },
                 onLoginComplete = {
                     onLoginToExistingAccount(flow, exitOnboarding, navController)
                 },
@@ -344,7 +355,6 @@ private fun onLoginToExistingAccount(
         is OnboardingFlow.AccountEncouragement,
         is OnboardingFlow.InitialOnboarding,
         is OnboardingFlow.LoggedOut,
-        is OnboardingFlow.LogIn,
         is OnboardingFlow.EngageSdk,
         -> exitOnboarding(OnboardingExitInfo(showPlusPromotionForFreeUser = true))
 
