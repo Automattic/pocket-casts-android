@@ -150,7 +150,7 @@ sealed class ReEngagementNotificationType(
         titleRes = LR.string.notification_reengage_we_miss_you_title,
         messageRes = LR.string.notification_reengage_we_miss_you_message,
     ) {
-        override fun toIntent(context: Context): Intent = DownloadsDeepLink.toIntent(context)
+        override fun toIntent(context: Context): Intent = StaffPicksDeepLink.toIntent(context)
     }
 
     object CatchUpOffline : ReEngagementNotificationType(

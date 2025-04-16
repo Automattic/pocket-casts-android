@@ -46,7 +46,7 @@ class NotificationSchedulerImpl @Inject constructor(
         val initialDelay = NotificationDelayCalculator().calculateDelayForReEngagementCheck()
 
         val workData = workDataOf(
-            "subcategory" to ReEngagementNotificationType.SUBCATEGORY_REENGAGE_CATCH_UP_OFFLINE, // This is the default re-engagement notification
+            "subcategory" to ReEngagementNotificationType.SUBCATEGORY_REENGAGE_WE_MISS_YOU,
         )
 
         val notificationWork = PeriodicWorkRequest.Builder(NotificationWorker::class.java, 1, TimeUnit.DAYS)

@@ -51,6 +51,7 @@ interface EpisodeManager {
     fun findDownloadedEpisodesRxFlowable(): Flowable<List<PodcastEpisode>>
     fun findStarredEpisodesRxFlowable(): Flowable<List<PodcastEpisode>>
     suspend fun findStarredEpisodes(): List<PodcastEpisode>
+    suspend fun downloadedEpisodesThatHaveNotBeenPlayedCountBlocking(): Int
 
     /** Add methods  */
     fun addBlocking(episode: PodcastEpisode, downloadMetaData: Boolean): Boolean
