@@ -114,6 +114,7 @@ class AppLifecycleObserverTest {
 
         verify(appLifecycleAnalytics, never()).onApplicationUpgrade(any())
         verify(notificationScheduler, times(1)).setupOnboardingNotifications()
+        verify(notificationScheduler, times(1)).setupReEngagementNotification()
     }
 
     @Test
@@ -133,6 +134,7 @@ class AppLifecycleObserverTest {
         verify(useUpNextDarkThemeSetting).set(false, updateModifiedAt = false)
         verify(appLifecycleAnalytics, never()).onApplicationUpgrade(any())
         verify(notificationScheduler, never()).setupOnboardingNotifications()
+        verify(notificationScheduler, times(1)).setupReEngagementNotification()
     }
 
     @Test
@@ -152,6 +154,7 @@ class AppLifecycleObserverTest {
         verify(useUpNextDarkThemeSetting).set(false, updateModifiedAt = false)
         verify(appLifecycleAnalytics, never()).onApplicationUpgrade(any())
         verify(notificationScheduler, never()).setupOnboardingNotifications()
+        verify(notificationScheduler, times(1)).setupReEngagementNotification()
     }
 
     /* UPGRADE */
@@ -170,5 +173,6 @@ class AppLifecycleObserverTest {
         verify(dailyRemindersNotificationSetting, never()).set(any(), any(), any(), any())
         verify(useUpNextDarkThemeSetting, never()).set(any(), any(), any(), any())
         verify(notificationScheduler, never()).setupOnboardingNotifications()
+        verify(notificationScheduler, times(1)).setupReEngagementNotification()
     }
 }

@@ -65,6 +65,7 @@ class AppLifecycleObserver(
         handleNewInstallOrUpgrade()
         setupFeatureFlags()
         networkConnectionWatcher.startWatching()
+        notificationScheduler.setupReEngagementNotification()
     }
 
     override fun onResume(owner: LifecycleOwner) {

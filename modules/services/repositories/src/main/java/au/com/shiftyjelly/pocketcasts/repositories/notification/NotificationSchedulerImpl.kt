@@ -1,7 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.repositories.notification
 
 import android.content.Context
+import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.OneTimeWorkRequest
+import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import androidx.work.workDataOf
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -38,5 +40,25 @@ class NotificationSchedulerImpl @Inject constructor(
 
             WorkManager.getInstance(context).enqueue(notificationWork)
         }
+    }
+
+    override fun setupReEngagementNotification() {
+        val initialDelay = NotificationDelayCalculator().calculateDelayForReEngagementCheck()
+
+        val workData = workDataOf(
+            "subcategory" to ReEngagementNotificationType.SUBCATEGORY_REENGAGE_CATCH_UP_OFFLINE, // This is the default re-engagement notification
+        )
+
+        val notificationWork = PeriodicWorkRequest.Builder(NotificationWorker::class.java, 1, TimeUnit.DAYS)
+            .setInputData(workData)
+            .setInitialDelay(initialDelay, TimeUnit.MILLISECONDS)
+            .addTag("daily_re_engagement_check")
+            .build()
+
+        WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+            "daily_re_engagement_check",
+            ExistingPeriodicWorkPolicy.REPLACE,
+            notificationWork,
+        )
     }
 }
