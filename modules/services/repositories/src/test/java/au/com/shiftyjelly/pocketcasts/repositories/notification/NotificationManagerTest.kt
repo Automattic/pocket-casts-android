@@ -67,6 +67,18 @@ class NotificationManagerTest {
     }
 
     @Test
+    fun `should update interacted_at when tracking user interaction feature passing id`() = runTest {
+        val id = 99
+
+        notificationManager.updateUserFeatureInteraction(id)
+
+        val idCaptor = argumentCaptor<Int>()
+        val timestampCaptor = argumentCaptor<Long>()
+        verify(userNotificationsDao).updateInteractedAt(idCaptor.capture(), timestampCaptor.capture())
+        assertEquals(id, idCaptor.firstValue)
+    }
+
+    @Test
     fun `should return false when user has not interacted with feature`() = runTest {
         val userNotification = UserNotifications(notificationId = Filters.notificationId, interactedAt = null)
         whenever(userNotificationsDao.getUserNotification(Filters.notificationId)).thenReturn(userNotification)

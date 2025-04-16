@@ -127,14 +127,15 @@ sealed class OnboardingNotificationType(
 }
 
 sealed class ReEngagementNotificationType(
-    override val notificationId: Int,
     override val subcategory: String,
     override val titleRes: Int,
     override val messageRes: Int,
 ) : NotificationType {
 
+    override val notificationId: Int
+        get() = ReEngagementNotificationType.notificationId
+
     object WeMissYou : ReEngagementNotificationType(
-        notificationId = NotificationId.RE_ENGAGEMENT.value,
         subcategory = SUBCATEGORY_REENGAGE_WE_MISS_YOU,
         titleRes = LR.string.notification_reengage_we_miss_you_title,
         messageRes = LR.string.notification_reengage_we_miss_you_message,
@@ -143,7 +144,6 @@ sealed class ReEngagementNotificationType(
     }
 
     object CatchUpOffline : ReEngagementNotificationType(
-        notificationId = NotificationId.RE_ENGAGEMENT.value,
         subcategory = SUBCATEGORY_REENGAGE_CATCH_UP_OFFLINE,
         titleRes = LR.string.notification_reengage_catch_up_offline_title,
         messageRes = LR.string.notification_reengage_catch_up_offline_message,
@@ -154,6 +154,9 @@ sealed class ReEngagementNotificationType(
     companion object {
         const val SUBCATEGORY_REENGAGE_WE_MISS_YOU = "we_miss_you"
         const val SUBCATEGORY_REENGAGE_CATCH_UP_OFFLINE = "catch_up_offline"
+
+        val notificationId: Int
+            get() = NotificationId.RE_ENGAGEMENT.value
 
         val values: List<ReEngagementNotificationType>
             get() = listOf(
