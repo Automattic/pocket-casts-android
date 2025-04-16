@@ -7,6 +7,8 @@ import kotlinx.parcelize.Parcelize
 sealed class OnboardingFlow(val analyticsValue: String) : Parcelable {
     @Parcelize object LoggedOut : OnboardingFlow("logged_out")
 
+    @Parcelize object LogIn : OnboardingFlow("log_in")
+
     @Parcelize object InitialOnboarding : OnboardingFlow("initial_onboarding")
 
     @Parcelize object EngageSdk : OnboardingFlow("engage_sdk")
@@ -19,7 +21,6 @@ sealed class OnboardingFlow(val analyticsValue: String) : Parcelable {
 
     @Parcelize class Upsell(
         override val source: OnboardingUpgradeSource,
-        val showPatronOnly: Boolean = false,
     ) : PlusFlow, OnboardingFlow("plus_upsell")
 
     @Parcelize class PatronAccountUpgrade(override val source: OnboardingUpgradeSource) : PlusFlow, OnboardingFlow("patron_account_upgrade")

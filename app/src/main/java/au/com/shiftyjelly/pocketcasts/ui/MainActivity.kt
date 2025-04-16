@@ -41,6 +41,7 @@ import androidx.transition.Slide
 import au.com.shiftyjelly.pocketcasts.R
 import au.com.shiftyjelly.pocketcasts.account.AccountActivity
 import au.com.shiftyjelly.pocketcasts.account.PromoCodeUpgradedFragment
+import au.com.shiftyjelly.pocketcasts.account.onboarding.AccountBenefitsFragment
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivity
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContract
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContract.OnboardingFinish
@@ -143,6 +144,7 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Network
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -497,11 +499,20 @@ class MainActivity :
             lifecycleScope.launch {
                 repeatOnLifecycle(Lifecycle.State.STARTED) {
                     val encourageAccountCreation = settings.showFreeAccountEncouragement.value
-                    if (encourageAccountCreation) {
-                        settings.showFreeAccountEncouragement.set(false, updateModifiedAt = true)
-                        if (!viewModel.signInState.asFlow().first().isSignedIn) {
-                            openOnboardingFlow(OnboardingFlow.AccountEncouragement)
-                        }
+                    if (!encourageAccountCreation) {
+                        return@repeatOnLifecycle
+                    }
+                    settings.showFreeAccountEncouragement.set(false, updateModifiedAt = true)
+
+                    val isSignedIn = viewModel.signInState.asFlow().first().isSignedIn
+                    if (isSignedIn) {
+                        return@repeatOnLifecycle
+                    }
+
+                    if (Util.isTablet(this@MainActivity)) {
+                        AccountBenefitsFragment().show(supportFragmentManager, "account_benefits_fragment")
+                    } else {
+                        openOnboardingFlow(OnboardingFlow.AccountEncouragement)
                     }
                 }
             }
