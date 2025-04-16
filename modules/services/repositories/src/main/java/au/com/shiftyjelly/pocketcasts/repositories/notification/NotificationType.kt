@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.deeplink.ShowUpNextTabDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.StaffPicksDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ThemesDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.UpsellDeepLink
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.NotificationId
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -20,6 +21,7 @@ sealed interface NotificationType {
     val messageRes: Int
 
     fun toIntent(context: Context): Intent
+    fun isSettingsToggleOn(settings: Settings): Boolean
 }
 
 sealed class OnboardingNotificationType(
@@ -29,6 +31,10 @@ sealed class OnboardingNotificationType(
     override val messageRes: Int,
     val dayOffset: Int,
 ) : NotificationType {
+
+    override fun isSettingsToggleOn(settings: Settings): Boolean {
+        return settings.dailyRemindersNotification.value
+    }
 
     object Sync : OnboardingNotificationType(
         notificationId = NotificationId.ONBOARDING_SYNC.value,
@@ -134,6 +140,10 @@ sealed class ReEngagementNotificationType(
 
     override val notificationId: Int
         get() = ReEngagementNotificationType.notificationId
+
+    override fun isSettingsToggleOn(settings: Settings): Boolean {
+        return settings.dailyRemindersNotification.value
+    }
 
     object WeMissYou : ReEngagementNotificationType(
         subcategory = SUBCATEGORY_REENGAGE_WE_MISS_YOU,

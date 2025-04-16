@@ -20,7 +20,7 @@ import dagger.assisted.AssistedInject
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 @HiltWorker
-class OnboardingNotificationWorker @AssistedInject constructor(
+class NotificationWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
     private val settings: Settings,
@@ -28,12 +28,13 @@ class OnboardingNotificationWorker @AssistedInject constructor(
     private val notificationManager: NotificationManager,
 ) : CoroutineWorker(context, params) {
     override suspend fun doWork(): Result {
-        if (!settings.dailyRemindersNotification.value) {
+        val subcategory = inputData.getString("subcategory") ?: return Result.failure()
+        val type =
+            OnboardingNotificationType.fromSubcategory(subcategory) ?: ReEngagementNotificationType.fromSubcategory(subcategory) ?: return Result.failure()
+
+        if (!type.isSettingsToggleOn(settings)) {
             return Result.failure()
         }
-
-        val subcategory = inputData.getString("subcategory") ?: return Result.failure()
-        val type = OnboardingNotificationType.fromSubcategory(subcategory) ?: return Result.failure()
 
         if (notificationManager.hasUserInteractedWithFeature(type)) {
             return Result.failure()
@@ -43,13 +44,13 @@ class OnboardingNotificationWorker @AssistedInject constructor(
 
         if (ActivityCompat.checkSelfPermission(applicationContext, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED && FeatureFlag.isEnabled(Feature.NOTIFICATIONS_REVAMP)) {
             NotificationManagerCompat.from(applicationContext).notify(type.notificationId, notification)
-            notificationManager.updateOnboardingNotificationSent(type)
+            notificationManager.updateNotificationSent(type)
         }
 
         return Result.success()
     }
 
-    private fun getNotificationBuilder(type: OnboardingNotificationType): NotificationCompat.Builder {
+    private fun getNotificationBuilder(type: NotificationType): NotificationCompat.Builder {
         return notificationHelper.dailyRemindersChannelBuilder()
             .setSmallIcon(IR.drawable.notification)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
@@ -59,7 +60,7 @@ class OnboardingNotificationWorker @AssistedInject constructor(
             .setContentIntent(openPageIntent(type))
     }
 
-    private fun openPageIntent(type: OnboardingNotificationType): PendingIntent {
+    private fun openPageIntent(type: NotificationType): PendingIntent {
         return PendingIntent.getActivity(applicationContext, 0, type.toIntent(applicationContext), PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     }
 }

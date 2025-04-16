@@ -31,7 +31,7 @@ class NotificationManagerImpl @Inject constructor(
         return userNotification.interactedAt != null
     }
 
-    override suspend fun updateOnboardingNotificationSent(type: NotificationType) {
+    override suspend fun updateNotificationSent(type: NotificationType) {
         userNotificationsDao.getUserNotification(type.notificationId)
             ?.apply {
                 sentThisWeek++

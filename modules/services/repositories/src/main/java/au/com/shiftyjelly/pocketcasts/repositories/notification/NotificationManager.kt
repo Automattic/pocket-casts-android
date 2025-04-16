@@ -6,5 +6,5 @@ interface NotificationManager {
     suspend fun updateUserFeatureInteraction(type: NotificationType)
     suspend fun updateUserFeatureInteraction(id: Int)
     suspend fun hasUserInteractedWithFeature(type: NotificationType): Boolean
-    suspend fun updateOnboardingNotificationSent(type: NotificationType)
+    suspend fun updateNotificationSent(type: NotificationType)
 }

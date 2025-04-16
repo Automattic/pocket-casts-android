@@ -30,7 +30,7 @@ class NotificationSchedulerImpl @Inject constructor(
                 "subcategory" to type.subcategory,
             )
 
-            val notificationWork = OneTimeWorkRequest.Builder(OnboardingNotificationWorker::class.java)
+            val notificationWork = OneTimeWorkRequest.Builder(NotificationWorker::class.java)
                 .setInputData(workData)
                 .setInitialDelay(delay, TimeUnit.MILLISECONDS)
                 .addTag("onboarding_notification_${type.subcategory}")

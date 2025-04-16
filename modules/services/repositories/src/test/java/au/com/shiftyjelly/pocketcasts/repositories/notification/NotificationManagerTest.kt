@@ -110,7 +110,7 @@ class NotificationManagerTest {
         )
         whenever(userNotificationsDao.getUserNotification(Filters.notificationId)).thenReturn(initialUserNotification)
 
-        notificationManager.updateOnboardingNotificationSent(Filters)
+        notificationManager.updateNotificationSent(Filters)
 
         val userNotificationCaptor = argumentCaptor<UserNotifications>()
         verify(userNotificationsDao).update(userNotificationCaptor.capture())
@@ -122,7 +122,7 @@ class NotificationManagerTest {
 
     @Test
     fun `should not update notification sent when notification is null`() = runTest {
-        notificationManager.updateOnboardingNotificationSent(Filters)
+        notificationManager.updateNotificationSent(Filters)
 
         verify(userNotificationsDao, never()).update(any())
     }
@@ -131,7 +131,7 @@ class NotificationManagerTest {
     fun `should not update notification sent when user notification is null`() = runTest {
         whenever(userNotificationsDao.getUserNotification(4)).thenReturn(null)
 
-        notificationManager.updateOnboardingNotificationSent(Filters)
+        notificationManager.updateNotificationSent(Filters)
 
         verify(userNotificationsDao, never()).update(any())
     }
