@@ -108,7 +108,7 @@ open class PodcastGridListFragment : BaseFragment(), Toolbar.OnMenuItemClickList
     val listUuid: String?
         get() = arguments?.getString(ARG_LIST_UUID)
 
-    private val inferredId: String
+    val inferredId: String
         get() = arguments?.getString(ARG_INFERRED_ID) ?: NetworkLoadableList.Companion.NONE
 
     val sourceUrl: String?
