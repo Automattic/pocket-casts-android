@@ -13,8 +13,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.AutoDownloadLimitSetting
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
-import au.com.shiftyjelly.pocketcasts.preferences.Settings.CloudSortOrder.entries
-import au.com.shiftyjelly.pocketcasts.preferences.Settings.UpNextAction.entries
 import au.com.shiftyjelly.pocketcasts.preferences.model.AppIconSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
@@ -133,7 +131,10 @@ interface Settings {
         NOTIFICATION_CHANNEL_ID_BOOKMARK("bookmark"),
         NOTIFICATION_CHANNEL_ID_FIX_DOWNLOADS("fixDownloads"),
         NOTIFICATION_CHANNEL_ID_FIX_DOWNLOADS_COMPLETE("fixDownloadsComplete"),
-        NOTIFICATION_CHANNEL_ID_ONBOARDING("onboarding"),
+        NOTIFICATION_CHANNEL_ID_DAILY_REMINDERS("dailyReminders"),
+        NOTIFICATION_CHANNEL_ID_TRENDING_AND_RECOMMENDATIONS("trendingAndRecommendations"),
+        NOTIFICATION_CHANNEL_ID_NEW_FEATURES_AND_TIPS("newFeaturesAndTips"),
+        NOTIFICATION_CHANNEL_ID_OFFERS("offers"),
     }
 
     enum class NotificationId(val value: Int) {
