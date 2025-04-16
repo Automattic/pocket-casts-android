@@ -25,7 +25,9 @@ class DeepLinkFactoryTest {
 
     @Test
     fun downloads() {
-        val intent = Intent().setAction("INTENT_OPEN_APP_DOWNLOADING")
+        val intent = Intent()
+            .setAction("INTENT_OPEN_APP_DOWNLOADING")
+            .setData(Uri.parse("pktc://profile/downloads"))
 
         val deepLink = factory.create(intent)
 
@@ -551,6 +553,17 @@ class DeepLinkFactoryTest {
     }
 
     @Test
+    fun openApp() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("pktc://open"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(AppOpenDeepLink, deepLink)
+    }
+
+    @Test
     fun upgradeAccount() {
         val intent = Intent()
             .setAction(ACTION_VIEW)
@@ -603,6 +616,28 @@ class DeepLinkFactoryTest {
         val deepLink = factory.create(intent)
 
         assertEquals(StaffPicksDeepLink, deepLink)
+    }
+
+    @Test
+    fun trending() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("pktc://discover/trending"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(TrendingDeepLink, deepLink)
+    }
+
+    @Test
+    fun recommendations() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("pktc://discover/recommendations"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(RecommendationsDeepLink, deepLink)
     }
 
     @Test

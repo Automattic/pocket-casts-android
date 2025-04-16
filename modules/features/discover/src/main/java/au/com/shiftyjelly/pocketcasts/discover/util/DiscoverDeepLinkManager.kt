@@ -31,7 +31,7 @@ class DiscoverDeepLinkManager @Inject constructor(
         )
 
         val discoverRows: List<DiscoverRow> = discover.layout.transformWithRegion(region, replacements, resources)
-        val staffPicksRow: DiscoverRow? = discoverRows.firstOrNull { it.listUuid == listId }
+        val staffPicksRow: DiscoverRow? = discoverRows.firstOrNull { it.inferredId() == listId }
         staffPicksRow?.transformWithReplacements(replacements, resources)
     }
 }

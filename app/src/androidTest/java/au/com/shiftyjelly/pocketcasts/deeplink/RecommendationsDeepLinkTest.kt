@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.deeplink
 
+import android.content.Intent.ACTION_VIEW
 import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -8,14 +9,14 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class DownloadsDeepLinkTest {
+class RecommendationsDeepLinkTest {
     private val context = InstrumentationRegistry.getInstrumentation().context
 
     @Test
     fun createIntent() {
-        val intent = DownloadsDeepLink.toIntent(context)
+        val intent = RecommendationsDeepLink.toIntent(context)
 
-        assertEquals("INTENT_OPEN_APP_DOWNLOADING", intent.action)
-        assertEquals(Uri.parse("pktc://profile/downloads"), intent.data)
+        assertEquals(ACTION_VIEW, intent.action)
+        assertEquals(Uri.parse("pktc://discover/recommendations"), intent.data)
     }
 }

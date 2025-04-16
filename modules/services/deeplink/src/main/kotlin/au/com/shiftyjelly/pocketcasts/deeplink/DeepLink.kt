@@ -8,7 +8,6 @@ import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_AD
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_BOOKMARK
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_CHANGE_BOOKMARK_TITLE
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_DELETE_BOOKMARK
-import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_DOWNLOADS
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_EPISODE
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_PODCAST
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_AUTO_PLAY
@@ -51,8 +50,10 @@ sealed interface UriDeepLink : DeepLink {
 }
 
 data object DownloadsDeepLink : IntentableDeepLink {
-    override fun toIntent(context: Context) = context.launcherIntent
-        .setAction(ACTION_OPEN_DOWNLOADS)
+    private val uri = Uri.parse("pktc://profile/downloads")
+
+    override fun toIntent(context: Context): Intent = Intent(ACTION_VIEW, uri)
+        .setPackage(context.packageName)
 }
 
 data object AddBookmarkDeepLink : IntentableDeepLink {
@@ -248,6 +249,21 @@ data object ImportDeepLink : IntentableDeepLink {
 data object StaffPicksDeepLink : IntentableDeepLink {
     override fun toIntent(context: Context) = Intent(ACTION_VIEW)
         .setData(Uri.parse("pktc://discover/staffpicks"))
+}
+
+data object TrendingDeepLink : IntentableDeepLink {
+    override fun toIntent(context: Context) = Intent(ACTION_VIEW)
+        .setData(Uri.parse("pktc://discover/trending"))
+}
+
+data object RecommendationsDeepLink : IntentableDeepLink {
+    override fun toIntent(context: Context) = Intent(ACTION_VIEW)
+        .setData(Uri.parse("pktc://discover/recommendations"))
+}
+
+data object AppOpenDeepLink : IntentableDeepLink {
+    override fun toIntent(context: Context) = Intent(ACTION_VIEW)
+        .setData(Uri.parse("pktc://open"))
 }
 
 data class PlayFromSearchDeepLink(
