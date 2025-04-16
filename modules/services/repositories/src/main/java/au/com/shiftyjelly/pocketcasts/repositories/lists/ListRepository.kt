@@ -63,7 +63,7 @@ class ListRepository(
 
     suspend fun getSimilarPodcasts(podcastUuid: String): ListFeed {
         return getListFeedSuspend(
-            url = "${Settings.SERVER_API_URL}/recommendations/social?podcast_uuid=$podcastUuid",
+            url = "${Settings.SERVER_API_URL}/recommendations/podcast?podcast_uuid=$podcastUuid",
             authenticated = false,
         )
     }
