@@ -55,6 +55,7 @@ import au.com.shiftyjelly.pocketcasts.deeplink.AppOpenDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.AssistantDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ChangeBookmarkTitleDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.CloudFilesDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.CreateAccountDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_PAGE
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLinkFactory
 import au.com.shiftyjelly.pocketcasts.deeplink.DeleteBookmarkDeepLink
@@ -1322,6 +1323,9 @@ class MainActivity :
                             }
                         }
                     }
+                }
+                is CreateAccountDeepLink -> {
+                    openOnboardingFlow(OnboardingFlow.LoggedOut)
                 }
                 is ShowFiltersDeepLink -> {
                     closePlayer()

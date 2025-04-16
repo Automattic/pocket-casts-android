@@ -11,6 +11,7 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import au.com.shiftyjelly.pocketcasts.deeplink.CreateAccountDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ImportDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowFiltersDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowUpNextTabDeepLink
@@ -71,7 +72,7 @@ class OnboardingNotificationWorker @AssistedInject constructor(
             OnboardingNotificationType.Import -> ImportDeepLink.toIntent(applicationContext)
             OnboardingNotificationType.PlusUpsell -> UpsellDeepLink.toIntent(applicationContext)
             OnboardingNotificationType.StaffPicks -> StaffPicksDeepLink.toIntent(applicationContext)
-            OnboardingNotificationType.Sync -> TODO()
+            OnboardingNotificationType.Sync -> CreateAccountDeepLink.toIntent(applicationContext)
             OnboardingNotificationType.Themes -> ThemesDeepLink.toIntent(applicationContext)
             OnboardingNotificationType.UpNext -> ShowUpNextTabDeepLink.toIntent(applicationContext)
         }
