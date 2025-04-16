@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.notification
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UserNotificationsDao
 import au.com.shiftyjelly.pocketcasts.models.entity.UserNotifications
 import au.com.shiftyjelly.pocketcasts.repositories.notification.OnboardingNotificationType.Filters
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -99,6 +100,57 @@ class NotificationManagerTest {
         val hasInteracted = notificationManager.hasUserInteractedWithFeature(Filters)
 
         assertTrue(hasInteracted)
+    }
+
+    @Test
+    fun `should return false when user interacted exactly 7 days ago`() = runTest {
+        val now = System.currentTimeMillis()
+        val sevenDaysInMillis = TimeUnit.DAYS.toMillis(7)
+
+        val userNotification = UserNotifications(
+            notificationId = ReEngagementNotificationType.WeMissYou.notificationId,
+            interactedAt = now - sevenDaysInMillis,
+        )
+        whenever(userNotificationsDao.getUserNotification(ReEngagementNotificationType.WeMissYou.notificationId))
+            .thenReturn(userNotification)
+
+        val hasInteracted = notificationManager.hasUserInteractedWithFeature(ReEngagementNotificationType.WeMissYou)
+
+        assertFalse(hasInteracted)
+    }
+
+    @Test
+    fun `should return true when user interacted just less than 7 days ago`() = runTest {
+        val now = System.currentTimeMillis()
+        val sevenDaysInMillis = TimeUnit.DAYS.toMillis(7)
+
+        val userNotification = UserNotifications(
+            notificationId = ReEngagementNotificationType.WeMissYou.notificationId,
+            interactedAt = now - sevenDaysInMillis + 1,
+        )
+        whenever(userNotificationsDao.getUserNotification(ReEngagementNotificationType.WeMissYou.notificationId))
+            .thenReturn(userNotification)
+
+        val hasInteracted = notificationManager.hasUserInteractedWithFeature(ReEngagementNotificationType.WeMissYou)
+
+        assertTrue(hasInteracted)
+    }
+
+    @Test
+    fun `should return false when user interacted more than 7 days ago`() = runTest {
+        val now = System.currentTimeMillis()
+        val sevenDaysInMillis = TimeUnit.DAYS.toMillis(7)
+
+        val userNotification = UserNotifications(
+            notificationId = ReEngagementNotificationType.WeMissYou.notificationId,
+            interactedAt = now - sevenDaysInMillis - 1,
+        )
+        whenever(userNotificationsDao.getUserNotification(ReEngagementNotificationType.WeMissYou.notificationId))
+            .thenReturn(userNotification)
+
+        val hasInteracted = notificationManager.hasUserInteractedWithFeature(ReEngagementNotificationType.WeMissYou)
+
+        assertFalse(hasInteracted)
     }
 
     @Test

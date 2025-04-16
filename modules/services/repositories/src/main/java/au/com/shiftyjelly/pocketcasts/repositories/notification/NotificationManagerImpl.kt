@@ -3,6 +3,8 @@ package au.com.shiftyjelly.pocketcasts.repositories.notification
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UserNotificationsDao
 import au.com.shiftyjelly.pocketcasts.models.entity.UserNotifications
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.milliseconds
 
 class NotificationManagerImpl @Inject constructor(
     private val userNotificationsDao: UserNotificationsDao,
@@ -27,6 +29,12 @@ class NotificationManagerImpl @Inject constructor(
     override suspend fun hasUserInteractedWithFeature(type: NotificationType): Boolean {
         val userNotification = userNotificationsDao.getUserNotification(type.notificationId)
             ?: return false
+
+        if (type is ReEngagementNotificationType) {
+            val lastInteraction = userNotification.interactedAt ?: return false
+            val elapsed = (System.currentTimeMillis() - lastInteraction).milliseconds
+            return elapsed < 7.days
+        }
 
         return userNotification.interactedAt != null
     }
