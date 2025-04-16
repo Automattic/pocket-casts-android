@@ -1,4 +1,14 @@
 package au.com.shiftyjelly.pocketcasts.repositories.notification
+
+import android.content.Context
+import android.content.Intent
+import au.com.shiftyjelly.pocketcasts.deeplink.CreateAccountDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.ImportDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.ShowFiltersDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.ShowUpNextTabDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.StaffPicksDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.ThemesDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.UpsellDeepLink
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.NotificationId
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -9,13 +19,18 @@ sealed class OnboardingNotificationType(
     val messageRes: Int,
     val dayOffset: Int,
 ) {
+
+    abstract fun toIntent(context: Context): Intent
+
     object Sync : OnboardingNotificationType(
         notificationId = NotificationId.ONBOARDING_SYNC.value,
         subcategory = SUBCATEGORY_SYNC,
         titleRes = LR.string.notification_sync_title,
         messageRes = LR.string.notification_sync_message,
         dayOffset = 0,
-    )
+    ) {
+        override fun toIntent(context: Context) = CreateAccountDeepLink.toIntent(context)
+    }
 
     object Import : OnboardingNotificationType(
         notificationId = NotificationId.ONBOARDING_IMPORT.value,
@@ -23,7 +38,9 @@ sealed class OnboardingNotificationType(
         titleRes = LR.string.notification_import_title,
         messageRes = LR.string.notification_import_message,
         dayOffset = 1,
-    )
+    ) {
+        override fun toIntent(context: Context) = ImportDeepLink.toIntent(context)
+    }
 
     object UpNext : OnboardingNotificationType(
         notificationId = NotificationId.ONBOARDING_UPNEXT.value,
@@ -31,7 +48,9 @@ sealed class OnboardingNotificationType(
         titleRes = LR.string.notification_up_next_title,
         messageRes = LR.string.notification_up_next_message,
         dayOffset = 2,
-    )
+    ) {
+        override fun toIntent(context: Context) = ShowUpNextTabDeepLink.toIntent(context)
+    }
 
     object Filters : OnboardingNotificationType(
         notificationId = NotificationId.ONBOARDING_FILTERS.value,
@@ -39,7 +58,9 @@ sealed class OnboardingNotificationType(
         titleRes = LR.string.notification_filters_title,
         messageRes = LR.string.notification_filters_message,
         dayOffset = 3,
-    )
+    ) {
+        override fun toIntent(context: Context) = ShowFiltersDeepLink.toIntent(context)
+    }
 
     object Themes : OnboardingNotificationType(
         notificationId = NotificationId.ONBOARDING_THEMES.value,
@@ -47,7 +68,9 @@ sealed class OnboardingNotificationType(
         titleRes = LR.string.notification_themes_title,
         messageRes = LR.string.notification_themes_message,
         dayOffset = 4,
-    )
+    ) {
+        override fun toIntent(context: Context) = ThemesDeepLink.toIntent(context)
+    }
 
     object StaffPicks : OnboardingNotificationType(
         notificationId = NotificationId.ONBOARDING_STAFF_PICKS.value,
@@ -55,7 +78,9 @@ sealed class OnboardingNotificationType(
         titleRes = LR.string.notification_staff_picks_title,
         messageRes = LR.string.notification_staff_picks_message,
         dayOffset = 5,
-    )
+    ) {
+        override fun toIntent(context: Context) = StaffPicksDeepLink.toIntent(context)
+    }
 
     object PlusUpsell : OnboardingNotificationType(
         notificationId = NotificationId.ONBOARDING_UPSELL.value,
@@ -63,7 +88,9 @@ sealed class OnboardingNotificationType(
         titleRes = LR.string.notification_plus_upsell_title,
         messageRes = LR.string.notification_plus_upsell_message,
         dayOffset = 6,
-    )
+    ) {
+        override fun toIntent(context: Context) = UpsellDeepLink.toIntent(context)
+    }
 
     companion object {
         const val SUBCATEGORY_SYNC = "sync"

@@ -11,13 +11,6 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import au.com.shiftyjelly.pocketcasts.deeplink.CreateAccountDeepLink
-import au.com.shiftyjelly.pocketcasts.deeplink.ImportDeepLink
-import au.com.shiftyjelly.pocketcasts.deeplink.ShowFiltersDeepLink
-import au.com.shiftyjelly.pocketcasts.deeplink.ShowUpNextTabDeepLink
-import au.com.shiftyjelly.pocketcasts.deeplink.StaffPicksDeepLink
-import au.com.shiftyjelly.pocketcasts.deeplink.ThemesDeepLink
-import au.com.shiftyjelly.pocketcasts.deeplink.UpsellDeepLink
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.R
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -67,15 +60,6 @@ class OnboardingNotificationWorker @AssistedInject constructor(
     }
 
     private fun openPageIntent(type: OnboardingNotificationType): PendingIntent {
-        val intent = when (type) {
-            OnboardingNotificationType.Filters -> ShowFiltersDeepLink.toIntent(applicationContext)
-            OnboardingNotificationType.Import -> ImportDeepLink.toIntent(applicationContext)
-            OnboardingNotificationType.PlusUpsell -> UpsellDeepLink.toIntent(applicationContext)
-            OnboardingNotificationType.StaffPicks -> StaffPicksDeepLink.toIntent(applicationContext)
-            OnboardingNotificationType.Sync -> CreateAccountDeepLink.toIntent(applicationContext)
-            OnboardingNotificationType.Themes -> ThemesDeepLink.toIntent(applicationContext)
-            OnboardingNotificationType.UpNext -> ShowUpNextTabDeepLink.toIntent(applicationContext)
-        }
-        return PendingIntent.getActivity(applicationContext, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        return PendingIntent.getActivity(applicationContext, 0, type.toIntent(applicationContext), PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     }
 }
