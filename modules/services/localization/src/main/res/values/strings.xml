@@ -2031,7 +2031,7 @@
     <string name="notification_channel_description_bookmark">Shows when bookmark is added using headphones</string>
     <string name="notification_channel_description_fix_downloads">Shows when downloads fix is triggered</string>
     <string name="notification_channel_description_fix_downloads_complete">Shows when downloads fix is complete</string>
-    <string name="notification_channel_description_daily_reminders">Shows daily tips to get you started during your first week.</string>
+    <string name="notification_channel_description_daily_reminders">Shows helpful suggestions to support your listening routine.</string>
     <string name="notification_channel_description_trending_and_recommendations">Shows trending podcasts and curated recommendations to help you discover new favorites</string>
     <string name="notification_channel_description_new_features_and_tips">Shows notifications about new features, updates, and handy tips to help you optimize your Pocket Casts experience</string>
     <string name="notification_channel_description_offers">Shows notifications about exclusive offers, discounts, and promotions to help you make the most of your Pocket Casts experience</string>
