@@ -1,7 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding
 
 import androidx.annotation.VisibleForTesting
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -13,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.import.OnboardingImport
 import au.com.shiftyjelly.pocketcasts.account.onboarding.recommendations.OnboardingRecommendationsFlow
 import au.com.shiftyjelly.pocketcasts.account.onboarding.recommendations.OnboardingRecommendationsFlow.onboardingRecommendationsFlowGraph
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeFlow
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.SystemBarsStyles
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
@@ -68,11 +71,11 @@ private fun Content(
     onUpdateSystemBars: (SystemBarsStyles) -> Unit,
 ) {
     val startDestination = when (flow) {
-        OnboardingFlow.LoggedOut,
+        is OnboardingFlow.LoggedOut,
         is OnboardingFlow.PlusAccountUpgradeNeedsLogin,
-        OnboardingFlow.InitialOnboarding,
-        OnboardingFlow.EngageSdk,
-        OnboardingFlow.ReferralLoginOrSignUp,
+        is OnboardingFlow.InitialOnboarding,
+        is OnboardingFlow.EngageSdk,
+        is OnboardingFlow.ReferralLoginOrSignUp,
         -> OnboardingNavRoute.logInOrSignUp
 
         // Cannot use OnboardingNavRoute.PlusUpgrade.routeWithSource here, it is set as a defaultValue in the PlusUpgrade composable,
@@ -81,8 +84,9 @@ private fun Content(
         is OnboardingFlow.PlusFlow,
         -> OnboardingNavRoute.PlusUpgrade.route
 
-        is OnboardingFlow.Welcome,
-        -> OnboardingNavRoute.welcome
+        is OnboardingFlow.Welcome -> OnboardingNavRoute.welcome
+
+        is OnboardingFlow.AccountEncouragement -> OnboardingNavRoute.encourageFreeAccount
     }
 
     val onAccountCreated: () -> Unit = {
@@ -129,6 +133,23 @@ private fun Content(
             onUpdateSystemBars = onUpdateSystemBars,
         )
 
+        composable(OnboardingNavRoute.encourageFreeAccount) {
+            AppTheme(theme) {
+                AccountBenefitsPage(
+                    onGetStarted = {
+                        navController.navigate(OnboardingNavRoute.logInOrSignUp) {
+                            popUpTo(OnboardingNavRoute.encourageFreeAccount) {
+                                inclusive = true
+                            }
+                        }
+                    },
+                    onLogIn = { navController.navigate(OnboardingNavRoute.logIn) },
+                    onClose = { exitOnboarding(OnboardingExitInfo()) },
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
+        }
+
         composable(OnboardingNavRoute.logInOrSignUp) {
             OnboardingLoginOrSignUpPage(
                 theme = theme,
@@ -141,7 +162,8 @@ private fun Content(
                         is OnboardingFlow.Welcome,
                         -> throw IllegalStateException("Account upgrade flow tried to present LoginOrSignupPage")
 
-                        OnboardingFlow.PlusAccountUpgradeNeedsLogin,
+                        is OnboardingFlow.AccountEncouragement,
+                        is OnboardingFlow.PlusAccountUpgradeNeedsLogin,
                         is OnboardingFlow.Upsell,
                         -> {
                             val popped = navController.popBackStack()
@@ -150,10 +172,10 @@ private fun Content(
                             }
                         }
 
-                        OnboardingFlow.InitialOnboarding,
-                        OnboardingFlow.LoggedOut,
-                        OnboardingFlow.EngageSdk,
-                        OnboardingFlow.ReferralLoginOrSignUp,
+                        is OnboardingFlow.InitialOnboarding,
+                        is OnboardingFlow.LoggedOut,
+                        is OnboardingFlow.EngageSdk,
+                        is OnboardingFlow.ReferralLoginOrSignUp,
                         -> exitOnboarding(OnboardingExitInfo())
                     }
                 },
@@ -307,16 +329,20 @@ private fun onLoginToExistingAccount(
     navController: NavHostController,
 ) {
     when (flow) {
-        OnboardingFlow.InitialOnboarding,
-        OnboardingFlow.LoggedOut,
-        OnboardingFlow.EngageSdk,
+        is OnboardingFlow.AccountEncouragement,
+        is OnboardingFlow.InitialOnboarding,
+        is OnboardingFlow.LoggedOut,
+        is OnboardingFlow.EngageSdk,
         -> exitOnboarding(OnboardingExitInfo(showPlusPromotionForFreeUser = true))
-        OnboardingFlow.ReferralLoginOrSignUp,
-        -> exitOnboarding(OnboardingExitInfo(showPlusPromotionForFreeUser = false))
-        OnboardingFlow.Welcome -> Unit // this should never happens, login is not initiated from welcome screen
+
+        is OnboardingFlow.ReferralLoginOrSignUp -> exitOnboarding(OnboardingExitInfo(showPlusPromotionForFreeUser = false))
+
+        // this should never happens, login is not initiated from welcome screen
+        is OnboardingFlow.Welcome -> Unit
+
         is OnboardingFlow.PlusAccountUpgrade,
         is OnboardingFlow.PatronAccountUpgrade,
-        OnboardingFlow.PlusAccountUpgradeNeedsLogin,
+        is OnboardingFlow.PlusAccountUpgradeNeedsLogin,
         is OnboardingFlow.Upsell,
         -> navController.navigate(
             OnboardingNavRoute.PlusUpgrade.routeWithSource(OnboardingUpgradeSource.LOGIN),
@@ -331,6 +357,7 @@ private fun onLoginToExistingAccount(
 object OnboardingNavRoute {
 
     const val createFreeAccount = "create_free_account"
+    const val encourageFreeAccount = "encourage_free_account"
     const val forgotPassword = "forgot_password"
     const val logIn = "log_in"
     const val logInOrSignUp = "log_in_or_sign_up"
