@@ -2367,7 +2367,7 @@
     <string name="notification_plus_upsell_message">Unlock exclusive features like folders, bookmarks, and more with Plus!</string>
 
     <string name="notification_reengage_we_miss_you_title">We miss you!</string>
-    <string name="notification_reengage_we_miss_you_message">It\'s been awhile since you\'ve listened. Jump back in and enjoy!</string>
+    <string name="notification_reengage_we_miss_you_message">It\'s been a while since you\'ve listened. Jump back in and enjoy!</string>
 
     <string name="notification_reengage_catch_up_offline_title">Catch up offline</string>
     <string name="notification_reengage_catch_up_offline_message">You have %d new episodes downloaded and ready to go!</string>
