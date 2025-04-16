@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.notification
 import android.content.Context
 import android.content.Intent
 import au.com.shiftyjelly.pocketcasts.deeplink.CreateAccountDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.DownloadsDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ImportDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowFiltersDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowUpNextTabDeepLink
@@ -12,15 +13,22 @@ import au.com.shiftyjelly.pocketcasts.deeplink.UpsellDeepLink
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.NotificationId
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-sealed class OnboardingNotificationType(
-    val notificationId: Int,
-    val subcategory: String,
-    val titleRes: Int,
-    val messageRes: Int,
-    val dayOffset: Int,
-) {
+sealed interface NotificationType {
+    val notificationId: Int
+    val subcategory: String
+    val titleRes: Int
+    val messageRes: Int
 
-    abstract fun toIntent(context: Context): Intent
+    fun toIntent(context: Context): Intent
+}
+
+sealed class OnboardingNotificationType(
+    override val notificationId: Int,
+    override val subcategory: String,
+    override val titleRes: Int,
+    override val messageRes: Int,
+    val dayOffset: Int,
+) : NotificationType {
 
     object Sync : OnboardingNotificationType(
         notificationId = NotificationId.ONBOARDING_SYNC.value,
@@ -113,6 +121,47 @@ sealed class OnboardingNotificationType(
             )
 
         fun fromSubcategory(subcategory: String): OnboardingNotificationType? {
+            return values.firstOrNull { it.subcategory == subcategory }
+        }
+    }
+}
+
+sealed class ReEngagementNotificationType(
+    override val notificationId: Int,
+    override val subcategory: String,
+    override val titleRes: Int,
+    override val messageRes: Int,
+) : NotificationType {
+
+    object WeMissYou : ReEngagementNotificationType(
+        notificationId = NotificationId.RE_ENGAGEMENT.value,
+        subcategory = SUBCATEGORY_REENGAGE_WE_MISS_YOU,
+        titleRes = LR.string.notification_reengage_we_miss_you_title,
+        messageRes = LR.string.notification_reengage_we_miss_you_message,
+    ) {
+        override fun toIntent(context: Context): Intent = DownloadsDeepLink.toIntent(context)
+    }
+
+    object CatchUpOffline : ReEngagementNotificationType(
+        notificationId = NotificationId.RE_ENGAGEMENT.value,
+        subcategory = SUBCATEGORY_REENGAGE_CATCH_UP_OFFLINE,
+        titleRes = LR.string.notification_reengage_catch_up_offline_title,
+        messageRes = LR.string.notification_reengage_catch_up_offline_message,
+    ) {
+        override fun toIntent(context: Context): Intent = DownloadsDeepLink.toIntent(context)
+    }
+
+    companion object {
+        const val SUBCATEGORY_REENGAGE_WE_MISS_YOU = "we_miss_you"
+        const val SUBCATEGORY_REENGAGE_CATCH_UP_OFFLINE = "catch_up_offline"
+
+        val values: List<ReEngagementNotificationType>
+            get() = listOf(
+                WeMissYou,
+                CatchUpOffline,
+            )
+
+        fun fromSubcategory(subcategory: String): ReEngagementNotificationType? {
             return values.firstOrNull { it.subcategory == subcategory }
         }
     }

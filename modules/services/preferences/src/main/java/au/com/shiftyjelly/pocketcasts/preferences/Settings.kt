@@ -152,6 +152,7 @@ interface Settings {
         ONBOARDING_THEMES(21483657),
         ONBOARDING_STAFF_PICKS(21483658),
         ONBOARDING_UPSELL(21483659),
+        RE_ENGAGEMENT(21483660),
     }
 
     enum class UpNextAction(val serverId: Int) {

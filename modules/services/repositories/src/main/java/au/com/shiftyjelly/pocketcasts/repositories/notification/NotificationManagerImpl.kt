@@ -16,18 +16,18 @@ class NotificationManagerImpl @Inject constructor(
         userNotificationsDao.insert(userNotifications)
     }
 
-    override suspend fun updateUserFeatureInteraction(type: OnboardingNotificationType) {
+    override suspend fun updateUserFeatureInteraction(type: NotificationType) {
         userNotificationsDao.updateInteractedAt(type.notificationId, System.currentTimeMillis())
     }
 
-    override suspend fun hasUserInteractedWithFeature(type: OnboardingNotificationType): Boolean {
+    override suspend fun hasUserInteractedWithFeature(type: NotificationType): Boolean {
         val userNotification = userNotificationsDao.getUserNotification(type.notificationId)
             ?: return false
 
         return userNotification.interactedAt != null
     }
 
-    override suspend fun updateOnboardingNotificationSent(type: OnboardingNotificationType) {
+    override suspend fun updateOnboardingNotificationSent(type: NotificationType) {
         userNotificationsDao.getUserNotification(type.notificationId)
             ?.apply {
                 sentThisWeek++
