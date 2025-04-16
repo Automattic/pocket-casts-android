@@ -180,6 +180,30 @@ class NotificationDelayCalculatorTest {
         assertEquals(expectedDelay, delay)
     }
 
+    @Test
+    fun testReEngagementCheck_Before4PM() {
+        val fixedTime = getFixedTime(2025, Calendar.APRIL, 10, 15, 0)
+        val expectedDelay = 1 * HOUR_IN_MILLIS
+        val delay = calculator.calculateDelayForReEngagementCheck(fixedTime)
+        assertEquals(expectedDelay, delay)
+    }
+
+    @Test
+    fun testReEngagementCheck_Exactly4PM() {
+        val fixedTime = getFixedTime(2025, Calendar.APRIL, 10, 16, 0)
+        val expectedDelay = 24 * HOUR_IN_MILLIS
+        val delay = calculator.calculateDelayForReEngagementCheck(fixedTime)
+        assertEquals(expectedDelay, delay)
+    }
+
+    @Test
+    fun testReEngagementCheck_After4PM() {
+        val fixedTime = getFixedTime(2025, Calendar.APRIL, 10, 17, 0)
+        val expectedDelay = 23 * HOUR_IN_MILLIS
+        val delay = calculator.calculateDelayForReEngagementCheck(fixedTime)
+        assertEquals(expectedDelay, delay)
+    }
+
     private fun getFixedTime(
         year: Int,
         month: Int,
