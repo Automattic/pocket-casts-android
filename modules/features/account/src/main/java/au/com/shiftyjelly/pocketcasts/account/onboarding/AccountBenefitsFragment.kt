@@ -39,7 +39,7 @@ class AccountBenefitsFragment : BaseDialogFragment() {
                 onLogIn = {
                     tracker.track(AnalyticsEvent.INFORMATIONAL_MODAL_VIEW_LOGIN_TAP)
                     dismiss()
-                    OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.LogIn)
+                    OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.LoggedOut)
                 },
                 onBenefitShown = { benefit ->
                     tracker.track(AnalyticsEvent.INFORMATIONAL_MODAL_VIEW_CARD_SHOWED, mapOf("card" to benefit.analyticsValue))

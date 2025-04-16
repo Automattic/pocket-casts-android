@@ -81,8 +81,6 @@ private fun Content(
         is OnboardingFlow.ReferralLoginOrSignUp,
         -> OnboardingNavRoute.logInOrSignUp
 
-        is OnboardingFlow.LogIn -> OnboardingNavRoute.logIn
-
         // Cannot use OnboardingNavRoute.PlusUpgrade.routeWithSource here, it is set as a defaultValue in the PlusUpgrade composable,
         // see https://stackoverflow.com/a/70410872/1910286
         is OnboardingFlow.PlusAccountUpgrade,
@@ -157,7 +155,11 @@ private fun Content(
                     },
                     onLogIn = {
                         viewModel.onLogInClick()
-                        navController.navigate(OnboardingNavRoute.logIn)
+                        navController.navigate(OnboardingNavRoute.logInOrSignUp) {
+                            popUpTo(OnboardingNavRoute.encourageFreeAccount) {
+                                inclusive = true
+                            }
+                        }
                     },
                     onClose = {
                         viewModel.onDismissClick()
@@ -195,7 +197,6 @@ private fun Content(
 
                         is OnboardingFlow.InitialOnboarding,
                         is OnboardingFlow.LoggedOut,
-                        is OnboardingFlow.LogIn,
                         is OnboardingFlow.EngageSdk,
                         is OnboardingFlow.ReferralLoginOrSignUp,
                         -> exitOnboarding(OnboardingExitInfo())
@@ -226,16 +227,7 @@ private fun Content(
         composable(OnboardingNavRoute.logIn) {
             OnboardingLoginPage(
                 theme = theme,
-                onBackPressed = {
-                    val popped = navController.popBackStack()
-                    if (!popped) {
-                        navController.navigate(OnboardingNavRoute.logInOrSignUp) {
-                            popUpTo(OnboardingNavRoute.logIn) {
-                                inclusive = true
-                            }
-                        }
-                    }
-                },
+                onBackPressed = { navController.popBackStack() },
                 onLoginComplete = {
                     onLoginToExistingAccount(flow, exitOnboarding, navController)
                 },
@@ -363,7 +355,6 @@ private fun onLoginToExistingAccount(
         is OnboardingFlow.AccountEncouragement,
         is OnboardingFlow.InitialOnboarding,
         is OnboardingFlow.LoggedOut,
-        is OnboardingFlow.LogIn,
         is OnboardingFlow.EngageSdk,
         -> exitOnboarding(OnboardingExitInfo(showPlusPromotionForFreeUser = true))
 

@@ -7,8 +7,6 @@ import kotlinx.parcelize.Parcelize
 sealed class OnboardingFlow(val analyticsValue: String) : Parcelable {
     @Parcelize object LoggedOut : OnboardingFlow("logged_out")
 
-    @Parcelize object LogIn : OnboardingFlow("log_in")
-
     @Parcelize object InitialOnboarding : OnboardingFlow("initial_onboarding")
 
     @Parcelize object EngageSdk : OnboardingFlow("engage_sdk")
