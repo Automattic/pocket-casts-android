@@ -85,7 +85,6 @@ Language: fr
     <string name="winback_claiming_offer">Profiter de l’offre</string>
     <string name="winback_claimed_offer_message_3">-50 % sur la prochaine année !</string>
     <string name="winback_offer_free_offer_yearly_description">Payez %1$s dès maintenant pour profiter d’une année supplémentaire à -50 %%.</string>
-    <string name="winback_offer_free_offer_yearly_title">Obtenir -50 % sur la prochaine année</string>
     <string name="podcast_refresh_no_episodes_found">Aucun épisode trouvé.</string>
     <string name="podcast_refresh_new_episode_found">Nouvel épisode trouvé !</string>
     <string name="podcast_refreshing_episode_list">Rafraîchissement de la liste des épisodes…</string>
@@ -121,7 +120,6 @@ Language: fr
     <string name="winback_offer_differnt_plan_title">À la recherche d’un plan différent ?</string>
     <string name="winback_offer_free_offer_button_label">Profiter de l’offre</string>
     <string name="winback_offer_free_offer_description">Économisez %1$s au début de votre prochain cycle de facturation.</string>
-    <string name="winback_offer_free_offer_title">Obtenir votre prochain mois gratuit</string>
     <string name="winback_offer_header">Avant que vous n’annuliez, jetez un coup d’œil à ces offres</string>
     <string name="settings_app_icon_pride">Pride</string>
     <string name="manage_download_dismiss_content_description">Gérer le rejet de la bannière de téléchargement</string>
