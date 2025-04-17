@@ -70,7 +70,7 @@ class NotificationWorker @AssistedInject constructor(
     }
 
     private suspend fun buildReEngagementNotification(type: ReEngagementNotificationType): NotificationCompat.Builder {
-        val downloadedEpisodes = episodeManager.downloadedEpisodesThatHaveNotBeenPlayedCountBlocking()
+        val downloadedEpisodes = episodeManager.downloadedEpisodesThatHaveNotBeenPlayedCount()
 
         val contentTitle = if (downloadedEpisodes > 0) {
             applicationContext.resources.getString(ReEngagementNotificationType.CatchUpOffline.titleRes)

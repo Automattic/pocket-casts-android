@@ -802,8 +802,8 @@ class EpisodeManagerImpl @Inject constructor(
         return episodeDao.findDownloadedEpisodesRxFlowable()
     }
 
-    override suspend fun downloadedEpisodesThatHaveNotBeenPlayedCountBlocking(): Int {
-        return episodeDao.downloadedEpisodesThatHaveNotBeenPlayedCountBlocking()
+    override suspend fun downloadedEpisodesThatHaveNotBeenPlayedCount(): Int {
+        return episodeDao.downloadedEpisodesThatHaveNotBeenPlayedCount()
     }
 
     override fun findStarredEpisodesRxFlowable(): Flowable<List<PodcastEpisode>> {
