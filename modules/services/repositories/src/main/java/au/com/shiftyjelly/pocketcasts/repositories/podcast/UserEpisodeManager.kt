@@ -283,7 +283,7 @@ class UserEpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override suspend fun syncFiles(playbackManager: PlaybackManager) {
+    private suspend fun syncFiles(playbackManager: PlaybackManager, shouldIgnoreImageChanges: Boolean) {
         val episodesToSync = userEpisodeDao.findUserEpisodesToSyncBlocking()
         if (episodesToSync.isNotEmpty()) {
             val response = withContext(Dispatchers.IO) {
@@ -337,7 +337,7 @@ class UserEpisodeManagerImpl @Inject constructor(
                     didChange = true
                 }
 
-                if (existingFile.hasCustomImage != it.hasCustomImage) {
+                if (!shouldIgnoreImageChanges && existingFile.hasCustomImage != it.hasCustomImage) {
                     existingFile.hasCustomImage = it.hasCustomImage
                     didChange = true
                 }
@@ -347,7 +347,7 @@ class UserEpisodeManagerImpl @Inject constructor(
                     didChange = true
                 }
 
-                if (existingFile.artworkUrl != it.imageUrl) {
+                if (!shouldIgnoreImageChanges && existingFile.artworkUrl != it.imageUrl) {
                     existingFile.artworkUrl = it.imageUrl
                     didChange = true
                 }
@@ -412,6 +412,10 @@ class UserEpisodeManagerImpl @Inject constructor(
         }
     }
 
+    override suspend fun syncFiles(playbackManager: PlaybackManager) {
+        syncFiles(playbackManager, false)
+    }
+
     override fun uploadToServer(userEpisode: UserEpisode, waitForWifi: Boolean) {
         val networkType = if (waitForWifi) NetworkType.UNMETERED else NetworkType.CONNECTED
         val constraints = Constraints.Builder()
@@ -474,9 +478,14 @@ class UserEpisodeManagerImpl @Inject constructor(
                     },
             )
             .andThen(
-                rxCompletable { syncFiles(playbackManager) }
-                    .doOnError { Timber.e(it) }
-                    .onErrorComplete(),
+                rxCompletable {
+                    syncFiles(
+                        playbackManager = playbackManager,
+                        shouldIgnoreImageChanges = true
+                    )
+                }.doOnError {
+                    Timber.e(it)
+                }.onErrorComplete(),
             )
     }
 
