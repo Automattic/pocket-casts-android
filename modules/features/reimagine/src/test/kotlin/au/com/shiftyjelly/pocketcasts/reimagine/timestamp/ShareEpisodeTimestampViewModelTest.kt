@@ -57,7 +57,7 @@ class ShareEpisodeTimestampViewModelTest {
             episodeManager,
             podcastManager,
             settings,
-            AnalyticsTracker.test(tracker, isEnabled = true),
+            AnalyticsTracker.test(tracker, isFirstPartyEnabled = true),
         )
     }
 

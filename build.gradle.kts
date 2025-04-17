@@ -6,6 +6,7 @@ import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import com.automattic.android.measure.reporters.InternalA8cCiReporter
+import com.automattic.android.measure.reporters.RemoteBuildCacheMetricsReporter
 import com.automattic.android.measure.reporters.SlowSlowTasksMetricsReporter
 import com.diffplug.gradle.spotless.SpotlessTask
 import com.google.devtools.ksp.gradle.KspExtension
@@ -34,6 +35,7 @@ plugins {
     alias(libs.plugins.protobuf) apply false
     alias(libs.plugins.compose.compiler) apply false
     alias(libs.plugins.dependency.analysis)
+    alias(libs.plugins.room) apply false
 }
 
 apply(from = rootProject.file("dependencies.gradle.kts"))
@@ -44,6 +46,7 @@ measureBuilds {
     onBuildMetricsReadyListener {
         val report = this@onBuildMetricsReadyListener
         SlowSlowTasksMetricsReporter.report(report)
+        RemoteBuildCacheMetricsReporter.report(report)
         InternalA8cCiReporter.reportBlocking(
             metricsReport = report,
             projectName = "pocketcasts",
@@ -233,6 +236,7 @@ subprojects {
                 buildConfigField("String", "ENCRYPTION_KEY", "\"${project.property("encryptionKey")}\"")
                 buildConfigField("String", "APP_SECRET", "\"${project.property("appSecret")}\"")
                 buildConfigField("String", "META_APP_ID", "\"${project.property("metaAppId")}\"")
+                buildConfigField("String", "APPS_FLYER_KEY", "\"${project.property("appsFlyerKey")}\"")
 
                 testInstrumentationRunner = project.property("testInstrumentationRunner") as String
                 testApplicationId = "au.com.shiftyjelly.pocketcasts.test${project.name.replace("-", "_")}"

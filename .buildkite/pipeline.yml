@@ -35,12 +35,21 @@ steps:
     command: ".buildkite/commands/run-unit-tests.sh"
     plugins: [$CI_TOOLKIT]
 
-  - label: 'Dependency diff'
-    if: build.pull_request.id != null
-    command: comment_with_dependency_diff 'app' 'releaseRuntimeClasspath'
-    plugins: [$CI_TOOLKIT]
-    artifact_paths:
-      - "**/build/reports/diff/*"
+  - group: "Diff Reports"
+    steps:
+      - label: 'Dependency diff'
+        if: build.pull_request.id != null
+        command: comment_with_dependency_diff 'app' 'releaseRuntimeClasspath'
+        plugins: [$CI_TOOLKIT]
+        artifact_paths:
+          - "**/build/reports/diff/*"
+
+      - label: "Merged Manifest Diff"
+        command: ".buildkite/commands/diff-merged-manifest.sh release"
+        if: build.pull_request.id != null
+        plugins: [$CI_TOOLKIT]
+        artifact_paths:
+          - "**/build/reports/diff_manifest/**/**/*"
 
   - label: 'Spotless formatting check'
     command: |
@@ -54,11 +63,25 @@ steps:
     artifact_paths:
       - "**/build/instrumented-tests/**/*"
 
-  - label: "Assemble release APK"
-    command: ".buildkite/commands/assemble-release-apk.sh"
-    plugins: [ $CI_TOOLKIT ]
-    artifact_paths:
-      - "**/build/outputs/apk/**/*"
+  - group: "Assemble release APKs"
+    steps:
+      - label: "Assemble app release APK"
+        command: ".buildkite/commands/assemble-release-apk.sh app"
+        plugins: [ $CI_TOOLKIT ]
+        artifact_paths:
+          - "**/build/outputs/apk/**/*"
+
+      - label: "Assemble automotive release APK"
+        command: ".buildkite/commands/assemble-release-apk.sh automotive"
+        plugins: [ $CI_TOOLKIT ]
+        artifact_paths:
+          - "**/build/outputs/apk/**/*"
+
+      - label: "Assemble wear release APK"
+        command: ".buildkite/commands/assemble-release-apk.sh wear"
+        plugins: [ $CI_TOOLKIT ]
+        artifact_paths:
+          - "**/build/outputs/apk/**/*"
 
   - label: "Prototype Builds"
     if: "build.pull_request.id != null"

@@ -602,6 +602,24 @@ class PodcastViewModel
     private fun getCurrentTab() =
         (uiState.value as? UiState.Loaded)?.showTab ?: PodcastTab.EPISODES
 
+    fun onHeadsetSettingsClicked() {
+        analyticsTracker.track(
+            AnalyticsEvent.BOOKMARKS_EMPTY_GO_TO_HEADPHONE_SETTINGS,
+            mapOf("source" to SourceView.PODCAST_SCREEN.analyticsValue),
+        )
+    }
+
+    fun onGetBookmarksClicked() {
+        analyticsTracker.track(
+            AnalyticsEvent.BOOKMARKS_GET_BOOKMARKS_BUTTON_TAPPED,
+            mapOf("source" to SourceView.PODCAST_SCREEN.analyticsValue),
+        )
+    }
+
+    fun onDonateClicked() {
+        analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_FUNDING_TAPPED)
+    }
+
     enum class PodcastTab(@StringRes val labelResId: Int, val analyticsValue: String) {
         EPISODES(LR.string.episodes, "episodes"),
         BOOKMARKS(LR.string.bookmarks, "bookmarks"),

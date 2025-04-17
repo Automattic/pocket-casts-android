@@ -13,6 +13,8 @@ import au.com.shiftyjelly.pocketcasts.models.type.AutoDownloadLimitSetting
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.preferences.Settings.CloudSortOrder.entries
+import au.com.shiftyjelly.pocketcasts.preferences.Settings.UpNextAction.entries
 import au.com.shiftyjelly.pocketcasts.preferences.model.AppIconSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
@@ -475,6 +477,7 @@ interface Settings {
     // Only the AnalyticsTracker object should update SendUsageState directly. Everything else
     // should update this setting through the AnalyticsTracker.
     val collectAnalytics: UserSetting<Boolean>
+    val collectAnalyticsThirdParty: UserSetting<Boolean>
     val sendCrashReports: UserSetting<Boolean>
     val linkCrashReportsToUser: UserSetting<Boolean>
 
@@ -566,8 +569,18 @@ interface Settings {
     val useRealTimeForPlaybackRemaingTime: UserSetting<Boolean>
 
     val showPodcastHeaderChangesTooltip: UserSetting<Boolean>
+    val showPodcastsRecentlyPlayedSortOrderTooltip: UserSetting<Boolean>
+
+    val showEmptyFiltersListTooltip: UserSetting<Boolean>
 
     val suggestedFoldersDismissTimestamp: UserSetting<Instant?>
     val suggestedFoldersDismissCount: UserSetting<Int>
     val suggestedFoldersFollowedHash: UserSetting<String>
+
+    val isTrackingConsentRequired: UserSetting<Boolean>
+
+    val isFreeAccountProfileBannerDismissed: UserSetting<Boolean>
+    val isFreeAccountFiltersBannerDismissed: UserSetting<Boolean>
+    val isFreeAccountHistoryBannerDismissed: UserSetting<Boolean>
+    val showFreeAccountEncouragement: UserSetting<Boolean>
 }

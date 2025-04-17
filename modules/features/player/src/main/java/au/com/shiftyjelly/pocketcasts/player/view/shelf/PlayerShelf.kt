@@ -34,6 +34,7 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel
+import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.TranscriptState
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.PlayerShelfData
@@ -206,7 +207,7 @@ private fun PlayerShelfContent(
                     onClick = onStarClick,
                 )
                 ShelfItem.Transcript -> TranscriptButton(
-                    isTranscriptAvailable = transcriptUiState !is TranscriptViewModel.UiState.Empty,
+                    isTranscriptAvailable = transcriptUiState.transcriptState !is TranscriptState.Empty,
                     iconColors = iconColors,
                     onClick = onTranscriptClick,
                 )
@@ -489,7 +490,7 @@ private fun PlayerShelfPreview(
     AppTheme(themeType) {
         PlayerShelfContent(
             shelfItems = ShelfItem.entries.toList().take(4),
-            transcriptUiState = TranscriptViewModel.UiState.Empty(),
+            transcriptUiState = TranscriptViewModel.UiState.Empty,
             iconColors = PlayerShelfIconColors(
                 normalColor = MaterialTheme.theme.colors.playerContrast03,
                 highlightColor = MaterialTheme.theme.colors.playerContrast01,

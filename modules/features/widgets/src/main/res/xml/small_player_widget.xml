@@ -6,4 +6,5 @@
     android:previewImage="@drawable/widget_player_small_preview"
     android:previewLayout="@layout/widget_player_small_preview"
     android:targetCellWidth="1"
-    android:targetCellHeight="1" />
+    android:targetCellHeight="1"
+    android:description="@string/small_player_widget_description" />

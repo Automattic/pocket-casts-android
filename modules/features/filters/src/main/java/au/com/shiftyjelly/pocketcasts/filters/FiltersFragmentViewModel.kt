@@ -7,24 +7,38 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManagerImpl.Companion.IN_PROGRESS_UUID
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManagerImpl.Companion.NEW_RELEASE_UUID
+import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.Collections
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 
 @HiltViewModel
 class FiltersFragmentViewModel @Inject constructor(
     val playlistManager: PlaylistManager,
     private val analyticsTracker: AnalyticsTracker,
-    episodeManager: EpisodeManager,
-    playbackManager: PlaybackManager,
+    private val settings: Settings,
+    private val episodeManager: EpisodeManager,
+    private val playbackManager: PlaybackManager,
+    private val userManager: UserManager,
 ) : ViewModel(), CoroutineScope {
 
     companion object {
@@ -91,5 +105,62 @@ class FiltersFragmentViewModel @Inject constructor(
 
     fun trackOnCreateFilterTap() {
         analyticsTracker.track(AnalyticsEvent.FILTER_CREATE_BUTTON_TAPPED)
+    }
+
+    fun trackTooltipShown() {
+        analyticsTracker.track(AnalyticsEvent.FILTER_TOOLTIP_SHOWN)
+    }
+
+    fun shouldShowTooltip(filters: List<Playlist>, onShowTooltip: () -> Unit) {
+        viewModelScope.launch {
+            shouldShowTooltipSuspend(filters, onShowTooltip)
+        }
+    }
+
+    suspend fun shouldShowTooltipSuspend(filters: List<Playlist>, onShowTooltip: () -> Unit) {
+        if (!settings.showEmptyFiltersListTooltip.value) return
+        if (filters.size > 2) return
+
+        val requiredUuids = setOf(NEW_RELEASE_UUID, IN_PROGRESS_UUID)
+        val filterUuids = filters.map { it.uuid }.toSet()
+
+        if (filterUuids != requiredUuids) return
+
+        withContext(Dispatchers.IO) {
+            val showTooltip = filters.all { playlist ->
+                val episodeCount = playlistManager.countEpisodesBlocking(playlist.id, episodeManager, playbackManager)
+                episodeCount == 0
+            }
+            if (showTooltip) {
+                withContext(Dispatchers.Main) {
+                    onShowTooltip()
+                }
+            }
+        }
+    }
+
+    fun onTooltipClosed() {
+        settings.showEmptyFiltersListTooltip.set(false, updateModifiedAt = false)
+        analyticsTracker.track(AnalyticsEvent.FILTER_TOOLTIP_CLOSED)
+    }
+
+    internal val isFreeAccountBannerVisible = combine(
+        userManager.getSignInState().asFlow().map { it.isSignedIn },
+        settings.isFreeAccountFiltersBannerDismissed.flow,
+    ) { isSignedIn, isBannerDismissed ->
+        !isSignedIn && !isBannerDismissed && FeatureFlag.isEnabled(Feature.ENCOURAGE_ACCOUNT_CREATION)
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = false,
+    )
+
+    internal fun onCreateFreeAccountClick() {
+        analyticsTracker.track(AnalyticsEvent.INFORMATIONAL_BANNER_VIEW_CREATE_ACCOUNT_TAP, mapOf("source" to "filters"))
+    }
+
+    internal fun dismissFreeAccountBanner() {
+        analyticsTracker.track(AnalyticsEvent.INFORMATIONAL_BANNER_VIEW_DISMISSED, mapOf("source" to "filters"))
+        settings.isFreeAccountFiltersBannerDismissed.set(true, updateModifiedAt = true)
     }
 }

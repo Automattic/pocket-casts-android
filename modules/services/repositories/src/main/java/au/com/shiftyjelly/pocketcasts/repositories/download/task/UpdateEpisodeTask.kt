@@ -8,6 +8,7 @@ import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import timber.log.Timber
@@ -52,13 +53,17 @@ class UpdateEpisodeTask @AssistedInject constructor(
                 !serverEpisodeUrl.isNullOrBlank() &&
                 episode.downloadUrl != serverEpisodeUrl
             ) {
+                val oldUrl = episode.downloadUrl
                 episode.downloadUrl = serverEpisodeUrl
                 episodeDao.updateDownloadUrl(serverEpisodeUrl, episode.uuid)
+                LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Episode download url updated. Podcast: $podcastUuid Episode: $episodeUuid Old URL: $oldUrl New URL: $serverEpisodeUrl")
             }
 
             return Result.success()
         } catch (e: Exception) {
-            Timber.i(e, "Failed to update episode download url. Podcast: $podcastUuid Episode: $episodeUuid")
+            val message = "Failed to update episode download url. Podcast: $podcastUuid Episode: $episodeUuid"
+            Timber.i(e, message)
+            LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, message)
             return Result.success()
         }
     }

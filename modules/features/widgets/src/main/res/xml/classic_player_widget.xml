@@ -1,0 +1,11 @@
+<appwidget-provider
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:description="@string/medium_player_widget_description"
+    android:initialLayout="@layout/glance_default_loading_layout"
+    android:minWidth="300dp"
+    android:minHeight="40dp"
+    android:minResizeWidth="220dp"
+    android:resizeMode="horizontal"
+    android:targetCellWidth="5"
+    android:targetCellHeight="1"
+    android:previewImage="@drawable/widget_classic_preview" />

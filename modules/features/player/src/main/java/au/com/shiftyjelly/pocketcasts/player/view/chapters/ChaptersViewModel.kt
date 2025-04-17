@@ -17,7 +17,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -169,7 +168,7 @@ class ChaptersViewModel @AssistedInject constructor(
         allChapters = chapters.toChapterStates(playbackPosition(playbackState, episode)),
         isTogglingChapters = isToggling,
         canSkipChapters = subscriptionStatus.canSkipChapters(),
-        showHeader = FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS) && episode is PodcastEpisode,
+        showHeader = episode is PodcastEpisode,
     )
 
     private fun playbackPosition(playbackState: PlaybackState, episode: BaseEpisode) = when (mode) {
@@ -191,7 +190,7 @@ class ChaptersViewModel @AssistedInject constructor(
         }
     }
 
-    private fun SubscriptionStatus?.canSkipChapters() = FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS) &&
+    private fun SubscriptionStatus?.canSkipChapters() =
         Feature.isUserEntitled(Feature.DESELECT_CHAPTERS, toUserTier())
 
     private fun SubscriptionStatus?.toUserTier() = (this as? SubscriptionStatus.Paid)?.tier?.toUserTier() ?: UserTier.Free

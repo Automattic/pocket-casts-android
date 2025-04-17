@@ -14,6 +14,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.Gravatar
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.toDurationFromNow
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -110,6 +112,17 @@ class ProfileViewModel @Inject constructor(
         initialValue = false,
     )
 
+    internal val isFreeAccountBannerVisible = combine(
+        signInState.map { it.isSignedIn },
+        settings.isFreeAccountProfileBannerDismissed.flow,
+    ) { isSignedIn, isBannerDismissed ->
+        !isSignedIn && !isBannerDismissed && FeatureFlag.isEnabled(Feature.ENCOURAGE_ACCOUNT_CREATION)
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = false,
+    )
+
     internal val refreshState = settings.refreshStateObservable.asFlow().stateIn(
         scope = viewModelScope,
         started = SharingStarted.Eagerly,
@@ -182,5 +195,14 @@ class ProfileViewModel @Inject constructor(
     internal fun closeUpgradeProfile(source: SourceView) {
         tracker.track(AnalyticsEvent.UPGRADE_BANNER_DISMISSED, mapOf("source" to source.analyticsValue))
         settings.upgradeProfileClosed.set(true, updateModifiedAt = false)
+    }
+
+    internal fun onCreateFreeAccountClick() {
+        tracker.track(AnalyticsEvent.INFORMATIONAL_BANNER_VIEW_CREATE_ACCOUNT_TAP, mapOf("source" to "profile"))
+    }
+
+    internal fun dismissFreeAccountBanner() {
+        tracker.track(AnalyticsEvent.INFORMATIONAL_BANNER_VIEW_DISMISSED, mapOf("source" to "profile"))
+        settings.isFreeAccountProfileBannerDismissed.set(true, updateModifiedAt = true)
     }
 }

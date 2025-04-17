@@ -122,6 +122,7 @@ private fun Preview() {
             scrollState = ScalingLazyColumnState(),
             state = PrivacySettingsViewModel.State(
                 sendAnalytics = true,
+                sendAnalyticsThirdParty = false,
                 sendCrashReports = true,
                 linkCrashReportsToUser = false,
             ),

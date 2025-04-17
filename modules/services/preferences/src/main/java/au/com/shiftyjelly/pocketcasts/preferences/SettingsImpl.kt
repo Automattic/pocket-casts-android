@@ -68,7 +68,9 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import timber.log.Timber
 
@@ -1311,13 +1313,19 @@ class SettingsImpl @Inject constructor(
 
     override val collectAnalytics = UserSetting.BoolPref(
         sharedPrefKey = "SendUsageStatsKey",
-        defaultValue = true,
+        defaultValue = BuildConfig.DATA_COLLECTION_DEFAULT_VALUE ?: true,
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val collectAnalyticsThirdParty = UserSetting.BoolPref(
+        sharedPrefKey = "SendUsageStatsThirdPartyKey",
+        defaultValue = false, // Ask for consent before sending third party analytics
         sharedPrefs = sharedPreferences,
     )
 
     override val sendCrashReports = UserSetting.BoolPref(
         sharedPrefKey = "SendCrashReportsKey",
-        defaultValue = true,
+        defaultValue = BuildConfig.DATA_COLLECTION_DEFAULT_VALUE ?: true,
         sharedPrefs = sharedPreferences,
     )
 
@@ -1508,9 +1516,9 @@ class SettingsImpl @Inject constructor(
         _themeReconfigurationEvents.tryEmit(Unit)
     }
 
-    private val _bottomInset = MutableSharedFlow<Int>(onBufferOverflow = BufferOverflow.DROP_OLDEST, replay = 1)
+    private val _bottomInset = MutableStateFlow(0)
     override val bottomInset: Flow<Int>
-        get() = _bottomInset.asSharedFlow()
+        get() = _bottomInset.asStateFlow()
 
     override fun updateBottomInset(height: Int) {
         _bottomInset.tryEmit(height)
@@ -1571,6 +1579,17 @@ class SettingsImpl @Inject constructor(
         defaultValue = true,
         sharedPrefs = sharedPreferences,
     )
+    override val showEmptyFiltersListTooltip: UserSetting<Boolean> = UserSetting.BoolPref(
+        sharedPrefKey = "show_empty_filters_list_tooltip",
+        defaultValue = true,
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val showPodcastsRecentlyPlayedSortOrderTooltip: UserSetting<Boolean> = UserSetting.BoolPref(
+        sharedPrefKey = "show_podcasts_recently_played_sort_order_tooltip",
+        defaultValue = true,
+        sharedPrefs = sharedPreferences,
+    )
 
     override val suggestedFoldersDismissTimestamp = UserSetting.PrefFromString<Instant?>(
         sharedPrefKey = "suggested_folders_dismiss_timestamp",
@@ -1589,6 +1608,36 @@ class SettingsImpl @Inject constructor(
     override val suggestedFoldersFollowedHash = UserSetting.StringPref(
         sharedPrefKey = "suggested_folders_followed_hash",
         defaultValue = "",
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val isTrackingConsentRequired = UserSetting.BoolPref(
+        sharedPrefKey = "tracking_consent_required",
+        defaultValue = true,
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val isFreeAccountProfileBannerDismissed = UserSetting.BoolPref(
+        sharedPrefKey = "free_account_banner_dismissed_profile",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val isFreeAccountFiltersBannerDismissed = UserSetting.BoolPref(
+        sharedPrefKey = "free_account_banner_dismissed_filters",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val isFreeAccountHistoryBannerDismissed = UserSetting.BoolPref(
+        sharedPrefKey = "free_account_banner_dismissed_history",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val showFreeAccountEncouragement = UserSetting.BoolPref(
+        sharedPrefKey = "show_free_account_encouragement",
+        defaultValue = true,
         sharedPrefs = sharedPreferences,
     )
 }

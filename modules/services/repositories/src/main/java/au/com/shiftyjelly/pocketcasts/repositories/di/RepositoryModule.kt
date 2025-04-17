@@ -16,6 +16,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearSync
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearSyncImpl
+import au.com.shiftyjelly.pocketcasts.repositories.history.upnext.UpNextHistoryManager
+import au.com.shiftyjelly.pocketcasts.repositories.history.upnext.UpNextHistoryManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationDrawer
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationDrawerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
@@ -61,8 +63,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserSettingsCrashReportPermission
-import au.com.shiftyjelly.pocketcasts.repositories.widget.WidgetManager
-import au.com.shiftyjelly.pocketcasts.repositories.widget.WidgetManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.winback.WinbackManager
 import au.com.shiftyjelly.pocketcasts.repositories.winback.WinbackManagerImpl
 import dagger.Binds
@@ -133,10 +133,6 @@ abstract class RepositoryModule {
 
     @Binds
     @Singleton
-    abstract fun providesWidgetManager(widgetManagerImpl: WidgetManagerImpl): WidgetManager
-
-    @Binds
-    @Singleton
     abstract fun providesCastManager(castManagerImpl: CastManagerImpl): CastManager
 
     @Binds
@@ -197,4 +193,7 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun provideWinbackManager(manager: WinbackManagerImpl): WinbackManager
+
+    @Binds
+    abstract fun provideUpNextHistoryManager(upNextHistoryManagerImpl: UpNextHistoryManagerImpl): UpNextHistoryManager
 }

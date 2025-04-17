@@ -16,6 +16,8 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
@@ -178,7 +180,14 @@ class UpNextAdapter(
 
         fun bind(header: PlayerViewModel.UpNextSummary) {
             with(binding) {
-                emptyUpNextContainer.isVisible = header.episodeCount == 0
+                binding.emptyUpNextComposeView.setContentWithViewCompositionStrategy {
+                    AppTheme(theme) {
+                        if (header.episodePlaying && header.episodeCount == 0) {
+                            UpNextEmptyState(onDiscoverTapped = { listener.onDiscoverTapped() })
+                        }
+                    }
+                }
+
                 val time = TimeHelper.getTimeDurationShortString(timeMs = (header.totalTimeSecs * 1000).toLong(), context = root.context)
                 lblUpNextTime.isVisible = hasEpisodeInProgress()
                 lblUpNextTime.text = if (header.episodeCount == 0) {

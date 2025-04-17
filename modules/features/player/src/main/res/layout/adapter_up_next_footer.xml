@@ -38,40 +38,10 @@
             app:srcCompat="@drawable/shuffle" />
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/emptyUpNextContainer"
-        android:background="@drawable/up_next_card"
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/emptyUpNextComposeView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginTop="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="20dp"
-        android:gravity="center_horizontal">
-
-        <TextView
-            android:id="@+id/emptyTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="@string/player_up_next_empty"
-            android:textAppearance="?attr/textH2"
-            android:textColor="?attr/primary_text_01"/>
-
-        <TextView
-            android:id="@+id/emptyDesc"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/player_up_next_empty_desc"
-            android:textAppearance="?attr/textSubtitle2"
-            android:textColor="?attr/primary_text_02"
-            android:gravity="center_horizontal"
-            android:lineSpacingExtra="6sp"
-            android:layout_marginTop="12dp"
-            android:layout_marginStart="50dp"
-            android:layout_marginEnd="50dp"
-            android:layout_marginBottom="37dp" />
-    </LinearLayout>
+        android:gravity="center_vertical" />
 
 </LinearLayout>

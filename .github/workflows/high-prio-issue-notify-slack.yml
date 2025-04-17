@@ -25,11 +25,11 @@ jobs:
 
       - name: Send Slack Notification
         if: env.SEND_SLACK == 'true'
-        uses: slackapi/slack-github-action@v1.24.0
+        uses: slackapi/slack-github-action@v2.0.0
         with:
+          webhook: ${{ secrets.SLACK_NOTIFIER_WEBHOOK_URL }}
+          webhook-type: webhook-trigger
           payload: |
             {
               "text": ":pocket-casts::android: *High Priority Alert!*\n\n*Type:* ${{ env.TYPE }}\n*Link:* ${{ env.LINK }}\n*Created By:* ${{ env.AUTHOR }}\n*Number:* ${{ env.NUMBER }}"
             }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_NOTIFIER_WEBHOOK_URL }}

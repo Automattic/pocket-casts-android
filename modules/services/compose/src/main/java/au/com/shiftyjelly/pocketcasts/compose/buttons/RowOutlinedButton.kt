@@ -51,6 +51,7 @@ fun RowOutlinedButton(
     disableScale: Boolean = false,
     textIcon: Painter? = null,
     textPadding: Dp = 6.dp,
+    maxLines: Int = Int.MAX_VALUE,
     fontFamily: FontFamily? = null,
     fontSize: TextUnit? = null,
     fontWeight: FontWeight? = null,
@@ -94,6 +95,7 @@ fun RowOutlinedButton(
                         fontFamily = fontFamily,
                         fontWeight = fontWeight,
                         fontSize = if (disableScale) fontSize?.value?.nonScaledSp else fontSize,
+                        maxLines = maxLines,
                         modifier = Modifier.padding(textPadding),
                     )
                 }

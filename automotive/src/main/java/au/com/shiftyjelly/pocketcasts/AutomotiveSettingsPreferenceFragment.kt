@@ -160,7 +160,6 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat() {
             is RefreshState.Never -> getString(LR.string.profile_refreshed_never)
             is RefreshState.Refreshing -> getString(LR.string.profile_refreshing)
             is RefreshState.Failed -> getString(LR.string.profile_refresh_failed)
-            else -> getString(LR.string.profile_refresh_status_unknown)
         }
         preferenceRefreshNow.summary = status
     }

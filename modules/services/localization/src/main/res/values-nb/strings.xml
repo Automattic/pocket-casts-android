@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-06-24 08:10:05+0000
+Translation-Revision-Date: 2025-04-11 08:10:10+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nb_NO
 -->
 <resources>
+    <string name="dismiss">Avbryt</string>
     <string name="playback">Avspilling</string>
     <string name="bookmark">Bokmerke</string>
     <string name="details">Detaljer</string>
@@ -48,8 +49,6 @@ Language: nb_NO
     <string name="settings_headphone_controls_confirmation_sound_summary">Spill av en bekreftelseslyd når du har opprettet et bokmerke med hodetelefonene.</string>
     <string name="settings_headphone_controls_summary">Tilpass handlingene som utføres av de vanligste hodetelefonkontrollene.</string>
     <string name="settings_title_headphone_controls">Hodetelefonkontroller</string>
-    <string name="bookmarks_create_instructions">Du kan lagre tidsstempler i episoder fra handlingsmenyen i avspilleren, eller ved å konfigurere en handling med hodetelefonene.</string>
-    <string name="bookmarks_not_found">Ingen bokmerker ennå</string>
     <string name="bookmarks_headphone_settings">Hodetelefoninnstillinger</string>
     <string name="bookmarks_singular">1 bokmerke</string>
     <string name="bookmarks_plural">%d bokmerker</string>
@@ -59,7 +58,6 @@ Language: nb_NO
     <string name="player_sleep_add_1_minute">+ 1 minutt</string>
     <string name="settings_autoplay">Automatisk avspilling</string>
     <string name="onboarding_patron_feature_early_access_title">Tidlig tilgang til funksjoner</string>
-    <string name="onboarding_plus_feature_extra_themes_icons_title">Ekstra temaer og appikoner</string>
     <string name="settings_continuous_playback_summary">Hvis Neste-køen er tom, spiller vi av episoder fra samme podcast eller liste som du lytter til nå.</string>
     <string name="renew_your_subscription">Forny abonnementet</string>
     <string name="log_in_free_acccount">%s bruker en gratiskonto</string>
@@ -260,6 +258,7 @@ Language: nb_NO
     <string name="onboarding_recommendations_import">Importer</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Alt du liker med Pocket Casts, pluss mye mer</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Lytt på flere steder med appene våre for Windows, macOS og nett.</string>
+    <string name="onboarding_plus_feature_folders_title">Mapper</string>
     <string name="onboarding_plus_feature_folders_text">Ordne podcastene i mapper og synkroniser dem mellom alle enhetene dine.</string>
     <string name="onboarding_plus_feature_cloud_storage_text">Last opp filene til skylageret, slik at du har dem tilgjengelig overalt.</string>
     <string name="onboarding_plus_feature_themes_icons_title">Temaer og ikoner</string>
@@ -950,7 +949,6 @@ Language: nb_NO
     <string name="profile_free_account">Gratis konto</string>
     <string name="profile_forgot_your_password">Jeg har glemt passordet mitt</string>
     <string name="profile_files_remove_image">Erstatt bilde</string>
-    <string name="profile_files_empty_title">Ingen filer</string>
     <string name="profile_files_empty_summary">Vil du lytte til dine egne filer?\nTrykk på +-knappen for å åpne dem i Pocket Casts, så vises de her.</string>
     <string name="profile_files_addfile_save">Lagre</string>
     <string name="profile_files_add_filename">Navn</string>
@@ -961,12 +959,6 @@ Language: nb_NO
     <string name="profile_ends">Avsluttes %s</string>
     <string name="profile_ended">Avsluttet %s</string>
     <string name="profile_end_tour">AVSLUTT OMVISNING</string>
-    <string name="profile_empty_starred_summary">Du har ikke gitt stjerner til noen episoder ennå.</string>
-    <string name="profile_empty_starred">Ingenting har fått stjerner</string>
-    <string name="profile_empty_history_summary">Du har ikke lyttet til noen episoder ennå.</string>
-    <string name="profile_empty_history">Ingenting spilt av</string>
-    <string name="profile_empty_downloaded_summary">Å nei! Du er tom for nedlastinger. Last ned noen flere, så vises de her.</string>
-    <string name="profile_empty_downloaded">Ingen nedlastede episoder</string>
     <string name="profile_email_address_changed">E-postadresse endret</string>
     <string name="profile_email_address">E-postadresse</string>
     <string name="profile_email">E-post</string>
@@ -1320,8 +1312,6 @@ Language: nb_NO
     <string name="player_effects_speed_up">Raskere</string>
     <string name="player_effects_speed_down">Tregere</string>
     <string name="player_effects_speed">Hastighet</string>
-    <string name="player_effects_custom_effects_applied">Egendefinerte effekter brukt</string>
-    <string name="player_effects_clear">TØM</string>
     <string name="player_effects">Effekter i avspiller</string>
     <string name="player_close">Velg avspiller</string>
     <string name="player_chapter_url">URL for kapittel</string>

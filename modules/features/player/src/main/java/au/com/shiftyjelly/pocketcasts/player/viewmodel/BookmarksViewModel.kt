@@ -16,7 +16,6 @@ import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkArguments
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.HeaderRowColors
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.MessageViewColors
-import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.NoBookmarksViewColors
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.search.BookmarkSearchHandler
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
@@ -360,19 +359,26 @@ class BookmarksViewModel
         analyticsTracker.track(AnalyticsEvent.BOOKMARKS_SEARCHBAR_CLEAR_BUTTON_TAPPED)
     }
 
+    fun onHeadphoneControlsButtonTapped() {
+        analyticsTracker.track(
+            AnalyticsEvent.BOOKMARKS_EMPTY_GO_TO_HEADPHONE_SETTINGS,
+            mapOf("source" to sourceView.analyticsValue),
+        )
+    }
+
+    fun onGetBookmarksButtonTapped() {
+        analyticsTracker.track(
+            AnalyticsEvent.BOOKMARKS_GET_BOOKMARKS_BUTTON_TAPPED,
+            mapOf("source" to sourceView.analyticsValue),
+        )
+    }
+
     fun onShare(podcastUuid: String, episodeUuid: String, source: SourceView) {
         analyticsTracker.track(AnalyticsEvent.BOOKMARK_SHARE_TAPPED, mapOf("podcast_uuid" to podcastUuid, "episode_uuid" to episodeUuid, "source" to source.analyticsValue))
     }
 
     sealed class UiState {
-        data class Empty(val sourceView: SourceView) : UiState() {
-            val colors: NoBookmarksViewColors
-                get() = when (sourceView) {
-                    SourceView.PLAYER -> NoBookmarksViewColors.Player
-                    else -> NoBookmarksViewColors.Default
-                }
-        }
-
+        data class Empty(val sourceView: SourceView) : UiState()
         data object Loading : UiState()
         data class Loaded(
             val bookmarks: List<Bookmark> = emptyList(),

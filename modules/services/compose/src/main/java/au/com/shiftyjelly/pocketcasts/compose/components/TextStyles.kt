@@ -65,6 +65,7 @@ fun TextH20(
     disableAutoScale: Boolean = false,
     fontSize: TextUnit = 22.sp,
     lineHeight: TextUnit = 30.sp,
+    letterSpacing: TextUnit = 0.sp,
     fontScale: Float = 1f,
 ) {
     Text(
@@ -72,6 +73,7 @@ fun TextH20(
         color = color,
         fontSize = fontSize.scaled(disableAutoScale, fontScale),
         lineHeight = lineHeight.scaled(disableAutoScale, fontScale),
+        letterSpacing = letterSpacing.scaled(disableAutoScale, fontScale),
         fontWeight = FontWeight.W700,
         maxLines = maxLines,
         overflow = overflow,
@@ -120,6 +122,7 @@ fun TextH30(
     disableAutoScale: Boolean = false,
     fontSize: TextUnit? = null,
     lineHeight: TextUnit = 21.sp,
+    letterSpacing: TextUnit = 0.sp,
     style: TextStyle = TextStyle(),
     fontScale: Float = 1f,
 ) {
@@ -130,6 +133,7 @@ fun TextH30(
         fontFamily = fontFamily,
         fontSize = fontSizeUpdated.scaled(disableAutoScale, fontScale),
         lineHeight = lineHeight.scaled(disableAutoScale, fontScale),
+        letterSpacing = letterSpacing.scaled(disableAutoScale, fontScale),
         textAlign = textAlign,
         fontWeight = fontWeight ?: FontWeight.W600,
         maxLines = maxLines,
@@ -481,15 +485,17 @@ fun TextC70(
     isUpperCase: Boolean = true,
     disableAutoScale: Boolean = false,
     fontScale: Float = 1f,
+    fontSize: TextUnit = 12.sp,
+    fontWeight: FontWeight = FontWeight.W500,
 ) {
     Text(
         text = if (isUpperCase) text.uppercase(Locale.getDefault()) else text,
         color = MaterialTheme.theme.colors.primaryText02,
         fontFamily = FontFamily.SansSerif,
-        fontSize = 12.sp.scaled(disableAutoScale, fontScale),
+        fontSize = fontSize.scaled(disableAutoScale, fontScale),
         lineHeight = 14.sp.scaled(disableAutoScale, fontScale),
         letterSpacing = 0.6.sp.scaled(disableAutoScale, fontScale),
-        fontWeight = FontWeight.W500,
+        fontWeight = fontWeight,
         maxLines = maxLines,
         overflow = TextOverflow.Ellipsis,
         modifier = modifier,

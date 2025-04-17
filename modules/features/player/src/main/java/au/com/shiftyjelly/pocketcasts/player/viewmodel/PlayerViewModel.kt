@@ -43,8 +43,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Util
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jakewharton.rxrelay2.BehaviorRelay
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -152,7 +150,7 @@ class PlayerViewModel @Inject constructor(
         }
     }
 
-    data class UpNextSummary(val episodeCount: Int, val totalTimeSecs: Double)
+    data class UpNextSummary(val episodeCount: Int, val totalTimeSecs: Double, val episodePlaying: Boolean)
 
     data class ListData(
         var podcastHeader: PlayerHeader,
@@ -172,7 +170,7 @@ class PlayerViewModel @Inject constructor(
 
     private val playbackStateObservable: Observable<PlaybackState> = playbackManager.playbackStateRelay
         .observeOn(Schedulers.io())
-    private val upNextStateObservable: Observable<UpNextQueue.State> = playbackManager.upNextQueue.getChangesObservableWithLiveCurrentEpisode(episodeManager, podcastManager)
+    val upNextStateObservable: Observable<UpNextQueue.State> = playbackManager.upNextQueue.getChangesObservableWithLiveCurrentEpisode(episodeManager, podcastManager)
         .observeOn(Schedulers.io())
 
     private val upNextExpandedObservable = BehaviorRelay.create<Boolean>().apply { accept(upNextExpanded) }
@@ -226,7 +224,7 @@ class PlayerViewModel @Inject constructor(
             null
         }
 
-        val upNextSummary = UpNextSummary(episodeCount = episodeCount, totalTimeSecs = totalTime)
+        val upNextSummary = UpNextSummary(episodeCount = episodeCount, totalTimeSecs = totalTime, episodePlaying = upNextState is UpNextQueue.State.Loaded)
 
         return@map listOfNotNull(nowPlayingInfo, upNextSummary) + upNextEpisodes
     }
@@ -404,7 +402,7 @@ class PlayerViewModel @Inject constructor(
                 }
             }
         }
-        val upNextFooter = UpNextSummary(episodeCount = episodeCount, totalTimeSecs = totalTime)
+        val upNextFooter = UpNextSummary(episodeCount = episodeCount, totalTimeSecs = totalTime, episodePlaying = upNextState is UpNextQueue.State.Loaded)
 
         return ListData(
             podcastHeader = podcastHeader,
@@ -675,13 +673,6 @@ class PlayerViewModel @Inject constructor(
         trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_SETTINGS_CHANGED)
     }
 
-    fun clearPodcastEffects(podcast: Podcast) {
-        launch {
-            podcastManager.updateOverrideGlobalEffectsBlocking(podcast, false)
-            playbackManager.updatePlayerEffects(settings.globalPlaybackEffects.value)
-        }
-    }
-
     fun clearUpNext(context: Context, upNextSource: UpNextSource): ClearUpNextDialog {
         val dialog = ClearUpNextDialog(
             source = upNextSource,
@@ -739,14 +730,12 @@ class PlayerViewModel @Inject constructor(
             event = event,
             props = buildMap {
                 putAll(properties)
-                if (FeatureFlag.isEnabled(Feature.CUSTOM_PLAYBACK_SETTINGS)) {
-                    val settings = if (effectsLive.value?.podcast?.overrideGlobalEffects == true) {
-                        PlaybackEffectsSettingsTab.ThisPodcast.analyticsValue
-                    } else {
-                        PlaybackEffectsSettingsTab.AllPodcasts.analyticsValue
-                    }
-                    put(AnalyticsProp.SETTINGS, settings)
+                val settings = if (effectsLive.value?.podcast?.overrideGlobalEffects == true) {
+                    PlaybackEffectsSettingsTab.ThisPodcast.analyticsValue
+                } else {
+                    PlaybackEffectsSettingsTab.AllPodcasts.analyticsValue
                 }
+                put(AnalyticsProp.SETTINGS, settings)
             },
             sourceView = SourceView.PLAYER_PLAYBACK_EFFECTS,
         )

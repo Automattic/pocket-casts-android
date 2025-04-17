@@ -6,18 +6,19 @@ import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListFragment.Mode
 import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListViewModel.State
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
+import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import io.reactivex.Flowable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.rx2.asFlowable
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -27,14 +28,12 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ProfileEpisodeListViewModelTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule()
-
-    @get:Rule
-    val featureFlagRule = InMemoryFeatureFlagRule()
 
     private val episodeManager: EpisodeManager = mock()
     private val playbackManager: PlaybackManager = mock()
@@ -45,11 +44,6 @@ class ProfileEpisodeListViewModelTest {
     private val listeningHistoryEpisodesMock = listOf(mock<PodcastEpisode>())
 
     private lateinit var viewModel: ProfileEpisodeListViewModel
-
-    @Before
-    fun setUp() {
-        FeatureFlag.setEnabled(Feature.SEARCH_IN_LISTENING_HISTORY, true)
-    }
 
     @Test
     fun `setup with Downloaded mode updates state with downloaded episodes`() = runTest {
@@ -96,26 +90,14 @@ class ProfileEpisodeListViewModelTest {
                 State.Empty(
                     titleRes = R.string.profile_empty_history,
                     summaryRes = R.string.profile_empty_history_summary,
+                    iconRes = IR.drawable.ic_listen_history,
                 ),
             )
         }
     }
 
     @Test
-    fun `search bar not shown for listening history when feature flag is false`() = runTest {
-        FeatureFlag.setEnabled(Feature.SEARCH_IN_LISTENING_HISTORY, false)
-        initViewModel()
-
-        viewModel.setup(Mode.History)
-
-        viewModel.state.test {
-            assertEquals(false, (awaitItem() as State.Loaded).showSearchBar)
-        }
-    }
-
-    @Test
-    fun `search bar is shown for listening history when feature flag is true`() = runTest {
-        FeatureFlag.setEnabled(Feature.SEARCH_IN_LISTENING_HISTORY, true)
+    fun `search bar is shown for listening history`() = runTest {
         initViewModel()
 
         viewModel.setup(Mode.History)
@@ -198,6 +180,7 @@ class ProfileEpisodeListViewModelTest {
                     titleRes = R.string.search_episodes_not_found_title,
                     summaryRes = R.string.search_episodes_not_found_summary,
                     showSearchBar = true,
+                    iconRes = IR.drawable.ic_listen_history,
                 ),
             )
         }
@@ -208,16 +191,25 @@ class ProfileEpisodeListViewModelTest {
         starredEpisodes: List<PodcastEpisode> = starredEpisodesMock,
         listeningHistoryEpisodes: List<PodcastEpisode> = listeningHistoryEpisodesMock,
     ) {
+        val settings = mock<Settings>()
+        val userManager = mock<UserManager>()
+        val bannerSetting = mock<UserSetting<Boolean>>()
+
         whenever(episodeManager.findDownloadEpisodesRxFlowable()).thenReturn(flowOf(downloadedEpisodes).asFlowable())
         whenever(episodeManager.findStarredEpisodesRxFlowable()).thenReturn(flowOf(starredEpisodes).asFlowable())
         whenever(episodeManager.findPlaybackHistoryEpisodesRxFlowable()).thenReturn(flowOf(listeningHistoryEpisodes).asFlowable())
         whenever(episodeManager.filteredPlaybackHistoryEpisodesFlow(anyOrNull())).thenReturn(flowOf(emptyList()))
+        whenever(userManager.getSignInState()).thenReturn(Flowable.empty())
+        whenever(settings.isFreeAccountHistoryBannerDismissed).thenReturn(bannerSetting)
+        whenever(bannerSetting.flow).thenReturn(MutableStateFlow(false))
         doNothing().whenever(analyticsTracker).track(any(), any())
 
         viewModel = ProfileEpisodeListViewModel(
             episodeManager = episodeManager,
             playbackManager = playbackManager,
             analyticsTracker = analyticsTracker,
+            settings = settings,
+            userManager = userManager,
         )
     }
 }

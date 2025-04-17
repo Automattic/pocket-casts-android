@@ -3,6 +3,9 @@ package au.com.shiftyjelly.pocketcasts.models.type
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
+import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType.entries
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonReader
@@ -22,13 +25,13 @@ enum class PodcastsSortType(
     val folderComparator: Comparator<FolderItem>,
     val analyticsValue: String,
 ) {
-    NAME_A_TO_Z(
-        clientId = 2,
-        serverId = 1,
-        labelId = R.string.name,
-        podcastComparator = compareBy { cleanStringForSortInternal(it.title) },
-        folderComparator = compareBy { cleanStringForSortInternal(it.title) },
-        analyticsValue = "name",
+    DATE_ADDED_NEWEST_TO_OLDEST(
+        clientId = 0,
+        serverId = 0,
+        labelId = R.string.podcasts_sort_by_date_added,
+        podcastComparator = compareByDescending { it.addedDate },
+        folderComparator = compareByDescending { it.addedDate },
+        analyticsValue = "date_added",
     ),
     EPISODE_DATE_NEWEST_TO_OLDEST(
         clientId = 5,
@@ -39,13 +42,22 @@ enum class PodcastsSortType(
         folderComparator = Comparator { _, _ -> 0 },
         analyticsValue = "episode_release_date",
     ),
-    DATE_ADDED_NEWEST_TO_OLDEST(
-        clientId = 0,
-        serverId = 0,
-        labelId = R.string.podcasts_sort_by_date_added,
-        podcastComparator = compareByDescending { it.addedDate },
-        folderComparator = compareByDescending { it.addedDate },
-        analyticsValue = "date_added",
+    RECENTLY_PLAYED(
+        clientId = 7,
+        serverId = 4,
+        labelId = R.string.podcasts_sort_by_recently_played,
+        // use a query to get the podcasts ordered by recently played episodes
+        podcastComparator = Comparator { _, _ -> 0 },
+        folderComparator = Comparator { _, _ -> 0 },
+        analyticsValue = "episode_recently_played",
+    ),
+    NAME_A_TO_Z(
+        clientId = 2,
+        serverId = 1,
+        labelId = R.string.name,
+        podcastComparator = compareBy { cleanStringForSortInternal(it.title) },
+        folderComparator = compareBy { cleanStringForSortInternal(it.title) },
+        analyticsValue = "name",
     ),
     DRAG_DROP(
         clientId = 6,
@@ -64,7 +76,9 @@ enum class PodcastsSortType(
             if (serverId == null) {
                 return default
             }
-            val sortType = values().firstOrNull { it.serverId == serverId }
+            val sortType = entries
+                .filter { FeatureFlag.isEnabled(Feature.PODCASTS_SORT_CHANGES) || it.serverId != RECENTLY_PLAYED.serverId }
+                .firstOrNull { it.serverId == serverId }
             if (sortType == null) {
                 LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Invalid server ID for PodcastsSortType: $serverId")
                 return default
@@ -74,7 +88,9 @@ enum class PodcastsSortType(
 
         fun fromClientIdString(clientIdString: String): PodcastsSortType {
             val clientId = clientIdString.toIntOrNull()
-            val sortType = PodcastsSortType.values().firstOrNull { it.clientId == clientId }
+            val sortType = entries
+                .filter { FeatureFlag.isEnabled(Feature.PODCASTS_SORT_CHANGES) || it.clientId != RECENTLY_PLAYED.clientId }
+                .firstOrNull { it.clientId == clientId }
             if (sortType == null) {
                 LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Invalid client ID for PodcastsSortType: $clientIdString")
                 return default

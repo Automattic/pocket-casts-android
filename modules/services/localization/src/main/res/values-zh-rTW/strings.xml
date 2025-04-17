@@ -1,17 +1,75 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-02-25 09:54:03+0000
+Translation-Revision-Date: 2025-04-11 08:10:11+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="dismiss">關閉</string>
+    <string name="settings_privacy_analytics_third_party_summary">允許我們使用信任的第三方服務來收集匿名資料。</string>
+    <string name="settings_privacy_analytics_third_party">第三方分析工具</string>
+    <string name="settings_privacy_analytics_first_party">第一方分析工具</string>
+    <string name="tracking_consent_dialog_reject">要求應用程式不要追蹤</string>
+    <string name="tracking_consent_dialog_allow">允許</string>
+    <string name="tracking_consent_dialog_message">我們使用分析工具來改善應用程式，並衡量廣告行銷活動是否成功。</string>
+    <string name="tracking_consent_dialog_title">是否允許 Pocket Casts 追蹤你在其他公司的應用程式和網站上的活動？</string>
+    <string name="donate">捐贈</string>
+    <string name="filters_tooltip_subtitle">建立用來整理單集的智慧篩選條件。 依期間、發佈日期與媒體類型加以篩選。</string>
+    <string name="filters_tooltip_title">整理你的單集</string>
+    <string name="podcasts_sort_by_recently_played">最近播放</string>
+    <string name="podcasts_sort_by_tooltip_message">你現在可依「最近播放」排序，並從上次進度迅速接續播放。</string>
+    <string name="podcasts_sort_by_tooltip_title">依「最近播放」排序</string>
+    <string name="bookmarks_free_user_empty_state_button">取得書籤</string>
+    <string name="bookmarks_free_user_empty_state_message">你可以儲存單集中重要時刻的時間戳記。</string>
+    <string name="bookmarks_empty_state_title">將該時刻加入書籤</string>
+    <string name="discover_collection_header_content_description">「%s」頁首</string>
+    <string name="up_next_history_restore_confirmation_description">系統會將這些節目新增至目前「接下來播放」的底部。</string>
+    <string name="up_next_history_restore_confirmation_title">要還原「接下來播放」嗎？</string>
+    <string name="up_next_history_restore_button">\@字串/還原</string>
+    <string name="player_up_next_empty_subtitle">在單集列向右滑動或點選單集卡上的圖示，即可將單集排入佇列接續播放。</string>
+    <string name="player_up_next_empty_title">精心策劃你的聆聽階段</string>
+    <string name="restore">恢復</string>
+    <string name="up_next_history_explanation">因其他裝置變更，因此在「接下來播放」進行的近期更新清單。 若要檢視單集並提供還原選項，請點選任意條目。</string>
+    <string name="up_next_history">「接下來播放」紀錄</string>
+    <string name="restore_from_local_history">從本機記錄還原</string>
+    <string name="delete_download_warning_summary">你確定要移除這些下載項目嗎？ 移除後就無法離線播放。</string>
+    <string name="delete_download_warning_title">移除下載的單集</string>
+    <string name="delete_download_warning_button">移除 %1$d 個下載項目</string>
+    <string name="profile_files_empty_title">收聽或觀賞自己的檔案</string>
+    <string name="profile_empty_starred_summary">為你喜愛的單集加上星號，方便隨時返回觀賞。</string>
+    <string name="profile_empty_starred">儲存最愛的項目</string>
+    <string name="profile_empty_history_summary">開始收聽 Podcast，並在此重溫收聽記錄。</string>
+    <string name="profile_empty_history">立即開聽吧！</string>
+    <string name="profile_empty_downloaded_summary">儲存單集以供離線收聽，精彩內容不漏接。</string>
+    <string name="profile_empty_downloaded">享受離線收聽體驗</string>
+    <string name="go_to_discover">開始探索</string>
+    <string name="large_player_widget_description">控制播放或切換單集</string>
+    <string name="large_player_widget_label">Podcast 控制項與「接下來播放」佇列</string>
+    <string name="medium_player_widget_description">播放、暫停或跳過單集</string>
+    <string name="medium_player_widget_label">Podcast 播放控制項</string>
+    <string name="small_player_widget_description">單次點選即可播放或暫停單集</string>
+    <string name="small_player_widget_label">Podcast 播放按鈕</string>
+    <string name="medium_player_classic_widget_label">Podcast 播放控制項 (傳統)</string>
+    <string name="transcript_generated_header">本逐字稿乃系統自動生成，僅供 Plus 訂閱者使用。</string>
+    <string name="transcript_generated_paywall_description">訂閱 Plus 即可存取逐字稿和其他進階版功能，例如書籤和資料夾。</string>
+    <string name="transcript_generated_paywall_title">本逐字稿乃 Pocket Casts 自動生成。</string>
+    <string name="onboarding_plus_feature_chapters_title">預先選取章節</string>
+    <string name="onboarding_plus_feature_bookmarks_title">書籤</string>
+    <string name="podcast_header_redesign_message">點選 Podcast 標題，將說明和詳細資料收合或展開</string>
+    <string name="suggested_folder_content_description">預覽「%1$s」資料夾</string>
+    <string name="suggested_folders_replace_subtitle">我們已將你的 Podcast 整理進資料夾。 你可立即儲存，或視需求自訂資料夾。 這個資料夾會取代任何現有的資料夾。</string>
+    <string name="suggested_folders_title">智慧資料夾</string>
+    <string name="discover_dismiss_selected_category">移除選取的分類</string>
+    <string name="discover_show_all_categories">顯示所有分類</string>
+    <string name="podcast_header_redesign_title">我們進行了一些變更！</string>
+    <string name="notifications_enabled_message">我們會在「%1$s」推出新單集時通知你。</string>
     <string name="see_more">查看更多</string>
     <string name="podcast_artwork_description">Podcast 封面圖片</string>
     <string name="suggested_folders_replace_folders_confirmation_description">若你接受建議的資料夾，系統將覆寫目前的資料夾。 此動作無法復原。</string>
     <string name="suggested_folders_replace_folders_confirmation_tittle">要取代現有的資料夾嗎？</string>
     <string name="suggested_folders_replace_folders_button">取代資料夾</string>
-    <string name="suggested_folders_subtitle">我們已將你的 Podcast 整理進資料夾。 你可立即儲存，或視需求自訂資料夾。</string>
+    <string name="suggested_folders_use_subtitle">我們已將你的 Podcast 整理進資料夾。 你可立即儲存，或視需求自訂資料夾。</string>
     <string name="onboarding_plus_feature_up_next_shuffle_title">接下來隨機播放</string>
     <string name="suggested_folders_plus_prompt">透過 Pocket Casts Plus 打理不同節目並享有更多功能</string>
     <string name="winback_cancel_subscription_header_title">取消訂閱</string>
@@ -20,13 +78,10 @@ Language: zh_TW
     <string name="onboarding_import_from_url_importing_message">正在匯入 OPML。 你可以回到申請程序。</string>
     <string name="onboarding_import_from_url_description">使用 URL 從 OPML 檔案匯入你的 Podcast。</string>
     <string name="onboarding_import_from_url">從 URL 匯入</string>
-    <string name="suggested_folders_paywall_tittle">自動整理 Podcast</string>
     <string name="podcast_feed_update_tooltip_subtitle">下拉或透過此選單查看新功能。</string>
     <string name="podcast_feed_update_tooltip_title">第一時間收聽全新單集！</string>
-    <string name="folder_content_description">資料夾「%s」</string>
-    <string name="suggested_folders_use_create_custom_folders_button">建立自訂資料夾</string>
+    <string name="suggested_folders_create_custom_folder_button">建立自訂資料夾</string>
     <string name="suggested_folders_use_these_folders_button">使用這些資料夾</string>
-    <string name="suggested_folders">建議資料夾</string>
     <string name="winback_claiming_offer">領取優惠</string>
     <string name="winback_claimed_offer_message_3">次年享五折優惠！</string>
     <string name="winback_offer_free_offer_yearly_description">立即支付「%1$s」，次年再享 50%% 優惠。</string>
@@ -267,7 +322,6 @@ Language: zh_TW
     <string name="settings_storage_fix_downloads">修正下載問題</string>
     <string name="nova_launcher_new_releases">新發佈內容</string>
     <string name="nova_launcher_subscribed_podcasts">已訂閱的 Podcast</string>
-    <string name="medium_player_classic_widget_label">中型播放器 (傳統)</string>
     <string name="widget_preview_time_left_4">剩餘 1 小時 36 分鐘</string>
     <string name="widget_preview_time_left_3">剩餘 55 分鐘</string>
     <string name="widget_preview_time_left_2">剩餘 12 分鐘</string>
@@ -294,9 +348,6 @@ Language: zh_TW
     <string name="widget_check_out_discover">查看「探索」深入更多內容</string>
     <string name="widget_nothing_in_up_next">「接下來播放」沒有內容</string>
     <string name="widget_no_episode_playing">沒有正在播放的單集</string>
-    <string name="large_player_widget_label">大型播放器</string>
-    <string name="medium_player_widget_label">中型播放器</string>
-    <string name="small_player_widget_label">小型播放器</string>
     <string name="clear_search">清除搜尋</string>
     <string name="bookmarks_search_results_not_found">找不到符合搜尋內容的書籤。</string>
     <string name="podcast_and_episode">Podcast 與節目</string>
@@ -310,7 +361,6 @@ Language: zh_TW
     <string name="discover_all_categories">所有類別</string>
     <string name="upgrade_to_patron">升級至 Patron</string>
     <string name="upgrade_to_plus">升級至 Plus</string>
-    <string name="skip_chapters_patron_prompt">訂閱 Pocket Casts Patron，就能預先選取章節並享有更多功能</string>
     <string name="skip_chapters_plus_prompt">訂閱 Pocket Casts Plus，就能預先選取章節並享有更多功能</string>
     <string name="number_of_chapters_summary_singular">1 個章節 • %d 個章節已隱藏</string>
     <string name="number_of_chapters_summary_plural">%1$d 個章節 • %2$d 個章節已隱藏</string>
@@ -322,7 +372,6 @@ Language: zh_TW
     <string name="half_price_first_year">首年享五折優惠</string>
     <string name="plus_offer_duration">%s優惠</string>
     <string name="onboarding_plus_feature_watch_playback">Apple Watch 和穿戴式裝置 OS</string>
-    <string name="onboarding_plus_feature_folders_and_bookmarks_title">資料夾和書籤</string>
     <string name="settings_use_dynamic_colors_widget_details">若你啟用此功能，小工具的顏色就會配合裝置的佈景主題顏色連帶變更。</string>
     <string name="settings_use_dynamic_colors_widget">啟用小工具的動態色彩功能</string>
     <string name="widget">小工具</string>
@@ -423,8 +472,7 @@ Language: zh_TW
     <string name="settings_headphone_controls_action_previous">上一個動作</string>
     <string name="settings_headphone_controls_action_next">下一個動作</string>
     <string name="bookmarks_headphone_settings">耳機設定</string>
-    <string name="bookmarks_not_found">尚未有書籤</string>
-    <string name="bookmarks_create_instructions">你可以從播放器的動作選單儲存單集的時間戳記，或設定耳機動作來儲存。</string>
+    <string name="bookmarks_paid_user_empty_state_message">若你想儲存單集的時間戳記，可以透過播放器的動作選單或設定耳機動作來進行。</string>
     <string name="bookmark_play">播放書籤位置 %s</string>
     <string name="bookmarks_plural">%d 個書籤</string>
     <string name="bookmarks_singular">1 個書籤</string>
@@ -432,7 +480,7 @@ Language: zh_TW
     <string name="settings_autoplay">自動播放</string>
     <string name="player_sleep_add_1_minute">1 分鐘</string>
     <string name="player_sleep_1_minute">1 分鐘</string>
-    <string name="onboarding_plus_feature_extra_themes_icons_title">其他主題和應用程式圖示</string>
+    <string name="onboarding_plus_feature_extra_themes_icons_title">其他主題和圖示</string>
     <string name="onboarding_patron_feature_early_access_title">搶先使用新功能</string>
     <string name="settings_continuous_playback_summary">如果「接下來播放」佇列是空的，我們會播放你正在聆聽的同一個 Podcast 或清單內的單集。</string>
     <string name="renew_your_subscription">續訂</string>
@@ -636,6 +684,7 @@ Language: zh_TW
     <string name="onboarding_plus_feature_cloud_storage_text">將你的檔案上傳至雲端儲存空間，隨時隨地使用。</string>
     <string name="onboarding_plus_feature_cloud_storage_title">20 GB 雲端儲存空間</string>
     <string name="onboarding_plus_feature_folders_text">在資料夾中整理你的 Podcast，並同步到所有裝置。</string>
+    <string name="onboarding_plus_feature_folders_title">資料夾</string>
     <string name="onboarding_plus_feature_desktop_apps_text">透過我們的 Windows、macOS 和網頁應用程式，享受更多元的收聽方式。</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">包含所有你喜愛的 Pocket Casts 功能，以及更多好康</string>
     <string name="onboarding_recommendations_import">匯入</string>
@@ -1348,7 +1397,6 @@ Language: zh_TW
     <string name="profile_free_account">免費帳號</string>
     <string name="profile_forgot_your_password">我忘記密碼</string>
     <string name="profile_files_remove_image">取代圖片</string>
-    <string name="profile_files_empty_title">沒有檔案</string>
     <string name="profile_files_empty_summary">想收聽自己的檔案嗎？\n點選 + 按鈕即可在 Pocket Casts 中開啟這些檔案，檔案會顯示於此處。</string>
     <string name="profile_files_addfile_save">儲存</string>
     <string name="profile_files_add_filename">名稱</string>
@@ -1359,12 +1407,6 @@ Language: zh_TW
     <string name="profile_ends">預計結束時間：%s</string>
     <string name="profile_ended">結束時間：%s</string>
     <string name="profile_end_tour">結束導覽</string>
-    <string name="profile_empty_starred_summary">你尚未將任何單集加上星號。</string>
-    <string name="profile_empty_starred">沒有加上星號的項目</string>
-    <string name="profile_empty_history_summary">你尚未收聽任何單集。</string>
-    <string name="profile_empty_history">沒有播放過任何單集</string>
-    <string name="profile_empty_downloaded_summary">糟糕！ 你剛完成下載。 下載更多節目，它們會顯示在這裡。</string>
-    <string name="profile_empty_downloaded">沒有已下載的單集</string>
     <string name="profile_email_address_changed">電子郵件地址已變更</string>
     <string name="profile_email_address">電子郵件地址</string>
     <string name="profile_email">電子郵件</string>
@@ -1724,8 +1766,6 @@ Language: zh_TW
     <string name="player_effects_speed_up">加速</string>
     <string name="player_effects_speed_down">減速</string>
     <string name="player_effects_speed">速度</string>
-    <string name="player_effects_custom_effects_applied">已套用自訂效果</string>
-    <string name="player_effects_clear">清除</string>
     <string name="player_effects">播放器效果</string>
     <string name="player_close">關閉播放器</string>
     <string name="player_chapter_url">段落 URL</string>

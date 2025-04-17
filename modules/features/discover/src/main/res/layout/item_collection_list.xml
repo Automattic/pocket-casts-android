@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginBottom="24dp">
+
+        <au.com.shiftyjelly.pocketcasts.discover.view.PodcastCollectionItem
+            android:id="@+id/row0"
+            android:layout_marginTop="6dp"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="4dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+        <au.com.shiftyjelly.pocketcasts.discover.view.PodcastCollectionItem
+            android:id="@+id/row1"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+             />
+</LinearLayout>

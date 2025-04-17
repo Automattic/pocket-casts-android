@@ -29,6 +29,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsThread
 import au.com.shiftyjelly.pocketcasts.repositories.sync.PodcastRefresher
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.refresh.RefreshServiceManager
+import au.com.shiftyjelly.pocketcasts.servers.refresh.UpdatePodcastResponse.EpisodeFound
+import au.com.shiftyjelly.pocketcasts.servers.refresh.UpdatePodcastResponse.Retry
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jakewharton.rxrelay2.PublishRelay
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -40,6 +42,7 @@ import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -327,11 +330,12 @@ class PodcastManagerImpl @Inject constructor(
 
     override suspend fun findSubscribedSorted(): List<Podcast> {
         val sortType = settings.podcastsSortType.value
-        // use a query to get the podcasts ordered by episode release date
-        if (sortType == PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST) {
-            return findPodcastsOrderByLatestEpisode(orderAsc = false)
+        return when (sortType) {
+            // use a query to get the podcasts ordered by episode release date or recently played episodes
+            PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST -> findPodcastsOrderByLatestEpisode(orderAsc = false)
+            PodcastsSortType.RECENTLY_PLAYED -> findPodcastsOrderByRecentlyPlayedEpisode()
+            else -> podcastDao.findSubscribedNoOrder().sortedWith(sortType.podcastComparator)
         }
-        return podcastDao.findSubscribedNoOrder().sortedWith(sortType.podcastComparator)
     }
 
     override fun findSubscribedRxSingle(): Single<List<Podcast>> {
@@ -346,11 +350,16 @@ class PodcastManagerImpl @Inject constructor(
         return podcastDao.findSubscribedOrderByLatestEpisodeRxFlowable(orderAsc = false)
     }
 
+    override fun podcastsOrderByRecentlyPlayedEpisodeRxFlowable(): Flowable<List<Podcast>> {
+        return podcastDao.findPodcastsOrderByRecentlyPlayedEpisodeRxFlowable()
+    }
+
     override fun podcastsInFolderOrderByUserChoiceRxFlowable(folder: Folder): Flowable<List<Podcast>> {
         val sort = folder.podcastsSortType
         return when (sort) {
             PodcastsSortType.DATE_ADDED_NEWEST_TO_OLDEST -> podcastDao.findFolderOrderByAddedDateRxFlowable(folder.uuid, sort.isAsc())
             PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST -> podcastDao.findFolderOrderByLatestEpisodeRxFlowable(folder.uuid, sort.isAsc())
+            PodcastsSortType.RECENTLY_PLAYED -> podcastDao.findPodcastsOrderByRecentlyPlayedEpisodeRxFlowable(folder.uuid)
             PodcastsSortType.DRAG_DROP -> podcastDao.findFolderOrderByUserSortRxFlowable(folder.uuid)
             else -> podcastDao.findFolderOrderByNameRxFlowable(folder.uuid, sort.isAsc())
         }
@@ -366,6 +375,14 @@ class PodcastManagerImpl @Inject constructor(
 
     override suspend fun findFolderPodcastsOrderByLatestEpisode(folderUuid: String): List<Podcast> {
         return podcastDao.findFolderPodcastsOrderByLatestEpisodeBlocking(folderUuid)
+    }
+
+    override suspend fun findPodcastsOrderByRecentlyPlayedEpisode(): List<Podcast> {
+        return podcastDao.findPodcastsOrderByRecentlyPlayedEpisode()
+    }
+
+    override suspend fun findFolderPodcastsOrderByRecentlyPlayedEpisode(folderUuid: String): List<Podcast> {
+        return podcastDao.findPodcastsOrderByRecentlyPlayedEpisode(folderUuid)
     }
 
     override suspend fun findPodcastsOrderByTitle(): List<Podcast> {
@@ -649,21 +666,15 @@ class PodcastManagerImpl @Inject constructor(
             podcastUuid = podcast.uuid,
             lastEpisodeUuid = podcast.latestEpisodeUuid,
         )
-        LogBuffer.i(TAG, "Refresh podcast feed: ${response.code()}")
+        LogBuffer.i(TAG, "Refresh podcast feed: $response")
 
-        while (response.code() == 202) {
-            val location = response.headers()["Location"]
-            val retryAfter = response.headers()["Retry-After"]?.toIntOrNull()
-            if (location != null && retryAfter != null) {
-                delay(retryAfter * 1000L)
-                response = refreshServiceManager.pollUpdatePodcast(location)
-                LogBuffer.i(TAG, "Refresh podcast feed poll: ${response.code()}")
-            } else {
-                return false
-            }
+        while (response is Retry) {
+            delay(response.retryAfter.seconds)
+            response = refreshServiceManager.pollUpdatePodcast(response.location)
+            LogBuffer.i(TAG, "Refresh podcast feed poll: $response")
         }
 
-        if (response.code() == 200) {
+        if (response is EpisodeFound) {
             refreshPodcasts("Refresh podcast feed")
             return true
         } else {

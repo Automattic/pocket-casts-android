@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.sentry)
@@ -59,6 +60,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.mediarouter)
+    implementation(libs.appsflyer)
     implementation(libs.automattic.crashlogging)
     implementation(libs.coil)
     implementation(libs.compose.ui)
@@ -75,6 +77,7 @@ dependencies {
     implementation(libs.hilt.work)
     implementation(libs.horologist.auth.data.phone)
     implementation(libs.horologist.datalayer)
+    implementation(libs.installreferrer)
     implementation(libs.lifecycle.reactivestreams.ktx)
     implementation(libs.material)
     implementation(libs.media3.extractor)

@@ -18,6 +18,8 @@ import androidx.glance.action.Action
 import androidx.glance.action.clickable
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.size
+import androidx.glance.semantics.contentDescription
+import androidx.glance.semantics.semantics
 import androidx.glance.unit.ColorProvider
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.widget.data.PlayerWidgetEpisode
@@ -32,6 +34,7 @@ internal fun EpisodeImage(
     size: Dp,
     backgroundColor: ((WidgetTheme) -> ColorProvider)? = null,
     onClick: Action? = null,
+    contentDescription: String = "",
 ) {
     var episodeBitmap by remember(episode?.uuid, useEpisodeArtwork, size) {
         mutableStateOf<Bitmap?>(null)
@@ -40,7 +43,14 @@ internal fun EpisodeImage(
     RounderCornerBox(
         contentAlignment = Alignment.Center,
         backgroundTint = backgroundColor?.invoke(LocalWidgetTheme.current) ?: LocalWidgetTheme.current.buttonBackground,
-        modifier = GlanceModifier.size(size).applyIf(onClick != null) { it.clickable(onClick!!) },
+        modifier = GlanceModifier
+            .size(size)
+            .applyIf(onClick != null) {
+                it.clickable(onClick!!)
+            }
+            .applyIf(contentDescription.isNotEmpty()) {
+                it.semantics { this.contentDescription = contentDescription }
+            },
     ) {
         PocketCastsLogo(
             size = size / 2.5f,

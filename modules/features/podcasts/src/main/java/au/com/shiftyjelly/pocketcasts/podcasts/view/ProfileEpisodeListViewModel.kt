@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view
 
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,8 +8,10 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListFragment.Mode
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,14 +21,17 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
@@ -33,6 +39,8 @@ class ProfileEpisodeListViewModel @Inject constructor(
     val episodeManager: EpisodeManager,
     val playbackManager: PlaybackManager,
     private val analyticsTracker: AnalyticsTracker,
+    private val settings: Settings,
+    private val userManager: UserManager,
 ) : ViewModel(), CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -69,10 +77,10 @@ class ProfileEpisodeListViewModel @Inject constructor(
                 val searchQuery = searchQueryFlow.value
                 val results = if (searchQuery.isNotEmpty()) searchResults else episodeList
                 val showSearchBar = mode.showSearch &&
-                    FeatureFlag.isEnabled(Feature.SEARCH_IN_LISTENING_HISTORY) &&
                     (results.isNotEmpty() || searchQuery.isNotEmpty())
                 _state.value = if (results.isEmpty()) {
                     State.Empty(
+                        iconRes = State.Empty.iconRes(mode),
                         titleRes = State.Empty.titleRes(mode, searchQuery.isNotEmpty()),
                         summaryRes = State.Empty.summaryRes(mode, searchQuery.isNotEmpty()),
                         showSearchBar = showSearchBar,
@@ -106,6 +114,26 @@ class ProfileEpisodeListViewModel @Inject constructor(
         }
     }
 
+    internal val isFreeAccountBannerVisible = combine(
+        userManager.getSignInState().asFlow().map { it.isSignedIn },
+        settings.isFreeAccountHistoryBannerDismissed.flow,
+    ) { isSignedIn, isBannerDismissed ->
+        !isSignedIn && !isBannerDismissed && FeatureFlag.isEnabled(Feature.ENCOURAGE_ACCOUNT_CREATION)
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = false,
+    )
+
+    internal fun onCreateFreeAccountClick() {
+        analyticsTracker.track(AnalyticsEvent.INFORMATIONAL_BANNER_VIEW_CREATE_ACCOUNT_TAP, mapOf("source" to "listening_history"))
+    }
+
+    internal fun dismissFreeAccountBanner() {
+        analyticsTracker.track(AnalyticsEvent.INFORMATIONAL_BANNER_VIEW_DISMISSED, mapOf("source" to "listening_history"))
+        settings.isFreeAccountHistoryBannerDismissed.set(true, updateModifiedAt = true)
+    }
+
     sealed class State {
         open val showSearchBar: Boolean = false
 
@@ -115,6 +143,7 @@ class ProfileEpisodeListViewModel @Inject constructor(
         ) : State()
 
         data class Empty(
+            @DrawableRes val iconRes: Int,
             @StringRes val titleRes: Int,
             @StringRes val summaryRes: Int,
             override val showSearchBar: Boolean = false,
@@ -139,6 +168,13 @@ class ProfileEpisodeListViewModel @Inject constructor(
                         is Mode.History -> LR.string.profile_empty_history_summary
                     }
                 }
+
+                fun iconRes(mode: Mode): Int =
+                    when (mode) {
+                        is Mode.Downloaded -> IR.drawable.ic_download
+                        is Mode.Starred -> IR.drawable.ic_starred
+                        is Mode.History -> IR.drawable.ic_listen_history
+                    }
             }
         }
 

@@ -9,7 +9,27 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.Toolbar
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.invisibleToUser
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -23,6 +43,9 @@ import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
+import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
@@ -89,11 +112,14 @@ class PodcastsFragment :
         }
     }
 
-    @Inject lateinit var settings: Settings
+    @Inject
+    lateinit var settings: Settings
 
-    @Inject lateinit var castManager: CastManager
+    @Inject
+    lateinit var castManager: CastManager
 
-    @Inject lateinit var analyticsTracker: AnalyticsTracker
+    @Inject
+    lateinit var analyticsTracker: AnalyticsTracker
 
     private var podcastOptionsDialog: PodcastsOptionsDialog? = null
     private var folderOptionsDialog: FolderOptionsDialog? = null
@@ -131,6 +157,64 @@ class PodcastsFragment :
             ItemTouchHelper(PodcastTouchCallback(this, context)).attachToRecyclerView(it)
         }
 
+        if (!viewModel.isFragmentChangingConfigurations) {
+            folderUuid?.let { viewModel.trackFolderShown(it) } ?: viewModel.trackPodcastsListShown()
+        }
+
+        val toolbar = binding.toolbar
+        setupToolbarAndStatusBar(
+            toolbar = toolbar,
+            menu = R.menu.podcasts_menu,
+            chromeCastButton = Shown(chromeCastAnalytics),
+        )
+        toolbar.setOnMenuItemClickListener(this)
+
+        toolbar.menu.findItem(R.id.folders_locked).setOnMenuItemClickListener {
+            if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS)) {
+                val state = viewModel.suggestedFoldersState.value
+                when (state) {
+                    is SuggestedFoldersState.Empty -> {
+                        OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.Upsell(OnboardingUpgradeSource.FOLDERS))
+                    }
+
+                    is SuggestedFoldersState.Available -> {
+                        showSuggestedFoldersCreation(SuggestedFoldersFragment.Source.ToolbarButton)
+                    }
+                }
+            } else {
+                OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.Upsell(OnboardingUpgradeSource.FOLDERS))
+            }
+            true
+        }
+
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            viewModel.refreshPodcasts()
+        }
+
+        binding.btnDiscover.setOnClickListener {
+            analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_DISCOVER_BUTTON_TAPPED)
+            (activity as FragmentHostListener).openTab(VR.id.navigation_discover)
+        }
+
+        binding.addToFolderButton.setOnClickListener {
+            val folder = viewModel.folder ?: return@setOnClickListener
+            FolderEditPodcastsFragment.newInstance(folderUuid = folder.uuid).show(parentFragmentManager, "add_podcasts_card")
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            if (viewModel.shouldShowTooltip()) {
+                binding.toolbar.post {
+                    showTooltip()
+                }
+            }
+        }
+
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         viewModel.folderState.observe(viewLifecycleOwner) { folderState ->
             if (folderUuid != null && folderState.folder == null) {
                 return@observe
@@ -143,10 +227,10 @@ class PodcastsFragment :
             val toolbarColors: ToolbarColors
             val navigationIcon: NavigationIcon
             if (folder == null) {
-                toolbarColors = ToolbarColors.theme(theme = theme, context = context, excludeMenuItems = listOf(R.id.folders_locked))
+                toolbarColors = ToolbarColors.theme(theme = theme, context = requireContext(), excludeMenuItems = listOf(R.id.folders_locked))
                 navigationIcon = NavigationIcon.None
             } else {
-                toolbarColors = ToolbarColors.user(color = folder.getColor(context), theme = theme)
+                toolbarColors = ToolbarColors.user(color = folder.getColor(requireContext()), theme = theme)
                 navigationIcon = NavigationIcon.BackArrow
             }
             setupToolbarAndStatusBar(
@@ -194,55 +278,24 @@ class PodcastsFragment :
             }
         }
 
-        if (!viewModel.isFragmentChangingConfigurations) {
-            folderUuid?.let { viewModel.trackFolderShown(it) } ?: viewModel.trackPodcastsListShown()
-        }
-
-        val toolbar = binding.toolbar
-        setupToolbarAndStatusBar(
-            toolbar = toolbar,
-            menu = R.menu.podcasts_menu,
-            chromeCastButton = Shown(chromeCastAnalytics),
-        )
-        toolbar.setOnMenuItemClickListener(this)
-
-        toolbar.menu.findItem(R.id.folders_locked).setOnMenuItemClickListener {
-            OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.Upsell(OnboardingUpgradeSource.FOLDERS))
-            true
-        }
-
-        binding.swipeRefreshLayout.setOnRefreshListener {
-            viewModel.refreshPodcasts()
-        }
-
-        binding.btnDiscover.setOnClickListener {
-            analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_DISCOVER_BUTTON_TAPPED)
-            (activity as FragmentHostListener).openTab(VR.id.navigation_discover)
-        }
-
-        binding.addToFolderButton.setOnClickListener {
-            val folder = viewModel.folder ?: return@setOnClickListener
-            FolderEditPodcastsFragment.newInstance(folderUuid = folder.uuid).show(parentFragmentManager, "add_podcasts_card")
-        }
-
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.refreshSuggestedFolders()
+            }
+        }
 
-                when (viewModel.suggestedFoldersState.value) {
-                    is SuggestedFoldersState.Available -> {
-                        if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS) && viewModel.isEligibleForSuggestedFoldersPopup()) {
-                            showSuggestedFoldersCreation(SuggestedFoldersFragment.Source.PodcastsPopup)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.suggestedFoldersState.collect { state ->
+                    when (state) {
+                        is SuggestedFoldersState.Available -> {
+                            if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS) && viewModel.isEligibleForSuggestedFoldersPopup()) {
+                                showSuggestedFoldersCreation(SuggestedFoldersFragment.Source.Popup)
+                            }
                         }
-                    }
 
-                    is SuggestedFoldersState.Empty -> Unit
+                        is SuggestedFoldersState.Empty -> Unit
+                    }
                 }
             }
         }
@@ -263,15 +316,18 @@ class PodcastsFragment :
                 openOptions()
                 true
             }
+
             R.id.search_podcasts -> {
                 search()
                 true
             }
+
             R.id.create_folder -> {
                 analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_FOLDER_BUTTON_TAPPED)
                 handleFolderCreation()
                 true
             }
+
             else -> false
         }
     }
@@ -320,9 +376,10 @@ class PodcastsFragment :
             is SuggestedFoldersState.Empty -> {
                 showCustomFolderCreation()
             }
+
             is SuggestedFoldersState.Available -> {
                 if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS)) {
-                    showSuggestedFoldersCreation(SuggestedFoldersFragment.Source.CreateFolderButton)
+                    showSuggestedFoldersCreation(SuggestedFoldersFragment.Source.ToolbarButton)
                 } else {
                     showCustomFolderCreation()
                 }
@@ -436,6 +493,56 @@ class PodcastsFragment :
 
     override fun scrollToTop() {
         binding.recyclerView.quickScrollToTop()
+    }
+
+    private fun showTooltip() {
+        binding.tooltipComposeView.apply {
+            isVisible = true
+            setContentWithViewCompositionStrategy {
+                CallOnce {
+                    viewModel.onTooltipShown()
+                }
+                AppTheme(theme.activeTheme) {
+                    val configuration = LocalConfiguration.current
+                    var toolbarY by remember { mutableIntStateOf(0) }
+
+                    LaunchedEffect(configuration) {
+                        with(binding.toolbar) {
+                            val location = IntArray(2)
+                            getLocationOnScreen(location)
+                            toolbarY = location[1] + height
+                        }
+                    }
+
+                    Box(
+                        contentAlignment = Alignment.TopEnd,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.Black.copy(alpha = 0.4f))
+                            .clickable(
+                                interactionSource = null,
+                                indication = null,
+                                onClick = ::closeTooltip,
+                            )
+                            .semantics { invisibleToUser() },
+                    ) {
+                        val density = LocalDensity.current
+                        val yOffset = with(density) { toolbarY.toDp() - 16.dp }
+                        RecentlyPlayedSortOptionTooltip(
+                            onClickClose = ::closeTooltip,
+                            modifier = Modifier
+                                .offset(y = yOffset),
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun closeTooltip() {
+        binding.tooltipComposeView.isGone = true
+        binding.tooltipComposeView.disposeComposition()
+        viewModel.onTooltipClosed()
     }
 
     inner class SpaceItemDecoration : RecyclerView.ItemDecoration() {

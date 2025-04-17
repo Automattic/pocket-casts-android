@@ -25,6 +25,7 @@ enum class AnalyticsEvent(val key: String) {
     BOOKMARK_EDIT_FORM_SUBMITTED("bookmark_edit_form_submitted"),
     BOOKMARK_SHARE_TAPPED("bookmark_share_tapped"),
     PROFILE_BOOKMARKS_SHOWN("profile_bookmarks_shown"),
+    BOOKMARKS_GET_BOOKMARKS_BUTTON_TAPPED("bookmarks_get_bookmarks_button_tapped"),
 
     /* User lifecycle events */
     USER_SIGNED_IN("user_signed_in"),
@@ -110,6 +111,8 @@ enum class AnalyticsEvent(val key: String) {
     PODCASTS_LIST_LAYOUT_CHANGED("podcasts_list_layout_changed"),
     PODCASTS_LIST_BADGES_CHANGED("podcasts_list_badges_changed"),
     PODCASTS_LIST_DISCOVER_BUTTON_TAPPED("podcasts_list_discover_button_tapped"),
+    EPISODE_RECENTLY_PLAYED_SORT_OPTION_TOOLTIP_SHOWN("episode_recently_played_sort_option_tooltip_shown"),
+    EPISODE_RECENTLY_PLAYED_SORT_OPTION_TOOLTIP_DISMISSED("episode_recently_played_sort_option_tooltip_dismissed"),
 
     /* Tab bar items */
     PODCASTS_TAB_OPENED("podcasts_tab_opened"),
@@ -157,6 +160,7 @@ enum class AnalyticsEvent(val key: String) {
     LISTENING_HISTORY_MULTI_SELECT_EXITED("listening_history_multi_select_exited"),
     LISTENING_HISTORY_CLEAR_HISTORY_BUTTON_TAPPED("listening_history_clear_history_button_tapped"),
     LISTENING_HISTORY_CLEARED("listening_history_cleared"),
+    LISTENING_HISTORY_DISCOVER_BUTTON_TAPPED("listening_history_discover_button_tapped"),
 
     /* Uploaded Files */
     UPLOADED_FILES_SHOWN("uploaded_files_shown"),
@@ -232,6 +236,8 @@ enum class AnalyticsEvent(val key: String) {
     PODCAST_SCREEN_REFRESH_NEW_EPISODE_FOUND("podcast_screen_refresh_new_episode_found"),
     PODCAST_SCREEN_REFRESH_NO_EPISODES_FOUND("podcast_screen_refresh_no_episodes_found"),
     PODCAST_SCREEN_CATEGORY_TAPPED("podcast_screen_category_tapped"),
+    PODCAST_SCREEN_PODCAST_DETAILS_LINK_TAPPED("podcast_screen_podcast_details_link_tapped"),
+    PODCAST_SCREEN_FUNDING_TAPPED("podcast_screen_funding_tapped"),
 
     /* Podcast Settings */
     PODCAST_SETTINGS_FEED_ERROR_TAPPED("podcast_settings_feed_error_tapped"),
@@ -271,6 +277,8 @@ enum class AnalyticsEvent(val key: String) {
     PRIVACY_SHOWN("privacy_shown"),
     ANALYTICS_OPT_IN("analytics_opt_in"),
     ANALYTICS_OPT_OUT("analytics_opt_out"),
+    ANALYTICS_THIRD_PARTY_OPT_IN("analytics_third_party_opt_in"),
+    ANALYTICS_THIRD_PARTY_OPT_OUT("analytics_third_party_opt_out"),
     CRASH_REPORTS_TOGGLED("crash_reports_toggled"),
     SETTINGS_SHOW_PRIVACY_POLICY("settings_show_privacy_policy"),
 
@@ -295,6 +303,8 @@ enum class AnalyticsEvent(val key: String) {
     FILTER_SORT_BY_CHANGED("filter_sort_by_changed"),
     FILTER_UPDATED("filter_updated"),
     FILTER_OPTIONS_MODAL_OPTION_TAPPED("filter_options_modal_option_tapped"),
+    FILTER_TOOLTIP_SHOWN("filter_tooltip_shown"),
+    FILTER_TOOLTIP_CLOSED("filter_tooltip_closed"),
 
     /* Discover */
     DISCOVER_SHOWN("discover_shown"),
@@ -310,6 +320,7 @@ enum class AnalyticsEvent(val key: String) {
     DISCOVER_FEATURED_PODCAST_SUBSCRIBED("discover_featured_podcast_subscribed"),
     DISCOVER_SHOW_ALL_TAPPED("discover_show_all_tapped"),
     DISCOVER_LIST_SHOW_ALL_TAPPED("discover_list_show_all_tapped"),
+    DISCOVER_LIST_COLLECTION_HEADER_TAPPED("discover_list_collection_header_tapped"),
     DISCOVER_LIST_IMPRESSION("discover_list_impression"),
     DISCOVER_LIST_EPISODE_TAPPED("discover_list_episode_tapped"),
     DISCOVER_LIST_EPISODE_PLAY("discover_list_episode_play"),
@@ -318,6 +329,7 @@ enum class AnalyticsEvent(val key: String) {
     DISCOVER_LIST_PODCAST_SUBSCRIBED("discover_list_podcast_subscribed"),
     DISCOVER_FEATURED_PAGE_CHANGED("discover_featured_page_changed"),
     DISCOVER_SMALL_LIST_PAGE_CHANGED("discover_small_list_page_changed"),
+    DISCOVER_COLLECTION_LIST_PAGE_CHANGED("discover_collection_list_page_changed"),
     DISCOVER_REGION_CHANGED("discover_region_changed"),
     DISCOVER_COLLECTION_LINK_TAPPED("discover_collection_link_tapped"),
 
@@ -338,6 +350,7 @@ enum class AnalyticsEvent(val key: String) {
     UP_NEXT_QUEUE_REORDERED("up_next_queue_reordered"),
     UP_NEXT_DISMISSED("up_next_dismissed"),
     UP_NEXT_SHUFFLE_ENABLED("up_next_shuffle_enabled"),
+    UP_NEXT_DISCOVER_BUTTON_TAPPED("up_next_discover_button_tapped"),
 
     /* Player */
     PLAYER_SHOWN("player_shown"),
@@ -701,6 +714,9 @@ enum class AnalyticsEvent(val key: String) {
     TRANSCRIPT_SEARCH_SHOWN("transcript_search_shown"),
     TRANSCRIPT_SEARCH_NEXT_RESULT("transcript_search_next_result"),
     TRANSCRIPT_SEARCH_PREVIOUS_RESULT("transcript_search_previous_result"),
+    TRANSCRIPT_GENERATED_PAYWALL_SHOWN("transcript_generated_paywall_shown"),
+    TRANSCRIPT_GENERATED_PAYWALL_DISMISSED("transcript_generated_paywall_dismissed"),
+    TRANSCRIPT_GENERATED_PAYWALL_SUBSCRIBE_TAPPED("transcript_generated_paywall_subscribe_tapped"),
 
     /* Referrals */
     REFERRAL_TOOLTIP_SHOWN("referral_tooltip_shown"),
@@ -737,4 +753,22 @@ enum class AnalyticsEvent(val key: String) {
     WINBACK_AVAILABLE_PLANS_NEW_PLAN_PURCHASE_SUCCESSFUL("winback_available_plans_new_plan_purchase_successful"),
     WINBACK_CANCEL_CONFIRMATION_STAY_BUTTON_TAPPED("winback_cancel_confirmation_stay_button_tapped"),
     WINBACK_CANCEL_CONFIRMATION_CANCEL_BUTTON_TAPPED("winback_cancel_confirmation_cancel_button_tapped"),
+
+    /* Suggested Folders */
+    SUGGESTED_FOLDERS_PAGE_SHOWN("suggested_folders_page_shown"),
+    SUGGESTED_FOLDERS_PAGE_DISMISSED("suggested_folders_page_dismissed"),
+    SUGGESTED_FOLDERS_USE_SUGGESTED_FOLDERS_TAPPED("suggested_folders_use_suggested_folders_tapped"),
+    SUGGESTED_FOLDERS_CREATE_CUSTOM_FOLDER_TAPPED("suggested_folders_create_custom_folder_tapped"),
+    SUGGESTED_FOLDERS_REPLACE_FOLDERS_TAPPED("suggested_folders_replace_folders_tapped"),
+    SUGGESTED_FOLDERS_REPLACE_FOLDERS_CONFIRM_TAPPED("suggested_folders_replace_folders_confirm_tapped"),
+    SUGGESTED_FOLDERS_PREVIEW_FOLDER_TAPPED("suggested_folders_preview_folder_tapped"),
+
+    /* Account Encouragement */
+    INFORMATIONAL_MODAL_VIEW_SHOWED("informational_modal_view_showed"),
+    INFORMATIONAL_MODAL_VIEW_DISMISSED("informational_modal_view_dismissed"),
+    INFORMATIONAL_MODAL_VIEW_GET_STARTED_TAP("informational_modal_view_get_started_tap"),
+    INFORMATIONAL_MODAL_VIEW_LOGIN_TAP("informational_modal_view_login_tap"),
+    INFORMATIONAL_MODAL_VIEW_CARD_SHOWED("informational_modal_view_card_showed"),
+    INFORMATIONAL_BANNER_VIEW_DISMISSED("informational_banner_view_dismissed"),
+    INFORMATIONAL_BANNER_VIEW_CREATE_ACCOUNT_TAP("informational_banner_view_create_account_tap"),
 }

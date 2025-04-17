@@ -44,6 +44,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.di.NotificationPermissionChec
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper.removeEpisodeFromQueue
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.file.CloudFilesManager
+import au.com.shiftyjelly.pocketcasts.repositories.history.upnext.UpNextHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.playback.LocalPlayer.Companion.VOLUME_DUCK
 import au.com.shiftyjelly.pocketcasts.repositories.playback.LocalPlayer.Companion.VOLUME_NORMAL
@@ -57,7 +58,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.NotificationBroadcastReceiver
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
-import au.com.shiftyjelly.pocketcasts.repositories.widget.WidgetManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.EpisodeSyncRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.EpisodeSyncResponse
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
@@ -122,7 +122,6 @@ open class PlaybackManager @Inject constructor(
     private val playerManager: PlayerFactory,
     private var castManager: CastManager,
     @ApplicationContext private val application: Context,
-    private val widgetManager: WidgetManager,
     private val playlistManager: PlaylistManager,
     private val downloadManager: DownloadManager,
     val upNextQueue: UpNextQueue,
@@ -140,6 +139,7 @@ open class PlaybackManager @Inject constructor(
     private val playbackManagerNetworkWatcherFactory: PlaybackManagerNetworkWatcher.Factory,
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val crashLogging: CrashLogging,
+    private val upNextHistoryManager: UpNextHistoryManager,
 ) : FocusManager.FocusChangeListener, AudioNoisyManager.AudioBecomingNoisyListener, CoroutineScope {
 
     companion object {
@@ -228,10 +228,6 @@ open class PlaybackManager @Inject constructor(
 
     @SuppressLint("CheckResult")
     fun setup() {
-        if (!Util.isAutomotive(application)) {
-            widgetManager.updateWidgetFromPlaybackState(this)
-        }
-
         // load an initial playback state
         upNextQueue.setupBlocking()
         mediaSessionManager.startObserving()
@@ -545,6 +541,7 @@ open class PlaybackManager @Inject constructor(
             SourceView.TASKER,
             SourceView.UNKNOWN,
             SourceView.UP_NEXT,
+            SourceView.UP_NEXT_HISTORY,
             SourceView.FILES_SETTINGS,
             SourceView.STATS,
             SourceView.WHATS_NEW,
@@ -807,7 +804,6 @@ open class PlaybackManager @Inject constructor(
             playbackStateRelay.accept(PlaybackState(state = PlaybackState.State.EMPTY, lastChangeFrom = LastChangeFrom.OnShutdown.value))
         }
         castManager.endSession()
-        widgetManager.updateWidgetNotPlaying()
     }
 
     suspend fun hibernatePlayback() {
@@ -993,6 +989,7 @@ open class PlaybackManager @Inject constructor(
 
     fun clearUpNextAsync() {
         launch {
+            upNextHistoryManager.snapshotUpNext()
             upNextQueue.clearUpNext()
         }
     }
@@ -1000,6 +997,7 @@ open class PlaybackManager @Inject constructor(
     fun endPlaybackAndClearUpNextAsync() {
         launch {
             shutdown()
+            upNextHistoryManager.snapshotUpNext()
             upNextQueue.removeAll()
         }
     }
@@ -1218,8 +1216,6 @@ open class PlaybackManager @Inject constructor(
         setupUpdateTimer()
         setupBufferUpdateTimer(episode)
         cancelPauseTimer()
-
-        widgetManager.updateWidget(podcast, true, episode)
     }
 
     fun markPodcastNeedsUpdating(podcastUuid: String) {
@@ -1257,10 +1253,6 @@ open class PlaybackManager @Inject constructor(
         }
 
         cancelUpdateTimer()
-
-        val podcast = if (episode == null) null else findPodcastByEpisode(episode)
-        widgetManager.updateWidget(podcast, false, episode)
-
         setupPauseTimer()
     }
 
@@ -1931,8 +1923,6 @@ open class PlaybackManager @Inject constructor(
 
         episodeManager.updatePlaybackInteractionDate(episode)
 
-        widgetManager.updateWidget(podcast, play, episode)
-
         if (play) {
             if (sameEpisode && currentPositionMs != null) {
                 player?.seekToTimeMs(currentPositionMs)
@@ -1948,7 +1938,6 @@ open class PlaybackManager @Inject constructor(
         return when (episode) {
             is PodcastEpisode -> podcastManager.findPodcastByUuidBlocking(episode.podcastUuid)
             is UserEpisode -> podcastManager.buildUserEpisodePodcast(episode)
-            else -> null
         }
     }
 

@@ -11,14 +11,19 @@ import androidx.media3.ui.AspectRatioFrameLayout
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SimplePlayer
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 
 class VideoView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) : FrameLayout(context, attrs, defStyleAttr), SurfaceHolder.Callback, SimplePlayer.VideoChangedListener {
+    companion object {
+        private const val DELAY_MS = 300L
+        private const val TAG = "VideoView"
+    }
 
     var playbackManager: PlaybackManager? = null
     var show: Boolean = false
         set(value) {
             field = value
-            connect()
+            connectWithDelay()
         }
 
     private val view = LayoutInflater.from(context).inflate(R.layout.video_view, this, true)
@@ -30,6 +35,7 @@ class VideoView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
     private val surfaceView = view.findViewById<SurfaceView>(R.id.surfaceView)
     private var isSurfaceCreated: Boolean = false
     private var isSurfaceSet: Boolean = false
+    private var pendingConnection = false
 
     init {
         surfaceView.holder.addCallback(this)
@@ -78,7 +84,7 @@ class VideoView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
     override fun surfaceCreated(holder: SurfaceHolder) {
         isSurfaceCreated = true
         isSurfaceSet = false
-        connect()
+        connectWithDelay()
     }
 
     override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
@@ -87,11 +93,30 @@ class VideoView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
     override fun surfaceDestroyed(holder: SurfaceHolder) {
         isSurfaceCreated = false
         isSurfaceSet = false
+        pendingConnection = false // Cancel any pending connection
     }
 
     fun updatePlayerPrepared(prepared: Boolean) {
         if (prepared && !isSurfaceSet) {
-            connect()
+            connectWithDelay()
         }
+    }
+
+    private fun connectWithDelay() {
+        pendingConnection = true
+        // Temporary fix for https://github.com/Automattic/pocket-casts-android/issues/3807
+        // The delay gives time for the Activity/Fragment transition to complete and
+        // prevents the race condition where surface gets destroyed immediately after creation
+
+        postDelayed({
+            if (pendingConnection) {
+                try {
+                    connect()
+                } catch (e: Exception) {
+                    LogBuffer.e(TAG, "Failed to connect video surface", e)
+                }
+            }
+            pendingConnection = false
+        }, DELAY_MS)
     }
 }

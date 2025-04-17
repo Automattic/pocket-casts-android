@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -34,6 +34,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.bookmark.BookmarkRow
 import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButtonColors
+import au.com.shiftyjelly.pocketcasts.compose.components.EmptyState
 import au.com.shiftyjelly.pocketcasts.compose.components.SearchBar
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
@@ -41,17 +42,17 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.HeaderRow
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.NoBookmarksInSearchView
-import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.NoBookmarksView
-import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.UpsellView
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel.BookmarkMessage
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel.UiState
+import au.com.shiftyjelly.pocketcasts.settings.HeadphoneControlsSettingsFragment
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper.NavigationState
 import java.util.Date
 import java.util.UUID
 import kotlinx.coroutines.flow.collectLatest
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -70,6 +71,7 @@ fun BookmarksPage(
     openFragment: (Fragment) -> Unit,
     onClearSearchTapped: () -> Unit,
     onSearchBarClearButtonTapped: () -> Unit,
+    onHeadphoneControlsButtonTapped: () -> Unit,
     bottomInset: Dp,
     isDarkTheme: Boolean,
 ) {
@@ -92,6 +94,7 @@ fun BookmarksPage(
         bottomInset = bottomInset,
         onClearSearchTapped = onClearSearchTapped,
         onSearchBarClearButtonTapped = onSearchBarClearButtonTapped,
+        onHeadphoneControlsButtonTapped = onHeadphoneControlsButtonTapped,
         isDarkTheme = isDarkTheme,
     )
     LaunchedEffect(episodeUuid) {
@@ -141,10 +144,12 @@ private fun Content(
     openFragment: (Fragment) -> Unit,
     onClearSearchTapped: () -> Unit,
     onSearchBarClearButtonTapped: () -> Unit,
+    onHeadphoneControlsButtonTapped: () -> Unit,
     bottomInset: Dp,
     isDarkTheme: Boolean,
 ) {
     Box(
+        contentAlignment = Alignment.Center,
         modifier = Modifier
             .background(color = backgroundColor)
             .padding(bottom = if (sourceView == SourceView.PROFILE) 0.dp else 28.dp),
@@ -164,21 +169,26 @@ private fun Content(
                 isDarkTheme = isDarkTheme,
             )
 
-            is UiState.Empty -> NoBookmarksView(
-                style = state.colors,
-                openFragment = openFragment,
-                sourceView = sourceView,
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .verticalScroll(rememberScrollState()),
+            is UiState.Empty -> EmptyState(
+                title = stringResource(LR.string.bookmarks_empty_state_title),
+                subtitle = stringResource(LR.string.bookmarks_paid_user_empty_state_message),
+                iconResourceId = IR.drawable.ic_bookmark,
+                buttonText = stringResource(LR.string.bookmarks_headphone_settings),
+                onButtonClick = {
+                    onHeadphoneControlsButtonTapped()
+                    openFragment(HeadphoneControlsSettingsFragment())
+                },
+                modifier = Modifier.verticalScroll(rememberScrollState()),
             )
-            is UiState.Upsell -> UpsellView(
-                style = state.colors,
-                onClick = onUpgradeClicked,
-                sourceView = sourceView,
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .verticalScroll(rememberScrollState()),
+            is UiState.Upsell -> EmptyState(
+                title = stringResource(LR.string.bookmarks_empty_state_title),
+                subtitle = stringResource(LR.string.bookmarks_free_user_empty_state_message),
+                iconResourceId = IR.drawable.ic_bookmark,
+                buttonText = stringResource(LR.string.bookmarks_free_user_empty_state_button),
+                onButtonClick = {
+                    onUpgradeClicked.invoke()
+                },
+                modifier = Modifier.verticalScroll(rememberScrollState()),
             )
         }
     }
@@ -322,6 +332,7 @@ private fun BookmarksPreview(
             openFragment = {},
             onClearSearchTapped = {},
             onSearchBarClearButtonTapped = {},
+            onHeadphoneControlsButtonTapped = {},
             bottomInset = 0.dp,
             isDarkTheme = false,
         )
