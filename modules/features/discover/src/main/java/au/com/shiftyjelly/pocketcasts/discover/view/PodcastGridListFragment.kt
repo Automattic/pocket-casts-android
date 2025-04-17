@@ -65,6 +65,7 @@ open class PodcastGridListFragment : BaseFragment(), Toolbar.OnMenuItemClickList
         internal const val ARG_TAGLINE = "tagline"
         internal const val ARG_CURATED = "curated"
         internal const val ARG_INFERRED_ID = "inferredId"
+        internal const val ARG_AUTHENTICATED = "authenticated"
 
         fun newInstanceBundle(
             networkLoadableList: NetworkLoadableList,
@@ -79,6 +80,7 @@ open class PodcastGridListFragment : BaseFragment(), Toolbar.OnMenuItemClickList
                 putString(ARG_EXPANDED_STYLE, networkLoadableList.expandedStyle.stringValue)
                 putString(ARG_TAGLINE, networkLoadableList.expandedTopItemLabel)
                 putBoolean(ARG_CURATED, networkLoadableList.curated)
+                putBoolean(ARG_AUTHENTICATED, networkLoadableList.authenticated ?: false)
             }
         }
     }

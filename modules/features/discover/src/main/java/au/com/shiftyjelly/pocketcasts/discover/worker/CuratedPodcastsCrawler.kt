@@ -1,11 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.discover.worker
 
 import au.com.shiftyjelly.pocketcasts.models.entity.CuratedPodcast
+import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.servers.BuildConfig
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRow
 import au.com.shiftyjelly.pocketcasts.servers.model.ListFeed
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
-import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
@@ -68,6 +68,6 @@ class CuratedPodcastsCrawler(
         } else {
             url
         }
-        return async { runCatching { listRepository.getListFeed(engageUrl) } }
+        return async { runCatching { listRepository.getListFeed(url = engageUrl, authenticated = false) } }
     }
 }

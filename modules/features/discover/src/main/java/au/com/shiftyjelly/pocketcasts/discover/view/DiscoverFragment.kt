@@ -191,7 +191,7 @@ class DiscoverFragment :
                 staticServiceManager = staticServiceManager,
                 listener = this,
                 theme = theme,
-                loadPodcastList = viewModel::loadPodcastList,
+                loadPodcastList = { source, authenticated -> viewModel.loadPodcastList(source, authenticated) },
                 loadCarouselSponsoredPodcastList = viewModel::loadCarouselSponsoredPodcasts,
                 categoriesState = { url, popularIds ->
                     categoriesManager.setMostPopularCategories(popularIds)

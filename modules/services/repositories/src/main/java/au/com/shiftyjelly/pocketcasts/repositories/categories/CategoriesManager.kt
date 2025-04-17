@@ -2,8 +2,8 @@ package au.com.shiftyjelly.pocketcasts.repositories.categories
 
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
+import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
-import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
