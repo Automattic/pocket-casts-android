@@ -2,12 +2,14 @@ package au.com.shiftyjelly.pocketcasts.repositories.notification
 
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UserNotificationsDao
 import au.com.shiftyjelly.pocketcasts.models.entity.UserNotifications
+import java.time.Clock
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.milliseconds
 
 class NotificationManagerImpl @Inject constructor(
     private val userNotificationsDao: UserNotificationsDao,
+    private val clock: Clock,
 ) : NotificationManager {
 
     override suspend fun setupOnboardingNotifications() {
@@ -19,11 +21,13 @@ class NotificationManagerImpl @Inject constructor(
     }
 
     override suspend fun updateUserFeatureInteraction(type: NotificationType) {
-        userNotificationsDao.updateInteractedAt(type.notificationId, System.currentTimeMillis())
+        val now = clock.instant().toEpochMilli()
+        userNotificationsDao.updateInteractedAt(type.notificationId, now)
     }
 
     override suspend fun updateUserFeatureInteraction(id: Int) {
-        userNotificationsDao.updateInteractedAt(id, System.currentTimeMillis())
+        val now = clock.instant().toEpochMilli()
+        userNotificationsDao.updateInteractedAt(id, now)
     }
 
     override suspend fun hasUserInteractedWithFeature(type: NotificationType): Boolean {
@@ -32,7 +36,7 @@ class NotificationManagerImpl @Inject constructor(
 
         if (type is ReEngagementNotificationType) {
             val lastInteraction = userNotification.interactedAt ?: return false
-            val elapsed = (System.currentTimeMillis() - lastInteraction).milliseconds
+            val elapsed = (clock.instant().toEpochMilli() - lastInteraction).milliseconds
             return elapsed < 7.days
         }
 
@@ -40,10 +44,11 @@ class NotificationManagerImpl @Inject constructor(
     }
 
     override suspend fun updateNotificationSent(type: NotificationType) {
+        val now = clock.instant().toEpochMilli()
         userNotificationsDao.getUserNotification(type.notificationId)
             ?.apply {
                 sentThisWeek++
-                lastSentAt = System.currentTimeMillis()
+                lastSentAt = now
             }
             ?.let { userNotificationsDao.update(it) }
     }

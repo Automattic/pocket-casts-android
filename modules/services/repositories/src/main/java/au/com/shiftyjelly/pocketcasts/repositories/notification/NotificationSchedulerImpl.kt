@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit
 class NotificationSchedulerImpl @Inject constructor(
     @ApplicationContext private val context: Context,
     private val episodeManager: EpisodeManager,
+    private val delayCalculator: NotificationDelayCalculator,
 ) : NotificationScheduler {
 
     companion object {
@@ -24,8 +25,6 @@ class NotificationSchedulerImpl @Inject constructor(
     }
 
     override fun setupOnboardingNotifications() {
-        val delayCalculator = NotificationDelayCalculator()
-
         listOf(
             OnboardingNotificationType.Sync,
             OnboardingNotificationType.Import,
@@ -52,7 +51,7 @@ class NotificationSchedulerImpl @Inject constructor(
     }
 
     override suspend fun setupReEngagementNotification() {
-        val initialDelay = NotificationDelayCalculator().calculateDelayForReEngagementCheck()
+        val initialDelay = delayCalculator.calculateDelayForReEngagementCheck()
 
         val downloadedEpisodes = episodeManager.downloadedEpisodesThatHaveNotBeenPlayedCount()
         val subcategory =
