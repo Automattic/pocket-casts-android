@@ -1,6 +1,8 @@
 7.88
 -----
-
+*   New Features
+    *   Add account encouragement flow
+        ([#3910](https://github.com/Automattic/pocket-casts-android/pull/3910))
 
 7.87
 -----
