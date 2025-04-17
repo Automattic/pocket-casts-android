@@ -424,6 +424,8 @@ private fun AvailablePlansPagePreview(
                         title = "Plus Monthly",
                         formattedPrice = "$3.99",
                         billingPeriod = BillingPeriod.Monthly,
+                        basePrice = 100.toBigDecimal(),
+                        currencyCode = "USD",
                     ),
                     SubscriptionPlan(
                         productId = "patron.monthly",
@@ -431,6 +433,8 @@ private fun AvailablePlansPagePreview(
                         title = "Patron Monthly",
                         formattedPrice = "$9.99",
                         billingPeriod = BillingPeriod.Monthly,
+                        basePrice = 200.toBigDecimal(),
+                        currencyCode = "USD",
                     ),
                     SubscriptionPlan(
                         productId = "plus.yearly",
@@ -438,6 +442,8 @@ private fun AvailablePlansPagePreview(
                         title = "Plus Yearly",
                         formattedPrice = "$39.99",
                         billingPeriod = BillingPeriod.Yearly,
+                        basePrice = 300.toBigDecimal(),
+                        currencyCode = "USD",
                     ),
                     SubscriptionPlan(
                         productId = "patron.yearly",
@@ -445,6 +451,8 @@ private fun AvailablePlansPagePreview(
                         title = "Plus Yearly",
                         formattedPrice = "$99.99",
                         billingPeriod = BillingPeriod.Yearly,
+                        basePrice = 400.toBigDecimal(),
+                        currencyCode = "USD",
                     ),
                 ),
             ),

@@ -20,6 +20,8 @@ import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
 import com.pocketcasts.service.api.WinbackResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.math.BigDecimal
+import java.math.RoundingMode
 import java.util.Date
 import javax.inject.Inject
 import kotlinx.coroutines.Deferred
@@ -509,7 +511,19 @@ internal data class SubscriptionPlan(
     val title: String,
     val formattedPrice: String,
     val billingPeriod: BillingPeriod,
-)
+    val basePrice: BigDecimal,
+    val currencyCode: String,
+) {
+    val pricePerWeek = basePrice
+        .let { price ->
+            val weeksCount = when (billingPeriod) {
+                BillingPeriod.Monthly -> 4
+                BillingPeriod.Yearly -> 52
+            }.toBigDecimal()
+            price.divide(weeksCount, 2, RoundingMode.HALF_UP)
+        }
+        .toFloat()
+}
 
 internal data class ActivePurchase(
     val orderId: String,
@@ -546,6 +560,11 @@ private fun Subscription.Simple.toPlan() = SubscriptionPlan(
         is SubscriptionPricingPhase.Months -> BillingPeriod.Monthly
         is SubscriptionPricingPhase.Years -> BillingPeriod.Yearly
     },
+    basePrice = recurringPricingPhase.pricingPhase
+        .priceAmountMicros
+        .toBigDecimal()
+        .divide(1000000.toBigDecimal()),
+    currencyCode = recurringPricingPhase.priceCurrencyCode,
 )
 
 private object PlanComparator : Comparator<SubscriptionPlan> {

@@ -59,6 +59,8 @@ class WinbackViewModelTest {
         title = "title",
         formattedPrice = "price",
         billingPeriod = BillingPeriod.Yearly,
+        basePrice = 100.toBigDecimal(),
+        currencyCode = "USD",
     )
 
     private val winbackResponse = winbackResponse {
