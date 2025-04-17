@@ -453,9 +453,6 @@ class UserEpisodeManagerImpl @Inject constructor(
         return userEpisodeDao.updateServerStatusRxCompletable(userEpisode.uuid, UserEpisodeServerStatus.UPLOADING)
             .andThen(userEpisodeDao.updateUploadErrorRxCompetable(userEpisode.uuid, null))
             .andThen(syncManager.uploadFileToServerRxCompletable(userEpisode))
-            .andThen(
-                userEpisodeDao.updateServerStatusRxCompletable(userEpisode.uuid, serverStatus = UserEpisodeServerStatus.UPLOADED),
-            )
             .andThen(imageUploadTask)
             // let the file upload report to upload to the api server
             .delay(1, TimeUnit.SECONDS)
