@@ -85,7 +85,6 @@ Language: ko_KR
     <string name="winback_claiming_offer">혜택 받는 중</string>
     <string name="winback_claimed_offer_message_3">다음 해 50% 할인!</string>
     <string name="winback_offer_free_offer_yearly_description">지금 %1$s을(를) 결제하고 다음 해에 50%% 할인을 받으세요.</string>
-    <string name="winback_offer_free_offer_yearly_title">다음 해에 50% 할인을 받으세요</string>
     <string name="podcast_refresh_no_episodes_found">에피소드를 찾을 수 없음</string>
     <string name="podcast_refresh_new_episode_found">새 에피소드 발견</string>
     <string name="podcast_refreshing_episode_list">에피소드 목록 새로 고치는 중…</string>
@@ -121,7 +120,6 @@ Language: ko_KR
     <string name="winback_offer_differnt_plan_title">다른 요금제를 찾고 있나요?</string>
     <string name="winback_offer_free_offer_button_label">혜택 받기</string>
     <string name="winback_offer_free_offer_description">다음 청구 주기가 시작될 때 %1$s 할인을 받아 보세요.</string>
-    <string name="winback_offer_free_offer_title">다음 달에 무료로 이용해 보세요</string>
     <string name="winback_offer_header">취소하기 전에 혜택을 확인해 보세요</string>
     <string name="settings_app_icon_pride">프라이드</string>
     <string name="manage_download_dismiss_content_description">다운로드 배너 닫기 관리</string>

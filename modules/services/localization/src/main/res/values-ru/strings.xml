@@ -85,7 +85,6 @@ Language: ru
     <string name="winback_claiming_offer">Предложение принимается</string>
     <string name="winback_claimed_offer_message_3">Скидка 50 % на следующий год!</string>
     <string name="winback_offer_free_offer_yearly_description">Уплатите %1$s за следующий год со скидкой 50 %% прямо сейчас.</string>
-    <string name="winback_offer_free_offer_yearly_title">Получите скидку 50 % на следующий год</string>
     <string name="podcast_refresh_no_episodes_found">Выпуски не найдены.</string>
     <string name="podcast_refresh_new_episode_found">Новый выпуск!</string>
     <string name="podcast_refreshing_episode_list">Обновление списка выпусков…</string>
@@ -121,7 +120,6 @@ Language: ru
     <string name="winback_offer_differnt_plan_title">Хотите перейти на другой тарифный план?</string>
     <string name="winback_offer_free_offer_button_label">Воспользоваться предложением</string>
     <string name="winback_offer_free_offer_description">Сэкономьте %1$s в начале следующего расчётного периода.</string>
-    <string name="winback_offer_free_offer_title">Следующий месяц бесплатно</string>
     <string name="winback_offer_header">Прежде чем окончательно отменить подписку, просмотрите наши предложения</string>
     <string name="settings_app_icon_pride">Гордость</string>
     <string name="manage_download_dismiss_content_description">Закрыть баннер «Управление загрузкой»</string>

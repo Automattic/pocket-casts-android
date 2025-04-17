@@ -85,7 +85,6 @@ Language: zh_CN
     <string name="winback_claiming_offer">领取优惠</string>
     <string name="winback_claimed_offer_message_3">下一年享 5 折优惠！</string>
     <string name="winback_offer_free_offer_yearly_description">现在付款 %1$s 即可再享一年 5%% 折优惠。</string>
-    <string name="winback_offer_free_offer_yearly_title">下一年获享 5 折优惠</string>
     <string name="podcast_refresh_no_episodes_found">未找到剧集。</string>
     <string name="podcast_refresh_new_episode_found">找到新剧集！</string>
     <string name="podcast_refreshing_episode_list">正在刷新剧集列表…</string>
@@ -121,7 +120,6 @@ Language: zh_CN
     <string name="winback_offer_differnt_plan_title">想换个套餐？</string>
     <string name="winback_offer_free_offer_button_label">领取优惠</string>
     <string name="winback_offer_free_offer_description">在您的下一个计费周期开始时节省 %1$s。</string>
-    <string name="winback_offer_free_offer_title">下个月免费</string>
     <string name="winback_offer_header">在取消之前，请查看以下优惠</string>
     <string name="settings_app_icon_pride">骄傲</string>
     <string name="manage_download_dismiss_content_description">管理下载横幅关闭</string>
