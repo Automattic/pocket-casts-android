@@ -2370,6 +2370,9 @@
     <string name="notification_reengage_we_miss_you_message">It\'s been a while since you\'ve listened. Jump back in and enjoy!</string>
 
     <string name="notification_reengage_catch_up_offline_title">Catch up offline</string>
-    <string name="notification_reengage_catch_up_offline_message">You have %d new episodes downloaded and ready to go!</string>
+    <plurals name="notification_reengage_catch_up_offline_message">
+        <item quantity="one">You have %d new episode downloaded and ready to go!</item>
+        <item quantity="other">You have %d new episodes downloaded and ready to go!</item>
+    </plurals>
 
 </resources>

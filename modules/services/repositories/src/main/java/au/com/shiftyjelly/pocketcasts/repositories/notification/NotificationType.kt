@@ -2,6 +2,8 @@ package au.com.shiftyjelly.pocketcasts.repositories.notification
 
 import android.content.Context
 import android.content.Intent
+import androidx.annotation.PluralsRes
+import androidx.annotation.StringRes
 import au.com.shiftyjelly.pocketcasts.deeplink.CreateAccountDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.DownloadsDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ImportDeepLink
@@ -17,8 +19,22 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 sealed interface NotificationType {
     val notificationId: Int
     val subcategory: String
+
+    @get:StringRes
     val titleRes: Int
-    val messageRes: Int
+
+    @get:StringRes
+    val messageRes: Int?
+
+    @get:PluralsRes
+    val messagePluralRes: Int?
+
+    fun formattedMessage(context: Context, count: Int = 0): String {
+        messagePluralRes?.takeIf { count > 0 }?.let { pluralRes ->
+            return context.resources.getQuantityString(pluralRes, count, count)
+        }
+        return messageRes?.let { context.getString(it) } ?: ""
+    }
 
     fun toIntent(context: Context): Intent
     fun isSettingsToggleOn(settings: Settings): Boolean
@@ -27,14 +43,16 @@ sealed interface NotificationType {
 sealed class OnboardingNotificationType(
     override val notificationId: Int,
     override val subcategory: String,
-    override val titleRes: Int,
-    override val messageRes: Int,
+    @StringRes override val titleRes: Int,
+    @StringRes override val messageRes: Int,
     val dayOffset: Int,
 ) : NotificationType {
 
     override fun isSettingsToggleOn(settings: Settings): Boolean {
         return settings.dailyRemindersNotification.value
     }
+
+    override val messagePluralRes: Int? get() = null
 
     object Sync : OnboardingNotificationType(
         notificationId = NotificationId.ONBOARDING_SYNC.value,
@@ -134,8 +152,9 @@ sealed class OnboardingNotificationType(
 
 sealed class ReEngagementNotificationType(
     override val subcategory: String,
-    override val titleRes: Int,
-    override val messageRes: Int,
+    @StringRes override val titleRes: Int,
+    @StringRes override val messageRes: Int? = null,
+    @PluralsRes override val messagePluralRes: Int? = null,
 ) : NotificationType {
 
     override val notificationId: Int
@@ -156,7 +175,7 @@ sealed class ReEngagementNotificationType(
     object CatchUpOffline : ReEngagementNotificationType(
         subcategory = SUBCATEGORY_REENGAGE_CATCH_UP_OFFLINE,
         titleRes = LR.string.notification_reengage_catch_up_offline_title,
-        messageRes = LR.string.notification_reengage_catch_up_offline_message,
+        messagePluralRes = LR.plurals.notification_reengage_catch_up_offline_message,
     ) {
         override fun toIntent(context: Context): Intent = DownloadsDeepLink.toIntent(context)
     }

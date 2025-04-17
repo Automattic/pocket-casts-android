@@ -54,36 +54,13 @@ class NotificationWorker @AssistedInject constructor(
     }
 
     private fun getNotificationBuilder(type: NotificationType): NotificationCompat.Builder {
-        return when (type) {
-            is OnboardingNotificationType -> buildOnboardingNotification(type)
-            is ReEngagementNotificationType -> buildReEngagementNotification(type)
-        }
-    }
-
-    private fun buildOnboardingNotification(type: OnboardingNotificationType): NotificationCompat.Builder {
-        return notificationHelper.dailyRemindersChannelBuilder()
-            .setSmallIcon(IR.drawable.notification)
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setContentTitle(applicationContext.resources.getString(type.titleRes))
-            .setContentText(applicationContext.resources.getString(type.messageRes))
-            .setColor(ContextCompat.getColor(applicationContext, R.color.notification_color))
-            .setContentIntent(openPageIntent(type))
-    }
-
-    private fun buildReEngagementNotification(type: ReEngagementNotificationType): NotificationCompat.Builder {
         val downloadedEpisodes = inputData.getInt(DOWNLOADED_EPISODES, 0)
 
-        val contentText = if (type is ReEngagementNotificationType.CatchUpOffline && downloadedEpisodes != 0) {
-            applicationContext.resources.getString(type.messageRes, downloadedEpisodes)
-        } else {
-            applicationContext.resources.getString(type.messageRes)
-        }
-
         return notificationHelper.dailyRemindersChannelBuilder()
             .setSmallIcon(IR.drawable.notification)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setContentTitle(applicationContext.resources.getString(type.titleRes))
-            .setContentText(contentText)
+            .setContentText(type.formattedMessage(applicationContext, downloadedEpisodes))
             .setColor(ContextCompat.getColor(applicationContext, R.color.notification_color))
             .setContentIntent(openPageIntent(type))
     }
