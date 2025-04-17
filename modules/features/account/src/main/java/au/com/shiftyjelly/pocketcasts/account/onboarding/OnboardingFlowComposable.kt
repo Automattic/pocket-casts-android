@@ -357,11 +357,11 @@ object OnboardingNavRoute {
 }
 
 private val forcedPurchaseSources = listOf(
-    OnboardingUpgradeSource.APPEARANCE,
     OnboardingUpgradeSource.BOOKMARKS,
     OnboardingUpgradeSource.BOOKMARKS_SHELF_ACTION,
     OnboardingUpgradeSource.GENERATED_TRANSCRIPTS,
     OnboardingUpgradeSource.SKIP_CHAPTERS,
     OnboardingUpgradeSource.SUGGESTED_FOLDERS,
+    OnboardingUpgradeSource.THEMES,
     OnboardingUpgradeSource.UP_NEXT_SHUFFLE,
 )
