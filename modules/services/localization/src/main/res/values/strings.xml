@@ -196,6 +196,10 @@
     <string name="move_down">Move down</string>
     <string name="see_more">See more</string>
     <string name="maybe_later">Maybe later</string>
+    <!-- %1$.2f is price with 2 decimal points precision, %1$s is the currency -->
+    <string name="price_per_week">%1$.2f %2$s/week</string>
+    <!-- %1$.2f is price with 2 decimal points precision, \u0024 is a dollar sign -->
+    <string name="price_per_week_usd">\u0024%1$.2f/week</string>
 
     <string name="multiselect_actions_shown">Shortcut in toolbar</string>
     <string name="multiselect_actions_hidden">In overflow</string>

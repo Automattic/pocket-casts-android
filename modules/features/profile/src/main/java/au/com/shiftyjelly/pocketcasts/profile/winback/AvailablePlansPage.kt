@@ -12,8 +12,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -49,6 +51,7 @@ import au.com.shiftyjelly.pocketcasts.compose.bars.BottomSheetAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.ProgressDialog
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.components.rememberViewInteropNestedScrollConnection
@@ -56,6 +59,7 @@ import au.com.shiftyjelly.pocketcasts.compose.pocketRed
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.type.BillingPeriod
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.profile.winback.FailureReason.Default
 import au.com.shiftyjelly.pocketcasts.profile.winback.FailureReason.NoOrderId
 import au.com.shiftyjelly.pocketcasts.profile.winback.FailureReason.NoProducts
@@ -301,47 +305,86 @@ private fun SubscriptionRow(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp))
-            .background(MaterialTheme.theme.colors.primaryUi01Active)
-            .then(
-                if (isSelected) {
-                    Modifier.border(
-                        width = 2.dp,
-                        color = MaterialTheme.theme.colors.primaryField03Active,
-                        shape = RoundedCornerShape(8.dp),
-                    )
-                } else {
-                    Modifier
-                },
-            )
-            .clickable(
-                enabled = !isSelected,
-                onClick = onClick,
-                role = Role.Button,
-                indication = ripple(color = MaterialTheme.theme.colors.primaryIcon01),
-                interactionSource = null,
-            )
-            .padding(start = 20.dp, end = 10.dp, top = 10.dp, bottom = 10.dp),
+    Box(
+        modifier = modifier.fillMaxWidth(),
     ) {
-        Column(
-            modifier = Modifier.weight(1f),
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(8.dp))
+                .background(MaterialTheme.theme.colors.primaryUi01Active)
+                .then(
+                    if (isSelected) {
+                        Modifier.border(
+                            width = 2.dp,
+                            color = MaterialTheme.theme.colors.primaryField03Active,
+                            shape = RoundedCornerShape(8.dp),
+                        )
+                    } else {
+                        Modifier
+                    },
+                )
+                .clickable(
+                    enabled = !isSelected,
+                    onClick = onClick,
+                    role = Role.Button,
+                    indication = ripple(color = MaterialTheme.theme.colors.primaryIcon01),
+                    interactionSource = null,
+                )
+                .padding(start = 20.dp, end = 10.dp, top = 10.dp, bottom = 10.dp),
         ) {
-            TextH30(
-                text = plan.title,
+            CheckMark(
+                isSelected = isSelected,
+                modifier = Modifier
+                    .align(Alignment.CenterVertically)
+                    .size(22.dp),
             )
-            TextP40(
-                text = plan.price(),
-                fontSize = 15.sp,
-                lineHeight = 21.sp,
+            Spacer(
+                modifier = Modifier.width(16.dp),
             )
+            Column(
+                modifier = Modifier.weight(1f),
+            ) {
+                TextH30(
+                    text = plan.title,
+                )
+                TextP40(
+                    text = plan.price(),
+                    color = MaterialTheme.theme.colors.primaryText02,
+                    fontSize = 15.sp,
+                    lineHeight = 21.sp,
+                )
+            }
+            if (plan.billingPeriod == BillingPeriod.Yearly) {
+                TextP40(
+                    text = if (plan.currencyCode == "USD") {
+                        stringResource(LR.string.price_per_week_usd, plan.pricePerWeek)
+                    } else {
+                        stringResource(LR.string.price_per_week, plan.pricePerWeek, plan.currencyCode)
+                    },
+                    color = MaterialTheme.theme.colors.primaryText02,
+                    fontSize = 15.sp,
+                    lineHeight = 21.sp,
+                    modifier = Modifier.align(Alignment.CenterVertically),
+                )
+            }
         }
-        CheckMark(
-            isSelected = isSelected,
-            modifier = Modifier.size(22.dp),
-        )
+
+        if (plan.productId == Subscription.PLUS_YEARLY_PRODUCT_ID) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .offset(x = -10.dp, y = -10.dp)
+                    .background(MaterialTheme.theme.colors.primaryField03Active, CircleShape)
+                    .padding(horizontal = 12.dp, vertical = 2.dp),
+            ) {
+                TextH50(
+                    text = "Best Value",
+                    color = MaterialTheme.theme.colors.primaryUi01,
+                    disableAutoScale = true,
+                )
+            }
+        }
     }
 }
 
@@ -415,44 +458,44 @@ private fun AvailablePlansPagePreview(
             plansState = SubscriptionPlansState.Loaded(
                 activePurchase = ActivePurchase(
                     orderId = "orderId",
-                    productId = "plus.monthly",
+                    productId = Subscription.PLUS_MONTHLY_PRODUCT_ID,
                 ),
                 plans = listOf(
                     SubscriptionPlan(
-                        productId = "plus.monthly",
+                        productId = Subscription.PLUS_MONTHLY_PRODUCT_ID,
                         offerToken = "",
                         title = "Plus Monthly",
                         formattedPrice = "$3.99",
                         billingPeriod = BillingPeriod.Monthly,
-                        basePrice = 100.toBigDecimal(),
+                        basePrice = 3.99.toBigDecimal(),
                         currencyCode = "USD",
                     ),
                     SubscriptionPlan(
-                        productId = "patron.monthly",
+                        productId = Subscription.PATRON_MONTHLY_PRODUCT_ID,
                         offerToken = "",
                         title = "Patron Monthly",
                         formattedPrice = "$9.99",
                         billingPeriod = BillingPeriod.Monthly,
-                        basePrice = 200.toBigDecimal(),
+                        basePrice = 9.99.toBigDecimal(),
                         currencyCode = "USD",
                     ),
                     SubscriptionPlan(
-                        productId = "plus.yearly",
+                        productId = Subscription.PLUS_YEARLY_PRODUCT_ID,
                         offerToken = "",
                         title = "Plus Yearly",
                         formattedPrice = "$39.99",
                         billingPeriod = BillingPeriod.Yearly,
-                        basePrice = 300.toBigDecimal(),
+                        basePrice = 39.99.toBigDecimal(),
                         currencyCode = "USD",
                     ),
                     SubscriptionPlan(
-                        productId = "patron.yearly",
+                        productId = Subscription.PATRON_YEARLY_PRODUCT_ID,
                         offerToken = "",
-                        title = "Plus Yearly",
+                        title = "Patron Yearly",
                         formattedPrice = "$99.99",
                         billingPeriod = BillingPeriod.Yearly,
-                        basePrice = 400.toBigDecimal(),
-                        currencyCode = "USD",
+                        basePrice = 99.99.toBigDecimal(),
+                        currencyCode = "PLN",
                     ),
                 ),
             ),
