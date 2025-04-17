@@ -118,11 +118,7 @@ class WinbackFragment : BaseDialogFragment() {
                         modifier = Modifier.fillMaxSize(),
                     ) {
                         composable(WinbackNavRoutes.WinbackOffer) {
-                            WinbackOfferPage(
-                                offer = state.winbackOfferState?.offer,
-                                onClaimOffer = { offer ->
-                                    viewModel.claimOffer(offer, requireActivity())
-                                },
+                            CancelOfferPage(
                                 onSeeAvailablePlans = {
                                     viewModel.trackAvailablePlansTapped()
                                     navController.navigate(WinbackNavRoutes.AvailablePlans)
