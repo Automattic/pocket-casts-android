@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.file.StorageOptions
 import au.com.shiftyjelly.pocketcasts.repositories.jobs.VersionMigrationsWorker
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManager
+import au.com.shiftyjelly.pocketcasts.repositories.notification.ReEngagementNotificationType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepTimerRestartWhenShakingDevice
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -188,6 +189,8 @@ class PocketCastsApplication : Application(), Configuration.Provider {
 
             notificationHelper.setupNotificationChannels()
             notificationManager.setupOnboardingNotifications()
+            notificationManager.setupReEngagementNotifications()
+            notificationManager.updateUserFeatureInteraction(ReEngagementNotificationType.notificationId)
             appLifecycleObserver.setup()
 
             Coil.setImageLoader(coilImageLoader)

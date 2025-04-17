@@ -2,25 +2,57 @@ package au.com.shiftyjelly.pocketcasts.repositories.notification
 
 import android.content.Context
 import android.content.Intent
+import androidx.annotation.PluralsRes
+import androidx.annotation.StringRes
 import au.com.shiftyjelly.pocketcasts.deeplink.CreateAccountDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.DownloadsDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ImportDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowFiltersDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowUpNextTabDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.StaffPicksDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ThemesDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.UpsellDeepLink
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.NotificationId
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-sealed class OnboardingNotificationType(
-    val notificationId: Int,
-    val subcategory: String,
-    val titleRes: Int,
-    val messageRes: Int,
-    val dayOffset: Int,
-) {
+sealed interface NotificationType {
+    val notificationId: Int
+    val subcategory: String
 
-    abstract fun toIntent(context: Context): Intent
+    @get:StringRes
+    val titleRes: Int
+
+    @get:StringRes
+    val messageRes: Int?
+
+    @get:PluralsRes
+    val messagePluralRes: Int?
+
+    fun formattedMessage(context: Context, count: Int = 0): String {
+        messagePluralRes?.takeIf { count > 0 }?.let { pluralRes ->
+            return context.resources.getQuantityString(pluralRes, count, count)
+        }
+        return messageRes?.let { context.getString(it) } ?: ""
+    }
+
+    fun toIntent(context: Context): Intent
+    fun isSettingsToggleOn(settings: Settings): Boolean
+}
+
+sealed class OnboardingNotificationType(
+    override val notificationId: Int,
+    override val subcategory: String,
+    @StringRes override val titleRes: Int,
+    @StringRes override val messageRes: Int,
+    val dayOffset: Int,
+) : NotificationType {
+
+    override fun isSettingsToggleOn(settings: Settings): Boolean {
+        return settings.dailyRemindersNotification.value
+    }
+
+    override val messagePluralRes: Int? get() = null
 
     object Sync : OnboardingNotificationType(
         notificationId = NotificationId.ONBOARDING_SYNC.value,
@@ -113,6 +145,55 @@ sealed class OnboardingNotificationType(
             )
 
         fun fromSubcategory(subcategory: String): OnboardingNotificationType? {
+            return values.firstOrNull { it.subcategory == subcategory }
+        }
+    }
+}
+
+sealed class ReEngagementNotificationType(
+    override val subcategory: String,
+    @StringRes override val titleRes: Int,
+    @StringRes override val messageRes: Int? = null,
+    @PluralsRes override val messagePluralRes: Int? = null,
+) : NotificationType {
+
+    override val notificationId: Int
+        get() = ReEngagementNotificationType.notificationId
+
+    override fun isSettingsToggleOn(settings: Settings): Boolean {
+        return settings.dailyRemindersNotification.value
+    }
+
+    object WeMissYou : ReEngagementNotificationType(
+        subcategory = SUBCATEGORY_REENGAGE_WE_MISS_YOU,
+        titleRes = LR.string.notification_reengage_we_miss_you_title,
+        messageRes = LR.string.notification_reengage_we_miss_you_message,
+    ) {
+        override fun toIntent(context: Context): Intent = StaffPicksDeepLink.toIntent(context)
+    }
+
+    object CatchUpOffline : ReEngagementNotificationType(
+        subcategory = SUBCATEGORY_REENGAGE_CATCH_UP_OFFLINE,
+        titleRes = LR.string.notification_reengage_catch_up_offline_title,
+        messagePluralRes = LR.plurals.notification_reengage_catch_up_offline_message,
+    ) {
+        override fun toIntent(context: Context): Intent = DownloadsDeepLink.toIntent(context)
+    }
+
+    companion object {
+        const val SUBCATEGORY_REENGAGE_WE_MISS_YOU = "we_miss_you"
+        const val SUBCATEGORY_REENGAGE_CATCH_UP_OFFLINE = "catch_up_offline"
+
+        val notificationId: Int
+            get() = NotificationId.RE_ENGAGEMENT.value
+
+        val values: List<ReEngagementNotificationType>
+            get() = listOf(
+                WeMissYou,
+                CatchUpOffline,
+            )
+
+        fun fromSubcategory(subcategory: String): ReEngagementNotificationType? {
             return values.firstOrNull { it.subcategory == subcategory }
         }
     }
