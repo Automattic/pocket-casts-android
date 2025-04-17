@@ -6,13 +6,22 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import androidx.work.workDataOf
+import au.com.shiftyjelly.pocketcasts.repositories.notification.ReEngagementNotificationType.Companion.SUBCATEGORY_REENGAGE_CATCH_UP_OFFLINE
+import au.com.shiftyjelly.pocketcasts.repositories.notification.ReEngagementNotificationType.Companion.SUBCATEGORY_REENGAGE_WE_MISS_YOU
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
 import java.util.concurrent.TimeUnit
 
 class NotificationSchedulerImpl @Inject constructor(
     @ApplicationContext private val context: Context,
+    private val episodeManager: EpisodeManager,
 ) : NotificationScheduler {
+
+    companion object {
+        const val SUBCATEGORY = "subcategory"
+        const val DOWNLOADED_EPISODES = "downloaded_episodes"
+    }
 
     override fun setupOnboardingNotifications() {
         val delayCalculator = NotificationDelayCalculator()
@@ -29,7 +38,7 @@ class NotificationSchedulerImpl @Inject constructor(
             val delay = delayCalculator.calculateDelayForOnboardingNotification(type)
 
             val workData = workDataOf(
-                "subcategory" to type.subcategory,
+                SUBCATEGORY to type.subcategory,
             )
 
             val notificationWork = OneTimeWorkRequest.Builder(NotificationWorker::class.java)
@@ -42,11 +51,16 @@ class NotificationSchedulerImpl @Inject constructor(
         }
     }
 
-    override fun setupReEngagementNotification() {
+    override suspend fun setupReEngagementNotification() {
         val initialDelay = NotificationDelayCalculator().calculateDelayForReEngagementCheck()
 
+        val downloadedEpisodes = episodeManager.downloadedEpisodesThatHaveNotBeenPlayedCount()
+        val subcategory =
+            if (downloadedEpisodes > 0) SUBCATEGORY_REENGAGE_CATCH_UP_OFFLINE else SUBCATEGORY_REENGAGE_WE_MISS_YOU
+
         val workData = workDataOf(
-            "subcategory" to ReEngagementNotificationType.SUBCATEGORY_REENGAGE_WE_MISS_YOU,
+            SUBCATEGORY to subcategory,
+            DOWNLOADED_EPISODES to downloadedEpisodes,
         )
 
         val notificationWork = PeriodicWorkRequest.Builder(NotificationWorker::class.java, 1, TimeUnit.DAYS)

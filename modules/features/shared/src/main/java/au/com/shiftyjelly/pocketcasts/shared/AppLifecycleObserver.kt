@@ -20,6 +20,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 
 class AppLifecycleObserver(
     @ApplicationContext private val appContext: Context,
@@ -65,7 +66,9 @@ class AppLifecycleObserver(
         handleNewInstallOrUpgrade()
         setupFeatureFlags()
         networkConnectionWatcher.startWatching()
-        notificationScheduler.setupReEngagementNotification()
+        applicationScope.launch {
+            notificationScheduler.setupReEngagementNotification()
+        }
     }
 
     override fun onResume(owner: LifecycleOwner) {

@@ -13,7 +13,8 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.R
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationSchedulerImpl.Companion.DOWNLOADED_EPISODES
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationSchedulerImpl.Companion.SUBCATEGORY
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.assisted.Assisted
@@ -27,10 +28,10 @@ class NotificationWorker @AssistedInject constructor(
     private val settings: Settings,
     private val notificationHelper: NotificationHelper,
     private val notificationManager: NotificationManager,
-    private val episodeManager: EpisodeManager,
 ) : CoroutineWorker(context, params) {
     override suspend fun doWork(): Result {
-        val subcategory = inputData.getString("subcategory") ?: return Result.failure()
+        val subcategory = inputData.getString(SUBCATEGORY) ?: return Result.failure()
+
         val type =
             OnboardingNotificationType.fromSubcategory(subcategory) ?: ReEngagementNotificationType.fromSubcategory(subcategory) ?: return Result.failure()
 
@@ -52,7 +53,7 @@ class NotificationWorker @AssistedInject constructor(
         return Result.success()
     }
 
-    private suspend fun getNotificationBuilder(type: NotificationType): NotificationCompat.Builder {
+    private fun getNotificationBuilder(type: NotificationType): NotificationCompat.Builder {
         return when (type) {
             is OnboardingNotificationType -> buildOnboardingNotification(type)
             is ReEngagementNotificationType -> buildReEngagementNotification(type)
@@ -69,34 +70,22 @@ class NotificationWorker @AssistedInject constructor(
             .setContentIntent(openPageIntent(type))
     }
 
-    private suspend fun buildReEngagementNotification(type: ReEngagementNotificationType): NotificationCompat.Builder {
-        val downloadedEpisodes = episodeManager.downloadedEpisodesThatHaveNotBeenPlayedCount()
+    private fun buildReEngagementNotification(type: ReEngagementNotificationType): NotificationCompat.Builder {
+        val downloadedEpisodes = inputData.getInt(DOWNLOADED_EPISODES, 0)
 
-        val contentTitle = if (downloadedEpisodes > 0) {
-            applicationContext.resources.getString(ReEngagementNotificationType.CatchUpOffline.titleRes)
-        } else {
-            applicationContext.resources.getString(type.titleRes)
-        }
-
-        val contentText = if (downloadedEpisodes > 0) {
-            applicationContext.resources.getString(ReEngagementNotificationType.CatchUpOffline.messageRes, downloadedEpisodes)
+        val contentText = if (type is ReEngagementNotificationType.CatchUpOffline && downloadedEpisodes != 0) {
+            applicationContext.resources.getString(type.messageRes, downloadedEpisodes)
         } else {
             applicationContext.resources.getString(type.messageRes)
-        }
-
-        val pendingIntent = if (downloadedEpisodes > 0) {
-            openPageIntent(ReEngagementNotificationType.CatchUpOffline)
-        } else {
-            openPageIntent(type)
         }
 
         return notificationHelper.dailyRemindersChannelBuilder()
             .setSmallIcon(IR.drawable.notification)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setContentTitle(contentTitle)
+            .setContentTitle(applicationContext.resources.getString(type.titleRes))
             .setContentText(contentText)
             .setColor(ContextCompat.getColor(applicationContext, R.color.notification_color))
-            .setContentIntent(pendingIntent)
+            .setContentIntent(openPageIntent(type))
     }
 
     private fun openPageIntent(type: NotificationType): PendingIntent {
