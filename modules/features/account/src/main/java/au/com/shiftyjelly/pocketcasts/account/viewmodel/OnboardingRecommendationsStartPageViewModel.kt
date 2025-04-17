@@ -7,13 +7,13 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRow
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.servers.model.transformWithRegion
-import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.Locale
 import javax.inject.Inject
@@ -250,7 +250,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
         }
 
         val feed = try {
-            repository.getListFeed(listItem.source)
+            repository.getListFeed(url = listItem.source, authenticated = false)
         } catch (e: Exception) {
             Timber.e(e)
             return
@@ -297,7 +297,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
         // as possible, and to maintain the order of the sections
         categories.forEach { category ->
             runCatching {
-                repository.getListFeed(category.source)
+                repository.getListFeed(url = category.source, authenticated = false)
             }
                 .onFailure { exception ->
                     Timber.e(exception, "Error getting list feed for category ${category.source}")

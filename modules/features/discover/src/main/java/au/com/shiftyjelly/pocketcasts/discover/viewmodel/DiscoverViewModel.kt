@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.discover.view.RemainingPodcastsByCategoryR
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.categories.CategoriesManager
+import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -27,7 +28,6 @@ import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
 import au.com.shiftyjelly.pocketcasts.servers.model.SponsoredPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.transformWithRegion
-import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
 import com.automattic.android.tracks.crashlogging.CrashLogging
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
@@ -134,8 +134,8 @@ class DiscoverViewModel @Inject constructor(
         loadFeed(resources)
     }
 
-    fun loadPodcastList(source: String): Flowable<PodcastList> {
-        return rxSingle { repository.getListFeed(source) }
+    fun loadPodcastList(source: String, authenticated: Boolean?): Flowable<PodcastList> {
+        return rxSingle { repository.getListFeed(source, authenticated) }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .map {
@@ -172,7 +172,7 @@ class DiscoverViewModel @Inject constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .flatMap { discoverFeed ->
                 val categoryUrl = transformNetworkLoadableList(category, resources).source
-                loadPodcastList(categoryUrl)
+                loadPodcastList(source = categoryUrl, authenticated = false)
                     .firstOrError()
                     .map { discoverFeed to it }
             }
@@ -208,7 +208,7 @@ class DiscoverViewModel @Inject constructor(
                 !isInvalidSponsoredSource
             }
             .map { sponsoredPodcast ->
-                loadPodcastList(sponsoredPodcast.source as String)
+                loadPodcastList(source = sponsoredPodcast.source as String, authenticated = false)
                     .filter {
                         it.podcasts.isNotEmpty() && it.listId != null
                     }

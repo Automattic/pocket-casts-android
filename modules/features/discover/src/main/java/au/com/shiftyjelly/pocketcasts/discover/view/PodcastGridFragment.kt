@@ -44,7 +44,11 @@ class PodcastGridFragment : PodcastGridListFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = PodcastGridFragmentBinding.inflate(inflater, container, false)
 
-        viewModel.load(arguments?.getString(ARG_SOURCE_URL), expandedStyle)
+        viewModel.load(
+            sourceUrl = arguments?.getString(ARG_SOURCE_URL),
+            listStyle = expandedStyle,
+            authenticated = arguments?.getBoolean(ARG_AUTHENTICATED),
+        )
         viewModel.state.observe(
             viewLifecycleOwner,
             Observer { state ->
