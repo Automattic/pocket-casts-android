@@ -165,7 +165,7 @@ class AutoPlaybackService : PlaybackService() {
         Log.d(Settings.LOG_TAG_AUTO, "Loading discover root")
         val discoverFeed: Discover
         try {
-            discoverFeed = listSource.getDiscoverFeedSuspend()
+            discoverFeed = listSource.getDiscoverFeed()
         } catch (e: Exception) {
             Log.e(Settings.LOG_TAG_AUTO, "Error loading discover", e)
             return emptyList()
@@ -181,7 +181,7 @@ class AutoPlaybackService : PlaybackService() {
             .filter { it.type is ListType.PodcastList && it.displayStyle !is DisplayStyle.CollectionList && !it.sponsored && it.displayStyle !is DisplayStyle.SinglePodcast }
             .map { discoverItem ->
                 Log.d(Settings.LOG_TAG_AUTO, "Loading discover feed ${discoverItem.source}")
-                val listFeed = listSource.getListFeedSuspend(discoverItem.source)
+                val listFeed = listSource.getListFeed(discoverItem.source)
                 Pair(discoverItem.title, listFeed.podcasts?.take(6) ?: emptyList())
             }
             .flatMap { (title, podcasts) ->
