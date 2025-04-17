@@ -25,6 +25,7 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import kotlinx.coroutines.rx2.rxMaybe
+import kotlinx.coroutines.rx2.rxSingle
 import timber.log.Timber
 
 @HiltViewModel
@@ -54,7 +55,9 @@ class PodcastListViewModel @Inject constructor(
             return
         }
 
-        listRepository.getListFeed(sourceUrl)
+        rxSingle { listRepository.getListFeed(sourceUrl) }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
             .flatMap {
                 return@flatMap if (listStyle is ExpandedStyle.RankedList) {
                     addColorsToFeed(it)

@@ -23,7 +23,7 @@ class CuratedPodcastsCrawler(
     ) : this(service, BuildConfig.SERVER_STATIC_URL)
 
     suspend fun crawl(platform: String): Result<List<CuratedPodcast>> = coroutineScope {
-        runCatching { service.getDiscoverFeedSuspend(platform) }.mapCatching { discover ->
+        runCatching { service.getDiscoverFeed(platform) }.mapCatching { discover ->
             val feeds = discover.layout
                 .filterDisplayablePodcasts()
                 .mapNotNull { row -> row.id?.let { id -> fetchFeed(id, row.source) } }
@@ -68,6 +68,6 @@ class CuratedPodcastsCrawler(
         } else {
             url
         }
-        return async { runCatching { service.getListFeedSuspend(engageUrl) } }
+        return async { runCatching { service.getListFeed(engageUrl) } }
     }
 }

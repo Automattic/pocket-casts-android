@@ -25,7 +25,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
-import kotlinx.coroutines.rx2.await
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -129,7 +128,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
             }
 
             val feed = try {
-                repository.getDiscoverFeed().await()
+                repository.getDiscoverFeed()
             } catch (e: Exception) {
                 Timber.e("Exception retrieving Discover feed: $e")
                 return@launch
@@ -252,8 +251,6 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
 
         val feed = try {
             repository.getListFeed(listItem.source)
-                .await()
-                ?: return
         } catch (e: Exception) {
             Timber.e(e)
             return
@@ -284,7 +281,6 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
                 try {
                     repository
                         .getCategoriesList(row.source)
-                        .await()
                         .map {
                             it.transformWithReplacements(
                                 replacements,
@@ -300,9 +296,15 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
         // Make network calls one at a time so the UI can load the initial sections as quickly
         // as possible, and to maintain the order of the sections
         categories.forEach { category ->
-            repository
-                .getListFeed(category.source).await()
-                .podcasts?.let { podcasts ->
+            runCatching {
+                repository.getListFeed(category.source)
+            }
+                .onFailure { exception ->
+                    Timber.e(exception, "Error getting list feed for category ${category.source}")
+                }
+                .getOrNull()
+                ?.podcasts
+                ?.let { podcasts ->
                     sectionsFlow.emit(
                         sectionsFlow.value + SectionInternal(
                             title = category.title.tryToLocalise(getApplication<Application>().resources),
