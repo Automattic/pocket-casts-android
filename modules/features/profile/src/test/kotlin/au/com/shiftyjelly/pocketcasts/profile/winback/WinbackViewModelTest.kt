@@ -553,6 +553,8 @@ class WinbackViewModelTest {
                         on { formattedPrice } doReturn "price"
                         on { billingPeriod } doReturn BillingPeriod.Monthly.value
                         on { recurrenceMode } doReturn RecurrenceMode.INFINITE_RECURRING
+                        on { priceAmountMicros } doReturn 100L
+                        on { priceCurrencyCode } doReturn "USD"
                     }
                 },
             ),
@@ -998,12 +1000,16 @@ private fun createProductDetails(
         on { formattedPrice } doReturn "base-price-$id"
         on { billingPeriod } doReturn period.value
         on { recurrenceMode } doReturn RecurrenceMode.INFINITE_RECURRING
+        on { priceAmountMicros } doReturn 100L
+        on { priceCurrencyCode } doReturn "USD"
     }
     val offerPricingPhase = bonusOfferId?.let {
         mock<PricingPhase> {
             on { formattedPrice } doReturn "offer-price-$id"
             on { billingPeriod } doReturn period.value
             on { recurrenceMode } doReturn RecurrenceMode.INFINITE_RECURRING
+            on { priceAmountMicros } doReturn 100L
+            on { priceCurrencyCode } doReturn "USD"
         }
     }
     val basePricingPhases = mock<PricingPhases> {
