@@ -225,6 +225,12 @@ class WinbackFragment : BaseDialogFragment() {
                                         handleSubscriptionCancellation(state.purchasedProductIds)
                                     },
                                 )
+                            } else {
+                                WinbackOfferErrorPage(
+                                    onDismiss = {
+                                        dismiss()
+                                    },
+                                )
                             }
                         }
                     }
