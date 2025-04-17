@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.settings
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -36,7 +37,8 @@ fun NotificationsSettingsPage(
     state: NotificationSettingsState,
     bottomInset: Dp,
     modifier: Modifier = Modifier,
-    onBackPressed: () -> Unit = {},
+    onBackPressed: () -> Unit,
+    onSelectPodcasts: () -> Unit,
 ) {
     var openActionsDialog by remember { mutableStateOf(false) }
 
@@ -74,6 +76,7 @@ fun NotificationsSettingsPage(
                                 primaryText = stringResource(LR.string.settings_notification_choose_podcasts),
                                 secondaryText = stringResource(LR.string.settings_podcasts_selected_zero),
                                 indent = true,
+                                modifier = modifier.clickable { onSelectPodcasts() },
                             )
 
                             SettingRow(
@@ -122,6 +125,8 @@ private fun NotificationsSettingsPagePreview(
                     onCheckedChange = {},
                 ),
             ),
+            onBackPressed = {},
+            onSelectPodcasts = {},
         )
     }
 }
