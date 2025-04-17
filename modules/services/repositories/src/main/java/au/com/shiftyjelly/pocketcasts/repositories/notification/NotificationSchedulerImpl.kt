@@ -57,7 +57,7 @@ class NotificationSchedulerImpl @Inject constructor(
 
         WorkManager.getInstance(context).enqueueUniquePeriodicWork(
             "daily_re_engagement_check",
-            ExistingPeriodicWorkPolicy.REPLACE,
+            ExistingPeriodicWorkPolicy.UPDATE,
             notificationWork,
         )
     }
