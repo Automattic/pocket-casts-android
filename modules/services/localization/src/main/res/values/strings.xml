@@ -2412,4 +2412,13 @@
     <string name="notification_plus_upsell_title">Level up your podcast game</string>
     <string name="notification_plus_upsell_message">Unlock exclusive features like folders, bookmarks, and more with Plus!</string>
 
+    <string name="notification_reengage_we_miss_you_title">We miss you!</string>
+    <string name="notification_reengage_we_miss_you_message">It\'s been a while since you\'ve listened. Jump back in and enjoy!</string>
+
+    <string name="notification_reengage_catch_up_offline_title">Catch up offline</string>
+    <plurals name="notification_reengage_catch_up_offline_message">
+        <item quantity="one">You have %d new episode downloaded and ready to go!</item>
+        <item quantity="other">You have %d new episodes downloaded and ready to go!</item>
+    </plurals>
+
 </resources>

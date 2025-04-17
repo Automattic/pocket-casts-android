@@ -69,6 +69,7 @@ class DeepLinkFactory(
         AssistantAdapter(),
         ThemesAdapter(),
         AppOpenAdapter(),
+        CreateAccountAdapter(),
     )
 
     fun create(intent: Intent): DeepLink? {
@@ -205,6 +206,20 @@ private class ShowFiltersAdapter : DeepLinkAdapter {
 
         return if (intent.action == ACTION_VIEW && scheme == "pktc" && host == "filters") {
             ShowFiltersDeepLink
+        } else {
+            null
+        }
+    }
+}
+
+private class CreateAccountAdapter : DeepLinkAdapter {
+    override fun create(intent: Intent): DeepLink? {
+        val uriData = intent.data
+        val scheme = uriData?.scheme
+        val host = uriData?.host
+
+        return if (intent.action == ACTION_VIEW && scheme == "pktc" && host == "signup") {
+            CreateAccountDeepLink
         } else {
             null
         }
@@ -572,6 +587,7 @@ private class OpmlAdapter(
             "www.subscribeonandroid.com",
             "discover",
             "open",
+            "signup",
         )
     }
 }

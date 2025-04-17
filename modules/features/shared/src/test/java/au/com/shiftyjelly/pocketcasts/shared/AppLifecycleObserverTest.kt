@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.PreferencesFea
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -98,7 +99,7 @@ class AppLifecycleObserverTest {
     /* NEW INSTALL */
 
     @Test
-    fun handlesNewInstallPhone() {
+    fun handlesNewInstallPhone() = runTest {
         whenever(settings.getMigratedVersionCode()).thenReturn(VERSION_CODE_DEFAULT)
 
         appLifecycleObserver = spy(appLifecycleObserver)
@@ -114,10 +115,11 @@ class AppLifecycleObserverTest {
 
         verify(appLifecycleAnalytics, never()).onApplicationUpgrade(any())
         verify(notificationScheduler, times(1)).setupOnboardingNotifications()
+        verify(notificationScheduler, times(1)).setupReEngagementNotification()
     }
 
     @Test
-    fun handlesNewInstallWear() {
+    fun handlesNewInstallWear() = runTest {
         whenever(settings.getMigratedVersionCode()).thenReturn(VERSION_CODE_DEFAULT)
 
         appLifecycleObserver = spy(appLifecycleObserver)
@@ -133,10 +135,11 @@ class AppLifecycleObserverTest {
         verify(useUpNextDarkThemeSetting).set(false, updateModifiedAt = false)
         verify(appLifecycleAnalytics, never()).onApplicationUpgrade(any())
         verify(notificationScheduler, never()).setupOnboardingNotifications()
+        verify(notificationScheduler, times(1)).setupReEngagementNotification()
     }
 
     @Test
-    fun handlesNewInstallAutomotive() {
+    fun handlesNewInstallAutomotive() = runTest {
         whenever(settings.getMigratedVersionCode()).thenReturn(VERSION_CODE_DEFAULT)
 
         appLifecycleObserver = spy(appLifecycleObserver)
@@ -152,12 +155,13 @@ class AppLifecycleObserverTest {
         verify(useUpNextDarkThemeSetting).set(false, updateModifiedAt = false)
         verify(appLifecycleAnalytics, never()).onApplicationUpgrade(any())
         verify(notificationScheduler, never()).setupOnboardingNotifications()
+        verify(notificationScheduler, times(1)).setupReEngagementNotification()
     }
 
     /* UPGRADE */
 
     @Test
-    fun handlesUpgrade() {
+    fun handlesUpgrade() = runTest {
         whenever(settings.getMigratedVersionCode()).thenReturn(VERSION_CODE_AFTER_FIRST_INSTALL)
 
         appLifecycleObserver.setup()
@@ -170,5 +174,6 @@ class AppLifecycleObserverTest {
         verify(dailyRemindersNotificationSetting, never()).set(any(), any(), any(), any())
         verify(useUpNextDarkThemeSetting, never()).set(any(), any(), any(), any())
         verify(notificationScheduler, never()).setupOnboardingNotifications()
+        verify(notificationScheduler, times(1)).setupReEngagementNotification()
     }
 }

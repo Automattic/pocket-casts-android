@@ -9,14 +9,14 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class DownloadsDeepLinkTest {
+class CreateAccountDeepLinkTest {
     private val context = InstrumentationRegistry.getInstrumentation().context
 
     @Test
     fun createIntent() {
-        val intent = DownloadsDeepLink.toIntent(context)
+        val intent = CreateAccountDeepLink.toIntent(context)
 
         assertEquals(ACTION_VIEW, intent.action)
-        assertEquals(Uri.parse("pktc://profile/downloads"), intent.data)
+        assertEquals(Uri.parse("pktc://signup"), intent.data)
     }
 }
