@@ -263,7 +263,7 @@ class PocketCastsApplication : Application(), Configuration.Provider {
         userEpisodeManager.monitorUploads(applicationContext)
         downloadManager.beginMonitoringWorkManager(applicationContext)
         userManager.beginMonitoringAccountManager(playbackManager)
-        CuratedPodcastsSyncWorker.enqueuPeriodicWork(this)
+        CuratedPodcastsSyncWorker.enqueuePeriodicWork(this)
         engageSdkBridge.registerIntegration()
 
         keepPlayerWidgetsUpdated()
