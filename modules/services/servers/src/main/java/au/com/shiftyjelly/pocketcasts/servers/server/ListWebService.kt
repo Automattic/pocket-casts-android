@@ -8,8 +8,8 @@ import retrofit2.http.Path
 import retrofit2.http.Url
 
 interface ListWebService {
-    @GET("/discover/{platform}/content_v2.json")
-    suspend fun getDiscoverFeed(@Path("platform") platform: String): Discover
+    @GET("/discover/{platform}/content_v{version}.json")
+    suspend fun getDiscoverFeed(@Path("platform") platform: String, @Path("version") version: Int): Discover
 
     @GET
     suspend fun getListFeed(@Url url: String): ListFeed

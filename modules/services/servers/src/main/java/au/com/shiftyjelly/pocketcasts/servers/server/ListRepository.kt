@@ -3,11 +3,14 @@ package au.com.shiftyjelly.pocketcasts.servers.server
 import au.com.shiftyjelly.pocketcasts.servers.model.Discover
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.servers.model.ListFeed
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 
 class ListRepository(private val listWebService: ListWebService, private val platform: String) {
 
     suspend fun getDiscoverFeed(): Discover {
-        return listWebService.getDiscoverFeed(platform)
+        val version = if (FeatureFlag.isEnabled(Feature.RECOMMENDATIONS)) 3 else 2
+        return listWebService.getDiscoverFeed(platform = platform, version = version)
     }
 
     suspend fun getListFeed(url: String): ListFeed {
