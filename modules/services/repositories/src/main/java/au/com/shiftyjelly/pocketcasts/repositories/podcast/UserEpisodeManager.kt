@@ -283,7 +283,7 @@ class UserEpisodeManagerImpl @Inject constructor(
         }
     }
 
-    private suspend fun syncFiles(playbackManager: PlaybackManager, shouldIgnoreImageChanges: Boolean) {
+    private suspend fun syncFiles(playbackManager: PlaybackManager, syncArtworkChanges: Boolean) {
         val episodesToSync = userEpisodeDao.findUserEpisodesToSyncBlocking()
         if (episodesToSync.isNotEmpty()) {
             val response = withContext(Dispatchers.IO) {
@@ -337,7 +337,7 @@ class UserEpisodeManagerImpl @Inject constructor(
                     didChange = true
                 }
 
-                if (!shouldIgnoreImageChanges && existingFile.hasCustomImage != it.hasCustomImage) {
+                if (syncArtworkChanges && existingFile.hasCustomImage != it.hasCustomImage) {
                     existingFile.hasCustomImage = it.hasCustomImage
                     didChange = true
                 }
@@ -347,7 +347,7 @@ class UserEpisodeManagerImpl @Inject constructor(
                     didChange = true
                 }
 
-                if (!shouldIgnoreImageChanges && existingFile.artworkUrl != it.imageUrl) {
+                if (syncArtworkChanges && existingFile.artworkUrl != it.imageUrl) {
                     existingFile.artworkUrl = it.imageUrl
                     didChange = true
                 }
@@ -413,7 +413,7 @@ class UserEpisodeManagerImpl @Inject constructor(
     }
 
     override suspend fun syncFiles(playbackManager: PlaybackManager) {
-        syncFiles(playbackManager, false)
+        syncFiles(playbackManager = playbackManager, syncArtworkChanges = true)
     }
 
     override fun uploadToServer(userEpisode: UserEpisode, waitForWifi: Boolean) {
@@ -481,7 +481,7 @@ class UserEpisodeManagerImpl @Inject constructor(
                 rxCompletable {
                     syncFiles(
                         playbackManager = playbackManager,
-                        shouldIgnoreImageChanges = true
+                        syncArtworkChanges = false
                     )
                 }.doOnError {
                     Timber.e(it)
