@@ -516,11 +516,10 @@ internal data class SubscriptionPlan(
 ) {
     val pricePerWeek = basePrice
         .let { price ->
-            val weeksCount = when (billingPeriod) {
-                BillingPeriod.Monthly -> 4
-                BillingPeriod.Yearly -> 52
-            }.toBigDecimal()
-            price.divide(weeksCount, 2, RoundingMode.HALF_UP)
+            when (billingPeriod) {
+                BillingPeriod.Monthly -> price.times(12.toBigDecimal())
+                BillingPeriod.Yearly -> price
+            }.divide(52.toBigDecimal(), 2, RoundingMode.HALF_UP)
         }
         .toFloat()
 }
@@ -529,17 +528,19 @@ internal data class ActivePurchase(
     val orderId: String,
     val productId: String,
 ) {
-    val tier get() = when (productId) {
-        Subscription.PLUS_MONTHLY_PRODUCT_ID, Subscription.PLUS_YEARLY_PRODUCT_ID -> "plus"
-        Subscription.PATRON_MONTHLY_PRODUCT_ID, Subscription.PATRON_YEARLY_PRODUCT_ID -> "patron"
-        else -> null
-    }
+    val tier
+        get() = when (productId) {
+            Subscription.PLUS_MONTHLY_PRODUCT_ID, Subscription.PLUS_YEARLY_PRODUCT_ID -> "plus"
+            Subscription.PATRON_MONTHLY_PRODUCT_ID, Subscription.PATRON_YEARLY_PRODUCT_ID -> "patron"
+            else -> null
+        }
 
-    val frequency get() = when (productId) {
-        Subscription.PLUS_MONTHLY_PRODUCT_ID, Subscription.PATRON_MONTHLY_PRODUCT_ID -> "monthly"
-        Subscription.PLUS_YEARLY_PRODUCT_ID, Subscription.PATRON_YEARLY_PRODUCT_ID -> "yearly"
-        else -> null
-    }
+    val frequency
+        get() = when (productId) {
+            Subscription.PLUS_MONTHLY_PRODUCT_ID, Subscription.PATRON_MONTHLY_PRODUCT_ID -> "monthly"
+            Subscription.PLUS_YEARLY_PRODUCT_ID, Subscription.PATRON_YEARLY_PRODUCT_ID -> "yearly"
+            else -> null
+        }
 }
 
 internal enum class FailureReason {
