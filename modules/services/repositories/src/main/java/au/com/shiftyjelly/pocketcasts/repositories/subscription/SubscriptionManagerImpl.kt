@@ -14,6 +14,8 @@ import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.payment.billing.BillingClientWrapper
+import au.com.shiftyjelly.pocketcasts.payment.billing.isOk
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionPurchaseRequest
@@ -59,6 +61,7 @@ class SubscriptionManagerImpl @Inject constructor(
     private val subscriptionMapper: SubscriptionMapper,
     private val syncManager: SyncManager,
     private val settings: Settings,
+    private val productDetailsInterceptor: ProductDetailsInterceptor,
 ) : SubscriptionManager {
 
     private var cachedSubscriptionStatus: SubscriptionStatus?
@@ -186,8 +189,9 @@ class SubscriptionManagerImpl @Inject constructor(
 
     override suspend fun loadProducts(): ProductDetailsState {
         val (result, products) = billingClient.loadProducts(productDetailsParams)
-        val state = if (result.isOk()) {
-            ProductDetailsState.Loaded(products)
+        val interceptedResult = productDetailsInterceptor.intercept(result, products)
+        val state = if (interceptedResult.first.isOk()) {
+            ProductDetailsState.Loaded(interceptedResult.second)
         } else {
             ProductDetailsState.Failure
         }
