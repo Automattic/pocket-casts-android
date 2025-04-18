@@ -481,7 +481,7 @@ class UserEpisodeManagerImpl @Inject constructor(
                 rxCompletable {
                     syncFiles(
                         playbackManager = playbackManager,
-                        syncArtworkChanges = false
+                        syncArtworkChanges = false,
                     )
                 }.doOnError {
                     Timber.e(it)
