@@ -20,6 +20,8 @@ import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
 import com.pocketcasts.service.api.WinbackResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.math.BigDecimal
+import java.math.RoundingMode
 import java.util.Date
 import javax.inject.Inject
 import kotlinx.coroutines.Deferred
@@ -509,23 +511,36 @@ internal data class SubscriptionPlan(
     val title: String,
     val formattedPrice: String,
     val billingPeriod: BillingPeriod,
-)
+    val basePrice: BigDecimal,
+    val currencyCode: String,
+) {
+    val pricePerWeek = basePrice
+        .let { price ->
+            when (billingPeriod) {
+                BillingPeriod.Monthly -> price.times(12.toBigDecimal())
+                BillingPeriod.Yearly -> price
+            }.divide(52.toBigDecimal(), 2, RoundingMode.HALF_UP)
+        }
+        .toFloat()
+}
 
 internal data class ActivePurchase(
     val orderId: String,
     val productId: String,
 ) {
-    val tier get() = when (productId) {
-        Subscription.PLUS_MONTHLY_PRODUCT_ID, Subscription.PLUS_YEARLY_PRODUCT_ID -> "plus"
-        Subscription.PATRON_MONTHLY_PRODUCT_ID, Subscription.PATRON_YEARLY_PRODUCT_ID -> "patron"
-        else -> null
-    }
+    val tier
+        get() = when (productId) {
+            Subscription.PLUS_MONTHLY_PRODUCT_ID, Subscription.PLUS_YEARLY_PRODUCT_ID -> "plus"
+            Subscription.PATRON_MONTHLY_PRODUCT_ID, Subscription.PATRON_YEARLY_PRODUCT_ID -> "patron"
+            else -> null
+        }
 
-    val frequency get() = when (productId) {
-        Subscription.PLUS_MONTHLY_PRODUCT_ID, Subscription.PATRON_MONTHLY_PRODUCT_ID -> "monthly"
-        Subscription.PLUS_YEARLY_PRODUCT_ID, Subscription.PATRON_YEARLY_PRODUCT_ID -> "yearly"
-        else -> null
-    }
+    val frequency
+        get() = when (productId) {
+            Subscription.PLUS_MONTHLY_PRODUCT_ID, Subscription.PATRON_MONTHLY_PRODUCT_ID -> "monthly"
+            Subscription.PLUS_YEARLY_PRODUCT_ID, Subscription.PATRON_YEARLY_PRODUCT_ID -> "yearly"
+            else -> null
+        }
 }
 
 internal enum class FailureReason {
@@ -546,6 +561,11 @@ private fun Subscription.Simple.toPlan() = SubscriptionPlan(
         is SubscriptionPricingPhase.Months -> BillingPeriod.Monthly
         is SubscriptionPricingPhase.Years -> BillingPeriod.Yearly
     },
+    basePrice = recurringPricingPhase.pricingPhase
+        .priceAmountMicros
+        .toBigDecimal()
+        .divide(1000000.toBigDecimal()),
+    currencyCode = recurringPricingPhase.priceCurrencyCode,
 )
 
 private object PlanComparator : Comparator<SubscriptionPlan> {
