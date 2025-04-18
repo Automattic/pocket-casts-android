@@ -250,7 +250,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
         }
 
         val feed = try {
-            repository.getListFeed(url = listItem.source, authenticated = false)
+            repository.getListFeed(listItem.source)
         } catch (e: Exception) {
             Timber.e(e)
             return
@@ -297,7 +297,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
         // as possible, and to maintain the order of the sections
         categories.forEach { category ->
             runCatching {
-                repository.getListFeed(url = category.source, authenticated = false)
+                repository.getListFeed(category.source)
             }
                 .onFailure { exception ->
                     Timber.e(exception, "Error getting list feed for category ${category.source}")
