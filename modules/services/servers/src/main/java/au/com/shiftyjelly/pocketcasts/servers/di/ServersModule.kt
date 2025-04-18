@@ -18,12 +18,10 @@ import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyleMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.servers.model.ListTypeMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheService
 import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptCacheService
-import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
 import au.com.shiftyjelly.pocketcasts.servers.server.ListWebService
 import au.com.shiftyjelly.pocketcasts.servers.sync.LoginIdentity
 import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponseParser
-import au.com.shiftyjelly.pocketcasts.utils.Util
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import dagger.Module
@@ -265,16 +263,6 @@ class ServersModule {
     @Singleton
     internal fun provideListWebService(@DiscoverServiceRetrofit retrofit: Retrofit): ListWebService {
         return retrofit.create(ListWebService::class.java)
-    }
-
-    @Provides
-    @Singleton
-    internal fun provideDiscoverRepository(listWebService: ListWebService, @ApplicationContext context: Context): ListRepository {
-        val platform = if (Util.isAutomotive(context)) "automotive" else "android"
-        return ListRepository(
-            listWebService,
-            platform,
-        )
     }
 
     @Provides
