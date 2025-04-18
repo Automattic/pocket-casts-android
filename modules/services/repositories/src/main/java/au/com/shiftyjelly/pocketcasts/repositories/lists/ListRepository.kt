@@ -19,7 +19,7 @@ class ListRepository(
         return listWebService.getDiscoverFeed(platform = platform, version = version)
     }
 
-    suspend fun getListFeed(url: String, authenticated: Boolean?): ListFeed {
+    suspend fun getListFeed(url: String, authenticated: Boolean? = false): ListFeed {
         return if (authenticated == true) {
             syncManager.getCacheTokenOrLogin { token ->
                 listWebService.getListFeedAuthenticated(url, "Bearer ${token.value}")
