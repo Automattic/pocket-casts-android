@@ -94,9 +94,8 @@ private fun Content(
 ) {
     val activity = LocalContext.current.getActivity()
     val windowSize = activity?.let { calculateWindowSizeClass(it) }
-    val heightSizeClass = if (LocalInspectionMode.current) {
-        val orientation = LocalConfiguration.current.orientation
-        if (orientation == Configuration.ORIENTATION_LANDSCAPE) WindowHeightSizeClass.Compact else WindowHeightSizeClass.Medium
+    val heightSizeClass = if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        WindowHeightSizeClass.Compact
     } else {
         windowSize?.heightSizeClass ?: return
     }
