@@ -15,8 +15,10 @@ import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedI
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.extensions.openUrl
 import com.mikepenz.aboutlibraries.Libs
+import com.mikepenz.aboutlibraries.entity.Library
 import com.mikepenz.aboutlibraries.ui.compose.LibrariesContainer
 import com.mikepenz.aboutlibraries.ui.compose.LibraryDefaults
+import com.mikepenz.aboutlibraries.ui.compose.libraryColors
 import com.mikepenz.aboutlibraries.ui.compose.util.author
 import com.mikepenz.aboutlibraries.util.withContext
 import kotlinx.collections.immutable.toImmutableList
@@ -35,6 +37,14 @@ class AutomotiveLicensesFragment : Fragment() {
 
     @Composable
     private fun LicensesPage(modifier: Modifier = Modifier) {
+        val librariesBlock: () -> Libs = {
+            val libs = Libs.Builder().withContext(requireContext()).build()
+            // without displaying the artifact id the libraries seem to appear twice
+            libs.copy(
+                libs.libraries.distinctBy { "${it.name}##${it.author}" }.toImmutableList(),
+            )
+        }
+
         LibrariesContainer(
             modifier = modifier.fillMaxSize(),
             showAuthor = true,
@@ -44,15 +54,11 @@ class AutomotiveLicensesFragment : Fragment() {
                 backgroundColor = MaterialTheme.colors.background,
                 contentColor = MaterialTheme.theme.colors.primaryText01,
             ),
-            itemContentPadding = PaddingValues(horizontal = 32.dp, vertical = 16.dp),
-            librariesBlock = { context ->
-                val libs = Libs.Builder().withContext(context).build()
-                // without displaying the artifact id the libraries seem to appear twice
-                libs.copy(
-                    libs.libraries.distinctBy { "${it.name}##${it.author}" }.toImmutableList(),
-                )
-            },
-            onLibraryClick = { library ->
+            padding = LibraryDefaults.libraryPadding(
+                contentPadding = PaddingValues(horizontal = 32.dp, vertical = 16.dp),
+            ),
+            librariesBlock = librariesBlock,
+            onLibraryClick = { library: Library ->
                 val website = library.website ?: return@LibrariesContainer
                 openUrl(website)
             },
