@@ -85,6 +85,9 @@ fun ArtworkSection(
     )
 }
 
+private val LANDSCAPE_COMPACT_HEIGHT_BREAKPOINT = 480.dp
+private const val PHONE_LANDSCAPE_HEIGHT_CLASS_TOLERANCE = 1.05f
+
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 private fun Content(
@@ -93,11 +96,24 @@ private fun Content(
     onChapterUrlClick: (HttpUrl) -> Unit,
 ) {
     val activity = LocalContext.current.getActivity()
-    val windowSize = activity?.let { calculateWindowSizeClass(it) }
-    val heightSizeClass = if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-        WindowHeightSizeClass.Compact
+    val orientation = LocalConfiguration.current.orientation
+    val heightSizeClass = if (LocalInspectionMode.current) {
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) WindowHeightSizeClass.Compact else WindowHeightSizeClass.Medium
     } else {
-        windowSize?.heightSizeClass ?: return
+        val windowSize = activity?.let { calculateWindowSizeClass(it) } ?: return
+
+        // See for details: https://github.com/Automattic/pocket-casts-android/issues/3901
+        // As it turned out, there is a very narrow section of phones that are classified as WindowHeightSizeClass.Medium in landscape orientation.
+        // These conditions are meant to relax the rule of 480dp by adding a tolerance of +5% in order to treat them as phones in landscape mode.
+        if (
+            orientation == Configuration.ORIENTATION_LANDSCAPE
+            && windowSize.heightSizeClass != WindowHeightSizeClass.Compact
+            && LocalConfiguration.current.screenHeightDp.dp <= LANDSCAPE_COMPACT_HEIGHT_BREAKPOINT * PHONE_LANDSCAPE_HEIGHT_CLASS_TOLERANCE
+        ) {
+            WindowHeightSizeClass.Compact
+        } else {
+            windowSize.heightSizeClass
+        }
     }
     val isPhoneLandscape = heightSizeClass == WindowHeightSizeClass.Compact
 
