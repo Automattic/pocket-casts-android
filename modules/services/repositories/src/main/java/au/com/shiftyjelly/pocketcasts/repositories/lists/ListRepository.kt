@@ -10,7 +10,7 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 
 class ListRepository(
     private val listWebService: ListWebService,
-    private val syncManager: SyncManager,
+    private val syncManager: SyncManager?,
     private val platform: String,
 ) {
 
@@ -20,7 +20,7 @@ class ListRepository(
     }
 
     suspend fun getListFeed(url: String, authenticated: Boolean? = false): ListFeed {
-        return if (authenticated == true) {
+        return if (authenticated == true && syncManager != null) {
             syncManager.getCacheTokenOrLogin { token ->
                 listWebService.getListFeedAuthenticated(url, "Bearer ${token.value}")
             }
