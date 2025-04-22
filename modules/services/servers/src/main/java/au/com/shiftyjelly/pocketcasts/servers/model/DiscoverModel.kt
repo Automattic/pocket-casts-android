@@ -124,6 +124,7 @@ data class ListFeed(
     @field:Json(name = "podcasts") var podcasts: List<DiscoverPodcast>?,
     @field:Json(name = "episodes") var episodes: List<DiscoverEpisode>?,
     @field:Json(name = "collection_image") var collectionImageUrl: String?,
+    @field:Json(name = "feature_image") var featureImage: String?,
     @field:Json(name = "header_image") var headerImageUrl: String?,
     @field:Json(name = "colors") var tintColors: DiscoverFeedTintColors?,
     @field:Json(name = "collage_images") var collageImages: List<DiscoverFeedImage>?,

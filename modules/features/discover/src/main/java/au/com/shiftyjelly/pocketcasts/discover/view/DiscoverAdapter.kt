@@ -31,6 +31,7 @@ import au.com.shiftyjelly.pocketcasts.discover.databinding.RowCollectionListDepr
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowErrorBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowMostPopularPodcastsBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowPodcastLargeListBinding
+import au.com.shiftyjelly.pocketcasts.discover.databinding.RowPodcastLargeListWithPodcastBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowPodcastSmallListBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowRemainingPodcastsByCategoryBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowSingleEpisodeBinding
@@ -66,6 +67,7 @@ import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
 import au.com.shiftyjelly.pocketcasts.servers.model.SponsoredPodcast
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
+import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeDrawable
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.images.ThemedImageTintTransformation
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -145,6 +147,7 @@ internal class DiscoverAdapter(
     private var isFeaturePageTrackingEnabled = true
 
     private val imageRequestFactory = PocketCastsImageRequestFactory(context).smallSize().themed()
+    private val placeholderDrawable = context.getThemeDrawable(UR.attr.defaultArtworkSmall)
 
     init {
         setHasStableIds(true)
@@ -204,6 +207,21 @@ internal class DiscoverAdapter(
 
             recyclerView?.adapter = adapter
 
+            adapter.showLoadingList()
+        }
+    }
+
+    inner class LargeListWithPodcastViewHolder(val binding: RowPodcastLargeListWithPodcastBinding) : NetworkLoadableViewHolder(binding.root), ShowAllRow {
+        val adapter = LargeListRowAdapter(context, listener::onPodcastClicked, listener::onPodcastSubscribe, analyticsTracker)
+        override val showAllButton: TextView
+            get() = binding.btnShowAll
+
+        init {
+            val linearLayoutManager = LinearLayoutManager(itemView.context, RecyclerView.HORIZONTAL, false)
+            linearLayoutManager.initialPrefetchItemCount = 3
+            recyclerView?.layoutManager = linearLayoutManager
+            recyclerView?.itemAnimator = null
+            recyclerView?.adapter = adapter
             adapter.showLoadingList()
         }
     }
@@ -566,6 +584,7 @@ internal class DiscoverAdapter(
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             R.layout.row_podcast_large_list -> LargeListViewHolder(RowPodcastLargeListBinding.inflate(inflater, parent, false))
+            R.layout.row_podcast_large_list_with_podcast -> LargeListWithPodcastViewHolder(RowPodcastLargeListWithPodcastBinding.inflate(inflater, parent, false))
             R.layout.row_podcast_small_list -> SmallListViewHolder(RowPodcastSmallListBinding.inflate(inflater, parent, false))
             R.layout.row_carousel_list -> CarouselListViewHolder(RowCarouselListBinding.inflate(inflater, parent, false))
             R.layout.row_error -> ErrorViewHolder(RowErrorBinding.inflate(inflater, parent, false))
@@ -603,6 +622,7 @@ internal class DiscoverAdapter(
                     return when (row.displayStyle) {
                         is DisplayStyle.Carousel -> R.layout.row_carousel_list
                         is DisplayStyle.LargeList -> R.layout.row_podcast_large_list
+                        is DisplayStyle.LargeListWithPodcast -> R.layout.row_podcast_large_list_with_podcast
                         is DisplayStyle.SmallList -> R.layout.row_podcast_small_list
                         is DisplayStyle.SinglePodcast -> R.layout.row_single_podcast
                         is DisplayStyle.CollectionList ->
@@ -655,6 +675,24 @@ internal class DiscoverAdapter(
                         onNext = {
                             row.listUuid?.let { listUuid -> holder.adapter.setFromListId(listUuid) }
                             holder.adapter.submitList(it.podcasts) { onRestoreInstanceState(holder) }
+                        },
+                    )
+                    row.listUuid?.let { trackListImpression(it) }
+                }
+
+                is LargeListWithPodcastViewHolder -> {
+                    holder.binding.title.text = ""
+                    holder.binding.subtitle.text = ""
+                    holder.binding.podcastImage.setImageResource(placeholderDrawable)
+
+                    holder.loadFlowable(
+                        loadPodcastList(row.source, row.authenticated),
+                        onNext = { list ->
+                            row.listUuid?.let { listUuid -> holder.adapter.setFromListId(listUuid) }
+                            holder.adapter.submitList(list.podcasts) { onRestoreInstanceState(holder) }
+                            holder.binding.title.text = list.title?.tryToLocalise(resources)
+                            holder.binding.subtitle.text = list.subtitle?.tryToLocalise(resources) ?: ""
+                            imageRequestFactory.createForPodcast(list.featureImage).loadInto(holder.binding.podcastImage)
                         },
                     )
                     row.listUuid?.let { trackListImpression(it) }

@@ -8,6 +8,7 @@ sealed class DisplayStyle(val stringValue: String) {
         private const val CAROUSEL = "carousel"
         private const val SMALL_LIST = "small_list"
         private const val LARGE_LIST = "large_list"
+        private const val LARGE_LIST_WITH_PODCAST = "large_list_with_podcast"
         private const val NETWORK = "network"
         private const val CATEGORY = "category"
         private const val PILLS = "pills"
@@ -20,6 +21,7 @@ sealed class DisplayStyle(val stringValue: String) {
                 CAROUSEL -> Carousel()
                 SMALL_LIST -> SmallList()
                 LARGE_LIST -> LargeList()
+                LARGE_LIST_WITH_PODCAST -> LargeListWithPodcast()
                 NETWORK -> Network()
                 CATEGORY -> Category()
                 PILLS -> Pills()
@@ -34,6 +36,7 @@ sealed class DisplayStyle(val stringValue: String) {
     class Carousel : DisplayStyle(CAROUSEL)
     class SmallList : DisplayStyle(SMALL_LIST)
     class LargeList : DisplayStyle(LARGE_LIST)
+    class LargeListWithPodcast : DisplayStyle(LARGE_LIST_WITH_PODCAST)
     class Network : DisplayStyle(NETWORK)
     class Category : DisplayStyle(CATEGORY)
     class Pills : DisplayStyle(PILLS)
