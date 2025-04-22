@@ -357,7 +357,7 @@ class ProductDetailsMapperTest {
 
     @Test
     fun `do not map product with invalid billing duration`() {
-        val durations = listOf("1M", "D1M", "PM", "P-1M", "P1U", "P1MY")
+        val durations = listOf("1M", "D1M", "PM", "P-1M", "P1U", "P1MY", "P1")
         val googleProducts = durations.map { duration ->
             GoogleProductDetails(
                 productId = "Product ID",
@@ -380,6 +380,7 @@ class ProductDetailsMapperTest {
             "Invalid billing period interval count 'null' in {basePlanId=Base plan ID, productId=Product ID, rawDuration=P-1M}",
             "Unrecognized billing interval period designator 'U' in {basePlanId=Base plan ID, productId=Product ID, rawDuration=P1U}",
             "Unrecognized billing interval period designator 'MY' in {basePlanId=Base plan ID, productId=Product ID, rawDuration=P1MY}",
+            "Unrecognized billing interval period designator '' in {basePlanId=Base plan ID, productId=Product ID, rawDuration=P1}",
         )
     }
 }
