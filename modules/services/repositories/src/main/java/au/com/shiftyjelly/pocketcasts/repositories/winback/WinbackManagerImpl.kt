@@ -1,11 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.repositories.winback
 
 import android.app.Activity
+import au.com.shiftyjelly.pocketcasts.payment.billing.isOk
 import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager
 import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager.ReferralResult
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchaseEvent
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.isOk
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
 import javax.inject.Inject
