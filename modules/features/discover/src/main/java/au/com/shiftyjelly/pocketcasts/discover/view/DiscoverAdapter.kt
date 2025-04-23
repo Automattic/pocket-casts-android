@@ -680,6 +680,7 @@ internal class DiscoverAdapter(
                         },
                         onError = { error ->
                             Timber.e(error, "Could not load feed ${row.source}")
+                            // hide authenticated lists when any errors such as not being logged in, having an invalid token, or nothing being recommended
                             if (row.authenticated == true) {
                                 holder.hideRow()
                             }
@@ -709,7 +710,6 @@ internal class DiscoverAdapter(
                         },
                         onError = { error ->
                             Timber.e(error, "Could not load feed ${row.source}")
-                            // hide authenticated lists when any errors such as not being logged in, having an invalid token, or nothing being recommended
                             if (row.authenticated == true) {
                                 holder.hideRow()
                             }
