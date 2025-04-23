@@ -753,6 +753,7 @@ enum class AnalyticsEvent(val key: String) {
     WINBACK_AVAILABLE_PLANS_NEW_PLAN_PURCHASE_SUCCESSFUL("winback_available_plans_new_plan_purchase_successful"),
     WINBACK_CANCEL_CONFIRMATION_STAY_BUTTON_TAPPED("winback_cancel_confirmation_stay_button_tapped"),
     WINBACK_CANCEL_CONFIRMATION_CANCEL_BUTTON_TAPPED("winback_cancel_confirmation_cancel_button_tapped"),
+    WINBACK_WINBACK_OFFER_CANCEL_BUTTON_TAPPED("winback_winback_offer_cancel_button_tapped"),
 
     /* Suggested Folders */
     SUGGESTED_FOLDERS_PAGE_SHOWN("suggested_folders_page_shown"),

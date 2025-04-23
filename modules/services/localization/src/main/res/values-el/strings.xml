@@ -76,7 +76,6 @@ Language: el_GR
     <string name="winback_claiming_offer">Διεκδίκηση προσφοράς</string>
     <string name="winback_claimed_offer_message_3">50% λιγότερο για την επόμενη χρονιά σου!</string>
     <string name="winback_offer_free_offer_yearly_description">Πλήρωσε %1$s τώρα για άλλον ένα χρόνο με έκπτωση 50%%.</string>
-    <string name="winback_offer_free_offer_yearly_title">Πάρε 50% έκπτωση την επόμενη χρονιά σου</string>
     <string name="podcast_refresh_no_episodes_found">Δε βρέθηκαν επεισόδια.</string>
     <string name="podcast_refresh_new_episode_found">Βρέθηκε νέο επεισόδιο!</string>
     <string name="podcast_refreshing_episode_list">Ανανέωση λίστας επεισοδίων…</string>
@@ -111,8 +110,6 @@ Language: el_GR
     <string name="winback_offer_differnt_plan_description">Βρες το πλάνο που σου ταιριάζει.</string>
     <string name="winback_offer_differnt_plan_title">Ψάχνεις για ένα διαφορετικό πλάνο;</string>
     <string name="winback_offer_free_offer_button_label">Διεκδίκηση προσφοράς</string>
-    <string name="winback_offer_free_offer_description">Εξοικονόμησε %1$s στην αρχή του επόμενου κύκλου χρέωσης σου.</string>
-    <string name="winback_offer_free_offer_title">Πάρε τον επόμενο μήνα δωρεάν</string>
     <string name="winback_offer_header">Πριν ακυρώσεις, ρίξε μια ματιά σ\' αυτές τις προσφορές</string>
     <string name="settings_app_icon_pride">Περηφάνεια</string>
     <string name="manage_download_dismiss_content_description">Διαχείριση Απόρριψης Κεφαλίδας Λήψης</string>
