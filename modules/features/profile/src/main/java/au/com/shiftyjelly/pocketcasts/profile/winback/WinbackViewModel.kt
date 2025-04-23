@@ -450,6 +450,12 @@ class WinbackViewModel @Inject constructor(
         )
     }
 
+    internal fun trackContinueWithCancellationTapped() {
+        tracker.track(
+            event = AnalyticsEvent.WINBACK_CANCEL_CONFIRMATION_CANCEL_BUTTON_TAPPED,
+        )
+    }
+
     internal data class UiState(
         val currentSubscriptionExpirationDate: Date?,
         val productsDetails: List<ProductDetails>,

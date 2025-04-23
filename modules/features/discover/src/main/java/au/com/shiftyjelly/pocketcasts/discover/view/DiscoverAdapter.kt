@@ -718,6 +718,24 @@ internal class DiscoverAdapter(
                     row.listUuid?.let { trackListImpression(it) }
                 }
 
+                is LargeListWithPodcastViewHolder -> {
+                    holder.binding.title.text = ""
+                    holder.binding.subtitle.text = ""
+                    holder.binding.podcastImage.setImageResource(placeholderDrawable)
+
+                    holder.loadFlowable(
+                        loadPodcastList(row.source, row.authenticated),
+                        onNext = { list ->
+                            row.listUuid?.let { listUuid -> holder.adapter.setFromListId(listUuid) }
+                            holder.adapter.submitList(list.podcasts) { onRestoreInstanceState(holder) }
+                            holder.binding.title.text = list.title?.tryToLocalise(resources)
+                            holder.binding.subtitle.text = list.subtitle?.tryToLocalise(resources) ?: ""
+                            imageRequestFactory.createForPodcast(list.featureImage).loadInto(holder.binding.podcastImage)
+                        },
+                    )
+                    row.listUuid?.let { trackListImpression(it) }
+                }
+
                 is CarouselListViewHolder -> {
                     val featuredLimit = 5
 

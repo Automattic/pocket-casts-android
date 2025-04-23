@@ -87,7 +87,10 @@ internal fun OfferClaimedPage(
             modifier = Modifier.height(16.dp),
         )
         TextP30(
-            text = stringResource(LR.string.winback_claimed_offer_message_2),
+            text = when (billingPeriod) {
+                BillingPeriod.Monthly -> stringResource(LR.string.winback_claimed_offer_message_2)
+                BillingPeriod.Yearly -> stringResource(LR.string.winback_claimed_offer_message_4)
+            },
             color = MaterialTheme.theme.colors.primaryText02,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(horizontal = 24.dp),

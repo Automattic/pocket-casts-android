@@ -2295,11 +2295,10 @@
     <!-- Winback -->
 
     <string name="winback_offer_header">Thinking of leaving?\nLet us help first</string>
-    <string name="winback_offer_free_offer_title">Get your next month free</string>
-    <string name="winback_offer_free_offer_yearly_title">Get 50% off your next year</string>
-    <!-- %1$s is the amount of money saved -->
-    <string name="winback_offer_free_offer_description">Save %1$s at the start of your next billing cycle.</string>
-    <string name="winback_offer_free_offer_yearly_description">Pay %1$s now for another year at 50%% off.</string>
+    <string name="winback_offer_free_offer_title">Get your next month free and save %1$s</string>
+    <string name="winback_offer_free_offer_yearly_title">Get 50%% off your next year and save %1$s</string>
+    <string name="winback_offer_free_offer_description">Enjoy one month of Pocket Casts Plus on us! The offer will be added to your current subscription.</string>
+    <string name="winback_offer_free_offer_yearly_description">Pay %1$s now to lock in a year of Pocket Casts Plus at half price. Your discounted year begins after your current plan ends.</string>
     <string name="winback_offer_free_offer_button_label">Claim offer</string>
     <string name="winback_offer_differnt_plan_title">Looking for a different plan?</string>
     <string name="winback_offer_differnt_plan_description">Find the plan that\'s right for you.</string>
@@ -2307,8 +2306,9 @@
     <string name="winback_offer_help_description">Struggling with any features or having issues.</string>
     <string name="winback_offer_cancel_continue_button_label">Continue to Cancellation</string>
     <string name="winback_claimed_offer_message_1">Enjoy your free month!</string>
-    <string name="winback_claimed_offer_message_2">Thanks for choosing Pocket&#160;Casts. Billing starts after your free month ends.</string>
+    <string name="winback_claimed_offer_message_2">Thanks for choosing Pocket&#160;Casts. Your free month will be added to your current subscription.</string>
     <string name="winback_claimed_offer_message_3">50% off your next year!</string>
+    <string name="winback_claimed_offer_message_4">Thanks for choosing Pocket&#160;Casts. Your discounted year begins after your current billing period.</string>
     <string name="winback_available_plans_title">Available Plans</string>
     <string name="winback_available_plans_billing_note">Your new plan will activate at the end of your current billing period.</string>
     <string name="winback_too_many_subscritpions_title">Multiple subscriptions found</string>
@@ -2326,6 +2326,9 @@
     <string name="winback_cancel_subscription_perk_files">All files uploaded to your Pocket Casts account will be deleted (but downloaded files on your mobile devices will remain).</string>
     <string name="winback_cancel_subscription_stay_button_label">Actually, I want to stay</string>
     <string name="winback_cancel_subscription_cancel_button_label">Yes, Cancel my Subscription</string>
+    <string name="winback_cancel_subscription_accept_offer_button_label">Accept offer</string>
+    <string name="winback_cancel_subscription_continue_cancel_button_label">Continue with cancellation</string>
+
 
     <!-- Suggested Folders -->
     <string name="suggested_folders_title">Smart folders</string>

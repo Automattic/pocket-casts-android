@@ -107,7 +107,7 @@ class WinbackFragment : BaseDialogFragment() {
                     NavHost(
                         navController = navController,
                         startDestination = if (params.hasGoogleSubscription) {
-                            WinbackNavRoutes.WinbackOffer
+                            WinbackNavRoutes.Main
                         } else {
                             WinbackNavRoutes.CancelConfirmation
                         },
@@ -117,12 +117,8 @@ class WinbackFragment : BaseDialogFragment() {
                         popExitTransition = { slideOutToEnd() },
                         modifier = Modifier.fillMaxSize(),
                     ) {
-                        composable(WinbackNavRoutes.WinbackOffer) {
-                            WinbackOfferPage(
-                                offer = state.winbackOfferState?.offer,
-                                onClaimOffer = { offer ->
-                                    viewModel.claimOffer(offer, requireActivity())
-                                },
+                        composable(WinbackNavRoutes.Main) {
+                            CancelOfferPage(
                                 onSeeAvailablePlans = {
                                     viewModel.trackAvailablePlansTapped()
                                     navController.navigate(WinbackNavRoutes.AvailablePlans)
@@ -207,9 +203,35 @@ class WinbackFragment : BaseDialogFragment() {
                                 },
                                 onCancelSubscription = {
                                     viewModel.trackCancelSubscriptionTapped()
-                                    handleSubscriptionCancellation(state.purchasedProductIds)
+                                    val offer = state.winbackOfferState?.offer
+                                    if (offer == null) {
+                                        handleSubscriptionCancellation(state.purchasedProductIds)
+                                    } else {
+                                        navController.navigate(WinbackNavRoutes.WinbackOffer)
+                                    }
                                 },
                             )
+                        }
+                        composable(WinbackNavRoutes.WinbackOffer) {
+                            val offer = state.winbackOfferState?.offer
+                            if (offer != null) {
+                                WinbackOfferPage(
+                                    offer = offer,
+                                    onAcceptOffer = {
+                                        viewModel.claimOffer(offer, requireActivity())
+                                    },
+                                    onCancelSubscription = {
+                                        viewModel.trackContinueWithCancellationTapped()
+                                        handleSubscriptionCancellation(state.purchasedProductIds)
+                                    },
+                                )
+                            } else {
+                                WinbackOfferErrorPage(
+                                    onDismiss = {
+                                        dismiss()
+                                    },
+                                )
+                            }
                         }
                     }
 
@@ -226,7 +248,7 @@ class WinbackFragment : BaseDialogFragment() {
                             viewModel.consumeClaimedOffer()
                             val billingPeriod = offerState.offer.details.billingPeriod
                             navController.navigate(WinbackNavRoutes.offerClaimedDestination(billingPeriod)) {
-                                popUpTo(WinbackNavRoutes.WinbackOffer) {
+                                popUpTo(WinbackNavRoutes.Main) {
                                     inclusive = true
                                 }
                             }
@@ -341,12 +363,13 @@ data class WinbackInitParams(
 }
 
 private object WinbackNavRoutes {
-    const val WinbackOffer = "main"
+    const val Main = "main"
     const val AvailablePlans = "available_plans"
     const val HelpAndFeedback = "help_and_feedback"
     const val SupportLogs = "logs"
     const val StatusCheck = "connection_status"
     const val CancelConfirmation = "cancel_confirmation"
+    const val WinbackOffer = "winback_offer"
     private const val OfferClaimed = "offer_claimed"
 
     const val OfferClaimedBillingPeriodArgument = "billingPeriod"

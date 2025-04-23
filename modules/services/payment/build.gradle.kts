@@ -14,4 +14,7 @@ android {
 dependencies {
     api(libs.billing.ktx)
     api(libs.coroutines.core)
+
+    testImplementation(libs.junit)
+    testImplementation(libs.robolectric)
 }
