@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.views.extensions
 import android.util.DisplayMetrics
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
 
@@ -49,12 +50,12 @@ fun RecyclerView.quickScrollToTop() {
 }
 
 fun RecyclerView.ViewHolder.hideRow() {
-    itemView.visibility = View.GONE
+    itemView.isVisible = false
     itemView.layoutParams.height = 0
 }
 
 fun RecyclerView.ViewHolder.showRow() {
-    itemView.visibility = View.VISIBLE
+    itemView.isVisible = true
     itemView.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
 }
 

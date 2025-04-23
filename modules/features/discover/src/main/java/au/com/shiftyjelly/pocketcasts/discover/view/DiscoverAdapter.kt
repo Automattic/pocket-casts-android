@@ -704,7 +704,7 @@ internal class DiscoverAdapter(
                                 row.listUuid?.let { listUuid -> holder.adapter.setFromListId(listUuid) }
                                 holder.adapter.submitList(list.podcasts) { onRestoreInstanceState(holder) }
                                 holder.binding.title.text = list.title?.tryToLocalise(resources)
-                                holder.binding.subtitle.text = list.subtitle?.tryToLocalise(resources) ?: ""
+                                holder.binding.subtitle.text = list.subtitle?.tryToLocalise(resources).orEmpty()
                                 imageRequestFactory.createForPodcast(list.featureImage).loadInto(holder.binding.podcastImage)
                             }
                         },
