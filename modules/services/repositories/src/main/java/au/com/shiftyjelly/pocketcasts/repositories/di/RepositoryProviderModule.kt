@@ -6,8 +6,12 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import au.com.shiftyjelly.pocketcasts.crashlogging.di.ProvideApplicationScope
 import au.com.shiftyjelly.pocketcasts.payment.Logger
 import au.com.shiftyjelly.pocketcasts.payment.billing.BillingClientWrapper
+import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncAccountManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import au.com.shiftyjelly.pocketcasts.servers.server.ListWebService
 import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.Module
 import dagger.Provides
@@ -66,4 +70,15 @@ class RepositoryProviderModule {
             }
         },
     )
+
+    @Provides
+    @Singleton
+    internal fun provideDiscoverRepository(listWebService: ListWebService, syncManager: SyncManager, @ApplicationContext context: Context): ListRepository {
+        val platform = if (Util.isAutomotive(context)) "automotive" else "android"
+        return ListRepository(
+            listWebService,
+            syncManager,
+            platform,
+        )
+    }
 }

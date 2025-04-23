@@ -1,8 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.discover.worker
 
 import au.com.shiftyjelly.pocketcasts.models.entity.CuratedPodcast
+import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.servers.di.ServersModule
-import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
 import au.com.shiftyjelly.pocketcasts.servers.server.ListWebService
 import kotlinx.coroutines.test.runTest
 import okhttp3.mockwebserver.MockResponse
@@ -31,7 +31,7 @@ class CuratedPodcastsCrawlerTest {
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
             .create<ListWebService>()
-        val listRepository = ListRepository(listWebService = service, platform = "android")
+        val listRepository = ListRepository(listWebService = service, syncManager = null, platform = "android")
         crawler = CuratedPodcastsCrawler(listRepository, staticHostUrl = server.url("/static").toString())
     }
 

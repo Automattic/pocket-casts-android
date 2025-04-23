@@ -574,7 +574,7 @@ class SyncManagerImpl @Inject constructor(
             AccountConstants.SignInType.Tokens -> syncServiceManager.loginToken(refreshToken = refreshToken)
         }
 
-    private suspend fun <T> getCacheTokenOrLogin(serverCall: suspend (token: AccessToken) -> T): T {
+    override suspend fun <T> getCacheTokenOrLogin(serverCall: suspend (token: AccessToken) -> T): T {
         if (isLoggedIn()) {
             return try {
                 val token = syncAccountManager.getAccessToken() ?: refreshTokenSuspend()
