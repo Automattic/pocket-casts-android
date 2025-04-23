@@ -1,6 +1,11 @@
 7.88
 -----
-
+*   New Features
+    *   Add account encouragement flow
+        ([#3909](https://github.com/Automattic/pocket-casts-android/pull/3909))
+*   Bug Fixes
+    *   Fix issue with disappearing file image after upload completes
+        ([#3910](https://github.com/Automattic/pocket-casts-android/pull/3910))
 
 7.87
 -----

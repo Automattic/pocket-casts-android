@@ -34,6 +34,7 @@ dependencies {
     api(projects.modules.services.crashlogging)
     api(projects.modules.services.localization)
     api(projects.modules.services.model)
+    api(projects.modules.services.payment)
     api(projects.modules.services.preferences)
     api(projects.modules.services.protobuf)
     api(projects.modules.services.servers)

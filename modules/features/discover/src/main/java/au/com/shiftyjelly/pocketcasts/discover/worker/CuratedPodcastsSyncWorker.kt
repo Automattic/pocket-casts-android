@@ -24,7 +24,7 @@ class CuratedPodcastsSyncWorker @AssistedInject constructor(
 
     override suspend fun doWork(): WorkerResult {
         Timber.tag(TAG).d("Starting crawling curated podcasts")
-        return crawler.crawl("android")
+        return crawler.crawl()
             .map { manager.replaceCuratedPodcasts(it) }
             .onSuccess { Timber.tag(TAG).d("Curated podcasts crawling finished") }
             .onFailure { Timber.tag(TAG).d(it, "Failed to crawl curated podcasts") }
@@ -38,7 +38,7 @@ class CuratedPodcastsSyncWorker @AssistedInject constructor(
         private const val TAG = "CuratedCrawler"
         private const val PERIODIC_WORK_NAME = "CuratedPodcastsSyncOneOffPeriodic"
 
-        fun enqueuPeriodicWork(context: Context) {
+        fun enqueuePeriodicWork(context: Context) {
             val tag = PERIODIC_WORK_NAME
             val request = PeriodicWorkRequestBuilder<CuratedPodcastsSyncWorker>(1, TimeUnit.DAYS)
                 .addTag(tag)

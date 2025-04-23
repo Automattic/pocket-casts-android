@@ -44,6 +44,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.rx2.rxSingle
 import timber.log.Timber
 
 @HiltViewModel
@@ -86,7 +87,9 @@ class DiscoverViewModel @Inject constructor(
     }
 
     fun loadFeed(resources: Resources) {
-        loadDiscoverFeed(resources)
+        loadDiscoverFeedRxSingle(resources)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = { discoverFeed ->
                     _state.update {
@@ -101,29 +104,28 @@ class DiscoverViewModel @Inject constructor(
             .addTo(disposables)
     }
 
-    private fun loadDiscoverFeed(resources: Resources): Single<DiscoverFeed> {
-        return repository.getDiscoverFeed().map { discover ->
-            val defaultRegion = discover.defaultRegionCode
-            val region = discover.regions[currentRegionCode ?: defaultRegion] ?: discover.regions[defaultRegion]
-            if (region == null) {
-                error("Could not get region $currentRegionCode")
-            }
-
-            if (currentRegionCode == null) {
-                currentRegionCode = defaultRegion
-            }
-            replacements = mapOf(
-                discover.regionCodeToken to region.code,
-                discover.regionNameToken to region.name,
-            )
-
-            // Update the list with the correct region substituted in where needed
-            val updatedList = discover.layout.transformWithRegion(region, replacements, resources)
-
-            // Save ads to display in category view
-            adsForCategoryView = updatedList.filter { discoverRow -> discoverRow.categoryId != null }
-            DiscoverFeed(updatedList, region, discover.regions.values.toList())
+    private fun loadDiscoverFeedRxSingle(resources: Resources): Single<DiscoverFeed> = rxSingle {
+        val discover = repository.getDiscoverFeed()
+        val defaultRegion = discover.defaultRegionCode
+        val region = discover.regions[currentRegionCode ?: defaultRegion] ?: discover.regions[defaultRegion]
+        if (region == null) {
+            error("Could not get region $currentRegionCode")
         }
+
+        if (currentRegionCode == null) {
+            currentRegionCode = defaultRegion
+        }
+        replacements = mapOf(
+            discover.regionCodeToken to region.code,
+            discover.regionNameToken to region.name,
+        )
+
+        // Update the list with the correct region substituted in where needed
+        val updatedList = discover.layout.transformWithRegion(region, replacements, resources)
+
+        // Save ads to display in category view
+        adsForCategoryView = updatedList.filter { discoverRow -> discoverRow.categoryId != null }
+        DiscoverFeed(updatedList, region, discover.regions.values.toList())
     }
 
     fun changeRegion(region: DiscoverRegion, resources: Resources) {
@@ -133,7 +135,9 @@ class DiscoverViewModel @Inject constructor(
     }
 
     fun loadPodcastList(source: String): Flowable<PodcastList> {
-        return repository.getListFeed(source)
+        return rxSingle { repository.getListFeed(source) }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
             .map {
                 PodcastList(
                     podcasts = it.podcasts ?: emptyList(),
@@ -158,12 +162,14 @@ class DiscoverViewModel @Inject constructor(
 
         val initialDiscoverFeed = state.value.discoverFeed
         val feedInitialization = if (initialDiscoverFeed == null) {
-            loadDiscoverFeed(resources)
+            loadDiscoverFeedRxSingle(resources)
         } else {
             Single.just(initialDiscoverFeed)
         }
 
         feedInitialization
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
             .flatMap { discoverFeed ->
                 val categoryUrl = transformNetworkLoadableList(category, resources).source
                 loadPodcastList(categoryUrl)

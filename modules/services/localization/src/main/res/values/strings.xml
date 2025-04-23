@@ -196,6 +196,10 @@
     <string name="move_down">Move down</string>
     <string name="see_more">See more</string>
     <string name="maybe_later">Maybe later</string>
+    <!-- %1$.2f is price with 2 decimal points precision, %1$s is the currency -->
+    <string name="price_per_week">%1$.2f %2$s/week</string>
+    <!-- %1$.2f is price with 2 decimal points precision, \u0024 is a dollar sign -->
+    <string name="price_per_week_usd">\u0024%1$.2f/week</string>
 
     <string name="multiselect_actions_shown">Shortcut in toolbar</string>
     <string name="multiselect_actions_hidden">In overflow</string>
@@ -2288,7 +2292,7 @@
 
     <!-- Winback -->
 
-    <string name="winback_offer_header">Before you cancel, check&#160;out these offers</string>
+    <string name="winback_offer_header">Thinking of leaving?\nLet us help first</string>
     <string name="winback_offer_free_offer_title">Get your next month free and save %1$s</string>
     <string name="winback_offer_free_offer_yearly_title">Get 50%% off your next year and save %1$s</string>
     <string name="winback_offer_free_offer_description">Enjoy one month of Pocket Casts Plus on us! The offer will be added to your current subscription.</string>
@@ -2311,7 +2315,7 @@
     <string name="winback_error_fetch_description">Sorry, but something went wrong fetching your plans.</string>
     <string name="winback_changing_plan">Changing plan</string>
     <string name="winback_claiming_offer">Claiming offer</string>
-    <string name="winback_cancel_subscription_header_title">Cancel Subscription</string>
+    <string name="winback_cancel_subscription_header_title">Things you should know before you cancel</string>
     <string name="winback_cancel_subscription_header_description">This will change your plan to a free account.</string>
     <string name="winback_cancel_subscription_perk_active_with_date">Your current subscription will remain active until %1$s.</string>
     <string name="winback_cancel_subscription_perk_active_without_date">Your current subscription will remain active until its expiration date.</string>

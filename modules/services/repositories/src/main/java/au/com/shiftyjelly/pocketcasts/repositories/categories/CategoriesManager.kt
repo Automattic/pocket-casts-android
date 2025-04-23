@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx2.await
 import timber.log.Timber
 
 @Singleton
@@ -66,7 +65,7 @@ class CategoriesManager @Inject constructor(
         if (discoverCategories.value.isEmpty() || areCategoriesStale()) {
             scope.launch {
                 try {
-                    discoverCategories.value = listRepository.getCategoriesList(url).await()
+                    discoverCategories.value = listRepository.getCategoriesList(url)
                     lastUpdate = TimeSource.Monotonic.markNow()
                 } catch (e: Throwable) {
                     Timber.e(e, "Failed to fetch categories under $url")

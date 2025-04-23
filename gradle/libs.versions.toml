@@ -16,7 +16,7 @@
 #    horologist = Horologist Version
 
 [versions]
-aboutlibraries = "11.6.3"
+aboutlibraries = "12.0.0"
 android-gradle-plugin = "8.9.1"
 billing = "7.0.0"
 coil = "2.7.0"
@@ -304,5 +304,5 @@ measure-builds = { id = "com.automattic.android.measure-builds", version.ref = "
 protobuf = { id = "com.google.protobuf", version.ref = "protobuf-plugin" }
 room = { id = "androidx.room", version.ref = "room" }
 sentry = { id = "io.sentry.android.gradle", version.ref = "sentry-plugin" }
-spotless = "com.diffplug.spotless:7.0.2"
+spotless = "com.diffplug.spotless:7.0.3"
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
