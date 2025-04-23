@@ -61,7 +61,7 @@ interface PodcastManager {
     fun subscribeToPodcast(podcastUuid: String, sync: Boolean, shouldAutoDownload: Boolean = true)
 
     fun subscribeToPodcastRxSingle(podcastUuid: String, sync: Boolean = false, shouldAutoDownload: Boolean = true): Single<Podcast>
-    fun findOrDownloadPodcastRxSingle(podcastUuid: String): Single<Podcast>
+    fun findOrDownloadPodcastRxSingle(podcastUuid: String, waitForSubscribe: Boolean = false): Single<Podcast>
     fun isSubscribingToPodcasts(): Boolean
     fun getSubscribedPodcastUuidsRxSingle(): Single<List<String>>
     fun isSubscribingToPodcast(podcastUuid: String): Boolean

@@ -134,8 +134,14 @@ class PodcastManagerImpl @Inject constructor(
     /**
      * If the podcast isn't already in the database add it as unsubscribed.
      */
-    override fun findOrDownloadPodcastRxSingle(podcastUuid: String): Single<Podcast> {
-        return rxMaybe { findPodcastOrWaitForSubscribe(podcastUuid) }
+    override fun findOrDownloadPodcastRxSingle(podcastUuid: String, waitForSubscribe: Boolean): Single<Podcast> {
+        return rxMaybe {
+            if (waitForSubscribe) {
+                findPodcastOrWaitForSubscribe(podcastUuid)
+            } else {
+                findPodcastByUuid(podcastUuid)
+            }
+        }
             .switchIfEmpty(subscribeManager.addPodcastRxSingle(podcastUuid, sync = false, subscribed = false, shouldAutoDownload = false).toMaybe())
             .toSingle()
     }
