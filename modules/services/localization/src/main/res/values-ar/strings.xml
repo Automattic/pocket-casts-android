@@ -119,7 +119,6 @@ Language: ar
     <string name="winback_offer_differnt_plan_description">ابحث عن الخطة المناسبة لك.</string>
     <string name="winback_offer_differnt_plan_title">هل تبحث عن خطة مختلفة؟</string>
     <string name="winback_offer_free_offer_button_label">المطالبة بعرض</string>
-    <string name="winback_offer_free_offer_description">وفِّر ⁦%1$s⁩ في بداية دورة الفوترة التالية الخاصة بك.</string>
     <string name="winback_offer_header">قبل الإلغاء، تحقق من هذه العروض</string>
     <string name="settings_app_icon_pride">كبرياء</string>
     <string name="manage_download_dismiss_content_description">إدارة تجاهل شعار التنزيل</string>

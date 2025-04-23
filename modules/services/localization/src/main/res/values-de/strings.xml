@@ -119,7 +119,6 @@ Language: de
     <string name="winback_offer_differnt_plan_description">Finde deinen passenden Tarif.</string>
     <string name="winback_offer_differnt_plan_title">Du suchst nach einem anderen Tarif?</string>
     <string name="winback_offer_free_offer_button_label">Angebot nutzen</string>
-    <string name="winback_offer_free_offer_description">Spare %1$s zu Beginn deines nächsten Abrechnungszyklus.</string>
     <string name="winback_offer_header">Schau dir diese Angebote an, bevor du kündigst</string>
     <string name="settings_app_icon_pride">Pride</string>
     <string name="manage_download_dismiss_content_description">Banner zum Verwalten von Downloads schließen</string>

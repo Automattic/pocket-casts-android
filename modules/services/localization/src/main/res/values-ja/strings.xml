@@ -119,7 +119,6 @@ Language: ja_JP
     <string name="winback_offer_differnt_plan_description">自分にぴったりのプランを見つけましょう。</string>
     <string name="winback_offer_differnt_plan_title">別のプランをお探しですか ?</string>
     <string name="winback_offer_free_offer_button_label">オファーを獲得</string>
-    <string name="winback_offer_free_offer_description">次の請求期間の開始時に%1$sを節約します。</string>
     <string name="winback_offer_header">キャンセルする前に、これらのオファーを確認しましょう</string>
     <string name="settings_app_icon_pride">プライド</string>
     <string name="manage_download_dismiss_content_description">「ダウンロードを管理」バナーを非表示</string>

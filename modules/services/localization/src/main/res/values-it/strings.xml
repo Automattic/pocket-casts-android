@@ -119,7 +119,6 @@ Language: it
     <string name="winback_offer_differnt_plan_description">Trova il piano adatto alle tue esigenze.</string>
     <string name="winback_offer_differnt_plan_title">Stai cercando un piano differente?</string>
     <string name="winback_offer_free_offer_button_label">Riscatta l\'offerta</string>
-    <string name="winback_offer_free_offer_description">Risparmia %1$s all\'inizio del prossimo ciclo di fatturazione.</string>
     <string name="winback_offer_header">Prima di annullare, controlla queste offerte</string>
     <string name="settings_app_icon_pride">Pride</string>
     <string name="manage_download_dismiss_content_description">Gestione Download Banner Ignora</string>

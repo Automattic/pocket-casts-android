@@ -119,7 +119,6 @@ Language: sv_SE
     <string name="winback_offer_differnt_plan_description">Hitta rätt paket för dig.</string>
     <string name="winback_offer_differnt_plan_title">Letar du efter ett annat paket?</string>
     <string name="winback_offer_free_offer_button_label">Utnyttja erbjudande</string>
-    <string name="winback_offer_free_offer_description">Spara %1$s i början av nästa faktureringscykel.</string>
     <string name="winback_offer_header">Innan du avslutar, kolla in dessa erbjudanden</string>
     <string name="settings_app_icon_pride">Pride</string>
     <string name="manage_download_dismiss_content_description">Hantera nedladdning, banner, avfärda</string>
