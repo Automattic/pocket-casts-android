@@ -1772,6 +1772,8 @@
     <string name="discover_select_categories">Select a category</string>
     <string name="discover_show_all_categories">Show all categories</string>
     <string name="discover_dismiss_selected_category">Dismiss selected category</string>
+    <string name="recommendations_if_you_like">If you like</string>
+    <string name="recommendations_loved_by_listeners">Loved by listeners of</string>
 
     <!-- Server errors -->
 

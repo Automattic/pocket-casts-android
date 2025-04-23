@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingEnd="8dp">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:elevation="2dp"
+            app:cardCornerRadius="4dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginVertical="4dp">
+
+            <ImageView
+                android:id="@+id/podcastImage"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:importantForAccessibility="no"
+                tools:background="#ccc" />
+
+        </androidx.cardview.widget.CardView>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:paddingVertical="4dp"
+            android:importantForAccessibility="yes">
+
+            <TextView
+                android:id="@+id/subtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="Loved by listeners of"
+                style="@style/H40"
+                android:includeFontPadding="false"
+                android:textColor="?attr/primary_text_02"/>
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="The Daily"
+                style="@style/H20"
+                android:includeFontPadding="false"
+                android:textColor="?attr/primary_text_01"/>
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnShowAll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/discover_show_all"
+            android:textAppearance="@style/C50"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:textColor="?attr/primary_interactive_01" />
+
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rowRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="8dp"
+        android:paddingRight="16dp"
+        android:clipToPadding="false"/>
+
+    <View style="@style/row_divider" />
+</LinearLayout>
