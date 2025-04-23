@@ -106,9 +106,9 @@ private fun Content(
         // As it turned out, there is a very narrow section of phones that are classified as WindowHeightSizeClass.Medium in landscape orientation.
         // These conditions are meant to relax the rule of 480dp by adding a tolerance of +5% in order to treat them as phones in landscape mode.
         if (
-            orientation == Configuration.ORIENTATION_LANDSCAPE
-            && windowSize.heightSizeClass != WindowHeightSizeClass.Compact
-            && LocalConfiguration.current.screenHeightDp.dp <= LANDSCAPE_COMPACT_HEIGHT_BREAKPOINT * PHONE_LANDSCAPE_HEIGHT_CLASS_TOLERANCE
+            orientation == Configuration.ORIENTATION_LANDSCAPE &&
+            windowSize.heightSizeClass != WindowHeightSizeClass.Compact &&
+            LocalConfiguration.current.screenHeightDp.dp <= LANDSCAPE_COMPACT_HEIGHT_BREAKPOINT * PHONE_LANDSCAPE_HEIGHT_CLASS_TOLERANCE
         ) {
             WindowHeightSizeClass.Compact
         } else {
