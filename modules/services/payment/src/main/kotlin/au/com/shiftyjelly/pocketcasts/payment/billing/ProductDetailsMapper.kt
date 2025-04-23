@@ -159,7 +159,7 @@ internal class ProductDetailsMapper(
         val rawCount = valuePart.takeWhile(Char::isDigit)
         val count = rawCount.toIntOrNull()
         if (count == null) {
-            logWarning("Invalid billing period interval count '$count'", context)
+            logWarning("Invalid billing period interval count '$rawCount'", context)
             return null
         }
 

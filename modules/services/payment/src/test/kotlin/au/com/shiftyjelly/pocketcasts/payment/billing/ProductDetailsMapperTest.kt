@@ -376,8 +376,8 @@ class ProductDetailsMapperTest {
         logger.assertWarnings(
             "Missing billing period duration designator in {basePlanId=Base plan ID, productId=Product ID, rawDuration=1M}",
             "Missing billing period duration designator in {basePlanId=Base plan ID, productId=Product ID, rawDuration=D1M}",
-            "Invalid billing period interval count 'null' in {basePlanId=Base plan ID, productId=Product ID, rawDuration=PM}",
-            "Invalid billing period interval count 'null' in {basePlanId=Base plan ID, productId=Product ID, rawDuration=P-1M}",
+            "Invalid billing period interval count '' in {basePlanId=Base plan ID, productId=Product ID, rawDuration=PM}",
+            "Invalid billing period interval count '' in {basePlanId=Base plan ID, productId=Product ID, rawDuration=P-1M}",
             "Unrecognized billing interval period designator 'U' in {basePlanId=Base plan ID, productId=Product ID, rawDuration=P1U}",
             "Unrecognized billing interval period designator 'MY' in {basePlanId=Base plan ID, productId=Product ID, rawDuration=P1MY}",
             "Unrecognized billing interval period designator '' in {basePlanId=Base plan ID, productId=Product ID, rawDuration=P1}",
