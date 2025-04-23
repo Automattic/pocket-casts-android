@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverEpisode
@@ -35,6 +36,7 @@ import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.combineLatest
 import io.reactivex.rxkotlin.subscribeBy
@@ -58,6 +60,7 @@ class DiscoverViewModel @Inject constructor(
     val categoriesManager: CategoriesManager,
     val analyticsTracker: AnalyticsTracker,
     val crashLogging: CrashLogging,
+    val syncManager: SyncManager,
 ) : ViewModel() {
     private val disposables = CompositeDisposable()
     private val sourceView = SourceView.DISCOVER
@@ -87,11 +90,22 @@ class DiscoverViewModel @Inject constructor(
     }
 
     fun loadFeed(resources: Resources) {
-        loadDiscoverFeedRxSingle(resources)
+        val loggedInObservable = syncManager.isLoggedInObservable
+        Observables.combineLatest(loadDiscoverFeedRxSingle(resources).toObservable(), loggedInObservable)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
+            .map { (discoverFeed: DiscoverFeed, isLoggedIn: Boolean) ->
+                // remove authenticated lists if the user's not logged in
+                if (!isLoggedIn) {
+                    discoverFeed.copy(
+                        data = discoverFeed.data.filterNot { it.authenticated ?: false },
+                    )
+                } else {
+                    discoverFeed
+                }
+            }
             .subscribeBy(
-                onSuccess = { discoverFeed ->
+                onNext = { discoverFeed ->
                     _state.update {
                         it.copy(discoverFeed = discoverFeed, categoryFeed = null, isLoading = false, isError = false)
                     }

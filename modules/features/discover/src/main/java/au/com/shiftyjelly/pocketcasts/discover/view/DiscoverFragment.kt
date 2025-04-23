@@ -224,7 +224,9 @@ class DiscoverFragment :
                     binding.recyclerView.isVisible = true
 
                     if (state.rows != null) {
-                        adapter?.submitList(state.rows)
+                        adapter?.submitList(state.rows) {
+                            adapter?.notifyDataSetChanged()
+                        }
 
                         val newCategoryId = state.categoryFeed?.category?.id
                         if (displayedCategoryId != newCategoryId) {
