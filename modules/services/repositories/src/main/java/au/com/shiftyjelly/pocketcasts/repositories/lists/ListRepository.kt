@@ -21,8 +21,8 @@ class ListRepository(
 
     suspend fun getListFeed(url: String, authenticated: Boolean? = false): ListFeed {
         return if (authenticated == true) {
-            syncManager ?: throw IllegalStateException("Sync Manager is null")
-            syncManager.getCacheTokenOrLogin { token ->
+            val syncManagerNotNull = syncManager ?: throw IllegalStateException("Sync Manager is null")
+            syncManagerNotNull.getCacheTokenOrLogin { token ->
                 listWebService.getListFeedAuthenticated(url, "Bearer ${token.value}")
             }
         } else {

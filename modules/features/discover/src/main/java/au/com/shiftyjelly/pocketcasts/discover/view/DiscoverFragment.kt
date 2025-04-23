@@ -225,6 +225,7 @@ class DiscoverFragment :
 
                     if (state.rows != null) {
                         adapter?.submitList(state.rows) {
+                            // Notify the adapter that the data has changed. Without this, after signing in, the new authenticated lists still show the previous (unauthenticated) list.
                             adapter?.notifyDataSetChanged()
                         }
 
