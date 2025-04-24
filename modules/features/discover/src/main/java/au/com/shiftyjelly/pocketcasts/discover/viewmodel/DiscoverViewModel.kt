@@ -151,6 +151,7 @@ class DiscoverViewModel @Inject constructor(
 
     fun loadPodcastList(source: String, authenticated: Boolean?): Flowable<PodcastList> {
         return rxMaybe { repository.getListFeed(source, authenticated) }
+            .toSingle()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .map {
