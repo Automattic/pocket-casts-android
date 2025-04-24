@@ -24,9 +24,7 @@ class ListRepository(
         return runCatching {
             if (authenticated == true) {
                 checkNotNull(syncManager) { "Sync Manager is null" }
-                if (!syncManager.isLoggedIn()) {
-                    return null
-                }
+                check(syncManager.isLoggedIn()) { "User is not logged in" }
                 syncManager.getCacheTokenOrLogin { token ->
                     listWebService.getListFeedAuthenticated(url, "Bearer ${token.value}")
                 }
