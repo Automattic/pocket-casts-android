@@ -252,7 +252,10 @@ enum class SubscriptionOffer {
     Winback,
     ;
 
-    fun offerId(tier: SubscriptionTier, billingCycle: SubscriptionBillingCycle) = when (this) {
+    fun offerId(
+        tier: SubscriptionTier,
+        billingCycle: SubscriptionBillingCycle,
+    ) = when (this) {
         Trial -> when (tier) {
             SubscriptionTier.Plus -> when (billingCycle) {
                 SubscriptionBillingCycle.Monthly -> null
