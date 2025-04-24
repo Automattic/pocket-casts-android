@@ -1,6 +1,18 @@
 package au.com.shiftyjelly.pocketcasts.payment
 
+import android.app.Activity
+import com.android.billingclient.api.AcknowledgePurchaseParams
+import com.android.billingclient.api.BillingFlowParams
+import com.android.billingclient.api.BillingResult
+import com.android.billingclient.api.ProductDetails
+import com.android.billingclient.api.Purchase
+import com.android.billingclient.api.PurchaseHistoryRecord
+import com.android.billingclient.api.QueryProductDetailsParams
+import com.android.billingclient.api.QueryPurchaseHistoryParams
+import com.android.billingclient.api.QueryPurchasesParams
 import java.math.BigDecimal
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 
 class FakePaymentDataSource : PaymentDataSource {
     var customProductsResult: PaymentResult<List<Product>>? = null
@@ -8,6 +20,31 @@ class FakePaymentDataSource : PaymentDataSource {
     override suspend fun loadProducts(): PaymentResult<List<Product>> {
         return customProductsResult ?: PaymentResult.Success(KnownProducts)
     }
+
+    // <editor-fold desc="Temporarily extracted old interface">
+    override val purchaseUpdates: SharedFlow<Pair<BillingResult, List<Purchase>>> = MutableSharedFlow()
+
+    override suspend fun loadProducts(
+        params: QueryProductDetailsParams,
+    ): Pair<BillingResult, List<ProductDetails>> = BillingResult.newBuilder().build() to emptyList()
+
+    override suspend fun loadPurchaseHistory(
+        params: QueryPurchaseHistoryParams,
+    ): Pair<BillingResult, List<PurchaseHistoryRecord>> = BillingResult.newBuilder().build() to emptyList()
+
+    override suspend fun loadPurchases(
+        params: QueryPurchasesParams,
+    ): Pair<BillingResult, List<Purchase>> = BillingResult.newBuilder().build() to emptyList()
+
+    override suspend fun acknowledgePurchase(
+        params: AcknowledgePurchaseParams,
+    ): BillingResult = BillingResult.newBuilder().build()
+
+    override suspend fun launchBillingFlow(
+        activity: Activity,
+        params: BillingFlowParams,
+    ): BillingResult = BillingResult.newBuilder().build()
+    // </editor-fold>
 }
 
 private val KnownProducts get() = SubscriptionTier.entries.flatMap { tier ->

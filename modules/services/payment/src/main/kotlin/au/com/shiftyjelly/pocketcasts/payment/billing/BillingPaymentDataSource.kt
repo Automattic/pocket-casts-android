@@ -29,14 +29,14 @@ import com.android.billingclient.api.queryPurchasesAsync
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 
-class BillingPaymentDataSource(
+internal class BillingPaymentDataSource(
     context: Context,
     private val logger: Logger,
 ) : PaymentDataSource {
     private val _purchaseUpdates = MutableSharedFlow<Pair<BillingResult, List<Purchase>>>(
         extraBufferCapacity = 100, // Arbitrarily large number
     )
-    val purchaseUpdates = _purchaseUpdates.asSharedFlow()
+    override val purchaseUpdates = _purchaseUpdates.asSharedFlow()
 
     private val connection = ClientConnection(
         context,
@@ -47,7 +47,7 @@ class BillingPaymentDataSource(
         logger = logger,
     )
 
-    suspend fun loadProducts(
+    override suspend fun loadProducts(
         params: QueryProductDetailsParams,
     ): Pair<BillingResult, List<ProductDetails>> {
         logger.info("Loading products")
@@ -62,7 +62,7 @@ class BillingPaymentDataSource(
         }
     }
 
-    suspend fun loadPurchaseHistory(
+    override suspend fun loadPurchaseHistory(
         params: QueryPurchaseHistoryParams,
     ): Pair<BillingResult, List<PurchaseHistoryRecord>> {
         logger.info("Loading purchase history")
@@ -77,7 +77,7 @@ class BillingPaymentDataSource(
         }
     }
 
-    suspend fun loadPurchases(
+    override suspend fun loadPurchases(
         params: QueryPurchasesParams,
     ): Pair<BillingResult, List<Purchase>> {
         logger.info("Loading purchases")
@@ -92,7 +92,7 @@ class BillingPaymentDataSource(
         }
     }
 
-    suspend fun acknowledgePurchase(
+    override suspend fun acknowledgePurchase(
         params: AcknowledgePurchaseParams,
     ): BillingResult {
         logger.info("Acknowledging purchase: ${params.purchaseToken}")
@@ -107,7 +107,7 @@ class BillingPaymentDataSource(
         }
     }
 
-    suspend fun launchBillingFlow(
+    override suspend fun launchBillingFlow(
         activity: Activity,
         params: BillingFlowParams,
     ): BillingResult {

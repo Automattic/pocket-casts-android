@@ -6,7 +6,6 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import au.com.shiftyjelly.pocketcasts.crashlogging.di.ProvideApplicationScope
 import au.com.shiftyjelly.pocketcasts.payment.Logger
 import au.com.shiftyjelly.pocketcasts.payment.PaymentDataSource
-import au.com.shiftyjelly.pocketcasts.payment.billing.BillingPaymentDataSource
 import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
@@ -70,35 +69,12 @@ class RepositoryProviderModule {
 
     @Provides
     @Singleton
-    fun provideBillingPaymentDataSource(
-        @ApplicationContext context: Context,
-    ) = BillingPaymentDataSource(
-        context = context,
-        logger = object : Logger {
-            override fun info(message: String) {
-                Timber.tag(LogBuffer.TAG_SUBSCRIPTIONS).i(message)
-            }
-
-            override fun warning(message: String) {
-                Timber.tag(LogBuffer.TAG_SUBSCRIPTIONS).w(message)
-                LogBuffer.w(LogBuffer.TAG_SUBSCRIPTIONS, message)
-            }
-
-            override fun error(message: String, exception: Throwable) {
-                Timber.tag(LogBuffer.TAG_SUBSCRIPTIONS).e(exception, message)
-                LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, exception, message)
-            }
-        }
-    )
-
-    @Provides
-    @Singleton
     fun providePaymentDataSource(
         @ApplicationContext context: Context,
         logger: Logger,
     ): PaymentDataSource {
         return if (context.packageName == "au.com.shiftyjelly.pocketcasts") {
-            BillingPaymentDataSource(context, logger)
+            PaymentDataSource.billing(context, logger)
         } else {
             PaymentDataSource.fake()
         }
