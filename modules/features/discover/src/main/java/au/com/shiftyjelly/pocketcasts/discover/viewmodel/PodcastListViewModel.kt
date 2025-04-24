@@ -25,7 +25,6 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import kotlinx.coroutines.rx2.rxMaybe
-import kotlinx.coroutines.rx2.rxSingle
 import timber.log.Timber
 
 @HiltViewModel
@@ -55,7 +54,8 @@ class PodcastListViewModel @Inject constructor(
             return
         }
 
-        rxSingle { listRepository.getListFeed(url = sourceUrl, authenticated = authenticated) }
+        rxMaybe { listRepository.getListFeed(url = sourceUrl, authenticated = authenticated) }
+            .toSingle()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .flatMap {

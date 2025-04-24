@@ -68,6 +68,11 @@ class CuratedPodcastsCrawler(
         } else {
             url
         }
-        return async { runCatching { listRepository.getListFeed(engageUrl) } }
+        return async {
+            runCatching {
+                val listFeed = listRepository.getListFeed(engageUrl)
+                checkNotNull(listFeed) { "Failed to fetch list $engageUrl" }
+            }
+        }
     }
 }

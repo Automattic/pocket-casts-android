@@ -46,6 +46,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.rx2.rxMaybe
 import kotlinx.coroutines.rx2.rxSingle
 import timber.log.Timber
 
@@ -149,7 +150,7 @@ class DiscoverViewModel @Inject constructor(
     }
 
     fun loadPodcastList(source: String, authenticated: Boolean?): Flowable<PodcastList> {
-        return rxSingle { repository.getListFeed(source, authenticated) }
+        return rxMaybe { repository.getListFeed(source, authenticated) }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .map {
