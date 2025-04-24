@@ -89,6 +89,12 @@ class SubscriptionPlans private constructor(
         return plans.getValue(key) as PaymentResult<SubscriptionPlan.WithOffer>
     }
 
+    override fun equals(other: Any?) = (other === this) || (other is SubscriptionPlans && other.plans == this.plans)
+
+    override fun hashCode() = plans.hashCode()
+
+    override fun toString() = "SubscriptionPlans(plans=$plans)"
+
     companion object {
         private val basePlanKeys = SubscriptionTier.entries.flatMap { tier ->
             SubscriptionBillingCycle.entries.map { billingCycle ->
@@ -103,7 +109,6 @@ class SubscriptionPlans private constructor(
                 }
             }
         }
-
 
         fun create(products: List<Product>): PaymentResult<SubscriptionPlans> {
             val basePlans = basePlanKeys.associateWith { key -> products.findMatchingSubscriptionPlan(key) }
@@ -128,6 +133,7 @@ class SubscriptionPlans private constructor(
                         matchingProducts[0].toBaseSubscriptionPlan(key)
                     },
                 )
+
                 0 -> PaymentResult.Failure("No matching product found for $key")
                 else -> PaymentResult.Failure("Multiple matching products found for $key. $matchingProducts")
             }
@@ -161,7 +167,7 @@ class SubscriptionPlans private constructor(
                 key.tier,
                 key.billingCycle,
                 key.offer,
-                matchingPricingPhases
+                matchingPricingPhases,
             )
         }
     }
