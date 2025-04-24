@@ -224,11 +224,7 @@ class DiscoverFragment :
                     binding.recyclerView.isVisible = true
 
                     if (state.rows != null) {
-                        adapter?.submitList(state.rows) {
-                            // Notify the adapter that the data has changed. Without this, after signing in, the new authenticated lists still show the previous (unauthenticated) list.
-                            adapter?.notifyDataSetChanged()
-                        }
-
+                        adapter?.submitList(state.rows)
                         val newCategoryId = state.categoryFeed?.category?.id
                         if (displayedCategoryId != newCategoryId) {
                             displayedCategoryId = newCategoryId

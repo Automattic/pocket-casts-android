@@ -612,7 +612,18 @@ internal class DiscoverAdapter(
     }
 
     override fun getItemId(position: Int): Long {
-        return position.toLong()
+        val row = getItem(position)
+        return when (row) {
+            is NetworkLoadableList -> row.adapterId
+            is ChangeRegionRow -> 1L
+            is MostPopularPodcastsByCategoryRow -> 2L
+            is RemainingPodcastsByCategoryRow -> 3L
+            is CategoryAdRow -> "CategoryAdRow${row.categoryId}".hashCode().toLong()
+            else -> {
+                Timber.w("Discover adapter item id not found. Position: $position")
+                position.toLong()
+            }
+        }
     }
 
     override fun getItemViewType(position: Int): Int {
