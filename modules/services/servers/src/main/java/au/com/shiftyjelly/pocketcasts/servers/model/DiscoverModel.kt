@@ -31,6 +31,9 @@ interface NetworkLoadableList {
         else -> NONE
     }
 
+    val adapterId: Long
+        get() = (listUuid ?: title).hashCode().toLong()
+
     companion object {
         const val TRENDING = "trending"
         private const val POPULAR = "popular"

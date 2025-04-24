@@ -76,8 +76,10 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatPattern
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature.GUEST_LISTS_NETWORK_HIGHLIGHTS_REDESIGN
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.views.extensions.hideRow
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
 import au.com.shiftyjelly.pocketcasts.views.extensions.showIf
+import au.com.shiftyjelly.pocketcasts.views.extensions.showRow
 import coil.imageLoader
 import coil.load
 import coil.request.ImageRequest
@@ -610,7 +612,18 @@ internal class DiscoverAdapter(
     }
 
     override fun getItemId(position: Int): Long {
-        return position.toLong()
+        val row = getItem(position)
+        return when (row) {
+            is NetworkLoadableList -> row.adapterId
+            is ChangeRegionRow -> 1L
+            is MostPopularPodcastsByCategoryRow -> 2L
+            is RemainingPodcastsByCategoryRow -> 3L
+            is CategoryAdRow -> "CategoryAdRow${row.categoryId}".hashCode().toLong()
+            else -> {
+                Timber.w("Discover adapter item id not found. Position: $position")
+                position.toLong()
+            }
+        }
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -676,6 +689,13 @@ internal class DiscoverAdapter(
                             row.listUuid?.let { listUuid -> holder.adapter.setFromListId(listUuid) }
                             holder.adapter.submitList(it.podcasts) { onRestoreInstanceState(holder) }
                         },
+                        onError = { error ->
+                            Timber.e(error, "Could not load feed ${row.source}")
+                            // hide authenticated lists when any errors such as not being logged in, having an invalid token, or nothing being recommended
+                            if (row.authenticated == true) {
+                                holder.hideRow()
+                            }
+                        },
                     )
                     row.listUuid?.let { trackListImpression(it) }
                 }
@@ -688,11 +708,22 @@ internal class DiscoverAdapter(
                     holder.loadFlowable(
                         loadPodcastList(row.source, row.authenticated),
                         onNext = { list ->
-                            row.listUuid?.let { listUuid -> holder.adapter.setFromListId(listUuid) }
-                            holder.adapter.submitList(list.podcasts) { onRestoreInstanceState(holder) }
-                            holder.binding.title.text = list.title?.tryToLocalise(resources)
-                            holder.binding.subtitle.text = list.subtitle?.tryToLocalise(resources) ?: ""
-                            imageRequestFactory.createForPodcast(list.featureImage).loadInto(holder.binding.podcastImage)
+                            if (list.podcasts.isEmpty()) {
+                                holder.hideRow()
+                            } else {
+                                holder.showRow()
+                                row.listUuid?.let { listUuid -> holder.adapter.setFromListId(listUuid) }
+                                holder.adapter.submitList(list.podcasts) { onRestoreInstanceState(holder) }
+                                holder.binding.title.text = list.title?.tryToLocalise(resources)
+                                holder.binding.subtitle.text = list.subtitle?.tryToLocalise(resources).orEmpty()
+                                imageRequestFactory.createForPodcast(list.featureImage).loadInto(holder.binding.podcastImage)
+                            }
+                        },
+                        onError = { error ->
+                            Timber.e(error, "Could not load feed ${row.source}")
+                            if (row.authenticated == true) {
+                                holder.hideRow()
+                            }
                         },
                     )
                     row.listUuid?.let { trackListImpression(it) }

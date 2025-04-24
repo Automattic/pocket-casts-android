@@ -225,7 +225,6 @@ class DiscoverFragment :
 
                     if (state.rows != null) {
                         adapter?.submitList(state.rows)
-
                         val newCategoryId = state.categoryFeed?.category?.id
                         if (displayedCategoryId != newCategoryId) {
                             displayedCategoryId = newCategoryId
