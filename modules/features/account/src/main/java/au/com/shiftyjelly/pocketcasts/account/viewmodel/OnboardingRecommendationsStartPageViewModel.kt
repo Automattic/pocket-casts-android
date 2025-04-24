@@ -256,7 +256,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
             return
         }
 
-        val podcasts = feed.podcasts
+        val podcasts = feed?.podcasts
         if (podcasts.isNullOrEmpty()) return
 
         val title = listItem.title.tryToLocalise(getApplication<Application>().resources)

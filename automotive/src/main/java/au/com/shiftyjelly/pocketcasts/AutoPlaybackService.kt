@@ -28,6 +28,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.SUGGESTED_ROOT
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter
 import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsTask
 import au.com.shiftyjelly.pocketcasts.servers.model.Discover
+import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
+import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRow
 import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.servers.model.transformWithRegion
@@ -178,14 +180,24 @@ class AutoPlaybackService : PlaybackService() {
         )
 
         val updatedList = discoverFeed.layout.transformWithRegion(region, replacements, resources)
-            .filter { it.type is ListType.PodcastList && it.displayStyle !is DisplayStyle.CollectionList && !it.sponsored && it.displayStyle !is DisplayStyle.SinglePodcast }
-            .map { discoverItem ->
+            .filter {
+                it.type is ListType.PodcastList &&
+                    it.displayStyle !is DisplayStyle.CollectionList &&
+                    !it.sponsored &&
+                    it.authenticated == false &&
+                    it.displayStyle !is DisplayStyle.SinglePodcast
+            }
+            .mapNotNull<DiscoverRow, Pair<String, List<DiscoverPodcast>>> { discoverItem ->
                 Log.d(Settings.LOG_TAG_AUTO, "Loading discover feed ${discoverItem.source}")
-                val listFeed = listSource.getListFeed(
+                listSource.getListFeed(
                     url = discoverItem.source,
                     authenticated = discoverItem.authenticated,
-                )
-                Pair(discoverItem.title, listFeed.podcasts?.take(6) ?: emptyList())
+                )?.run {
+                    Pair(
+                        title.orEmpty().ifEmpty { discoverItem.title },
+                        podcasts?.take(6) ?: emptyList(),
+                    )
+                }
             }
             .flatMap { (title, podcasts) ->
                 Log.d(Settings.LOG_TAG_AUTO, "Mapping $title to media item")

@@ -68,6 +68,10 @@ class CuratedPodcastsCrawler(
         } else {
             url
         }
-        return async { runCatching { listRepository.getListFeed(engageUrl) } }
+        return async {
+            runCatching {
+                checkNotNull(listRepository.getListFeed(engageUrl))
+            }
+        }
     }
 }
