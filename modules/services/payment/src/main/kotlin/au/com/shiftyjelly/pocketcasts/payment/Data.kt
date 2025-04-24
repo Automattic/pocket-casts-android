@@ -5,15 +5,15 @@ import java.math.BigDecimal
 data class Product(
     val id: String,
     val name: String,
-    val plans: Plans,
+    val pricingPlans: PricingPlans,
 )
 
-data class Plans(
-    val offerPlans: List<Plan.Offer>,
-    val basePlan: Plan.Base,
+data class PricingPlans(
+    val basePlan: PricingPlan.Base,
+    val offerPlans: List<PricingPlan.Offer>,
 )
 
-sealed interface Plan {
+sealed interface PricingPlan {
     val planId: String
     val pricingPhases: List<PricingPhase>
     val tags: List<String>
@@ -22,14 +22,14 @@ sealed interface Plan {
         override val planId: String,
         override val pricingPhases: List<PricingPhase>,
         override val tags: List<String>,
-    ) : Plan
+    ) : PricingPlan
 
     data class Offer(
         val offerId: String,
         override val planId: String,
         override val pricingPhases: List<PricingPhase>,
         override val tags: List<String>,
-    ) : Plan
+    ) : PricingPlan
 }
 
 data class PricingPhase(

@@ -2,17 +2,17 @@ package au.com.shiftyjelly.pocketcasts.payment.billing
 
 import au.com.shiftyjelly.pocketcasts.payment.BillingPeriod
 import au.com.shiftyjelly.pocketcasts.payment.Logger
-import au.com.shiftyjelly.pocketcasts.payment.Plan
-import au.com.shiftyjelly.pocketcasts.payment.Plans
 import au.com.shiftyjelly.pocketcasts.payment.Price
 import au.com.shiftyjelly.pocketcasts.payment.PricingPhase
+import au.com.shiftyjelly.pocketcasts.payment.PricingPlan
+import au.com.shiftyjelly.pocketcasts.payment.PricingPlans
 import au.com.shiftyjelly.pocketcasts.payment.Product
 import com.android.billingclient.api.ProductDetails.RecurrenceMode
 import com.android.billingclient.api.ProductDetails as GoogleProduct
 import com.android.billingclient.api.ProductDetails.PricingPhase as GooglePricingPhase
 import com.android.billingclient.api.ProductDetails.SubscriptionOfferDetails as GoogleOfferDetails
 
-internal class ProductDetailsMapper(
+internal class BillingPaymentMapper(
     val logger: Logger,
 ) {
     fun toProduct(productDetails: GoogleProduct): Product? {
@@ -32,31 +32,31 @@ internal class ProductDetailsMapper(
         return Product(
             id = productDetails.productId,
             name = productDetails.name,
-            plans = toPlans(offerDetails, mappingContext) ?: return null,
+            pricingPlans = toPlans(offerDetails, mappingContext) ?: return null,
         )
     }
 
     private fun toPlans(
         offerDetails: List<GoogleOfferDetails>,
         mappingContext: Map<String, Any?>,
-    ): Plans? {
-        return Plans(
-            offerPlans = toOfferPlans(offerDetails, mappingContext) ?: return null,
+    ): PricingPlans? {
+        return PricingPlans(
             basePlan = toBasePlan(offerDetails, mappingContext) ?: return null,
+            offerPlans = toOfferPlans(offerDetails, mappingContext) ?: return null,
         )
     }
 
     private fun toBasePlan(
         offerDetails: List<GoogleOfferDetails>,
         mappingContext: Map<String, Any?>,
-    ): Plan.Base? {
+    ): PricingPlan.Base? {
         val noOfferDetails = offerDetails.singleOrNull { it.offerId == null }
         if (noOfferDetails == null) {
             logWarning("No single base offer", mappingContext)
             return null
         }
 
-        return Plan.Base(
+        return PricingPlan.Base(
             planId = noOfferDetails.basePlanId,
             pricingPhases = toPricingPhases(
                 pricingPhases = noOfferDetails.pricingPhases.pricingPhaseList,
@@ -71,7 +71,7 @@ internal class ProductDetailsMapper(
     private fun toOfferPlans(
         offerDetails: List<GoogleOfferDetails>,
         mappingContext: Map<String, Any?>,
-    ): List<Plan.Offer>? {
+    ): List<PricingPlan.Offer>? {
         val withOfferDetails = offerDetails.filter { it.offerId != null }
         val mappedPlans = withOfferDetails.mapNotNull { toOfferPlan(it, mappingContext) }
 
@@ -85,8 +85,8 @@ internal class ProductDetailsMapper(
     private fun toOfferPlan(
         offerDetails: GoogleOfferDetails,
         mappingContext: Map<String, Any?>,
-    ): Plan.Offer? {
-        return Plan.Offer(
+    ): PricingPlan.Offer? {
+        return PricingPlan.Offer(
             offerId = requireNotNull(offerDetails.offerId),
             planId = offerDetails.basePlanId,
             pricingPhases = toPricingPhases(
