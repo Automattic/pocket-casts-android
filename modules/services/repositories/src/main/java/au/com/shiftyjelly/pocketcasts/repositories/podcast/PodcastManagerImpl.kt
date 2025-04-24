@@ -51,6 +51,7 @@ import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.rx2.rxMaybe
 import timber.log.Timber
 
 class PodcastManagerImpl @Inject constructor(
@@ -133,10 +134,41 @@ class PodcastManagerImpl @Inject constructor(
     /**
      * If the podcast isn't already in the database add it as unsubscribed.
      */
-    override fun findOrDownloadPodcastRxSingle(podcastUuid: String): Single<Podcast> {
-        return findPodcastByUuidRxMaybe(podcastUuid)
+    override fun findOrDownloadPodcastRxSingle(podcastUuid: String, waitForSubscribe: Boolean): Single<Podcast> {
+        return rxMaybe {
+            if (waitForSubscribe) {
+                findPodcastOrWaitForSubscribe(podcastUuid)
+            } else {
+                findPodcastByUuid(podcastUuid)
+            }
+        }
             .switchIfEmpty(subscribeManager.addPodcastRxSingle(podcastUuid, sync = false, subscribed = false, shouldAutoDownload = false).toMaybe())
             .toSingle()
+    }
+
+    private suspend fun findPodcastOrWaitForSubscribe(
+        podcastUuid: String,
+        retries: Int = 5,
+        waitMs: Long = 1000L,
+    ): Podcast? {
+        val existingPodcast = findPodcastByUuid(podcastUuid)
+        if (existingPodcast != null) {
+            return existingPodcast
+        }
+        // if the podcast is being subscribed to wait for it to be added
+        if (subscribeManager.isSubscribingToPodcast(podcastUuid)) {
+            // retry 5 times to see if the podcast has been added
+            for (retryCount in 1..retries) {
+                Timber.i("Waiting for podcast to subscribe: $podcastUuid retryCount: $retryCount")
+                // wait 1 second before checking again
+                delay(waitMs)
+                val podcast = findPodcastByUuid(podcastUuid)
+                if (podcast != null) {
+                    return podcast
+                }
+            }
+        }
+        return null
     }
 
     override fun addPodcastRxSingle(podcastUuid: String, sync: Boolean, subscribed: Boolean, shouldAutoDownload: Boolean): Single<Podcast> {

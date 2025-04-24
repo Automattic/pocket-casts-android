@@ -20,7 +20,7 @@ import com.android.billingclient.api.queryPurchasesAsync
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 
-class BillingClientWrapper(
+class PaymentDataSource(
     context: Context,
     private val logger: Logger,
 ) {

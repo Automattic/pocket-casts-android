@@ -782,7 +782,7 @@ private fun Maybe<Podcast>.downloadMissingPodcast(uuid: String, podcastManager: 
     return this.switchIfEmpty(
         Single.defer {
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Podcast $uuid not found in database")
-            podcastManager.findOrDownloadPodcastRxSingle(uuid)
+            podcastManager.findOrDownloadPodcastRxSingle(podcastUuid = uuid, waitForSubscribe = true)
         },
     )
 }
