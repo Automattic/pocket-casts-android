@@ -1,6 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.payment
 
-class PaymentClient(
+import javax.inject.Inject
+
+class PaymentClient @Inject constructor(
     private val dataSource: PaymentDataSource,
     private val logger: Logger,
 ) {
