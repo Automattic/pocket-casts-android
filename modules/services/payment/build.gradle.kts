@@ -15,6 +15,7 @@ dependencies {
     api(libs.billing.ktx)
     api(libs.coroutines.core)
 
+    testImplementation(libs.coroutines.test)
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
 }

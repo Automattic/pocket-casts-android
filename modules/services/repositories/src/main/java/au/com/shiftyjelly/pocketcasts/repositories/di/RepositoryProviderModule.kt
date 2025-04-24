@@ -5,7 +5,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import au.com.shiftyjelly.pocketcasts.crashlogging.di.ProvideApplicationScope
 import au.com.shiftyjelly.pocketcasts.payment.Logger
-import au.com.shiftyjelly.pocketcasts.payment.billing.PaymentDataSource
+import au.com.shiftyjelly.pocketcasts.payment.billing.BillingPaymentDataSource
 import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
@@ -52,7 +52,7 @@ class RepositoryProviderModule {
     @Singleton
     fun providePaymentDataSource(
         @ApplicationContext context: Context,
-    ) = PaymentDataSource(
+    ) = BillingPaymentDataSource(
         context = context,
         logger = object : Logger {
             override fun info(message: String) {
