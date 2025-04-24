@@ -18,9 +18,9 @@ import org.robolectric.annotation.Config
 
 @Config(manifest = Config.NONE)
 @RunWith(RobolectricTestRunner::class)
-class ProductDetailsMapperTest {
+class BillingPaymentMapperTest {
     private val logger = TestLogger()
-    private val mapper = ProductDetailsMapper(logger)
+    private val mapper = BillingPaymentMapper(logger)
 
     @Test
     fun `map product`() {
@@ -70,7 +70,7 @@ class ProductDetailsMapperTest {
             ),
         )
 
-        val basePlan = mapper.toProduct(googleProduct)!!.plans.basePlan
+        val basePlan = mapper.toProduct(googleProduct)!!.pricingPlans.basePlan
 
         assertEquals("Base plan ID", basePlan.planId)
         assertEquals(listOf("Tag", "Another tag"), basePlan.tags)
@@ -100,7 +100,7 @@ class ProductDetailsMapperTest {
             ),
         )
 
-        val offerPlans = mapper.toProduct(googleProduct)!!.plans.offerPlans
+        val offerPlans = mapper.toProduct(googleProduct)!!.pricingPlans.offerPlans
         assertEquals(1, offerPlans.size)
         val offerPlan = offerPlans[0]
 
@@ -137,7 +137,7 @@ class ProductDetailsMapperTest {
             ),
         )
 
-        val prices = mapper.toProduct(googleProduct)!!.plans
+        val prices = mapper.toProduct(googleProduct)!!.pricingPlans
             .offerPlans
             .flatMap { it.pricingPhases }
             .map { it.price }
@@ -230,7 +230,7 @@ class ProductDetailsMapperTest {
             ),
         )
 
-        val billingPeriods = mapper.toProduct(googleProduct)!!.plans
+        val billingPeriods = mapper.toProduct(googleProduct)!!.pricingPlans
             .offerPlans
             .flatMap { it.pricingPhases }
             .map { it.billingPeriod }
