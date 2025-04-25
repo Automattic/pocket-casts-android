@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.compose.text
 import android.text.method.LinkMovementMethod
 import android.view.Gravity
 import android.widget.TextView
+import androidx.annotation.ColorRes
 import androidx.annotation.StyleRes
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -28,6 +29,7 @@ fun HtmlText(
     lineSpacingMultiplier: Float = 1.4f,
     selectable: Boolean = false,
     @StyleRes textStyleResId: Int = UR.style.H50,
+    @ColorRes backgroundColorRes: Int? = null
 ) {
     AndroidView(
         modifier = modifier,
@@ -40,7 +42,7 @@ fun HtmlText(
                 setTextColor(color.toArgb())
                 setLinkTextColor(linkColor.toArgb())
                 setTextIsSelectable(selectable)
-                movementMethod = LinkMovementMethod.getInstance()
+                backgroundColorRes?.let(::setBackgroundResource)
             }
         },
         update = { it.text = HtmlCompat.fromHtml(html, HtmlCompat.FROM_HTML_MODE_COMPACT) },

@@ -54,6 +54,7 @@ fun UpgradeFeatureItem(
             color = color,
             linkColor = color,
             textStyleResId = UR.style.H50,
+            backgroundColorRes =  au.com.shiftyjelly.pocketcasts.ui.R.color.selector_transparent_focused_background
         )
     }
 }
