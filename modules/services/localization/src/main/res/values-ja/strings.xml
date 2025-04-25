@@ -1,11 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-04-11 08:10:10+0000
+Translation-Revision-Date: 2025-04-22 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="price_per_week_usd">\u0024%1$.2f/ 週</string>
+    <string name="price_per_week">%1$.2f %2$s/ 週</string>
+    <string name="winback_cancel_subscription_header_title">解約前に知っておくべきこと</string>
+    <string name="winback_offer_header">解約をお考えですか ?\nまずはサポートをご利用ください</string>
+    <string name="account_benefit_recommendations_description">聴取習慣に基づいてカスタマイズされたポッドキャストの提案を受け取ります。</string>
+    <string name="account_benefit_recommendations_title">パーソナライズされたおすすめ</string>
+    <string name="account_benefit_backups_description">ライブラリと設定が安全に保存されます。</string>
+    <string name="account_benefit_backups_title">信頼できるバックアップ</string>
+    <string name="account_benefit_sync_description">進捗を同期して、すべての端末で表示します。</string>
+    <string name="account_benefit_sync_title">端末間で同期</string>
+    <string name="account_encourage_benefits_title">アカウント特典</string>
+    <string name="account_encourage_description">アカウントを作成またはログインして、Pocket Casts を最大限に楽しみましょう。</string>
+    <string name="account_encourage_title">ログインしていないようです</string>
+    <string name="onboarding_get_started">開始する</string>
+    <string name="onboarding_plus_feature_libro_title">%1$s の無料オーディオブック</string>
+    <string name="encourage_account_history_banner_description">無料アカウントを作成すると、どこでも聴取履歴を同期できます。</string>
+    <string name="encourage_account_history_banner_title">再生内容の追跡を継続</string>
+    <string name="encourage_account_filters_banner_description">無料アカウントを作成すると、どの端末でもフィルターを同期できます。</string>
+    <string name="encourage_account_filters_banner_title">フィルターの同期を維持</string>
+    <string name="encourage_account_sync_banner_description">無料アカウントを作成すると、番組を同期して場所を問わず聴取できます。</string>
+    <string name="encourage_account_sync_banner_title">あらゆる端末で番組を楽しむ</string>
+    <string name="encourage_account_banner_action_label">無料アカウントを作成</string>
     <string name="dismiss">非表示</string>
     <string name="settings_privacy_analytics_third_party_summary">信頼できるサードパーティのサービスを使用した当社による匿名のデータ収集を許可します。</string>
     <string name="settings_privacy_analytics_third_party">サードパーティのアナリティクス</string>
@@ -72,7 +94,6 @@ Language: ja_JP
     <string name="suggested_folders_use_subtitle">ポッドキャストをフォルダーにまとめました。 今すぐ保存して、後でカスタマイズしてご自身のスタイルに合わせます。</string>
     <string name="onboarding_plus_feature_up_next_shuffle_title">次のシャッフル</string>
     <string name="suggested_folders_plus_prompt">Pocket Casts Plus で番組の整理などを利用しましょう</string>
-    <string name="winback_cancel_subscription_header_title">サブスクリプションをキャンセル</string>
     <string name="onboarding_import_from_url_failed">OPML インポートに失敗しました</string>
     <string name="onboarding_import_from_url_error_message">無効な URLです</string>
     <string name="onboarding_import_from_url_importing_message">OPML インポートが進行中です。 オンボーディングプロセスに戻ることができます。</string>
@@ -111,7 +132,6 @@ Language: ja_JP
     <string name="clean_history">履歴から削除</string>
     <string name="onboarding_start_free_trial_upgrade_button">無料お試しを開始</string>
     <string name="sharing_is_not_available_for_private_podcasts">プライベートなポッドキャストでは共有できません</string>
-    <string name="winback_claimed_offer_message_2">Pocket Casts をお選びいただきありがとうございます。 1か月の無料期間が終わると請求が始まります。</string>
     <string name="winback_claimed_offer_message_1">1か月の無料期間をお楽しみください !</string>
     <string name="winback_offer_cancel_continue_button_label">キャンセルに進む</string>
     <string name="winback_offer_help_description">機能に不便がある、または問題が発生しています。</string>
@@ -119,7 +139,6 @@ Language: ja_JP
     <string name="winback_offer_differnt_plan_description">自分にぴったりのプランを見つけましょう。</string>
     <string name="winback_offer_differnt_plan_title">別のプランをお探しですか ?</string>
     <string name="winback_offer_free_offer_button_label">オファーを獲得</string>
-    <string name="winback_offer_header">キャンセルする前に、これらのオファーを確認しましょう</string>
     <string name="settings_app_icon_pride">プライド</string>
     <string name="manage_download_dismiss_content_description">「ダウンロードを管理」バナーを非表示</string>
     <string name="dismiss_manage_download_banner">閉じる</string>

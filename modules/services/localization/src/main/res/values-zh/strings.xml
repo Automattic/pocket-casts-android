@@ -1,11 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-04-11 08:10:10+0000
+Translation-Revision-Date: 2025-04-24 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="price_per_week_usd">\u0024%1$.2f/周</string>
+    <string name="price_per_week">%1$.2f %2$s/周</string>
+    <string name="winback_cancel_subscription_header_title">取消前的须知事项</string>
+    <string name="winback_offer_header">想要离开？\n不妨先与我们聊聊</string>
+    <string name="account_benefit_recommendations_description">根据您的收听习惯，获取量身定制的播客推荐。</string>
+    <string name="account_benefit_recommendations_title">个性化推荐</string>
+    <string name="account_benefit_backups_description">您的媒体库和首选项设置将得到安全存储。</string>
+    <string name="account_benefit_backups_title">安全备份</string>
+    <string name="account_benefit_sync_description">收听进度与节目内容将在所有设备上自动同步。</string>
+    <string name="account_benefit_sync_title">跨设备同步</string>
+    <string name="account_encourage_benefits_title">账户优势</string>
+    <string name="account_encourage_description">创建账户或登录，即可尽情使用 Pocket Casts。</string>
+    <string name="account_encourage_title">我们注意到您尚未登录</string>
+    <string name="onboarding_get_started">开始</string>
+    <string name="onboarding_plus_feature_libro_title">来自 %1$s 的免费有声读物</string>
+    <string name="encourage_account_history_banner_description">创建一个免费账户，即可随时随地同步您的收听历史记录。</string>
+    <string name="encourage_account_history_banner_title">记录播放历史</string>
+    <string name="encourage_account_filters_banner_description">创建一个免费账户，即可在任何设备上同步您的筛选条件。</string>
+    <string name="encourage_account_filters_banner_title">同步筛选条件</string>
+    <string name="encourage_account_sync_banner_description">创建一个免费账户，即可同步节目，随时随地畅听。</string>
+    <string name="encourage_account_sync_banner_title">全端畅听节目</string>
+    <string name="encourage_account_banner_action_label">创建一个免费账户</string>
     <string name="dismiss">消除</string>
     <string name="settings_privacy_analytics_third_party_summary">允许我们使用可信的第三方服务来收集匿名数据。</string>
     <string name="settings_privacy_analytics_third_party">第三方分析</string>
@@ -72,7 +94,6 @@ Language: zh_CN
     <string name="suggested_folders_use_subtitle">我们已将您的播客整理到文件夹中。 立即保存，稍后根据您的风格进行自定义。</string>
     <string name="onboarding_plus_feature_up_next_shuffle_title">下一个随机播放</string>
     <string name="suggested_folders_plus_prompt">通过 Pocket Casts Plus 整理您的节目，并享用更多功能</string>
-    <string name="winback_cancel_subscription_header_title">取消订阅</string>
     <string name="onboarding_import_from_url_failed">OPML 导入失败</string>
     <string name="onboarding_import_from_url_error_message">URL 无效</string>
     <string name="onboarding_import_from_url_importing_message">正在导入 OPML。 您可以返回入门流程。</string>
@@ -111,7 +132,6 @@ Language: zh_CN
     <string name="clean_history">从历史记录中删除</string>
     <string name="onboarding_start_free_trial_upgrade_button">开始免费试用</string>
     <string name="sharing_is_not_available_for_private_podcasts">私人播客不可共享</string>
-    <string name="winback_claimed_offer_message_2">感谢您选用 Pocket Casts。 免费月结束后开始计费。</string>
     <string name="winback_claimed_offer_message_1">享受一个月的免费体验！</string>
     <string name="winback_offer_cancel_continue_button_label">继续取消</string>
     <string name="winback_offer_help_description">在使用任何功能时感到困难或遇到问题。</string>
@@ -119,7 +139,6 @@ Language: zh_CN
     <string name="winback_offer_differnt_plan_description">找到适合您的套餐。</string>
     <string name="winback_offer_differnt_plan_title">想换个套餐？</string>
     <string name="winback_offer_free_offer_button_label">领取优惠</string>
-    <string name="winback_offer_header">在取消之前，请查看以下优惠</string>
     <string name="settings_app_icon_pride">骄傲</string>
     <string name="manage_download_dismiss_content_description">管理下载横幅关闭</string>
     <string name="dismiss_manage_download_banner">忽略</string>

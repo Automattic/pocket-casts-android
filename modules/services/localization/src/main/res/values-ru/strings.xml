@@ -1,11 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-04-11 08:10:10+0000
+Translation-Revision-Date: 2025-04-23 15:54:03+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="price_per_week_usd">\u0024%1$.2f в неделю</string>
+    <string name="price_per_week">%1$.2f %2$s в неделю</string>
+    <string name="winback_cancel_subscription_header_title">Что нужно знать до отмены</string>
+    <string name="winback_offer_header">Собираетесь уйти?\nСначала позвольте вам помочь</string>
+    <string name="account_benefit_recommendations_description">Получайте индивидуальные рекомендации по подкастам на основе ваших предпочтений.</string>
+    <string name="account_benefit_recommendations_title">Индивидуальные рекомендации</string>
+    <string name="account_benefit_backups_description">Ваша библиотека и настройки надёжно сохраняются.</string>
+    <string name="account_benefit_backups_title">Надёжное резервное копирование</string>
+    <string name="account_benefit_sync_description">Синхронизируйте журнал прослушивания и шоу на всех устройствах.</string>
+    <string name="account_benefit_sync_title">Синхронизация на всех устройствах</string>
+    <string name="account_encourage_benefits_title">Преимущества учётной записи</string>
+    <string name="account_encourage_description">Создайте учётную запись или войдите, чтобы пользоваться всеми возможностями Pocket Casts.</string>
+    <string name="account_encourage_title">Мы заметили, что вы не вошли в систему</string>
+    <string name="onboarding_get_started">Начать</string>
+    <string name="onboarding_plus_feature_libro_title">Бесплатная аудиокнига от %1$s</string>
+    <string name="encourage_account_history_banner_description">Создайте бесплатную учётную запись, чтобы синхронизировать журнал прослушивания на всех устройствах.</string>
+    <string name="encourage_account_history_banner_title">Следите за тем, что вы прослушали</string>
+    <string name="encourage_account_filters_banner_description">Создайте бесплатную учётную запись, чтобы синхронизировать фильтры на всех устройствах.</string>
+    <string name="encourage_account_filters_banner_title">Синхронизируйте фильтры</string>
+    <string name="encourage_account_sync_banner_description">Создайте бесплатную учётную запись, чтобы синхронизировать и слушать шоу где угодно.</string>
+    <string name="encourage_account_sync_banner_title">Ваши шоу на всех устройствах</string>
+    <string name="encourage_account_banner_action_label">Создать бесплатную учётную запись</string>
     <string name="dismiss">Отклонить</string>
     <string name="settings_privacy_analytics_third_party_summary">Разрешите нам использовать доверенные сторонние службы для сбора анонимных данных.</string>
     <string name="settings_privacy_analytics_third_party">Сторонняя аналитика</string>
@@ -72,7 +94,6 @@ Language: ru
     <string name="suggested_folders_use_subtitle">Мы распределили ваши подкасты по папкам. Сохраните их сейчас или настройте позже по вашему вкусу.</string>
     <string name="onboarding_plus_feature_up_next_shuffle_title">Следующий, случайно выбранный элемент</string>
     <string name="suggested_folders_plus_prompt">Упорядочивайте ваши подкасты и не только с помощью Pocket Casts Plus.</string>
-    <string name="winback_cancel_subscription_header_title">Отменить подписку</string>
     <string name="onboarding_import_from_url_failed">Не удалось импортировать OPML</string>
     <string name="onboarding_import_from_url_error_message">Недопустимый URL-адрес</string>
     <string name="onboarding_import_from_url_importing_message">Выполняется импорт OPML. Вы можете вернуться к процессу адаптации.</string>
@@ -111,7 +132,6 @@ Language: ru
     <string name="clean_history">Удалить из журнала</string>
     <string name="onboarding_start_free_trial_upgrade_button">Начать бесплатный пробный период</string>
     <string name="sharing_is_not_available_for_private_podcasts">Закрытыми подкастами нельзя поделиться</string>
-    <string name="winback_claimed_offer_message_2">Благодарим за то, что вы выбрали Pocket Casts. По истечении месяца бесплатного пользования вы начнёте получать счета на оплату.</string>
     <string name="winback_claimed_offer_message_1">Пользуйтесь весь месяц бесплатно!</string>
     <string name="winback_offer_cancel_continue_button_label">Продолжить отмену</string>
     <string name="winback_offer_help_description">Проблемы с определёнными функциями или неполадки.</string>
@@ -119,7 +139,6 @@ Language: ru
     <string name="winback_offer_differnt_plan_description">Выберите оптимальный тарифный план.</string>
     <string name="winback_offer_differnt_plan_title">Хотите перейти на другой тарифный план?</string>
     <string name="winback_offer_free_offer_button_label">Воспользоваться предложением</string>
-    <string name="winback_offer_header">Прежде чем окончательно отменить подписку, просмотрите наши предложения</string>
     <string name="settings_app_icon_pride">Гордость</string>
     <string name="manage_download_dismiss_content_description">Закрыть баннер «Управление загрузкой»</string>
     <string name="dismiss_manage_download_banner">Закрыть</string>

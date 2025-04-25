@@ -1,11 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-04-11 08:10:10+0000
+Translation-Revision-Date: 2025-04-24 14:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="price_per_week_usd">\u0024%1$.2f/week</string>
+    <string name="price_per_week">%1$.2f %2$s/week</string>
+    <string name="winback_cancel_subscription_header_title">Dingen die je moet weten voordat je annuleert</string>
+    <string name="winback_offer_header">Overweeg je om weg te gaan?\nLaat ons eerst helpen</string>
+    <string name="account_benefit_recommendations_description">Ontvang op maat gemaakte podcastsuggesties op basis van je luistergewoonten.</string>
+    <string name="account_benefit_recommendations_title">Gepersonaliseerde aanbevelingen</string>
+    <string name="account_benefit_backups_description">Je bibliotheek en voorkeuren worden veilig opgeslagen.</string>
+    <string name="account_benefit_backups_title">Betrouwbare backups</string>
+    <string name="account_benefit_sync_description">Synchroniseer je voortgang en laat zien op al je apparaten.</string>
+    <string name="account_benefit_sync_title">Synchroniseren op verschillende apparaten</string>
+    <string name="account_encourage_benefits_title">Accountvoordelen</string>
+    <string name="account_encourage_description">Maak een account aan of log in om optimaal van Pocket Casts te genieten.</string>
+    <string name="account_encourage_title">We hebben gemerkt dat je niet bent ingelogd</string>
+    <string name="onboarding_get_started">Aan de slag</string>
+    <string name="onboarding_plus_feature_libro_title">Gratis audioboek van %1$s</string>
+    <string name="encourage_account_history_banner_description">Maak een gratis account aan om je luistergeschiedenis overal te synchroniseren.</string>
+    <string name="encourage_account_history_banner_title">Houd bij wat je hebt afgespeeld</string>
+    <string name="encourage_account_filters_banner_description">Maak een gratis account aan om je filters op elk apparaat te synchroniseren.</string>
+    <string name="encourage_account_filters_banner_title">Houd je filters gesynchroniseerd</string>
+    <string name="encourage_account_sync_banner_description">Maak een gratis account aan om je shows te synchroniseren en overal te luisteren.</string>
+    <string name="encourage_account_sync_banner_title">Je shows, op elk apparaat</string>
+    <string name="encourage_account_banner_action_label">Een gratis-account aanmaken</string>
     <string name="dismiss">Afsluiten</string>
     <string name="settings_privacy_analytics_third_party_summary">Sta ons toe om vertrouwde diensten van derden te gebruiken om anonieme gegevens te verzamelen.</string>
     <string name="settings_privacy_analytics_third_party">Analyses van derden</string>
@@ -72,7 +94,6 @@ Language: nl
     <string name="suggested_folders_use_subtitle">We hebben je podcasts in mappen geordend. Sla ze nu op en pas ze later naar eigen smaak aan.</string>
     <string name="onboarding_plus_feature_up_next_shuffle_title">Hierna shuffelen</string>
     <string name="suggested_folders_plus_prompt">Orden je podcasts met Pocket Casts Plus en meer</string>
-    <string name="winback_cancel_subscription_header_title">Abonnement annuleren</string>
     <string name="onboarding_import_from_url_failed">OPML-import mislukt</string>
     <string name="onboarding_import_from_url_error_message">Onjuiste URL</string>
     <string name="onboarding_import_from_url_importing_message">OPML-import bezig. Je kan teruggaan naar je onboardingproces.</string>
@@ -111,7 +132,6 @@ Language: nl
     <string name="clean_history">Verwijderen uit geschiedenis</string>
     <string name="onboarding_start_free_trial_upgrade_button">Gratis proefversie starten</string>
     <string name="sharing_is_not_available_for_private_podcasts">Delen is niet beschikbaar voor privépodcasts.</string>
-    <string name="winback_claimed_offer_message_2">Bedankt dat je voor Pocket Casts kiest. De facturering begint nadat je gratis maand is afgelopen.</string>
     <string name="winback_claimed_offer_message_1">Geniet van een maand gratis toegang!</string>
     <string name="winback_offer_cancel_continue_button_label">Doorgaan met annuleren</string>
     <string name="winback_offer_help_description">Moeite met een van de functies of andere problemen?</string>
@@ -119,7 +139,6 @@ Language: nl
     <string name="winback_offer_differnt_plan_description">Vind het abonnement dat bij je past.</string>
     <string name="winback_offer_differnt_plan_title">Op zoek naar een ander abonnement?</string>
     <string name="winback_offer_free_offer_button_label">Aanbieding claimen</string>
-    <string name="winback_offer_header">Kijk eens naar deze aanbiedingen voordat je annuleert</string>
     <string name="settings_app_icon_pride">Pride</string>
     <string name="manage_download_dismiss_content_description">Downloadbanner beheren negeren</string>
     <string name="dismiss_manage_download_banner">Negeren</string>

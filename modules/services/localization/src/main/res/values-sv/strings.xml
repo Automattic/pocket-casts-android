@@ -1,11 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-04-11 08:10:09+0000
+Translation-Revision-Date: 2025-04-24 11:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="price_per_week_usd">\u0024%1$.2f/vecka</string>
+    <string name="price_per_week">%1$.2f %2$s/vecka</string>
+    <string name="winback_cancel_subscription_header_title">Saker du bör veta innan du avslutar</string>
+    <string name="winback_offer_header">Funderar du på att lämna oss?\nLåt oss hjälpa dig först</string>
+    <string name="account_benefit_recommendations_description">Få skräddarsydda podcastförslag baserat på dina lyssningsvanor.</string>
+    <string name="account_benefit_recommendations_title">Personliga rekommendationer</string>
+    <string name="account_benefit_backups_description">Ditt bibliotek och dina inställningar är säkert sparade.</string>
+    <string name="account_benefit_backups_title">Tillförlitliga säkerhetskopior</string>
+    <string name="account_benefit_sync_description">Synkronisera ditt lyssningsförlopp och dina shower på alla enheter.</string>
+    <string name="account_benefit_sync_title">Synkronisera mellan enheter</string>
+    <string name="account_encourage_benefits_title">Kontofördelar</string>
+    <string name="account_encourage_description">Skapa ett konto eller logga in för att ta del av Pocket Casts fullt ut.</string>
+    <string name="account_encourage_title">Vi har noterat att du inte är inloggad</string>
+    <string name="onboarding_get_started">Kom igång</string>
+    <string name="onboarding_plus_feature_libro_title">Gratis ljudbok från %1$s</string>
+    <string name="encourage_account_history_banner_description">Skapa ett gratis konto för att synkronisera din lyssningshistorik överallt.</string>
+    <string name="encourage_account_history_banner_title">Håll koll på vad du har spelat upp</string>
+    <string name="encourage_account_filters_banner_description">Skapa ett gratis konto för att synkronisera dina filter på vilken enhet som helst.</string>
+    <string name="encourage_account_filters_banner_title">Håll dina filter synkroniserade</string>
+    <string name="encourage_account_sync_banner_description">Skapa ett gratis konto för att synkronisera dina shower och lyssna var som helst.</string>
+    <string name="encourage_account_sync_banner_title">Dina shower, på vilken enhet som helst</string>
+    <string name="encourage_account_banner_action_label">Skapa ett gratis konto</string>
     <string name="dismiss">Stäng</string>
     <string name="settings_privacy_analytics_third_party_summary">Tillåt oss att använda betrodda tjänster från tredje part för att samla in anonyma data.</string>
     <string name="settings_privacy_analytics_third_party">Analyser från tredje part</string>
@@ -72,7 +94,6 @@ Language: sv_SE
     <string name="suggested_folders_use_subtitle">Vi har organiserat dina podcasts i mappar. Spara dem nu och anpassa dem efter din stil senare.</string>
     <string name="onboarding_plus_feature_up_next_shuffle_title">Slumpmässig Nästa-uppspelning</string>
     <string name="suggested_folders_plus_prompt">Organisera dina shower och mer därtill med Pocket Casts Plus</string>
-    <string name="winback_cancel_subscription_header_title">Avsluta prenumeration</string>
     <string name="onboarding_import_from_url_failed">OPML-importen misslyckades</string>
     <string name="onboarding_import_from_url_error_message">Ogiltig URL</string>
     <string name="onboarding_import_from_url_importing_message">OPML-import pågår Du kan gå tillbaka till din onboardingprocess.</string>
@@ -111,7 +132,6 @@ Language: sv_SE
     <string name="clean_history">Ta bort från historik</string>
     <string name="onboarding_start_free_trial_upgrade_button">Starta kostnadsfri testperiod</string>
     <string name="sharing_is_not_available_for_private_podcasts">Delning är inte tillgängligt för privata podcasts</string>
-    <string name="winback_claimed_offer_message_2">Tack för att du väljer Pocket Casts. Fakturering startar när din gratismånad har löpt ut.</string>
     <string name="winback_claimed_offer_message_1">Njut av din gratismånad!</string>
     <string name="winback_offer_cancel_continue_button_label">Fortsätt till annullering</string>
     <string name="winback_offer_help_description">Har du stött på problem eller någon funktion som krånglar?</string>
@@ -119,7 +139,6 @@ Language: sv_SE
     <string name="winback_offer_differnt_plan_description">Hitta rätt paket för dig.</string>
     <string name="winback_offer_differnt_plan_title">Letar du efter ett annat paket?</string>
     <string name="winback_offer_free_offer_button_label">Utnyttja erbjudande</string>
-    <string name="winback_offer_header">Innan du avslutar, kolla in dessa erbjudanden</string>
     <string name="settings_app_icon_pride">Pride</string>
     <string name="manage_download_dismiss_content_description">Hantera nedladdning, banner, avfärda</string>
     <string name="dismiss_manage_download_banner">Avfärda</string>
