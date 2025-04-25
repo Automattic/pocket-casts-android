@@ -1,11 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-04-11 08:10:10+0000
+Translation-Revision-Date: 2025-04-24 14:54:03+0000
 Plural-Forms: nplurals=2; plural=(n > 1);
 Generator: GlotPress/2.4.0-alpha
 Language: pt_BR
 -->
 <resources>
+    <string name="price_per_week_usd">\u0024%1$.2f/semana</string>
+    <string name="price_per_week">%1$.2f %2$s/semana</string>
+    <string name="winback_cancel_subscription_header_title">O que você deve saber antes de cancelar</string>
+    <string name="winback_offer_header">Pensando em ir embora?\nDeixe a gente ajudar você primeiro</string>
+    <string name="account_benefit_recommendations_description">Descubra podcasts feitos para você, com base no que você costuma ouvir.</string>
+    <string name="account_benefit_recommendations_title">Recomendações personalizadas</string>
+    <string name="account_benefit_backups_description">Sua biblioteca e preferências estão salvas em segurança.</string>
+    <string name="account_benefit_backups_title">Backups confiáveis</string>
+    <string name="account_benefit_sync_description">Sincronize seu progresso e acompanhe em todos os seus dispositivos.</string>
+    <string name="account_benefit_sync_title">Sincronização entre dispositivos</string>
+    <string name="account_encourage_benefits_title">Benefícios da conta</string>
+    <string name="account_encourage_description">Crie uma conta ou faça login para aproveitar ao máximo o Pocket Casts.</string>
+    <string name="account_encourage_title">Percebemos que você não fez login</string>
+    <string name="onboarding_get_started">Começar</string>
+    <string name="onboarding_plus_feature_libro_title">Audiolivro gratuito do %1$s</string>
+    <string name="encourage_account_history_banner_description">Crie uma conta gratuita para sincronizar seu histórico de reprodução em todos os dispositivos.</string>
+    <string name="encourage_account_history_banner_title">Veja o que você já reproduziu</string>
+    <string name="encourage_account_filters_banner_description">Crie uma conta gratuita para sincronizar seus filtros em qualquer dispositivo.</string>
+    <string name="encourage_account_filters_banner_title">Sincronize seus filtros</string>
+    <string name="encourage_account_sync_banner_description">Crie uma conta gratuita para sincronizar seus programas e ouvi-los em qualquer lugar.</string>
+    <string name="encourage_account_sync_banner_title">Ouça seus programas em qualquer dispositivo</string>
+    <string name="encourage_account_banner_action_label">Crie uma conta gratuita</string>
     <string name="dismiss">Fechar</string>
     <string name="settings_privacy_analytics_third_party_summary">Permita-nos usar serviços de terceiros confiáveis para coletar dados anônimos.</string>
     <string name="settings_privacy_analytics_third_party">Análises de terceiros</string>
@@ -72,7 +94,6 @@ Language: pt_BR
     <string name="suggested_folders_use_subtitle">Organizamos seus podcasts em pastas. Salve agora e personalize depois conforme o seu estilo.</string>
     <string name="onboarding_plus_feature_up_next_shuffle_title">Próximo aleatório</string>
     <string name="suggested_folders_plus_prompt">Organize seus programas e muito mais com o Pocket Casts Plus</string>
-    <string name="winback_cancel_subscription_header_title">Cancelar assinatura</string>
     <string name="onboarding_import_from_url_failed">Falha na importação de OPML</string>
     <string name="onboarding_import_from_url_error_message">URL inválida</string>
     <string name="onboarding_import_from_url_importing_message">Importação de OPML em andamento. Você pode voltar para o seu processo de integração.</string>
@@ -84,8 +105,6 @@ Language: pt_BR
     <string name="suggested_folders_use_these_folders_button">Usar estas pastas</string>
     <string name="winback_claiming_offer">Aproveitando oferta</string>
     <string name="winback_claimed_offer_message_3">50% de desconto no próximo ano!</string>
-    <string name="winback_offer_free_offer_yearly_description">Pague %1$s agora e tenha mais um ano com 50%% de desconto.</string>
-    <string name="winback_offer_free_offer_yearly_title">Obtenha 50% de desconto no próximo ano</string>
     <string name="podcast_refresh_no_episodes_found">Nenhum episódio encontrado.</string>
     <string name="podcast_refresh_new_episode_found">Novo episódio encontrado!</string>
     <string name="podcast_refreshing_episode_list">Atualizando lista de episódios…</string>
@@ -112,7 +131,6 @@ Language: pt_BR
     <string name="clean_history">Remover do histórico</string>
     <string name="onboarding_start_free_trial_upgrade_button">Iniciar teste gratuito</string>
     <string name="sharing_is_not_available_for_private_podcasts">Não foi possível compartilhar podcasts privados</string>
-    <string name="winback_claimed_offer_message_2">Agradecemos por escolher o Pocket Casts. A cobrança começa após o mês gratuito.</string>
     <string name="winback_claimed_offer_message_1">Aproveite seu mês gratuito!</string>
     <string name="winback_offer_cancel_continue_button_label">Continuar com o cancelamento</string>
     <string name="winback_offer_help_description">Está tendo problemas com uma funcionalidade ou alguma outra coisa?</string>
@@ -120,9 +138,6 @@ Language: pt_BR
     <string name="winback_offer_differnt_plan_description">Encontre o plano ideal para você.</string>
     <string name="winback_offer_differnt_plan_title">Quer um plano diferente?</string>
     <string name="winback_offer_free_offer_button_label">Aproveitar oferta</string>
-    <string name="winback_offer_free_offer_description">Economize %1$s no começo do próximo ciclo de cobrança.</string>
-    <string name="winback_offer_free_offer_title">Não pague nada no próximo mês</string>
-    <string name="winback_offer_header">Antes de cancelar, confira estas ofertas</string>
     <string name="settings_app_icon_pride">Orgulho</string>
     <string name="manage_download_dismiss_content_description">Ignore o banner Gerenciar download</string>
     <string name="dismiss_manage_download_banner">Ignorar</string>
