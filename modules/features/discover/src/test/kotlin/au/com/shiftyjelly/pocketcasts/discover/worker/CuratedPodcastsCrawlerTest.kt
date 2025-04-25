@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.discover.worker
 
 import au.com.shiftyjelly.pocketcasts.models.entity.CuratedPodcast
+import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.servers.di.ServersModule
 import au.com.shiftyjelly.pocketcasts.servers.server.ListWebService
 import kotlinx.coroutines.test.runTest
@@ -30,24 +31,15 @@ class CuratedPodcastsCrawlerTest {
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
             .create<ListWebService>()
-        crawler = CuratedPodcastsCrawler(service, staticHostUrl = server.url("/static").toString())
-    }
-
-    @Test
-    fun `use specified crawling platform`() = runTest {
-        server.enqueue(MockResponse())
-
-        crawler.crawl("some-platform")
-        val request = server.takeRequest()
-
-        assertEquals("/discover/some-platform/content_v2.json", request.path)
+        val listRepository = ListRepository(listWebService = service, syncManager = null, platform = "android")
+        crawler = CuratedPodcastsCrawler(listRepository, staticHostUrl = server.url("/static").toString())
     }
 
     @Test
     fun `crawl empty page`() = runTest {
         enqueueDiscoverPage("[]")
 
-        val podcasts = crawler.crawl("android").getOrThrow()
+        val podcasts = crawler.crawl().getOrThrow()
 
         assertEqualsInAnyOrder(emptyList(), podcasts)
     }
@@ -91,7 +83,7 @@ class CuratedPodcastsCrawlerTest {
         """.trimMargin("|"),
         )
 
-        val podcasts = crawler.crawl("android").getOrThrow()
+        val podcasts = crawler.crawl().getOrThrow()
 
         assertEqualsInAnyOrder(
             listOf(
@@ -173,7 +165,7 @@ class CuratedPodcastsCrawlerTest {
         """.trimMargin("|"),
         )
 
-        val podcasts = crawler.crawl("android").getOrThrow()
+        val podcasts = crawler.crawl().getOrThrow()
 
         assertEqualsInAnyOrder(
             listOf(
@@ -242,7 +234,7 @@ class CuratedPodcastsCrawlerTest {
         """.trimMargin("|"),
         )
 
-        val podcasts = crawler.crawl("android").getOrThrow()
+        val podcasts = crawler.crawl().getOrThrow()
 
         assertEqualsInAnyOrder(
             listOf(
@@ -262,7 +254,7 @@ class CuratedPodcastsCrawlerTest {
     fun `fail to crawl if discover page is not fetched`() = runTest {
         server.enqueue(MockResponse().setSocketPolicy(SocketPolicy.SHUTDOWN_INPUT_AT_END))
 
-        val result = crawler.crawl("android")
+        val result = crawler.crawl()
 
         assertTrue(result.isFailure)
     }
@@ -300,7 +292,7 @@ class CuratedPodcastsCrawlerTest {
         server.enqueue(MockResponse().setSocketPolicy(SocketPolicy.SHUTDOWN_INPUT_AT_END))
         server.enqueue(MockResponse().setSocketPolicy(SocketPolicy.SHUTDOWN_INPUT_AT_END))
 
-        val result = crawler.crawl("android")
+        val result = crawler.crawl()
 
         assertTrue(result.isFailure)
     }
@@ -325,7 +317,7 @@ class CuratedPodcastsCrawlerTest {
         """.trimMargin("|"),
         )
 
-        val podcasts = crawler.crawl("android").getOrThrow()
+        val podcasts = crawler.crawl().getOrThrow()
 
         assertEqualsInAnyOrder(emptyList(), podcasts)
     }
@@ -350,7 +342,7 @@ class CuratedPodcastsCrawlerTest {
         """.trimMargin("|"),
         )
 
-        val podcasts = crawler.crawl("android").getOrThrow()
+        val podcasts = crawler.crawl().getOrThrow()
 
         assertEqualsInAnyOrder(emptyList(), podcasts)
     }
@@ -375,7 +367,7 @@ class CuratedPodcastsCrawlerTest {
         """.trimMargin("|"),
         )
 
-        val podcasts = crawler.crawl("android").getOrThrow()
+        val podcasts = crawler.crawl().getOrThrow()
 
         assertEqualsInAnyOrder(emptyList(), podcasts)
     }
@@ -414,7 +406,7 @@ class CuratedPodcastsCrawlerTest {
         """.trimMargin("|"),
         )
 
-        val podcasts = crawler.crawl("android").getOrThrow()
+        val podcasts = crawler.crawl().getOrThrow()
 
         assertEqualsInAnyOrder(
             listOf(
@@ -464,7 +456,7 @@ class CuratedPodcastsCrawlerTest {
         """.trimMargin("|"),
         )
 
-        val podcasts = crawler.crawl("android").getOrThrow()
+        val podcasts = crawler.crawl().getOrThrow()
 
         assertEqualsInAnyOrder(
             listOf(

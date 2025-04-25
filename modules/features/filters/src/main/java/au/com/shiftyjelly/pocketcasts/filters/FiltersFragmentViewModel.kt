@@ -155,7 +155,12 @@ class FiltersFragmentViewModel @Inject constructor(
         initialValue = false,
     )
 
+    internal fun onCreateFreeAccountClick() {
+        analyticsTracker.track(AnalyticsEvent.INFORMATIONAL_BANNER_VIEW_CREATE_ACCOUNT_TAP, mapOf("source" to "filters"))
+    }
+
     internal fun dismissFreeAccountBanner() {
+        analyticsTracker.track(AnalyticsEvent.INFORMATIONAL_BANNER_VIEW_DISMISSED, mapOf("source" to "filters"))
         settings.isFreeAccountFiltersBannerDismissed.set(true, updateModifiedAt = true)
     }
 }

@@ -68,7 +68,7 @@ interface UserEpisodeManager {
     suspend fun deleteAll(episodes: List<UserEpisode>, playbackManager: PlaybackManager)
     suspend fun findUserEpisodes(): List<UserEpisode>
     fun episodeRxFlowable(uuid: String): Flowable<UserEpisode>
-    fun episodeFlow(uuid: String): Flow<UserEpisode>
+    fun episodeFlow(uuid: String): Flow<UserEpisode?>
     fun findEpisodeByUuidRxMaybe(uuid: String): Maybe<UserEpisode>
     suspend fun findEpisodeByUuid(uuid: String): UserEpisode?
     suspend fun findEpisodesByUuids(episodeUuids: List<String>): List<UserEpisode>
@@ -230,7 +230,7 @@ class UserEpisodeManagerImpl @Inject constructor(
         return userEpisodeDao.findEpisodeRxFlowable(uuid)
     }
 
-    override fun episodeFlow(uuid: String): Flow<UserEpisode> {
+    override fun episodeFlow(uuid: String): Flow<UserEpisode?> {
         return userEpisodeDao.findEpisodeFlow(uuid)
     }
 
@@ -283,7 +283,7 @@ class UserEpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override suspend fun syncFiles(playbackManager: PlaybackManager) {
+    private suspend fun syncFiles(playbackManager: PlaybackManager, syncArtworkChanges: Boolean) {
         val episodesToSync = userEpisodeDao.findUserEpisodesToSyncBlocking()
         if (episodesToSync.isNotEmpty()) {
             val response = withContext(Dispatchers.IO) {
@@ -337,7 +337,7 @@ class UserEpisodeManagerImpl @Inject constructor(
                     didChange = true
                 }
 
-                if (existingFile.hasCustomImage != it.hasCustomImage) {
+                if (syncArtworkChanges && existingFile.hasCustomImage != it.hasCustomImage) {
                     existingFile.hasCustomImage = it.hasCustomImage
                     didChange = true
                 }
@@ -347,7 +347,7 @@ class UserEpisodeManagerImpl @Inject constructor(
                     didChange = true
                 }
 
-                if (existingFile.artworkUrl != it.imageUrl) {
+                if (syncArtworkChanges && existingFile.artworkUrl != it.imageUrl) {
                     existingFile.artworkUrl = it.imageUrl
                     didChange = true
                 }
@@ -412,6 +412,10 @@ class UserEpisodeManagerImpl @Inject constructor(
         }
     }
 
+    override suspend fun syncFiles(playbackManager: PlaybackManager) {
+        syncFiles(playbackManager = playbackManager, syncArtworkChanges = true)
+    }
+
     override fun uploadToServer(userEpisode: UserEpisode, waitForWifi: Boolean) {
         val networkType = if (waitForWifi) NetworkType.UNMETERED else NetworkType.CONNECTED
         val constraints = Constraints.Builder()
@@ -453,9 +457,6 @@ class UserEpisodeManagerImpl @Inject constructor(
         return userEpisodeDao.updateServerStatusRxCompletable(userEpisode.uuid, UserEpisodeServerStatus.UPLOADING)
             .andThen(userEpisodeDao.updateUploadErrorRxCompetable(userEpisode.uuid, null))
             .andThen(syncManager.uploadFileToServerRxCompletable(userEpisode))
-            .andThen(
-                userEpisodeDao.updateServerStatusRxCompletable(userEpisode.uuid, serverStatus = UserEpisodeServerStatus.UPLOADED),
-            )
             .andThen(imageUploadTask)
             // let the file upload report to upload to the api server
             .delay(1, TimeUnit.SECONDS)
@@ -477,9 +478,14 @@ class UserEpisodeManagerImpl @Inject constructor(
                     },
             )
             .andThen(
-                rxCompletable { syncFiles(playbackManager) }
-                    .doOnError { Timber.e(it) }
-                    .onErrorComplete(),
+                rxCompletable {
+                    syncFiles(
+                        playbackManager = playbackManager,
+                        syncArtworkChanges = false,
+                    )
+                }.doOnError {
+                    Timber.e(it)
+                }.onErrorComplete(),
             )
     }
 

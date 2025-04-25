@@ -753,6 +753,7 @@ enum class AnalyticsEvent(val key: String) {
     WINBACK_AVAILABLE_PLANS_NEW_PLAN_PURCHASE_SUCCESSFUL("winback_available_plans_new_plan_purchase_successful"),
     WINBACK_CANCEL_CONFIRMATION_STAY_BUTTON_TAPPED("winback_cancel_confirmation_stay_button_tapped"),
     WINBACK_CANCEL_CONFIRMATION_CANCEL_BUTTON_TAPPED("winback_cancel_confirmation_cancel_button_tapped"),
+    WINBACK_WINBACK_OFFER_CANCEL_BUTTON_TAPPED("winback_winback_offer_cancel_button_tapped"),
 
     /* Suggested Folders */
     SUGGESTED_FOLDERS_PAGE_SHOWN("suggested_folders_page_shown"),
@@ -762,4 +763,13 @@ enum class AnalyticsEvent(val key: String) {
     SUGGESTED_FOLDERS_REPLACE_FOLDERS_TAPPED("suggested_folders_replace_folders_tapped"),
     SUGGESTED_FOLDERS_REPLACE_FOLDERS_CONFIRM_TAPPED("suggested_folders_replace_folders_confirm_tapped"),
     SUGGESTED_FOLDERS_PREVIEW_FOLDER_TAPPED("suggested_folders_preview_folder_tapped"),
+
+    /* Account Encouragement */
+    INFORMATIONAL_MODAL_VIEW_SHOWED("informational_modal_view_showed"),
+    INFORMATIONAL_MODAL_VIEW_DISMISSED("informational_modal_view_dismissed"),
+    INFORMATIONAL_MODAL_VIEW_GET_STARTED_TAP("informational_modal_view_get_started_tap"),
+    INFORMATIONAL_MODAL_VIEW_LOGIN_TAP("informational_modal_view_login_tap"),
+    INFORMATIONAL_MODAL_VIEW_CARD_SHOWED("informational_modal_view_card_showed"),
+    INFORMATIONAL_BANNER_VIEW_DISMISSED("informational_banner_view_dismissed"),
+    INFORMATIONAL_BANNER_VIEW_CREATE_ACCOUNT_TAP("informational_banner_view_create_account_tap"),
 }

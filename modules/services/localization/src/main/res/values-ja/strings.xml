@@ -105,6 +105,7 @@ Language: ja_JP
     <string name="suggested_folders_use_these_folders_button">これらのフォルダーを使用</string>
     <string name="winback_claiming_offer">オファーの獲得</string>
     <string name="winback_claimed_offer_message_3">次年度が50% オフ !</string>
+    <string name="winback_offer_free_offer_yearly_description">今すぐ%1$sを支払うと、もう1年が50%% オフになります。</string>
     <string name="podcast_refresh_no_episodes_found">エピソードがありません。</string>
     <string name="podcast_refresh_new_episode_found">新しいエピソードが見つかりました !</string>
     <string name="podcast_refreshing_episode_list">エピソードリストを更新中…</string>
@@ -138,6 +139,7 @@ Language: ja_JP
     <string name="winback_offer_differnt_plan_description">自分にぴったりのプランを見つけましょう。</string>
     <string name="winback_offer_differnt_plan_title">別のプランをお探しですか ?</string>
     <string name="winback_offer_free_offer_button_label">オファーを獲得</string>
+    <string name="winback_offer_header">キャンセルする前に、これらのオファーを確認しましょう</string>
     <string name="settings_app_icon_pride">プライド</string>
     <string name="manage_download_dismiss_content_description">「ダウンロードを管理」バナーを非表示</string>
     <string name="dismiss_manage_download_banner">閉じる</string>

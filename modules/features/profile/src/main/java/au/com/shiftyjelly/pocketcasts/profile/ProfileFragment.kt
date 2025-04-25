@@ -101,6 +101,7 @@ class ProfileFragment : BaseFragment(), TopScrollable {
                 }
             },
             onCreateFreeAccountBannerClick = {
+                profileViewModel.onCreateFreeAccountClick()
                 OnboardingLauncher.openOnboardingFlow(
                     activity = requireActivity(),
                     onboardingFlow = OnboardingFlow.LoggedOut,

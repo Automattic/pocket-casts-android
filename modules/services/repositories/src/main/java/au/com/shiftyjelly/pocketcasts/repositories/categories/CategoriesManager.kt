@@ -2,8 +2,8 @@ package au.com.shiftyjelly.pocketcasts.repositories.categories
 
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
+import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
-import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx2.await
 import timber.log.Timber
 
 @Singleton
@@ -66,7 +65,7 @@ class CategoriesManager @Inject constructor(
         if (discoverCategories.value.isEmpty() || areCategoriesStale()) {
             scope.launch {
                 try {
-                    discoverCategories.value = listRepository.getCategoriesList(url).await()
+                    discoverCategories.value = listRepository.getCategoriesList(url)
                     lastUpdate = TimeSource.Monotonic.markNow()
                 } catch (e: Throwable) {
                     Timber.e(e, "Failed to fetch categories under $url")

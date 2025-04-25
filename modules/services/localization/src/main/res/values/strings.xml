@@ -196,6 +196,10 @@
     <string name="move_down">Move down</string>
     <string name="see_more">See more</string>
     <string name="maybe_later">Maybe later</string>
+    <!-- %1$.2f is price with 2 decimal points precision, %1$s is the currency -->
+    <string name="price_per_week">%1$.2f %2$s/week</string>
+    <!-- %1$.2f is price with 2 decimal points precision, \u0024 is a dollar sign -->
+    <string name="price_per_week_usd">\u0024%1$.2f/week</string>
 
     <string name="multiselect_actions_shown">Shortcut in toolbar</string>
     <string name="multiselect_actions_hidden">In overflow</string>
@@ -1768,6 +1772,8 @@
     <string name="discover_select_categories">Select a category</string>
     <string name="discover_show_all_categories">Show all categories</string>
     <string name="discover_dismiss_selected_category">Dismiss selected category</string>
+    <string name="recommendations_if_you_like">If you like</string>
+    <string name="recommendations_loved_by_listeners">Loved by listeners of</string>
 
     <!-- Server errors -->
 
@@ -1928,6 +1934,7 @@
     <string name="onboarding_welcome_back">Welcome Back</string>
     <string name="not_now">Not now</string>
     <string name="onboarding_log_in">Log in</string>
+    <string name="onboarding_get_started">Get started</string>
     <string name="onboarding_sign_up">Sign up</string>
     <string name="onboarding_continue_with_google">Continue with Google</string>
     <string name="onboarding_continue_with_google_error">Unable to launch Google sign in.</string>
@@ -2018,6 +2025,15 @@
     <string name="onboarding_can_import_from_opml">Pocket Casts can import podcasts from OPML files, so if your current app can export an OPML file, you can follow these steps:</string>
     <string name="onboarding_import_from_other_apps_step_1">Find the other app\’s export option and export an OPML file.</string>
     <string name="onboarding_import_from_other_apps_step_2">Use your phone\’s \“Share\” menu to send the file to Pocket Casts. Alternatively, import the file from Pocket Casts\’ \“Import &amp; export OPML\” settings menu.</string>
+    <string name="account_encourage_title">We noticed you’re not logged&#160;in</string>
+    <string name="account_encourage_description">Create an account or log in to enjoy Pocket&#160;Casts to the fullest.</string>
+    <string name="account_encourage_benefits_title">Account Benefits</string>
+    <string name="account_benefit_sync_title">Sync across devices</string>
+    <string name="account_benefit_sync_description">Sync your progress, and shows across all your devices.</string>
+    <string name="account_benefit_backups_title">Reliable backups</string>
+    <string name="account_benefit_backups_description">Your library and preferences are securely saved.</string>
+    <string name="account_benefit_recommendations_title">Personalized recommendations</string>
+    <string name="account_benefit_recommendations_description">Get tailored podcast suggestions based on your listening habits.</string>
 
     <!-- Notification channel -->
 
@@ -2278,12 +2294,11 @@
 
     <!-- Winback -->
 
-    <string name="winback_offer_header">Before you cancel, check&#160;out these offers</string>
-    <string name="winback_offer_free_offer_title">Get your next month free</string>
-    <string name="winback_offer_free_offer_yearly_title">Get 50% off your next year</string>
-    <!-- %1$s is the amount of money saved -->
-    <string name="winback_offer_free_offer_description">Save %1$s at the start of your next billing cycle.</string>
-    <string name="winback_offer_free_offer_yearly_description">Pay %1$s now for another year at 50%% off.</string>
+    <string name="winback_offer_header">Thinking of leaving?\nLet us help first</string>
+    <string name="winback_offer_free_offer_title">Get your next month free and save %1$s</string>
+    <string name="winback_offer_free_offer_yearly_title">Get 50%% off your next year and save %1$s</string>
+    <string name="winback_offer_free_offer_description">Enjoy one month of Pocket Casts Plus on us! The offer will be added to your current subscription.</string>
+    <string name="winback_offer_free_offer_yearly_description">Pay %1$s now to lock in a year of Pocket Casts Plus at half price. Your discounted year begins after your current plan ends.</string>
     <string name="winback_offer_free_offer_button_label">Claim offer</string>
     <string name="winback_offer_differnt_plan_title">Looking for a different plan?</string>
     <string name="winback_offer_differnt_plan_description">Find the plan that\'s right for you.</string>
@@ -2291,8 +2306,9 @@
     <string name="winback_offer_help_description">Struggling with any features or having issues.</string>
     <string name="winback_offer_cancel_continue_button_label">Continue to Cancellation</string>
     <string name="winback_claimed_offer_message_1">Enjoy your free month!</string>
-    <string name="winback_claimed_offer_message_2">Thanks for choosing Pocket&#160;Casts. Billing starts after your free month ends.</string>
+    <string name="winback_claimed_offer_message_2">Thanks for choosing Pocket&#160;Casts. Your free month will be added to your current subscription.</string>
     <string name="winback_claimed_offer_message_3">50% off your next year!</string>
+    <string name="winback_claimed_offer_message_4">Thanks for choosing Pocket&#160;Casts. Your discounted year begins after your current billing period.</string>
     <string name="winback_available_plans_title">Available Plans</string>
     <string name="winback_available_plans_billing_note">Your new plan will activate at the end of your current billing period.</string>
     <string name="winback_too_many_subscritpions_title">Multiple subscriptions found</string>
@@ -2301,7 +2317,7 @@
     <string name="winback_error_fetch_description">Sorry, but something went wrong fetching your plans.</string>
     <string name="winback_changing_plan">Changing plan</string>
     <string name="winback_claiming_offer">Claiming offer</string>
-    <string name="winback_cancel_subscription_header_title">Cancel Subscription</string>
+    <string name="winback_cancel_subscription_header_title">Things you should know before you cancel</string>
     <string name="winback_cancel_subscription_header_description">This will change your plan to a free account.</string>
     <string name="winback_cancel_subscription_perk_active_with_date">Your current subscription will remain active until %1$s.</string>
     <string name="winback_cancel_subscription_perk_active_without_date">Your current subscription will remain active until its expiration date.</string>
@@ -2310,6 +2326,9 @@
     <string name="winback_cancel_subscription_perk_files">All files uploaded to your Pocket Casts account will be deleted (but downloaded files on your mobile devices will remain).</string>
     <string name="winback_cancel_subscription_stay_button_label">Actually, I want to stay</string>
     <string name="winback_cancel_subscription_cancel_button_label">Yes, Cancel my Subscription</string>
+    <string name="winback_cancel_subscription_accept_offer_button_label">Accept offer</string>
+    <string name="winback_cancel_subscription_continue_cancel_button_label">Continue with cancellation</string>
+
 
     <!-- Suggested Folders -->
     <string name="suggested_folders_title">Smart folders</string>

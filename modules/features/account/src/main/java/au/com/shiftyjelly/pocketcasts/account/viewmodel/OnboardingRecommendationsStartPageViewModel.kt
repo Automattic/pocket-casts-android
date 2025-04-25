@@ -7,13 +7,13 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRow
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.servers.model.transformWithRegion
-import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.Locale
 import javax.inject.Inject
@@ -25,7 +25,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
-import kotlinx.coroutines.rx2.await
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -129,7 +128,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
             }
 
             val feed = try {
-                repository.getDiscoverFeed().await()
+                repository.getDiscoverFeed()
             } catch (e: Exception) {
                 Timber.e("Exception retrieving Discover feed: $e")
                 return@launch
@@ -252,14 +251,12 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
 
         val feed = try {
             repository.getListFeed(listItem.source)
-                .await()
-                ?: return
         } catch (e: Exception) {
             Timber.e(e)
             return
         }
 
-        val podcasts = feed.podcasts
+        val podcasts = feed?.podcasts
         if (podcasts.isNullOrEmpty()) return
 
         val title = listItem.title.tryToLocalise(getApplication<Application>().resources)
@@ -284,7 +281,6 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
                 try {
                     repository
                         .getCategoriesList(row.source)
-                        .await()
                         .map {
                             it.transformWithReplacements(
                                 replacements,
@@ -300,9 +296,15 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
         // Make network calls one at a time so the UI can load the initial sections as quickly
         // as possible, and to maintain the order of the sections
         categories.forEach { category ->
-            repository
-                .getListFeed(category.source).await()
-                .podcasts?.let { podcasts ->
+            runCatching {
+                repository.getListFeed(category.source)
+            }
+                .onFailure { exception ->
+                    Timber.e(exception, "Error getting list feed for category ${category.source}")
+                }
+                .getOrNull()
+                ?.podcasts
+                ?.let { podcasts ->
                     sectionsFlow.emit(
                         sectionsFlow.value + SectionInternal(
                             title = category.title.tryToLocalise(getApplication<Application>().resources),

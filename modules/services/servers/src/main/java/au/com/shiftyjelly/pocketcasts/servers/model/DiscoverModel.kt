@@ -20,6 +20,7 @@ interface NetworkLoadableList {
     val expandedTopItemLabel: String?
     val listUuid: String?
     val curated: Boolean
+    val authenticated: Boolean?
 
     fun transformWithReplacements(replacements: Map<String, String>, resources: Resources): NetworkLoadableList
 
@@ -29,6 +30,9 @@ interface NetworkLoadableList {
         source.lowercase().contains(POPULAR) -> POPULAR
         else -> NONE
     }
+
+    val adapterId: Long
+        get() = (listUuid ?: title).hashCode().toLong()
 
     companion object {
         const val TRENDING = "trending"
@@ -64,6 +68,7 @@ data class DiscoverRow(
     @field:Json(name = "regions") val regions: List<String>,
     @field:Json(name = "sponsored") val sponsored: Boolean = false,
     @field:Json(name = "curated") override val curated: Boolean = false,
+    @field:Json(name = "authenticated") override val authenticated: Boolean? = false,
     @field:Json(name = "sponsored_podcasts") val sponsoredPodcasts: List<SponsoredPodcast> = emptyList(),
     @field:Json(name = "popular") val mostPopularCategoriesId: List<Int>?,
 ) : NetworkLoadableList {
@@ -101,6 +106,7 @@ data class DiscoverRow(
             categoryId = categoryId,
             sponsoredPodcasts = sponsoredPodcasts,
             mostPopularCategoriesId = mostPopularCategoriesId,
+            authenticated = authenticated,
         )
     }
 }
@@ -121,6 +127,7 @@ data class ListFeed(
     @field:Json(name = "podcasts") var podcasts: List<DiscoverPodcast>?,
     @field:Json(name = "episodes") var episodes: List<DiscoverEpisode>?,
     @field:Json(name = "collection_image") var collectionImageUrl: String?,
+    @field:Json(name = "feature_image") var featureImage: String?,
     @field:Json(name = "header_image") var headerImageUrl: String?,
     @field:Json(name = "colors") var tintColors: DiscoverFeedTintColors?,
     @field:Json(name = "collage_images") var collageImages: List<DiscoverFeedImage>?,
@@ -259,6 +266,7 @@ data class DiscoverCategory(
         get() = null
     override val listUuid: String?
         get() = null
+    override val authenticated: Boolean = false
 
     override fun transformWithReplacements(replacements: Map<String, String>, resources: Resources): NetworkLoadableList {
         var newTitle = title

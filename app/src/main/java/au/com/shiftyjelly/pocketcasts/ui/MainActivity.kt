@@ -31,6 +31,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.commitNow
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
+import androidx.lifecycle.asFlow
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.mediarouter.media.MediaControlIntent
@@ -40,6 +41,7 @@ import androidx.transition.Slide
 import au.com.shiftyjelly.pocketcasts.R
 import au.com.shiftyjelly.pocketcasts.account.AccountActivity
 import au.com.shiftyjelly.pocketcasts.account.PromoCodeUpgradedFragment
+import au.com.shiftyjelly.pocketcasts.account.onboarding.AccountBenefitsFragment
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivity
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContract
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContract.OnboardingFinish
@@ -142,6 +144,7 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Network
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -175,6 +178,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -477,6 +481,8 @@ class MainActivity :
         mediaRouter = MediaRouter.getInstance(this)
 
         ThemeSettingObserver(this, theme, settings.themeReconfigurationEvents).observeThemeChanges()
+
+        encourageAccountCreation()
     }
 
     private fun resetEoYBadgeIfNeeded() {
@@ -485,6 +491,31 @@ class MainActivity :
         ) {
             binding.bottomNavigation.removeBadge(VR.id.navigation_profile)
             settings.setEndOfYearShowBadge2023(false)
+        }
+    }
+
+    private fun encourageAccountCreation() {
+        if (FeatureFlag.isEnabled(Feature.ENCOURAGE_ACCOUNT_CREATION)) {
+            lifecycleScope.launch {
+                repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    val encourageAccountCreation = settings.showFreeAccountEncouragement.value
+                    if (!encourageAccountCreation) {
+                        return@repeatOnLifecycle
+                    }
+                    settings.showFreeAccountEncouragement.set(false, updateModifiedAt = true)
+
+                    val isSignedIn = viewModel.signInState.asFlow().first().isSignedIn
+                    if (isSignedIn) {
+                        return@repeatOnLifecycle
+                    }
+
+                    if (Util.isTablet(this@MainActivity)) {
+                        AccountBenefitsFragment().show(supportFragmentManager, "account_benefits_fragment")
+                    } else {
+                        openOnboardingFlow(OnboardingFlow.AccountEncouragement)
+                    }
+                }
+            }
         }
     }
 

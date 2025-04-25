@@ -105,6 +105,7 @@ Language: nl
     <string name="suggested_folders_use_these_folders_button">Deze mappen gebruiken</string>
     <string name="winback_claiming_offer">Aanbieding claimen</string>
     <string name="winback_claimed_offer_message_3">50% korting op je eerste jaar!</string>
+    <string name="winback_offer_free_offer_yearly_description">Betaal nu %1$s voor nog een jaar met 50%% korting.</string>
     <string name="podcast_refresh_no_episodes_found">Geen afleveringen gevonden.</string>
     <string name="podcast_refresh_new_episode_found">Nieuwe afleveringen gevonden!</string>
     <string name="podcast_refreshing_episode_list">Lijst met afleveringen vernieuwen …</string>
@@ -138,6 +139,7 @@ Language: nl
     <string name="winback_offer_differnt_plan_description">Vind het abonnement dat bij je past.</string>
     <string name="winback_offer_differnt_plan_title">Op zoek naar een ander abonnement?</string>
     <string name="winback_offer_free_offer_button_label">Aanbieding claimen</string>
+    <string name="winback_offer_header">Kijk eens naar deze aanbiedingen voordat je annuleert</string>
     <string name="settings_app_icon_pride">Pride</string>
     <string name="manage_download_dismiss_content_description">Downloadbanner beheren negeren</string>
     <string name="dismiss_manage_download_banner">Negeren</string>

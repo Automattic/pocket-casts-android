@@ -187,14 +187,6 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
-    PODCAST_VIEW_CHANGES(
-        key = "podcast_view_changes_2025",
-        title = "Podcast View Changes",
-        defaultValue = BuildConfig.DEBUG,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
-    ),
     PODCASTS_SORT_CHANGES(
         key = "podcasts_sort_changes",
         title = "Podcasts Sort Changes",
@@ -238,6 +230,14 @@ enum class Feature(
     ENCOURAGE_ACCOUNT_CREATION(
         key = "encourage_account_creation",
         title = "Account creation encouragement",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    ),
+    RECOMMENDATIONS(
+        key = "recommendations",
+        title = "Recommendations",
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = false,

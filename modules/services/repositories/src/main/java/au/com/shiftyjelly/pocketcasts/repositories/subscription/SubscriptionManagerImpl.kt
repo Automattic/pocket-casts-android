@@ -14,6 +14,8 @@ import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.payment.billing.PaymentDataSource
+import au.com.shiftyjelly.pocketcasts.payment.billing.isOk
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionPurchaseRequest
@@ -55,10 +57,11 @@ import kotlinx.coroutines.rx2.rxSingle
 
 @Singleton
 class SubscriptionManagerImpl @Inject constructor(
-    private val billingClient: BillingClientWrapper,
+    private val paymentDataSource: PaymentDataSource,
     private val subscriptionMapper: SubscriptionMapper,
     private val syncManager: SyncManager,
     private val settings: Settings,
+    private val productDetailsInterceptor: ProductDetailsInterceptor,
 ) : SubscriptionManager {
 
     private var cachedSubscriptionStatus: SubscriptionStatus?
@@ -142,7 +145,7 @@ class SubscriptionManagerImpl @Inject constructor(
     }
 
     private suspend fun listenToPurchaseUpdates(): Nothing {
-        billingClient.purchaseUpdates.collect { (billingResult, purchases) ->
+        paymentDataSource.purchaseUpdates.collect { (billingResult, purchases) ->
             when (billingResult.responseCode) {
                 BillingClient.BillingResponseCode.OK -> {
                     purchases.forEach { purchase ->
@@ -155,7 +158,7 @@ class SubscriptionManagerImpl @Inject constructor(
                 }
 
                 BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED -> {
-                    val (result, freshPurchases) = billingClient.loadPurchases(purchasesParams)
+                    val (result, freshPurchases) = paymentDataSource.loadPurchases(purchasesParams)
                     if (result.isOk()) {
                         val existingPurchase = freshPurchases.firstOrNull()
                         if (existingPurchase != null) {
@@ -185,9 +188,10 @@ class SubscriptionManagerImpl @Inject constructor(
     }
 
     override suspend fun loadProducts(): ProductDetailsState {
-        val (result, products) = billingClient.loadProducts(productDetailsParams)
-        val state = if (result.isOk()) {
-            ProductDetailsState.Loaded(products)
+        val (result, products) = paymentDataSource.loadProducts(productDetailsParams)
+        val interceptedResult = productDetailsInterceptor.intercept(result, products)
+        val state = if (interceptedResult.first.isOk()) {
+            ProductDetailsState.Loaded(interceptedResult.second)
         } else {
             ProductDetailsState.Failure
         }
@@ -196,7 +200,7 @@ class SubscriptionManagerImpl @Inject constructor(
     }
 
     override suspend fun loadPurchases() = coroutineScope {
-        val (purchasesResult, purchases) = billingClient.loadPurchases(purchasesParams)
+        val (purchasesResult, purchases) = paymentDataSource.loadPurchases(purchasesParams)
 
         if (purchasesResult.isOk()) {
             purchases.forEach { purchase ->
@@ -211,7 +215,7 @@ class SubscriptionManagerImpl @Inject constructor(
     }
 
     override suspend fun loadPurchaseHistory(): PurchaseHistoryState {
-        val (historyResults, historyRecords) = billingClient.loadPurchaseHistory(purchaseHistoryParams)
+        val (historyResults, historyRecords) = paymentDataSource.loadPurchaseHistory(purchaseHistoryParams)
         return if (historyResults.isOk()) {
             historyRecords.forEach(::handleHistoryRecord)
             PurchaseHistoryState.Loaded(historyRecords)
@@ -248,7 +252,7 @@ class SubscriptionManagerImpl @Inject constructor(
     }
 
     private suspend fun acknowledgePurchase(purchase: Purchase) {
-        val result = billingClient.acknowledgePurchase(acknowledgePurchaseParams(purchase))
+        val result = paymentDataSource.acknowledgePurchase(acknowledgePurchaseParams(purchase))
         if (result.isOk()) {
             purchaseEvents.accept(PurchaseEvent.Success)
         } else {
@@ -293,7 +297,7 @@ class SubscriptionManagerImpl @Inject constructor(
                     }
                 }
                 .build()
-            billingClient.launchBillingFlow(activity, billingFlowParams)
+            paymentDataSource.launchBillingFlow(activity, billingFlowParams)
         }
     }
 
@@ -327,7 +331,7 @@ class SubscriptionManagerImpl @Inject constructor(
                 }
             }
             .build()
-        return billingClient.launchBillingFlow(activity, billingFlowParams)
+        return paymentDataSource.launchBillingFlow(activity, billingFlowParams)
     }
 
     override suspend fun claimWinbackOffer(
@@ -351,7 +355,7 @@ class SubscriptionManagerImpl @Inject constructor(
             .setSubscriptionUpdateParams(updateParams)
             .build()
 
-        return billingClient.launchBillingFlow(activity, billingFlowParams)
+        return paymentDataSource.launchBillingFlow(activity, billingFlowParams)
     }
 
     private suspend fun loadSubscriptionUpdateParamsMode(
@@ -365,7 +369,7 @@ class SubscriptionManagerImpl @Inject constructor(
             return okResult to null
         }
 
-        val (result, purchases) = billingClient.loadPurchases(purchasesParams)
+        val (result, purchases) = paymentDataSource.loadPurchases(purchasesParams)
         return if (result.isOk()) {
             val params = purchases.firstOrNull()?.let { purchase ->
                 BillingFlowParams.SubscriptionUpdateParams.newBuilder()

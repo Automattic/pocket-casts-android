@@ -191,7 +191,7 @@ class DiscoverFragment :
                 staticServiceManager = staticServiceManager,
                 listener = this,
                 theme = theme,
-                loadPodcastList = viewModel::loadPodcastList,
+                loadPodcastList = { source, authenticated -> viewModel.loadPodcastList(source, authenticated) },
                 loadCarouselSponsoredPodcastList = viewModel::loadCarouselSponsoredPodcasts,
                 categoriesState = { url, popularIds ->
                     categoriesManager.setMostPopularCategories(popularIds)
@@ -225,7 +225,6 @@ class DiscoverFragment :
 
                     if (state.rows != null) {
                         adapter?.submitList(state.rows)
-
                         val newCategoryId = state.categoryFeed?.category?.id
                         if (displayedCategoryId != newCategoryId) {
                             displayedCategoryId = newCategoryId

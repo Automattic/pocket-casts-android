@@ -1,20 +1,14 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.podcast
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
-import android.animation.AnimatorSet
-import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
-import android.os.Build
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.TextView
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
@@ -26,16 +20,12 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
-import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import androidx.transition.ChangeBounds
-import androidx.transition.TransitionManager
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.text.toAnnotatedString
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
@@ -48,9 +38,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterEpisodeBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterEpisodeHeaderBinding
-import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterPodcastHeaderBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
-import au.com.shiftyjelly.pocketcasts.podcasts.view.components.ratings.PodcastRatingRow
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.BookmarkHeaderViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.BookmarkUpsellViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.BookmarkViewHolder
@@ -64,28 +52,19 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
-import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
-import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
-import au.com.shiftyjelly.pocketcasts.views.extensions.hide
-import au.com.shiftyjelly.pocketcasts.views.extensions.show
-import au.com.shiftyjelly.pocketcasts.views.extensions.toggleVisibility
-import au.com.shiftyjelly.pocketcasts.views.helper.AnimatorUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
-import au.com.shiftyjelly.pocketcasts.views.helper.toCircle
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import java.util.Date
-import kotlinx.coroutines.CompletableDeferred
-import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -198,7 +177,6 @@ class PodcastAdapter(
     object NoBookmarkMessage
 
     enum class HeaderType {
-        SolidColor,
         Blur,
         Scrim,
     }
@@ -209,8 +187,8 @@ class PodcastAdapter(
         private const val VIEW_TYPE_BOOKMARK_HEADER = 102
         private const val VIEW_TYPE_BOOKMARK_UPSELL = 103
         private const val VIEW_TYPE_NO_BOOKMARK = 104
+        const val VIEW_TYPE_PODCAST_HEADER = 105
         val VIEW_TYPE_EPISODE_HEADER = R.layout.adapter_episode_header
-        val VIEW_TYPE_PODCAST_HEADER = R.layout.adapter_podcast_header
         val VIEW_TYPE_EPISODE_LIMIT_ROW = R.layout.adapter_episode_limit
         val VIEW_TYPE_NO_RESULTS = R.layout.adapter_no_results
         val VIEW_TYPE_DIVIDER = R.layout.adapter_divider_row
@@ -240,47 +218,34 @@ class PodcastAdapter(
         setHasStableIds(true)
     }
 
-    private val tooltipHeaderOffset = CompletableDeferred<Dp?>()
-
-    suspend fun awaitTooltipHeaderTopOffset() = tooltipHeaderOffset.await()
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
-            VIEW_TYPE_PODCAST_HEADER -> when (headerType) {
-                HeaderType.SolidColor -> {
-                    tooltipHeaderOffset.complete(null)
-                    PodcastViewHolder(AdapterPodcastHeaderBinding.inflate(inflater, parent, false), this)
-                }
-                HeaderType.Blur, HeaderType.Scrim -> {
-                    PodcastHeaderViewHolder(
-                        context = parent.context,
-                        theme = theme,
-                        useBlurredArtwork = headerType == HeaderType.Blur,
-                        onClickCategory = onClickCategory,
-                        onClickRating = onClickRating,
-                        onClickFollow = onSubscribeClicked,
-                        onClickUnfollow = { onUnsubscribeClicked { } },
-                        onClickFolder = onFoldersClicked,
-                        onClickNotification = onNotificationsClicked,
-                        onClickDonate = onDonateClicked,
-                        onClickSettings = onSettingsClicked,
-                        onClickWebsiteLink = onClickWebsite,
-                        onToggleHeader = {
-                            onChangeHeaderExpanded(podcast.uuid, !podcast.isHeaderExpanded)
-                        },
-                        onToggleDescription = {
-                            isDescriptionExpanded = !isDescriptionExpanded
-                            notifyItemChanged(0)
-                        },
-                        onLongClickArtwork = {
-                            onArtworkLongClicked { notifyItemChanged(0) }
-                        },
-                        onArtworkAvailable = onArtworkAvailable,
-                        onTooltipOffsetMeasured = tooltipHeaderOffset::complete,
-                    )
-                }
-            }
+            VIEW_TYPE_PODCAST_HEADER -> PodcastHeaderViewHolder(
+                context = parent.context,
+                theme = theme,
+                useBlurredArtwork = headerType == HeaderType.Blur,
+                onClickCategory = onClickCategory,
+                onClickRating = onClickRating,
+                onClickFollow = onSubscribeClicked,
+                onClickUnfollow = { onUnsubscribeClicked { } },
+                onClickFolder = onFoldersClicked,
+                onClickNotification = onNotificationsClicked,
+                onClickDonate = onDonateClicked,
+                onClickSettings = onSettingsClicked,
+                onClickWebsiteLink = onClickWebsite,
+                onToggleHeader = {
+                    onChangeHeaderExpanded(podcast.uuid, !podcast.isHeaderExpanded)
+                },
+                onToggleDescription = {
+                    isDescriptionExpanded = !isDescriptionExpanded
+                    notifyItemChanged(0)
+                },
+                onLongClickArtwork = {
+                    onArtworkLongClicked { notifyItemChanged(0) }
+                },
+                onArtworkAvailable = onArtworkAvailable,
+            )
 
             VIEW_TYPE_TABS -> TabsViewHolder(ComposeView(parent.context), theme)
             VIEW_TYPE_EPISODE_HEADER -> EpisodeHeaderViewHolder(AdapterEpisodeHeaderBinding.inflate(inflater, parent, false), onEpisodesOptionsClicked, onSearchFocus)
@@ -320,7 +285,6 @@ class PodcastAdapter(
             )
 
             is EpisodeViewHolder -> bindEpisodeViewHolder(holder, position, fromListUuid)
-            is PodcastViewHolder -> bindPodcastViewHolder(holder)
             is TabsViewHolder -> holder.bind(getItem(position) as TabsHeader)
             is EpisodeHeaderViewHolder -> bindingEpisodeHeaderViewHolder(holder, position)
             is EpisodeLimitViewHolder -> bindEpisodeLimitRow(holder, position)
@@ -336,91 +300,6 @@ class PodcastAdapter(
     override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
         super.onDetachedFromRecyclerView(recyclerView)
         disposables.clear()
-    }
-
-    private fun bindPodcastViewHolder(holder: PodcastViewHolder) {
-        bindHeaderBottom(holder, ratingState)
-        bindHeaderTop(holder)
-
-        val imageView = holder.binding.top.artwork
-        // stopping the artwork flickering when the image is reloaded
-        if (imageView.drawable == null || holder.lastImagePodcastUuid == null || holder.lastImagePodcastUuid != podcast.uuid) {
-            holder.lastImagePodcastUuid = podcast.uuid
-            imageRequestFactory.create(podcast).loadInto(imageView)
-        }
-
-        imageView.setOnLongClickListener {
-            onArtworkLongClicked {
-                imageRequestFactory.create(podcast).loadInto(imageView)
-            }
-            true
-        }
-
-        holder.binding.podcastHeader.contentDescription = podcast.title
-    }
-
-    private fun bindHeaderBottom(holder: PodcastViewHolder, ratingState: RatingState) {
-        holder.binding.bottom.root.isVisible = headerExpanded
-
-        holder.binding.bottom.podcastHeaderBottom.setContent {
-            AppTheme(theme.activeTheme) {
-                PodcastHeaderBottom(
-                    title = podcast.title,
-                    category = podcast.getFirstCategory(context.resources),
-                    description = podcastDescription,
-                    podcastInfoContent = {
-                        PodcastInfoView(
-                            PodcastInfoState(
-                                author = podcast.author,
-                                link = podcast.getShortUrl(),
-                                schedule = podcast.displayableFrequency(context.resources),
-                                next = podcast.displayableNextEpisodeDate(context),
-                            ),
-                            onWebsiteLinkClicked = { onClickWebsite(podcast) },
-                        )
-                    },
-                    ratingsContent = {
-                        if (ratingState is RatingState.Loaded) {
-                            PodcastRatingRow(
-                                state = ratingState,
-                                onClick = { source -> onClickRating(podcast, source) },
-                            )
-                        }
-                    },
-                    onDescriptionClicked = onPodcastDescriptionClicked,
-                )
-            }
-        }
-    }
-
-    private fun bindHeaderTop(holder: PodcastViewHolder) {
-        val isPlusOrPatronUser = signInState.isSignedInAsPlusOrPatron
-        holder.binding.top.chevron.isEnabled = headerExpanded
-        holder.binding.top.settings.isVisible = podcast.isSubscribed
-        holder.binding.top.subscribeButton.isVisible = !podcast.isSubscribed
-        holder.binding.top.subscribedButton.isVisible = podcast.isSubscribed
-        holder.binding.top.subscribedButton.toCircle(true)
-        holder.binding.top.header.setBackgroundColor(ThemeColor.podcastUi03(theme.activeTheme, podcast.backgroundColor))
-        holder.binding.top.folders.setImageResource(
-            when {
-                !isPlusOrPatronUser -> IR.drawable.ic_folder_plus
-                podcast.folderUuid != null -> IR.drawable.ic_folder_check
-                else -> IR.drawable.ic_folder
-            },
-        )
-        holder.binding.top.folders.isVisible = podcast.isSubscribed
-        with(holder.binding.top.notifications) {
-            val notificationsIconText =
-                context.getString(if (podcast.isShowNotifications) LR.string.podcast_notifications_on else LR.string.podcast_notifications_off)
-            contentDescription = notificationsIconText
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                tooltipText = notificationsIconText
-            }
-            setImageResource(
-                if (podcast.isShowNotifications) IR.drawable.ic_notifications_on else IR.drawable.ic_notifications_off,
-            )
-            isVisible = podcast.isSubscribed
-        }
     }
 
     private fun bindingEpisodeHeaderViewHolder(holder: EpisodeHeaderViewHolder, position: Int) {
@@ -688,7 +567,7 @@ class PodcastAdapter(
     override fun getItemViewType(position: Int): Int {
         val item = getItem(position)
         return when (item) {
-            is Podcast -> R.layout.adapter_podcast_header
+            is Podcast -> VIEW_TYPE_PODCAST_HEADER
             is EpisodeHeader -> R.layout.adapter_episode_header
             is EpisodeLimitRow -> R.layout.adapter_episode_limit
             is NoResultsMessage -> R.layout.adapter_no_results
@@ -727,26 +606,6 @@ class PodcastAdapter(
         }
     }
 
-    private fun onHeaderClicked(binding: AdapterPodcastHeaderBinding) {
-        val transition = ChangeBounds().apply {
-            duration = 200
-            interpolator = FastOutSlowInInterpolator()
-        }
-
-        val constraintLayout = binding.top.root
-        val constraintSet = ConstraintSet()
-        constraintSet.clone(constraintLayout)
-        constraintSet.constrainPercentWidth(R.id.artworkContainer, if (!binding.bottom.root.isVisible) 0.40f else 0.38f)
-
-        TransitionManager.beginDelayedTransition(binding.root as ViewGroup, transition)
-        constraintSet.applyTo(constraintLayout)
-
-        val expanded = binding.bottom.root.toggleVisibility()
-        binding.top.chevron.isEnabled = expanded
-        headerExpanded = expanded
-        onHeaderSummaryToggled(expanded, true)
-    }
-
     internal class EpisodeHeaderViewHolder(val binding: AdapterEpisodeHeaderBinding, val onEpisodesOptionsClicked: () -> Unit, val onSearchFocus: () -> Unit) : RecyclerView.ViewHolder(binding.root) {
         init {
             binding.btnEpisodeOptions.setOnClickListener {
@@ -772,142 +631,6 @@ class PodcastAdapter(
         val lblTitle = itemView.findViewById<TextView>(R.id.lblTitle)
     }
 
-    internal inner class PodcastViewHolder(val binding: AdapterPodcastHeaderBinding, val adapter: PodcastAdapter) : RecyclerView.ViewHolder(binding.root) {
-
-        var lastImagePodcastUuid: String? = null
-
-        init {
-            binding.top.header.setOnClickListener {
-                adapter.onHeaderClicked(binding)
-            }
-            binding.top.artwork.setOnClickListener {
-                adapter.onHeaderClicked(binding)
-            }
-            binding.top.subscribeButton.setOnClickListener {
-                animateToSubscribed()
-            }
-            binding.top.subscribedButton.setOnClickListener {
-                unsubscribe()
-            }
-            binding.top.folders.setOnClickListener {
-                adapter.onFoldersClicked()
-            }
-            binding.top.notifications.setOnClickListener {
-                adapter.onNotificationsClicked(podcast, !podcast.isShowNotifications)
-            }
-            binding.top.settings.setOnClickListener {
-                adapter.onSettingsClicked()
-            }
-        }
-
-        private fun unsubscribe() {
-            adapter.onUnsubscribeClicked {
-                unsubscribeConfirmed()
-            }
-        }
-
-        private fun unsubscribeConfirmed() {
-            val subscribeButton = binding.top.subscribeButton
-            val subscribedButton = binding.top.subscribedButton
-            val greenButton = binding.top.animationSubscribedButton
-            val subscribeText = binding.top.animationSubscribeText
-            val notificationsButton = binding.top.notifications
-            val settingsButton = binding.top.settings
-
-            subscribeButton.show()
-            subscribedButton.hide()
-            greenButton.hide()
-            subscribeText.hide()
-            notificationsButton.hide()
-            settingsButton.hide()
-        }
-
-        private fun animateToSubscribed() {
-            val subscribeButton = binding.top.subscribeButton
-            val subscribedButton = binding.top.subscribedButton
-            val greenButton = binding.top.animationSubscribedButton
-            val subscribeText = binding.top.animationSubscribeText
-            val notificationsButton = binding.top.notifications
-            val settingsButton = binding.top.settings
-            val displayMetrics = greenButton.context.resources.displayMetrics
-            val accelerateDecelerateInterpolator = AccelerateDecelerateInterpolator()
-
-            greenButton.alpha = 0f
-            greenButton.show()
-
-            subscribeText.alpha = 0f
-            subscribeText.show()
-
-            subscribedButton.alpha = 0f
-            subscribedButton.show()
-
-            notificationsButton.alpha = 0f
-            notificationsButton.show()
-
-            settingsButton.alpha = 0f
-            settingsButton.show()
-
-            val fadeInGreenButton = AnimatorUtil.fadeIn(greenButton, 300)
-            fadeInGreenButton.addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator) {
-                    subscribeButton.hide()
-                }
-            })
-
-            val fadeInSubscribeText = AnimatorUtil.fadeIn(subscribeText, 300)
-
-            val fadeInButton = AnimatorSet()
-            fadeInButton.playTogether(fadeInGreenButton, fadeInSubscribeText)
-
-            val greenButtonWidth = subscribeButton.measuredWidth
-            val changeWidthGreenButton = ValueAnimator.ofInt(greenButtonWidth, 32.dpToPx(displayMetrics))
-            changeWidthGreenButton.addUpdateListener { valueAnimator ->
-                val animatedValue = valueAnimator.animatedValue as Int
-                val layoutParams = greenButton.layoutParams
-                layoutParams.width = animatedValue
-                greenButton.layoutParams = layoutParams
-            }
-            changeWidthGreenButton.addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator) {
-                    greenButton.layoutParams.width = greenButtonWidth
-                    greenButton.hide()
-                }
-            })
-            changeWidthGreenButton.duration = 300
-            changeWidthGreenButton.startDelay = 600
-
-            val fadeOutSubscribeText = AnimatorUtil.fadeOut(subscribeText, 100)
-            fadeOutSubscribeText.startDelay = 600
-
-            val fadeInSubscribedButton = AnimatorUtil.fadeIn(subscribedButton, 200)
-            fadeInSubscribedButton.startDelay = 700
-
-            val fadeInNotificationsButton = AnimatorUtil.fadeIn(notificationsButton, 200)
-            fadeInNotificationsButton.startDelay = 700
-
-            val fadeInSettingsButton = AnimatorUtil.fadeIn(settingsButton, 200)
-            fadeInSettingsButton.startDelay = 700
-
-            val translationXNotificationsButton = AnimatorUtil.translationX(notificationsButton, 100.dpToPx(displayMetrics), 0, accelerateDecelerateInterpolator, 900)
-            val translationXSettingsButton = AnimatorUtil.translationX(settingsButton, 100.dpToPx(displayMetrics), 0, accelerateDecelerateInterpolator, 900)
-
-            val widthAndTickSet = AnimatorSet()
-            widthAndTickSet.playTogether(fadeOutSubscribeText, changeWidthGreenButton, fadeInSubscribedButton, fadeInNotificationsButton, fadeInSettingsButton, translationXSettingsButton, translationXNotificationsButton)
-
-            val set = AnimatorSet()
-            set.playSequentially(fadeInButton, widthAndTickSet)
-            set.addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator) {
-                    if (headerExpanded) {
-                        adapter.onHeaderClicked(binding)
-                    }
-                    adapter.onSubscribeClicked()
-                }
-            })
-            set.start()
-        }
-    }
-
     private inner class PodcastHeaderViewHolder(
         context: Context,
         private val theme: Theme,
@@ -925,7 +648,6 @@ class PodcastAdapter(
         private val onToggleDescription: () -> Unit,
         private val onLongClickArtwork: () -> Unit,
         private val onArtworkAvailable: (Podcast) -> Unit,
-        private val onTooltipOffsetMeasured: (Dp) -> Unit,
     ) : RecyclerView.ViewHolder(ComposeView(context)) {
         private val composeView get() = itemView as ComposeView
 
@@ -992,7 +714,6 @@ class PodcastAdapter(
                         onToggleDescription = onToggleDescription,
                         onLongClickArtwork = onLongClickArtwork,
                         onArtworkAvailable = { onArtworkAvailable(podcast) },
-                        onTooltipOffsetMeasured = onTooltipOffsetMeasured,
                     )
                 }
             }

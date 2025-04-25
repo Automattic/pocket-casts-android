@@ -105,6 +105,7 @@ Language: sv_SE
     <string name="suggested_folders_use_these_folders_button">Använd dessa mappar</string>
     <string name="winback_claiming_offer">Utnyttjar erbjudande</string>
     <string name="winback_claimed_offer_message_3">50 % rabatt på ditt nästa år.</string>
+    <string name="winback_offer_free_offer_yearly_description">Betala %1$s nu för ytterligare ett år med 50 %% rabatt.</string>
     <string name="podcast_refresh_no_episodes_found">Inga avsnitt hittades.</string>
     <string name="podcast_refresh_new_episode_found">Nytt avsnitt hittat.</string>
     <string name="podcast_refreshing_episode_list">Uppdaterar avsnittslista…</string>
@@ -138,6 +139,7 @@ Language: sv_SE
     <string name="winback_offer_differnt_plan_description">Hitta rätt paket för dig.</string>
     <string name="winback_offer_differnt_plan_title">Letar du efter ett annat paket?</string>
     <string name="winback_offer_free_offer_button_label">Utnyttja erbjudande</string>
+    <string name="winback_offer_header">Innan du avslutar, kolla in dessa erbjudanden</string>
     <string name="settings_app_icon_pride">Pride</string>
     <string name="manage_download_dismiss_content_description">Hantera nedladdning, banner, avfärda</string>
     <string name="dismiss_manage_download_banner">Avfärda</string>

@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.colors.ColorManager
+import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -12,7 +13,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverEpisode
 import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.ListFeed
-import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
@@ -48,13 +48,16 @@ class PodcastListViewModel @Inject constructor(
         disposables.clear()
     }
 
-    fun load(sourceUrl: String?, listStyle: ExpandedStyle) {
+    fun load(sourceUrl: String?, listStyle: ExpandedStyle, authenticated: Boolean?) {
         if (sourceUrl == null) {
             state.value = PodcastListViewState.Error(IllegalStateException("Must provide a source url"))
             return
         }
 
-        listRepository.getListFeed(sourceUrl)
+        rxMaybe { listRepository.getListFeed(url = sourceUrl, authenticated = authenticated) }
+            .toSingle()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
             .flatMap {
                 return@flatMap if (listStyle is ExpandedStyle.RankedList) {
                     addColorsToFeed(it)

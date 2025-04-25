@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
+import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.repositories.playback.EXTRA_CONTENT_STYLE_GROUP_TITLE_HINT
 import au.com.shiftyjelly.pocketcasts.repositories.playback.FOLDER_ROOT_PREFIX
 import au.com.shiftyjelly.pocketcasts.repositories.playback.MEDIA_ID_ROOT
@@ -27,10 +28,11 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.SUGGESTED_ROOT
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter
 import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsTask
 import au.com.shiftyjelly.pocketcasts.servers.model.Discover
+import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
+import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRow
 import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.servers.model.transformWithRegion
-import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -165,7 +167,7 @@ class AutoPlaybackService : PlaybackService() {
         Log.d(Settings.LOG_TAG_AUTO, "Loading discover root")
         val discoverFeed: Discover
         try {
-            discoverFeed = listSource.getDiscoverFeedSuspend()
+            discoverFeed = listSource.getDiscoverFeed()
         } catch (e: Exception) {
             Log.e(Settings.LOG_TAG_AUTO, "Error loading discover", e)
             return emptyList()
@@ -178,11 +180,24 @@ class AutoPlaybackService : PlaybackService() {
         )
 
         val updatedList = discoverFeed.layout.transformWithRegion(region, replacements, resources)
-            .filter { it.type is ListType.PodcastList && it.displayStyle !is DisplayStyle.CollectionList && !it.sponsored && it.displayStyle !is DisplayStyle.SinglePodcast }
-            .map { discoverItem ->
+            .filter {
+                it.type is ListType.PodcastList &&
+                    it.displayStyle !is DisplayStyle.CollectionList &&
+                    !it.sponsored &&
+                    it.authenticated == false &&
+                    it.displayStyle !is DisplayStyle.SinglePodcast
+            }
+            .mapNotNull<DiscoverRow, Pair<String, List<DiscoverPodcast>>> { discoverItem ->
                 Log.d(Settings.LOG_TAG_AUTO, "Loading discover feed ${discoverItem.source}")
-                val listFeed = listSource.getListFeedSuspend(discoverItem.source)
-                Pair(discoverItem.title, listFeed.podcasts?.take(6) ?: emptyList())
+                listSource.getListFeed(
+                    url = discoverItem.source,
+                    authenticated = discoverItem.authenticated,
+                )?.run {
+                    Pair(
+                        title.orEmpty().ifEmpty { discoverItem.title },
+                        podcasts?.take(6) ?: emptyList(),
+                    )
+                }
             }
             .flatMap { (title, podcasts) ->
                 Log.d(Settings.LOG_TAG_AUTO, "Mapping $title to media item")

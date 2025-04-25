@@ -103,6 +103,7 @@ Language: ar
     <string name="suggested_folders_use_these_folders_button">استخدام هذه المجلدات</string>
     <string name="winback_claiming_offer">المطالبة بعرض</string>
     <string name="winback_claimed_offer_message_3">خصم قدره 50% على عامك الأول!</string>
+    <string name="winback_offer_free_offer_yearly_description">ادفع ⁦%1$s⁩ الآن للحصول على عام آخر بخصم قدره 50%%.</string>
     <string name="podcast_refresh_no_episodes_found">لم يتم العثور على أي حلقات.</string>
     <string name="podcast_refresh_new_episode_found">تم العثور على حلقة جديدة!</string>
     <string name="podcast_refreshing_episode_list">جارٍ تحديث قائمة الحلقات…</string>
@@ -136,6 +137,7 @@ Language: ar
     <string name="winback_offer_differnt_plan_description">ابحث عن الخطة المناسبة لك.</string>
     <string name="winback_offer_differnt_plan_title">هل تبحث عن خطة مختلفة؟</string>
     <string name="winback_offer_free_offer_button_label">المطالبة بعرض</string>
+    <string name="winback_offer_header">قبل الإلغاء، تحقق من هذه العروض</string>
     <string name="settings_app_icon_pride">كبرياء</string>
     <string name="manage_download_dismiss_content_description">إدارة تجاهل شعار التنزيل</string>
     <string name="dismiss_manage_download_banner">تجاهل</string>

@@ -1,11 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.discover.worker
 
 import au.com.shiftyjelly.pocketcasts.models.entity.CuratedPodcast
+import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.servers.BuildConfig
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRow
 import au.com.shiftyjelly.pocketcasts.servers.model.ListFeed
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
-import au.com.shiftyjelly.pocketcasts.servers.server.ListWebService
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
@@ -15,15 +15,15 @@ import kotlinx.coroutines.coroutineScope
 import timber.log.Timber
 
 class CuratedPodcastsCrawler(
-    private val service: ListWebService,
+    private val listRepository: ListRepository,
     private val staticHostUrl: String,
 ) {
     @Inject constructor(
-        service: ListWebService,
-    ) : this(service, BuildConfig.SERVER_STATIC_URL)
+        listRepository: ListRepository,
+    ) : this(listRepository, BuildConfig.SERVER_STATIC_URL)
 
-    suspend fun crawl(platform: String): Result<List<CuratedPodcast>> = coroutineScope {
-        runCatching { service.getDiscoverFeedSuspend(platform) }.mapCatching { discover ->
+    suspend fun crawl(): Result<List<CuratedPodcast>> = coroutineScope {
+        runCatching { listRepository.getDiscoverFeed() }.mapCatching { discover ->
             val feeds = discover.layout
                 .filterDisplayablePodcasts()
                 .mapNotNull { row -> row.id?.let { id -> fetchFeed(id, row.source) } }
@@ -68,6 +68,10 @@ class CuratedPodcastsCrawler(
         } else {
             url
         }
-        return async { runCatching { service.getListFeedSuspend(engageUrl) } }
+        return async {
+            runCatching {
+                checkNotNull(listRepository.getListFeed(engageUrl))
+            }
+        }
     }
 }

@@ -127,6 +127,7 @@ class FiltersFragment :
                     actionLabel = stringResource(LR.string.encourage_account_banner_action_label),
                     icon = painterResource(IR.drawable.ic_refresh),
                     onActionClick = {
+                        viewModel.onCreateFreeAccountClick()
                         OnboardingLauncher.openOnboardingFlow(
                             activity = requireActivity(),
                             onboardingFlow = OnboardingFlow.LoggedOut,

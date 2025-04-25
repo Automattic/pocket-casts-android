@@ -105,6 +105,7 @@ Language: es
     <string name="suggested_folders_use_these_folders_button">Usar estas carpetas</string>
     <string name="winback_claiming_offer">Reclamar oferta</string>
     <string name="winback_claimed_offer_message_3">50 % de descuento el próximo año</string>
+    <string name="winback_offer_free_offer_yearly_description">Paga %1$s ahora para obtener un año más al 50 %% de descuento.</string>
     <string name="podcast_refresh_no_episodes_found">No se ha encontrado ningún episodio.</string>
     <string name="podcast_refresh_new_episode_found">Se ha encontrado un nuevo episodio.</string>
     <string name="podcast_refreshing_episode_list">Actualizando la lista de episodios…</string>
@@ -138,6 +139,7 @@ Language: es
     <string name="winback_offer_differnt_plan_description">Encuentra el plan adecuado para ti.</string>
     <string name="winback_offer_differnt_plan_title">¿Necesitas un plan diferente?</string>
     <string name="winback_offer_free_offer_button_label">Reclamar oferta</string>
+    <string name="winback_offer_header">Antes de cancelar, echa un vistazo a estas ofertas</string>
     <string name="settings_app_icon_pride">Orgullo</string>
     <string name="manage_download_dismiss_content_description">Gestionar el descarte de los banners de descarga</string>
     <string name="dismiss_manage_download_banner">Descartar</string>

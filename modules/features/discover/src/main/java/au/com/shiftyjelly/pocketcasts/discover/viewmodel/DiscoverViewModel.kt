@@ -12,9 +12,11 @@ import au.com.shiftyjelly.pocketcasts.discover.view.RemainingPodcastsByCategoryR
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.categories.CategoriesManager
+import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverEpisode
@@ -27,7 +29,6 @@ import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
 import au.com.shiftyjelly.pocketcasts.servers.model.SponsoredPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.transformWithRegion
-import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
 import com.automattic.android.tracks.crashlogging.CrashLogging
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
@@ -35,6 +36,7 @@ import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.combineLatest
 import io.reactivex.rxkotlin.subscribeBy
@@ -44,6 +46,8 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.rx2.rxMaybe
+import kotlinx.coroutines.rx2.rxSingle
 import timber.log.Timber
 
 @HiltViewModel
@@ -57,6 +61,7 @@ class DiscoverViewModel @Inject constructor(
     val categoriesManager: CategoriesManager,
     val analyticsTracker: AnalyticsTracker,
     val crashLogging: CrashLogging,
+    val syncManager: SyncManager,
 ) : ViewModel() {
     private val disposables = CompositeDisposable()
     private val sourceView = SourceView.DISCOVER
@@ -86,9 +91,22 @@ class DiscoverViewModel @Inject constructor(
     }
 
     fun loadFeed(resources: Resources) {
-        loadDiscoverFeed(resources)
+        val loggedInObservable = syncManager.isLoggedInObservable
+        Observables.combineLatest(loadDiscoverFeedRxSingle(resources).toObservable(), loggedInObservable)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .map { (discoverFeed: DiscoverFeed, isLoggedIn: Boolean) ->
+                // remove authenticated lists if the user's not logged in
+                if (!isLoggedIn) {
+                    discoverFeed.copy(
+                        data = discoverFeed.data.filterNot { it.authenticated ?: false },
+                    )
+                } else {
+                    discoverFeed
+                }
+            }
             .subscribeBy(
-                onSuccess = { discoverFeed ->
+                onNext = { discoverFeed ->
                     _state.update {
                         it.copy(discoverFeed = discoverFeed, categoryFeed = null, isLoading = false, isError = false)
                     }
@@ -101,29 +119,28 @@ class DiscoverViewModel @Inject constructor(
             .addTo(disposables)
     }
 
-    private fun loadDiscoverFeed(resources: Resources): Single<DiscoverFeed> {
-        return repository.getDiscoverFeed().map { discover ->
-            val defaultRegion = discover.defaultRegionCode
-            val region = discover.regions[currentRegionCode ?: defaultRegion] ?: discover.regions[defaultRegion]
-            if (region == null) {
-                error("Could not get region $currentRegionCode")
-            }
-
-            if (currentRegionCode == null) {
-                currentRegionCode = defaultRegion
-            }
-            replacements = mapOf(
-                discover.regionCodeToken to region.code,
-                discover.regionNameToken to region.name,
-            )
-
-            // Update the list with the correct region substituted in where needed
-            val updatedList = discover.layout.transformWithRegion(region, replacements, resources)
-
-            // Save ads to display in category view
-            adsForCategoryView = updatedList.filter { discoverRow -> discoverRow.categoryId != null }
-            DiscoverFeed(updatedList, region, discover.regions.values.toList())
+    private fun loadDiscoverFeedRxSingle(resources: Resources): Single<DiscoverFeed> = rxSingle {
+        val discover = repository.getDiscoverFeed()
+        val defaultRegion = discover.defaultRegionCode
+        val region = discover.regions[currentRegionCode ?: defaultRegion] ?: discover.regions[defaultRegion]
+        if (region == null) {
+            error("Could not get region $currentRegionCode")
         }
+
+        if (currentRegionCode == null) {
+            currentRegionCode = defaultRegion
+        }
+        replacements = mapOf(
+            discover.regionCodeToken to region.code,
+            discover.regionNameToken to region.name,
+        )
+
+        // Update the list with the correct region substituted in where needed
+        val updatedList = discover.layout.transformWithRegion(region, replacements, resources)
+
+        // Save ads to display in category view
+        adsForCategoryView = updatedList.filter { discoverRow -> discoverRow.categoryId != null }
+        DiscoverFeed(updatedList, region, discover.regions.values.toList())
     }
 
     fun changeRegion(region: DiscoverRegion, resources: Resources) {
@@ -132,8 +149,11 @@ class DiscoverViewModel @Inject constructor(
         loadFeed(resources)
     }
 
-    fun loadPodcastList(source: String): Flowable<PodcastList> {
-        return repository.getListFeed(source)
+    fun loadPodcastList(source: String, authenticated: Boolean?): Flowable<PodcastList> {
+        return rxMaybe { repository.getListFeed(source, authenticated) }
+            .toSingle()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
             .map {
                 PodcastList(
                     podcasts = it.podcasts ?: emptyList(),
@@ -142,6 +162,7 @@ class DiscoverViewModel @Inject constructor(
                     subtitle = it.subtitle,
                     description = it.description,
                     collectionImageUrl = it.collectionImageUrl,
+                    featureImage = it.featureImage,
                     tintColors = it.tintColors,
                     images = it.collageImages,
                     listId = it.listId,
@@ -158,15 +179,17 @@ class DiscoverViewModel @Inject constructor(
 
         val initialDiscoverFeed = state.value.discoverFeed
         val feedInitialization = if (initialDiscoverFeed == null) {
-            loadDiscoverFeed(resources)
+            loadDiscoverFeedRxSingle(resources)
         } else {
             Single.just(initialDiscoverFeed)
         }
 
         feedInitialization
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
             .flatMap { discoverFeed ->
                 val categoryUrl = transformNetworkLoadableList(category, resources).source
-                loadPodcastList(categoryUrl)
+                loadPodcastList(source = categoryUrl, authenticated = false)
                     .firstOrError()
                     .map { discoverFeed to it }
             }
@@ -202,7 +225,7 @@ class DiscoverViewModel @Inject constructor(
                 !isInvalidSponsoredSource
             }
             .map { sponsoredPodcast ->
-                loadPodcastList(sponsoredPodcast.source as String)
+                loadPodcastList(source = sponsoredPodcast.source as String, authenticated = false)
                     .filter {
                         it.podcasts.isNotEmpty() && it.listId != null
                     }
@@ -375,6 +398,7 @@ data class PodcastList(
     val subtitle: String?,
     val description: String?,
     val collectionImageUrl: String?,
+    val featureImage: String?,
     val tintColors: DiscoverFeedTintColors?,
     val images: List<DiscoverFeedImage>?,
     val listId: String? = null,
