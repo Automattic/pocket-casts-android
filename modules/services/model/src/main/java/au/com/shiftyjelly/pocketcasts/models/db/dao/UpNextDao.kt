@@ -149,7 +149,7 @@ abstract class UpNextDao {
         val idToPosition = upNextEpisodes.associate { it.episodeUuid to it.position }
         val podcastEpisodes = findPodcastEpisodes(idToPosition.keys)
         val userEpisodes = if (podcastEpisodes.size != upNextEpisodes.size) findUserEpisodes(idToPosition.keys) else emptyList()
-        return (podcastEpisodes + userEpisodes).sortedBy { idToPosition[it.uuid] }
+        return (podcastEpisodes + userEpisodes).sortedBy { idToPosition.getOrDefault(it.uuid, null) }
     }
 
     @Query("SELECT * FROM up_next_episodes ORDER BY position ASC LIMIT :limit")
