@@ -1,11 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-03-31 08:36:31+0000
+Translation-Revision-Date: 2025-04-23 10:47:57+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: el_GR
 -->
 <resources>
+    <string name="price_per_week_usd">\u0024%1$.2f/βδομάδα</string>
+    <string name="price_per_week">%1$.2f %2$s/βδομάδα</string>
+    <string name="winback_cancel_subscription_header_title">Τι πρέπει να ξέρεις πριν ακυρώσεις</string>
+    <string name="winback_offer_header">Σκέφτεσαι να φύγεις;\nΆσε μας να σε βοηθήσουμε πρώτα</string>
+    <string name="account_benefit_recommendations_description">Λάβε προσωποποιημένες προτάσεις για podcasts βασισμένες στις συνήθειες ακρόασής σου.</string>
+    <string name="account_benefit_recommendations_title">Προσωποποιημένες προτάσεις</string>
+    <string name="account_benefit_backups_description">Η βιβλιοθήκη και οι προτιμήσεις σου είναι αποθηκευμένες με ασφάλεια.</string>
+    <string name="account_benefit_backups_title">Αξιόπιστα αντίγραφα</string>
+    <string name="account_benefit_sync_description">Συγχρόνισε τη πρόοδό σου και τις εκπομπές σου σε όλες σου τις συσκευές.</string>
+    <string name="account_benefit_sync_title">Συγχρονισμός μεταξύ συσκευών</string>
+    <string name="account_encourage_benefits_title">Προνόμια Λογαριασμού</string>
+    <string name="account_encourage_description">Δημιούργησε έναν λογαριασμό ή συνδέσου για να απολαύσεις το Pocket Casts στο έπακρο.</string>
+    <string name="account_encourage_title">Προσέξαμε ότι δεν έχεις συνδεθεί</string>
+    <string name="onboarding_get_started">Ας ξεκινήσουμε</string>
+    <string name="onboarding_plus_feature_libro_title">Δωρεάν ηχητικό βιβλίο από %1$s</string>
+    <string name="encourage_account_history_banner_description">Δημιούργησε έναν δωρέαν λογαριασμό για να συγχρονίζεις το ιστορικό ακρόασής σου παντού.</string>
+    <string name="encourage_account_history_banner_title">Παρακολούθα τι έχεις ακούσει</string>
+    <string name="encourage_account_filters_banner_description">Δημιούργησε έναν δωρέαν λογαριασμό για να συγχρονίζεις τα φίλτρα σου σε κάθε συσκευή.</string>
+    <string name="encourage_account_filters_banner_title">Κράτα τα φίλτρα σου συγχρονισμένα</string>
+    <string name="encourage_account_sync_banner_description">Δημιούργησε έναν δωρέαν λογαριασμό για να συγχρονίσεις τις εκπομπές σου και να ακούς από παντού.</string>
+    <string name="encourage_account_sync_banner_title">Οι εκπομπές σου, παντού</string>
+    <string name="encourage_account_banner_action_label">Δημιούργησε έναν δωρεάν λογαριασμό</string>
+    <string name="dismiss">Απόρριψη</string>
+    <string name="settings_privacy_analytics_third_party_summary">Επέτρεψέ μας να χρησιμοποιούμε έμπιστες υπηρεσίες τρίτων για να συλλέγουμε ανώνυμα δεδομένα.</string>
+    <string name="settings_privacy_analytics_third_party">Αναλυτικά τρίτου μέρους</string>
+    <string name="settings_privacy_analytics_first_party">Αναλυτικά πρώτου μέρους</string>
+    <string name="tracking_consent_dialog_reject">Αίτημα Αποτροπής Παρακολούθησης</string>
+    <string name="tracking_consent_dialog_allow">Επιτρέπεται</string>
+    <string name="tracking_consent_dialog_message">Χρησιμοποιούμε αναλυτικά για να κάνουμε την εφαρμογή καλύτερη και να διαπιστώνουμε αν οι διαφημίσεις μας είναι επιτυχείς.</string>
+    <string name="tracking_consent_dialog_title">Επιτρέπεις στο \"Pocket Casts\" να παρακολουθεί τη δραστηριότητά σου σε ιστοσελίδες και εφαρμογές άλλων εταιριών;</string>
+    <string name="donate">Δωρεά</string>
     <string name="filters_tooltip_subtitle">Δημιούργησε έξυπνα φίλτρα για να οργανώσεις τα επεισόδιά σου. Φιλτράρισε βάσει διάρκειας, ημερομηνίας κυκλοφορίας, τύπο πολυμέσων και άλλα.</string>
     <string name="filters_tooltip_title">Όργάνωσε τα επεισόδιά σου</string>
     <string name="podcasts_sort_by_recently_played">Παίχθηκαν πρόσφατα</string>
@@ -63,7 +94,6 @@ Language: el_GR
     <string name="suggested_folders_use_subtitle">Οργανώσαμε τα podcasts σου σε φακέλους. Αποθήκευσέ τους τώρα και επεξεργάσου τους αργότερα όπως σου ταιριάζουν.</string>
     <string name="onboarding_plus_feature_up_next_shuffle_title">Ανακάτεμα Επόμενου</string>
     <string name="suggested_folders_plus_prompt">Οργάνωσε τις εκπομπές σου, με το Pocket Casts Plus και άλλα</string>
-    <string name="winback_cancel_subscription_header_title">Ακύρωση Συνδρομής</string>
     <string name="onboarding_import_from_url_failed">Η εισαγωγή του OPML απέτυχε</string>
     <string name="onboarding_import_from_url_error_message">Μη έγκυρο URL</string>
     <string name="onboarding_import_from_url_importing_message">Η εισαγωγή του OPML είναι σε εξέλιξη. Μπορείς να γυρίσεις στη διαδικασία εισαγωγής σου.</string>
@@ -75,8 +105,6 @@ Language: el_GR
     <string name="suggested_folders_use_these_folders_button">Χρήση αυτών των επεισοδίων</string>
     <string name="winback_claiming_offer">Διεκδίκηση προσφοράς</string>
     <string name="winback_claimed_offer_message_3">50% λιγότερο για την επόμενη χρονιά σου!</string>
-    <string name="winback_offer_free_offer_yearly_description">Πλήρωσε %1$s τώρα για άλλον ένα χρόνο με έκπτωση 50%%.</string>
-    <string name="winback_offer_free_offer_yearly_title">Πάρε 50% έκπτωση την επόμενη χρονιά σου</string>
     <string name="podcast_refresh_no_episodes_found">Δε βρέθηκαν επεισόδια.</string>
     <string name="podcast_refresh_new_episode_found">Βρέθηκε νέο επεισόδιο!</string>
     <string name="podcast_refreshing_episode_list">Ανανέωση λίστας επεισοδίων…</string>
@@ -103,7 +131,6 @@ Language: el_GR
     <string name="clean_history">Αφαίρεση από το ιστορικό</string>
     <string name="onboarding_start_free_trial_upgrade_button">Ξεκίνα την δωρεάν δοκιμή</string>
     <string name="sharing_is_not_available_for_private_podcasts">Η κοινοποίηση δεν είναι διαθέσιμη για ιδιωτικά podcasts</string>
-    <string name="winback_claimed_offer_message_2">Ευχαριστούμε που επέλεξες το Pocket Casts. Η χρέωση ξεκινάει μετά την ολοκλήρωση του δωρεάν μήνα σου.</string>
     <string name="winback_claimed_offer_message_1">Απόλαυσε τον δωρεάν μήνα σου!</string>
     <string name="winback_offer_cancel_continue_button_label">Συνέχισε την Ακύρωση</string>
     <string name="winback_offer_help_description">Δυσκολεύομαι με κάποια χαρακτηριστικά ή έχω προβλήματα.</string>
@@ -111,9 +138,6 @@ Language: el_GR
     <string name="winback_offer_differnt_plan_description">Βρες το πλάνο που σου ταιριάζει.</string>
     <string name="winback_offer_differnt_plan_title">Ψάχνεις για ένα διαφορετικό πλάνο;</string>
     <string name="winback_offer_free_offer_button_label">Διεκδίκηση προσφοράς</string>
-    <string name="winback_offer_free_offer_description">Εξοικονόμησε %1$s στην αρχή του επόμενου κύκλου χρέωσης σου.</string>
-    <string name="winback_offer_free_offer_title">Πάρε τον επόμενο μήνα δωρεάν</string>
-    <string name="winback_offer_header">Πριν ακυρώσεις, ρίξε μια ματιά σ\' αυτές τις προσφορές</string>
     <string name="settings_app_icon_pride">Περηφάνεια</string>
     <string name="manage_download_dismiss_content_description">Διαχείριση Απόρριψης Κεφαλίδας Λήψης</string>
     <string name="dismiss_manage_download_banner">Απόρριψη</string>

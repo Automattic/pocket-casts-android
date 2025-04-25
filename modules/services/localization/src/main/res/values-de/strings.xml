@@ -1,11 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-04-11 08:10:11+0000
+Translation-Revision-Date: 2025-04-23 15:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="price_per_week_usd">\u0024%1$.2f/Woche</string>
+    <string name="price_per_week">%1$.2f %2$s/Woche</string>
+    <string name="winback_cancel_subscription_header_title">Was du vor deiner Kündigung wissen solltest</string>
+    <string name="winback_offer_header">Du denkst darüber nach, zu gehen?\nLass uns dir zuerst helfen</string>
+    <string name="account_benefit_recommendations_description">Erhalte maßgeschneiderte Podcast-Vorschläge, die auf deinen Hörgewohnheiten basieren.</string>
+    <string name="account_benefit_recommendations_title">Personalisierte Empfehlungen</string>
+    <string name="account_benefit_backups_description">Deine Mediathek und deine Einstellungen werden sicher gespeichert.</string>
+    <string name="account_benefit_backups_title">Zuverlässige Backups</string>
+    <string name="account_benefit_sync_description">Synchronisiere deinen Fortschritt und deine Shows auf all deinen Geräten.</string>
+    <string name="account_benefit_sync_title">Geräteübergreifende Synchronisation</string>
+    <string name="account_encourage_benefits_title">Kontovorteile</string>
+    <string name="account_encourage_description">Erstelle ein Konto oder melde dich an, um Pocket Casts in vollen Zügen genießen zu können.</string>
+    <string name="account_encourage_title">Wir haben festgestellt, dass du nicht angemeldet bist</string>
+    <string name="onboarding_get_started">Los geht’s</string>
+    <string name="onboarding_plus_feature_libro_title">Kostenloses Hörbuch von %1$s</string>
+    <string name="encourage_account_history_banner_description">Erstelle ein kostenloses Konto, um deinen Hörverlauf überall zu synchronisieren.</string>
+    <string name="encourage_account_history_banner_title">Überblick über wiedergegebene Titel behalten</string>
+    <string name="encourage_account_filters_banner_description">Erstelle ein kostenloses Konto, um deine Filter auf jedem Gerät zu synchronisieren.</string>
+    <string name="encourage_account_filters_banner_title">Deine Filter synchron halten</string>
+    <string name="encourage_account_sync_banner_description">Erstelle ein kostenloses Konto, um deine Shows zu synchronisieren und überall zu hören.</string>
+    <string name="encourage_account_sync_banner_title">Deine Shows, auf jedem Gerät</string>
+    <string name="encourage_account_banner_action_label">Kostenloses Konto erstellen</string>
     <string name="dismiss">Verwerfen</string>
     <string name="settings_privacy_analytics_third_party_summary">Erlaube uns, vertrauenswürdige Drittanbieterdienste zu nutzen, um anonyme Daten zu sammeln.</string>
     <string name="settings_privacy_analytics_third_party">Drittanbieter-Analysen</string>
@@ -72,7 +94,6 @@ Language: de
     <string name="suggested_folders_use_subtitle">Wir haben deine Podcasts in Ordnern organisiert. Speichere sie jetzt oder passe sie später nach Belieben an.</string>
     <string name="onboarding_plus_feature_up_next_shuffle_title">Mischen der Warteschlange</string>
     <string name="suggested_folders_plus_prompt">Organisiere deine Shows mit Pocket Casts Plus und vieles mehr</string>
-    <string name="winback_cancel_subscription_header_title">Abonnement kündigen</string>
     <string name="onboarding_import_from_url_failed">OPML-Import fehlgeschlagen</string>
     <string name="onboarding_import_from_url_error_message">Ungültige URL</string>
     <string name="onboarding_import_from_url_importing_message">OPML-Import läuft. Du kannst zum Onboarding-Prozess zurückkehren.</string>
@@ -84,8 +105,6 @@ Language: de
     <string name="suggested_folders_use_these_folders_button">Diese Ordner verwenden</string>
     <string name="winback_claiming_offer">Angebot nutzen</string>
     <string name="winback_claimed_offer_message_3">50 % Rabatt auf das nächstes Jahr!</string>
-    <string name="winback_offer_free_offer_yearly_description">Zahle jetzt %1$s und erhalte für ein weiteres Jahr 50 %% Rabatt.</string>
-    <string name="winback_offer_free_offer_yearly_title">50 % Rabatt auf das nächste Jahr sichern</string>
     <string name="podcast_refresh_no_episodes_found">Keine Folgen gefunden.</string>
     <string name="podcast_refresh_new_episode_found">Neue Folge gefunden!</string>
     <string name="podcast_refreshing_episode_list">Folgenliste wird aktualisiert …</string>
@@ -112,7 +131,6 @@ Language: de
     <string name="clean_history">Aus dem Verlauf entfernen</string>
     <string name="onboarding_start_free_trial_upgrade_button">Kostenlosen Testzeitraum starten</string>
     <string name="sharing_is_not_available_for_private_podcasts">Teilen ist für private Podcasts nicht verfügbar</string>
-    <string name="winback_claimed_offer_message_2">Vielen Dank, dass du dich für Pocket Casts entschieden hast. Die Abrechnung beginnt nach dem kostenlosen Monat.</string>
     <string name="winback_claimed_offer_message_1">Genieße deinen kostenlosen Monat!</string>
     <string name="winback_offer_cancel_continue_button_label">Weiter zur Kündigung</string>
     <string name="winback_offer_help_description">Kommst du mit bestimmten Funktionen nicht zurecht oder hast du Probleme?</string>
@@ -120,9 +138,6 @@ Language: de
     <string name="winback_offer_differnt_plan_description">Finde deinen passenden Tarif.</string>
     <string name="winback_offer_differnt_plan_title">Du suchst nach einem anderen Tarif?</string>
     <string name="winback_offer_free_offer_button_label">Angebot nutzen</string>
-    <string name="winback_offer_free_offer_description">Spare %1$s zu Beginn deines nächsten Abrechnungszyklus.</string>
-    <string name="winback_offer_free_offer_title">Erhalte deinen nächsten Monat kostenlos</string>
-    <string name="winback_offer_header">Schau dir diese Angebote an, bevor du kündigst</string>
     <string name="settings_app_icon_pride">Pride</string>
     <string name="manage_download_dismiss_content_description">Banner zum Verwalten von Downloads schließen</string>
     <string name="dismiss_manage_download_banner">Verwerfen</string>

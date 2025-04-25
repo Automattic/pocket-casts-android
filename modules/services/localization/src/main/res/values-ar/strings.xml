@@ -1,11 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-04-11 08:10:11+0000
+Translation-Revision-Date: 2025-04-22 09:54:03+0000
 Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;
 Generator: GlotPress/2.4.0-alpha
 Language: ar
 -->
 <resources>
+    <string name="winback_cancel_subscription_header_title">أشياء يجب أن تعرفها قبل أن تقوم بالإلغاء</string>
+    <string name="winback_offer_header">هل تفكر في المغادرة؟\nدعنا نساعدك أولا</string>
+    <string name="account_benefit_recommendations_description">احصل على اقتراحات بودكاست مخصصة استنادًا إلى عادات الاستماع الخاصة بك.</string>
+    <string name="account_benefit_recommendations_title">التوصيات المخصصة</string>
+    <string name="account_benefit_backups_description">تم حفظ مكتبتك وتفضيلاتك بأمان.</string>
+    <string name="account_benefit_backups_title">نسخ احتياطية موثوقة</string>
+    <string name="account_benefit_sync_description">قم بمزامنة التقدم الذي تحرزه والعروض التي تتابعها عبر كل أجهزتك.</string>
+    <string name="account_benefit_sync_title">مزامنة عبر الأجهزة</string>
+    <string name="account_encourage_benefits_title">مزايا الحساب</string>
+    <string name="account_encourage_description">أنشئ حسابًا أو سجّل الدخول للاستمتاع ب Pocket Casts على أكمل وجه.</string>
+    <string name="account_encourage_title">لاحظنا أنك لم تسجل الدخول</string>
+    <string name="onboarding_get_started">ابدأ</string>
+    <string name="onboarding_plus_feature_libro_title">كتاب صوتي مجاني من ⁦%1$s⁩</string>
+    <string name="encourage_account_history_banner_description">أنشئ حسابا مجانيا لمزامنة سجل استماعك في كل مكان.</string>
+    <string name="encourage_account_history_banner_title">تعقب ما تشغله</string>
+    <string name="encourage_account_filters_banner_description">أنشئ حسابًا مجانيًا لمزامنة عوامل التصفية الخاصة بك على أي جهاز.</string>
+    <string name="encourage_account_filters_banner_title">حافظ على مزامنة عوامل التصفية الخاصة بك</string>
+    <string name="encourage_account_sync_banner_description">أنشئ حسابًا مجانيًا لمزامنة عروضك والاستماع إليها من أي مكان.</string>
+    <string name="encourage_account_sync_banner_title">تابع عروضك، على أي جهاز</string>
+    <string name="encourage_account_banner_action_label">أنشئ حسابًا مجانيًا</string>
     <string name="dismiss">تجاهل</string>
     <string name="settings_privacy_analytics_third_party_summary">اسمح لنا باستخدام خدمات موثوق بها تابعة لأطراف ثالثة لجمع بيانات مجهولة الهوية.</string>
     <string name="settings_privacy_analytics_third_party">تحليلات تابعة للأطراف الثالثة</string>
@@ -72,7 +92,6 @@ Language: ar
     <string name="suggested_folders_use_subtitle">لقد نظمَّنا حلقات البث الصوتي الخاصة بك في مجلدات. احفظها الآن وخصصها لاحقًا لتناسب نمطك.</string>
     <string name="onboarding_plus_feature_up_next_shuffle_title">خلط العناصر التالية</string>
     <string name="suggested_folders_plus_prompt">تنظيم عروضك باستخدام Pocket Casts Plus والمزيد</string>
-    <string name="winback_cancel_subscription_header_title">إلغاء الاشتراك</string>
     <string name="onboarding_import_from_url_failed">فشل تصدير OPML</string>
     <string name="onboarding_import_from_url_error_message">عنوان موقع غير صالح</string>
     <string name="onboarding_import_from_url_importing_message">استيراد OPML قيد التقدُّم. يمكنك الرجوع إلى عملية الإعداد الخاصة بك.</string>
@@ -84,8 +103,6 @@ Language: ar
     <string name="suggested_folders_use_these_folders_button">استخدام هذه المجلدات</string>
     <string name="winback_claiming_offer">المطالبة بعرض</string>
     <string name="winback_claimed_offer_message_3">خصم قدره 50% على عامك الأول!</string>
-    <string name="winback_offer_free_offer_yearly_description">ادفع ⁦%1$s⁩ الآن للحصول على عام آخر بخصم قدره 50%%.</string>
-    <string name="winback_offer_free_offer_yearly_title">الحصول على خصم قدره 50% على عامك التالي</string>
     <string name="podcast_refresh_no_episodes_found">لم يتم العثور على أي حلقات.</string>
     <string name="podcast_refresh_new_episode_found">تم العثور على حلقة جديدة!</string>
     <string name="podcast_refreshing_episode_list">جارٍ تحديث قائمة الحلقات…</string>
@@ -112,7 +129,6 @@ Language: ar
     <string name="clean_history">إزالة من السجل</string>
     <string name="onboarding_start_free_trial_upgrade_button">بدء تجربة مجانية</string>
     <string name="sharing_is_not_available_for_private_podcasts">المشاركة غير متاحة لحلقات البث الصوتي الخاص</string>
-    <string name="winback_claimed_offer_message_2">شكرًا على اختيار Pocket Casts. تبدأ الفوترة بعد انتهاء الشهر المجاني الخاص بك.</string>
     <string name="winback_claimed_offer_message_1">استمتع بشهرك المجاني!</string>
     <string name="winback_offer_cancel_continue_button_label">الاستمرار إلى الإلغاء</string>
     <string name="winback_offer_help_description">المعاناة مع أي ميزات أو مواجهة مشكلات.</string>
@@ -120,9 +136,6 @@ Language: ar
     <string name="winback_offer_differnt_plan_description">ابحث عن الخطة المناسبة لك.</string>
     <string name="winback_offer_differnt_plan_title">هل تبحث عن خطة مختلفة؟</string>
     <string name="winback_offer_free_offer_button_label">المطالبة بعرض</string>
-    <string name="winback_offer_free_offer_description">وفِّر ⁦%1$s⁩ في بداية دورة الفوترة التالية الخاصة بك.</string>
-    <string name="winback_offer_free_offer_title">الحصول على شهرك التالي مجانًا</string>
-    <string name="winback_offer_header">قبل الإلغاء، تحقق من هذه العروض</string>
     <string name="settings_app_icon_pride">كبرياء</string>
     <string name="manage_download_dismiss_content_description">إدارة تجاهل شعار التنزيل</string>
     <string name="dismiss_manage_download_banner">تجاهل</string>

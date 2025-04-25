@@ -1,11 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-04-11 08:10:10+0000
+Translation-Revision-Date: 2025-04-24 09:54:03+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="price_per_week_usd">\u0024%1$.2f/semaine</string>
+    <string name="price_per_week">%1$.2f %2$s/semaine</string>
+    <string name="winback_cancel_subscription_header_title">Ce que vous devez savoir avant d’annuler</string>
+    <string name="winback_offer_header">Vous envisagez de nous quitter ?\nLaissez-nous d’abord vous aider</string>
+    <string name="account_benefit_recommendations_description">Recevez des suggestions de podcasts sur mesure en fonction de vos habitudes d’écoute.</string>
+    <string name="account_benefit_recommendations_title">Recommandations personnalisées</string>
+    <string name="account_benefit_backups_description">Votre bibliothèque et vos préférences sont enregistrées en toute sécurité.</string>
+    <string name="account_benefit_backups_title">Sauvegardes fiables</string>
+    <string name="account_benefit_sync_description">Synchronisez votre progression et vos émissions sur tous vos appareils.</string>
+    <string name="account_benefit_sync_title">Synchronisation entre les appareils</string>
+    <string name="account_encourage_benefits_title">Avantages d’avoir un compte</string>
+    <string name="account_encourage_description">Créez un compte ou connectez-vous pour profiter pleinement de Pocket Casts.</string>
+    <string name="account_encourage_title">Nous avons remarqué que vous n’êtes pas connecté(e)</string>
+    <string name="onboarding_get_started">Commencer</string>
+    <string name="onboarding_plus_feature_libro_title">Livre audio gratuit provenant de %1$s</string>
+    <string name="encourage_account_history_banner_description">Créez un compte gratuit pour synchroniser votre historique d’écoute partout.</string>
+    <string name="encourage_account_history_banner_title">Garder une trace de ce que vous avez écouté</string>
+    <string name="encourage_account_filters_banner_description">Créez un compte gratuit pour synchroniser vos filtres sur tous vos appareils.</string>
+    <string name="encourage_account_filters_banner_title">Synchroniser vos filtres</string>
+    <string name="encourage_account_sync_banner_description">Créez un compte gratuit pour synchroniser vos émissions et les écouter où que vous soyez.</string>
+    <string name="encourage_account_sync_banner_title">Vos émissions, sur tous vos appareils</string>
+    <string name="encourage_account_banner_action_label">Créer un compte gratuit</string>
     <string name="dismiss">ignorer</string>
     <string name="settings_privacy_analytics_third_party_summary">Autorisez-nous à utiliser des services tiers de confiance pour collecter des données anonymes.</string>
     <string name="settings_privacy_analytics_third_party">Statistiques tierces</string>
@@ -72,7 +94,6 @@ Language: fr
     <string name="suggested_folders_use_subtitle">Nous avons organisé vos podcasts dans des dossiers. Enregistrez-les maintenant et personnalisez-les plus tard pour les faire correspondre à votre style.</string>
     <string name="onboarding_plus_feature_up_next_shuffle_title">Lecture aléatoire dans la file d’attente</string>
     <string name="suggested_folders_plus_prompt">Organiser vos émissions avec Pocket Casts Plus, et plus encore</string>
-    <string name="winback_cancel_subscription_header_title">Annuler l’abonnement</string>
     <string name="onboarding_import_from_url_failed">Échec de l’importation OPML</string>
     <string name="onboarding_import_from_url_error_message">URL non valide</string>
     <string name="onboarding_import_from_url_importing_message">Importation OPML en cours Vous pouvez revenir à votre processus d’intégration.</string>
@@ -84,8 +105,6 @@ Language: fr
     <string name="suggested_folders_use_these_folders_button">Utiliser ces dossiers</string>
     <string name="winback_claiming_offer">Profiter de l’offre</string>
     <string name="winback_claimed_offer_message_3">-50 % sur la prochaine année !</string>
-    <string name="winback_offer_free_offer_yearly_description">Payez %1$s dès maintenant pour profiter d’une année supplémentaire à -50 %%.</string>
-    <string name="winback_offer_free_offer_yearly_title">Obtenir -50 % sur la prochaine année</string>
     <string name="podcast_refresh_no_episodes_found">Aucun épisode trouvé.</string>
     <string name="podcast_refresh_new_episode_found">Nouvel épisode trouvé !</string>
     <string name="podcast_refreshing_episode_list">Rafraîchissement de la liste des épisodes…</string>
@@ -112,7 +131,6 @@ Language: fr
     <string name="clean_history">Retirer de l’historique</string>
     <string name="onboarding_start_free_trial_upgrade_button">Démarrer l’essai gratuit</string>
     <string name="sharing_is_not_available_for_private_podcasts">Le partage n’est pas disponible pour les podcasts privés</string>
-    <string name="winback_claimed_offer_message_2">Merci d’avoir choisi Pocket Casts. La facturation commence au terme du mois gratuit.</string>
     <string name="winback_claimed_offer_message_1">Profitez de votre mois gratuit !</string>
     <string name="winback_offer_cancel_continue_button_label">Poursuivre vers l’annulation</string>
     <string name="winback_offer_help_description">Des problèmes avec des fonctionnalités ou autres ?</string>
@@ -120,9 +138,6 @@ Language: fr
     <string name="winback_offer_differnt_plan_description">Trouvez le plan qui vous convient.</string>
     <string name="winback_offer_differnt_plan_title">À la recherche d’un plan différent ?</string>
     <string name="winback_offer_free_offer_button_label">Profiter de l’offre</string>
-    <string name="winback_offer_free_offer_description">Économisez %1$s au début de votre prochain cycle de facturation.</string>
-    <string name="winback_offer_free_offer_title">Obtenir votre prochain mois gratuit</string>
-    <string name="winback_offer_header">Avant que vous n’annuliez, jetez un coup d’œil à ces offres</string>
     <string name="settings_app_icon_pride">Pride</string>
     <string name="manage_download_dismiss_content_description">Gérer le rejet de la bannière de téléchargement</string>
     <string name="dismiss_manage_download_banner">Ignorer</string>
