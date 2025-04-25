@@ -31,6 +31,8 @@ fun HtmlText(
     @StyleRes textStyleResId: Int = UR.style.H50,
     @ColorRes backgroundColorRes: Int? = null
 ) {
+    val focusedLinkColor = MaterialTheme.theme.colors.primaryInteractive01
+
     AndroidView(
         modifier = modifier,
         factory = { context ->
@@ -41,6 +43,7 @@ fun HtmlText(
                 setMaxLines(maxLines)
                 setTextColor(color.toArgb())
                 setLinkTextColor(linkColor.toArgb())
+                highlightColor = focusedLinkColor.toArgb()
                 setTextIsSelectable(selectable)
                 backgroundColorRes?.let(::setBackgroundResource)
             }
