@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.compose.text
 
 import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
 import android.view.Gravity
 import android.widget.TextView
 import androidx.annotation.ColorRes
@@ -13,6 +14,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.text.HtmlCompat
+import androidx.core.text.getSpans
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -48,7 +50,16 @@ fun HtmlText(
                 backgroundColorRes?.let(::setBackgroundResource)
             }
         },
-        update = { it.text = HtmlCompat.fromHtml(html, HtmlCompat.FROM_HTML_MODE_COMPACT) },
+        update = { view ->
+            view.text = HtmlCompat.fromHtml(html, HtmlCompat.FROM_HTML_MODE_COMPACT).also {
+                if (it.getSpans<ClickableSpan>().isNotEmpty()) {
+                    view.movementMethod = LinkMovementMethod.getInstance()
+                } else {
+                    view.movementMethod = null
+                    view.isFocusable = false
+                }
+            }
+        },
     )
 }
 
