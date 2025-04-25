@@ -139,7 +139,6 @@ Language: el_GR
     <string name="winback_offer_differnt_plan_description">Βρες το πλάνο που σου ταιριάζει.</string>
     <string name="winback_offer_differnt_plan_title">Ψάχνεις για ένα διαφορετικό πλάνο;</string>
     <string name="winback_offer_free_offer_button_label">Διεκδίκηση προσφοράς</string>
-    <string name="winback_offer_header">Πριν ακυρώσεις, ρίξε μια ματιά σ\' αυτές τις προσφορές</string>
     <string name="settings_app_icon_pride">Περηφάνεια</string>
     <string name="manage_download_dismiss_content_description">Διαχείριση Απόρριψης Κεφαλίδας Λήψης</string>
     <string name="dismiss_manage_download_banner">Απόρριψη</string>

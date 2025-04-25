@@ -139,7 +139,6 @@ Language: ru
     <string name="winback_offer_differnt_plan_description">Выберите оптимальный тарифный план.</string>
     <string name="winback_offer_differnt_plan_title">Хотите перейти на другой тарифный план?</string>
     <string name="winback_offer_free_offer_button_label">Воспользоваться предложением</string>
-    <string name="winback_offer_header">Прежде чем окончательно отменить подписку, просмотрите наши предложения</string>
     <string name="settings_app_icon_pride">Гордость</string>
     <string name="manage_download_dismiss_content_description">Закрыть баннер «Управление загрузкой»</string>
     <string name="dismiss_manage_download_banner">Закрыть</string>

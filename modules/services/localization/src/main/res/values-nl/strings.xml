@@ -139,7 +139,6 @@ Language: nl
     <string name="winback_offer_differnt_plan_description">Vind het abonnement dat bij je past.</string>
     <string name="winback_offer_differnt_plan_title">Op zoek naar een ander abonnement?</string>
     <string name="winback_offer_free_offer_button_label">Aanbieding claimen</string>
-    <string name="winback_offer_header">Kijk eens naar deze aanbiedingen voordat je annuleert</string>
     <string name="settings_app_icon_pride">Pride</string>
     <string name="manage_download_dismiss_content_description">Downloadbanner beheren negeren</string>
     <string name="dismiss_manage_download_banner">Negeren</string>

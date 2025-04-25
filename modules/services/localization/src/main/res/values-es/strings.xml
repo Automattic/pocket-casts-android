@@ -139,7 +139,6 @@ Language: es
     <string name="winback_offer_differnt_plan_description">Encuentra el plan adecuado para ti.</string>
     <string name="winback_offer_differnt_plan_title">¿Necesitas un plan diferente?</string>
     <string name="winback_offer_free_offer_button_label">Reclamar oferta</string>
-    <string name="winback_offer_header">Antes de cancelar, echa un vistazo a estas ofertas</string>
     <string name="settings_app_icon_pride">Orgullo</string>
     <string name="manage_download_dismiss_content_description">Gestionar el descarte de los banners de descarga</string>
     <string name="dismiss_manage_download_banner">Descartar</string>

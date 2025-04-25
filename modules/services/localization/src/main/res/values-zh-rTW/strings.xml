@@ -139,7 +139,6 @@ Language: zh_TW
     <string name="winback_offer_differnt_plan_description">尋找適合你的方案。</string>
     <string name="winback_offer_differnt_plan_title">正在尋找其他方案？</string>
     <string name="winback_offer_free_offer_button_label">領取優惠</string>
-    <string name="winback_offer_header">取消前，不妨看看以下優惠</string>
     <string name="settings_app_icon_pride">驕傲</string>
     <string name="manage_download_dismiss_content_description">關閉管理下載橫幅</string>
     <string name="dismiss_manage_download_banner">關閉</string>

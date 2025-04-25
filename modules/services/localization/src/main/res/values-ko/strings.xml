@@ -139,7 +139,6 @@ Language: ko_KR
     <string name="winback_offer_differnt_plan_description">나에게 맞는 요금제를 찾아보세요.</string>
     <string name="winback_offer_differnt_plan_title">다른 요금제를 찾고 있나요?</string>
     <string name="winback_offer_free_offer_button_label">혜택 받기</string>
-    <string name="winback_offer_header">취소하기 전에 혜택을 확인해 보세요</string>
     <string name="settings_app_icon_pride">프라이드</string>
     <string name="manage_download_dismiss_content_description">다운로드 배너 닫기 관리</string>
     <string name="dismiss_manage_download_banner">해제</string>

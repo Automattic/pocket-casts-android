@@ -139,7 +139,6 @@ Language: zh_CN
     <string name="winback_offer_differnt_plan_description">找到适合您的套餐。</string>
     <string name="winback_offer_differnt_plan_title">想换个套餐？</string>
     <string name="winback_offer_free_offer_button_label">领取优惠</string>
-    <string name="winback_offer_header">在取消之前，请查看以下优惠</string>
     <string name="settings_app_icon_pride">骄傲</string>
     <string name="manage_download_dismiss_content_description">管理下载横幅关闭</string>
     <string name="dismiss_manage_download_banner">忽略</string>
