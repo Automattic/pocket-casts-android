@@ -14,7 +14,7 @@ class PaymentResultTest {
 
     @Test
     fun `getOrNull for failure`() {
-        val result: PaymentResult<Int> = PaymentResult.Failure("Error")
+        val result: PaymentResult<Int> = PaymentResult.Failure(PaymentResultCode.Error, "Whoops!")
 
         assertNull(result.getOrNull())
     }
@@ -30,7 +30,7 @@ class PaymentResultTest {
 
     @Test
     fun `map for failure`() {
-        val result: PaymentResult<Int> = PaymentResult.Failure("Error")
+        val result: PaymentResult<Int> = PaymentResult.Failure(PaymentResultCode.Error, "Whoops!")
 
         val mapped = result.map { "${it * 2}" }
 
@@ -48,7 +48,7 @@ class PaymentResultTest {
 
     @Test
     fun `flatMap for failure`() {
-        val result: PaymentResult<Int> = PaymentResult.Failure("Error")
+        val result: PaymentResult<Int> = PaymentResult.Failure(PaymentResultCode.Error, "Whoops!")
 
         val mapped = result.flatMap { PaymentResult.Success("${it * 2}") }
 
@@ -67,7 +67,7 @@ class PaymentResultTest {
 
     @Test
     fun `onSuccess for failure`() {
-        val result: PaymentResult<Int> = PaymentResult.Failure("Error")
+        val result: PaymentResult<Int> = PaymentResult.Failure(PaymentResultCode.Error, "Whoops!")
         var value = "Hello"
 
         result.onSuccess { value = "${it * 2}" }
@@ -80,18 +80,36 @@ class PaymentResultTest {
         val result = PaymentResult.Success(10)
         var value = "Hello"
 
-        result.onFailure { value = it }
+        result.onFailure { code, message -> value = "$code $message" }
 
         assertEquals("Hello", value)
     }
 
     @Test
     fun `onFailure for failure`() {
-        val result: PaymentResult<Int> = PaymentResult.Failure("Error")
+        val result: PaymentResult<Int> = PaymentResult.Failure(PaymentResultCode.Error, "Whoops!")
         var value = "Hello"
 
-        result.onFailure { value = it }
+        result.onFailure { code, message -> value = "$code $message" }
 
-        assertEquals("Error", value)
+        assertEquals("Error Whoops!", value)
+    }
+
+    @Test
+    fun `recover for success`() {
+        val result = PaymentResult.Success(10)
+
+        val recovered = result.recover { code, message -> PaymentResult.Success(55) }
+
+        assertEquals(10, recovered.getOrNull())
+    }
+
+    @Test
+    fun `recover for failure`() {
+        val result: PaymentResult<Int> = PaymentResult.Failure(PaymentResultCode.Error, "Whoops!")
+
+        val recovered = result.recover { _, _ -> PaymentResult.Success(55) }
+
+        assertEquals(55, recovered.getOrNull())
     }
 }

@@ -134,8 +134,8 @@ class SubscriptionPlans private constructor(
                     },
                 )
 
-                0 -> PaymentResult.Failure("No matching product found for $key")
-                else -> PaymentResult.Failure("Multiple matching products found for $key. $matchingProducts")
+                0 -> PaymentResult.Failure(PaymentResultCode.DeveloperError, "No matching product found for $key")
+                else -> PaymentResult.Failure(PaymentResultCode.DeveloperError, "Multiple matching products found for $key. $matchingProducts")
             }
         }
 

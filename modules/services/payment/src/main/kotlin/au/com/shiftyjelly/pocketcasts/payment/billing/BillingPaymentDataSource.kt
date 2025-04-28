@@ -168,4 +168,29 @@ private fun ProductDetailsResult.toPaymentResult(): PaymentResult<List<ProductDe
     }
 }
 
-private fun BillingResult.toPaymentFailure() = PaymentResult.Failure("Response code: $responseCode, $debugMessage")
+private fun PurchasesResult.toPaymentResult(): PaymentResult<List<GooglePurchase>> {
+    return if (billingResult.isOk()) {
+        PaymentResult.Success(purchasesList.orEmpty())
+    } else {
+        billingResult.toPaymentFailure()
+    }
+}
+
+private fun BillingResult.toPaymentFailure() = PaymentResult.Failure(
+    when (responseCode) {
+        -2 -> PaymentResultCode.FeatureNotSupported
+        -1 -> PaymentResultCode.ServiceDisconnected
+        0 -> PaymentResultCode.Ok
+        1 -> PaymentResultCode.UserCancelled
+        2, -3 -> PaymentResultCode.ServiceUnavailable
+        3 -> PaymentResultCode.BillingUnavailable
+        4 -> PaymentResultCode.ItemUnavailable
+        5 -> PaymentResultCode.DeveloperError
+        6 -> PaymentResultCode.Error
+        7 -> PaymentResultCode.ItemAlreadyOwned
+        8 -> PaymentResultCode.ItemNotOwned
+        12 -> PaymentResultCode.NetworkError
+        else -> PaymentResultCode.Unknown(responseCode)
+    },
+    debugMessage,
+)

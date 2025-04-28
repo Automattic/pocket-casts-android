@@ -12,6 +12,6 @@ class PaymentClient @Inject constructor(
             .loadProducts()
             .flatMap(SubscriptionPlans::create)
             .onSuccess { plans -> logger.info("Subscription plans loaded: $plans") }
-            .onFailure { message -> logger.warning("Failed to load subscription plans: $message") }
+            .onFailure { code, message -> logger.warning("Failed to load subscription plans. $code $message") }
     }
 }
