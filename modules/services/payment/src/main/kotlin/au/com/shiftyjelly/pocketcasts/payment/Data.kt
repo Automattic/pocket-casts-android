@@ -287,3 +287,27 @@ enum class SubscriptionOffer {
         }
     }
 }
+
+data class Purchase(
+    val state: PurchaseState,
+    val token: String,
+    val productIds: List<String>,
+    val isAcknowledged: Boolean,
+    val isAutoRenewing: Boolean,
+)
+
+sealed interface PurchaseState {
+    val orderId: String?
+
+    data object Pending : PurchaseState {
+        override val orderId get() = null
+    }
+
+    data class Purchased(
+        override val orderId: String,
+    ) : PurchaseState
+
+    data object Unspecified : PurchaseState {
+        override val orderId get() = null
+    }
+}

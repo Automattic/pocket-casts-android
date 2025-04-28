@@ -2,10 +2,12 @@ package au.com.shiftyjelly.pocketcasts.payment.billing
 
 import au.com.shiftyjelly.pocketcasts.payment.BillingPeriod
 import au.com.shiftyjelly.pocketcasts.payment.Price
+import au.com.shiftyjelly.pocketcasts.payment.PurchaseState
 import au.com.shiftyjelly.pocketcasts.payment.TestLogger
 import com.android.billingclient.api.GoogleOfferDetails
 import com.android.billingclient.api.GooglePricingPhase
 import com.android.billingclient.api.GoogleProductDetails
+import com.android.billingclient.api.GooglePurchase
 import com.android.billingclient.api.ProductDetails.RecurrenceMode
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -28,7 +30,7 @@ class BillingPaymentMapperTest {
     }
 
     @Test
-    fun `no errors are logged when mapped successfully`() {
+    fun `no errors are logged when product is mapped successfully`() {
         mapper.toProduct(GoogleProductDetails())
 
         logger.assertNoLogs()
@@ -382,5 +384,55 @@ class BillingPaymentMapperTest {
             "Unrecognized billing interval period designator 'MY' in {basePlanId=Base plan ID, productId=Product ID, rawDuration=P1MY}",
             "Unrecognized billing interval period designator '' in {basePlanId=Base plan ID, productId=Product ID, rawDuration=P1}",
         )
+    }
+
+    @Test
+    fun `map purchase`() {
+        assertNotNull(mapper.toPurchase(GooglePurchase()))
+    }
+
+    @Test
+    fun `no errors are logged when purchase is mapped`() {
+        mapper.toPurchase(GooglePurchase())
+
+        logger.assertNoLogs()
+    }
+
+    @Test
+    fun `map base purchase properties`() {
+        val googlePurchase = GooglePurchase(
+            orderId = "Order ID",
+            purchaseToken = "Purchase token",
+            productIds = listOf("Product ID 1", "Product ID 2"),
+            isAcknowledged = false,
+            isAutoRenewing = true,
+            isPurchased = true,
+        )
+
+        val purchase = mapper.toPurchase(googlePurchase)
+
+        assertEquals(PurchaseState.Purchased("Order ID"), purchase.state)
+        assertEquals("Purchase token", purchase.token)
+        assertEquals(listOf("Product ID 1", "Product ID 2"), purchase.productIds)
+        assertEquals(false, purchase.isAcknowledged)
+        assertEquals(true, purchase.isAutoRenewing)
+    }
+
+    @Test
+    fun `map pending purchase state`() {
+        val googlePurchase = GooglePurchase(isPurchased = false)
+
+        val purchase = mapper.toPurchase(googlePurchase)
+
+        assertEquals(PurchaseState.Pending, purchase.state)
+    }
+
+    @Test
+    fun `map purchase with purchased state and without order ID to unspecified state`() {
+        val googlePurchase = GooglePurchase(isPurchased = true, orderId = null)
+
+        val purchase = mapper.toPurchase(googlePurchase)
+
+        assertEquals(PurchaseState.Unspecified, purchase.state)
     }
 }
