@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.lists
 
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.model.Discover
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
@@ -40,5 +41,12 @@ class ListRepository(
 
     suspend fun getCategoriesList(url: String): List<DiscoverCategory> {
         return listWebService.getCategoriesList(url)
+    }
+
+    suspend fun getSimilarPodcasts(podcastUuid: String): ListFeed? {
+        return getListFeed(
+            url = "${Settings.SERVER_API_URL}/recommendations/podcast?podcast_uuid=$podcastUuid",
+            authenticated = true,
+        )
     }
 }

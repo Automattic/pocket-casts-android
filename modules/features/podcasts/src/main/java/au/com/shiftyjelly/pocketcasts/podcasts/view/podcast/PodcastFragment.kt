@@ -816,6 +816,14 @@ class PodcastFragment : BaseFragment() {
                     updateStausBarForBackground()
                 }
             },
+            onSimilarPodcastClicked = { podcastUuid ->
+                val fragment = newInstance(podcastUuid = podcastUuid, fromListUuid = "recommendations_podcast", sourceView = sourceView)
+                (activity as FragmentHostListener).addFragment(fragment)
+            },
+            onSimilarPodcastSubscribeClicked = { podcastUuid ->
+                viewModel.onSimilarPodcastSubscribeClicked(podcastUuid)
+            },
+
         ).apply {
             stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
         }
@@ -1059,6 +1067,11 @@ class PodcastFragment : BaseFragment() {
                             )
 
                             adapter?.notifyDataSetChanged()
+                        }
+                        PodcastTab.SIMILAR_SHOWS -> {
+                            adapter?.setSimilarPodcasts(
+                                podcasts = state.similarPodcasts,
+                            )
                         }
                     }
                     if (state.searchTerm.isNotEmpty() && state.searchTerm != lastSearchTerm) {

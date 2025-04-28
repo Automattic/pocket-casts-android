@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.BundlePaidType
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import java.util.Date
+import java.util.UUID
 import kotlinx.parcelize.Parcelize
 
 interface NetworkLoadableList {
@@ -205,6 +206,9 @@ data class DiscoverPodcast(
     val listId: String? = null, // for carousel sponsored podcast
     @ColorInt var color: Int = 0,
 ) : Parcelable {
+    val adapterId: Long
+        get() = UUID.nameUUIDFromBytes(uuid.toByteArray()).mostSignificantBits
+
     fun updateIsSubscribed(value: Boolean): DiscoverPodcast {
         return copy(isSubscribed = value)
     }
