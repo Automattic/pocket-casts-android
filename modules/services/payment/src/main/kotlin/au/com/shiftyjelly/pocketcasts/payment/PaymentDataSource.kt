@@ -7,15 +7,21 @@ import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingResult
 import com.android.billingclient.api.ProductDetails
-import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.PurchaseHistoryRecord
 import com.android.billingclient.api.QueryProductDetailsParams
 import com.android.billingclient.api.QueryPurchaseHistoryParams
 import com.android.billingclient.api.QueryPurchasesParams
 import kotlinx.coroutines.flow.SharedFlow
+import com.android.billingclient.api.Purchase as GooglePurchase
 
 interface PaymentDataSource {
+    val purchaseResults: SharedFlow<PaymentResult<List<Purchase>>>
+
     suspend fun loadProducts(): PaymentResult<List<Product>>
+
+    suspend fun loadPurchases(): PaymentResult<List<Purchase>>
+
+    suspend fun acknowledgePurchase(purchase: Purchase): PaymentResult<Purchase>
 
     companion object {
         fun billing(
@@ -27,7 +33,7 @@ interface PaymentDataSource {
     }
 
     // <editor-fold desc="Temporarily extracted old interface">
-    val purchaseUpdates: SharedFlow<Pair<BillingResult, List<Purchase>>>
+    val purchaseUpdates: SharedFlow<Pair<BillingResult, List<GooglePurchase>>>
 
     suspend fun loadProducts(
         params: QueryProductDetailsParams,
@@ -39,7 +45,7 @@ interface PaymentDataSource {
 
     suspend fun loadPurchases(
         params: QueryPurchasesParams,
-    ): Pair<BillingResult, List<Purchase>>
+    ): Pair<BillingResult, List<GooglePurchase>>
 
     suspend fun acknowledgePurchase(
         params: AcknowledgePurchaseParams,

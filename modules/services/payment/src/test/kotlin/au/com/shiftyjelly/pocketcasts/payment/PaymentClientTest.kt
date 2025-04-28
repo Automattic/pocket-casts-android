@@ -43,6 +43,6 @@ class PaymentClientTest {
         client.loadSubscriptionPlans()
 
         logger.assertInfos("Load subscription plans")
-        logger.assertWarnings("Failed to load subscription plans: Test failure")
+        logger.assertWarnings("Failed to load subscription plans. Error, Test failure")
     }
 }

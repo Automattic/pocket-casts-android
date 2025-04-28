@@ -5,7 +5,6 @@ import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingResult
 import com.android.billingclient.api.ProductDetails
-import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.PurchaseHistoryRecord
 import com.android.billingclient.api.QueryProductDetailsParams
 import com.android.billingclient.api.QueryPurchaseHistoryParams
@@ -13,16 +12,33 @@ import com.android.billingclient.api.QueryPurchasesParams
 import java.math.BigDecimal
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
+import com.android.billingclient.api.Purchase as GooglePurchase
 
 class FakePaymentDataSource : PaymentDataSource {
     var customProductsResult: PaymentResult<List<Product>>? = null
+    var customPurchases: PaymentResult<List<Purchase>>? = null
+    var acknowledgePurchaseResultCode: PaymentResultCode = PaymentResultCode.Ok
+
+    override val purchaseResults = MutableSharedFlow<PaymentResult<List<Purchase>>>()
 
     override suspend fun loadProducts(): PaymentResult<List<Product>> {
         return customProductsResult ?: PaymentResult.Success(KnownProducts)
     }
 
+    override suspend fun loadPurchases(): PaymentResult<List<Purchase>> {
+        return customPurchases ?: PaymentResult.Success(emptyList())
+    }
+
+    override suspend fun acknowledgePurchase(purchase: Purchase): PaymentResult<Purchase> {
+        return if (acknowledgePurchaseResultCode is PaymentResultCode.Ok) {
+            PaymentResult.Success(purchase.copy(isAcknowledged = true))
+        } else {
+            PaymentResult.Failure(acknowledgePurchaseResultCode, "Error")
+        }
+    }
+
     // <editor-fold desc="Temporarily extracted old interface">
-    override val purchaseUpdates: SharedFlow<Pair<BillingResult, List<Purchase>>> = MutableSharedFlow()
+    override val purchaseUpdates: SharedFlow<Pair<BillingResult, List<GooglePurchase>>> = MutableSharedFlow()
 
     override suspend fun loadProducts(
         params: QueryProductDetailsParams,
@@ -34,7 +50,7 @@ class FakePaymentDataSource : PaymentDataSource {
 
     override suspend fun loadPurchases(
         params: QueryPurchasesParams,
-    ): Pair<BillingResult, List<Purchase>> = BillingResult.newBuilder().build() to emptyList()
+    ): Pair<BillingResult, List<GooglePurchase>> = BillingResult.newBuilder().build() to emptyList()
 
     override suspend fun acknowledgePurchase(
         params: AcknowledgePurchaseParams,
