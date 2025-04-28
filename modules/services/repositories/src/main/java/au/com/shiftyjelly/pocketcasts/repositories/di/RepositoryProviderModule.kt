@@ -5,7 +5,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import au.com.shiftyjelly.pocketcasts.crashlogging.di.ProvideApplicationScope
 import au.com.shiftyjelly.pocketcasts.payment.Logger
-import au.com.shiftyjelly.pocketcasts.payment.billing.PaymentDataSource
+import au.com.shiftyjelly.pocketcasts.payment.PaymentDataSource
 import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
@@ -49,27 +49,36 @@ class RepositoryProviderModule {
     fun processLifecycle(): LifecycleOwner = ProcessLifecycleOwner.get()
 
     @Provides
+    fun providePaymentLogger(): Logger = object : Logger {
+        private val TAG = "Payments"
+
+        override fun info(message: String) {
+            Timber.tag(TAG).i(message)
+        }
+
+        override fun warning(message: String) {
+            Timber.tag(TAG).w(message)
+            LogBuffer.w(TAG, message)
+        }
+
+        override fun error(message: String, exception: Throwable) {
+            Timber.tag(TAG).e(exception, message)
+            LogBuffer.e(TAG, exception, message)
+        }
+    }
+
+    @Provides
     @Singleton
     fun providePaymentDataSource(
         @ApplicationContext context: Context,
-    ) = PaymentDataSource(
-        context = context,
-        logger = object : Logger {
-            override fun info(message: String) {
-                Timber.tag(LogBuffer.TAG_SUBSCRIPTIONS).i(message)
-            }
-
-            override fun warning(message: String) {
-                Timber.tag(LogBuffer.TAG_SUBSCRIPTIONS).w(message)
-                LogBuffer.w(LogBuffer.TAG_SUBSCRIPTIONS, message)
-            }
-
-            override fun error(message: String, exception: Throwable) {
-                Timber.tag(LogBuffer.TAG_SUBSCRIPTIONS).e(exception, message)
-                LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, exception, message)
-            }
-        },
-    )
+        logger: Logger,
+    ): PaymentDataSource {
+        return if (context.packageName == "au.com.shiftyjelly.pocketcasts") {
+            PaymentDataSource.billing(context, logger)
+        } else {
+            PaymentDataSource.fake()
+        }
+    }
 
     @Provides
     @Singleton

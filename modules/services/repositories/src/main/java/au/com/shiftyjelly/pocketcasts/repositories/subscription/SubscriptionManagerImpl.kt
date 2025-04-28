@@ -14,7 +14,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
-import au.com.shiftyjelly.pocketcasts.payment.billing.PaymentDataSource
+import au.com.shiftyjelly.pocketcasts.payment.PaymentDataSource
 import au.com.shiftyjelly.pocketcasts.payment.billing.isOk
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager

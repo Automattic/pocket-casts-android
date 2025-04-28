@@ -18,4 +18,80 @@ class PaymentResultTest {
 
         assertNull(result.getOrNull())
     }
+
+    @Test
+    fun `map for success`() {
+        val result = PaymentResult.Success(10)
+
+        val mapped = result.map { "${it * 2}" }
+
+        assertEquals("20", mapped.getOrNull())
+    }
+
+    @Test
+    fun `map for failure`() {
+        val result: PaymentResult<Int> = PaymentResult.Failure("Error")
+
+        val mapped = result.map { "${it * 2}" }
+
+        assertNull(mapped.getOrNull())
+    }
+
+    @Test
+    fun `flatMap for success`() {
+        val result = PaymentResult.Success(10)
+
+        val mapped = result.flatMap { PaymentResult.Success("${it * 2}") }
+
+        assertEquals("20", mapped.getOrNull())
+    }
+
+    @Test
+    fun `flatMap for failure`() {
+        val result: PaymentResult<Int> = PaymentResult.Failure("Error")
+
+        val mapped = result.flatMap { PaymentResult.Success("${it * 2}") }
+
+        assertNull(mapped.getOrNull())
+    }
+
+    @Test
+    fun `onSuccess for success`() {
+        val result = PaymentResult.Success(10)
+        var value = "Hello"
+
+        result.onSuccess { value = "${it * 2}" }
+
+        assertEquals("20", value)
+    }
+
+    @Test
+    fun `onSuccess for failure`() {
+        val result: PaymentResult<Int> = PaymentResult.Failure("Error")
+        var value = "Hello"
+
+        result.onSuccess { value = "${it * 2}" }
+
+        assertEquals("Hello", value)
+    }
+
+    @Test
+    fun `onFailure for success`() {
+        val result = PaymentResult.Success(10)
+        var value = "Hello"
+
+        result.onFailure { value = it }
+
+        assertEquals("Hello", value)
+    }
+
+    @Test
+    fun `onFailure for failure`() {
+        val result: PaymentResult<Int> = PaymentResult.Failure("Error")
+        var value = "Hello"
+
+        result.onFailure { value = it }
+
+        assertEquals("Error", value)
+    }
 }

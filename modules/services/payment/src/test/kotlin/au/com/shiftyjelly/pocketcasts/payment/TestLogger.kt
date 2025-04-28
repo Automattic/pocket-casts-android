@@ -17,6 +17,11 @@ class TestLogger : Logger {
         logs += LogEntry(LogLevel.Error, message)
     }
 
+    fun assertInfos(vararg messages: String) {
+        val infoLogs = logs.filter { it.level == LogLevel.Info }.map { it.message }
+        assertEquals(messages.toList(), infoLogs)
+    }
+
     fun assertWarnings(vararg messages: String) {
         val warningLogs = logs.filter { it.level == LogLevel.Warning }.map { it.message }
         assertEquals(messages.toList(), warningLogs)
