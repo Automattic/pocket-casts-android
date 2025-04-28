@@ -16,7 +16,7 @@
 #    horologist = Horologist Version
 
 [versions]
-aboutlibraries = "12.0.0"
+aboutlibraries = "12.0.1"
 android-gradle-plugin = "8.9.1"
 billing = "7.0.0"
 coil = "2.7.0"
