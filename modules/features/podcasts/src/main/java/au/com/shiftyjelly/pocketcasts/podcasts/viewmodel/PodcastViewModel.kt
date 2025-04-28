@@ -18,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkArguments
+import au.com.shiftyjelly.pocketcasts.podcasts.helper.SimilarPodcastHandler
 import au.com.shiftyjelly.pocketcasts.podcasts.helper.search.BookmarkSearchHandler
 import au.com.shiftyjelly.pocketcasts.podcasts.helper.search.EpisodeSearchHandler
 import au.com.shiftyjelly.pocketcasts.podcasts.helper.search.SearchHandler
@@ -37,7 +38,10 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
@@ -630,39 +634,25 @@ class PodcastViewModel
         analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_FUNDING_TAPPED, mapOf("podcast_uuid" to podcastUuid))
     }
 
-    fun onSimilarPodcastSubscribeClicked(podcastUuid: String, listDate: String) {
+    fun onSimilarPodcastSubscribeClicked(podcastUuid: String) {
         podcastManager.subscribeToPodcast(podcastUuid = podcastUuid, sync = true)
-        analyticsTracker.track(
-            event = AnalyticsEvent.PODCAST_SCREEN_SIMILAR_SHOW_SUBSCRIBED,
-            properties = mapOf(
-                "podcast_uuid" to podcastUuid,
-                "list_datetime" to listDate,
-            ),
-        )
     }
 
-    fun onSimilarPodcastClicked(podcastUuid: String, listDate: String) {
-        analyticsTracker.track(
-            event = AnalyticsEvent.PODCAST_SCREEN_SIMILAR_SHOW_TAPPED,
-            properties = mapOf(
-                "podcast_uuid" to podcastUuid,
-                "list_datetime" to listDate,
-            ),
-        )
-    }
-
-    enum class PodcastTab(@StringRes val labelResId: Int, val analyticsValue: String) {
+    enum class PodcastTab(@StringRes val labelResId: Int, val analyticsValue: String, val isVisible: () -> Boolean) {
         EPISODES(
             labelResId = LR.string.episodes,
             analyticsValue = "episodes",
+            isVisible = { true },
         ),
         BOOKMARKS(
             labelResId = LR.string.bookmarks,
             analyticsValue = "bookmarks",
+            isVisible = { true },
         ),
         SIMILAR_SHOWS(
             labelResId = LR.string.similar_shows,
             analyticsValue = "similar_shows",
+            isVisible = { FeatureFlag.isEnabled(Feature.RECOMMENDATIONS) },
         ),
     }
 
@@ -671,7 +661,7 @@ class PodcastViewModel
             val podcast: Podcast,
             val episodes: List<PodcastEpisode>,
             val bookmarks: List<Bookmark>,
-            val similarPodcasts: SimilarPodcastsResult,
+            val similarPodcasts: List<DiscoverPodcast>,
             val showingArchived: Boolean,
             val episodeCount: Int,
             val archivedCount: Int,
@@ -764,7 +754,7 @@ private fun Flowable<CombinedEpisodeAndBookmarkData>.loadEpisodesAndBookmarks(
                     { bookmarkSearchResults.searchUuids?.contains(it.uuid) ?: false },
                     searchResults = bookmarkSearchResults,
                 ),
-            similarPodcastHandler.getSimilarPodcastListFlowable(podcast),
+            similarPodcastHandler.getSimilarPodcastsFlowable(podcast),
         ) { (searchList, episodeList), (bookmarks, _), similarPodcasts ->
             val episodeCount = episodeList.size
             val archivedCount = episodeList.count { it.isArchived }

@@ -18,7 +18,8 @@ class TabsViewHolder(
     private val theme: Theme,
 ) : RecyclerView.ViewHolder(composeView) {
     fun bind(tabsHeader: TabsHeader) {
-        val tabs = tabsHeader.tabs
+        val tabs = PodcastTab.entries
+            .filter { it.isVisible() }
             .map {
                 ButtonTab(
                     labelResId = it.labelResId,
