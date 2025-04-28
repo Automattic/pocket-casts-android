@@ -1,6 +1,12 @@
 *   New Features
-    *   Add Greek locale support
-        ([#3864](https://github.com/Automattic/pocket-casts-android/pull/3864))
+    *   Add account encouragement flow
+        ([#3909](https://github.com/Automattic/pocket-casts-android/pull/3909))
 *   Bug Fixes
-    *   Fix episode sometimes not updating their metadata.
-        ([#3867](https://github.com/Automattic/pocket-casts-android/pull/3867))
+    *   Fix crash when updating playlist
+        ([#3929](https://github.com/Automattic/pocket-casts-android/pull/3929))
+    *   Fix podcast follow in the Discover tab not always working
+        ([#3922](https://github.com/Automattic/pocket-casts-android/pull/3922))
+    *   Fix missing fullscreen player controls in landscape mode
+        ([#3917](https://github.com/Automattic/pocket-casts-android/pull/3917))
+    *   Fix issue with disappearing file image after upload completes
+        ([#3910](https://github.com/Automattic/pocket-casts-android/pull/3910))
