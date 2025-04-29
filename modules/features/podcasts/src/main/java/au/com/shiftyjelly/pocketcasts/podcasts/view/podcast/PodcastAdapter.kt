@@ -39,6 +39,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterEpisodeBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterEpisodeHeaderBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
+import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastAdapter.Companion.VIEW_TYPE_PODCAST_HEADER
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.BookmarkHeaderViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.BookmarkUpsellViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.BookmarkViewHolder
@@ -181,10 +182,18 @@ class PodcastAdapter(
     object NoBookmarkMessage
 
     data class SimilarPodcast(
+        val index: Int,
+        val total: Int,
         val podcast: DiscoverPodcast,
         val onRowClick: (String) -> Unit,
         val onSubscribeClick: (String) -> Unit,
-    )
+    ) {
+        val isFirst: Boolean
+            get() = index == 0
+
+        val isLast: Boolean
+            get() = index == total - 1
+    }
 
     enum class HeaderType {
         Blur,
@@ -573,9 +582,11 @@ class PodcastAdapter(
         val content = buildList {
             add(Podcast())
             add(TabsHeader(PodcastTab.SIMILAR_SHOWS, onTabClicked))
-            for (podcast in podcasts) {
+            podcasts.forEachIndexed { index, podcast ->
                 add(
                     SimilarPodcast(
+                        index = index,
+                        total = podcasts.size,
                         podcast = podcast,
                         onRowClick = onSimilarPodcastClicked,
                         onSubscribeClick = onSimilarPodcastSubscribeClicked,
