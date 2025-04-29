@@ -18,6 +18,7 @@ class FakePaymentDataSource : PaymentDataSource {
     var customProductsResult: PaymentResult<List<Product>>? = null
     var customPurchases: PaymentResult<List<Purchase>>? = null
     var acknowledgePurchaseResultCode: PaymentResultCode = PaymentResultCode.Ok
+    var launchBillingFlowResultCode: PaymentResultCode = PaymentResultCode.Ok
 
     override val purchaseResults = MutableSharedFlow<PaymentResult<List<Purchase>>>()
 
@@ -32,6 +33,14 @@ class FakePaymentDataSource : PaymentDataSource {
     override suspend fun acknowledgePurchase(purchase: Purchase): PaymentResult<Purchase> {
         return if (acknowledgePurchaseResultCode is PaymentResultCode.Ok) {
             PaymentResult.Success(purchase.copy(isAcknowledged = true))
+        } else {
+            PaymentResult.Failure(acknowledgePurchaseResultCode, "Error")
+        }
+    }
+
+    override suspend fun launchBillingFlow(plan: SubscriptionPlan, activity: Activity): PaymentResult<Unit> {
+        return if (launchBillingFlowResultCode is PaymentResultCode.Ok) {
+            PaymentResult.Success(Unit)
         } else {
             PaymentResult.Failure(acknowledgePurchaseResultCode, "Error")
         }

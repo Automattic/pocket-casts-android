@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.payment.Purchase
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionBillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.payment.flatMap
 import au.com.shiftyjelly.pocketcasts.payment.map
 import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.BillingClient
@@ -171,6 +172,34 @@ internal class BillingPaymentDataSource(
             } else {
                 billingResult.toPaymentFailure()
             }
+        }
+    }
+
+    override suspend fun launchBillingFlow(
+        plan: SubscriptionPlan,
+        activity: Activity,
+    ): PaymentResult<Unit> {
+        return connection.withConnectedClient { client ->
+            client.queryProductDetails(AllSubscriptionsQueryProductDetailsParams)
+                .toPaymentResult()
+                .flatMap { productDetails ->
+                    client.queryPurchasesAsync(SubscriptionsQueryPurchasesParams)
+                        .toPaymentResult()
+                        .map { purchases -> productDetails to purchases }
+                }
+                .flatMap { (productDetails, purchases) ->
+                    val params = mapper.toBillingFlowRequest(plan, productDetails, purchases)?.toGoogleParams()
+                    if (params == null) {
+                        PaymentResult.Failure(PaymentResultCode.DeveloperError, "Couldn't create billing flow params")
+                    } else {
+                        val billingResult = client.launchBillingFlow(activity, params)
+                        if (billingResult.isOk()) {
+                            PaymentResult.Success(Unit)
+                        } else {
+                            billingResult.toPaymentFailure()
+                        }
+                    }
+                }
         }
     }
     // </editor-fold>

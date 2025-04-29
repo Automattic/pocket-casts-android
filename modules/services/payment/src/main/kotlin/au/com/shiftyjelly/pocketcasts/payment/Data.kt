@@ -187,19 +187,26 @@ sealed interface SubscriptionPlan {
     val name: String
     val tier: SubscriptionTier
     val billingCycle: SubscriptionBillingCycle
+    val offer: SubscriptionOffer?
+
+    val productId get() = SubscriptionPlan.productId(tier, billingCycle)
+    val basePlanId get() = SubscriptionPlan.basePlanId(tier, billingCycle)
+    val offerId get() = offer?.offerId(tier, billingCycle)
 
     data class Base(
         override val name: String,
         override val tier: SubscriptionTier,
         override val billingCycle: SubscriptionBillingCycle,
         val pricingPhase: PricingPhase,
-    ) : SubscriptionPlan
+    ) : SubscriptionPlan {
+        override val offer get() = null
+    }
 
     data class WithOffer(
         override val name: String,
         override val tier: SubscriptionTier,
         override val billingCycle: SubscriptionBillingCycle,
-        val offer: SubscriptionOffer,
+        override val offer: SubscriptionOffer,
         val pricingPhases: List<PricingPhase>,
     ) : SubscriptionPlan
 
