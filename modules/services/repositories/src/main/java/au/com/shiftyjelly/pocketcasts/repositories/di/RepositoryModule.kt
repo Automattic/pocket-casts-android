@@ -4,6 +4,7 @@ import androidx.work.WorkerFactory
 import au.com.shiftyjelly.pocketcasts.analytics.AccountStatusInfo
 import au.com.shiftyjelly.pocketcasts.crashlogging.CrashReportPermissionCheck
 import au.com.shiftyjelly.pocketcasts.crashlogging.ObserveUser
+import au.com.shiftyjelly.pocketcasts.payment.PurchaseApprover
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.SettingsImpl
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
@@ -48,6 +49,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager
 import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManagerImpl
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.ServerPurchaseApprover
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.sync.AccountManagerStatusInfo
@@ -196,4 +198,7 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun provideUpNextHistoryManager(upNextHistoryManagerImpl: UpNextHistoryManagerImpl): UpNextHistoryManager
+
+    @Binds
+    abstract fun providePurchaseApprover(approver: ServerPurchaseApprover): PurchaseApprover
 }
