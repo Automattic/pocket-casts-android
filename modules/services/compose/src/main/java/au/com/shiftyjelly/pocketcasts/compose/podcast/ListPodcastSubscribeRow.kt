@@ -1,11 +1,12 @@
 package au.com.shiftyjelly.pocketcasts.compose.podcast
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -37,18 +38,14 @@ fun ListPodcastSubscribeRow(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier.clickable { onRowClick(uuid) },
     ) {
-        Box(
-            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
-        ) {
-            PodcastImage(
-                uuid = uuid,
-                modifier = Modifier.size(56.dp),
-            )
-        }
-        Column(
+        PodcastImage(
+            uuid = uuid,
             modifier = Modifier
-                .padding(end = 8.dp)
-                .weight(1f),
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .size(56.dp),
+        )
+        Column(
+            modifier = Modifier.weight(1f),
         ) {
             TextP40(
                 text = title,
@@ -66,7 +63,7 @@ fun ListPodcastSubscribeRow(
                 contentDescription = stringResource(LR.string.podcast_subscribed),
                 tint = MaterialTheme.theme.colors.support02,
                 modifier = Modifier
-                    .padding(8.dp)
+                    .padding(16.dp)
                     .size(24.dp),
             )
         } else {
@@ -76,10 +73,12 @@ fun ListPodcastSubscribeRow(
                 tint = MaterialTheme.theme.colors.primaryIcon02,
                 modifier = Modifier
                     .padding(8.dp)
+                    .clip(CircleShape)
                     .clickable { onSubscribeClick(uuid) }
-                    .size(24.dp)
-                    .clip(CircleShape),
+                    .padding(8.dp)
+                    .size(24.dp),
             )
         }
+        Spacer(Modifier.width(8.dp))
     }
 }
