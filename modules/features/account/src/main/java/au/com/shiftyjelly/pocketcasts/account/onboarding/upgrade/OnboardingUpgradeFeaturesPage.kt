@@ -7,6 +7,7 @@ import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusGroup
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -49,6 +50,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -159,10 +161,10 @@ private fun UpgradeLayout(
     onSubscriptionFrequencyChanged: (SubscriptionFrequency) -> Unit,
     onFeatureCardChanged: (Int) -> Unit,
     onClickSubscribe: () -> Unit,
+    modifier: Modifier = Modifier,
     onPrivacyPolicyClick: () -> Unit = {},
     onTermsAndConditionsClick: () -> Unit = {},
     canUpgrade: Boolean,
-    modifier: Modifier = Modifier,
 ) {
     Box(
         modifier = modifier.fillMaxHeight(),
@@ -179,6 +181,9 @@ private fun UpgradeLayout(
                 tier = state.currentFeatureCard.subscriptionTier,
                 backgroundGlowsRes = state.currentFeatureCard.backgroundGlowsRes,
             ) {
+
+                val (titleFocus, tabsFocus, pagerFocus) = remember { FocusRequester.createRefs() }
+
                 Column(
                     Modifier
                         .windowInsetsPadding(WindowInsets.statusBars)
@@ -198,7 +203,10 @@ private fun UpgradeLayout(
                             iconColor = Color.White,
                             modifier = Modifier
                                 .height(48.dp)
-                                .width(48.dp),
+                                .width(48.dp)
+                                .focusProperties {
+                                    down = titleFocus
+                                },
                         )
                         if (state.showNotNow) {
                             TextH30(
@@ -215,7 +223,13 @@ private fun UpgradeLayout(
 
                     Column {
                         Box(
-                            modifier = Modifier.heightIn(min = 70.dp),
+                            modifier = Modifier
+                                .heightIn(min = 70.dp)
+                                .focusGroup()
+                                .focusRequester(titleFocus)
+                                .focusProperties {
+                                    down = tabsFocus
+                                },
                             contentAlignment = Alignment.Center,
                         ) {
                             AutoResizeText(
@@ -226,6 +240,7 @@ private fun UpgradeLayout(
                                 fontWeight = FontWeight.W700,
                                 maxLines = 2,
                                 textAlign = TextAlign.Center,
+                                isFocusable = true,
                                 modifier = Modifier
                                     .padding(horizontal = 24.dp)
                                     .fillMaxWidth(),
@@ -237,6 +252,12 @@ private fun UpgradeLayout(
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
+                                .focusRequester(tabsFocus)
+                                .focusGroup()
+                                .focusProperties {
+                                    up = titleFocus
+                                    down = pagerFocus
+                                }
                                 .padding(bottom = 24.dp),
                             contentAlignment = Alignment.Center,
                         ) {
@@ -255,6 +276,12 @@ private fun UpgradeLayout(
                         }
 
                         FeatureCards(
+                            modifier = Modifier
+                                .focusRequester(pagerFocus)
+                                .focusGroup()
+                                .focusProperties {
+                                    up = tabsFocus
+                                },
                             state = state,
                             upgradeButton = state.currentUpgradeButton,
                             onFeatureCardChanged = onFeatureCardChanged,
@@ -282,12 +309,14 @@ fun FeatureCards(
     state: OnboardingUpgradeFeaturesState.Loaded,
     upgradeButton: UpgradeButton,
     onFeatureCardChanged: (Int) -> Unit,
+    modifier: Modifier = Modifier,
     onPrivacyPolicyClick: () -> Unit = {},
     onTermsAndConditionsClick: () -> Unit = {},
 ) {
     val featureCardsState = state.featureCardsState
     val currentSubscriptionFrequency = state.currentSubscriptionFrequency
     HorizontalPagerWrapper(
+        modifier = modifier,
         pageCount = featureCardsState.featureCards.size,
         initialPage = featureCardsState.featureCards.indexOf(state.currentFeatureCard),
         onPageChanged = onFeatureCardChanged,
@@ -433,7 +462,8 @@ internal fun UpgradeButton(
 
     Box(
         contentAlignment = Alignment.BottomCenter,
-        modifier = Modifier.fadeBackground()
+        modifier = Modifier
+            .fadeBackground()
             .focusGroup()
             .focusProperties {
                 down = FocusRequester.Cancel

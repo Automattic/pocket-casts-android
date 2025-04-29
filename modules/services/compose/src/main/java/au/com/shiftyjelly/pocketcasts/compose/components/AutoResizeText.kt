@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.compose.components
 
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.requiredHeight
@@ -56,6 +57,7 @@ fun AutoResizeText(
     onTextLayout: (TextLayoutResult) -> Unit = {},
     style: TextStyle = LocalTextStyle.current,
     heightFactor: Float? = null,
+    isFocusable: Boolean = false
 ) {
     val alignment = contentAlignment ?: when (textAlign) {
         TextAlign.Left -> Alignment.TopStart
@@ -66,7 +68,10 @@ fun AutoResizeText(
         TextAlign.End -> Alignment.TopEnd
         else -> Alignment.TopStart
     }
-    BoxWithConstraints(modifier = modifier, contentAlignment = alignment) {
+    BoxWithConstraints(
+        modifier = modifier,
+        contentAlignment = alignment
+    ) {
         var shrunkFontSize = if (maxFontSize.isSpecified) maxFontSize else 100.sp
 
         val calculateIntrinsics = @Composable {
@@ -158,7 +163,13 @@ fun AutoResizeText(
             onTextLayout = onTextLayout,
             maxLines = maxLines,
             style = style,
-            modifier = heightModifier,
+            modifier = heightModifier.then(
+                if (isFocusable) {
+                    Modifier.focusable()
+                } else {
+                    Modifier
+                }
+            ),
         )
     }
 }
