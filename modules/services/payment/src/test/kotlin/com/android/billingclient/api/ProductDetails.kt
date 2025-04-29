@@ -4,6 +4,7 @@ import com.android.billingclient.api.ProductDetails.PricingPhase
 import com.android.billingclient.api.ProductDetails.SubscriptionOfferDetails
 import org.json.JSONArray
 import org.json.JSONObject
+import com.android.billingclient.api.Purchase as GooglePurchase
 
 fun GoogleProductDetails(
     productId: String = "product-id",
@@ -55,6 +56,32 @@ fun GooglePricingPhase(
         .put("recurrenceMode", recurrenceMode)
         .put("billingCycleCount", billingCycleCount)
     return PricingPhase(json)
+}
+
+fun GooglePurchase(
+    orderId: String? = "order-id",
+    purchaseToken: String = "purchase-token",
+    productIds: List<String> = listOf("product-id"),
+    isAcknowledged: Boolean = true,
+    isAutoRenewing: Boolean = true,
+    isPurchased: Boolean = true,
+): GooglePurchase {
+    val quantity = productIds.size
+    val productsField: Any? = if (quantity > 1) {
+        JSONArray(productIds)
+    } else {
+        productIds.getOrNull(0)
+    }
+    val json = JSONObject()
+        .put("orderId", orderId)
+        .put("purchaseToken", purchaseToken)
+        .put("purchaseState", if (isPurchased) 1 else 4)
+        .put("quantity", quantity)
+        .put(if (quantity > 1) "productIds" else "productId", productsField)
+        .put("acknowledged", isAcknowledged)
+        .put("autoRenewing", isAutoRenewing)
+
+    return GooglePurchase(json.toString(), "")
 }
 
 private fun PricingPhase.toJson() = JSONObject()

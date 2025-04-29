@@ -7,10 +7,14 @@ import au.com.shiftyjelly.pocketcasts.payment.PricingPhase
 import au.com.shiftyjelly.pocketcasts.payment.PricingPlan
 import au.com.shiftyjelly.pocketcasts.payment.PricingPlans
 import au.com.shiftyjelly.pocketcasts.payment.Product
+import au.com.shiftyjelly.pocketcasts.payment.Purchase
+import au.com.shiftyjelly.pocketcasts.payment.PurchaseState
 import com.android.billingclient.api.ProductDetails.RecurrenceMode
 import com.android.billingclient.api.ProductDetails as GoogleProduct
 import com.android.billingclient.api.ProductDetails.PricingPhase as GooglePricingPhase
 import com.android.billingclient.api.ProductDetails.SubscriptionOfferDetails as GoogleOfferDetails
+import com.android.billingclient.api.Purchase as GooglePurchase
+import com.android.billingclient.api.Purchase.PurchaseState as GooglePurchaseState
 
 internal class BillingPaymentMapper(
     val logger: Logger,
@@ -33,6 +37,20 @@ internal class BillingPaymentMapper(
             id = productDetails.productId,
             name = productDetails.name,
             pricingPlans = toPlans(offerDetails, mappingContext) ?: return null,
+        )
+    }
+
+    fun toPurchase(purchase: GooglePurchase): Purchase {
+        return Purchase(
+            state = when (purchase.purchaseState) {
+                GooglePurchaseState.PENDING -> PurchaseState.Pending
+                GooglePurchaseState.PURCHASED -> purchase.orderId?.let(PurchaseState::Purchased) ?: PurchaseState.Unspecified
+                else -> PurchaseState.Unspecified
+            },
+            token = purchase.purchaseToken,
+            productIds = purchase.products,
+            isAcknowledged = purchase.isAcknowledged,
+            isAutoRenewing = purchase.isAutoRenewing,
         )
     }
 

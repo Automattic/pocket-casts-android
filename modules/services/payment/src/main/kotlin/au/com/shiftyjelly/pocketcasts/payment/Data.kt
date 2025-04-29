@@ -134,8 +134,8 @@ class SubscriptionPlans private constructor(
                     },
                 )
 
-                0 -> PaymentResult.Failure("No matching product found for $key")
-                else -> PaymentResult.Failure("Multiple matching products found for $key. $matchingProducts")
+                0 -> PaymentResult.Failure(PaymentResultCode.DeveloperError, "No matching product found for $key")
+                else -> PaymentResult.Failure(PaymentResultCode.DeveloperError, "Multiple matching products found for $key. $matchingProducts")
             }
         }
 
@@ -285,5 +285,29 @@ enum class SubscriptionOffer {
                 SubscriptionBillingCycle.Yearly -> "patron-yearly-winback"
             }
         }
+    }
+}
+
+data class Purchase(
+    val state: PurchaseState,
+    val token: String,
+    val productIds: List<String>,
+    val isAcknowledged: Boolean,
+    val isAutoRenewing: Boolean,
+)
+
+sealed interface PurchaseState {
+    val orderId: String?
+
+    data object Pending : PurchaseState {
+        override val orderId get() = null
+    }
+
+    data class Purchased(
+        override val orderId: String,
+    ) : PurchaseState
+
+    data object Unspecified : PurchaseState {
+        override val orderId get() = null
     }
 }

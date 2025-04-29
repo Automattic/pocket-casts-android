@@ -19,7 +19,7 @@ class PaymentClientTest {
 
     @Test
     fun `load plans with failure`() = runTest {
-        dataSource.customProductsResult = PaymentResult.Failure("Test failure")
+        dataSource.customProductsResult = PaymentResult.Failure(PaymentResultCode.Error, "Test failure")
 
         val plans = client.loadSubscriptionPlans()
 
@@ -38,11 +38,11 @@ class PaymentClientTest {
 
     @Test
     fun `log loading plans with failure`() = runTest {
-        dataSource.customProductsResult = PaymentResult.Failure("Test failure")
+        dataSource.customProductsResult = PaymentResult.Failure(PaymentResultCode.Error, "Test failure")
 
         client.loadSubscriptionPlans()
 
         logger.assertInfos("Load subscription plans")
-        logger.assertWarnings("Failed to load subscription plans: Test failure")
+        logger.assertWarnings("Failed to load subscription plans. Error, Test failure")
     }
 }
