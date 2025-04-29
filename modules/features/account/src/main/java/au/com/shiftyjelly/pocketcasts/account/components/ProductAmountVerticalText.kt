@@ -68,6 +68,7 @@ fun ProductAmountHorizontalText(
     lineThroughOriginalPrice: Boolean = true,
     hasBackgroundAlwaysWhite: Boolean = false,
     verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
+    secondaryTextColor: Color = MaterialTheme.theme.colors.primaryText02,
 ) {
     Row(
         modifier = modifier,
@@ -78,11 +79,11 @@ fun ProductAmountHorizontalText(
                 text = price,
                 fontSize = priceTextFontSize,
                 color =
-                    if (hasBackgroundAlwaysWhite) {
-                        Color.Black
-                    } else {
-                        MaterialTheme.theme.colors.primaryText01
-                    },
+                if (hasBackgroundAlwaysWhite) {
+                    Color.Black
+                } else {
+                    MaterialTheme.theme.colors.primaryText01
+                },
             )
         }
 
@@ -90,7 +91,7 @@ fun ProductAmountHorizontalText(
             TextP60(
                 text = period,
                 fontSize = originalPriceFontSize,
-                color = MaterialTheme.theme.colors.primaryText02,
+                color = secondaryTextColor,
                 modifier = modifier.padding(start = 4.dp),
             )
         }
@@ -101,7 +102,7 @@ fun ProductAmountHorizontalText(
             TextP60(
                 text = originalPrice,
                 fontSize = originalPriceFontSize,
-                color = MaterialTheme.theme.colors.primaryText02,
+                color = secondaryTextColor,
                 style = TextStyle(
                     textDecoration = if (lineThroughOriginalPrice) TextDecoration.LineThrough else TextDecoration.None,
                 ),
@@ -131,7 +132,7 @@ private fun ProductAmountPreviewHorizontal(
     AppTheme(themeType) {
         ProductAmountHorizontalText(
             price = "$0.99",
-            period = "/year"
+            period = "/year",
         )
     }
 }
@@ -145,7 +146,7 @@ private fun ProductAmountPreviewHorizontalDiscount(
         ProductAmountHorizontalText(
             price = "$0.99",
             originalPrice = "$1.29",
-            period = "/year"
+            period = "/year",
         )
     }
 }
