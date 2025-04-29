@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.podcasts.helper
+package au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.podcast
 
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
@@ -29,7 +29,6 @@ class SimilarPodcastHandler @Inject constructor(
     }
 
     fun getSimilarPodcastsFlowable(podcast: Podcast): Flowable<List<DiscoverPodcast>> {
-        enabledObservable.onNext(false)
         return isEnabledFlowable()
             .distinctUntilChanged()
             .switchMap { enabled ->
