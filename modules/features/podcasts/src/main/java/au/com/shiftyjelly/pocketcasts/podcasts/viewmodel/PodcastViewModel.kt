@@ -18,13 +18,10 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkArguments
-import au.com.shiftyjelly.pocketcasts.podcasts.helper.SimilarPodcastHandler
 import au.com.shiftyjelly.pocketcasts.podcasts.helper.search.BookmarkSearchHandler
 import au.com.shiftyjelly.pocketcasts.podcasts.helper.search.EpisodeSearchHandler
 import au.com.shiftyjelly.pocketcasts.podcasts.helper.search.SearchHandler
-import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastViewModel.PodcastTab
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.podcast.SimilarPodcastHandler
-import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.podcast.SimilarPodcastsResult
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortType
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodcast

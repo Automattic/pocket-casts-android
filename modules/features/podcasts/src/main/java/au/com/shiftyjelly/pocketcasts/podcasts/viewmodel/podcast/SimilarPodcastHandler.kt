@@ -3,21 +3,14 @@ package au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.servers.model.ListFeed
+import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
-import io.reactivex.Single
 import io.reactivex.subjects.BehaviorSubject
 import javax.inject.Inject
 import kotlinx.coroutines.rx2.rxSingle
-import timber.log.Timber
-
-sealed class SimilarPodcastsResult {
-    data class Success(val listFeed: ListFeed) : SimilarPodcastsResult()
-    object Empty : SimilarPodcastsResult()
-}
 
 class SimilarPodcastHandler @Inject constructor(
     private val listRepository: ListRepository,
@@ -35,46 +28,33 @@ class SimilarPodcastHandler @Inject constructor(
         return enabledObservable.toFlowable(BackpressureStrategy.LATEST)
     }
 
-    fun getSimilarPodcastListFlowable(podcast: Podcast): Flowable<SimilarPodcastsResult> {
+    fun getSimilarPodcastsFlowable(podcast: Podcast): Flowable<List<DiscoverPodcast>> {
         return isEnabledFlowable()
             .distinctUntilChanged()
             .switchMap { enabled ->
                 if (enabled) {
-                    getSimilarPodcastListSingle(podcast)
+                    getSimilarPodcastsSingle(podcast)
                         .toFlowable()
                         .addSubscribedStatusFlowable()
-                        .map { listFeed ->
-                            if (listFeed.podcasts.isNullOrEmpty()) {
-                                SimilarPodcastsResult.Empty
-                            } else {
-                                SimilarPodcastsResult.Success(listFeed)
-                            }
-                        }
-                        .onErrorReturn { error ->
-                            Timber.e(error, "Error loading similar podcasts")
-                            SimilarPodcastsResult.Empty
-                        }
                 } else {
-                    Flowable.just(SimilarPodcastsResult.Empty)
+                    Flowable.just(emptyList())
                 }
             }
     }
 
-    private fun getSimilarPodcastListSingle(podcast: Podcast): Single<ListFeed> = rxSingle {
-        listRepository.getSimilarPodcasts(podcast.uuid)
-            ?: error("Failed to load similar podcasts")
+    private fun getSimilarPodcastsSingle(podcast: Podcast) = rxSingle {
+        listRepository.getSimilarPodcasts(podcast.uuid)?.podcasts ?: emptyList()
     }
 
-    private fun Flowable<ListFeed>.addSubscribedStatusFlowable(): Flowable<ListFeed> {
-        return switchMap { list ->
+    private fun Flowable<List<DiscoverPodcast>>.addSubscribedStatusFlowable(): Flowable<List<DiscoverPodcast>> {
+        return switchMap { podcasts ->
             podcastManager.getSubscribedPodcastUuidsRxSingle()
                 .toFlowable()
                 .mergeWith(podcastManager.podcastSubscriptionsRxFlowable())
                 .map { subscribedList ->
-                    val podcasts = list.podcasts?.map { podcast ->
+                    podcasts.map { podcast ->
                         podcast.copy(isSubscribed = subscribedList.contains(podcast.uuid))
                     }
-                    list.copy(podcasts = podcasts)
                 }
         }
     }

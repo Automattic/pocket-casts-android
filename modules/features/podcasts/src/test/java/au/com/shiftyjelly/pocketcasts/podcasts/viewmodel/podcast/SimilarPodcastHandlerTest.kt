@@ -15,7 +15,6 @@ import io.reactivex.Single
 import java.util.UUID
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -56,7 +55,7 @@ class SimilarPodcastHandlerTest {
 
         similarPodcasts.setEnabled(true)
 
-        val list = similarPodcasts.getSimilarPodcastListFlowable(testPodcast)
+        val podcasts = similarPodcasts.getSimilarPodcastsFlowable(testPodcast)
             .test()
             .awaitCount(1)
             .assertNoErrors()
@@ -64,7 +63,7 @@ class SimilarPodcastHandlerTest {
             .first()
 
         // no podcasts should be found
-        assertTrue(list is SimilarPodcastsResult.Empty)
+        assert(podcasts.isEmpty())
     }
 
     @Test
@@ -73,7 +72,7 @@ class SimilarPodcastHandlerTest {
         similarPodcasts.setEnabled(true)
 
         // expected URL for the list recommendation
-        val listUrl = "${Settings.SERVER_API_URL}/recommendations/podcast/${testPodcast.uuid}"
+        val listUrl = "${Settings.SERVER_API_URL}/recommendations/podcast?podcast_uuid=${testPodcast.uuid}"
         whenever(listWebService.getListFeed(listUrl)).thenReturn(testListFeed)
 
         // mark the first podcast as subscribed
@@ -82,7 +81,7 @@ class SimilarPodcastHandlerTest {
         whenever(podcastManager.podcastSubscriptionsRxFlowable()).thenReturn(Flowable.just(emptyList()))
 
         // call the method to test
-        val list = similarPodcasts.getSimilarPodcastListFlowable(testPodcast)
+        val podcasts = similarPodcasts.getSimilarPodcastsFlowable(testPodcast)
             .test()
             .awaitCount(1)
             .assertNoErrors()
@@ -90,16 +89,13 @@ class SimilarPodcastHandlerTest {
             .first()
 
         // check that the podcasts are fetched correctly
-        assertTrue(list is SimilarPodcastsResult.Success)
-
-        val podcasts = (list as SimilarPodcastsResult.Success).listFeed.podcasts
-        assertEquals(testListFeed.podcasts?.size, podcasts?.size)
+        assertEquals(testListFeed.podcasts?.size, podcasts.size)
 
         // check that the subscribed status is set correctly
-        val subscribedPodcast = podcasts?.find { it.uuid == subscribedUuid }
-        val unsubscribedPodcast = podcasts?.find { it.uuid != subscribedUuid }
+        val subscribedPodcast = podcasts.find { it.uuid == subscribedUuid }
+        val unsubscribedPodcast = podcasts.find { it.uuid != subscribedUuid }
 
-        assertTrue(subscribedPodcast?.isSubscribed == true)
-        assertTrue(unsubscribedPodcast?.isSubscribed == false)
+        assert(subscribedPodcast?.isSubscribed == true)
+        assert(unsubscribedPodcast?.isSubscribed == false)
     }
 }
