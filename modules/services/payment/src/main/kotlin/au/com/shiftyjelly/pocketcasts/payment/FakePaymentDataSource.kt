@@ -38,7 +38,7 @@ class FakePaymentDataSource : PaymentDataSource {
         }
     }
 
-    override suspend fun launchBillingFlow(plan: SubscriptionPlan, activity: Activity): PaymentResult<Unit> {
+    override suspend fun launchBillingFlow(key: SubscriptionPlan.Key, activity: Activity): PaymentResult<Unit> {
         return if (launchBillingFlowResultCode is PaymentResultCode.Ok) {
             PaymentResult.Success(Unit)
         } else {
