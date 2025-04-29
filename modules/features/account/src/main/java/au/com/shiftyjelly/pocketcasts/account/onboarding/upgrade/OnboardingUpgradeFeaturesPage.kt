@@ -134,6 +134,7 @@ internal fun OnboardingUpgradeFeaturesPage(
                 onTermsAndConditionsClick = { viewModel.onTermsAndConditionsPressed() },
             )
         }
+
         is OnboardingUpgradeFeaturesState.NoSubscriptions -> {
             NoSubscriptionsLayout(
                 showNotNow = (state as OnboardingUpgradeFeaturesState.NoSubscriptions).showNotNow,
@@ -306,6 +307,8 @@ fun FeatureCards(
     }
 }
 
+private val secondaryTextColor = Color(0xFF6F7580)
+
 @Composable
 private fun FeatureCard(
     card: UpgradeFeatureCard,
@@ -389,7 +392,11 @@ private fun FeatureCard(
             }
 
             Column {
-                SubscriptionProductAmountHorizontal(subscription, hasBackgroundAlwaysWhite = true)
+                SubscriptionProductAmountHorizontal(
+                    subscription = subscription,
+                    hasBackgroundAlwaysWhite = true,
+                    secondaryTextColor = secondaryTextColor,
+                )
 
                 Spacer(modifier = Modifier.padding(vertical = 4.dp))
 
@@ -398,7 +405,7 @@ private fun FeatureCard(
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 OnboardingUpgradeHelper.PrivacyPolicy(
-                    color = Color.Black.copy(alpha = .5f),
+                    color = secondaryTextColor,
                     textAlign = TextAlign.Start,
                     lineHeight = 18.sp,
                     onPrivacyPolicyClick = onPrivacyPolicyClick,

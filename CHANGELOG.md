@@ -1,6 +1,8 @@
 7.89
 -----
-
+*   Updates
+    *   Improve contrast of secondary texts on Upgrade page
+        ([#3942](https://github.com/Automattic/pocket-casts-android/pull/3942))
 
 7.88
 -----
