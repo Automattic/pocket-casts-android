@@ -57,7 +57,7 @@ fun AutoResizeText(
     onTextLayout: (TextLayoutResult) -> Unit = {},
     style: TextStyle = LocalTextStyle.current,
     heightFactor: Float? = null,
-    isFocusable: Boolean = false
+    isFocusable: Boolean = false,
 ) {
     val alignment = contentAlignment ?: when (textAlign) {
         TextAlign.Left -> Alignment.TopStart
@@ -70,7 +70,7 @@ fun AutoResizeText(
     }
     BoxWithConstraints(
         modifier = modifier,
-        contentAlignment = alignment
+        contentAlignment = alignment,
     ) {
         var shrunkFontSize = if (maxFontSize.isSpecified) maxFontSize else 100.sp
 
@@ -168,7 +168,7 @@ fun AutoResizeText(
                     Modifier.focusable()
                 } else {
                     Modifier
-                }
+                },
             ),
         )
     }

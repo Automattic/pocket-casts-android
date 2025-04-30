@@ -41,7 +41,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -181,7 +181,6 @@ private fun UpgradeLayout(
                 tier = state.currentFeatureCard.subscriptionTier,
                 backgroundGlowsRes = state.currentFeatureCard.backgroundGlowsRes,
             ) {
-
                 val (titleFocus, tabsFocus, pagerFocus) = remember { FocusRequester.createRefs() }
 
                 Column(
@@ -358,12 +357,13 @@ private fun FeatureCard(
         backgroundColor = Color.White,
         modifier = modifier
             .padding(8.dp)
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .focusGroup(),
     ) {
         Column(
             modifier = Modifier.padding(24.dp),
         ) {
-            var offerBadgeTextLength by remember { mutableStateOf(MAX_OFFER_BADGE_TEXT_LENGTH) }
+            var offerBadgeTextLength by remember { mutableIntStateOf(MAX_OFFER_BADGE_TEXT_LENGTH) }
             val screenWidth = LocalConfiguration.current.screenWidthDp
             val displayInHorizontal = screenWidth >= MIN_SCREEN_WIDTH_FOR_HORIZONTAL_DISPLAY && offerBadgeTextLength <= MAX_OFFER_BADGE_TEXT_LENGTH
 
@@ -426,6 +426,7 @@ private fun FeatureCard(
 
             Column {
                 SubscriptionProductAmountHorizontal(
+                    isFocusable = true,
                     subscription = subscription,
                     hasBackgroundAlwaysWhite = true,
                     secondaryTextColor = secondaryTextColor,

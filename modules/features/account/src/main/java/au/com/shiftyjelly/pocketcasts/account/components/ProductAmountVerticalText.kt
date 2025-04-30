@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.account.components
 
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -69,6 +70,7 @@ fun ProductAmountHorizontalText(
     hasBackgroundAlwaysWhite: Boolean = false,
     verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
     secondaryTextColor: Color = MaterialTheme.theme.colors.primaryText02,
+    isFocusable: Boolean = false,
 ) {
     Row(
         modifier = modifier,
@@ -79,11 +81,14 @@ fun ProductAmountHorizontalText(
                 text = price,
                 fontSize = priceTextFontSize,
                 color =
-                if (hasBackgroundAlwaysWhite) {
-                    Color.Black
-                } else {
-                    MaterialTheme.theme.colors.primaryText01
-                },
+                    if (hasBackgroundAlwaysWhite) {
+                        Color.Black
+                    } else {
+                        MaterialTheme.theme.colors.primaryText01
+                    },
+                modifier = if (isFocusable) {
+                    Modifier.focusable()
+                } else Modifier,
             )
         }
 

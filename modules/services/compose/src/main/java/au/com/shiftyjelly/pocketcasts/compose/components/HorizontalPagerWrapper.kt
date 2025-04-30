@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.compose.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -13,17 +14,26 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 
 /* This wrapper class allows the pager to adjust its height based on the tallest page. */
 @OptIn(ExperimentalFoundationApi::class)
@@ -47,7 +57,10 @@ fun HorizontalPagerWrapper(
         }
     }
 
-    var pagerHeight by remember { mutableStateOf(0) }
+    val coroutineScope = rememberCoroutineScope()
+    val focusRequesters = remember { List(pageCount) { FocusRequester() } }
+
+    var pagerHeight by remember { mutableIntStateOf(0) }
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier,
@@ -57,7 +70,7 @@ fun HorizontalPagerWrapper(
             pageSize = pageSize,
             contentPadding = contentPadding,
         ) { index ->
-            var pageHeight by remember { mutableStateOf(0) }
+            var pageHeight by remember { mutableIntStateOf(0) }
             Box(
                 Modifier
                     .fillMaxWidth()
@@ -75,7 +88,34 @@ fun HorizontalPagerWrapper(
                         if (pageHeight > pagerHeight) {
                             pagerHeight = pageHeight
                         }
-                    },
+                    }
+                    .focusRequester(focusRequesters[index])
+                    .focusable()
+                    .onKeyEvent { event ->
+                        if (event.type == KeyEventType.KeyDown) {
+                            when (event.key) {
+                                Key.DirectionRight -> {
+                                    val next = (index + 1).coerceAtMost(pageCount - 1)
+                                    focusRequesters[next].requestFocus()
+                                    coroutineScope.launch {
+                                        pagerState.scrollToPage(next)
+                                    }
+                                    true
+                                }
+                                Key.DirectionLeft -> {
+                                    val prev = (index - 1).coerceAtLeast(0)
+                                    focusRequesters[prev].requestFocus()
+                                    coroutineScope.launch {
+                                        pagerState.scrollToPage(prev)
+                                    }
+                                    true
+                                }
+                                else -> false
+                            }
+                        } else {
+                            false
+                        }
+                    }
             ) {
                 content(index, pagerHeight)
             }
