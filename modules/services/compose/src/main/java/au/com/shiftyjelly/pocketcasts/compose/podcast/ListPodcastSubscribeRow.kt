@@ -16,12 +16,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
+import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.images.R
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -30,13 +36,13 @@ fun ListPodcastSubscribeRow(
     title: String,
     author: String,
     subscribed: Boolean,
-    onRowClick: (uuid: String) -> Unit,
-    onSubscribeClick: (uuid: String) -> Unit,
+    onRowClick: () -> Unit,
+    onSubscribeClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.clickable { onRowClick(uuid) },
+        modifier = modifier.clickable { onRowClick() },
     ) {
         PodcastImage(
             uuid = uuid,
@@ -74,11 +80,39 @@ fun ListPodcastSubscribeRow(
                 modifier = Modifier
                     .padding(8.dp)
                     .clip(CircleShape)
-                    .clickable { onSubscribeClick(uuid) }
+                    .clickable { onSubscribeClick() }
                     .padding(8.dp)
                     .size(24.dp),
             )
         }
         Spacer(Modifier.width(8.dp))
+    }
+}
+
+@Preview
+@ShowkaseComposable(name = "PodcastSubscribeRow", group = "Row")
+@Composable
+fun ListPodcastSubscribeRowPreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) theme: Theme.ThemeType,
+) {
+    AppThemeWithBackground(theme) {
+        Column {
+            ListPodcastSubscribeRow(
+                uuid = "uuid",
+                title = "Podcast Title",
+                author = "Podcast Author",
+                subscribed = true,
+                onRowClick = {},
+                onSubscribeClick = {},
+            )
+            ListPodcastSubscribeRow(
+                uuid = "uuid",
+                title = "Podcast Title",
+                author = "Podcast Author",
+                subscribed = false,
+                onRowClick = {},
+                onSubscribeClick = {},
+            )
+        }
     }
 }

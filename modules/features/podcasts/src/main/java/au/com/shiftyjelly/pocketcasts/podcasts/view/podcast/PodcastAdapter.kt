@@ -147,8 +147,8 @@ class PodcastAdapter(
     private val onClickCategory: (Podcast) -> Unit,
     private val onClickWebsite: (Podcast) -> Unit,
     private val onArtworkAvailable: (Podcast) -> Unit,
-    private val onSimilarPodcastClicked: (String) -> Unit,
-    private val onSimilarPodcastSubscribeClicked: (String) -> Unit,
+    private val onSimilarPodcastClicked: (String, String) -> Unit,
+    private val onSimilarPodcastSubscribeClicked: (String, String) -> Unit,
 ) : LargeListAdapter<Any, RecyclerView.ViewHolder>(1500, differ) {
 
     data class EpisodeLimitRow(val episodeLimit: Int)
@@ -186,9 +186,10 @@ class PodcastAdapter(
     data class SimilarPodcast(
         val index: Int,
         val total: Int,
+        val listDate: String,
         val podcast: DiscoverPodcast,
-        val onRowClick: (String) -> Unit,
-        val onSubscribeClick: (String) -> Unit,
+        val onRowClick: (podcastUuid: String, listDate: String) -> Unit,
+        val onSubscribeClick: (podcastUuid: String, listDate: String) -> Unit,
     ) {
         val isFirst: Boolean
             get() = index == 0
@@ -582,20 +583,28 @@ class PodcastAdapter(
         submitList(content)
     }
 
-    fun setSimilarPodcasts(podcasts: List<DiscoverPodcast>) {
+    fun setSimilarPodcasts(
+        similarPodcasts: SimilarPodcastsResult,
+        tabs: List<PodcastTab>,
+    ) {
         val content = buildList {
             add(Podcast())
-            add(TabsHeader(PodcastTab.SIMILAR_SHOWS, onTabClicked))
-            podcasts.forEachIndexed { index, podcast ->
-                add(
-                    SimilarPodcast(
-                        index = index,
-                        total = podcasts.size,
-                        podcast = podcast,
-                        onRowClick = onSimilarPodcastClicked,
-                        onSubscribeClick = onSimilarPodcastSubscribeClicked,
-                    ),
-                )
+            add(TabsHeader(tabs = tabs, selectedTab = PodcastTab.SIMILAR_SHOWS, onTabClicked = onTabClicked))
+            if (similarPodcasts is SimilarPodcastsResult.Success) {
+                val list = similarPodcasts.listFeed
+                val podcasts = list.podcasts
+                podcasts?.forEachIndexed { index, podcast ->
+                    add(
+                        SimilarPodcast(
+                            index = index,
+                            total = podcasts.size,
+                            listDate = list.date ?: "",
+                            podcast = podcast,
+                            onRowClick = onSimilarPodcastClicked,
+                            onSubscribeClick = onSimilarPodcastSubscribeClicked,
+                        ),
+                    )
+                }
             }
         }
         submitList(content)
