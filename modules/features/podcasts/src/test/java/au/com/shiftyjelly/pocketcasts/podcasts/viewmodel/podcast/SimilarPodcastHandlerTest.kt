@@ -55,7 +55,7 @@ class SimilarPodcastHandlerTest {
 
         similarPodcasts.setEnabled(true)
 
-        val podcasts = similarPodcasts.getSimilarPodcastsFlowable(testPodcast)
+        val list = similarPodcasts.getSimilarPodcastListFlowable(testPodcast)
             .test()
             .awaitCount(1)
             .assertNoErrors()
@@ -63,7 +63,7 @@ class SimilarPodcastHandlerTest {
             .first()
 
         // no podcasts should be found
-        assert(podcasts.isEmpty())
+        assert(list is SimilarPodcastsResult.Empty)
     }
 
     @Test
@@ -81,7 +81,7 @@ class SimilarPodcastHandlerTest {
         whenever(podcastManager.podcastSubscriptionsRxFlowable()).thenReturn(Flowable.just(emptyList()))
 
         // call the method to test
-        val podcasts = similarPodcasts.getSimilarPodcastsFlowable(testPodcast)
+        val list = similarPodcasts.getSimilarPodcastListFlowable(testPodcast)
             .test()
             .awaitCount(1)
             .assertNoErrors()
@@ -89,11 +89,14 @@ class SimilarPodcastHandlerTest {
             .first()
 
         // check that the podcasts are fetched correctly
-        assertEquals(testListFeed.podcasts?.size, podcasts.size)
+        assert(list is SimilarPodcastsResult.Success)
+
+        val podcasts = (list as SimilarPodcastsResult.Success).listFeed.podcasts
+        assertEquals(testListFeed.podcasts?.size, podcasts?.size)
 
         // check that the subscribed status is set correctly
-        val subscribedPodcast = podcasts.find { it.uuid == subscribedUuid }
-        val unsubscribedPodcast = podcasts.find { it.uuid != subscribedUuid }
+        val subscribedPodcast = podcasts?.find { it.uuid == subscribedUuid }
+        val unsubscribedPodcast = podcasts?.find { it.uuid != subscribedUuid }
 
         assert(subscribedPodcast?.isSubscribed == true)
         assert(unsubscribedPodcast?.isSubscribed == false)
