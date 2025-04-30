@@ -21,7 +21,9 @@ import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkArguments
 import au.com.shiftyjelly.pocketcasts.podcasts.helper.search.BookmarkSearchHandler
 import au.com.shiftyjelly.pocketcasts.podcasts.helper.search.EpisodeSearchHandler
 import au.com.shiftyjelly.pocketcasts.podcasts.helper.search.SearchHandler
+import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastViewModel.PodcastTab
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.podcast.SimilarPodcastHandler
+import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.podcast.SimilarPodcastsResult
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortType
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodcast
@@ -35,10 +37,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
-import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
@@ -631,25 +630,39 @@ class PodcastViewModel
         analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_FUNDING_TAPPED)
     }
 
-    fun onSimilarPodcastSubscribeClicked(podcastUuid: String) {
+    fun onSimilarPodcastSubscribeClicked(podcastUuid: String, listDate: String) {
         podcastManager.subscribeToPodcast(podcastUuid = podcastUuid, sync = true)
+        analyticsTracker.track(
+            event = AnalyticsEvent.PODCAST_SCREEN_SIMILAR_SHOW_SUBSCRIBED,
+            properties = mapOf(
+                "podcast_uuid" to podcastUuid,
+                "list_datetime" to listDate,
+            ),
+        )
     }
 
-    enum class PodcastTab(@StringRes val labelResId: Int, val analyticsValue: String, val isVisible: () -> Boolean) {
+    fun onSimilarPodcastClicked(podcastUuid: String, listDate: String) {
+        analyticsTracker.track(
+            event = AnalyticsEvent.PODCAST_SCREEN_SIMILAR_SHOW_TAPPED,
+            properties = mapOf(
+                "podcast_uuid" to podcastUuid,
+                "list_datetime" to listDate,
+            ),
+        )
+    }
+
+    enum class PodcastTab(@StringRes val labelResId: Int, val analyticsValue: String) {
         EPISODES(
             labelResId = LR.string.episodes,
             analyticsValue = "episodes",
-            isVisible = { true },
         ),
         BOOKMARKS(
             labelResId = LR.string.bookmarks,
             analyticsValue = "bookmarks",
-            isVisible = { true },
         ),
         SIMILAR_SHOWS(
             labelResId = LR.string.similar_shows,
             analyticsValue = "similar_shows",
-            isVisible = { FeatureFlag.isEnabled(Feature.RECOMMENDATIONS) },
         ),
     }
 
@@ -658,7 +671,7 @@ class PodcastViewModel
             val podcast: Podcast,
             val episodes: List<PodcastEpisode>,
             val bookmarks: List<Bookmark>,
-            val similarPodcasts: List<DiscoverPodcast>,
+            val similarPodcasts: SimilarPodcastsResult,
             val showingArchived: Boolean,
             val episodeCount: Int,
             val archivedCount: Int,
@@ -667,6 +680,7 @@ class PodcastViewModel
             val episodeLimit: Int?,
             val episodeLimitIndex: Int?,
             val showTab: PodcastTab = PodcastTab.EPISODES,
+            val tabs: List<PodcastTab>,
         ) : UiState()
         data class Error(
             val errorMessage: String,
@@ -750,7 +764,7 @@ private fun Flowable<CombinedEpisodeAndBookmarkData>.loadEpisodesAndBookmarks(
                     { bookmarkSearchResults.searchUuids?.contains(it.uuid) ?: false },
                     searchResults = bookmarkSearchResults,
                 ),
-            similarPodcastHandler.getSimilarPodcastsFlowable(podcast),
+            similarPodcastHandler.getSimilarPodcastListFlowable(podcast),
         ) { (searchList, episodeList), (bookmarks, _), similarPodcasts ->
             val episodeCount = episodeList.size
             val archivedCount = episodeList.count { it.isArchived }
@@ -781,6 +795,13 @@ private fun Flowable<CombinedEpisodeAndBookmarkData>.loadEpisodesAndBookmarks(
                 episodeLimitIndex = null
             }
 
+            val tabs = PodcastTab.entries
+                .filter { tab ->
+                    tab == PodcastTab.EPISODES ||
+                        tab == PodcastTab.BOOKMARKS ||
+                        (tab == PodcastTab.SIMILAR_SHOWS && similarPodcasts is SimilarPodcastsResult.Success)
+                }
+
             val state: PodcastViewModel.UiState = PodcastViewModel.UiState.Loaded(
                 podcast = podcast,
                 episodes = filteredList,
@@ -793,6 +814,7 @@ private fun Flowable<CombinedEpisodeAndBookmarkData>.loadEpisodesAndBookmarks(
                 searchBookmarkTerm = bookmarkSearchResults.searchTerm,
                 episodeLimit = podcast.autoArchiveEpisodeLimit?.value,
                 episodeLimitIndex = episodeLimitIndex,
+                tabs = tabs,
             )
             state
         }

@@ -50,6 +50,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel.RatingState
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel.RatingTappedSource
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastViewModel.PodcastTab
+import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.podcast.SimilarPodcastsResult
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -146,8 +147,8 @@ class PodcastAdapter(
     private val onClickCategory: (Podcast) -> Unit,
     private val onClickWebsite: (Podcast) -> Unit,
     private val onArtworkAvailable: (Podcast) -> Unit,
-    private val onSimilarPodcastClicked: (String) -> Unit,
-    private val onSimilarPodcastSubscribeClicked: (String) -> Unit,
+    private val onSimilarPodcastClicked: (String, String) -> Unit,
+    private val onSimilarPodcastSubscribeClicked: (String, String) -> Unit,
 ) : LargeListAdapter<Any, RecyclerView.ViewHolder>(1500, differ) {
 
     data class EpisodeLimitRow(val episodeLimit: Int)
@@ -155,6 +156,7 @@ class PodcastAdapter(
     data class NoResultsMessage(val title: String, val bodyText: String, val showButton: Boolean)
     data class EpisodeHeader(val showingArchived: Boolean, val episodeCount: Int, val archivedCount: Int, val searchTerm: String, val episodeLimit: Int?)
     data class TabsHeader(
+        val tabs: List<PodcastTab>,
         val selectedTab: PodcastTab,
         val onTabClicked: (PodcastTab) -> Unit,
     )
@@ -184,9 +186,10 @@ class PodcastAdapter(
     data class SimilarPodcast(
         val index: Int,
         val total: Int,
+        val listDate: String,
         val podcast: DiscoverPodcast,
-        val onRowClick: (String) -> Unit,
-        val onSubscribeClick: (String) -> Unit,
+        val onRowClick: (podcastUuid: String, listDate: String) -> Unit,
+        val onSubscribeClick: (podcastUuid: String, listDate: String) -> Unit,
     ) {
         val isFirst: Boolean
             get() = index == 0
@@ -449,6 +452,7 @@ class PodcastAdapter(
         episodeLimit: Int?,
         episodeLimitIndex: Int?,
         podcast: Podcast,
+        tabs: List<PodcastTab>,
         context: Context,
     ) {
         val grouping = podcast.grouping
@@ -472,7 +476,7 @@ class PodcastAdapter(
         }
         val content = mutableListOf<Any>().apply {
             add(Podcast())
-            add(TabsHeader(PodcastTab.EPISODES, onTabClicked))
+            add(TabsHeader(tabs = tabs, selectedTab = PodcastTab.EPISODES, onTabClicked = onTabClicked))
             add(
                 EpisodeHeader(
                     showingArchived = showingArchived,
@@ -522,11 +526,12 @@ class PodcastAdapter(
         bookmarks: List<Bookmark>,
         episodes: List<BaseEpisode>,
         searchTerm: String,
+        tabs: List<PodcastTab>,
         context: Context,
     ) {
         val content = mutableListOf<Any>().apply {
             add(Podcast())
-            add(TabsHeader(PodcastTab.BOOKMARKS, onTabClicked))
+            add(TabsHeader(tabs = tabs, selectedTab = PodcastTab.BOOKMARKS, onTabClicked = onTabClicked))
 
             if (!bookmarksAvailable) {
                 add(BookmarkUpsell)
@@ -578,20 +583,28 @@ class PodcastAdapter(
         submitList(content)
     }
 
-    fun setSimilarPodcasts(podcasts: List<DiscoverPodcast>) {
+    fun setSimilarPodcasts(
+        similarPodcasts: SimilarPodcastsResult,
+        tabs: List<PodcastTab>,
+    ) {
         val content = buildList {
             add(Podcast())
-            add(TabsHeader(PodcastTab.SIMILAR_SHOWS, onTabClicked))
-            podcasts.forEachIndexed { index, podcast ->
-                add(
-                    SimilarPodcast(
-                        index = index,
-                        total = podcasts.size,
-                        podcast = podcast,
-                        onRowClick = onSimilarPodcastClicked,
-                        onSubscribeClick = onSimilarPodcastSubscribeClicked,
-                    ),
-                )
+            add(TabsHeader(tabs = tabs, selectedTab = PodcastTab.SIMILAR_SHOWS, onTabClicked = onTabClicked))
+            if (similarPodcasts is SimilarPodcastsResult.Success) {
+                val list = similarPodcasts.listFeed
+                val podcasts = list.podcasts
+                podcasts?.forEachIndexed { index, podcast ->
+                    add(
+                        SimilarPodcast(
+                            index = index,
+                            total = podcasts.size,
+                            listDate = list.date ?: "",
+                            podcast = podcast,
+                            onRowClick = onSimilarPodcastClicked,
+                            onSubscribeClick = onSimilarPodcastSubscribeClicked,
+                        ),
+                    )
+                }
             }
         }
         submitList(content)

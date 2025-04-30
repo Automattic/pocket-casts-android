@@ -72,7 +72,7 @@ class SimilarPodcastHandlerTest {
         similarPodcasts.setEnabled(true)
 
         // expected URL for the list recommendation
-        val listUrl = "${Settings.SERVER_API_URL}/recommendations/podcast?podcast_uuid=${testPodcast.uuid}"
+        val listUrl = "${Settings.SERVER_API_URL}/recommendations/podcast/${testPodcast.uuid}"
         whenever(listWebService.getListFeed(listUrl)).thenReturn(testListFeed)
 
         // mark the first podcast as subscribed

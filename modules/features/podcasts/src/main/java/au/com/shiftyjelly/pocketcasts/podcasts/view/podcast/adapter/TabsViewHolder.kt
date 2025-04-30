@@ -13,7 +13,6 @@ import au.com.shiftyjelly.pocketcasts.compose.buttons.ButtonTab
 import au.com.shiftyjelly.pocketcasts.compose.buttons.ButtonTabs
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastAdapter.TabsHeader
-import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastViewModel.PodcastTab
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 
 class TabsViewHolder(
@@ -21,8 +20,7 @@ class TabsViewHolder(
     private val theme: Theme,
 ) : RecyclerView.ViewHolder(composeView) {
     fun bind(tabsHeader: TabsHeader) {
-        val tabs = PodcastTab.entries
-            .filter { it.isVisible() }
+        val tabs = tabsHeader.tabs
             .map {
                 ButtonTab(
                     labelResId = it.labelResId,
