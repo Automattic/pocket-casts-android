@@ -6,8 +6,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.focusGroup
-import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -50,7 +48,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -181,8 +178,6 @@ private fun UpgradeLayout(
                 tier = state.currentFeatureCard.subscriptionTier,
                 backgroundGlowsRes = state.currentFeatureCard.backgroundGlowsRes,
             ) {
-                val (titleFocus, tabsFocus, pagerFocus) = remember { FocusRequester.createRefs() }
-
                 Column(
                     Modifier
                         .windowInsetsPadding(WindowInsets.statusBars)
@@ -202,10 +197,7 @@ private fun UpgradeLayout(
                             iconColor = Color.White,
                             modifier = Modifier
                                 .height(48.dp)
-                                .width(48.dp)
-                                .focusProperties {
-                                    down = titleFocus
-                                },
+                                .width(48.dp),
                         )
                         if (state.showNotNow) {
                             TextH30(
@@ -223,12 +215,7 @@ private fun UpgradeLayout(
                     Column {
                         Box(
                             modifier = Modifier
-                                .heightIn(min = 70.dp)
-                                .focusGroup()
-                                .focusRequester(titleFocus)
-                                .focusProperties {
-                                    down = tabsFocus
-                                },
+                                .heightIn(min = 70.dp),
                             contentAlignment = Alignment.Center,
                         ) {
                             AutoResizeText(
@@ -251,12 +238,6 @@ private fun UpgradeLayout(
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .focusRequester(tabsFocus)
-                                .focusGroup()
-                                .focusProperties {
-                                    up = titleFocus
-                                    down = pagerFocus
-                                }
                                 .padding(bottom = 24.dp),
                             contentAlignment = Alignment.Center,
                         ) {
@@ -275,12 +256,6 @@ private fun UpgradeLayout(
                         }
 
                         FeatureCards(
-                            modifier = Modifier
-                                .focusRequester(pagerFocus)
-                                .focusGroup()
-                                .focusProperties {
-                                    up = tabsFocus
-                                },
                             state = state,
                             upgradeButton = state.currentUpgradeButton,
                             onFeatureCardChanged = onFeatureCardChanged,
@@ -357,8 +332,7 @@ private fun FeatureCard(
         backgroundColor = Color.White,
         modifier = modifier
             .padding(8.dp)
-            .fillMaxWidth()
-            .focusGroup(),
+            .fillMaxWidth(),
     ) {
         Column(
             modifier = Modifier.padding(24.dp),
@@ -465,7 +439,6 @@ internal fun UpgradeButton(
         contentAlignment = Alignment.BottomCenter,
         modifier = Modifier
             .fadeBackground()
-            .focusGroup()
             .focusProperties {
                 down = FocusRequester.Cancel
                 left = FocusRequester.Cancel
