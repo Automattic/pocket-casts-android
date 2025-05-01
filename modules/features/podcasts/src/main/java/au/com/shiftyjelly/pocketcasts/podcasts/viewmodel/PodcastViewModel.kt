@@ -617,7 +617,7 @@ class PodcastViewModel
     }
 
     fun onDonateClicked() {
-        analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_FUNDING_TAPPED)
+        analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_FUNDING_TAPPED, mapOf("podcast_uuid" to podcastUuid))
     }
 
     enum class PodcastTab(@StringRes val labelResId: Int, val analyticsValue: String) {
