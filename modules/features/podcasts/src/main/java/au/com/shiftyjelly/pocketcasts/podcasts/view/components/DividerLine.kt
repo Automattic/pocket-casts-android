@@ -21,8 +21,8 @@ fun DividerLine() {
         modifier = Modifier.padding(horizontal = 16.dp),
     ) {
         Divider(
-            color = MaterialTheme.theme.colors.primaryIcon02,
-            thickness = 0.5.dp,
+            color = MaterialTheme.theme.colors.primaryUi05,
+            thickness = 1.dp,
         )
     }
 }
