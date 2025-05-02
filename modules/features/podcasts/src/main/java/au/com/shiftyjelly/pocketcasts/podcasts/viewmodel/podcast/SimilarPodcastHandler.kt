@@ -74,7 +74,10 @@ class SimilarPodcastHandler @Inject constructor(
                     val podcasts = list.podcasts?.map { podcast ->
                         podcast.copy(isSubscribed = subscribedList.contains(podcast.uuid))
                     }
-                    list.copy(podcasts = podcasts)
+                    val podroll = list.podroll?.map { podcast ->
+                        podcast.copy(isSubscribed = subscribedList.contains(podcast.uuid))
+                    }
+                    list.copy(podcasts = podcasts, podroll = podroll)
                 }
         }
     }
