@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.ListFeed
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
@@ -78,10 +77,5 @@ class SimilarPodcastHandler @Inject constructor(
                     list.copy(podcasts = podcasts)
                 }
         }
-    }
-
-    fun isTabVisible(podcasts: List<DiscoverPodcast>): Boolean {
-        return FeatureFlag.isEnabled(Feature.RECOMMENDATIONS) &&
-            podcasts.isNotEmpty()
     }
 }
