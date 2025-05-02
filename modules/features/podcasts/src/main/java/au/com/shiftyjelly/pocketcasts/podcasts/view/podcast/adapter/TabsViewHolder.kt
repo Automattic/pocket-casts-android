@@ -2,11 +2,9 @@ package au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.unit.dp
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.buttons.ButtonTab
@@ -34,7 +32,6 @@ class TabsViewHolder(
                     selectedTab = tabs[tabsHeader.selectedTab.ordinal],
                     modifier = Modifier
                         .background(color = MaterialTheme.theme.colors.primaryUi02)
-                        .padding(start = 16.dp)
                         .fillMaxWidth(),
 
                 )
