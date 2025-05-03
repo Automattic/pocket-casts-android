@@ -651,6 +651,25 @@ class PodcastViewModel
         )
     }
 
+    fun onPodrollInformationModalShown() {
+        analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_PODROLL_INFORMATION_MODEL_SHOWN)
+    }
+
+    fun onPodrollPodcastClicked(podcastUuid: String) {
+        analyticsTracker.track(
+            event = AnalyticsEvent.PODCAST_SCREEN_PODROLL_PODCAST_TAPPED,
+            properties = mapOf("podcast_uuid" to podcastUuid),
+        )
+    }
+
+    fun onPodrollPodcastSubscribeClicked(podcastUuid: String) {
+        podcastManager.subscribeToPodcast(podcastUuid = podcastUuid, sync = true)
+        analyticsTracker.track(
+            event = AnalyticsEvent.PODCAST_SCREEN_PODROLL_PODCAST_SUBSCRIBED,
+            properties = mapOf("podcast_uuid" to podcastUuid),
+        )
+    }
+
     enum class PodcastTab(@StringRes val labelResId: Int, val analyticsValue: String) {
         EPISODES(
             labelResId = LR.string.episodes,
