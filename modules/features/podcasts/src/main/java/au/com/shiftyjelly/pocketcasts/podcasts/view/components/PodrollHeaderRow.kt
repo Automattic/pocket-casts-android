@@ -26,12 +26,12 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-fun PodrollHeader() {
+fun PodrollHeader(onClick: () -> Unit) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { }
+            .clickable { onClick() }
             .padding(horizontal = 16.dp, vertical = 10.dp),
     ) {
         Icon(
@@ -54,6 +54,6 @@ fun PodrollHeaderPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) theme: Theme.ThemeType,
 ) {
     AppThemeWithBackground(theme) {
-        PodrollHeader()
+        PodrollHeader(onClick = {})
     }
 }

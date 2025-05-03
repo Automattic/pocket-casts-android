@@ -1776,6 +1776,9 @@
     <string name="recommendations_if_you_like">If you like</string>
     <string name="recommendations_loved_by_listeners">Loved by listeners of</string>
     <string name="recommended_by_creator">Recommended shows by the creator</string>
+    <string name="podroll_information_title">What\'s a creator\'s pick?</string>
+    <string name="podroll_information_summary">Creator Picks are podcasts recommended by the show\'s creator using Podroll.</string>
+    <string name="podroll_information_button">Got it</string>
 
     <!-- Server errors -->
 
