@@ -45,7 +45,7 @@ class SimilarPodcastHandlerTest {
             DiscoverPodcast(uuid = UUID.randomUUID().toString(), title = "Test Podcast 1", url = null, author = null, category = null, description = null, language = null, mediaType = null),
             DiscoverPodcast(uuid = UUID.randomUUID().toString(), title = "Test Podcast 2", url = null, author = null, category = null, description = null, language = null, mediaType = null),
         )
-        testListFeed = ListFeed(title = "Test List Feed", podcasts = testDiscoverPodcasts, subtitle = null, description = null, date = null, episodes = null, collectionImageUrl = null, featureImage = null, headerImageUrl = null, tintColors = null, collageImages = null, webLinkUrl = null, webLinkTitle = null, promotion = null)
+        testListFeed = ListFeed(title = "Test List Feed", podcasts = testDiscoverPodcasts, subtitle = null, description = null, date = null, episodes = null, collectionImageUrl = null, featureImage = null, headerImageUrl = null, tintColors = null, collageImages = null, webLinkUrl = null, webLinkTitle = null, promotion = null, podroll = null)
     }
 
     @Test
