@@ -141,7 +141,7 @@ class OnboardingUpgradeBottomSheetViewModel @Inject constructor(
                 }
 
                 if (purchaseEvent != null) {
-                    CreateAccountViewModel.trackPurchaseEvent(subscription, purchaseEvent, analyticsTracker)
+                    CreateAccountViewModel.trackPurchaseEvent(subscription, purchaseEvent, source, analyticsTracker)
                 }
             }
             subscriptionManager.launchBillingFlow(
