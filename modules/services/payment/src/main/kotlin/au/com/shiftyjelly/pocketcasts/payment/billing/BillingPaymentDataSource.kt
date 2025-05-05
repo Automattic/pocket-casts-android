@@ -37,17 +37,11 @@ internal class BillingPaymentDataSource(
     context: Context,
     private val logger: Logger,
 ) : PaymentDataSource {
-    private val _purchaseUpdates = MutableSharedFlow<Pair<BillingResult, List<GooglePurchase>>>(
-        extraBufferCapacity = 100, // Arbitrarily large number
-    )
-    override val purchaseUpdates = _purchaseUpdates.asSharedFlow()
 
     private val connection = ClientConnection(
         context,
         listener = PurchasesUpdatedListener { billingResult, googlePurchases ->
             logger.info("Purchase results updated")
-            _purchaseUpdates.tryEmit(billingResult to googlePurchases.orEmpty())
-
             val result = if (billingResult.isOk()) {
                 PaymentResult.Success(googlePurchases?.map(mapper::toPurchase).orEmpty())
             } else {
@@ -100,21 +94,6 @@ internal class BillingPaymentDataSource(
                 logger.warning("Failed to load purchases: ${result.billingResult.debugMessage}")
             }
             result.billingResult to result.purchasesList
-        }
-    }
-
-    override suspend fun acknowledgePurchase(
-        params: AcknowledgePurchaseParams,
-    ): BillingResult {
-        logger.info("Acknowledging purchase: ${params.purchaseToken}")
-        return connection.withConnectedClient { client ->
-            val result = client.acknowledgePurchase(params)
-            if (result.isOk()) {
-                logger.info("Purchase acknowledge: ${params.purchaseToken}")
-            } else {
-                logger.warning("Failed to acknowledge purchase: ${params.purchaseToken}, ${result.debugMessage}")
-            }
-            result
         }
     }
 

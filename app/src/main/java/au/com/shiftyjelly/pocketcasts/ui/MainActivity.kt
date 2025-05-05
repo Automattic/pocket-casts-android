@@ -92,7 +92,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.navigation.BottomNavigator
 import au.com.shiftyjelly.pocketcasts.navigation.FragmentInfo
 import au.com.shiftyjelly.pocketcasts.navigation.NavigatorAction
-import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
 import au.com.shiftyjelly.pocketcasts.player.view.PlayerBottomSheet
 import au.com.shiftyjelly.pocketcasts.player.view.PlayerContainerFragment
 import au.com.shiftyjelly.pocketcasts.player.view.UpNextFragment
@@ -246,8 +245,6 @@ class MainActivity :
     lateinit var applicationScope: CoroutineScope
 
     @Inject lateinit var crashLogging: CrashLogging
-
-    @Inject lateinit var paymentClient: PaymentClient
 
     private val viewModel: MainActivityViewModel by viewModels()
     private val disposables = CompositeDisposable()
@@ -486,13 +483,6 @@ class MainActivity :
         ThemeSettingObserver(this, theme, settings.themeReconfigurationEvents).observeThemeChanges()
 
         encourageAccountCreation()
-
-        if (BuildConfig.DEBUG) {
-            lifecycleScope.launch {
-                delay(5000)
-                paymentClient.loadSubscriptionPlans()
-            }
-        }
     }
 
     private fun resetEoYBadgeIfNeeded() {

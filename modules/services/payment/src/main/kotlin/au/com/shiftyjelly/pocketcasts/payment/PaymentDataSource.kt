@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.payment
 import android.app.Activity
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.payment.billing.BillingPaymentDataSource
-import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingResult
 import com.android.billingclient.api.ProductDetails
@@ -35,8 +34,6 @@ interface PaymentDataSource {
     }
 
     // <editor-fold desc="Temporarily extracted old interface">
-    val purchaseUpdates: SharedFlow<Pair<BillingResult, List<GooglePurchase>>>
-
     suspend fun loadProducts(
         params: QueryProductDetailsParams,
     ): Pair<BillingResult, List<ProductDetails>>
@@ -48,10 +45,6 @@ interface PaymentDataSource {
     suspend fun loadPurchases(
         params: QueryPurchasesParams,
     ): Pair<BillingResult, List<GooglePurchase>>
-
-    suspend fun acknowledgePurchase(
-        params: AcknowledgePurchaseParams,
-    ): BillingResult
 
     suspend fun launchBillingFlow(
         activity: Activity,

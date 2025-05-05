@@ -12,10 +12,11 @@ import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.BillingPeriod
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.WinbackOfferDetails
+import au.com.shiftyjelly.pocketcasts.payment.PaymentResultCode
+import au.com.shiftyjelly.pocketcasts.payment.PurchaseResult
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchaseEvent
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchasesState
 import au.com.shiftyjelly.pocketcasts.repositories.winback.WinbackManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
@@ -247,7 +248,7 @@ class WinbackViewModelTest {
 
             val newPurchase = createPurchase(orderId = "new-purchase")
             winbackManager.addPurchases(listOf(newPurchase))
-            winbackManager.addPurchaseEvent(PurchaseEvent.Success)
+            winbackManager.addPurchaseEvent(PurchaseResult.Purchased)
 
             val changedPlanState = awaitItem()
             val plansState = changedPlanState.subscriptionPlansState as SubscriptionPlansState.Loaded
@@ -303,7 +304,7 @@ class WinbackViewModelTest {
             viewModel.changePlan(knownPlan, mock())
             assertTrue(awaitLoadedState().isChangingPlan)
 
-            winbackManager.addPurchaseEvent(PurchaseEvent.Cancelled(0))
+            winbackManager.addPurchaseEvent(PurchaseResult.Cancelled)
             val state = awaitLoadedState()
 
             assertFalse(state.isChangingPlan)
@@ -323,7 +324,7 @@ class WinbackViewModelTest {
             viewModel.changePlan(knownPlan, mock())
             assertTrue(awaitLoadedState().isChangingPlan)
 
-            winbackManager.addPurchaseEvent(PurchaseEvent.Failure("", 0))
+            winbackManager.addPurchaseEvent(PurchaseResult.Failure(PaymentResultCode.Error))
             val state = awaitLoadedState()
 
             assertFalse(state.isChangingPlan)
@@ -344,7 +345,7 @@ class WinbackViewModelTest {
             assertTrue(awaitLoadedState().isChangingPlan)
 
             winbackManager.addPurchases(emptyList())
-            winbackManager.addPurchaseEvent(PurchaseEvent.Success)
+            winbackManager.addPurchaseEvent(PurchaseResult.Purchased)
 
             val changedPlanState = awaitItem()
             assertTrue(changedPlanState.subscriptionPlansState is SubscriptionPlansState.Failure)
@@ -616,7 +617,7 @@ class WinbackViewModelTest {
             assertFalse(claimingState.isOfferClaimed)
             assertFalse(claimingState.hasOfferClaimFailed)
 
-            winbackManager.addPurchaseEvent(PurchaseEvent.Success)
+            winbackManager.addPurchaseEvent(PurchaseResult.Purchased)
             val claimedState = awaitOfferState()
             assertFalse(claimedState.isClaimingOffer)
             assertTrue(claimedState.isOfferClaimed)
@@ -667,7 +668,7 @@ class WinbackViewModelTest {
             viewModel.claimOffer(winbackOffer, mock())
             assertTrue(awaitOfferState().isClaimingOffer)
 
-            winbackManager.addPurchaseEvent(PurchaseEvent.Cancelled(responseCode = 1))
+            winbackManager.addPurchaseEvent(PurchaseResult.Cancelled)
             val claimedState = awaitOfferState()
             assertFalse(claimedState.isClaimingOffer)
             assertFalse(claimedState.isOfferClaimed)
@@ -687,7 +688,7 @@ class WinbackViewModelTest {
             viewModel.claimOffer(winbackOffer, mock())
             skipItems(1)
 
-            winbackManager.addPurchaseEvent(PurchaseEvent.Failure("error", responseCode = 1))
+            winbackManager.addPurchaseEvent(PurchaseResult.Failure(PaymentResultCode.Error))
             val claimedState = awaitOfferState()
             assertFalse(claimedState.isClaimingOffer)
             assertFalse(claimedState.isOfferClaimed)
@@ -753,7 +754,7 @@ class WinbackViewModelTest {
         winbackManager.addWinbackResponse(null)
 
         viewModel.claimOffer(winbackOffer, mock())
-        winbackManager.addPurchaseEvent(PurchaseEvent.Success)
+        winbackManager.addPurchaseEvent(PurchaseResult.Purchased)
 
         val event = tracker.events.single()
         assertEquals(
@@ -776,7 +777,7 @@ class WinbackViewModelTest {
         winbackManager.addWinbackResponse(null)
 
         viewModel.claimOffer(winbackOffer, mock())
-        winbackManager.addPurchaseEvent(PurchaseEvent.Success)
+        winbackManager.addPurchaseEvent(PurchaseResult.Purchased)
 
         val event = tracker.events.single()
         assertEquals(
@@ -799,7 +800,7 @@ class WinbackViewModelTest {
         winbackManager.addWinbackResponse(null)
 
         viewModel.claimOffer(winbackOffer, mock())
-        winbackManager.addPurchaseEvent(PurchaseEvent.Success)
+        winbackManager.addPurchaseEvent(PurchaseResult.Purchased)
 
         val event = tracker.events.single()
         assertEquals(
@@ -822,7 +823,7 @@ class WinbackViewModelTest {
         winbackManager.addWinbackResponse(null)
 
         viewModel.claimOffer(winbackOffer, mock())
-        winbackManager.addPurchaseEvent(PurchaseEvent.Success)
+        winbackManager.addPurchaseEvent(PurchaseResult.Purchased)
 
         val event = tracker.events.single()
         assertEquals(
@@ -914,7 +915,7 @@ class WinbackViewModelTest {
 
         winbackManager.addPurchase(createPurchase(productIds = listOf(Subscription.PLUS_MONTHLY_PRODUCT_ID)))
         winbackManager.addWinbackResponse(null)
-        winbackManager.addPurchaseEvent(PurchaseEvent.Success)
+        winbackManager.addPurchaseEvent(PurchaseResult.Purchased)
 
         assertEquals(
             listOf(
@@ -1074,9 +1075,9 @@ class FakeWinbackManager : WinbackManager {
 
     suspend fun addPurchases(purchases: List<Purchase>) = purchasesTurbine.add(PurchasesState.Loaded(purchases))
 
-    private val purchaseEventTurbine = Turbine<PurchaseEvent>()
+    private val purchaseEventTurbine = Turbine<PurchaseResult>()
 
-    suspend fun addPurchaseEvent(purchaseEvent: PurchaseEvent) = purchaseEventTurbine.add(purchaseEvent)
+    suspend fun addPurchaseEvent(purchaseEvent: PurchaseResult) = purchaseEventTurbine.add(purchaseEvent)
 
     private val winbackResponseTurbine = Turbine<WinbackResponse?>()
 

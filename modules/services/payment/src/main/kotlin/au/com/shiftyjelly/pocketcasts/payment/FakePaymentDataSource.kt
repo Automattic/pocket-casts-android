@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.payment
 
 import android.app.Activity
-import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingResult
 import com.android.billingclient.api.ProductDetails
@@ -11,7 +10,6 @@ import com.android.billingclient.api.QueryPurchaseHistoryParams
 import com.android.billingclient.api.QueryPurchasesParams
 import java.math.BigDecimal
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.first
 import com.android.billingclient.api.Purchase as GooglePurchase
 
@@ -58,8 +56,6 @@ class FakePaymentDataSource : PaymentDataSource {
     }
 
     // <editor-fold desc="Temporarily extracted old interface">
-    override val purchaseUpdates: SharedFlow<Pair<BillingResult, List<GooglePurchase>>> = MutableSharedFlow()
-
     override suspend fun loadProducts(
         params: QueryProductDetailsParams,
     ): Pair<BillingResult, List<ProductDetails>> = BillingResult.newBuilder().build() to emptyList()
@@ -71,10 +67,6 @@ class FakePaymentDataSource : PaymentDataSource {
     override suspend fun loadPurchases(
         params: QueryPurchasesParams,
     ): Pair<BillingResult, List<GooglePurchase>> = BillingResult.newBuilder().build() to emptyList()
-
-    override suspend fun acknowledgePurchase(
-        params: AcknowledgePurchaseParams,
-    ): BillingResult = BillingResult.newBuilder().build()
 
     override suspend fun launchBillingFlow(
         activity: Activity,

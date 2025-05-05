@@ -10,9 +10,9 @@ import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.models.type.WinbackOfferDetails
+import au.com.shiftyjelly.pocketcasts.payment.PurchaseResult
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchaseEvent
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchasesState
 import au.com.shiftyjelly.pocketcasts.repositories.winback.WinbackManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -119,28 +119,27 @@ class WinbackViewModel @Inject constructor(
                 plans.copy(isChangingPlan = true)
             }
             val currentProductId = loadedState.activePurchase.productId
-            val purchaseEvent = winbackManager.changeProduct(
+            val purchaseResult = winbackManager.changeProduct(
                 currentPurchase = currentPurchase,
                 currentPurchaseProductId = currentProductId,
                 newProduct = newProduct,
                 newProductOfferToken = newPlan.offerToken,
                 activity = activity,
             )
-            when (purchaseEvent) {
-                is PurchaseEvent.Cancelled -> {
+            when (purchaseResult) {
+                is PurchaseResult.Cancelled -> {
                     _uiState.value = _uiState.value.withLoadedSubscriptionPlans { plans ->
                         plans.copy(isChangingPlan = false)
                     }
                 }
 
-                is PurchaseEvent.Failure -> {
-                    logWarning("Purchase failure: ${purchaseEvent.responseCode}, ${purchaseEvent.errorMessage}")
+                is PurchaseResult.Failure -> {
                     _uiState.value = _uiState.value.withLoadedSubscriptionPlans { plans ->
                         plans.copy(isChangingPlan = false, hasPlanChangeFailed = true)
                     }
                 }
 
-                is PurchaseEvent.Success -> {
+                is PurchaseResult.Purchased -> {
                     trackPlanPurchased(
                         currentProductId = currentProductId,
                         newProductId = newProduct.productId,
@@ -201,28 +200,27 @@ class WinbackViewModel @Inject constructor(
             _uiState.value = _uiState.value.withOfferState { state ->
                 state.copy(isClaimingOffer = true)
             }
-            val purchaseEvent = winbackManager.claimWinbackOffer(
+            val purchaseResult = winbackManager.claimWinbackOffer(
                 currentPurchase = currentPurchase,
                 winbackProduct = winbackProduct,
                 winbackOfferToken = offer.offerToken,
                 winbackClaimCode = offer.redeemCode,
                 activity = activity,
             )
-            when (purchaseEvent) {
-                is PurchaseEvent.Cancelled -> {
+            when (purchaseResult) {
+                is PurchaseResult.Cancelled -> {
                     _uiState.value = _uiState.value.withOfferState { state ->
                         state.copy(isClaimingOffer = false)
                     }
                 }
 
-                is PurchaseEvent.Failure -> {
-                    logWarning("Winback offer failure: ${purchaseEvent.responseCode}, ${purchaseEvent.errorMessage}")
+                is PurchaseResult.Failure -> {
                     _uiState.value = _uiState.value.withOfferState { state ->
                         state.copy(isClaimingOffer = false, hasOfferClaimFailed = true)
                     }
                 }
 
-                is PurchaseEvent.Success -> {
+                is PurchaseResult.Purchased -> {
                     _uiState.value = _uiState.value.withOfferState { state ->
                         state.copy(isClaimingOffer = false, isOfferClaimed = true)
                     }

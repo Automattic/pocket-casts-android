@@ -1,6 +1,13 @@
 package au.com.shiftyjelly.pocketcasts.payment
 
 import android.app.Activity
+import com.android.billingclient.api.BillingFlowParams
+import com.android.billingclient.api.BillingResult
+import com.android.billingclient.api.ProductDetails
+import com.android.billingclient.api.PurchaseHistoryRecord
+import com.android.billingclient.api.QueryProductDetailsParams
+import com.android.billingclient.api.QueryPurchaseHistoryParams
+import com.android.billingclient.api.QueryPurchasesParams
 import java.util.Collections
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
@@ -8,6 +15,7 @@ import javax.inject.Singleton
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -17,7 +25,7 @@ class PaymentClient @Inject constructor(
     private val purchaseApprover: PurchaseApprover,
     private val logger: Logger,
 ) {
-    private val purchaseEvents = MutableSharedFlow<PurchaseResult>()
+    private val _purchaseEvents = MutableSharedFlow<PurchaseResult>()
     private val pendingPurchases = Collections.newSetFromMap(ConcurrentHashMap<String, Boolean>())
 
     suspend fun monitorPurchaseUpdates(): Nothing = coroutineScope {
@@ -38,7 +46,7 @@ class PaymentClient @Inject constructor(
         key: SubscriptionPlan.Key,
         activity: Activity,
     ): PurchaseResult = coroutineScope {
-        val purchaseConfirmationDeferred = async { purchaseEvents.first() }
+        val purchaseConfirmationDeferred = async { _purchaseEvents.first() }
         val billingResult = dataSource.launchBillingFlow(key, activity)
         when (billingResult) {
             is PaymentResult.Success -> {
@@ -53,7 +61,7 @@ class PaymentClient @Inject constructor(
         }
     }
 
-    private suspend fun loadAndAcknowledgePurchases() {
+    suspend fun loadAndAcknowledgePurchases() {
         dataSource.loadPurchases().onSuccess { purchases ->
             purchases
                 .filter { purchase -> !purchase.isAcknowledged }
@@ -79,7 +87,7 @@ class PaymentClient @Inject constructor(
 
                 is PaymentResult.Failure -> {
                     logger.warning("Purchase failure: ${recoveredResult.code} ${recoveredResult.message}")
-                    purchaseEvents.emit(recoveredResult.toPurchaseResult())
+                    _purchaseEvents.emit(recoveredResult.toPurchaseResult())
                 }
             }
         }
@@ -103,11 +111,40 @@ class PaymentClient @Inject constructor(
                 .onSuccess { logger.info("Purchase confirmed: $it") }
                 .onFailure { code, message -> logger.warning("Failed to confirm purchase: $purchase. $code $message") }
             if (dispatchConfirmation) {
-                purchaseEvents.emit(confirmResult.toPurchaseResult())
+                _purchaseEvents.emit(confirmResult.toPurchaseResult())
             }
             pendingPurchases.remove(purchase.state.orderId)
         }
     }
+
+    // <editor-fold desc="Temporarily extracted old interface">
+    val purchaseEvents = _purchaseEvents.asSharedFlow()
+
+    suspend fun loadProducts(
+        params: QueryProductDetailsParams,
+    ): Pair<BillingResult, List<ProductDetails>> {
+        return dataSource.loadProducts(params)
+    }
+
+    suspend fun loadPurchaseHistory(
+        params: QueryPurchaseHistoryParams,
+    ): Pair<BillingResult, List<PurchaseHistoryRecord>> {
+        return dataSource.loadPurchaseHistory(params)
+    }
+
+    suspend fun loadPurchases(
+        params: QueryPurchasesParams,
+    ): Pair<BillingResult, List<com.android.billingclient.api.Purchase>> {
+        return dataSource.loadPurchases(params)
+    }
+
+    suspend fun launchBillingFlow(
+        activity: Activity,
+        params: BillingFlowParams,
+    ): BillingResult {
+        return dataSource.launchBillingFlow(activity, params)
+    }
+    // </editor-fold>
 }
 
 private fun PaymentResult<*>.toPurchaseResult() = when (this) {

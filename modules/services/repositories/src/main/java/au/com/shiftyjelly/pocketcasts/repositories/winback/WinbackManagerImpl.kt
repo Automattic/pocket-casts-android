@@ -1,10 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.repositories.winback
 
 import android.app.Activity
+import au.com.shiftyjelly.pocketcasts.payment.PaymentResultCode
+import au.com.shiftyjelly.pocketcasts.payment.PurchaseResult
 import au.com.shiftyjelly.pocketcasts.payment.billing.isOk
 import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager
 import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager.ReferralResult
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchaseEvent
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
@@ -26,7 +27,7 @@ class WinbackManagerImpl @Inject constructor(
         newProduct: ProductDetails,
         newProductOfferToken: String,
         activity: Activity,
-    ): PurchaseEvent {
+    ): PurchaseResult {
         val startResult = subscriptionManager.changeProduct(
             currentPurchase = currentPurchase,
             currentPurchaseProductId = currentPurchaseProductId,
@@ -37,10 +38,7 @@ class WinbackManagerImpl @Inject constructor(
         return if (startResult.isOk()) {
             subscriptionManager.observePurchaseEvents().asFlow().first()
         } else {
-            PurchaseEvent.Failure(
-                "Failed to start change product flow. ${startResult.debugMessage}",
-                startResult.responseCode,
-            )
+            PurchaseResult.Failure(PaymentResultCode.Error)
         }
     }
 
@@ -56,7 +54,7 @@ class WinbackManagerImpl @Inject constructor(
         winbackOfferToken: String,
         winbackClaimCode: String,
         activity: Activity,
-    ): PurchaseEvent {
+    ): PurchaseResult {
         val startResult = subscriptionManager.claimWinbackOffer(
             currentPurchase = currentPurchase,
             winbackProduct = winbackProduct,
@@ -65,7 +63,7 @@ class WinbackManagerImpl @Inject constructor(
         )
         return if (startResult.isOk()) {
             val purchaseEvent = subscriptionManager.observePurchaseEvents().asFlow().first()
-            if (purchaseEvent is PurchaseEvent.Success) {
+            if (purchaseEvent is PurchaseResult.Purchased) {
                 /**
                  * Successfully redeeming a referral code means that a user is no longer eligible for the Winback offer.
                  * Failure to redeem the code means that the Winback offer remains available to the user.
@@ -84,10 +82,7 @@ class WinbackManagerImpl @Inject constructor(
             }
             purchaseEvent
         } else {
-            PurchaseEvent.Failure(
-                "Failed to start change product flow. ${startResult.debugMessage}",
-                startResult.responseCode,
-            )
+            PurchaseResult.Failure(PaymentResultCode.Error)
         }
     }
 }
