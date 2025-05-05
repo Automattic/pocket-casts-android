@@ -23,6 +23,8 @@ interface PaymentDataSource {
 
     suspend fun acknowledgePurchase(purchase: Purchase): PaymentResult<Purchase>
 
+    suspend fun launchBillingFlow(plan: SubscriptionPlan, activity: Activity): PaymentResult<Unit>
+
     companion object {
         fun billing(
             context: Context,
