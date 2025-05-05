@@ -28,11 +28,6 @@ class PaymentClient @Inject constructor(
     private val _purchaseEvents = MutableSharedFlow<PurchaseResult>()
     private val pendingPurchases = Collections.newSetFromMap(ConcurrentHashMap<String, Boolean>())
 
-    suspend fun monitorPurchaseUpdates(): Nothing = coroutineScope {
-        launch { loadAndAcknowledgePurchases() }
-        listenToPurchaseUpdates()
-    }
-
     suspend fun loadSubscriptionPlans(): PaymentResult<SubscriptionPlans> {
         logger.info("Load subscription plans")
         return dataSource
@@ -40,6 +35,15 @@ class PaymentClient @Inject constructor(
             .flatMap(SubscriptionPlans::create)
             .onSuccess { plans -> logger.info("Subscription plans loaded: $plans") }
             .onFailure { code, message -> logger.warning("Failed to load subscription plans. $code, $message") }
+    }
+
+    suspend fun loadAcknowledgedSubscriptions(): PaymentResult<List<AcknowledgedSubscription>> {
+        logger.info("Loading acknowledged subscriptions")
+        return dataSource
+            .loadPurchases()
+            .map { purchases -> purchases.toAcknowledgedSubscriptions() }
+            .onSuccess { subscriptions -> logger.info("Acknowledged subscriptions loaded: $subscriptions") }
+            .onFailure { code, message -> logger.warning("Failed to load acknowledged subscriptions. $code, $message") }
     }
 
     suspend fun purchaseSubscriptionPlan(
@@ -61,7 +65,12 @@ class PaymentClient @Inject constructor(
         }
     }
 
-    suspend fun loadAndAcknowledgePurchases() {
+    suspend fun monitorPurchaseUpdates(): Nothing = coroutineScope {
+        launch { acknowledgePendingPurchases() }
+        listenToPurchaseUpdates()
+    }
+
+    suspend fun acknowledgePendingPurchases() {
         dataSource.loadPurchases().onSuccess { purchases ->
             purchases
                 .filter { purchase -> !purchase.isAcknowledged }
@@ -115,6 +124,41 @@ class PaymentClient @Inject constructor(
             }
             pendingPurchases.remove(purchase.state.orderId)
         }
+    }
+
+    private fun List<Purchase>.toAcknowledgedSubscriptions() = mapNotNull { it.toAcknowledgedSubscription() }
+
+    private fun Purchase.toAcknowledgedSubscription(): AcknowledgedSubscription? {
+        if (!isAcknowledged || state !is PurchaseState.Purchased) return null
+
+        if (productIds.isEmpty()) {
+            logger.warning("Skipping purchase ${state.orderId}. No associated products.")
+            return null
+        }
+
+        if (productIds.size > 1) {
+            logger.warning("Skipping purchase ${state.orderId}. Too many associated products: $productIds")
+            return null
+        }
+
+        val productId = productIds[0]
+        val productKey = findMatchingProductKey(productId)
+
+        if (productKey == null) {
+            logger.warning("Skipping purchase ${state.orderId}. Couldn't find matching product key for $productId")
+            return null
+        }
+
+        return AcknowledgedSubscription(state.orderId, productKey.tier, productKey.billingCycle, isAutoRenewing)
+    }
+
+    private fun findMatchingProductKey(productId: String): SubscriptionPlan.Key? {
+        val keys = SubscriptionTier.entries.flatMap { tier ->
+            SubscriptionBillingCycle.entries.map { cycle ->
+                SubscriptionPlan.Key(tier, cycle, offer = null)
+            }
+        }
+        return keys.firstOrNull { it.productId == productId }
     }
 
     // <editor-fold desc="Temporarily extracted old interface">

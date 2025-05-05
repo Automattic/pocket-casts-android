@@ -322,3 +322,12 @@ sealed interface PurchaseState {
         override val orderId get() = null
     }
 }
+
+data class AcknowledgedSubscription(
+    val orderId: String,
+    val tier: SubscriptionTier,
+    val billingCycle: SubscriptionBillingCycle,
+    val isAutoRenewing: Boolean,
+) {
+    val productId get() = SubscriptionPlan.productId(tier, billingCycle)
+}
