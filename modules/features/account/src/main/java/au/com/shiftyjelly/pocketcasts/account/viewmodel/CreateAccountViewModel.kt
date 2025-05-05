@@ -88,59 +88,11 @@ class CreateAccountViewModel
             }
         }
 
-        private fun PaymentResultCode.analyticProperties() = when (this) {
-            is PaymentResultCode.BillingUnavailable -> mapOf(
-                ERROR_KEY to "billing_unavailable",
-            )
-
-            is PaymentResultCode.DeveloperError -> mapOf(
-                ERROR_KEY to "developer_error",
-            )
-
-            is PaymentResultCode.Error -> mapOf(
-                ERROR_KEY to "error",
-            )
-
-            is PaymentResultCode.FeatureNotSupported -> mapOf(
-                ERROR_KEY to "feature_not_supported",
-            )
-
-            is PaymentResultCode.ItemAlreadyOwned -> mapOf(
-                ERROR_KEY to "item_already_woned",
-            )
-
-            is PaymentResultCode.ItemNotOwned -> mapOf(
-                ERROR_KEY to "item_not_owned",
-            )
-
-            is PaymentResultCode.ItemUnavailable -> mapOf(
-                ERROR_KEY to "item_unavailable",
-            )
-
-            is PaymentResultCode.NetworkError -> mapOf(
-                ERROR_KEY to "network_error",
-            )
-
-            is PaymentResultCode.Ok -> mapOf(
-                ERROR_KEY to "ok",
-            )
-
-            is PaymentResultCode.ServiceDisconnected -> mapOf(
-                ERROR_KEY to "service_disconnected",
-            )
-
-            is PaymentResultCode.ServiceUnavailable -> mapOf(
-                ERROR_KEY to "service_unavailable",
-            )
-
-            is PaymentResultCode.Unknown -> mapOf(
-                ERROR_KEY to "unknown",
-                ERROR_CODE_KEY to code,
-            )
-
-            is PaymentResultCode.UserCancelled -> mapOf(
-                ERROR_KEY to "user_cancelled",
-            )
+        private fun PaymentResultCode.analyticProperties() = buildMap {
+            put(ERROR_KEY, analyticsValue)
+            if (this@analyticProperties is PaymentResultCode.Unknown) {
+                put(ERROR_CODE_KEY, code)
+            }
         }
     }
 
