@@ -14,13 +14,16 @@ class ServerPurchaseApprover @Inject constructor(
     private val syncManager: SyncManager,
 ) : PurchaseApprover {
     override suspend fun approve(purchase: Purchase): PaymentResult<Purchase> {
-        return try {
+        return runCatching {
             val request = SubscriptionPurchaseRequest(purchase.token, purchase.productIds.first())
             syncManager.subscriptionPurchaseRxSingle(request).await()
             PaymentResult.Success(purchase)
-        } catch (e: Throwable) {
-            if (e is CancellationException) throw e
-            PaymentResult.Failure(PaymentResultCode.Unknown(0), e.message ?: "Server confirmation error")
+        }.getOrElse { error ->
+            if (error is CancellationException) {
+                throw error
+            } else {
+                PaymentResult.Failure(PaymentResultCode.Unknown(0), error.message ?: "Server confirmation error")
+            }
         }
     }
 }
