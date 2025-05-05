@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.payment.Product
 import au.com.shiftyjelly.pocketcasts.payment.Purchase
 import au.com.shiftyjelly.pocketcasts.payment.PurchaseState
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionBillingCycle
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import com.android.billingclient.api.BillingFlowParams.SubscriptionUpdateParams.ReplacementMode
@@ -60,15 +61,15 @@ internal class BillingPaymentMapper(
     }
 
     fun toBillingFlowRequest(
-        plan: SubscriptionPlan,
+        key: SubscriptionPlan.Key,
         productDetails: List<ProductDetails>,
         purchases: List<GooglePurchase>,
     ): BillingFlowRequest? {
-        val (product, offerToken) = findMatchForPlan(productDetails, plan) ?: return null
+        val (product, offerToken) = findMatchForPlan(productDetails, key) ?: return null
 
         val productQuery = BillingFlowRequest.ProductQuery(product, offerToken)
         val updateQuery = findActivePurchase(purchases)?.let { (purchaseToken, purchasedProductId) ->
-            findReplacementMode(purchasedProductId, plan)?.let { replacementMode ->
+            findReplacementMode(purchasedProductId, key)?.let { replacementMode ->
                 BillingFlowRequest.SubscriptionUpdateQuery(purchaseToken, replacementMode)
             }
         }
@@ -219,15 +220,15 @@ internal class BillingPaymentMapper(
 
     private fun findMatchForPlan(
         products: List<ProductDetails>,
-        plan: SubscriptionPlan,
+        key: SubscriptionPlan.Key,
     ): Pair<ProductDetails, String>? {
         val mappingContext = mapOf(
-            "tier" to plan.tier,
-            "billingCycle" to plan.billingCycle,
-            "offer" to plan.offer,
+            "tier" to key.tier,
+            "billingCycle" to key.billingCycle,
+            "offer" to key.offer,
         )
 
-        val matchingProducts = products.filter { it.productId == plan.productId }
+        val matchingProducts = products.filter { it.productId == key.productId }
         if (matchingProducts.size > 1) {
             logWarning("Found multiple matching products", mappingContext)
             return null
@@ -240,7 +241,7 @@ internal class BillingPaymentMapper(
         }
 
         val matchingOffers = matchingProduct.subscriptionOfferDetails
-            ?.filter { offer -> offer.basePlanId == plan.basePlanId && offer.offerId == plan.offerId }
+            ?.filter { offer -> offer.basePlanId == key.basePlanId && offer.offerId == key.offerId }
             .orEmpty()
         if (matchingOffers.size > 1) {
             logWarning("Found multiple matching offers", mappingContext)
@@ -304,31 +305,31 @@ internal class BillingPaymentMapper(
      */
     private fun findReplacementMode(
         currentPlanId: String,
-        newPlan: SubscriptionPlan,
-    ) = when (newPlan) {
-        is SubscriptionPlan.Base -> when (currentPlanId) {
-            PlusMonthlyId -> when (newPlan.productId) {
+        newPlanKey: SubscriptionPlan.Key,
+    ) = when (newPlanKey.offer) {
+        null -> when (currentPlanId) {
+            PlusMonthlyId -> when (newPlanKey.productId) {
                 PatronMonthlyId -> ReplacementMode.CHARGE_PRORATED_PRICE
                 PlusYearlyId -> ReplacementMode.CHARGE_FULL_PRICE
                 PatronYearlyId -> ReplacementMode.CHARGE_FULL_PRICE
                 else -> null
             }
 
-            PatronMonthlyId -> when (newPlan.productId) {
+            PatronMonthlyId -> when (newPlanKey.productId) {
                 PlusMonthlyId -> ReplacementMode.WITH_TIME_PRORATION
                 PlusYearlyId -> ReplacementMode.CHARGE_FULL_PRICE
                 PatronYearlyId -> ReplacementMode.CHARGE_FULL_PRICE
                 else -> null
             }
 
-            PlusYearlyId -> when (newPlan.productId) {
+            PlusYearlyId -> when (newPlanKey.productId) {
                 PlusMonthlyId -> ReplacementMode.WITH_TIME_PRORATION
                 PatronMonthlyId -> ReplacementMode.WITH_TIME_PRORATION
                 PatronYearlyId -> ReplacementMode.CHARGE_PRORATED_PRICE
                 else -> null
             }
 
-            PatronYearlyId -> when (newPlan.productId) {
+            PatronYearlyId -> when (newPlanKey.productId) {
                 PlusMonthlyId -> ReplacementMode.WITH_TIME_PRORATION
                 PatronMonthlyId -> ReplacementMode.WITH_TIME_PRORATION
                 PlusYearlyId -> ReplacementMode.WITH_TIME_PRORATION
@@ -337,8 +338,9 @@ internal class BillingPaymentMapper(
 
             else -> null
         }
-
-        is SubscriptionPlan.WithOffer -> ReplacementMode.CHARGE_FULL_PRICE
+        SubscriptionOffer.Trial -> ReplacementMode.CHARGE_FULL_PRICE
+        SubscriptionOffer.Referral -> ReplacementMode.CHARGE_FULL_PRICE
+        SubscriptionOffer.Winback -> ReplacementMode.CHARGE_FULL_PRICE
     }
 
     private fun logWarning(message: String, context: Map<String, Any?>) {

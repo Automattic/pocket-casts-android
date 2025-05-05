@@ -176,7 +176,7 @@ internal class BillingPaymentDataSource(
     }
 
     override suspend fun launchBillingFlow(
-        plan: SubscriptionPlan,
+        key: SubscriptionPlan.Key,
         activity: Activity,
     ): PaymentResult<Unit> {
         return connection.withConnectedClient { client ->
@@ -188,7 +188,7 @@ internal class BillingPaymentDataSource(
                         .map { purchases -> productDetails to purchases }
                 }
                 .flatMap { (productDetails, purchases) ->
-                    val params = mapper.toBillingFlowRequest(plan, productDetails, purchases)?.toGoogleParams()
+                    val params = mapper.toBillingFlowRequest(key, productDetails, purchases)?.toGoogleParams()
                     if (params == null) {
                         PaymentResult.Failure(PaymentResultCode.DeveloperError, "Couldn't create billing flow params")
                     } else {
