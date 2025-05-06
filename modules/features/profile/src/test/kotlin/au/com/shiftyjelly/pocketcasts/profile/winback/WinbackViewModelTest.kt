@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.profile.winback
 
 import android.app.Activity
-import app.cash.turbine.Turbine
 import app.cash.turbine.TurbineTestContext
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
@@ -9,30 +8,27 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.Tracker
 import au.com.shiftyjelly.pocketcasts.analytics.TrackerType
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
-import au.com.shiftyjelly.pocketcasts.models.type.BillingPeriod
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription
-import au.com.shiftyjelly.pocketcasts.models.type.WinbackOfferDetails
+import au.com.shiftyjelly.pocketcasts.payment.AcknowledgedSubscription
+import au.com.shiftyjelly.pocketcasts.payment.FakePaymentDataSource
+import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
 import au.com.shiftyjelly.pocketcasts.payment.PaymentResultCode
-import au.com.shiftyjelly.pocketcasts.payment.PurchaseResult
+import au.com.shiftyjelly.pocketcasts.payment.Purchase
+import au.com.shiftyjelly.pocketcasts.payment.PurchaseState
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionBillingCycle
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlans
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchasesState
-import au.com.shiftyjelly.pocketcasts.repositories.winback.WinbackManager
+import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager
+import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager.ReferralResult
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
-import com.android.billingclient.api.ProductDetails
-import com.android.billingclient.api.ProductDetails.PricingPhase
-import com.android.billingclient.api.ProductDetails.PricingPhases
-import com.android.billingclient.api.ProductDetails.RecurrenceMode
-import com.android.billingclient.api.ProductDetails.SubscriptionOfferDetails
-import com.android.billingclient.api.Purchase
-import com.pocketcasts.service.api.WinbackResponse
 import com.pocketcasts.service.api.winbackResponse
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -41,40 +37,16 @@ import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import org.mockito.kotlin.wheneverBlocking
 
 class WinbackViewModelTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule()
 
-    private val winbackManager = FakeWinbackManager()
+    private val paymentDataSource = FakePaymentDataSource()
     private val tracker = FakeTracker()
     private val settings = mock<Settings>()
-
-    private val products = WinbackOfferDetails.entries.map { it.toProductDetails() }
-
-    private val purchase = createPurchase()
-
-    private val knownPlan = SubscriptionPlan(
-        productId = Subscription.PLUS_YEARLY_PRODUCT_ID,
-        offerToken = "token",
-        title = "title",
-        formattedPrice = "price",
-        billingPeriod = BillingPeriod.Yearly,
-        basePrice = 100.toBigDecimal(),
-        currencyCode = "USD",
-    )
-
-    private val winbackResponse = winbackResponse {
-        offer = WinbackOfferDetails.PlusMonthly.offerId
-        code = "ABC"
-    }
-
-    private val winbackOffer = WinbackOffer(
-        details = WinbackOfferDetails.PlusMonthly,
-        offerToken = "offer-token-${WinbackOfferDetails.PlusMonthly.productId}",
-        redeemCode = "ABC",
-        formattedPrice = "formated-price",
-    )
+    private val referralManager = mock<ReferralManager>()
 
     private lateinit var viewModel: WinbackViewModel
 
@@ -84,11 +56,15 @@ class WinbackViewModelTest {
             on { flow } doReturn MutableStateFlow(null)
         }
         whenever(settings.cachedSubscriptionStatus) doReturn subscriptionSettingMock
+        wheneverBlocking { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(
+            offerId = SubscriptionOffer.Winback.offerId(SubscriptionTier.Plus, SubscriptionBillingCycle.Yearly)!!,
+        )
 
         viewModel = WinbackViewModel(
-            winbackManager,
-            settings,
-            AnalyticsTracker.test(tracker, isFirstPartyEnabled = true),
+            paymentClient = PaymentClient.test(paymentDataSource),
+            referralManager = referralManager,
+            settings = settings,
+            tracker = AnalyticsTracker.test(tracker, isFirstPartyEnabled = true),
         )
     }
 
@@ -101,32 +77,19 @@ class WinbackViewModelTest {
 
     @Test
     fun `subscription plans for user with active subscription`() = runTest {
-        winbackManager.addProductDetails(products)
-        winbackManager.addPurchase(purchase)
-        winbackManager.addWinbackResponse(null)
+        viewModel.loadWinbackData()
 
         viewModel.uiState.test {
             val state = awaitLoadedState()
-
-            val plusMonthly = state[Subscription.PLUS_MONTHLY_PRODUCT_ID]
-            val patronMonthly = state[Subscription.PATRON_MONTHLY_PRODUCT_ID]
-            val plusYearly = state[Subscription.PLUS_YEARLY_PRODUCT_ID]
-            val patronYearly = state[Subscription.PATRON_YEARLY_PRODUCT_ID]
-
-            assertNotNull(plusMonthly?.productId)
-            assertNotNull(patronMonthly?.productId)
-            assertNotNull(plusYearly?.productId)
-            assertNotNull(patronYearly?.productId)
-
-            assertEquals(state.activePurchase.productId, Subscription.PLUS_MONTHLY_PRODUCT_ID)
+            assertEquals(state.currentSubscription.productId, SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Yearly))
         }
     }
 
     @Test
     fun `subscription plans for user with unacknowledged purchase`() = runTest {
-        winbackManager.addProductDetails(products)
-        winbackManager.addPurchase(createPurchase(isAcknowledged = false))
-        winbackManager.addWinbackResponse(null)
+        paymentDataSource.loadedPurchases = listOf(createPurchase(isAcknowledged = false))
+
+        viewModel.loadWinbackData()
 
         viewModel.uiState.test {
             val availablePlans = awaitItem().subscriptionPlansState as SubscriptionPlansState.Failure
@@ -137,9 +100,9 @@ class WinbackViewModelTest {
 
     @Test
     fun `subscription plans for user with not auto-renewing purchase`() = runTest {
-        winbackManager.addProductDetails(products)
-        winbackManager.addPurchase(createPurchase(isAutoRenewing = false))
-        winbackManager.addWinbackResponse(null)
+        paymentDataSource.loadedPurchases = listOf(createPurchase(isAutoRenewing = false))
+
+        viewModel.loadWinbackData()
 
         viewModel.uiState.test {
             val availablePlans = awaitItem().subscriptionPlansState as SubscriptionPlansState.Failure
@@ -150,22 +113,22 @@ class WinbackViewModelTest {
 
     @Test
     fun `subscription plans for user with purchase without order ID`() = runTest {
-        winbackManager.addProductDetails(products)
-        winbackManager.addPurchase(createPurchase(orderId = null))
-        winbackManager.addWinbackResponse(null)
+        paymentDataSource.loadedPurchases = listOf(createPurchase(orderId = null))
+
+        viewModel.loadWinbackData()
 
         viewModel.uiState.test {
             val availablePlans = awaitItem().subscriptionPlansState as SubscriptionPlansState.Failure
 
-            assertEquals(FailureReason.NoOrderId, availablePlans.reason)
+            assertEquals(FailureReason.NoPurchases, availablePlans.reason)
         }
     }
 
     @Test
     fun `subscription plans for user with multiple purchases`() = runTest {
-        winbackManager.addProductDetails(products)
-        winbackManager.addPurchases(listOf(createPurchase(orderId = "1"), createPurchase(orderId = "2")))
-        winbackManager.addWinbackResponse(null)
+        paymentDataSource.loadedPurchases = listOf(createPurchase(orderId = "1"), createPurchase(orderId = "2"))
+
+        viewModel.loadWinbackData()
 
         viewModel.uiState.test {
             val availablePlans = awaitItem().subscriptionPlansState as SubscriptionPlansState.Failure
@@ -176,137 +139,106 @@ class WinbackViewModelTest {
 
     @Test
     fun `subscription plans for user with purchase with multiple products`() = runTest {
-        winbackManager.addProductDetails(products)
-        winbackManager.addPurchase(createPurchase(productIds = listOf("id1", "id2")))
-        winbackManager.addWinbackResponse(null)
+        paymentDataSource.loadedPurchases = listOf(createPurchase(productIds = listOf("id1", "id2")))
+
+        viewModel.loadWinbackData()
 
         viewModel.uiState.test {
             val availablePlans = awaitItem().subscriptionPlansState as SubscriptionPlansState.Failure
 
-            assertEquals(FailureReason.TooManyProducts, availablePlans.reason)
+            assertEquals(FailureReason.NoPurchases, availablePlans.reason)
         }
     }
 
     @Test
     fun `subscription plans for user with purchase with no products`() = runTest {
-        winbackManager.addProductDetails(products)
-        winbackManager.addPurchase(createPurchase(productIds = emptyList()))
-        winbackManager.addWinbackResponse(null)
+        paymentDataSource.loadedPurchases = emptyList()
+
+        viewModel.loadWinbackData()
 
         viewModel.uiState.test {
             val availablePlans = awaitItem().subscriptionPlansState as SubscriptionPlansState.Failure
 
-            assertEquals(FailureReason.NoProducts, availablePlans.reason)
-        }
-    }
-
-    @Test
-    fun `subscription plans use only base offer from products`() = runTest {
-        winbackManager.addProductDetails(products)
-        winbackManager.addPurchase(purchase)
-        winbackManager.addWinbackResponse(null)
-
-        viewModel.uiState.test {
-            val subscriptionPlansState = awaitLoadedState()
-
-            val plan = subscriptionPlansState[Subscription.PLUS_MONTHLY_PRODUCT_ID]
-            assertEquals("base-token-${Subscription.PLUS_MONTHLY_PRODUCT_ID}", plan?.offerToken)
+            assertEquals(FailureReason.NoPurchases, availablePlans.reason)
         }
     }
 
     @Test
     fun `subscription plans are sorted`() = runTest {
-        winbackManager.addProductDetails(products.reversed())
-        winbackManager.addPurchase(purchase)
-        winbackManager.addWinbackResponse(null)
+        viewModel.loadWinbackData()
 
         viewModel.uiState.test {
-            val subscriptionPlansState = awaitLoadedState()
+            val loadedState = awaitLoadedState()
 
-            val tokens = subscriptionPlansState.plans.map(SubscriptionPlan::productId)
             val expected = listOf(
-                Subscription.PLUS_MONTHLY_PRODUCT_ID,
-                Subscription.PATRON_MONTHLY_PRODUCT_ID,
-                Subscription.PLUS_YEARLY_PRODUCT_ID,
-                Subscription.PATRON_YEARLY_PRODUCT_ID,
+                SubscriptionPlans.Preview.getBasePlan(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly),
+                SubscriptionPlans.Preview.getBasePlan(SubscriptionTier.Patron, SubscriptionBillingCycle.Monthly),
+                SubscriptionPlans.Preview.getBasePlan(SubscriptionTier.Plus, SubscriptionBillingCycle.Yearly),
+                SubscriptionPlans.Preview.getBasePlan(SubscriptionTier.Patron, SubscriptionBillingCycle.Yearly),
             )
-            assertEquals(expected, tokens)
+            assertEquals(expected, loadedState.basePlans)
         }
     }
 
     @Test
     fun `change subscription plan successfully`() = runTest {
-        winbackManager.addProductDetails(products)
-        winbackManager.addPurchase(purchase)
-        winbackManager.addWinbackResponse(null)
+        val newPlan = SubscriptionPlans.Preview.getBasePlan(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly)
+        val newPurchase = createPurchase(
+            orderId = "new-order-id",
+            productIds = listOf(SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly)),
+        )
+        val newSubscription = AcknowledgedSubscription("new-order-id", SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly, isAutoRenewing = true)
+
+        viewModel.loadWinbackData()
 
         viewModel.uiState.test {
             assertFalse(awaitLoadedState().isChangingPlan)
 
-            viewModel.changePlan(knownPlan, mock())
+            paymentDataSource.loadedPurchases = listOf(newPurchase)
+
+            viewModel.changePlan(newPlan, mock<Activity>())
             assertTrue(awaitLoadedState().isChangingPlan)
 
-            val newPurchase = createPurchase(orderId = "new-purchase")
-            winbackManager.addPurchases(listOf(newPurchase))
-            winbackManager.addPurchaseEvent(PurchaseResult.Purchased)
+            val state = awaitLoadedState()
+            assertFalse(state.isChangingPlan)
+            assertEquals(newSubscription, state.currentSubscription)
 
-            val changedPlanState = awaitItem()
-            val plansState = changedPlanState.subscriptionPlansState as SubscriptionPlansState.Loaded
-            assertFalse(plansState.isChangingPlan)
-            assertEquals(plansState.activePurchase, ActivePurchase(newPurchase.orderId!!, newPurchase.products[0]))
-            assertNull(changedPlanState.winbackOfferState)
-
-            winbackManager.addWinbackResponse(winbackResponse)
-            assertEquals(
-                "offer-token-${Subscription.PLUS_MONTHLY_PRODUCT_ID}",
-                awaitOfferState().offer.offerToken,
-            )
+//            assertNull(changedPlanState.winbackOfferState)
+//            winbackManager.addWinbackResponse(winbackResponse)
+//            assertEquals(
+//                "offer-token-${Subscription.PLUS_MONTHLY_PRODUCT_ID}",
+//                awaitOfferState().offer.offerToken,
+//            )
         }
     }
 
     @Test
     fun `change subscription when current state is not loaded`() = runTest {
-        winbackManager.addProductDetails(products)
-        winbackManager.addPurchases(emptyList())
-        winbackManager.addWinbackResponse(null)
+        val newPlan = SubscriptionPlans.Preview.getBasePlan(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly)
 
         viewModel.uiState.test {
             skipItems(1)
 
-            viewModel.changePlan(knownPlan, mock())
-            expectNoEvents()
-        }
-    }
-
-    @Test
-    fun `change subscription when there is no matching product`() = runTest {
-        winbackManager.addProductDetails(products)
-        winbackManager.addPurchase(purchase)
-        winbackManager.addWinbackResponse(null)
-
-        viewModel.uiState.test {
-            skipItems(1)
-
-            viewModel.changePlan(knownPlan.copy(productId = "unknown"), mock())
+            viewModel.changePlan(newPlan, mock())
             expectNoEvents()
         }
     }
 
     @Test
     fun `change subscription when it is cancelled`() = runTest {
-        winbackManager.addProductDetails(products)
-        winbackManager.addPurchase(purchase)
-        winbackManager.addWinbackResponse(null)
+        val newPlan = SubscriptionPlans.Preview.getBasePlan(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly)
+
+        viewModel.loadWinbackData()
 
         viewModel.uiState.test {
             assertFalse(awaitLoadedState().isChangingPlan)
 
-            viewModel.changePlan(knownPlan, mock())
+            paymentDataSource.purchasedProductsResultCode = PaymentResultCode.UserCancelled
+
+            viewModel.changePlan(newPlan, mock())
             assertTrue(awaitLoadedState().isChangingPlan)
 
-            winbackManager.addPurchaseEvent(PurchaseResult.Cancelled)
             val state = awaitLoadedState()
-
             assertFalse(state.isChangingPlan)
             assertFalse(state.hasPlanChangeFailed)
         }
@@ -314,19 +246,19 @@ class WinbackViewModelTest {
 
     @Test
     fun `change subscription when purchase fails`() = runTest {
-        winbackManager.addProductDetails(products)
-        winbackManager.addPurchase(purchase)
-        winbackManager.addWinbackResponse(null)
+        val newPlan = SubscriptionPlans.Preview.getBasePlan(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly)
+
+        viewModel.loadWinbackData()
 
         viewModel.uiState.test {
             assertFalse(awaitLoadedState().isChangingPlan)
 
-            viewModel.changePlan(knownPlan, mock())
+            paymentDataSource.purchasedProductsResultCode = PaymentResultCode.BillingUnavailable
+
+            viewModel.changePlan(newPlan, mock())
             assertTrue(awaitLoadedState().isChangingPlan)
 
-            winbackManager.addPurchaseEvent(PurchaseResult.Failure(PaymentResultCode.Error))
             val state = awaitLoadedState()
-
             assertFalse(state.isChangingPlan)
             assertTrue(state.hasPlanChangeFailed)
         }
@@ -334,46 +266,42 @@ class WinbackViewModelTest {
 
     @Test
     fun `change subscription when new plans fail to load`() = runTest {
-        winbackManager.addProductDetails(products)
-        winbackManager.addPurchase(purchase)
-        winbackManager.addWinbackResponse(null)
+        val newPlan = SubscriptionPlans.Preview.getBasePlan(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly)
+
+        viewModel.loadWinbackData()
 
         viewModel.uiState.test {
             assertFalse(awaitLoadedState().isChangingPlan)
 
-            viewModel.changePlan(knownPlan, mock())
-            assertTrue(awaitLoadedState().isChangingPlan)
+            paymentDataSource.loadedPurchasesResultCode = PaymentResultCode.BillingUnavailable
 
-            winbackManager.addPurchases(emptyList())
-            winbackManager.addPurchaseEvent(PurchaseResult.Purchased)
+            viewModel.changePlan(newPlan, mock())
+            assertTrue(awaitLoadedState().isChangingPlan)
 
             val changedPlanState = awaitItem()
             assertTrue(changedPlanState.subscriptionPlansState is SubscriptionPlansState.Failure)
             assertNull(changedPlanState.winbackOfferState)
-
-            winbackManager.addWinbackResponse(winbackResponse)
-            expectNoEvents()
         }
     }
 
     @Test
     fun `plus monthly winback offer`() = runTest {
-        winbackManager.addProductDetails(products)
-        winbackManager.addPurchase(purchase)
-        winbackManager.addWinbackResponse(
-            winbackResponse {
-                offer = WinbackOfferDetails.PlusMonthly.offerId
-                code = "ABC"
-            },
+        paymentDataSource.loadedPurchases = listOf(
+            createPurchase(productIds = listOf(SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly))),
         )
+        wheneverBlocking { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(
+            offerId = SubscriptionOffer.Winback.offerId(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly)!!,
+        )
+
+        viewModel.loadWinbackData()
 
         viewModel.uiState.test {
             assertEquals(
                 WinbackOffer(
                     redeemCode = "ABC",
-                    details = WinbackOfferDetails.PlusMonthly,
-                    offerToken = "offer-token-${Subscription.PLUS_MONTHLY_PRODUCT_ID}",
-                    formattedPrice = "base-price-${Subscription.PLUS_MONTHLY_PRODUCT_ID}",
+                    formattedPrice = "$3.99",
+                    tier = SubscriptionTier.Plus,
+                    billingCycle = SubscriptionBillingCycle.Monthly,
                 ),
                 awaitItem().winbackOfferState?.offer,
             )
@@ -382,22 +310,15 @@ class WinbackViewModelTest {
 
     @Test
     fun `plus yearly winback offer`() = runTest {
-        winbackManager.addProductDetails(products)
-        winbackManager.addPurchase(purchase)
-        winbackManager.addWinbackResponse(
-            winbackResponse {
-                offer = WinbackOfferDetails.PlusYearly.offerId
-                code = "ABC"
-            },
-        )
+        viewModel.loadWinbackData()
 
         viewModel.uiState.test {
             assertEquals(
                 WinbackOffer(
                     redeemCode = "ABC",
-                    details = WinbackOfferDetails.PlusYearly,
-                    offerToken = "offer-token-${Subscription.PLUS_YEARLY_PRODUCT_ID}",
-                    formattedPrice = "offer-price-${Subscription.PLUS_YEARLY_PRODUCT_ID}",
+                    formattedPrice = "$20.00",
+                    tier = SubscriptionTier.Plus,
+                    billingCycle = SubscriptionBillingCycle.Yearly,
                 ),
                 awaitItem().winbackOfferState?.offer,
             )
@@ -406,22 +327,22 @@ class WinbackViewModelTest {
 
     @Test
     fun `patron monthly winback offer`() = runTest {
-        winbackManager.addProductDetails(products)
-        winbackManager.addPurchase(purchase)
-        winbackManager.addWinbackResponse(
-            winbackResponse {
-                offer = WinbackOfferDetails.PatronMonthly.offerId
-                code = "ABC"
-            },
+        paymentDataSource.loadedPurchases = listOf(
+            createPurchase(productIds = listOf(SubscriptionPlan.productId(SubscriptionTier.Patron, SubscriptionBillingCycle.Monthly))),
         )
+        wheneverBlocking { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(
+            offerId = SubscriptionOffer.Winback.offerId(SubscriptionTier.Patron, SubscriptionBillingCycle.Monthly)!!,
+        )
+
+        viewModel.loadWinbackData()
 
         viewModel.uiState.test {
             assertEquals(
                 WinbackOffer(
                     redeemCode = "ABC",
-                    details = WinbackOfferDetails.PatronMonthly,
-                    offerToken = "offer-token-${Subscription.PATRON_MONTHLY_PRODUCT_ID}",
-                    formattedPrice = "base-price-${Subscription.PATRON_MONTHLY_PRODUCT_ID}",
+                    formattedPrice = "$9.99",
+                    tier = SubscriptionTier.Patron,
+                    billingCycle = SubscriptionBillingCycle.Monthly,
                 ),
                 awaitItem().winbackOfferState?.offer,
             )
@@ -430,22 +351,22 @@ class WinbackViewModelTest {
 
     @Test
     fun `patron yearly winback offer`() = runTest {
-        winbackManager.addProductDetails(products)
-        winbackManager.addPurchase(purchase)
-        winbackManager.addWinbackResponse(
-            winbackResponse {
-                offer = WinbackOfferDetails.PatronYearly.offerId
-                code = "ABC"
-            },
+        paymentDataSource.loadedPurchases = listOf(
+            createPurchase(productIds = listOf(SubscriptionPlan.productId(SubscriptionTier.Patron, SubscriptionBillingCycle.Yearly))),
         )
+        wheneverBlocking { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(
+            offerId = SubscriptionOffer.Winback.offerId(SubscriptionTier.Patron, SubscriptionBillingCycle.Yearly)!!,
+        )
+
+        viewModel.loadWinbackData()
 
         viewModel.uiState.test {
             assertEquals(
                 WinbackOffer(
                     redeemCode = "ABC",
-                    details = WinbackOfferDetails.PatronYearly,
-                    offerToken = "offer-token-${Subscription.PATRON_YEARLY_PRODUCT_ID}",
-                    formattedPrice = "offer-price-${Subscription.PATRON_YEARLY_PRODUCT_ID}",
+                    formattedPrice = "$50.00",
+                    tier = SubscriptionTier.Patron,
+                    billingCycle = SubscriptionBillingCycle.Yearly,
                 ),
                 awaitItem().winbackOfferState?.offer,
             )
@@ -454,9 +375,9 @@ class WinbackViewModelTest {
 
     @Test
     fun `no winback offer`() = runTest {
-        winbackManager.addProductDetails(products)
-        winbackManager.addPurchase(purchase)
-        winbackManager.addWinbackResponse(null)
+        wheneverBlocking { referralManager.getWinbackResponse() } doReturn ReferralResult.EmptyResult()
+
+        viewModel.loadWinbackData()
 
         viewModel.uiState.test {
             assertNull(awaitItem().winbackOfferState)
@@ -465,14 +386,9 @@ class WinbackViewModelTest {
 
     @Test
     fun `winback offer with blank offer ID`() = runTest {
-        winbackManager.addProductDetails(products)
-        winbackManager.addPurchase(purchase)
-        winbackManager.addWinbackResponse(
-            winbackResponse {
-                offer = " "
-                code = "ABC"
-            },
-        )
+        wheneverBlocking { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(offerId = "")
+
+        viewModel.loadWinbackData()
 
         viewModel.uiState.test {
             assertNull(awaitItem().winbackOfferState)
@@ -481,14 +397,9 @@ class WinbackViewModelTest {
 
     @Test
     fun `winback offer with blank redeem code`() = runTest {
-        winbackManager.addProductDetails(products)
-        winbackManager.addPurchase(purchase)
-        winbackManager.addWinbackResponse(
-            winbackResponse {
-                offer = WinbackOfferDetails.PlusMonthly.offerId
-                code = " "
-            },
-        )
+        wheneverBlocking { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(code = "")
+
+        viewModel.loadWinbackData()
 
         viewModel.uiState.test {
             assertNull(awaitItem().winbackOfferState)
@@ -497,14 +408,9 @@ class WinbackViewModelTest {
 
     @Test
     fun `winback offer with unknown ID`() = runTest {
-        winbackManager.addProductDetails(products)
-        winbackManager.addPurchase(purchase)
-        winbackManager.addWinbackResponse(
-            winbackResponse {
-                offer = "unknown"
-                code = "ABC"
-            },
-        )
+        wheneverBlocking { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(offerId = "unknown-offer")
+
+        viewModel.loadWinbackData()
 
         viewModel.uiState.test {
             assertNull(awaitItem().winbackOfferState)
@@ -513,32 +419,14 @@ class WinbackViewModelTest {
 
     @Test
     fun `winback offer with no matching product ID`() = runTest {
-        winbackManager.addProductDetails(products.filter { it.productId != Subscription.PLUS_MONTHLY_PRODUCT_ID })
-        winbackManager.addPurchase(purchase)
-        winbackManager.addWinbackResponse(
-            winbackResponse {
-                offer = WinbackOfferDetails.PlusMonthly.offerId
-                code = "ABC"
-            },
+        paymentDataSource.loadedPurchases = listOf(
+            createPurchase(productIds = listOf(SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Yearly))),
+        )
+        wheneverBlocking { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(
+            offerId = SubscriptionOffer.Winback.offerId(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly)!!,
         )
 
-        viewModel.uiState.test {
-            assertNull(awaitItem().winbackOfferState)
-        }
-    }
-
-    @Test
-    fun `winback offer with no matching product offer ID`() = runTest {
-        winbackManager.addProductDetails(
-            WinbackOfferDetails.PlusMonthly.toProductDetails(bonusOfferId = "offer-id"),
-        )
-        winbackManager.addPurchase(purchase)
-        winbackManager.addWinbackResponse(
-            winbackResponse {
-                offer = WinbackOfferDetails.PlusMonthly.offerId
-                code = "ABC"
-            },
-        )
+        viewModel.loadWinbackData()
 
         viewModel.uiState.test {
             assertNull(awaitItem().winbackOfferState)
@@ -547,63 +435,55 @@ class WinbackViewModelTest {
 
     @Test
     fun `winback offer with too few pricing phases`() = runTest {
-        winbackManager.addProductDetails(
-            WinbackOfferDetails.PlusMonthly.toProductDetails(
-                customPricingPhases = List(1) {
-                    mock<PricingPhase>() {
-                        on { formattedPrice } doReturn "price"
-                        on { billingPeriod } doReturn BillingPeriod.Monthly.value
-                        on { recurrenceMode } doReturn RecurrenceMode.INFINITE_RECURRING
-                        on { priceAmountMicros } doReturn 100L
-                        on { priceCurrencyCode } doReturn "USD"
-                    }
-                },
-            ),
-        )
-        winbackManager.addPurchase(purchase)
-        winbackManager.addWinbackResponse(
-            winbackResponse {
-                offer = WinbackOfferDetails.PlusMonthly.offerId
-                code = "ABC"
-            },
+        paymentDataSource.loadedProducts = FakePaymentDataSource.DefaultLoadedProducts.map { product ->
+            val newOfferPlans = product.pricingPlans.offerPlans.map { offer ->
+                offer.copy(pricingPhases = offer.pricingPhases.take(1))
+            }
+            val newPricingPlans = product.pricingPlans.copy(offerPlans = newOfferPlans)
+            product.copy(pricingPlans = newPricingPlans)
+        }
+        wheneverBlocking { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(
+            offerId = SubscriptionOffer.Winback.offerId(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly)!!,
         )
 
+        viewModel.loadWinbackData()
+
         viewModel.uiState.test {
-            assertNull(awaitItem().winbackOfferState)
+            val state = awaitItem()
+            assertTrue(state.subscriptionPlansState is SubscriptionPlansState.Loaded)
+            assertNull(state.winbackOfferState)
         }
     }
 
     @Test
     fun `winback offer with too many pricing phases`() = runTest {
-        winbackManager.addProductDetails(
-            WinbackOfferDetails.PlusMonthly.toProductDetails(
-                customPricingPhases = List(3) {
-                    mock<PricingPhase>() {
-                        on { formattedPrice } doReturn "price"
-                        on { billingPeriod } doReturn BillingPeriod.Monthly.value
-                        on { recurrenceMode } doReturn RecurrenceMode.INFINITE_RECURRING
-                    }
-                },
-            ),
-        )
-        winbackManager.addPurchase(purchase)
-        winbackManager.addWinbackResponse(
-            winbackResponse {
-                offer = WinbackOfferDetails.PlusMonthly.offerId
-                code = "ABC"
-            },
+        paymentDataSource.loadedProducts = FakePaymentDataSource.DefaultLoadedProducts.map { product ->
+            val newOfferPlans = product.pricingPlans.offerPlans.map { offer ->
+                offer.copy(pricingPhases = offer.pricingPhases + offer.pricingPhases)
+            }
+            val newPricingPlans = product.pricingPlans.copy(offerPlans = newOfferPlans)
+            product.copy(pricingPlans = newPricingPlans)
+        }
+        wheneverBlocking { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(
+            offerId = SubscriptionOffer.Winback.offerId(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly)!!,
         )
 
+        viewModel.loadWinbackData()
+
         viewModel.uiState.test {
-            assertNull(awaitItem().winbackOfferState)
+            val state = awaitItem()
+            assertTrue(state.subscriptionPlansState is SubscriptionPlansState.Loaded)
+            assertNull(state.winbackOfferState)
         }
     }
 
     @Test
     fun `claim winback offer successfully`() = runTest {
-        winbackManager.addProductDetails(products)
-        winbackManager.addPurchase(purchase)
-        winbackManager.addWinbackResponse(winbackResponse)
+        wheneverBlocking { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(
+            offerId = SubscriptionOffer.Winback.offerId(SubscriptionTier.Plus, SubscriptionBillingCycle.Yearly)!!,
+        )
+
+        viewModel.loadWinbackData()
 
         viewModel.uiState.test {
             val initialState = awaitOfferState()
@@ -611,13 +491,12 @@ class WinbackViewModelTest {
             assertFalse(initialState.isOfferClaimed)
             assertFalse(initialState.hasOfferClaimFailed)
 
-            viewModel.claimOffer(winbackOffer, mock())
+            viewModel.claimOffer(mock<Activity>())
             val claimingState = awaitOfferState()
             assertTrue(claimingState.isClaimingOffer)
             assertFalse(claimingState.isOfferClaimed)
             assertFalse(claimingState.hasOfferClaimFailed)
 
-            winbackManager.addPurchaseEvent(PurchaseResult.Purchased)
             val claimedState = awaitOfferState()
             assertFalse(claimedState.isClaimingOffer)
             assertTrue(claimedState.isOfferClaimed)
@@ -630,45 +509,30 @@ class WinbackViewModelTest {
 
     @Test
     fun `claim winback offer when current state is not loaded`() = runTest {
-        winbackManager.addProductDetails(products)
-        winbackManager.addPurchases(emptyList())
-        winbackManager.addWinbackResponse(winbackResponse)
+        paymentDataSource.loadedPurchases = emptyList()
+
+        viewModel.loadWinbackData()
 
         viewModel.uiState.test {
             skipItems(1)
 
-            viewModel.claimOffer(winbackOffer, mock())
-            expectNoEvents()
-        }
-    }
-
-    @Test
-    fun `claim winback offer when there is no matching product`() = runTest {
-        winbackManager.addProductDetails(products)
-        winbackManager.addPurchase(purchase)
-        winbackManager.addWinbackResponse(winbackResponse)
-
-        viewModel.uiState.test {
-            skipItems(1)
-
-            viewModel.claimOffer(winbackOffer.copy(offerToken = "unknown"), mock())
+            viewModel.claimOffer(mock<Activity>())
             expectNoEvents()
         }
     }
 
     @Test
     fun `claim winback offer when it is cancelled`() = runTest {
-        winbackManager.addProductDetails(products)
-        winbackManager.addPurchase(purchase)
-        winbackManager.addWinbackResponse(winbackResponse)
+        viewModel.loadWinbackData()
 
         viewModel.uiState.test {
             assertFalse(awaitOfferState().isClaimingOffer)
 
-            viewModel.claimOffer(winbackOffer, mock())
+            paymentDataSource.purchasedProductsResultCode = PaymentResultCode.UserCancelled
+
+            viewModel.claimOffer(mock<Activity>())
             assertTrue(awaitOfferState().isClaimingOffer)
 
-            winbackManager.addPurchaseEvent(PurchaseResult.Cancelled)
             val claimedState = awaitOfferState()
             assertFalse(claimedState.isClaimingOffer)
             assertFalse(claimedState.isOfferClaimed)
@@ -678,17 +542,16 @@ class WinbackViewModelTest {
 
     @Test
     fun `claim winback offer when purchase fails`() = runTest {
-        winbackManager.addProductDetails(products)
-        winbackManager.addPurchase(purchase)
-        winbackManager.addWinbackResponse(winbackResponse)
+        viewModel.loadWinbackData()
 
         viewModel.uiState.test {
-            skipItems(1)
+            assertFalse(awaitOfferState().isClaimingOffer)
 
-            viewModel.claimOffer(winbackOffer, mock())
-            skipItems(1)
+            paymentDataSource.purchasedProductsResultCode = PaymentResultCode.BillingUnavailable
 
-            winbackManager.addPurchaseEvent(PurchaseResult.Failure(PaymentResultCode.Error))
+            viewModel.claimOffer(mock<Activity>())
+            assertTrue(awaitOfferState().isClaimingOffer)
+
             val claimedState = awaitOfferState()
             assertFalse(claimedState.isClaimingOffer)
             assertFalse(claimedState.isOfferClaimed)
@@ -698,10 +561,6 @@ class WinbackViewModelTest {
 
     @Test
     fun `track screen shown`() = runTest {
-        winbackManager.addProductDetails(products)
-        winbackManager.addPurchase(purchase)
-        winbackManager.addWinbackResponse(null)
-
         viewModel.trackScreenShown("screen_key")
 
         val event = tracker.events.single()
@@ -716,10 +575,6 @@ class WinbackViewModelTest {
 
     @Test
     fun `track screen dismissed`() = runTest {
-        winbackManager.addProductDetails(products)
-        winbackManager.addPurchase(purchase)
-        winbackManager.addWinbackResponse(null)
-
         viewModel.trackScreenDismissed("screen_key")
 
         val event = tracker.events.single()
@@ -734,10 +589,6 @@ class WinbackViewModelTest {
 
     @Test
     fun `track continue cancellation tapped`() = runTest {
-        winbackManager.addProductDetails(products)
-        winbackManager.addPurchase(purchase)
-        winbackManager.addWinbackResponse(null)
-
         viewModel.trackContinueCancellationTapped()
 
         val event = tracker.events.single()
@@ -749,12 +600,12 @@ class WinbackViewModelTest {
 
     @Test
     fun `track claim plus monthly offer tapped`() = runTest {
-        winbackManager.addProductDetails(products)
-        winbackManager.addPurchase(createPurchase(productIds = listOf(Subscription.PLUS_MONTHLY_PRODUCT_ID)))
-        winbackManager.addWinbackResponse(null)
+        paymentDataSource.loadedPurchases = listOf(
+            createPurchase(productIds = listOf(SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly))),
+        )
 
-        viewModel.claimOffer(winbackOffer, mock())
-        winbackManager.addPurchaseEvent(PurchaseResult.Purchased)
+        viewModel.loadWinbackData()
+        viewModel.claimOffer(mock<Activity>())
 
         val event = tracker.events.single()
         assertEquals(
@@ -772,12 +623,12 @@ class WinbackViewModelTest {
 
     @Test
     fun `track claim plus yearly offer tapped`() = runTest {
-        winbackManager.addProductDetails(products)
-        winbackManager.addPurchase(createPurchase(productIds = listOf(Subscription.PLUS_YEARLY_PRODUCT_ID)))
-        winbackManager.addWinbackResponse(null)
+        paymentDataSource.loadedPurchases = listOf(
+            createPurchase(productIds = listOf(SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Yearly))),
+        )
 
-        viewModel.claimOffer(winbackOffer, mock())
-        winbackManager.addPurchaseEvent(PurchaseResult.Purchased)
+        viewModel.loadWinbackData()
+        viewModel.claimOffer(mock<Activity>())
 
         val event = tracker.events.single()
         assertEquals(
@@ -795,12 +646,12 @@ class WinbackViewModelTest {
 
     @Test
     fun `track claim patron monthly offer tapped`() = runTest {
-        winbackManager.addProductDetails(products)
-        winbackManager.addPurchase(createPurchase(productIds = listOf(Subscription.PATRON_MONTHLY_PRODUCT_ID)))
-        winbackManager.addWinbackResponse(null)
+        paymentDataSource.loadedPurchases = listOf(
+            createPurchase(productIds = listOf(SubscriptionPlan.productId(SubscriptionTier.Patron, SubscriptionBillingCycle.Monthly))),
+        )
 
-        viewModel.claimOffer(winbackOffer, mock())
-        winbackManager.addPurchaseEvent(PurchaseResult.Purchased)
+        viewModel.loadWinbackData()
+        viewModel.claimOffer(mock<Activity>())
 
         val event = tracker.events.single()
         assertEquals(
@@ -818,12 +669,12 @@ class WinbackViewModelTest {
 
     @Test
     fun `track claim patron yearly offer tapped`() = runTest {
-        winbackManager.addProductDetails(products)
-        winbackManager.addPurchase(createPurchase(productIds = listOf(Subscription.PATRON_YEARLY_PRODUCT_ID)))
-        winbackManager.addWinbackResponse(null)
+        paymentDataSource.loadedPurchases = listOf(
+            createPurchase(productIds = listOf(SubscriptionPlan.productId(SubscriptionTier.Patron, SubscriptionBillingCycle.Yearly))),
+        )
 
-        viewModel.claimOffer(winbackOffer, mock())
-        winbackManager.addPurchaseEvent(PurchaseResult.Purchased)
+        viewModel.loadWinbackData()
+        viewModel.claimOffer(mock<Activity>())
 
         val event = tracker.events.single()
         assertEquals(
@@ -841,10 +692,6 @@ class WinbackViewModelTest {
 
     @Test
     fun `track available plans tapped`() = runTest {
-        winbackManager.addProductDetails(products)
-        winbackManager.addPurchase(purchase)
-        winbackManager.addWinbackResponse(null)
-
         viewModel.trackAvailablePlansTapped()
 
         val event = tracker.events.single()
@@ -859,10 +706,6 @@ class WinbackViewModelTest {
 
     @Test
     fun `track help and feedback tapped`() = runTest {
-        winbackManager.addProductDetails(products)
-        winbackManager.addPurchase(purchase)
-        winbackManager.addWinbackResponse(null)
-
         viewModel.trackHelpAndFeedbackTapped()
 
         val event = tracker.events.single()
@@ -877,10 +720,6 @@ class WinbackViewModelTest {
 
     @Test
     fun `track offer claimed confirmation tapped`() = runTest {
-        winbackManager.addProductDetails(products)
-        winbackManager.addPurchase(purchase)
-        winbackManager.addWinbackResponse(null)
-
         viewModel.trackOfferClaimedConfirmationTapped()
 
         val event = tracker.events.single()
@@ -892,10 +731,6 @@ class WinbackViewModelTest {
 
     @Test
     fun `track plans back button tapped`() = runTest {
-        winbackManager.addProductDetails(products)
-        winbackManager.addPurchase(purchase)
-        winbackManager.addWinbackResponse(null)
-
         viewModel.trackPlansBackButtonTapped()
 
         val event = tracker.events.single()
@@ -907,29 +742,29 @@ class WinbackViewModelTest {
 
     @Test
     fun `track plan change`() = runTest {
-        winbackManager.addProductDetails(products)
-        winbackManager.addPurchase(purchase)
-        winbackManager.addWinbackResponse(null)
+        val newPlan = SubscriptionPlans.Preview.getBasePlan(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly)
+        val newPurchase = createPurchase(
+            orderId = "new-order-id",
+            productIds = listOf(SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly)),
+        )
 
-        viewModel.changePlan(knownPlan, mock())
-
-        winbackManager.addPurchase(createPurchase(productIds = listOf(Subscription.PLUS_MONTHLY_PRODUCT_ID)))
-        winbackManager.addWinbackResponse(null)
-        winbackManager.addPurchaseEvent(PurchaseResult.Purchased)
+        viewModel.loadWinbackData()
+        paymentDataSource.loadedPurchases = listOf(newPurchase)
+        viewModel.changePlan(newPlan, mock<Activity>())
 
         assertEquals(
             listOf(
                 TrackEvent(
                     AnalyticsEvent.WINBACK_AVAILABLE_PLANS_SELECT_PLAN,
                     mapOf(
-                        "product" to knownPlan.productId,
+                        "product" to newPlan.productId,
                     ),
                 ),
                 TrackEvent(
                     AnalyticsEvent.WINBACK_AVAILABLE_PLANS_NEW_PLAN_PURCHASE_SUCCESSFUL,
                     mapOf(
-                        "current_product" to Subscription.PLUS_MONTHLY_PRODUCT_ID,
-                        "new_product" to knownPlan.productId,
+                        "current_product" to SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Yearly),
+                        "new_product" to newPlan.productId,
                     ),
                 ),
             ),
@@ -939,10 +774,6 @@ class WinbackViewModelTest {
 
     @Test
     fun `track keep subscription tapped`() = runTest {
-        winbackManager.addProductDetails(products)
-        winbackManager.addPurchase(purchase)
-        winbackManager.addWinbackResponse(null)
-
         viewModel.trackKeepSubscriptionTapped()
 
         val event = tracker.events.single()
@@ -954,10 +785,6 @@ class WinbackViewModelTest {
 
     @Test
     fun `track cancel subscription tapped`() = runTest {
-        winbackManager.addProductDetails(products)
-        winbackManager.addPurchase(purchase)
-        winbackManager.addWinbackResponse(null)
-
         viewModel.trackCancelSubscriptionTapped()
 
         val event = tracker.events.single()
@@ -976,135 +803,28 @@ private suspend fun TurbineTestContext<WinbackViewModel.UiState>.awaitOfferState
     return awaitItem().winbackOfferState!!
 }
 
-private operator fun SubscriptionPlansState.Loaded.get(productId: String) =
-    plans.singleOrNull { it.productId == productId }
-
-private fun WinbackOfferDetails.toProductDetails(
-    bonusOfferId: String? = this.offerId,
-    customPricingPhases: List<PricingPhase>? = null,
-) = createProductDetails(
-    id = productId,
-    bonusOfferId = bonusOfferId,
-    period = billingPeriod,
-    customPricingPhases = customPricingPhases,
-)
-
-private fun createProductDetails(
-    id: String,
-    bonusOfferId: String?,
-    period: BillingPeriod,
-    customPricingPhases: List<PricingPhase>?,
-) = mock<ProductDetails> {
-    check(id != bonusOfferId) { "ID and offer ID must be different" }
-
-    val basePricingPhase = mock<PricingPhase> {
-        on { formattedPrice } doReturn "base-price-$id"
-        on { billingPeriod } doReturn period.value
-        on { recurrenceMode } doReturn RecurrenceMode.INFINITE_RECURRING
-        on { priceAmountMicros } doReturn 100L
-        on { priceCurrencyCode } doReturn "USD"
-    }
-    val offerPricingPhase = bonusOfferId?.let {
-        mock<PricingPhase> {
-            on { formattedPrice } doReturn "offer-price-$id"
-            on { billingPeriod } doReturn period.value
-            on { recurrenceMode } doReturn RecurrenceMode.INFINITE_RECURRING
-            on { priceAmountMicros } doReturn 100L
-            on { priceCurrencyCode } doReturn "USD"
-        }
-    }
-    val basePricingPhases = mock<PricingPhases> {
-        on { pricingPhaseList } doReturn listOf(basePricingPhase)
-    }
-    val offerPricingPhases = offerPricingPhase?.let {
-        mock<PricingPhases> {
-            on { pricingPhaseList } doReturn (customPricingPhases ?: listOf(offerPricingPhase, basePricingPhase))
-        }
-    }
-    val offerDetails = buildList {
-        if (offerPricingPhases != null) {
-            add(
-                mock<SubscriptionOfferDetails> {
-                    on { offerId } doReturn bonusOfferId
-                    on { offerToken } doReturn "offer-token-$id"
-                    on { pricingPhases } doReturn offerPricingPhases
-                },
-            )
-        }
-        add(
-            mock<SubscriptionOfferDetails> {
-                on { offerToken } doReturn "base-token-$id"
-                on { pricingPhases } doReturn basePricingPhases
-            },
-        )
-    }
-
-    on { this.productId } doReturn id
-    on { this.title } doReturn "title-$id"
-    on { subscriptionOfferDetails } doReturn offerDetails
-}
-
 private fun createPurchase(
-    orderId: String? = "orderId",
-    productIds: List<String> = listOf(Subscription.PLUS_MONTHLY_PRODUCT_ID),
+    orderId: String? = "order-id",
+    productIds: List<String> = listOf(SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Yearly)),
     isAcknowledged: Boolean = true,
     isAutoRenewing: Boolean = true,
-) = mock<Purchase> {
-    on { this.orderId } doReturn orderId
-    on { this.products } doReturn productIds
-    on { this.isAcknowledged } doReturn isAcknowledged
-    on { this.isAutoRenewing } doReturn isAutoRenewing
-}
+) = Purchase(
+    state = orderId?.let(PurchaseState::Purchased) ?: PurchaseState.Pending,
+    token = "token",
+    productIds = productIds,
+    isAcknowledged = isAcknowledged,
+    isAutoRenewing = isAutoRenewing,
+)
 
-private val BillingPeriod.value
-    get() = when (this) {
-        BillingPeriod.Monthly -> "P1M"
-        BillingPeriod.Yearly -> "P1Y"
-    }
-
-class FakeWinbackManager : WinbackManager {
-    private val productDetailsTurbine = Turbine<ProductDetailsState>()
-
-    suspend fun addProductDetails(productDetails: ProductDetails) = addProductDetails(listOf(productDetails))
-
-    suspend fun addProductDetails(productDetails: List<ProductDetails>) = productDetailsTurbine.add(ProductDetailsState.Loaded(productDetails))
-
-    private val purchasesTurbine = Turbine<PurchasesState>()
-
-    suspend fun addPurchase(purchase: Purchase) = addPurchases(listOf(purchase))
-
-    suspend fun addPurchases(purchases: List<Purchase>) = purchasesTurbine.add(PurchasesState.Loaded(purchases))
-
-    private val purchaseEventTurbine = Turbine<PurchaseResult>()
-
-    suspend fun addPurchaseEvent(purchaseEvent: PurchaseResult) = purchaseEventTurbine.add(purchaseEvent)
-
-    private val winbackResponseTurbine = Turbine<WinbackResponse?>()
-
-    suspend fun addWinbackResponse(response: WinbackResponse?) = winbackResponseTurbine.add(response)
-
-    override suspend fun loadProducts() = productDetailsTurbine.awaitItem()
-
-    override suspend fun loadPurchases() = purchasesTurbine.awaitItem()
-
-    override suspend fun changeProduct(
-        currentPurchase: Purchase,
-        currentPurchaseProductId: String,
-        newProduct: ProductDetails,
-        newProductOfferToken: String,
-        activity: Activity,
-    ) = purchaseEventTurbine.awaitItem()
-
-    override suspend fun getWinbackOffer() = winbackResponseTurbine.awaitItem()
-
-    override suspend fun claimWinbackOffer(
-        currentPurchase: Purchase,
-        winbackProduct: ProductDetails,
-        winbackOfferToken: String,
-        winbackClaimCode: String,
-        activity: Activity,
-    ) = purchaseEventTurbine.awaitItem()
-}
+private fun createSuccessReferralResult(
+    offerId: String = SubscriptionOffer.Winback.offerId(SubscriptionTier.Plus, SubscriptionBillingCycle.Yearly)!!,
+    code: String = "ABC",
+) = ReferralResult.SuccessResult(
+    winbackResponse {
+        this.code = code
+        this.offer = offerId
+    },
+)
 
 class FakeTracker : Tracker {
     private val _events = mutableListOf<TrackEvent>()

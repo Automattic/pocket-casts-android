@@ -47,8 +47,8 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP30
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.models.type.BillingPeriod
-import au.com.shiftyjelly.pocketcasts.models.type.WinbackOfferDetails
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionBillingCycle
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -80,9 +80,9 @@ internal fun WinbackOfferPage(
             modifier = Modifier.height(20.dp),
         )
         Text(
-            text = when (offer.details.billingPeriod) {
-                BillingPeriod.Monthly -> stringResource(LR.string.winback_offer_free_offer_title, offer.formattedPrice)
-                BillingPeriod.Yearly -> stringResource(LR.string.winback_offer_free_offer_yearly_title, offer.formattedPrice)
+            text = when (offer.billingCycle) {
+                SubscriptionBillingCycle.Monthly -> stringResource(LR.string.winback_offer_free_offer_title, offer.formattedPrice)
+                SubscriptionBillingCycle.Yearly -> stringResource(LR.string.winback_offer_free_offer_yearly_title, offer.formattedPrice)
             },
             fontWeight = FontWeight.Bold,
             fontSize = 28.sp,
@@ -95,9 +95,9 @@ internal fun WinbackOfferPage(
             modifier = Modifier.height(16.dp),
         )
         TextP30(
-            text = when (offer.details.billingPeriod) {
-                BillingPeriod.Monthly -> stringResource(LR.string.winback_offer_free_offer_description, offer.formattedPrice)
-                BillingPeriod.Yearly -> stringResource(LR.string.winback_offer_free_offer_yearly_description, offer.formattedPrice)
+            text = when (offer.billingCycle) {
+                SubscriptionBillingCycle.Monthly -> stringResource(LR.string.winback_offer_free_offer_description, offer.formattedPrice)
+                SubscriptionBillingCycle.Yearly -> stringResource(LR.string.winback_offer_free_offer_yearly_description, offer.formattedPrice)
             },
             color = MaterialTheme.theme.colors.primaryText02,
             textAlign = TextAlign.Center,
@@ -258,28 +258,28 @@ private fun WinbackOfferPageThemePreview(
             onAcceptOffer = {},
             onCancelSubscription = {},
             offer = WinbackOffer(
-                details = WinbackOfferDetails.PlusMonthly,
-                offerToken = "",
                 redeemCode = "",
                 formattedPrice = "\$3.99",
+                tier = SubscriptionTier.Plus,
+                billingCycle = SubscriptionBillingCycle.Monthly,
             ),
         )
     }
 }
 
-private class WinbackOfferParameterProvider : PreviewParameterProvider<WinbackOffer?> {
+private class WinbackOfferParameterProvider : PreviewParameterProvider<WinbackOffer> {
     override val values = sequenceOf(
         WinbackOffer(
-            details = WinbackOfferDetails.PlusMonthly,
-            offerToken = "",
             redeemCode = "",
             formattedPrice = "\$3.99",
+            tier = SubscriptionTier.Plus,
+            billingCycle = SubscriptionBillingCycle.Monthly,
         ),
         WinbackOffer(
-            details = WinbackOfferDetails.PlusYearly,
-            offerToken = "",
             redeemCode = "",
             formattedPrice = "\$19.99",
+            tier = SubscriptionTier.Plus,
+            billingCycle = SubscriptionBillingCycle.Yearly,
         ),
     )
 }

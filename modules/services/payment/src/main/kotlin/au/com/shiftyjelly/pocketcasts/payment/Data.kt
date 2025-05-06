@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.payment
 
+import au.com.shiftyjelly.pocketcasts.payment.FakePaymentDataSource.Companion.DefaultLoadedProducts
 import java.math.BigDecimal
 
 data class Product(
@@ -64,6 +65,14 @@ data class BillingPeriod(
 
         data object Infinite : Cycle
     }
+
+    companion object {
+        val Preview = BillingPeriod(
+            cycle = BillingPeriod.Cycle.Infinite,
+            interval = BillingPeriod.Interval.Yearly,
+            intervalCount = 0,
+        )
+    }
 }
 
 class SubscriptionPlans private constructor(
@@ -96,6 +105,8 @@ class SubscriptionPlans private constructor(
     override fun toString() = "SubscriptionPlans(plans=$plans)"
 
     companion object {
+        val Preview get() = SubscriptionPlans.create(DefaultLoadedProducts).getOrNull()!!
+
         private val basePlanKeys = SubscriptionTier.entries.flatMap { tier ->
             SubscriptionBillingCycle.entries.map { billingCycle ->
                 SubscriptionPlan.Key(tier, billingCycle, offer = null)
@@ -215,6 +226,46 @@ sealed interface SubscriptionPlan {
     }
 
     companion object {
+        val PlusMonthlyPreview = SubscriptionPlan.Base(
+            name = "Plus Monthly",
+            tier = SubscriptionTier.Plus,
+            billingCycle = SubscriptionBillingCycle.Monthly,
+            pricingPhase = PricingPhase(
+                price = Price(3.99.toBigDecimal(), "USD", "$3.99"),
+                billingPeriod = au.com.shiftyjelly.pocketcasts.payment.BillingPeriod.Preview,
+            ),
+        )
+
+        val PlusYearlyPreview = SubscriptionPlan.Base(
+            name = "Plus Yearly",
+            tier = SubscriptionTier.Plus,
+            billingCycle = SubscriptionBillingCycle.Yearly,
+            pricingPhase = PricingPhase(
+                price = Price(39.99.toBigDecimal(), "USD", "$39.99"),
+                billingPeriod = au.com.shiftyjelly.pocketcasts.payment.BillingPeriod.Preview,
+            ),
+        )
+
+        val PatronMonthlyPreview = SubscriptionPlan.Base(
+            name = "Patron Monthly",
+            tier = SubscriptionTier.Plus,
+            billingCycle = SubscriptionBillingCycle.Monthly,
+            pricingPhase = PricingPhase(
+                price = Price(9.99.toBigDecimal(), "USD", "$9.99"),
+                billingPeriod = au.com.shiftyjelly.pocketcasts.payment.BillingPeriod.Preview,
+            ),
+        )
+
+        val PatronYearlyPreview = SubscriptionPlan.Base(
+            name = "Patron Yearly",
+            tier = SubscriptionTier.Patron,
+            billingCycle = SubscriptionBillingCycle.Yearly,
+            pricingPhase = PricingPhase(
+                price = Price(99.99.toBigDecimal(), "USD", "$99.99"),
+                billingPeriod = au.com.shiftyjelly.pocketcasts.payment.BillingPeriod.Preview,
+            ),
+        )
+
         fun productId(
             tier: SubscriptionTier,
             billingCycle: SubscriptionBillingCycle,

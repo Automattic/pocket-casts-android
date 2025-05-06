@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.repositories.subscription
 
-import android.app.Activity
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
@@ -68,10 +67,6 @@ class SubscriptionManagerImpl @Inject constructor(
 
     private var hasOfferEligible = ConcurrentHashMap<SubscriptionTier, Boolean>()
 
-    override fun signOut() {
-        clearCachedStatus()
-    }
-
     override fun observeProductDetails(): Flowable<ProductDetailsState> {
         return productDetails.toFlowable(BackpressureStrategy.LATEST)
     }
@@ -133,7 +128,7 @@ class SubscriptionManagerImpl @Inject constructor(
         paymentClient.purchaseEvents.collect(purchaseEvents::accept)
     }
 
-    override suspend fun loadProducts(): ProductDetailsState {
+    private suspend fun loadProducts(): ProductDetailsState {
         val (result, products) = paymentClient.loadProducts(productDetailsParams)
         val interceptedResult = productDetailsInterceptor.intercept(result, products)
         val state = if (interceptedResult.first.isOk()) {
@@ -202,63 +197,6 @@ class SubscriptionManagerImpl @Inject constructor(
         }
     }
 
-    override suspend fun changeProduct(
-        currentPurchase: Purchase,
-        currentPurchaseProductId: String,
-        newProduct: ProductDetails,
-        newProductOfferToken: String,
-        activity: Activity,
-    ): BillingResult {
-        val productDetailsParams = BillingFlowParams.ProductDetailsParams.newBuilder()
-            .setProductDetails(newProduct)
-            .setOfferToken(newProductOfferToken)
-            .build()
-
-        val updateParams = getReplacementMode(currentPurchaseProductId, newProduct.productId)
-            ?.let { replacementMode ->
-                BillingFlowParams.SubscriptionUpdateParams.newBuilder()
-                    .setOldPurchaseToken(currentPurchase.purchaseToken)
-                    .setSubscriptionReplacementMode(replacementMode)
-                    .build()
-            }
-
-        val billingFlowParams = BillingFlowParams.newBuilder()
-            .setProductDetailsParamsList(listOf(productDetailsParams))
-            .let { builder ->
-                if (updateParams != null) {
-                    builder.setSubscriptionUpdateParams(updateParams)
-                } else {
-                    builder
-                }
-            }
-            .build()
-        return paymentClient.launchBillingFlow(activity, billingFlowParams)
-    }
-
-    override suspend fun claimWinbackOffer(
-        currentPurchase: Purchase,
-        winbackProduct: ProductDetails,
-        winbackOfferToken: String,
-        activity: Activity,
-    ): BillingResult {
-        val productDetailsParams = BillingFlowParams.ProductDetailsParams.newBuilder()
-            .setProductDetails(winbackProduct)
-            .setOfferToken(winbackOfferToken)
-            .build()
-
-        val updateParams = BillingFlowParams.SubscriptionUpdateParams.newBuilder()
-            .setOldPurchaseToken(currentPurchase.purchaseToken)
-            .setSubscriptionReplacementMode(BillingFlowParams.SubscriptionUpdateParams.ReplacementMode.CHARGE_FULL_PRICE)
-            .build()
-
-        val billingFlowParams = BillingFlowParams.newBuilder()
-            .setProductDetailsParamsList(listOf(productDetailsParams))
-            .setSubscriptionUpdateParams(updateParams)
-            .build()
-
-        return paymentClient.launchBillingFlow(activity, billingFlowParams)
-    }
-
     private suspend fun loadSubscriptionUpdateParamsMode(
         productDetails: ProductDetails,
     ): Pair<BillingResult, BillingFlowParams.SubscriptionUpdateParams?> {
@@ -294,9 +232,10 @@ class SubscriptionManagerImpl @Inject constructor(
 
     override fun isOfferEligible(tier: SubscriptionTier): Boolean = hasOfferEligible[tier] ?: true
 
-    override fun updateOfferEligible(tier: SubscriptionTier, eligible: Boolean) {
+    private fun updateOfferEligible(tier: SubscriptionTier, eligible: Boolean) {
         hasOfferEligible[tier] = eligible
     }
+
     override fun getDefaultSubscription(
         subscriptions: List<Subscription>,
         tier: SubscriptionTier?,
