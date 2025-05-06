@@ -58,3 +58,9 @@ fun <T : Any> PaymentResult<T>.getOrNull() = when (this) {
     is PaymentResult.Success -> value
     is PaymentResult.Failure -> null
 }
+
+sealed interface PurchaseResult {
+    data object Purchased : PurchaseResult
+    data object Cancelled : PurchaseResult
+    data class Failure(val code: PaymentResultCode) : PurchaseResult
+}

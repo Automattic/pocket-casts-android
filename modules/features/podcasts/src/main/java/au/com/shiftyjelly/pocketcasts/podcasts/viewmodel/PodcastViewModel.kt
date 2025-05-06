@@ -627,7 +627,28 @@ class PodcastViewModel
     }
 
     fun onDonateClicked() {
-        analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_FUNDING_TAPPED)
+        analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_FUNDING_TAPPED, mapOf("podcast_uuid" to podcastUuid))
+    }
+
+    fun onSimilarPodcastSubscribeClicked(podcastUuid: String, listDate: String) {
+        podcastManager.subscribeToPodcast(podcastUuid = podcastUuid, sync = true)
+        analyticsTracker.track(
+            event = AnalyticsEvent.PODCAST_SCREEN_SIMILAR_SHOW_SUBSCRIBED,
+            properties = mapOf(
+                "podcast_uuid" to podcastUuid,
+                "list_datetime" to listDate,
+            ),
+        )
+    }
+
+    fun onSimilarPodcastClicked(podcastUuid: String, listDate: String) {
+        analyticsTracker.track(
+            event = AnalyticsEvent.PODCAST_SCREEN_SIMILAR_SHOW_TAPPED,
+            properties = mapOf(
+                "podcast_uuid" to podcastUuid,
+                "list_datetime" to listDate,
+            ),
+        )
     }
 
     fun onSimilarPodcastSubscribeClicked(podcastUuid: String, listDate: String) {

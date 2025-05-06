@@ -22,8 +22,7 @@ billing = "7.0.0"
 coil = "2.7.0"
 compose = "2024.10.00" # https://developer.android.com/jetpack/compose/bom/bom-mapping
 dependency-analysis = "2.17.0"
-espresso = "3.6.1"
-firebase = "33.12.0"
+firebase = "33.13.0"
 fragment = "1.8.6"
 glance = "1.0.0"
 google-services = "4.4.2"
@@ -33,7 +32,7 @@ horologist = "0.6.20"
 java = "17"
 kotlin = "2.1.20"
 kotlin-coroutines = "1.10.2"
-ksp = "2.1.20-2.0.0"
+ksp = "2.1.20-2.0.1"
 ktlint = "0.50.0"
 lifecycle = "2.8.7"
 lottie = "6.6.6"
@@ -107,10 +106,6 @@ dagger-hilt-core = { module = "com.google.dagger:hilt-core", version.ref = "hilt
 hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hilt-compiler" }
 hilt-navigation-compose = "androidx.hilt:hilt-navigation-compose:1.2.0"
 hilt-work = "androidx.hilt:hilt-work:1.2.0"
-
-# Espresso
-espresso-contrib = { module = "androidx.test.espresso:espresso-contrib", version.ref = "espresso" }
-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espresso" }
 
 # Firebase
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase" }
@@ -263,8 +258,7 @@ androidx-recyclerview = "androidx.recyclerview:recyclerview:1.4.0"
 androidx-swiperefreshlayout = "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
 androidx-uiautomator = "androidx.test.uiautomator:uiautomator:2.3.0"
 androidx-viewpager = "androidx.viewpager2:viewpager2:1.1.0"
-appsflyer = "com.appsflyer:af-android-sdk:6.16.2"
-barista = "com.adevinta.android:barista:4.3.0"
+appsflyer = "com.appsflyer:af-android-sdk:6.17.0"
 capturable = "dev.shreyaspatil:capturable:3.0.1"
 compose-webview = "io.github.kevinnzou:compose-webview:0.33.6"
 desugar-jdk = "com.android.tools:desugar_jdk_libs:2.1.5"
