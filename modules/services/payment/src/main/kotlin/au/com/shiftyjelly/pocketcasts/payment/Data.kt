@@ -67,13 +67,13 @@ data class BillingPeriod(
 }
 
 class SubscriptionPlans private constructor(
-    private val plans: Map<Key, PaymentResult<SubscriptionPlan>>,
+    private val plans: Map<SubscriptionPlan.Key, PaymentResult<SubscriptionPlan>>,
 ) {
     fun getBasePlan(
         tier: SubscriptionTier,
         billingCycle: SubscriptionBillingCycle,
     ): SubscriptionPlan.Base {
-        val key = Key(tier, billingCycle, offer = null)
+        val key = SubscriptionPlan.Key(tier, billingCycle, offer = null)
         // This is a safe cast because constructor is private and we validate data in the create function
         return plans.getValue(key).getOrNull() as SubscriptionPlan.Base
     }
@@ -83,7 +83,7 @@ class SubscriptionPlans private constructor(
         billingCycle: SubscriptionBillingCycle,
         offer: SubscriptionOffer,
     ): PaymentResult<SubscriptionPlan.WithOffer> {
-        val key = Key(tier, billingCycle, offer)
+        val key = SubscriptionPlan.Key(tier, billingCycle, offer)
         // This is a safe cast because constructor is private and we validate data in the create function
         @Suppress("UNCHECKED_CAST")
         return plans.getValue(key) as PaymentResult<SubscriptionPlan.WithOffer>
@@ -98,14 +98,14 @@ class SubscriptionPlans private constructor(
     companion object {
         private val basePlanKeys = SubscriptionTier.entries.flatMap { tier ->
             SubscriptionBillingCycle.entries.map { billingCycle ->
-                Key(tier, billingCycle, offer = null)
+                SubscriptionPlan.Key(tier, billingCycle, offer = null)
             }
         }
 
         private val offerPlanKeys = SubscriptionTier.entries.flatMap { tier ->
             SubscriptionBillingCycle.entries.flatMap { billingCycle ->
                 SubscriptionOffer.entries.map { offer ->
-                    Key(tier, billingCycle, offer)
+                    SubscriptionPlan.Key(tier, billingCycle, offer)
                 }
             }
         }
@@ -123,7 +123,7 @@ class SubscriptionPlans private constructor(
             return PaymentResult.Success(SubscriptionPlans(basePlans + offerPlans))
         }
 
-        private fun List<Product>.findMatchingSubscriptionPlan(key: Key): PaymentResult<SubscriptionPlan> {
+        private fun List<Product>.findMatchingSubscriptionPlan(key: SubscriptionPlan.Key): PaymentResult<SubscriptionPlan> {
             val matchingProducts = findMatchingProducts(key)
             return when (matchingProducts.size) {
                 1 -> PaymentResult.Success(
@@ -139,7 +139,7 @@ class SubscriptionPlans private constructor(
             }
         }
 
-        private fun List<Product>.findMatchingProducts(key: Key): List<Product> {
+        private fun List<Product>.findMatchingProducts(key: SubscriptionPlan.Key): List<Product> {
             return filter { product ->
                 val offerCondition = if (key.offer != null) {
                     product.pricingPlans.offerPlans.singleOrNull { it.offerId == key.offerId } != null
@@ -150,7 +150,7 @@ class SubscriptionPlans private constructor(
             }
         }
 
-        private fun Product.toBaseSubscriptionPlan(key: Key): SubscriptionPlan.Base {
+        private fun Product.toBaseSubscriptionPlan(key: SubscriptionPlan.Key): SubscriptionPlan.Base {
             return SubscriptionPlan.Base(
                 name,
                 key.tier,
@@ -159,7 +159,7 @@ class SubscriptionPlans private constructor(
             )
         }
 
-        private fun Product.toOfferSubscriptionPlan(key: Key): SubscriptionPlan.WithOffer {
+        private fun Product.toOfferSubscriptionPlan(key: SubscriptionPlan.Key): SubscriptionPlan.WithOffer {
             checkNotNull(key.offer)
             val matchingPricingPhases = pricingPlans.offerPlans.single { it.offerId == key.offerId }.pricingPhases
             return SubscriptionPlan.WithOffer(
@@ -171,8 +171,40 @@ class SubscriptionPlans private constructor(
             )
         }
     }
+}
 
-    private data class Key(
+sealed interface SubscriptionPlan {
+    val name: String
+    val key: SubscriptionPlan.Key
+    val tier: SubscriptionTier
+    val billingCycle: SubscriptionBillingCycle
+    val offer: SubscriptionOffer?
+
+    val productId get() = key.productId
+    val basePlanId get() = key.basePlanId
+    val offerId get() = key.offerId
+
+    data class Base(
+        override val name: String,
+        override val tier: SubscriptionTier,
+        override val billingCycle: SubscriptionBillingCycle,
+        val pricingPhase: PricingPhase,
+    ) : SubscriptionPlan {
+        override val offer get() = null
+        override val key get() = SubscriptionPlan.Key(tier, billingCycle, offer = null)
+    }
+
+    data class WithOffer(
+        override val name: String,
+        override val tier: SubscriptionTier,
+        override val billingCycle: SubscriptionBillingCycle,
+        override val offer: SubscriptionOffer,
+        val pricingPhases: List<PricingPhase>,
+    ) : SubscriptionPlan {
+        override val key get() = SubscriptionPlan.Key(tier, billingCycle, offer)
+    }
+
+    data class Key(
         val tier: SubscriptionTier,
         val billingCycle: SubscriptionBillingCycle,
         val offer: SubscriptionOffer?,
@@ -181,27 +213,6 @@ class SubscriptionPlans private constructor(
         val basePlanId = SubscriptionPlan.basePlanId(tier, billingCycle)
         val offerId = offer?.offerId(tier, billingCycle)
     }
-}
-
-sealed interface SubscriptionPlan {
-    val name: String
-    val tier: SubscriptionTier
-    val billingCycle: SubscriptionBillingCycle
-
-    data class Base(
-        override val name: String,
-        override val tier: SubscriptionTier,
-        override val billingCycle: SubscriptionBillingCycle,
-        val pricingPhase: PricingPhase,
-    ) : SubscriptionPlan
-
-    data class WithOffer(
-        override val name: String,
-        override val tier: SubscriptionTier,
-        override val billingCycle: SubscriptionBillingCycle,
-        val offer: SubscriptionOffer,
-        val pricingPhases: List<PricingPhase>,
-    ) : SubscriptionPlan
 
     companion object {
         fun productId(

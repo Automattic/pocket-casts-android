@@ -12,12 +12,18 @@ import com.android.billingclient.api.QueryPurchasesParams
 import java.math.BigDecimal
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.first
 import com.android.billingclient.api.Purchase as GooglePurchase
 
 class FakePaymentDataSource : PaymentDataSource {
     var customProductsResult: PaymentResult<List<Product>>? = null
     var customPurchases: PaymentResult<List<Purchase>>? = null
-    var acknowledgePurchaseResultCode: PaymentResultCode = PaymentResultCode.Ok
+    var launchBillingFlowResultCode: PaymentResultCode = PaymentResultCode.Ok
+
+    var receivedPurchases = emptyList<Purchase>()
+        private set
+
+    private val acknowledgeFlow = MutableSharedFlow<PaymentResultCode>()
 
     override val purchaseResults = MutableSharedFlow<PaymentResult<List<Purchase>>>()
 
@@ -30,10 +36,24 @@ class FakePaymentDataSource : PaymentDataSource {
     }
 
     override suspend fun acknowledgePurchase(purchase: Purchase): PaymentResult<Purchase> {
-        return if (acknowledgePurchaseResultCode is PaymentResultCode.Ok) {
+        receivedPurchases += purchase
+        val resultCode = acknowledgeFlow.first()
+        return if (resultCode is PaymentResultCode.Ok) {
             PaymentResult.Success(purchase.copy(isAcknowledged = true))
         } else {
-            PaymentResult.Failure(acknowledgePurchaseResultCode, "Error")
+            PaymentResult.Failure(resultCode, "Error")
+        }
+    }
+
+    suspend fun emitAcknowledgeResponse(code: PaymentResultCode) {
+        acknowledgeFlow.emit(code)
+    }
+
+    override suspend fun launchBillingFlow(key: SubscriptionPlan.Key, activity: Activity): PaymentResult<Unit> {
+        return if (launchBillingFlowResultCode is PaymentResultCode.Ok) {
+            PaymentResult.Success(Unit)
+        } else {
+            PaymentResult.Failure(launchBillingFlowResultCode, "Error")
         }
     }
 
