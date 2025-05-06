@@ -62,7 +62,7 @@ class SimilarPodcastHandler @Inject constructor(
 
     private fun getSimilarPodcastListSingle(podcast: Podcast): Single<ListFeed> = rxSingle {
         listRepository.getSimilarPodcasts(podcast.uuid)
-            ?: throw IllegalStateException("Failed to load similar podcasts")
+            ?: error("Failed to load similar podcasts")
     }
 
     private fun Flowable<ListFeed>.addSubscribedStatusFlowable(): Flowable<ListFeed> {

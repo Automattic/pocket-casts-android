@@ -15,6 +15,7 @@ import io.reactivex.Single
 import java.util.UUID
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -63,7 +64,7 @@ class SimilarPodcastHandlerTest {
             .first()
 
         // no podcasts should be found
-        assert(list is SimilarPodcastsResult.Empty)
+        assertTrue(list is SimilarPodcastsResult.Empty)
     }
 
     @Test
@@ -89,7 +90,7 @@ class SimilarPodcastHandlerTest {
             .first()
 
         // check that the podcasts are fetched correctly
-        assert(list is SimilarPodcastsResult.Success)
+        assertTrue(list is SimilarPodcastsResult.Success)
 
         val podcasts = (list as SimilarPodcastsResult.Success).listFeed.podcasts
         assertEquals(testListFeed.podcasts?.size, podcasts?.size)
@@ -98,7 +99,7 @@ class SimilarPodcastHandlerTest {
         val subscribedPodcast = podcasts?.find { it.uuid == subscribedUuid }
         val unsubscribedPodcast = podcasts?.find { it.uuid != subscribedUuid }
 
-        assert(subscribedPodcast?.isSubscribed == true)
-        assert(unsubscribedPodcast?.isSubscribed == false)
+        assertTrue(subscribedPodcast?.isSubscribed == true)
+        assertTrue(unsubscribedPodcast?.isSubscribed == false)
     }
 }
