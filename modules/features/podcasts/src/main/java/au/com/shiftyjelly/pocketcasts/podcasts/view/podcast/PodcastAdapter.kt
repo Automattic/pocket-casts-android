@@ -216,7 +216,7 @@ class PodcastAdapter(
         val VIEW_TYPE_EPISODE_HEADER = R.layout.adapter_episode_header
         val VIEW_TYPE_EPISODE_LIMIT_ROW = R.layout.adapter_episode_limit
         val VIEW_TYPE_NO_RESULTS = R.layout.adapter_no_results
-        val VIEW_TYPE_DIVIDER = R.layout.adapter_divider_row
+        val VIEW_TYPE_DIVIDER_TITLE = R.layout.adapter_divider_row
     }
 
     private val disposables = CompositeDisposable()
@@ -276,7 +276,7 @@ class PodcastAdapter(
             VIEW_TYPE_EPISODE_HEADER -> EpisodeHeaderViewHolder(AdapterEpisodeHeaderBinding.inflate(inflater, parent, false), onEpisodesOptionsClicked, onSearchFocus)
             VIEW_TYPE_EPISODE_LIMIT_ROW -> EpisodeLimitViewHolder(inflater.inflate(R.layout.adapter_episode_limit, parent, false))
             VIEW_TYPE_NO_RESULTS -> NoResultsViewHolder(inflater.inflate(R.layout.adapter_no_results, parent, false))
-            VIEW_TYPE_DIVIDER -> DividerViewHolder(inflater.inflate(R.layout.adapter_divider_row, parent, false))
+            VIEW_TYPE_DIVIDER_TITLE -> DividerTitleViewHolder(inflater.inflate(R.layout.adapter_divider_row, parent, false))
             VIEW_TYPE_BOOKMARKS -> BookmarkViewHolder(ComposeView(parent.context), theme)
             VIEW_TYPE_BOOKMARK_HEADER -> BookmarkHeaderViewHolder(ComposeView(parent.context), theme)
             VIEW_TYPE_BOOKMARK_UPSELL -> BookmarkUpsellViewHolder(ComposeView(parent.context), onGetBookmarksClicked, theme)
@@ -318,7 +318,7 @@ class PodcastAdapter(
             is EpisodeHeaderViewHolder -> bindingEpisodeHeaderViewHolder(holder, position)
             is EpisodeLimitViewHolder -> bindEpisodeLimitRow(holder, position)
             is NoResultsViewHolder -> bindNoResultsMessage(holder, position)
-            is DividerViewHolder -> bindDividerRow(holder, position)
+            is DividerTitleViewHolder -> bindDividerRow(holder, position)
             is BookmarkViewHolder -> holder.bind(getItem(position) as BookmarkItemData)
             is BookmarkHeaderViewHolder -> holder.bind(getItem(position) as BookmarkHeader)
             is BookmarkUpsellViewHolder -> holder.bind()
@@ -406,7 +406,7 @@ class PodcastAdapter(
         holder.btnShowArchived.isVisible = noResultsMessage.showButton
     }
 
-    private fun bindDividerRow(holder: DividerViewHolder, position: Int) {
+    private fun bindDividerRow(holder: DividerTitleViewHolder, position: Int) {
         val dividerRow = getItem(position) as? DividerRow ?: return
         val title = dividerRow.grouping.groupTitles(dividerRow.groupIndex, holder.lblTitle.context)
         if (title.isNotEmpty()) {
@@ -715,7 +715,7 @@ class PodcastAdapter(
         val btnShowArchived = itemView.findViewById<View>(R.id.btnShowArchived)
     }
 
-    internal class DividerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    internal class DividerTitleViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val lblTitle = itemView.findViewById<TextView>(R.id.lblTitle)
     }
 
