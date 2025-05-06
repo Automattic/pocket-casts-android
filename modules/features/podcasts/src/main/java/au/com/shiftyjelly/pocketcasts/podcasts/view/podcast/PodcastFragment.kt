@@ -827,6 +827,14 @@ class PodcastFragment : BaseFragment() {
             onPodrollHeaderClicked = {
                 showPodrollInformationModal()
             },
+            onPodrollPodcastClicked = { podcastUuid ->
+                viewModel.onPodrollPodcastClicked(podcastUuid = podcastUuid)
+                val fragment = newInstance(podcastUuid = podcastUuid, fromListUuid = "podroll", sourceView = sourceView)
+                (activity as FragmentHostListener).addFragment(fragment)
+            },
+            onPodrollPodcastSubscribeClicked = { podcastUuid ->
+                viewModel.onPodrollPodcastSubscribeClicked(podcastUuid = podcastUuid)
+            },
         ).apply {
             stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
         }
@@ -874,6 +882,7 @@ class PodcastFragment : BaseFragment() {
     }
 
     private fun showPodrollInformationModal() {
+        viewModel.onPodrollInformationModalShown()
         val dialog = ConfirmationDialog()
             .setIconId(R.drawable.ic_author)
             .setTitle(getString(LR.string.podroll_information_title))

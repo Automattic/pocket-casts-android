@@ -152,6 +152,8 @@ class PodcastAdapter(
     private val onSimilarPodcastClicked: (String, String) -> Unit,
     private val onSimilarPodcastSubscribeClicked: (String, String) -> Unit,
     private val onPodrollHeaderClicked: () -> Unit,
+    private val onPodrollPodcastClicked: (String) -> Unit,
+    private val onPodrollPodcastSubscribeClicked: (String) -> Unit,
 ) : LargeListAdapter<Any, RecyclerView.ViewHolder>(1500, differ) {
 
     data class EpisodeLimitRow(val episodeLimit: Int)
@@ -612,8 +614,8 @@ class PodcastAdapter(
                             SimilarPodcast(
                                 listDate = list.date ?: "",
                                 podcast = podcast,
-                                onRowClick = onSimilarPodcastClicked,
-                                onSubscribeClick = onSimilarPodcastSubscribeClicked,
+                                onRowClick = { podcastUuid, _ -> onPodrollPodcastClicked(podcastUuid) },
+                                onSubscribeClick = { podcastUuid, _ -> onPodrollPodcastSubscribeClicked(podcastUuid) },
                             ),
                         )
                     }

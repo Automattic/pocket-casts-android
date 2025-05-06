@@ -240,6 +240,9 @@ enum class AnalyticsEvent(val key: String) {
     PODCAST_SCREEN_FUNDING_TAPPED("podcast_screen_funding_tapped"),
     PODCAST_SCREEN_SIMILAR_SHOW_TAPPED("podcast_screen_similar_show_tapped"),
     PODCAST_SCREEN_SIMILAR_SHOW_SUBSCRIBED("podcast_screen_similar_show_subscribed"),
+    PODCAST_SCREEN_PODROLL_PODCAST_TAPPED("podcast_screen_podroll_podcast_tapped"),
+    PODCAST_SCREEN_PODROLL_PODCAST_SUBSCRIBED("podcast_screen_podroll_podcast_subscribed"),
+    PODCAST_SCREEN_PODROLL_INFORMATION_MODEL_SHOWN("podcast_screen_podroll_information_model_shown"),
 
     /* Podcast Settings */
     PODCAST_SETTINGS_FEED_ERROR_TAPPED("podcast_settings_feed_error_tapped"),
