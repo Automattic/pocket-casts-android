@@ -42,7 +42,10 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.BookmarkHeaderViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.BookmarkUpsellViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.BookmarkViewHolder
+import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.DividerLineViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.NoBookmarkViewHolder
+import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.PaddingViewHolder
+import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.PodrollViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.SimilarPodcastViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.TabsViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel
@@ -182,20 +185,17 @@ class PodcastAdapter(
     object BookmarkUpsell
     object NoBookmarkMessage
 
+    object PodrollHeaderRow
+    object DividerLineRow
+    data class PaddingRow(
+        val padding: Dp,
+    )
     data class SimilarPodcast(
-        val index: Int,
-        val total: Int,
         val listDate: String,
         val podcast: DiscoverPodcast,
         val onRowClick: (podcastUuid: String, listDate: String) -> Unit,
         val onSubscribeClick: (podcastUuid: String, listDate: String) -> Unit,
-    ) {
-        val isFirst: Boolean
-            get() = index == 0
-
-        val isLast: Boolean
-            get() = index == total - 1
-    }
+    )
 
     enum class HeaderType {
         Blur,
@@ -210,10 +210,13 @@ class PodcastAdapter(
         private const val VIEW_TYPE_NO_BOOKMARK = 104
         const val VIEW_TYPE_PODCAST_HEADER = 105
         private const val VIEW_TYPE_SIMILAR_PODCAST = 106
+        private const val VIEW_TYPE_PODROLL_HEADER = 107
+        private const val VIEW_TYPE_DIVIDER_LINE = 108
+        private const val VIEW_TYPE_PADDING_ROW = 109
         val VIEW_TYPE_EPISODE_HEADER = R.layout.adapter_episode_header
         val VIEW_TYPE_EPISODE_LIMIT_ROW = R.layout.adapter_episode_limit
         val VIEW_TYPE_NO_RESULTS = R.layout.adapter_no_results
-        val VIEW_TYPE_DIVIDER = R.layout.adapter_divider_row
+        val VIEW_TYPE_DIVIDER_TITLE = R.layout.adapter_divider_row
     }
 
     private val disposables = CompositeDisposable()
@@ -273,12 +276,15 @@ class PodcastAdapter(
             VIEW_TYPE_EPISODE_HEADER -> EpisodeHeaderViewHolder(AdapterEpisodeHeaderBinding.inflate(inflater, parent, false), onEpisodesOptionsClicked, onSearchFocus)
             VIEW_TYPE_EPISODE_LIMIT_ROW -> EpisodeLimitViewHolder(inflater.inflate(R.layout.adapter_episode_limit, parent, false))
             VIEW_TYPE_NO_RESULTS -> NoResultsViewHolder(inflater.inflate(R.layout.adapter_no_results, parent, false))
-            VIEW_TYPE_DIVIDER -> DividerViewHolder(inflater.inflate(R.layout.adapter_divider_row, parent, false))
+            VIEW_TYPE_DIVIDER_TITLE -> DividerTitleViewHolder(inflater.inflate(R.layout.adapter_divider_row, parent, false))
             VIEW_TYPE_BOOKMARKS -> BookmarkViewHolder(ComposeView(parent.context), theme)
             VIEW_TYPE_BOOKMARK_HEADER -> BookmarkHeaderViewHolder(ComposeView(parent.context), theme)
             VIEW_TYPE_BOOKMARK_UPSELL -> BookmarkUpsellViewHolder(ComposeView(parent.context), onGetBookmarksClicked, theme)
             VIEW_TYPE_NO_BOOKMARK -> NoBookmarkViewHolder(ComposeView(parent.context), theme, onHeadsetSettingsClicked)
             VIEW_TYPE_SIMILAR_PODCAST -> SimilarPodcastViewHolder(ComposeView(parent.context), theme)
+            VIEW_TYPE_PODROLL_HEADER -> PodrollViewHolder(ComposeView(parent.context), theme)
+            VIEW_TYPE_DIVIDER_LINE -> DividerLineViewHolder(ComposeView(parent.context), theme)
+            VIEW_TYPE_PADDING_ROW -> PaddingViewHolder(ComposeView(parent.context))
             else -> EpisodeViewHolder(
                 binding = AdapterEpisodeBinding.inflate(inflater, parent, false),
                 viewMode = if (settings.artworkConfiguration.value.useEpisodeArtwork(Element.Podcasts)) {
@@ -312,12 +318,15 @@ class PodcastAdapter(
             is EpisodeHeaderViewHolder -> bindingEpisodeHeaderViewHolder(holder, position)
             is EpisodeLimitViewHolder -> bindEpisodeLimitRow(holder, position)
             is NoResultsViewHolder -> bindNoResultsMessage(holder, position)
-            is DividerViewHolder -> bindDividerRow(holder, position)
+            is DividerTitleViewHolder -> bindDividerRow(holder, position)
             is BookmarkViewHolder -> holder.bind(getItem(position) as BookmarkItemData)
             is BookmarkHeaderViewHolder -> holder.bind(getItem(position) as BookmarkHeader)
             is BookmarkUpsellViewHolder -> holder.bind()
             is NoBookmarkViewHolder -> holder.bind()
             is SimilarPodcastViewHolder -> holder.bind(getItem(position) as SimilarPodcast)
+            is PodrollViewHolder -> holder.bind()
+            is DividerLineViewHolder -> holder.bind()
+            is PaddingViewHolder -> holder.bind(getItem(position) as PaddingRow)
         }
     }
 
@@ -397,7 +406,7 @@ class PodcastAdapter(
         holder.btnShowArchived.isVisible = noResultsMessage.showButton
     }
 
-    private fun bindDividerRow(holder: DividerViewHolder, position: Int) {
+    private fun bindDividerRow(holder: DividerTitleViewHolder, position: Int) {
         val dividerRow = getItem(position) as? DividerRow ?: return
         val title = dividerRow.grouping.groupTitles(dividerRow.groupIndex, holder.lblTitle.context)
         if (title.isNotEmpty()) {
@@ -591,12 +600,29 @@ class PodcastAdapter(
             add(TabsHeader(tabs = tabs, selectedTab = PodcastTab.SIMILAR_SHOWS, onTabClicked = onTabClicked))
             if (similarPodcasts is SimilarPodcastsResult.Success) {
                 val list = similarPodcasts.listFeed
+                // Podroll
+                val podroll = list.podroll
+                if (!podroll.isNullOrEmpty()) {
+                    add(PodrollHeaderRow)
+                    podroll.forEachIndexed { index, podcast ->
+                        add(
+                            SimilarPodcast(
+                                listDate = list.date ?: "",
+                                podcast = podcast,
+                                onRowClick = onSimilarPodcastClicked,
+                                onSubscribeClick = onSimilarPodcastSubscribeClicked,
+                            ),
+                        )
+                    }
+                    add(PaddingRow(12.dp))
+                    add(DividerLineRow)
+                }
+                add(PaddingRow(12.dp))
+                // Recommended similar podcasts
                 val podcasts = list.podcasts
                 podcasts?.forEachIndexed { index, podcast ->
                     add(
                         SimilarPodcast(
-                            index = index,
-                            total = podcasts.size,
                             listDate = list.date ?: "",
                             podcast = podcast,
                             onRowClick = onSimilarPodcastClicked,
@@ -604,6 +630,7 @@ class PodcastAdapter(
                         ),
                     )
                 }
+                add(PaddingRow(12.dp))
             }
         }
         submitList(content)
@@ -631,6 +658,9 @@ class PodcastAdapter(
             is BookmarkUpsell -> VIEW_TYPE_BOOKMARK_UPSELL
             is NoBookmarkMessage -> VIEW_TYPE_NO_BOOKMARK
             is SimilarPodcast -> VIEW_TYPE_SIMILAR_PODCAST
+            is PodrollHeaderRow -> VIEW_TYPE_PODROLL_HEADER
+            is DividerLineRow -> VIEW_TYPE_DIVIDER_LINE
+            is PaddingRow -> VIEW_TYPE_PADDING_ROW
             else -> R.layout.adapter_episode
         }
     }
@@ -650,6 +680,9 @@ class PodcastAdapter(
             is PodcastEpisode -> item.adapterId
             is BookmarkItemData -> item.bookmark.adapterId
             is SimilarPodcast -> item.podcast.adapterId
+            is PodrollHeaderRow -> Long.MAX_VALUE - 8
+            is DividerLineRow -> Long.MAX_VALUE - 9
+            is PaddingRow -> Long.MAX_VALUE - 10
             else -> throw IllegalStateException("Unknown item type")
         }
     }
@@ -682,7 +715,7 @@ class PodcastAdapter(
         val btnShowArchived = itemView.findViewById<View>(R.id.btnShowArchived)
     }
 
-    internal class DividerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    internal class DividerTitleViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val lblTitle = itemView.findViewById<TextView>(R.id.lblTitle)
     }
 
