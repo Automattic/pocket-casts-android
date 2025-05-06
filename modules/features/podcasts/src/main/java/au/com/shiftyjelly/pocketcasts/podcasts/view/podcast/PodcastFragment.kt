@@ -816,6 +816,15 @@ class PodcastFragment : BaseFragment() {
                     updateStausBarForBackground()
                 }
             },
+            onSimilarPodcastClicked = { podcastUuid, listDate ->
+                viewModel.onSimilarPodcastClicked(podcastUuid = podcastUuid, listDate = listDate)
+                val fragment = newInstance(podcastUuid = podcastUuid, fromListUuid = "recommendations_podcast", sourceView = sourceView)
+                (activity as FragmentHostListener).addFragment(fragment)
+            },
+            onSimilarPodcastSubscribeClicked = { podcastUuid, listDate ->
+                viewModel.onSimilarPodcastSubscribeClicked(podcastUuid = podcastUuid, listDate = listDate)
+            },
+
         ).apply {
             stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
         }
@@ -1046,6 +1055,7 @@ class PodcastFragment : BaseFragment() {
                                 episodeLimit = state.episodeLimit,
                                 episodeLimitIndex = state.episodeLimitIndex,
                                 podcast = state.podcast,
+                                tabs = state.tabs,
                                 context = requireContext(),
                             )
                         }
@@ -1055,10 +1065,17 @@ class PodcastFragment : BaseFragment() {
                                 bookmarks = state.bookmarks,
                                 episodes = state.episodes,
                                 searchTerm = state.searchBookmarkTerm,
+                                tabs = state.tabs,
                                 context = requireContext(),
                             )
 
                             adapter?.notifyDataSetChanged()
+                        }
+                        PodcastTab.SIMILAR_SHOWS -> {
+                            adapter?.setSimilarPodcasts(
+                                similarPodcasts = state.similarPodcasts,
+                                tabs = state.tabs,
+                            )
                         }
                     }
                     if (state.searchTerm.isNotEmpty() && state.searchTerm != lastSearchTerm) {
