@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -23,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
@@ -49,7 +51,7 @@ fun HorizontalPagerWrapper(
     pageIndicatorColor: Color = Color.White,
     pageSize: PageSize = PageSize.Fixed(LocalConfiguration.current.screenWidthDp.dp - 1.dp), // With full page width, height is not adjusted properly
     contentPadding: PaddingValues = PaddingValues(0.dp),
-    content: @Composable (Int, Int) -> Unit = { _, _ -> },
+    content: @Composable (Int, Int, FocusRequester) -> Unit = { _, _, _ -> },
 ) {
     val pagerState = rememberPagerState(initialPage = initialPage) { pageCount }
 
@@ -61,6 +63,7 @@ fun HorizontalPagerWrapper(
 
     val coroutineScope = rememberCoroutineScope()
     val focusRequesters = remember { List(pageCount) { FocusRequester() } }
+    val subContentFocusRequesters = remember { List(pageCount) { FocusRequester() } }
 
     var pagerHeight by remember { mutableIntStateOf(0) }
     Column(
@@ -73,6 +76,7 @@ fun HorizontalPagerWrapper(
             contentPadding = contentPadding,
         ) { index ->
             var pageHeight by remember { mutableIntStateOf(0) }
+            var isSubContentFocused by remember { mutableStateOf(false) }
             Box(
                 Modifier
                     .semantics {
@@ -94,6 +98,11 @@ fun HorizontalPagerWrapper(
                             pagerHeight = pageHeight
                         }
                     }
+                    .onFocusChanged {
+                        if (it.isFocused) {
+                            isSubContentFocused = false
+                        }
+                    }
                     .focusRequester(focusRequesters[index])
                     .focusable()
                     .onKeyEvent { event ->
@@ -105,6 +114,7 @@ fun HorizontalPagerWrapper(
                                     coroutineScope.launch {
                                         pagerState.scrollToPage(next)
                                     }
+                                    isSubContentFocused = false
                                     true
                                 }
                                 Key.DirectionLeft -> {
@@ -113,7 +123,17 @@ fun HorizontalPagerWrapper(
                                     coroutineScope.launch {
                                         pagerState.scrollToPage(prev)
                                     }
+                                    isSubContentFocused = false
                                     true
+                                }
+                                Key.DirectionDown -> {
+                                    if (!isSubContentFocused) {
+                                        subContentFocusRequesters[index].requestFocus()
+                                        isSubContentFocused = true
+                                        true
+                                    } else {
+                                        false
+                                    }
                                 }
                                 else -> false
                             }
@@ -122,7 +142,7 @@ fun HorizontalPagerWrapper(
                         }
                     }
             ) {
-                content(index, pagerHeight)
+                content(index, pagerHeight, subContentFocusRequesters[index])
             }
         }
 

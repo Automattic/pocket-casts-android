@@ -10,6 +10,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
@@ -71,6 +73,7 @@ fun ProductAmountHorizontalText(
     verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
     secondaryTextColor: Color = MaterialTheme.theme.colors.primaryText02,
     isFocusable: Boolean = false,
+    focusRequester: FocusRequester? = null,
 ) {
     Row(
         modifier = modifier,
@@ -86,9 +89,15 @@ fun ProductAmountHorizontalText(
                     } else {
                         MaterialTheme.theme.colors.primaryText01
                     },
-                modifier = if (isFocusable) {
-                    Modifier.focusable()
-                } else Modifier,
+                modifier = if (focusRequester != null) {
+                    Modifier.focusRequester(focusRequester)
+                } else {
+                    Modifier
+                }.then(
+                    if (isFocusable) {
+                        Modifier.focusable()
+                    } else Modifier
+                ),
             )
         }
 

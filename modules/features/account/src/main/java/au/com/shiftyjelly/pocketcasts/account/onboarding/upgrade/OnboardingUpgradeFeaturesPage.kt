@@ -6,6 +6,8 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusGroup
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -48,6 +50,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -297,7 +300,7 @@ fun FeatureCards(
         showPageIndicator = featureCardsState.showPageIndicator,
         pageSize = PageSize.Fixed(LocalConfiguration.current.screenWidthDp.dp - 64.dp),
         contentPadding = PaddingValues(horizontal = 32.dp),
-    ) { index, pagerHeight ->
+    ) { index, pagerHeight, focusRequester ->
         FeatureCard(
             subscription = state.currentSubscription,
             card = featureCardsState.featureCards[index],
@@ -309,7 +312,9 @@ fun FeatureCards(
                 Modifier.height(pagerHeight.pxToDp(LocalContext.current).dp)
             } else {
                 Modifier
-            },
+            }.then(
+                Modifier.focusRequester(focusRequester)
+            ),
         )
     }
 }
@@ -398,7 +403,9 @@ private fun FeatureCard(
                 }
             }
 
-            Column {
+            Column(
+                modifier = Modifier.focusGroup()
+            ) {
                 SubscriptionProductAmountHorizontal(
                     isFocusable = true,
                     subscription = subscription,
@@ -409,10 +416,13 @@ private fun FeatureCard(
                 Spacer(modifier = Modifier.padding(vertical = 4.dp))
 
                 card.featureItems(subscriptionFrequency).forEach {
-                    UpgradeFeatureItem(it)
+                    UpgradeFeatureItem(
+                        item = it,
+                    )
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 OnboardingUpgradeHelper.PrivacyPolicy(
+                    modifier = Modifier.focusable(),
                     color = secondaryTextColor,
                     textAlign = TextAlign.Start,
                     lineHeight = 18.sp,
