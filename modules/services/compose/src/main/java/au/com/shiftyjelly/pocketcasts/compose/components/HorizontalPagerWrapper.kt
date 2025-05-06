@@ -32,6 +32,8 @@ import androidx.compose.ui.input.key.type
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 
@@ -73,6 +75,9 @@ fun HorizontalPagerWrapper(
             var pageHeight by remember { mutableIntStateOf(0) }
             Box(
                 Modifier
+                    .semantics {
+                        contentDescription = "Page ${index + 1} of $pageCount"
+                    }
                     .fillMaxWidth()
                     .layout { measurable, constraints ->
                         /* https://github.com/google/accompanist/issues/1050#issuecomment-1097483476 */
