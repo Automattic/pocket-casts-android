@@ -84,11 +84,11 @@ fun ProductAmountHorizontalText(
                 text = price,
                 fontSize = priceTextFontSize,
                 color =
-                    if (hasBackgroundAlwaysWhite) {
-                        Color.Black
-                    } else {
-                        MaterialTheme.theme.colors.primaryText01
-                    },
+                if (hasBackgroundAlwaysWhite) {
+                    Color.Black
+                } else {
+                    MaterialTheme.theme.colors.primaryText01
+                },
                 modifier = if (focusRequester != null) {
                     Modifier.focusRequester(focusRequester)
                 } else {
@@ -96,7 +96,9 @@ fun ProductAmountHorizontalText(
                 }.then(
                     if (isFocusable) {
                         Modifier.focusable()
-                    } else Modifier
+                    } else {
+                        Modifier
+                    },
                 ),
             )
         }

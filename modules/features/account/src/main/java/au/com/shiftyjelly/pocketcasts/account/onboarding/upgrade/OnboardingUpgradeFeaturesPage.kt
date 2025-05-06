@@ -170,7 +170,6 @@ private fun UpgradeLayout(
         modifier = modifier.fillMaxHeight(),
         contentAlignment = Alignment.BottomCenter,
     ) {
-
         val focusPager = remember { FocusRequester() }
 
         // Need this BoxWithConstraints so we can force the inner column to fill the screen with vertical scroll enabled
@@ -318,7 +317,7 @@ fun FeatureCards(
             } else {
                 Modifier
             }.then(
-                Modifier.focusRequester(focusRequester)
+                Modifier.focusRequester(focusRequester),
             ),
         )
     }
@@ -409,7 +408,7 @@ private fun FeatureCard(
             }
 
             Column(
-                modifier = Modifier.focusGroup()
+                modifier = Modifier.focusGroup(),
             ) {
                 SubscriptionProductAmountHorizontal(
                     isFocusable = true,
@@ -444,7 +443,7 @@ private fun FeatureCard(
 internal fun UpgradeButton(
     button: UpgradeButton,
     onClickSubscribe: () -> Unit,
-    upFocusRequester: FocusRequester
+    upFocusRequester: FocusRequester,
 ) {
     val resources = LocalContext.current.resources
     val shortName = resources.getString(button.shortNameRes)

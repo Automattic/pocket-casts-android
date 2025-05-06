@@ -140,7 +140,7 @@ fun HorizontalPagerWrapper(
                         } else {
                             false
                         }
-                    }
+                    },
             ) {
                 content(index, pagerHeight, subContentFocusRequesters[index])
             }
