@@ -63,7 +63,7 @@ class CuratedPodcastsCrawlerTest {
             |]
         """.trimMargin("|"),
         )
-        enqueuFeed(
+        enqueueFeed(
             """
             |{
             |  "list_id": "bork",
@@ -136,7 +136,7 @@ class CuratedPodcastsCrawlerTest {
             |]
         """.trimMargin("|"),
         )
-        enqueuFeed(
+        enqueueFeed(
             """
             |{
             |  "list_id": "bork",
@@ -150,7 +150,7 @@ class CuratedPodcastsCrawlerTest {
             |}
         """.trimMargin("|"),
         )
-        enqueuFeed(
+        enqueueFeed(
             """
             |{
             |  "list_id": "smork",
@@ -219,7 +219,7 @@ class CuratedPodcastsCrawlerTest {
         """.trimMargin("|"),
         )
         server.enqueue(MockResponse().setSocketPolicy(SocketPolicy.SHUTDOWN_INPUT_AT_END))
-        enqueuFeed(
+        enqueueFeed(
             """
             |{
             |  "list_id": "smork",
@@ -391,7 +391,7 @@ class CuratedPodcastsCrawlerTest {
             |]
         """.trimMargin("|"),
         )
-        enqueuFeed(
+        enqueueFeed(
             """
             |{
             |  "list_id": "trending",
@@ -441,7 +441,7 @@ class CuratedPodcastsCrawlerTest {
             |]
         """.trimMargin("|"),
         )
-        enqueuFeed(
+        enqueueFeed(
             """
             |{
             |  "list_id": "featured",
@@ -489,7 +489,7 @@ class CuratedPodcastsCrawlerTest {
         server.enqueue(MockResponse().setBody(body))
     }
 
-    private fun enqueuFeed(body: String) {
+    private fun enqueueFeed(body: String) {
         server.enqueue(MockResponse().setBody(body))
     }
 

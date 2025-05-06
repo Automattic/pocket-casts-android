@@ -22,7 +22,6 @@ billing = "7.0.0"
 coil = "2.7.0"
 compose = "2024.10.00" # https://developer.android.com/jetpack/compose/bom/bom-mapping
 dependency-analysis = "2.17.0"
-espresso = "3.6.1"
 firebase = "33.13.0"
 fragment = "1.8.6"
 glance = "1.0.0"
@@ -107,10 +106,6 @@ dagger-hilt-core = { module = "com.google.dagger:hilt-core", version.ref = "hilt
 hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hilt-compiler" }
 hilt-navigation-compose = "androidx.hilt:hilt-navigation-compose:1.2.0"
 hilt-work = "androidx.hilt:hilt-work:1.2.0"
-
-# Espresso
-espresso-contrib = { module = "androidx.test.espresso:espresso-contrib", version.ref = "espresso" }
-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espresso" }
 
 # Firebase
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase" }
@@ -264,7 +259,6 @@ androidx-swiperefreshlayout = "androidx.swiperefreshlayout:swiperefreshlayout:1.
 androidx-uiautomator = "androidx.test.uiautomator:uiautomator:2.3.0"
 androidx-viewpager = "androidx.viewpager2:viewpager2:1.1.0"
 appsflyer = "com.appsflyer:af-android-sdk:6.17.0"
-barista = "com.adevinta.android:barista:4.3.0"
 capturable = "dev.shreyaspatil:capturable:3.0.1"
 compose-webview = "io.github.kevinnzou:compose-webview:0.33.6"
 desugar-jdk = "com.android.tools:desugar_jdk_libs:2.1.5"

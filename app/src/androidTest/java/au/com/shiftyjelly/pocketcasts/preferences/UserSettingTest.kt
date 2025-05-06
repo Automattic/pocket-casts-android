@@ -1,8 +1,9 @@
+package au.com.shiftyjelly.pocketcasts.preferences
+
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
-import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.utils.MutableClock
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNull
