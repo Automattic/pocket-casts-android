@@ -651,27 +651,6 @@ class PodcastViewModel
         )
     }
 
-    fun onSimilarPodcastSubscribeClicked(podcastUuid: String, listDate: String) {
-        podcastManager.subscribeToPodcast(podcastUuid = podcastUuid, sync = true)
-        analyticsTracker.track(
-            event = AnalyticsEvent.PODCAST_SCREEN_SIMILAR_SHOW_SUBSCRIBED,
-            properties = mapOf(
-                "podcast_uuid" to podcastUuid,
-                "list_datetime" to listDate,
-            ),
-        )
-    }
-
-    fun onSimilarPodcastClicked(podcastUuid: String, listDate: String) {
-        analyticsTracker.track(
-            event = AnalyticsEvent.PODCAST_SCREEN_SIMILAR_SHOW_TAPPED,
-            properties = mapOf(
-                "podcast_uuid" to podcastUuid,
-                "list_datetime" to listDate,
-            ),
-        )
-    }
-
     enum class PodcastTab(@StringRes val labelResId: Int, val analyticsValue: String) {
         EPISODES(
             labelResId = LR.string.episodes,
