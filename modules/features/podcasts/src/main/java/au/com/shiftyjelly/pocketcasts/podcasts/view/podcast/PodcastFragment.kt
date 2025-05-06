@@ -824,7 +824,9 @@ class PodcastFragment : BaseFragment() {
             onSimilarPodcastSubscribeClicked = { podcastUuid, listDate ->
                 viewModel.onSimilarPodcastSubscribeClicked(podcastUuid = podcastUuid, listDate = listDate)
             },
-
+            onPodrollHeaderClicked = {
+                showPodrollInformationModal()
+            },
         ).apply {
             stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
         }
@@ -869,6 +871,15 @@ class PodcastFragment : BaseFragment() {
         updateStatusBar()
 
         return binding.root
+    }
+
+    private fun showPodrollInformationModal() {
+        val dialog = ConfirmationDialog()
+            .setIconId(R.drawable.ic_author)
+            .setTitle(getString(LR.string.podroll_information_title))
+            .setSummary(getString(LR.string.podroll_information_summary))
+            .setButtonType(ConfirmationDialog.ButtonType.Normal(getString(LR.string.podroll_information_button)))
+        dialog.show(parentFragmentManager, "podroll_information")
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

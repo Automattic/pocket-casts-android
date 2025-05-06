@@ -151,6 +151,7 @@ class PodcastAdapter(
     private val onArtworkAvailable: (Podcast) -> Unit,
     private val onSimilarPodcastClicked: (String, String) -> Unit,
     private val onSimilarPodcastSubscribeClicked: (String, String) -> Unit,
+    private val onPodrollHeaderClicked: () -> Unit,
 ) : LargeListAdapter<Any, RecyclerView.ViewHolder>(1500, differ) {
 
     data class EpisodeLimitRow(val episodeLimit: Int)
@@ -185,7 +186,9 @@ class PodcastAdapter(
     object BookmarkUpsell
     object NoBookmarkMessage
 
-    object PodrollHeaderRow
+    data class PodrollHeaderRow(
+        val onClick: () -> Unit,
+    )
     object DividerLineRow
     data class PaddingRow(
         val padding: Dp,
@@ -324,7 +327,7 @@ class PodcastAdapter(
             is BookmarkUpsellViewHolder -> holder.bind()
             is NoBookmarkViewHolder -> holder.bind()
             is SimilarPodcastViewHolder -> holder.bind(getItem(position) as SimilarPodcast)
-            is PodrollViewHolder -> holder.bind()
+            is PodrollViewHolder -> holder.bind(getItem(position) as PodrollHeaderRow)
             is DividerLineViewHolder -> holder.bind()
             is PaddingViewHolder -> holder.bind(getItem(position) as PaddingRow)
         }
@@ -603,7 +606,7 @@ class PodcastAdapter(
                 // Podroll
                 val podroll = list.podroll
                 if (!podroll.isNullOrEmpty()) {
-                    add(PodrollHeaderRow)
+                    add(PodrollHeaderRow(onClick = onPodrollHeaderClicked))
                     podroll.forEachIndexed { index, podcast ->
                         add(
                             SimilarPodcast(

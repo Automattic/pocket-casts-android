@@ -15,6 +15,7 @@ import androidx.annotation.AttrRes
 import androidx.annotation.DrawableRes
 import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
+import androidx.fragment.app.FragmentManager
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -277,5 +278,11 @@ open class ConfirmationDialog : BottomSheetDialogFragment() {
     override fun onPause() {
         super.onPause()
         this.dismissAllowingStateLoss()
+    }
+
+    override fun show(manager: FragmentManager, tag: String?) {
+        if (manager.findFragmentByTag(tag) == null) {
+            super.show(manager, tag)
+        }
     }
 }
