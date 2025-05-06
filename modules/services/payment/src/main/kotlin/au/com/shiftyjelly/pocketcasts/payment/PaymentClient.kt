@@ -12,7 +12,9 @@ import java.util.Collections
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.async
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -50,24 +52,23 @@ class PaymentClient @Inject constructor(
         key: SubscriptionPlan.Key,
         activity: Activity,
     ): PurchaseResult = coroutineScope {
+        val purchaseUpdatesJob = launch(start = CoroutineStart.UNDISPATCHED) { listenToPurchaseUpdates() }
         val purchaseConfirmationDeferred = async { _purchaseEvents.first() }
+
         val billingResult = dataSource.launchBillingFlow(key, activity)
-        when (billingResult) {
+        val purchaseResult = when (billingResult) {
             is PaymentResult.Success -> {
                 purchaseConfirmationDeferred.await()
             }
 
             is PaymentResult.Failure -> {
-                logger.warning("Launching billing flow failed: ${billingResult.code} ${billingResult.message}")
+                logger.warning("Launching billing flow failed: ${billingResult.code}, ${billingResult.message}")
                 purchaseConfirmationDeferred.cancel()
                 billingResult.toPurchaseResult()
             }
         }
-    }
-
-    suspend fun monitorPurchaseUpdates(): Nothing = coroutineScope {
-        launch { acknowledgePendingPurchases() }
-        listenToPurchaseUpdates()
+        purchaseUpdatesJob.cancelAndJoin()
+        purchaseResult
     }
 
     suspend fun acknowledgePendingPurchases() {
@@ -78,7 +79,7 @@ class PaymentClient @Inject constructor(
         }
     }
 
-    private suspend fun listenToPurchaseUpdates(): Nothing {
+    suspend fun listenToPurchaseUpdates(): Nothing {
         dataSource.purchaseResults.collect { result ->
             val recoveredResult = result.recover { code, message ->
                 when (code) {
@@ -95,7 +96,7 @@ class PaymentClient @Inject constructor(
                 }
 
                 is PaymentResult.Failure -> {
-                    logger.warning("Purchase failure: ${recoveredResult.code} ${recoveredResult.message}")
+                    logger.warning("Purchase failure: ${recoveredResult.code}, ${recoveredResult.message}")
                     _purchaseEvents.emit(recoveredResult.toPurchaseResult())
                 }
             }
@@ -118,7 +119,7 @@ class PaymentClient @Inject constructor(
                     }
                 }
                 .onSuccess { logger.info("Purchase confirmed: $it") }
-                .onFailure { code, message -> logger.warning("Failed to confirm purchase: $purchase. $code $message") }
+                .onFailure { code, message -> logger.warning("Failed to confirm purchase: $purchase. $code, $message") }
             if (dispatchConfirmation) {
                 _purchaseEvents.emit(confirmResult.toPurchaseResult())
             }
