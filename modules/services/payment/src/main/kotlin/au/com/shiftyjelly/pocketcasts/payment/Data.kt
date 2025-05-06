@@ -247,14 +247,26 @@ sealed interface SubscriptionPlan {
     }
 }
 
-enum class SubscriptionTier {
-    Plus,
-    Patron,
+enum class SubscriptionTier(
+    val analyticsValue: String,
+) {
+    Plus(
+        analyticsValue = "plus",
+    ),
+    Patron(
+        analyticsValue = "patron",
+    ),
 }
 
-enum class SubscriptionBillingCycle {
-    Monthly,
-    Yearly,
+enum class SubscriptionBillingCycle(
+    val analyticsValue: String,
+) {
+    Monthly(
+        analyticsValue = "monthly",
+    ),
+    Yearly(
+        analyticsValue = "yearly",
+    ),
 }
 
 enum class SubscriptionOffer {
