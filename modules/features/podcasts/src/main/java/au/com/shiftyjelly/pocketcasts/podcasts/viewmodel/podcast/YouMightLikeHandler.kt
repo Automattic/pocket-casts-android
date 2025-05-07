@@ -8,10 +8,10 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
-import io.reactivex.Single
+import io.reactivex.Maybe
 import io.reactivex.subjects.BehaviorSubject
 import javax.inject.Inject
-import kotlinx.coroutines.rx2.rxSingle
+import kotlinx.coroutines.rx2.rxMaybe
 import timber.log.Timber
 
 sealed class YouMightLikeResult {
@@ -40,7 +40,7 @@ class YouMightLikeHandler @Inject constructor(
             .distinctUntilChanged()
             .switchMap { enabled ->
                 if (enabled) {
-                    getYouMightLikeListSingle(podcast)
+                    getYouMightLikeListMaybe(podcast)
                         .toFlowable()
                         .addSubscribedStatusFlowable()
                         .map { listFeed ->
@@ -50,19 +50,18 @@ class YouMightLikeHandler @Inject constructor(
                                 YouMightLikeResult.Success(listFeed)
                             }
                         }
+                        .onErrorReturn { error ->
+                            Timber.e(error, "Error loading 'You might like' podcasts")
+                            YouMightLikeResult.Empty
+                        }
                 } else {
                     Flowable.just(YouMightLikeResult.Empty)
                 }
             }
-            .onErrorReturn { error ->
-                Timber.e(error, "Error loading you might like podcasts")
-                YouMightLikeResult.Empty
-            }
     }
 
-    private fun getYouMightLikeListSingle(podcast: Podcast): Single<ListFeed> = rxSingle {
+    private fun getYouMightLikeListMaybe(podcast: Podcast): Maybe<ListFeed> = rxMaybe {
         listRepository.getYouMightLikePodcasts(podcast.uuid)
-            ?: error("Failed to load you might like podcasts")
     }
 
     private fun Flowable<ListFeed>.addSubscribedStatusFlowable(): Flowable<ListFeed> {
