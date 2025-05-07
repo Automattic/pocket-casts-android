@@ -240,7 +240,7 @@ enum class Feature(
         title = "Recommendations",
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
     ;
