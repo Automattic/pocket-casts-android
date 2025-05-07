@@ -9,7 +9,6 @@ import com.android.billingclient.api.QueryProductDetailsParams
 import com.android.billingclient.api.QueryPurchaseHistoryParams
 import com.android.billingclient.api.QueryPurchasesParams
 import java.math.BigDecimal
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import com.android.billingclient.api.Purchase as GooglePurchase
@@ -124,7 +123,7 @@ class FakePaymentDataSource : PaymentDataSource {
             get() = Purchase(
                 state = PurchaseState.Purchased("order-id"),
                 token = "purchase-token",
-                productIds = listOf(SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Yearly)),
+                productIds = listOf(SubscriptionPlan.PlusYearlyProductId),
                 isAcknowledged = true,
                 isAutoRenewing = true,
             )
@@ -133,7 +132,7 @@ class FakePaymentDataSource : PaymentDataSource {
             get() = Purchase(
                 state = PurchaseState.Purchased("order-id"),
                 token = "purchase-token",
-                productIds = listOf(SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Yearly)),
+                productIds = listOf(SubscriptionPlan.PlusYearlyProductId),
                 isAcknowledged = false,
                 isAutoRenewing = true,
             )

@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.payment
 
-import au.com.shiftyjelly.pocketcasts.payment.FakePaymentDataSource.Companion.DefaultLoadedProducts
 import java.math.BigDecimal
 
 data class Product(
@@ -105,7 +104,7 @@ class SubscriptionPlans private constructor(
     override fun toString() = "SubscriptionPlans(plans=$plans)"
 
     companion object {
-        val Preview get() = SubscriptionPlans.create(DefaultLoadedProducts).getOrNull()!!
+        val Preview get() = SubscriptionPlans.create(FakePaymentDataSource.DefaultLoadedProducts).getOrNull()!!
 
         private val basePlanKeys = SubscriptionTier.entries.flatMap { tier ->
             SubscriptionBillingCycle.entries.map { billingCycle ->
@@ -226,58 +225,28 @@ sealed interface SubscriptionPlan {
     }
 
     companion object {
-        val PlusMonthlyPreview = SubscriptionPlan.Base(
-            name = "Plus Monthly",
-            tier = SubscriptionTier.Plus,
-            billingCycle = SubscriptionBillingCycle.Monthly,
-            pricingPhase = PricingPhase(
-                price = Price(3.99.toBigDecimal(), "USD", "$3.99"),
-                billingPeriod = au.com.shiftyjelly.pocketcasts.payment.BillingPeriod.Preview,
-            ),
-        )
+        const val PlusMonthlyProductId = "com.pocketcasts.plus.monthly"
+        const val PlusYearlyProductId = "com.pocketcasts.plus.yearly"
+        const val PatronMonthlyProductId = "com.pocketcasts.monthly.patron"
+        const val PatronYearlyProductId = "com.pocketcasts.yearly.patron"
 
-        val PlusYearlyPreview = SubscriptionPlan.Base(
-            name = "Plus Yearly",
-            tier = SubscriptionTier.Plus,
-            billingCycle = SubscriptionBillingCycle.Yearly,
-            pricingPhase = PricingPhase(
-                price = Price(39.99.toBigDecimal(), "USD", "$39.99"),
-                billingPeriod = au.com.shiftyjelly.pocketcasts.payment.BillingPeriod.Preview,
-            ),
-        )
-
-        val PatronMonthlyPreview = SubscriptionPlan.Base(
-            name = "Patron Monthly",
-            tier = SubscriptionTier.Plus,
-            billingCycle = SubscriptionBillingCycle.Monthly,
-            pricingPhase = PricingPhase(
-                price = Price(9.99.toBigDecimal(), "USD", "$9.99"),
-                billingPeriod = au.com.shiftyjelly.pocketcasts.payment.BillingPeriod.Preview,
-            ),
-        )
-
-        val PatronYearlyPreview = SubscriptionPlan.Base(
-            name = "Patron Yearly",
-            tier = SubscriptionTier.Patron,
-            billingCycle = SubscriptionBillingCycle.Yearly,
-            pricingPhase = PricingPhase(
-                price = Price(99.99.toBigDecimal(), "USD", "$99.99"),
-                billingPeriod = au.com.shiftyjelly.pocketcasts.payment.BillingPeriod.Preview,
-            ),
-        )
+        val PlusMonthlyPreview get() = SubscriptionPlans.Preview.getBasePlan(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly)
+        val PlusYearlyPreview get() = SubscriptionPlans.Preview.getBasePlan(SubscriptionTier.Plus, SubscriptionBillingCycle.Yearly)
+        val PatronMonthlyPreview get() = SubscriptionPlans.Preview.getBasePlan(SubscriptionTier.Patron, SubscriptionBillingCycle.Monthly)
+        val PatronYearlyPreview get() = SubscriptionPlans.Preview.getBasePlan(SubscriptionTier.Patron, SubscriptionBillingCycle.Yearly)
 
         fun productId(
             tier: SubscriptionTier,
             billingCycle: SubscriptionBillingCycle,
         ) = when (tier) {
             SubscriptionTier.Plus -> when (billingCycle) {
-                SubscriptionBillingCycle.Monthly -> "com.pocketcasts.plus.monthly"
-                SubscriptionBillingCycle.Yearly -> "com.pocketcasts.plus.yearly"
+                SubscriptionBillingCycle.Monthly -> PlusMonthlyProductId
+                SubscriptionBillingCycle.Yearly -> PlusYearlyProductId
             }
 
             SubscriptionTier.Patron -> when (billingCycle) {
-                SubscriptionBillingCycle.Monthly -> "com.pocketcasts.monthly.patron"
-                SubscriptionBillingCycle.Yearly -> "com.pocketcasts.yearly.patron"
+                SubscriptionBillingCycle.Monthly -> PatronMonthlyProductId
+                SubscriptionBillingCycle.Yearly -> PatronYearlyProductId
             }
         }
 
