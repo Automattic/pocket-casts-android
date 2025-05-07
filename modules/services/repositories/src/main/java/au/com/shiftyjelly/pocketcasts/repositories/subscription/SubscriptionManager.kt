@@ -17,8 +17,6 @@ import timber.log.Timber
 interface SubscriptionManager {
     suspend fun initializeBillingConnection(): Nothing
 
-    suspend fun loadPurchases(): PurchasesState
-
     suspend fun loadPurchaseHistory(): PurchaseHistoryState
 
     suspend fun refresh()

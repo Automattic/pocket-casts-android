@@ -140,16 +140,6 @@ class SubscriptionManagerImpl @Inject constructor(
         return state
     }
 
-    override suspend fun loadPurchases() = coroutineScope {
-        val (purchasesResult, purchases) = paymentClient.loadPurchases(purchasesParams)
-
-        if (purchasesResult.isOk()) {
-            PurchasesState.Loaded(purchases)
-        } else {
-            PurchasesState.Failure
-        }
-    }
-
     override suspend fun loadPurchaseHistory(): PurchaseHistoryState {
         val (historyResults, historyRecords) = paymentClient.loadPurchaseHistory(purchaseHistoryParams)
         return if (historyResults.isOk()) {
