@@ -15,7 +15,7 @@ import com.android.billingclient.api.Purchase as GooglePurchase
 
 class FakePaymentDataSource : PaymentDataSource {
     var customProductsResult: PaymentResult<List<Product>>? = null
-    var customPurchases: PaymentResult<List<Purchase>>? = null
+    var customPurchasesResult: PaymentResult<List<Purchase>>? = null
     var launchBillingFlowResultCode: PaymentResultCode = PaymentResultCode.Ok
 
     var receivedPurchases = emptyList<Purchase>()
@@ -30,7 +30,7 @@ class FakePaymentDataSource : PaymentDataSource {
     }
 
     override suspend fun loadPurchases(): PaymentResult<List<Purchase>> {
-        return customPurchases ?: PaymentResult.Success(emptyList())
+        return customPurchasesResult ?: PaymentResult.Success(DefaultPurchases)
     }
 
     override suspend fun acknowledgePurchase(purchase: Purchase): PaymentResult<Purchase> {
@@ -116,6 +116,16 @@ private val PatronMonthlyPricingPhase get() = PricingPhase(
 private val PatronYearlyPricingPhase get() = PricingPhase(
     Price(99.99.toBigDecimal(), "USD", "$99.99"),
     BillingPeriod(BillingPeriod.Cycle.Infinite, BillingPeriod.Interval.Yearly, intervalCount = 0),
+)
+
+private val DefaultPurchases get() = listOf(
+    Purchase(
+        state = PurchaseState.Purchased("order-id"),
+        token = "purchase-token",
+        productIds = listOf(SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Yearly)),
+        isAcknowledged = true,
+        isAutoRenewing = true,
+    ),
 )
 
 private fun productName(

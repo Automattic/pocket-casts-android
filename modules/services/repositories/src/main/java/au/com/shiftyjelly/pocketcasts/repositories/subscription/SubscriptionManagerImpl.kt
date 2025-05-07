@@ -41,7 +41,6 @@ import javax.inject.Singleton
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.transformLatest
@@ -126,7 +125,7 @@ class SubscriptionManagerImpl @Inject constructor(
     override suspend fun refresh() {
         loadProducts()
         loadPurchaseHistory()
-        paymentClient.loadAndAcknowledgePurchases()
+        paymentClient.acknowledgePendingPurchases()
     }
 
     override suspend fun initializeBillingConnection(): Nothing = coroutineScope {

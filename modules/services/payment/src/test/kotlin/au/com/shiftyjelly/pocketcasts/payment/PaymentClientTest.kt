@@ -47,6 +47,147 @@ class PaymentClientTest {
     }
 
     @Test
+    fun `load acknowledged subscribtion purchases`() = runTest {
+        dataSource.customPurchasesResult = PaymentResult.Success(
+            listOf(
+                purchase.copy(
+                    state = PurchaseState.Purchased("order-id-1"),
+                    productIds = listOf(SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly)),
+                    isAcknowledged = true,
+                    isAutoRenewing = true,
+                ),
+                purchase.copy(
+                    state = PurchaseState.Purchased("order-id-2"),
+                    productIds = listOf(SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Yearly)),
+                    isAcknowledged = true,
+                    isAutoRenewing = true,
+                ),
+                purchase.copy(
+                    state = PurchaseState.Purchased("order-id-3"),
+                    productIds = listOf(SubscriptionPlan.productId(SubscriptionTier.Patron, SubscriptionBillingCycle.Monthly)),
+                    isAcknowledged = true,
+                    isAutoRenewing = true,
+                ),
+                purchase.copy(
+                    state = PurchaseState.Purchased("order-id-4"),
+                    productIds = listOf(SubscriptionPlan.productId(SubscriptionTier.Patron, SubscriptionBillingCycle.Yearly)),
+                    isAcknowledged = true,
+                    isAutoRenewing = false,
+                ),
+            ),
+        )
+
+        val subscriptions = client.loadAcknowledgedSubscriptions().getOrNull()!!
+
+        assertEquals(
+            listOf(
+                AcknowledgedSubscription("order-id-1", SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly, isAutoRenewing = true),
+                AcknowledgedSubscription("order-id-2", SubscriptionTier.Plus, SubscriptionBillingCycle.Yearly, isAutoRenewing = true),
+                AcknowledgedSubscription("order-id-3", SubscriptionTier.Patron, SubscriptionBillingCycle.Monthly, isAutoRenewing = true),
+                AcknowledgedSubscription("order-id-4", SubscriptionTier.Patron, SubscriptionBillingCycle.Yearly, isAutoRenewing = false),
+            ),
+            subscriptions,
+        )
+    }
+
+    @Test
+    fun `do not load unconfirmed subscription purchases`() = runTest {
+        dataSource.customPurchasesResult = PaymentResult.Success(
+            listOf(
+                purchase.copy(
+                    state = PurchaseState.Pending,
+                    isAcknowledged = true,
+                ),
+                purchase.copy(
+                    state = PurchaseState.Unspecified,
+                    isAcknowledged = false,
+                ),
+                purchase.copy(
+                    state = PurchaseState.Purchased("order-id-3"),
+                    isAcknowledged = false,
+                ),
+            ),
+        )
+
+        val subscriptions = client.loadAcknowledgedSubscriptions().getOrNull()!!
+
+        assertEquals(emptyList<AcknowledgedSubscription>(), subscriptions)
+    }
+
+    @Test
+    fun `do not load acknowledged subscription purchases without any products`() = runTest {
+        dataSource.customPurchasesResult = PaymentResult.Success(
+            listOf(
+                purchase.copy(
+                    productIds = listOf(
+                        SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly),
+                        SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Yearly),
+                    ),
+                ),
+            ),
+        )
+
+        val subscriptions = client.loadAcknowledgedSubscriptions().getOrNull()!!
+
+        assertEquals(emptyList<AcknowledgedSubscription>(), subscriptions)
+    }
+
+    @Test
+    fun `do not load acknowledged subscription purchases with unknown products`() = runTest {
+        dataSource.customPurchasesResult = PaymentResult.Success(
+            listOf(purchase.copy(productIds = listOf("some-unknown-product"))),
+        )
+
+        val subscriptions = client.loadAcknowledgedSubscriptions().getOrNull()!!
+
+        assertEquals(emptyList<AcknowledgedSubscription>(), subscriptions)
+    }
+
+    @Test
+    fun `do not load acknowledged subscription purchases without multiple products`() = runTest {
+        dataSource.customPurchasesResult = PaymentResult.Success(
+            listOf(purchase.copy(productIds = emptyList())),
+        )
+
+        val subscriptions = client.loadAcknowledgedSubscriptions().getOrNull()!!
+
+        assertEquals(emptyList<AcknowledgedSubscription>(), subscriptions)
+    }
+
+    @Test
+    fun `ignore invalid purchases when loading acknowledged subscription purchases`() = runTest {
+        dataSource.customPurchasesResult = PaymentResult.Success(
+            listOf(
+                purchase.copy(
+                    state = PurchaseState.Purchased("order-id"),
+                    productIds = listOf(SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly)),
+                    isAcknowledged = true,
+                    isAutoRenewing = true,
+                ),
+                purchase.copy(productIds = emptyList()),
+            ),
+        )
+
+        val subscriptions = client.loadAcknowledgedSubscriptions().getOrNull()!!
+
+        assertEquals(
+            listOf(
+                AcknowledgedSubscription("order-id", SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly, isAutoRenewing = true),
+            ),
+            subscriptions,
+        )
+    }
+
+    @Test
+    fun `load acknowledged subscriptions with failure`() = runTest {
+        dataSource.customPurchasesResult = PaymentResult.Failure(PaymentResultCode.Error, "Test error")
+
+        val subscriptions = client.loadAcknowledgedSubscriptions()
+
+        assertNull(subscriptions.getOrNull())
+    }
+
+    @Test
     fun `purchase subscription`() = monitoredTest {
         val purchaseResult = purchaseSubscription()
 
@@ -165,7 +306,7 @@ class PaymentClientTest {
             purchase.copy(state = PurchaseState.Pending),
             purchase.copy(state = PurchaseState.Purchased("order-id-2")),
         )
-        dataSource.customPurchases = PaymentResult.Success(purchases)
+        dataSource.customPurchasesResult = PaymentResult.Success(purchases)
 
         backgroundScope.launch(start = CoroutineStart.UNDISPATCHED) { client.monitorPurchaseUpdates() }
         yield() // Yield due to starting internal job inside monitorPurchaseUpdates()
@@ -198,6 +339,65 @@ class PaymentClientTest {
 
         logger.assertInfos("Load subscription plans")
         logger.assertWarnings("Failed to load subscription plans. Error, Test failure")
+    }
+
+    @Test
+    fun `log loading acknowledged subscription purchases succesfully`() = runTest {
+        val subscriptions = client.loadAcknowledgedSubscriptions().getOrNull()!!
+
+        logger.assertInfos(
+            "Loading acknowledged subscriptions",
+            "Acknowledged subscriptions loaded: $subscriptions",
+        )
+    }
+
+    @Test
+    fun `log loading acknowledged subscription with failure`() = runTest {
+        dataSource.customPurchasesResult = PaymentResult.Failure(PaymentResultCode.Error, "Test failure")
+
+        client.loadAcknowledgedSubscriptions()
+
+        logger.assertInfos("Loading acknowledged subscriptions")
+        logger.assertWarnings("Failed to load acknowledged subscriptions. Error, Test failure")
+    }
+
+    @Test
+    fun `log issues with invalid acknowledged subscription purchases`() = runTest {
+        dataSource.customPurchasesResult = PaymentResult.Success(
+            listOf(
+                purchase.copy(
+                    state = PurchaseState.Pending,
+                    isAcknowledged = true,
+                ),
+                purchase.copy(
+                    state = PurchaseState.Purchased(orderId = "order-id-1"),
+                    isAcknowledged = false,
+                ),
+                purchase.copy(
+                    state = PurchaseState.Purchased(orderId = "order-id-2"),
+                    isAcknowledged = true,
+                    productIds = emptyList(),
+                ),
+                purchase.copy(
+                    state = PurchaseState.Purchased(orderId = "order-id-3"),
+                    isAcknowledged = true,
+                    productIds = listOf("product-id-1", "product-id-2"),
+                ),
+                purchase.copy(
+                    state = PurchaseState.Purchased(orderId = "order-id-4"),
+                    isAcknowledged = true,
+                    productIds = listOf("unknown-product-id"),
+                ),
+            ),
+        )
+
+        client.loadAcknowledgedSubscriptions()
+
+        logger.assertWarnings(
+            "Skipping purchase order-id-2. No associated products.",
+            "Skipping purchase order-id-3. Too many associated products: [product-id-1, product-id-2]",
+            "Skipping purchase order-id-4. Couldn't find matching product key for unknown-product-id",
+        )
     }
 
     @Test
