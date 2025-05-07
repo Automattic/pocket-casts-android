@@ -1,10 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.payment
 
 import android.app.Activity
-import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.yield
 import org.junit.Assert.assertEquals
@@ -39,7 +36,7 @@ class PaymentClientTest {
 
     @Test
     fun `load plans with failure`() = runTest {
-        dataSource.customProductsResult = PaymentResult.Failure(PaymentResultCode.Error, "Test failure")
+        dataSource.loadedProductsResultCode = PaymentResultCode.Error
 
         val plans = client.loadSubscriptionPlans()
 
@@ -48,32 +45,30 @@ class PaymentClientTest {
 
     @Test
     fun `load acknowledged subscribtion purchases`() = runTest {
-        dataSource.customPurchasesResult = PaymentResult.Success(
-            listOf(
-                purchase.copy(
-                    state = PurchaseState.Purchased("order-id-1"),
-                    productIds = listOf(SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly)),
-                    isAcknowledged = true,
-                    isAutoRenewing = true,
-                ),
-                purchase.copy(
-                    state = PurchaseState.Purchased("order-id-2"),
-                    productIds = listOf(SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Yearly)),
-                    isAcknowledged = true,
-                    isAutoRenewing = true,
-                ),
-                purchase.copy(
-                    state = PurchaseState.Purchased("order-id-3"),
-                    productIds = listOf(SubscriptionPlan.productId(SubscriptionTier.Patron, SubscriptionBillingCycle.Monthly)),
-                    isAcknowledged = true,
-                    isAutoRenewing = true,
-                ),
-                purchase.copy(
-                    state = PurchaseState.Purchased("order-id-4"),
-                    productIds = listOf(SubscriptionPlan.productId(SubscriptionTier.Patron, SubscriptionBillingCycle.Yearly)),
-                    isAcknowledged = true,
-                    isAutoRenewing = false,
-                ),
+        dataSource.loadedPurchases = listOf(
+            purchase.copy(
+                state = PurchaseState.Purchased("order-id-1"),
+                productIds = listOf(SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly)),
+                isAcknowledged = true,
+                isAutoRenewing = true,
+            ),
+            purchase.copy(
+                state = PurchaseState.Purchased("order-id-2"),
+                productIds = listOf(SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Yearly)),
+                isAcknowledged = true,
+                isAutoRenewing = true,
+            ),
+            purchase.copy(
+                state = PurchaseState.Purchased("order-id-3"),
+                productIds = listOf(SubscriptionPlan.productId(SubscriptionTier.Patron, SubscriptionBillingCycle.Monthly)),
+                isAcknowledged = true,
+                isAutoRenewing = true,
+            ),
+            purchase.copy(
+                state = PurchaseState.Purchased("order-id-4"),
+                productIds = listOf(SubscriptionPlan.productId(SubscriptionTier.Patron, SubscriptionBillingCycle.Yearly)),
+                isAcknowledged = true,
+                isAutoRenewing = false,
             ),
         )
 
@@ -92,20 +87,18 @@ class PaymentClientTest {
 
     @Test
     fun `do not load unconfirmed subscription purchases`() = runTest {
-        dataSource.customPurchasesResult = PaymentResult.Success(
-            listOf(
-                purchase.copy(
-                    state = PurchaseState.Pending,
-                    isAcknowledged = true,
-                ),
-                purchase.copy(
-                    state = PurchaseState.Unspecified,
-                    isAcknowledged = false,
-                ),
-                purchase.copy(
-                    state = PurchaseState.Purchased("order-id-3"),
-                    isAcknowledged = false,
-                ),
+        dataSource.loadedPurchases = listOf(
+            purchase.copy(
+                state = PurchaseState.Pending,
+                isAcknowledged = true,
+            ),
+            purchase.copy(
+                state = PurchaseState.Unspecified,
+                isAcknowledged = false,
+            ),
+            purchase.copy(
+                state = PurchaseState.Purchased("order-id-3"),
+                isAcknowledged = false,
             ),
         )
 
@@ -116,13 +109,11 @@ class PaymentClientTest {
 
     @Test
     fun `do not load acknowledged subscription purchases without any products`() = runTest {
-        dataSource.customPurchasesResult = PaymentResult.Success(
-            listOf(
-                purchase.copy(
-                    productIds = listOf(
-                        SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly),
-                        SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Yearly),
-                    ),
+        dataSource.loadedPurchases = listOf(
+            purchase.copy(
+                productIds = listOf(
+                    SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly),
+                    SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Yearly),
                 ),
             ),
         )
@@ -134,8 +125,8 @@ class PaymentClientTest {
 
     @Test
     fun `do not load acknowledged subscription purchases with unknown products`() = runTest {
-        dataSource.customPurchasesResult = PaymentResult.Success(
-            listOf(purchase.copy(productIds = listOf("some-unknown-product"))),
+        dataSource.loadedPurchases = listOf(
+            purchase.copy(productIds = listOf("some-unknown-product")),
         )
 
         val subscriptions = client.loadAcknowledgedSubscriptions().getOrNull()!!
@@ -145,8 +136,8 @@ class PaymentClientTest {
 
     @Test
     fun `do not load acknowledged subscription purchases without multiple products`() = runTest {
-        dataSource.customPurchasesResult = PaymentResult.Success(
-            listOf(purchase.copy(productIds = emptyList())),
+        dataSource.loadedPurchases = listOf(
+            purchase.copy(productIds = emptyList()),
         )
 
         val subscriptions = client.loadAcknowledgedSubscriptions().getOrNull()!!
@@ -156,16 +147,14 @@ class PaymentClientTest {
 
     @Test
     fun `ignore invalid purchases when loading acknowledged subscription purchases`() = runTest {
-        dataSource.customPurchasesResult = PaymentResult.Success(
-            listOf(
-                purchase.copy(
-                    state = PurchaseState.Purchased("order-id"),
-                    productIds = listOf(SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly)),
-                    isAcknowledged = true,
-                    isAutoRenewing = true,
-                ),
-                purchase.copy(productIds = emptyList()),
+        dataSource.loadedPurchases = listOf(
+            purchase.copy(
+                state = PurchaseState.Purchased("order-id"),
+                productIds = listOf(SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly)),
+                isAcknowledged = true,
+                isAutoRenewing = true,
             ),
+            purchase.copy(productIds = emptyList()),
         )
 
         val subscriptions = client.loadAcknowledgedSubscriptions().getOrNull()!!
@@ -180,7 +169,7 @@ class PaymentClientTest {
 
     @Test
     fun `load acknowledged subscriptions with failure`() = runTest {
-        dataSource.customPurchasesResult = PaymentResult.Failure(PaymentResultCode.Error, "Test error")
+        dataSource.loadedPurchasesResultCode = PaymentResultCode.Error
 
         val subscriptions = client.loadAcknowledgedSubscriptions()
 
@@ -188,133 +177,102 @@ class PaymentClientTest {
     }
 
     @Test
-    fun `purchase subscription`() = monitoredTest {
-        val purchaseResult = purchaseSubscription()
+    fun `purchase subscription`() = runTest {
+        val purchaseResult = client.purchaseSubscriptionPlan(planKey, mock<Activity>())
 
-        dataSource.purchaseResults.emit(PaymentResult.Success(listOf(purchase)))
-        approver.emitApproveResponse(PaymentResultCode.Ok)
-        dataSource.emitAcknowledgeResponse(PaymentResultCode.Ok)
-
-        assertEquals(PurchaseResult.Purchased, purchaseResult.await())
+        assertEquals(PurchaseResult.Purchased, purchaseResult)
     }
 
     @Test
-    fun `do not purchase subscription when billing result is failure`() = monitoredTest {
-        dataSource.launchBillingFlowResultCode = PaymentResultCode.FeatureNotSupported
+    fun `do not purchase subscription when billing result is failure`() = runTest {
+        dataSource.billingFlowResultCode = PaymentResultCode.FeatureNotSupported
 
-        val purchaseResult = purchaseSubscription()
+        val purchaseResult = client.purchaseSubscriptionPlan(planKey, mock<Activity>())
 
-        assertEquals(PurchaseResult.Failure(PaymentResultCode.FeatureNotSupported), purchaseResult.await())
+        assertEquals(PurchaseResult.Failure(PaymentResultCode.FeatureNotSupported), purchaseResult)
     }
 
     @Test
-    fun `do not purchase subscription when purchase result is failure`() = monitoredTest {
-        val purchaseResult = purchaseSubscription()
+    fun `do not purchase subscription when purchase result is failure`() = runTest {
+        dataSource.purchasedProductsResultCode = PaymentResultCode.Error
 
-        dataSource.purchaseResults.emit(PaymentResult.Failure(PaymentResultCode.BillingUnavailable, "Error"))
+        val purchaseResult = client.purchaseSubscriptionPlan(planKey, mock<Activity>())
 
-        assertEquals(PurchaseResult.Failure(PaymentResultCode.BillingUnavailable), purchaseResult.await())
+        assertEquals(PurchaseResult.Failure(PaymentResultCode.Error), purchaseResult)
     }
 
     @Test
-    fun `cancel purchase subscription when purchase result is cancelled`() = monitoredTest {
-        val purchaseResult = purchaseSubscription()
+    fun `cancel purchase subscription when purchase result is cancelled`() = runTest {
+        dataSource.purchasedProductsResultCode = PaymentResultCode.UserCancelled
 
-        dataSource.purchaseResults.emit(PaymentResult.Failure(PaymentResultCode.UserCancelled, "Error"))
+        val purchaseResult = client.purchaseSubscriptionPlan(planKey, mock<Activity>())
 
-        assertEquals(PurchaseResult.Cancelled, purchaseResult.await())
+        assertEquals(PurchaseResult.Cancelled, purchaseResult)
     }
 
     @Test
-    fun `do not purchase subscription when approving fails`() = monitoredTest {
-        val purchaseResult = purchaseSubscription()
+    fun `do not purchase subscription when approving fails`() = runTest {
+        approver.approveResultCode = PaymentResultCode.Error
 
-        dataSource.purchaseResults.emit(PaymentResult.Success(listOf(purchase)))
-        approver.emitApproveResponse(PaymentResultCode.Error)
+        val purchaseResult = client.purchaseSubscriptionPlan(planKey, mock<Activity>())
 
-        assertEquals(PurchaseResult.Failure(PaymentResultCode.Error), purchaseResult.await())
+        assertEquals(PurchaseResult.Failure(PaymentResultCode.Error), purchaseResult)
     }
 
     @Test
-    fun `do not purchase subscription when acknowledging fails`() = monitoredTest {
-        val purchaseResult = purchaseSubscription()
+    fun `do not purchase subscription when acknowledging fails`() = runTest {
+        dataSource.acknowledgePurchaseResultCode = PaymentResultCode.Error
 
-        dataSource.purchaseResults.emit(PaymentResult.Success(listOf(purchase)))
-        approver.emitApproveResponse(PaymentResultCode.Ok)
-        dataSource.emitAcknowledgeResponse(PaymentResultCode.Error)
+        val purchaseResult = client.purchaseSubscriptionPlan(planKey, mock<Activity>())
 
-        assertEquals(PurchaseResult.Failure(PaymentResultCode.Error), purchaseResult.await())
+        assertEquals(PurchaseResult.Failure(PaymentResultCode.Error), purchaseResult)
     }
 
     @Test
-    fun `cancel purchase subscription when acknowledging is cancelled`() = monitoredTest {
-        val purchaseResult = purchaseSubscription()
+    fun `cancel purchase subscription when acknowledging is cancelled`() = runTest {
+        dataSource.acknowledgePurchaseResultCode = PaymentResultCode.UserCancelled
 
-        dataSource.purchaseResults.emit(PaymentResult.Success(listOf(purchase)))
-        approver.emitApproveResponse(PaymentResultCode.Ok)
-        dataSource.emitAcknowledgeResponse(PaymentResultCode.UserCancelled)
+        val purchaseResult = client.purchaseSubscriptionPlan(planKey, mock<Activity>())
 
-        assertEquals(PurchaseResult.Cancelled, purchaseResult.await())
+        assertEquals(PurchaseResult.Cancelled, purchaseResult)
     }
 
     @Test
-    fun `wait for all purchases to be confirmed before finalizing purchase`() = monitoredTest {
-        val purchaseResult = purchaseSubscription()
+    fun `do not finalize non confirmed purchases`() = runTest {
+        dataSource.purchasedProducts = listOf(
+            purchase.copy(state = PurchaseState.Pending),
+        )
 
-        dataSource.purchaseResults.emit(PaymentResult.Success(listOf(purchase, purchase)))
-        approver.emitApproveResponse(PaymentResultCode.Ok)
-        dataSource.emitAcknowledgeResponse(PaymentResultCode.Ok)
-
+        val purchaseResult = backgroundScope.async { client.purchaseSubscriptionPlan(planKey, mock<Activity>()) }
         yield() // Yield to make sure the job didn't cancel
-        assertTrue(purchaseResult.isActive)
 
-        approver.emitApproveResponse(PaymentResultCode.Ok)
-        dataSource.emitAcknowledgeResponse(PaymentResultCode.Ok)
-
-        assertEquals(PurchaseResult.Purchased, purchaseResult.await())
-    }
-
-    @Test
-    fun `do not finalize non confirmed purchases`() = monitoredTest {
-        val purchaseResult = purchaseSubscription()
-
-        dataSource.purchaseResults.emit(PaymentResult.Success(listOf(purchase.copy(state = PurchaseState.Pending))))
-        approver.emitApproveResponse(PaymentResultCode.Ok)
-        dataSource.emitAcknowledgeResponse(PaymentResultCode.Ok)
-
-        yield() // Yield to make sure the job didn't cancel
         assertTrue(purchaseResult.isActive)
         assertTrue(approver.receivedPurchases.isEmpty())
     }
 
     @Test
-    fun `do not acknowledge purchases that are already acknowledged`() = monitoredTest {
-        val purchaseResult = purchaseSubscription()
+    fun `do not acknowledge purchases that are already acknowledged`() = runTest {
+        dataSource.purchasedProducts = listOf(
+            purchase.copy(isAcknowledged = true),
+        )
 
-        dataSource.purchaseResults.emit(PaymentResult.Success(listOf(purchase.copy(isAcknowledged = true))))
-        approver.emitApproveResponse(PaymentResultCode.Ok)
+        val purchaseResult = client.purchaseSubscriptionPlan(planKey, mock<Activity>())
 
         assertTrue(dataSource.receivedPurchases.isEmpty())
-        assertEquals(PurchaseResult.Purchased, purchaseResult.await())
+        assertEquals(PurchaseResult.Purchased, purchaseResult)
     }
 
     @Test
-    fun `acknowledge lingering purchases when monitoring starts`() = runTest {
+    fun `acknowledge lingering purchases`() = runTest {
         val purchases = listOf(
             purchase.copy(state = PurchaseState.Purchased("order-id-1")),
             purchase.copy(isAcknowledged = true),
             purchase.copy(state = PurchaseState.Pending),
             purchase.copy(state = PurchaseState.Purchased("order-id-2")),
         )
-        dataSource.customPurchasesResult = PaymentResult.Success(purchases)
+        dataSource.loadedPurchases = purchases
 
-        backgroundScope.launch(start = CoroutineStart.UNDISPATCHED) { client.monitorPurchaseUpdates() }
-        yield() // Yield due to starting internal job inside monitorPurchaseUpdates()
-
-        approver.emitApproveResponse(PaymentResultCode.Ok)
-        dataSource.emitAcknowledgeResponse(PaymentResultCode.Ok)
-        approver.emitApproveResponse(PaymentResultCode.Ok)
-        dataSource.emitAcknowledgeResponse(PaymentResultCode.Ok)
+        client.acknowledgePendingPurchases()
 
         val expectedPurchases = listOf(purchases[0], purchases[3])
         assertEquals(expectedPurchases, approver.receivedPurchases)
@@ -333,12 +291,12 @@ class PaymentClientTest {
 
     @Test
     fun `log loading plans with failure`() = runTest {
-        dataSource.customProductsResult = PaymentResult.Failure(PaymentResultCode.Error, "Test failure")
+        dataSource.loadedProductsResultCode = PaymentResultCode.Error
 
         client.loadSubscriptionPlans()
 
         logger.assertInfos("Load subscription plans")
-        logger.assertWarnings("Failed to load subscription plans. Error, Test failure")
+        logger.assertWarnings("Failed to load subscription plans. Error, Load products error")
     }
 
     @Test
@@ -353,41 +311,39 @@ class PaymentClientTest {
 
     @Test
     fun `log loading acknowledged subscription with failure`() = runTest {
-        dataSource.customPurchasesResult = PaymentResult.Failure(PaymentResultCode.Error, "Test failure")
+        dataSource.loadedPurchasesResultCode = PaymentResultCode.Error
 
         client.loadAcknowledgedSubscriptions()
 
         logger.assertInfos("Loading acknowledged subscriptions")
-        logger.assertWarnings("Failed to load acknowledged subscriptions. Error, Test failure")
+        logger.assertWarnings("Failed to load acknowledged subscriptions. Error, Load purchases error")
     }
 
     @Test
     fun `log issues with invalid acknowledged subscription purchases`() = runTest {
-        dataSource.customPurchasesResult = PaymentResult.Success(
-            listOf(
-                purchase.copy(
-                    state = PurchaseState.Pending,
-                    isAcknowledged = true,
-                ),
-                purchase.copy(
-                    state = PurchaseState.Purchased(orderId = "order-id-1"),
-                    isAcknowledged = false,
-                ),
-                purchase.copy(
-                    state = PurchaseState.Purchased(orderId = "order-id-2"),
-                    isAcknowledged = true,
-                    productIds = emptyList(),
-                ),
-                purchase.copy(
-                    state = PurchaseState.Purchased(orderId = "order-id-3"),
-                    isAcknowledged = true,
-                    productIds = listOf("product-id-1", "product-id-2"),
-                ),
-                purchase.copy(
-                    state = PurchaseState.Purchased(orderId = "order-id-4"),
-                    isAcknowledged = true,
-                    productIds = listOf("unknown-product-id"),
-                ),
+        dataSource.loadedPurchases = listOf(
+            purchase.copy(
+                state = PurchaseState.Pending,
+                isAcknowledged = true,
+            ),
+            purchase.copy(
+                state = PurchaseState.Purchased(orderId = "order-id-1"),
+                isAcknowledged = false,
+            ),
+            purchase.copy(
+                state = PurchaseState.Purchased(orderId = "order-id-2"),
+                productIds = emptyList(),
+                isAcknowledged = true,
+            ),
+            purchase.copy(
+                state = PurchaseState.Purchased(orderId = "order-id-3"),
+                productIds = listOf("product-id-1", "product-id-2"),
+                isAcknowledged = true,
+            ),
+            purchase.copy(
+                state = PurchaseState.Purchased(orderId = "order-id-4"),
+                productIds = listOf("unknown-product-id"),
+                isAcknowledged = true,
             ),
         )
 
@@ -401,13 +357,10 @@ class PaymentClientTest {
     }
 
     @Test
-    fun `log confirming purchase`() = monitoredTest {
-        val purchaseResult = purchaseSubscription()
+    fun `log confirming purchase`() = runTest {
+        dataSource.purchasedProducts = listOf(purchase)
 
-        dataSource.purchaseResults.emit(PaymentResult.Success(listOf(purchase)))
-        approver.emitApproveResponse(PaymentResultCode.Ok)
-        dataSource.emitAcknowledgeResponse(PaymentResultCode.Ok)
-        purchaseResult.await()
+        client.purchaseSubscriptionPlan(planKey, mock<Activity>())
 
         logger.assertInfos(
             "Confirm purchase: $purchase",
@@ -416,50 +369,39 @@ class PaymentClientTest {
     }
 
     @Test
-    fun `log confirming purchase failure`() = monitoredTest {
-        val purchaseResult = purchaseSubscription()
+    fun `log confirming purchase failure`() = runTest {
+        dataSource.purchasedProducts = listOf(purchase)
+        approver.approveResultCode = PaymentResultCode.DeveloperError
 
-        dataSource.purchaseResults.emit(PaymentResult.Success(listOf(purchase)))
-        approver.emitApproveResponse(PaymentResultCode.DeveloperError)
-        purchaseResult.await()
+        client.purchaseSubscriptionPlan(planKey, mock<Activity>())
 
         logger.assertInfos(
             "Confirm purchase: $purchase",
         )
         logger.assertWarnings(
-            "Failed to confirm purchase: $purchase. DeveloperError Error",
+            "Failed to confirm purchase: $purchase. DeveloperError, Error message",
         )
     }
 
     @Test
-    fun `log purchase result failure`() = monitoredTest {
-        val purchaseResult = purchaseSubscription()
+    fun `log purchase result failure`() = runTest {
+        dataSource.purchasedProductsResultCode = PaymentResultCode.ServiceDisconnected
 
-        dataSource.purchaseResults.emit(PaymentResult.Failure(PaymentResultCode.ServiceDisconnected, "Whoops!"))
-        purchaseResult.await()
+        client.purchaseSubscriptionPlan(planKey, mock<Activity>())
 
         logger.assertWarnings(
-            "Purchase failure: ServiceDisconnected Whoops!",
+            "Purchase failure: ServiceDisconnected, Purchase product error",
         )
     }
 
     @Test
-    fun `log billing result failure`() = monitoredTest {
-        dataSource.launchBillingFlowResultCode = PaymentResultCode.DeveloperError
+    fun `log billing result failure`() = runTest {
+        dataSource.billingFlowResultCode = PaymentResultCode.DeveloperError
 
-        purchaseSubscription()
+        client.purchaseSubscriptionPlan(planKey, mock<Activity>())
 
         logger.assertWarnings(
-            "Launching billing flow failed: DeveloperError Error",
+            "Launching billing flow failed: DeveloperError, Launch billing error",
         )
     }
-
-    private fun monitoredTest(testBody: suspend TestScope.() -> Unit) = runTest {
-        backgroundScope.launch(start = CoroutineStart.UNDISPATCHED) { client.monitorPurchaseUpdates() }
-        testBody()
-    }
-
-    private fun TestScope.purchaseSubscription(
-        key: SubscriptionPlan.Key = planKey,
-    ) = backgroundScope.async(start = CoroutineStart.UNDISPATCHED) { client.purchaseSubscriptionPlan(key, mock<Activity>()) }
 }

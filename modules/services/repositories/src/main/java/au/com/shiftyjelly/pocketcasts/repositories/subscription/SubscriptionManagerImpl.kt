@@ -129,7 +129,7 @@ class SubscriptionManagerImpl @Inject constructor(
     }
 
     override suspend fun initializeBillingConnection(): Nothing = coroutineScope {
-        launch { paymentClient.monitorPurchaseUpdates() }
+        launch { paymentClient.listenToPurchaseUpdates() }
         paymentClient.purchaseEvents.collect(purchaseEvents::accept)
     }
 

@@ -140,20 +140,6 @@ internal class BillingPaymentDataSource(
         }
     }
 
-    override suspend fun acknowledgePurchase(purchase: Purchase): PaymentResult<Purchase> {
-        return connection.withConnectedClient { client ->
-            val params = AcknowledgePurchaseParams.newBuilder()
-                .setPurchaseToken(purchase.token)
-                .build()
-            val billingResult = client.acknowledgePurchase(params)
-            if (billingResult.isOk()) {
-                PaymentResult.Success(purchase.copy(isAcknowledged = true))
-            } else {
-                billingResult.toPaymentFailure()
-            }
-        }
-    }
-
     override suspend fun launchBillingFlow(
         key: SubscriptionPlan.Key,
         activity: Activity,
@@ -179,6 +165,20 @@ internal class BillingPaymentDataSource(
                         }
                     }
                 }
+        }
+    }
+
+    override suspend fun acknowledgePurchase(purchase: Purchase): PaymentResult<Purchase> {
+        return connection.withConnectedClient { client ->
+            val params = AcknowledgePurchaseParams.newBuilder()
+                .setPurchaseToken(purchase.token)
+                .build()
+            val billingResult = client.acknowledgePurchase(params)
+            if (billingResult.isOk()) {
+                PaymentResult.Success(purchase.copy(isAcknowledged = true))
+            } else {
+                billingResult.toPaymentFailure()
+            }
         }
     }
     // </editor-fold>

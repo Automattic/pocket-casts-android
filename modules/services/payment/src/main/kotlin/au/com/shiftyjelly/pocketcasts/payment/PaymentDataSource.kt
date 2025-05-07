@@ -20,9 +20,9 @@ interface PaymentDataSource {
 
     suspend fun loadPurchases(): PaymentResult<List<Purchase>>
 
-    suspend fun acknowledgePurchase(purchase: Purchase): PaymentResult<Purchase>
-
     suspend fun launchBillingFlow(key: SubscriptionPlan.Key, activity: Activity): PaymentResult<Unit>
+
+    suspend fun acknowledgePurchase(purchase: Purchase): PaymentResult<Purchase>
 
     companion object {
         fun billing(

@@ -10,48 +10,65 @@ import com.android.billingclient.api.QueryPurchaseHistoryParams
 import com.android.billingclient.api.QueryPurchasesParams
 import java.math.BigDecimal
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.asSharedFlow
 import com.android.billingclient.api.Purchase as GooglePurchase
 
 class FakePaymentDataSource : PaymentDataSource {
-    var customProductsResult: PaymentResult<List<Product>>? = null
-    var customPurchasesResult: PaymentResult<List<Purchase>>? = null
-    var launchBillingFlowResultCode: PaymentResultCode = PaymentResultCode.Ok
+    var loadedProducts: List<Product> = DefaultLoadedProducts
+    var loadedProductsResultCode: PaymentResultCode = PaymentResultCode.Ok
 
+    var loadedPurchases: List<Purchase> = listOf(DefaultLoadedPurchase)
+    var loadedPurchasesResultCode: PaymentResultCode = PaymentResultCode.Ok
+
+    var billingFlowResultCode: PaymentResultCode = PaymentResultCode.Ok
+    var purchasedProducts: List<Purchase> = listOf(DefaultPurchasedProduct)
+    var purchasedProductsResultCode: PaymentResultCode = PaymentResultCode.Ok
+
+    var acknowledgePurchaseResultCode: PaymentResultCode = PaymentResultCode.Ok
     var receivedPurchases = emptyList<Purchase>()
         private set
 
-    private val acknowledgeFlow = MutableSharedFlow<PaymentResultCode>()
+    private val _purchaseResults = MutableSharedFlow<PaymentResult<List<Purchase>>>()
 
-    override val purchaseResults = MutableSharedFlow<PaymentResult<List<Purchase>>>()
+    override val purchaseResults = _purchaseResults.asSharedFlow()
 
     override suspend fun loadProducts(): PaymentResult<List<Product>> {
-        return customProductsResult ?: PaymentResult.Success(KnownProducts)
+        return if (loadedProductsResultCode == PaymentResultCode.Ok) {
+            PaymentResult.Success(loadedProducts)
+        } else {
+            PaymentResult.Failure(loadedProductsResultCode, "Load products error")
+        }
     }
 
     override suspend fun loadPurchases(): PaymentResult<List<Purchase>> {
-        return customPurchasesResult ?: PaymentResult.Success(DefaultPurchases)
+        return if (loadedPurchasesResultCode == PaymentResultCode.Ok) {
+            PaymentResult.Success(loadedPurchases)
+        } else {
+            PaymentResult.Failure(loadedPurchasesResultCode, "Load purchases error")
+        }
+    }
+
+    override suspend fun launchBillingFlow(key: SubscriptionPlan.Key, activity: Activity): PaymentResult<Unit> {
+        return if (billingFlowResultCode == PaymentResultCode.Ok) {
+            val billingResult = PaymentResult.Success(Unit)
+            val purchaseResult = if (purchasedProductsResultCode == PaymentResultCode.Ok) {
+                PaymentResult.Success(purchasedProducts)
+            } else {
+                PaymentResult.Failure(purchasedProductsResultCode, "Purchase product error")
+            }
+            _purchaseResults.emit(purchaseResult)
+            billingResult
+        } else {
+            PaymentResult.Failure(billingFlowResultCode, "Launch billing error")
+        }
     }
 
     override suspend fun acknowledgePurchase(purchase: Purchase): PaymentResult<Purchase> {
         receivedPurchases += purchase
-        val resultCode = acknowledgeFlow.first()
-        return if (resultCode is PaymentResultCode.Ok) {
+        return if (acknowledgePurchaseResultCode == PaymentResultCode.Ok) {
             PaymentResult.Success(purchase.copy(isAcknowledged = true))
         } else {
-            PaymentResult.Failure(resultCode, "Error")
-        }
-    }
-
-    suspend fun emitAcknowledgeResponse(code: PaymentResultCode) {
-        acknowledgeFlow.emit(code)
-    }
-
-    override suspend fun launchBillingFlow(key: SubscriptionPlan.Key, activity: Activity): PaymentResult<Unit> {
-        return if (launchBillingFlowResultCode is PaymentResultCode.Ok) {
-            PaymentResult.Success(Unit)
-        } else {
-            PaymentResult.Failure(launchBillingFlowResultCode, "Error")
+            PaymentResult.Failure(acknowledgePurchaseResultCode, "Acknowledge purchase error")
         }
     }
 
@@ -73,31 +90,52 @@ class FakePaymentDataSource : PaymentDataSource {
         params: BillingFlowParams,
     ): BillingResult = BillingResult.newBuilder().build()
     // </editor-fold>
-}
 
-private val KnownProducts get() = SubscriptionTier.entries.flatMap { tier ->
-    SubscriptionBillingCycle.entries.map { billingCycle ->
-        Product(
-            SubscriptionPlan.productId(tier, billingCycle),
-            productName(tier, billingCycle),
-            PricingPlans(
-                PricingPlan.Base(
-                    SubscriptionPlan.basePlanId(tier, billingCycle),
-                    pricingPhases(tier, billingCycle, offer = null),
-                    emptyList(),
-                ),
-                SubscriptionOffer.entries
-                    .mapNotNull { offer -> offer.offerId(tier, billingCycle)?.let { offer to it } }
-                    .map { (offer, offerId) ->
-                        PricingPlan.Offer(
-                            offerId,
-                            SubscriptionPlan.basePlanId(tier, billingCycle),
-                            pricingPhases(tier, billingCycle, offer),
-                            emptyList(),
-                        )
-                    },
-            ),
-        )
+    companion object {
+        val DefaultLoadedProducts
+            get() = SubscriptionTier.entries.flatMap { tier ->
+                SubscriptionBillingCycle.entries.map { billingCycle ->
+                    Product(
+                        SubscriptionPlan.productId(tier, billingCycle),
+                        productName(tier, billingCycle),
+                        PricingPlans(
+                            PricingPlan.Base(
+                                SubscriptionPlan.basePlanId(tier, billingCycle),
+                                pricingPhases(tier, billingCycle, offer = null),
+                                emptyList(),
+                            ),
+                            SubscriptionOffer.entries
+                                .mapNotNull { offer -> offer.offerId(tier, billingCycle)?.let { offer to it } }
+                                .map { (offer, offerId) ->
+                                    PricingPlan.Offer(
+                                        offerId,
+                                        SubscriptionPlan.basePlanId(tier, billingCycle),
+                                        pricingPhases(tier, billingCycle, offer),
+                                        emptyList(),
+                                    )
+                                },
+                        ),
+                    )
+                }
+            }
+
+        val DefaultLoadedPurchase
+            get() = Purchase(
+                state = PurchaseState.Purchased("order-id"),
+                token = "purchase-token",
+                productIds = listOf(SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Yearly)),
+                isAcknowledged = true,
+                isAutoRenewing = true,
+            )
+
+        val DefaultPurchasedProduct
+            get() = Purchase(
+                state = PurchaseState.Purchased("order-id"),
+                token = "purchase-token",
+                productIds = listOf(SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Yearly)),
+                isAcknowledged = false,
+                isAutoRenewing = true,
+            )
     }
 }
 
@@ -116,16 +154,6 @@ private val PatronMonthlyPricingPhase get() = PricingPhase(
 private val PatronYearlyPricingPhase get() = PricingPhase(
     Price(99.99.toBigDecimal(), "USD", "$99.99"),
     BillingPeriod(BillingPeriod.Cycle.Infinite, BillingPeriod.Interval.Yearly, intervalCount = 0),
-)
-
-private val DefaultPurchases get() = listOf(
-    Purchase(
-        state = PurchaseState.Purchased("order-id"),
-        token = "purchase-token",
-        productIds = listOf(SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Yearly)),
-        isAcknowledged = true,
-        isAutoRenewing = true,
-    ),
 )
 
 private fun productName(
