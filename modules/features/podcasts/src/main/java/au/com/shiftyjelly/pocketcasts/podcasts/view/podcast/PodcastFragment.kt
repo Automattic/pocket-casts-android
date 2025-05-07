@@ -816,13 +816,13 @@ class PodcastFragment : BaseFragment() {
                     updateStausBarForBackground()
                 }
             },
-            onSimilarPodcastClicked = { podcastUuid, listDate ->
-                viewModel.onSimilarPodcastClicked(podcastUuid = podcastUuid, listDate = listDate)
+            onYouMightLikePodcastClicked = { podcastUuid, listDate ->
+                viewModel.onYouMightLikePodcastClicked(podcastUuid = podcastUuid, listDate = listDate)
                 val fragment = newInstance(podcastUuid = podcastUuid, fromListUuid = "recommendations_podcast", sourceView = sourceView)
                 (activity as FragmentHostListener).addFragment(fragment)
             },
-            onSimilarPodcastSubscribeClicked = { podcastUuid, listDate ->
-                viewModel.onSimilarPodcastSubscribeClicked(podcastUuid = podcastUuid, listDate = listDate)
+            onYouMightLikePodcastSubscribeClicked = { podcastUuid, listDate ->
+                viewModel.onYouMightLikePodcastSubscribeClicked(podcastUuid = podcastUuid, listDate = listDate)
             },
             onPodrollHeaderClicked = {
                 showPodrollInformationModal()
@@ -1091,9 +1091,9 @@ class PodcastFragment : BaseFragment() {
 
                             adapter?.notifyDataSetChanged()
                         }
-                        PodcastTab.SIMILAR_SHOWS -> {
-                            adapter?.setSimilarPodcasts(
-                                similarPodcasts = state.similarPodcasts,
+                        PodcastTab.YOU_MIGHT_LIKE -> {
+                            adapter?.setYouMightLike(
+                                result = state.youMightLike,
                                 tabs = state.tabs,
                             )
                         }

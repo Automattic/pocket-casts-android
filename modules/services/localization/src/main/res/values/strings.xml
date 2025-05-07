@@ -87,7 +87,7 @@
     <string name="search_episodes_not_found_title">No episodes found</string>
     <string name="search_episodes_not_found_summary">We couldn\'t find any episode for that search. Try another keyword.</string>
     <string name="selected">Selected</string>
-    <string name="similar_shows">Similar Shows</string>
+    <string name="you_might_like">You might like</string>
     <string name="sort_newest_to_oldest">Newest to oldest</string>
     <string name="sort_oldest_to_newest">Oldest to newest</string>
     <string name="not_selected">Not selected</string>

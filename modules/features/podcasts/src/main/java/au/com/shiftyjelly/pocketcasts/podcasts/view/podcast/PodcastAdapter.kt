@@ -46,13 +46,13 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.DividerLineV
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.NoBookmarkViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.PaddingViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.PodrollViewHolder
-import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.SimilarPodcastViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.TabsViewHolder
+import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.YouMightLikePodcastViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel.RatingState
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel.RatingTappedSource
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastViewModel.PodcastTab
-import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.podcast.SimilarPodcastsResult
+import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.podcast.YouMightLikeResult
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -149,8 +149,8 @@ class PodcastAdapter(
     private val onClickCategory: (Podcast) -> Unit,
     private val onClickWebsite: (Podcast) -> Unit,
     private val onArtworkAvailable: (Podcast) -> Unit,
-    private val onSimilarPodcastClicked: (String, String) -> Unit,
-    private val onSimilarPodcastSubscribeClicked: (String, String) -> Unit,
+    private val onYouMightLikePodcastClicked: (String, String) -> Unit,
+    private val onYouMightLikePodcastSubscribeClicked: (String, String) -> Unit,
     private val onPodrollHeaderClicked: () -> Unit,
     private val onPodrollPodcastClicked: (String) -> Unit,
     private val onPodrollPodcastSubscribeClicked: (String) -> Unit,
@@ -195,7 +195,7 @@ class PodcastAdapter(
     data class PaddingRow(
         val padding: Dp,
     )
-    data class SimilarPodcast(
+    data class YouMightLikePodcast(
         val listDate: String,
         val podcast: DiscoverPodcast,
         val onRowClick: (podcastUuid: String, listDate: String) -> Unit,
@@ -214,7 +214,7 @@ class PodcastAdapter(
         private const val VIEW_TYPE_BOOKMARK_UPSELL = 103
         private const val VIEW_TYPE_NO_BOOKMARK = 104
         const val VIEW_TYPE_PODCAST_HEADER = 105
-        private const val VIEW_TYPE_SIMILAR_PODCAST = 106
+        private const val VIEW_TYPE_YOU_MIGHT_LIKE_PODCAST = 106
         private const val VIEW_TYPE_PODROLL_HEADER = 107
         private const val VIEW_TYPE_DIVIDER_LINE = 108
         private const val VIEW_TYPE_PADDING_ROW = 109
@@ -286,7 +286,7 @@ class PodcastAdapter(
             VIEW_TYPE_BOOKMARK_HEADER -> BookmarkHeaderViewHolder(ComposeView(parent.context), theme)
             VIEW_TYPE_BOOKMARK_UPSELL -> BookmarkUpsellViewHolder(ComposeView(parent.context), onGetBookmarksClicked, theme)
             VIEW_TYPE_NO_BOOKMARK -> NoBookmarkViewHolder(ComposeView(parent.context), theme, onHeadsetSettingsClicked)
-            VIEW_TYPE_SIMILAR_PODCAST -> SimilarPodcastViewHolder(ComposeView(parent.context), theme)
+            VIEW_TYPE_YOU_MIGHT_LIKE_PODCAST -> YouMightLikePodcastViewHolder(ComposeView(parent.context), theme)
             VIEW_TYPE_PODROLL_HEADER -> PodrollViewHolder(ComposeView(parent.context), theme)
             VIEW_TYPE_DIVIDER_LINE -> DividerLineViewHolder(ComposeView(parent.context), theme)
             VIEW_TYPE_PADDING_ROW -> PaddingViewHolder(ComposeView(parent.context))
@@ -328,7 +328,7 @@ class PodcastAdapter(
             is BookmarkHeaderViewHolder -> holder.bind(getItem(position) as BookmarkHeader)
             is BookmarkUpsellViewHolder -> holder.bind()
             is NoBookmarkViewHolder -> holder.bind()
-            is SimilarPodcastViewHolder -> holder.bind(getItem(position) as SimilarPodcast)
+            is YouMightLikePodcastViewHolder -> holder.bind(getItem(position) as YouMightLikePodcast)
             is PodrollViewHolder -> holder.bind(getItem(position) as PodrollHeaderRow)
             is DividerLineViewHolder -> holder.bind()
             is PaddingViewHolder -> holder.bind(getItem(position) as PaddingRow)
@@ -596,26 +596,26 @@ class PodcastAdapter(
         submitList(content)
     }
 
-    fun setSimilarPodcasts(
-        similarPodcasts: SimilarPodcastsResult,
+    fun setYouMightLike(
+        result: YouMightLikeResult,
         tabs: List<PodcastTab>,
     ) {
         val content = buildList {
             add(Podcast())
-            add(TabsHeader(tabs = tabs, selectedTab = PodcastTab.SIMILAR_SHOWS, onTabClicked = onTabClicked))
-            if (similarPodcasts is SimilarPodcastsResult.Success) {
-                val list = similarPodcasts.listFeed
+            add(TabsHeader(tabs = tabs, selectedTab = PodcastTab.YOU_MIGHT_LIKE, onTabClicked = onTabClicked))
+            if (result is YouMightLikeResult.Success) {
+                val list = result.listFeed
                 // Podroll
                 val podroll = list.podroll
                 if (!podroll.isNullOrEmpty()) {
                     add(PodrollHeaderRow(onClick = onPodrollHeaderClicked))
                     podroll.forEachIndexed { index, podcast ->
                         add(
-                            SimilarPodcast(
+                            YouMightLikePodcast(
                                 listDate = list.date ?: "",
                                 podcast = podcast,
-                                onRowClick = { podcastUuid, _ -> onPodrollPodcastClicked(podcastUuid) },
-                                onSubscribeClick = { podcastUuid, _ -> onPodrollPodcastSubscribeClicked(podcastUuid) },
+                                onRowClick = onYouMightLikePodcastClicked,
+                                onSubscribeClick = onYouMightLikePodcastSubscribeClicked,
                             ),
                         )
                     }
@@ -623,15 +623,15 @@ class PodcastAdapter(
                     add(DividerLineRow)
                 }
                 add(PaddingRow(12.dp))
-                // Recommended similar podcasts
+                // Recommended "You might like" podcasts
                 val podcasts = list.podcasts
                 podcasts?.forEachIndexed { index, podcast ->
                     add(
-                        SimilarPodcast(
+                        YouMightLikePodcast(
                             listDate = list.date ?: "",
                             podcast = podcast,
-                            onRowClick = onSimilarPodcastClicked,
-                            onSubscribeClick = onSimilarPodcastSubscribeClicked,
+                            onRowClick = onYouMightLikePodcastClicked,
+                            onSubscribeClick = onYouMightLikePodcastSubscribeClicked,
                         ),
                     )
                 }
@@ -662,7 +662,7 @@ class PodcastAdapter(
             is BookmarkHeader -> VIEW_TYPE_BOOKMARK_HEADER
             is BookmarkUpsell -> VIEW_TYPE_BOOKMARK_UPSELL
             is NoBookmarkMessage -> VIEW_TYPE_NO_BOOKMARK
-            is SimilarPodcast -> VIEW_TYPE_SIMILAR_PODCAST
+            is YouMightLikePodcast -> VIEW_TYPE_YOU_MIGHT_LIKE_PODCAST
             is PodrollHeaderRow -> VIEW_TYPE_PODROLL_HEADER
             is DividerLineRow -> VIEW_TYPE_DIVIDER_LINE
             is PaddingRow -> VIEW_TYPE_PADDING_ROW
@@ -684,7 +684,7 @@ class PodcastAdapter(
             is DividerRow -> item.groupIndex.toLong()
             is PodcastEpisode -> item.adapterId
             is BookmarkItemData -> item.bookmark.adapterId
-            is SimilarPodcast -> item.podcast.adapterId
+            is YouMightLikePodcast -> item.podcast.adapterId
             is PodrollHeaderRow -> Long.MAX_VALUE - 8
             is DividerLineRow -> Long.MAX_VALUE - 9
             is PaddingRow -> Long.MAX_VALUE - 10

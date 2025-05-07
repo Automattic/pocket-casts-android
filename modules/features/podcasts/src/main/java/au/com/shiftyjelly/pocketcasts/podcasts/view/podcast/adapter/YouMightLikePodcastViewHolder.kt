@@ -7,12 +7,12 @@ import au.com.shiftyjelly.pocketcasts.compose.podcast.ListPodcastSubscribeRow
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastAdapter
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 
-class SimilarPodcastViewHolder(
+class YouMightLikePodcastViewHolder(
     private val composeView: ComposeView,
     private val theme: Theme,
 ) : RecyclerView.ViewHolder(composeView) {
 
-    fun bind(data: PodcastAdapter.SimilarPodcast) {
+    fun bind(data: PodcastAdapter.YouMightLikePodcast) {
         composeView.setContent {
             AppTheme(theme.activeTheme) {
                 val uuid = data.podcast.uuid

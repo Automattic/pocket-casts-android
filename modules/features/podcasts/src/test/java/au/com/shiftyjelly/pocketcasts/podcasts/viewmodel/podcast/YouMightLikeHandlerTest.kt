@@ -22,14 +22,14 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
-class SimilarPodcastHandlerTest {
+class YouMightLikeHandlerTest {
 
     @get:Rule
     val featureFlagRule = InMemoryFeatureFlagRule()
 
     private lateinit var listWebService: ListWebService
     private lateinit var podcastManager: PodcastManager
-    private lateinit var similarPodcasts: SimilarPodcastHandler
+    private lateinit var youMightLikePodcasts: YouMightLikeHandler
     private lateinit var testPodcast: Podcast
     private lateinit var testListFeed: ListFeed
     private lateinit var testDiscoverPodcasts: List<DiscoverPodcast>
@@ -39,7 +39,7 @@ class SimilarPodcastHandlerTest {
         listWebService = mock()
         val listRepository = ListRepository(listWebService = listWebService, syncManager = null, platform = "android")
         podcastManager = mock()
-        similarPodcasts = SimilarPodcastHandler(listRepository, podcastManager)
+        youMightLikePodcasts = YouMightLikeHandler(listRepository, podcastManager)
 
         testPodcast = Podcast(uuid = UUID.randomUUID().toString())
         testDiscoverPodcasts = listOf(
@@ -54,9 +54,9 @@ class SimilarPodcastHandlerTest {
         // feature flag is disabled
         FeatureFlag.setEnabled(feature = Feature.RECOMMENDATIONS, enabled = false)
 
-        similarPodcasts.setEnabled(true)
+        youMightLikePodcasts.setEnabled(true)
 
-        val list = similarPodcasts.getSimilarPodcastListFlowable(testPodcast)
+        val list = youMightLikePodcasts.getYouMightLikeListFlowable(testPodcast)
             .test()
             .awaitCount(1)
             .assertNoErrors()
@@ -64,13 +64,13 @@ class SimilarPodcastHandlerTest {
             .first()
 
         // no podcasts should be found
-        assertTrue(list is SimilarPodcastsResult.Empty)
+        assertTrue(list is YouMightLikeResult.Empty)
     }
 
     @Test
     fun testEnabledAndFeatureFlagOnPodcastsFetched() = runTest {
         FeatureFlag.setEnabled(feature = Feature.RECOMMENDATIONS, enabled = true)
-        similarPodcasts.setEnabled(true)
+        youMightLikePodcasts.setEnabled(true)
 
         // expected URL for the list recommendation
         val listUrl = "${Settings.SERVER_API_URL}/recommendations/podcast/${testPodcast.uuid}"
@@ -82,7 +82,7 @@ class SimilarPodcastHandlerTest {
         whenever(podcastManager.podcastSubscriptionsRxFlowable()).thenReturn(Flowable.just(emptyList()))
 
         // call the method to test
-        val list = similarPodcasts.getSimilarPodcastListFlowable(testPodcast)
+        val list = youMightLikePodcasts.getYouMightLikeListFlowable(testPodcast)
             .test()
             .awaitCount(1)
             .assertNoErrors()
@@ -90,9 +90,9 @@ class SimilarPodcastHandlerTest {
             .first()
 
         // check that the podcasts are fetched correctly
-        assertTrue(list is SimilarPodcastsResult.Success)
+        assertTrue(list is YouMightLikeResult.Success)
 
-        val podcasts = (list as SimilarPodcastsResult.Success).listFeed.podcasts
+        val podcasts = (list as YouMightLikeResult.Success).listFeed.podcasts
         assertEquals(testListFeed.podcasts?.size, podcasts?.size)
 
         // check that the subscribed status is set correctly

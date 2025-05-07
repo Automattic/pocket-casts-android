@@ -14,12 +14,12 @@ import javax.inject.Inject
 import kotlinx.coroutines.rx2.rxSingle
 import timber.log.Timber
 
-sealed class SimilarPodcastsResult {
-    data class Success(val listFeed: ListFeed) : SimilarPodcastsResult()
-    object Empty : SimilarPodcastsResult()
+sealed class YouMightLikeResult {
+    data class Success(val listFeed: ListFeed) : YouMightLikeResult()
+    data object Empty : YouMightLikeResult()
 }
 
-class SimilarPodcastHandler @Inject constructor(
+class YouMightLikeHandler @Inject constructor(
     private val listRepository: ListRepository,
     private val podcastManager: PodcastManager,
 ) {
@@ -35,34 +35,34 @@ class SimilarPodcastHandler @Inject constructor(
         return enabledObservable.toFlowable(BackpressureStrategy.LATEST)
     }
 
-    fun getSimilarPodcastListFlowable(podcast: Podcast): Flowable<SimilarPodcastsResult> {
+    fun getYouMightLikeListFlowable(podcast: Podcast): Flowable<YouMightLikeResult> {
         return isEnabledFlowable()
             .distinctUntilChanged()
             .switchMap { enabled ->
                 if (enabled) {
-                    getSimilarPodcastListSingle(podcast)
+                    getYouMightLikeListSingle(podcast)
                         .toFlowable()
                         .addSubscribedStatusFlowable()
                         .map { listFeed ->
                             if (listFeed.podcasts.isNullOrEmpty()) {
-                                SimilarPodcastsResult.Empty
+                                YouMightLikeResult.Empty
                             } else {
-                                SimilarPodcastsResult.Success(listFeed)
+                                YouMightLikeResult.Success(listFeed)
                             }
                         }
-                        .onErrorReturn { error ->
-                            Timber.e(error, "Error loading similar podcasts")
-                            SimilarPodcastsResult.Empty
-                        }
                 } else {
-                    Flowable.just(SimilarPodcastsResult.Empty)
+                    Flowable.just(YouMightLikeResult.Empty)
                 }
+            }
+            .onErrorReturn { error ->
+                Timber.e(error, "Error loading you might like podcasts")
+                YouMightLikeResult.Empty
             }
     }
 
-    private fun getSimilarPodcastListSingle(podcast: Podcast): Single<ListFeed> = rxSingle {
-        listRepository.getSimilarPodcasts(podcast.uuid)
-            ?: error("Failed to load similar podcasts")
+    private fun getYouMightLikeListSingle(podcast: Podcast): Single<ListFeed> = rxSingle {
+        listRepository.getYouMightLikePodcasts(podcast.uuid)
+            ?: error("Failed to load you might like podcasts")
     }
 
     private fun Flowable<ListFeed>.addSubscribedStatusFlowable(): Flowable<ListFeed> {
