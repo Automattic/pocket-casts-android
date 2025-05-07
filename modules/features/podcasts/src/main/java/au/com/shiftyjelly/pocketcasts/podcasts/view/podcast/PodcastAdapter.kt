@@ -614,8 +614,8 @@ class PodcastAdapter(
                             YouMightLikePodcast(
                                 listDate = list.date ?: "",
                                 podcast = podcast,
-                                onRowClick = onYouMightLikePodcastClicked,
-                                onSubscribeClick = onYouMightLikePodcastSubscribeClicked,
+                                onRowClick = { podcastUuid, _ -> onPodrollPodcastClicked(podcastUuid) },
+                                onSubscribeClick = { podcastUuid, _ -> onPodrollPodcastSubscribeClicked(podcastUuid) },
                             ),
                         )
                     }
