@@ -36,7 +36,7 @@ class FakePaymentDataSource : PaymentDataSource {
         return if (loadedProductsResultCode == PaymentResultCode.Ok) {
             PaymentResult.Success(loadedProducts)
         } else {
-            PaymentResult.Failure(loadedProductsResultCode, "Error message")
+            PaymentResult.Failure(loadedProductsResultCode, "Load products error")
         }
     }
 
@@ -44,7 +44,7 @@ class FakePaymentDataSource : PaymentDataSource {
         return if (loadedPurchasesResultCode == PaymentResultCode.Ok) {
             PaymentResult.Success(loadedPurchases)
         } else {
-            PaymentResult.Failure(loadedPurchasesResultCode, "Error message")
+            PaymentResult.Failure(loadedPurchasesResultCode, "Load purchases error")
         }
     }
 
@@ -54,12 +54,12 @@ class FakePaymentDataSource : PaymentDataSource {
             val purchaseResult = if (purchasedProductsResultCode == PaymentResultCode.Ok) {
                 PaymentResult.Success(purchasedProducts)
             } else {
-                PaymentResult.Failure(purchasedProductsResultCode, "Error message")
+                PaymentResult.Failure(purchasedProductsResultCode, "Purchase product error")
             }
             _purchaseResults.emit(purchaseResult)
             billingResult
         } else {
-            PaymentResult.Failure(billingFlowResultCode, "Error message")
+            PaymentResult.Failure(billingFlowResultCode, "Launch billing error")
         }
     }
 
@@ -68,7 +68,7 @@ class FakePaymentDataSource : PaymentDataSource {
         return if (acknowledgePurchaseResultCode == PaymentResultCode.Ok) {
             PaymentResult.Success(purchase.copy(isAcknowledged = true))
         } else {
-            PaymentResult.Failure(acknowledgePurchaseResultCode, "Error message")
+            PaymentResult.Failure(acknowledgePurchaseResultCode, "Acknowledge purchase error")
         }
     }
 

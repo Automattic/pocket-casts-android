@@ -296,7 +296,7 @@ class PaymentClientTest {
         client.loadSubscriptionPlans()
 
         logger.assertInfos("Load subscription plans")
-        logger.assertWarnings("Failed to load subscription plans. Error, Error message")
+        logger.assertWarnings("Failed to load subscription plans. Error, Load products error")
     }
 
     @Test
@@ -316,7 +316,7 @@ class PaymentClientTest {
         client.loadAcknowledgedSubscriptions()
 
         logger.assertInfos("Loading acknowledged subscriptions")
-        logger.assertWarnings("Failed to load acknowledged subscriptions. Error, Error message")
+        logger.assertWarnings("Failed to load acknowledged subscriptions. Error, Load purchases error")
     }
 
     @Test
@@ -390,7 +390,7 @@ class PaymentClientTest {
         client.purchaseSubscriptionPlan(planKey, mock<Activity>())
 
         logger.assertWarnings(
-            "Purchase failure: ServiceDisconnected, Error message",
+            "Purchase failure: ServiceDisconnected, Purchase product error",
         )
     }
 
@@ -401,7 +401,7 @@ class PaymentClientTest {
         client.purchaseSubscriptionPlan(planKey, mock<Activity>())
 
         logger.assertWarnings(
-            "Launching billing flow failed: DeveloperError, Error message",
+            "Launching billing flow failed: DeveloperError, Launch billing error",
         )
     }
 }
