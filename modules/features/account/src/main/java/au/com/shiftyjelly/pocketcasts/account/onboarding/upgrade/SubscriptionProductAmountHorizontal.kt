@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -20,7 +19,6 @@ fun SubscriptionProductAmountHorizontal(
     hasBackgroundAlwaysWhite: Boolean = false,
     secondaryTextColor: Color = MaterialTheme.theme.colors.primaryText02,
     isFocusable: Boolean = false,
-    focusRequester: FocusRequester? = null,
 ) {
     if (subscription is Subscription.WithOffer) {
         if (subscription is Subscription.Intro) {
@@ -31,7 +29,6 @@ fun SubscriptionProductAmountHorizontal(
                 originalPrice = subscription.recurringPricingPhase.priceSlashPeriod(LocalContext.current.resources),
                 hasBackgroundAlwaysWhite = hasBackgroundAlwaysWhite,
                 isFocusable = isFocusable,
-                focusRequester = focusRequester,
             )
         } else if (subscription is Subscription.Trial) {
             ProductAmountHorizontalText(
@@ -41,7 +38,6 @@ fun SubscriptionProductAmountHorizontal(
                 lineThroughOriginalPrice = false,
                 hasBackgroundAlwaysWhite = hasBackgroundAlwaysWhite,
                 isFocusable = isFocusable,
-                focusRequester = focusRequester,
             )
         }
 
@@ -54,7 +50,6 @@ fun SubscriptionProductAmountHorizontal(
             lineThroughOriginalPrice = false,
             hasBackgroundAlwaysWhite = hasBackgroundAlwaysWhite,
             isFocusable = isFocusable,
-            focusRequester = focusRequester,
         )
     }
 }
