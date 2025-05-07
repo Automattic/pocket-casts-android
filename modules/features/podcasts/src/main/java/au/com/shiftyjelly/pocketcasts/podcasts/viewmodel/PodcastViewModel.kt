@@ -22,8 +22,8 @@ import au.com.shiftyjelly.pocketcasts.podcasts.helper.search.BookmarkSearchHandl
 import au.com.shiftyjelly.pocketcasts.podcasts.helper.search.EpisodeSearchHandler
 import au.com.shiftyjelly.pocketcasts.podcasts.helper.search.SearchHandler
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastViewModel.PodcastTab
-import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.podcast.YouMightLikeHandler
-import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.podcast.YouMightLikeResult
+import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.podcast.RecommendationsHandler
+import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.podcast.RecommendationsResult
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortType
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodcast
@@ -84,7 +84,7 @@ class PodcastViewModel
     private val bookmarkManager: BookmarkManager,
     private val episodeSearchHandler: EpisodeSearchHandler,
     private val bookmarkSearchHandler: BookmarkSearchHandler,
-    private val youMightLikePodcastHandler: YouMightLikeHandler,
+    private val recommendationsHandler: RecommendationsHandler,
     val multiSelectEpisodesHelper: MultiSelectEpisodesHelper,
     val multiSelectBookmarksHelper: MultiSelectBookmarksHelper,
     private val settings: Settings,
@@ -175,7 +175,7 @@ class PodcastViewModel
                     )
                 }.toFlowable(BackpressureStrategy.LATEST)
             }
-            .loadEpisodesAndBookmarks(episodeManager, bookmarkManager, youMightLikePodcastHandler, settings)
+            .loadEpisodesAndBookmarks(episodeManager, bookmarkManager, recommendationsHandler, settings)
             .doOnNext {
                 if (it is UiState.Loaded) {
                     val groups = it.podcast.grouping.formGroups(it.episodes, it.podcast, resources)
@@ -286,9 +286,7 @@ class PodcastViewModel
         when (getCurrentTab()) {
             PodcastTab.EPISODES -> episodeSearchHandler.searchQueryUpdated(newValue)
             PodcastTab.BOOKMARKS -> bookmarkSearchHandler.searchQueryUpdated(newValue)
-            PodcastTab.YOU_MIGHT_LIKE -> {
-                // No search for you might like tab
-            }
+            PodcastTab.RECOMMENDATIONS -> Unit // No search for the recommendations tab
         }
     }
 
@@ -465,9 +463,7 @@ class PodcastViewModel
         when (uiState.showTab) {
             PodcastTab.EPISODES -> multiSelectEpisodesHelper.deselectAllInList(uiState.episodes)
             PodcastTab.BOOKMARKS -> multiSelectBookmarksHelper.deselectAllInList(uiState.bookmarks)
-            PodcastTab.YOU_MIGHT_LIKE -> {
-                // No multi select for you might like tab
-            }
+            PodcastTab.RECOMMENDATIONS -> Unit // No multi select for the recommendations tab
         }
     }
 
@@ -524,9 +520,7 @@ class PodcastViewModel
         when (uiState.showTab) {
             PodcastTab.EPISODES -> multiSelectEpisodesHelper.selectAllInList(uiState.episodes)
             PodcastTab.BOOKMARKS -> multiSelectBookmarksHelper.selectAllInList(uiState.bookmarks)
-            PodcastTab.YOU_MIGHT_LIKE -> {
-                // No multi select for you might like tab
-            }
+            PodcastTab.RECOMMENDATIONS -> Unit // No multi select for recommendations tab
         }
     }
 
@@ -630,7 +624,7 @@ class PodcastViewModel
         analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_FUNDING_TAPPED, mapOf("podcast_uuid" to podcastUuid))
     }
 
-    fun onYouMightLikePodcastSubscribeClicked(podcastUuid: String, listDate: String) {
+    fun onRecommendedPodcastSubscribeClicked(podcastUuid: String, listDate: String) {
         podcastManager.subscribeToPodcast(podcastUuid = podcastUuid, sync = true)
         analyticsTracker.track(
             event = AnalyticsEvent.PODCAST_SCREEN_YOU_MIGHT_LIKE_SUBSCRIBED,
@@ -641,7 +635,7 @@ class PodcastViewModel
         )
     }
 
-    fun onYouMightLikePodcastClicked(podcastUuid: String, listDate: String) {
+    fun onRecommendedPodcastClicked(podcastUuid: String, listDate: String) {
         analyticsTracker.track(
             event = AnalyticsEvent.PODCAST_SCREEN_YOU_MIGHT_LIKE_TAPPED,
             properties = mapOf(
@@ -679,7 +673,7 @@ class PodcastViewModel
             labelResId = LR.string.bookmarks,
             analyticsValue = "bookmarks",
         ),
-        YOU_MIGHT_LIKE(
+        RECOMMENDATIONS(
             labelResId = LR.string.you_might_like,
             analyticsValue = "you_might_like",
         ),
@@ -690,7 +684,7 @@ class PodcastViewModel
             val podcast: Podcast,
             val episodes: List<PodcastEpisode>,
             val bookmarks: List<Bookmark>,
-            val youMightLike: YouMightLikeResult,
+            val recommendations: RecommendationsResult,
             val showingArchived: Boolean,
             val episodeCount: Int,
             val archivedCount: Int,
@@ -750,7 +744,7 @@ private data class CombinedEpisodeAndBookmarkData(
 private fun Flowable<CombinedEpisodeAndBookmarkData>.loadEpisodesAndBookmarks(
     episodeManager: EpisodeManager,
     bookmarkManager: BookmarkManager,
-    youMightLikePodcastHandler: YouMightLikeHandler,
+    recommendationsHandler: RecommendationsHandler,
     settings: Settings,
 ): Flowable<PodcastViewModel.UiState> {
     return this.switchMap { (podcast, showArchived, episodeSearchResults, bookmarkSearchResults) ->
@@ -761,8 +755,8 @@ private fun Flowable<CombinedEpisodeAndBookmarkData>.loadEpisodesAndBookmarks(
         Flowable.combineLatest(
             episodeManager.findEpisodesByPodcastOrderedRxFlowable(podcast)
                 .doOnNext {
-                    // load the "You might like" podcasts after the episodes have been loaded
-                    youMightLikePodcastHandler.setEnabled(true)
+                    // load the recommendations after the episodes have been loaded
+                    recommendationsHandler.setEnabled(true)
                 }
                 .map {
                     val sortFunction = podcast.grouping.sortFunction
@@ -783,8 +777,8 @@ private fun Flowable<CombinedEpisodeAndBookmarkData>.loadEpisodesAndBookmarks(
                     { bookmarkSearchResults.searchUuids?.contains(it.uuid) ?: false },
                     searchResults = bookmarkSearchResults,
                 ),
-            youMightLikePodcastHandler.getYouMightLikeListFlowable(podcast),
-        ) { (searchList, episodeList), (bookmarks, _), youMightLikePodcasts ->
+            recommendationsHandler.getRecommendationsFlowable(podcast),
+        ) { (searchList, episodeList), (bookmarks, _), recommendations ->
             val episodeCount = episodeList.size
             val archivedCount = episodeList.count { it.isArchived }
             val showArchivedWithSearch = episodeSearchResults.searchUuids != null || showArchived
@@ -818,14 +812,14 @@ private fun Flowable<CombinedEpisodeAndBookmarkData>.loadEpisodesAndBookmarks(
                 .filter { tab ->
                     tab == PodcastTab.EPISODES ||
                         tab == PodcastTab.BOOKMARKS ||
-                        (tab == PodcastTab.YOU_MIGHT_LIKE && youMightLikePodcasts is YouMightLikeResult.Success)
+                        (tab == PodcastTab.RECOMMENDATIONS && recommendations is RecommendationsResult.Success)
                 }
 
             val state: PodcastViewModel.UiState = PodcastViewModel.UiState.Loaded(
                 podcast = podcast,
                 episodes = filteredList,
                 bookmarks = bookmarks,
-                youMightLike = youMightLikePodcasts,
+                recommendations = recommendations,
                 showingArchived = showArchivedWithSearch,
                 episodeCount = episodeCount,
                 archivedCount = archivedCount,

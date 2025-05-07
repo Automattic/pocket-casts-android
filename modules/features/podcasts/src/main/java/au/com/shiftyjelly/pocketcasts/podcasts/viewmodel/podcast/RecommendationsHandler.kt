@@ -14,12 +14,12 @@ import javax.inject.Inject
 import kotlinx.coroutines.rx2.rxMaybe
 import timber.log.Timber
 
-sealed class YouMightLikeResult {
-    data class Success(val listFeed: ListFeed) : YouMightLikeResult()
-    data object Empty : YouMightLikeResult()
+sealed class RecommendationsResult {
+    data class Success(val listFeed: ListFeed) : RecommendationsResult()
+    data object Empty : RecommendationsResult()
 }
 
-class YouMightLikeHandler @Inject constructor(
+class RecommendationsHandler @Inject constructor(
     private val listRepository: ListRepository,
     private val podcastManager: PodcastManager,
 ) {
@@ -35,33 +35,33 @@ class YouMightLikeHandler @Inject constructor(
         return enabledObservable.toFlowable(BackpressureStrategy.LATEST)
     }
 
-    fun getYouMightLikeListFlowable(podcast: Podcast): Flowable<YouMightLikeResult> {
+    fun getRecommendationsFlowable(podcast: Podcast): Flowable<RecommendationsResult> {
         return isEnabledFlowable()
             .distinctUntilChanged()
             .switchMap { enabled ->
                 if (enabled) {
-                    getYouMightLikeListMaybe(podcast)
+                    getRecommendationsMaybe(podcast)
                         .toFlowable()
                         .addSubscribedStatusFlowable()
                         .map { listFeed ->
                             if (listFeed.podcasts.isNullOrEmpty()) {
-                                YouMightLikeResult.Empty
+                                RecommendationsResult.Empty
                             } else {
-                                YouMightLikeResult.Success(listFeed)
+                                RecommendationsResult.Success(listFeed)
                             }
                         }
                         .onErrorReturn { error ->
-                            Timber.e(error, "Error loading 'You might like' podcasts")
-                            YouMightLikeResult.Empty
+                            Timber.e(error, "Error loading recommendations")
+                            RecommendationsResult.Empty
                         }
                 } else {
-                    Flowable.just(YouMightLikeResult.Empty)
+                    Flowable.just(RecommendationsResult.Empty)
                 }
             }
     }
 
-    private fun getYouMightLikeListMaybe(podcast: Podcast): Maybe<ListFeed> = rxMaybe {
-        listRepository.getYouMightLikePodcasts(podcast.uuid)
+    private fun getRecommendationsMaybe(podcast: Podcast): Maybe<ListFeed> = rxMaybe {
+        listRepository.getPodcastRecommendations(podcast.uuid)
     }
 
     private fun Flowable<ListFeed>.addSubscribedStatusFlowable(): Flowable<ListFeed> {
