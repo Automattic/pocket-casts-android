@@ -18,6 +18,7 @@ fun SubscriptionProductAmountHorizontal(
     modifier: Modifier = Modifier,
     hasBackgroundAlwaysWhite: Boolean = false,
     secondaryTextColor: Color = MaterialTheme.theme.colors.primaryText02,
+    isFocusable: Boolean = false,
 ) {
     if (subscription is Subscription.WithOffer) {
         if (subscription is Subscription.Intro) {
@@ -27,6 +28,7 @@ fun SubscriptionProductAmountHorizontal(
                 period = subscription.offerPricingPhase.slashPeriod(LocalContext.current.resources),
                 originalPrice = subscription.recurringPricingPhase.priceSlashPeriod(LocalContext.current.resources),
                 hasBackgroundAlwaysWhite = hasBackgroundAlwaysWhite,
+                isFocusable = isFocusable,
             )
         } else if (subscription is Subscription.Trial) {
             ProductAmountHorizontalText(
@@ -35,6 +37,7 @@ fun SubscriptionProductAmountHorizontal(
                 originalPrice = subscription.recurringPricingPhase.slashPeriod(LocalContext.current.resources),
                 lineThroughOriginalPrice = false,
                 hasBackgroundAlwaysWhite = hasBackgroundAlwaysWhite,
+                isFocusable = isFocusable,
             )
         }
 
@@ -46,6 +49,7 @@ fun SubscriptionProductAmountHorizontal(
             originalPrice = subscription.recurringPricingPhase.slashPeriod(LocalContext.current.resources),
             lineThroughOriginalPrice = false,
             hasBackgroundAlwaysWhite = hasBackgroundAlwaysWhite,
+            isFocusable = isFocusable,
         )
     }
 }

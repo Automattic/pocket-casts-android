@@ -59,7 +59,7 @@ fun ProfileUpgradeBanner(
             showPageIndicator = featureCardsState.showPageIndicator,
             pageIndicatorColor = MaterialTheme.theme.colors.primaryText01,
             modifier = modifier,
-        ) { index, pagerHeight ->
+        ) { index, pagerHeight, _ ->
             val currentTier = featureCardsState.featureCards[index].subscriptionTier
             FeatureCard(
                 card = featureCardsState.featureCards[index],

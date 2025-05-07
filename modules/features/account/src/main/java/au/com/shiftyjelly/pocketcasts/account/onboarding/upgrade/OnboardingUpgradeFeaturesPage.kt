@@ -6,6 +6,8 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusGroup
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -39,12 +41,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -155,15 +161,17 @@ private fun UpgradeLayout(
     onSubscriptionFrequencyChanged: (SubscriptionFrequency) -> Unit,
     onFeatureCardChanged: (Int) -> Unit,
     onClickSubscribe: () -> Unit,
+    modifier: Modifier = Modifier,
     onPrivacyPolicyClick: () -> Unit = {},
     onTermsAndConditionsClick: () -> Unit = {},
     canUpgrade: Boolean,
-    modifier: Modifier = Modifier,
 ) {
     Box(
         modifier = modifier.fillMaxHeight(),
         contentAlignment = Alignment.BottomCenter,
     ) {
+        val focusPager = remember { FocusRequester() }
+
         // Need this BoxWithConstraints so we can force the inner column to fill the screen with vertical scroll enabled
         BoxWithConstraints(
             Modifier
@@ -211,7 +219,8 @@ private fun UpgradeLayout(
 
                     Column {
                         Box(
-                            modifier = Modifier.heightIn(min = 70.dp),
+                            modifier = Modifier
+                                .heightIn(min = 70.dp),
                             contentAlignment = Alignment.Center,
                         ) {
                             AutoResizeText(
@@ -222,6 +231,7 @@ private fun UpgradeLayout(
                                 fontWeight = FontWeight.W700,
                                 maxLines = 2,
                                 textAlign = TextAlign.Center,
+                                isFocusable = true,
                                 modifier = Modifier
                                     .padding(horizontal = 24.dp)
                                     .fillMaxWidth(),
@@ -251,6 +261,7 @@ private fun UpgradeLayout(
                         }
 
                         FeatureCards(
+                            modifier = Modifier.focusRequester(focusPager),
                             state = state,
                             upgradeButton = state.currentUpgradeButton,
                             onFeatureCardChanged = onFeatureCardChanged,
@@ -266,6 +277,7 @@ private fun UpgradeLayout(
 
         if (canUpgrade) {
             UpgradeButton(
+                upFocusRequester = focusPager,
                 button = state.currentUpgradeButton,
                 onClickSubscribe = onClickSubscribe,
             )
@@ -278,19 +290,21 @@ fun FeatureCards(
     state: OnboardingUpgradeFeaturesState.Loaded,
     upgradeButton: UpgradeButton,
     onFeatureCardChanged: (Int) -> Unit,
+    modifier: Modifier = Modifier,
     onPrivacyPolicyClick: () -> Unit = {},
     onTermsAndConditionsClick: () -> Unit = {},
 ) {
     val featureCardsState = state.featureCardsState
     val currentSubscriptionFrequency = state.currentSubscriptionFrequency
     HorizontalPagerWrapper(
+        modifier = modifier,
         pageCount = featureCardsState.featureCards.size,
         initialPage = featureCardsState.featureCards.indexOf(state.currentFeatureCard),
         onPageChanged = onFeatureCardChanged,
         showPageIndicator = featureCardsState.showPageIndicator,
         pageSize = PageSize.Fixed(LocalConfiguration.current.screenWidthDp.dp - 64.dp),
         contentPadding = PaddingValues(horizontal = 32.dp),
-    ) { index, pagerHeight ->
+    ) { index, pagerHeight, focusRequester ->
         FeatureCard(
             subscription = state.currentSubscription,
             card = featureCardsState.featureCards[index],
@@ -302,7 +316,9 @@ fun FeatureCards(
                 Modifier.height(pagerHeight.pxToDp(LocalContext.current).dp)
             } else {
                 Modifier
-            },
+            }.then(
+                Modifier.focusRequester(focusRequester),
+            ),
         )
     }
 }
@@ -330,7 +346,7 @@ private fun FeatureCard(
         Column(
             modifier = Modifier.padding(24.dp),
         ) {
-            var offerBadgeTextLength by remember { mutableStateOf(MAX_OFFER_BADGE_TEXT_LENGTH) }
+            var offerBadgeTextLength by remember { mutableIntStateOf(MAX_OFFER_BADGE_TEXT_LENGTH) }
             val screenWidth = LocalConfiguration.current.screenWidthDp
             val displayInHorizontal = screenWidth >= MIN_SCREEN_WIDTH_FOR_HORIZONTAL_DISPLAY && offerBadgeTextLength <= MAX_OFFER_BADGE_TEXT_LENGTH
 
@@ -391,8 +407,11 @@ private fun FeatureCard(
                 }
             }
 
-            Column {
+            Column(
+                modifier = Modifier.focusGroup(),
+            ) {
                 SubscriptionProductAmountHorizontal(
+                    isFocusable = true,
                     subscription = subscription,
                     hasBackgroundAlwaysWhite = true,
                     secondaryTextColor = secondaryTextColor,
@@ -401,10 +420,13 @@ private fun FeatureCard(
                 Spacer(modifier = Modifier.padding(vertical = 4.dp))
 
                 card.featureItems(subscriptionFrequency).forEach {
-                    UpgradeFeatureItem(it)
+                    UpgradeFeatureItem(
+                        item = it,
+                    )
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 OnboardingUpgradeHelper.PrivacyPolicy(
+                    modifier = Modifier.focusable(),
                     color = secondaryTextColor,
                     textAlign = TextAlign.Start,
                     lineHeight = 18.sp,
@@ -416,10 +438,12 @@ private fun FeatureCard(
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun UpgradeButton(
     button: UpgradeButton,
     onClickSubscribe: () -> Unit,
+    upFocusRequester: FocusRequester,
 ) {
     val resources = LocalContext.current.resources
     val shortName = resources.getString(button.shortNameRes)
@@ -428,7 +452,14 @@ internal fun UpgradeButton(
 
     Box(
         contentAlignment = Alignment.BottomCenter,
-        modifier = Modifier.fadeBackground(),
+        modifier = Modifier
+            .fadeBackground()
+            .focusProperties {
+                up = upFocusRequester
+                down = FocusRequester.Cancel
+                left = FocusRequester.Cancel
+                right = FocusRequester.Cancel
+            },
     ) {
         Column {
             UpgradeRowButton(
