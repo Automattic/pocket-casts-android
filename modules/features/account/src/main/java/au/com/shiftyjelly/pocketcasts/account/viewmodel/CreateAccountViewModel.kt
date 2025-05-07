@@ -8,9 +8,10 @@ import au.com.shiftyjelly.pocketcasts.analytics.TracksAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PLUS_MONTHLY_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PLUS_YEARLY_PRODUCT_ID
+import au.com.shiftyjelly.pocketcasts.payment.PaymentResultCode
+import au.com.shiftyjelly.pocketcasts.payment.PurchaseResult
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchaseEvent
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
@@ -38,7 +39,8 @@ class CreateAccountViewModel
     private val disposables = CompositeDisposable()
     var defaultSubscriptionType = SubscriptionType.FREE
 
-    @Inject lateinit var subscriptionManager: SubscriptionManager
+    @Inject
+    lateinit var subscriptionManager: SubscriptionManager
 
     companion object {
         private const val PRODUCT_KEY = "product"
@@ -46,11 +48,12 @@ class CreateAccountViewModel
         private const val OFFER_TYPE_NONE = "none"
         private const val OFFER_TYPE_FREE_TRIAL = "free_trial"
         private const val OFFER_TYPE_INTRO_OFFER = "intro_offer"
+        private const val ERROR_KEY = "error"
         private const val ERROR_CODE_KEY = "error_code"
         private const val SOURCE_KEY = "source"
         private const val ENABLED_KEY = "enabled"
 
-        fun trackPurchaseEvent(subscription: Subscription?, purchaseEvent: PurchaseEvent, analyticsTracker: AnalyticsTracker) {
+        fun trackPurchaseEvent(subscription: Subscription?, purchaseResult: PurchaseResult, analyticsTracker: AnalyticsTracker) {
             val productKey = subscription?.productDetails?.productId?.let {
                 if (it in listOf(PLUS_MONTHLY_PRODUCT_ID, PLUS_YEARLY_PRODUCT_ID)) {
                     // retain short product id for plus subscriptions
@@ -71,22 +74,24 @@ class CreateAccountViewModel
                 OFFER_TYPE_KEY to offerType,
             )
 
-            when (purchaseEvent) {
-                is PurchaseEvent.Success -> analyticsTracker.track(AnalyticsEvent.PURCHASE_SUCCESSFUL, analyticsProperties)
+            when (purchaseResult) {
+                is PurchaseResult.Purchased -> analyticsTracker.track(AnalyticsEvent.PURCHASE_SUCCESSFUL, analyticsProperties)
 
-                is PurchaseEvent.Cancelled -> analyticsTracker.track(
-                    AnalyticsEvent.PURCHASE_CANCELLED,
-                    analyticsProperties.plus(ERROR_CODE_KEY to purchaseEvent.responseCode),
-                )
+                is PurchaseResult.Cancelled -> analyticsTracker.track(AnalyticsEvent.PURCHASE_CANCELLED)
 
-                is PurchaseEvent.Failure -> {
-                    // Exclude error_code property if we do not have a responseCode
-                    val properties = purchaseEvent.responseCode?.let {
-                        analyticsProperties.plus(ERROR_CODE_KEY to it)
-                    } ?: analyticsProperties
-
-                    analyticsTracker.track(AnalyticsEvent.PURCHASE_FAILED, properties)
+                is PurchaseResult.Failure -> {
+                    analyticsTracker.track(
+                        AnalyticsEvent.PURCHASE_FAILED,
+                        analyticsProperties + purchaseResult.code.analyticProperties(),
+                    )
                 }
+            }
+        }
+
+        private fun PaymentResultCode.analyticProperties() = buildMap {
+            put(ERROR_KEY, analyticsValue)
+            if (this@analyticProperties is PaymentResultCode.Unknown) {
+                put(ERROR_CODE_KEY, code)
             }
         }
     }
@@ -97,6 +102,7 @@ class CreateAccountViewModel
             is CreateAccountState.Failure -> {
                 errors.addAll(existingState.errors)
             }
+
             else -> {}
         }
         if (add) errors.add(error) else errors.remove(error)
@@ -167,6 +173,7 @@ class CreateAccountViewModel
             is CreateAccountState.Failure -> {
                 return state.errors.contains(error)
             }
+
             else -> {}
         }
         return false
@@ -188,6 +195,7 @@ class CreateAccountViewModel
                     podcastManager.refreshPodcastsAfterSignIn()
                     createAccountState.postValue(CreateAccountState.AccountCreated)
                 }
+
                 is LoginResult.Failed -> {
                     val message = result.message
                     val errors = mutableSetOf(CreateAccountError.CANNOT_CREATE_ACCOUNT)

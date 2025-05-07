@@ -14,9 +14,9 @@ import au.com.shiftyjelly.pocketcasts.models.type.OfferSubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.payment.PurchaseResult
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchaseEvent
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
@@ -120,19 +120,19 @@ class OnboardingUpgradeBottomSheetViewModel @Inject constructor(
             )
 
             viewModelScope.launch {
-                val purchaseEvent = subscriptionManager
+                val purchaseResult = subscriptionManager
                     .observePurchaseEvents()
                     .asFlow()
                     .firstOrNull()
 
-                when (purchaseEvent) {
-                    PurchaseEvent.Success -> {
+                when (purchaseResult) {
+                    PurchaseResult.Purchased -> {
                         onComplete()
                     }
-                    is PurchaseEvent.Cancelled -> {
+                    is PurchaseResult.Cancelled -> {
                         // User cancelled subscription creation. Do nothing.
                     }
-                    is PurchaseEvent.Failure -> {
+                    is PurchaseResult.Failure -> {
                         _state.update { loadedState.copy(purchaseFailed = true) }
                     }
                     null -> {
@@ -140,8 +140,8 @@ class OnboardingUpgradeBottomSheetViewModel @Inject constructor(
                     }
                 }
 
-                if (purchaseEvent != null) {
-                    CreateAccountViewModel.trackPurchaseEvent(subscription, purchaseEvent, analyticsTracker)
+                if (purchaseResult != null) {
+                    CreateAccountViewModel.trackPurchaseEvent(subscription, purchaseResult, analyticsTracker)
                 }
             }
             subscriptionManager.launchBillingFlow(

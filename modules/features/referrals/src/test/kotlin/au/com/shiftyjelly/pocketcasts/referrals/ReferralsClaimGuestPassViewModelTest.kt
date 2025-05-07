@@ -7,6 +7,8 @@ import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfo
 import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfoPlayStore
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.payment.PaymentResultCode
+import au.com.shiftyjelly.pocketcasts.payment.PurchaseResult
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsClaimGuestPassViewModel.NavigationEvent
@@ -17,7 +19,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager.Ref
 import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager.ReferralResult.ErrorResult
 import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager.ReferralResult.SuccessResult
 import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralOfferInfoProvider
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchaseEvent
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
@@ -162,7 +163,7 @@ class ReferralsClaimGuestPassViewModelTest {
             offerInfo = referralOfferInfo,
             signInState = SignInState.SignedIn("email", SubscriptionStatus.Free()),
             referralValidationResult = SuccessResult(mock()),
-            purchaseEvent = PurchaseEvent.Success,
+            purchaseResult = PurchaseResult.Purchased,
         )
         viewModel.onActivatePassClick()
 
@@ -176,7 +177,7 @@ class ReferralsClaimGuestPassViewModelTest {
             offerInfo = referralOfferInfo,
             signInState = SignInState.SignedIn("email", SubscriptionStatus.Free()),
             referralValidationResult = SuccessResult(mock()),
-            purchaseEvent = PurchaseEvent.Failure(errorMessage = "", responseCode = 0),
+            purchaseResult = PurchaseResult.Failure(PaymentResultCode.Error),
         )
 
         viewModel.snackBarEvent.test {
@@ -260,10 +261,10 @@ class ReferralsClaimGuestPassViewModelTest {
         offerInfo: ReferralsOfferInfo? = referralOfferInfo,
         signInState: SignInState = SignInState.SignedOut,
         referralValidationResult: ReferralManager.ReferralResult<ReferralValidationResponse> = SuccessResult(mock()),
-        purchaseEvent: PurchaseEvent = PurchaseEvent.Success,
+        purchaseResult: PurchaseResult = PurchaseResult.Purchased,
         showWelcomeSetting: UserSetting<Boolean> = UserSetting.Mock(false, mock()),
     ) {
-        whenever(subscriptionManager.observePurchaseEvents()).thenReturn(Flowable.just(purchaseEvent))
+        whenever(subscriptionManager.observePurchaseEvents()).thenReturn(Flowable.just(purchaseResult))
         whenever(referralOfferInfoProvider.referralOfferInfo()).thenReturn(offerInfo)
         whenever(settings.referralClaimCode).thenReturn(UserSetting.Mock(referralCode, mock()))
         whenever(settings.showReferralWelcome).thenReturn(showWelcomeSetting)
