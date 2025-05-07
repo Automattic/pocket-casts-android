@@ -62,8 +62,8 @@ fun HorizontalPagerWrapper(
     }
 
     val coroutineScope = rememberCoroutineScope()
-    val focusRequesters = remember { List(pageCount) { FocusRequester() } }
-    val subContentFocusRequesters = remember { List(pageCount) { FocusRequester() } }
+    val focusRequesters = remember(pageCount) { List(pageCount) { FocusRequester() } }
+    val subContentFocusRequesters = remember(pageCount) { List(pageCount) { FocusRequester() } }
 
     var pagerHeight by remember { mutableIntStateOf(0) }
     Column(
