@@ -8,18 +8,18 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
-import io.reactivex.Single
+import io.reactivex.Maybe
 import io.reactivex.subjects.BehaviorSubject
 import javax.inject.Inject
-import kotlinx.coroutines.rx2.rxSingle
+import kotlinx.coroutines.rx2.rxMaybe
 import timber.log.Timber
 
-sealed class SimilarPodcastsResult {
-    data class Success(val listFeed: ListFeed) : SimilarPodcastsResult()
-    object Empty : SimilarPodcastsResult()
+sealed class RecommendationsResult {
+    data class Success(val listFeed: ListFeed) : RecommendationsResult()
+    data object Empty : RecommendationsResult()
 }
 
-class SimilarPodcastHandler @Inject constructor(
+class RecommendationsHandler @Inject constructor(
     private val listRepository: ListRepository,
     private val podcastManager: PodcastManager,
 ) {
@@ -35,34 +35,33 @@ class SimilarPodcastHandler @Inject constructor(
         return enabledObservable.toFlowable(BackpressureStrategy.LATEST)
     }
 
-    fun getSimilarPodcastListFlowable(podcast: Podcast): Flowable<SimilarPodcastsResult> {
+    fun getRecommendationsFlowable(podcast: Podcast): Flowable<RecommendationsResult> {
         return isEnabledFlowable()
             .distinctUntilChanged()
             .switchMap { enabled ->
                 if (enabled) {
-                    getSimilarPodcastListSingle(podcast)
+                    getRecommendationsMaybe(podcast)
                         .toFlowable()
                         .addSubscribedStatusFlowable()
                         .map { listFeed ->
                             if (listFeed.podcasts.isNullOrEmpty()) {
-                                SimilarPodcastsResult.Empty
+                                RecommendationsResult.Empty
                             } else {
-                                SimilarPodcastsResult.Success(listFeed)
+                                RecommendationsResult.Success(listFeed)
                             }
                         }
                         .onErrorReturn { error ->
-                            Timber.e(error, "Error loading similar podcasts")
-                            SimilarPodcastsResult.Empty
+                            Timber.e(error, "Error loading recommendations")
+                            RecommendationsResult.Empty
                         }
                 } else {
-                    Flowable.just(SimilarPodcastsResult.Empty)
+                    Flowable.just(RecommendationsResult.Empty)
                 }
             }
     }
 
-    private fun getSimilarPodcastListSingle(podcast: Podcast): Single<ListFeed> = rxSingle {
-        listRepository.getSimilarPodcasts(podcast.uuid)
-            ?: error("Failed to load similar podcasts")
+    private fun getRecommendationsMaybe(podcast: Podcast): Maybe<ListFeed> = rxMaybe {
+        listRepository.getPodcastRecommendations(podcast.uuid)
     }
 
     private fun Flowable<ListFeed>.addSubscribedStatusFlowable(): Flowable<ListFeed> {
