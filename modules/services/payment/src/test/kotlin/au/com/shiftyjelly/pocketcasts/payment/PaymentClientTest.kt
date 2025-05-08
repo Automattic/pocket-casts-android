@@ -18,7 +18,7 @@ class PaymentClientTest {
 
     private val client = PaymentClient(dataSource, approver, logger)
 
-    private val planKey = SubscriptionPlan.Key(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly, offer = null)
+    private val planKey = SubscriptionPlan.Key(SubscriptionTier.Plus, BillingCycle.Monthly, offer = null)
     private val purchase = Purchase(
         state = PurchaseState.Purchased("orderId"),
         token = "token",
@@ -76,10 +76,10 @@ class PaymentClientTest {
 
         assertEquals(
             listOf(
-                AcknowledgedSubscription("order-id-1", SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly, isAutoRenewing = true),
-                AcknowledgedSubscription("order-id-2", SubscriptionTier.Plus, SubscriptionBillingCycle.Yearly, isAutoRenewing = true),
-                AcknowledgedSubscription("order-id-3", SubscriptionTier.Patron, SubscriptionBillingCycle.Monthly, isAutoRenewing = true),
-                AcknowledgedSubscription("order-id-4", SubscriptionTier.Patron, SubscriptionBillingCycle.Yearly, isAutoRenewing = false),
+                AcknowledgedSubscription("order-id-1", SubscriptionTier.Plus, BillingCycle.Monthly, isAutoRenewing = true),
+                AcknowledgedSubscription("order-id-2", SubscriptionTier.Plus, BillingCycle.Yearly, isAutoRenewing = true),
+                AcknowledgedSubscription("order-id-3", SubscriptionTier.Patron, BillingCycle.Monthly, isAutoRenewing = true),
+                AcknowledgedSubscription("order-id-4", SubscriptionTier.Patron, BillingCycle.Yearly, isAutoRenewing = false),
             ),
             subscriptions,
         )
@@ -161,7 +161,7 @@ class PaymentClientTest {
 
         assertEquals(
             listOf(
-                AcknowledgedSubscription("order-id", SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly, isAutoRenewing = true),
+                AcknowledgedSubscription("order-id", SubscriptionTier.Plus, BillingCycle.Monthly, isAutoRenewing = true),
             ),
             subscriptions,
         )

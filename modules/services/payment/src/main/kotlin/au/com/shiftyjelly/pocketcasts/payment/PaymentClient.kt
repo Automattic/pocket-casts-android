@@ -155,7 +155,7 @@ class PaymentClient @Inject constructor(
 
     private fun findMatchingProductKey(productId: String): SubscriptionPlan.Key? {
         val keys = SubscriptionTier.entries.flatMap { tier ->
-            SubscriptionBillingCycle.entries.map { cycle ->
+            BillingCycle.entries.map { cycle ->
                 SubscriptionPlan.Key(tier, cycle, offer = null)
             }
         }

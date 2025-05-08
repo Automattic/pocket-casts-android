@@ -6,10 +6,10 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.payment.AcknowledgedSubscription
+import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
 import au.com.shiftyjelly.pocketcasts.payment.PaymentResult
 import au.com.shiftyjelly.pocketcasts.payment.PurchaseResult
-import au.com.shiftyjelly.pocketcasts.payment.SubscriptionBillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlans
@@ -252,8 +252,8 @@ class WinbackViewModel @Inject constructor(
         return WinbackOffer(
             redeemCode = redeemCode,
             formattedPrice = when (plan.billingCycle) {
-                SubscriptionBillingCycle.Monthly -> regularPhase.price.formattedPrice
-                SubscriptionBillingCycle.Yearly -> discountPhase.price.formattedPrice
+                BillingCycle.Monthly -> regularPhase.price.formattedPrice
+                BillingCycle.Yearly -> discountPhase.price.formattedPrice
             },
             tier = plan.tier,
             billingCycle = plan.billingCycle,
@@ -290,7 +290,7 @@ class WinbackViewModel @Inject constructor(
 
     private fun SubscriptionPlans.finMatchingWinbackPlan(offerId: String): SubscriptionPlan.WithOffer? {
         SubscriptionTier.entries.forEach { tier ->
-            SubscriptionBillingCycle.entries.forEach { billingCycle ->
+            BillingCycle.entries.forEach { billingCycle ->
                 val offer = findOfferPlan(tier, billingCycle, SubscriptionOffer.Winback).getOrNull()
                 if (offer != null && offer.offerId == offerId) {
                     return offer
@@ -449,10 +449,10 @@ internal sealed interface SubscriptionPlansState {
         val hasPlanChangeFailed: Boolean = false,
     ) : SubscriptionPlansState {
         val basePlans get() = listOf(
-            subscriptionPlans.getBasePlan(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly),
-            subscriptionPlans.getBasePlan(SubscriptionTier.Patron, SubscriptionBillingCycle.Monthly),
-            subscriptionPlans.getBasePlan(SubscriptionTier.Plus, SubscriptionBillingCycle.Yearly),
-            subscriptionPlans.getBasePlan(SubscriptionTier.Patron, SubscriptionBillingCycle.Yearly),
+            subscriptionPlans.getBasePlan(SubscriptionTier.Plus, BillingCycle.Monthly),
+            subscriptionPlans.getBasePlan(SubscriptionTier.Patron, BillingCycle.Monthly),
+            subscriptionPlans.getBasePlan(SubscriptionTier.Plus, BillingCycle.Yearly),
+            subscriptionPlans.getBasePlan(SubscriptionTier.Patron, BillingCycle.Yearly),
         )
     }
 }
@@ -461,7 +461,7 @@ internal data class WinbackOffer(
     val redeemCode: String,
     val formattedPrice: String,
     val tier: SubscriptionTier,
-    val billingCycle: SubscriptionBillingCycle,
+    val billingCycle: BillingCycle,
 ) {
     val productId get() = SubscriptionPlan.productId(tier, billingCycle)
 }

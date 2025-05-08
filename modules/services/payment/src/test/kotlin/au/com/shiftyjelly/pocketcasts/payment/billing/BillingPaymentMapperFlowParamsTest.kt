@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.payment.billing
 
-import au.com.shiftyjelly.pocketcasts.payment.SubscriptionBillingCycle
+import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
@@ -29,7 +29,7 @@ class BillingPaymentMapperFlowParamsTest {
 
         @Test
         fun `create billing params`() {
-            val planKey = SubscriptionPlan.Key(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly, offer = null)
+            val planKey = SubscriptionPlan.Key(SubscriptionTier.Plus, BillingCycle.Monthly, offer = null)
             val product = GoogleProductDetails(
                 productId = planKey.productId,
                 subscriptionOfferDetails = listOf(
@@ -84,7 +84,7 @@ class BillingPaymentMapperFlowParamsTest {
                     isAutoRenewing = false,
                 ),
             )
-            val planKey = SubscriptionPlan.Key(SubscriptionTier.Plus, SubscriptionBillingCycle.Yearly, offer = null)
+            val planKey = SubscriptionPlan.Key(SubscriptionTier.Plus, BillingCycle.Yearly, offer = null)
             val product = GoogleProductDetails(
                 productId = planKey.productId,
                 subscriptionOfferDetails = listOf(
@@ -109,7 +109,7 @@ class BillingPaymentMapperFlowParamsTest {
 
         @Test
         fun `log too many matching products`() {
-            val planKey = SubscriptionPlan.Key(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly, offer = null)
+            val planKey = SubscriptionPlan.Key(SubscriptionTier.Plus, BillingCycle.Monthly, offer = null)
             val product = GoogleProductDetails(
                 productId = planKey.productId,
                 subscriptionOfferDetails = listOf(
@@ -130,7 +130,7 @@ class BillingPaymentMapperFlowParamsTest {
 
         @Test
         fun `log no matching products`() {
-            val planKey = SubscriptionPlan.Key(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly, offer = null)
+            val planKey = SubscriptionPlan.Key(SubscriptionTier.Plus, BillingCycle.Monthly, offer = null)
 
             mapper.toBillingFlowRequest(planKey, productDetails = emptyList(), purchases = emptyList())
 
@@ -141,7 +141,7 @@ class BillingPaymentMapperFlowParamsTest {
 
         @Test
         fun `log too many matching offers`() {
-            val planKey = SubscriptionPlan.Key(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly, offer = null)
+            val planKey = SubscriptionPlan.Key(SubscriptionTier.Plus, BillingCycle.Monthly, offer = null)
             val product = GoogleProductDetails(
                 productId = planKey.productId,
                 subscriptionOfferDetails = listOf(
@@ -167,7 +167,7 @@ class BillingPaymentMapperFlowParamsTest {
 
         @Test
         fun `log no matching offers`() {
-            val planKey = SubscriptionPlan.Key(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly, offer = null)
+            val planKey = SubscriptionPlan.Key(SubscriptionTier.Plus, BillingCycle.Monthly, offer = null)
             val product = GoogleProductDetails(
                 productId = planKey.productId,
                 subscriptionOfferDetails = emptyList(),
@@ -192,7 +192,7 @@ class BillingPaymentMapperFlowParamsTest {
                     productIds = listOf("product-id-2"),
                 ),
             )
-            val planKey = SubscriptionPlan.Key(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly, offer = null)
+            val planKey = SubscriptionPlan.Key(SubscriptionTier.Plus, BillingCycle.Monthly, offer = null)
             val product = GoogleProductDetails(
                 productId = planKey.productId,
                 subscriptionOfferDetails = listOf(
@@ -215,7 +215,7 @@ class BillingPaymentMapperFlowParamsTest {
                     productIds = listOf("product-id-1", "product-id-2"),
                 ),
             )
-            val planKey = SubscriptionPlan.Key(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly, offer = null)
+            val planKey = SubscriptionPlan.Key(SubscriptionTier.Plus, BillingCycle.Monthly, offer = null)
             val product = GoogleProductDetails(
                 productId = planKey.productId,
                 subscriptionOfferDetails = listOf(
@@ -232,7 +232,7 @@ class BillingPaymentMapperFlowParamsTest {
 
         @Test
         fun `do not log anything when mapped succesfully`() {
-            val planKey = SubscriptionPlan.Key(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly, offer = null)
+            val planKey = SubscriptionPlan.Key(SubscriptionTier.Plus, BillingCycle.Monthly, offer = null)
             val product = GoogleProductDetails(
                 productId = planKey.productId,
                 subscriptionOfferDetails = listOf(
@@ -250,7 +250,7 @@ class BillingPaymentMapperFlowParamsTest {
     @RunWith(ParameterizedRobolectricTestRunner::class)
     class WithoutActivePurchase(
         private val tier: SubscriptionTier,
-        private val billingCycle: SubscriptionBillingCycle,
+        private val billingCycle: BillingCycle,
     ) {
         private val mapper = BillingPaymentMapper(TestLogger())
 
@@ -327,10 +327,10 @@ class BillingPaymentMapperFlowParamsTest {
             @JvmStatic
             @ParameterizedRobolectricTestRunner.Parameters(name = "{0} {1}")
             fun params() = listOf(
-                arrayOf(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly),
-                arrayOf(SubscriptionTier.Plus, SubscriptionBillingCycle.Yearly),
-                arrayOf(SubscriptionTier.Patron, SubscriptionBillingCycle.Monthly),
-                arrayOf(SubscriptionTier.Patron, SubscriptionBillingCycle.Yearly),
+                arrayOf(SubscriptionTier.Plus, BillingCycle.Monthly),
+                arrayOf(SubscriptionTier.Plus, BillingCycle.Yearly),
+                arrayOf(SubscriptionTier.Patron, BillingCycle.Monthly),
+                arrayOf(SubscriptionTier.Patron, BillingCycle.Yearly),
             )
         }
     }
@@ -339,9 +339,9 @@ class BillingPaymentMapperFlowParamsTest {
     @RunWith(ParameterizedRobolectricTestRunner::class)
     class WithActivePurchase(
         private val fromTier: SubscriptionTier,
-        private val fromBillingCycle: SubscriptionBillingCycle,
+        private val fromBillingCycle: BillingCycle,
         private val toTier: SubscriptionTier,
-        private val toBillingCycle: SubscriptionBillingCycle,
+        private val toBillingCycle: BillingCycle,
         private val expectedReplacementMode: Int?,
     ) {
         private val mapper = BillingPaymentMapper(TestLogger())
@@ -385,7 +385,7 @@ class BillingPaymentMapperFlowParamsTest {
                 GooglePurchase(
                     purchaseToken = "purchase-token-2",
                     productIds = listOf(
-                        SubscriptionPlan.productId(SubscriptionTier.entries.random(), SubscriptionBillingCycle.entries.random()),
+                        SubscriptionPlan.productId(SubscriptionTier.entries.random(), BillingCycle.entries.random()),
                     ),
                 ),
             )
@@ -433,114 +433,114 @@ class BillingPaymentMapperFlowParamsTest {
             fun params() = listOf<Array<Any?>>(
                 arrayOf(
                     SubscriptionTier.Plus,
-                    SubscriptionBillingCycle.Monthly,
+                    BillingCycle.Monthly,
                     SubscriptionTier.Plus,
-                    SubscriptionBillingCycle.Monthly,
+                    BillingCycle.Monthly,
                     null,
                 ),
                 arrayOf(
                     SubscriptionTier.Plus,
-                    SubscriptionBillingCycle.Monthly,
+                    BillingCycle.Monthly,
                     SubscriptionTier.Plus,
-                    SubscriptionBillingCycle.Yearly,
+                    BillingCycle.Yearly,
                     ReplacementMode.CHARGE_FULL_PRICE,
                 ),
                 arrayOf(
                     SubscriptionTier.Plus,
-                    SubscriptionBillingCycle.Monthly,
+                    BillingCycle.Monthly,
                     SubscriptionTier.Patron,
-                    SubscriptionBillingCycle.Monthly,
+                    BillingCycle.Monthly,
                     ReplacementMode.CHARGE_PRORATED_PRICE,
                 ),
                 arrayOf(
                     SubscriptionTier.Plus,
-                    SubscriptionBillingCycle.Monthly,
+                    BillingCycle.Monthly,
                     SubscriptionTier.Patron,
-                    SubscriptionBillingCycle.Yearly,
+                    BillingCycle.Yearly,
                     ReplacementMode.CHARGE_FULL_PRICE,
                 ),
                 arrayOf(
                     SubscriptionTier.Plus,
-                    SubscriptionBillingCycle.Yearly,
+                    BillingCycle.Yearly,
                     SubscriptionTier.Plus,
-                    SubscriptionBillingCycle.Monthly,
+                    BillingCycle.Monthly,
                     ReplacementMode.WITH_TIME_PRORATION,
                 ),
                 arrayOf(
                     SubscriptionTier.Plus,
-                    SubscriptionBillingCycle.Yearly,
+                    BillingCycle.Yearly,
                     SubscriptionTier.Plus,
-                    SubscriptionBillingCycle.Yearly,
+                    BillingCycle.Yearly,
                     null,
                 ),
                 arrayOf(
                     SubscriptionTier.Plus,
-                    SubscriptionBillingCycle.Yearly,
+                    BillingCycle.Yearly,
                     SubscriptionTier.Patron,
-                    SubscriptionBillingCycle.Monthly,
+                    BillingCycle.Monthly,
                     ReplacementMode.WITH_TIME_PRORATION,
                 ),
                 arrayOf(
                     SubscriptionTier.Plus,
-                    SubscriptionBillingCycle.Yearly,
+                    BillingCycle.Yearly,
                     SubscriptionTier.Patron,
-                    SubscriptionBillingCycle.Yearly,
+                    BillingCycle.Yearly,
                     ReplacementMode.CHARGE_PRORATED_PRICE,
                 ),
                 arrayOf(
                     SubscriptionTier.Patron,
-                    SubscriptionBillingCycle.Monthly,
+                    BillingCycle.Monthly,
                     SubscriptionTier.Plus,
-                    SubscriptionBillingCycle.Monthly,
+                    BillingCycle.Monthly,
                     ReplacementMode.WITH_TIME_PRORATION,
                 ),
                 arrayOf(
                     SubscriptionTier.Patron,
-                    SubscriptionBillingCycle.Monthly,
+                    BillingCycle.Monthly,
                     SubscriptionTier.Plus,
-                    SubscriptionBillingCycle.Yearly,
+                    BillingCycle.Yearly,
                     ReplacementMode.CHARGE_FULL_PRICE,
                 ),
                 arrayOf(
                     SubscriptionTier.Patron,
-                    SubscriptionBillingCycle.Monthly,
+                    BillingCycle.Monthly,
                     SubscriptionTier.Patron,
-                    SubscriptionBillingCycle.Monthly,
+                    BillingCycle.Monthly,
                     null,
                 ),
                 arrayOf(
                     SubscriptionTier.Patron,
-                    SubscriptionBillingCycle.Monthly,
+                    BillingCycle.Monthly,
                     SubscriptionTier.Patron,
-                    SubscriptionBillingCycle.Yearly,
+                    BillingCycle.Yearly,
                     ReplacementMode.CHARGE_FULL_PRICE,
                 ),
                 arrayOf(
                     SubscriptionTier.Patron,
-                    SubscriptionBillingCycle.Yearly,
+                    BillingCycle.Yearly,
                     SubscriptionTier.Plus,
-                    SubscriptionBillingCycle.Monthly,
+                    BillingCycle.Monthly,
                     ReplacementMode.WITH_TIME_PRORATION,
                 ),
                 arrayOf(
                     SubscriptionTier.Patron,
-                    SubscriptionBillingCycle.Yearly,
+                    BillingCycle.Yearly,
                     SubscriptionTier.Plus,
-                    SubscriptionBillingCycle.Yearly,
+                    BillingCycle.Yearly,
                     ReplacementMode.WITH_TIME_PRORATION,
                 ),
                 arrayOf(
                     SubscriptionTier.Patron,
-                    SubscriptionBillingCycle.Yearly,
+                    BillingCycle.Yearly,
                     SubscriptionTier.Patron,
-                    SubscriptionBillingCycle.Monthly,
+                    BillingCycle.Monthly,
                     ReplacementMode.WITH_TIME_PRORATION,
                 ),
                 arrayOf(
                     SubscriptionTier.Patron,
-                    SubscriptionBillingCycle.Yearly,
+                    BillingCycle.Yearly,
                     SubscriptionTier.Patron,
-                    SubscriptionBillingCycle.Yearly,
+                    BillingCycle.Yearly,
                     null,
                 ),
             )

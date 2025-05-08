@@ -71,7 +71,7 @@ class SubscriptionPlans private constructor(
 ) {
     fun getBasePlan(
         tier: SubscriptionTier,
-        billingCycle: SubscriptionBillingCycle,
+        billingCycle: BillingCycle,
     ): SubscriptionPlan.Base {
         val key = SubscriptionPlan.Key(tier, billingCycle, offer = null)
         // This is a safe cast because constructor is private and we validate data in the create function
@@ -80,7 +80,7 @@ class SubscriptionPlans private constructor(
 
     fun findOfferPlan(
         tier: SubscriptionTier,
-        billingCycle: SubscriptionBillingCycle,
+        billingCycle: BillingCycle,
         offer: SubscriptionOffer,
     ): PaymentResult<SubscriptionPlan.WithOffer> {
         val key = SubscriptionPlan.Key(tier, billingCycle, offer)
@@ -99,13 +99,13 @@ class SubscriptionPlans private constructor(
         val Preview get() = SubscriptionPlans.create(FakePaymentDataSource.DefaultLoadedProducts).getOrNull()!!
 
         private val basePlanKeys = SubscriptionTier.entries.flatMap { tier ->
-            SubscriptionBillingCycle.entries.map { billingCycle ->
+            BillingCycle.entries.map { billingCycle ->
                 SubscriptionPlan.Key(tier, billingCycle, offer = null)
             }
         }
 
         private val offerPlanKeys = SubscriptionTier.entries.flatMap { tier ->
-            SubscriptionBillingCycle.entries.flatMap { billingCycle ->
+            BillingCycle.entries.flatMap { billingCycle ->
                 SubscriptionOffer.entries.map { offer ->
                     SubscriptionPlan.Key(tier, billingCycle, offer)
                 }
@@ -179,7 +179,7 @@ sealed interface SubscriptionPlan {
     val name: String
     val key: SubscriptionPlan.Key
     val tier: SubscriptionTier
-    val billingCycle: SubscriptionBillingCycle
+    val billingCycle: BillingCycle
     val offer: SubscriptionOffer?
 
     val productId get() = key.productId
@@ -189,7 +189,7 @@ sealed interface SubscriptionPlan {
     data class Base(
         override val name: String,
         override val tier: SubscriptionTier,
-        override val billingCycle: SubscriptionBillingCycle,
+        override val billingCycle: BillingCycle,
         val pricingPhase: PricingPhase,
     ) : SubscriptionPlan {
         override val offer get() = null
@@ -199,7 +199,7 @@ sealed interface SubscriptionPlan {
     data class WithOffer(
         override val name: String,
         override val tier: SubscriptionTier,
-        override val billingCycle: SubscriptionBillingCycle,
+        override val billingCycle: BillingCycle,
         override val offer: SubscriptionOffer,
         val pricingPhases: List<PricingPhase>,
     ) : SubscriptionPlan {
@@ -208,7 +208,7 @@ sealed interface SubscriptionPlan {
 
     data class Key(
         val tier: SubscriptionTier,
-        val billingCycle: SubscriptionBillingCycle,
+        val billingCycle: BillingCycle,
         val offer: SubscriptionOffer?,
     ) {
         val productId = SubscriptionPlan.productId(tier, billingCycle)
@@ -222,38 +222,38 @@ sealed interface SubscriptionPlan {
         const val PatronMonthlyProductId = "com.pocketcasts.monthly.patron"
         const val PatronYearlyProductId = "com.pocketcasts.yearly.patron"
 
-        val PlusMonthlyPreview get() = SubscriptionPlans.Preview.getBasePlan(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly)
-        val PlusYearlyPreview get() = SubscriptionPlans.Preview.getBasePlan(SubscriptionTier.Plus, SubscriptionBillingCycle.Yearly)
-        val PatronMonthlyPreview get() = SubscriptionPlans.Preview.getBasePlan(SubscriptionTier.Patron, SubscriptionBillingCycle.Monthly)
-        val PatronYearlyPreview get() = SubscriptionPlans.Preview.getBasePlan(SubscriptionTier.Patron, SubscriptionBillingCycle.Yearly)
+        val PlusMonthlyPreview get() = SubscriptionPlans.Preview.getBasePlan(SubscriptionTier.Plus, BillingCycle.Monthly)
+        val PlusYearlyPreview get() = SubscriptionPlans.Preview.getBasePlan(SubscriptionTier.Plus, BillingCycle.Yearly)
+        val PatronMonthlyPreview get() = SubscriptionPlans.Preview.getBasePlan(SubscriptionTier.Patron, BillingCycle.Monthly)
+        val PatronYearlyPreview get() = SubscriptionPlans.Preview.getBasePlan(SubscriptionTier.Patron, BillingCycle.Yearly)
 
         fun productId(
             tier: SubscriptionTier,
-            billingCycle: SubscriptionBillingCycle,
+            billingCycle: BillingCycle,
         ) = when (tier) {
             SubscriptionTier.Plus -> when (billingCycle) {
-                SubscriptionBillingCycle.Monthly -> PlusMonthlyProductId
-                SubscriptionBillingCycle.Yearly -> PlusYearlyProductId
+                BillingCycle.Monthly -> PlusMonthlyProductId
+                BillingCycle.Yearly -> PlusYearlyProductId
             }
 
             SubscriptionTier.Patron -> when (billingCycle) {
-                SubscriptionBillingCycle.Monthly -> PatronMonthlyProductId
-                SubscriptionBillingCycle.Yearly -> PatronYearlyProductId
+                BillingCycle.Monthly -> PatronMonthlyProductId
+                BillingCycle.Yearly -> PatronYearlyProductId
             }
         }
 
         fun basePlanId(
             tier: SubscriptionTier,
-            billingCycle: SubscriptionBillingCycle,
+            billingCycle: BillingCycle,
         ) = when (tier) {
             SubscriptionTier.Plus -> when (billingCycle) {
-                SubscriptionBillingCycle.Monthly -> "p1m"
-                SubscriptionBillingCycle.Yearly -> "p1y"
+                BillingCycle.Monthly -> "p1m"
+                BillingCycle.Yearly -> "p1y"
             }
 
             SubscriptionTier.Patron -> when (billingCycle) {
-                SubscriptionBillingCycle.Monthly -> "patron-monthly"
-                SubscriptionBillingCycle.Yearly -> "patron-yearly"
+                BillingCycle.Monthly -> "patron-monthly"
+                BillingCycle.Yearly -> "patron-yearly"
             }
         }
     }
@@ -270,7 +270,7 @@ enum class SubscriptionTier(
     ),
 }
 
-enum class SubscriptionBillingCycle(
+enum class BillingCycle(
     val analyticsValue: String,
 ) {
     Monthly(
@@ -289,12 +289,12 @@ enum class SubscriptionOffer {
 
     fun offerId(
         tier: SubscriptionTier,
-        billingCycle: SubscriptionBillingCycle,
+        billingCycle: BillingCycle,
     ) = when (this) {
         Trial -> when (tier) {
             SubscriptionTier.Plus -> when (billingCycle) {
-                SubscriptionBillingCycle.Monthly -> null
-                SubscriptionBillingCycle.Yearly -> "plus-yearly-trial-30days"
+                BillingCycle.Monthly -> null
+                BillingCycle.Yearly -> "plus-yearly-trial-30days"
             }
 
             SubscriptionTier.Patron -> null
@@ -302,8 +302,8 @@ enum class SubscriptionOffer {
 
         Referral -> when (tier) {
             SubscriptionTier.Plus -> when (billingCycle) {
-                SubscriptionBillingCycle.Monthly -> null
-                SubscriptionBillingCycle.Yearly -> "plus-yearly-referral-two-months-free"
+                BillingCycle.Monthly -> null
+                BillingCycle.Yearly -> "plus-yearly-referral-two-months-free"
             }
 
             SubscriptionTier.Patron -> null
@@ -311,13 +311,13 @@ enum class SubscriptionOffer {
 
         Winback -> when (tier) {
             SubscriptionTier.Plus -> when (billingCycle) {
-                SubscriptionBillingCycle.Monthly -> "plus-monthly-winback"
-                SubscriptionBillingCycle.Yearly -> "plus-yearly-winback"
+                BillingCycle.Monthly -> "plus-monthly-winback"
+                BillingCycle.Yearly -> "plus-yearly-winback"
             }
 
             SubscriptionTier.Patron -> when (billingCycle) {
-                SubscriptionBillingCycle.Monthly -> "patron-monthly-winback"
-                SubscriptionBillingCycle.Yearly -> "patron-yearly-winback"
+                BillingCycle.Monthly -> "patron-monthly-winback"
+                BillingCycle.Yearly -> "patron-yearly-winback"
             }
         }
     }
@@ -350,7 +350,7 @@ sealed interface PurchaseState {
 data class AcknowledgedSubscription(
     val orderId: String,
     val tier: SubscriptionTier,
-    val billingCycle: SubscriptionBillingCycle,
+    val billingCycle: BillingCycle,
     val isAutoRenewing: Boolean,
 ) {
     val productId get() = SubscriptionPlan.productId(tier, billingCycle)
