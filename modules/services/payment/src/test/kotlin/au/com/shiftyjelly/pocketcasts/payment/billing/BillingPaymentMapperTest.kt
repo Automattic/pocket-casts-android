@@ -379,9 +379,9 @@ class BillingPaymentMapperTest {
             "Missing billing period duration designator in {basePlanId=Base plan ID, productId=Product ID, rawDuration=D1M}",
             "Invalid billing period interval count '' in {basePlanId=Base plan ID, productId=Product ID, rawDuration=PM}",
             "Invalid billing period interval count '' in {basePlanId=Base plan ID, productId=Product ID, rawDuration=P-1M}",
-            "Unrecognized period designator 'U' in {basePlanId=Base plan ID, productId=Product ID, rawDuration=P1U}",
-            "Unrecognized period designator 'MY' in {basePlanId=Base plan ID, productId=Product ID, rawDuration=P1MY}",
-            "Unrecognized period designator '' in {basePlanId=Base plan ID, productId=Product ID, rawDuration=P1}",
+            "Unrecognized billing interval period designator 'U' in {basePlanId=Base plan ID, productId=Product ID, rawDuration=P1U}",
+            "Unrecognized billing interval period designator 'MY' in {basePlanId=Base plan ID, productId=Product ID, rawDuration=P1MY}",
+            "Unrecognized billing interval period designator '' in {basePlanId=Base plan ID, productId=Product ID, rawDuration=P1}",
         )
     }
 
