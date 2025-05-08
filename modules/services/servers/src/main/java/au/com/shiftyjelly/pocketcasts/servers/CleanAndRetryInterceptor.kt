@@ -9,7 +9,9 @@ internal class CleanAndRetryInterceptor(
     override fun intercept(chain: Interceptor.Chain): Response {
         val originalRequest = chain.request()
         val response = chain.proceed(originalRequest)
-        return if (response.isSuccessful || response.isRedirect) {
+        // response.isRedirect returns true only when redirecting to different resources
+        // It doesn't work here as it doesn't account for 304
+        return if (response.code in 200..399) {
             response
         } else {
             response.close()

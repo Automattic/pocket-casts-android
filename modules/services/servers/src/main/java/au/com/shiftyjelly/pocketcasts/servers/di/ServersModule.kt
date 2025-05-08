@@ -200,6 +200,18 @@ class ServersModule {
     }
 
     @Provides
+    @Singleton
+    @Artwork
+    fun provideArtworkClient(
+        @Raw client: OkHttpClient,
+        @Artwork interceptors: List<@JvmSuppressWildcards OkHttpInterceptor>,
+    ): OkHttpClient {
+        return client.newBuilder()
+            .addInterceptors(interceptors)
+            .build()
+    }
+
+    @Provides
     @SyncServiceRetrofit
     @Singleton
     internal fun provideApiRetrofit(@Cached okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
@@ -321,6 +333,10 @@ annotation class Transcripts
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class Player
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class Artwork
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)

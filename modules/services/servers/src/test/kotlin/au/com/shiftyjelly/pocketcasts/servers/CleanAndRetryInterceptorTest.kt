@@ -34,6 +34,24 @@ class CleanAndRetryInterceptorTest {
     }
 
     @Test
+    fun `do not remove header from request if response is 304`() {
+        val client = OkHttpClient.Builder()
+            .addInterceptor(CleanAndRetryInterceptor(headersToRemove = listOf("x-custom")))
+            .build()
+        val request = Request.Builder()
+            .url(url)
+            .header("x-custom", "value")
+            .build()
+
+        server.enqueue(MockResponse().setResponseCode(304))
+        client.newCall(request).execute()
+
+        val serverRequest = server.takeRequest()
+
+        assertEquals("value", serverRequest.getHeader("X-custom"))
+    }
+
+    @Test
     fun `remove header from request if response is error`() {
         val client = OkHttpClient.Builder()
             .addInterceptor(CleanAndRetryInterceptor(headersToRemove = listOf("x-custom")))
