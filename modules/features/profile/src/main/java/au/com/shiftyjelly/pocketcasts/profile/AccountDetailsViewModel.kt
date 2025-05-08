@@ -134,12 +134,10 @@ class AccountDetailsViewModel @Inject constructor(
         return if (subscriptionPlatform != SubscriptionPlatform.ANDROID) {
             WinbackInitParams.Empty
         } else {
-            when (val subscritpionsResult = paymentClient.loadAcknowledgedSubscriptions()) {
+            when (val subscriptionsResult = paymentClient.loadAcknowledgedSubscriptions()) {
                 is PaymentResult.Failure -> WinbackInitParams.Empty
                 is PaymentResult.Success -> WinbackInitParams(
-                    hasGoogleSubscription = subscritpionsResult.value
-                        .filter { it.isAutoRenewing }
-                        .isNotEmpty(),
+                    hasGoogleSubscription = subscriptionsResult.value.any { it.isAutoRenewing },
                 )
             }
         }
