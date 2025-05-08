@@ -185,6 +185,22 @@ class SubscriptionPlansTest {
     }
 
     @Test
+    fun `find plus yearly intro offer plan`() {
+        val plans = SubscriptionPlans.create(products).getOrNull()!!
+
+        val plan = plans.findOfferPlan(
+            SubscriptionTier.Plus,
+            BillingCycle.Yearly,
+            SubscriptionOffer.IntroOffer,
+        ).getOrNull()!!
+
+        assertEquals("Plus Yearly", plan.name)
+        assertEquals(SubscriptionTier.Plus, plan.tier)
+        assertEquals(BillingCycle.Yearly, plan.billingCycle)
+        assertEquals(SubscriptionOffer.IntroOffer, plan.offer)
+    }
+
+    @Test
     fun `do not find unknown offer plan`() {
         val plans = SubscriptionPlans.create(products).getOrNull()!!
 

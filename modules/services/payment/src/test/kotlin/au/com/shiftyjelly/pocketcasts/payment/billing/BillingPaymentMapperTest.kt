@@ -228,6 +228,16 @@ class BillingPaymentMapperTest {
                         ),
                     ),
                 ),
+                GoogleOfferDetails(
+                    offerId = "ID",
+                    pricingPhases = listOf(
+                        GooglePricingPhase(
+                            billingPeriod = "P2D",
+                            billingCycleCount = 0,
+                            recurrenceMode = RecurrenceMode.INFINITE_RECURRING,
+                        ),
+                    ),
+                ),
             ),
         )
 
@@ -271,6 +281,11 @@ class BillingPaymentMapperTest {
                 PricingSchedule(
                     periodCount = 3,
                     period = PricingSchedule.Period.Yearly,
+                    recurrenceMode = PricingSchedule.RecurrenceMode.Infinite,
+                ),
+                PricingSchedule(
+                    periodCount = 2,
+                    period = PricingSchedule.Period.Daily,
                     recurrenceMode = PricingSchedule.RecurrenceMode.Infinite,
                 ),
             ),

@@ -49,6 +49,7 @@ data class PricingSchedule(
     val periodCount: Int,
 ) {
     enum class Period {
+        Daily,
         Weekly,
         Monthly,
         Yearly,
@@ -282,6 +283,7 @@ enum class BillingCycle(
 }
 
 enum class SubscriptionOffer {
+    IntroOffer,
     Trial,
     Referral,
     Winback,
@@ -291,6 +293,14 @@ enum class SubscriptionOffer {
         tier: SubscriptionTier,
         billingCycle: BillingCycle,
     ) = when (this) {
+        IntroOffer -> when (tier) {
+            SubscriptionTier.Plus -> when (billingCycle) {
+                BillingCycle.Monthly -> null
+                BillingCycle.Yearly -> "plus-yearly-intro-50percent"
+            }
+
+            SubscriptionTier.Patron -> null
+        }
         Trial -> when (tier) {
             SubscriptionTier.Plus -> when (billingCycle) {
                 BillingCycle.Monthly -> null
