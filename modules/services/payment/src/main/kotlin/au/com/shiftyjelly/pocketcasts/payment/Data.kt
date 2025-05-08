@@ -64,6 +64,14 @@ data class BillingPeriod(
 
         data object Infinite : Cycle
     }
+
+    companion object {
+        val Preview = BillingPeriod(
+            cycle = BillingPeriod.Cycle.Infinite,
+            interval = BillingPeriod.Interval.Yearly,
+            intervalCount = 0,
+        )
+    }
 }
 
 class SubscriptionPlans private constructor(
@@ -96,6 +104,8 @@ class SubscriptionPlans private constructor(
     override fun toString() = "SubscriptionPlans(plans=$plans)"
 
     companion object {
+        val Preview get() = SubscriptionPlans.create(FakePaymentDataSource.DefaultLoadedProducts).getOrNull()!!
+
         private val basePlanKeys = SubscriptionTier.entries.flatMap { tier ->
             SubscriptionBillingCycle.entries.map { billingCycle ->
                 SubscriptionPlan.Key(tier, billingCycle, offer = null)
@@ -215,18 +225,28 @@ sealed interface SubscriptionPlan {
     }
 
     companion object {
+        const val PlusMonthlyProductId = "com.pocketcasts.plus.monthly"
+        const val PlusYearlyProductId = "com.pocketcasts.plus.yearly"
+        const val PatronMonthlyProductId = "com.pocketcasts.monthly.patron"
+        const val PatronYearlyProductId = "com.pocketcasts.yearly.patron"
+
+        val PlusMonthlyPreview get() = SubscriptionPlans.Preview.getBasePlan(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly)
+        val PlusYearlyPreview get() = SubscriptionPlans.Preview.getBasePlan(SubscriptionTier.Plus, SubscriptionBillingCycle.Yearly)
+        val PatronMonthlyPreview get() = SubscriptionPlans.Preview.getBasePlan(SubscriptionTier.Patron, SubscriptionBillingCycle.Monthly)
+        val PatronYearlyPreview get() = SubscriptionPlans.Preview.getBasePlan(SubscriptionTier.Patron, SubscriptionBillingCycle.Yearly)
+
         fun productId(
             tier: SubscriptionTier,
             billingCycle: SubscriptionBillingCycle,
         ) = when (tier) {
             SubscriptionTier.Plus -> when (billingCycle) {
-                SubscriptionBillingCycle.Monthly -> "com.pocketcasts.plus.monthly"
-                SubscriptionBillingCycle.Yearly -> "com.pocketcasts.plus.yearly"
+                SubscriptionBillingCycle.Monthly -> PlusMonthlyProductId
+                SubscriptionBillingCycle.Yearly -> PlusYearlyProductId
             }
 
             SubscriptionTier.Patron -> when (billingCycle) {
-                SubscriptionBillingCycle.Monthly -> "com.pocketcasts.monthly.patron"
-                SubscriptionBillingCycle.Yearly -> "com.pocketcasts.yearly.patron"
+                SubscriptionBillingCycle.Monthly -> PatronMonthlyProductId
+                SubscriptionBillingCycle.Yearly -> PatronYearlyProductId
             }
         }
 
@@ -247,14 +267,26 @@ sealed interface SubscriptionPlan {
     }
 }
 
-enum class SubscriptionTier {
-    Plus,
-    Patron,
+enum class SubscriptionTier(
+    val analyticsValue: String,
+) {
+    Plus(
+        analyticsValue = "plus",
+    ),
+    Patron(
+        analyticsValue = "patron",
+    ),
 }
 
-enum class SubscriptionBillingCycle {
-    Monthly,
-    Yearly,
+enum class SubscriptionBillingCycle(
+    val analyticsValue: String,
+) {
+    Monthly(
+        analyticsValue = "monthly",
+    ),
+    Yearly(
+        analyticsValue = "yearly",
+    ),
 }
 
 enum class SubscriptionOffer {

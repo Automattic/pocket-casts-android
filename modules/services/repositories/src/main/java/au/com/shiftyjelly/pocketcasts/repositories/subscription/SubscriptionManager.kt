@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.repositories.subscription
 
-import android.app.Activity
 import androidx.appcompat.app.AppCompatActivity
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
@@ -9,9 +8,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.payment.PurchaseResult
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import com.android.billingclient.api.BillingResult
 import com.android.billingclient.api.ProductDetails
-import com.android.billingclient.api.Purchase
 import io.reactivex.Flowable
 import io.reactivex.Single
 import kotlinx.coroutines.flow.Flow
@@ -20,32 +17,11 @@ import timber.log.Timber
 interface SubscriptionManager {
     suspend fun initializeBillingConnection(): Nothing
 
-    suspend fun loadProducts(): ProductDetailsState
-
-    suspend fun loadPurchases(): PurchasesState
-
     suspend fun loadPurchaseHistory(): PurchaseHistoryState
 
     suspend fun refresh()
 
     fun launchBillingFlow(activity: AppCompatActivity, productDetails: ProductDetails, offerToken: String)
-
-    suspend fun changeProduct(
-        currentPurchase: Purchase,
-        currentPurchaseProductId: String,
-        newProduct: ProductDetails,
-        newProductOfferToken: String,
-        activity: Activity,
-    ): BillingResult
-
-    suspend fun claimWinbackOffer(
-        currentPurchase: Purchase,
-        winbackProduct: ProductDetails,
-        winbackOfferToken: String,
-        activity: Activity,
-    ): BillingResult
-
-    fun signOut()
 
     fun observeProductDetails(): Flowable<ProductDetailsState>
     fun observePurchaseEvents(): Flowable<PurchaseResult>
@@ -57,7 +33,6 @@ interface SubscriptionManager {
     fun getCachedStatus(): SubscriptionStatus?
     fun clearCachedStatus()
     fun isOfferEligible(tier: SubscriptionTier): Boolean
-    fun updateOfferEligible(tier: SubscriptionTier, eligible: Boolean)
     fun getDefaultSubscription(
         subscriptions: List<Subscription>,
         tier: SubscriptionTier? = null,

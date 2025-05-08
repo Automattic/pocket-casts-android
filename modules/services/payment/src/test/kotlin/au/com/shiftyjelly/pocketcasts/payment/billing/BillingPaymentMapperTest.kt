@@ -65,7 +65,6 @@ class BillingPaymentMapperTest {
                             recurrenceMode = RecurrenceMode.INFINITE_RECURRING,
                             billingCycleCount = 0,
                         ),
-
                     ),
                     offerTags = listOf("Tag", "Another tag"),
                 ),

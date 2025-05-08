@@ -7,19 +7,15 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
+import au.com.shiftyjelly.pocketcasts.payment.PaymentResult
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.profile.winback.WinbackInitParams
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchasesState
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.Gravatar
-import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.toDurationFromNow
 import com.automattic.android.tracks.crashlogging.CrashLogging
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -39,33 +35,15 @@ import timber.log.Timber
 @HiltViewModel
 class AccountDetailsViewModel @Inject constructor(
     userManager: UserManager,
-    private val subscriptionManager: SubscriptionManager,
+    private val paymentClient: PaymentClient,
     private val syncManager: SyncManager,
     private val settings: Settings,
     private val analyticsTracker: AnalyticsTracker,
     private val crashLogging: CrashLogging,
-    private val subscriptionMapper: SubscriptionMapper,
 ) : ViewModel() {
     internal val deleteAccountState = MutableStateFlow<DeleteAccountState>(DeleteAccountState.Empty)
     internal val signInState = userManager.getSignInState()
     internal val marketingOptIn = settings.marketingOptIn.flow
-    private val subscription = subscriptionManager.observeProductDetails().map { state ->
-        if (state is ProductDetailsState.Loaded) {
-            val subscriptions = state.productDetails
-                .mapNotNull {
-                    subscriptionMapper.mapFromProductDetails(
-                        productDetails = it,
-                        isOfferEligible = subscriptionManager.isOfferEligible(
-                            SubscriptionTier.fromProductId(it.productId),
-                        ),
-                    )
-                }
-            val filteredOffer = Subscription.filterOffers(subscriptions)
-            Optional.of(subscriptionManager.getDefaultSubscription(filteredOffer))
-        } else {
-            Optional.empty()
-        }
-    }
 
     internal val headerState = signInState.asFlow().map { state ->
         when (state) {
@@ -115,14 +93,12 @@ class AccountDetailsViewModel @Inject constructor(
         }
     }.stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = AccountHeaderState.empty())
 
-    internal val showUpgradeBanner = combine(
-        signInState.asFlow(),
-        subscription.asFlow(),
-    ) { signInState, subscription ->
-        val signedInState = signInState as? SignInState.SignedIn
-        val isGiftExpiring = (signedInState?.subscriptionStatus as? SubscriptionStatus.Paid)?.isExpiring == true
-        subscription != null && (signInState.isSignedInAsFree || isGiftExpiring)
-    }.stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = false)
+    internal val showUpgradeBanner = signInState.asFlow()
+        .map { state ->
+            val signedInState = state as? SignInState.SignedIn
+            val isGiftExpiring = (signedInState?.subscriptionStatus as? SubscriptionStatus.Paid)?.isExpiring == true
+            state.isSignedInAsFree || isGiftExpiring
+        }.stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = false)
 
     internal val sectionsState = combine(
         signInState.asFlow(),
@@ -158,12 +134,10 @@ class AccountDetailsViewModel @Inject constructor(
         return if (subscriptionPlatform != SubscriptionPlatform.ANDROID) {
             WinbackInitParams.Empty
         } else {
-            when (val purchasesState = subscriptionManager.loadPurchases()) {
-                is PurchasesState.Failure -> WinbackInitParams.Empty
-                is PurchasesState.Loaded -> WinbackInitParams(
-                    hasGoogleSubscription = purchasesState.purchases
-                        .filter { it.isAcknowledged && it.isAutoRenewing }
-                        .isNotEmpty(),
+            when (val subscriptionsResult = paymentClient.loadAcknowledgedSubscriptions()) {
+                is PaymentResult.Failure -> WinbackInitParams.Empty
+                is PaymentResult.Success -> WinbackInitParams(
+                    hasGoogleSubscription = subscriptionsResult.value.any { it.isAutoRenewing },
                 )
             }
         }

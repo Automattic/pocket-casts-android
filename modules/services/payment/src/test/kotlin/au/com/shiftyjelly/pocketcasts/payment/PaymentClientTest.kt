@@ -48,25 +48,25 @@ class PaymentClientTest {
         dataSource.loadedPurchases = listOf(
             purchase.copy(
                 state = PurchaseState.Purchased("order-id-1"),
-                productIds = listOf(SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly)),
+                productIds = listOf(SubscriptionPlan.PlusMonthlyProductId),
                 isAcknowledged = true,
                 isAutoRenewing = true,
             ),
             purchase.copy(
                 state = PurchaseState.Purchased("order-id-2"),
-                productIds = listOf(SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Yearly)),
+                productIds = listOf(SubscriptionPlan.PlusYearlyProductId),
                 isAcknowledged = true,
                 isAutoRenewing = true,
             ),
             purchase.copy(
                 state = PurchaseState.Purchased("order-id-3"),
-                productIds = listOf(SubscriptionPlan.productId(SubscriptionTier.Patron, SubscriptionBillingCycle.Monthly)),
+                productIds = listOf(SubscriptionPlan.PatronMonthlyProductId),
                 isAcknowledged = true,
                 isAutoRenewing = true,
             ),
             purchase.copy(
                 state = PurchaseState.Purchased("order-id-4"),
-                productIds = listOf(SubscriptionPlan.productId(SubscriptionTier.Patron, SubscriptionBillingCycle.Yearly)),
+                productIds = listOf(SubscriptionPlan.PatronYearlyProductId),
                 isAcknowledged = true,
                 isAutoRenewing = false,
             ),
@@ -112,8 +112,8 @@ class PaymentClientTest {
         dataSource.loadedPurchases = listOf(
             purchase.copy(
                 productIds = listOf(
-                    SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly),
-                    SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Yearly),
+                    SubscriptionPlan.PlusMonthlyProductId,
+                    SubscriptionPlan.PlusYearlyProductId,
                 ),
             ),
         )
@@ -150,7 +150,7 @@ class PaymentClientTest {
         dataSource.loadedPurchases = listOf(
             purchase.copy(
                 state = PurchaseState.Purchased("order-id"),
-                productIds = listOf(SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly)),
+                productIds = listOf(SubscriptionPlan.PlusMonthlyProductId),
                 isAcknowledged = true,
                 isAutoRenewing = true,
             ),

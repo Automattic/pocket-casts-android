@@ -190,6 +190,22 @@ class PaymentClient @Inject constructor(
         return dataSource.launchBillingFlow(activity, params)
     }
     // </editor-fold>
+
+    companion object {
+        fun test(dataSource: PaymentDataSource = PaymentDataSource.fake()) = PaymentClient(
+            dataSource,
+            purchaseApprover = object : PurchaseApprover {
+                override suspend fun approve(purchase: Purchase): PaymentResult<Purchase> {
+                    return PaymentResult.Success(purchase)
+                }
+            },
+            logger = object : Logger {
+                override fun info(message: String) = Unit
+                override fun warning(message: String) = Unit
+                override fun error(message: String, exception: Throwable) = Unit
+            },
+        )
+    }
 }
 
 private fun PaymentResult<*>.toPurchaseResult() = when (this) {

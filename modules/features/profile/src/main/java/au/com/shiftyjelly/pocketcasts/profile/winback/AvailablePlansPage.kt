@@ -58,13 +58,13 @@ import au.com.shiftyjelly.pocketcasts.compose.components.rememberViewInteropNest
 import au.com.shiftyjelly.pocketcasts.compose.pocketRed
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.models.type.BillingPeriod
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.payment.AcknowledgedSubscription
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionBillingCycle
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlans
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.profile.winback.FailureReason.Default
-import au.com.shiftyjelly.pocketcasts.profile.winback.FailureReason.NoOrderId
-import au.com.shiftyjelly.pocketcasts.profile.winback.FailureReason.NoProducts
 import au.com.shiftyjelly.pocketcasts.profile.winback.FailureReason.NoPurchases
-import au.com.shiftyjelly.pocketcasts.profile.winback.FailureReason.TooManyProducts
 import au.com.shiftyjelly.pocketcasts.profile.winback.FailureReason.TooManyPurchases
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -73,7 +73,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 internal fun AvailablePlansPage(
     plansState: SubscriptionPlansState,
-    onSelectPlan: (SubscriptionPlan) -> Unit,
+    onSelectPlan: (SubscriptionPlan.Base) -> Unit,
     onGoToSubscriptions: () -> Unit,
     onReload: () -> Unit,
     onGoBack: () -> Unit,
@@ -94,18 +94,18 @@ internal fun AvailablePlansPage(
                 is SubscriptionPlansState.Loading -> LoadingState()
 
                 is SubscriptionPlansState.Failure -> when (state.reason) {
-                    TooManyPurchases, TooManyProducts -> TooManyPurchasesState(
+                    TooManyPurchases -> TooManyPurchasesState(
                         onGoToSubscriptions = onGoToSubscriptions,
                     )
 
-                    NoPurchases, NoProducts, NoOrderId, Default -> ErrorState(
+                    NoPurchases, Default -> ErrorState(
                         onReload = onReload,
                     )
                 }
 
                 is SubscriptionPlansState.Loaded -> LoadedState(
-                    userPlanId = state.activePurchase.productId,
-                    plans = state.plans,
+                    userPlanId = state.currentSubscription.productId,
+                    plans = state.basePlans,
                     isChangingPlan = state.isChangingPlan,
                     onSelectPlan = onSelectPlan,
                 )
@@ -117,9 +117,9 @@ internal fun AvailablePlansPage(
 @Composable
 private fun LoadedState(
     userPlanId: String?,
-    plans: List<SubscriptionPlan>,
+    plans: List<SubscriptionPlan.Base>,
     isChangingPlan: Boolean,
-    onSelectPlan: (SubscriptionPlan) -> Unit,
+    onSelectPlan: (SubscriptionPlan.Base) -> Unit,
 ) {
     Box {
         Column(
@@ -300,7 +300,7 @@ private fun PocketCastsLogo(
 
 @Composable
 private fun SubscriptionRow(
-    plan: SubscriptionPlan,
+    plan: SubscriptionPlan.Base,
     isSelected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -346,7 +346,7 @@ private fun SubscriptionRow(
                 modifier = Modifier.weight(1f),
             ) {
                 TextH30(
-                    text = plan.title,
+                    text = plan.name,
                 )
                 TextP40(
                     text = plan.price(),
@@ -355,12 +355,13 @@ private fun SubscriptionRow(
                     lineHeight = 21.sp,
                 )
             }
-            if (plan.billingPeriod == BillingPeriod.Yearly) {
+            if (plan.billingCycle == SubscriptionBillingCycle.Yearly) {
+                val currencyCode = plan.pricingPhase.price.currencyCode
                 TextP40(
-                    text = if (plan.currencyCode == "USD") {
+                    text = if (currencyCode == "USD") {
                         stringResource(LR.string.price_per_week_usd, plan.pricePerWeek)
                     } else {
-                        stringResource(LR.string.price_per_week, plan.pricePerWeek, plan.currencyCode)
+                        stringResource(LR.string.price_per_week, plan.pricePerWeek, currencyCode)
                     },
                     color = MaterialTheme.theme.colors.primaryText02,
                     fontSize = 15.sp,
@@ -370,7 +371,7 @@ private fun SubscriptionRow(
             }
         }
 
-        if (plan.productId == Subscription.PLUS_YEARLY_PRODUCT_ID) {
+        if (plan.tier == SubscriptionTier.Plus && plan.billingCycle == SubscriptionBillingCycle.Yearly) {
             Box(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
@@ -439,11 +440,20 @@ private fun ManageSubscriptions(
     }
 }
 
+private val SubscriptionPlan.Base.pricePerWeek: Float
+    get() {
+        val pricePerWeek = when (billingCycle) {
+            SubscriptionBillingCycle.Monthly -> pricingPhase.price.amount * 12.toBigDecimal()
+            SubscriptionBillingCycle.Yearly -> pricingPhase.price.amount
+        } / 52.toBigDecimal()
+        return pricePerWeek.toFloat()
+    }
+
 @Composable
 @ReadOnlyComposable
-private fun SubscriptionPlan.price() = when (billingPeriod) {
-    BillingPeriod.Monthly -> stringResource(LR.string.plus_per_month, formattedPrice)
-    BillingPeriod.Yearly -> stringResource(LR.string.plus_per_year, formattedPrice)
+private fun SubscriptionPlan.Base.price() = when (billingCycle) {
+    SubscriptionBillingCycle.Monthly -> stringResource(LR.string.plus_per_month, pricingPhase.price.formattedPrice)
+    SubscriptionBillingCycle.Yearly -> stringResource(LR.string.plus_per_year, pricingPhase.price.formattedPrice)
 }
 
 @Preview(device = Devices.PortraitRegular)
@@ -456,48 +466,13 @@ private fun AvailablePlansPagePreview(
     ) {
         AvailablePlansPage(
             plansState = SubscriptionPlansState.Loaded(
-                activePurchase = ActivePurchase(
+                currentSubscription = AcknowledgedSubscription(
                     orderId = "orderId",
-                    productId = Subscription.PLUS_MONTHLY_PRODUCT_ID,
+                    tier = SubscriptionTier.Plus,
+                    billingCycle = SubscriptionBillingCycle.Yearly,
+                    isAutoRenewing = true,
                 ),
-                plans = listOf(
-                    SubscriptionPlan(
-                        productId = Subscription.PLUS_MONTHLY_PRODUCT_ID,
-                        offerToken = "",
-                        title = "Plus Monthly",
-                        formattedPrice = "$3.99",
-                        billingPeriod = BillingPeriod.Monthly,
-                        basePrice = 3.99.toBigDecimal(),
-                        currencyCode = "USD",
-                    ),
-                    SubscriptionPlan(
-                        productId = Subscription.PATRON_MONTHLY_PRODUCT_ID,
-                        offerToken = "",
-                        title = "Patron Monthly",
-                        formattedPrice = "$9.99",
-                        billingPeriod = BillingPeriod.Monthly,
-                        basePrice = 9.99.toBigDecimal(),
-                        currencyCode = "USD",
-                    ),
-                    SubscriptionPlan(
-                        productId = Subscription.PLUS_YEARLY_PRODUCT_ID,
-                        offerToken = "",
-                        title = "Plus Yearly",
-                        formattedPrice = "$39.99",
-                        billingPeriod = BillingPeriod.Yearly,
-                        basePrice = 39.99.toBigDecimal(),
-                        currencyCode = "USD",
-                    ),
-                    SubscriptionPlan(
-                        productId = Subscription.PATRON_YEARLY_PRODUCT_ID,
-                        offerToken = "",
-                        title = "Patron Yearly",
-                        formattedPrice = "$99.99",
-                        billingPeriod = BillingPeriod.Yearly,
-                        basePrice = 99.99.toBigDecimal(),
-                        currencyCode = "PLN",
-                    ),
-                ),
+                subscriptionPlans = SubscriptionPlans.Preview,
             ),
             onSelectPlan = {},
             onGoToSubscriptions = {},

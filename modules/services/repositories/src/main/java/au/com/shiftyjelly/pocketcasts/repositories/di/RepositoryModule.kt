@@ -65,8 +65,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserSettingsCrashReportPermission
-import au.com.shiftyjelly.pocketcasts.repositories.winback.WinbackManager
-import au.com.shiftyjelly.pocketcasts.repositories.winback.WinbackManagerImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -192,9 +190,6 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun providePodcastRefresher(podcastRefresherImpl: PodcastRefresherImpl): PodcastRefresher
-
-    @Binds
-    abstract fun provideWinbackManager(manager: WinbackManagerImpl): WinbackManager
 
     @Binds
     abstract fun provideUpNextHistoryManager(upNextHistoryManagerImpl: UpNextHistoryManagerImpl): UpNextHistoryManager

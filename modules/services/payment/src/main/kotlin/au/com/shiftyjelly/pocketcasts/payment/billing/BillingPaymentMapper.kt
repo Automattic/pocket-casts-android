@@ -9,10 +9,8 @@ import au.com.shiftyjelly.pocketcasts.payment.PricingPlans
 import au.com.shiftyjelly.pocketcasts.payment.Product
 import au.com.shiftyjelly.pocketcasts.payment.Purchase
 import au.com.shiftyjelly.pocketcasts.payment.PurchaseState
-import au.com.shiftyjelly.pocketcasts.payment.SubscriptionBillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
-import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import com.android.billingclient.api.BillingFlowParams.SubscriptionUpdateParams.ReplacementMode
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.ProductDetails.RecurrenceMode
@@ -308,31 +306,31 @@ internal class BillingPaymentMapper(
         newPlanKey: SubscriptionPlan.Key,
     ) = when (newPlanKey.offer) {
         null -> when (currentPlanId) {
-            PlusMonthlyId -> when (newPlanKey.productId) {
-                PatronMonthlyId -> ReplacementMode.CHARGE_PRORATED_PRICE
-                PlusYearlyId -> ReplacementMode.CHARGE_FULL_PRICE
-                PatronYearlyId -> ReplacementMode.CHARGE_FULL_PRICE
+            SubscriptionPlan.PlusMonthlyProductId -> when (newPlanKey.productId) {
+                SubscriptionPlan.PatronMonthlyProductId -> ReplacementMode.CHARGE_PRORATED_PRICE
+                SubscriptionPlan.PlusYearlyProductId -> ReplacementMode.CHARGE_FULL_PRICE
+                SubscriptionPlan.PatronYearlyProductId -> ReplacementMode.CHARGE_FULL_PRICE
                 else -> null
             }
 
-            PatronMonthlyId -> when (newPlanKey.productId) {
-                PlusMonthlyId -> ReplacementMode.WITH_TIME_PRORATION
-                PlusYearlyId -> ReplacementMode.CHARGE_FULL_PRICE
-                PatronYearlyId -> ReplacementMode.CHARGE_FULL_PRICE
+            SubscriptionPlan.PatronMonthlyProductId -> when (newPlanKey.productId) {
+                SubscriptionPlan.PlusMonthlyProductId -> ReplacementMode.WITH_TIME_PRORATION
+                SubscriptionPlan.PlusYearlyProductId -> ReplacementMode.CHARGE_FULL_PRICE
+                SubscriptionPlan.PatronYearlyProductId -> ReplacementMode.CHARGE_FULL_PRICE
                 else -> null
             }
 
-            PlusYearlyId -> when (newPlanKey.productId) {
-                PlusMonthlyId -> ReplacementMode.WITH_TIME_PRORATION
-                PatronMonthlyId -> ReplacementMode.WITH_TIME_PRORATION
-                PatronYearlyId -> ReplacementMode.CHARGE_PRORATED_PRICE
+            SubscriptionPlan.PlusYearlyProductId -> when (newPlanKey.productId) {
+                SubscriptionPlan.PlusMonthlyProductId -> ReplacementMode.WITH_TIME_PRORATION
+                SubscriptionPlan.PatronMonthlyProductId -> ReplacementMode.WITH_TIME_PRORATION
+                SubscriptionPlan.PatronYearlyProductId -> ReplacementMode.CHARGE_PRORATED_PRICE
                 else -> null
             }
 
-            PatronYearlyId -> when (newPlanKey.productId) {
-                PlusMonthlyId -> ReplacementMode.WITH_TIME_PRORATION
-                PatronMonthlyId -> ReplacementMode.WITH_TIME_PRORATION
-                PlusYearlyId -> ReplacementMode.WITH_TIME_PRORATION
+            SubscriptionPlan.PatronYearlyProductId -> when (newPlanKey.productId) {
+                SubscriptionPlan.PlusMonthlyProductId -> ReplacementMode.WITH_TIME_PRORATION
+                SubscriptionPlan.PatronMonthlyProductId -> ReplacementMode.WITH_TIME_PRORATION
+                SubscriptionPlan.PlusYearlyProductId -> ReplacementMode.WITH_TIME_PRORATION
                 else -> null
             }
 
@@ -349,7 +347,3 @@ internal class BillingPaymentMapper(
 }
 
 private const val SubscriptionType = "subs"
-private val PlusMonthlyId = SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly)
-private val PlusYearlyId = SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Yearly)
-private val PatronMonthlyId = SubscriptionPlan.productId(SubscriptionTier.Patron, SubscriptionBillingCycle.Monthly)
-private val PatronYearlyId = SubscriptionPlan.productId(SubscriptionTier.Patron, SubscriptionBillingCycle.Yearly)

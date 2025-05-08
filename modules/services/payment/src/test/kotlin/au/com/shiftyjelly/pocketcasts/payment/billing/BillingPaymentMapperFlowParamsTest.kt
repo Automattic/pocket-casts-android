@@ -58,36 +58,28 @@ class BillingPaymentMapperFlowParamsTest {
                 GooglePurchase(
                     orderId = "order-id-1",
                     purchaseToken = "purchase-token-1",
-                    productIds = listOf(
-                        SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly),
-                    ),
+                    productIds = listOf(SubscriptionPlan.PlusMonthlyProductId),
                     isAcknowledged = true,
                     isAutoRenewing = true,
                 ),
                 GooglePurchase(
                     orderId = "order-id-2",
                     purchaseToken = "purchase-token-2",
-                    productIds = listOf(
-                        SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly),
-                    ),
+                    productIds = listOf(SubscriptionPlan.PlusMonthlyProductId),
                     isAcknowledged = true,
                     isAutoRenewing = false,
                 ),
                 GooglePurchase(
                     orderId = "order-id-2",
                     purchaseToken = "purchase-token-3",
-                    productIds = listOf(
-                        SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly),
-                    ),
+                    productIds = listOf(SubscriptionPlan.PlusMonthlyProductId),
                     isAcknowledged = false,
                     isAutoRenewing = true,
                 ),
                 GooglePurchase(
                     orderId = "order-id-2",
                     purchaseToken = "purchase-token-3",
-                    productIds = listOf(
-                        SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly),
-                    ),
+                    productIds = listOf(SubscriptionPlan.PlusMonthlyProductId),
                     isAcknowledged = false,
                     isAutoRenewing = false,
                 ),

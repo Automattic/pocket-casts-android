@@ -123,7 +123,7 @@ class FakePaymentDataSource : PaymentDataSource {
             get() = Purchase(
                 state = PurchaseState.Purchased("order-id"),
                 token = "purchase-token",
-                productIds = listOf(SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Yearly)),
+                productIds = listOf(SubscriptionPlan.PlusYearlyProductId),
                 isAcknowledged = true,
                 isAutoRenewing = true,
             )
@@ -132,29 +132,33 @@ class FakePaymentDataSource : PaymentDataSource {
             get() = Purchase(
                 state = PurchaseState.Purchased("order-id"),
                 token = "purchase-token",
-                productIds = listOf(SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Yearly)),
+                productIds = listOf(SubscriptionPlan.PlusYearlyProductId),
                 isAcknowledged = false,
                 isAutoRenewing = true,
             )
     }
 }
 
-private val PlusMonthlyPricingPhase get() = PricingPhase(
-    Price(3.99.toBigDecimal(), "USD", "$3.99"),
-    BillingPeriod(BillingPeriod.Cycle.Infinite, BillingPeriod.Interval.Monthly, intervalCount = 0),
-)
-private val PlusYearlyPricingPhase get() = PricingPhase(
-    Price(39.99.toBigDecimal(), "USD", "$39.99"),
-    BillingPeriod(BillingPeriod.Cycle.Infinite, BillingPeriod.Interval.Monthly, intervalCount = 0),
-)
-private val PatronMonthlyPricingPhase get() = PricingPhase(
-    Price(9.99.toBigDecimal(), "USD", "$9.99"),
-    BillingPeriod(BillingPeriod.Cycle.Infinite, BillingPeriod.Interval.Monthly, intervalCount = 0),
-)
-private val PatronYearlyPricingPhase get() = PricingPhase(
-    Price(99.99.toBigDecimal(), "USD", "$99.99"),
-    BillingPeriod(BillingPeriod.Cycle.Infinite, BillingPeriod.Interval.Yearly, intervalCount = 0),
-)
+private val PlusMonthlyPricingPhase
+    get() = PricingPhase(
+        Price(3.99.toBigDecimal(), "USD", "$3.99"),
+        BillingPeriod(BillingPeriod.Cycle.Infinite, BillingPeriod.Interval.Monthly, intervalCount = 0),
+    )
+private val PlusYearlyPricingPhase
+    get() = PricingPhase(
+        Price(39.99.toBigDecimal(), "USD", "$39.99"),
+        BillingPeriod(BillingPeriod.Cycle.Infinite, BillingPeriod.Interval.Monthly, intervalCount = 0),
+    )
+private val PatronMonthlyPricingPhase
+    get() = PricingPhase(
+        Price(9.99.toBigDecimal(), "USD", "$9.99"),
+        BillingPeriod(BillingPeriod.Cycle.Infinite, BillingPeriod.Interval.Monthly, intervalCount = 0),
+    )
+private val PatronYearlyPricingPhase
+    get() = PricingPhase(
+        Price(99.99.toBigDecimal(), "USD", "$99.99"),
+        BillingPeriod(BillingPeriod.Cycle.Infinite, BillingPeriod.Interval.Yearly, intervalCount = 0),
+    )
 
 private fun productName(
     tier: SubscriptionTier,

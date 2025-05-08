@@ -8,9 +8,7 @@ import au.com.shiftyjelly.pocketcasts.payment.PaymentResult
 import au.com.shiftyjelly.pocketcasts.payment.PaymentResultCode
 import au.com.shiftyjelly.pocketcasts.payment.Product
 import au.com.shiftyjelly.pocketcasts.payment.Purchase
-import au.com.shiftyjelly.pocketcasts.payment.SubscriptionBillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
-import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.payment.flatMap
 import au.com.shiftyjelly.pocketcasts.payment.map
 import com.android.billingclient.api.AcknowledgePurchaseParams
@@ -188,19 +186,19 @@ private val AllSubscriptionsQueryProductDetailsParams = QueryProductDetailsParam
     .setProductList(
         listOf(
             QueryProductDetailsParams.Product.newBuilder()
-                .setProductId(SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly))
+                .setProductId(SubscriptionPlan.PlusMonthlyProductId)
                 .setProductType(BillingClient.ProductType.SUBS)
                 .build(),
             QueryProductDetailsParams.Product.newBuilder()
-                .setProductId(SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Yearly))
+                .setProductId(SubscriptionPlan.PlusYearlyProductId)
                 .setProductType(BillingClient.ProductType.SUBS)
                 .build(),
             QueryProductDetailsParams.Product.newBuilder()
-                .setProductId(SubscriptionPlan.productId(SubscriptionTier.Patron, SubscriptionBillingCycle.Monthly))
+                .setProductId(SubscriptionPlan.PatronMonthlyProductId)
                 .setProductType(BillingClient.ProductType.SUBS)
                 .build(),
             QueryProductDetailsParams.Product.newBuilder()
-                .setProductId(SubscriptionPlan.productId(SubscriptionTier.Patron, SubscriptionBillingCycle.Yearly))
+                .setProductId(SubscriptionPlan.PatronYearlyProductId)
                 .setProductType(BillingClient.ProductType.SUBS)
                 .build(),
         ),
