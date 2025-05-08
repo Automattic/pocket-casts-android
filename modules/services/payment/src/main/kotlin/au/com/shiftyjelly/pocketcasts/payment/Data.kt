@@ -49,6 +49,7 @@ data class PricingSchedule(
     val periodCount: Int,
 ) {
     enum class Period {
+        Daily,
         Weekly,
         Monthly,
         Yearly,

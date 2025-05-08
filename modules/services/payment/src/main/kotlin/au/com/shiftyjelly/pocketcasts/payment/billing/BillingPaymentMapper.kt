@@ -203,6 +203,7 @@ internal class BillingPaymentMapper(
 
         val rawInterval = valuePart.drop(rawCount.length)
         val period = when (rawInterval) {
+            "D" -> PricingSchedule.Period.Daily
             "W" -> PricingSchedule.Period.Weekly
             "M" -> PricingSchedule.Period.Monthly
             "Y" -> PricingSchedule.Period.Yearly
