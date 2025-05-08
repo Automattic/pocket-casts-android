@@ -147,7 +147,7 @@ private val PlusMonthlyPricingPhase
 private val PlusYearlyPricingPhase
     get() = PricingPhase(
         Price(39.99.toBigDecimal(), "USD", "$39.99"),
-        PricingSchedule(PricingSchedule.RecurrenceMode.Infinite, PricingSchedule.Period.Monthly, periodCount = 0),
+        PricingSchedule(PricingSchedule.RecurrenceMode.Infinite, PricingSchedule.Period.Yearly, periodCount = 0),
     )
 private val PatronMonthlyPricingPhase
     get() = PricingPhase(
@@ -170,6 +170,19 @@ private fun pricingPhases(
     billingCycle: BillingCycle,
     offer: SubscriptionOffer?,
 ): List<PricingPhase> = when (offer) {
+    SubscriptionOffer.IntroOffer -> when (billingCycle) {
+        BillingCycle.Yearly -> when (tier) {
+            SubscriptionTier.Plus -> listOf(
+                PlusYearlyPricingPhase.withDiscount(priceFraction = 0.5, period = PricingSchedule.Period.Yearly),
+                PlusYearlyPricingPhase,
+            )
+
+            SubscriptionTier.Patron -> emptyList()
+        }
+
+        BillingCycle.Monthly -> emptyList()
+    }
+
     SubscriptionOffer.Trial -> when (billingCycle) {
         BillingCycle.Yearly -> when (tier) {
             SubscriptionTier.Plus -> listOf(

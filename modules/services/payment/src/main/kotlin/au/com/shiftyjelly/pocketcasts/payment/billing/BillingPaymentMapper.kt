@@ -336,6 +336,7 @@ internal class BillingPaymentMapper(
 
             else -> null
         }
+        SubscriptionOffer.IntroOffer -> ReplacementMode.CHARGE_FULL_PRICE
         SubscriptionOffer.Trial -> ReplacementMode.CHARGE_FULL_PRICE
         SubscriptionOffer.Referral -> ReplacementMode.CHARGE_FULL_PRICE
         SubscriptionOffer.Winback -> ReplacementMode.CHARGE_FULL_PRICE
