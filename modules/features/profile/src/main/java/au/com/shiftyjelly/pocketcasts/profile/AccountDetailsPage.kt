@@ -20,9 +20,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.FeatureCardsState
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.ProfileUpgradeBanner
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.UpgradeFeatureCard
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.ProfileUpgradeBannerState
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.AutomotivePreview
 import au.com.shiftyjelly.pocketcasts.compose.OrientationPreview
@@ -32,10 +31,11 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlans
 import au.com.shiftyjelly.pocketcasts.profile.winback.WinbackInitParams
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import kotlin.time.Duration.Companion.days
-import au.com.shiftyjelly.pocketcasts.account.viewmodel.ProfileUpgradeBannerViewModel.State as UpgradeBannerState
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -44,8 +44,8 @@ internal fun AccountDetailsPage(
     theme: Theme.ThemeType,
     onNavigateBack: () -> Unit,
     onClickHeader: () -> Unit,
-    onClickUpgradeBanner: () -> Unit,
-    onFeatureCardChanged: (UpgradeFeatureCard) -> Unit,
+    onClickSubscribe: (SubscriptionPlan.Key) -> Unit,
+    onChangeFeatureCard: (SubscriptionPlan.Key) -> Unit,
     onChangeAvatar: (String) -> Unit,
     onChangeEmail: () -> Unit,
     onChangePassword: () -> Unit,
@@ -132,15 +132,15 @@ internal fun AccountDetailsPage(
                             .then(if (state.isAutomotive) Modifier.padding(top = 32.dp) else Modifier),
                     )
                 }
-                if (bannerState is UpgradeBannerState.Loaded) {
+                if (bannerState != null) {
                     item {
                         Divider()
                     }
                     item {
                         ProfileUpgradeBanner(
                             state = bannerState,
-                            onClick = onClickUpgradeBanner,
-                            onFeatureCardChanged = onFeatureCardChanged,
+                            onClickSubscribe = onClickSubscribe,
+                            onChangeFeatureCard = onChangeFeatureCard,
                             modifier = Modifier.fillMaxWidth(),
                         )
                     }
@@ -174,7 +174,7 @@ internal data class AccountDetailsPageState(
     val isAutomotive: Boolean,
     val miniPlayerPadding: Dp,
     val headerState: AccountHeaderState,
-    val upgradeBannerState: UpgradeBannerState?,
+    val upgradeBannerState: ProfileUpgradeBannerState?,
     val sectionsState: AccountSectionsState,
 )
 
@@ -208,13 +208,11 @@ private fun AccountDetailsPageThemePreview(
 private fun AccountDetailsPageStub(
     theme: Theme.ThemeType,
     isAutomotive: Boolean = false,
-    upgradeBannerState: UpgradeBannerState? = UpgradeBannerState.Loaded(
-        featureCardsState = FeatureCardsState(
-            subscriptions = emptyList(),
-            currentFeatureCard = UpgradeFeatureCard.PLUS,
-            currentFrequency = SubscriptionFrequency.NONE,
-        ),
-        upgradeButtons = emptyList(),
+    upgradeBannerState: ProfileUpgradeBannerState? = ProfileUpgradeBannerState(
+        subscriptionPlans = SubscriptionPlans.Preview,
+        selectedFeatureCard = null,
+        currentSubscription = null,
+        isRenewingSubscription = false,
     ),
 ) {
     AccountDetailsPage(
@@ -243,8 +241,8 @@ private fun AccountDetailsPageStub(
         theme = theme,
         onNavigateBack = {},
         onClickHeader = {},
-        onClickUpgradeBanner = {},
-        onFeatureCardChanged = {},
+        onClickSubscribe = {},
+        onChangeFeatureCard = {},
         onChangeAvatar = {},
         onChangeEmail = {},
         onChangePassword = {},

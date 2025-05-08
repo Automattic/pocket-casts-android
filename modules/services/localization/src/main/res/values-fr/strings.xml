@@ -20,7 +20,7 @@ Language: fr
     <string name="account_encourage_description">Créez un compte ou connectez-vous pour profiter pleinement de Pocket Casts.</string>
     <string name="account_encourage_title">Nous avons remarqué que vous n’êtes pas connecté(e)</string>
     <string name="onboarding_get_started">Commencer</string>
-    <string name="onboarding_plus_feature_libro_title">Livre audio gratuit provenant de %1$s</string>
+    <string name="onboarding_plus_feature_libro_title"><![CDATA[Livre audio gratuit provenant de <a href="https://libro.fm/">Libro.fm</a>]]></string>
     <string name="encourage_account_history_banner_description">Créez un compte gratuit pour synchroniser votre historique d’écoute partout.</string>
     <string name="encourage_account_history_banner_title">Garder une trace de ce que vous avez écouté</string>
     <string name="encourage_account_filters_banner_description">Créez un compte gratuit pour synchroniser vos filtres sur tous vos appareils.</string>

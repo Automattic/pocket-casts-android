@@ -254,7 +254,7 @@ private fun PricingPhase.withDiscount(
     period: PricingSchedule.Period = PricingSchedule.Period.Monthly,
     intervalCount: Int = 1,
 ): PricingPhase {
-    val newAmount = price.amount.times(priceFraction.coerceIn(0.0..1.0).toBigDecimal())
+    val newAmount = price.amount.times(priceFraction.coerceIn(0.0..1.0).toBigDecimal()).stripTrailingZeros()
     val newFormattedPrice = if (newAmount == BigDecimal.ZERO) "Free" else "$%.2f".format(newAmount.toDouble())
     return copy(
         price = price.copy(amount = newAmount, formattedPrice = newFormattedPrice),

@@ -30,7 +30,7 @@ Language: ca
     <string name="account_encourage_description">Crea un compte o inicia sessió per gaudir de Pocket Casts al màxim.</string>
     <string name="account_encourage_title">Hem detectat que no has iniciat sessió</string>
     <string name="onboarding_get_started">Comença</string>
-    <string name="onboarding_plus_feature_libro_title">Àudiollibre gratuït des de %1$s</string>
+    <string name="onboarding_plus_feature_libro_title"><![CDATA[Àudiollibre gratuït des de  <a href="https://libro.fm/">Libro.fm</a>]]></string>
     <string name="encourage_account_history_banner_description">Crea un compte gratuït per sincronitzar el teu historial d\'escolta a tot arreu.</string>
     <string name="encourage_account_history_banner_title">Fes un seguiment del que has escoltat</string>
     <string name="encourage_account_filters_banner_description">Crea un compte gratuït per sincronitzar els teus filtres en qualsevol dispositiu.</string>

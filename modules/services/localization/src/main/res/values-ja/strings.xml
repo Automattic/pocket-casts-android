@@ -20,7 +20,7 @@ Language: ja_JP
     <string name="account_encourage_description">アカウントを作成またはログインして、Pocket Casts を最大限に楽しみましょう。</string>
     <string name="account_encourage_title">ログインしていないようです</string>
     <string name="onboarding_get_started">開始する</string>
-    <string name="onboarding_plus_feature_libro_title">%1$s の無料オーディオブック</string>
+    <string name="onboarding_plus_feature_libro_title"><![CDATA[<a href="https://libro.fm/">Libro.fm</a> の無料オーディオブック]]></string>
     <string name="encourage_account_history_banner_description">無料アカウントを作成すると、どこでも聴取履歴を同期できます。</string>
     <string name="encourage_account_history_banner_title">再生内容の追跡を継続</string>
     <string name="encourage_account_filters_banner_description">無料アカウントを作成すると、どの端末でもフィルターを同期できます。</string>

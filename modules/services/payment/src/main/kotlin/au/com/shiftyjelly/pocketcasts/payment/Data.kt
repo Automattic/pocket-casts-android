@@ -67,7 +67,8 @@ data class PricingSchedule(
     }
 }
 
-class SubscriptionPlans private constructor(
+@ConsistentCopyVisibility
+data class SubscriptionPlans private constructor(
     private val plans: Map<SubscriptionPlan.Key, PaymentResult<SubscriptionPlan>>,
 ) {
     fun getBasePlan(
@@ -89,12 +90,6 @@ class SubscriptionPlans private constructor(
         @Suppress("UNCHECKED_CAST")
         return plans.getValue(key) as PaymentResult<SubscriptionPlan.WithOffer>
     }
-
-    override fun equals(other: Any?) = (other === this) || (other is SubscriptionPlans && other.plans == this.plans)
-
-    override fun hashCode() = plans.hashCode()
-
-    override fun toString() = "SubscriptionPlans(plans=$plans)"
 
     companion object {
         val Preview get() = SubscriptionPlans.create(FakePaymentDataSource.DefaultLoadedProducts).getOrNull()!!
