@@ -34,7 +34,7 @@ sealed interface PricingPlan {
 
 data class PricingPhase(
     val price: Price,
-    val billingPeriod: BillingPeriod,
+    val schedule: PricingSchedule,
 )
 
 data class Price(
@@ -43,34 +43,26 @@ data class Price(
     val formattedPrice: String,
 )
 
-data class BillingPeriod(
-    val cycle: BillingPeriod.Cycle,
-    val interval: BillingPeriod.Interval,
-    val intervalCount: Int,
+data class PricingSchedule(
+    val recurrenceMode: PricingSchedule.RecurrenceMode,
+    val period: PricingSchedule.Period,
+    val periodCount: Int,
 ) {
-    enum class Interval {
+    enum class Period {
         Weekly,
         Monthly,
         Yearly,
     }
 
-    sealed interface Cycle {
-        data object NonRecurring : Cycle
+    sealed interface RecurrenceMode {
+        data object NonRecurring : RecurrenceMode
 
         @JvmInline
         value class Recurring(
             val value: Int,
-        ) : Cycle
+        ) : RecurrenceMode
 
-        data object Infinite : Cycle
-    }
-
-    companion object {
-        val Preview = BillingPeriod(
-            cycle = BillingPeriod.Cycle.Infinite,
-            interval = BillingPeriod.Interval.Yearly,
-            intervalCount = 0,
-        )
+        data object Infinite : RecurrenceMode
     }
 }
 

@@ -8,7 +8,7 @@ import org.junit.Test
 class SubscriptionPlansTest {
     private val pricingPhase = PricingPhase(
         Price(100.toBigDecimal(), "USD", "$100.00"),
-        BillingPeriod(BillingPeriod.Cycle.Infinite, BillingPeriod.Interval.Yearly, intervalCount = 1),
+        PricingSchedule(PricingSchedule.RecurrenceMode.Infinite, PricingSchedule.Period.Yearly, periodCount = 1),
     )
 
     private val products = SubscriptionTier.entries.flatMap { tier ->

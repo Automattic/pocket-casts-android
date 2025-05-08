@@ -1,11 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.payment.billing
 
-import au.com.shiftyjelly.pocketcasts.payment.BillingPeriod
 import au.com.shiftyjelly.pocketcasts.payment.Logger
 import au.com.shiftyjelly.pocketcasts.payment.Price
 import au.com.shiftyjelly.pocketcasts.payment.PricingPhase
 import au.com.shiftyjelly.pocketcasts.payment.PricingPlan
 import au.com.shiftyjelly.pocketcasts.payment.PricingPlans
+import au.com.shiftyjelly.pocketcasts.payment.PricingSchedule
 import au.com.shiftyjelly.pocketcasts.payment.Product
 import au.com.shiftyjelly.pocketcasts.payment.Purchase
 import au.com.shiftyjelly.pocketcasts.payment.PurchaseState
@@ -155,7 +155,7 @@ internal class BillingPaymentMapper(
         pricingPhase: GooglePricingPhase,
         mappingContext: Map<String, Any?>,
     ): PricingPhase? {
-        val (count, interval) = toBillingDuration(pricingPhase.billingPeriod, mappingContext) ?: return null
+        val (count, period) = toPricingSchedulePeriod(pricingPhase.billingPeriod, mappingContext) ?: return null
 
         return PricingPhase(
             price = Price(
@@ -163,15 +163,15 @@ internal class BillingPaymentMapper(
                 currencyCode = pricingPhase.priceCurrencyCode,
                 formattedPrice = pricingPhase.formattedPrice,
             ),
-            billingPeriod = BillingPeriod(
-                intervalCount = count,
-                interval = interval,
-                cycle = when (pricingPhase.recurrenceMode) {
-                    RecurrenceMode.NON_RECURRING -> BillingPeriod.Cycle.NonRecurring
-                    RecurrenceMode.FINITE_RECURRING -> BillingPeriod.Cycle.Recurring(
+            schedule = PricingSchedule(
+                periodCount = count,
+                period = period,
+                recurrenceMode = when (pricingPhase.recurrenceMode) {
+                    RecurrenceMode.NON_RECURRING -> PricingSchedule.RecurrenceMode.NonRecurring
+                    RecurrenceMode.FINITE_RECURRING -> PricingSchedule.RecurrenceMode.Recurring(
                         value = pricingPhase.billingCycleCount,
                     )
-                    RecurrenceMode.INFINITE_RECURRING -> BillingPeriod.Cycle.Infinite
+                    RecurrenceMode.INFINITE_RECURRING -> PricingSchedule.RecurrenceMode.Infinite
                     else -> {
                         logWarning("Unrecognized recurrence mode '${pricingPhase.recurrenceMode}'", mappingContext)
                         return null
@@ -181,10 +181,10 @@ internal class BillingPaymentMapper(
         )
     }
 
-    private fun toBillingDuration(
+    private fun toPricingSchedulePeriod(
         iso8601Duration: String,
         mappingContext: Map<String, Any?>,
-    ): Pair<Int, BillingPeriod.Interval>? {
+    ): Pair<Int, PricingSchedule.Period>? {
         val context = mappingContext + mapOf("rawDuration" to iso8601Duration)
 
         val designator = iso8601Duration[0]
@@ -202,18 +202,18 @@ internal class BillingPaymentMapper(
         }
 
         val rawInterval = valuePart.drop(rawCount.length)
-        val interval = when (rawInterval) {
-            "W" -> BillingPeriod.Interval.Weekly
-            "M" -> BillingPeriod.Interval.Monthly
-            "Y" -> BillingPeriod.Interval.Yearly
+        val period = when (rawInterval) {
+            "W" -> PricingSchedule.Period.Weekly
+            "M" -> PricingSchedule.Period.Monthly
+            "Y" -> PricingSchedule.Period.Yearly
             else -> null
         }
-        if (interval == null) {
+        if (period == null) {
             logWarning("Unrecognized billing interval period designator '$rawInterval'", context)
             return null
         }
 
-        return count to interval
+        return count to period
     }
 
     private fun findMatchForPlan(
