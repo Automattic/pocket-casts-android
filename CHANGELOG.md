@@ -17,7 +17,7 @@
     *   Fix issue with disappearing file image after upload completes
         ([#3910](https://github.com/Automattic/pocket-casts-android/pull/3910))
     *   Fix issue with image artwork not loading in some cases
-        ([#3910](https://github.com/Automattic/pocket-casts-android/pull/3910))
+        ([#3970](https://github.com/Automattic/pocket-casts-android/pull/3970))
 
 7.87
 -----
