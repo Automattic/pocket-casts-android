@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.payment.billing
 
-import au.com.shiftyjelly.pocketcasts.payment.BillingPeriod
 import au.com.shiftyjelly.pocketcasts.payment.Price
+import au.com.shiftyjelly.pocketcasts.payment.PricingSchedule
 import au.com.shiftyjelly.pocketcasts.payment.PurchaseState
 import au.com.shiftyjelly.pocketcasts.payment.TestLogger
 import com.android.billingclient.api.GoogleOfferDetails
@@ -83,8 +83,8 @@ class BillingPaymentMapperTest {
             pricingPhase.price,
         )
         assertEquals(
-            BillingPeriod(BillingPeriod.Cycle.Infinite, BillingPeriod.Interval.Monthly, intervalCount = 1),
-            pricingPhase.billingPeriod,
+            PricingSchedule(PricingSchedule.RecurrenceMode.Infinite, PricingSchedule.Period.Monthly, periodCount = 1),
+            pricingPhase.schedule,
         )
     }
 
@@ -154,7 +154,7 @@ class BillingPaymentMapperTest {
     }
 
     @Test
-    fun `map product billing intervals`() {
+    fun `map product pricing schedules`() {
         val googleProduct = GoogleProductDetails(
             subscriptionOfferDetails = listOf(
                 GoogleOfferDetails(offerId = null),
@@ -231,50 +231,50 @@ class BillingPaymentMapperTest {
             ),
         )
 
-        val billingPeriods = mapper.toProduct(googleProduct)!!.pricingPlans
+        val pricingSchedules = mapper.toProduct(googleProduct)!!.pricingPlans
             .offerPlans
             .flatMap { it.pricingPhases }
-            .map { it.billingPeriod }
+            .map { it.schedule }
 
         assertEquals(
             listOf(
-                BillingPeriod(
-                    intervalCount = 1,
-                    interval = BillingPeriod.Interval.Monthly,
-                    cycle = BillingPeriod.Cycle.Infinite,
+                PricingSchedule(
+                    periodCount = 1,
+                    period = PricingSchedule.Period.Monthly,
+                    recurrenceMode = PricingSchedule.RecurrenceMode.Infinite,
                 ),
-                BillingPeriod(
-                    intervalCount = 1,
-                    interval = BillingPeriod.Interval.Monthly,
-                    cycle = BillingPeriod.Cycle.NonRecurring,
+                PricingSchedule(
+                    periodCount = 1,
+                    period = PricingSchedule.Period.Monthly,
+                    recurrenceMode = PricingSchedule.RecurrenceMode.NonRecurring,
                 ),
-                BillingPeriod(
-                    intervalCount = 1,
-                    interval = BillingPeriod.Interval.Monthly,
-                    cycle = BillingPeriod.Cycle.Recurring(1),
+                PricingSchedule(
+                    periodCount = 1,
+                    period = PricingSchedule.Period.Monthly,
+                    recurrenceMode = PricingSchedule.RecurrenceMode.Recurring(1),
                 ),
-                BillingPeriod(
-                    intervalCount = 1,
-                    interval = BillingPeriod.Interval.Monthly,
-                    cycle = BillingPeriod.Cycle.Recurring(2),
+                PricingSchedule(
+                    periodCount = 1,
+                    period = PricingSchedule.Period.Monthly,
+                    recurrenceMode = PricingSchedule.RecurrenceMode.Recurring(2),
                 ),
-                BillingPeriod(
-                    intervalCount = 2,
-                    interval = BillingPeriod.Interval.Monthly,
-                    cycle = BillingPeriod.Cycle.Infinite,
+                PricingSchedule(
+                    periodCount = 2,
+                    period = PricingSchedule.Period.Monthly,
+                    recurrenceMode = PricingSchedule.RecurrenceMode.Infinite,
                 ),
-                BillingPeriod(
-                    intervalCount = 1,
-                    interval = BillingPeriod.Interval.Weekly,
-                    cycle = BillingPeriod.Cycle.Infinite,
+                PricingSchedule(
+                    periodCount = 1,
+                    period = PricingSchedule.Period.Weekly,
+                    recurrenceMode = PricingSchedule.RecurrenceMode.Infinite,
                 ),
-                BillingPeriod(
-                    intervalCount = 3,
-                    interval = BillingPeriod.Interval.Yearly,
-                    cycle = BillingPeriod.Cycle.Infinite,
+                PricingSchedule(
+                    periodCount = 3,
+                    period = PricingSchedule.Period.Yearly,
+                    recurrenceMode = PricingSchedule.RecurrenceMode.Infinite,
                 ),
             ),
-            billingPeriods,
+            pricingSchedules,
         )
     }
 

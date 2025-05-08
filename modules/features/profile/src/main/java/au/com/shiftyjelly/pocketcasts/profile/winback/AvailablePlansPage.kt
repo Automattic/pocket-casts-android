@@ -59,7 +59,7 @@ import au.com.shiftyjelly.pocketcasts.compose.pocketRed
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.payment.AcknowledgedSubscription
-import au.com.shiftyjelly.pocketcasts.payment.SubscriptionBillingCycle
+import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlans
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
@@ -355,7 +355,7 @@ private fun SubscriptionRow(
                     lineHeight = 21.sp,
                 )
             }
-            if (plan.billingCycle == SubscriptionBillingCycle.Yearly) {
+            if (plan.billingCycle == BillingCycle.Yearly) {
                 val currencyCode = plan.pricingPhase.price.currencyCode
                 TextP40(
                     text = if (currencyCode == "USD") {
@@ -371,7 +371,7 @@ private fun SubscriptionRow(
             }
         }
 
-        if (plan.tier == SubscriptionTier.Plus && plan.billingCycle == SubscriptionBillingCycle.Yearly) {
+        if (plan.tier == SubscriptionTier.Plus && plan.billingCycle == BillingCycle.Yearly) {
             Box(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
@@ -443,8 +443,8 @@ private fun ManageSubscriptions(
 private val SubscriptionPlan.Base.pricePerWeek: Float
     get() {
         val pricePerWeek = when (billingCycle) {
-            SubscriptionBillingCycle.Monthly -> pricingPhase.price.amount * 12.toBigDecimal()
-            SubscriptionBillingCycle.Yearly -> pricingPhase.price.amount
+            BillingCycle.Monthly -> pricingPhase.price.amount * 12.toBigDecimal()
+            BillingCycle.Yearly -> pricingPhase.price.amount
         } / 52.toBigDecimal()
         return pricePerWeek.toFloat()
     }
@@ -452,8 +452,8 @@ private val SubscriptionPlan.Base.pricePerWeek: Float
 @Composable
 @ReadOnlyComposable
 private fun SubscriptionPlan.Base.price() = when (billingCycle) {
-    SubscriptionBillingCycle.Monthly -> stringResource(LR.string.plus_per_month, pricingPhase.price.formattedPrice)
-    SubscriptionBillingCycle.Yearly -> stringResource(LR.string.plus_per_year, pricingPhase.price.formattedPrice)
+    BillingCycle.Monthly -> stringResource(LR.string.plus_per_month, pricingPhase.price.formattedPrice)
+    BillingCycle.Yearly -> stringResource(LR.string.plus_per_year, pricingPhase.price.formattedPrice)
 }
 
 @Preview(device = Devices.PortraitRegular)
@@ -469,7 +469,7 @@ private fun AvailablePlansPagePreview(
                 currentSubscription = AcknowledgedSubscription(
                     orderId = "orderId",
                     tier = SubscriptionTier.Plus,
-                    billingCycle = SubscriptionBillingCycle.Yearly,
+                    billingCycle = BillingCycle.Yearly,
                     isAutoRenewing = true,
                 ),
                 subscriptionPlans = SubscriptionPlans.Preview,

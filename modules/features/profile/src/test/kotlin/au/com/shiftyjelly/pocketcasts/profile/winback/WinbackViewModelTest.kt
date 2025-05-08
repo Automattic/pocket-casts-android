@@ -9,12 +9,12 @@ import au.com.shiftyjelly.pocketcasts.analytics.Tracker
 import au.com.shiftyjelly.pocketcasts.analytics.TrackerType
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.payment.AcknowledgedSubscription
+import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.FakePaymentDataSource
 import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
 import au.com.shiftyjelly.pocketcasts.payment.PaymentResultCode
 import au.com.shiftyjelly.pocketcasts.payment.Purchase
 import au.com.shiftyjelly.pocketcasts.payment.PurchaseState
-import au.com.shiftyjelly.pocketcasts.payment.SubscriptionBillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
@@ -56,7 +56,7 @@ class WinbackViewModelTest {
         }
         whenever(settings.cachedSubscriptionStatus) doReturn subscriptionSettingMock
         wheneverBlocking { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(
-            offerId = SubscriptionOffer.Winback.offerId(SubscriptionTier.Plus, SubscriptionBillingCycle.Yearly)!!,
+            offerId = SubscriptionOffer.Winback.offerId(SubscriptionTier.Plus, BillingCycle.Yearly)!!,
         )
 
         viewModel = WinbackViewModel(
@@ -185,7 +185,7 @@ class WinbackViewModelTest {
             orderId = "new-order-id",
             productIds = listOf(SubscriptionPlan.PlusMonthlyProductId),
         )
-        val newSubscription = AcknowledgedSubscription("new-order-id", SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly, isAutoRenewing = true)
+        val newSubscription = AcknowledgedSubscription("new-order-id", SubscriptionTier.Plus, BillingCycle.Monthly, isAutoRenewing = true)
 
         viewModel.loadWinbackData()
 
@@ -273,7 +273,7 @@ class WinbackViewModelTest {
             createPurchase(productIds = listOf(SubscriptionPlan.PlusMonthlyProductId)),
         )
         wheneverBlocking { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(
-            offerId = SubscriptionOffer.Winback.offerId(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly)!!,
+            offerId = SubscriptionOffer.Winback.offerId(SubscriptionTier.Plus, BillingCycle.Monthly)!!,
         )
 
         viewModel.loadWinbackData()
@@ -284,7 +284,7 @@ class WinbackViewModelTest {
                     redeemCode = "ABC",
                     formattedPrice = "$3.99",
                     tier = SubscriptionTier.Plus,
-                    billingCycle = SubscriptionBillingCycle.Monthly,
+                    billingCycle = BillingCycle.Monthly,
                 ),
                 awaitItem().winbackOfferState?.offer,
             )
@@ -301,7 +301,7 @@ class WinbackViewModelTest {
                     redeemCode = "ABC",
                     formattedPrice = "$20.00",
                     tier = SubscriptionTier.Plus,
-                    billingCycle = SubscriptionBillingCycle.Yearly,
+                    billingCycle = BillingCycle.Yearly,
                 ),
                 awaitItem().winbackOfferState?.offer,
             )
@@ -314,7 +314,7 @@ class WinbackViewModelTest {
             createPurchase(productIds = listOf(SubscriptionPlan.PatronMonthlyProductId)),
         )
         wheneverBlocking { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(
-            offerId = SubscriptionOffer.Winback.offerId(SubscriptionTier.Patron, SubscriptionBillingCycle.Monthly)!!,
+            offerId = SubscriptionOffer.Winback.offerId(SubscriptionTier.Patron, BillingCycle.Monthly)!!,
         )
 
         viewModel.loadWinbackData()
@@ -325,7 +325,7 @@ class WinbackViewModelTest {
                     redeemCode = "ABC",
                     formattedPrice = "$9.99",
                     tier = SubscriptionTier.Patron,
-                    billingCycle = SubscriptionBillingCycle.Monthly,
+                    billingCycle = BillingCycle.Monthly,
                 ),
                 awaitItem().winbackOfferState?.offer,
             )
@@ -338,7 +338,7 @@ class WinbackViewModelTest {
             createPurchase(productIds = listOf(SubscriptionPlan.PatronYearlyProductId)),
         )
         wheneverBlocking { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(
-            offerId = SubscriptionOffer.Winback.offerId(SubscriptionTier.Patron, SubscriptionBillingCycle.Yearly)!!,
+            offerId = SubscriptionOffer.Winback.offerId(SubscriptionTier.Patron, BillingCycle.Yearly)!!,
         )
 
         viewModel.loadWinbackData()
@@ -349,7 +349,7 @@ class WinbackViewModelTest {
                     redeemCode = "ABC",
                     formattedPrice = "$50.00",
                     tier = SubscriptionTier.Patron,
-                    billingCycle = SubscriptionBillingCycle.Yearly,
+                    billingCycle = BillingCycle.Yearly,
                 ),
                 awaitItem().winbackOfferState?.offer,
             )
@@ -373,13 +373,13 @@ class WinbackViewModelTest {
             orderId = "new-order-id",
             productIds = listOf(SubscriptionPlan.PatronYearlyProductId),
         )
-        val newSubscription = AcknowledgedSubscription("new-order-id", SubscriptionTier.Patron, SubscriptionBillingCycle.Yearly, isAutoRenewing = true)
+        val newSubscription = AcknowledgedSubscription("new-order-id", SubscriptionTier.Patron, BillingCycle.Yearly, isAutoRenewing = true)
 
         viewModel.loadWinbackData()
 
         paymentDataSource.loadedPurchases = listOf(newPurchase)
         wheneverBlocking { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(
-            offerId = SubscriptionOffer.Winback.offerId(SubscriptionTier.Patron, SubscriptionBillingCycle.Yearly)!!,
+            offerId = SubscriptionOffer.Winback.offerId(SubscriptionTier.Patron, BillingCycle.Yearly)!!,
         )
 
         viewModel.changePlan(SubscriptionPlan.PlusMonthlyPreview, mock<Activity>())
@@ -389,7 +389,7 @@ class WinbackViewModelTest {
                 redeemCode = "ABC",
                 formattedPrice = "$50.00",
                 tier = SubscriptionTier.Patron,
-                billingCycle = SubscriptionBillingCycle.Yearly,
+                billingCycle = BillingCycle.Yearly,
             ),
             viewModel.uiState.value.winbackOfferState?.offer,
         )
@@ -434,7 +434,7 @@ class WinbackViewModelTest {
             createPurchase(productIds = listOf(SubscriptionPlan.PlusYearlyProductId)),
         )
         wheneverBlocking { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(
-            offerId = SubscriptionOffer.Winback.offerId(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly)!!,
+            offerId = SubscriptionOffer.Winback.offerId(SubscriptionTier.Plus, BillingCycle.Monthly)!!,
         )
 
         viewModel.loadWinbackData()
@@ -454,7 +454,7 @@ class WinbackViewModelTest {
             product.copy(pricingPlans = newPricingPlans)
         }
         wheneverBlocking { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(
-            offerId = SubscriptionOffer.Winback.offerId(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly)!!,
+            offerId = SubscriptionOffer.Winback.offerId(SubscriptionTier.Plus, BillingCycle.Monthly)!!,
         )
 
         viewModel.loadWinbackData()
@@ -476,7 +476,7 @@ class WinbackViewModelTest {
             product.copy(pricingPlans = newPricingPlans)
         }
         wheneverBlocking { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(
-            offerId = SubscriptionOffer.Winback.offerId(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly)!!,
+            offerId = SubscriptionOffer.Winback.offerId(SubscriptionTier.Plus, BillingCycle.Monthly)!!,
         )
 
         viewModel.loadWinbackData()
@@ -491,7 +491,7 @@ class WinbackViewModelTest {
     @Test
     fun `claim winback offer successfully`() = runTest {
         wheneverBlocking { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(
-            offerId = SubscriptionOffer.Winback.offerId(SubscriptionTier.Plus, SubscriptionBillingCycle.Yearly)!!,
+            offerId = SubscriptionOffer.Winback.offerId(SubscriptionTier.Plus, BillingCycle.Yearly)!!,
         )
 
         viewModel.loadWinbackData()
@@ -827,7 +827,7 @@ private fun createPurchase(
 )
 
 private fun createSuccessReferralResult(
-    offerId: String = SubscriptionOffer.Winback.offerId(SubscriptionTier.Plus, SubscriptionBillingCycle.Yearly)!!,
+    offerId: String = SubscriptionOffer.Winback.offerId(SubscriptionTier.Plus, BillingCycle.Yearly)!!,
     code: String = "ABC",
 ) = ReferralResult.SuccessResult(
     winbackResponse {

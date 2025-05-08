@@ -94,7 +94,7 @@ class FakePaymentDataSource : PaymentDataSource {
     companion object {
         val DefaultLoadedProducts
             get() = SubscriptionTier.entries.flatMap { tier ->
-                SubscriptionBillingCycle.entries.map { billingCycle ->
+                BillingCycle.entries.map { billingCycle ->
                     Product(
                         SubscriptionPlan.productId(tier, billingCycle),
                         productName(tier, billingCycle),
@@ -142,36 +142,36 @@ class FakePaymentDataSource : PaymentDataSource {
 private val PlusMonthlyPricingPhase
     get() = PricingPhase(
         Price(3.99.toBigDecimal(), "USD", "$3.99"),
-        BillingPeriod(BillingPeriod.Cycle.Infinite, BillingPeriod.Interval.Monthly, intervalCount = 0),
+        PricingSchedule(PricingSchedule.RecurrenceMode.Infinite, PricingSchedule.Period.Monthly, periodCount = 0),
     )
 private val PlusYearlyPricingPhase
     get() = PricingPhase(
         Price(39.99.toBigDecimal(), "USD", "$39.99"),
-        BillingPeriod(BillingPeriod.Cycle.Infinite, BillingPeriod.Interval.Monthly, intervalCount = 0),
+        PricingSchedule(PricingSchedule.RecurrenceMode.Infinite, PricingSchedule.Period.Monthly, periodCount = 0),
     )
 private val PatronMonthlyPricingPhase
     get() = PricingPhase(
         Price(9.99.toBigDecimal(), "USD", "$9.99"),
-        BillingPeriod(BillingPeriod.Cycle.Infinite, BillingPeriod.Interval.Monthly, intervalCount = 0),
+        PricingSchedule(PricingSchedule.RecurrenceMode.Infinite, PricingSchedule.Period.Monthly, periodCount = 0),
     )
 private val PatronYearlyPricingPhase
     get() = PricingPhase(
         Price(99.99.toBigDecimal(), "USD", "$99.99"),
-        BillingPeriod(BillingPeriod.Cycle.Infinite, BillingPeriod.Interval.Yearly, intervalCount = 0),
+        PricingSchedule(PricingSchedule.RecurrenceMode.Infinite, PricingSchedule.Period.Yearly, periodCount = 0),
     )
 
 private fun productName(
     tier: SubscriptionTier,
-    billingCycle: SubscriptionBillingCycle,
+    billingCycle: BillingCycle,
 ) = "$tier $billingCycle (Fake)"
 
 private fun pricingPhases(
     tier: SubscriptionTier,
-    billingCycle: SubscriptionBillingCycle,
+    billingCycle: BillingCycle,
     offer: SubscriptionOffer?,
 ): List<PricingPhase> = when (offer) {
     SubscriptionOffer.Trial -> when (billingCycle) {
-        SubscriptionBillingCycle.Yearly -> when (tier) {
+        BillingCycle.Yearly -> when (tier) {
             SubscriptionTier.Plus -> listOf(
                 PlusYearlyPricingPhase.withDiscount(priceFraction = 0.0),
                 PlusYearlyPricingPhase,
@@ -180,11 +180,11 @@ private fun pricingPhases(
             SubscriptionTier.Patron -> emptyList()
         }
 
-        SubscriptionBillingCycle.Monthly -> emptyList()
+        BillingCycle.Monthly -> emptyList()
     }
 
     SubscriptionOffer.Referral -> when (billingCycle) {
-        SubscriptionBillingCycle.Yearly -> when (tier) {
+        BillingCycle.Yearly -> when (tier) {
             SubscriptionTier.Plus -> listOf(
                 PlusYearlyPricingPhase.withDiscount(priceFraction = 0.0, intervalCount = 2),
                 PlusYearlyPricingPhase,
@@ -193,11 +193,11 @@ private fun pricingPhases(
             SubscriptionTier.Patron -> emptyList()
         }
 
-        SubscriptionBillingCycle.Monthly -> emptyList()
+        BillingCycle.Monthly -> emptyList()
     }
 
     SubscriptionOffer.Winback -> when (billingCycle) {
-        SubscriptionBillingCycle.Monthly -> when (tier) {
+        BillingCycle.Monthly -> when (tier) {
             SubscriptionTier.Plus -> listOf(
                 PlusMonthlyPricingPhase.withDiscount(priceFraction = 0.5),
                 PlusMonthlyPricingPhase,
@@ -209,26 +209,26 @@ private fun pricingPhases(
             )
         }
 
-        SubscriptionBillingCycle.Yearly -> when (tier) {
+        BillingCycle.Yearly -> when (tier) {
             SubscriptionTier.Plus -> listOf(
-                PlusYearlyPricingPhase.withDiscount(priceFraction = 0.5, interval = BillingPeriod.Interval.Yearly),
+                PlusYearlyPricingPhase.withDiscount(priceFraction = 0.5, period = PricingSchedule.Period.Yearly),
                 PlusYearlyPricingPhase,
             )
 
             SubscriptionTier.Patron -> listOf(
-                PatronYearlyPricingPhase.withDiscount(priceFraction = 0.5, interval = BillingPeriod.Interval.Yearly),
+                PatronYearlyPricingPhase.withDiscount(priceFraction = 0.5, period = PricingSchedule.Period.Yearly),
                 PatronYearlyPricingPhase,
             )
         }
     }
 
     null -> when (billingCycle) {
-        SubscriptionBillingCycle.Monthly -> when (tier) {
+        BillingCycle.Monthly -> when (tier) {
             SubscriptionTier.Plus -> listOf(PlusMonthlyPricingPhase)
             SubscriptionTier.Patron -> listOf(PatronMonthlyPricingPhase)
         }
 
-        SubscriptionBillingCycle.Yearly -> when (tier) {
+        BillingCycle.Yearly -> when (tier) {
             SubscriptionTier.Plus -> listOf(PlusYearlyPricingPhase)
             SubscriptionTier.Patron -> listOf(PatronYearlyPricingPhase)
         }
@@ -237,14 +237,14 @@ private fun pricingPhases(
 
 private fun PricingPhase.withDiscount(
     priceFraction: Double,
-    cycle: BillingPeriod.Cycle = BillingPeriod.Cycle.Recurring(1),
-    interval: BillingPeriod.Interval = BillingPeriod.Interval.Monthly,
+    recurrenceMode: PricingSchedule.RecurrenceMode = PricingSchedule.RecurrenceMode.Recurring(1),
+    period: PricingSchedule.Period = PricingSchedule.Period.Monthly,
     intervalCount: Int = 1,
 ): PricingPhase {
     val newAmount = price.amount.times(priceFraction.coerceIn(0.0..1.0).toBigDecimal())
     val newFormattedPrice = if (newAmount == BigDecimal.ZERO) "Free" else "$%.2f".format(newAmount.toDouble())
     return copy(
         price = price.copy(amount = newAmount, formattedPrice = newFormattedPrice),
-        billingPeriod = BillingPeriod(cycle, interval, intervalCount),
+        schedule = PricingSchedule(recurrenceMode, period, intervalCount),
     )
 }

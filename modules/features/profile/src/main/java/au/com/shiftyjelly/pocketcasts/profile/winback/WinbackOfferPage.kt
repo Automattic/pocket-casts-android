@@ -47,7 +47,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP30
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.payment.SubscriptionBillingCycle
+import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -81,8 +81,8 @@ internal fun WinbackOfferPage(
         )
         Text(
             text = when (offer.billingCycle) {
-                SubscriptionBillingCycle.Monthly -> stringResource(LR.string.winback_offer_free_offer_title, offer.formattedPrice)
-                SubscriptionBillingCycle.Yearly -> stringResource(LR.string.winback_offer_free_offer_yearly_title, offer.formattedPrice)
+                BillingCycle.Monthly -> stringResource(LR.string.winback_offer_free_offer_title, offer.formattedPrice)
+                BillingCycle.Yearly -> stringResource(LR.string.winback_offer_free_offer_yearly_title, offer.formattedPrice)
             },
             fontWeight = FontWeight.Bold,
             fontSize = 28.sp,
@@ -96,8 +96,8 @@ internal fun WinbackOfferPage(
         )
         TextP30(
             text = when (offer.billingCycle) {
-                SubscriptionBillingCycle.Monthly -> stringResource(LR.string.winback_offer_free_offer_description, offer.formattedPrice)
-                SubscriptionBillingCycle.Yearly -> stringResource(LR.string.winback_offer_free_offer_yearly_description, offer.formattedPrice)
+                BillingCycle.Monthly -> stringResource(LR.string.winback_offer_free_offer_description, offer.formattedPrice)
+                BillingCycle.Yearly -> stringResource(LR.string.winback_offer_free_offer_yearly_description, offer.formattedPrice)
             },
             color = MaterialTheme.theme.colors.primaryText02,
             textAlign = TextAlign.Center,
@@ -261,7 +261,7 @@ private fun WinbackOfferPageThemePreview(
                 redeemCode = "",
                 formattedPrice = "\$3.99",
                 tier = SubscriptionTier.Plus,
-                billingCycle = SubscriptionBillingCycle.Monthly,
+                billingCycle = BillingCycle.Monthly,
             ),
         )
     }
@@ -273,13 +273,13 @@ private class WinbackOfferParameterProvider : PreviewParameterProvider<WinbackOf
             redeemCode = "",
             formattedPrice = "\$3.99",
             tier = SubscriptionTier.Plus,
-            billingCycle = SubscriptionBillingCycle.Monthly,
+            billingCycle = BillingCycle.Monthly,
         ),
         WinbackOffer(
             redeemCode = "",
             formattedPrice = "\$19.99",
             tier = SubscriptionTier.Plus,
-            billingCycle = SubscriptionBillingCycle.Yearly,
+            billingCycle = BillingCycle.Yearly,
         ),
     )
 }

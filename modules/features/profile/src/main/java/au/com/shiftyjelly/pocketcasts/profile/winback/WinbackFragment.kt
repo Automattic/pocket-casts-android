@@ -52,7 +52,7 @@ import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.components.ProgressDialog
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.payment.SubscriptionBillingCycle
+import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.settings.HelpPage
 import au.com.shiftyjelly.pocketcasts.settings.LogsPage
@@ -142,12 +142,12 @@ class WinbackFragment : BaseDialogFragment() {
                             WinbackNavRoutes.offerClaimedRoute(),
                             listOf(
                                 navArgument(WinbackNavRoutes.OfferClaimedBillingCycleArgument) {
-                                    type = NavType.EnumType(SubscriptionBillingCycle::class.java)
+                                    type = NavType.EnumType(BillingCycle::class.java)
                                 },
                             ),
                         ) { backStackEntry ->
                             val arguments = requireNotNull(backStackEntry.arguments) { "Missing back stack entry arguments" }
-                            val billingCycle = requireNotNull(BundleCompat.getSerializable(arguments, WinbackNavRoutes.OfferClaimedBillingCycleArgument, SubscriptionBillingCycle::class.java)) {
+                            val billingCycle = requireNotNull(BundleCompat.getSerializable(arguments, WinbackNavRoutes.OfferClaimedBillingCycleArgument, BillingCycle::class.java)) {
                                 "Missing billing cycle argument"
                             }
                             OfferClaimedPage(
@@ -386,7 +386,7 @@ private object WinbackNavRoutes {
 
     fun offerClaimedRoute() = "$OfferClaimed/{$OfferClaimedBillingCycleArgument}"
 
-    fun offerClaimedDestination(billingCycle: SubscriptionBillingCycle) = "$OfferClaimed/$billingCycle"
+    fun offerClaimedDestination(billingCycle: BillingCycle) = "$OfferClaimed/$billingCycle"
 }
 
 private val intOffsetAnimationSpec = tween<IntOffset>(350)
