@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,78 +10,68 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalInspectionMode
-import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import au.com.shiftyjelly.pocketcasts.account.components.SubscriptionPriceLabel
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradeFeatureItem
-import au.com.shiftyjelly.pocketcasts.account.viewmodel.ProfileUpgradeBannerViewModel.State
+import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalPagerWrapper
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.images.OfferBadge
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
+import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
-import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlans
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.payment.flatMap
+import au.com.shiftyjelly.pocketcasts.payment.getOrNull
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 
 @Composable
 fun ProfileUpgradeBanner(
-    state: State.Loaded,
-    onFeatureCardChanged: (UpgradeFeatureCard) -> Unit,
-    onClick: () -> Unit,
+    state: ProfileUpgradeBannerState,
+    onChangeFeatureCard: (SubscriptionPlan.Key) -> Unit,
+    onClickSubscribe: (SubscriptionPlan.Key) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    // Due to dependency on the billing classes in loaded state
-    // the banner is not previawable as we cannot
-    // instantiate the state ourselves.
-    if (LocalInspectionMode.current) {
-        TextH20(
-            text = "Dummy upgrade banner for preview",
-            textAlign = TextAlign.Center,
-            modifier = modifier
-                .background(MaterialTheme.theme.colors.primaryText01.copy(alpha = 0.1f))
-                .padding(32.dp),
+    HorizontalPagerWrapper(
+        pageCount = state.onboardingPlans.size,
+        initialPage = state.selectedFeatureCard?.let { selectedPlan ->
+            state.onboardingPlans.indexOfFirst { it.key == selectedPlan }.takeIf { it != -1 }
+        } ?: 0,
+        onPageChanged = { onChangeFeatureCard(state.onboardingPlans[it].key) },
+        showPageIndicator = state.onboardingPlans.size > 1,
+        pageIndicatorColor = MaterialTheme.theme.colors.primaryText01,
+        modifier = modifier,
+    ) { index, pagerHeight, _ ->
+        val subscriptionPlan = state.onboardingPlans[index]
+        FeatureCard(
+            subscriptionPlan = subscriptionPlan,
+            isRenewingSubscription = state.isRenewingSubscription,
+            onClickSubscribe = { onClickSubscribe(subscriptionPlan.key) },
+            expandContentHeight = true,
+            modifier = if (pagerHeight > 0) {
+                Modifier.height(LocalDensity.current.run { pagerHeight.toDp() })
+            } else {
+                Modifier
+            },
         )
-    } else {
-        val featureCardsState = state.featureCardsState
-        HorizontalPagerWrapper(
-            pageCount = featureCardsState.featureCards.size,
-            initialPage = featureCardsState.featureCards.indexOf(state.featureCardsState.currentFeatureCard),
-            onPageChanged = { onFeatureCardChanged(state.featureCardsState.featureCards[it]) },
-            showPageIndicator = featureCardsState.showPageIndicator,
-            pageIndicatorColor = MaterialTheme.theme.colors.primaryText01,
-            modifier = modifier,
-        ) { index, pagerHeight, _ ->
-            val currentTier = featureCardsState.featureCards[index].subscriptionTier
-            FeatureCard(
-                card = featureCardsState.featureCards[index],
-                button = requireNotNull(state.upgradeButtons.find { it.subscription.tier == currentTier }),
-                onClick = onClick,
-                subscriptionFrequency = state.featureCardsState.currentFrequency,
-                modifier = if (pagerHeight > 0) {
-                    Modifier.height(pagerHeight.pxToDp(LocalContext.current).dp)
-                } else {
-                    Modifier
-                },
-            )
-        }
     }
 }
 
 @Composable
 private fun FeatureCard(
-    card: UpgradeFeatureCard,
-    button: UpgradeButton,
-    onClick: () -> Unit,
-    subscriptionFrequency: SubscriptionFrequency,
+    subscriptionPlan: OnboardingSubscriptionPlan,
+    isRenewingSubscription: Boolean,
+    onClickSubscribe: () -> Unit,
     modifier: Modifier = Modifier,
+    expandContentHeight: Boolean = false,
 ) {
     Column(
         modifier = modifier.padding(horizontal = 16.dp),
@@ -94,49 +83,116 @@ private fun FeatureCard(
                 .padding(bottom = 12.dp),
         ) {
             SubscriptionBadge(
-                iconRes = card.iconRes,
-                shortNameRes = card.shortNameRes,
+                iconRes = subscriptionPlan.badgeIconRes,
+                shortNameRes = subscriptionPlan.shortNameRes,
             )
 
-            if (button.subscription is Subscription.WithOffer) {
+            val offerText = subscriptionPlan.offerBadgeText
+            if (offerText != null) {
                 OfferBadge(
-                    text = (button.subscription as Subscription.WithOffer).badgeOfferText(LocalContext.current.resources),
-                    backgroundColor = button.backgroundColorRes,
-                    textColor = button.textColorRes,
+                    text = offerText,
+                    backgroundColor = subscriptionPlan.offerBadgeColorRes,
+                    textColor = subscriptionPlan.offerBadgeTextColorRes,
                     modifier = Modifier.padding(start = 4.dp),
                 )
             }
         }
 
-        Column {
-            SubscriptionProductAmountHorizontal(
-                subscription = button.subscription,
+        SubscriptionPriceLabel(subscriptionPlan)
+
+        subscriptionPlan.featureItems.forEach { item ->
+            UpgradeFeatureItem(
+                item = item,
+                color = MaterialTheme.theme.colors.primaryText01,
             )
-
-            card.featureItems(subscriptionFrequency).forEach {
-                UpgradeFeatureItem(
-                    item = it,
-                    color = MaterialTheme.theme.colors.primaryText01,
-                )
-            }
         }
 
-        Spacer(modifier = Modifier.weight(1f))
-        Spacer(modifier = Modifier.height(8.dp))
-
-        val primaryText = when (button.planType) {
-            UpgradeButton.PlanType.RENEW -> stringResource(LR.string.renew_your_subscription)
-            UpgradeButton.PlanType.SUBSCRIBE, UpgradeButton.PlanType.UPGRADE -> { stringResource(LR.string.subscribe_to, stringResource(button.shortNameRes)) }
+        if (expandContentHeight) {
+            Spacer(
+                modifier = Modifier.weight(1f),
+            )
+            Spacer(
+                modifier = Modifier.height(8.dp),
+            )
         }
+
         OnboardingUpgradeHelper.UpgradeRowButton(
-            primaryText = primaryText,
-            backgroundColor = colorResource(button.backgroundColorRes),
+            primaryText = subscriptionPlan.ctaButtonText(isRenewingSubscription),
+            backgroundColor = subscriptionPlan.ctaButtonBackgroundColor,
             fontWeight = FontWeight.W500,
-            textColor = colorResource(button.textColorRes),
-            onClick = onClick,
+            textColor = subscriptionPlan.ctaButtonTextColor,
+            onClick = onClickSubscribe,
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(min = 48.dp),
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun FeatureCardPreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: ThemeType,
+) {
+    AppThemeWithBackground(themeType) {
+        FeatureCard(
+            subscriptionPlan = OnboardingSubscriptionPlan.create(SubscriptionPlan.PlusYearlyPreview),
+            isRenewingSubscription = false,
+            onClickSubscribe = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun FeatureCardPlusPreview() {
+    AppThemeWithBackground(ThemeType.LIGHT) {
+        FeatureCard(
+            subscriptionPlan = OnboardingSubscriptionPlan.create(SubscriptionPlan.PlusYearlyPreview),
+            isRenewingSubscription = false,
+            onClickSubscribe = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun FeatureCardPatronPreview() {
+    AppThemeWithBackground(ThemeType.LIGHT) {
+        FeatureCard(
+            subscriptionPlan = OnboardingSubscriptionPlan.create(SubscriptionPlan.PatronYearlyPreview),
+            isRenewingSubscription = false,
+            onClickSubscribe = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun FeatureCardIntroOfferPreview() {
+    AppThemeWithBackground(ThemeType.LIGHT) {
+        FeatureCard(
+            subscriptionPlan = SubscriptionPlans.Preview
+                .findOfferPlan(SubscriptionTier.Plus, BillingCycle.Yearly, SubscriptionOffer.IntroOffer)
+                .flatMap { OnboardingSubscriptionPlan.create(it) }
+                .getOrNull()!!,
+            isRenewingSubscription = false,
+            onClickSubscribe = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun FeatureCardTrialPreview() {
+    AppThemeWithBackground(ThemeType.LIGHT) {
+        FeatureCard(
+            subscriptionPlan = SubscriptionPlans.Preview
+                .findOfferPlan(SubscriptionTier.Plus, BillingCycle.Yearly, SubscriptionOffer.Trial)
+                .flatMap { OnboardingSubscriptionPlan.create(it) }
+                .getOrNull()!!,
+            isRenewingSubscription = false,
+            onClickSubscribe = {},
         )
     }
 }

@@ -14,19 +14,14 @@ interface UpgradeFeatureItem {
     @get:StringRes
     val title: Int
 
-    @get:StringRes
-    val text: Int?
-
     val isYearlyFeature: Boolean
+
     val isMonthlyFeature: Boolean
 }
 
 enum class PlusUpgradeFeatureItem(
     override val image: Int,
     override val title: Int,
-    override val text: Int? = null,
-    override val isYearlyFeature: Boolean = true,
-    override val isMonthlyFeature: Boolean = true,
 ) : UpgradeFeatureItem {
     Folders(
         image = IR.drawable.ic_plus_feature_folder,
@@ -59,23 +54,27 @@ enum class PlusUpgradeFeatureItem(
     SlumberStudiosPromo(
         image = IR.drawable.ic_plus_feature_slumber_studios,
         title = LR.string.onboarding_plus_feature_slumber_studios_title,
-        isMonthlyFeature = false,
-        isYearlyFeature = FeatureFlag.isEnabled(Feature.SLUMBER_STUDIOS_YEARLY_PROMO),
-    ),
+    ) {
+        override val isMonthlyFeature get() = false
+        override val isYearlyFeature get() = FeatureFlag.isEnabled(Feature.SLUMBER_STUDIOS_YEARLY_PROMO)
+    },
     LibroFm(
         image = IR.drawable.ic_plus_feature_libro,
         title = LR.string.onboarding_plus_feature_libro_title,
-        isMonthlyFeature = FeatureFlag.isEnabled(Feature.LIBRO_FM),
-        isYearlyFeature = FeatureFlag.isEnabled(Feature.LIBRO_FM),
-    ),
+    ) {
+
+        override val isYearlyFeature get() = FeatureFlag.isEnabled(Feature.LIBRO_FM)
+        override val isMonthlyFeature get() = FeatureFlag.isEnabled(Feature.LIBRO_FM)
+    },
+    ;
+
+    override val isYearlyFeature get() = true
+    override val isMonthlyFeature get() = true
 }
 
 enum class PatronUpgradeFeatureItem(
     override val image: Int,
     override val title: Int,
-    override val text: Int? = null,
-    override val isYearlyFeature: Boolean = true,
-    override val isMonthlyFeature: Boolean = true,
 ) : UpgradeFeatureItem {
     EverythingInPlus(
         image = IR.drawable.ic_check,
@@ -101,4 +100,8 @@ enum class PatronUpgradeFeatureItem(
         image = IR.drawable.ic_heart,
         title = LR.string.onboarding_patron_feature_gratitude_title,
     ),
+    ;
+
+    override val isYearlyFeature get() = true
+    override val isMonthlyFeature get() = true
 }

@@ -20,7 +20,7 @@ Language: nl
     <string name="account_encourage_description">Maak een account aan of log in om optimaal van Pocket Casts te genieten.</string>
     <string name="account_encourage_title">We hebben gemerkt dat je niet bent ingelogd</string>
     <string name="onboarding_get_started">Aan de slag</string>
-    <string name="onboarding_plus_feature_libro_title">Gratis audioboek van %1$s</string>
+    <string name="onboarding_plus_feature_libro_title"><![CDATA[Gratis audioboek van <a href="https://libro.fm/">Libro.fm</a>]]></string>
     <string name="encourage_account_history_banner_description">Maak een gratis account aan om je luistergeschiedenis overal te synchroniseren.</string>
     <string name="encourage_account_history_banner_title">Houd bij wat je hebt afgespeeld</string>
     <string name="encourage_account_filters_banner_description">Maak een gratis account aan om je filters op elk apparaat te synchroniseren.</string>

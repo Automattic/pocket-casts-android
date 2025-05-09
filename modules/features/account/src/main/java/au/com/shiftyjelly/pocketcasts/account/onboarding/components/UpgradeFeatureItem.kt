@@ -15,10 +15,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.PlusUpgradeFeatureItem
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.UpgradeFeatureItem
 import au.com.shiftyjelly.pocketcasts.compose.text.HtmlText
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @Composable
@@ -44,13 +42,7 @@ fun UpgradeFeatureItem(
         )
         Spacer(Modifier.width(16.dp))
         HtmlText(
-            html = when (item) {
-                PlusUpgradeFeatureItem.LibroFm -> stringResource(
-                    id = item.title,
-                    stringResource(id = LR.string.libro_fm),
-                )
-                else -> stringResource(id = item.title)
-            },
+            html = stringResource(id = item.title),
             color = color,
             linkColor = color,
             textStyleResId = UR.style.H50,

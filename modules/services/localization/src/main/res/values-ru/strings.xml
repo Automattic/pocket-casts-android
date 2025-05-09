@@ -20,7 +20,7 @@ Language: ru
     <string name="account_encourage_description">Создайте учётную запись или войдите, чтобы пользоваться всеми возможностями Pocket Casts.</string>
     <string name="account_encourage_title">Мы заметили, что вы не вошли в систему</string>
     <string name="onboarding_get_started">Начать</string>
-    <string name="onboarding_plus_feature_libro_title">Бесплатная аудиокнига от %1$s</string>
+    <string name="onboarding_plus_feature_libro_title"><![CDATA[Бесплатная аудиокнига от <a href="https://libro.fm/">Libro.fm</a>]]></string>
     <string name="encourage_account_history_banner_description">Создайте бесплатную учётную запись, чтобы синхронизировать журнал прослушивания на всех устройствах.</string>
     <string name="encourage_account_history_banner_title">Следите за тем, что вы прослушали</string>
     <string name="encourage_account_filters_banner_description">Создайте бесплатную учётную запись, чтобы синхронизировать фильтры на всех устройствах.</string>

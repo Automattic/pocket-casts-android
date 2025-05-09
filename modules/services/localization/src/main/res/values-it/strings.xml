@@ -20,7 +20,7 @@ Language: it
     <string name="account_encourage_description">Crea un account o accedi per goderti al massimo Pocket Casts.</string>
     <string name="account_encourage_title">Abbiamo notato che non hai effettuato l\'accesso</string>
     <string name="onboarding_get_started">Inizia</string>
-    <string name="onboarding_plus_feature_libro_title">Audiolibro gratuito di %1$s</string>
+    <string name="onboarding_plus_feature_libro_title"><![CDATA[Audiolibro gratuito di <a href="https://libro.fm/">Libro.fm</a>]]></string>
     <string name="encourage_account_history_banner_description">Crea un account gratuito per sincronizzare la cronologia degli ascolti ovunque tu sia.</string>
     <string name="encourage_account_history_banner_title">Tieni traccia dei contenuti che hai riprodotto</string>
     <string name="encourage_account_filters_banner_description">Crea un account gratuito per sincronizzare i filtri su qualsiasi dispositivo.</string>

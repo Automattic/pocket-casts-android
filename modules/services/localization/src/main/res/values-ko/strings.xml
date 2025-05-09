@@ -20,7 +20,7 @@ Language: ko_KR
     <string name="account_encourage_description">계정을 생성하거나 로그인하여 Pocket Casts를 마음껏 즐기세요.</string>
     <string name="account_encourage_title">로그인되지 않았음</string>
     <string name="onboarding_get_started">시작하기</string>
-    <string name="onboarding_plus_feature_libro_title">%1$s에서 무료 오디오북 듣기</string>
+    <string name="onboarding_plus_feature_libro_title"><![CDATA[<a href="https://libro.fm/">Libro.fm</a>에서 무료 오디오북 듣기]]></string>
     <string name="encourage_account_history_banner_description">무료 계정을 만들어 청취 기록을 어디에서나 동기화하세요.</string>
     <string name="encourage_account_history_banner_title">재생한 내용 추적</string>
     <string name="encourage_account_filters_banner_description">무료 계정을 만들어 모든 기기에서 필터를 동기화하세요.</string>
