@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-04-24 14:54:03+0000
+Translation-Revision-Date: 2025-05-02 13:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="winback_cancel_subscription_continue_cancel_button_label">Doorgaan met annuleren</string>
+    <string name="winback_cancel_subscription_accept_offer_button_label">Aanbieding accepteren</string>
+    <string name="winback_claimed_offer_message_4">Bedankt dat je voor Pocket Casts kiest. Je abonnement met een jaar lang korting gaat in na je huidige factuurperiode.</string>
+    <string name="winback_claimed_offer_message_2">Bedankt dat je voor Pocket Casts kiest. Je gratis maand wordt toegevoegd aan je huidige abonnement.</string>
+    <string name="winback_offer_free_offer_yearly_description">Betaal nu %1$s om een jaar Pocket Casts Plus tegen de helft van de prijs vast te leggen. Je jaar met korting begint nadat je huidige abonnement is afgelopen.</string>
+    <string name="winback_offer_free_offer_description">Geniet van een gratis maand Pocket Casts Plus! De aanbieding wordt toegevoegd aan je huidige abonnement.</string>
+    <string name="winback_offer_free_offer_yearly_title">Krijg 50%% korting op je volgende jaar en bespaar %1$s</string>
+    <string name="winback_offer_free_offer_title">Krijg je volgende maand gratis en bespaar %1$s</string>
+    <string name="recommendations_loved_by_listeners">Geliefd bij luisteraars van</string>
+    <string name="recommendations_if_you_like">Als je dit leuk vindt</string>
     <string name="price_per_week_usd">\u0024%1$.2f/week</string>
     <string name="price_per_week">%1$.2f %2$s/week</string>
     <string name="winback_cancel_subscription_header_title">Dingen die je moet weten voordat je annuleert</string>
@@ -105,7 +115,6 @@ Language: nl
     <string name="suggested_folders_use_these_folders_button">Deze mappen gebruiken</string>
     <string name="winback_claiming_offer">Aanbieding claimen</string>
     <string name="winback_claimed_offer_message_3">50% korting op je eerste jaar!</string>
-    <string name="winback_offer_free_offer_yearly_description">Betaal nu %1$s voor nog een jaar met 50%% korting.</string>
     <string name="podcast_refresh_no_episodes_found">Geen afleveringen gevonden.</string>
     <string name="podcast_refresh_new_episode_found">Nieuwe afleveringen gevonden!</string>
     <string name="podcast_refreshing_episode_list">Lijst met afleveringen vernieuwen …</string>

@@ -15,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.disposables.CompositeDisposable
@@ -53,7 +54,7 @@ class CreateAccountViewModel
         private const val SOURCE_KEY = "source"
         private const val ENABLED_KEY = "enabled"
 
-        fun trackPurchaseEvent(subscription: Subscription?, purchaseResult: PurchaseResult, analyticsTracker: AnalyticsTracker) {
+        fun trackPurchaseEvent(subscription: Subscription?, purchaseResult: PurchaseResult, source: OnboardingUpgradeSource, analyticsTracker: AnalyticsTracker) {
             val productKey = subscription?.productDetails?.productId?.let {
                 if (it in listOf(PLUS_MONTHLY_PRODUCT_ID, PLUS_YEARLY_PRODUCT_ID)) {
                     // retain short product id for plus subscriptions
@@ -72,6 +73,7 @@ class CreateAccountViewModel
             val analyticsProperties = mapOf(
                 PRODUCT_KEY to productKey,
                 OFFER_TYPE_KEY to offerType,
+                SOURCE_KEY to source.analyticsValue,
             )
 
             when (purchaseResult) {

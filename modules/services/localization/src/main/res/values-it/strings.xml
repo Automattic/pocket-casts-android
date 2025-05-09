@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-04-24 16:54:03+0000
+Translation-Revision-Date: 2025-04-30 09:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
+    <string name="winback_cancel_subscription_continue_cancel_button_label">Continua con l\'annullamento</string>
+    <string name="winback_cancel_subscription_accept_offer_button_label">Accetta l\'offerta</string>
+    <string name="winback_claimed_offer_message_4">Grazie per aver scelto Pocket Casts. Il tuo anno a un prezzo scontato inizierà al termine del periodo di fatturazione attuale.</string>
+    <string name="winback_claimed_offer_message_2">Grazie per aver scelto Pocket Casts. Il mese gratuito verrà aggiunto all\'abbonamento attuale.</string>
+    <string name="winback_offer_free_offer_yearly_description">Paga %1$s ora per assicurarti un anno di Pocket Casts Plus a metà prezzo. Il tuo anno a un prezzo scontato inizierà alla scadenza del piano attuale.</string>
+    <string name="winback_offer_free_offer_description">Goditi un mese di Pocket Casts Plus offerto da noi. L\'offerta verrà aggiunta all\'abbonamento attuale.</string>
+    <string name="winback_offer_free_offer_yearly_title">Ottieni uno sconto del 50%% sul prossimo anno e risparmia %1$s</string>
+    <string name="winback_offer_free_offer_title">Ottieni il tuo prossimo mese gratuitamente e risparmia %1$s</string>
+    <string name="recommendations_loved_by_listeners">Amato dagli ascoltatori di</string>
+    <string name="recommendations_if_you_like">Se ti piace</string>
     <string name="price_per_week_usd">\u0024%1$.2f/settimana</string>
     <string name="price_per_week">%1$.2f %2$s/settimana</string>
     <string name="winback_cancel_subscription_header_title">Cose da sapere prima di annullare</string>
@@ -105,7 +115,6 @@ Language: it
     <string name="suggested_folders_use_these_folders_button">Utilizza queste cartelle</string>
     <string name="winback_claiming_offer">Riscatto dell\'offerta</string>
     <string name="winback_claimed_offer_message_3">Sconto del 50% sul prossimo anno!</string>
-    <string name="winback_offer_free_offer_yearly_description">Paga %1$s ora per un ulteriore anno con uno sconto del 50%%.</string>
     <string name="podcast_refresh_no_episodes_found">Nessun episodio trovato.</string>
     <string name="podcast_refresh_new_episode_found">Nuovo episodio trovato!</string>
     <string name="podcast_refreshing_episode_list">Aggiornamento dell\'elenco degli episodi in corso…</string>

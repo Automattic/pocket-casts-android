@@ -1,20 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-04-23 13:54:04+0000
+Translation-Revision-Date: 2025-04-30 14:54:04+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
-    <string name="price_per_week_usd">\u0024%1$.2f/semana</string>
-    <string name="price_per_week">%1$.2f %2$s/semana</string>
+    <string name="winback_cancel_subscription_continue_cancel_button_label">Continuar con la cancelación</string>
+    <string name="winback_cancel_subscription_accept_offer_button_label">Aceptar oferta</string>
+    <string name="winback_claimed_offer_message_4">Gracias por elegir Pocket Casts. Tu año con descuento empezará después de tu periodo de facturación actual.</string>
+    <string name="winback_claimed_offer_message_2">Gracias por elegir Pocket Casts. Tu mes gratuito se añadirá a tu suscripción actual.</string>
+    <string name="winback_offer_free_offer_yearly_description">Paga %1$s ahora para conseguir un año de Pocket Casts Plus a mitad de precio. Tu año con descuento empezará cuando finalice tu plan actual.</string>
+    <string name="winback_offer_free_offer_description">Disfruta de un mes de Pocket Casts Plus sin coste. La oferta se añadirá a tu suscripción actual.</string>
+    <string name="winback_offer_free_offer_yearly_title">Consigue un 50 %% de descuento en tu próximo año y ahorra %1$s</string>
+    <string name="winback_offer_free_offer_title">Consigue tu próximo mes gratis y ahorra %1$s</string>
+    <string name="recommendations_loved_by_listeners">Les encanta a los oyentes de</string>
+    <string name="recommendations_if_you_like">Si te gusta</string>
+    <string name="price_per_week_usd">%1$.2f \u0024 por semana</string>
+    <string name="price_per_week">%1$.2f  %2$s por semana</string>
     <string name="winback_cancel_subscription_header_title">Cosas que deberías saber antes de cancelar</string>
     <string name="winback_offer_header">¿Estás pensando en irte?\nDeja que te ayudemos</string>
     <string name="account_benefit_recommendations_description">Obtén sugerencias de podcasts personalizadas en función de tus hábitos de escucha.</string>
     <string name="account_benefit_recommendations_title">Recomendaciones personalizadas</string>
     <string name="account_benefit_backups_description">Tu biblioteca y tus preferencias se guardan de forma segura.</string>
     <string name="account_benefit_backups_title">Copias de seguridad fiables</string>
-    <string name="account_benefit_sync_description">Sincroniza tu progreso y se mostrará en todos tus dispositivos.</string>
+    <string name="account_benefit_sync_description">Sincroniza tu progreso y tus programas en todos tus dispositivos.</string>
     <string name="account_benefit_sync_title">Sincronización entre dispositivos</string>
     <string name="account_encourage_benefits_title">Ventajas de la cuenta</string>
     <string name="account_encourage_description">Crea una cuenta o inicia sesión para disfrutar al máximo de Pocket Casts.</string>
@@ -105,7 +115,6 @@ Language: es
     <string name="suggested_folders_use_these_folders_button">Usar estas carpetas</string>
     <string name="winback_claiming_offer">Reclamar oferta</string>
     <string name="winback_claimed_offer_message_3">50 % de descuento el próximo año</string>
-    <string name="winback_offer_free_offer_yearly_description">Paga %1$s ahora para obtener un año más al 50 %% de descuento.</string>
     <string name="podcast_refresh_no_episodes_found">No se ha encontrado ningún episodio.</string>
     <string name="podcast_refresh_new_episode_found">Se ha encontrado un nuevo episodio.</string>
     <string name="podcast_refreshing_episode_list">Actualizando la lista de episodios…</string>

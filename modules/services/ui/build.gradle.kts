@@ -26,6 +26,7 @@ dependencies {
     api(projects.modules.services.model)
     api(projects.modules.services.preferences)
     api(projects.modules.services.repositories)
+    api(projects.modules.services.servers)
 
     implementation(platform(libs.compose.bom))
 

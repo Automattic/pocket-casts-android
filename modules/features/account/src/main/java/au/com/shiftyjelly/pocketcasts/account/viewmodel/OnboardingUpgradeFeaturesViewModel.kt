@@ -225,6 +225,7 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
                         CreateAccountViewModel.trackPurchaseEvent(
                             subscription,
                             purchaseResult,
+                            source,
                             analyticsTracker,
                         )
                     }
