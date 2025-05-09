@@ -56,7 +56,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.extensions.brush
 import au.com.shiftyjelly.pocketcasts.compose.patronGradientBrush
 import au.com.shiftyjelly.pocketcasts.compose.plusGradientBrush
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -238,14 +238,12 @@ object OnboardingUpgradeHelper {
         selected: Boolean = true,
     ) {
         val brush = when (subscriptionTier) {
-            SubscriptionTier.PLUS -> Brush.plusGradientBrush
-            SubscriptionTier.PATRON -> Brush.patronGradientBrush
-            SubscriptionTier.NONE -> throw IllegalStateException("Unknown subscription tier")
+            SubscriptionTier.Plus -> Brush.plusGradientBrush
+            SubscriptionTier.Patron -> Brush.patronGradientBrush
         }
         val textColor = when (subscriptionTier) {
-            SubscriptionTier.PLUS -> Color.Black
-            SubscriptionTier.PATRON -> Color.White
-            SubscriptionTier.NONE -> throw IllegalStateException("Unknown subscription tier")
+            SubscriptionTier.Plus -> Color.Black
+            SubscriptionTier.Patron -> Color.White
         }
         Box(
             modifier = if (selected) {
@@ -308,9 +306,8 @@ object OnboardingUpgradeHelper {
         Box(modifier) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 when (tier) {
-                    SubscriptionTier.PLUS -> PlusBlurredCanvasBackground()
-                    SubscriptionTier.PATRON -> PatronBlurredCanvasBackground()
-                    SubscriptionTier.NONE -> throw IllegalStateException("Unknown tier")
+                    SubscriptionTier.Plus -> PlusBlurredCanvasBackground()
+                    SubscriptionTier.Patron -> PatronBlurredCanvasBackground()
                 }
             } else {
                 ImageBackground(backgroundGlowsRes)

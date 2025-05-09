@@ -1,33 +1,72 @@
 package au.com.shiftyjelly.pocketcasts.settings.onboarding
 
 import android.os.Parcelable
+import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-sealed class OnboardingFlow(val analyticsValue: String) : Parcelable {
-    @Parcelize object LoggedOut : OnboardingFlow("logged_out")
+sealed interface OnboardingFlow : Parcelable {
+    val analyticsValue: String
+    val source: OnboardingUpgradeSource get() = OnboardingUpgradeSource.UNKNOWN
+    val preselectedTier: SubscriptionTier get() = SubscriptionTier.Plus
+    val preselectedBillingCycle: BillingCycle get() = BillingCycle.Yearly
 
-    @Parcelize object InitialOnboarding : OnboardingFlow("initial_onboarding")
-
-    @Parcelize object EngageSdk : OnboardingFlow("engage_sdk")
-
-    @Parcelize class PlusAccountUpgrade(override val source: OnboardingUpgradeSource) : PlusFlow, OnboardingFlow("plus_account_upgrade")
-
-    @Parcelize object PlusAccountUpgradeNeedsLogin : OnboardingFlow("plus_account_upgrade_needs_login")
-
-    @Parcelize object ReferralLoginOrSignUp : OnboardingFlow("referral_login_or_signup")
-
-    @Parcelize class Upsell(
-        override val source: OnboardingUpgradeSource,
-    ) : PlusFlow, OnboardingFlow("plus_upsell")
-
-    @Parcelize class PatronAccountUpgrade(override val source: OnboardingUpgradeSource) : PlusFlow, OnboardingFlow("patron_account_upgrade")
-
-    sealed interface PlusFlow {
-        val source: OnboardingUpgradeSource
+    @Parcelize
+    data object LoggedOut : OnboardingFlow {
+        override val analyticsValue get() = "logged_out"
     }
 
-    @Parcelize data object Welcome : OnboardingFlow("welcome")
+    @Parcelize
+    data object InitialOnboarding : OnboardingFlow {
+        override val analyticsValue get() = "initial_onboarding"
+    }
 
-    @Parcelize data object AccountEncouragement : OnboardingFlow("account_encouragement")
+    @Parcelize
+    data object EngageSdk : OnboardingFlow {
+        override val analyticsValue get() = "engage_sdk"
+    }
+
+    @Parcelize
+    data class PlusAccountUpgrade(
+        override val source: OnboardingUpgradeSource,
+        override val preselectedTier: SubscriptionTier,
+        override val preselectedBillingCycle: BillingCycle,
+    ) : OnboardingFlow {
+        override val analyticsValue get() = "plus_account_upgrade"
+    }
+
+    @Parcelize
+    data object PlusAccountUpgradeNeedsLogin : OnboardingFlow {
+        override val analyticsValue get() = "plus_account_upgrade_needs_login"
+    }
+
+    @Parcelize
+    data object ReferralLoginOrSignUp : OnboardingFlow {
+        override val analyticsValue get() = "referral_login_or_signup"
+    }
+
+    @Parcelize
+    data class Upsell(
+        override val source: OnboardingUpgradeSource,
+    ) : OnboardingFlow {
+        override val analyticsValue get() = "plus_upsell"
+    }
+
+    @Parcelize
+    data class PatronAccountUpgrade(
+        override val source: OnboardingUpgradeSource,
+    ) : OnboardingFlow {
+        override val analyticsValue get() = "patron_account_upgrade"
+    }
+
+    @Parcelize
+    data object Welcome : OnboardingFlow {
+        override val analyticsValue get() = "welcome"
+    }
+
+    @Parcelize
+    data object AccountEncouragement : OnboardingFlow {
+        override val analyticsValue get() = "account_encouragement"
+    }
 }

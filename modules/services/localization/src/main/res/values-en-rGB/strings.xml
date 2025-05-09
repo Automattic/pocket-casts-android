@@ -253,7 +253,6 @@ Language: en_GB
     <string name="onboarding_welcome_recommendations_title">Discover something new</string>
     <string name="onboarding_welcome_get_you_listening_plus">Thank you, now let\'s get you listening!</string>
     <string name="onboarding_welcome_get_you_listening">Welcome, now let\'s get you listening!</string>
-    <string name="onboarding_plus_recurring_after_free_trial">Recurring payments will begin after your %s</string>
     <string name="onboarding_plus_start_free_trial_and_subscribe">Start free trial &amp; subscribe</string>
     <string name="onboarding_plus_terms_and_conditions">Terms and Conditions</string>
     <string name="onboarding_plus_privacy_policy">Privacy Policy</string>

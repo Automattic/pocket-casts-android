@@ -245,7 +245,6 @@ Language: nb_NO
     <string name="onboarding_plus_privacy_policy">Retningslinjer for personvern</string>
     <string name="onboarding_plus_terms_and_conditions">Vilkår</string>
     <string name="onboarding_plus_start_free_trial_and_subscribe">Start en gratis prøveperiode og abonner</string>
-    <string name="onboarding_plus_recurring_after_free_trial">Regelmessige betalinger starter etter %s</string>
     <string name="onboarding_welcome_get_you_listening">Velkommen, la oss få deg i gang med lyttingen!</string>
     <string name="onboarding_welcome_get_you_listening_plus">Takk, la oss nå få deg i gang med lyttingen!</string>
     <string name="onboarding_welcome_recommendations_title">Oppdag noe nytt</string>

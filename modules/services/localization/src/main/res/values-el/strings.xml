@@ -390,8 +390,6 @@ Language: el_GR
     <string name="single_chapter">1 κεφάλαιο</string>
     <string name="number_of_chapters">%d κεφάλαια</string>
     <string name="onboarding_plus_feature_slumber_studios_title">1 χρόνος αποκλειστικού περιεχομένου από τα &lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt;</string>
-    <string name="onboarding_plus_recurring_after_intro_offer_sufix">μετά τον πρώτο σου χρόνο</string>
-    <string name="onboarding_plus_recurring_after_intro_offer">Επαναλαμβανόμενη πληρωμή στις %s</string>
     <string name="half_price_first_year">50% έκπτωση στον πρώτο σου χρόνο</string>
     <string name="plus_offer_duration">%s προσφορά</string>
     <string name="onboarding_plus_feature_watch_playback">Εφαρμογές Apple Watch &amp; Wear OS</string>
@@ -691,7 +689,6 @@ Language: el_GR
     <string name="onboarding_welcome_recommendations_title">Ανακάλυψε κάτι νέο</string>
     <string name="onboarding_welcome_get_you_listening_plus">Σε ευχαριστουμε, τώρα ας σε βάλουμε να ακούσεις!</string>
     <string name="onboarding_welcome_get_you_listening">Καλωσήρθες, τώρα ας σου βρούμε κάτι να ακούσεις!</string>
-    <string name="onboarding_plus_recurring_after_free_trial">Οι επαναλαμβανόμενες πληρωμές θα ξεκινήσουν μετά το %s</string>
     <string name="onboarding_plus_start_free_trial_and_subscribe">Ξεκίνα δωρεάν δοκιμή &amp; εγγραφή</string>
     <string name="onboarding_plus_terms_and_conditions">Όροι και Προϋποθέσεις</string>
     <string name="onboarding_plus_privacy_policy">Πολιτική Απορρήτου</string>

@@ -11,8 +11,6 @@ import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.AutoDownloadLimitSetting
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.CloudSortOrder.entries
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.UpNextAction.entries
 import au.com.shiftyjelly.pocketcasts.preferences.model.AppIconSetting
@@ -495,12 +493,6 @@ interface Settings {
 
     fun isNotificationsDisabledMessageShown(): Boolean
     fun setNotificationsDisabledMessageShown(value: Boolean)
-
-    fun setLastSelectedSubscriptionTier(tier: SubscriptionTier)
-    fun getLastSelectedSubscriptionTier(): SubscriptionTier?
-
-    fun setLastSelectedSubscriptionFrequency(frequency: SubscriptionFrequency)
-    fun getLastSelectedSubscriptionFrequency(): SubscriptionFrequency?
 
     // This boolean should be update to false when a user signs in and should be set to
     // true once a user signs out and that sign out has been fully handled

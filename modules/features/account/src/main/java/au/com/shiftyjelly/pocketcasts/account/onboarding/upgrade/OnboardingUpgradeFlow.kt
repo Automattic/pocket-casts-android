@@ -10,22 +10,19 @@ import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.OutlinedRowButton
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UnselectedOutlinedRowButton
-import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeBottomSheetState
-import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeBottomSheetViewModel
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesViewModel
 import au.com.shiftyjelly.pocketcasts.compose.bars.SystemBarsStyles
 import au.com.shiftyjelly.pocketcasts.compose.plusGradientBrush
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
@@ -36,6 +33,8 @@ private const val NULL_ACTIVITY_ERROR = "Activity is null when attempting subscr
 
 @Composable
 fun OnboardingUpgradeFlow(
+    viewModel: OnboardingUpgradeFeaturesViewModel,
+    state: OnboardingUpgradeFeaturesState,
     flow: OnboardingFlow,
     source: OnboardingUpgradeSource,
     isLoggedIn: Boolean,
@@ -45,36 +44,24 @@ fun OnboardingUpgradeFlow(
     onProceed: () -> Unit,
     onUpdateSystemBars: (SystemBarsStyles) -> Unit,
 ) {
-    val bottomSheetViewModel = hiltViewModel<OnboardingUpgradeBottomSheetViewModel>()
-    val mainSheetViewModel = hiltViewModel<OnboardingUpgradeFeaturesViewModel>()
-    val state = bottomSheetViewModel.state.collectAsState().value
-    val hasSubscriptions = state is OnboardingUpgradeBottomSheetState.Loaded && state.subscriptions.isNotEmpty()
-
-    val coroutineScope = rememberCoroutineScope()
     val activity = LocalContext.current.getActivity()
+    val coroutineScope = rememberCoroutineScope()
 
+    val areSubscriptionsLoaded = state is OnboardingUpgradeFeaturesState.Loaded
     val forceAutoPurchase = forcePurchase ||
         (flow is OnboardingFlow.Upsell && (source == OnboardingUpgradeSource.RECOMMENDATIONS || source == OnboardingUpgradeSource.LOGIN))
 
     if (forceAutoPurchase) {
         activity?.let {
             LaunchedEffect(Unit) {
-                mainSheetViewModel.onClickSubscribe(
-                    activity = activity,
-                    flow = flow,
-                    source = source,
-                    onComplete = onProceed,
-                )
+                viewModel.purchaseSelectedPlan(activity, onProceed)
             }
         }
     }
 
-    val startSelectPaymentFrequencyInExpandedState =
-        // Only start with expanded state if there are any subscriptions and payment frequency selection is needed
-        hasSubscriptions && (
-            flow is OnboardingFlow.PlusAccountUpgradeNeedsLogin ||
-                flow is OnboardingFlow.PlusAccountUpgrade
-            )
+    // Only start with expanded state if there are any subscriptions and payment frequency selection is needed
+    val startSelectPaymentFrequencyInExpandedState = areSubscriptionsLoaded &&
+        (flow is OnboardingFlow.PlusAccountUpgradeNeedsLogin || flow is OnboardingFlow.PlusAccountUpgrade)
     val initialValue = if (startSelectPaymentFrequencyInExpandedState) {
         ModalBottomSheetValue.Expanded
     } else {
@@ -90,14 +77,15 @@ fun OnboardingUpgradeFlow(
             ModalBottomSheetValue.Hidden -> {
                 // Don't fire event when initially loading the screen and both current and target are "Hidden"
                 if (sheetState.currentValue == ModalBottomSheetValue.Expanded) {
-                    bottomSheetViewModel.onSelectPaymentFrequencyDismissed(flow, source)
+                    viewModel.onSelectPaymentFrequencyDismissed(flow, source)
                     if (flow is OnboardingFlow.PlusAccountUpgrade) {
-                        mainSheetViewModel.onDismiss(flow, source)
+                        viewModel.onDismiss(flow, source)
                         onBackPressed()
                     }
                 }
             }
-            ModalBottomSheetValue.Expanded -> bottomSheetViewModel.onSelectPaymentFrequencyShown(flow, source)
+
+            ModalBottomSheetValue.Expanded -> viewModel.onSelectPaymentFrequencyShown(flow, source)
             else -> {}
         }
     }
@@ -115,7 +103,7 @@ fun OnboardingUpgradeFlow(
         if (sheetState.isVisible) {
             coroutineScope.launch { sheetState.hide() }
         } else {
-            mainSheetViewModel.onDismiss(flow, source)
+            viewModel.onDismiss(flow, source)
             onBackPressed()
         }
     }
@@ -128,6 +116,8 @@ fun OnboardingUpgradeFlow(
         content = {
             if (flow !is OnboardingFlow.PlusAccountUpgrade) {
                 OnboardingUpgradeFeaturesPage(
+                    viewModel = viewModel,
+                    state = state,
                     flow = flow,
                     source = source,
                     onBackPressed = onBackPressed,
@@ -139,12 +129,7 @@ fun OnboardingUpgradeFlow(
                                         sheetState.show()
                                     }
                                 } else {
-                                    mainSheetViewModel.onClickSubscribe(
-                                        activity = activity,
-                                        flow = flow,
-                                        source = source,
-                                        onComplete = onProceed,
-                                    )
+                                    viewModel.purchaseSelectedPlan(activity, onProceed)
                                 }
                             } else {
                                 onNeedLogin()
@@ -154,30 +139,26 @@ fun OnboardingUpgradeFlow(
                         }
                     },
                     onNotNowPressed = onProceed,
-                    canUpgrade = hasSubscriptions,
                     onUpdateSystemBars = onUpdateSystemBars,
                 )
             }
         },
         sheetContent = {
             OnboardingUpgradeBottomSheet(
+                viewModel = viewModel,
+                state = state,
                 onClickSubscribe = {
                     if (activity != null) {
-                        bottomSheetViewModel.onClickSubscribe(
-                            activity = activity,
-                            flow = flow,
-                            source = source,
-                            onComplete = onProceed,
-                        )
+                        viewModel.purchaseSelectedPlan(activity, onProceed)
                     } else {
                         LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, NULL_ACTIVITY_ERROR)
                     }
                 },
                 onPrivacyPolicyClick = {
-                    mainSheetViewModel.onPrivacyPolicyPressed()
+                    viewModel.onPrivacyPolicyPressed()
                 },
                 onTermsAndConditionsClick = {
-                    mainSheetViewModel.onTermsAndConditionsPressed()
+                    viewModel.onTermsAndConditionsPressed()
                 },
             )
         },
@@ -192,26 +173,26 @@ private fun OutlinedButtonPreview() {
             text = "one this is way too long | | | | | | | | | | |",
             brush = Brush.plusGradientBrush,
             selectedCheckMark = true,
-            subscriptionTier = SubscriptionTier.PLUS,
+            subscriptionTier = SubscriptionTier.Plus,
             onClick = {},
         )
         OutlinedRowButton(
             text = "two",
             topText = "woohoo!",
             brush = Brush.plusGradientBrush,
-            subscriptionTier = SubscriptionTier.PLUS,
+            subscriptionTier = SubscriptionTier.Plus,
             selectedCheckMark = true,
             onClick = {},
         )
         UnselectedOutlinedRowButton(
             text = "three",
-            subscriptionTier = SubscriptionTier.PLUS,
+            subscriptionTier = SubscriptionTier.Plus,
             onClick = {},
         )
         UnselectedOutlinedRowButton(
             text = "four this is also way too long | | | | | | |",
             topText = "woohoo!",
-            subscriptionTier = SubscriptionTier.PLUS,
+            subscriptionTier = SubscriptionTier.Plus,
             onClick = {},
         )
     }
