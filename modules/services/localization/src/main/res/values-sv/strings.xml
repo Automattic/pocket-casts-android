@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-04-24 11:54:03+0000
+Translation-Revision-Date: 2025-04-30 11:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="winback_cancel_subscription_continue_cancel_button_label">Fortsätt med annullering</string>
+    <string name="winback_cancel_subscription_accept_offer_button_label">Acceptera erbjudandet</string>
+    <string name="winback_claimed_offer_message_4">Tack för att du väljer Pocket Casts. Din rabatterade år börjar efter din nuvarande faktureringsperiod.</string>
+    <string name="winback_claimed_offer_message_2">Tack för att du väljer Pocket Casts. Din gratismånad kommer att läggas till i din nuvarande prenumeration.</string>
+    <string name="winback_offer_free_offer_yearly_description">Betala %1$s för att säkra ett år med Pocket Casts Plus till halva priset. Ditt rabatterade år börjar efter att ditt nuvarande paket löper ut.</string>
+    <string name="winback_offer_free_offer_description">Få en månad med Pocket Casts Plus utan kostnad! Erbjudandet kommer att läggas till i din nuvarande prenumeration.</string>
+    <string name="winback_offer_free_offer_yearly_title">Få 50 %% rabatt på ditt nästa år och spara %1$s</string>
+    <string name="winback_offer_free_offer_title">Få nästa månad gratis och spara %1$s</string>
+    <string name="recommendations_loved_by_listeners">Älskad av lyssnare på</string>
+    <string name="recommendations_if_you_like">Om du gillar</string>
     <string name="price_per_week_usd">\u0024%1$.2f/vecka</string>
     <string name="price_per_week">%1$.2f %2$s/vecka</string>
     <string name="winback_cancel_subscription_header_title">Saker du bör veta innan du avslutar</string>
@@ -105,7 +115,6 @@ Language: sv_SE
     <string name="suggested_folders_use_these_folders_button">Använd dessa mappar</string>
     <string name="winback_claiming_offer">Utnyttjar erbjudande</string>
     <string name="winback_claimed_offer_message_3">50 % rabatt på ditt nästa år.</string>
-    <string name="winback_offer_free_offer_yearly_description">Betala %1$s nu för ytterligare ett år med 50 %% rabatt.</string>
     <string name="podcast_refresh_no_episodes_found">Inga avsnitt hittades.</string>
     <string name="podcast_refresh_new_episode_found">Nytt avsnitt hittat.</string>
     <string name="podcast_refreshing_episode_list">Uppdaterar avsnittslista…</string>

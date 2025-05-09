@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-04-22 09:54:03+0000
+Translation-Revision-Date: 2025-04-29 12:54:03+0000
 Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;
 Generator: GlotPress/2.4.0-alpha
 Language: ar
 -->
 <resources>
+    <string name="winback_cancel_subscription_continue_cancel_button_label">الاستمرار مع الإلغاء</string>
+    <string name="winback_cancel_subscription_accept_offer_button_label">قبول العرض</string>
+    <string name="winback_claimed_offer_message_4">شكرًا على اختيار Pocket Casts. يبدأ عامك المخفَّض بعد فترة الفوترة الحالية الخاصة بك.</string>
+    <string name="winback_claimed_offer_message_2">شكرًا على اختيار Pocket Casts. ستتم إضافة شهرك المجاني إلى اشتراكك الحالي.</string>
+    <string name="winback_offer_free_offer_yearly_description">ادفع ⁦%1$s⁩ الآن لتأمين عام من Pocket Casts Plus بنصف السعر. يبدأ عامك المخفَّض بعد انتهاء خطتك الحالية.</string>
+    <string name="winback_offer_free_offer_description">استمتع بشهر واحد من Pocket Casts Plus وسنتحمل تكلفته! ستتم إضافة العرض إلى اشتراكك الحالي.</string>
+    <string name="winback_offer_free_offer_yearly_title">الحصول على خصم قدره 50%% على عامك التالي وتوفير ⁦%1$s⁩</string>
+    <string name="winback_offer_free_offer_title">الحصول على شهرك التالي مجانًا وتوفير ⁦%1$s⁩</string>
+    <string name="recommendations_loved_by_listeners">محبوب من قِبل مستمعي</string>
+    <string name="recommendations_if_you_like">إذا كنت ترغب</string>
     <string name="winback_cancel_subscription_header_title">أشياء يجب أن تعرفها قبل أن تقوم بالإلغاء</string>
     <string name="winback_offer_header">هل تفكر في المغادرة؟\nدعنا نساعدك أولا</string>
     <string name="account_benefit_recommendations_description">احصل على اقتراحات بودكاست مخصصة استنادًا إلى عادات الاستماع الخاصة بك.</string>
@@ -103,7 +113,6 @@ Language: ar
     <string name="suggested_folders_use_these_folders_button">استخدام هذه المجلدات</string>
     <string name="winback_claiming_offer">المطالبة بعرض</string>
     <string name="winback_claimed_offer_message_3">خصم قدره 50% على عامك الأول!</string>
-    <string name="winback_offer_free_offer_yearly_description">ادفع ⁦%1$s⁩ الآن للحصول على عام آخر بخصم قدره 50%%.</string>
     <string name="podcast_refresh_no_episodes_found">لم يتم العثور على أي حلقات.</string>
     <string name="podcast_refresh_new_episode_found">تم العثور على حلقة جديدة!</string>
     <string name="podcast_refreshing_episode_list">جارٍ تحديث قائمة الحلقات…</string>

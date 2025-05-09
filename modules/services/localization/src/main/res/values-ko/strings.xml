@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-04-23 09:54:03+0000
+Translation-Revision-Date: 2025-04-30 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="winback_cancel_subscription_continue_cancel_button_label">취소 계속하기</string>
+    <string name="winback_cancel_subscription_accept_offer_button_label">혜택 받기</string>
+    <string name="winback_claimed_offer_message_4">Pocket Casts를 선택해 주셔서 감사합니다. 할인된 1년 구독은 현재 청구 기간 후에 시작됩니다.</string>
+    <string name="winback_claimed_offer_message_2">Pocket Casts를 선택해 주셔서 감사합니다. 무료 1개월이 현재 구독에 추가됩니다.</string>
+    <string name="winback_offer_free_offer_yearly_description">지금 %1$s을(를) 결제하여 절반 가격에 Pocket Casts Plus를 1년간 이용할 수 있습니다. 할인된 1년 구독은 현재 요금제가 종료된 후에 시작됩니다.</string>
+    <string name="winback_offer_free_offer_description">Pocket Casts Plus를 한 달 동안 무료로 이용해 보세요! 이 혜택은 현재 구독에 추가됩니다.</string>
+    <string name="winback_offer_free_offer_yearly_title">다음 해에 50%% 할인을 받아 %1$s을(를) 절약하세요</string>
+    <string name="winback_offer_free_offer_title">다음 달에 무료로 이용하여 %1$s을(를) 절약하세요</string>
+    <string name="recommendations_loved_by_listeners">다음 팟캐스트의 청취자들이 좋아합니다:</string>
+    <string name="recommendations_if_you_like">다음이 마음에 드는 경우:</string>
     <string name="price_per_week_usd">\u0024%1$.2f/주</string>
     <string name="price_per_week">%1$.2f %2$s/주</string>
     <string name="winback_cancel_subscription_header_title">취소하기 전에 알아두어야 할 사항</string>
@@ -105,7 +115,6 @@ Language: ko_KR
     <string name="suggested_folders_use_these_folders_button">이대로 폴더 사용</string>
     <string name="winback_claiming_offer">혜택 받는 중</string>
     <string name="winback_claimed_offer_message_3">다음 해 50% 할인!</string>
-    <string name="winback_offer_free_offer_yearly_description">지금 %1$s을(를) 결제하고 다음 해에 50%% 할인을 받으세요.</string>
     <string name="podcast_refresh_no_episodes_found">에피소드를 찾을 수 없음</string>
     <string name="podcast_refresh_new_episode_found">새 에피소드 발견</string>
     <string name="podcast_refreshing_episode_list">에피소드 목록 새로 고치는 중…</string>

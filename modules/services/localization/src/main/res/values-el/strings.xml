@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-04-23 10:47:57+0000
+Translation-Revision-Date: 2025-05-01 12:35:48+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: el_GR
 -->
 <resources>
+    <string name="winback_cancel_subscription_continue_cancel_button_label">Συνέχισε την ακύρωση</string>
+    <string name="winback_cancel_subscription_accept_offer_button_label">Αποδοχή προσφοράς</string>
+    <string name="winback_claimed_offer_message_4">Ευχαριστούμε που επιλέγεις το Pocket Casts. Ο εκπτωτικός σου χρόνος ξεκινάει μετά τη τρέχουσα περίοδο χρέωσής σου.</string>
+    <string name="winback_offer_free_offer_description">Απόλαυσε έναν μήνα δωρέαν Pocket Casts Plus κερασμένο από \'μας! Η προσφορά θα προστεθεί στη τρέχουσα συνδρομή σου.</string>
+    <string name="winback_offer_free_offer_yearly_title">Πάρε 50%% έκπτωση στον επόμενο χρόνο σου και κέρδισε %1$s</string>
+    <string name="winback_offer_free_offer_title">Πάρε τον επόμενο μήνα σου δωρεάν και κέρδισε %1$s</string>
+    <string name="recommendations_loved_by_listeners">Λατρεύτηκε από ακροατές του</string>
+    <string name="recommendations_if_you_like">Αν σου αρέσει</string>
     <string name="price_per_week_usd">\u0024%1$.2f/βδομάδα</string>
     <string name="price_per_week">%1$.2f %2$s/βδομάδα</string>
     <string name="winback_cancel_subscription_header_title">Τι πρέπει να ξέρεις πριν ακυρώσεις</string>
@@ -47,7 +55,7 @@ Language: el_GR
     <string name="bookmarks_empty_state_title">Βάλε σε σελιδοδείκτη τούτη τη στιγμή</string>
     <string name="discover_collection_header_content_description">Κεφαλίδα %s</string>
     <string name="up_next_history_restore_confirmation_description">Αυτά τα επεισόδια θα προστεθούν στον πάτω του τρέχοντος Επόμενο</string>
-    <string name="up_next_history_restore_confirmation_title">Ανάκτηση Επόμενο;</string>
+    <string name="up_next_history_restore_confirmation_title">Ανάκτηση Επομένου;</string>
     <string name="up_next_history_restore_button">@string/restore</string>
     <string name="player_up_next_empty_subtitle">Μπορείς να βάλεις επεισόδια στην ουρά σέρνοντας δεξία στις γραμμές επεισοδίου ή πατώντας το εικονίδιο στη κάρτα επεισοδίου.</string>
     <string name="player_up_next_empty_title">Επιμελήσου την συνεδρία ακρόασής σου</string>
@@ -105,7 +113,6 @@ Language: el_GR
     <string name="suggested_folders_use_these_folders_button">Χρήση αυτών των επεισοδίων</string>
     <string name="winback_claiming_offer">Διεκδίκηση προσφοράς</string>
     <string name="winback_claimed_offer_message_3">50% λιγότερο για την επόμενη χρονιά σου!</string>
-    <string name="winback_offer_free_offer_yearly_description">Πλήρωσε %1$s τώρα για άλλον ένα χρόνο με έκπτωση 50%%.</string>
     <string name="podcast_refresh_no_episodes_found">Δε βρέθηκαν επεισόδια.</string>
     <string name="podcast_refresh_new_episode_found">Βρέθηκε νέο επεισόδιο!</string>
     <string name="podcast_refreshing_episode_list">Ανανέωση λίστας επεισοδίων…</string>
@@ -159,7 +166,7 @@ Language: el_GR
     <string name="plus_subscription_finished">Η Συνδρομή Ολοκληρώθηκε</string>
     <string name="shuffle_whats_new_message">Παίξε εύκολα ένα τυχαίο επεισόδιο χωρίς να αλλάξεις τη σειρά της ουράς σου.</string>
     <string name="shuffle_whats_new_title">Παρουσιάζουμε το Ανακάτεμα</string>
-    <string name="chapter_time_remaining_content_description">απομένουν %s στο κεφάλαιο</string>
+    <string name="chapter_time_remaining_content_description">%s ακόμη στο κεφάλαιο</string>
     <string name="chapter_count_summary">%1$d από %2$d</string>
     <string name="referrals_share_text">Γεια σου!\n\nΟρίστε ένα πάσο επισκέπτη %1$s για το Pocket Casts Plus–τον αγαπημένο μου αναπαραγωγέα podcast. Είναι γεμάτο με μοναδικά χαρακτηριστικά όπως σελιδοδείκτες, φακέλους και άλλα που δεν θα βρεις πουθενά αλλού. Νομίζω ότι θα το αγαπήσεις κι εσύ!</string>
     <string name="files_plus_prompt">Ανέβασε τα αρχεία σου με το Pocket Casts Plus και άλλα</string>
@@ -241,7 +248,7 @@ Language: el_GR
     <string name="move_up">Μετακίνηση πάνω</string>
     <string name="search_episodes_not_found_summary">Δεν μπορέσαμε να βρούμε κανένα επεισόδιο για αυτή την αναζήτηση. Δοκίμασε μια άλλη λέξη-κλειδί.</string>
     <string name="search_episodes_not_found_title">Δεν βρέθηκαν επεισόδια</string>
-    <string name="player_time_remaining">Χρόνος που απομένει %s</string>
+    <string name="player_time_remaining">Υπολοιπόμενος χρόνος %s</string>
     <string name="player_played_up_to">Αναπαράχθηκε μέχρι το %s</string>
     <string name="onboarding_plus_feature_dream_with_slumber_studios">&lt;a href=\"https://slumberstudios.com/\"&gt;Ονειρέψου με το περιεχόμενο των Slumber Studios&lt;/a&gt;</string>
     <string name="gift">Δώρισε</string>
@@ -338,10 +345,10 @@ Language: el_GR
     <string name="settings_storage_fix_downloads">Επιδιόρθωση λήψεων</string>
     <string name="nova_launcher_new_releases">Νέες Κυκλοφορίες</string>
     <string name="nova_launcher_subscribed_podcasts">Εγγεγραμένα Podcasts</string>
-    <string name="widget_preview_time_left_4">απομένει 1ώ 36λ</string>
-    <string name="widget_preview_time_left_3">απομένουν 55λ</string>
-    <string name="widget_preview_time_left_2">απομένουν 12λ</string>
-    <string name="widget_preview_time_left_1">απομένουν 25λ</string>
+    <string name="widget_preview_time_left_4">1ώ 36λ ακόμη</string>
+    <string name="widget_preview_time_left_3">55λ ακόμη</string>
+    <string name="widget_preview_time_left_2">12λ ακόμη</string>
+    <string name="widget_preview_time_left_1">25λ ακόμη</string>
     <string name="widget_preview_episode_in_up_next_title">Επεισόδιο στο Επόμενο</string>
     <string name="widget_preview_episode_title">Τίτλος επεισοδίου</string>
     <string name="hour_and_minutes">1 ώρα και %d λεπτά</string>
@@ -911,7 +918,7 @@ Language: el_GR
     <string name="filters_download_options">Επιλογές Λήψης</string>
     <string name="filters_release_date">Ημερομηνία Κυκλοφορίας</string>
     <string name="filters_duration">Διάρκεια</string>
-    <string name="player_up_next_time_remaining">Συνολικός υπολειπόμενος χρόνος %s</string>
+    <string name="player_up_next_time_remaining">Συνολικός υπολοιπόμενος χρόνος %s</string>
     <string name="video">Βίντεο</string>
     <string name="audio">Ήχος</string>
     <string name="not_downloaded">Δεν Κατέβηκε</string>
@@ -1788,7 +1795,7 @@ Language: el_GR
     <string name="player_actions">Ενέργειες επεισοδίου</string>
     <string name="player_action_previous_chapter">Προηγούμενο κεφάλαιο</string>
     <string name="player_action_next_chapter">Επόμενο κεφάλαιο</string>
-    <string name="time_left">απομένουν %s</string>
+    <string name="time_left">%s ακόμη</string>
     <string name="time_short_seconds">%dδλ</string>
     <string name="time_short_minutes">%dλ</string>
     <string name="time_short_hours_minutes">%1$dώ %2$dλ</string>
@@ -1944,8 +1951,8 @@ Language: el_GR
         <item quantity="other">λεπτά</item>
     </plurals>
     <plurals name="player_up_next_header_title">
-        <item quantity="one" formatted="true">%1$d επεισόδιο - απομένουν %2$s</item>
-        <item quantity="other" formatted="true">%1$d επεισόδια - απομένουν %2$s</item>
+        <item quantity="one" formatted="true">%1$d επεισόδιο - %2$s ακόμη</item>
+        <item quantity="other" formatted="true">%1$d επεισόδια - %2$s ακόμη</item>
     </plurals>
     <plurals name="podcast">
         <item quantity="one">Podcast</item>

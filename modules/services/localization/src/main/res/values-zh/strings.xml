@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-04-24 09:54:03+0000
+Translation-Revision-Date: 2025-04-30 14:54:04+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="winback_cancel_subscription_continue_cancel_button_label">继续取消</string>
+    <string name="winback_cancel_subscription_accept_offer_button_label">接受优惠</string>
+    <string name="winback_claimed_offer_message_4">感谢您选用 Pocket Casts。 您的年度折扣套餐将从您当前的计费周期结束后开始计算。</string>
+    <string name="winback_claimed_offer_message_2">感谢您选用 Pocket Casts。 您的免费月份将添加到您的当前订阅。</string>
+    <string name="winback_offer_free_offer_yearly_description">现在支付 %1$s，即可锁定 Pocket Casts Plus 一年期套餐半价。 您的年度折扣套餐将从您当前的套餐结束后开始计算。</string>
+    <string name="winback_offer_free_offer_description">免费畅享一个月的 Pocket Casts Plus！ 该优惠将添加到您当前的订阅中。</string>
+    <string name="winback_offer_free_offer_yearly_title">下一年获享 50%% 优惠，可节省 %1$s</string>
+    <string name="winback_offer_free_offer_title">下个月免费，可节省 %1$s</string>
+    <string name="recommendations_loved_by_listeners">深受听众喜爱，包括</string>
+    <string name="recommendations_if_you_like">如果您喜欢</string>
     <string name="price_per_week_usd">\u0024%1$.2f/周</string>
     <string name="price_per_week">%1$.2f %2$s/周</string>
     <string name="winback_cancel_subscription_header_title">取消前的须知事项</string>
@@ -105,7 +115,6 @@ Language: zh_CN
     <string name="suggested_folders_use_these_folders_button">使用这些文件夹</string>
     <string name="winback_claiming_offer">领取优惠</string>
     <string name="winback_claimed_offer_message_3">下一年享 5 折优惠！</string>
-    <string name="winback_offer_free_offer_yearly_description">现在付款 %1$s 即可再享一年 5%% 折优惠。</string>
     <string name="podcast_refresh_no_episodes_found">未找到剧集。</string>
     <string name="podcast_refresh_new_episode_found">找到新剧集！</string>
     <string name="podcast_refreshing_episode_list">正在刷新剧集列表…</string>

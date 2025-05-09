@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-04-22 09:54:03+0000
+Translation-Revision-Date: 2025-04-30 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="winback_cancel_subscription_continue_cancel_button_label">キャンセルを続行</string>
+    <string name="winback_cancel_subscription_accept_offer_button_label">オファーを受理</string>
+    <string name="winback_claimed_offer_message_4">Pocket Casts をお選びいただきありがとうございます。 年間割引は現在の請求期間の後に開始します。</string>
+    <string name="winback_claimed_offer_message_2">Pocket Casts をお選びいただきありがとうございます。 現在のサブスクリプションに1か月の無料期間が追加されます。</string>
+    <string name="winback_offer_free_offer_yearly_description">今すぐ%1$sを支払うと Pocket Casts Plus を1年間半額でご利用いただけます。 年間割引は現在のプランが終了した後に開始します。</string>
+    <string name="winback_offer_free_offer_description">Pocket Casts Plus を1か月間無料でお楽しみください。 現在のサブスクリプションにオファーが追加されます。</string>
+    <string name="winback_offer_free_offer_yearly_title">次年度50%% オフを獲得して%1$s節約</string>
+    <string name="winback_offer_free_offer_title">来月分を無料で利用して%1$s節約</string>
+    <string name="recommendations_loved_by_listeners">次のリスナーから高い評価を得ています:</string>
+    <string name="recommendations_if_you_like">次がお好きな方におすすめ:</string>
     <string name="price_per_week_usd">\u0024%1$.2f/ 週</string>
     <string name="price_per_week">%1$.2f %2$s/ 週</string>
     <string name="winback_cancel_subscription_header_title">解約前に知っておくべきこと</string>
@@ -105,7 +115,6 @@ Language: ja_JP
     <string name="suggested_folders_use_these_folders_button">これらのフォルダーを使用</string>
     <string name="winback_claiming_offer">オファーの獲得</string>
     <string name="winback_claimed_offer_message_3">次年度が50% オフ !</string>
-    <string name="winback_offer_free_offer_yearly_description">今すぐ%1$sを支払うと、もう1年が50%% オフになります。</string>
     <string name="podcast_refresh_no_episodes_found">エピソードがありません。</string>
     <string name="podcast_refresh_new_episode_found">新しいエピソードが見つかりました !</string>
     <string name="podcast_refreshing_episode_list">エピソードリストを更新中…</string>
