@@ -1,11 +1,13 @@
 package au.com.shiftyjelly.pocketcasts.payment.billing
 
-import au.com.shiftyjelly.pocketcasts.payment.BillingPeriod
 import au.com.shiftyjelly.pocketcasts.payment.Price
+import au.com.shiftyjelly.pocketcasts.payment.PricingSchedule
+import au.com.shiftyjelly.pocketcasts.payment.PurchaseState
 import au.com.shiftyjelly.pocketcasts.payment.TestLogger
 import com.android.billingclient.api.GoogleOfferDetails
 import com.android.billingclient.api.GooglePricingPhase
 import com.android.billingclient.api.GoogleProductDetails
+import com.android.billingclient.api.GooglePurchase
 import com.android.billingclient.api.ProductDetails.RecurrenceMode
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -28,7 +30,7 @@ class BillingPaymentMapperTest {
     }
 
     @Test
-    fun `no errors are logged when mapped successfully`() {
+    fun `no errors are logged when product is mapped successfully`() {
         mapper.toProduct(GoogleProductDetails())
 
         logger.assertNoLogs()
@@ -63,7 +65,6 @@ class BillingPaymentMapperTest {
                             recurrenceMode = RecurrenceMode.INFINITE_RECURRING,
                             billingCycleCount = 0,
                         ),
-
                     ),
                     offerTags = listOf("Tag", "Another tag"),
                 ),
@@ -82,8 +83,8 @@ class BillingPaymentMapperTest {
             pricingPhase.price,
         )
         assertEquals(
-            BillingPeriod(BillingPeriod.Cycle.Infinite, BillingPeriod.Interval.Monthly, intervalCount = 1),
-            pricingPhase.billingPeriod,
+            PricingSchedule(PricingSchedule.RecurrenceMode.Infinite, PricingSchedule.Period.Monthly, periodCount = 1),
+            pricingPhase.schedule,
         )
     }
 
@@ -153,7 +154,7 @@ class BillingPaymentMapperTest {
     }
 
     @Test
-    fun `map product billing intervals`() {
+    fun `map product pricing schedules`() {
         val googleProduct = GoogleProductDetails(
             subscriptionOfferDetails = listOf(
                 GoogleOfferDetails(offerId = null),
@@ -227,53 +228,68 @@ class BillingPaymentMapperTest {
                         ),
                     ),
                 ),
+                GoogleOfferDetails(
+                    offerId = "ID",
+                    pricingPhases = listOf(
+                        GooglePricingPhase(
+                            billingPeriod = "P2D",
+                            billingCycleCount = 0,
+                            recurrenceMode = RecurrenceMode.INFINITE_RECURRING,
+                        ),
+                    ),
+                ),
             ),
         )
 
-        val billingPeriods = mapper.toProduct(googleProduct)!!.pricingPlans
+        val pricingSchedules = mapper.toProduct(googleProduct)!!.pricingPlans
             .offerPlans
             .flatMap { it.pricingPhases }
-            .map { it.billingPeriod }
+            .map { it.schedule }
 
         assertEquals(
             listOf(
-                BillingPeriod(
-                    intervalCount = 1,
-                    interval = BillingPeriod.Interval.Monthly,
-                    cycle = BillingPeriod.Cycle.Infinite,
+                PricingSchedule(
+                    periodCount = 1,
+                    period = PricingSchedule.Period.Monthly,
+                    recurrenceMode = PricingSchedule.RecurrenceMode.Infinite,
                 ),
-                BillingPeriod(
-                    intervalCount = 1,
-                    interval = BillingPeriod.Interval.Monthly,
-                    cycle = BillingPeriod.Cycle.NonRecurring,
+                PricingSchedule(
+                    periodCount = 1,
+                    period = PricingSchedule.Period.Monthly,
+                    recurrenceMode = PricingSchedule.RecurrenceMode.NonRecurring,
                 ),
-                BillingPeriod(
-                    intervalCount = 1,
-                    interval = BillingPeriod.Interval.Monthly,
-                    cycle = BillingPeriod.Cycle.Recurring(1),
+                PricingSchedule(
+                    periodCount = 1,
+                    period = PricingSchedule.Period.Monthly,
+                    recurrenceMode = PricingSchedule.RecurrenceMode.Recurring(1),
                 ),
-                BillingPeriod(
-                    intervalCount = 1,
-                    interval = BillingPeriod.Interval.Monthly,
-                    cycle = BillingPeriod.Cycle.Recurring(2),
+                PricingSchedule(
+                    periodCount = 1,
+                    period = PricingSchedule.Period.Monthly,
+                    recurrenceMode = PricingSchedule.RecurrenceMode.Recurring(2),
                 ),
-                BillingPeriod(
-                    intervalCount = 2,
-                    interval = BillingPeriod.Interval.Monthly,
-                    cycle = BillingPeriod.Cycle.Infinite,
+                PricingSchedule(
+                    periodCount = 2,
+                    period = PricingSchedule.Period.Monthly,
+                    recurrenceMode = PricingSchedule.RecurrenceMode.Infinite,
                 ),
-                BillingPeriod(
-                    intervalCount = 1,
-                    interval = BillingPeriod.Interval.Weekly,
-                    cycle = BillingPeriod.Cycle.Infinite,
+                PricingSchedule(
+                    periodCount = 1,
+                    period = PricingSchedule.Period.Weekly,
+                    recurrenceMode = PricingSchedule.RecurrenceMode.Infinite,
                 ),
-                BillingPeriod(
-                    intervalCount = 3,
-                    interval = BillingPeriod.Interval.Yearly,
-                    cycle = BillingPeriod.Cycle.Infinite,
+                PricingSchedule(
+                    periodCount = 3,
+                    period = PricingSchedule.Period.Yearly,
+                    recurrenceMode = PricingSchedule.RecurrenceMode.Infinite,
+                ),
+                PricingSchedule(
+                    periodCount = 2,
+                    period = PricingSchedule.Period.Daily,
+                    recurrenceMode = PricingSchedule.RecurrenceMode.Infinite,
                 ),
             ),
-            billingPeriods,
+            pricingSchedules,
         )
     }
 
@@ -382,5 +398,55 @@ class BillingPaymentMapperTest {
             "Unrecognized billing interval period designator 'MY' in {basePlanId=Base plan ID, productId=Product ID, rawDuration=P1MY}",
             "Unrecognized billing interval period designator '' in {basePlanId=Base plan ID, productId=Product ID, rawDuration=P1}",
         )
+    }
+
+    @Test
+    fun `map purchase`() {
+        assertNotNull(mapper.toPurchase(GooglePurchase()))
+    }
+
+    @Test
+    fun `no errors are logged when purchase is mapped`() {
+        mapper.toPurchase(GooglePurchase())
+
+        logger.assertNoLogs()
+    }
+
+    @Test
+    fun `map base purchase properties`() {
+        val googlePurchase = GooglePurchase(
+            orderId = "Order ID",
+            purchaseToken = "Purchase token",
+            productIds = listOf("Product ID 1", "Product ID 2"),
+            isAcknowledged = false,
+            isAutoRenewing = true,
+            isPurchased = true,
+        )
+
+        val purchase = mapper.toPurchase(googlePurchase)
+
+        assertEquals(PurchaseState.Purchased("Order ID"), purchase.state)
+        assertEquals("Purchase token", purchase.token)
+        assertEquals(listOf("Product ID 1", "Product ID 2"), purchase.productIds)
+        assertEquals(false, purchase.isAcknowledged)
+        assertEquals(true, purchase.isAutoRenewing)
+    }
+
+    @Test
+    fun `map pending purchase state`() {
+        val googlePurchase = GooglePurchase(isPurchased = false)
+
+        val purchase = mapper.toPurchase(googlePurchase)
+
+        assertEquals(PurchaseState.Pending, purchase.state)
+    }
+
+    @Test
+    fun `map purchase with purchased state and without order ID to unspecified state`() {
+        val googlePurchase = GooglePurchase(isPurchased = true, orderId = null)
+
+        val purchase = mapper.toPurchase(googlePurchase)
+
+        assertEquals(PurchaseState.Unspecified, purchase.state)
     }
 }

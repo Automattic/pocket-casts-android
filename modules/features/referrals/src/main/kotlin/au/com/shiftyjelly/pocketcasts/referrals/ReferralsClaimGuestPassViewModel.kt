@@ -8,11 +8,11 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfo
 import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfoPlayStore
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.payment.PurchaseResult
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager
 import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager.ReferralResult
 import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralOfferInfoProvider
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchaseEvent
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.exception.NoNetworkException
@@ -120,23 +120,23 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
     ) {
         _navigationEvent.emit(NavigationEvent.LaunchBillingFlow(subscriptionWithOffer))
 
-        val purchaseEvent = subscriptionManager
+        val purchaseResult = subscriptionManager
             .observePurchaseEvents()
             .asFlow()
             .firstOrNull()
 
-        when (purchaseEvent) {
-            PurchaseEvent.Success -> {
+        when (purchaseResult) {
+            PurchaseResult.Purchased -> {
                 analyticsTracker.track(AnalyticsEvent.REFERRAL_PURCHASE_SUCCESS)
                 redeemReferralCode(settings.referralClaimCode.value)
             }
 
-            is PurchaseEvent.Cancelled -> {
+            is PurchaseResult.Cancelled -> {
                 LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "PurchaseEvent.Cancelled")
                 // User cancelled subscription creation. Do nothing.
             }
 
-            is PurchaseEvent.Failure -> {
+            is PurchaseResult.Failure -> {
                 _snackBarEvent.emit(SnackbarEvent.PurchaseFailed)
             }
 

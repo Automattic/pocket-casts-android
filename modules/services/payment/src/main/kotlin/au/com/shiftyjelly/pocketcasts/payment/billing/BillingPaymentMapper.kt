@@ -1,16 +1,24 @@
 package au.com.shiftyjelly.pocketcasts.payment.billing
 
-import au.com.shiftyjelly.pocketcasts.payment.BillingPeriod
 import au.com.shiftyjelly.pocketcasts.payment.Logger
 import au.com.shiftyjelly.pocketcasts.payment.Price
 import au.com.shiftyjelly.pocketcasts.payment.PricingPhase
 import au.com.shiftyjelly.pocketcasts.payment.PricingPlan
 import au.com.shiftyjelly.pocketcasts.payment.PricingPlans
+import au.com.shiftyjelly.pocketcasts.payment.PricingSchedule
 import au.com.shiftyjelly.pocketcasts.payment.Product
+import au.com.shiftyjelly.pocketcasts.payment.Purchase
+import au.com.shiftyjelly.pocketcasts.payment.PurchaseState
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
+import com.android.billingclient.api.BillingFlowParams.SubscriptionUpdateParams.ReplacementMode
+import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.ProductDetails.RecurrenceMode
 import com.android.billingclient.api.ProductDetails as GoogleProduct
 import com.android.billingclient.api.ProductDetails.PricingPhase as GooglePricingPhase
 import com.android.billingclient.api.ProductDetails.SubscriptionOfferDetails as GoogleOfferDetails
+import com.android.billingclient.api.Purchase as GooglePurchase
+import com.android.billingclient.api.Purchase.PurchaseState as GooglePurchaseState
 
 internal class BillingPaymentMapper(
     val logger: Logger,
@@ -34,6 +42,36 @@ internal class BillingPaymentMapper(
             name = productDetails.name,
             pricingPlans = toPlans(offerDetails, mappingContext) ?: return null,
         )
+    }
+
+    fun toPurchase(purchase: GooglePurchase): Purchase {
+        return Purchase(
+            state = when (purchase.purchaseState) {
+                GooglePurchaseState.PENDING -> PurchaseState.Pending
+                GooglePurchaseState.PURCHASED -> purchase.orderId?.let(PurchaseState::Purchased) ?: PurchaseState.Unspecified
+                else -> PurchaseState.Unspecified
+            },
+            token = purchase.purchaseToken,
+            productIds = purchase.products,
+            isAcknowledged = purchase.isAcknowledged,
+            isAutoRenewing = purchase.isAutoRenewing,
+        )
+    }
+
+    fun toBillingFlowRequest(
+        key: SubscriptionPlan.Key,
+        productDetails: List<ProductDetails>,
+        purchases: List<GooglePurchase>,
+    ): BillingFlowRequest? {
+        val (product, offerToken) = findMatchForPlan(productDetails, key) ?: return null
+
+        val productQuery = BillingFlowRequest.ProductQuery(product, offerToken)
+        val updateQuery = findActivePurchase(purchases)?.let { (purchaseToken, purchasedProductId) ->
+            findReplacementMode(purchasedProductId, key)?.let { replacementMode ->
+                BillingFlowRequest.SubscriptionUpdateQuery(purchaseToken, replacementMode)
+            }
+        }
+        return BillingFlowRequest(productQuery, updateQuery)
     }
 
     private fun toPlans(
@@ -117,7 +155,7 @@ internal class BillingPaymentMapper(
         pricingPhase: GooglePricingPhase,
         mappingContext: Map<String, Any?>,
     ): PricingPhase? {
-        val (count, interval) = toBillingDuration(pricingPhase.billingPeriod, mappingContext) ?: return null
+        val (count, period) = toPricingSchedulePeriod(pricingPhase.billingPeriod, mappingContext) ?: return null
 
         return PricingPhase(
             price = Price(
@@ -125,15 +163,15 @@ internal class BillingPaymentMapper(
                 currencyCode = pricingPhase.priceCurrencyCode,
                 formattedPrice = pricingPhase.formattedPrice,
             ),
-            billingPeriod = BillingPeriod(
-                intervalCount = count,
-                interval = interval,
-                cycle = when (pricingPhase.recurrenceMode) {
-                    RecurrenceMode.NON_RECURRING -> BillingPeriod.Cycle.NonRecurring
-                    RecurrenceMode.FINITE_RECURRING -> BillingPeriod.Cycle.Recurring(
+            schedule = PricingSchedule(
+                periodCount = count,
+                period = period,
+                recurrenceMode = when (pricingPhase.recurrenceMode) {
+                    RecurrenceMode.NON_RECURRING -> PricingSchedule.RecurrenceMode.NonRecurring
+                    RecurrenceMode.FINITE_RECURRING -> PricingSchedule.RecurrenceMode.Recurring(
                         value = pricingPhase.billingCycleCount,
                     )
-                    RecurrenceMode.INFINITE_RECURRING -> BillingPeriod.Cycle.Infinite
+                    RecurrenceMode.INFINITE_RECURRING -> PricingSchedule.RecurrenceMode.Infinite
                     else -> {
                         logWarning("Unrecognized recurrence mode '${pricingPhase.recurrenceMode}'", mappingContext)
                         return null
@@ -143,10 +181,10 @@ internal class BillingPaymentMapper(
         )
     }
 
-    private fun toBillingDuration(
+    private fun toPricingSchedulePeriod(
         iso8601Duration: String,
         mappingContext: Map<String, Any?>,
-    ): Pair<Int, BillingPeriod.Interval>? {
+    ): Pair<Int, PricingSchedule.Period>? {
         val context = mappingContext + mapOf("rawDuration" to iso8601Duration)
 
         val designator = iso8601Duration[0]
@@ -164,18 +202,145 @@ internal class BillingPaymentMapper(
         }
 
         val rawInterval = valuePart.drop(rawCount.length)
-        val interval = when (rawInterval) {
-            "W" -> BillingPeriod.Interval.Weekly
-            "M" -> BillingPeriod.Interval.Monthly
-            "Y" -> BillingPeriod.Interval.Yearly
+        val period = when (rawInterval) {
+            "D" -> PricingSchedule.Period.Daily
+            "W" -> PricingSchedule.Period.Weekly
+            "M" -> PricingSchedule.Period.Monthly
+            "Y" -> PricingSchedule.Period.Yearly
             else -> null
         }
-        if (interval == null) {
+        if (period == null) {
             logWarning("Unrecognized billing interval period designator '$rawInterval'", context)
             return null
         }
 
-        return count to interval
+        return count to period
+    }
+
+    private fun findMatchForPlan(
+        products: List<ProductDetails>,
+        key: SubscriptionPlan.Key,
+    ): Pair<ProductDetails, String>? {
+        val mappingContext = mapOf(
+            "tier" to key.tier,
+            "billingCycle" to key.billingCycle,
+            "offer" to key.offer,
+        )
+
+        val matchingProducts = products.filter { it.productId == key.productId }
+        if (matchingProducts.size > 1) {
+            logWarning("Found multiple matching products", mappingContext)
+            return null
+        }
+
+        val matchingProduct = matchingProducts.firstOrNull()
+        if (matchingProduct == null) {
+            logWarning("Found no matching products", mappingContext)
+            return null
+        }
+
+        val matchingOffers = matchingProduct.subscriptionOfferDetails
+            ?.filter { offer -> offer.basePlanId == key.basePlanId && offer.offerId == key.offerId }
+            .orEmpty()
+        if (matchingOffers.size > 1) {
+            logWarning("Found multiple matching offers", mappingContext)
+            return null
+        }
+
+        val token = matchingOffers.firstOrNull()?.offerToken
+        if (token == null) {
+            logWarning("Found no matching offers", mappingContext)
+            return null
+        }
+
+        return matchingProduct to token
+    }
+
+    private fun findActivePurchase(purchases: List<GooglePurchase>): Pair<String, String>? {
+        val activePurchases = purchases.filter { it.isAcknowledged && it.isAutoRenewing }
+        if (activePurchases.size > 1) {
+            val context = mapOf("purchases" to activePurchases.joinToString { "${it.orderId}: ${it.products}" })
+            logWarning("Found more than one active purchase", context)
+            return null
+        }
+
+        val activePurchase = activePurchases.firstOrNull() ?: return null
+        if (activePurchase.products.size != 1) {
+            val context = mapOf(
+                "orderId" to activePurchase.orderId,
+                "products" to activePurchase.products,
+            )
+            logWarning("Active purchase should have only a single product", context)
+            return null
+        }
+
+        return activePurchase.purchaseToken to activePurchase.products.first()
+    }
+
+    /**
+     * Determines the correct subscription replacement mode when a user switches subscriptions
+     * from one plan to another, based on a predefined transition table. If the new plan is a plan with an offer
+     * replacement mode is always `CHARGE_FULL_PRICE`.
+     *
+     * Transition Table:
+     * ```
+     * |                | Plus Monthly        | Patron Monthly        | Plus Yearly           | Patron Yearly         |
+     * | Plus Monthly   | N/A                 | CHARGE_PRORATED_PRICE | CHARGE_FULL_PRICE     | CHARGE_FULL_PRICE     |
+     * | Patron Monthly | WITH_TIME_PRORATION | N/A                   | CHARGE_FULL_PRICE     | CHARGE_FULL_PRICE     |
+     * | Plus Yearly    | WITH_TIME_PRORATION | WITH_TIME_PRORATION   | N/A                   | CHARGE_PRORATED_PRICE |
+     * | Patron Yearly  | WITH_TIME_PRORATION | WITH_TIME_PRORATION   | WITH_TIME_PRORATION   | N/A                   |
+     * ```
+     *
+     * * `CHARGE_PRORATED_PRICE`: Charge the price difference and keep the billing cycle.
+     * * `CHARGE_FULL_PRICE`: Upgrade or downgrade immediately. The remaining value is either carried over or prorated for time.
+     * * `WITH_TIME_PRORATION`: Upgrade or downgrade immediately. The remaining time is adjusted based on the price difference.
+     *
+     * Note: We avoid using the DEFERRED replacement mode because it leaves users
+     * without an active subscription until the deferred date, which complicates handling
+     * further plan changes.
+     *
+     * See the [documentation](https://developer.android.com/google/play/billing/subscriptions#replacement-modes) for details
+     * on replacement modes.
+     */
+    private fun findReplacementMode(
+        currentPlanId: String,
+        newPlanKey: SubscriptionPlan.Key,
+    ) = when (newPlanKey.offer) {
+        null -> when (currentPlanId) {
+            SubscriptionPlan.PlusMonthlyProductId -> when (newPlanKey.productId) {
+                SubscriptionPlan.PatronMonthlyProductId -> ReplacementMode.CHARGE_PRORATED_PRICE
+                SubscriptionPlan.PlusYearlyProductId -> ReplacementMode.CHARGE_FULL_PRICE
+                SubscriptionPlan.PatronYearlyProductId -> ReplacementMode.CHARGE_FULL_PRICE
+                else -> null
+            }
+
+            SubscriptionPlan.PatronMonthlyProductId -> when (newPlanKey.productId) {
+                SubscriptionPlan.PlusMonthlyProductId -> ReplacementMode.WITH_TIME_PRORATION
+                SubscriptionPlan.PlusYearlyProductId -> ReplacementMode.CHARGE_FULL_PRICE
+                SubscriptionPlan.PatronYearlyProductId -> ReplacementMode.CHARGE_FULL_PRICE
+                else -> null
+            }
+
+            SubscriptionPlan.PlusYearlyProductId -> when (newPlanKey.productId) {
+                SubscriptionPlan.PlusMonthlyProductId -> ReplacementMode.WITH_TIME_PRORATION
+                SubscriptionPlan.PatronMonthlyProductId -> ReplacementMode.WITH_TIME_PRORATION
+                SubscriptionPlan.PatronYearlyProductId -> ReplacementMode.CHARGE_PRORATED_PRICE
+                else -> null
+            }
+
+            SubscriptionPlan.PatronYearlyProductId -> when (newPlanKey.productId) {
+                SubscriptionPlan.PlusMonthlyProductId -> ReplacementMode.WITH_TIME_PRORATION
+                SubscriptionPlan.PatronMonthlyProductId -> ReplacementMode.WITH_TIME_PRORATION
+                SubscriptionPlan.PlusYearlyProductId -> ReplacementMode.WITH_TIME_PRORATION
+                else -> null
+            }
+
+            else -> null
+        }
+        SubscriptionOffer.IntroOffer -> ReplacementMode.CHARGE_FULL_PRICE
+        SubscriptionOffer.Trial -> ReplacementMode.CHARGE_FULL_PRICE
+        SubscriptionOffer.Referral -> ReplacementMode.CHARGE_FULL_PRICE
+        SubscriptionOffer.Winback -> ReplacementMode.CHARGE_FULL_PRICE
     }
 
     private fun logWarning(message: String, context: Map<String, Any?>) {

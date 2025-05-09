@@ -30,7 +30,7 @@ Language: sv_SE
     <string name="account_encourage_description">Skapa ett konto eller logga in för att ta del av Pocket Casts fullt ut.</string>
     <string name="account_encourage_title">Vi har noterat att du inte är inloggad</string>
     <string name="onboarding_get_started">Kom igång</string>
-    <string name="onboarding_plus_feature_libro_title">Gratis ljudbok från %1$s</string>
+    <string name="onboarding_plus_feature_libro_title"><![CDATA[Gratis ljudbok från <a href="https://libro.fm/">Libro.fm</a>]]></string>
     <string name="encourage_account_history_banner_description">Skapa ett gratis konto för att synkronisera din lyssningshistorik överallt.</string>
     <string name="encourage_account_history_banner_title">Håll koll på vad du har spelat upp</string>
     <string name="encourage_account_filters_banner_description">Skapa ett gratis konto för att synkronisera dina filter på vilken enhet som helst.</string>

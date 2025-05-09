@@ -196,8 +196,8 @@ class DurationUtilTest {
     }
 
     @Test
-    fun neagtiveDuration() {
-        val duration = -1.days - 2.hours - 3.minutes - 5.seconds
+    fun negativeDuration() {
+        val duration = (-1).days - 2.hours - 3.minutes - 5.seconds
 
         val text = duration.toFriendlyString(resources)
 

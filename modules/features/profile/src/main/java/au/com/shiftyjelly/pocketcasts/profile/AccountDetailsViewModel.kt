@@ -2,24 +2,26 @@ package au.com.shiftyjelly.pocketcasts.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.ProfileUpgradeBannerState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.NewsletterSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
+import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
+import au.com.shiftyjelly.pocketcasts.payment.PaymentResult
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.payment.getOrNull
+import au.com.shiftyjelly.pocketcasts.payment.map
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.profile.winback.WinbackInitParams
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchasesState
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.Gravatar
-import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.toDurationFromNow
 import com.automattic.android.tracks.crashlogging.CrashLogging
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -35,37 +37,21 @@ import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier as OldSubscriptionTier
 
 @HiltViewModel
 class AccountDetailsViewModel @Inject constructor(
     userManager: UserManager,
-    private val subscriptionManager: SubscriptionManager,
+    private val paymentClient: PaymentClient,
     private val syncManager: SyncManager,
     private val settings: Settings,
     private val analyticsTracker: AnalyticsTracker,
     private val crashLogging: CrashLogging,
-    private val subscriptionMapper: SubscriptionMapper,
 ) : ViewModel() {
     internal val deleteAccountState = MutableStateFlow<DeleteAccountState>(DeleteAccountState.Empty)
+    internal val selectedFeatureCard = MutableStateFlow<SubscriptionPlan.Key?>(null)
     internal val signInState = userManager.getSignInState()
     internal val marketingOptIn = settings.marketingOptIn.flow
-    private val subscription = subscriptionManager.observeProductDetails().map { state ->
-        if (state is ProductDetailsState.Loaded) {
-            val subscriptions = state.productDetails
-                .mapNotNull {
-                    subscriptionMapper.mapFromProductDetails(
-                        productDetails = it,
-                        isOfferEligible = subscriptionManager.isOfferEligible(
-                            SubscriptionTier.fromProductId(it.productId),
-                        ),
-                    )
-                }
-            val filteredOffer = Subscription.filterOffers(subscriptions)
-            Optional.of(subscriptionManager.getDefaultSubscription(filteredOffer))
-        } else {
-            Optional.empty()
-        }
-    }
 
     internal val headerState = signInState.asFlow().map { state ->
         when (state) {
@@ -115,14 +101,40 @@ class AccountDetailsViewModel @Inject constructor(
         }
     }.stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = AccountHeaderState.empty())
 
-    internal val showUpgradeBanner = combine(
+    internal val upgradeBannerState = combine(
         signInState.asFlow(),
-        subscription.asFlow(),
-    ) { signInState, subscription ->
+        selectedFeatureCard,
+    ) { signInState, featureCard ->
         val signedInState = signInState as? SignInState.SignedIn
-        val isGiftExpiring = (signedInState?.subscriptionStatus as? SubscriptionStatus.Paid)?.isExpiring == true
-        subscription != null && (signInState.isSignedInAsFree || isGiftExpiring)
-    }.stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = false)
+        val paidSubscriptionStatus = signedInState?.subscriptionStatus as? SubscriptionStatus.Paid
+        val isExpiring = paidSubscriptionStatus?.isExpiring == true
+
+        paymentClient.loadSubscriptionPlans()
+            .map { subscriptionPlans ->
+                ProfileUpgradeBannerState(
+                    subscriptionPlans = subscriptionPlans,
+                    selectedFeatureCard = featureCard,
+                    currentSubscription = paidSubscriptionStatus?.let { status ->
+                        SubscriptionPlan.Key(
+                            tier = when (status.tier) {
+                                OldSubscriptionTier.NONE -> return@let null
+                                OldSubscriptionTier.PLUS -> SubscriptionTier.Plus
+                                OldSubscriptionTier.PATRON -> SubscriptionTier.Patron
+                            },
+                            billingCycle = when (status.frequency) {
+                                SubscriptionFrequency.NONE -> return@let null
+                                SubscriptionFrequency.MONTHLY -> BillingCycle.Monthly
+                                SubscriptionFrequency.YEARLY -> BillingCycle.Yearly
+                            },
+                            offer = null,
+                        )
+                    },
+                    isRenewingSubscription = isExpiring,
+                )
+            }
+            .getOrNull()
+            .takeIf { signInState.isSignedInAsFree || isExpiring }
+    }.stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = null)
 
     internal val sectionsState = combine(
         signInState.asFlow(),
@@ -158,12 +170,10 @@ class AccountDetailsViewModel @Inject constructor(
         return if (subscriptionPlatform != SubscriptionPlatform.ANDROID) {
             WinbackInitParams.Empty
         } else {
-            when (val purchasesState = subscriptionManager.loadPurchases()) {
-                is PurchasesState.Failure -> WinbackInitParams.Empty
-                is PurchasesState.Loaded -> WinbackInitParams(
-                    hasGoogleSubscription = purchasesState.purchases
-                        .filter { it.isAcknowledged && it.isAutoRenewing }
-                        .isNotEmpty(),
+            when (val subscriptionsResult = paymentClient.loadAcknowledgedSubscriptions()) {
+                is PaymentResult.Failure -> WinbackInitParams.Empty
+                is PaymentResult.Success -> WinbackInitParams(
+                    hasGoogleSubscription = subscriptionsResult.value.any { it.isAutoRenewing },
                 )
             }
         }
@@ -209,11 +219,27 @@ class AccountDetailsViewModel @Inject constructor(
         settings.marketingOptIn.set(isChecked, updateModifiedAt = true)
     }
 
+    internal fun changeSelectedFeatureCard(key: SubscriptionPlan.Key) {
+        selectedFeatureCard.value = key
+        settings.setLastSelectedSubscriptionTier(
+            when (key.tier) {
+                SubscriptionTier.Plus -> OldSubscriptionTier.PLUS
+                SubscriptionTier.Patron -> OldSubscriptionTier.PATRON
+            },
+        )
+        settings.setLastSelectedSubscriptionFrequency(
+            when (key.billingCycle) {
+                BillingCycle.Monthly -> SubscriptionFrequency.MONTHLY
+                BillingCycle.Yearly -> SubscriptionFrequency.YEARLY
+            },
+        )
+    }
+
     companion object {
         private const val SOURCE_KEY = "source"
         private const val ENABLED_KEY = "enabled"
 
-        private val paidTiers = listOf(SubscriptionTier.PLUS, SubscriptionTier.PATRON)
+        private val paidTiers = listOf(OldSubscriptionTier.PLUS, OldSubscriptionTier.PATRON)
     }
 }
 

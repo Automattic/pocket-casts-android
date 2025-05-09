@@ -816,6 +816,25 @@ class PodcastFragment : BaseFragment() {
                     updateStausBarForBackground()
                 }
             },
+            onRecommendedPodcastClicked = { podcastUuid, listDate ->
+                viewModel.onRecommendedPodcastClicked(podcastUuid = podcastUuid, listDate = listDate)
+                val fragment = newInstance(podcastUuid = podcastUuid, fromListUuid = "recommendations_podcast", sourceView = sourceView)
+                (activity as FragmentHostListener).addFragment(fragment)
+            },
+            onRecommendedPodcastSubscribeClicked = { podcastUuid, listDate ->
+                viewModel.onRecommendedPodcastSubscribeClicked(podcastUuid = podcastUuid, listDate = listDate)
+            },
+            onPodrollHeaderClicked = {
+                showPodrollInformationModal()
+            },
+            onPodrollPodcastClicked = { podcastUuid ->
+                viewModel.onPodrollPodcastClicked(podcastUuid = podcastUuid)
+                val fragment = newInstance(podcastUuid = podcastUuid, fromListUuid = "podroll", sourceView = sourceView)
+                (activity as FragmentHostListener).addFragment(fragment)
+            },
+            onPodrollPodcastSubscribeClicked = { podcastUuid ->
+                viewModel.onPodrollPodcastSubscribeClicked(podcastUuid = podcastUuid)
+            },
         ).apply {
             stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
         }
@@ -860,6 +879,16 @@ class PodcastFragment : BaseFragment() {
         updateStatusBar()
 
         return binding.root
+    }
+
+    private fun showPodrollInformationModal() {
+        viewModel.onPodrollInformationModalShown()
+        val dialog = ConfirmationDialog()
+            .setIconId(R.drawable.ic_author)
+            .setTitle(getString(LR.string.podroll_information_title))
+            .setSummary(getString(LR.string.podroll_information_summary))
+            .setButtonType(ConfirmationDialog.ButtonType.Normal(getString(LR.string.podroll_information_button)))
+        dialog.show(parentFragmentManager, "podroll_information")
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -1046,6 +1075,7 @@ class PodcastFragment : BaseFragment() {
                                 episodeLimit = state.episodeLimit,
                                 episodeLimitIndex = state.episodeLimitIndex,
                                 podcast = state.podcast,
+                                tabs = state.tabs,
                                 context = requireContext(),
                             )
                         }
@@ -1055,10 +1085,17 @@ class PodcastFragment : BaseFragment() {
                                 bookmarks = state.bookmarks,
                                 episodes = state.episodes,
                                 searchTerm = state.searchBookmarkTerm,
+                                tabs = state.tabs,
                                 context = requireContext(),
                             )
 
                             adapter?.notifyDataSetChanged()
+                        }
+                        PodcastTab.RECOMMENDATIONS -> {
+                            adapter?.setRecommendations(
+                                result = state.recommendations,
+                                tabs = state.tabs,
+                            )
                         }
                     }
                     if (state.searchTerm.isNotEmpty() && state.searchTerm != lastSearchTerm) {

@@ -35,7 +35,7 @@ class SuggestedFoldersPopupPolicyTest {
             currentTimestamp = answer.arguments[0] as Instant?
         }
 
-        var currentCount: Int = 0
+        var currentCount = 0
         val countSetting = mock<UserSetting<Int>>()
         whenever(countSetting.value) doAnswer { currentCount }
         whenever(countSetting.set(any(), any(), any(), any())) doAnswer { answer ->
@@ -56,21 +56,21 @@ class SuggestedFoldersPopupPolicyTest {
     }
 
     @Test
-    fun `initial policy for unsinged unser`() {
+    fun `initial policy for logged out user`() {
         currentSubscriptionStatus = null
 
         assertTrue(policy.isEligibleForPopup())
     }
 
     @Test
-    fun `initial policy for free unser`() {
+    fun `initial policy for free user`() {
         currentSubscriptionStatus = SubscriptionStatus.Free()
 
         assertTrue(policy.isEligibleForPopup())
     }
 
     @Test
-    fun `initial policy for paid unser`() {
+    fun `initial policy for paid user`() {
         currentSubscriptionStatus = SubscriptionStatus.Paid(
             expiryDate = Date(),
             tier = SubscriptionTier.PLUS,

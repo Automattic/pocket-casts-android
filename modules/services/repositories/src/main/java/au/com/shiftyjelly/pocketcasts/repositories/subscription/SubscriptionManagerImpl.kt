@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.repositories.subscription
 
-import android.app.Activity
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
@@ -14,16 +13,13 @@ import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
-import au.com.shiftyjelly.pocketcasts.payment.PaymentDataSource
+import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
+import au.com.shiftyjelly.pocketcasts.payment.PurchaseResult
 import au.com.shiftyjelly.pocketcasts.payment.billing.isOk
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
-import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionPurchaseRequest
-import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionResponse
-import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionStatusResponse
+import au.com.shiftyjelly.pocketcasts.servers.sync.toStatus
 import au.com.shiftyjelly.pocketcasts.utils.Optional
-import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingResult
@@ -38,13 +34,10 @@ import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.Single
-import java.util.Collections
-import java.util.Date
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -52,12 +45,12 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
-import kotlinx.coroutines.rx2.await
+import kotlinx.coroutines.rx2.asFlowable
 import kotlinx.coroutines.rx2.rxSingle
 
 @Singleton
 class SubscriptionManagerImpl @Inject constructor(
-    private val paymentDataSource: PaymentDataSource,
+    private val paymentClient: PaymentClient,
     private val subscriptionMapper: SubscriptionMapper,
     private val syncManager: SyncManager,
     private val settings: Settings,
@@ -68,37 +61,24 @@ class SubscriptionManagerImpl @Inject constructor(
         get() = settings.cachedSubscriptionStatus.value
         set(value) = settings.cachedSubscriptionStatus.set(value, updateModifiedAt = false)
 
-    private var subscriptionStatus = BehaviorRelay.create<Optional<SubscriptionStatus>>().apply {
-        val cachedStatus = cachedSubscriptionStatus
-        if (cachedStatus != null) {
-            accept(Optional.of(cachedStatus))
-        } else {
-            accept(Optional.of(null))
-        }
-    }
-
     private val productDetails = BehaviorRelay.create<ProductDetailsState>()
-    private val purchaseEvents = PublishRelay.create<PurchaseEvent>()
+    private val purchaseEvents = PublishRelay.create<PurchaseResult>()
     private val subscriptionChangedEvents = PublishRelay.create<SubscriptionChangedEvent>()
 
     private var hasOfferEligible = ConcurrentHashMap<SubscriptionTier, Boolean>()
-
-    private val pendingPurchases = Collections.newSetFromMap(ConcurrentHashMap<String, Boolean>())
-
-    override fun signOut() {
-        clearCachedStatus()
-    }
 
     override fun observeProductDetails(): Flowable<ProductDetailsState> {
         return productDetails.toFlowable(BackpressureStrategy.LATEST)
     }
 
-    override fun observePurchaseEvents(): Flowable<PurchaseEvent> {
+    override fun observePurchaseEvents(): Flowable<PurchaseResult> {
         return purchaseEvents.toFlowable(BackpressureStrategy.LATEST)
     }
 
     override fun observeSubscriptionStatus(): Flowable<Optional<SubscriptionStatus>> {
-        return subscriptionStatus.toFlowable(BackpressureStrategy.LATEST)
+        return settings.cachedSubscriptionStatus.flow
+            .map { status -> Optional.of(status) }
+            .asFlowable()
     }
 
     override fun subscriptionTier(): Flow<SubscriptionTier> {
@@ -121,7 +101,6 @@ class SubscriptionManagerImpl @Inject constructor(
 
         val status = syncManager.subscriptionStatus().toStatus()
 
-        subscriptionStatus.accept(Optional.of(status))
         val oldStatus = cachedSubscriptionStatus
         if (oldStatus != status) {
             if (status is SubscriptionStatus.Paid && oldStatus is SubscriptionStatus.Free) {
@@ -138,57 +117,19 @@ class SubscriptionManagerImpl @Inject constructor(
         return status
     }
 
-    override suspend fun initializeBillingConnection() = coroutineScope {
-        launch { listenToPurchaseUpdates() }
-        launch { refresh() }
-        awaitCancellation()
+    override suspend fun refresh() {
+        loadProducts()
+        loadPurchaseHistory()
+        paymentClient.acknowledgePendingPurchases()
     }
 
-    private suspend fun listenToPurchaseUpdates(): Nothing {
-        paymentDataSource.purchaseUpdates.collect { (billingResult, purchases) ->
-            when (billingResult.responseCode) {
-                BillingClient.BillingResponseCode.OK -> {
-                    purchases.forEach { purchase ->
-                        handlePurchase(purchase)
-                    }
-                }
-
-                BillingClient.BillingResponseCode.USER_CANCELED -> {
-                    purchaseEvents.accept(PurchaseEvent.Cancelled(billingResult.responseCode))
-                }
-
-                BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED -> {
-                    val (result, freshPurchases) = paymentDataSource.loadPurchases(purchasesParams)
-                    if (result.isOk()) {
-                        val existingPurchase = freshPurchases.firstOrNull()
-                        if (existingPurchase != null) {
-                            try {
-                                sendPurchaseToServer(existingPurchase)
-                                purchaseEvents.accept(PurchaseEvent.Success)
-                            } catch (e: Throwable) {
-                                logSubscriptionError(e, "Failed to send purchase info")
-                                val failureEvent = PurchaseEvent.Failure(e.message ?: "Unknown errror", billingResult.responseCode)
-                                purchaseEvents.accept(failureEvent)
-                            }
-                        } else {
-                            logSubscriptionWarning("Failed to load already owned purchase: ${billingResult.debugMessage}")
-                            val failureEvent = PurchaseEvent.Failure(result.debugMessage, billingResult.responseCode)
-                            purchaseEvents.accept(failureEvent)
-                        }
-                    }
-                }
-
-                else -> {
-                    logSubscriptionWarning("Could not purchase subscription: ${billingResult.debugMessage}")
-                    val failureEvent = PurchaseEvent.Failure(billingResult.debugMessage, billingResult.responseCode)
-                    purchaseEvents.accept(failureEvent)
-                }
-            }
-        }
+    override suspend fun initializeBillingConnection(): Nothing = coroutineScope {
+        launch { paymentClient.listenToPurchaseUpdates() }
+        paymentClient.purchaseEvents.collect(purchaseEvents::accept)
     }
 
-    override suspend fun loadProducts(): ProductDetailsState {
-        val (result, products) = paymentDataSource.loadProducts(productDetailsParams)
+    private suspend fun loadProducts(): ProductDetailsState {
+        val (result, products) = paymentClient.loadProducts(productDetailsParams)
         val interceptedResult = productDetailsInterceptor.intercept(result, products)
         val state = if (interceptedResult.first.isOk()) {
             ProductDetailsState.Loaded(interceptedResult.second)
@@ -199,23 +140,8 @@ class SubscriptionManagerImpl @Inject constructor(
         return state
     }
 
-    override suspend fun loadPurchases() = coroutineScope {
-        val (purchasesResult, purchases) = paymentDataSource.loadPurchases(purchasesParams)
-
-        if (purchasesResult.isOk()) {
-            purchases.forEach { purchase ->
-                if (!purchase.isAcknowledged) {
-                    launch { handlePurchase(purchase) }
-                }
-            }
-            PurchasesState.Loaded(purchases)
-        } else {
-            PurchasesState.Failure
-        }
-    }
-
     override suspend fun loadPurchaseHistory(): PurchaseHistoryState {
-        val (historyResults, historyRecords) = paymentDataSource.loadPurchaseHistory(purchaseHistoryParams)
+        val (historyResults, historyRecords) = paymentClient.loadPurchaseHistory(purchaseHistoryParams)
         return if (historyResults.isOk()) {
             historyRecords.forEach(::handleHistoryRecord)
             PurchaseHistoryState.Loaded(historyRecords)
@@ -229,46 +155,6 @@ class SubscriptionManagerImpl @Inject constructor(
             .map(SubscriptionTier::fromProductId)
             .distinct()
             .forEach { tier -> updateOfferEligible(tier, false) }
-    }
-
-    private suspend fun handlePurchase(purchase: Purchase) {
-        if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED && pendingPurchases.add(purchase.orderId)) {
-            try {
-                sendPurchaseToServer(purchase)
-                if (!purchase.isAcknowledged) {
-                    acknowledgePurchase(purchase)
-                }
-                purchase.products
-                    .map(SubscriptionTier::fromProductId)
-                    .distinct()
-                    .forEach { tier -> updateOfferEligible(tier, false) }
-            } catch (e: Throwable) {
-                purchaseEvents.accept(PurchaseEvent.Failure(e.message ?: "Unknown error", responseCode = null))
-                logSubscriptionError(e, "Could not send purchase info: ${purchase.orderId}")
-            } finally {
-                pendingPurchases.remove(purchase.orderId)
-            }
-        }
-    }
-
-    private suspend fun acknowledgePurchase(purchase: Purchase) {
-        val result = paymentDataSource.acknowledgePurchase(acknowledgePurchaseParams(purchase))
-        if (result.isOk()) {
-            purchaseEvents.accept(PurchaseEvent.Success)
-        } else {
-            purchaseEvents.accept(PurchaseEvent.Failure(result.debugMessage, result.responseCode))
-        }
-    }
-
-    private suspend fun sendPurchaseToServer(purchase: Purchase) {
-        if (purchase.products.size != 1) {
-            LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, "expected 1 product when sending purchase to server, but there were ${purchase.products.size}")
-        }
-
-        val response = syncManager.subscriptionPurchaseRxSingle(SubscriptionPurchaseRequest(purchase.purchaseToken, purchase.products.first())).await()
-        val newStatus = response.toStatus()
-        cachedSubscriptionStatus = newStatus
-        subscriptionStatus.accept(Optional.of(newStatus))
     }
 
     override fun launchBillingFlow(
@@ -297,65 +183,8 @@ class SubscriptionManagerImpl @Inject constructor(
                     }
                 }
                 .build()
-            paymentDataSource.launchBillingFlow(activity, billingFlowParams)
+            paymentClient.launchBillingFlow(activity, billingFlowParams)
         }
-    }
-
-    override suspend fun changeProduct(
-        currentPurchase: Purchase,
-        currentPurchaseProductId: String,
-        newProduct: ProductDetails,
-        newProductOfferToken: String,
-        activity: Activity,
-    ): BillingResult {
-        val productDetailsParams = BillingFlowParams.ProductDetailsParams.newBuilder()
-            .setProductDetails(newProduct)
-            .setOfferToken(newProductOfferToken)
-            .build()
-
-        val updateParams = getReplacementMode(currentPurchaseProductId, newProduct.productId)
-            ?.let { replacementMode ->
-                BillingFlowParams.SubscriptionUpdateParams.newBuilder()
-                    .setOldPurchaseToken(currentPurchase.purchaseToken)
-                    .setSubscriptionReplacementMode(replacementMode)
-                    .build()
-            }
-
-        val billingFlowParams = BillingFlowParams.newBuilder()
-            .setProductDetailsParamsList(listOf(productDetailsParams))
-            .let { builder ->
-                if (updateParams != null) {
-                    builder.setSubscriptionUpdateParams(updateParams)
-                } else {
-                    builder
-                }
-            }
-            .build()
-        return paymentDataSource.launchBillingFlow(activity, billingFlowParams)
-    }
-
-    override suspend fun claimWinbackOffer(
-        currentPurchase: Purchase,
-        winbackProduct: ProductDetails,
-        winbackOfferToken: String,
-        activity: Activity,
-    ): BillingResult {
-        val productDetailsParams = BillingFlowParams.ProductDetailsParams.newBuilder()
-            .setProductDetails(winbackProduct)
-            .setOfferToken(winbackOfferToken)
-            .build()
-
-        val updateParams = BillingFlowParams.SubscriptionUpdateParams.newBuilder()
-            .setOldPurchaseToken(currentPurchase.purchaseToken)
-            .setSubscriptionReplacementMode(BillingFlowParams.SubscriptionUpdateParams.ReplacementMode.CHARGE_FULL_PRICE)
-            .build()
-
-        val billingFlowParams = BillingFlowParams.newBuilder()
-            .setProductDetailsParamsList(listOf(productDetailsParams))
-            .setSubscriptionUpdateParams(updateParams)
-            .build()
-
-        return paymentDataSource.launchBillingFlow(activity, billingFlowParams)
     }
 
     private suspend fun loadSubscriptionUpdateParamsMode(
@@ -369,7 +198,7 @@ class SubscriptionManagerImpl @Inject constructor(
             return okResult to null
         }
 
-        val (result, purchases) = paymentDataSource.loadPurchases(purchasesParams)
+        val (result, purchases) = paymentClient.loadPurchases(purchasesParams)
         return if (result.isOk()) {
             val params = purchases.firstOrNull()?.let { purchase ->
                 BillingFlowParams.SubscriptionUpdateParams.newBuilder()
@@ -384,18 +213,19 @@ class SubscriptionManagerImpl @Inject constructor(
     }
 
     override fun getCachedStatus(): SubscriptionStatus? {
-        return subscriptionStatus.value?.get()
+        return cachedSubscriptionStatus
     }
 
     override fun clearCachedStatus() {
         cachedSubscriptionStatus = null
-        subscriptionStatus.accept(Optional.empty())
     }
+
     override fun isOfferEligible(tier: SubscriptionTier): Boolean = hasOfferEligible[tier] ?: true
 
-    override fun updateOfferEligible(tier: SubscriptionTier, eligible: Boolean) {
+    private fun updateOfferEligible(tier: SubscriptionTier, eligible: Boolean) {
         hasOfferEligible[tier] = eligible
     }
+
     override fun getDefaultSubscription(
         subscriptions: List<Subscription>,
         tier: SubscriptionTier?,
@@ -483,10 +313,6 @@ class SubscriptionManagerImpl @Inject constructor(
                         .build(),
                 ),
             )
-            .build()
-
-        fun acknowledgePurchaseParams(purchase: Purchase) = AcknowledgePurchaseParams.newBuilder()
-            .setPurchaseToken(purchase.purchaseToken)
             .build()
     }
 }
@@ -588,15 +414,6 @@ sealed interface PurchaseHistoryState {
     data object Failure : PurchaseHistoryState
 }
 
-sealed class PurchaseEvent {
-    object Success : PurchaseEvent()
-    data class Cancelled(@BillingClient.BillingResponseCode val responseCode: Int) : PurchaseEvent()
-    data class Failure(
-        val errorMessage: String,
-        @BillingClient.BillingResponseCode val responseCode: Int?,
-    ) : PurchaseEvent()
-}
-
 sealed class SubscriptionChangedEvent {
     object AccountUpgradedToPlus : SubscriptionChangedEvent()
     object AccountDowngradedToFree : SubscriptionChangedEvent()
@@ -606,23 +423,3 @@ data class FreeTrial(
     val subscriptionTier: SubscriptionTier,
     val exists: Boolean = false,
 )
-
-private fun SubscriptionStatusResponse.toStatus(): SubscriptionStatus {
-    val originalPlatform = SubscriptionPlatform.entries.getOrNull(platform) ?: SubscriptionPlatform.NONE
-
-    return if (paid == 0) {
-        SubscriptionStatus.Free(expiryDate, giftDays, originalPlatform)
-    } else {
-        val subs = subscriptions?.map { it.toSubscription() } ?: emptyList()
-        subs.getOrNull(index)?.isPrimarySubscription = true // Mark the subscription that the server says is the main one
-        val freq = SubscriptionFrequency.entries.getOrNull(frequency) ?: SubscriptionFrequency.NONE
-        val enumTier = SubscriptionTier.fromString(tier)
-        SubscriptionStatus.Paid(expiryDate ?: Date(), autoRenewing, giftDays, freq, originalPlatform, subs, enumTier, index)
-    }
-}
-
-private fun SubscriptionResponse.toSubscription(): SubscriptionStatus.Subscription {
-    val enumTier = SubscriptionTier.fromString(tier)
-    val freq = SubscriptionFrequency.entries.getOrNull(frequency) ?: SubscriptionFrequency.NONE
-    return SubscriptionStatus.Subscription(enumTier, freq, expiryDate, autoRenewing, updateUrl)
-}

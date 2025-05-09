@@ -8,11 +8,11 @@ import org.junit.Test
 class SubscriptionPlansTest {
     private val pricingPhase = PricingPhase(
         Price(100.toBigDecimal(), "USD", "$100.00"),
-        BillingPeriod(BillingPeriod.Cycle.Infinite, BillingPeriod.Interval.Yearly, intervalCount = 1),
+        PricingSchedule(PricingSchedule.RecurrenceMode.Infinite, PricingSchedule.Period.Yearly, periodCount = 1),
     )
 
     private val products = SubscriptionTier.entries.flatMap { tier ->
-        SubscriptionBillingCycle.entries.map { billingCycle ->
+        BillingCycle.entries.map { billingCycle ->
             Product(
                 id = SubscriptionPlan.productId(tier, billingCycle),
                 name = "$tier $billingCycle",
@@ -48,44 +48,44 @@ class SubscriptionPlansTest {
     fun `get plus monthly base plan`() {
         val plans = SubscriptionPlans.create(products).getOrNull()!!
 
-        val plan = plans.getBasePlan(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly)
+        val plan = plans.getBasePlan(SubscriptionTier.Plus, BillingCycle.Monthly)
 
         assertEquals("Plus Monthly", plan.name)
         assertEquals(SubscriptionTier.Plus, plan.tier)
-        assertEquals(SubscriptionBillingCycle.Monthly, plan.billingCycle)
+        assertEquals(BillingCycle.Monthly, plan.billingCycle)
     }
 
     @Test
     fun `get plus yearly base plan`() {
         val plans = SubscriptionPlans.create(products).getOrNull()!!
 
-        val plan = plans.getBasePlan(SubscriptionTier.Plus, SubscriptionBillingCycle.Yearly)
+        val plan = plans.getBasePlan(SubscriptionTier.Plus, BillingCycle.Yearly)
 
         assertEquals("Plus Yearly", plan.name)
         assertEquals(SubscriptionTier.Plus, plan.tier)
-        assertEquals(SubscriptionBillingCycle.Yearly, plan.billingCycle)
+        assertEquals(BillingCycle.Yearly, plan.billingCycle)
     }
 
     @Test
     fun `get patron monthly base plan`() {
         val plans = SubscriptionPlans.create(products).getOrNull()!!
 
-        val plan = plans.getBasePlan(SubscriptionTier.Patron, SubscriptionBillingCycle.Monthly)
+        val plan = plans.getBasePlan(SubscriptionTier.Patron, BillingCycle.Monthly)
 
         assertEquals("Patron Monthly", plan.name)
         assertEquals(SubscriptionTier.Patron, plan.tier)
-        assertEquals(SubscriptionBillingCycle.Monthly, plan.billingCycle)
+        assertEquals(BillingCycle.Monthly, plan.billingCycle)
     }
 
     @Test
     fun `get patron yearly base plan`() {
         val plans = SubscriptionPlans.create(products).getOrNull()!!
 
-        val plan = plans.getBasePlan(SubscriptionTier.Patron, SubscriptionBillingCycle.Yearly)
+        val plan = plans.getBasePlan(SubscriptionTier.Patron, BillingCycle.Yearly)
 
         assertEquals("Patron Yearly", plan.name)
         assertEquals(SubscriptionTier.Patron, plan.tier)
-        assertEquals(SubscriptionBillingCycle.Yearly, plan.billingCycle)
+        assertEquals(BillingCycle.Yearly, plan.billingCycle)
     }
 
     @Test
@@ -94,13 +94,13 @@ class SubscriptionPlansTest {
 
         val plan = plans.findOfferPlan(
             SubscriptionTier.Plus,
-            SubscriptionBillingCycle.Monthly,
+            BillingCycle.Monthly,
             SubscriptionOffer.Winback,
         ).getOrNull()!!
 
         assertEquals("Plus Monthly", plan.name)
         assertEquals(SubscriptionTier.Plus, plan.tier)
-        assertEquals(SubscriptionBillingCycle.Monthly, plan.billingCycle)
+        assertEquals(BillingCycle.Monthly, plan.billingCycle)
         assertEquals(SubscriptionOffer.Winback, plan.offer)
     }
 
@@ -110,13 +110,13 @@ class SubscriptionPlansTest {
 
         val plan = plans.findOfferPlan(
             SubscriptionTier.Plus,
-            SubscriptionBillingCycle.Yearly,
+            BillingCycle.Yearly,
             SubscriptionOffer.Winback,
         ).getOrNull()!!
 
         assertEquals("Plus Yearly", plan.name)
         assertEquals(SubscriptionTier.Plus, plan.tier)
-        assertEquals(SubscriptionBillingCycle.Yearly, plan.billingCycle)
+        assertEquals(BillingCycle.Yearly, plan.billingCycle)
         assertEquals(SubscriptionOffer.Winback, plan.offer)
     }
 
@@ -126,13 +126,13 @@ class SubscriptionPlansTest {
 
         val plan = plans.findOfferPlan(
             SubscriptionTier.Patron,
-            SubscriptionBillingCycle.Monthly,
+            BillingCycle.Monthly,
             SubscriptionOffer.Winback,
         ).getOrNull()!!
 
         assertEquals("Patron Monthly", plan.name)
         assertEquals(SubscriptionTier.Patron, plan.tier)
-        assertEquals(SubscriptionBillingCycle.Monthly, plan.billingCycle)
+        assertEquals(BillingCycle.Monthly, plan.billingCycle)
         assertEquals(SubscriptionOffer.Winback, plan.offer)
     }
 
@@ -142,13 +142,13 @@ class SubscriptionPlansTest {
 
         val plan = plans.findOfferPlan(
             SubscriptionTier.Patron,
-            SubscriptionBillingCycle.Yearly,
+            BillingCycle.Yearly,
             SubscriptionOffer.Winback,
         ).getOrNull()!!
 
         assertEquals("Patron Yearly", plan.name)
         assertEquals(SubscriptionTier.Patron, plan.tier)
-        assertEquals(SubscriptionBillingCycle.Yearly, plan.billingCycle)
+        assertEquals(BillingCycle.Yearly, plan.billingCycle)
         assertEquals(SubscriptionOffer.Winback, plan.offer)
     }
 
@@ -158,13 +158,13 @@ class SubscriptionPlansTest {
 
         val plan = plans.findOfferPlan(
             SubscriptionTier.Plus,
-            SubscriptionBillingCycle.Yearly,
+            BillingCycle.Yearly,
             SubscriptionOffer.Referral,
         ).getOrNull()!!
 
         assertEquals("Plus Yearly", plan.name)
         assertEquals(SubscriptionTier.Plus, plan.tier)
-        assertEquals(SubscriptionBillingCycle.Yearly, plan.billingCycle)
+        assertEquals(BillingCycle.Yearly, plan.billingCycle)
         assertEquals(SubscriptionOffer.Referral, plan.offer)
     }
 
@@ -174,14 +174,30 @@ class SubscriptionPlansTest {
 
         val plan = plans.findOfferPlan(
             SubscriptionTier.Plus,
-            SubscriptionBillingCycle.Yearly,
+            BillingCycle.Yearly,
             SubscriptionOffer.Trial,
         ).getOrNull()!!
 
         assertEquals("Plus Yearly", plan.name)
         assertEquals(SubscriptionTier.Plus, plan.tier)
-        assertEquals(SubscriptionBillingCycle.Yearly, plan.billingCycle)
+        assertEquals(BillingCycle.Yearly, plan.billingCycle)
         assertEquals(SubscriptionOffer.Trial, plan.offer)
+    }
+
+    @Test
+    fun `find plus yearly intro offer plan`() {
+        val plans = SubscriptionPlans.create(products).getOrNull()!!
+
+        val plan = plans.findOfferPlan(
+            SubscriptionTier.Plus,
+            BillingCycle.Yearly,
+            SubscriptionOffer.IntroOffer,
+        ).getOrNull()!!
+
+        assertEquals("Plus Yearly", plan.name)
+        assertEquals(SubscriptionTier.Plus, plan.tier)
+        assertEquals(BillingCycle.Yearly, plan.billingCycle)
+        assertEquals(SubscriptionOffer.IntroOffer, plan.offer)
     }
 
     @Test
@@ -190,7 +206,7 @@ class SubscriptionPlansTest {
 
         val plan = plans.findOfferPlan(
             SubscriptionTier.Patron,
-            SubscriptionBillingCycle.Monthly,
+            BillingCycle.Monthly,
             SubscriptionOffer.Trial,
         ).getOrNull()
 
@@ -199,7 +215,7 @@ class SubscriptionPlansTest {
 
     @Test
     fun `do not create plans when plus monthly product is missing`() {
-        val products = products.filter { it.id != SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Monthly) }
+        val products = products.filter { it.id != SubscriptionPlan.PlusMonthlyProductId }
 
         val plans = SubscriptionPlans.create(products).getOrNull()
 
@@ -208,7 +224,7 @@ class SubscriptionPlansTest {
 
     @Test
     fun `do not create plans when plus yearly product is missing`() {
-        val products = products.filter { it.id != SubscriptionPlan.productId(SubscriptionTier.Plus, SubscriptionBillingCycle.Yearly) }
+        val products = products.filter { it.id != SubscriptionPlan.PlusYearlyProductId }
 
         val plans = SubscriptionPlans.create(products).getOrNull()
 
@@ -217,7 +233,7 @@ class SubscriptionPlansTest {
 
     @Test
     fun `do not create plans when patron monthly product is missing`() {
-        val products = products.filter { it.id != SubscriptionPlan.productId(SubscriptionTier.Patron, SubscriptionBillingCycle.Monthly) }
+        val products = products.filter { it.id != SubscriptionPlan.PatronMonthlyProductId }
 
         val plans = SubscriptionPlans.create(products).getOrNull()
 
@@ -226,7 +242,7 @@ class SubscriptionPlansTest {
 
     @Test
     fun `do not create plans when patron yearly product is missing`() {
-        val products = products.filter { it.id != SubscriptionPlan.productId(SubscriptionTier.Patron, SubscriptionBillingCycle.Yearly) }
+        val products = products.filter { it.id != SubscriptionPlan.PatronYearlyProductId }
 
         val plans = SubscriptionPlans.create(products).getOrNull()
 
@@ -236,7 +252,7 @@ class SubscriptionPlansTest {
     @Test
     fun `do not create plans when base plan has multiple pricing phases`() {
         val products = products.map { product ->
-            if (product.id == SubscriptionPlan.productId(SubscriptionTier.Patron, SubscriptionBillingCycle.Yearly)) {
+            if (product.id == SubscriptionPlan.PatronYearlyProductId) {
                 val basePlan = product.pricingPlans.basePlan.copy(pricingPhases = listOf(pricingPhase, pricingPhase))
                 val pricingPlans = product.pricingPlans.copy(basePlan = basePlan)
                 product.copy(pricingPlans = pricingPlans)
@@ -283,7 +299,7 @@ class SubscriptionPlansTest {
 
         val plan = plans.findOfferPlan(
             SubscriptionTier.Plus,
-            SubscriptionBillingCycle.Yearly,
+            BillingCycle.Yearly,
             SubscriptionOffer.Winback,
         ).getOrNull()
 

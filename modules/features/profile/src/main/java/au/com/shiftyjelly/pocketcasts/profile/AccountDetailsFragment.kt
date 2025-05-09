@@ -12,13 +12,13 @@ import androidx.appcompat.app.AlertDialog
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import au.com.shiftyjelly.pocketcasts.account.ChangeEmailFragment
 import au.com.shiftyjelly.pocketcasts.account.ChangePwdFragment
-import au.com.shiftyjelly.pocketcasts.account.viewmodel.ProfileUpgradeBannerViewModel
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
@@ -50,7 +50,6 @@ import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.cartheme.R as CR
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -91,25 +90,17 @@ class AccountDetailsFragment : BaseFragment() {
     @Inject lateinit var syncManager: SyncManager
 
     private val accountViewModel by viewModels<AccountDetailsViewModel>()
-    private val upgradeBannerViewModel by viewModels<ProfileUpgradeBannerViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = contentWithoutConsumedInsets {
-        val upgradeBannerState = remember {
-            combine(
-                accountViewModel.showUpgradeBanner,
-                upgradeBannerViewModel.state,
-            ) { showBanner, state -> state.takeIf { showBanner } }
-        }
-
         val state = AccountDetailsPageState(
             isAutomotive = remember { Util.isAutomotive(requireContext()) },
             miniPlayerPadding = accountViewModel.miniPlayerInset.collectAsState().value.pxToDp(requireContext()).dp,
             headerState = accountViewModel.headerState.collectAsState().value,
-            upgradeBannerState = upgradeBannerState.collectAsState(null).value,
+            upgradeBannerState = accountViewModel.upgradeBannerState.collectAsState().value,
             sectionsState = accountViewModel.sectionsState.collectAsState().value,
         )
 
@@ -125,20 +116,20 @@ class AccountDetailsFragment : BaseFragment() {
                     PocketCastsChampionBottomSheetDialog().show(childFragmentManager, "pocket_casts_champion_dialog")
                 }
             },
-            onClickUpgradeBanner = {
+            onClickSubscribe = { planKey ->
                 analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_UPGRADE_BUTTON_TAPPED)
                 val source = OnboardingUpgradeSource.PROFILE
                 val onboardingFlow = OnboardingFlow.PlusAccountUpgrade(source)
                 OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
             },
-            onFeatureCardChanged = { featureCard ->
-                analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_SUBSCRIPTION_TIER_CHANGED, mapOf("value" to featureCard.subscriptionTier.name.lowercase()))
-                upgradeBannerViewModel.onFeatureCardChanged(featureCard)
+            onChangeFeatureCard = { planKey ->
+                analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_SUBSCRIPTION_TIER_CHANGED, mapOf("value" to planKey.tier.analyticsValue))
+                accountViewModel.changeSelectedFeatureCard(planKey)
             },
             onChangeAvatar = { email ->
                 analyticsTracker.track(AnalyticsEvent.ACCOUNT_DETAILS_CHANGE_AVATAR)
                 Gravatar.refreshGravatarTimestamp()
-                requireActivity().startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Gravatar.getGravatarChangeAvatarUrl(email))))
+                requireActivity().startActivity(Intent(Intent.ACTION_VIEW, Gravatar.getGravatarChangeAvatarUrl(email).toUri()))
             },
             onChangeEmail = {
                 (requireActivity() as FragmentHostListener).addFragment(ChangeEmailFragment.newInstance())

@@ -34,7 +34,7 @@ sealed interface PricingPlan {
 
 data class PricingPhase(
     val price: Price,
-    val billingPeriod: BillingPeriod,
+    val schedule: PricingSchedule,
 )
 
 data class Price(
@@ -43,69 +43,67 @@ data class Price(
     val formattedPrice: String,
 )
 
-data class BillingPeriod(
-    val cycle: BillingPeriod.Cycle,
-    val interval: BillingPeriod.Interval,
-    val intervalCount: Int,
+data class PricingSchedule(
+    val recurrenceMode: PricingSchedule.RecurrenceMode,
+    val period: PricingSchedule.Period,
+    val periodCount: Int,
 ) {
-    enum class Interval {
+    enum class Period {
+        Daily,
         Weekly,
         Monthly,
         Yearly,
     }
 
-    sealed interface Cycle {
-        data object NonRecurring : Cycle
+    sealed interface RecurrenceMode {
+        data object NonRecurring : RecurrenceMode
 
         @JvmInline
         value class Recurring(
             val value: Int,
-        ) : Cycle
+        ) : RecurrenceMode
 
-        data object Infinite : Cycle
+        data object Infinite : RecurrenceMode
     }
 }
 
-class SubscriptionPlans private constructor(
-    private val plans: Map<Key, PaymentResult<SubscriptionPlan>>,
+@ConsistentCopyVisibility
+data class SubscriptionPlans private constructor(
+    private val plans: Map<SubscriptionPlan.Key, PaymentResult<SubscriptionPlan>>,
 ) {
     fun getBasePlan(
         tier: SubscriptionTier,
-        billingCycle: SubscriptionBillingCycle,
+        billingCycle: BillingCycle,
     ): SubscriptionPlan.Base {
-        val key = Key(tier, billingCycle, offer = null)
+        val key = SubscriptionPlan.Key(tier, billingCycle, offer = null)
         // This is a safe cast because constructor is private and we validate data in the create function
         return plans.getValue(key).getOrNull() as SubscriptionPlan.Base
     }
 
     fun findOfferPlan(
         tier: SubscriptionTier,
-        billingCycle: SubscriptionBillingCycle,
+        billingCycle: BillingCycle,
         offer: SubscriptionOffer,
     ): PaymentResult<SubscriptionPlan.WithOffer> {
-        val key = Key(tier, billingCycle, offer)
+        val key = SubscriptionPlan.Key(tier, billingCycle, offer)
         // This is a safe cast because constructor is private and we validate data in the create function
         @Suppress("UNCHECKED_CAST")
         return plans.getValue(key) as PaymentResult<SubscriptionPlan.WithOffer>
     }
 
-    override fun equals(other: Any?) = (other === this) || (other is SubscriptionPlans && other.plans == this.plans)
-
-    override fun hashCode() = plans.hashCode()
-
-    override fun toString() = "SubscriptionPlans(plans=$plans)"
-
     companion object {
+        val Preview get() = SubscriptionPlans.create(FakePaymentDataSource.DefaultLoadedProducts).getOrNull()!!
+
         private val basePlanKeys = SubscriptionTier.entries.flatMap { tier ->
-            SubscriptionBillingCycle.entries.map { billingCycle ->
-                Key(tier, billingCycle, offer = null)
+            BillingCycle.entries.map { billingCycle ->
+                SubscriptionPlan.Key(tier, billingCycle, offer = null)
             }
         }
 
         private val offerPlanKeys = SubscriptionTier.entries.flatMap { tier ->
-            SubscriptionBillingCycle.entries.flatMap { billingCycle ->
+            BillingCycle.entries.flatMap { billingCycle ->
                 SubscriptionOffer.entries.map { offer ->
-                    Key(tier, billingCycle, offer)
+                    SubscriptionPlan.Key(tier, billingCycle, offer)
                 }
             }
         }
@@ -123,7 +121,7 @@ class SubscriptionPlans private constructor(
             return PaymentResult.Success(SubscriptionPlans(basePlans + offerPlans))
         }
 
-        private fun List<Product>.findMatchingSubscriptionPlan(key: Key): PaymentResult<SubscriptionPlan> {
+        private fun List<Product>.findMatchingSubscriptionPlan(key: SubscriptionPlan.Key): PaymentResult<SubscriptionPlan> {
             val matchingProducts = findMatchingProducts(key)
             return when (matchingProducts.size) {
                 1 -> PaymentResult.Success(
@@ -134,12 +132,12 @@ class SubscriptionPlans private constructor(
                     },
                 )
 
-                0 -> PaymentResult.Failure("No matching product found for $key")
-                else -> PaymentResult.Failure("Multiple matching products found for $key. $matchingProducts")
+                0 -> PaymentResult.Failure(PaymentResultCode.DeveloperError, "No matching product found for $key")
+                else -> PaymentResult.Failure(PaymentResultCode.DeveloperError, "Multiple matching products found for $key. $matchingProducts")
             }
         }
 
-        private fun List<Product>.findMatchingProducts(key: Key): List<Product> {
+        private fun List<Product>.findMatchingProducts(key: SubscriptionPlan.Key): List<Product> {
             return filter { product ->
                 val offerCondition = if (key.offer != null) {
                     product.pricingPlans.offerPlans.singleOrNull { it.offerId == key.offerId } != null
@@ -150,7 +148,7 @@ class SubscriptionPlans private constructor(
             }
         }
 
-        private fun Product.toBaseSubscriptionPlan(key: Key): SubscriptionPlan.Base {
+        private fun Product.toBaseSubscriptionPlan(key: SubscriptionPlan.Key): SubscriptionPlan.Base {
             return SubscriptionPlan.Base(
                 name,
                 key.tier,
@@ -159,7 +157,7 @@ class SubscriptionPlans private constructor(
             )
         }
 
-        private fun Product.toOfferSubscriptionPlan(key: Key): SubscriptionPlan.WithOffer {
+        private fun Product.toOfferSubscriptionPlan(key: SubscriptionPlan.Key): SubscriptionPlan.WithOffer {
             checkNotNull(key.offer)
             val matchingPricingPhases = pricingPlans.offerPlans.single { it.offerId == key.offerId }.pricingPhases
             return SubscriptionPlan.WithOffer(
@@ -171,82 +169,116 @@ class SubscriptionPlans private constructor(
             )
         }
     }
+}
 
-    private data class Key(
+sealed interface SubscriptionPlan {
+    val name: String
+    val key: SubscriptionPlan.Key
+    val tier: SubscriptionTier
+    val billingCycle: BillingCycle
+    val offer: SubscriptionOffer?
+
+    val productId get() = key.productId
+    val basePlanId get() = key.basePlanId
+    val offerId get() = key.offerId
+
+    data class Base(
+        override val name: String,
+        override val tier: SubscriptionTier,
+        override val billingCycle: BillingCycle,
+        val pricingPhase: PricingPhase,
+    ) : SubscriptionPlan {
+        override val offer get() = null
+        override val key get() = SubscriptionPlan.Key(tier, billingCycle, offer = null)
+    }
+
+    data class WithOffer(
+        override val name: String,
+        override val tier: SubscriptionTier,
+        override val billingCycle: BillingCycle,
+        override val offer: SubscriptionOffer,
+        val pricingPhases: List<PricingPhase>,
+    ) : SubscriptionPlan {
+        override val key get() = SubscriptionPlan.Key(tier, billingCycle, offer)
+    }
+
+    data class Key(
         val tier: SubscriptionTier,
-        val billingCycle: SubscriptionBillingCycle,
+        val billingCycle: BillingCycle,
         val offer: SubscriptionOffer?,
     ) {
         val productId = SubscriptionPlan.productId(tier, billingCycle)
         val basePlanId = SubscriptionPlan.basePlanId(tier, billingCycle)
         val offerId = offer?.offerId(tier, billingCycle)
     }
-}
-
-sealed interface SubscriptionPlan {
-    val name: String
-    val tier: SubscriptionTier
-    val billingCycle: SubscriptionBillingCycle
-
-    data class Base(
-        override val name: String,
-        override val tier: SubscriptionTier,
-        override val billingCycle: SubscriptionBillingCycle,
-        val pricingPhase: PricingPhase,
-    ) : SubscriptionPlan
-
-    data class WithOffer(
-        override val name: String,
-        override val tier: SubscriptionTier,
-        override val billingCycle: SubscriptionBillingCycle,
-        val offer: SubscriptionOffer,
-        val pricingPhases: List<PricingPhase>,
-    ) : SubscriptionPlan
 
     companion object {
+        const val PlusMonthlyProductId = "com.pocketcasts.plus.monthly"
+        const val PlusYearlyProductId = "com.pocketcasts.plus.yearly"
+        const val PatronMonthlyProductId = "com.pocketcasts.monthly.patron"
+        const val PatronYearlyProductId = "com.pocketcasts.yearly.patron"
+
+        val PlusMonthlyPreview get() = SubscriptionPlans.Preview.getBasePlan(SubscriptionTier.Plus, BillingCycle.Monthly)
+        val PlusYearlyPreview get() = SubscriptionPlans.Preview.getBasePlan(SubscriptionTier.Plus, BillingCycle.Yearly)
+        val PatronMonthlyPreview get() = SubscriptionPlans.Preview.getBasePlan(SubscriptionTier.Patron, BillingCycle.Monthly)
+        val PatronYearlyPreview get() = SubscriptionPlans.Preview.getBasePlan(SubscriptionTier.Patron, BillingCycle.Yearly)
+
         fun productId(
             tier: SubscriptionTier,
-            billingCycle: SubscriptionBillingCycle,
+            billingCycle: BillingCycle,
         ) = when (tier) {
             SubscriptionTier.Plus -> when (billingCycle) {
-                SubscriptionBillingCycle.Monthly -> "com.pocketcasts.plus.monthly"
-                SubscriptionBillingCycle.Yearly -> "com.pocketcasts.plus.yearly"
+                BillingCycle.Monthly -> PlusMonthlyProductId
+                BillingCycle.Yearly -> PlusYearlyProductId
             }
 
             SubscriptionTier.Patron -> when (billingCycle) {
-                SubscriptionBillingCycle.Monthly -> "com.pocketcasts.monthly.patron"
-                SubscriptionBillingCycle.Yearly -> "com.pocketcasts.yearly.patron"
+                BillingCycle.Monthly -> PatronMonthlyProductId
+                BillingCycle.Yearly -> PatronYearlyProductId
             }
         }
 
         fun basePlanId(
             tier: SubscriptionTier,
-            billingCycle: SubscriptionBillingCycle,
+            billingCycle: BillingCycle,
         ) = when (tier) {
             SubscriptionTier.Plus -> when (billingCycle) {
-                SubscriptionBillingCycle.Monthly -> "p1m"
-                SubscriptionBillingCycle.Yearly -> "p1y"
+                BillingCycle.Monthly -> "p1m"
+                BillingCycle.Yearly -> "p1y"
             }
 
             SubscriptionTier.Patron -> when (billingCycle) {
-                SubscriptionBillingCycle.Monthly -> "patron-monthly"
-                SubscriptionBillingCycle.Yearly -> "patron-yearly"
+                BillingCycle.Monthly -> "patron-monthly"
+                BillingCycle.Yearly -> "patron-yearly"
             }
         }
     }
 }
 
-enum class SubscriptionTier {
-    Plus,
-    Patron,
+enum class SubscriptionTier(
+    val analyticsValue: String,
+) {
+    Plus(
+        analyticsValue = "plus",
+    ),
+    Patron(
+        analyticsValue = "patron",
+    ),
 }
 
-enum class SubscriptionBillingCycle {
-    Monthly,
-    Yearly,
+enum class BillingCycle(
+    val analyticsValue: String,
+) {
+    Monthly(
+        analyticsValue = "monthly",
+    ),
+    Yearly(
+        analyticsValue = "yearly",
+    ),
 }
 
 enum class SubscriptionOffer {
+    IntroOffer,
     Trial,
     Referral,
     Winback,
@@ -254,12 +286,20 @@ enum class SubscriptionOffer {
 
     fun offerId(
         tier: SubscriptionTier,
-        billingCycle: SubscriptionBillingCycle,
+        billingCycle: BillingCycle,
     ) = when (this) {
+        IntroOffer -> when (tier) {
+            SubscriptionTier.Plus -> when (billingCycle) {
+                BillingCycle.Monthly -> null
+                BillingCycle.Yearly -> "plus-yearly-intro-50percent"
+            }
+
+            SubscriptionTier.Patron -> null
+        }
         Trial -> when (tier) {
             SubscriptionTier.Plus -> when (billingCycle) {
-                SubscriptionBillingCycle.Monthly -> null
-                SubscriptionBillingCycle.Yearly -> "plus-yearly-trial-30days"
+                BillingCycle.Monthly -> null
+                BillingCycle.Yearly -> "plus-yearly-trial-30days"
             }
 
             SubscriptionTier.Patron -> null
@@ -267,8 +307,8 @@ enum class SubscriptionOffer {
 
         Referral -> when (tier) {
             SubscriptionTier.Plus -> when (billingCycle) {
-                SubscriptionBillingCycle.Monthly -> null
-                SubscriptionBillingCycle.Yearly -> "plus-yearly-referral-two-months-free"
+                BillingCycle.Monthly -> null
+                BillingCycle.Yearly -> "plus-yearly-referral-two-months-free"
             }
 
             SubscriptionTier.Patron -> null
@@ -276,14 +316,47 @@ enum class SubscriptionOffer {
 
         Winback -> when (tier) {
             SubscriptionTier.Plus -> when (billingCycle) {
-                SubscriptionBillingCycle.Monthly -> "plus-monthly-winback"
-                SubscriptionBillingCycle.Yearly -> "plus-yearly-winback"
+                BillingCycle.Monthly -> "plus-monthly-winback"
+                BillingCycle.Yearly -> "plus-yearly-winback"
             }
 
             SubscriptionTier.Patron -> when (billingCycle) {
-                SubscriptionBillingCycle.Monthly -> "patron-monthly-winback"
-                SubscriptionBillingCycle.Yearly -> "patron-yearly-winback"
+                BillingCycle.Monthly -> "patron-monthly-winback"
+                BillingCycle.Yearly -> "patron-yearly-winback"
             }
         }
     }
+}
+
+data class Purchase(
+    val state: PurchaseState,
+    val token: String,
+    val productIds: List<String>,
+    val isAcknowledged: Boolean,
+    val isAutoRenewing: Boolean,
+)
+
+sealed interface PurchaseState {
+    val orderId: String?
+
+    data object Pending : PurchaseState {
+        override val orderId get() = null
+    }
+
+    data class Purchased(
+        override val orderId: String,
+    ) : PurchaseState
+
+    data object Unspecified : PurchaseState {
+        override val orderId get() = null
+    }
+}
+
+data class AcknowledgedSubscription(
+    val orderId: String,
+    val tier: SubscriptionTier,
+    val billingCycle: BillingCycle,
+    val isAutoRenewing: Boolean,
+) {
+    val productId get() = SubscriptionPlan.productId(tier, billingCycle)
 }

@@ -87,6 +87,7 @@
     <string name="search_episodes_not_found_title">No episodes found</string>
     <string name="search_episodes_not_found_summary">We couldn\'t find any episode for that search. Try another keyword.</string>
     <string name="selected">Selected</string>
+    <string name="you_might_like">You might like</string>
     <string name="sort_newest_to_oldest">Newest to oldest</string>
     <string name="sort_oldest_to_newest">Oldest to newest</string>
     <string name="not_selected">Not selected</string>
@@ -708,6 +709,22 @@
     <string name="notifications_enabled_message">We’ll notify you with new episodes of %1$s.</string>
     <string name="podcast_header_redesign_title">We’ve made some changes!</string>
     <string name="podcast_header_redesign_message">Tap on the podcast title to collapse or expand its description and details</string>
+    <plurals name="year_with_count">
+        <item quantity="one">%1$d year</item>
+        <item quantity="other">%1$d years</item>
+    </plurals>
+    <plurals name="month_with_count">
+        <item quantity="one">%1$d month</item>
+        <item quantity="other">%1$d months</item>
+    </plurals>
+    <plurals name="week_with_count">
+        <item quantity="one">%1$d week</item>
+        <item quantity="other">%1$d weeks</item>
+    </plurals>
+    <plurals name="day_with_count">
+        <item quantity="one">%1$d day</item>
+        <item quantity="other">%1$d days</item>
+    </plurals>
 
     <!-- Give Rating -->
 
@@ -1774,6 +1791,10 @@
     <string name="discover_dismiss_selected_category">Dismiss selected category</string>
     <string name="recommendations_if_you_like">If you like</string>
     <string name="recommendations_loved_by_listeners">Loved by listeners of</string>
+    <string name="recommended_by_creator">Recommended shows by the creator</string>
+    <string name="podroll_information_title">What\'s a creator\'s pick?</string>
+    <string name="podroll_information_summary">Creator Picks are podcasts recommended by the show\'s creator using Podroll.</string>
+    <string name="podroll_information_button">Got it</string>
 
     <!-- Server errors -->
 
@@ -1981,8 +2002,7 @@
     <string name="onboarding_plus_feature_themes_icons_title">Themes &amp; Icons</string>
     <string name="onboarding_plus_feature_themes_icons_text">Fly your true colors. Exclusive icons and themes for the Plus club only.</string>
     <string name="onboarding_plus_feature_gratitude_title">The undying gratitude of everyone here at Pocket Casts</string>
-    <string name="onboarding_plus_feature_libro_title">Free audiobook from %1$s</string>
-    <string name="libro_fm" translatable="false"><![CDATA[<a href="https://libro.fm/">Libro.fm</a>]]></string>
+    <string name="onboarding_plus_feature_libro_title"><![CDATA[Free audiobook from <a href="https://libro.fm/">Libro.fm</a>]]></string>
     <!-- Do not translate Slumber Studios -->
     <string name="onboarding_plus_feature_slumber_studios_title"><![CDATA[1 year of exclusive content from <a href="https://slumberstudios.com/">Slumber&#160;Studios</a>]]></string>
     <string name="onboarding_plus_feature_dream_with_slumber_studios"><![CDATA[<a href="https://slumberstudios.com/">Dream with Slumber Studios content</a>]]></string>

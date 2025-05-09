@@ -3,19 +3,26 @@ package au.com.shiftyjelly.pocketcasts.payment
 import android.app.Activity
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.payment.billing.BillingPaymentDataSource
-import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingResult
 import com.android.billingclient.api.ProductDetails
-import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.PurchaseHistoryRecord
 import com.android.billingclient.api.QueryProductDetailsParams
 import com.android.billingclient.api.QueryPurchaseHistoryParams
 import com.android.billingclient.api.QueryPurchasesParams
 import kotlinx.coroutines.flow.SharedFlow
+import com.android.billingclient.api.Purchase as GooglePurchase
 
 interface PaymentDataSource {
+    val purchaseResults: SharedFlow<PaymentResult<List<Purchase>>>
+
     suspend fun loadProducts(): PaymentResult<List<Product>>
+
+    suspend fun loadPurchases(): PaymentResult<List<Purchase>>
+
+    suspend fun launchBillingFlow(key: SubscriptionPlan.Key, activity: Activity): PaymentResult<Unit>
+
+    suspend fun acknowledgePurchase(purchase: Purchase): PaymentResult<Purchase>
 
     companion object {
         fun billing(
@@ -27,8 +34,6 @@ interface PaymentDataSource {
     }
 
     // <editor-fold desc="Temporarily extracted old interface">
-    val purchaseUpdates: SharedFlow<Pair<BillingResult, List<Purchase>>>
-
     suspend fun loadProducts(
         params: QueryProductDetailsParams,
     ): Pair<BillingResult, List<ProductDetails>>
@@ -39,11 +44,7 @@ interface PaymentDataSource {
 
     suspend fun loadPurchases(
         params: QueryPurchasesParams,
-    ): Pair<BillingResult, List<Purchase>>
-
-    suspend fun acknowledgePurchase(
-        params: AcknowledgePurchaseParams,
-    ): BillingResult
+    ): Pair<BillingResult, List<GooglePurchase>>
 
     suspend fun launchBillingFlow(
         activity: Activity,
