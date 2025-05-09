@@ -33,7 +33,7 @@ enum class Feature(
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
-        hasDevToggle = false,
+        hasDevToggle = true,
     ),
     SLUMBER_STUDIOS_YEARLY_PROMO(
         key = "slumber_studios_yearly_promo_code",
@@ -240,7 +240,7 @@ enum class Feature(
         title = "Recommendations",
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
     ;

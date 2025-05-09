@@ -28,7 +28,6 @@ Language: ar
     <string name="account_encourage_description">أنشئ حسابًا أو سجّل الدخول للاستمتاع ب Pocket Casts على أكمل وجه.</string>
     <string name="account_encourage_title">لاحظنا أنك لم تسجل الدخول</string>
     <string name="onboarding_get_started">ابدأ</string>
-    <string name="onboarding_plus_feature_libro_title">كتاب صوتي مجاني من ⁦%1$s⁩</string>
     <string name="encourage_account_history_banner_description">أنشئ حسابا مجانيا لمزامنة سجل استماعك في كل مكان.</string>
     <string name="encourage_account_history_banner_title">تعقب ما تشغله</string>
     <string name="encourage_account_filters_banner_description">أنشئ حسابًا مجانيًا لمزامنة عوامل التصفية الخاصة بك على أي جهاز.</string>

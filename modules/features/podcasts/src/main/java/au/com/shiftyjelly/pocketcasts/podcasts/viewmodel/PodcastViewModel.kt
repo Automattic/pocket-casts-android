@@ -21,6 +21,9 @@ import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkArguments
 import au.com.shiftyjelly.pocketcasts.podcasts.helper.search.BookmarkSearchHandler
 import au.com.shiftyjelly.pocketcasts.podcasts.helper.search.EpisodeSearchHandler
 import au.com.shiftyjelly.pocketcasts.podcasts.helper.search.SearchHandler
+import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastViewModel.PodcastTab
+import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.podcast.RecommendationsHandler
+import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.podcast.RecommendationsResult
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortType
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodcast
@@ -81,6 +84,7 @@ class PodcastViewModel
     private val bookmarkManager: BookmarkManager,
     private val episodeSearchHandler: EpisodeSearchHandler,
     private val bookmarkSearchHandler: BookmarkSearchHandler,
+    private val recommendationsHandler: RecommendationsHandler,
     val multiSelectEpisodesHelper: MultiSelectEpisodesHelper,
     val multiSelectBookmarksHelper: MultiSelectBookmarksHelper,
     private val settings: Settings,
@@ -171,7 +175,7 @@ class PodcastViewModel
                     )
                 }.toFlowable(BackpressureStrategy.LATEST)
             }
-            .loadEpisodesAndBookmarks(episodeManager, bookmarkManager, settings)
+            .loadEpisodesAndBookmarks(episodeManager, bookmarkManager, recommendationsHandler, settings)
             .doOnNext {
                 if (it is UiState.Loaded) {
                     val groups = it.podcast.grouping.formGroups(it.episodes, it.podcast, resources)
@@ -198,10 +202,7 @@ class PodcastViewModel
     }
 
     fun onTabClicked(tab: PodcastTab) {
-        when (tab) {
-            PodcastTab.EPISODES -> multiSelectBookmarksHelper.closeMultiSelect()
-            PodcastTab.BOOKMARKS -> multiSelectEpisodesHelper.closeMultiSelect()
-        }
+        multiSelectBookmarksHelper.closeMultiSelect()
         analyticsTracker.track(AnalyticsEvent.PODCASTS_SCREEN_TAB_TAPPED, mapOf("value" to tab.analyticsValue))
         _uiState.value = (uiState.value as? UiState.Loaded)?.copy(showTab = tab)
     }
@@ -285,6 +286,7 @@ class PodcastViewModel
         when (getCurrentTab()) {
             PodcastTab.EPISODES -> episodeSearchHandler.searchQueryUpdated(newValue)
             PodcastTab.BOOKMARKS -> bookmarkSearchHandler.searchQueryUpdated(newValue)
+            PodcastTab.RECOMMENDATIONS -> Unit // No search for the recommendations tab
         }
     }
 
@@ -461,6 +463,7 @@ class PodcastViewModel
         when (uiState.showTab) {
             PodcastTab.EPISODES -> multiSelectEpisodesHelper.deselectAllInList(uiState.episodes)
             PodcastTab.BOOKMARKS -> multiSelectBookmarksHelper.deselectAllInList(uiState.bookmarks)
+            PodcastTab.RECOMMENDATIONS -> Unit // No multi select for the recommendations tab
         }
     }
 
@@ -517,6 +520,7 @@ class PodcastViewModel
         when (uiState.showTab) {
             PodcastTab.EPISODES -> multiSelectEpisodesHelper.selectAllInList(uiState.episodes)
             PodcastTab.BOOKMARKS -> multiSelectBookmarksHelper.selectAllInList(uiState.bookmarks)
+            PodcastTab.RECOMMENDATIONS -> Unit // No multi select for recommendations tab
         }
     }
 
@@ -617,12 +621,62 @@ class PodcastViewModel
     }
 
     fun onDonateClicked() {
-        analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_FUNDING_TAPPED)
+        analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_FUNDING_TAPPED, mapOf("podcast_uuid" to podcastUuid))
+    }
+
+    fun onRecommendedPodcastSubscribeClicked(podcastUuid: String, listDate: String) {
+        podcastManager.subscribeToPodcast(podcastUuid = podcastUuid, sync = true)
+        analyticsTracker.track(
+            event = AnalyticsEvent.PODCAST_SCREEN_YOU_MIGHT_LIKE_SUBSCRIBED,
+            properties = mapOf(
+                "podcast_uuid" to podcastUuid,
+                "list_datetime" to listDate,
+            ),
+        )
+    }
+
+    fun onRecommendedPodcastClicked(podcastUuid: String, listDate: String) {
+        analyticsTracker.track(
+            event = AnalyticsEvent.PODCAST_SCREEN_YOU_MIGHT_LIKE_TAPPED,
+            properties = mapOf(
+                "podcast_uuid" to podcastUuid,
+                "list_datetime" to listDate,
+            ),
+        )
+    }
+
+    fun onPodrollInformationModalShown() {
+        analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_PODROLL_INFORMATION_MODEL_SHOWN)
+    }
+
+    fun onPodrollPodcastClicked(podcastUuid: String) {
+        analyticsTracker.track(
+            event = AnalyticsEvent.PODCAST_SCREEN_PODROLL_PODCAST_TAPPED,
+            properties = mapOf("podcast_uuid" to podcastUuid),
+        )
+    }
+
+    fun onPodrollPodcastSubscribeClicked(podcastUuid: String) {
+        podcastManager.subscribeToPodcast(podcastUuid = podcastUuid, sync = true)
+        analyticsTracker.track(
+            event = AnalyticsEvent.PODCAST_SCREEN_PODROLL_PODCAST_SUBSCRIBED,
+            properties = mapOf("podcast_uuid" to podcastUuid),
+        )
     }
 
     enum class PodcastTab(@StringRes val labelResId: Int, val analyticsValue: String) {
-        EPISODES(LR.string.episodes, "episodes"),
-        BOOKMARKS(LR.string.bookmarks, "bookmarks"),
+        EPISODES(
+            labelResId = LR.string.episodes,
+            analyticsValue = "episodes",
+        ),
+        BOOKMARKS(
+            labelResId = LR.string.bookmarks,
+            analyticsValue = "bookmarks",
+        ),
+        RECOMMENDATIONS(
+            labelResId = LR.string.you_might_like,
+            analyticsValue = "you_might_like",
+        ),
     }
 
     sealed class UiState {
@@ -630,6 +684,7 @@ class PodcastViewModel
             val podcast: Podcast,
             val episodes: List<PodcastEpisode>,
             val bookmarks: List<Bookmark>,
+            val recommendations: RecommendationsResult,
             val showingArchived: Boolean,
             val episodeCount: Int,
             val archivedCount: Int,
@@ -638,6 +693,7 @@ class PodcastViewModel
             val episodeLimit: Int?,
             val episodeLimitIndex: Int?,
             val showTab: PodcastTab = PodcastTab.EPISODES,
+            val tabs: List<PodcastTab>,
         ) : UiState()
         data class Error(
             val errorMessage: String,
@@ -688,6 +744,7 @@ private data class CombinedEpisodeAndBookmarkData(
 private fun Flowable<CombinedEpisodeAndBookmarkData>.loadEpisodesAndBookmarks(
     episodeManager: EpisodeManager,
     bookmarkManager: BookmarkManager,
+    recommendationsHandler: RecommendationsHandler,
     settings: Settings,
 ): Flowable<PodcastViewModel.UiState> {
     return this.switchMap { (podcast, showArchived, episodeSearchResults, bookmarkSearchResults) ->
@@ -697,6 +754,10 @@ private fun Flowable<CombinedEpisodeAndBookmarkData>.loadEpisodesAndBookmarks(
         )
         Flowable.combineLatest(
             episodeManager.findEpisodesByPodcastOrderedRxFlowable(podcast)
+                .doOnNext {
+                    // load the recommendations after the episodes have been loaded
+                    recommendationsHandler.setEnabled(true)
+                }
                 .map {
                     val sortFunction = podcast.grouping.sortFunction
                     if (sortFunction != null) {
@@ -716,7 +777,8 @@ private fun Flowable<CombinedEpisodeAndBookmarkData>.loadEpisodesAndBookmarks(
                     { bookmarkSearchResults.searchUuids?.contains(it.uuid) ?: false },
                     searchResults = bookmarkSearchResults,
                 ),
-        ) { (searchList, episodeList), (bookmarks, _) ->
+            recommendationsHandler.getRecommendationsFlowable(podcast),
+        ) { (searchList, episodeList), (bookmarks, _), recommendations ->
             val episodeCount = episodeList.size
             val archivedCount = episodeList.count { it.isArchived }
             val showArchivedWithSearch = episodeSearchResults.searchUuids != null || showArchived
@@ -746,10 +808,18 @@ private fun Flowable<CombinedEpisodeAndBookmarkData>.loadEpisodesAndBookmarks(
                 episodeLimitIndex = null
             }
 
+            val tabs = PodcastTab.entries
+                .filter { tab ->
+                    tab == PodcastTab.EPISODES ||
+                        tab == PodcastTab.BOOKMARKS ||
+                        (tab == PodcastTab.RECOMMENDATIONS && recommendations is RecommendationsResult.Success)
+                }
+
             val state: PodcastViewModel.UiState = PodcastViewModel.UiState.Loaded(
                 podcast = podcast,
                 episodes = filteredList,
                 bookmarks = bookmarks,
+                recommendations = recommendations,
                 showingArchived = showArchivedWithSearch,
                 episodeCount = episodeCount,
                 archivedCount = archivedCount,
@@ -757,6 +827,7 @@ private fun Flowable<CombinedEpisodeAndBookmarkData>.loadEpisodesAndBookmarks(
                 searchBookmarkTerm = bookmarkSearchResults.searchTerm,
                 episodeLimit = podcast.autoArchiveEpisodeLimit?.value,
                 episodeLimitIndex = episodeLimitIndex,
+                tabs = tabs,
             )
             state
         }

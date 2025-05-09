@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.profile.winback
 
 import android.content.DialogInterface
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.LayoutInflater
@@ -37,6 +36,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
@@ -48,10 +48,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.components.ProgressDialog
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.models.type.BillingPeriod
+import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.settings.HelpPage
 import au.com.shiftyjelly.pocketcasts.settings.LogsPage
@@ -81,6 +82,10 @@ class WinbackFragment : BaseDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = content {
+        CallOnce {
+            viewModel.loadWinbackData()
+        }
+
         LaunchedEffect(Unit) {
             setBackgroundTint(Color.Transparent.toArgb())
         }
@@ -136,17 +141,17 @@ class WinbackFragment : BaseDialogFragment() {
                         composable(
                             WinbackNavRoutes.offerClaimedRoute(),
                             listOf(
-                                navArgument(WinbackNavRoutes.OfferClaimedBillingPeriodArgument) {
-                                    type = NavType.EnumType(BillingPeriod::class.java)
+                                navArgument(WinbackNavRoutes.OfferClaimedBillingCycleArgument) {
+                                    type = NavType.EnumType(BillingCycle::class.java)
                                 },
                             ),
                         ) { backStackEntry ->
                             val arguments = requireNotNull(backStackEntry.arguments) { "Missing back stack entry arguments" }
-                            val billingPeriod = requireNotNull(BundleCompat.getSerializable(arguments, WinbackNavRoutes.OfferClaimedBillingPeriodArgument, BillingPeriod::class.java)) {
-                                "Missing billing period argument"
+                            val billingCycle = requireNotNull(BundleCompat.getSerializable(arguments, WinbackNavRoutes.OfferClaimedBillingCycleArgument, BillingCycle::class.java)) {
+                                "Missing billing cycle argument"
                             }
                             OfferClaimedPage(
-                                billingPeriod = billingPeriod,
+                                billingCycle = billingCycle,
                                 onConfirm = {
                                     viewModel.trackOfferClaimedConfirmationTapped()
                                     dismiss()
@@ -205,7 +210,7 @@ class WinbackFragment : BaseDialogFragment() {
                                     viewModel.trackCancelSubscriptionTapped()
                                     val offer = state.winbackOfferState?.offer
                                     if (offer == null) {
-                                        handleSubscriptionCancellation(state.purchasedProductIds)
+                                        handleSubscriptionCancellation(state.subscriptionPlansState)
                                     } else {
                                         navController.navigate(WinbackNavRoutes.WinbackOffer)
                                     }
@@ -218,11 +223,11 @@ class WinbackFragment : BaseDialogFragment() {
                                 WinbackOfferPage(
                                     offer = offer,
                                     onAcceptOffer = {
-                                        viewModel.claimOffer(offer, requireActivity())
+                                        viewModel.claimOffer(requireActivity())
                                     },
                                     onCancelSubscription = {
                                         viewModel.trackContinueWithCancellationTapped()
-                                        handleSubscriptionCancellation(state.purchasedProductIds)
+                                        handleSubscriptionCancellation(state.subscriptionPlansState)
                                     },
                                 )
                             } else {
@@ -246,8 +251,8 @@ class WinbackFragment : BaseDialogFragment() {
                     if (offerState?.isOfferClaimed == true) {
                         LaunchedEffect(Unit) {
                             viewModel.consumeClaimedOffer()
-                            val billingPeriod = offerState.offer.details.billingPeriod
-                            navController.navigate(WinbackNavRoutes.offerClaimedDestination(billingPeriod)) {
+                            val billingCycle = offerState.offer.billingCycle
+                            navController.navigate(WinbackNavRoutes.offerClaimedDestination(billingCycle)) {
                                 popUpTo(WinbackNavRoutes.Main) {
                                     inclusive = true
                                 }
@@ -306,9 +311,14 @@ class WinbackFragment : BaseDialogFragment() {
         }
     }
 
-    private fun handleSubscriptionCancellation(productIds: List<String>) {
-        val isPlayStoreSubscriptionOpened = if (productIds.isNotEmpty() && params.hasGoogleSubscription) {
-            goToPlayStoreSubscriptions(productIds.singleOrNull())
+    private fun handleSubscriptionCancellation(state: SubscriptionPlansState) {
+        val isPlayStoreSubscriptionOpened = if (params.hasGoogleSubscription) {
+            val productId = when (state) {
+                is SubscriptionPlansState.Loaded -> state.currentSubscription.productId
+                is SubscriptionPlansState.Failure -> null
+                is SubscriptionPlansState.Loading -> null
+            }
+            goToPlayStoreSubscriptions(productId)
         } else {
             false
         }
@@ -320,7 +330,7 @@ class WinbackFragment : BaseDialogFragment() {
     }
 
     private fun goToPlayStoreSubscriptions(sku: String? = null): Boolean {
-        val uri = Uri.parse("https://play.google.com/store/account/subscriptions")
+        val uri = "https://play.google.com/store/account/subscriptions".toUri()
             .buildUpon()
             .let { builder ->
                 if (sku != null) {
@@ -372,11 +382,11 @@ private object WinbackNavRoutes {
     const val WinbackOffer = "winback_offer"
     private const val OfferClaimed = "offer_claimed"
 
-    const val OfferClaimedBillingPeriodArgument = "billingPeriod"
+    const val OfferClaimedBillingCycleArgument = "billingCycle"
 
-    fun offerClaimedRoute() = "$OfferClaimed/{$OfferClaimedBillingPeriodArgument}"
+    fun offerClaimedRoute() = "$OfferClaimed/{$OfferClaimedBillingCycleArgument}"
 
-    fun offerClaimedDestination(billingPeriod: BillingPeriod) = "$OfferClaimed/$billingPeriod"
+    fun offerClaimedDestination(billingCycle: BillingCycle) = "$OfferClaimed/$billingCycle"
 }
 
 private val intOffsetAnimationSpec = tween<IntOffset>(350)

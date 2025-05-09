@@ -30,7 +30,7 @@ Language: zh_CN
     <string name="account_encourage_description">创建账户或登录，即可尽情使用 Pocket Casts。</string>
     <string name="account_encourage_title">我们注意到您尚未登录</string>
     <string name="onboarding_get_started">开始</string>
-    <string name="onboarding_plus_feature_libro_title">来自 %1$s 的免费有声读物</string>
+    <string name="onboarding_plus_feature_libro_title"><![CDATA[来自 <a href="https://libro.fm/">Libro.fm</a> 的免费有声读物]]></string>
     <string name="encourage_account_history_banner_description">创建一个免费账户，即可随时随地同步您的收听历史记录。</string>
     <string name="encourage_account_history_banner_title">记录播放历史</string>
     <string name="encourage_account_filters_banner_description">创建一个免费账户，即可在任何设备上同步您的筛选条件。</string>

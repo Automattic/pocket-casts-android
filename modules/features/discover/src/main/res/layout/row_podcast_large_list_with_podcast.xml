@@ -55,6 +55,8 @@
                 tools:text="The Daily"
                 style="@style/H20"
                 android:includeFontPadding="false"
+                android:maxLines="2"
+                android:ellipsize="end"
                 android:textColor="?attr/primary_text_01"/>
 
         </LinearLayout>

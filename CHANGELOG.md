@@ -1,6 +1,15 @@
 7.89
 -----
-
+*   New Features
+    *   Podcast recommendations
+        ([#3946](https://github.com/Automattic/pocket-casts-android/pull/3946))
+    *   Support for Podroll 
+        ([#3950](https://github.com/Automattic/pocket-casts-android/pull/3950))
+*   Updates
+    *   Improve contrast of secondary texts on Upgrade page
+        ([#3942](https://github.com/Automattic/pocket-casts-android/pull/3942))
+    *   Improve Accessibility on the Upgrade page
+        ([#3947](https://github.com/Automattic/pocket-casts-android/pull/3947))
 
 7.88
 -----

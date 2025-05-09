@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.BundlePaidType
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import java.util.Date
+import java.util.UUID
 import kotlinx.parcelize.Parcelize
 
 interface NetworkLoadableList {
@@ -126,6 +127,7 @@ data class ListFeed(
     @field:Json(name = "datetime") val date: String?,
     @field:Json(name = "podcasts") var podcasts: List<DiscoverPodcast>?,
     @field:Json(name = "episodes") var episodes: List<DiscoverEpisode>?,
+    @field:Json(name = "podroll") var podroll: List<DiscoverPodcast>?,
     @field:Json(name = "collection_image") var collectionImageUrl: String?,
     @field:Json(name = "feature_image") var featureImage: String?,
     @field:Json(name = "header_image") var headerImageUrl: String?,
@@ -205,6 +207,9 @@ data class DiscoverPodcast(
     val listId: String? = null, // for carousel sponsored podcast
     @ColorInt var color: Int = 0,
 ) : Parcelable {
+    val adapterId: Long
+        get() = UUID.nameUUIDFromBytes(uuid.toByteArray()).mostSignificantBits
+
     fun updateIsSubscribed(value: Boolean): DiscoverPodcast {
         return copy(isSubscribed = value)
     }

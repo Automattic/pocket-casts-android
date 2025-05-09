@@ -28,7 +28,7 @@ Language: el_GR
     <string name="account_encourage_description">Δημιούργησε έναν λογαριασμό ή συνδέσου για να απολαύσεις το Pocket Casts στο έπακρο.</string>
     <string name="account_encourage_title">Προσέξαμε ότι δεν έχεις συνδεθεί</string>
     <string name="onboarding_get_started">Ας ξεκινήσουμε</string>
-    <string name="onboarding_plus_feature_libro_title">Δωρεάν ηχητικό βιβλίο από %1$s</string>
+    <string name="onboarding_plus_feature_libro_title"><![CDATA[Δωρεάν ηχητικό βιβλίο από <a href="https://libro.fm/">Libro.fm</a>]]></string>
     <string name="encourage_account_history_banner_description">Δημιούργησε έναν δωρέαν λογαριασμό για να συγχρονίζεις το ιστορικό ακρόασής σου παντού.</string>
     <string name="encourage_account_history_banner_title">Παρακολούθα τι έχεις ακούσει</string>
     <string name="encourage_account_filters_banner_description">Δημιούργησε έναν δωρέαν λογαριασμό για να συγχρονίζεις τα φίλτρα σου σε κάθε συσκευή.</string>

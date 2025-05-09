@@ -30,7 +30,7 @@ Language: zh_TW
     <string name="account_encourage_description">建立帳號或登入，即可充分暢聽 Pocket Casts。</string>
     <string name="account_encourage_title">我們注意到你並未登入</string>
     <string name="onboarding_get_started">開始使用</string>
-    <string name="onboarding_plus_feature_libro_title">來自「%1$s」的免費有聲書</string>
+    <string name="onboarding_plus_feature_libro_title"><![CDATA[來自「<a href="https://libro.fm/">Libro.fm</a>」的免費有聲書]]></string>
     <string name="encourage_account_history_banner_description">建立免費帳號，隨處同步收聽記錄。</string>
     <string name="encourage_account_history_banner_title">追蹤播放過的內容</string>
     <string name="encourage_account_filters_banner_description">建立免費帳號，將篩選條件同步至任何裝置。</string>

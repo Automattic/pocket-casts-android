@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.account.components
 
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -28,8 +29,8 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 @Composable
 fun ProductAmountVerticalText(
     primaryText: String,
-    secondaryText: String? = null,
     modifier: Modifier = Modifier,
+    secondaryText: String? = null,
     horizontalAlignment: Alignment.Horizontal = Alignment.End,
     emphasized: Boolean = true,
 ) {
@@ -59,6 +60,7 @@ fun ProductAmountVerticalText(
 
 @Composable
 fun ProductAmountHorizontalText(
+    modifier: Modifier = Modifier,
     price: String? = null,
     priceTextFontSize: TextUnit = 22.sp,
     originalPrice: String? = null,
@@ -67,7 +69,8 @@ fun ProductAmountHorizontalText(
     lineThroughOriginalPrice: Boolean = true,
     hasBackgroundAlwaysWhite: Boolean = false,
     verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
-    modifier: Modifier = Modifier,
+    secondaryTextColor: Color = MaterialTheme.theme.colors.primaryText02,
+    isFocusable: Boolean = false,
 ) {
     Row(
         modifier = modifier,
@@ -77,11 +80,15 @@ fun ProductAmountHorizontalText(
             TextH30(
                 text = price,
                 fontSize = priceTextFontSize,
-                color =
-                if (hasBackgroundAlwaysWhite) {
+                color = if (hasBackgroundAlwaysWhite) {
                     Color.Black
                 } else {
                     MaterialTheme.theme.colors.primaryText01
+                },
+                modifier = if (isFocusable) {
+                    Modifier.focusable()
+                } else {
+                    Modifier
                 },
             )
         }
@@ -90,7 +97,7 @@ fun ProductAmountHorizontalText(
             TextP60(
                 text = period,
                 fontSize = originalPriceFontSize,
-                color = MaterialTheme.theme.colors.primaryText02,
+                color = secondaryTextColor,
                 modifier = modifier.padding(start = 4.dp),
             )
         }
@@ -101,7 +108,7 @@ fun ProductAmountHorizontalText(
             TextP60(
                 text = originalPrice,
                 fontSize = originalPriceFontSize,
-                color = MaterialTheme.theme.colors.primaryText02,
+                color = secondaryTextColor,
                 style = TextStyle(
                     textDecoration = if (lineThroughOriginalPrice) TextDecoration.LineThrough else TextDecoration.None,
                 ),
@@ -119,6 +126,33 @@ private fun ProductAmountPreview(
         ProductAmountVerticalText(
             primaryText = "4 days free",
             secondaryText = "then $0.99 / month",
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ProductAmountPreviewHorizontal(
+    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
+) {
+    AppTheme(themeType) {
+        ProductAmountHorizontalText(
+            price = "$0.99",
+            period = "/year",
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ProductAmountPreviewHorizontalDiscount(
+    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
+) {
+    AppTheme(themeType) {
+        ProductAmountHorizontalText(
+            price = "$0.99",
+            originalPrice = "$1.29",
+            period = "/year",
         )
     }
 }
