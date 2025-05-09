@@ -227,4 +227,21 @@ object InterceptorModule {
             }
         }
     }
+
+    @Provides
+    @Artwork
+    fun provideArtworkInterceptors(): List<OkHttpInterceptor> {
+        return buildList {
+            add(publicUserAgentInterceptor.toClientInterceptor())
+            add(crashLoggingInterceptor.toClientInterceptor())
+            add(cleanAndRetryInterceptor)
+
+            if (BuildConfig.DEBUG) {
+                val loggingInterceptor = HttpLoggingInterceptor().apply {
+                    level = HttpLoggingInterceptor.Level.HEADERS
+                }
+                add(loggingInterceptor.toClientInterceptor())
+            }
+        }
+    }
 }
