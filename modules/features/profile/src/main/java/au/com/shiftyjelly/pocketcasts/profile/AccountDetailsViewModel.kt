@@ -221,18 +221,6 @@ class AccountDetailsViewModel @Inject constructor(
 
     internal fun changeSelectedFeatureCard(key: SubscriptionPlan.Key) {
         selectedFeatureCard.value = key
-        settings.setLastSelectedSubscriptionTier(
-            when (key.tier) {
-                SubscriptionTier.Plus -> OldSubscriptionTier.PLUS
-                SubscriptionTier.Patron -> OldSubscriptionTier.PATRON
-            },
-        )
-        settings.setLastSelectedSubscriptionFrequency(
-            when (key.billingCycle) {
-                BillingCycle.Monthly -> SubscriptionFrequency.MONTHLY
-                BillingCycle.Yearly -> SubscriptionFrequency.YEARLY
-            },
-        )
     }
 
     companion object {

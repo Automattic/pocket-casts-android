@@ -389,8 +389,6 @@ Language: ar
     <string name="single_chapter">فصل واحد</string>
     <string name="number_of_chapters">%d من الفصول</string>
     <string name="onboarding_plus_feature_slumber_studios_title">عام واحد من المحتوى الحصري من  &lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt;</string>
-    <string name="onboarding_plus_recurring_after_intro_offer_sufix">بعد عامك الأول</string>
-    <string name="onboarding_plus_recurring_after_intro_offer">دفع متكرر في %s</string>
     <string name="half_price_first_year">خصم قدره 50% على عامك الأول</string>
     <string name="plus_offer_duration">عرض %s</string>
     <string name="onboarding_plus_feature_watch_playback">تطبيقات Apple Watch وWear OS</string>
@@ -690,7 +688,6 @@ Language: ar
     <string name="onboarding_welcome_recommendations_title">اكتشاف شيء جديد</string>
     <string name="onboarding_welcome_get_you_listening_plus">شكرًا لك، لنجعلك تستمع الآن!</string>
     <string name="onboarding_welcome_get_you_listening">مرحبًا بك، لنجعلك تستمع الآن!</string>
-    <string name="onboarding_plus_recurring_after_free_trial">ستبدأ المدفوعات المتكررة بعد %s الخاص بك</string>
     <string name="onboarding_plus_start_free_trial_and_subscribe">بدء الإصدار التجريبي المجاني والاشتراك</string>
     <string name="onboarding_plus_terms_and_conditions">الشروط والأحكام</string>
     <string name="onboarding_plus_privacy_policy">سياسة الخصوصية</string>

@@ -119,7 +119,7 @@ class AccountDetailsFragment : BaseFragment() {
             onClickSubscribe = { planKey ->
                 analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_UPGRADE_BUTTON_TAPPED)
                 val source = OnboardingUpgradeSource.PROFILE
-                val onboardingFlow = OnboardingFlow.PlusAccountUpgrade(source)
+                val onboardingFlow = OnboardingFlow.PlusAccountUpgrade(source, planKey.tier, planKey.billingCycle)
                 OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
             },
             onChangeFeatureCard = { planKey ->

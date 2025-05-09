@@ -15,8 +15,6 @@ import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.AutoDownloadLimitSetting
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.DEFAULT_MAX_AUTO_ADD_LIMIT
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.GLOBAL_AUTO_DOWNLOAD_NONE
@@ -89,8 +87,6 @@ class SettingsImpl @Inject constructor(
         private const val END_OF_YEAR_SHOW_BADGE_2023_KEY = "EndOfYearShowBadge2023Key"
         private const val END_OF_YEAR_SHOW_MODAL_2023_KEY = "EndOfYearModalShowModal2023Key"
         private const val DONE_INITIAL_ONBOARDING_KEY = "CompletedOnboardingKey"
-        private const val LAST_SELECTED_SUBSCRIPTION_TIER_KEY = "LastSelectedSubscriptionTierKey"
-        private const val LAST_SELECTED_SUBSCRIPTION_FREQUENCY_KEY = "LastSelectedSubscriptionFrequencyKey"
         private const val PROCESSED_SIGNOUT_KEY = "ProcessedSignout"
     }
 
@@ -1373,24 +1369,6 @@ class SettingsImpl @Inject constructor(
     override fun setNotificationsDisabledMessageShown(value: Boolean) {
         setBoolean(NOTIFICATIONS_DISABLED_MESSAGE_SHOWN, value)
     }
-
-    override fun setLastSelectedSubscriptionTier(tier: SubscriptionTier) {
-        setString(LAST_SELECTED_SUBSCRIPTION_TIER_KEY, tier.label)
-    }
-
-    override fun getLastSelectedSubscriptionTier() =
-        getString(LAST_SELECTED_SUBSCRIPTION_TIER_KEY)?.let {
-            SubscriptionTier.fromString(it)
-        }
-
-    override fun setLastSelectedSubscriptionFrequency(frequency: SubscriptionFrequency) {
-        setString(LAST_SELECTED_SUBSCRIPTION_FREQUENCY_KEY, frequency.name)
-    }
-
-    override fun getLastSelectedSubscriptionFrequency() =
-        getString(LAST_SELECTED_SUBSCRIPTION_FREQUENCY_KEY)?.let {
-            SubscriptionFrequency.valueOf(it)
-        }
 
     override fun setFullySignedOut(boolean: Boolean) {
         setBoolean(PROCESSED_SIGNOUT_KEY, boolean)

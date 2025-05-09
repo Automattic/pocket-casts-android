@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import au.com.shiftyjelly.pocketcasts.account.R
 import au.com.shiftyjelly.pocketcasts.compose.patronPurple
 import au.com.shiftyjelly.pocketcasts.compose.plusGold
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
@@ -15,7 +16,12 @@ import au.com.shiftyjelly.pocketcasts.payment.PricingSchedule.RecurrenceMode
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import java.math.BigDecimal
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+import java.time.temporal.ChronoUnit
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -58,10 +64,73 @@ data class OnboardingSubscriptionPlan private constructor(
             SubscriptionTier.Patron -> IR.drawable.ic_patron
         }
 
-    val pricePeriodText
+    val pricePerPeriodText
+        @Composable get() = when (key.offer) {
+            SubscriptionOffer.IntroOffer -> when (key.billingCycle) {
+                BillingCycle.Monthly -> stringResource(LR.string.plus_per_month, requireNotNull(discountedPricingPhase).price.formattedPrice)
+                BillingCycle.Yearly -> stringResource(LR.string.plus_per_year, requireNotNull(discountedPricingPhase).price.formattedPrice)
+            }
+
+            SubscriptionOffer.Trial,
+            SubscriptionOffer.Referral,
+            SubscriptionOffer.Winback,
+            null,
+            -> when (key.billingCycle) {
+                BillingCycle.Monthly -> stringResource(LR.string.plus_per_month, pricingPhase.price.formattedPrice)
+                BillingCycle.Yearly -> stringResource(LR.string.plus_per_year, pricingPhase.price.formattedPrice)
+            }
+        }
+
+    val pricePerPeriodWithSlashText
         @Composable get() = when (key.billingCycle) {
             BillingCycle.Monthly -> "/ ${stringResource(LR.string.plus_month)}"
             BillingCycle.Yearly -> "/ ${stringResource(LR.string.plus_year)}"
+        }
+
+    val planDescriptionText
+        @Composable get() = when (key.offer) {
+            SubscriptionOffer.IntroOffer -> {
+                val yearFromNow = ZonedDateTime.now().plusYears(1)
+                val formattedDate = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).format(yearFromNow)
+                stringResource(
+                    LR.string.onboarding_plus_recurring_after_intro_offer,
+                    pricingPhase.price.formattedPrice,
+                    formattedDate,
+                )
+            }
+
+            SubscriptionOffer.Trial -> {
+                val discountedPhase = requireNotNull(discountedPricingPhase)
+                val recurringPeriods = (discountedPhase.schedule.recurrenceMode as RecurrenceMode.Recurring).value
+                val chronoUnit = when (discountedPhase.schedule.period) {
+                    PricingSchedule.Period.Daily -> ChronoUnit.DAYS
+                    PricingSchedule.Period.Weekly -> ChronoUnit.WEEKS
+                    PricingSchedule.Period.Monthly -> ChronoUnit.MONTHS
+                    PricingSchedule.Period.Yearly -> ChronoUnit.YEARS
+                }
+                val dateFromNow = ZonedDateTime.now().plus(recurringPeriods.toLong(), chronoUnit)
+                val formattedDate = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).format(dateFromNow)
+
+                stringResource(
+                    LR.string.onboarding_plus_recurring_after_free_trial,
+                    discountedPhase.schedule.period.toText(recurringPeriods),
+                    formattedDate,
+                )
+            }
+
+            SubscriptionOffer.Referral,
+            SubscriptionOffer.Winback,
+            null,
+            -> {
+                val firstLine = stringResource(
+                    when (key.billingCycle) {
+                        BillingCycle.Monthly -> LR.string.plus_renews_automatically_monthly
+                        BillingCycle.Yearly -> LR.string.plus_renews_automatically_yearly
+                    },
+                )
+                val secondLine = stringResource(LR.string.onboarding_plus_can_be_canceled_at_any_time)
+                "$firstLine.\n$secondLine"
+            }
         }
 
     val offerBadgeText
@@ -118,10 +187,42 @@ data class OnboardingSubscriptionPlan private constructor(
         }
 
     val featureItems: List<UpgradeFeatureItem>
-        get() = when (key.tier) {
-            SubscriptionTier.Plus -> PlusUpgradeFeatureItem.entries
-            SubscriptionTier.Patron -> PatronUpgradeFeatureItem.entries
+        get() {
+            val items = when (key.tier) {
+                SubscriptionTier.Plus -> PlusUpgradeFeatureItem.entries
+                SubscriptionTier.Patron -> PatronUpgradeFeatureItem.entries
+            }
+            return items.filter { item ->
+                when (key.billingCycle) {
+                    BillingCycle.Monthly -> item.isMonthlyFeature
+                    BillingCycle.Yearly -> item.isYearlyFeature
+                }
+            }
         }
+
+    val backgroundGlowsRes
+        get() = when (key.tier) {
+            SubscriptionTier.Plus -> R.drawable.upgrade_background_plus_glows
+            SubscriptionTier.Patron -> R.drawable.upgrade_background_patron_glows
+        }
+
+    fun customFeatureTitle(source: OnboardingUpgradeSource) = when (key.tier) {
+        SubscriptionTier.Plus -> when (source) {
+            OnboardingUpgradeSource.SKIP_CHAPTERS -> LR.string.skip_chapters_plus_prompt
+            OnboardingUpgradeSource.UP_NEXT_SHUFFLE -> LR.string.up_next_shuffle_plus_prompt
+            OnboardingUpgradeSource.THEMES -> LR.string.themes_plus_prompt
+            OnboardingUpgradeSource.ICONS -> LR.string.icons_plus_prompt
+            OnboardingUpgradeSource.FILES -> LR.string.files_plus_prompt
+            OnboardingUpgradeSource.FOLDERS,
+            OnboardingUpgradeSource.FOLDERS_PODCAST_SCREEN,
+            OnboardingUpgradeSource.SUGGESTED_FOLDERS,
+            -> LR.string.folders_plus_prompt
+
+            else -> LR.string.onboarding_plus_features_title
+        }
+
+        SubscriptionTier.Patron -> LR.string.onboarding_patron_features_title
+    }
 
     companion object {
         fun create(plan: SubscriptionPlan.Base): OnboardingSubscriptionPlan {

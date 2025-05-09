@@ -392,8 +392,6 @@ Language: it
     <string name="single_chapter">1 capitolo</string>
     <string name="number_of_chapters">%d capitoli</string>
     <string name="onboarding_plus_feature_slumber_studios_title">1 anno di contenuti esclusivi &lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt;</string>
-    <string name="onboarding_plus_recurring_after_intro_offer_sufix">dopo il tuo primo anno</string>
-    <string name="onboarding_plus_recurring_after_intro_offer">Pagamento ricorrente il %s</string>
     <string name="half_price_first_year">Sconto del 50% sul primo anno</string>
     <string name="plus_offer_duration">%s offerta</string>
     <string name="onboarding_plus_feature_watch_playback">App Apple Watch e Wear OS</string>
@@ -693,7 +691,6 @@ Language: it
     <string name="onboarding_welcome_recommendations_title">Scopri qualcosa di nuovo</string>
     <string name="onboarding_welcome_get_you_listening_plus">Grazie, ora mettiamoci all\'ascolto!</string>
     <string name="onboarding_welcome_get_you_listening">Benvenuto, ora mettiamoci all\'ascolto!</string>
-    <string name="onboarding_plus_recurring_after_free_trial">I pagamenti ricorrenti inizieranno dopo il %s</string>
     <string name="onboarding_plus_start_free_trial_and_subscribe">Inizia la prova gratuita e abbonati</string>
     <string name="onboarding_plus_terms_and_conditions">Termini e condizioni</string>
     <string name="onboarding_plus_privacy_policy">Politica sulla privacy</string>

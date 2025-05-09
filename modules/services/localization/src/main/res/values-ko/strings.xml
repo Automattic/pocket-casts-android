@@ -392,8 +392,6 @@ Language: ko_KR
     <string name="single_chapter">1개 챕터</string>
     <string name="number_of_chapters">%d개 챕터</string>
     <string name="onboarding_plus_feature_slumber_studios_title">&lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt;의 1년 독점 콘텐츠</string>
-    <string name="onboarding_plus_recurring_after_intro_offer_sufix">첫해 이후</string>
-    <string name="onboarding_plus_recurring_after_intro_offer">반복 결제: %s</string>
     <string name="half_price_first_year">첫해 50% 할인</string>
     <string name="plus_offer_duration">%s 행사</string>
     <string name="onboarding_plus_feature_watch_playback">Apple Watch 및 Wear OS 앱</string>
@@ -693,7 +691,6 @@ Language: ko_KR
     <string name="onboarding_welcome_recommendations_title">새로운 내용 발견</string>
     <string name="onboarding_welcome_get_you_listening_plus">감사합니다. 이제 들려드리겠습니다!</string>
     <string name="onboarding_welcome_get_you_listening">환영합니다. 이제 들려드리겠습니다!</string>
-    <string name="onboarding_plus_recurring_after_free_trial">%s 후 반복 결제 시작</string>
     <string name="onboarding_plus_start_free_trial_and_subscribe">무료 평가판 시작 및 구독</string>
     <string name="onboarding_plus_terms_and_conditions">이용 약관</string>
     <string name="onboarding_plus_privacy_policy">개인정보 취급방침</string>

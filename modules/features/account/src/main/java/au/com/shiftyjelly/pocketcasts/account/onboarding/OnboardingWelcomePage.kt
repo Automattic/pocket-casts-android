@@ -98,7 +98,7 @@ fun OnboardingWelcomePage(
 
     // Do not prompt for discover if the user was adding a file because we don't want to break them
     // out of the add file flow
-    val showDiscover = (flow as? OnboardingFlow.PlusFlow)?.source != OnboardingUpgradeSource.FILES
+    val showDiscover = flow.source != OnboardingUpgradeSource.FILES
 
     Content(
         isSignedInAsPlusOrPatron = isSignedInAsPlusOrPatron,

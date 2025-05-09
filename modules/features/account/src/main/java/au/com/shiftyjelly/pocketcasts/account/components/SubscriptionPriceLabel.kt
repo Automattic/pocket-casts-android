@@ -7,6 +7,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
@@ -32,6 +33,8 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 fun SubscriptionPriceLabel(
     subscriptionPlan: OnboardingSubscriptionPlan,
     modifier: Modifier = Modifier,
+    primaryTextColor: Color = MaterialTheme.theme.colors.primaryText01,
+    secondaryTextColor: Color = MaterialTheme.theme.colors.primaryText02,
     isFocusable: Boolean = false,
 ) {
     Row(
@@ -40,7 +43,7 @@ fun SubscriptionPriceLabel(
     ) {
         TextH30(
             text = subscriptionPlan.highlightedPrice.formattedPrice,
-            color = MaterialTheme.theme.colors.primaryText01,
+            color = primaryTextColor,
             fontSize = 22.sp,
             modifier = if (isFocusable) {
                 Modifier.focusable()
@@ -50,8 +53,8 @@ fun SubscriptionPriceLabel(
         )
 
         TextP60(
-            text = subscriptionPlan.pricePeriodText,
-            color = MaterialTheme.theme.colors.primaryText02,
+            text = subscriptionPlan.pricePerPeriodWithSlashText,
+            color = secondaryTextColor,
             modifier = Modifier.padding(start = 4.dp),
         )
 
@@ -59,7 +62,7 @@ fun SubscriptionPriceLabel(
         if (crossedPrice != null) {
             TextP60(
                 text = crossedPrice.formattedPrice,
-                color = MaterialTheme.theme.colors.primaryText02,
+                color = secondaryTextColor,
                 modifier = Modifier.padding(start = 4.dp),
                 style = TextStyle(textDecoration = TextDecoration.LineThrough),
             )

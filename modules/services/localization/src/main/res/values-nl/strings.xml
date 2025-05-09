@@ -392,8 +392,6 @@ Language: nl
     <string name="single_chapter">1 hoofdstuk</string>
     <string name="number_of_chapters">%d hoofdstukken</string>
     <string name="onboarding_plus_feature_slumber_studios_title">1 jaar lang exclusieve content van &lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt;</string>
-    <string name="onboarding_plus_recurring_after_intro_offer_sufix">na je eerste jaar</string>
-    <string name="onboarding_plus_recurring_after_intro_offer">Herhaaldelijke betaling op %s</string>
     <string name="half_price_first_year">50% korting op je eerste jaar</string>
     <string name="plus_offer_duration">%s aanbieding</string>
     <string name="onboarding_plus_feature_watch_playback">Apple Watch- en Wear OS-apps</string>
@@ -693,7 +691,6 @@ Language: nl
     <string name="onboarding_welcome_recommendations_title">Ontdek iets nieuws</string>
     <string name="onboarding_welcome_get_you_listening_plus">Bedankt, veel luisterplezier!</string>
     <string name="onboarding_welcome_get_you_listening">Welkom, veel luisterplezier!</string>
-    <string name="onboarding_plus_recurring_after_free_trial">Herhaaldelijke betalingen beginnen na je %s</string>
     <string name="onboarding_plus_start_free_trial_and_subscribe">Start gratis proefversie en abonneer je</string>
     <string name="onboarding_plus_terms_and_conditions">Algemene voorwaarden</string>
     <string name="onboarding_plus_privacy_policy">Privacybeleid</string>

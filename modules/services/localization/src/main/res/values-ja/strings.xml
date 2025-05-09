@@ -392,8 +392,6 @@ Language: ja_JP
     <string name="single_chapter">1個のチャプター</string>
     <string name="number_of_chapters">%d個のチャプター</string>
     <string name="onboarding_plus_feature_slumber_studios_title">&lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt; の限定コンテンツを1年間聴取可能</string>
-    <string name="onboarding_plus_recurring_after_intro_offer_sufix">夢は大きく</string>
-    <string name="onboarding_plus_recurring_after_intro_offer">%s に定期支払い</string>
     <string name="half_price_first_year">初年度は50% オフ</string>
     <string name="plus_offer_duration">%s のオファー</string>
     <string name="onboarding_plus_feature_watch_playback">Apple Watch アプリと Wear OS アプリ</string>
@@ -693,7 +691,6 @@ Language: ja_JP
     <string name="onboarding_welcome_recommendations_title">新しいものを見つける</string>
     <string name="onboarding_welcome_get_you_listening_plus">ありがとうございます。どうぞお聞きください !</string>
     <string name="onboarding_welcome_get_you_listening">ようこそ、どうぞお聞きください !</string>
-    <string name="onboarding_plus_recurring_after_free_trial">%sの後に定期支払いが発生します</string>
     <string name="onboarding_plus_start_free_trial_and_subscribe">無料お試しとサブスクリプションを開始</string>
     <string name="onboarding_plus_terms_and_conditions">利用規約</string>
     <string name="onboarding_plus_privacy_policy">プライバシーポリシー</string>

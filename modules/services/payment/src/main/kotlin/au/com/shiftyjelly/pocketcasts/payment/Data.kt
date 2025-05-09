@@ -277,11 +277,21 @@ enum class BillingCycle(
     ),
 }
 
-enum class SubscriptionOffer {
-    IntroOffer,
-    Trial,
-    Referral,
-    Winback,
+enum class SubscriptionOffer(
+    val analyticsValue: String,
+) {
+    IntroOffer(
+        analyticsValue = "into_offer",
+    ),
+    Trial(
+        analyticsValue = "free_trial",
+    ),
+    Referral(
+        analyticsValue = "referral",
+    ),
+    Winback(
+        analyticsValue = "winback",
+    ),
     ;
 
     fun offerId(
