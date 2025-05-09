@@ -1075,7 +1075,6 @@ class PodcastFragment : BaseFragment() {
                                 episodeLimit = state.episodeLimit,
                                 episodeLimitIndex = state.episodeLimitIndex,
                                 podcast = state.podcast,
-                                tabs = state.tabs,
                                 context = requireContext(),
                             )
                         }
@@ -1085,17 +1084,13 @@ class PodcastFragment : BaseFragment() {
                                 bookmarks = state.bookmarks,
                                 episodes = state.episodes,
                                 searchTerm = state.searchBookmarkTerm,
-                                tabs = state.tabs,
                                 context = requireContext(),
                             )
 
                             adapter?.notifyDataSetChanged()
                         }
                         PodcastTab.RECOMMENDATIONS -> {
-                            adapter?.setRecommendations(
-                                result = state.recommendations,
-                                tabs = state.tabs,
-                            )
+                            adapter?.setRecommendations(state.recommendations)
                         }
                     }
                     if (state.searchTerm.isNotEmpty() && state.searchTerm != lastSearchTerm) {

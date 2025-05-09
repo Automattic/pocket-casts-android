@@ -43,7 +43,7 @@ class ListRepository(
         return listWebService.getCategoriesList(url)
     }
 
-    suspend fun getPodcastRecommendations(podcastUuid: String): ListFeed? {
-        return getListFeed(url = "${Settings.SERVER_API_URL}/recommendations/podcast/$podcastUuid")
+    suspend fun getPodcastRecommendations(podcastUuid: String, countryCode: String?): ListFeed? {
+        return getListFeed(url = "${Settings.SERVER_API_URL}/recommendations/podcast/$podcastUuid?country=${countryCode ?: "global"}")
     }
 }
