@@ -57,7 +57,7 @@ class DeepLinkFactory(
         ShareLinkNativeAdapter(),
         SignInAdapter(shareHost),
         ShareLinkAdapter(shareHost),
-        WebPlayerShareLinkAdapter(webPlayerHost),
+        WebPlayerShareLinkAdapter(webBaseHost = webBaseHost, webPlayerHost = webPlayerHost),
         OpmlAdapter(listOf(listHost, shareHost)),
         PodcastUrlSchemeAdapter(listOf(listHost, shareHost, webBaseHost)),
         PlayFromSearchAdapter(),
@@ -430,6 +430,7 @@ private class ShareLinkAdapter(
 }
 
 private class WebPlayerShareLinkAdapter(
+    private val webBaseHost: String,
     private val webPlayerHost: String,
 ) : DeepLinkAdapter {
     private val timestampParser = SharingUrlTimestampParser()
@@ -441,7 +442,7 @@ private class WebPlayerShareLinkAdapter(
 
         if (intent.action != ACTION_VIEW ||
             scheme !in listOf("http", "https") ||
-            host != webPlayerHost ||
+            (host != webBaseHost && host != webPlayerHost) ||
             uriData.pathSegments.size <= 1 ||
             uriData.pathSegments.first() != "podcasts"
         ) {

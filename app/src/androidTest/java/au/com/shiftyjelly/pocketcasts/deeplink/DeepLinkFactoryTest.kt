@@ -752,6 +752,17 @@ class DeepLinkFactoryTest {
     }
 
     @Test
+    fun webBaseSharePodcast() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("https://pocketcasts.com/podcasts/podcast-id?source_view=source"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(ShowPodcastDeepLink("podcast-id", sourceView = "source"), deepLink)
+    }
+
+    @Test
     fun webPlayerShareEpisode() {
         val intent = Intent()
             .setAction(ACTION_VIEW)
