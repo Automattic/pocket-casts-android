@@ -292,7 +292,7 @@ subprojects {
                     buildConfigField("String", "SERVER_SHORT_URL", "\"https://pcast.pocketcasts.net\"")
                     buildConfigField("String", "SERVER_SHORT_HOST", "\"pcast.pocketcasts.net\"")
                     buildConfigField("String", "SERVER_WEB_PLAYER_HOST", "\"play.pocketcasts.net\"")
-                    buildConfigField("String", "WEB_BASE_HOST", "\"pocket-casts-main-development.mystagingwebsite.com\"")
+                    buildConfigField("String", "WEB_BASE_HOST", "\"pocketcasts.net\"")
                     buildConfigField("String", "SERVER_LIST_URL", "\"https://lists.pocketcasts.net\"")
                     buildConfigField("String", "SERVER_LIST_HOST", "\"lists.pocketcasts.net\"")
 
