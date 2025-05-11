@@ -5,13 +5,17 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfo
-import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfoPlayStore
+import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
+import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.payment.flatMap
+import au.com.shiftyjelly.pocketcasts.payment.getOrNull
+import au.com.shiftyjelly.pocketcasts.payment.onFailure
 import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager
 import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager.ReferralResult.EmptyResult
 import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager.ReferralResult.ErrorResult
 import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager.ReferralResult.SuccessResult
-import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralOfferInfoProvider
 import au.com.shiftyjelly.pocketcasts.sharing.SharingClient
 import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
 import au.com.shiftyjelly.pocketcasts.utils.exception.NoNetworkException
@@ -21,12 +25,11 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @HiltViewModel
 class ReferralsSendGuestPassViewModel @Inject constructor(
     private val referralsManager: ReferralManager,
-    private val referralOfferInfoProvider: ReferralOfferInfoProvider,
+    private val paymentClient: PaymentClient,
     private val sharingClient: SharingClient,
     private val analyticsTracker: AnalyticsTracker,
 ) : ViewModel() {
@@ -39,40 +42,35 @@ class ReferralsSendGuestPassViewModel @Inject constructor(
 
     private fun getReferralCode() {
         viewModelScope.launch {
-            val referralsOfferInfo = referralOfferInfoProvider.referralOfferInfo() as? ReferralsOfferInfoPlayStore
-            referralsOfferInfo?.subscriptionWithOffer?.let {
-                val result = referralsManager.getReferralCode()
-                _state.value = when (result) {
+            val referralPlan = paymentClient.loadSubscriptionPlans()
+                .flatMap { plans -> plans.findOfferPlan(SubscriptionTier.Plus, BillingCycle.Yearly, SubscriptionOffer.Referral) }
+                .flatMap(ReferralSubscriptionPlan::create)
+                .onFailure { code, message -> LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Failed to load referral offer: $code, $message") }
+                .getOrNull()
+            _state.value = if (referralPlan != null) {
+                val codeResult = referralsManager.getReferralCode()
+                when (codeResult) {
                     is SuccessResult -> UiState.Loaded(
-                        code = result.body.code,
-                        referralsOfferInfo = referralsOfferInfo,
+                        referralPlan = referralPlan,
+                        code = codeResult.body.code,
                     )
 
                     is EmptyResult -> {
-                        LogBuffer.e(
-                            LogBuffer.TAG_INVALID_STATE,
-                            "Empty result when getting referral code.",
-                        )
+                        LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Empty result when getting referral code.")
                         UiState.Error(ReferralSendGuestPassError.Empty)
                     }
 
                     is ErrorResult -> {
-                        if (result.error is NoNetworkException) {
+                        if (codeResult.error is NoNetworkException) {
                             UiState.Error(ReferralSendGuestPassError.NoNetwork)
                         } else {
-                            LogBuffer.e(
-                                LogBuffer.TAG_INVALID_STATE,
-                                "Failed to get referral code ${result.errorMessage}",
-                            )
+                            LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Failed to get referral code ${codeResult.errorMessage}")
                             UiState.Error(ReferralSendGuestPassError.FailedToLoad)
                         }
                     }
                 }
-            } ?: run {
-                val message = "Failed to load referral offer info"
-                LogBuffer.e(LogBuffer.TAG_INVALID_STATE, message)
-                Timber.e(message)
-                _state.value = UiState.Error(ReferralSendGuestPassError.FailedToLoad)
+            } else {
+                UiState.Error(ReferralSendGuestPassError.FailedToLoad)
             }
         }
     }
@@ -82,14 +80,15 @@ class ReferralsSendGuestPassViewModel @Inject constructor(
         getReferralCode()
     }
 
-    fun onShareClick(referralCode: String) {
-        if (_state.value !is UiState.Loaded) return
-        val request = SharingRequest.referralLink(
-            referralCode = referralCode,
-            referralsOfferInfo = (_state.value as UiState.Loaded).referralsOfferInfo,
-        ).setSourceView(SourceView.REFERRALS)
-            .build()
+    fun onShareClick(
+        referralCode: String,
+        offerName: String,
+        offerDuration: String,
+    ) {
         viewModelScope.launch {
+            val request = SharingRequest.referralLink(referralCode, offerName, offerDuration)
+                .setSourceView(SourceView.REFERRALS)
+                .build()
             sharingClient.share(request)
         }
     }
@@ -104,12 +103,13 @@ class ReferralsSendGuestPassViewModel @Inject constructor(
 
     sealed class UiState {
         data object Loading : UiState()
-        data class Loaded(
-            val code: String,
-            val referralsOfferInfo: ReferralsOfferInfo,
-        ) : UiState()
 
         data class Error(val error: ReferralSendGuestPassError) : UiState()
+
+        data class Loaded(
+            val referralPlan: ReferralSubscriptionPlan,
+            val code: String,
+        ) : UiState()
     }
 
     sealed class ReferralSendGuestPassError {

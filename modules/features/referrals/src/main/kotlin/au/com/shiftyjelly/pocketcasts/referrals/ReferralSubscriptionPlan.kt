@@ -22,24 +22,30 @@ data class ReferralSubscriptionPlan private constructor(
 ) {
     val offerName: String
         @Composable get() {
-            val periodsCount = (freePricingPhase.schedule.recurrenceMode as RecurrenceMode.Recurring).value
+            val recurranceCount = (freePricingPhase.schedule.recurrenceMode as RecurrenceMode.Recurring).value
+            val periodCount = freePricingPhase.schedule.periodCount
+            val totalCount = recurranceCount * periodCount
+
             val periodText = when (freePricingPhase.schedule.period) {
                 Period.Daily -> stringResource(LR.string.plus_day)
                 Period.Weekly -> stringResource(LR.string.plus_week)
                 Period.Monthly -> stringResource(LR.string.plus_month)
                 Period.Yearly -> stringResource(LR.string.plus_year)
             }.titlecaseFirstChar()
-            return "$periodsCount-$periodText"
+            return "$totalCount-$periodText"
         }
 
     val offerDurationText: String
         @Composable get() {
-            val periodCount = (freePricingPhase.schedule.recurrenceMode as RecurrenceMode.Recurring).value
+            val recurranceCount = (freePricingPhase.schedule.recurrenceMode as RecurrenceMode.Recurring).value
+            val periodCount = freePricingPhase.schedule.periodCount
+            val totalCount = recurranceCount * periodCount
+
             return when (freePricingPhase.schedule.period) {
-                Period.Daily -> pluralStringResource(LR.plurals.day_with_count, periodCount, periodCount)
-                Period.Weekly -> pluralStringResource(LR.plurals.week_with_count, periodCount, periodCount)
-                Period.Monthly -> pluralStringResource(LR.plurals.month_with_count, periodCount, periodCount)
-                Period.Yearly -> pluralStringResource(LR.plurals.year_with_count, periodCount, periodCount)
+                Period.Daily -> pluralStringResource(LR.plurals.day_with_count, totalCount, totalCount)
+                Period.Weekly -> pluralStringResource(LR.plurals.week_with_count, totalCount, totalCount)
+                Period.Monthly -> pluralStringResource(LR.plurals.month_with_count, totalCount, totalCount)
+                Period.Yearly -> pluralStringResource(LR.plurals.year_with_count, totalCount, totalCount)
             }
         }
 

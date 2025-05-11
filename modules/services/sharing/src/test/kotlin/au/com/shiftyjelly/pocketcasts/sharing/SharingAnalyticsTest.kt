@@ -11,7 +11,6 @@ import au.com.shiftyjelly.pocketcasts.models.to.LongestEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.RatingStats
 import au.com.shiftyjelly.pocketcasts.models.to.Story
 import au.com.shiftyjelly.pocketcasts.models.to.TopPodcast
-import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfoMock
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import java.time.Year
 import java.util.Date
@@ -449,8 +448,7 @@ class SharingAnalyticsTest {
     @Test
     fun `log referral link sharing`() {
         val referralCode = "TEST_CODE"
-        val referralsOfferInfo = ReferralsOfferInfoMock
-        val request = SharingRequest.referralLink(referralCode, referralsOfferInfo)
+        val request = SharingRequest.referralLink(referralCode, "offer-name", "offer-duration")
             .setSourceView(SourceView.REFERRALS)
             .build()
 

@@ -12,13 +12,11 @@ class SubscriptionMapper @Inject constructor() {
     fun mapFromProductDetails(
         productDetails: ProductDetails,
         isOfferEligible: Boolean = false,
-        referralProductDetails: ReferralProductDetails? = null,
         removeWinbackOffer: Boolean = true,
     ): Subscription? {
-        val matchingSubscriptionOfferDetails = if (isOfferEligible || referralProductDetails != null) {
+        val matchingSubscriptionOfferDetails = if (isOfferEligible) {
             productDetails
                 .subscriptionOfferDetails
-                ?.filter { referralProductDetails == null && !it.offerTags.contains(REFERRAL_OFFER_TAG) } // get SubscriptionOfferDetails with offers
                 ?.filter { if (removeWinbackOffer) !it.offerTags.contains(WINBACK_OFFER_TAG) else true }
                 ?.filter { it.offerSubscriptionPricingPhase != null } // get SubscriptionOfferDetails with offers
                 ?.ifEmpty { productDetails.subscriptionOfferDetails } // if no special offers, return all offers available
@@ -29,17 +27,13 @@ class SubscriptionMapper @Inject constructor() {
                 ?.filter { it.offerSubscriptionPricingPhase == null } // Take the first if there are multiple SubscriptionOfferDetails without special offers
         } ?: emptyList()
 
-        val relevantSubscriptionOfferDetails = if ((FeatureFlag.isEnabled(Feature.REFERRALS_CLAIM) || FeatureFlag.isEnabled(Feature.REFERRALS_SEND)) && referralProductDetails != null) {
-            matchingSubscriptionOfferDetails.find { it.offerId == referralProductDetails.offerId }
-        } else {
-            matchingSubscriptionOfferDetails
-                .filter { !it.offerTags.contains(REFERRAL_OFFER_TAG) }
-                .filter { if (removeWinbackOffer) !it.offerTags.contains(WINBACK_OFFER_TAG) else true }
-                // This assumes that base plan has lowest number of pricing phases,
-                // and if something else has the same number of phases,
-                // base plan will be the first one
-                .minByOrNull { offerDetails -> offerDetails.pricingPhases.pricingPhaseList.size }
-        }
+        val relevantSubscriptionOfferDetails = matchingSubscriptionOfferDetails
+            .filter { !it.offerTags.contains(REFERRAL_OFFER_TAG) }
+            .filter { if (removeWinbackOffer) !it.offerTags.contains(WINBACK_OFFER_TAG) else true }
+            // This assumes that base plan has lowest number of pricing phases,
+            // and if something else has the same number of phases,
+            // base plan will be the first one
+            .minByOrNull { offerDetails -> offerDetails.pricingPhases.pricingPhaseList.size }
 
         return relevantSubscriptionOfferDetails
             ?.recurringSubscriptionPricingPhase
@@ -61,7 +55,7 @@ class SubscriptionMapper @Inject constructor() {
                             productDetails = productDetails,
                             offerToken = relevantSubscriptionOfferDetails.offerToken,
                         )
-                    } else if (hasTrial(productDetails, referralProductDetails)) {
+                    } else if (hasTrial(productDetails)) {
                         Subscription.Trial(
                             tier = SubscriptionTier.fromProductId(productDetails.productId),
                             recurringPricingPhase = recurringPricingPhase,
@@ -76,16 +70,9 @@ class SubscriptionMapper @Inject constructor() {
             }
     }
 
-    private fun hasTrial(productDetails: ProductDetails, referralProductDetails: ReferralProductDetails?): Boolean {
+    private fun hasTrial(productDetails: ProductDetails): Boolean {
         return productDetails.subscriptionOfferDetails?.any {
-            it.offerId in buildList {
-                add(Subscription.TRIAL_OFFER_ID)
-                referralProductDetails?.let {
-                    if (FeatureFlag.isEnabled(Feature.REFERRALS_CLAIM) || FeatureFlag.isEnabled(Feature.REFERRALS_SEND)) {
-                        add(referralProductDetails.offerId)
-                    }
-                }
-            }
+            it.offerId in listOf(Subscription.TRIAL_OFFER_ID)
         } ?: false
     }
 

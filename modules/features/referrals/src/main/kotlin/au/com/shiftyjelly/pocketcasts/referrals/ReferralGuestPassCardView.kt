@@ -22,8 +22,12 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH60
-import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfo
-import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfoMock
+import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlans
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.payment.flatMap
+import au.com.shiftyjelly.pocketcasts.payment.getOrNull
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -50,11 +54,11 @@ object ReferralGuestPassCardDefaults {
 
 @Composable
 fun ReferralGuestPassCardView(
-    modifier: Modifier = Modifier,
+    referralPlan: ReferralSubscriptionPlan,
     source: ReferralGuestPassCardViewSource,
-    referralsOfferInfo: ReferralsOfferInfo,
+    modifier: Modifier = Modifier,
 ) {
-    val cardTitle = stringResource(LR.string.referrals_guest_pass_card_title, referralsOfferInfo.localizedOfferDurationAdjective)
+    val cardTitle = stringResource(LR.string.referrals_guest_pass_card_title, referralPlan.offerName)
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(ReferralGuestPassCardDefaults.cardRadius(source)))
@@ -106,10 +110,12 @@ fun ReferralGuestPassCardView(
 @Composable
 fun ReferralPassCardSendViewPreview() {
     ReferralGuestPassCardView(
-        modifier = Modifier
-            .size(DpSize(315.dp, 200.dp)),
+        referralPlan = SubscriptionPlans.Preview
+            .findOfferPlan(SubscriptionTier.Plus, BillingCycle.Yearly, SubscriptionOffer.Referral)
+            .flatMap(ReferralSubscriptionPlan::create)
+            .getOrNull()!!,
         source = ReferralGuestPassCardViewSource.Send,
-        referralsOfferInfo = ReferralsOfferInfoMock,
+        modifier = Modifier.size(DpSize(315.dp, 200.dp)),
     )
 }
 
@@ -117,10 +123,12 @@ fun ReferralPassCardSendViewPreview() {
 @Composable
 fun ReferralPassCardProfileBannerViewPreview() {
     ReferralGuestPassCardView(
-        modifier = Modifier
-            .size(DpSize(150.dp, 150.dp * ReferralGuestPassCardDefaults.cardAspectRatio)),
+        referralPlan = SubscriptionPlans.Preview
+            .findOfferPlan(SubscriptionTier.Plus, BillingCycle.Yearly, SubscriptionOffer.Referral)
+            .flatMap(ReferralSubscriptionPlan::create)
+            .getOrNull()!!,
         source = ReferralGuestPassCardViewSource.ProfileBanner,
-        referralsOfferInfo = ReferralsOfferInfoMock,
+        modifier = Modifier.size(DpSize(150.dp, 150.dp * ReferralGuestPassCardDefaults.cardAspectRatio)),
     )
 }
 

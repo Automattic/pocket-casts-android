@@ -4,73 +4,71 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfo
-import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfoPlayStore
+import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
+import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.payment.flatMap
+import au.com.shiftyjelly.pocketcasts.payment.getOrNull
+import au.com.shiftyjelly.pocketcasts.payment.onFailure
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralOfferInfoProvider
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
-import timber.log.Timber
 
 @HiltViewModel
 class ReferralsViewModel @Inject constructor(
     private val userManager: UserManager,
-    private val referralOfferInfoProvider: ReferralOfferInfoProvider,
+    private val paymentClient: PaymentClient,
     private val settings: Settings,
     private val analyticsTracker: AnalyticsTracker,
 ) : ViewModel() {
     private val _state: MutableStateFlow<UiState> = MutableStateFlow(UiState.Loading)
-    val state: StateFlow<UiState> = _state
+    val state = _state.asStateFlow()
 
     init {
         viewModelScope.launch {
-            val referralsOfferInfo = referralOfferInfoProvider.referralOfferInfo() as? ReferralsOfferInfoPlayStore
-            referralsOfferInfo?.subscriptionWithOffer?.let {
-                combine(
-                    userManager.getSignInState().asFlow(),
-                    settings.playerOrUpNextBottomSheetState,
-                ) { signInState, playerBottomSheetState ->
-                    val eligibleToSendPass = FeatureFlag.isEnabled(Feature.REFERRALS_SEND) && signInState.isSignedInAsPlusOrPatron
-                    val eligibleToClaimPass = FeatureFlag.isEnabled(Feature.REFERRALS_CLAIM) &&
-                        (!signInState.isSignedIn || signInState.isSignedInAsFree) &&
-                        settings.referralClaimCode.value.isNotEmpty()
-                    _state.update {
-                        UiState.Loaded(
-                            showIcon = eligibleToSendPass,
-                            showTooltip = if (playerBottomSheetState == BottomSheetBehavior.STATE_COLLAPSED) {
-                                eligibleToSendPass && settings.showReferralsTooltip.value
-                            } else {
-                                false
-                            },
-                            showProfileBanner = eligibleToClaimPass,
-                            referralsOfferInfo = referralsOfferInfo,
-                        )
-                    }
-                }.stateIn(this)
-            } ?: run {
-                val message = "Failed to load referral offer info"
-                LogBuffer.e(LogBuffer.TAG_INVALID_STATE, message)
-                Timber.e(message)
-                _state.update {
-                    UiState.Loaded(
-                        showIcon = false,
-                        showTooltip = false,
-                        showProfileBanner = false,
-                    )
+            val referralPlan = paymentClient.loadSubscriptionPlans()
+                .flatMap { plans -> plans.findOfferPlan(SubscriptionTier.Plus, BillingCycle.Yearly, SubscriptionOffer.Referral) }
+                .flatMap(ReferralSubscriptionPlan::create)
+                .onFailure { code, message -> LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Failed to load referral offer: $code, $message") }
+                .getOrNull()
+            if (referralPlan != null) {
+                observeLoadedUiStates(referralPlan).collect { state ->
+                    _state.value = state
                 }
+            } else {
+                _state.value = UiState.NoOffer
             }
+        }
+    }
+
+    private fun observeLoadedUiStates(referralPlan: ReferralSubscriptionPlan): Flow<UiState> {
+        return combine(
+            userManager.getSignInState().asFlow(),
+            settings.playerOrUpNextBottomSheetState,
+        ) { signInState, playerBottomSheetState ->
+            val canClaimReferral = signInState.isNoAccountOrFree && settings.referralClaimCode.value.isNotEmpty()
+            val canSendReferral = signInState.isSignedInAsPlusOrPatron
+            UiState.Loaded(
+                referralPlan = referralPlan,
+                showIcon = canSendReferral,
+                showTooltip = if (playerBottomSheetState == BottomSheetBehavior.STATE_COLLAPSED) {
+                    canSendReferral && settings.showReferralsTooltip.value
+                } else {
+                    false
+                },
+                showProfileBanner = canClaimReferral,
+            )
         }
     }
 
@@ -119,12 +117,15 @@ class ReferralsViewModel @Inject constructor(
 
     sealed class UiState {
         data object Loading : UiState()
+
+        data object NoOffer : UiState()
+
         data class Loaded(
+            val referralPlan: ReferralSubscriptionPlan,
             val showIcon: Boolean = false,
             val showTooltip: Boolean = false,
             val showProfileBanner: Boolean = false,
             val showHideBannerPopup: Boolean = false,
-            val referralsOfferInfo: ReferralsOfferInfo? = null,
         ) : UiState()
     }
 }

@@ -29,8 +29,6 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSourc
 import au.com.shiftyjelly.pocketcasts.settings.stats.StatsFragment
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.TopScrollable
 import dagger.hilt.android.AndroidEntryPoint
@@ -54,9 +52,7 @@ class ProfileFragment : BaseFragment(), TopScrollable {
             profileViewModel.onScreenShown()
         }
         val state = ProfilePageState(
-            isSendReferralsEnabled = FeatureFlag.isEnabled(Feature.REFERRALS_SEND),
             isPlaybackEnabled = profileViewModel.isPlaybackAvailable.collectAsState().value,
-            isClaimReferralsEnabled = FeatureFlag.isEnabled(Feature.REFERRALS_CLAIM),
             isFreeAccountBannerVisible = profileViewModel.isFreeAccountBannerVisible.collectAsState().value,
             isUpgradeBannerVisible = profileViewModel.showUpgradeBanner.collectAsState(false).value,
             miniPlayerPadding = profileViewModel.miniPlayerInset.collectAsState().value.pxToDp(requireContext()).dp,

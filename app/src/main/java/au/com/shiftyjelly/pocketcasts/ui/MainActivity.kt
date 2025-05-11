@@ -1386,9 +1386,6 @@ class MainActivity :
     }
 
     private fun openReferralClaim(code: String) {
-        if (!FeatureFlag.isEnabled(Feature.REFERRALS_CLAIM)) {
-            return
-        }
         settings.referralClaimCode.set(code, false)
         openTab(VR.id.navigation_profile)
         val fragment = ReferralsGuestPassFragment.newInstance(ReferralsGuestPassFragment.ReferralsPageType.Claim)

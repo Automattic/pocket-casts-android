@@ -25,8 +25,12 @@ import au.com.shiftyjelly.pocketcasts.compose.components.PopupDropdownMenuToolti
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfo
-import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfoMock
+import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlans
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.payment.flatMap
+import au.com.shiftyjelly.pocketcasts.payment.getOrNull
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -43,7 +47,7 @@ fun ReferralsIconWithTooltip(
     }
 
     when (state) {
-        is UiState.Loading -> Unit
+        is UiState.Loading, UiState.NoOffer -> Unit
         is UiState.Loaded -> {
             ReferralsIconWithTooltip(
                 state = state,
@@ -70,12 +74,10 @@ private fun ReferralsIconWithTooltip(
             PopupDropdownMenuTooltip(
                 show = state.showTooltip,
             ) {
-                state.referralsOfferInfo?.let {
-                    TooltipContent(
-                        referralsOfferInfo = it,
-                        onClick = onTooltipClick,
-                    )
-                }
+                TooltipContent(
+                    referralPlan = state.referralPlan,
+                    onClick = onTooltipClick,
+                )
             }
         }
     }
@@ -83,7 +85,7 @@ private fun ReferralsIconWithTooltip(
 
 @Composable
 private fun TooltipContent(
-    referralsOfferInfo: ReferralsOfferInfo,
+    referralPlan: ReferralSubscriptionPlan,
     onClick: () -> Unit,
 ) {
     Column(
@@ -95,7 +97,7 @@ private fun TooltipContent(
             },
     ) {
         TextH40(
-            text = stringResource(LR.string.referrals_tooltip_message, referralsOfferInfo.localizedOfferDurationNoun.lowercase()),
+            text = stringResource(LR.string.referrals_tooltip_message, referralPlan.offerDurationText),
         )
     }
 }
@@ -138,7 +140,10 @@ fun TooltipContentPreview(
 ) {
     AppThemeWithBackground(themeType) {
         TooltipContent(
-            referralsOfferInfo = ReferralsOfferInfoMock,
+            referralPlan = SubscriptionPlans.Preview
+                .findOfferPlan(SubscriptionTier.Plus, BillingCycle.Yearly, SubscriptionOffer.Referral)
+                .flatMap(ReferralSubscriptionPlan::create)
+                .getOrNull()!!,
             onClick = {},
         )
     }
