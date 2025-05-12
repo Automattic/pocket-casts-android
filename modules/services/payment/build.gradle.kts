@@ -17,9 +17,10 @@ dependencies {
     ksp(libs.dagger.hilt.compiler)
     ksp(libs.hilt.compiler)
 
-    api(libs.billing.ktx)
     api(libs.coroutines.core)
     api(libs.dagger.hilt.android)
+
+    implementation(libs.billing.ktx)
 
     testImplementation(libs.coroutines.test)
     testImplementation(libs.junit)
