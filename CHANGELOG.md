@@ -14,9 +14,6 @@
         ([#3942](https://github.com/Automattic/pocket-casts-android/pull/3942))
     *   Improve Accessibility on the Upgrade page
         ([#3947](https://github.com/Automattic/pocket-casts-android/pull/3947))
-*   Bug Fixes
-    *   Updates datastore dependency to prevent crashes
-        ([#3982](https://github.com/Automattic/pocket-casts-android/pull/3982)
 
 7.88
 -----
