@@ -73,7 +73,7 @@ dependencies {
     implementation(libs.coroutines.rx2)
     implementation(libs.dagger.hilt.android)
     implementation(libs.dagger.hilt.core)
-    implementation(libs.datastore) // Force using the latest datastore version to stop the app crashing with Glance widgets. Glance and Horologist libraries both include this library. Google Play Console issue 63d0f64987c33fcdff73fc0092b45936.
+    implementation(libs.datastore) // Force using the latest datastore version to stop the app crashing with Glance widgets. Glance and Horologist libraries both include this library. Pull request https://github.com/Automattic/pocket-casts-android/pull/3982.
     implementation(libs.encryptedlogging)
     implementation(libs.firebase.config)
     implementation(libs.guava)
