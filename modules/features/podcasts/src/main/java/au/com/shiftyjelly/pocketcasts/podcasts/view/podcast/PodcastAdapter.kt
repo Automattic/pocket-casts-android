@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.podcast
 
-import android.R.attr.category
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
