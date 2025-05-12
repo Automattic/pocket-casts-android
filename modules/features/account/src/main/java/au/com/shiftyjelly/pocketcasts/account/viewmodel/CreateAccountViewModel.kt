@@ -4,10 +4,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.utils.Util
@@ -27,15 +25,11 @@ class CreateAccountViewModel
 
     val upgradeMode = MutableLiveData<Boolean>()
     val subscriptionType = MutableLiveData<SubscriptionType>().apply { value = SubscriptionType.FREE }
-    val subscription = MutableLiveData<Subscription?>()
     val newsletter = MutableLiveData<Boolean>().apply { postValue(false) }
 
     val createAccountState = MutableLiveData<CreateAccountState>().apply { value = CreateAccountState.CurrentlyValid }
     private val disposables = CompositeDisposable()
     var defaultSubscriptionType = SubscriptionType.FREE
-
-    @Inject
-    lateinit var subscriptionManager: SubscriptionManager
 
     companion object {
         private const val SOURCE_KEY = "source"
@@ -106,7 +100,6 @@ class CreateAccountViewModel
     fun clearValues() {
         upgradeMode.value = false
         subscriptionType.value = defaultSubscriptionType
-        subscription.value = null
         newsletter.value = false
     }
 

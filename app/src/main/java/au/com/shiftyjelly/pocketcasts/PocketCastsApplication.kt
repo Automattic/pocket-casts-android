@@ -26,7 +26,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.support.DatabaseExportHelper
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
@@ -88,8 +87,6 @@ class PocketCastsApplication : Application(), Configuration.Provider {
     @Inject lateinit var notificationHelper: NotificationHelper
 
     @Inject lateinit var workerFactory: HiltWorkerFactory
-
-    @Inject lateinit var subscriptionManager: SubscriptionManager
 
     @Inject lateinit var userEpisodeManager: UserEpisodeManager
 
@@ -257,7 +254,6 @@ class PocketCastsApplication : Application(), Configuration.Provider {
             }
         }
 
-        applicationScope.launch { subscriptionManager.initializeBillingConnection() }
         applicationScope.launch(Dispatchers.IO) { fileStorage.fixBrokenFiles(episodeManager) }
 
         userEpisodeManager.monitorUploads(applicationContext)

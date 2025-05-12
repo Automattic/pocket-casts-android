@@ -1,13 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.payment
 
 import android.app.Activity
-import com.android.billingclient.api.BillingFlowParams
-import com.android.billingclient.api.BillingResult
-import com.android.billingclient.api.ProductDetails
-import com.android.billingclient.api.PurchaseHistoryRecord
-import com.android.billingclient.api.QueryProductDetailsParams
-import com.android.billingclient.api.QueryPurchaseHistoryParams
-import com.android.billingclient.api.QueryPurchasesParams
 import java.util.Collections
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
@@ -17,7 +10,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -79,7 +71,7 @@ class PaymentClient @Inject constructor(
         }
     }
 
-    suspend fun listenToPurchaseUpdates(): Nothing {
+    private suspend fun listenToPurchaseUpdates(): Nothing {
         dataSource.purchaseResults.collect { result ->
             val recoveredResult = result.recover { code, message ->
                 when (code) {
@@ -161,35 +153,6 @@ class PaymentClient @Inject constructor(
         }
         return keys.firstOrNull { it.productId == productId }
     }
-
-    // <editor-fold desc="Temporarily extracted old interface">
-    val purchaseEvents = _purchaseEvents.asSharedFlow()
-
-    suspend fun loadProducts(
-        params: QueryProductDetailsParams,
-    ): Pair<BillingResult, List<ProductDetails>> {
-        return dataSource.loadProducts(params)
-    }
-
-    suspend fun loadPurchaseHistory(
-        params: QueryPurchaseHistoryParams,
-    ): Pair<BillingResult, List<PurchaseHistoryRecord>> {
-        return dataSource.loadPurchaseHistory(params)
-    }
-
-    suspend fun loadPurchases(
-        params: QueryPurchasesParams,
-    ): Pair<BillingResult, List<com.android.billingclient.api.Purchase>> {
-        return dataSource.loadPurchases(params)
-    }
-
-    suspend fun launchBillingFlow(
-        activity: Activity,
-        params: BillingFlowParams,
-    ): BillingResult {
-        return dataSource.launchBillingFlow(activity, params)
-    }
-    // </editor-fold>
 
     companion object {
         fun test(dataSource: PaymentDataSource = PaymentDataSource.fake()) = PaymentClient(
