@@ -139,6 +139,24 @@
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data
+                    android:host="pocketcasts.com"
+                    android:scheme="https"
+                    android:pathPrefix="/podcasts/" />
+            </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data
+                    android:host="pocketcasts.net"
+                    android:scheme="https"
+                    android:pathPrefix="/podcasts/" />
+            </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data
                     android:host="pocket-casts-main-development.mystagingwebsite.com"
                     android:scheme="https"
                     android:pathPrefix="/redeem" />
