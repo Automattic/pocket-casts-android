@@ -21,11 +21,10 @@ android-gradle-plugin = "8.9.2"
 billing = "7.0.0"
 coil = "2.7.0"
 compose = "2024.10.00" # https://developer.android.com/jetpack/compose/bom/bom-mapping
-datastore = "1.1.6"
 dependency-analysis = "2.17.0"
 firebase = "33.13.0"
 fragment = "1.8.6"
-glance = "1.1.1"
+glance = "1.0.0"
 google-services = "4.4.2"
 hilt = "2.56.2"
 hilt-compiler = "1.2.0"
@@ -107,9 +106,6 @@ dagger-hilt-core = { module = "com.google.dagger:hilt-core", version.ref = "hilt
 hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hilt-compiler" }
 hilt-navigation-compose = "androidx.hilt:hilt-navigation-compose:1.2.0"
 hilt-work = "androidx.hilt:hilt-work:1.2.0"
-
-# Datastore
-datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
 
 # Firebase
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase" }
