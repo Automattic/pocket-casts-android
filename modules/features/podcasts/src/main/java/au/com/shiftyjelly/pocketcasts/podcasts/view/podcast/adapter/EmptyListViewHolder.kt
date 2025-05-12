@@ -13,7 +13,6 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 class EmptyListViewHolder(
     private val composeView: ComposeView,
     private val theme: Theme,
-    private val onButtonClick: () -> Unit,
 ) : RecyclerView.ViewHolder(composeView) {
     fun bind(emptyList: PodcastAdapter.EmptyList) {
         composeView.setContent {
@@ -23,7 +22,7 @@ class EmptyListViewHolder(
                     subtitle = emptyList.subtitle,
                     iconResourceId = emptyList.iconResourceId,
                     buttonText = emptyList.buttonText,
-                    onButtonClick = onButtonClick,
+                    onButtonClick = emptyList.onButtonClick,
                     modifier = Modifier.padding(vertical = 56.dp),
                 )
             }

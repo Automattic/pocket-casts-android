@@ -835,6 +835,9 @@ class PodcastFragment : BaseFragment() {
             onPodrollPodcastSubscribeClicked = { podcastUuid ->
                 viewModel.onPodrollPodcastSubscribeClicked(podcastUuid = podcastUuid)
             },
+            onRecommendedRetryClicked = {
+                viewModel.onRecommendedRetryClicked()
+            },
         ).apply {
             stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
         }

@@ -40,7 +40,6 @@ import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterEpisodeBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterEpisodeHeaderBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
-import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastAdapter.Companion.VIEW_TYPE_PODCAST_HEADER
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.BookmarkHeaderViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.BookmarkUpsellViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.BookmarkViewHolder
@@ -153,6 +152,7 @@ class PodcastAdapter(
     private val onClickCategory: (Podcast) -> Unit,
     private val onClickWebsite: (Podcast) -> Unit,
     private val onArtworkAvailable: (Podcast) -> Unit,
+    private val onRecommendedRetryClicked: () -> Unit,
     private val onRecommendedPodcastClicked: (String, String) -> Unit,
     private val onRecommendedPodcastSubscribeClicked: (String, String) -> Unit,
     private val onPodrollHeaderClicked: () -> Unit,
@@ -195,7 +195,7 @@ class PodcastAdapter(
         val subtitle: String = "",
         val iconResourceId: Int,
         val buttonText: String? = null,
-        val onButtonClick: (() -> Unit)? = null,
+        val onButtonClick: () -> Unit,
     )
 
     data class PodrollHeaderRow(
@@ -298,7 +298,7 @@ class PodcastAdapter(
             VIEW_TYPE_BOOKMARKS -> BookmarkViewHolder(ComposeView(parent.context), theme)
             VIEW_TYPE_BOOKMARK_HEADER -> BookmarkHeaderViewHolder(ComposeView(parent.context), theme)
             VIEW_TYPE_BOOKMARK_UPSELL -> BookmarkUpsellViewHolder(ComposeView(parent.context), onGetBookmarksClicked, theme)
-            VIEW_TYPE_EMPTY_LIST -> EmptyListViewHolder(ComposeView(parent.context), theme, onHeadsetSettingsClicked)
+            VIEW_TYPE_EMPTY_LIST -> EmptyListViewHolder(ComposeView(parent.context), theme)
             VIEW_TYPE_RECOMMENDED_PODCAST -> RecommendedPodcastViewHolder(ComposeView(parent.context), theme)
             VIEW_TYPE_PODROLL_HEADER -> PodrollViewHolder(ComposeView(parent.context), theme)
             VIEW_TYPE_DIVIDER_LINE -> DividerLineViewHolder(ComposeView(parent.context), theme)
@@ -634,6 +634,8 @@ class PodcastAdapter(
                         EmptyList(
                             title = resources.getString(LR.string.you_might_like_empty_title),
                             iconResourceId = IR.drawable.ic_exclamation_circle,
+                            buttonText = resources.getString(LR.string.you_might_like_empty_button),
+                            onButtonClick = onRecommendedRetryClicked,
                         ),
                     )
                 }

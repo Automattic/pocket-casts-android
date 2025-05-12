@@ -728,6 +728,7 @@
 
     <!-- Recommendations -->
     <string name="you_might_like_empty_title">Couldn\'t load recommendations</string>
+    <string name="you_might_like_empty_button" translatable="false">@string/try_again</string>
 
     <!-- Give Rating -->
 

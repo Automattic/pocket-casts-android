@@ -27,6 +27,7 @@ class RecommendationsHandler @Inject constructor(
     private val settings: Settings,
 ) {
     private val enabledObservable = BehaviorSubject.createDefault(false)
+    private val retryCountObservable = BehaviorSubject.createDefault(0)
 
     fun setEnabled(enabled: Boolean) {
         if (FeatureFlag.isEnabled(Feature.RECOMMENDATIONS)) {
@@ -34,13 +35,12 @@ class RecommendationsHandler @Inject constructor(
         }
     }
 
-    private fun isEnabledFlowable(): Flowable<Boolean> {
-        return enabledObservable.toFlowable(BackpressureStrategy.LATEST)
-    }
-
     fun getRecommendationsFlowable(podcast: Podcast): Flowable<RecommendationsResult> {
-        return isEnabledFlowable()
-            .distinctUntilChanged()
+        return Flowable
+            .combineLatest(
+                enabledObservable.toFlowable(BackpressureStrategy.LATEST).distinctUntilChanged(),
+                retryCountObservable.toFlowable(BackpressureStrategy.LATEST).distinctUntilChanged(),
+            ) { enabled, _ -> enabled }
             .switchMap { enabled ->
                 if (enabled) {
                     getRecommendationsMaybe(podcast)
@@ -85,5 +85,9 @@ class RecommendationsHandler @Inject constructor(
                     list.copy(podcasts = podcasts, podroll = podroll)
                 }
         }
+    }
+
+    fun retry() {
+        retryCountObservable.onNext((retryCountObservable.value ?: 0) + 1)
     }
 }

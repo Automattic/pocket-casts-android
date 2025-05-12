@@ -645,6 +645,10 @@ class PodcastViewModel
         )
     }
 
+    fun onRecommendedRetryClicked() {
+        recommendationsHandler.retry()
+    }
+
     fun onPodrollInformationModalShown() {
         analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_PODROLL_INFORMATION_MODEL_SHOWN)
     }
