@@ -645,6 +645,10 @@ class PodcastViewModel
         )
     }
 
+    fun onRecommendedRetryClicked() {
+        recommendationsHandler.retry()
+    }
+
     fun onPodrollInformationModalShown() {
         analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_PODROLL_INFORMATION_MODEL_SHOWN)
     }
@@ -693,7 +697,6 @@ class PodcastViewModel
             val episodeLimit: Int?,
             val episodeLimitIndex: Int?,
             val showTab: PodcastTab = PodcastTab.EPISODES,
-            val tabs: List<PodcastTab>,
         ) : UiState()
         data class Error(
             val errorMessage: String,
@@ -808,13 +811,6 @@ private fun Flowable<CombinedEpisodeAndBookmarkData>.loadEpisodesAndBookmarks(
                 episodeLimitIndex = null
             }
 
-            val tabs = PodcastTab.entries
-                .filter { tab ->
-                    tab == PodcastTab.EPISODES ||
-                        tab == PodcastTab.BOOKMARKS ||
-                        (tab == PodcastTab.RECOMMENDATIONS && recommendations is RecommendationsResult.Success)
-                }
-
             val state: PodcastViewModel.UiState = PodcastViewModel.UiState.Loaded(
                 podcast = podcast,
                 episodes = filteredList,
@@ -827,7 +823,6 @@ private fun Flowable<CombinedEpisodeAndBookmarkData>.loadEpisodesAndBookmarks(
                 searchBookmarkTerm = bookmarkSearchResults.searchTerm,
                 episodeLimit = podcast.autoArchiveEpisodeLimit?.value,
                 episodeLimitIndex = episodeLimitIndex,
-                tabs = tabs,
             )
             state
         }

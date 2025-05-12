@@ -726,6 +726,10 @@
         <item quantity="other">%1$d days</item>
     </plurals>
 
+    <!-- Recommendations -->
+    <string name="you_might_like_empty_title">Couldn\'t load recommendations</string>
+    <string name="you_might_like_empty_button" translatable="false">@string/try_again</string>
+
     <!-- Give Rating -->
 
     <string name="podcast_log_in_to_rate">You must log in to leave a rating</string>

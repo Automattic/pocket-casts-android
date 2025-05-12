@@ -43,7 +43,8 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.BookmarkHead
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.BookmarkUpsellViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.BookmarkViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.DividerLineViewHolder
-import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.NoBookmarkViewHolder
+import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.EmptyListViewHolder
+import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.LoadingViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.PaddingViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.PodrollViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.RecommendedPodcastViewHolder
@@ -71,6 +72,7 @@ import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelpe
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import java.util.Date
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -149,6 +151,7 @@ class PodcastAdapter(
     private val onClickCategory: (Podcast) -> Unit,
     private val onClickWebsite: (Podcast) -> Unit,
     private val onArtworkAvailable: (Podcast) -> Unit,
+    private val onRecommendedRetryClicked: () -> Unit,
     private val onRecommendedPodcastClicked: (String, String) -> Unit,
     private val onRecommendedPodcastSubscribeClicked: (String, String) -> Unit,
     private val onPodrollHeaderClicked: () -> Unit,
@@ -161,7 +164,6 @@ class PodcastAdapter(
     data class NoResultsMessage(val title: String, val bodyText: String, val showButton: Boolean)
     data class EpisodeHeader(val showingArchived: Boolean, val episodeCount: Int, val archivedCount: Int, val searchTerm: String, val episodeLimit: Int?)
     data class TabsHeader(
-        val tabs: List<PodcastTab>,
         val selectedTab: PodcastTab,
         val onTabClicked: (PodcastTab) -> Unit,
     )
@@ -186,7 +188,14 @@ class PodcastAdapter(
     )
 
     object BookmarkUpsell
-    object NoBookmarkMessage
+
+    data class EmptyList(
+        val title: String,
+        val subtitle: String = "",
+        val iconResourceId: Int,
+        val buttonText: String? = null,
+        val onButtonClick: () -> Unit,
+    )
 
     data class PodrollHeaderRow(
         val onClick: () -> Unit,
@@ -195,6 +204,8 @@ class PodcastAdapter(
     data class PaddingRow(
         val padding: Dp,
     )
+    object LoadingRow
+
     data class RecommendedPodcast(
         val listDate: String,
         val podcast: DiscoverPodcast,
@@ -212,12 +223,13 @@ class PodcastAdapter(
         private const val VIEW_TYPE_BOOKMARKS = 101
         private const val VIEW_TYPE_BOOKMARK_HEADER = 102
         private const val VIEW_TYPE_BOOKMARK_UPSELL = 103
-        private const val VIEW_TYPE_NO_BOOKMARK = 104
+        private const val VIEW_TYPE_EMPTY_LIST = 104
         const val VIEW_TYPE_PODCAST_HEADER = 105
         private const val VIEW_TYPE_RECOMMENDED_PODCAST = 106
         private const val VIEW_TYPE_PODROLL_HEADER = 107
         private const val VIEW_TYPE_DIVIDER_LINE = 108
         private const val VIEW_TYPE_PADDING_ROW = 109
+        private const val VIEW_TYPE_LOADING_ROW = 110
         val VIEW_TYPE_EPISODE_HEADER = R.layout.adapter_episode_header
         val VIEW_TYPE_EPISODE_LIMIT_ROW = R.layout.adapter_episode_limit
         val VIEW_TYPE_NO_RESULTS = R.layout.adapter_no_results
@@ -285,11 +297,12 @@ class PodcastAdapter(
             VIEW_TYPE_BOOKMARKS -> BookmarkViewHolder(ComposeView(parent.context), theme)
             VIEW_TYPE_BOOKMARK_HEADER -> BookmarkHeaderViewHolder(ComposeView(parent.context), theme)
             VIEW_TYPE_BOOKMARK_UPSELL -> BookmarkUpsellViewHolder(ComposeView(parent.context), onGetBookmarksClicked, theme)
-            VIEW_TYPE_NO_BOOKMARK -> NoBookmarkViewHolder(ComposeView(parent.context), theme, onHeadsetSettingsClicked)
+            VIEW_TYPE_EMPTY_LIST -> EmptyListViewHolder(ComposeView(parent.context), theme)
             VIEW_TYPE_RECOMMENDED_PODCAST -> RecommendedPodcastViewHolder(ComposeView(parent.context), theme)
             VIEW_TYPE_PODROLL_HEADER -> PodrollViewHolder(ComposeView(parent.context), theme)
             VIEW_TYPE_DIVIDER_LINE -> DividerLineViewHolder(ComposeView(parent.context), theme)
             VIEW_TYPE_PADDING_ROW -> PaddingViewHolder(ComposeView(parent.context))
+            VIEW_TYPE_LOADING_ROW -> LoadingViewHolder(ComposeView(parent.context), theme)
             else -> EpisodeViewHolder(
                 binding = AdapterEpisodeBinding.inflate(inflater, parent, false),
                 viewMode = if (settings.artworkConfiguration.value.useEpisodeArtwork(Element.Podcasts)) {
@@ -327,11 +340,12 @@ class PodcastAdapter(
             is BookmarkViewHolder -> holder.bind(getItem(position) as BookmarkItemData)
             is BookmarkHeaderViewHolder -> holder.bind(getItem(position) as BookmarkHeader)
             is BookmarkUpsellViewHolder -> holder.bind()
-            is NoBookmarkViewHolder -> holder.bind()
+            is EmptyListViewHolder -> holder.bind(getItem(position) as EmptyList)
             is RecommendedPodcastViewHolder -> holder.bind(getItem(position) as RecommendedPodcast)
             is PodrollViewHolder -> holder.bind(getItem(position) as PodrollHeaderRow)
             is DividerLineViewHolder -> holder.bind()
             is PaddingViewHolder -> holder.bind(getItem(position) as PaddingRow)
+            is LoadingViewHolder -> holder.bind()
         }
     }
 
@@ -465,7 +479,6 @@ class PodcastAdapter(
         episodeLimit: Int?,
         episodeLimitIndex: Int?,
         podcast: Podcast,
-        tabs: List<PodcastTab>,
         context: Context,
     ) {
         val grouping = podcast.grouping
@@ -489,7 +502,7 @@ class PodcastAdapter(
         }
         val content = mutableListOf<Any>().apply {
             add(Podcast())
-            add(TabsHeader(tabs = tabs, selectedTab = PodcastTab.EPISODES, onTabClicked = onTabClicked))
+            add(TabsHeader(selectedTab = PodcastTab.EPISODES, onTabClicked = onTabClicked))
             add(
                 EpisodeHeader(
                     showingArchived = showingArchived,
@@ -539,17 +552,25 @@ class PodcastAdapter(
         bookmarks: List<Bookmark>,
         episodes: List<BaseEpisode>,
         searchTerm: String,
-        tabs: List<PodcastTab>,
         context: Context,
     ) {
         val content = mutableListOf<Any>().apply {
             add(Podcast())
-            add(TabsHeader(tabs = tabs, selectedTab = PodcastTab.BOOKMARKS, onTabClicked = onTabClicked))
+            add(TabsHeader(selectedTab = PodcastTab.BOOKMARKS, onTabClicked = onTabClicked))
 
             if (!bookmarksAvailable) {
                 add(BookmarkUpsell)
             } else if (searchTerm.isEmpty() && bookmarks.isEmpty()) {
-                add(NoBookmarkMessage)
+                val resources = context.resources
+                add(
+                    EmptyList(
+                        title = resources.getString(LR.string.bookmarks_empty_state_title),
+                        subtitle = resources.getString(LR.string.bookmarks_paid_user_empty_state_message),
+                        iconResourceId = IR.drawable.ic_bookmark,
+                        buttonText = resources.getString(LR.string.bookmarks_headphone_settings),
+                        onButtonClick = onHeadsetSettingsClicked,
+                    ),
+                )
             } else {
                 add(
                     BookmarkHeader(
@@ -596,46 +617,61 @@ class PodcastAdapter(
         submitList(content)
     }
 
-    fun setRecommendations(
-        result: RecommendationsResult,
-        tabs: List<PodcastTab>,
-    ) {
+    fun setRecommendations(result: RecommendationsResult) {
         val content = buildList {
             add(Podcast())
-            add(TabsHeader(tabs = tabs, selectedTab = PodcastTab.RECOMMENDATIONS, onTabClicked = onTabClicked))
-            if (result is RecommendationsResult.Success) {
-                val list = result.listFeed
-                // Podroll
-                val podroll = list.podroll
-                if (!podroll.isNullOrEmpty()) {
-                    add(PodrollHeaderRow(onClick = onPodrollHeaderClicked))
-                    podroll.forEachIndexed { index, podcast ->
+            add(TabsHeader(selectedTab = PodcastTab.RECOMMENDATIONS, onTabClicked = onTabClicked))
+            when (result) {
+                is RecommendationsResult.Loading -> {
+                    add(PaddingRow(32.dp))
+                    add(LoadingRow)
+                    add(PaddingRow(12.dp))
+                }
+                is RecommendationsResult.Empty -> {
+                    val resources = context.resources
+                    add(
+                        EmptyList(
+                            title = resources.getString(LR.string.you_might_like_empty_title),
+                            iconResourceId = IR.drawable.ic_exclamation_circle,
+                            buttonText = resources.getString(LR.string.you_might_like_empty_button),
+                            onButtonClick = onRecommendedRetryClicked,
+                        ),
+                    )
+                }
+                is RecommendationsResult.Success -> {
+                    val list = result.listFeed
+                    // Podroll
+                    val podroll = list.podroll
+                    if (!podroll.isNullOrEmpty()) {
+                        add(PodrollHeaderRow(onClick = onPodrollHeaderClicked))
+                        podroll.forEachIndexed { index, podcast ->
+                            add(
+                                RecommendedPodcast(
+                                    listDate = list.date ?: "",
+                                    podcast = podcast,
+                                    onRowClick = { podcastUuid, _ -> onPodrollPodcastClicked(podcastUuid) },
+                                    onSubscribeClick = { podcastUuid, _ -> onPodrollPodcastSubscribeClicked(podcastUuid) },
+                                ),
+                            )
+                        }
+                        add(PaddingRow(12.dp))
+                        add(DividerLineRow)
+                    }
+                    add(PaddingRow(12.dp))
+                    // Recommended "You might like" podcasts
+                    val podcasts = list.podcasts
+                    podcasts?.forEachIndexed { index, podcast ->
                         add(
                             RecommendedPodcast(
                                 listDate = list.date ?: "",
                                 podcast = podcast,
-                                onRowClick = { podcastUuid, _ -> onPodrollPodcastClicked(podcastUuid) },
-                                onSubscribeClick = { podcastUuid, _ -> onPodrollPodcastSubscribeClicked(podcastUuid) },
+                                onRowClick = onRecommendedPodcastClicked,
+                                onSubscribeClick = onRecommendedPodcastSubscribeClicked,
                             ),
                         )
                     }
                     add(PaddingRow(12.dp))
-                    add(DividerLineRow)
                 }
-                add(PaddingRow(12.dp))
-                // Recommended podcasts
-                val podcasts = list.podcasts
-                podcasts?.forEachIndexed { index, podcast ->
-                    add(
-                        RecommendedPodcast(
-                            listDate = list.date ?: "",
-                            podcast = podcast,
-                            onRowClick = onRecommendedPodcastClicked,
-                            onSubscribeClick = onRecommendedPodcastSubscribeClicked,
-                        ),
-                    )
-                }
-                add(PaddingRow(12.dp))
             }
         }
         submitList(content)
@@ -661,11 +697,12 @@ class PodcastAdapter(
             is BookmarkItemData -> VIEW_TYPE_BOOKMARKS
             is BookmarkHeader -> VIEW_TYPE_BOOKMARK_HEADER
             is BookmarkUpsell -> VIEW_TYPE_BOOKMARK_UPSELL
-            is NoBookmarkMessage -> VIEW_TYPE_NO_BOOKMARK
+            is EmptyList -> VIEW_TYPE_EMPTY_LIST
             is RecommendedPodcast -> VIEW_TYPE_RECOMMENDED_PODCAST
             is PodrollHeaderRow -> VIEW_TYPE_PODROLL_HEADER
             is DividerLineRow -> VIEW_TYPE_DIVIDER_LINE
             is PaddingRow -> VIEW_TYPE_PADDING_ROW
+            is LoadingRow -> VIEW_TYPE_LOADING_ROW
             else -> R.layout.adapter_episode
         }
     }
@@ -680,7 +717,7 @@ class PodcastAdapter(
             is TabsHeader -> Long.MAX_VALUE - 4
             is BookmarkHeader -> Long.MAX_VALUE - 5
             is BookmarkUpsell -> Long.MAX_VALUE - 6
-            is NoBookmarkMessage -> Long.MAX_VALUE - 7
+            is EmptyList -> Long.MAX_VALUE - 7
             is DividerRow -> item.groupIndex.toLong()
             is PodcastEpisode -> item.adapterId
             is BookmarkItemData -> item.bookmark.adapterId
@@ -688,6 +725,7 @@ class PodcastAdapter(
             is PodrollHeaderRow -> Long.MAX_VALUE - 8
             is DividerLineRow -> Long.MAX_VALUE - 9
             is PaddingRow -> Long.MAX_VALUE - 10
+            is LoadingRow -> Long.MAX_VALUE - 11
             else -> throw IllegalStateException("Unknown item type")
         }
     }

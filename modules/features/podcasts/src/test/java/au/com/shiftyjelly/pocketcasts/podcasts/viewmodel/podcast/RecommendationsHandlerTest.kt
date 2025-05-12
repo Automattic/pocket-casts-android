@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.podcast
 
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
@@ -39,7 +40,13 @@ class RecommendationsHandlerTest {
         listWebService = mock()
         val listRepository = ListRepository(listWebService = listWebService, syncManager = null, platform = "android")
         podcastManager = mock()
-        recommendations = RecommendationsHandler(listRepository, podcastManager)
+
+        val discoverCountryCode = mock<UserSetting<String>>()
+        whenever(discoverCountryCode.value).thenReturn("us")
+        val settings = mock<Settings>()
+        whenever(settings.discoverCountryCode).thenReturn(discoverCountryCode)
+
+        recommendations = RecommendationsHandler(listRepository, podcastManager, settings)
 
         testPodcast = Podcast(uuid = UUID.randomUUID().toString())
         testDiscoverPodcasts = listOf(
@@ -73,7 +80,7 @@ class RecommendationsHandlerTest {
         recommendations.setEnabled(true)
 
         // expected URL for the list recommendation
-        val listUrl = "${Settings.SERVER_API_URL}/recommendations/podcast/${testPodcast.uuid}"
+        val listUrl = "${Settings.SERVER_API_URL}/recommendations/podcast/${testPodcast.uuid}?country=us"
         whenever(listWebService.getListFeed(listUrl)).thenReturn(testListFeed)
 
         // mark the first podcast as subscribed

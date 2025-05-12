@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -49,7 +50,7 @@ fun EmptyState(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
-        modifier = modifier.padding(horizontal = 32.dp),
+        modifier = modifier.fillMaxWidth().padding(horizontal = 32.dp),
     ) {
         if (isPortraitOrTablet) {
             Spacer(Modifier.height(heightPadding))
@@ -70,16 +71,18 @@ fun EmptyState(
             fontWeight = FontWeight.W500,
         )
 
-        Spacer(Modifier.height(heightPadding))
+        if (subtitle.isNotEmpty()) {
+            Spacer(Modifier.height(heightPadding))
 
-        TextP40(
-            text = subtitle,
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.theme.colors.primaryText02,
-            fontSize = 15.sp,
-            fontWeight = FontWeight.W400,
-            modifier = Modifier.widthIn(max = 330.dp),
-        )
+            TextP40(
+                text = subtitle,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.theme.colors.primaryText02,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.W400,
+                modifier = Modifier.widthIn(max = 330.dp),
+            )
+        }
 
         buttonText?.let {
             Spacer(Modifier.height(heightPadding))
