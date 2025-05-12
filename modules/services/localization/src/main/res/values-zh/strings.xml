@@ -392,8 +392,6 @@ Language: zh_CN
     <string name="single_chapter">1 个章节</string>
     <string name="number_of_chapters">%d 个章节</string>
     <string name="onboarding_plus_feature_slumber_studios_title">由 &lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt; 提供的一年独家内容</string>
-    <string name="onboarding_plus_recurring_after_intro_offer_sufix">第一年之后</string>
-    <string name="onboarding_plus_recurring_after_intro_offer">定期付款费用为 %s</string>
     <string name="half_price_first_year">首年享 5 折优惠</string>
     <string name="plus_offer_duration">%s 优惠</string>
     <string name="onboarding_plus_feature_watch_playback">Apple Watch &amp; Wear OS 应用程序</string>
@@ -693,7 +691,6 @@ Language: zh_CN
     <string name="onboarding_welcome_recommendations_title">发现新事物</string>
     <string name="onboarding_welcome_get_you_listening_plus">谢谢，现在开始聆听吧！</string>
     <string name="onboarding_welcome_get_you_listening">欢迎，现在开始聆听吧！</string>
-    <string name="onboarding_plus_recurring_after_free_trial">定期付款将在您的 %s 后开始</string>
     <string name="onboarding_plus_start_free_trial_and_subscribe">开始免费试用版并订阅</string>
     <string name="onboarding_plus_terms_and_conditions">条款和条件</string>
     <string name="onboarding_plus_privacy_policy">隐私政策</string>

@@ -4,18 +4,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.analytics.TracksAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PLUS_MONTHLY_PRODUCT_ID
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PLUS_YEARLY_PRODUCT_ID
-import au.com.shiftyjelly.pocketcasts.payment.PaymentResultCode
-import au.com.shiftyjelly.pocketcasts.payment.PurchaseResult
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
-import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.disposables.CompositeDisposable
@@ -44,58 +38,8 @@ class CreateAccountViewModel
     lateinit var subscriptionManager: SubscriptionManager
 
     companion object {
-        private const val PRODUCT_KEY = "product"
-        private const val OFFER_TYPE_KEY = "offer_type"
-        private const val OFFER_TYPE_NONE = "none"
-        private const val OFFER_TYPE_FREE_TRIAL = "free_trial"
-        private const val OFFER_TYPE_INTRO_OFFER = "intro_offer"
-        private const val ERROR_KEY = "error"
-        private const val ERROR_CODE_KEY = "error_code"
         private const val SOURCE_KEY = "source"
         private const val ENABLED_KEY = "enabled"
-
-        fun trackPurchaseEvent(subscription: Subscription?, purchaseResult: PurchaseResult, source: OnboardingUpgradeSource, analyticsTracker: AnalyticsTracker) {
-            val productKey = subscription?.productDetails?.productId?.let {
-                if (it in listOf(PLUS_MONTHLY_PRODUCT_ID, PLUS_YEARLY_PRODUCT_ID)) {
-                    // retain short product id for plus subscriptions
-                    // extract part of the product id after the last period ("com.pocketcasts.plus.monthly" -> "monthly")
-                    it.split('.').lastOrNull()
-                } else {
-                    it // return full product id for new products
-                }
-            } ?: TracksAnalyticsTracker.INVALID_OR_NULL_VALUE
-            val offerType = when (subscription) {
-                is Subscription.Trial -> OFFER_TYPE_FREE_TRIAL
-                is Subscription.Intro -> OFFER_TYPE_INTRO_OFFER
-                else -> OFFER_TYPE_NONE
-            }
-
-            val analyticsProperties = mapOf(
-                PRODUCT_KEY to productKey,
-                OFFER_TYPE_KEY to offerType,
-                SOURCE_KEY to source.analyticsValue,
-            )
-
-            when (purchaseResult) {
-                is PurchaseResult.Purchased -> analyticsTracker.track(AnalyticsEvent.PURCHASE_SUCCESSFUL, analyticsProperties)
-
-                is PurchaseResult.Cancelled -> analyticsTracker.track(AnalyticsEvent.PURCHASE_CANCELLED)
-
-                is PurchaseResult.Failure -> {
-                    analyticsTracker.track(
-                        AnalyticsEvent.PURCHASE_FAILED,
-                        analyticsProperties + purchaseResult.code.analyticProperties(),
-                    )
-                }
-            }
-        }
-
-        private fun PaymentResultCode.analyticProperties() = buildMap {
-            put(ERROR_KEY, analyticsValue)
-            if (this@analyticProperties is PaymentResultCode.Unknown) {
-                put(ERROR_CODE_KEY, code)
-            }
-        }
     }
 
     private fun errorUpdate(error: CreateAccountError, add: Boolean) {
@@ -229,19 +173,13 @@ enum class SubscriptionType(val value: String) {
 }
 
 enum class CreateAccountError {
-    CANNOT_LOAD_SUBS,
     INVALID_EMAIL,
     INVALID_PASSWORD,
     CANNOT_CREATE_ACCOUNT,
-    CANNOT_CREATE_SUB,
-    CANCELLED_CREATE_SUB,
 }
 
 sealed class CreateAccountState {
     object CurrentlyValid : CreateAccountState()
-    object SubscriptionTypeChosen : CreateAccountState()
-    object ProductsLoading : CreateAccountState()
-    data class ProductsLoaded(val list: List<Subscription>) : CreateAccountState()
     object AccountCreating : CreateAccountState()
     object AccountCreated : CreateAccountState()
     object SubscriptionCreated : CreateAccountState()

@@ -392,8 +392,6 @@ Language: ru
     <string name="single_chapter">1 глава</string>
     <string name="number_of_chapters">Глав: %d</string>
     <string name="onboarding_plus_feature_slumber_studios_title">Эксклюзивный контент от &lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt; на 1 год</string>
-    <string name="onboarding_plus_recurring_after_intro_offer_sufix">по окончании первого года</string>
-    <string name="onboarding_plus_recurring_after_intro_offer">Регулярный платёж %s</string>
     <string name="half_price_first_year">Скидка 50 % на первый год</string>
     <string name="plus_offer_duration">Предложение %s</string>
     <string name="onboarding_plus_feature_watch_playback">Приложения для Apple Watch и Wear OS</string>
@@ -693,7 +691,6 @@ Language: ru
     <string name="onboarding_welcome_recommendations_title">Найдите для себя что-то новое</string>
     <string name="onboarding_welcome_get_you_listening_plus">Спасибо. А теперь давайте что-нибудь послушаем!</string>
     <string name="onboarding_welcome_get_you_listening">Добро пожаловать. Давайте что-нибудь послушаем!</string>
-    <string name="onboarding_plus_recurring_after_free_trial">Регулярные платежи начнут списываться, когда вы %s</string>
     <string name="onboarding_plus_start_free_trial_and_subscribe">Начать бесплатный пробный период и подписаться</string>
     <string name="onboarding_plus_terms_and_conditions">Условия предоставления услуг</string>
     <string name="onboarding_plus_privacy_policy">Политику конфиденциальности</string>

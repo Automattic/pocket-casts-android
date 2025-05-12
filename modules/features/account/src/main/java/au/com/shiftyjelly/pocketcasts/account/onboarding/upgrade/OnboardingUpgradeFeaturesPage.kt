@@ -39,7 +39,6 @@ import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -58,14 +57,13 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import au.com.shiftyjelly.pocketcasts.account.components.SubscriptionPriceLabel
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradeFeatureItem
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UpgradeRowButton
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
@@ -80,8 +78,8 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.images.OfferBadge
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
+import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
@@ -92,17 +90,15 @@ private const val MIN_SCREEN_WIDTH_FOR_HORIZONTAL_DISPLAY = 400
 
 @Composable
 internal fun OnboardingUpgradeFeaturesPage(
+    viewModel: OnboardingUpgradeFeaturesViewModel,
+    state: OnboardingUpgradeFeaturesState,
     flow: OnboardingFlow,
     source: OnboardingUpgradeSource,
     onBackPressed: () -> Unit,
     onClickSubscribe: (showUpgradeBottomSheet: Boolean) -> Unit,
     onNotNowPressed: () -> Unit,
-    canUpgrade: Boolean,
     onUpdateSystemBars: (SystemBarsStyles) -> Unit,
 ) {
-    val viewModel = hiltViewModel<OnboardingUpgradeFeaturesViewModel>()
-    val state by viewModel.state.collectAsState()
-
     @Suppress("NAME_SHADOWING")
     val onNotNowPressed = {
         viewModel.onNotNow(flow, source)
@@ -125,25 +121,23 @@ internal fun OnboardingUpgradeFeaturesPage(
     when (state) {
         is OnboardingUpgradeFeaturesState.Loading -> Unit // Do Nothing
         is OnboardingUpgradeFeaturesState.Loaded -> {
-            val loadedState = state as OnboardingUpgradeFeaturesState.Loaded
             UpgradeLayout(
-                state = loadedState,
+                state = state,
                 source = source,
                 scrollState = scrollState,
-                onBackPressed = onBackPressed,
-                onNotNowPressed = onNotNowPressed,
-                onSubscriptionFrequencyChanged = { viewModel.onSubscriptionFrequencyChanged(it) },
-                onFeatureCardChanged = { viewModel.onFeatureCardChanged(loadedState.featureCardsState.featureCards[it]) },
+                onBackPress = onBackPressed,
+                onNotNowPress = onNotNowPressed,
+                onChangeBillingCycle = { viewModel.changeBillingCycle(it) },
+                onChangeSubscriptionTier = { viewModel.changeSubscriptionTier(it) },
                 onClickSubscribe = { onClickSubscribe(false) },
-                canUpgrade = canUpgrade,
-                onPrivacyPolicyClick = { viewModel.onPrivacyPolicyPressed() },
-                onTermsAndConditionsClick = { viewModel.onTermsAndConditionsPressed() },
+                onClickPrivacyPolicy = { viewModel.onPrivacyPolicyPressed() },
+                onClickTermsAndConditions = { viewModel.onTermsAndConditionsPressed() },
             )
         }
 
         is OnboardingUpgradeFeaturesState.NoSubscriptions -> {
             NoSubscriptionsLayout(
-                showNotNow = (state as OnboardingUpgradeFeaturesState.NoSubscriptions).showNotNow,
+                showNotNow = source == OnboardingUpgradeSource.RECOMMENDATIONS,
                 onBackPressed = onBackPressed,
                 onNotNowPressed = onNotNowPressed,
             )
@@ -156,15 +150,14 @@ private fun UpgradeLayout(
     state: OnboardingUpgradeFeaturesState.Loaded,
     source: OnboardingUpgradeSource,
     scrollState: ScrollState,
-    onBackPressed: () -> Unit,
-    onNotNowPressed: () -> Unit,
-    onSubscriptionFrequencyChanged: (SubscriptionFrequency) -> Unit,
-    onFeatureCardChanged: (Int) -> Unit,
+    onBackPress: () -> Unit,
+    onNotNowPress: () -> Unit,
+    onChangeBillingCycle: (BillingCycle) -> Unit,
+    onChangeSubscriptionTier: (SubscriptionTier) -> Unit,
     onClickSubscribe: () -> Unit,
+    onClickPrivacyPolicy: () -> Unit,
+    onClickTermsAndConditions: () -> Unit,
     modifier: Modifier = Modifier,
-    onPrivacyPolicyClick: () -> Unit = {},
-    onTermsAndConditionsClick: () -> Unit = {},
-    canUpgrade: Boolean,
 ) {
     Box(
         modifier = modifier.fillMaxHeight(),
@@ -180,8 +173,8 @@ private fun UpgradeLayout(
         ) {
             OnboardingUpgradeHelper.UpgradeBackground(
                 modifier = Modifier.verticalScroll(scrollState),
-                tier = state.currentFeatureCard.subscriptionTier,
-                backgroundGlowsRes = state.currentFeatureCard.backgroundGlowsRes,
+                tier = state.selectedPlan.key.tier,
+                backgroundGlowsRes = state.selectedPlan.backgroundGlowsRes,
             ) {
                 Column(
                     Modifier
@@ -198,19 +191,19 @@ private fun UpgradeLayout(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         NavigationIconButton(
-                            onNavigationClick = onBackPressed,
+                            onNavigationClick = onBackPress,
                             iconColor = Color.White,
                             modifier = Modifier
                                 .height(48.dp)
                                 .width(48.dp),
                         )
-                        if (state.showNotNow) {
+                        if (source == OnboardingUpgradeSource.RECOMMENDATIONS) {
                             TextH30(
                                 text = stringResource(LR.string.not_now),
                                 color = Color.White,
                                 modifier = Modifier
                                     .padding(horizontal = 24.dp)
-                                    .clickable { onNotNowPressed() },
+                                    .clickable { onNotNowPress() },
                             )
                         }
                     }
@@ -219,12 +212,11 @@ private fun UpgradeLayout(
 
                     Column {
                         Box(
-                            modifier = Modifier
-                                .heightIn(min = 70.dp),
+                            modifier = Modifier.heightIn(min = 70.dp),
                             contentAlignment = Alignment.Center,
                         ) {
                             AutoResizeText(
-                                text = stringResource(state.currentFeatureCard.titleRes(source)),
+                                text = stringResource(state.selectedPlan.customFeatureTitle(source)),
                                 color = Color.White,
                                 maxFontSize = 22.sp,
                                 lineHeight = 30.sp,
@@ -246,16 +238,15 @@ private fun UpgradeLayout(
                                 .padding(bottom = 24.dp),
                             contentAlignment = Alignment.Center,
                         ) {
+                            val billingCycles = remember(state.availablePlans) {
+                                state.availablePlans
+                                    .map { it.key.billingCycle }
+                                    .distinct()
+                            }
                             SegmentedTabBar(
-                                items = state.subscriptionFrequencies
-                                    .map { stringResource(id = it.localisedLabelRes) },
-                                selectedIndex = state.subscriptionFrequencies.indexOf(
-                                    state.currentSubscriptionFrequency,
-                                ),
-                                onItemSelected = {
-                                    val selectedFrequency = state.subscriptionFrequencies[it]
-                                    onSubscriptionFrequencyChanged(selectedFrequency)
-                                },
+                                items = billingCycles.map { stringResource(it.labelRes) },
+                                selectedIndex = billingCycles.indexOf(state.selectedPlan.key.billingCycle),
+                                onItemSelected = { index -> onChangeBillingCycle(billingCycles[index]) },
                                 modifier = Modifier.width(IntrinsicSize.Max),
                             )
                         }
@@ -263,10 +254,9 @@ private fun UpgradeLayout(
                         FeatureCards(
                             modifier = Modifier.focusRequester(focusPager),
                             state = state,
-                            upgradeButton = state.currentUpgradeButton,
-                            onFeatureCardChanged = onFeatureCardChanged,
-                            onPrivacyPolicyClick = onPrivacyPolicyClick,
-                            onTermsAndConditionsClick = onTermsAndConditionsClick,
+                            onChangeSubscriptionTier = onChangeSubscriptionTier,
+                            onPrivacyPolicyClick = onClickPrivacyPolicy,
+                            onTermsAndConditionsClick = onClickTermsAndConditions,
                         )
                     }
 
@@ -275,41 +265,34 @@ private fun UpgradeLayout(
             }
         }
 
-        if (canUpgrade) {
-            UpgradeButton(
-                upFocusRequester = focusPager,
-                button = state.currentUpgradeButton,
-                onClickSubscribe = onClickSubscribe,
-            )
-        }
+        UpgradeButton(
+            selectedPlan = state.selectedPlan,
+            upFocusRequester = focusPager,
+            onClickSubscribe = onClickSubscribe,
+        )
     }
 }
 
 @Composable
 fun FeatureCards(
     state: OnboardingUpgradeFeaturesState.Loaded,
-    upgradeButton: UpgradeButton,
-    onFeatureCardChanged: (Int) -> Unit,
+    onChangeSubscriptionTier: (SubscriptionTier) -> Unit,
     modifier: Modifier = Modifier,
     onPrivacyPolicyClick: () -> Unit = {},
     onTermsAndConditionsClick: () -> Unit = {},
 ) {
-    val featureCardsState = state.featureCardsState
-    val currentSubscriptionFrequency = state.currentSubscriptionFrequency
+    val subscriptionPlans = state.availablePlans.filter { it.key.billingCycle == state.selectedPlan.key.billingCycle }
     HorizontalPagerWrapper(
         modifier = modifier,
-        pageCount = featureCardsState.featureCards.size,
-        initialPage = featureCardsState.featureCards.indexOf(state.currentFeatureCard),
-        onPageChanged = onFeatureCardChanged,
-        showPageIndicator = featureCardsState.showPageIndicator,
+        pageCount = subscriptionPlans.size,
+        initialPage = subscriptionPlans.indexOf(state.selectedPlan).takeIf { it != -1 } ?: 0,
+        onPageChanged = { index -> onChangeSubscriptionTier(subscriptionPlans[index].key.tier) },
+        showPageIndicator = subscriptionPlans.size > 1,
         pageSize = PageSize.Fixed(LocalConfiguration.current.screenWidthDp.dp - 64.dp),
         contentPadding = PaddingValues(horizontal = 32.dp),
     ) { index, pagerHeight, focusRequester ->
         FeatureCard(
-            subscription = state.currentSubscription,
-            card = featureCardsState.featureCards[index],
-            subscriptionFrequency = currentSubscriptionFrequency,
-            upgradeButton = upgradeButton,
+            subscriptionPlan = subscriptionPlans[index],
             onPrivacyPolicyClick = onPrivacyPolicyClick,
             onTermsAndConditionsClick = onTermsAndConditionsClick,
             modifier = if (pagerHeight > 0) {
@@ -327,10 +310,7 @@ private val secondaryTextColor = Color(0xFF6F7580)
 
 @Composable
 private fun FeatureCard(
-    card: UpgradeFeatureCard,
-    upgradeButton: UpgradeButton,
-    subscription: Subscription,
-    subscriptionFrequency: SubscriptionFrequency,
+    subscriptionPlan: OnboardingSubscriptionPlan,
     modifier: Modifier = Modifier,
     onPrivacyPolicyClick: () -> Unit = {},
     onTermsAndConditionsClick: () -> Unit = {},
@@ -358,8 +338,8 @@ private fun FeatureCard(
                         .padding(bottom = 12.dp),
                 ) {
                     SubscriptionBadge(
-                        iconRes = card.iconRes,
-                        shortNameRes = card.shortNameRes,
+                        iconRes = subscriptionPlan.badgeIconRes,
+                        shortNameRes = subscriptionPlan.shortNameRes,
                         backgroundColor = Color.Black,
                         textColor = Color.White,
                         modifier = Modifier
@@ -367,13 +347,13 @@ private fun FeatureCard(
                             .wrapContentHeight(),
                     )
 
-                    if (subscription is Subscription.WithOffer) {
-                        val offerText = subscription.badgeOfferText(LocalContext.current.resources)
-                        offerBadgeTextLength = offerText.length
+                    val offerBadgeText = subscriptionPlan.offerBadgeText
+                    if (offerBadgeText != null) {
+                        offerBadgeTextLength = offerBadgeText.length
                         OfferBadge(
-                            text = offerText,
-                            backgroundColor = upgradeButton.backgroundColorRes,
-                            textColor = upgradeButton.textColorRes,
+                            text = offerBadgeText,
+                            backgroundColor = subscriptionPlan.offerBadgeColorRes,
+                            textColor = subscriptionPlan.offerBadgeTextColorRes,
                             modifier = Modifier.padding(start = 4.dp),
                         )
                     }
@@ -385,8 +365,8 @@ private fun FeatureCard(
                         .padding(bottom = 8.dp),
                 ) {
                     SubscriptionBadge(
-                        iconRes = card.iconRes,
-                        shortNameRes = card.shortNameRes,
+                        iconRes = subscriptionPlan.badgeIconRes,
+                        shortNameRes = subscriptionPlan.shortNameRes,
                         backgroundColor = Color.Black,
                         textColor = Color.White,
                         modifier = Modifier
@@ -394,14 +374,14 @@ private fun FeatureCard(
                             .wrapContentHeight(),
                     )
 
-                    if (subscription is Subscription.WithOffer) {
-                        val offerText = subscription.badgeOfferText(LocalContext.current.resources)
-                        offerBadgeTextLength = offerText.length
+                    val offerBadgeText = subscriptionPlan.offerBadgeText
+                    if (offerBadgeText != null) {
+                        offerBadgeTextLength = offerBadgeText.length
                         OfferBadge(
-                            text = offerText,
-                            backgroundColor = upgradeButton.backgroundColorRes,
-                            textColor = upgradeButton.textColorRes,
-                            modifier = Modifier.padding(top = 4.dp),
+                            text = offerBadgeText,
+                            backgroundColor = subscriptionPlan.offerBadgeColorRes,
+                            textColor = subscriptionPlan.offerBadgeTextColorRes,
+                            modifier = Modifier.padding(start = 4.dp),
                         )
                     }
                 }
@@ -410,21 +390,25 @@ private fun FeatureCard(
             Column(
                 modifier = Modifier.focusGroup(),
             ) {
-                SubscriptionProductAmountHorizontal(
+                SubscriptionPriceLabel(
+                    subscriptionPlan = subscriptionPlan,
                     isFocusable = true,
-                    subscription = subscription,
-                    hasBackgroundAlwaysWhite = true,
+                    primaryTextColor = Color.Black,
                     secondaryTextColor = secondaryTextColor,
                 )
 
-                Spacer(modifier = Modifier.padding(vertical = 4.dp))
+                Spacer(
+                    modifier = Modifier.padding(vertical = 4.dp),
+                )
 
-                card.featureItems(subscriptionFrequency).forEach {
-                    UpgradeFeatureItem(
-                        item = it,
-                    )
+                subscriptionPlan.featureItems.forEach { item ->
+                    UpgradeFeatureItem(item = item)
                 }
-                Spacer(modifier = Modifier.weight(1f))
+
+                Spacer(
+                    modifier = Modifier.weight(1f),
+                )
+
                 OnboardingUpgradeHelper.PrivacyPolicy(
                     modifier = Modifier.focusable(),
                     color = secondaryTextColor,
@@ -441,15 +425,10 @@ private fun FeatureCard(
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun UpgradeButton(
-    button: UpgradeButton,
+    selectedPlan: OnboardingSubscriptionPlan,
     onClickSubscribe: () -> Unit,
     upFocusRequester: FocusRequester,
 ) {
-    val resources = LocalContext.current.resources
-    val shortName = resources.getString(button.shortNameRes)
-    val upgradeButtonText =
-        if (button.subscription is Subscription.Trial) stringResource(LR.string.onboarding_start_free_trial_upgrade_button) else stringResource(LR.string.upgrade_to, shortName)
-
     Box(
         contentAlignment = Alignment.BottomCenter,
         modifier = Modifier
@@ -463,9 +442,9 @@ internal fun UpgradeButton(
     ) {
         Column {
             UpgradeRowButton(
-                primaryText = upgradeButtonText,
-                backgroundColor = colorResource(button.backgroundColorRes),
-                textColor = colorResource(button.textColorRes),
+                primaryText = selectedPlan.ctaButtonText(isRenewingSubscription = false),
+                backgroundColor = selectedPlan.ctaButtonBackgroundColor,
+                textColor = selectedPlan.ctaButtonTextColor,
                 fontWeight = FontWeight.W500,
                 onClick = onClickSubscribe,
                 modifier = Modifier
@@ -474,8 +453,7 @@ internal fun UpgradeButton(
                     .heightIn(min = 48.dp),
             )
             Spacer(
-                modifier = Modifier
-                    .windowInsetsBottomHeight(WindowInsets.navigationBars),
+                modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars),
             )
         }
     }
@@ -521,9 +499,9 @@ internal fun BoxWithConstraintsScope.calculateMinimumHeightWithInsets(): Dp {
 
 @Composable
 fun NoSubscriptionsLayout(
+    showNotNow: Boolean,
     onBackPressed: () -> Unit,
     onNotNowPressed: () -> Unit,
-    showNotNow: Boolean,
 ) {
     Column(
         Modifier
@@ -581,3 +559,8 @@ private fun Modifier.fadeBackground() = this
             drawContent()
         }
     }
+
+private val BillingCycle.labelRes get() = when (this) {
+    BillingCycle.Monthly -> LR.string.plus_monthly
+    BillingCycle.Yearly -> LR.string.plus_yearly
+}

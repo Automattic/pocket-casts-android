@@ -9,26 +9,42 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
 import androidx.core.content.IntentCompat
 import androidx.core.view.WindowCompat
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContract.OnboardingFinish
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingActivityViewModel
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesViewModel
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
 import kotlinx.coroutines.reactive.asFlow
 
 @AndroidEntryPoint
 class OnboardingActivity : AppCompatActivity() {
+    @Inject
+    lateinit var theme: Theme
 
-    @Inject lateinit var theme: Theme
+    @Inject
+    lateinit var userManager: UserManager
 
-    @Inject lateinit var userManager: UserManager
+    private val viewModel by viewModels<OnboardingActivityViewModel>()
 
-    private val viewModel: OnboardingActivityViewModel by viewModels()
+    private val upgradeFeaturesViewModel by viewModels<OnboardingUpgradeFeaturesViewModel>(
+        extrasProducer = {
+            defaultViewModelCreationExtras.withCreationCallback<OnboardingUpgradeFeaturesViewModel.Factory> { factory ->
+                factory.create(onboardingFlow)
+            }
+        },
+    )
+
+    private val onboardingFlow
+        get() = requireNotNull(IntentCompat.getParcelableExtra(intent, ANALYTICS_FLOW_KEY, OnboardingFlow::class.java)) {
+            "Onboarding flow is not set"
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,6 +52,7 @@ class OnboardingActivity : AppCompatActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
+            val onboardingState by upgradeFeaturesViewModel.state.collectAsState()
             val signInState = userManager.getSignInState().asFlow().collectAsState(null)
             val currentSignInState = signInState.value
 
@@ -43,10 +60,6 @@ class OnboardingActivity : AppCompatActivity() {
             finishState.value?.let { finishWithResult(it) }
 
             if (currentSignInState != null) {
-                val onboardingFlow = remember(savedInstanceState) {
-                    IntentCompat.getParcelableExtra(intent, ANALYTICS_FLOW_KEY, OnboardingFlow::class.java)
-                } ?: throw IllegalStateException("Analytics flow not set")
-
                 if (shouldSetupTheme(onboardingFlow)) {
                     theme.setupThemeForConfig(this, resources.configuration)
                 }
@@ -54,6 +67,8 @@ class OnboardingActivity : AppCompatActivity() {
                 enableEdgeToEdge()
 
                 OnboardingFlowComposable(
+                    featuresViewModel = upgradeFeaturesViewModel,
+                    state = onboardingState,
                     theme = theme.activeTheme,
                     flow = onboardingFlow,
                     exitOnboarding = { viewModel.onExitOnboarding(it) },
@@ -75,21 +90,17 @@ class OnboardingActivity : AppCompatActivity() {
     private fun finishWithResult(result: OnboardingFinish) {
         setResult(
             Activity.RESULT_OK,
-            Intent().apply {
-                putExtra(OnboardingActivityContract.FINISH_KEY, result)
-            },
+            Intent().putExtra(OnboardingActivityContract.FINISH_KEY, result),
         )
         finish()
     }
 
-    private fun shouldSetupTheme(onboardingFlow: OnboardingFlow) =
-        (onboardingFlow !is OnboardingFlow.PlusAccountUpgrade)
+    private fun shouldSetupTheme(onboardingFlow: OnboardingFlow) = (onboardingFlow !is OnboardingFlow.PlusAccountUpgrade)
 
     companion object {
-        fun newInstance(context: Context, onboardingFlow: OnboardingFlow) =
-            Intent(context, OnboardingActivity::class.java).apply {
-                putExtra(ANALYTICS_FLOW_KEY, onboardingFlow)
-            }
+        fun newInstance(context: Context, onboardingFlow: OnboardingFlow): Intent {
+            return Intent(context, OnboardingActivity::class.java).putExtra(ANALYTICS_FLOW_KEY, onboardingFlow)
+        }
 
         private const val ANALYTICS_FLOW_KEY = "analytics_flow"
     }

@@ -17,6 +17,8 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.recommendations.Onboard
 import au.com.shiftyjelly.pocketcasts.account.onboarding.recommendations.OnboardingRecommendationsFlow.onboardingRecommendationsFlowGraph
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeFlow
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingAccountBenefitsViewModel
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesViewModel
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
@@ -30,6 +32,8 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.getSerializableCompat
 
 @Composable
 fun OnboardingFlowComposable(
+    featuresViewModel: OnboardingUpgradeFeaturesViewModel,
+    state: OnboardingUpgradeFeaturesState,
     theme: Theme.ThemeType,
     flow: OnboardingFlow,
     exitOnboarding: (OnboardingExitInfo) -> Unit,
@@ -40,7 +44,9 @@ fun OnboardingFlowComposable(
 ) {
     if (flow is OnboardingFlow.PlusAccountUpgrade) {
         Content(
-            theme,
+            featuresViewModel = featuresViewModel,
+            state = state,
+            theme = theme,
             flow = flow,
             exitOnboarding = exitOnboarding,
             completeOnboardingToDiscover = completeOnboardingToDiscover,
@@ -51,7 +57,9 @@ fun OnboardingFlowComposable(
     } else {
         AppThemeWithBackground(theme) {
             Content(
-                theme,
+                featuresViewModel = featuresViewModel,
+                state = state,
+                theme = theme,
                 flow = flow,
                 exitOnboarding = exitOnboarding,
                 completeOnboardingToDiscover = completeOnboardingToDiscover,
@@ -65,6 +73,8 @@ fun OnboardingFlowComposable(
 
 @Composable
 private fun Content(
+    featuresViewModel: OnboardingUpgradeFeaturesViewModel,
+    state: OnboardingUpgradeFeaturesState,
     theme: Theme.ThemeType,
     flow: OnboardingFlow,
     exitOnboarding: (OnboardingExitInfo) -> Unit,
@@ -84,7 +94,8 @@ private fun Content(
         // Cannot use OnboardingNavRoute.PlusUpgrade.routeWithSource here, it is set as a defaultValue in the PlusUpgrade composable,
         // see https://stackoverflow.com/a/70410872/1910286
         is OnboardingFlow.PlusAccountUpgrade,
-        is OnboardingFlow.PlusFlow,
+        is OnboardingFlow.PatronAccountUpgrade,
+        is OnboardingFlow.Upsell,
         -> OnboardingNavRoute.PlusUpgrade.route
 
         is OnboardingFlow.Welcome -> OnboardingNavRoute.welcome
@@ -97,6 +108,7 @@ private fun Content(
             flow is OnboardingFlow.ReferralLoginOrSignUp -> {
                 exitOnboarding(OnboardingExitInfo(showWelcomeInReferralFlow = true))
             }
+
             flow is OnboardingFlow.Upsell && flow.source in forcedPurchaseSources -> {
                 navController.navigate(OnboardingNavRoute.PlusUpgrade.routeWithSource(flow.source, forcePurchase = true)) {
                     // clear backstack after account is created
@@ -105,6 +117,7 @@ private fun Content(
                     }
                 }
             }
+
             else -> {
                 navController.navigate(OnboardingRecommendationsFlow.route) {
                     // clear backstack after account is created
@@ -183,7 +196,7 @@ private fun Content(
                         is OnboardingFlow.PlusAccountUpgrade,
                         is OnboardingFlow.PatronAccountUpgrade,
                         is OnboardingFlow.Welcome,
-                        -> throw IllegalStateException("Account upgrade flow tried to present LoginOrSignupPage")
+                        -> error("Account upgrade flow tried to present LoginOrSignupPage")
 
                         is OnboardingFlow.AccountEncouragement,
                         is OnboardingFlow.PlusAccountUpgradeNeedsLogin,
@@ -252,8 +265,11 @@ private fun Content(
                     type = NavType.EnumType(OnboardingUpgradeSource::class.java)
                     /* Set default value for onboarding flows with startDestination. */
                     when (flow) {
-                        is OnboardingFlow.PlusAccountUpgrade -> defaultValue = flow.source
-                        is OnboardingFlow.PlusFlow -> defaultValue = flow.source
+                        is OnboardingFlow.PlusAccountUpgrade,
+                        is OnboardingFlow.Upsell,
+                        is OnboardingFlow.PatronAccountUpgrade,
+                        -> defaultValue = flow.source
+
                         else -> Unit // Not a startDestination, default value should not be set.
                     }
                 },
@@ -301,6 +317,8 @@ private fun Content(
             }
 
             OnboardingUpgradeFlow(
+                viewModel = featuresViewModel,
+                state = state,
                 flow = flow,
                 source = upgradeSource,
                 isLoggedIn = signInState.isSignedIn,
@@ -367,9 +385,7 @@ private fun onLoginToExistingAccount(
         is OnboardingFlow.PatronAccountUpgrade,
         is OnboardingFlow.PlusAccountUpgradeNeedsLogin,
         is OnboardingFlow.Upsell,
-        -> navController.navigate(
-            OnboardingNavRoute.PlusUpgrade.routeWithSource(OnboardingUpgradeSource.LOGIN),
-        ) {
+        -> navController.navigate(OnboardingNavRoute.PlusUpgrade.routeWithSource(OnboardingUpgradeSource.LOGIN)) {
             // clear backstack after successful login
             popUpTo(OnboardingNavRoute.logInOrSignUp) { inclusive = true }
         }

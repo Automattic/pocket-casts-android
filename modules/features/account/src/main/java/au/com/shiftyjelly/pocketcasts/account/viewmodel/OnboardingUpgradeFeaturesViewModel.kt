@@ -1,120 +1,146 @@
 package au.com.shiftyjelly.pocketcasts.account.viewmodel
 
-import android.app.Application
-import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.SavedStateHandle
+import android.app.Activity
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.FeatureCardsState
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.UpgradeButton
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.UpgradeFeatureCard
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.toUpgradeButton
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.toUpgradeFeatureCard
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingSubscriptionPlan
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
+import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
+import au.com.shiftyjelly.pocketcasts.payment.PaymentResultCode
 import au.com.shiftyjelly.pocketcasts.payment.PurchaseResult
-import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlans
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.payment.flatMap
+import au.com.shiftyjelly.pocketcasts.payment.getOrNull
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.reactive.asFlow
-import timber.log.Timber
 
-@HiltViewModel
-class OnboardingUpgradeFeaturesViewModel @Inject constructor(
-    app: Application,
+@HiltViewModel(assistedFactory = OnboardingUpgradeFeaturesViewModel.Factory::class)
+class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
+    private val paymentClient: PaymentClient,
     private val analyticsTracker: AnalyticsTracker,
-    private val subscriptionManager: SubscriptionManager,
-    private val settings: Settings,
-    private val subscriptionMapper: SubscriptionMapper,
-    savedStateHandle: SavedStateHandle,
-) : AndroidViewModel(app) {
-
-    private val _state: MutableStateFlow<OnboardingUpgradeFeaturesState> = MutableStateFlow(OnboardingUpgradeFeaturesState.Loading)
-    val state: StateFlow<OnboardingUpgradeFeaturesState> = _state
-
-    private val source = savedStateHandle.get<OnboardingUpgradeSource>("source") ?: OnboardingUpgradeSource.UNKNOWN
-    private val showPatronOnly = savedStateHandle.get<Boolean>("show_patron_only")
+    @Assisted private val flow: OnboardingFlow,
+) : ViewModel() {
+    private val _state = MutableStateFlow<OnboardingUpgradeFeaturesState>(OnboardingUpgradeFeaturesState.Loading)
+    val state = _state.asStateFlow()
 
     init {
         viewModelScope.launch {
-            subscriptionManager
-                .observeProductDetails()
-                .asFlow()
-                .stateIn(viewModelScope)
-                .collect { productDetails ->
-                    val subscriptions = when (productDetails) {
-                        is ProductDetailsState.Failure -> emptyList()
-                        is ProductDetailsState.Loaded -> productDetails.productDetails.mapNotNull { productDetailsState ->
-                            subscriptionMapper.mapFromProductDetails(
-                                productDetails = productDetailsState,
-                                isOfferEligible = subscriptionManager.isOfferEligible(
-                                    SubscriptionTier.fromProductId(productDetailsState.productId),
-                                ),
-                            )
-                        }
-                    }
-                    val filteredOffer = Subscription.filterOffers(subscriptions)
-                    updateState(filteredOffer)
-                }
+            val subscriptionPlans = paymentClient.loadSubscriptionPlans().getOrNull()
+            if (subscriptionPlans == null) {
+                _state.value = OnboardingUpgradeFeaturesState.NoSubscriptions
+            } else {
+                _state.value = createInitialLoadedState(subscriptionPlans)
+            }
         }
     }
 
-    private fun updateState(
-        subscriptions: List<Subscription>,
-    ) {
-        val lastSelectedTier = settings.getLastSelectedSubscriptionTier().takeIf { source in listOf(OnboardingUpgradeSource.LOGIN, OnboardingUpgradeSource.PROFILE) }
-        val lastSelectedFrequency = settings.getLastSelectedSubscriptionFrequency().takeIf { source in listOf(OnboardingUpgradeSource.LOGIN, OnboardingUpgradeSource.PROFILE) }
-
-        val showPatronOnly = source == OnboardingUpgradeSource.ACCOUNT_DETAILS || showPatronOnly == true
-        val fromLogin = source == OnboardingUpgradeSource.LOGIN
-        val updatedSubscriptions =
-            if (showPatronOnly) {
-                subscriptions.filter { it.tier == SubscriptionTier.PATRON }
-            } else {
-                subscriptions
-            }
-
-        val selectedSubscription = subscriptionManager.getDefaultSubscription(
-            subscriptions = updatedSubscriptions,
-            tier = if (showPatronOnly) SubscriptionTier.PATRON else { if (fromLogin) lastSelectedTier else null },
-            frequency = if (fromLogin) lastSelectedFrequency else null,
+    private fun createInitialLoadedState(
+        subscriptionPlans: SubscriptionPlans,
+    ): OnboardingUpgradeFeaturesState.Loaded {
+        val showPatronOnly = flow.source == OnboardingUpgradeSource.ACCOUNT_DETAILS
+        return OnboardingUpgradeFeaturesState.Loaded(
+            subscriptionPlans,
+            selectedBillingCycle = flow.preselectedBillingCycle,
+            selectedTier = if (showPatronOnly) SubscriptionTier.Patron else flow.preselectedTier,
+            showOnlyPatronPlans = showPatronOnly,
+            purchaseFailed = false,
         )
+    }
 
-        val showNotNow = source == OnboardingUpgradeSource.RECOMMENDATIONS
+    fun changeBillingCycle(billingCycle: BillingCycle) {
+        analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_SUBSCRIPTION_FREQUENCY_CHANGED, mapOf("value" to billingCycle.analyticsValue))
+        _state.update { state ->
+            (_state.value as? OnboardingUpgradeFeaturesState.Loaded)
+                ?.let { loadedState -> loadedState.copy(selectedBillingCycle = billingCycle) }
+                ?: state
+        }
+    }
 
-        selectedSubscription?.let {
-            val currentSubscriptionFrequency = selectedSubscription.recurringPricingPhase.toSubscriptionFrequency()
-            val currentTier = SubscriptionTier.fromProductId(selectedSubscription.productDetails.productId)
-            val currentFeatureCard = currentTier.toUpgradeFeatureCard()
-            _state.update {
-                OnboardingUpgradeFeaturesState.Loaded(
-                    featureCardsState = FeatureCardsState(
-                        subscriptions = updatedSubscriptions,
-                        currentFeatureCard = currentFeatureCard,
-                        currentFrequency = currentSubscriptionFrequency,
-                    ),
-                    currentSubscription = selectedSubscription,
-                    currentFeatureCard = currentFeatureCard,
-                    currentSubscriptionFrequency = currentSubscriptionFrequency,
-                    showNotNow = showNotNow,
+    fun changeSubscriptionTier(tier: SubscriptionTier) {
+        analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_SUBSCRIPTION_TIER_CHANGED, mapOf("value" to tier.analyticsValue))
+        _state.update { state ->
+            (_state.value as? OnboardingUpgradeFeaturesState.Loaded)
+                ?.let { loadedState -> loadedState.copy(selectedTier = tier) }
+                ?: state
+        }
+    }
+
+    fun purchaseSelectedPlan(
+        activity: Activity,
+        onComplete: () -> Unit,
+    ) {
+        _state.update { value -> (value as? OnboardingUpgradeFeaturesState.Loaded)?.copy(purchaseFailed = false) ?: value }
+        (state.value as? OnboardingUpgradeFeaturesState.Loaded)?.let { loadedState ->
+            val planKey = loadedState.selectedPlan.key
+            trackPaymentFrequencyButtonTapped(planKey)
+            viewModelScope.launch {
+                val purchaseResult = paymentClient.purchaseSubscriptionPlan(planKey, activity)
+                trackPurchaseResult(planKey, purchaseResult)
+
+                when (purchaseResult) {
+                    is PurchaseResult.Purchased -> {
+                        onComplete()
+                    }
+
+                    is PurchaseResult.Cancelled -> Unit
+                    is PurchaseResult.Failure -> {
+                        _state.update { value -> (value as? OnboardingUpgradeFeaturesState.Loaded)?.copy(purchaseFailed = true) ?: value }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun trackPaymentFrequencyButtonTapped(plan: SubscriptionPlan.Key) {
+        analyticsTracker.track(
+            AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_NEXT_BUTTON_TAPPED,
+            mapOf(
+                "flow" to flow.analyticsValue,
+                "source" to flow.source.analyticsValue,
+                "product" to plan.productId,
+            ),
+        )
+    }
+
+    private fun trackPurchaseResult(
+        plan: SubscriptionPlan.Key,
+        purchaseResult: PurchaseResult,
+    ) {
+        val productValue = when (plan.tier) {
+            SubscriptionTier.Plus -> plan.billingCycle.analyticsValue
+            SubscriptionTier.Patron -> plan.productId
+        }
+        val analyticsProperties = buildMap {
+            put("product", productValue)
+            put("offer_type", plan.offer?.analyticsValue ?: "none")
+            put("source", flow.source.analyticsValue)
+        }
+        when (purchaseResult) {
+            is PurchaseResult.Purchased -> analyticsTracker.track(AnalyticsEvent.PURCHASE_SUCCESSFUL, analyticsProperties)
+
+            is PurchaseResult.Cancelled -> analyticsTracker.track(AnalyticsEvent.PURCHASE_CANCELLED)
+
+            is PurchaseResult.Failure -> {
+                analyticsTracker.track(
+                    AnalyticsEvent.PURCHASE_FAILED,
+                    analyticsProperties + purchaseResult.code.analyticProperties(),
                 )
             }
-        } ?: _state.update { // In ideal world, we should never get here
-            OnboardingUpgradeFeaturesState.NoSubscriptions(showNotNow)
         }
     }
 
@@ -130,119 +156,6 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
         analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_NOT_NOW_BUTTON_TAPPED, analyticsProps(flow, source))
     }
 
-    fun onSubscriptionFrequencyChanged(frequency: SubscriptionFrequency) {
-        (_state.value as? OnboardingUpgradeFeaturesState.Loaded)?.let { loadedState ->
-            val currentSubscription = subscriptionManager
-                .getDefaultSubscription(
-                    subscriptions = loadedState.featureCardsState.subscriptions,
-                    tier = loadedState.currentFeatureCard.subscriptionTier,
-                    frequency = frequency,
-                )
-            settings.setLastSelectedSubscriptionFrequency(frequency)
-            analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_SUBSCRIPTION_FREQUENCY_CHANGED, mapOf("value" to frequency.name.lowercase()))
-            currentSubscription?.let {
-                _state.update {
-                    loadedState.copy(
-                        currentSubscription = currentSubscription,
-                        currentSubscriptionFrequency = frequency,
-                    )
-                }
-            }
-        }
-    }
-
-    fun onFeatureCardChanged(upgradeFeatureCard: UpgradeFeatureCard) {
-        (_state.value as? OnboardingUpgradeFeaturesState.Loaded)?.let { loadedState ->
-            val currentSubscription = subscriptionManager
-                .getDefaultSubscription(
-                    subscriptions = loadedState.featureCardsState.subscriptions,
-                    tier = upgradeFeatureCard.subscriptionTier,
-                    frequency = loadedState.currentSubscriptionFrequency,
-                )
-            analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_SUBSCRIPTION_TIER_CHANGED, mapOf("value" to upgradeFeatureCard.subscriptionTier.name.lowercase()))
-            settings.setLastSelectedSubscriptionTier(upgradeFeatureCard.subscriptionTier)
-            currentSubscription?.let {
-                _state.update {
-                    loadedState.copy(
-                        currentSubscription = currentSubscription,
-                        currentFeatureCard = upgradeFeatureCard,
-                    )
-                }
-            }
-        }
-    }
-
-    fun onClickSubscribe(
-        activity: AppCompatActivity,
-        flow: OnboardingFlow,
-        source: OnboardingUpgradeSource,
-        onComplete: () -> Unit,
-    ) {
-        (state.value as? OnboardingUpgradeFeaturesState.Loaded)?.let { loadedState ->
-            _state.update { loadedState.copy(purchaseFailed = false) }
-            val currentSubscription = subscriptionManager
-                .getDefaultSubscription(
-                    subscriptions = loadedState.featureCardsState.subscriptions,
-                    tier = loadedState.currentFeatureCard.subscriptionTier,
-                    frequency = loadedState.currentSubscriptionFrequency,
-                )
-
-            currentSubscription?.let { subscription ->
-                analyticsTracker.track(
-                    AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_NEXT_BUTTON_TAPPED,
-                    mapOf(
-                        OnboardingUpgradeBottomSheetViewModel.flowKey to flow.analyticsValue,
-                        OnboardingUpgradeBottomSheetViewModel.sourceKey to source.analyticsValue,
-                        OnboardingUpgradeBottomSheetViewModel.selectedSubscriptionKey to subscription.productDetails.productId,
-                    ),
-                )
-
-                viewModelScope.launch {
-                    val purchaseResult = subscriptionManager
-                        .observePurchaseEvents()
-                        .asFlow()
-                        .firstOrNull()
-
-                    when (purchaseResult) {
-                        PurchaseResult.Purchased -> {
-                            onComplete()
-                        }
-
-                        is PurchaseResult.Cancelled -> {
-                            // User cancelled subscription creation. Do nothing.
-                        }
-
-                        is PurchaseResult.Failure -> {
-                            _state.update { loadedState.copy(purchaseFailed = true) }
-                        }
-
-                        null -> {
-                            Timber.e("Purchase event was null. This should never happen.")
-                        }
-                    }
-
-                    if (purchaseResult != null) {
-                        CreateAccountViewModel.trackPurchaseEvent(
-                            subscription,
-                            purchaseResult,
-                            source,
-                            analyticsTracker,
-                        )
-                    }
-                }
-                subscriptionManager.launchBillingFlow(
-                    activity,
-                    subscription.productDetails,
-                    subscription.offerToken,
-                )
-            }
-        }
-    }
-
-    fun onRateUsPressed() {
-        analyticsTracker.track(AnalyticsEvent.RATE_US_TAPPED, mapOf("source" to OnboardingUpgradeSource.PLUS_DETAILS.analyticsValue))
-    }
-
     fun onPrivacyPolicyPressed() {
         analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_PRIVACY_POLICY_TAPPED)
     }
@@ -251,28 +164,85 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
         analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_TERMS_AND_CONDITIONS_TAPPED)
     }
 
+    fun onSelectPaymentFrequencyShown(flow: OnboardingFlow, source: OnboardingUpgradeSource) {
+        analyticsTracker.track(AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_SHOWN, analyticsProps(flow, source))
+    }
+
+    fun onSelectPaymentFrequencyDismissed(flow: OnboardingFlow, source: OnboardingUpgradeSource) {
+        analyticsTracker.track(AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_DISMISSED, analyticsProps(flow, source))
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(flow: OnboardingFlow): OnboardingUpgradeFeaturesViewModel
+    }
+
     companion object {
-        private fun analyticsProps(flow: OnboardingFlow, source: OnboardingUpgradeSource) =
-            mapOf("flow" to flow.analyticsValue, "source" to source.analyticsValue)
+        private fun analyticsProps(flow: OnboardingFlow, source: OnboardingUpgradeSource) = mapOf(
+            "flow" to flow.analyticsValue,
+            "source" to source.analyticsValue,
+        )
+    }
+}
+
+private fun PaymentResultCode.analyticProperties() = buildMap {
+    put("error", analyticsValue)
+    if (this@analyticProperties is PaymentResultCode.Unknown) {
+        put("error_code", code)
     }
 }
 
 sealed class OnboardingUpgradeFeaturesState {
     data object Loading : OnboardingUpgradeFeaturesState()
 
-    data class NoSubscriptions(val showNotNow: Boolean) : OnboardingUpgradeFeaturesState()
+    data object NoSubscriptions : OnboardingUpgradeFeaturesState()
 
     data class Loaded(
-        val currentFeatureCard: UpgradeFeatureCard,
-        val featureCardsState: FeatureCardsState,
-        val currentSubscriptionFrequency: SubscriptionFrequency,
-        val currentSubscription: Subscription,
-        val purchaseFailed: Boolean = false,
-        val showNotNow: Boolean,
+        val subscriptionPlans: SubscriptionPlans,
+        val selectedTier: SubscriptionTier,
+        val selectedBillingCycle: BillingCycle,
+        val showOnlyPatronPlans: Boolean,
+        val purchaseFailed: Boolean,
     ) : OnboardingUpgradeFeaturesState() {
-        val subscriptionFrequencies =
-            listOf(SubscriptionFrequency.YEARLY, SubscriptionFrequency.MONTHLY)
-        val currentUpgradeButton: UpgradeButton
-            get() = currentSubscription.toUpgradeButton()
+        val availablePlans = listOfNotNull(
+            plusYearlyPlanWithOffer().takeUnless { showOnlyPatronPlans },
+            plusMonthlyPlan().takeUnless { showOnlyPatronPlans },
+            patronYearlyPlan(),
+            patronMonthlyPlan(),
+        )
+
+        val selectedPlan get() = getPlan(selectedTier, selectedBillingCycle)
+
+        private fun getPlan(tier: SubscriptionTier, billingCycle: BillingCycle) = availablePlans.first { plan ->
+            plan.key.tier == tier && plan.key.billingCycle == billingCycle
+        }
+
+        private fun plusYearlyPlanWithOffer(): OnboardingSubscriptionPlan {
+            val offer = if (FeatureFlag.isEnabled(Feature.INTRO_PLUS_OFFER_ENABLED)) {
+                SubscriptionOffer.IntroOffer
+            } else {
+                SubscriptionOffer.Trial
+            }
+            return subscriptionPlans.findOfferPlan(SubscriptionTier.Plus, BillingCycle.Yearly, offer)
+                .flatMap { OnboardingSubscriptionPlan.create(it) }
+                .getOrNull()
+                ?: plusYearlyPlan()
+        }
+
+        private fun plusYearlyPlan(): OnboardingSubscriptionPlan {
+            return OnboardingSubscriptionPlan.create(subscriptionPlans.getBasePlan(SubscriptionTier.Plus, BillingCycle.Yearly))
+        }
+
+        private fun patronYearlyPlan(): OnboardingSubscriptionPlan {
+            return OnboardingSubscriptionPlan.create(subscriptionPlans.getBasePlan(SubscriptionTier.Patron, BillingCycle.Yearly))
+        }
+
+        private fun plusMonthlyPlan(): OnboardingSubscriptionPlan {
+            return OnboardingSubscriptionPlan.create(subscriptionPlans.getBasePlan(SubscriptionTier.Plus, BillingCycle.Monthly))
+        }
+
+        private fun patronMonthlyPlan(): OnboardingSubscriptionPlan {
+            return OnboardingSubscriptionPlan.create(subscriptionPlans.getBasePlan(SubscriptionTier.Patron, BillingCycle.Monthly))
+        }
     }
 }

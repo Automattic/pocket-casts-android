@@ -148,6 +148,7 @@ dependencies {
     androidTestImplementation(libs.coroutines.test)
     androidTestImplementation(libs.jsonassert)
     androidTestImplementation(libs.junit)
+    androidTestImplementation(libs.hilt.navigation.compose)
     androidTestImplementation(libs.mockito.android)
     androidTestImplementation(libs.mockito.core)
     androidTestImplementation(libs.mockito.kotlin)
