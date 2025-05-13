@@ -85,7 +85,7 @@ interface SyncManager : NamedSettingsCaller {
 
     // Subscription
     suspend fun subscriptionStatus(): SubscriptionStatusResponse
-    fun subscriptionPurchaseRxSingle(request: SubscriptionPurchaseRequest): Single<SubscriptionStatusResponse>
+    suspend fun subscriptionPurchase(request: SubscriptionPurchaseRequest): SubscriptionStatusResponse
     fun redeemPromoCodeRxSingle(code: String): Single<PromoCodeResponse>
     fun validatePromoCodeRxSingle(code: String): Single<PromoCodeResponse>
 

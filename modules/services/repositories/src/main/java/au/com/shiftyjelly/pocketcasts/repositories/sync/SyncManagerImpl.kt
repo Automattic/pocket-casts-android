@@ -343,8 +343,8 @@ class SyncManagerImpl @Inject constructor(
             syncServiceManager.subscriptionStatus(token)
         }
 
-    override fun subscriptionPurchaseRxSingle(request: SubscriptionPurchaseRequest): Single<SubscriptionStatusResponse> =
-        getCacheTokenOrLoginRxSingle { token ->
+    override suspend fun subscriptionPurchase(request: SubscriptionPurchaseRequest): SubscriptionStatusResponse =
+        getCacheTokenOrLogin { token ->
             syncServiceManager.subscriptionPurchase(request, token)
         }
 
