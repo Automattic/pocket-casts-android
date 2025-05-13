@@ -6,16 +6,19 @@ import au.com.shiftyjelly.pocketcasts.settings.notifications.data.NotificationsP
 import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreference
 import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreferenceCategory
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @HiltViewModel
-internal class NotificationsSettingViewModel(
+internal class NotificationsSettingViewModel @Inject constructor(
     private val preferenceRepository: NotificationsPreferenceRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(State(emptyList()))
+    val state: StateFlow<State> = _state
 
     init {
         loadPreferences()
@@ -29,8 +32,7 @@ internal class NotificationsSettingViewModel(
         // To be implemented later
     }
 
+    internal data class State(
+        val categories: List<NotificationPreferenceCategory>
+    )
 }
-
-internal data class State(
-    val categories: List<NotificationPreferenceCategory>
-)

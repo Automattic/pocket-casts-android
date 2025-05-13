@@ -336,17 +336,15 @@ class NotificationsSettingsFragment :
             if (findPreference<PreferenceScreen>("notificationActions") == null) {
                 category.addPreference(notificationActions)
             }
-            if (findPreference<Preference>("openSystemSettings") == null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (findPreference<Preference>("openSystemSettings") == null) {
                 category.addPreference(systemSettingsPreference)
             }
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
                 if (findPreference<Preference>("notificationRingtone") == null) {
                     category.addPreference(ringtonePreference)
                 }
                 if (findPreference<ListPreference>("notificationVibrate") == null) {
                     category.addPreference(vibratePreference)
                 }
-            }
         } else {
             category.removePreference(notificationPodcasts)
             category.removePreference(ringtonePreference)
