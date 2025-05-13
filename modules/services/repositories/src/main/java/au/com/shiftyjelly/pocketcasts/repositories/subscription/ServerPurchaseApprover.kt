@@ -10,7 +10,6 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionPurchaseRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.toStatus
 import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.rx2.await
 
 class ServerPurchaseApprover @Inject constructor(
     private val syncManager: SyncManager,
@@ -19,7 +18,7 @@ class ServerPurchaseApprover @Inject constructor(
     override suspend fun approve(purchase: Purchase): PaymentResult<Purchase> {
         return runCatching {
             val request = SubscriptionPurchaseRequest(purchase.token, purchase.productIds.first())
-            val response = syncManager.subscriptionPurchaseRxSingle(request).await()
+            val response = syncManager.subscriptionPurchase(request)
             settings.cachedSubscriptionStatus.set(response.toStatus(), updateModifiedAt = false)
             PaymentResult.Success(purchase)
         }.getOrElse { error ->

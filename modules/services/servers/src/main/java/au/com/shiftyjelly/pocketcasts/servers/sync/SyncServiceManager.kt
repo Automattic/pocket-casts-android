@@ -191,10 +191,10 @@ open class SyncServiceManager @Inject constructor(
     suspend fun subscriptionStatus(token: AccessToken): SubscriptionStatusResponse =
         service.subscriptionStatus(addBearer(token))
 
-    fun subscriptionPurchase(
+    suspend fun subscriptionPurchase(
         request: SubscriptionPurchaseRequest,
         token: AccessToken,
-    ): Single<SubscriptionStatusResponse> =
+    ): SubscriptionStatusResponse =
         service.subscriptionPurchase(addBearer(token), request)
 
     fun getFiles(token: AccessToken): Single<Response<FilesResponse>> =

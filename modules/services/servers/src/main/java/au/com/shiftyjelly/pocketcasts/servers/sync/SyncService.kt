@@ -108,7 +108,7 @@ interface SyncService {
     suspend fun subscriptionStatus(@Header("Authorization") authorization: String): SubscriptionStatusResponse
 
     @POST("/subscription/purchase/android")
-    fun subscriptionPurchase(@Header("Authorization") authorization: String, @Body request: SubscriptionPurchaseRequest): Single<SubscriptionStatusResponse>
+    suspend fun subscriptionPurchase(@Header("Authorization") authorization: String, @Body request: SubscriptionPurchaseRequest): SubscriptionStatusResponse
 
     @GET("/files")
     fun getFiles(@Header("Authorization") authorization: String): Single<Response<FilesResponse>>
