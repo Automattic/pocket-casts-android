@@ -74,7 +74,7 @@ class OnboardingCreateAccountViewModel @Inject constructor(
             )
         }
 
-        subscriptionManager.clearCachedStatus()
+        subscriptionManager.clearCachedSubscription()
 
         viewModelScope.launch {
             val result = syncManager.createUserWithEmailAndPassword(

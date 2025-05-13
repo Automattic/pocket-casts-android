@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.folders
 
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import java.time.Clock
 import javax.inject.Inject
@@ -12,14 +11,14 @@ class SuggestedFoldersPopupPolicy @Inject constructor(
 ) {
     private val timestampSetting = settings.suggestedFoldersDismissTimestamp
     private val countSetting = settings.suggestedFoldersDismissCount
-    private val subscriptionStatusSetting = settings.cachedSubscriptionStatus
+    private val subscriptionsSetting = settings.cachedSubscription
 
     fun isEligibleForPopup(): Boolean {
-        val subscriptionStatus = subscriptionStatusSetting.value
+        val subscription = subscriptionsSetting.value
         val currentCount = countSetting.value
 
         return when {
-            subscriptionStatus is SubscriptionStatus.Paid -> false
+            subscription != null -> false
             currentCount == 0 -> true
             currentCount == 1 -> {
                 timestampSetting.value

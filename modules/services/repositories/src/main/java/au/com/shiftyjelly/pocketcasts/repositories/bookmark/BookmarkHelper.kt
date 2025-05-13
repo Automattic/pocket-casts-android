@@ -12,7 +12,6 @@ import au.com.shiftyjelly.pocketcasts.deeplink.AddBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ChangeBookmarkTitleDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.DeleteBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowBookmarkDeepLink
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.R
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -68,7 +67,7 @@ class BookmarkHelper(
         }
     }
 
-    private fun shouldAllowAddBookmark() = (settings.cachedSubscriptionStatus.value as? SubscriptionStatus.Paid)?.tier?.isPaid == true
+    private fun shouldAllowAddBookmark() = settings.cachedSubscription.value != null
 }
 
 private fun buildAndShowNotification(

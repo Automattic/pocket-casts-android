@@ -7,7 +7,7 @@ import au.com.shiftyjelly.pocketcasts.payment.PurchaseApprover
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionPurchaseRequest
-import au.com.shiftyjelly.pocketcasts.servers.sync.toStatus
+import au.com.shiftyjelly.pocketcasts.servers.sync.toSubscription
 import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
 
@@ -18,8 +18,8 @@ class ServerPurchaseApprover @Inject constructor(
     override suspend fun approve(purchase: Purchase): PaymentResult<Purchase> {
         return runCatching {
             val request = SubscriptionPurchaseRequest(purchase.token, purchase.productIds.first())
-            val response = syncManager.subscriptionPurchase(request)
-            settings.cachedSubscriptionStatus.set(response.toStatus(), updateModifiedAt = false)
+            val subscription = syncManager.subscriptionPurchase(request).toSubscription()
+            settings.cachedSubscription.set(subscription, updateModifiedAt = false)
             PaymentResult.Success(purchase)
         }.getOrElse { error ->
             if (error is CancellationException) {

@@ -87,8 +87,8 @@ import au.com.shiftyjelly.pocketcasts.localization.helper.LocaliseHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
-import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
+import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.navigation.BottomNavigator
 import au.com.shiftyjelly.pocketcasts.navigation.FragmentInfo
 import au.com.shiftyjelly.pocketcasts.navigation.NavigatorAction
@@ -865,7 +865,7 @@ class MainActivity :
         }
 
         viewModel.signInState.observe(this) { signinState ->
-            val status = (signinState as? SignInState.SignedIn)?.subscriptionStatus
+            val subscription = (signinState as? SignInState.SignedIn)?.subscription
 
             if (signinState.isSignedIn) {
                 if (viewModel.waitingForSignInToShowStories) {
@@ -877,12 +877,10 @@ class MainActivity :
                 }
             }
 
-            if (signinState.isSignedInAsPlusOrPatron) {
-                status?.let {
-                    if (viewModel.shouldShowCancelled(it)) {
-                        val cancelledFragment = SubCancelledFragment.newInstance()
-                        showBottomSheet(cancelledFragment)
-                    }
+            if (subscription != null) {
+                if (viewModel.shouldShowCancelled(subscription)) {
+                    val cancelledFragment = SubCancelledFragment.newInstance()
+                    showBottomSheet(cancelledFragment)
                 }
             } else {
                 applicationScope.launch { userEpisodeManager.removeCloudStatusFromFiles(playbackManager) }

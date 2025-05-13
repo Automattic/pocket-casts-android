@@ -13,12 +13,14 @@ import au.com.shiftyjelly.pocketcasts.crashlogging.InitializeRemoteLogging
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
+import au.com.shiftyjelly.pocketcasts.repositories.jobs.VersionMigrationsWorker
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsTask
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.TimberDebugTree
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -63,6 +65,8 @@ class AutomotiveApplication : Application(), Configuration.Provider {
 
     @Inject lateinit var experimentProvider: ExperimentProvider
 
+    @Inject lateinit var syncManager: SyncManager
+
     @Inject @ApplicationScope
     lateinit var applicationScope: CoroutineScope
 
@@ -92,6 +96,13 @@ class AutomotiveApplication : Application(), Configuration.Provider {
                 downloadManager.setup(episodeManager, podcastManager, playlistManager, playbackManager)
                 RefreshPodcastsTask.runNow(this@AutomotiveApplication, applicationScope)
             }
+
+            VersionMigrationsWorker.performMigrations(
+                podcastManager = podcastManager,
+                settings = settings,
+                syncManager = syncManager,
+                context = this@AutomotiveApplication,
+            )
         }
 
         val playServices = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS

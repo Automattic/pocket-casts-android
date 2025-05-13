@@ -41,8 +41,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.deeplink.CloudFilesDeepLink
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
-import au.com.shiftyjelly.pocketcasts.models.to.SignInState
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -222,8 +220,7 @@ class AddFileActivity :
 
         updateForm(readOnly = true, loading = true)
         viewModel.signInState.observe(this) { signInState ->
-            freeSubscription = (signInState is SignInState.SignedOut) ||
-                (signInState is SignInState.SignedIn && signInState.subscriptionStatus is SubscriptionStatus.Free)
+            freeSubscription = signInState.isNoAccountOrFree
             updateForm(freeSubscription, false)
 
             if (!freeSubscription) {

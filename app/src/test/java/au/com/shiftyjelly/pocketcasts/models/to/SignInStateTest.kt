@@ -1,8 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.models.to
 
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
+import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import java.util.Date
 import org.junit.Test
 

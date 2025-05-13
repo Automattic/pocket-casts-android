@@ -14,7 +14,6 @@ import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
@@ -22,7 +21,6 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.task.UploadEpisodeTask
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.FileAccount
 import au.com.shiftyjelly.pocketcasts.servers.sync.FilePost
@@ -126,7 +124,6 @@ class UserEpisodeManagerImpl @Inject constructor(
     appDatabase: AppDatabase,
     val syncManager: SyncManager,
     val settings: Settings,
-    val subscriptionManager: SubscriptionManager,
     val downloadManager: DownloadManager,
     @ApplicationContext val context: Context,
     val episodeAnalytics: EpisodeAnalytics,
@@ -385,7 +382,7 @@ class UserEpisodeManagerImpl @Inject constructor(
                 val newEpisode = it.toUserEpisode()
                 add(newEpisode, playbackManager)
 
-                if (settings.cloudAutoDownload.value && subscriptionManager.getCachedStatus() is SubscriptionStatus.Paid) {
+                if (settings.cloudAutoDownload.value && settings.cachedSubscription.value != null) {
                     userEpisodeDao.updateAutoDownloadStatusBlocking(PodcastEpisode.AUTO_DOWNLOAD_STATUS_AUTO_DOWNLOADED, newEpisode.uuid)
                     newEpisode.autoDownloadStatus = PodcastEpisode.AUTO_DOWNLOAD_STATUS_AUTO_DOWNLOADED
                     downloadManager.addEpisodeToQueue(newEpisode, "cloud files sync", fireEvent = false, source = SourceView.UNKNOWN)
@@ -573,7 +570,7 @@ class UserEpisodeManagerImpl @Inject constructor(
     }
 
     override fun autoUploadToCloudIfReq(episode: UserEpisode) {
-        if (settings.cloudAutoUpload.value && subscriptionManager.getCachedStatus() is SubscriptionStatus.Paid) {
+        if (settings.cloudAutoUpload.value && settings.cachedSubscription.value != null) {
             uploadToServer(episode, settings.cloudDownloadOnlyOnWifi.value)
         }
     }

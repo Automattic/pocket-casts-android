@@ -7,7 +7,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.plusGold
 import au.com.shiftyjelly.pocketcasts.images.R
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,10 +29,10 @@ class HeadphoneControlsSettingsPageViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            settings.cachedSubscriptionStatus.flow
+            settings.cachedSubscription.flow
                 .stateIn(viewModelScope)
-                .collect {
-                    val isPaidUser = (it as? SubscriptionStatus.Paid)?.tier?.isPaid == true
+                .collect { subscription ->
+                    val isPaidUser = subscription != null
 
                     _state.update { state ->
                         state.copy(

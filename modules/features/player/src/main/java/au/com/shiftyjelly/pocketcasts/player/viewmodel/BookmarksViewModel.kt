@@ -12,7 +12,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkArguments
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.HeaderRowColors
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.MessageViewColors
@@ -165,11 +164,11 @@ class BookmarksViewModel
             bookmarksFlow,
             isMultiSelectingFlow,
             selectedListFlow,
-            settings.cachedSubscriptionStatus.flow,
+            settings.cachedSubscription.flow,
             settings.artworkConfiguration.flow,
             bookmarkSearchResults,
-        ) { bookmarks, isMultiSelecting, selectedList, cachedSubscriptionStatus, artworkConfiguration, searchResults ->
-            val isPaidUser = (cachedSubscriptionStatus as? SubscriptionStatus.Paid)?.tier?.isPaid == true
+        ) { bookmarks, isMultiSelecting, selectedList, subscription, artworkConfiguration, searchResults ->
+            val isPaidUser = subscription != null
             _uiState.value = if (!isPaidUser) {
                 UiState.Upsell(sourceView)
             } else if (bookmarks.isEmpty()) {

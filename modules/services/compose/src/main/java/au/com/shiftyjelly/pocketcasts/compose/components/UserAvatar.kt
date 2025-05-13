@@ -38,10 +38,7 @@ import au.com.shiftyjelly.pocketcasts.compose.plusGoldDark
 import au.com.shiftyjelly.pocketcasts.compose.plusGoldLight
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier.NONE
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier.PATRON
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier.PLUS
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import coil.compose.AsyncImage
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -49,10 +46,10 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 @Composable
 fun UserAvatar(
     imageUrl: String?,
-    subscriptionTier: SubscriptionTier,
+    subscriptionTier: SubscriptionTier?,
     modifier: Modifier = Modifier,
     borderCompletion: Float = 1f,
-    showBadge: Boolean = subscriptionTier == PATRON,
+    showBadge: Boolean = subscriptionTier == SubscriptionTier.Patron,
     config: UserAvatarConfig = UserAvatarConfig(),
 ) {
     SubcomposeLayout(
@@ -66,7 +63,7 @@ fun UserAvatar(
             )
         }[0].measure(constraints)
 
-        val border = if (config.strokeWidth > Dp.Hairline && subscriptionTier != NONE) {
+        val border = if (config.strokeWidth > Dp.Hairline && subscriptionTier != null) {
             subcompose("border") {
                 UserPictureBorder(
                     borderCompletion = borderCompletion,
@@ -78,7 +75,7 @@ fun UserAvatar(
             null
         }
 
-        val badge = if (showBadge) {
+        val badge = if (showBadge && subscriptionTier != null) {
             subcompose("badge") {
                 SubscriptionBadgeForTier(
                     tier = subscriptionTier,
@@ -126,7 +123,7 @@ fun UserAvatar(
 @Composable
 private fun UserPicture(
     imageUrl: String?,
-    subscriptionTier: SubscriptionTier,
+    subscriptionTier: SubscriptionTier?,
     modifier: Modifier = Modifier,
     config: UserAvatarConfig = UserAvatarConfig(),
 ) {
@@ -190,39 +187,39 @@ data class UserAvatarConfig(
     val badgeContentPadding: Dp = 4.dp,
 )
 
-private fun SubscriptionTier.toLightColor() = when (this) {
-    NONE -> Color.Transparent
-    PLUS -> Color.plusGoldLight
-    PATRON -> Color.patronPurpleLight
+private fun SubscriptionTier?.toLightColor() = when (this) {
+    null -> Color.Transparent
+    SubscriptionTier.Plus -> Color.plusGoldLight
+    SubscriptionTier.Patron -> Color.patronPurpleLight
 }
 
-private fun SubscriptionTier.toDarkColor() = when (this) {
-    NONE -> Color.Transparent
-    PLUS -> Color.plusGoldDark
-    PATRON -> Color.patronPurpleDark
-}
-
-@Composable
-private fun SubscriptionTier.toBackgroundBrush() = when (this) {
-    NONE -> SolidColor(MaterialTheme.theme.colors.primaryIcon02)
-    PLUS, PATRON -> Brush.horizontalGradient(listOf(toLightColor(), toDarkColor()))
+private fun SubscriptionTier?.toDarkColor() = when (this) {
+    null -> Color.Transparent
+    SubscriptionTier.Plus -> Color.plusGoldDark
+    SubscriptionTier.Patron -> Color.patronPurpleDark
 }
 
 @Composable
-private fun SubscriptionTier.toIcon() = when (this) {
-    NONE, PATRON -> IR.drawable.ic_account_free
-    PLUS -> IR.drawable.ic_account_plus
+private fun SubscriptionTier?.toBackgroundBrush() = when (this) {
+    null -> SolidColor(MaterialTheme.theme.colors.primaryIcon02)
+    SubscriptionTier.Plus, SubscriptionTier.Patron -> Brush.horizontalGradient(listOf(toLightColor(), toDarkColor()))
 }
 
 @Composable
-private fun SubscriptionTier.toIconTint() = when (this) {
-    NONE -> MaterialTheme.theme.colors.primaryUi01
-    PLUS, PATRON -> if (MaterialTheme.theme.isLight) Color.White else Color.Black
+private fun SubscriptionTier?.toIcon() = when (this) {
+    null, SubscriptionTier.Patron -> IR.drawable.ic_account_free
+    SubscriptionTier.Plus -> IR.drawable.ic_account_plus
 }
 
-private fun SubscriptionTier.toIconSize(config: UserAvatarConfig) = when (this) {
-    NONE, PATRON -> DpSize(config.imageSize / 3, config.imageSize / 3)
-    PLUS -> DpSize(config.imageSize, config.imageSize / 3)
+@Composable
+private fun SubscriptionTier?.toIconTint() = when (this) {
+    null -> MaterialTheme.theme.colors.primaryUi01
+    SubscriptionTier.Plus, SubscriptionTier.Patron -> if (MaterialTheme.theme.isLight) Color.White else Color.Black
+}
+
+private fun SubscriptionTier?.toIconSize(config: UserAvatarConfig) = when (this) {
+    null, SubscriptionTier.Patron -> DpSize(config.imageSize / 3, config.imageSize / 3)
+    SubscriptionTier.Plus -> DpSize(config.imageSize, config.imageSize / 3)
 }
 
 @Preview
@@ -246,7 +243,7 @@ private fun UserAvatarCompletionPreview(
     AppTheme(Theme.ThemeType.LIGHT) {
         UserAvatar(
             imageUrl = null,
-            subscriptionTier = PLUS,
+            subscriptionTier = SubscriptionTier.Plus,
             borderCompletion = borderCompletion,
         )
     }
@@ -266,7 +263,7 @@ private fun UserAvatarThemePreview(
         ) {
             UserAvatar(
                 imageUrl = null,
-                subscriptionTier = NONE,
+                subscriptionTier = null,
             )
         }
     }

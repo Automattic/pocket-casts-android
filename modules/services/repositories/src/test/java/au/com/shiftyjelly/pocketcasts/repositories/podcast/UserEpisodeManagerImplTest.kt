@@ -45,7 +45,6 @@ class UserEpisodeManagerImplTest {
             syncManager = mock(),
             downloadManager = mock(),
             context = mock(),
-            subscriptionManager = mock(),
             episodeAnalytics = mock(),
         )
     }

@@ -6,8 +6,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
-import au.com.shiftyjelly.pocketcasts.models.to.SignInState
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -55,18 +54,14 @@ class ProfileViewModel @Inject constructor(
         when (state) {
             is SignInState.SignedIn -> ProfileHeaderState(
                 imageUrl = Gravatar.getUrl(state.email),
-                subscriptionTier = when {
-                    state.isSignedInAsPatron -> SubscriptionTier.PATRON
-                    state.isSignedInAsPlus -> SubscriptionTier.PLUS
-                    else -> SubscriptionTier.NONE
-                },
+                subscriptionTier = state.subscription?.tier,
                 email = state.email,
-                expiresIn = state.subscriptionStatus.expiryDate?.toDurationFromNow(),
+                expiresIn = state.subscription?.expiryDate?.toDurationFromNow(),
             )
 
             is SignInState.SignedOut -> ProfileHeaderState(
                 imageUrl = null,
-                subscriptionTier = SubscriptionTier.NONE,
+                subscriptionTier = null,
                 email = null,
                 expiresIn = null,
             )
@@ -76,7 +71,7 @@ class ProfileViewModel @Inject constructor(
         started = SharingStarted.Eagerly,
         initialValue = ProfileHeaderState(
             imageUrl = null,
-            subscriptionTier = SubscriptionTier.NONE,
+            subscriptionTier = null,
             email = null,
             expiresIn = null,
         ),

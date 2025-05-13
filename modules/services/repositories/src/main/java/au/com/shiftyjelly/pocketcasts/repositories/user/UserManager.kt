@@ -8,8 +8,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.analytics.TracksAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
-import au.com.shiftyjelly.pocketcasts.models.to.SignInState
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearSync
@@ -23,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.android.tracks.crashlogging.CrashLogging
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -34,8 +34,11 @@ import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.rx2.asFlowable
+import kotlinx.coroutines.rx2.rxSingle
 import timber.log.Timber
 
 interface UserManager {
@@ -88,23 +91,24 @@ class UserManagerImpl @Inject constructor(
         return syncManager.isLoggedInObservable.toFlowable(BackpressureStrategy.LATEST)
             .switchMap { isLoggedIn ->
                 if (isLoggedIn) {
-                    subscriptionManager.observeSubscriptionStatus()
-                        .flatMapSingle {
-                            val value = it.get()
-                            if (value != null) {
-                                Single.just(value)
+                    settings.cachedSubscription.flow
+                        .map { Optional.of(it) }
+                        .asFlowable()
+                        .flatMapSingle { maybeSubscription ->
+                            if (maybeSubscription.isPresent()) {
+                                Single.just(maybeSubscription)
                             } else {
-                                subscriptionManager.getSubscriptionStatusRxSingle(allowCache = false)
+                                rxSingle { Optional.of(subscriptionManager.fetchFreshSubscription()) }
                             }
                         }
                         .combineLatest(syncManager.emailFlowable())
-                        .map { (status, maybeEmail) ->
+                        .map { (maybeSubscription, maybeEmail) ->
                             analyticsTracker.refreshMetadata()
-                            SignInState.SignedIn(email = maybeEmail.get() ?: "", subscriptionStatus = status)
+                            SignInState.SignedIn(email = maybeEmail.get() ?: "", subscription = maybeSubscription.get())
                         }
                         .onErrorReturn {
                             Timber.e(it, "Error getting subscription state")
-                            SignInState.SignedIn(syncManager.getEmail() ?: "", SubscriptionStatus.Free())
+                            SignInState.SignedIn(syncManager.getEmail() ?: "", subscription = null)
                         }
                 } else {
                     Flowable.just(SignInState.SignedOut)
@@ -115,7 +119,7 @@ class UserManagerImpl @Inject constructor(
     override fun signOut(playbackManager: PlaybackManager, wasInitiatedByUser: Boolean) {
         if (wasInitiatedByUser || !settings.getFullySignedOut()) {
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Signing out")
-            subscriptionManager.clearCachedStatus()
+            subscriptionManager.clearCachedSubscription()
             syncManager.signOut {
                 applicationScope.launch {
                     settings.clearPlusPreferences()

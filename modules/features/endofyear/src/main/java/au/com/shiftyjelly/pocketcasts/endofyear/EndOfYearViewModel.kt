@@ -9,11 +9,11 @@ import au.com.shiftyjelly.pocketcasts.endofyear.StoriesActivity.StoriesSource
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.Story
 import au.com.shiftyjelly.pocketcasts.models.to.TopPodcast
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearStats
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearSync
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.servers.list.ListServiceManager
 import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
 import au.com.shiftyjelly.pocketcasts.utils.coroutines.CachedAction
@@ -43,7 +43,7 @@ class EndOfYearViewModel @AssistedInject constructor(
     @Assisted private val source: StoriesSource,
     private val endOfYearSync: EndOfYearSync,
     private val endOfYearManager: EndOfYearManager,
-    subscriptionManager: SubscriptionManager,
+    settings: Settings,
     private val listServiceManager: ListServiceManager,
     private val sharingClient: StorySharingClient,
     private val analyticsTracker: AnalyticsTracker,
@@ -80,7 +80,7 @@ class EndOfYearViewModel @AssistedInject constructor(
 
     internal val uiState = combine(
         syncState,
-        subscriptionManager.subscriptionTier(),
+        settings.cachedSubscription.flow,
         topPodcastsLink,
         progress,
         ::createUiModel,
@@ -99,7 +99,7 @@ class EndOfYearViewModel @AssistedInject constructor(
 
     private suspend fun createUiModel(
         syncState: SyncState,
-        subscriptionTier: SubscriptionTier,
+        subscription: Subscription?,
         topPodcastsLink: String?,
         progress: Float,
     ) = when (syncState) {
@@ -107,10 +107,10 @@ class EndOfYearViewModel @AssistedInject constructor(
         SyncState.Failure -> UiState.Failure
         SyncState.Synced -> {
             val (stats, randomShowIds) = eoyStatsAction.run(year, viewModelScope).await()
-            val stories = createStories(stats, randomShowIds, subscriptionTier, topPodcastsLink)
+            val stories = createStories(stats, randomShowIds, subscription, topPodcastsLink)
             UiState.Synced(
                 stories = stories,
-                isPaidAccount = subscriptionTier.isPaid,
+                isPaidAccount = subscription != null,
                 storyProgress = progress,
             )
         }
@@ -119,7 +119,7 @@ class EndOfYearViewModel @AssistedInject constructor(
     private fun createStories(
         stats: EndOfYearStats,
         randomShowIds: RandomShowIds?,
-        subscriptionTier: SubscriptionTier,
+        subscription: Subscription?,
         topPodcastsLink: String?,
     ): List<Story> = buildList {
         add(Story.Cover)
@@ -144,21 +144,21 @@ class EndOfYearViewModel @AssistedInject constructor(
         if (longestEpisode != null) {
             add(Story.LongestEpisode(longestEpisode))
         }
-        if (subscriptionTier == SubscriptionTier.NONE) {
+        if (subscription == null) {
             add(Story.PlusInterstitial)
         }
         add(
             Story.YearVsYear(
                 lastYearDuration = stats.lastYearPlaybackTime,
                 thisYearDuration = stats.playbackTime,
-                subscriptionTier = subscriptionTier,
+                subscriptionTier = subscription?.tier,
             ),
         )
         add(
             Story.CompletionRate(
                 listenedCount = stats.playedEpisodeCount,
                 completedCount = stats.completedEpisodeCount,
-                subscriptionTier = subscriptionTier,
+                subscriptionTier = subscription?.tier,
             ),
         )
         add(Story.Ending)

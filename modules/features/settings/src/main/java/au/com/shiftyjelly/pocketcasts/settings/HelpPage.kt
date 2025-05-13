@@ -118,7 +118,7 @@ fun HelpPage(
                 }
             },
             onContactSupport = {
-                if (state.subscriptionTier.isPaid) {
+                if (state.isPaidUser) {
                     scope.launch {
                         val intent = viewModel.getSupportIntent(activity)
                         try {

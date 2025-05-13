@@ -17,7 +17,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserPodcastRating
 import au.com.shiftyjelly.pocketcasts.models.to.StatsBundle
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
@@ -61,7 +60,6 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.math.roundToInt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -338,8 +336,8 @@ class PodcastSyncProcess(
     }
 
     private suspend fun syncCloudFiles() {
-        val status = subscriptionManager.getSubscriptionStatus(allowCache = false)
-        if (status is SubscriptionStatus.Paid) {
+        val subscription = subscriptionManager.fetchFreshSubscription()
+        if (subscription != null) {
             userEpisodeManager.syncFiles(playbackManager)
         }
     }

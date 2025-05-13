@@ -25,8 +25,7 @@ import androidx.wear.compose.navigation.composable
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavHostState
 import androidx.wear.tooling.preview.devices.WearDevices
-import au.com.shiftyjelly.pocketcasts.models.to.SignInState
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import au.com.shiftyjelly.pocketcasts.wear.ui.FilesScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.LoggingInScreen
@@ -66,9 +65,7 @@ class MainActivity : ComponentActivity() {
                 val state by viewModel.state.collectAsState()
 
                 WearApp(
-                    email = state.email,
                     signInState = state.signInState,
-                    subscriptionStatus = state.subscriptionStatus,
                     showLoggingInScreen = state.showLoggingInScreen,
                     onLoggingInScreenShown = viewModel::onSignInConfirmationActionHandled,
                     signOut = viewModel::signOut,
@@ -85,9 +82,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun WearApp(
-    email: String?,
-    signInState: SignInState?,
-    subscriptionStatus: SubscriptionStatus?,
+    signInState: SignInState,
     showLoggingInScreen: Boolean,
     onLoggingInScreenShown: () -> Unit,
     signOut: () -> Unit,
@@ -101,13 +96,7 @@ fun WearApp(
         onLoggingInScreenShown()
     }
 
-    val userCanAccessWatch = when (subscriptionStatus) {
-        is SubscriptionStatus.Free,
-        null,
-        -> false
-
-        is SubscriptionStatus.Paid -> true
-    }
+    val userCanAccessWatch = signInState.isSignedInAsPlusOrPatron == true
 
     val waitingForSignIn = remember { mutableStateOf(false) }
     if (!userCanAccessWatch) {
@@ -342,46 +331,27 @@ fun WearApp(
         }
     }
 
-    // We cannot use the subscription status contained in the SignInState object because the subscription status
-    // gets updated to the correct value a bit after the user signs in—there is a delay in getting the updated and
-    // correct subscription status. For example, immediately after a user signs in with a plus account, their
-    // sign in state does not report that it is a Plus subscription until after the subscription call completes.
-    // This has to happen after the WearNavScaffold so that the new start destination has been processed,
-    // otherwise the new start destination will replace any navigation we do here to the LoggingInScreen.
-    val previousSubscriptionStatus = remember { mutableStateOf<SubscriptionStatus?>(null) }
-    when (subscriptionStatus) {
-        null -> {
-            /* do nothing */
-        }
+    when (signInState) {
+        is SignInState.SignedOut -> Unit // Do nothing
 
-        is SubscriptionStatus.Free -> {
-            // This gets the user back to the start destination if they logged in as free. The
-            // start destination should have been reset to the RequirePlusScreen already.
-            signOut()
-            val popped = navController.popBackStack(startDestination, inclusive = false)
-            if (popped) {
-                ScrollToTop.initiate(navController)
-            }
-            val message = if (email != null) {
-                stringResource(LR.string.log_in_free_acccount, email)
-            } else {
-                stringResource(LR.string.log_in_with_plus)
-            }
-            Toast.makeText(LocalContext.current, message, Toast.LENGTH_LONG).show()
-        }
-
-        is SubscriptionStatus.Paid -> {
-            if (waitingForSignIn.value &&
-                signInState is SignInState.SignedIn &&
-                previousSubscriptionStatus.value != subscriptionStatus
-            ) {
+        is SignInState.SignedIn -> {
+            val subscription = signInState.subscription
+            if (subscription == null) {
+                // This gets the user back to the start destination if they logged in as free. The
+                // start destination should have been reset to the RequirePlusScreen already.
+                signOut()
+                val popped = navController.popBackStack(startDestination, inclusive = false)
+                if (popped) {
+                    ScrollToTop.initiate(navController)
+                }
+                val message = stringResource(LR.string.log_in_free_acccount, signInState.email)
+                Toast.makeText(LocalContext.current, message, Toast.LENGTH_LONG).show()
+            } else if (waitingForSignIn.value) {
                 navController.navigate(LoggingInScreen.route)
                 waitingForSignIn.value = false
             }
         }
     }
-
-    previousSubscriptionStatus.value = subscriptionStatus
 }
 
 @Composable
@@ -427,9 +397,7 @@ private fun NavGraphBuilder.loggingInScreens(
 @Composable
 private fun DefaultPreview() {
     WearApp(
-        email = "",
-        signInState = null,
-        subscriptionStatus = null,
+        signInState = SignInState.SignedOut,
         showLoggingInScreen = false,
         onLoggingInScreenShown = {},
         signOut = {},

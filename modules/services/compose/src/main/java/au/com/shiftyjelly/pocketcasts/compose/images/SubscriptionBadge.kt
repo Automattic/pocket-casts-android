@@ -35,7 +35,7 @@ import au.com.shiftyjelly.pocketcasts.compose.plusGold
 import au.com.shiftyjelly.pocketcasts.compose.plusGoldDark
 import au.com.shiftyjelly.pocketcasts.compose.plusGoldLight
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -128,7 +128,7 @@ fun SubscriptionBadgeForTier(
     padding: Dp = 4.dp,
 ) {
     when (tier) {
-        SubscriptionTier.PLUS -> SubscriptionBadge(
+        SubscriptionTier.Plus -> SubscriptionBadge(
             fontSize = fontSize,
             padding = padding,
             iconRes = IR.drawable.ic_plus,
@@ -161,7 +161,7 @@ fun SubscriptionBadgeForTier(
             modifier = modifier,
         )
 
-        SubscriptionTier.PATRON -> SubscriptionBadge(
+        SubscriptionTier.Patron -> SubscriptionBadge(
             fontSize = fontSize,
             padding = padding,
             iconRes = IR.drawable.ic_patron,
@@ -193,8 +193,6 @@ fun SubscriptionBadgeForTier(
             iconSize = iconSize,
             modifier = modifier,
         )
-
-        SubscriptionTier.NONE -> Unit
     }
 }
 
@@ -204,7 +202,7 @@ fun SubscriptionIconForTier(
     iconSize: Dp = 16.dp,
 ) {
     when (tier) {
-        SubscriptionTier.PLUS -> Icon(
+        SubscriptionTier.Plus -> Icon(
             painter = painterResource(IR.drawable.ic_plus),
             contentDescription = stringResource(LR.string.pocket_casts_plus_short),
             tint = Color.plusGold,
@@ -212,7 +210,7 @@ fun SubscriptionIconForTier(
                 .size(iconSize),
         )
 
-        SubscriptionTier.PATRON -> Icon(
+        SubscriptionTier.Patron -> Icon(
             painter = painterResource(IR.drawable.ic_patron),
             contentDescription = stringResource(LR.string.pocket_casts_patron_short),
             tint = if (MaterialTheme.theme.isLight) {
@@ -223,8 +221,6 @@ fun SubscriptionIconForTier(
             modifier = Modifier
                 .size(iconSize),
         )
-
-        SubscriptionTier.NONE -> Unit
     }
 }
 
@@ -275,7 +271,7 @@ enum class SubscriptionBadgeDisplayMode {
 fun SubscriptionBadgePlusColoredLightThemePreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         SubscriptionBadgeForTier(
-            tier = SubscriptionTier.PLUS,
+            tier = SubscriptionTier.Plus,
             displayMode = SubscriptionBadgeDisplayMode.Colored,
         )
     }
@@ -287,7 +283,7 @@ fun SubscriptionBadgePlusColoredLightThemePreview() {
 fun SubscriptionBadgePlusColoredDarkThemePreview() {
     AppThemeWithBackground(Theme.ThemeType.DARK) {
         SubscriptionBadgeForTier(
-            tier = SubscriptionTier.PLUS,
+            tier = SubscriptionTier.Plus,
             displayMode = SubscriptionBadgeDisplayMode.Colored,
         )
     }
@@ -299,7 +295,7 @@ fun SubscriptionBadgePlusColoredDarkThemePreview() {
 fun SubscriptionBadgePlusColoredDarkLightThemePreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         SubscriptionBadgeForTier(
-            tier = SubscriptionTier.PLUS,
+            tier = SubscriptionTier.Plus,
             displayMode = SubscriptionBadgeDisplayMode.ColoredDark,
         )
     }
@@ -311,7 +307,7 @@ fun SubscriptionBadgePlusColoredDarkLightThemePreview() {
 fun SubscriptionBadgePlusColoredDarkDarkThemePreview() {
     AppThemeWithBackground(Theme.ThemeType.DARK) {
         SubscriptionBadgeForTier(
-            tier = SubscriptionTier.PLUS,
+            tier = SubscriptionTier.Plus,
             displayMode = SubscriptionBadgeDisplayMode.ColoredDark,
         )
     }
@@ -322,7 +318,7 @@ fun SubscriptionBadgePlusColoredDarkDarkThemePreview() {
 @Composable
 fun SubscriptionBadgePlusColoredWhiteForegroundPreview() {
     SubscriptionBadgeForTier(
-        tier = SubscriptionTier.PLUS,
+        tier = SubscriptionTier.Plus,
         displayMode = SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground,
     )
 }
@@ -332,7 +328,7 @@ fun SubscriptionBadgePlusColoredWhiteForegroundPreview() {
 @Composable
 fun SubscriptionBadgePlusBlackPreview() {
     SubscriptionBadgeForTier(
-        tier = SubscriptionTier.PLUS,
+        tier = SubscriptionTier.Plus,
         displayMode = SubscriptionBadgeDisplayMode.Black,
     )
 }
@@ -342,7 +338,7 @@ fun SubscriptionBadgePlusBlackPreview() {
 @Composable
 fun SubscriptionBadgePlusColoredWithBlackForegroundPreview() {
     SubscriptionBadgeForTier(
-        tier = SubscriptionTier.PLUS,
+        tier = SubscriptionTier.Plus,
         displayMode = SubscriptionBadgeDisplayMode.ColoredWithBlackForeground,
     )
 }
@@ -353,7 +349,7 @@ fun SubscriptionBadgePlusColoredWithBlackForegroundPreview() {
 fun SubscriptionBadgePatronColoredLightThemePreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         SubscriptionBadgeForTier(
-            tier = SubscriptionTier.PATRON,
+            tier = SubscriptionTier.Patron,
             displayMode = SubscriptionBadgeDisplayMode.Colored,
         )
     }
@@ -365,7 +361,7 @@ fun SubscriptionBadgePatronColoredLightThemePreview() {
 fun SubscriptionBadgePatronColoredDarkThemePreview() {
     AppThemeWithBackground(Theme.ThemeType.DARK) {
         SubscriptionBadgeForTier(
-            tier = SubscriptionTier.PATRON,
+            tier = SubscriptionTier.Patron,
             displayMode = SubscriptionBadgeDisplayMode.Colored,
         )
     }
@@ -377,7 +373,7 @@ fun SubscriptionBadgePatronColoredDarkThemePreview() {
 fun SubscriptionBadgePatronColoredDarkLightThemePreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         SubscriptionBadgeForTier(
-            tier = SubscriptionTier.PATRON,
+            tier = SubscriptionTier.Patron,
             displayMode = SubscriptionBadgeDisplayMode.ColoredDark,
         )
     }
@@ -389,7 +385,7 @@ fun SubscriptionBadgePatronColoredDarkLightThemePreview() {
 fun SubscriptionBadgePatronColoredDarkDarkThemePreview() {
     AppThemeWithBackground(Theme.ThemeType.DARK) {
         SubscriptionBadgeForTier(
-            tier = SubscriptionTier.PATRON,
+            tier = SubscriptionTier.Patron,
             displayMode = SubscriptionBadgeDisplayMode.ColoredDark,
         )
     }
@@ -400,7 +396,7 @@ fun SubscriptionBadgePatronColoredDarkDarkThemePreview() {
 @Composable
 fun SubscriptionBadgePatronColoredWhiteForegroundPreview() {
     SubscriptionBadgeForTier(
-        tier = SubscriptionTier.PATRON,
+        tier = SubscriptionTier.Patron,
         displayMode = SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground,
     )
 }
@@ -410,7 +406,7 @@ fun SubscriptionBadgePatronColoredWhiteForegroundPreview() {
 @Composable
 fun SubscriptionBadgePatronBlackPreview() {
     SubscriptionBadgeForTier(
-        tier = SubscriptionTier.PATRON,
+        tier = SubscriptionTier.Patron,
         displayMode = SubscriptionBadgeDisplayMode.Black,
     )
 }
@@ -420,7 +416,7 @@ fun SubscriptionBadgePatronBlackPreview() {
 @Composable
 fun SubscriptionBadgePatronColoredWithBlackForegroundPreview() {
     SubscriptionBadgeForTier(
-        tier = SubscriptionTier.PATRON,
+        tier = SubscriptionTier.Patron,
         displayMode = SubscriptionBadgeDisplayMode.ColoredWithBlackForeground,
     )
 }

@@ -9,11 +9,11 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptCuesInfo
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptFormat
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptsManager
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.utils.exception.EmptyDataException
 import au.com.shiftyjelly.pocketcasts.utils.exception.NoNetworkException
 import au.com.shiftyjelly.pocketcasts.utils.exception.ParsingException
@@ -39,7 +39,7 @@ class TranscriptViewModel @Inject constructor(
     private val transcriptsManager: TranscriptsManager,
     private val playbackManager: PlaybackManager,
     private val analyticsTracker: AnalyticsTracker,
-    private val subscriptionManager: SubscriptionManager,
+    private val settings: Settings,
 ) : ViewModel() {
     private var _uiState = MutableStateFlow<UiState>(UiState.Empty)
     val uiState = _uiState.asStateFlow()
@@ -72,8 +72,8 @@ class TranscriptViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            subscriptionManager.subscriptionTier().collect { tier ->
-                _uiState.update { value -> value.copy(subscriptionTier = tier) }
+            settings.cachedSubscription.flow.collect { subscription ->
+                _uiState.update { value -> value.copy(subscriptionTier = subscription?.tier) }
             }
         }
     }
@@ -224,12 +224,12 @@ class TranscriptViewModel @Inject constructor(
     }
 
     data class UiState(
-        val subscriptionTier: SubscriptionTier,
+        val subscriptionTier: SubscriptionTier?,
         val podcastAndEpisode: PodcastAndEpisode?,
         val transcriptState: TranscriptState,
     ) {
         private val isSubscriptionRequired = if (transcriptState.transcript?.isGenerated == true) {
-            !subscriptionTier.isPaid
+            subscriptionTier == null
         } else {
             false
         }
@@ -240,7 +240,7 @@ class TranscriptViewModel @Inject constructor(
 
         companion object {
             val Empty = UiState(
-                subscriptionTier = SubscriptionTier.NONE,
+                subscriptionTier = null,
                 podcastAndEpisode = null,
                 transcriptState = TranscriptState.Empty,
             )

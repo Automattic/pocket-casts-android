@@ -19,7 +19,6 @@ import au.com.shiftyjelly.pocketcasts.models.to.Story.TopShows
 import au.com.shiftyjelly.pocketcasts.models.to.Story.TotalTime
 import au.com.shiftyjelly.pocketcasts.models.to.Story.YearVsYear
 import au.com.shiftyjelly.pocketcasts.models.to.TopPodcast
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearStats
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearSync

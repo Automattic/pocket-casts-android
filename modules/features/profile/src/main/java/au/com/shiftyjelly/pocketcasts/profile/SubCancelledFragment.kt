@@ -8,8 +8,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import au.com.shiftyjelly.pocketcasts.models.to.SignInState
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.profile.databinding.FragmentCancelledSubBinding
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -51,7 +50,7 @@ class SubCancelledFragment : BaseFragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.signInState.collect { signInState ->
-                    val expiryDate = ((signInState as? SignInState.SignedIn)?.subscriptionStatus as? SubscriptionStatus.Paid)?.expiryDate ?: Date()
+                    val expiryDate = (signInState as? SignInState.SignedIn)?.subscription?.expiryDate ?: Date()
                     val endDate = dateFormatter.format(expiryDate)
                     binding?.txtHint0?.text = getString(LR.string.profile_sub_cancel_hint0) + " " + endDate
                 }

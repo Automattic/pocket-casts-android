@@ -39,10 +39,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.UserAvatar
 import au.com.shiftyjelly.pocketcasts.compose.components.UserAvatarConfig
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.helper.toFriendlyString
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier.NONE
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier.PATRON
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier.PLUS
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
@@ -76,7 +73,7 @@ fun ProfileHeader(
 data class ProfileHeaderState(
     val email: String?,
     val imageUrl: String?,
-    val subscriptionTier: SubscriptionTier,
+    val subscriptionTier: SubscriptionTier?,
     val expiresIn: Duration?,
 )
 
@@ -232,14 +229,14 @@ fun HorizontalProfileHeader(
     }
 }
 
-private fun expirationLabel(context: Context, duration: Duration, subscriptionTier: SubscriptionTier): String? {
+private fun expirationLabel(context: Context, duration: Duration, subscriptionTier: SubscriptionTier?): String? {
     if (duration > 30.days) {
         return null
     }
     return when (subscriptionTier) {
-        NONE -> null
-        PLUS -> context.getString(LR.string.profile_plus_expires_in, duration.toExpirationString(context))
-        PATRON -> context.getString(LR.string.profile_patron_expires_in, duration.toExpirationString(context))
+        null -> null
+        SubscriptionTier.Plus -> context.getString(LR.string.profile_plus_expires_in, duration.toExpirationString(context))
+        SubscriptionTier.Patron -> context.getString(LR.string.profile_patron_expires_in, duration.toExpirationString(context))
     }
 }
 
@@ -255,7 +252,7 @@ private fun ProfileHeaderUnsignedPreview() {
             state = ProfileHeaderState(
                 email = null,
                 imageUrl = null,
-                subscriptionTier = NONE,
+                subscriptionTier = null,
                 expiresIn = null,
             ),
             onClick = {},
@@ -273,7 +270,7 @@ private fun ProfileHeaderFreePreview() {
             state = ProfileHeaderState(
                 email = "noreply@pocketcasts.com",
                 imageUrl = null,
-                subscriptionTier = NONE,
+                subscriptionTier = null,
                 expiresIn = null,
             ),
             onClick = {},
@@ -291,7 +288,7 @@ private fun ProfileHeaderPatronPreview() {
             state = ProfileHeaderState(
                 email = "noreply@pocketcasts.com",
                 imageUrl = null,
-                subscriptionTier = PATRON,
+                subscriptionTier = SubscriptionTier.Patron,
                 expiresIn = 31.days,
             ),
             onClick = {},
@@ -309,7 +306,7 @@ private fun ProfileHeaderPatronExpirePreview() {
             state = ProfileHeaderState(
                 email = "noreply@pocketcasts.com",
                 imageUrl = null,
-                subscriptionTier = PATRON,
+                subscriptionTier = SubscriptionTier.Patron,
                 expiresIn = 25.days,
             ),
             onClick = {},
@@ -327,7 +324,7 @@ private fun ProfileHeaderPlusPreview() {
             state = ProfileHeaderState(
                 email = "noreply@pocketcasts.com",
                 imageUrl = null,
-                subscriptionTier = PLUS,
+                subscriptionTier = SubscriptionTier.Plus,
                 expiresIn = 31.days,
             ),
             onClick = {},
@@ -345,7 +342,7 @@ private fun ProfileHeaderPlusExpirePreview() {
             state = ProfileHeaderState(
                 email = "noreply@pocketcasts.com",
                 imageUrl = null,
-                subscriptionTier = PLUS,
+                subscriptionTier = SubscriptionTier.Plus,
                 expiresIn = 8.minutes,
             ),
             onClick = {},
@@ -364,7 +361,7 @@ private fun ProfileHeaderHorizontalPreview() {
             state = ProfileHeaderState(
                 email = "noreply@pocketcasts.com",
                 imageUrl = null,
-                subscriptionTier = PLUS,
+                subscriptionTier = SubscriptionTier.Plus,
                 expiresIn = 20.days,
             ),
             config = ProfileHeaderConfig(),
