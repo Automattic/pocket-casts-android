@@ -84,7 +84,6 @@ interface SyncManager : NamedSettingsCaller {
     suspend fun historyYear(year: Int, count: Boolean): HistoryYearResponse
 
     // Subscription
-    fun subscriptionStatusRxSingle(): Single<SubscriptionStatusResponse>
     suspend fun subscriptionStatus(): SubscriptionStatusResponse
     fun subscriptionPurchaseRxSingle(request: SubscriptionPurchaseRequest): Single<SubscriptionStatusResponse>
     fun redeemPromoCodeRxSingle(code: String): Single<PromoCodeResponse>
