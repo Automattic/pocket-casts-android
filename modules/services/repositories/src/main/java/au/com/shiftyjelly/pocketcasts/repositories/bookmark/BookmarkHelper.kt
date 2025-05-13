@@ -12,23 +12,21 @@ import au.com.shiftyjelly.pocketcasts.deeplink.AddBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ChangeBookmarkTitleDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.DeleteBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowBookmarkDeepLink
+import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.R
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isAppForeground
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-class BookmarkHelper @Inject constructor(
+class BookmarkHelper(
     private val playbackManager: PlaybackManager,
     private val bookmarkManager: BookmarkManager,
     private val settings: Settings,
-    private val bookmarkFeature: BookmarkFeatureControl,
 ) {
     suspend fun handleAddBookmarkAction(
         context: Context,
@@ -70,8 +68,7 @@ class BookmarkHelper @Inject constructor(
         }
     }
 
-    private fun shouldAllowAddBookmark() =
-        bookmarkFeature.isAvailable(settings.userTier)
+    private fun shouldAllowAddBookmark() = (settings.cachedSubscriptionStatus.value as? SubscriptionStatus.Paid)?.tier?.isPaid == true
 }
 
 private fun buildAndShowNotification(

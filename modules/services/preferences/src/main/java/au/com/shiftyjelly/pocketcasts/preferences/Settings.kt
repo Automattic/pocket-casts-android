@@ -11,8 +11,6 @@ import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.AutoDownloadLimitSetting
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
-import au.com.shiftyjelly.pocketcasts.preferences.Settings.CloudSortOrder.entries
-import au.com.shiftyjelly.pocketcasts.preferences.Settings.UpNextAction.entries
 import au.com.shiftyjelly.pocketcasts.preferences.model.AppIconSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
@@ -28,7 +26,6 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSett
 import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import io.reactivex.Observable
 import java.time.Instant
 import java.util.Date
@@ -426,7 +423,6 @@ interface Settings {
     val cloudAutoDownload: UserSetting<Boolean>
     val cloudDownloadOnlyOnWifi: UserSetting<Boolean>
     val cachedSubscriptionStatus: UserSetting<SubscriptionStatus?>
-    val userTier: UserTier
 
     val upgradeProfileClosed: UserSetting<Boolean>
     fun getUpgradeClosedAddFile(): Boolean

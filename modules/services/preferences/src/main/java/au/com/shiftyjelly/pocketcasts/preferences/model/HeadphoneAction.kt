@@ -3,8 +3,6 @@ package au.com.shiftyjelly.pocketcasts.preferences.model
 import android.content.SharedPreferences
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -47,16 +45,14 @@ class HeadphoneActionUserSetting(
     defaultAction: HeadphoneAction,
     sharedPrefs: SharedPreferences,
     subscriptionStatusFlow: StateFlow<SubscriptionStatus?>,
-    bookmarkFeature: BookmarkFeatureControl,
 ) : UserSetting.PrefFromInt<HeadphoneAction>(
     sharedPrefKey = sharedPrefKey,
     defaultValue = defaultAction,
     sharedPrefs = sharedPrefs,
     fromInt = {
-        val userTier = (subscriptionStatusFlow.value as? SubscriptionStatus.Paid)?.tier?.toUserTier()
-            ?: UserTier.Free
+        val isPaidUser = (subscriptionStatusFlow.value as? SubscriptionStatus.Paid)?.tier?.isPaid == true
         val nextAction = HeadphoneAction.entries[it]
-        if (nextAction == HeadphoneAction.ADD_BOOKMARK && !bookmarkFeature.isAvailable(userTier)) {
+        if (nextAction == HeadphoneAction.ADD_BOOKMARK && !isPaidUser) {
             defaultAction
         } else {
             nextAction

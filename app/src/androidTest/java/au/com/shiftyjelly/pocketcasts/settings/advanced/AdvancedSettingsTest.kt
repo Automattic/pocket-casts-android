@@ -9,7 +9,6 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.servers.di.ServersModule
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -35,7 +34,6 @@ class AdvancedSettingsTest {
             context = context,
             firebaseRemoteConfig = firebaseRemoteConfig,
             moshi = moshi,
-            bookmarkFeature = BookmarkFeatureControl(),
         )
     }
 
