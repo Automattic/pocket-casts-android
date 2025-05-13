@@ -8,12 +8,13 @@ import androidx.test.rule.ServiceTestRule
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PODCASTS_ROOT
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackService
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoMediaId
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import java.util.Date
 import java.util.UUID
 import java.util.concurrent.TimeoutException
@@ -85,8 +86,13 @@ class AutoPlaybackServiceTest {
         val podcast = Podcast(UUID.randomUUID().toString(), title = "Test podcast")
         val podcastManager = mock<PodcastManager> { on { runBlocking { findSubscribedSorted() } }.doReturn(listOf(podcast)) }
         service.podcastManager = podcastManager
-        val subscriptionManager = mock<SubscriptionManager> { on { getCachedStatus() }.doReturn(SubscriptionStatus.Free()) }
-        service.subscriptionManager = subscriptionManager
+        val setting = mock<UserSetting<Subscription?>> {
+            on { value } doReturn null
+        }
+        val subscriptionManager = mock<Settings> {
+            on { cachedSubscription } doReturn setting
+        }
+        service.settings = subscriptionManager
 
         runBlocking {
             val podcastsRoot = service.loadPodcastsChildren()

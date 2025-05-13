@@ -935,7 +935,7 @@ class SharingClientTest {
         val story = Story.YearVsYear(
             lastYearDuration = Duration.ZERO,
             thisYearDuration = Duration.ZERO,
-            subscriptionTier = SubscriptionTier.NONE,
+            subscriptionTier = null,
         )
         val request = SharingRequest.endOfYearStory(story, Year.of(1000), screenshot).build()
 
@@ -963,7 +963,7 @@ class SharingClientTest {
         val story = Story.CompletionRate(
             listenedCount = 0,
             completedCount = 0,
-            subscriptionTier = SubscriptionTier.NONE,
+            subscriptionTier = null,
         )
         val request = SharingRequest.endOfYearStory(story, Year.of(1000), screenshot).build()
 
