@@ -9,7 +9,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.ChromeCastAnalytics
@@ -208,7 +207,7 @@ class ShelfSharedViewModel @Inject constructor(
     ) {
         trackShelfAction(ShelfItem.Bookmark, source)
         viewModelScope.launch {
-            val isPaidUser = (settings.cachedSubscriptionStatus.flow.value as? SubscriptionStatus.Paid)?.tier?.isPaid == true
+            val isPaidUser = settings.cachedSubscription.value != null
             if (isPaidUser) {
                 _navigationState.emit(NavigationState.ShowAddBookmark)
             } else {

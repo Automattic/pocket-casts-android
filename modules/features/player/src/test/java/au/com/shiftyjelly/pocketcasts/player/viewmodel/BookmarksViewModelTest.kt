@@ -7,9 +7,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.search.BookmarkSearchHandler
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting

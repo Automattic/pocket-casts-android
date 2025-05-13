@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.settings
 
-import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,8 +7,8 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.RecyclerView
-import au.com.shiftyjelly.pocketcasts.models.to.SignInState
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.models.type.SignInState
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.settings.databinding.AdapterAppearanceAppiconItemBinding
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.AppIcon
@@ -89,17 +88,19 @@ class AppearanceIconSettingsAdapter(
 
             val drawable = AppCompatResources.getDrawable(itemView.context, appIcon.settingsIcon)
             binding.imgIcon.setImageDrawable(drawable)
-            var tickDrawable: Drawable? = null
-            if (isValidIcon && selected) {
-                tickDrawable = AppCompatResources.getDrawable(itemView.context, R.drawable.ic_circle_tick)
+            val tickDrawableId = if (isValidIcon && selected) {
+                R.drawable.ic_circle_tick
             } else if (!isValidIcon) {
-                val iconDrawable = when (appIcon.tier) {
-                    SubscriptionTier.PLUS -> R.drawable.ic_locked_plus
-                    SubscriptionTier.PATRON -> R.drawable.ic_locked_patron
-                    SubscriptionTier.NONE -> throw IllegalStateException("Unknown type found for AppIcon")
+                when (appIcon.tier) {
+                    SubscriptionTier.Plus -> R.drawable.ic_locked_plus
+                    SubscriptionTier.Patron -> R.drawable.ic_locked_patron
+                    null -> null
                 }
-                tickDrawable = AppCompatResources.getDrawable(itemView.context, iconDrawable)
+            } else {
+                null
             }
+            val tickDrawable = tickDrawableId?.let { AppCompatResources.getDrawable(itemView.context, it) }
+
             binding.imgTick.setImageDrawable(tickDrawable)
             binding.imgTick.contentDescription = binding.imgTick.resources.getString(if (selected) LR.string.on else LR.string.off)
             binding.imgLock.isVisible = !isValidIcon
@@ -121,9 +122,10 @@ class AppearanceIconSettingsAdapter(
             notifyDataSetChanged()
         }
 
-        private fun isValidIcon(appIcon: AppIcon.AppIconType) =
-            (appIcon.tier == SubscriptionTier.NONE) ||
-                (appIcon.tier == SubscriptionTier.PLUS && signInState?.isSignedInAsPlusOrPatron == true) ||
-                (appIcon.tier == SubscriptionTier.PATRON && signInState?.isSignedInAsPatron == true)
+        private fun isValidIcon(appIcon: AppIcon.AppIconType) = when (appIcon.tier) {
+            SubscriptionTier.Plus -> signInState?.isSignedInAsPlusOrPatron == true
+            SubscriptionTier.Patron -> signInState?.isSignedInAsPatron == true
+            null -> true
+        }
     }
 }

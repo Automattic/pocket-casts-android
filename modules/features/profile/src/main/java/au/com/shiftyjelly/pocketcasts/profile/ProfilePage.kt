@@ -61,7 +61,6 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier as OldSubscriptionTier
 
 @Composable
 internal fun ProfilePage(
@@ -371,7 +370,7 @@ private fun ProfilePageStub(
             headerState = ProfileHeaderState(
                 email = "noreply@pocketcasts.com",
                 imageUrl = null,
-                subscriptionTier = OldSubscriptionTier.NONE,
+                subscriptionTier = null,
                 expiresIn = null,
             ),
             statsState = ProfileStatsState(

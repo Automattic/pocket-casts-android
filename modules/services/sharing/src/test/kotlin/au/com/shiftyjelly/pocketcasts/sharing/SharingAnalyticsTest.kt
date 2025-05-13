@@ -11,7 +11,6 @@ import au.com.shiftyjelly.pocketcasts.models.to.LongestEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.RatingStats
 import au.com.shiftyjelly.pocketcasts.models.to.Story
 import au.com.shiftyjelly.pocketcasts.models.to.TopPodcast
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import java.time.Year
 import java.util.Date
 import kotlin.time.Duration

@@ -8,9 +8,9 @@ import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.AutoDownloadLimitSetting
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.model.AppIconSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
@@ -302,6 +302,8 @@ interface Settings {
     fun setLongForKey(key: String, value: Long)
     fun getBooleanForKey(key: String, defaultValue: Boolean): Boolean
     fun setBooleanForKey(key: String, value: Boolean)
+    fun getStringForKey(key: String, isPrivate: Boolean = false): String?
+    fun deleteKey(key: String, isPrivate: Boolean = false)
 
     val discoverCountryCode: UserSetting<String>
 
@@ -388,7 +390,7 @@ interface Settings {
     fun selectedTab(): Int?
     fun setSelectedTab(selected: Int?)
 
-    fun contains(key: String): Boolean
+    fun contains(key: String, isPrivate: Boolean = false): Boolean
 
     val upNextSwipe: UserSetting<UpNextAction>
     val tapOnUpNextShouldPlay: UserSetting<Boolean>
@@ -422,7 +424,7 @@ interface Settings {
     val cloudAutoUpload: UserSetting<Boolean>
     val cloudAutoDownload: UserSetting<Boolean>
     val cloudDownloadOnlyOnWifi: UserSetting<Boolean>
-    val cachedSubscriptionStatus: UserSetting<SubscriptionStatus?>
+    val cachedSubscription: UserSetting<Subscription?>
 
     val upgradeProfileClosed: UserSetting<Boolean>
     fun getUpgradeClosedAddFile(): Boolean

@@ -13,7 +13,6 @@ import androidx.media.utils.MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_
 import androidx.media.utils.MediaConstants.DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_LIST_ITEM
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
@@ -144,7 +143,7 @@ class AutoPlaybackService : PlaybackService() {
     private fun loadProfileRoot(): List<MediaBrowserCompat.MediaItem> {
         return buildList {
             // Add the user uploaded Files if they are a paying subscriber
-            val isPaidUser = subscriptionManager.getCachedStatus() is SubscriptionStatus.Paid
+            val isPaidUser = settings.cachedSubscription.value != null
             if (isPaidUser) {
                 add(buildListMediaItem(id = PROFILE_FILES, title = LR.string.profile_navigation_files, drawable = IR.drawable.automotive_files))
             }

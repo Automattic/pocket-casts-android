@@ -2,8 +2,8 @@ package au.com.shiftyjelly.pocketcasts.referrals
 
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.FakePaymentDataSource
 import au.com.shiftyjelly.pocketcasts.payment.PaymentClient

@@ -2,10 +2,8 @@ package au.com.shiftyjelly.pocketcasts.account.viewmodel
 
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContract.OnboardingFinish
-import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingExitInfo
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule

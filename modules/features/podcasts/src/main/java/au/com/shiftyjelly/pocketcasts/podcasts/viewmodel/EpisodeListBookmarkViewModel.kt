@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.podcasts.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -22,13 +21,10 @@ class EpisodeListBookmarkViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            settings.cachedSubscriptionStatus.flow
-                .stateIn(viewModelScope).collect { cachedSubscriptionStatus ->
+            settings.cachedSubscription.flow
+                .stateIn(viewModelScope).collect { subscription ->
                     _stateFlow.update { state ->
-                        val isPaidUser = (cachedSubscriptionStatus as? SubscriptionStatus.Paid)?.tier?.isPaid == true
-                        state.copy(
-                            isBookmarkFeatureAvailable = isPaidUser,
-                        )
+                        state.copy(isBookmarkFeatureAvailable = subscription != null)
                     }
                 }
         }

@@ -1,11 +1,12 @@
 package au.com.shiftyjelly.pocketcasts.servers.sync
 
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
+import java.time.Instant
 import java.util.Date
 
 @JsonClass(generateAdapter = true)
@@ -26,28 +27,42 @@ data class SubscriptionStatusResponse(
 data class SubscriptionResponse(
     @field:Json(name = "type") val type: Int,
     @field:Json(name = "tier") val tier: String?,
+    @field:Json(name = "platform") val platform: Int,
     @field:Json(name = "frequency") val frequency: Int,
     @field:Json(name = "expiryDate") val expiryDate: Date?,
     @field:Json(name = "autoRenewing") val autoRenewing: Boolean,
-    @field:Json(name = "updateUrl") val updateUrl: String?,
+    @field:Json(name = "giftDays") val giftDays: Int,
 )
 
-fun SubscriptionStatusResponse.toStatus(): SubscriptionStatus {
-    val originalPlatform = SubscriptionPlatform.entries.getOrNull(platform) ?: SubscriptionPlatform.NONE
-
-    return if (paid == 0) {
-        SubscriptionStatus.Free(expiryDate, giftDays, originalPlatform)
-    } else {
-        val subs = subscriptions?.map { it.toSubscription() } ?: emptyList()
-        subs.getOrNull(index)?.isPrimarySubscription = true // Mark the subscription that the server says is the main one
-        val freq = SubscriptionFrequency.entries.getOrNull(frequency) ?: SubscriptionFrequency.NONE
-        val enumTier = SubscriptionTier.fromString(tier)
-        SubscriptionStatus.Paid(expiryDate ?: Date(), autoRenewing, giftDays, freq, originalPlatform, subs, enumTier, index)
+fun SubscriptionStatusResponse.toSubscription(): Subscription? {
+    if (paid == 0) {
+        return null
     }
+
+    val subscriptionResponse = subscriptions?.getOrNull(index) ?: fallbackSubscription
+
+    return Subscription(
+        tier = when (subscriptionResponse.tier?.lowercase()) {
+            "plus" -> SubscriptionTier.Plus
+            "patron" -> SubscriptionTier.Patron
+            else -> return null
+        },
+        billingCycle = when (subscriptionResponse.frequency) {
+            1 -> BillingCycle.Monthly
+            2 -> BillingCycle.Yearly
+            else -> null
+        },
+        platform = when (subscriptionResponse.platform) {
+            1 -> SubscriptionPlatform.iOS
+            2 -> SubscriptionPlatform.Android
+            3 -> SubscriptionPlatform.Web
+            4 -> SubscriptionPlatform.Gift
+            else -> SubscriptionPlatform.Unknown
+        },
+        expiryDate = subscriptionResponse.expiryDate?.toInstant() ?: Instant.MAX,
+        isAutoRenewing = subscriptionResponse.autoRenewing,
+        giftDays = subscriptionResponse.giftDays,
+    )
 }
 
-private fun SubscriptionResponse.toSubscription(): SubscriptionStatus.Subscription {
-    val enumTier = SubscriptionTier.fromString(tier)
-    val freq = SubscriptionFrequency.entries.getOrNull(frequency) ?: SubscriptionFrequency.NONE
-    return SubscriptionStatus.Subscription(enumTier, freq, expiryDate, autoRenewing, updateUrl)
-}
+private val SubscriptionStatusResponse.fallbackSubscription get() = SubscriptionResponse(type, tier, platform, frequency, expiryDate, autoRenewing, giftDays)

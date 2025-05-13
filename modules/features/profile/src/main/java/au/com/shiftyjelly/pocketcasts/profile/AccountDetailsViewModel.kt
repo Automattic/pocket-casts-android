@@ -6,15 +6,11 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.ProfileUpgradeB
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.NewsletterSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.models.to.SignInState
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
+import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
-import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
 import au.com.shiftyjelly.pocketcasts.payment.PaymentResult
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
-import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.payment.getOrNull
 import au.com.shiftyjelly.pocketcasts.payment.map
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -37,7 +33,6 @@ import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier as OldSubscriptionTier
 
 @HiltViewModel
 class AccountDetailsViewModel @Inject constructor(
@@ -57,44 +52,26 @@ class AccountDetailsViewModel @Inject constructor(
         when (state) {
             is SignInState.SignedOut -> AccountHeaderState.empty()
             is SignInState.SignedIn -> {
-                val status = state.subscriptionStatus
+                val subscription = state.subscription
                 AccountHeaderState(
                     email = state.email,
                     imageUrl = Gravatar.getUrl(state.email),
-                    subscription = when (status) {
-                        is SubscriptionStatus.Free -> SubscriptionHeaderState.Free
-                        is SubscriptionStatus.Paid -> {
-                            val activeSubscription = status.subscriptions.getOrNull(status.index)
-                            if (activeSubscription == null || activeSubscription.tier in paidTiers) {
-                                if (status.autoRenew) {
-                                    SubscriptionHeaderState.PaidRenew(
-                                        tier = status.tier,
-                                        expiresIn = status.expiryDate.toDurationFromNow(),
-                                        frequency = status.frequency,
-                                    )
-                                } else {
-                                    SubscriptionHeaderState.PaidCancel(
-                                        tier = status.tier,
-                                        expiresIn = status.expiryDate.toDurationFromNow(),
-                                        isChampion = status.isPocketCastsChampion,
-                                        platform = status.platform,
-                                        giftDaysLeft = status.giftDays,
-                                    )
-                                }
-                            } else if (activeSubscription.autoRenewing) {
-                                SubscriptionHeaderState.SupporterRenew(
-                                    tier = activeSubscription.tier,
-                                    expiresIn = activeSubscription.expiryDate?.toDurationFromNow(),
-                                    isChampion = status.isPocketCastsChampion,
-                                )
-                            } else {
-                                SubscriptionHeaderState.SupporterCancel(
-                                    tier = activeSubscription.tier,
-                                    expiresIn = activeSubscription.expiryDate?.toDurationFromNow(),
-                                    isChampion = status.isPocketCastsChampion,
-                                )
-                            }
-                        }
+                    subscription = if (subscription == null) {
+                        SubscriptionHeaderState.Free
+                    } else if (subscription.isAutoRenewing) {
+                        SubscriptionHeaderState.PaidRenew(
+                            tier = subscription.tier,
+                            expiresIn = subscription.expiryDate.toDurationFromNow(),
+                            billingCycle = subscription.billingCycle,
+                        )
+                    } else {
+                        SubscriptionHeaderState.PaidCancel(
+                            tier = subscription.tier,
+                            expiresIn = subscription.expiryDate.toDurationFromNow(),
+                            isChampion = subscription.isChampion,
+                            platform = subscription.platform,
+                            giftDaysLeft = subscription.giftDays,
+                        )
                     },
                 )
             }
@@ -106,26 +83,17 @@ class AccountDetailsViewModel @Inject constructor(
         selectedFeatureCard,
     ) { signInState, featureCard ->
         val signedInState = signInState as? SignInState.SignedIn
-        val paidSubscriptionStatus = signedInState?.subscriptionStatus as? SubscriptionStatus.Paid
-        val isExpiring = paidSubscriptionStatus?.isExpiring == true
+        val isExpiring = signedInState?.subscription?.isExpiring == true
 
         paymentClient.loadSubscriptionPlans()
             .map { subscriptionPlans ->
                 ProfileUpgradeBannerState(
                     subscriptionPlans = subscriptionPlans,
                     selectedFeatureCard = featureCard,
-                    currentSubscription = paidSubscriptionStatus?.let { status ->
+                    currentSubscription = signedInState?.subscription?.let { subscription ->
                         SubscriptionPlan.Key(
-                            tier = when (status.tier) {
-                                OldSubscriptionTier.NONE -> return@let null
-                                OldSubscriptionTier.PLUS -> SubscriptionTier.Plus
-                                OldSubscriptionTier.PATRON -> SubscriptionTier.Patron
-                            },
-                            billingCycle = when (status.frequency) {
-                                SubscriptionFrequency.NONE -> return@let null
-                                SubscriptionFrequency.MONTHLY -> BillingCycle.Monthly
-                                SubscriptionFrequency.YEARLY -> BillingCycle.Yearly
-                            },
+                            tier = subscription.tier,
+                            billingCycle = subscription.billingCycle ?: return@let null,
                             offer = null,
                         )
                     },
@@ -141,7 +109,7 @@ class AccountDetailsViewModel @Inject constructor(
         marketingOptIn,
     ) { signInState, marketingOptIn ->
         val signedInState = signInState as? SignInState.SignedIn
-        val isGiftExpiring = (signedInState?.subscriptionStatus as? SubscriptionStatus.Paid)?.isExpiring == true
+        val isGiftExpiring = signedInState?.subscription?.isExpiring == true
         AccountSectionsState(
             isSubscribedToNewsLetter = marketingOptIn,
             email = signedInState?.email,
@@ -164,10 +132,9 @@ class AccountDetailsViewModel @Inject constructor(
     )
 
     private suspend fun computeWinbackParams(signInState: SignInState): WinbackInitParams {
-        val paidSubscriptionStatus = (signInState as? SignInState.SignedIn)?.subscriptionStatus as? SubscriptionStatus.Paid
-        val subscriptionPlatform = paidSubscriptionStatus?.platform
+        val subscription = (signInState as? SignInState.SignedIn)?.subscription
 
-        return if (subscriptionPlatform != SubscriptionPlatform.ANDROID) {
+        return if (subscription?.platform != SubscriptionPlatform.Android) {
             WinbackInitParams.Empty
         } else {
             when (val subscriptionsResult = paymentClient.loadAcknowledgedSubscriptions()) {
@@ -226,8 +193,6 @@ class AccountDetailsViewModel @Inject constructor(
     companion object {
         private const val SOURCE_KEY = "source"
         private const val ENABLED_KEY = "enabled"
-
-        private val paidTiers = listOf(OldSubscriptionTier.PLUS, OldSubscriptionTier.PATRON)
     }
 }
 
