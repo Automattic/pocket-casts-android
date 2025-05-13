@@ -91,22 +91,6 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = false,
     ),
-    REFERRALS_CLAIM(
-        key = "referrals_claim",
-        title = "Referrals Claim",
-        defaultValue = true,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
-    ),
-    REFERRALS_SEND(
-        key = "referrals_send",
-        title = "Referrals Send",
-        defaultValue = true,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
-    ),
     AUTO_DOWNLOAD(
         key = "auto_download",
         title = "Auto download episodes after subscribing to a podcast",

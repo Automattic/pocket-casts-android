@@ -13,19 +13,15 @@ import au.com.shiftyjelly.pocketcasts.payment.flatMap
 import au.com.shiftyjelly.pocketcasts.payment.map
 import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.BillingClient
-import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingResult
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.ProductDetailsResult
-import com.android.billingclient.api.PurchaseHistoryRecord
 import com.android.billingclient.api.PurchasesResult
 import com.android.billingclient.api.PurchasesUpdatedListener
 import com.android.billingclient.api.QueryProductDetailsParams
-import com.android.billingclient.api.QueryPurchaseHistoryParams
 import com.android.billingclient.api.QueryPurchasesParams
 import com.android.billingclient.api.acknowledgePurchase
 import com.android.billingclient.api.queryProductDetails
-import com.android.billingclient.api.queryPurchaseHistory
 import com.android.billingclient.api.queryPurchasesAsync
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -50,68 +46,6 @@ internal class BillingPaymentDataSource(
         logger = logger,
     )
 
-    override suspend fun loadProducts(
-        params: QueryProductDetailsParams,
-    ): Pair<BillingResult, List<ProductDetails>> {
-        logger.info("Loading products")
-        return connection.withConnectedClient { client ->
-            val result = client.queryProductDetails(params)
-            if (result.billingResult.isOk()) {
-                logger.info("Products loaded")
-            } else {
-                logger.warning("Failed to load products: ${result.billingResult.debugMessage}")
-            }
-            result.billingResult to result.productDetailsList.orEmpty()
-        }
-    }
-
-    override suspend fun loadPurchaseHistory(
-        params: QueryPurchaseHistoryParams,
-    ): Pair<BillingResult, List<PurchaseHistoryRecord>> {
-        logger.info("Loading purchase history")
-        return connection.withConnectedClient { client ->
-            val result = client.queryPurchaseHistory(params)
-            if (result.billingResult.isOk()) {
-                logger.info("Purchase history loaded")
-            } else {
-                logger.warning("Failed to load purchase history: ${result.billingResult.debugMessage}")
-            }
-            result.billingResult to result.purchaseHistoryRecordList.orEmpty()
-        }
-    }
-
-    override suspend fun loadPurchases(
-        params: QueryPurchasesParams,
-    ): Pair<BillingResult, List<GooglePurchase>> {
-        logger.info("Loading purchases")
-        return connection.withConnectedClient { client ->
-            val result = client.queryPurchasesAsync(params)
-            if (result.billingResult.isOk()) {
-                logger.info("Purchases loaded")
-            } else {
-                logger.warning("Failed to load purchases: ${result.billingResult.debugMessage}")
-            }
-            result.billingResult to result.purchasesList
-        }
-    }
-
-    override suspend fun launchBillingFlow(
-        activity: Activity,
-        params: BillingFlowParams,
-    ): BillingResult {
-        logger.info("Launching billing flow")
-        return connection.withConnectedClient { client ->
-            val result = client.launchBillingFlow(activity, params)
-            if (result.isOk()) {
-                logger.info("Launched billing flow")
-            } else {
-                logger.warning("Failed to launch billing flow: ${result.debugMessage}")
-            }
-            result
-        }
-    }
-
-    // <editor-fold desc="PaymentDataSource implementation in progress">
     private val mapper = BillingPaymentMapper(logger)
 
     private val _purchases = MutableSharedFlow<PaymentResult<List<Purchase>>>(
@@ -179,7 +113,6 @@ internal class BillingPaymentDataSource(
             }
         }
     }
-    // </editor-fold>
 }
 
 private val AllSubscriptionsQueryProductDetailsParams = QueryProductDetailsParams.newBuilder()

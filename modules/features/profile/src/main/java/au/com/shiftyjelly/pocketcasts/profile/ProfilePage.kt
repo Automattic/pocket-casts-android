@@ -45,8 +45,13 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.endofyear.ui.EndOfYearPromptCard
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
-import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfoMock
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlans
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.payment.flatMap
+import au.com.shiftyjelly.pocketcasts.payment.getOrNull
+import au.com.shiftyjelly.pocketcasts.referrals.ReferralSubscriptionPlan
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsClaimGuestPassBannerCard
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsIconWithTooltip
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsViewModel
@@ -56,6 +61,7 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier as OldSubscriptionTier
 
 @Composable
 internal fun ProfilePage(
@@ -88,7 +94,6 @@ internal fun ProfilePage(
                 .background(MaterialTheme.theme.colors.primaryUi02),
         ) {
             Toolbar(
-                showReferralsIcon = state.isSendReferralsEnabled,
                 state = state.referralsState,
                 onSendReferralsClick = onSendReferralsClick,
                 onReferralsTooltipClick = onReferralsTooltipClick,
@@ -140,21 +145,19 @@ internal fun ProfilePage(
                         VerticalSpacer()
                     }
                 }
-                if (state.isClaimReferralsEnabled) {
+                item {
+                    ReferralsClaimGuestPassBannerCard(
+                        state = state.referralsState,
+                        onClick = onClaimReferralsClick,
+                        onHideBannerClick = onHideReferralsCardClick,
+                        onBannerShown = onReferralsCardShown,
+                        onShowReferralsSheet = onShowReferralsSheet,
+                        modifier = Modifier.padding(horizontal = horizontalPadding),
+                    )
+                }
+                if ((state.referralsState as? ReferralsViewModel.UiState.Loaded)?.showProfileBanner == true) {
                     item {
-                        ReferralsClaimGuestPassBannerCard(
-                            state = state.referralsState,
-                            onClick = onClaimReferralsClick,
-                            onHideBannerClick = onHideReferralsCardClick,
-                            onBannerShown = onReferralsCardShown,
-                            onShowReferralsSheet = onShowReferralsSheet,
-                            modifier = Modifier.padding(horizontal = horizontalPadding),
-                        )
-                    }
-                    if ((state.referralsState as? ReferralsViewModel.UiState.Loaded)?.showProfileBanner == true) {
-                        item {
-                            VerticalSpacer()
-                        }
+                        VerticalSpacer()
                     }
                 }
                 item {
@@ -212,9 +215,7 @@ internal fun ProfilePage(
 }
 
 internal data class ProfilePageState(
-    val isSendReferralsEnabled: Boolean,
     val isPlaybackEnabled: Boolean,
-    val isClaimReferralsEnabled: Boolean,
     val isFreeAccountBannerVisible: Boolean,
     val isUpgradeBannerVisible: Boolean,
     val miniPlayerPadding: Dp,
@@ -236,7 +237,6 @@ private fun VerticalSpacer() {
 
 @Composable
 private fun Toolbar(
-    showReferralsIcon: Boolean,
     state: ReferralsViewModel.UiState,
     onSendReferralsClick: () -> Unit,
     onReferralsTooltipClick: () -> Unit,
@@ -253,14 +253,12 @@ private fun Toolbar(
             .height(56.dp)
             .padding(horizontal = horizontalPadding),
     ) {
-        if (showReferralsIcon) {
-            ReferralsIconWithTooltip(
-                state = state,
-                onIconClick = onSendReferralsClick,
-                onTooltipClick = onReferralsTooltipClick,
-                onTooltipShown = onReferralsTooltipShown,
-            )
-        }
+        ReferralsIconWithTooltip(
+            state = state,
+            onIconClick = onSendReferralsClick,
+            onTooltipClick = onReferralsTooltipClick,
+            onTooltipShown = onReferralsTooltipShown,
+        )
         if (LocalConfiguration.current.orientation != Configuration.ORIENTATION_LANDSCAPE) {
             Spacer(
                 modifier = Modifier.weight(1f),
@@ -366,16 +364,14 @@ private fun ProfilePageStub(
 ) {
     ProfilePage(
         state = ProfilePageState(
-            isSendReferralsEnabled = true,
             isPlaybackEnabled = true,
-            isClaimReferralsEnabled = true,
             isUpgradeBannerVisible = true,
             isFreeAccountBannerVisible = true,
             miniPlayerPadding = 64.dp,
             headerState = ProfileHeaderState(
                 email = "noreply@pocketcasts.com",
                 imageUrl = null,
-                subscriptionTier = SubscriptionTier.NONE,
+                subscriptionTier = OldSubscriptionTier.NONE,
                 expiresIn = null,
             ),
             statsState = ProfileStatsState(
@@ -384,11 +380,14 @@ private fun ProfilePageStub(
                 savedDuration = 35.minutes,
             ),
             referralsState = ReferralsViewModel.UiState.Loaded(
+                referralPlan = SubscriptionPlans.Preview
+                    .findOfferPlan(SubscriptionTier.Plus, BillingCycle.Yearly, SubscriptionOffer.Referral)
+                    .flatMap(ReferralSubscriptionPlan::create)
+                    .getOrNull()!!,
                 showIcon = true,
                 showTooltip = false,
                 showProfileBanner = true,
                 showHideBannerPopup = false,
-                referralsOfferInfo = ReferralsOfferInfoMock,
             ),
             refreshState = RefreshState.Success(Date()),
         ),

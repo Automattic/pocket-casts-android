@@ -41,6 +41,9 @@ sealed class SignInState {
     val isExpiredTrial: Boolean
         get() = this is SignedIn && this.subscriptionStatus is SubscriptionStatus.Free && (getDaysRemaining() ?: 0) < 0 && this.subscriptionStatus.platform == SubscriptionPlatform.GIFT
 
+    val isNoAccountOrFree: Boolean
+        get() = !isSignedIn || isSignedInAsFree
+
     fun getDaysRemaining(): Int? {
         if (this is SignedIn) {
             return DateUtil.daysBetweenTwoDates(Date(), this.subscriptionStatus.expiryDate ?: Date())

@@ -56,8 +56,12 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.extensions.plusBackgroundBrush
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
-import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfo
-import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfoMock
+import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlans
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.payment.flatMap
+import au.com.shiftyjelly.pocketcasts.payment.getOrNull
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.pageCornerRadius
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.pageWidthPercent
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.shouldShowFullScreen
@@ -118,7 +122,7 @@ fun ReferralsClaimGuestPassPage(
                         activity?.let {
                             viewModel.launchBillingFlow(
                                 activity = activity,
-                                subscriptionWithOffer = navigationEvent.subscriptionWithOffer,
+                                referralPlan = navigationEvent.plan,
                             )
                         }
                     }
@@ -202,10 +206,10 @@ private fun ReferralsClaimGuestPassContent(
 
                 is UiState.Loaded -> {
                     ClaimGuestPassContent(
+                        referralPlan = state.referralPlan,
+                        showFullScreen = showFullScreen,
                         pageWidth = pageWidth,
                         windowHeightSizeClass = windowHeightSizeClass,
-                        showFullScreen = showFullScreen,
-                        referralsOfferInfo = state.referralsOfferInfo,
                         onDismiss = onDismiss,
                         onActivatePassClick = onActivatePassClick,
                     )
@@ -241,10 +245,10 @@ private fun ReferralsClaimGuestPassContent(
 
 @Composable
 private fun ClaimGuestPassContent(
+    referralPlan: ReferralSubscriptionPlan,
+    showFullScreen: Boolean,
     pageWidth: Dp,
     windowHeightSizeClass: WindowHeightSizeClass,
-    showFullScreen: Boolean,
-    referralsOfferInfo: ReferralsOfferInfo,
     onDismiss: () -> Unit,
     onActivatePassClick: () -> Unit,
 ) {
@@ -262,7 +266,7 @@ private fun ClaimGuestPassContent(
         } else {
             LR.string.referrals_claim_guest_pass_title
         }
-        val price = referralsOfferInfo.localizedPriceAfterOffer
+        val price = referralPlan.priceAfterOffer.formattedPrice
 
         TextButton(
             modifier = Modifier
@@ -287,7 +291,7 @@ private fun ClaimGuestPassContent(
         Spacer(modifier = Modifier.height(24.dp))
 
         TextH10(
-            text = stringResource(titleTextResId, referralsOfferInfo.localizedOfferDurationAdjective),
+            text = stringResource(titleTextResId, referralPlan.offerName),
             textAlign = TextAlign.Center,
         )
 
@@ -297,10 +301,9 @@ private fun ClaimGuestPassContent(
 
             val guestPassCardHeight = (guestPassCardWidth.value * ReferralGuestPassCardDefaults.cardAspectRatio).dp
             ReferralGuestPassCardView(
-                modifier = Modifier
-                    .size(guestPassCardWidth, guestPassCardHeight),
+                referralPlan = referralPlan,
                 source = ReferralGuestPassCardViewSource.Claim,
-                referralsOfferInfo = referralsOfferInfo,
+                modifier = Modifier.size(guestPassCardWidth, guestPassCardHeight),
             )
         }
 
@@ -373,7 +376,12 @@ fun ReferralsClaimGuestPassContentPreview(
         ReferralsClaimGuestPassContent(
             windowWidthSizeClass = windowWidthSizeClass,
             windowHeightSizeClass = windowHeightSizeClass,
-            state = UiState.Loaded(ReferralsOfferInfoMock),
+            state = UiState.Loaded(
+                referralPlan = SubscriptionPlans.Preview
+                    .findOfferPlan(SubscriptionTier.Plus, BillingCycle.Yearly, SubscriptionOffer.Referral)
+                    .flatMap(ReferralSubscriptionPlan::create)
+                    .getOrNull()!!,
+            ),
             onDismiss = {},
             onActivatePassClick = {},
             onRetry = {},
