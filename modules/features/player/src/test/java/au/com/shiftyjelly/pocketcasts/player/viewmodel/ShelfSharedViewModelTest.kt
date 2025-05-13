@@ -7,7 +7,10 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
+import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.NavigationState
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.ShelfItemSource
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.SnackbarMessage
@@ -24,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import io.reactivex.Observable
+import java.time.Instant
 import java.util.Date
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -78,17 +82,13 @@ class ShelfSharedViewModelTest {
 
     private lateinit var shelfSharedViewModel: ShelfSharedViewModel
 
-    private val cachedSubscriptionStatus = MutableStateFlow<SubscriptionStatus?>(
-        SubscriptionStatus.Paid(
-            expiryDate = Date(),
-            autoRenew = true,
-            giftDays = 0,
-            frequency = SubscriptionFrequency.MONTHLY,
-            platform = SubscriptionPlatform.ANDROID,
-            subscriptions = emptyList(),
-            tier = SubscriptionTier.PLUS,
-            index = 0,
-        ),
+    private val plusSubscription = Subscription(
+        tier = SubscriptionTier.Plus,
+        billingCycle = BillingCycle.Monthly,
+        platform = SubscriptionPlatform.Android,
+        expiryDate = Instant.now(),
+        isAutoRenewing = true,
+        giftDays = 0,
     )
 
     @Test
@@ -239,9 +239,7 @@ class ShelfSharedViewModelTest {
     @Test
     fun `given bookmark feature not available, when add bookmark button clicked, then upsell flow is started`() =
         runTest {
-            cachedSubscriptionStatus.value = SubscriptionStatus.Free()
-
-            initViewModel()
+            initViewModel(subscription = null)
 
             shelfSharedViewModel.navigationState.test {
                 shelfSharedViewModel.onAddBookmarkClick(
@@ -291,7 +289,9 @@ class ShelfSharedViewModelTest {
         }
     }
 
-    private fun initViewModel() {
+    private fun initViewModel(
+        subscription: Subscription? = plusSubscription,
+    ) {
         whenever(playbackManager.upNextQueue).thenReturn(upNextQueue)
         whenever(
             upNextQueue.getChangesObservableWithLiveCurrentEpisode(
@@ -304,9 +304,9 @@ class ShelfSharedViewModelTest {
         whenever(userSetting.flow).thenReturn(MutableStateFlow(ShelfItem.entries))
         whenever(settings.shelfItems).thenReturn(userSetting)
 
-        val userSubscriptionSetting = mock<UserSetting<SubscriptionStatus?>>()
-        whenever(userSubscriptionSetting.flow).thenReturn(cachedSubscriptionStatus)
-        whenever(settings.cachedSubscriptionStatus).thenReturn(userSubscriptionSetting)
+        val userSubscriptionSetting = mock<UserSetting<Subscription?>>()
+        whenever(userSubscriptionSetting.value).thenReturn(subscription)
+        whenever(settings.cachedSubscription).thenReturn(userSubscriptionSetting)
 
         shelfSharedViewModel = ShelfSharedViewModel(
             analyticsTracker = analyticsTracker,

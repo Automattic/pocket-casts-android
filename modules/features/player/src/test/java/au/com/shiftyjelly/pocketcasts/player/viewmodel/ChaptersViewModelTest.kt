@@ -7,7 +7,10 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
+import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersViewModel
 import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersViewModel.Mode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -17,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import java.time.Instant
 import java.util.Date
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -63,15 +67,15 @@ class ChaptersViewModelTest {
     private val playbackStateFlow = MutableStateFlow(PlaybackState(episodeUuid = "id"))
     private val episodeFlow = MutableStateFlow<BaseEpisode>(episode)
     private val chaptersFlow = MutableStateFlow(chapters)
-    private val subscriptionStatusFlow = MutableStateFlow<SubscriptionStatus?>(
-        SubscriptionStatus.Paid(
-            expiryDate = Date(),
-            autoRenew = false,
-            index = 0,
-            platform = SubscriptionPlatform.GIFT,
-            tier = SubscriptionTier.PATRON,
-        ),
+    private val plusSubscription = Subscription(
+        tier = SubscriptionTier.Plus,
+        billingCycle = BillingCycle.Monthly,
+        platform = SubscriptionPlatform.Android,
+        expiryDate = Instant.now(),
+        isAutoRenewing = true,
+        giftDays = 0,
     )
+    private val subscriptionFlow = MutableStateFlow<Subscription?>(plusSubscription)
 
     private lateinit var chaptersViewModel: ChaptersViewModel
 
@@ -80,9 +84,9 @@ class ChaptersViewModelTest {
         whenever(playbackManager.playbackStateFlow).thenReturn(playbackStateFlow)
         whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(episodeFlow)
         whenever(chapterManager.observerChaptersForEpisode("id")).thenReturn(chaptersFlow)
-        val userSetting = mock<UserSetting<SubscriptionStatus?>>()
-        whenever(userSetting.flow).thenReturn(subscriptionStatusFlow)
-        whenever(settings.cachedSubscriptionStatus).thenReturn(userSetting)
+        val userSetting = mock<UserSetting<Subscription?>>()
+        whenever(userSetting.flow).thenReturn(subscriptionFlow)
+        whenever(settings.cachedSubscription).thenReturn(userSetting)
 
         chaptersViewModel = ChaptersViewModel(
             Mode.Episode(episode.uuid),
@@ -104,16 +108,7 @@ class ChaptersViewModelTest {
 
     @Test
     fun `free user cant skip chapters`() = runTest {
-        subscriptionStatusFlow.value = SubscriptionStatus.Free()
-
-        chaptersViewModel.uiState.test {
-            assertFalse(awaitItem().canSkipChapters)
-        }
-    }
-
-    @Test
-    fun `unknown user cant skip chapters`() = runTest {
-        subscriptionStatusFlow.value = null
+        subscriptionFlow.value = null
 
         chaptersViewModel.uiState.test {
             assertFalse(awaitItem().canSkipChapters)
@@ -164,7 +159,7 @@ class ChaptersViewModelTest {
 
     @Test
     fun `free user cant toggle chapters`() = runTest {
-        subscriptionStatusFlow.value = SubscriptionStatus.Free()
+        subscriptionFlow.value = null
 
         chaptersViewModel.uiState.test {
             assertFalse(awaitItem().isTogglingChapters)

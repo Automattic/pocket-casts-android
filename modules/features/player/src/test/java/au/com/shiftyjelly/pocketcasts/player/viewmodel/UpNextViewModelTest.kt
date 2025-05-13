@@ -1,10 +1,13 @@
 package au.com.shiftyjelly.pocketcasts.player.viewmodel
 
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
+import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import io.reactivex.Flowable
-import java.util.Date
+import java.time.Instant
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -40,19 +43,17 @@ class UpNextViewModelTest {
                 Flowable.just(
                     SignInState.SignedIn(
                         email = "",
-                        subscriptionStatus = if (isPaidUser) {
-                            SubscriptionStatus.Paid(
-                                expiryDate = Date(),
-                                autoRenew = true,
+                        subscription = if (isPaidUser) {
+                            Subscription(
+                                tier = SubscriptionTier.Plus,
+                                billingCycle = BillingCycle.Monthly,
+                                platform = SubscriptionPlatform.Android,
+                                expiryDate = Instant.now(),
+                                isAutoRenewing = true,
                                 giftDays = 0,
-                                frequency = SubscriptionFrequency.MONTHLY,
-                                platform = SubscriptionPlatform.ANDROID,
-                                subscriptions = emptyList(),
-                                tier = SubscriptionTier.PLUS,
-                                index = 0,
                             )
                         } else {
-                            SubscriptionStatus.Free()
+                            null
                         },
                     ),
                 ),

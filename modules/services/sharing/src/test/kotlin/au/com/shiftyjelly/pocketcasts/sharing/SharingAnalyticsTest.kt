@@ -625,7 +625,7 @@ class SharingAnalyticsTest {
         val story = Story.YearVsYear(
             lastYearDuration = Duration.ZERO,
             thisYearDuration = Duration.ZERO,
-            subscriptionTier = SubscriptionTier.NONE,
+            subscriptionTier = null,
         )
         val request = SharingRequest.endOfYearStory(story, Year.of(1000), tempFolder.newFile()).build()
 
@@ -649,7 +649,7 @@ class SharingAnalyticsTest {
         val story = Story.CompletionRate(
             listenedCount = 0,
             completedCount = 0,
-            subscriptionTier = SubscriptionTier.NONE,
+            subscriptionTier = null,
         )
         val request = SharingRequest.endOfYearStory(story, Year.of(1000), tempFolder.newFile()).build()
 

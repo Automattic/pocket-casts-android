@@ -1,11 +1,13 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.folders
 
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
+import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.sharedtest.MutableClock
 import java.time.Instant
-import java.util.Date
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.milliseconds
 import org.junit.Assert.assertFalse
@@ -20,7 +22,7 @@ import org.mockito.kotlin.whenever
 
 class SuggestedFoldersPopupPolicyTest {
     private val clock = MutableClock()
-    private var currentSubscriptionStatus: SubscriptionStatus? = null
+    private var currentSubscription: Subscription? = null
 
     private lateinit var policy: SuggestedFoldersPopupPolicy
 
@@ -40,41 +42,35 @@ class SuggestedFoldersPopupPolicyTest {
             currentCount = answer.arguments[0] as Int
         }
 
-        val subscriptionStatusSetting = mock<UserSetting<SubscriptionStatus?>>()
-        whenever(subscriptionStatusSetting.value) doAnswer { currentSubscriptionStatus }
+        val subscriptionSetting = mock<UserSetting<Subscription?>>()
+        whenever(subscriptionSetting.value) doAnswer { currentSubscription }
 
         policy = SuggestedFoldersPopupPolicy(
             settings = mock<Settings> {
                 on { suggestedFoldersDismissTimestamp } doReturn timestampSetting
                 on { suggestedFoldersDismissCount } doReturn countSetting
-                on { cachedSubscriptionStatus } doReturn subscriptionStatusSetting
+                on { cachedSubscription } doReturn subscriptionSetting
             },
             clock = clock,
         )
     }
 
     @Test
-    fun `initial policy for logged out user`() {
-        currentSubscriptionStatus = null
-
-        assertTrue(policy.isEligibleForPopup())
-    }
-
-    @Test
     fun `initial policy for free user`() {
-        currentSubscriptionStatus = SubscriptionStatus.Free()
+        currentSubscription = null
 
         assertTrue(policy.isEligibleForPopup())
     }
 
     @Test
     fun `initial policy for paid user`() {
-        currentSubscriptionStatus = SubscriptionStatus.Paid(
-            expiryDate = Date(),
-            tier = SubscriptionTier.PLUS,
-            platform = SubscriptionPlatform.ANDROID,
-            autoRenew = false,
-            index = 0,
+        currentSubscription = Subscription(
+            tier = SubscriptionTier.Plus,
+            billingCycle = BillingCycle.Monthly,
+            platform = SubscriptionPlatform.Android,
+            expiryDate = Instant.now(),
+            isAutoRenewing = true,
+            giftDays = 0,
         )
 
         assertFalse(policy.isEligibleForPopup())

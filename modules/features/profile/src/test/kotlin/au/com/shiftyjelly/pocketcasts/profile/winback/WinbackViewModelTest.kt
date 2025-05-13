@@ -7,7 +7,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.Tracker
 import au.com.shiftyjelly.pocketcasts.analytics.TrackerType
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.payment.AcknowledgedSubscription
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.FakePaymentDataSource
@@ -51,10 +51,10 @@ class WinbackViewModelTest {
 
     @Before
     fun setUp() {
-        val subscriptionSettingMock = mock<UserSetting<SubscriptionStatus?>> {
+        val subscriptionSettingMock = mock<UserSetting<Subscription?>> {
             on { flow } doReturn MutableStateFlow(null)
         }
-        whenever(settings.cachedSubscriptionStatus) doReturn subscriptionSettingMock
+        whenever(settings.cachedSubscription) doReturn subscriptionSettingMock
         wheneverBlocking { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(
             offerId = SubscriptionOffer.Winback.offerId(SubscriptionTier.Plus, BillingCycle.Yearly)!!,
         )
