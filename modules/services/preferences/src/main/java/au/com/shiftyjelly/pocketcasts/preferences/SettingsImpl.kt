@@ -44,8 +44,6 @@ import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.config.FirebaseConfig
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getString
 import au.com.shiftyjelly.pocketcasts.utils.extensions.splitIgnoreEmpty
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.squareup.moshi.Moshi
@@ -78,7 +76,6 @@ class SettingsImpl @Inject constructor(
     @ApplicationContext private val context: Context,
     private val firebaseRemoteConfig: FirebaseRemoteConfig,
     private val moshi: Moshi,
-    private val bookmarkFeature: BookmarkFeatureControl,
 ) : Settings {
 
     companion object {
@@ -1060,16 +1057,11 @@ class SettingsImpl @Inject constructor(
         },
     )
 
-    // This is passed to the feature module which cannot access subscription tier to determine feature availability
-    override val userTier: UserTier
-        get() = (cachedSubscriptionStatus.value as? SubscriptionStatus.Paid)?.tier?.toUserTier() ?: UserTier.Free
-
     override val headphoneControlsNextAction = HeadphoneActionUserSetting(
         sharedPrefKey = "headphone_controls_next_action",
         defaultAction = HeadphoneAction.SKIP_FORWARD,
         sharedPrefs = sharedPreferences,
         subscriptionStatusFlow = cachedSubscriptionStatus.flow,
-        bookmarkFeature = bookmarkFeature,
     )
 
     override val headphoneControlsPreviousAction = HeadphoneActionUserSetting(
@@ -1077,7 +1069,6 @@ class SettingsImpl @Inject constructor(
         defaultAction = HeadphoneAction.SKIP_BACK,
         sharedPrefs = sharedPreferences,
         subscriptionStatusFlow = cachedSubscriptionStatus.flow,
-        bookmarkFeature = bookmarkFeature,
     )
 
     override val headphoneControlsPlayBookmarkConfirmationSound = UserSetting.BoolPref(

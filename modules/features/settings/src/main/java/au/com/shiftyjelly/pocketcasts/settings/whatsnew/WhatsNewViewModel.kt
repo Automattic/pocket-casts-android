@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -26,7 +25,6 @@ class WhatsNewViewModel @Inject constructor() : ViewModel() {
     init {
         _state.value = UiState.Loaded(
             feature = WhatsNewFeature.Shuffle,
-            tier = UserTier.Plus,
         )
     }
 
@@ -38,9 +36,9 @@ class WhatsNewViewModel @Inject constructor() : ViewModel() {
 
     sealed class UiState {
         data object Loading : UiState()
+
         data class Loaded(
             val feature: WhatsNewFeature,
-            val tier: UserTier,
         ) : UiState()
     }
 

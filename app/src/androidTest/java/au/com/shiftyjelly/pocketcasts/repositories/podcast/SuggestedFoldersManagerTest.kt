@@ -16,7 +16,6 @@ import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MutableClock
 import au.com.shiftyjelly.pocketcasts.utils.UUIDProvider
 import au.com.shiftyjelly.pocketcasts.utils.extensions.md5
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.squareup.moshi.Moshi
 import java.util.Date
@@ -64,7 +63,6 @@ class SuggestedFoldersManagerTest {
             context = context,
             firebaseRemoteConfig = FirebaseRemoteConfig.getInstance(),
             moshi = moshi,
-            bookmarkFeature = BookmarkFeatureControl(),
         )
 
         manager = SuggestedFoldersManager(

@@ -30,8 +30,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.combine
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
@@ -62,7 +60,6 @@ class BookmarksViewModel
     private val settings: Settings,
     private val playbackManager: PlaybackManager,
     private val theme: Theme,
-    private val bookmarkFeature: BookmarkFeatureControl,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val bookmarkSearchHandler: BookmarkSearchHandler,
 ) : ViewModel() {
@@ -172,8 +169,8 @@ class BookmarksViewModel
             settings.artworkConfiguration.flow,
             bookmarkSearchResults,
         ) { bookmarks, isMultiSelecting, selectedList, cachedSubscriptionStatus, artworkConfiguration, searchResults ->
-            val userTier = (cachedSubscriptionStatus as? SubscriptionStatus.Paid)?.tier?.toUserTier() ?: UserTier.Free
-            _uiState.value = if (!bookmarkFeature.isAvailable(userTier)) {
+            val isPaidUser = (cachedSubscriptionStatus as? SubscriptionStatus.Paid)?.tier?.isPaid == true
+            _uiState.value = if (!isPaidUser) {
                 UiState.Upsell(sourceView)
             } else if (bookmarks.isEmpty()) {
                 UiState.Empty(sourceView)

@@ -16,8 +16,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -190,10 +188,7 @@ class ChaptersViewModel @AssistedInject constructor(
         }
     }
 
-    private fun SubscriptionStatus?.canSkipChapters() =
-        Feature.isUserEntitled(Feature.DESELECT_CHAPTERS, toUserTier())
-
-    private fun SubscriptionStatus?.toUserTier() = (this as? SubscriptionStatus.Paid)?.tier?.toUserTier() ?: UserTier.Free
+    private fun SubscriptionStatus?.canSkipChapters() = (this as? SubscriptionStatus.Paid)?.tier?.isPaid == true
 
     private fun trackChapterSelectionToggled(episode: BaseEpisode, selected: Boolean) {
         tracker.track(

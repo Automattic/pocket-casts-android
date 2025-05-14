@@ -7,6 +7,10 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.NavigationState
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.ShelfItemSource
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.SnackbarMessage
@@ -22,7 +26,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
 import io.reactivex.Observable
 import java.util.Date
 import kotlinx.coroutines.CoroutineScope
@@ -37,7 +40,6 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito.mock
 import org.mockito.junit.MockitoJUnitRunner
-import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -55,9 +57,6 @@ class ShelfSharedViewModelTest {
 
     @Mock
     private lateinit var analyticsTracker: AnalyticsTracker
-
-    @Mock
-    private lateinit var bookmarkFeature: BookmarkFeatureControl
 
     @Mock
     private lateinit var chromeCastAnalytics: ChromeCastAnalytics
@@ -81,6 +80,19 @@ class ShelfSharedViewModelTest {
     private lateinit var userEpisodeManager: UserEpisodeManager
 
     private lateinit var shelfSharedViewModel: ShelfSharedViewModel
+
+    private val cachedSubscriptionStatus = MutableStateFlow<SubscriptionStatus?>(
+        SubscriptionStatus.Paid(
+            expiryDate = Date(),
+            autoRenew = true,
+            giftDays = 0,
+            frequency = SubscriptionFrequency.MONTHLY,
+            platform = SubscriptionPlatform.ANDROID,
+            subscriptions = emptyList(),
+            tier = SubscriptionTier.PLUS,
+            index = 0,
+        ),
+    )
 
     @Test
     fun `when effects button clicked, then effects options are shown`() = runTest {
@@ -216,7 +228,6 @@ class ShelfSharedViewModelTest {
     @Test
     fun `given bookmark feature available, when add bookmark button clicked, then add bookmark is shown`() =
         runTest {
-            whenever(bookmarkFeature.isAvailable(anyOrNull())).thenReturn(true)
             initViewModel()
 
             shelfSharedViewModel.navigationState.test {
@@ -231,7 +242,8 @@ class ShelfSharedViewModelTest {
     @Test
     fun `given bookmark feature not available, when add bookmark button clicked, then upsell flow is started`() =
         runTest {
-            whenever(bookmarkFeature.isAvailable(anyOrNull())).thenReturn(false)
+            cachedSubscriptionStatus.value = SubscriptionStatus.Free()
+
             initViewModel()
 
             shelfSharedViewModel.navigationState.test {
@@ -290,13 +302,18 @@ class ShelfSharedViewModelTest {
                 podcastManager,
             ),
         ).thenReturn(Observable.just(UpNextQueue.State.Empty))
+
         val userSetting = mock<UserSetting<List<ShelfItem>>>()
         whenever(userSetting.flow).thenReturn(MutableStateFlow(ShelfItem.entries))
         whenever(settings.shelfItems).thenReturn(userSetting)
+
+        val userSubscriptionSetting = mock<UserSetting<SubscriptionStatus?>>()
+        whenever(userSubscriptionSetting.flow).thenReturn(cachedSubscriptionStatus)
+        whenever(settings.cachedSubscriptionStatus).thenReturn(userSubscriptionSetting)
+
         shelfSharedViewModel = ShelfSharedViewModel(
             analyticsTracker = analyticsTracker,
             applicationScope = applicationScope,
-            bookmarkFeature = bookmarkFeature,
             chromeCastAnalytics = chromeCastAnalytics,
             episodeManager = episodeManager,
             playbackManager = playbackManager,
