@@ -6,11 +6,13 @@ import android.net.Uri
 import android.os.Build
 import au.com.shiftyjelly.pocketcasts.preferences.NotificationSound
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreference
-import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreferences
 import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreferenceCategory
+import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreferences
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
@@ -57,7 +59,7 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
                             )
                         )
 
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                             add(
                                 NotificationPreference.TextPreference(
                                     title = context.getString(LR.string.settings_notification_advanced),
@@ -65,7 +67,7 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
                                     preference = NotificationPreferences.NEW_EPISODES_ADVANCED
                                 )
                             )
-                        } else {
+//                        } else {
                             add(
                                 NotificationPreference.TextPreference(
                                     title = context.getString(LR.string.settings_notification_sound),
@@ -74,29 +76,35 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
                                 )
                             )
                             add(
-                                NotificationPreference.TextPreference(
+                                NotificationPreference.RadioGroupPreference(
                                     title = context.getString(LR.string.settings_notification_vibrate),
-                                    value = context.getString(settings.notificationVibrate.value.summary),
-                                    NotificationPreferences.NEW_EPISODES_VIBRATION
+                                    value = settings.notificationVibrate.value,
+                                    options = listOf(
+                                        NotificationVibrateSetting.NewEpisodes,
+                                        NotificationVibrateSetting.OnlyWhenSilent,
+                                        NotificationVibrateSetting.Never,
+                                    ),
+                                    preference =  NotificationPreferences.NEW_EPISODES_VIBRATION,
+                                    displayText = context.getString(settings.notificationVibrate.value.summary)
                                 )
                             )
-                        }
+//                        }
                     }
                 }
             ),
             NotificationPreferenceCategory(
                 title = context.getString(LR.string.settings),
                 preferences = listOf(
-                    NotificationPreference.RadioGroupPreference<String>(
+                    NotificationPreference.RadioGroupPreference(
                         title = context.getString(LR.string.settings_notification_play_over),
-                        value = context.getString(settings.playOverNotification.value.titleRes),
+                        value = settings.playOverNotification.value,
                         preference = NotificationPreferences.SETTINGS_PlAY_OVER,
-                        // TODO
                         options = listOf(
-                            "1",
-                            "2",
-                            "3"
-                        )
+                            PlayOverNotificationSetting.NEVER,
+                            PlayOverNotificationSetting.DUCK,
+                            PlayOverNotificationSetting.ALWAYS,
+                        ),
+                        displayText = context.getString(settings.playOverNotification.value.titleRes)
                     ),
                     NotificationPreference.SwitchPreference(
                         title = context.getString(LR.string.settings_notification_hide_on_pause),
@@ -162,9 +170,21 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
                     settings.setNotificationLastSeenToNow()
                 }
             }
+
             NotificationPreferences.SETTINGS_HIDE_NOTIFICATION_ON_PAUSE -> {
                 settings.hideNotificationOnPause.set(value = (preference as NotificationPreference.SwitchPreference).value, updateModifiedAt = true)
             }
+
+            NotificationPreferences.SETTINGS_PlAY_OVER -> {
+                val setting = preference.value as? PlayOverNotificationSetting ?: return@withContext
+                settings.playOverNotification.set(value = setting, updateModifiedAt = true)
+            }
+
+            NotificationPreferences.NEW_EPISODES_VIBRATION -> {
+                val setting = (preference.value as? NotificationVibrateSetting) ?: NotificationVibrateSetting.DEFAULT
+                settings.notificationVibrate.set(value = setting, updateModifiedAt = false)
+            }
+
             else -> Unit // TO BE IMPLEMENTED
         }
     }

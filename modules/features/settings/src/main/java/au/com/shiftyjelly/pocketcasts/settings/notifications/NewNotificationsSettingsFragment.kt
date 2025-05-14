@@ -10,18 +10,24 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
+import au.com.shiftyjelly.pocketcasts.views.fragments.PodcastSelectFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import kotlinx.coroutines.runBlocking
 
 @AndroidEntryPoint
-internal class NewNotificationsSettingsFragment : BaseFragment() {
+internal class NewNotificationsSettingsFragment : BaseFragment(), PodcastSelectFragment.Listener {
 
     private val viewModel: NotificationsSettingViewModel by viewModels()
 
     @Inject
     lateinit var settings: Settings
+
+    @Inject
+    lateinit var notificationHelper: NotificationHelper
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -37,7 +43,16 @@ internal class NewNotificationsSettingsFragment : BaseFragment() {
                     activity?.onBackPressed()
                 },
                 bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
+                onAdvancedSettingsClicked = {
+                    notificationHelper.openEpisodeNotificationSettings(requireActivity())
+                },
             )
         }
     }
+
+    override fun podcastSelectFragmentSelectionChanged(newSelection: List<String>) {
+        viewModel.onSelectedPodcastsChanged(newSelection)
+    }
+
+    override fun podcastSelectFragmentGetCurrentSelection() = runCatching { runBlocking { viewModel.getSelectedPodcastIds() } }.getOrDefault(emptyList())
 }
