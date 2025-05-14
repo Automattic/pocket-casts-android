@@ -67,11 +67,11 @@ fun SubscriptionStatusResponse.toSubscription(): Subscription? {
 
 private val SubscriptionStatusResponse.fallbackSubscription
     get() = SubscriptionResponse(
-        type,
-        tier,
-        platform,
-        frequency,
-        expiryDate,
-        autoRenewing,
-        giftDays,
+        type = type,
+        tier = tier,
+        platform = platform,
+        frequency = frequency,
+        expiryDate = expiryDate,
+        autoRenewing = autoRenewing,
+        giftDays = giftDays,
     )
