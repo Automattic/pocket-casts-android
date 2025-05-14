@@ -18,6 +18,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Function
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
+import kotlinx.coroutines.rx2.rxCompletable
 import retrofit2.HttpException
 
 @HiltViewModel
@@ -39,7 +40,8 @@ class PromoCodeViewModel @Inject constructor(
     fun setup(code: String, context: Context) {
         val signedInFlow = Single.defer<ViewState> { syncManager.redeemPromoCodeRxSingle(code).map { ViewState.Success(it) } }
             .flatMap { viewState ->
-                subscriptionManager.getSubscriptionStatusRxSingle(allowCache = false).map { viewState } // Force reloading of the new subscription status
+                // Force reloading of the new subscription status
+                rxCompletable { subscriptionManager.fetchFreshSubscription() }.toSingleDefault(viewState)
             }
             .observeOn(AndroidSchedulers.mainThread())
             .onErrorReturn(errorHandler(isSignedIn = true, resources = context.resources))

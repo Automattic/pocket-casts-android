@@ -6,19 +6,25 @@ import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptCuesInfo
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
+import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.TranscriptError
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.TranscriptState
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.UiState
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptsManager
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.exception.EmptyDataException
 import au.com.shiftyjelly.pocketcasts.utils.exception.NoNetworkException
+import java.time.Instant
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -43,24 +49,36 @@ class TranscriptViewModelTest {
 
     private val transcriptsManager: TranscriptsManager = mock()
     private val playbackManager: PlaybackManager = mock()
-    private val subscriptionManager: SubscriptionManager = mock()
+    private val settings: Settings = mock()
     private val podcastId = "podcast_id"
     private val transcript: Transcript = Transcript("episode_id", "url", "type", isGenerated = false)
     private val playbackState = PlaybackState(podcast = Podcast("podcast_id"), episodeUuid = "episode_id")
     private val playbackStateFlow = MutableSharedFlow<PlaybackState>()
-    private val subscriptionTierFlow = MutableSharedFlow<SubscriptionTier>()
+    private val subscriptonFlow = MutableStateFlow<Subscription?>(null)
     private lateinit var viewModel: TranscriptViewModel
+
+    private val plusSubscription = Subscription(
+        tier = SubscriptionTier.Plus,
+        billingCycle = BillingCycle.Monthly,
+        platform = SubscriptionPlatform.Android,
+        expiryDate = Instant.now(),
+        isAutoRenewing = true,
+        giftDays = 0,
+    )
+    private val patronSubscription = plusSubscription.copy(tier = SubscriptionTier.Patron)
 
     @Before
     fun setup() = runBlocking {
         whenever(playbackManager.playbackStateFlow).thenReturn(playbackStateFlow)
-        whenever(subscriptionManager.subscriptionTier()).thenReturn(subscriptionTierFlow)
+        val userSetting = mock<UserSetting<Subscription?>>()
+        whenever(userSetting.flow).thenReturn(subscriptonFlow)
+        whenever(settings.cachedSubscription).thenReturn(userSetting)
 
         viewModel = TranscriptViewModel(
             transcriptsManager = transcriptsManager,
             playbackManager = playbackManager,
             analyticsTracker = mock(),
-            subscriptionManager = subscriptionManager,
+            settings = settings,
         )
     }
 
@@ -281,7 +299,7 @@ class TranscriptViewModelTest {
             playbackStateFlow.emit(playbackState)
             skipItems(1)
 
-            subscriptionTierFlow.emit(SubscriptionTier.PLUS)
+            subscriptonFlow.value = plusSubscription
             assertFalse(awaitItem().showPaywall)
 
             prepareCues("Hello")
@@ -300,7 +318,7 @@ class TranscriptViewModelTest {
             playbackStateFlow.emit(playbackState)
             skipItems(1)
 
-            subscriptionTierFlow.emit(SubscriptionTier.PATRON)
+            subscriptonFlow.value = patronSubscription
             assertFalse(awaitItem().showPaywall)
 
             prepareCues("Hello")

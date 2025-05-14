@@ -29,10 +29,10 @@ import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.UserAvatarConfig
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlans
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.profile.winback.WinbackInitParams
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import kotlin.time.Duration.Companion.days
@@ -223,9 +223,9 @@ private fun AccountDetailsPageStub(
                 email = "noreplay@pocketcasts.com",
                 imageUrl = null,
                 subscription = SubscriptionHeaderState.PaidRenew(
-                    tier = SubscriptionTier.PATRON,
+                    tier = SubscriptionTier.Patron,
                     expiresIn = 36.days,
-                    frequency = SubscriptionFrequency.MONTHLY,
+                    billingCycle = BillingCycle.Monthly,
                 ),
             ),
             upgradeBannerState = upgradeBannerState,

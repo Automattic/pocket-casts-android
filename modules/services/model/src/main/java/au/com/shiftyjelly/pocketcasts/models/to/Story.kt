@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.models.to
 
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import au.com.shiftyjelly.pocketcasts.models.to.LongestEpisode as LongestEpisodeData
@@ -66,7 +66,7 @@ sealed interface Story {
     data class YearVsYear(
         val lastYearDuration: Duration,
         val thisYearDuration: Duration,
-        val subscriptionTier: SubscriptionTier,
+        val subscriptionTier: SubscriptionTier?,
     ) : Story {
         override val isFree = false
         override val analyticsValue = "year_vs_year"
@@ -82,7 +82,7 @@ sealed interface Story {
     data class CompletionRate(
         val listenedCount: Int,
         val completedCount: Int,
-        val subscriptionTier: SubscriptionTier,
+        val subscriptionTier: SubscriptionTier?,
     ) : Story {
         override val isFree = false
         override val analyticsValue = "completion_rate"

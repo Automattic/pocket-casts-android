@@ -2,8 +2,7 @@ package au.com.shiftyjelly.pocketcasts.referrals
 
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.models.to.SignInState
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.FakePaymentDataSource
 import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
@@ -91,7 +90,7 @@ class ReferralsClaimGuestPassViewModelTest {
     fun `given user signed-in, when activate pass button is clicked, then referral code is validated`() = runTest {
         whenever(referralManager.redeemReferralCode(referralCode)).thenReturn(SuccessResult(mock()))
         initViewModel(
-            signInState = SignInState.SignedIn("email", SubscriptionStatus.Free()),
+            signInState = SignInState.SignedIn("email", subscription = null),
         )
 
         viewModel.onActivatePassClick()
@@ -102,7 +101,7 @@ class ReferralsClaimGuestPassViewModelTest {
     @Test
     fun `given validation error, when activate pass button is clicked, then invalid offer is shown`() = runTest {
         initViewModel(
-            signInState = SignInState.SignedIn("email", SubscriptionStatus.Free()),
+            signInState = SignInState.SignedIn("email", subscription = null),
             referralValidationResult = ErrorResult(""),
         )
 
@@ -115,7 +114,7 @@ class ReferralsClaimGuestPassViewModelTest {
     @Test
     fun `given validation empty result, when activate pass button is clicked, then invalid offer is shown`() = runTest {
         initViewModel(
-            signInState = SignInState.SignedIn("email", SubscriptionStatus.Free()),
+            signInState = SignInState.SignedIn("email", subscription = null),
             referralValidationResult = EmptyResult(),
         )
 
@@ -128,7 +127,7 @@ class ReferralsClaimGuestPassViewModelTest {
     @Test
     fun `given no network, when activate pass button is clicked, then no network error is shown`() = runTest {
         initViewModel(
-            signInState = SignInState.SignedIn("email", SubscriptionStatus.Free()),
+            signInState = SignInState.SignedIn("email", subscription = null),
             referralValidationResult = ErrorResult(errorMessage = "", error = NoNetworkException()),
         )
 
@@ -143,7 +142,7 @@ class ReferralsClaimGuestPassViewModelTest {
         whenever(referralManager.redeemReferralCode(referralCode)).thenReturn(SuccessResult(mock()))
 
         initViewModel(
-            signInState = SignInState.SignedIn("email", SubscriptionStatus.Free()),
+            signInState = SignInState.SignedIn("email", subscription = null),
             referralValidationResult = SuccessResult(mock()),
         )
 
@@ -159,7 +158,7 @@ class ReferralsClaimGuestPassViewModelTest {
         whenever(referralManager.redeemReferralCode(referralCode)).thenReturn(SuccessResult(mock()))
 
         initViewModel(
-            signInState = SignInState.SignedIn("email", SubscriptionStatus.Free()),
+            signInState = SignInState.SignedIn("email", subscription = null),
             referralValidationResult = SuccessResult(mock()),
         )
         viewModel.launchBillingFlow(referralPlan, mock())
@@ -172,7 +171,7 @@ class ReferralsClaimGuestPassViewModelTest {
         paymentDataSource.purchasedProductsResultCode = PaymentResultCode.Error
 
         initViewModel(
-            signInState = SignInState.SignedIn("email", SubscriptionStatus.Free()),
+            signInState = SignInState.SignedIn("email", subscription = null),
             referralValidationResult = SuccessResult(mock()),
         )
 
@@ -187,7 +186,7 @@ class ReferralsClaimGuestPassViewModelTest {
         whenever(referralManager.redeemReferralCode(referralCode)).thenReturn(ErrorResult(""))
 
         initViewModel(
-            signInState = SignInState.SignedIn("email", SubscriptionStatus.Free()),
+            signInState = SignInState.SignedIn("email", subscription = null),
             referralValidationResult = SuccessResult(mock()),
         )
 
@@ -202,7 +201,7 @@ class ReferralsClaimGuestPassViewModelTest {
         whenever(referralManager.redeemReferralCode(referralCode)).thenReturn(SuccessResult(mock()))
 
         initViewModel(
-            signInState = SignInState.SignedIn("email", SubscriptionStatus.Free()),
+            signInState = SignInState.SignedIn("email", subscription = null),
             referralValidationResult = SuccessResult(mock()),
         )
 
@@ -218,7 +217,7 @@ class ReferralsClaimGuestPassViewModelTest {
         whenever(referralManager.redeemReferralCode(referralCode)).thenReturn(SuccessResult(mock()))
 
         initViewModel(
-            signInState = SignInState.SignedIn("email", SubscriptionStatus.Free()),
+            signInState = SignInState.SignedIn("email", subscription = null),
             referralValidationResult = SuccessResult(mock()),
             showWelcomeSetting = UserSetting.Mock(true, mock()),
         )
@@ -235,7 +234,7 @@ class ReferralsClaimGuestPassViewModelTest {
         whenever(referralManager.redeemReferralCode(referralCode)).thenReturn(SuccessResult(mock()))
 
         initViewModel(
-            signInState = SignInState.SignedIn("email", SubscriptionStatus.Free()),
+            signInState = SignInState.SignedIn("email", subscription = null),
             referralValidationResult = SuccessResult(mock()),
             showWelcomeSetting = UserSetting.Mock(false, mock()),
         )

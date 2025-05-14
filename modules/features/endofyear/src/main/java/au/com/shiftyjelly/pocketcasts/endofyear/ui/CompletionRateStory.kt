@@ -50,7 +50,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.extensions.nonScaledSp
 import au.com.shiftyjelly.pocketcasts.endofyear.StoryCaptureController
 import au.com.shiftyjelly.pocketcasts.models.to.Story
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import dev.shreyaspatil.capturable.capturable
 import java.io.File
 import kotlin.math.roundToInt
@@ -297,9 +297,9 @@ private fun CompletionRateInfo(
             modifier = Modifier.height(16.dp),
         )
         val badgeId = when (story.subscriptionTier) {
-            SubscriptionTier.PLUS -> IR.drawable.end_of_year_2024_completion_rate_plus_badge
-            SubscriptionTier.PATRON -> IR.drawable.end_of_year_2024_completion_rate_patron_badge
-            SubscriptionTier.NONE -> null
+            SubscriptionTier.Plus -> IR.drawable.end_of_year_2024_completion_rate_plus_badge
+            SubscriptionTier.Patron -> IR.drawable.end_of_year_2024_completion_rate_patron_badge
+            null -> null
         }
 
         if (badgeId != null) {
@@ -354,7 +354,7 @@ private fun CompletionRatePreview(
             story = Story.CompletionRate(
                 listenedCount = 100,
                 completedCount = count,
-                subscriptionTier = SubscriptionTier.PATRON,
+                subscriptionTier = SubscriptionTier.Patron,
             ),
             measurements = measurements,
             controller = StoryCaptureController.preview(),

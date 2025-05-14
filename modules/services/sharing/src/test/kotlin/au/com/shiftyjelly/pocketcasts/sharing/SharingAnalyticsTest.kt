@@ -11,7 +11,6 @@ import au.com.shiftyjelly.pocketcasts.models.to.LongestEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.RatingStats
 import au.com.shiftyjelly.pocketcasts.models.to.Story
 import au.com.shiftyjelly.pocketcasts.models.to.TopPodcast
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import java.time.Year
 import java.util.Date
 import kotlin.time.Duration
@@ -626,7 +625,7 @@ class SharingAnalyticsTest {
         val story = Story.YearVsYear(
             lastYearDuration = Duration.ZERO,
             thisYearDuration = Duration.ZERO,
-            subscriptionTier = SubscriptionTier.NONE,
+            subscriptionTier = null,
         )
         val request = SharingRequest.endOfYearStory(story, Year.of(1000), tempFolder.newFile()).build()
 
@@ -650,7 +649,7 @@ class SharingAnalyticsTest {
         val story = Story.CompletionRate(
             listenedCount = 0,
             completedCount = 0,
-            subscriptionTier = SubscriptionTier.NONE,
+            subscriptionTier = null,
         )
         val request = SharingRequest.endOfYearStory(story, Year.of(1000), tempFolder.newFile()).build()
 

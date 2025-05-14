@@ -15,8 +15,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast.Companion.AUTO_DOWNLOAD_NEW_EPISODES
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -84,10 +83,9 @@ class Support @Inject constructor(
             if (emailSupport) {
                 intent.putExtra(Intent.EXTRA_EMAIL, arrayOf("support@pocketcasts.com"))
             }
-            val isPaid = subscriptionManager.getCachedStatus() is SubscriptionStatus.Paid
             intent.putExtra(
                 Intent.EXTRA_SUBJECT,
-                "$subject v${settings.getVersion()} ${getAccountType(isPaid)}",
+                "$subject v${settings.getVersion()} ${getAccountType()}",
             )
 
             // try to attach the debug information
@@ -145,10 +143,9 @@ class Support @Inject constructor(
         withContext(Dispatchers.IO) {
             intent.type = "text/html"
             intent.putExtra(Intent.EXTRA_EMAIL, arrayOf("support@pocketcasts.com"))
-            val isPaid = subscriptionManager.getCachedStatus() is SubscriptionStatus.Paid
             intent.putExtra(
                 Intent.EXTRA_SUBJECT,
-                "$subject v${settings.getVersion()} ${getAccountType(isPaid)}",
+                "$subject v${settings.getVersion()} ${getAccountType()}",
             )
 
             try {
@@ -183,14 +180,10 @@ class Support @Inject constructor(
         return intent
     }
 
-    private fun getAccountType(isPaid: Boolean) = if (isPaid) {
-        when ((subscriptionManager.getCachedStatus() as SubscriptionStatus.Paid).tier) {
-            SubscriptionTier.PATRON -> "Patron Account"
-            SubscriptionTier.PLUS -> "Plus Account"
-            SubscriptionTier.NONE -> ""
-        }
-    } else {
-        ""
+    private fun getAccountType() = when (settings.cachedSubscription.value?.tier) {
+        SubscriptionTier.Patron -> "Patron Account"
+        SubscriptionTier.Plus -> "Plus Account"
+        null -> ""
     }
 
     suspend fun getLogs(): String =
@@ -208,8 +201,8 @@ class Support @Inject constructor(
         val output = StringBuilder()
         try {
             val eol = if (html) "<br/>" else "\n"
-            output.append("Platform : ").append(Util.getAppPlatform(context)).append(eol)
-            output.append("App version : ").append(settings.getVersion()).append(" (").append(settings.getVersionCode()).append(")").append(eol)
+            output.append("Platform: ").append(Util.getAppPlatform(context)).append(eol)
+            output.append("App version: ").append(settings.getVersion()).append(" (").append(settings.getVersionCode()).append(")").append(eol)
             output.append("Sync account: ").append(if (syncManager.isLoggedIn()) syncManager.getEmail() else "Not logged in").append(eol)
             if (syncManager.isLoggedIn()) {
                 output.append("Last Sync: ").append(settings.getLastModified() ?: "Never").append(eol)

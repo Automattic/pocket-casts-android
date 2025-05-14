@@ -9,7 +9,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -65,7 +65,7 @@ class ChaptersViewModel @AssistedInject constructor(
         playbackManager.playbackStateFlow,
         episodeManager.findEpisodeByUuidFlow(episodeId),
         chapterManager.observerChaptersForEpisode(episodeId),
-        settings.cachedSubscriptionStatus.flow,
+        settings.cachedSubscription.flow,
         isTogglingChapters,
         ::createUiState,
     )
@@ -159,13 +159,13 @@ class ChaptersViewModel @AssistedInject constructor(
         playbackState: PlaybackState,
         episode: BaseEpisode,
         chapters: Chapters,
-        subscriptionStatus: SubscriptionStatus?,
+        subscription: Subscription?,
         isToggling: Boolean,
     ) = UiState(
         podcast = playbackState.podcast,
         allChapters = chapters.toChapterStates(playbackPosition(playbackState, episode)),
         isTogglingChapters = isToggling,
-        canSkipChapters = subscriptionStatus.canSkipChapters(),
+        canSkipChapters = subscription != null,
         showHeader = episode is PodcastEpisode,
     )
 
@@ -187,8 +187,6 @@ class ChaptersViewModel @AssistedInject constructor(
             }
         }
     }
-
-    private fun SubscriptionStatus?.canSkipChapters() = (this as? SubscriptionStatus.Paid)?.tier?.isPaid == true
 
     private fun trackChapterSelectionToggled(episode: BaseEpisode, selected: Boolean) {
         tracker.track(

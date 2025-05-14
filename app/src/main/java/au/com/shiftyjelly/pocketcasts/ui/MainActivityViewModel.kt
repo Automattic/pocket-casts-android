@@ -9,8 +9,8 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
-import au.com.shiftyjelly.pocketcasts.models.to.SignInState
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.models.type.SignInState
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkArguments
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
@@ -27,7 +27,7 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
-import java.util.Date
+import java.time.Instant
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -112,12 +112,11 @@ class MainActivityViewModel
     val isSignedIn: Boolean
         get() = signInState.value?.isSignedIn ?: false
 
-    fun shouldShowCancelled(subscriptionStatus: SubscriptionStatus): Boolean {
-        val paidStatus = (subscriptionStatus as? SubscriptionStatus.Paid) ?: return false
-        val renewing = subscriptionStatus.autoRenew
+    fun shouldShowCancelled(subscription: Subscription): Boolean {
+        val renewing = subscription.isAutoRenewing
         val cancelAcknowledged = settings.getCancelledAcknowledged()
-        val giftDays = paidStatus.giftDays
-        val expired = paidStatus.expiryDate.before(Date())
+        val giftDays = subscription.giftDays
+        val expired = subscription.expiryDate.isBefore(Instant.now())
 
         return !renewing && !cancelAcknowledged && giftDays == 0 && expired
     }
@@ -127,6 +126,7 @@ class MainActivityViewModel
     }
 
     suspend fun isEndOfYearStoriesEligible() = endOfYearManager.isEligibleForEndOfYear()
+
     fun updateStoriesModalShowState(show: Boolean) {
         viewModelScope.launch {
             shouldShowStoriesModal.value = show &&

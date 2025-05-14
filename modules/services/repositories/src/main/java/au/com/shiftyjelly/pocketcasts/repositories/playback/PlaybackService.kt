@@ -26,7 +26,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
@@ -42,7 +41,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.list.ListServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
@@ -136,8 +134,6 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
     @Inject lateinit var serviceManager: ServiceManager
 
     @Inject lateinit var notificationHelper: NotificationHelper
-
-    @Inject lateinit var subscriptionManager: SubscriptionManager
 
     @Inject lateinit var listServiceManager: ListServiceManager
 
@@ -536,7 +532,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
     }
 
     suspend fun loadPodcastsChildren(): List<MediaBrowserCompat.MediaItem> {
-        return if (subscriptionManager.getCachedStatus() is SubscriptionStatus.Paid) {
+        return if (settings.cachedSubscription.value != null) {
             folderManager.getHomeFolder().mapNotNull { item ->
                 when (item) {
                     is FolderItem.Folder -> convertFolderToMediaItem(this, item.folder)
@@ -551,7 +547,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
     }
 
     suspend fun loadFolderPodcastsChildren(folderUuid: String): List<MediaBrowserCompat.MediaItem> {
-        return if (subscriptionManager.getCachedStatus() is SubscriptionStatus.Paid) {
+        return if (settings.cachedSubscription.value != null) {
             folderManager.findFolderPodcastsSorted(folderUuid).mapNotNull { podcast ->
                 convertPodcastToMediaItem(podcast = podcast, context = this, useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork)
             }
