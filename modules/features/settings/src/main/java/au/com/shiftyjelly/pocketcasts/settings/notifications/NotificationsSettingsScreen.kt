@@ -13,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.R
@@ -26,6 +27,10 @@ internal fun NotificationsSettingsScreen(
     modifier: Modifier = Modifier,
 ) {
     val state: NotificationsSettingViewModel.State by viewModel.state.collectAsState()
+
+    CallOnce {
+        viewModel.onShown()
+    }
 
     Column {
         ThemedTopAppBar(
@@ -45,7 +50,7 @@ internal fun NotificationsSettingsScreen(
                     NotificationPreferenceCategory(
                         categoryTitle = category.title,
                         items = category.preferences,
-                        onItemClicked = {},
+                        onItemClicked = viewModel::onPreferenceClicked,
                         modifier = Modifier.fillMaxWidth()
                     )
                 }

@@ -13,16 +13,17 @@ import au.com.shiftyjelly.pocketcasts.compose.components.SettingRowToggle
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingSection
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreference
-import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreference.ExternalPreference
-import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreference.ValuePreference.SwitchPreference
-import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreference.ValuePreference.TextPreference
+import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreference.RadioGroupPreference
+import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreference.SwitchPreference
+import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreference.TextPreference
+import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreferences
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 
 @Composable
 internal fun NotificationPreferenceCategory(
     categoryTitle: String,
-    items: List<NotificationPreference>,
-    onItemClicked: (NotificationPreference) -> Unit,
+    items: List<NotificationPreference<*>>,
+    onItemClicked: (NotificationPreference<*>) -> Unit,
     modifier: Modifier = Modifier
 ) {
     SettingSection(
@@ -46,10 +47,9 @@ internal fun NotificationPreferenceCategory(
                     modifier = modifier.clickable { onItemClicked(item) }
                 )
 
-                is ExternalPreference -> SettingRow(
+                is RadioGroupPreference<*> -> SettingRow(
                     primaryText = item.title,
-                    secondaryText = item.description,
-                    modifier = modifier.clickable { onItemClicked(item) }
+                    secondaryText = (item.value as? String).orEmpty(),
                 )
             }
         }
@@ -68,28 +68,19 @@ private fun NotificationCategoryPreview(
             items = listOf(
                 SwitchPreference(
                     title = "offItem",
-                    preferenceKey = "",
                     value = false,
+                    preference = NotificationPreferences.NEW_EPISODES_NOTIFY_ME,
                 ),
                 SwitchPreference(
                     title = "onItem",
-                    preferenceKey = "",
                     value = true,
+                    preference = NotificationPreferences.NEW_EPISODES_NOTIFY_ME,
                 ),
-                TextPreference.SingleSelectPreference(
+                TextPreference(
                     title = "singleSelectItem",
                     value = "value",
-                    preferenceKey = ""
+                    preference = NotificationPreferences.NEW_EPISODES_ACTIONS
                 ),
-                TextPreference.MultiSelectPreference(
-                    title = "multiSelectItem",
-                    value = "value",
-                    preferenceKey = ""
-                ),
-                ExternalPreference(
-                    title = "externalItem",
-                    description = "description"
-                )
             ),
             onItemClicked = { }
         )
