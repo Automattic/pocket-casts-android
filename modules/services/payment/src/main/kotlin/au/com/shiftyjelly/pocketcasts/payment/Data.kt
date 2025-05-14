@@ -284,7 +284,7 @@ enum class SubscriptionOffer(
     val analyticsValue: String,
 ) {
     IntroOffer(
-        analyticsValue = "into_offer",
+        analyticsValue = "intro_offer",
     ),
     Trial(
         analyticsValue = "free_trial",
