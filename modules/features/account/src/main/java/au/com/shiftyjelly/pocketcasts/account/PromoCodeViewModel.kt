@@ -9,7 +9,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionMana
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.PromoCodeResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.parseErrorResponse
-import au.com.shiftyjelly.pocketcasts.utils.Optional
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
@@ -19,7 +18,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Function
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
-import kotlinx.coroutines.rx2.rxSingle
+import kotlinx.coroutines.rx2.rxCompletable
 import retrofit2.HttpException
 
 @HiltViewModel
@@ -42,8 +41,7 @@ class PromoCodeViewModel @Inject constructor(
         val signedInFlow = Single.defer<ViewState> { syncManager.redeemPromoCodeRxSingle(code).map { ViewState.Success(it) } }
             .flatMap { viewState ->
                 // Force reloading of the new subscription status
-                rxSingle { subscriptionManager.fetchFreshSubscription().let { Optional.of(it) } }
-                    .map { viewState }
+                rxCompletable { subscriptionManager.fetchFreshSubscription() }.toSingleDefault(viewState)
             }
             .observeOn(AndroidSchedulers.mainThread())
             .onErrorReturn(errorHandler(isSignedIn = true, resources = context.resources))
