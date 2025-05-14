@@ -176,3 +176,5 @@ private fun BillingResult.toPaymentFailure() = PaymentResult.Failure(
     },
     debugMessage,
 )
+
+private fun BillingResult.isOk() = responseCode == BillingClient.BillingResponseCode.OK
