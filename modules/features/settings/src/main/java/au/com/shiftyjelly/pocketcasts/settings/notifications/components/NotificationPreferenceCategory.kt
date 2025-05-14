@@ -4,14 +4,18 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.components.SettingRadioDialogRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRowToggle
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingSection
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
+import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreference
 import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreference.RadioGroupPreference
 import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreference.SwitchPreference
@@ -19,6 +23,7 @@ import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationP
 import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreferences
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 
+@Suppress("UNCHECKED_CAST")
 @Composable
 internal fun NotificationPreferenceCategory(
     categoryTitle: String,
@@ -47,15 +52,50 @@ internal fun NotificationPreferenceCategory(
                     modifier = modifier.clickable { onItemClicked(item) }
                 )
 
-                is RadioGroupPreference<*> -> SettingRow(
-                    primaryText = item.title,
-                    secondaryText = (item.value as? String).orEmpty(),
-                )
+                is RadioGroupPreference<*> -> {
+                    val context = LocalContext.current
+                    when (item.preference) {
+                        NotificationPreferences.SETTINGS_PlAY_OVER -> {
+                            val castedItem = item as RadioGroupPreference<PlayOverNotificationSetting>
+                            SettingRadioDialogRow(
+                                primaryText = item.title,
+                                secondaryText = item.displayText,
+                                options = castedItem.options,
+                                savedOption = item.value,
+                                optionToLocalisedString = {
+                                    context.getString(it.titleRes)
+                                },
+                                onSave = { value ->
+                                    onItemClicked(
+                                        item.copy(value = value)
+                                    )
+                                },
+                            )
+                        }
+                        NotificationPreferences.NEW_EPISODES_VIBRATION -> {
+                            val castedItem = item as RadioGroupPreference<NotificationVibrateSetting>
+                            SettingRadioDialogRow(
+                                primaryText = item.title,
+                                secondaryText = item.displayText,
+                                options = castedItem.options,
+                                savedOption = item.value,
+                                optionToLocalisedString = {
+                                    context.getString(it.summary)
+                                },
+                                onSave = { value ->
+                                    onItemClicked(
+                                        item.copy(value = value)
+                                    )
+                                },
+                            )
+                        }
+                        else -> Unit // TO
+                    }
+                }
             }
         }
     }
 }
-
 
 @Preview(showBackground = true)
 @Composable

@@ -16,22 +16,23 @@ internal sealed interface NotificationPreference<T> {
     val preference: NotificationPreferences
     val value: T
 
-    data class TextPreference(
-        override val title: String,
-        override val value: String?,
-        override val preference: NotificationPreferences
-    ): NotificationPreference<String?>
-
     data class SwitchPreference(
         override val title: String,
         override val value: Boolean,
         override val preference: NotificationPreferences
     ) : NotificationPreference<Boolean>
 
+    data class TextPreference(
+        override val title: String,
+        override val value: String?,
+        override val preference: NotificationPreferences,
+    ): NotificationPreference<String?>
+
     data class RadioGroupPreference<T>(
         override val title: String,
         override val value: T,
         override val preference: NotificationPreferences,
-        val options: List<T>
+        val options: List<T>,
+        val displayText: String?
     ) : NotificationPreference<T>
 }
