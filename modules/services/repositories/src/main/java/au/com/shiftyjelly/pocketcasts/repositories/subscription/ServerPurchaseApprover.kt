@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionPurchaseRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.toSubscription
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
 
@@ -25,7 +26,8 @@ class ServerPurchaseApprover @Inject constructor(
             if (error is CancellationException) {
                 throw error
             } else {
-                PaymentResult.Failure(PaymentResultCode.Unknown(0), error.message ?: "Server confirmation error")
+                LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, error, "Failed to approve a purchase")
+                PaymentResult.Failure(PaymentResultCode.ItemNotApproved, error.message ?: "Server confirmation error")
             }
         }
     }

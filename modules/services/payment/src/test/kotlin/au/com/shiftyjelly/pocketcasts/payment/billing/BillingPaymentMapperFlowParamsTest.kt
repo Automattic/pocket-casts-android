@@ -4,7 +4,7 @@ import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
-import au.com.shiftyjelly.pocketcasts.payment.TestLogger
+import au.com.shiftyjelly.pocketcasts.payment.TestListener
 import com.android.billingclient.api.BillingFlowParams.SubscriptionUpdateParams.ReplacementMode
 import com.android.billingclient.api.GoogleOfferDetails
 import com.android.billingclient.api.GoogleProductDetails
@@ -24,8 +24,8 @@ class BillingPaymentMapperFlowParamsTest {
     @Config(manifest = Config.NONE)
     @RunWith(RobolectricTestRunner::class)
     class GeneralBehavior {
-        private val logger = TestLogger()
-        private val mapper = BillingPaymentMapper(logger)
+        private val listener = TestListener()
+        private val mapper = BillingPaymentMapper(setOf(listener))
 
         @Test
         fun `create billing params`() {
@@ -123,7 +123,7 @@ class BillingPaymentMapperFlowParamsTest {
 
             mapper.toBillingFlowRequest(planKey, listOf(product, product), purchases = emptyList())
 
-            logger.assertWarnings(
+            listener.assertMessages(
                 "Found multiple matching products in {billingCycle=Monthly, offer=null, tier=Plus}",
             )
         }
@@ -134,7 +134,7 @@ class BillingPaymentMapperFlowParamsTest {
 
             mapper.toBillingFlowRequest(planKey, productDetails = emptyList(), purchases = emptyList())
 
-            logger.assertWarnings(
+            listener.assertMessages(
                 "Found no matching products in {billingCycle=Monthly, offer=null, tier=Plus}",
             )
         }
@@ -160,7 +160,7 @@ class BillingPaymentMapperFlowParamsTest {
 
             mapper.toBillingFlowRequest(planKey, listOf(product), purchases = emptyList())
 
-            logger.assertWarnings(
+            listener.assertMessages(
                 "Found multiple matching offers in {billingCycle=Monthly, offer=null, tier=Plus}",
             )
         }
@@ -175,7 +175,7 @@ class BillingPaymentMapperFlowParamsTest {
 
             mapper.toBillingFlowRequest(planKey, listOf(product), purchases = emptyList())
 
-            logger.assertWarnings(
+            listener.assertMessages(
                 "Found no matching offers in {billingCycle=Monthly, offer=null, tier=Plus}",
             )
         }
@@ -202,7 +202,7 @@ class BillingPaymentMapperFlowParamsTest {
 
             mapper.toBillingFlowRequest(planKey, listOf(product), currentPurchases)
 
-            logger.assertWarnings(
+            listener.assertMessages(
                 "Found more than one active purchase in {purchases=order-id-1: [product-id-1], order-id-2: [product-id-2]}",
             )
         }
@@ -225,7 +225,7 @@ class BillingPaymentMapperFlowParamsTest {
 
             mapper.toBillingFlowRequest(planKey, listOf(product), currentPurchases)
 
-            logger.assertWarnings(
+            listener.assertMessages(
                 "Active purchase should have only a single product in {orderId=order-id, products=[product-id-1, product-id-2]}",
             )
         }
@@ -242,7 +242,7 @@ class BillingPaymentMapperFlowParamsTest {
 
             mapper.toBillingFlowRequest(planKey, listOf(product), purchases = emptyList())
 
-            logger.assertNoLogs()
+            listener.assertMessages()
         }
     }
 
@@ -252,7 +252,7 @@ class BillingPaymentMapperFlowParamsTest {
         private val tier: SubscriptionTier,
         private val billingCycle: BillingCycle,
     ) {
-        private val mapper = BillingPaymentMapper(TestLogger())
+        private val mapper = BillingPaymentMapper(listeners = emptySet())
 
         @Test
         fun `map base plan to billing flow request`() {
@@ -344,7 +344,7 @@ class BillingPaymentMapperFlowParamsTest {
         private val toBillingCycle: BillingCycle,
         private val expectedReplacementMode: Int?,
     ) {
-        private val mapper = BillingPaymentMapper(TestLogger())
+        private val mapper = BillingPaymentMapper(listeners = emptySet())
 
         @Test
         fun `create billing request with correct replacement mode`() {

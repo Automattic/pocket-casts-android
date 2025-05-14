@@ -19,8 +19,8 @@ interface PaymentDataSource {
     companion object {
         fun billing(
             context: Context,
-            logger: Logger,
-        ): PaymentDataSource = BillingPaymentDataSource(context, logger)
+            listeners: Set<PaymentClient.Listener>,
+        ): PaymentDataSource = BillingPaymentDataSource(context, listeners)
 
         fun fake() = FakePaymentDataSource()
     }

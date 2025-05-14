@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.payment.billing
 
 import android.app.Activity
 import android.content.Context
-import au.com.shiftyjelly.pocketcasts.payment.Logger
+import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
 import au.com.shiftyjelly.pocketcasts.payment.PaymentDataSource
 import au.com.shiftyjelly.pocketcasts.payment.PaymentResult
 import au.com.shiftyjelly.pocketcasts.payment.PaymentResultCode
@@ -29,13 +29,12 @@ import com.android.billingclient.api.Purchase as GooglePurchase
 
 internal class BillingPaymentDataSource(
     context: Context,
-    private val logger: Logger,
+    private val listeners: Set<PaymentClient.Listener>,
 ) : PaymentDataSource {
 
     private val connection = ClientConnection(
         context,
-        listener = PurchasesUpdatedListener { billingResult, googlePurchases ->
-            logger.info("Purchase results updated")
+        purchaseUpdateListener = PurchasesUpdatedListener { billingResult, googlePurchases ->
             val result = if (billingResult.isOk()) {
                 PaymentResult.Success(googlePurchases?.map(mapper::toPurchase).orEmpty())
             } else {
@@ -43,10 +42,10 @@ internal class BillingPaymentDataSource(
             }
             _purchases.tryEmit(result)
         },
-        logger = logger,
+        diagnosticListeners = listeners,
     )
 
-    private val mapper = BillingPaymentMapper(logger)
+    private val mapper = BillingPaymentMapper(listeners)
 
     private val _purchases = MutableSharedFlow<PaymentResult<List<Purchase>>>(
         extraBufferCapacity = 100, // Arbitrarily large number

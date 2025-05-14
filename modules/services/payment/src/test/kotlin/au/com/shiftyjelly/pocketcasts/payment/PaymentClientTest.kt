@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.payment
 
 import android.app.Activity
+import au.com.shiftyjelly.pocketcasts.payment.TestListener.Event
 import kotlinx.coroutines.async
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.yield
@@ -14,9 +15,9 @@ import org.mockito.kotlin.mock
 class PaymentClientTest {
     private val dataSource = PaymentDataSource.fake()
     private val approver = TestPurchaseApprover()
-    private val logger = TestLogger()
+    private val listener = TestListener()
 
-    private val client = PaymentClient(dataSource, approver, logger)
+    private val client = PaymentClient(dataSource, approver, setOf(listener))
 
     private val planKey = SubscriptionPlan.Key(SubscriptionTier.Plus, BillingCycle.Monthly, offer = null)
     private val purchase = Purchase(
@@ -280,43 +281,47 @@ class PaymentClientTest {
     }
 
     @Test
-    fun `log loading plans successfully`() = runTest {
-        val plans = client.loadSubscriptionPlans()
+    fun `dispatch loading plans successfully`() = runTest {
+        client.loadSubscriptionPlans()
 
-        logger.assertInfos(
-            "Load subscription plans",
-            "Subscription plans loaded: ${plans.getOrNull()}",
+        listener.assertEvents(
+            Event.LoadSubscriptionPlans,
+            Event.LoadSubscriptionPlansSuccess,
         )
     }
 
     @Test
-    fun `log loading plans with failure`() = runTest {
+    fun `dispatch loading plans with failure`() = runTest {
         dataSource.loadedProductsResultCode = PaymentResultCode.Error
 
         client.loadSubscriptionPlans()
 
-        logger.assertInfos("Load subscription plans")
-        logger.assertWarnings("Failed to load subscription plans. Error, Load products error")
-    }
-
-    @Test
-    fun `log loading acknowledged subscription purchases succesfully`() = runTest {
-        val subscriptions = client.loadAcknowledgedSubscriptions().getOrNull()!!
-
-        logger.assertInfos(
-            "Loading acknowledged subscriptions",
-            "Acknowledged subscriptions loaded: $subscriptions",
+        listener.assertEvents(
+            Event.LoadSubscriptionPlans,
+            Event.LoadSubscriptionPlansFailure,
         )
     }
 
     @Test
-    fun `log loading acknowledged subscription with failure`() = runTest {
+    fun `dispatch loading acknowledged subscription purchases succesfully`() = runTest {
+        client.loadAcknowledgedSubscriptions()
+
+        listener.assertEvents(
+            Event.LoadAcknowledgedSubscriptions,
+            Event.LoadAcknowledgedSubscriptionsSuccess,
+        )
+    }
+
+    @Test
+    fun `dispatch loading acknowledged subscription with failure`() = runTest {
         dataSource.loadedPurchasesResultCode = PaymentResultCode.Error
 
         client.loadAcknowledgedSubscriptions()
 
-        logger.assertInfos("Loading acknowledged subscriptions")
-        logger.assertWarnings("Failed to load acknowledged subscriptions. Error, Load purchases error")
+        listener.assertEvents(
+            Event.LoadAcknowledgedSubscriptions,
+            Event.LoadAcknowledgedSubscriptionsFailure,
+        )
     }
 
     @Test
@@ -349,7 +354,7 @@ class PaymentClientTest {
 
         client.loadAcknowledgedSubscriptions()
 
-        logger.assertWarnings(
+        listener.assertMessages(
             "Skipping purchase order-id-2. No associated products.",
             "Skipping purchase order-id-3. Too many associated products: [product-id-1, product-id-2]",
             "Skipping purchase order-id-4. Couldn't find matching product key for unknown-product-id",
@@ -357,51 +362,64 @@ class PaymentClientTest {
     }
 
     @Test
-    fun `log confirming purchase`() = runTest {
-        dataSource.purchasedProducts = listOf(purchase)
-
+    fun `dispatch purchase result success`() = runTest {
         client.purchaseSubscriptionPlan(planKey, mock<Activity>())
 
-        logger.assertInfos(
-            "Confirm purchase: $purchase",
-            "Purchase confirmed: ${purchase.copy(isAcknowledged = true)}",
+        listener.assertEvents(
+            Event.PurchaseSubscriptionPlan,
+            Event.ConfirmPurchase,
+            Event.ConfirmPurchaseSuccess,
+            Event.PurchaseSubscriptionPlanSuccess,
         )
     }
 
     @Test
-    fun `log confirming purchase failure`() = runTest {
-        dataSource.purchasedProducts = listOf(purchase)
-        approver.approveResultCode = PaymentResultCode.DeveloperError
+    fun `dispatch purchase result cancellation`() = runTest {
+        dataSource.purchasedProductsResultCode = PaymentResultCode.UserCancelled
 
         client.purchaseSubscriptionPlan(planKey, mock<Activity>())
 
-        logger.assertInfos(
-            "Confirm purchase: $purchase",
-        )
-        logger.assertWarnings(
-            "Failed to confirm purchase: $purchase. DeveloperError, Error message",
+        listener.assertEvents(
+            Event.PurchaseSubscriptionPlan,
+            Event.PurchaseSubscriptionPlanCancelled,
         )
     }
 
     @Test
-    fun `log purchase result failure`() = runTest {
+    fun `dispatch purchase result failure`() = runTest {
         dataSource.purchasedProductsResultCode = PaymentResultCode.ServiceDisconnected
 
         client.purchaseSubscriptionPlan(planKey, mock<Activity>())
 
-        logger.assertWarnings(
-            "Purchase failure: ServiceDisconnected, Purchase product error",
+        listener.assertEvents(
+            Event.PurchaseSubscriptionPlan,
+            Event.PurchaseSubscriptionPlanFailure,
         )
     }
 
     @Test
-    fun `log billing result failure`() = runTest {
+    fun `dispatch billing result failure`() = runTest {
         dataSource.billingFlowResultCode = PaymentResultCode.DeveloperError
 
         client.purchaseSubscriptionPlan(planKey, mock<Activity>())
 
-        logger.assertWarnings(
-            "Launching billing flow failed: DeveloperError, Launch billing error",
+        listener.assertEvents(
+            Event.PurchaseSubscriptionPlan,
+            Event.PurchaseSubscriptionPlanFailure,
+        )
+    }
+
+    @Test
+    fun `dispatch confirm pruchase result failure`() = runTest {
+        approver.approveResultCode = PaymentResultCode.DeveloperError
+
+        client.purchaseSubscriptionPlan(planKey, mock<Activity>())
+
+        listener.assertEvents(
+            Event.PurchaseSubscriptionPlan,
+            Event.ConfirmPurchase,
+            Event.ConfirmPurchaseFailure,
+            Event.PurchaseSubscriptionPlanFailure,
         )
     }
 }
