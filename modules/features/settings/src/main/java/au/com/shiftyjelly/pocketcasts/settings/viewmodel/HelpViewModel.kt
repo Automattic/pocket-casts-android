@@ -3,38 +3,20 @@ package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 import android.app.Activity
 import android.content.Intent
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.support.DatabaseExportHelper
 import au.com.shiftyjelly.pocketcasts.repositories.support.Support
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.io.File
 import javax.inject.Inject
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 @HiltViewModel
 class HelpViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTracker,
     private val support: Support,
     private val databaseExportHelper: DatabaseExportHelper,
-    private val settings: Settings,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(UiState())
-    val uiState: StateFlow<UiState> = _uiState
-
-    init {
-        viewModelScope.launch {
-            settings.cachedSubscription.flow.collect { subscription ->
-                _uiState.update { it.copy(isPaidUser = subscription != null) }
-            }
-        }
-    }
-
     suspend fun exportDatabase(): File? {
         return databaseExportHelper.getExportFile()
     }
@@ -43,7 +25,7 @@ class HelpViewModel @Inject constructor(
         analyticsTracker.track(AnalyticsEvent.SETTINGS_LEAVE_FEEDBACK)
         return support.shareLogs(
             subject = "Android feedback.",
-            intro = "It's a great app, but it really needs...",
+            intro = "It's a great app, but it really needs…",
             emailSupport = true,
             context = activity,
         )
@@ -53,13 +35,9 @@ class HelpViewModel @Inject constructor(
         analyticsTracker.track(AnalyticsEvent.SETTINGS_GET_SUPPORT)
         return support.shareLogs(
             subject = "Android support.",
-            intro = "Hi there, just needed help with something....",
+            intro = "Hi there, just needed help with something…",
             emailSupport = true,
             context = activity,
         )
     }
-
-    data class UiState(
-        val isPaidUser: Boolean = false,
-    )
 }
