@@ -7,7 +7,6 @@ import android.content.Intent
 import android.net.Uri
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
-import androidx.appcompat.app.AlertDialog
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
@@ -44,7 +43,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -99,7 +97,6 @@ fun HelpPage(
     onWebViewDisposed: (WebView) -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
-    val state by viewModel.uiState.collectAsState()
     var isExportingDatabase by remember { mutableStateOf(false) }
 
     Box(
@@ -118,24 +115,13 @@ fun HelpPage(
                 }
             },
             onContactSupport = {
-                if (state.subscriptionTier.isPaid) {
-                    scope.launch {
-                        val intent = viewModel.getSupportIntent(activity)
-                        try {
-                            activity.startActivity(intent)
-                        } catch (_: ActivityNotFoundException) {
-                            UiUtil.displayDialogNoEmailApp(activity)
-                        }
+                scope.launch {
+                    val intent = viewModel.getSupportIntent(activity)
+                    try {
+                        activity.startActivity(intent)
+                    } catch (_: ActivityNotFoundException) {
+                        UiUtil.displayDialogNoEmailApp(activity)
                     }
-                } else {
-                    val forumUrl = "https://forums.pocketcasts.com/"
-                    AlertDialog.Builder(activity)
-                        .setTitle(LR.string.settings_forums)
-                        .setMessage(activity.getString(LR.string.settings_forums_description, forumUrl))
-                        .setPositiveButton(LR.string.settings_take_me_there) { _, _ ->
-                            activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(forumUrl)))
-                        }
-                        .show()
                 }
             },
             onTapUri = { uri ->
