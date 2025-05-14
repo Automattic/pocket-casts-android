@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -62,7 +63,7 @@ internal class NotificationsSettingViewModel @Inject constructor(
                 }
             }
 
-            NotificationPreferences.SETTINGS_PlAY_OVER -> {
+            NotificationPreferences.SETTINGS_PLAY_OVER -> {
                 viewModelScope.launch {
                     preferenceRepository.setPreference(preference)
                     (preference.value as? PlayOverNotificationSetting)?.let {
@@ -89,6 +90,27 @@ internal class NotificationsSettingViewModel @Inject constructor(
 
             NotificationPreferences.NEW_EPISODES_ADVANCED -> {
                 analyticsTracker.track(AnalyticsEvent.SETTINGS_NOTIFICATIONS_ADVANCED_SETTINGS_TAPPED)
+            }
+
+            NotificationPreferences.NEW_EPISODES_ACTIONS -> {
+                val previousValue = state.value.categories.map { it.preferences }.flatten().find { it.preference == NotificationPreferences.NEW_EPISODES_ACTIONS }
+                if (previousValue?.value != preference.value) {
+                    viewModelScope.launch {
+                        preferenceRepository.setPreference(preference)
+
+                        val selectedActions = (preference as? NotificationPreference.MultiSelectPreference<*>)?.value?.filterIsInstance<NewEpisodeNotificationAction>() ?: emptyList()
+                        analyticsTracker.track(
+                            AnalyticsEvent.SETTINGS_NOTIFICATIONS_ACTIONS_CHANGED,
+                            mapOf(
+                                "action_archive" to selectedActions.contains(NewEpisodeNotificationAction.Archive),
+                                "action_download" to selectedActions.contains(NewEpisodeNotificationAction.Download),
+                                "action_play" to selectedActions.contains(NewEpisodeNotificationAction.Play),
+                                "action_play_next" to selectedActions.contains(NewEpisodeNotificationAction.PlayNext),
+                                "action_play_last" to selectedActions.contains(NewEpisodeNotificationAction.PlayLast),
+                            ),
+                        )
+                    }
+                }
             }
 
             else -> Unit // TO BE IMPLEMENTED LATER

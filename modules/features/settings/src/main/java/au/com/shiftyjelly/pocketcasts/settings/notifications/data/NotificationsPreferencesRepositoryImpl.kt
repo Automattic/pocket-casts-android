@@ -3,9 +3,9 @@ package au.com.shiftyjelly.pocketcasts.settings.notifications.data
 import android.content.Context
 import android.media.RingtoneManager
 import android.net.Uri
-import android.os.Build
 import au.com.shiftyjelly.pocketcasts.preferences.NotificationSound
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
@@ -51,11 +51,13 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
                             )
                         )
                         add(
-                            // TODO select 3
-                            NotificationPreference.TextPreference(
+                            NotificationPreference.MultiSelectPreference(
                                 title = context.getString(LR.string.settings_notification_actions_title),
-                                value = getActionsSummary(),
-                                preference = NotificationPreferences.NEW_EPISODES_ACTIONS
+                                numberOfItemToSelect = 3,
+                                value =  settings.newEpisodeNotificationActions.value,
+                                preference = NotificationPreferences.NEW_EPISODES_ACTIONS,
+                                options = NewEpisodeNotificationAction.entries,
+                                displayText = getActionsSummary(),
                             )
                         )
 
@@ -98,7 +100,7 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
                     NotificationPreference.RadioGroupPreference(
                         title = context.getString(LR.string.settings_notification_play_over),
                         value = settings.playOverNotification.value,
-                        preference = NotificationPreferences.SETTINGS_PlAY_OVER,
+                        preference = NotificationPreferences.SETTINGS_PLAY_OVER,
                         options = listOf(
                             PlayOverNotificationSetting.NEVER,
                             PlayOverNotificationSetting.DUCK,
@@ -175,7 +177,7 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
                 settings.hideNotificationOnPause.set(value = (preference as NotificationPreference.SwitchPreference).value, updateModifiedAt = true)
             }
 
-            NotificationPreferences.SETTINGS_PlAY_OVER -> {
+            NotificationPreferences.SETTINGS_PLAY_OVER -> {
                 val setting = preference.value as? PlayOverNotificationSetting ?: return@withContext
                 settings.playOverNotification.set(value = setting, updateModifiedAt = true)
             }
@@ -183,6 +185,11 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
             NotificationPreferences.NEW_EPISODES_VIBRATION -> {
                 val setting = (preference.value as? NotificationVibrateSetting) ?: NotificationVibrateSetting.DEFAULT
                 settings.notificationVibrate.set(value = setting, updateModifiedAt = false)
+            }
+
+            NotificationPreferences.NEW_EPISODES_ACTIONS -> {
+                val setting = preference as? NotificationPreference.MultiSelectPreference<*> ?: error("oopsie")
+                settings.newEpisodeNotificationActions.set(value = setting.value.filterIsInstance<NewEpisodeNotificationAction>(), updateModifiedAt = true)
             }
 
             else -> Unit // TO BE IMPLEMENTED

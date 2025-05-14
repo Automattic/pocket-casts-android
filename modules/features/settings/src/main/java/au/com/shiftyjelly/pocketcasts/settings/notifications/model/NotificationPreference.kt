@@ -7,7 +7,7 @@ internal enum class NotificationPreferences {
     NEW_EPISODES_ADVANCED,
     NEW_EPISODES_RINGTONE,
     NEW_EPISODES_VIBRATION,
-    SETTINGS_PlAY_OVER,
+    SETTINGS_PLAY_OVER,
     SETTINGS_HIDE_NOTIFICATION_ON_PAUSE
 }
 
@@ -35,4 +35,13 @@ internal sealed interface NotificationPreference<T> {
         val options: List<T>,
         val displayText: String?
     ) : NotificationPreference<T>
+
+    data class MultiSelectPreference<T>(
+        override val title: String,
+        override val value: List<T>,
+        override val preference: NotificationPreferences,
+        val options: List<T>,
+        val displayText: String?,
+        val numberOfItemToSelect: Int
+    ) : NotificationPreference<List<T>>
 }
