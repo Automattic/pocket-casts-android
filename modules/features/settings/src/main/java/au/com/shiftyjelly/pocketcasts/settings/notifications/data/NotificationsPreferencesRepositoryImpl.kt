@@ -8,8 +8,8 @@ import au.com.shiftyjelly.pocketcasts.preferences.NotificationSound
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.settings.notifications.model.LocalPreference
 import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreference
+import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreferences
 import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreferenceCategory
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -34,46 +34,50 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
                 preferences = buildList {
                     val isEnabled = settings.notifyRefreshPodcast.flow.value
                     add(
-                        NotificationPreference.ValuePreference.SwitchPreference(
+                        NotificationPreference.SwitchPreference(
                             title = context.getString(LR.string.settings_notification_notify_me),
                             value = isEnabled,
-                            preferenceKey = PREF_NOTIFY_ME
+                            preference = NotificationPreferences.NEW_EPISODES_NOTIFY_ME
                         )
                     )
                     if (isEnabled) {
                         add(
-                            NotificationPreference.ValuePreference.TextPreference.MultiSelectPreference(
+                            NotificationPreference.TextPreference(
                                 title = context.getString(LR.string.settings_notification_choose_podcasts),
-                                value = getPodcastsSummary().orEmpty(),
-                                preferenceKey = ""
+                                value = getPodcastsSummary(),
+                                preference = NotificationPreferences.NEW_EPISODES_CHOOSE_PODCASTS
                             )
                         )
                         add(
-                            NotificationPreference.ValuePreference.TextPreference.MultiSelectPreference(
+                            // TODO select 3
+                            NotificationPreference.TextPreference(
                                 title = context.getString(LR.string.settings_notification_actions_title),
                                 value = getActionsSummary(),
-                                preferenceKey = ""
+                                preference = NotificationPreferences.NEW_EPISODES_ACTIONS
                             )
                         )
 
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                             add(
-                                NotificationPreference.ExternalPreference(
+                                NotificationPreference.TextPreference(
                                     title = context.getString(LR.string.settings_notification_advanced),
-                                    description = context.getString(LR.string.settings_notification_advanced_summary)
+                                    value = context.getString(LR.string.settings_notification_advanced_summary),
+                                    preference = NotificationPreferences.NEW_EPISODES_ADVANCED
                                 )
                             )
                         } else {
                             add(
-                                NotificationPreference.ExternalPreference(
+                                NotificationPreference.TextPreference(
                                     title = context.getString(LR.string.settings_notification_sound),
-                                    description = getNotificationSoundSummary()
+                                    value = getNotificationSoundSummary(),
+                                    preference = NotificationPreferences.NEW_EPISODES_RINGTONE
                                 )
                             )
                             add(
-                                NotificationPreference.ExternalPreference(
+                                NotificationPreference.TextPreference(
                                     title = context.getString(LR.string.settings_notification_vibrate),
-                                    description = context.getString(settings.notificationVibrate.value.summary)
+                                    value = context.getString(settings.notificationVibrate.value.summary),
+                                    NotificationPreferences.NEW_EPISODES_VIBRATION
                                 )
                             )
                         }
@@ -83,15 +87,21 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
             NotificationPreferenceCategory(
                 title = context.getString(LR.string.settings),
                 preferences = listOf(
-                    NotificationPreference.ValuePreference.TextPreference.SingleSelectPreference(
+                    NotificationPreference.RadioGroupPreference<String>(
                         title = context.getString(LR.string.settings_notification_play_over),
                         value = context.getString(settings.playOverNotification.value.titleRes),
-                        preferenceKey = ""
+                        preference = NotificationPreferences.SETTINGS_PlAY_OVER,
+                        // TODO
+                        options = listOf(
+                            "1",
+                            "2",
+                            "3"
+                        )
                     ),
-                    NotificationPreference.ValuePreference.SwitchPreference(
+                    NotificationPreference.SwitchPreference(
                         title = context.getString(LR.string.settings_notification_hide_on_pause),
                         value = settings.hideNotificationOnPause.value,
-                        preferenceKey = ""
+                        preference = NotificationPreferences.SETTINGS_HIDE_NOTIFICATION_ON_PAUSE
                     )
                 )
             )
@@ -142,11 +152,20 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun setPreference(preference: LocalPreference) = withContext(dispatcher) {
-        // TO be implemented later
-    }
-
-    private companion object {
-        const val PREF_NOTIFY_ME = "notifyMe"
+    override suspend fun setPreference(preference: NotificationPreference<*>) = withContext(dispatcher) {
+        when (preference.preference) {
+            NotificationPreferences.NEW_EPISODES_NOTIFY_ME -> {
+                val value = (preference as NotificationPreference.SwitchPreference).value
+                settings.notifyRefreshPodcast.set(value = value, updateModifiedAt = true)
+                podcastManager.updateAllShowNotifications(value)
+                if (value) {
+                    settings.setNotificationLastSeenToNow()
+                }
+            }
+            NotificationPreferences.SETTINGS_HIDE_NOTIFICATION_ON_PAUSE -> {
+                settings.hideNotificationOnPause.set(value = (preference as NotificationPreference.SwitchPreference).value, updateModifiedAt = true)
+            }
+            else -> Unit // TO BE IMPLEMENTED
+        }
     }
 }
