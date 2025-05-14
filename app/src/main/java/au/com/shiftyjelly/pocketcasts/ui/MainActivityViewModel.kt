@@ -116,7 +116,7 @@ class MainActivityViewModel
         val renewing = subscription.isAutoRenewing
         val cancelAcknowledged = settings.getCancelledAcknowledged()
         val giftDays = subscription.giftDays
-        val expired = subscription.expiryDate.isAfter(Instant.now())
+        val expired = subscription.expiryDate.isBefore(Instant.now())
 
         return !renewing && !cancelAcknowledged && giftDays == 0 && expired
     }
