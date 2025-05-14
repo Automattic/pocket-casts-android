@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.Dp
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.R
-import au.com.shiftyjelly.pocketcasts.settings.notifications.components.NotificationCategory
+import au.com.shiftyjelly.pocketcasts.settings.notifications.components.NotificationPreferenceCategory
 
 @Composable
 internal fun NotificationsSettingsScreen(
@@ -42,7 +42,7 @@ internal fun NotificationsSettingsScreen(
         ) {
             for (category in state.categories) {
                 item {
-                    NotificationCategory(
+                    NotificationPreferenceCategory(
                         categoryTitle = category.title,
                         items = category.preferences,
                         onItemClicked = {},
