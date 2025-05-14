@@ -79,7 +79,7 @@ internal fun NotificationsSettingsScreen(
                                     NotificationPreferences.NEW_EPISODES_CHOOSE_PODCASTS -> {
                                         isShowingPodcastSelector = true
                                     }
-
+                                    
                                     else -> Unit
                                 }
                                 viewModel.onPreferenceClicked(preference)
