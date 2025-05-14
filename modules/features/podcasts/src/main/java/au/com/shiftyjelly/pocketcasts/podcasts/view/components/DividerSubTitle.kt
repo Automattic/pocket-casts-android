@@ -35,11 +35,13 @@ fun DividerSubTitle(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .let { modifier ->
-                onClick?.let { click ->
-                    modifier.clickable(role = Role.Button, onClick = click)
-                } ?: modifier
-            }
+            .then(
+                if (onClick != null) {
+                    Modifier.clickable(role = Role.Button, onClick = onClick)
+                } else {
+                    Modifier
+                },
+            )
             .padding(horizontal = 16.dp, vertical = 10.dp),
     ) {
         Icon(
