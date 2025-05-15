@@ -59,7 +59,7 @@ class PodcastSelectFragment : BaseFragment() {
                 arguments = createArgs(
                     tintColor = tintColor,
                     showToolbar = showToolbar,
-                    source = source
+                    source = source,
                 )
             }
 

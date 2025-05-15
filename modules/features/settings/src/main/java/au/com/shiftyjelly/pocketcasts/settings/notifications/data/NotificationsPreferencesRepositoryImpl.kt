@@ -41,16 +41,16 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
                         NotificationPreference.SwitchPreference(
                             title = context.getString(LR.string.settings_notification_notify_me),
                             value = isEnabled,
-                            preference = NotificationPreferences.NEW_EPISODES_NOTIFY_ME
-                        )
+                            preference = NotificationPreferences.NEW_EPISODES_NOTIFY_ME,
+                        ),
                     )
                     if (isEnabled) {
                         add(
                             NotificationPreference.TextPreference(
                                 title = context.getString(LR.string.settings_notification_choose_podcasts),
                                 value = getPodcastsSummary(),
-                                preference = NotificationPreferences.NEW_EPISODES_CHOOSE_PODCASTS
-                            )
+                                preference = NotificationPreferences.NEW_EPISODES_CHOOSE_PODCASTS,
+                            ),
                         )
                         add(
                             NotificationPreference.MultiSelectPreference(
@@ -60,7 +60,7 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
                                 preference = NotificationPreferences.NEW_EPISODES_ACTIONS,
                                 options = NewEpisodeNotificationAction.entries,
                                 displayText = getActionsSummary(),
-                            )
+                            ),
                         )
 
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -68,8 +68,8 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
                                 NotificationPreference.TextPreference(
                                     title = context.getString(LR.string.settings_notification_advanced),
                                     value = context.getString(LR.string.settings_notification_advanced_summary),
-                                    preference = NotificationPreferences.NEW_EPISODES_ADVANCED
-                                )
+                                    preference = NotificationPreferences.NEW_EPISODES_ADVANCED,
+                                ),
                             )
                         } else {
                             add(
@@ -77,8 +77,8 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
                                     title = context.getString(LR.string.settings_notification_sound),
                                     value = settings.notificationSound.value.path,
                                     displayValue = getNotificationSoundSummary(),
-                                    preference = NotificationPreferences.NEW_EPISODES_RINGTONE
-                                )
+                                    preference = NotificationPreferences.NEW_EPISODES_RINGTONE,
+                                ),
                             )
                             add(
                                 NotificationPreference.RadioGroupPreference(
@@ -90,12 +90,12 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
                                         NotificationVibrateSetting.Never,
                                     ),
                                     preference = NotificationPreferences.NEW_EPISODES_VIBRATION,
-                                    displayText = context.getString(settings.notificationVibrate.value.summary)
-                                )
+                                    displayText = context.getString(settings.notificationVibrate.value.summary),
+                                ),
                             )
                         }
                     }
-                }
+                },
             ),
             NotificationPreferenceCategory(
                 title = context.getString(LR.string.settings),
@@ -109,15 +109,15 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
                             PlayOverNotificationSetting.DUCK,
                             PlayOverNotificationSetting.ALWAYS,
                         ),
-                        displayText = context.getString(settings.playOverNotification.value.titleRes)
+                        displayText = context.getString(settings.playOverNotification.value.titleRes),
                     ),
                     NotificationPreference.SwitchPreference(
                         title = context.getString(LR.string.settings_notification_hide_on_pause),
                         value = settings.hideNotificationOnPause.value,
-                        preference = NotificationPreferences.SETTINGS_HIDE_NOTIFICATION_ON_PAUSE
-                    )
-                )
-            )
+                        preference = NotificationPreferences.SETTINGS_HIDE_NOTIFICATION_ON_PAUSE,
+                    ),
+                ),
+            ),
         )
     }
 
@@ -204,7 +204,7 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
 
     private inline fun <reified T> expectTypedValue(
         preference: NotificationPreference<*>,
-        fallbackToValue: T? = null
+        fallbackToValue: T? = null,
     ): T = (preference.value as? T)
         ?: fallbackToValue
         ?: error("Expected value of ${preference.preference} was ${T::class} but found ${preference.value?.javaClass}")

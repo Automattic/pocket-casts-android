@@ -60,11 +60,10 @@ internal fun NotificationsSettingsScreen(
                     preference = NotificationPreferences.NEW_EPISODES_RINGTONE,
                     title = "",
                     value = filePath,
-                    displayValue = ""
-                )
+                    displayValue = "",
+                ),
             )
         }
-
     }
 
     CallOnce {
@@ -107,25 +106,27 @@ internal fun NotificationsSettingsScreen(
                                     }
 
                                     NotificationPreferences.NEW_EPISODES_RINGTONE -> {
-                                        launcher.launch(Intent(RingtoneManager.ACTION_RINGTONE_PICKER).apply {
-                                            putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION)
-                                            putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true)
-                                            putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, true)
-                                            putExtra(RingtoneManager.EXTRA_RINGTONE_DEFAULT_URI, android.provider.Settings.System.DEFAULT_NOTIFICATION_URI)
-                                            // Select "Silent" if empty
-                                            runCatching {
-                                                (preference.value as String).toUri()
-                                            }.getOrNull()?.let {
-                                                putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, it)
-                                            }
-                                        })
+                                        launcher.launch(
+                                            Intent(RingtoneManager.ACTION_RINGTONE_PICKER).apply {
+                                                putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION)
+                                                putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true)
+                                                putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, true)
+                                                putExtra(RingtoneManager.EXTRA_RINGTONE_DEFAULT_URI, android.provider.Settings.System.DEFAULT_NOTIFICATION_URI)
+                                                // Select "Silent" if empty
+                                                runCatching {
+                                                    (preference.value as String).toUri()
+                                                }.getOrNull()?.let {
+                                                    putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, it)
+                                                }
+                                            },
+                                        )
                                     }
 
                                     else -> Unit
                                 }
                                 viewModel.onPreferenceChanged(preference)
                             },
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
                         )
                     }
                 }
