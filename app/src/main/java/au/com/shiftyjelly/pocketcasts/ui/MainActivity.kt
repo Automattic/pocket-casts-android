@@ -519,8 +519,12 @@ class MainActivity :
         }
     }
 
+    override fun launchIntent(onboardingFlow: OnboardingFlow): Intent {
+        return OnboardingActivity.newInstance(this, onboardingFlow)
+    }
+
     override fun openOnboardingFlow(onboardingFlow: OnboardingFlow) {
-        onboardingLauncher.launch(OnboardingActivity.newInstance(this, onboardingFlow))
+        onboardingLauncher.launch(launchIntent(onboardingFlow))
     }
 
     override fun onStart() {

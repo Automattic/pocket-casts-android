@@ -296,7 +296,7 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
                 binding.layoutLockedCloud.setOnClickListener {
                     viewModel.trackOptionTapped(UPLOAD_UPGRADE_REQUIRED)
                     OnboardingLauncher.openOnboardingFlow(
-                        activity,
+                        requireActivity(),
                         OnboardingFlow.Upsell(OnboardingUpgradeSource.FILES),
                     )
                 }

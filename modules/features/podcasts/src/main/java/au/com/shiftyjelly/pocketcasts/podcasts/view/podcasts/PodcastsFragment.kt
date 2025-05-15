@@ -174,7 +174,7 @@ class PodcastsFragment :
                 val state = viewModel.suggestedFoldersState.value
                 when (state) {
                     is SuggestedFoldersState.Empty -> {
-                        OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.Upsell(OnboardingUpgradeSource.FOLDERS))
+                        OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.Upsell(OnboardingUpgradeSource.FOLDERS))
                     }
 
                     is SuggestedFoldersState.Available -> {
@@ -182,7 +182,7 @@ class PodcastsFragment :
                     }
                 }
             } else {
-                OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.Upsell(OnboardingUpgradeSource.FOLDERS))
+                OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.Upsell(OnboardingUpgradeSource.FOLDERS))
             }
             true
         }
