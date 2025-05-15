@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationAc
 import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreference
+import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreference.MultiSelectPreference
 import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreference.RadioGroupPreference
 import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreference.SwitchPreference
 import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreference.TextPreference
@@ -45,14 +46,16 @@ internal fun NotificationPreferenceCategory(
     ) {
         items.forEach { item ->
             when (item) {
-                is SwitchPreference -> SettingRow(
-                    primaryText = item.title,
-                    toggle = SettingRowToggle.Switch(checked = item.value),
-                    modifier = modifier.toggleable(
-                        value = item.value,
-                        role = Role.Switch,
-                    ) { onItemClicked(item) },
-                )
+                is SwitchPreference -> {
+                    SettingRow(
+                        primaryText = item.title,
+                        toggle = SettingRowToggle.Switch(checked = item.value),
+                        modifier = modifier.toggleable(
+                            value = item.value,
+                            role = Role.Switch,
+                        ) { onItemClicked(item.copy(value = !item.value)) },
+                    )
+                }
 
                 is TextPreference -> SettingRow(
                     primaryText = item.title,
@@ -109,7 +112,7 @@ internal fun NotificationPreferenceCategory(
                     }
                 }
 
-                is NotificationPreference.MultiSelectPreference<*> -> {
+                is MultiSelectPreference<*> -> {
                     val activity = LocalContext.current
                     SettingRow(
                         primaryText = item.title,
@@ -137,7 +140,7 @@ internal fun NotificationPreferenceCategory(
                                         res = R.string.ok,
                                         click = {
                                             onItemClicked(
-                                                (item as NotificationPreference.MultiSelectPreference<NewEpisodeNotificationAction>).copy(value = selectedActions.toImmutableList())
+                                                (item as MultiSelectPreference<NewEpisodeNotificationAction>).copy(value = selectedActions.toImmutableList())
                                             )
                                         },
                                     )
@@ -178,20 +181,41 @@ private fun NotificationCategoryPreview(
             categoryTitle = "Test Category",
             items = listOf(
                 SwitchPreference(
-                    title = "offItem",
+                    title = "Off item",
                     value = false,
                     preference = NotificationPreferences.NEW_EPISODES_NOTIFY_ME,
                 ),
                 SwitchPreference(
-                    title = "onItem",
+                    title = "On item",
                     value = true,
                     preference = NotificationPreferences.NEW_EPISODES_NOTIFY_ME,
                 ),
                 TextPreference(
-                    title = "singleSelectItem",
-                    value = "value",
+                    title = "Text item",
+                    value = "Text value",
                     preference = NotificationPreferences.NEW_EPISODES_ACTIONS
                 ),
+                ValueHolderPreference(
+                    title = "Pi Value Holder item",
+                    value = 3.14,
+                    displayValue = "Pi",
+                    preference = NotificationPreferences.NEW_EPISODES_NOTIFY_ME
+                ),
+                RadioGroupPreference(
+                    title = "Radio item",
+                    value = 1,
+                    preference = NotificationPreferences.NEW_EPISODES_NOTIFY_ME,
+                    options = (1..5).toList(),
+                    displayText = "one"
+                ),
+                MultiSelectPreference(
+                    title = "Multiselect item",
+                    value = (1..3).toList(),
+                    preference = NotificationPreferences.NEW_EPISODES_NOTIFY_ME,
+                    options = (1..10).toList(),
+                    displayText = (1..3).joinToString(", "),
+                    maxNumberOfSelectableOptions = 3
+                )
             ),
             onItemClicked = { }
         )

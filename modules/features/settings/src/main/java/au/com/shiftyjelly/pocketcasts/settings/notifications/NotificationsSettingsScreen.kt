@@ -24,18 +24,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.core.content.IntentCompat.getParcelableExtra
+import androidx.core.net.toUri
 import androidx.fragment.compose.AndroidFragment
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.settings.notifications.components.NotificationPreferenceCategory
+import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreference
 import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreferences
 import au.com.shiftyjelly.pocketcasts.views.fragments.PodcastSelectFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.PodcastSelectFragmentSource
-import kotlinx.coroutines.runBlocking
-import androidx.core.net.toUri
-import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreference
 
 @Composable
 internal fun NotificationsSettingsScreen(
@@ -47,13 +46,16 @@ internal fun NotificationsSettingsScreen(
 ) {
     val state: NotificationsSettingViewModel.State by viewModel.state.collectAsState()
 
+    // Unfortunately, PodcastSelectFragment was meant to be used from another fragment that defines a toolbar.
+    // This flag is used to determine whether we should render the podcast selector inside this composable and change toolbar title and override back navigation when necessary.
     var isShowingPodcastSelector by remember { mutableStateOf(false) }
 
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         result.data?.let { data ->
             val ringtone: Uri? = getParcelableExtra(data, RingtoneManager.EXTRA_RINGTONE_PICKED_URI, Uri::class.java)
             val filePath = ringtone?.toString().orEmpty()
-            viewModel.onPreferenceClicked(
+            viewModel.onPreferenceChanged(
+                // construct a fake item to pass the new value, otherwise I'd need to hold a reference to the original preference item
                 NotificationPreference.ValueHolderPreference(
                     preference = NotificationPreferences.NEW_EPISODES_RINGTONE,
                     title = "",
@@ -121,7 +123,7 @@ internal fun NotificationsSettingsScreen(
 
                                     else -> Unit
                                 }
-                                viewModel.onPreferenceClicked(preference)
+                                viewModel.onPreferenceChanged(preference)
                             },
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -133,17 +135,6 @@ internal fun NotificationsSettingsScreen(
                     modifier = Modifier.fillMaxSize(),
                     clazz = PodcastSelectFragment::class.java,
                     arguments = PodcastSelectFragment.createArgs(source = PodcastSelectFragmentSource.NOTIFICATIONS),
-                    onUpdate = {
-                        it.listener = object : PodcastSelectFragment.Listener {
-                            override fun podcastSelectFragmentSelectionChanged(newSelection: List<String>) {
-                                viewModel.onSelectedPodcastsChanged(newSelection)
-                            }
-
-                            override fun podcastSelectFragmentGetCurrentSelection(): List<String> = runBlocking {
-                                viewModel.getSelectedPodcastIds()
-                            }
-                        }
-                    }
                 )
             }
         }
