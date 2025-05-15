@@ -40,11 +40,11 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.PodcastSelectFragmentSourc
 internal fun NotificationsSettingsScreen(
     onBackPressed: () -> Unit,
     bottomInset: Dp,
-    viewModel: NotificationsSettingViewModel,
+    viewModel: NotificationsSettingsViewModel,
     onAdvancedSettingsClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val state: NotificationsSettingViewModel.State by viewModel.state.collectAsState()
+    val state: NotificationsSettingsViewModel.State by viewModel.state.collectAsState()
 
     // Unfortunately, PodcastSelectFragment was meant to be used from another fragment that defines a toolbar.
     // This flag is used to determine whether we should render the podcast selector inside this composable and change toolbar title and override back navigation when necessary.
