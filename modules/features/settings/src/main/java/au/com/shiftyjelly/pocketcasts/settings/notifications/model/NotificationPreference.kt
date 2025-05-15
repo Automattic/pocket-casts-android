@@ -11,7 +11,7 @@ internal enum class NotificationPreferences {
     NEW_EPISODES_RINGTONE,
     NEW_EPISODES_VIBRATION,
     SETTINGS_PLAY_OVER,
-    SETTINGS_HIDE_NOTIFICATION_ON_PAUSE
+    SETTINGS_HIDE_NOTIFICATION_ON_PAUSE,
 }
 
 /**
@@ -28,7 +28,7 @@ internal sealed interface NotificationPreference<T> {
     data class SwitchPreference(
         override val title: String,
         override val value: Boolean,
-        override val preference: NotificationPreferences
+        override val preference: NotificationPreferences,
     ) : NotificationPreference<Boolean>
 
     /**
@@ -38,7 +38,7 @@ internal sealed interface NotificationPreference<T> {
         override val title: String,
         override val value: String?,
         override val preference: NotificationPreferences,
-    ): NotificationPreference<String?>
+    ) : NotificationPreference<String?>
 
     /**
      * Preference that holds the generic raw value of the underlying setting and also provides a human-readable [displayValue].
@@ -48,7 +48,7 @@ internal sealed interface NotificationPreference<T> {
         override val value: T,
         val displayValue: String,
         override val preference: NotificationPreferences,
-    ): NotificationPreference<T>
+    ) : NotificationPreference<T>
 
     /**
      * Preference that lets you select form the provided [options] and keeps track of the current selection. Also provides a human-readable [displayText] that represents the current [value].
@@ -58,7 +58,7 @@ internal sealed interface NotificationPreference<T> {
         override val value: T,
         override val preference: NotificationPreferences,
         val options: List<T>,
-        val displayText: String?
+        val displayText: String?,
     ) : NotificationPreference<T>
 
     /**
@@ -70,6 +70,6 @@ internal sealed interface NotificationPreference<T> {
         override val preference: NotificationPreferences,
         val options: List<T>,
         val displayText: String?,
-        val maxNumberOfSelectableOptions: Int = options.size
+        val maxNumberOfSelectableOptions: Int = options.size,
     ) : NotificationPreference<List<T>>
 }

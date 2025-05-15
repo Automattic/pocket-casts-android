@@ -15,5 +15,4 @@ abstract class NotificationSettingsModule {
     @Binds
     @Singleton
     internal abstract fun bindRepository(impl: NotificationsPreferencesRepositoryImpl): NotificationsPreferenceRepository
-
 }

@@ -111,7 +111,6 @@ internal class NotificationsSettingsViewModel @Inject constructor(
                     analyticsTracker.track(AnalyticsEvent.SETTINGS_NOTIFICATIONS_SOUND_CHANGED)
                 }
 
-
                 else -> Unit
             }
             loadPreferences()
@@ -137,6 +136,6 @@ internal class NotificationsSettingsViewModel @Inject constructor(
     }.await()
 
     internal data class State(
-        val categories: List<NotificationPreferenceCategory>
+        val categories: List<NotificationPreferenceCategory>,
     )
 }

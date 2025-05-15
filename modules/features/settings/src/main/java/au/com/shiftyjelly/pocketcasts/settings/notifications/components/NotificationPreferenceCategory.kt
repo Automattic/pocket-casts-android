@@ -38,11 +38,11 @@ internal fun NotificationPreferenceCategory(
     categoryTitle: String,
     items: List<NotificationPreference<*>>,
     onItemClicked: (NotificationPreference<*>) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     SettingSection(
         modifier = modifier,
-        heading = categoryTitle
+        heading = categoryTitle,
     ) {
         items.forEach { item ->
             when (item) {
@@ -60,13 +60,13 @@ internal fun NotificationPreferenceCategory(
                 is TextPreference -> SettingRow(
                     primaryText = item.title,
                     secondaryText = item.value,
-                    modifier = modifier.clickable { onItemClicked(item) }
+                    modifier = modifier.clickable { onItemClicked(item) },
                 )
 
                 is ValueHolderPreference<*> -> SettingRow(
                     primaryText = item.title,
                     secondaryText = item.displayValue,
-                    modifier = modifier.clickable { onItemClicked(item) }
+                    modifier = modifier.clickable { onItemClicked(item) },
                 )
 
                 is RadioGroupPreference<*> -> {
@@ -84,7 +84,7 @@ internal fun NotificationPreferenceCategory(
                                 },
                                 onSave = { value ->
                                     onItemClicked(
-                                        item.copy(value = value)
+                                        item.copy(value = value),
                                     )
                                 },
                             )
@@ -102,7 +102,7 @@ internal fun NotificationPreferenceCategory(
                                 },
                                 onSave = { value ->
                                     onItemClicked(
-                                        item.copy(value = value)
+                                        item.copy(value = value),
                                     )
                                 },
                             )
@@ -140,14 +140,14 @@ internal fun NotificationPreferenceCategory(
                                         res = R.string.ok,
                                         click = {
                                             onItemClicked(
-                                                (item as MultiSelectPreference<NewEpisodeNotificationAction>).copy(value = selectedActions.toImmutableList())
+                                                (item as MultiSelectPreference<NewEpisodeNotificationAction>).copy(value = selectedActions.toImmutableList()),
                                             )
                                         },
                                     )
                                     negativeButton(res = R.string.cancel)
                                 }
                             changeActionsDialog(item.maxNumberOfSelectableOptions, selectedActions, dialog)
-                        }
+                        },
                     )
                 }
             }
@@ -193,20 +193,20 @@ private fun NotificationCategoryPreview(
                 TextPreference(
                     title = "Text item",
                     value = "Text value",
-                    preference = NotificationPreferences.NEW_EPISODES_ACTIONS
+                    preference = NotificationPreferences.NEW_EPISODES_ACTIONS,
                 ),
                 ValueHolderPreference(
                     title = "Pi Value Holder item",
                     value = 3.14,
                     displayValue = "Pi",
-                    preference = NotificationPreferences.NEW_EPISODES_NOTIFY_ME
+                    preference = NotificationPreferences.NEW_EPISODES_NOTIFY_ME,
                 ),
                 RadioGroupPreference(
                     title = "Radio item",
                     value = 1,
                     preference = NotificationPreferences.NEW_EPISODES_NOTIFY_ME,
                     options = (1..5).toList(),
-                    displayText = "one"
+                    displayText = "one",
                 ),
                 MultiSelectPreference(
                     title = "Multiselect item",
@@ -214,10 +214,10 @@ private fun NotificationCategoryPreview(
                     preference = NotificationPreferences.NEW_EPISODES_NOTIFY_ME,
                     options = (1..10).toList(),
                     displayText = (1..3).joinToString(", "),
-                    maxNumberOfSelectableOptions = 3
-                )
+                    maxNumberOfSelectableOptions = 3,
+                ),
             ),
-            onItemClicked = { }
+            onItemClicked = { },
         )
     }
 }

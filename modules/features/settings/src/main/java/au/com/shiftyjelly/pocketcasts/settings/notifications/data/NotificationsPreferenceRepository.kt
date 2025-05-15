@@ -7,5 +7,4 @@ internal interface NotificationsPreferenceRepository {
 
     suspend fun getPreferenceCategories(): List<NotificationPreferenceCategory>
     suspend fun setPreference(preference: NotificationPreference<*>)
-
 }
