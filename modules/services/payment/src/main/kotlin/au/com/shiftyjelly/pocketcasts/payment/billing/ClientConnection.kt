@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.payment.billing
 
 import android.content.Context
-import au.com.shiftyjelly.pocketcasts.payment.Logger
+import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClientStateListener
 import com.android.billingclient.api.BillingResult
@@ -14,8 +14,8 @@ import kotlinx.coroutines.sync.withLock
 
 internal class ClientConnection(
     private val context: Context,
-    private val listener: PurchasesUpdatedListener,
-    private val logger: Logger,
+    private val purchaseUpdateListener: PurchasesUpdatedListener,
+    private val diagnosticListeners: Set<PaymentClient.Listener>,
 ) {
     private val connectionMutex = Mutex()
 
@@ -26,7 +26,7 @@ internal class ClientConnection(
 
     private suspend fun connect() = connectionMutex.withLock {
         val client = getActiveClient()
-        logger.info("Billing client connected: ${client.isReady}")
+        dispatchMessage("Billing client connected: ${client.isReady}")
         if (!client.isReady) {
             val isConnectionEstablished = setupBillingClient(client)
             if (!isConnectionEstablished) {
@@ -37,25 +37,23 @@ internal class ClientConnection(
     }
 
     private suspend fun setupBillingClient(client: BillingClient): Boolean {
-        logger.info("Connecting to billing client")
+        dispatchMessage("Connecting to billing client")
         return suspendCancellableCoroutine<Boolean> { continuation ->
             client.startConnection(object : BillingClientStateListener {
                 override fun onBillingSetupFinished(billingResult: BillingResult) {
-                    logger.info("Billing setup finished: $billingResult")
+                    dispatchMessage("Billing setup finished: $billingResult")
                     try {
                         continuation.resume(billingResult.responseCode == BillingClient.BillingResponseCode.OK)
-                    } catch (e: IllegalStateException) {
-                        logger.error("Failed to dispatch billing connection client setup", e)
+                    } catch (_: IllegalStateException) {
                     }
                 }
 
                 override fun onBillingServiceDisconnected() {
-                    logger.warning("Billing client disconnected")
+                    dispatchMessage("Billing client disconnected")
                     client.endConnection()
                     try {
                         continuation.resume(false)
                     } catch (e: IllegalStateException) {
-                        logger.error("Failed to dispatch billing client disconnection", e)
                     }
                 }
             })
@@ -83,7 +81,11 @@ internal class ClientConnection(
             .build()
         return BillingClient.newBuilder(context)
             .enablePendingPurchases(params)
-            .setListener(listener)
+            .setListener(purchaseUpdateListener)
             .build()
+    }
+
+    private fun dispatchMessage(message: String) {
+        diagnosticListeners.forEach { it.onMessage(message) }
     }
 }

@@ -17,39 +17,55 @@ sealed interface PaymentResultCode {
     data object Error : PaymentResultCode {
         override val analyticsValue get() = "error"
     }
+
     data object FeatureNotSupported : PaymentResultCode {
         override val analyticsValue get() = "feature_not_suported"
     }
+
     data object ServiceDisconnected : PaymentResultCode {
         override val analyticsValue get() = "service_disconnected"
     }
+
     data object Ok : PaymentResultCode {
         override val analyticsValue get() = "ok"
     }
+
     data object UserCancelled : PaymentResultCode {
         override val analyticsValue get() = "user_cancelled"
     }
+
     data object ServiceUnavailable : PaymentResultCode {
         override val analyticsValue get() = "service_unavailable"
     }
+
     data object BillingUnavailable : PaymentResultCode {
         override val analyticsValue get() = "billing_unavailable"
     }
+
     data object ItemUnavailable : PaymentResultCode {
         override val analyticsValue get() = "item_unavailable"
     }
+
+    data object ItemNotApproved : PaymentResultCode {
+        override val analyticsValue get() = "item_not_approved"
+    }
+
     data object DeveloperError : PaymentResultCode {
         override val analyticsValue get() = "developer_error"
     }
+
     data object ItemAlreadyOwned : PaymentResultCode {
         override val analyticsValue get() = "item_already_owned"
     }
+
     data object ItemNotOwned : PaymentResultCode {
         override val analyticsValue get() = "item_not_owned"
     }
+
     data object NetworkError : PaymentResultCode {
         override val analyticsValue get() = "network_error"
     }
+
     data class Unknown(val code: Int) : PaymentResultCode {
         override val analyticsValue get() = "unknown"
     }

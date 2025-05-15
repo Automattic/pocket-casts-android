@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.payment.billing
 
-import au.com.shiftyjelly.pocketcasts.payment.Logger
+import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
 import au.com.shiftyjelly.pocketcasts.payment.Price
 import au.com.shiftyjelly.pocketcasts.payment.PricingPhase
 import au.com.shiftyjelly.pocketcasts.payment.PricingPlan
@@ -21,19 +21,19 @@ import com.android.billingclient.api.Purchase as GooglePurchase
 import com.android.billingclient.api.Purchase.PurchaseState as GooglePurchaseState
 
 internal class BillingPaymentMapper(
-    val logger: Logger,
+    private val listeners: Set<PaymentClient.Listener>,
 ) {
     fun toProduct(productDetails: GoogleProduct): Product? {
         val mappingContext = mapOf("productId" to productDetails.productId)
 
         if (productDetails.productType != SubscriptionType) {
-            logWarning("Unrecognized product type '${productDetails.productType}'", mappingContext)
+            dispatchMessage("Unrecognized product type '${productDetails.productType}'", mappingContext)
             return null
         }
 
         val offerDetails = productDetails.subscriptionOfferDetails
         if (offerDetails.isNullOrEmpty()) {
-            logWarning("No subscription offers", mappingContext)
+            dispatchMessage("No subscription offers", mappingContext)
             return null
         }
 
@@ -90,7 +90,7 @@ internal class BillingPaymentMapper(
     ): PricingPlan.Base? {
         val noOfferDetails = offerDetails.singleOrNull { it.offerId == null }
         if (noOfferDetails == null) {
-            logWarning("No single base offer", mappingContext)
+            dispatchMessage("No single base offer", mappingContext)
             return null
         }
 
@@ -173,7 +173,7 @@ internal class BillingPaymentMapper(
                     )
                     RecurrenceMode.INFINITE_RECURRING -> PricingSchedule.RecurrenceMode.Infinite
                     else -> {
-                        logWarning("Unrecognized recurrence mode '${pricingPhase.recurrenceMode}'", mappingContext)
+                        dispatchMessage("Unrecognized recurrence mode '${pricingPhase.recurrenceMode}'", mappingContext)
                         return null
                     }
                 },
@@ -189,7 +189,7 @@ internal class BillingPaymentMapper(
 
         val designator = iso8601Duration[0]
         if (designator != 'P') {
-            logWarning("Missing billing period duration designator", context)
+            dispatchMessage("Missing billing period duration designator", context)
             return null
         }
         val valuePart = iso8601Duration.drop(1)
@@ -197,7 +197,7 @@ internal class BillingPaymentMapper(
         val rawCount = valuePart.takeWhile(Char::isDigit)
         val count = rawCount.toIntOrNull()
         if (count == null) {
-            logWarning("Invalid billing period interval count '$rawCount'", context)
+            dispatchMessage("Invalid billing period interval count '$rawCount'", context)
             return null
         }
 
@@ -210,7 +210,7 @@ internal class BillingPaymentMapper(
             else -> null
         }
         if (period == null) {
-            logWarning("Unrecognized billing interval period designator '$rawInterval'", context)
+            dispatchMessage("Unrecognized billing interval period designator '$rawInterval'", context)
             return null
         }
 
@@ -229,13 +229,13 @@ internal class BillingPaymentMapper(
 
         val matchingProducts = products.filter { it.productId == key.productId }
         if (matchingProducts.size > 1) {
-            logWarning("Found multiple matching products", mappingContext)
+            dispatchMessage("Found multiple matching products", mappingContext)
             return null
         }
 
         val matchingProduct = matchingProducts.firstOrNull()
         if (matchingProduct == null) {
-            logWarning("Found no matching products", mappingContext)
+            dispatchMessage("Found no matching products", mappingContext)
             return null
         }
 
@@ -243,13 +243,13 @@ internal class BillingPaymentMapper(
             ?.filter { offer -> offer.basePlanId == key.basePlanId && offer.offerId == key.offerId }
             .orEmpty()
         if (matchingOffers.size > 1) {
-            logWarning("Found multiple matching offers", mappingContext)
+            dispatchMessage("Found multiple matching offers", mappingContext)
             return null
         }
 
         val token = matchingOffers.firstOrNull()?.offerToken
         if (token == null) {
-            logWarning("Found no matching offers", mappingContext)
+            dispatchMessage("Found no matching offers", mappingContext)
             return null
         }
 
@@ -260,7 +260,7 @@ internal class BillingPaymentMapper(
         val activePurchases = purchases.filter { it.isAcknowledged && it.isAutoRenewing }
         if (activePurchases.size > 1) {
             val context = mapOf("purchases" to activePurchases.joinToString { "${it.orderId}: ${it.products}" })
-            logWarning("Found more than one active purchase", context)
+            dispatchMessage("Found more than one active purchase", context)
             return null
         }
 
@@ -270,7 +270,7 @@ internal class BillingPaymentMapper(
                 "orderId" to activePurchase.orderId,
                 "products" to activePurchase.products,
             )
-            logWarning("Active purchase should have only a single product", context)
+            dispatchMessage("Active purchase should have only a single product", context)
             return null
         }
 
@@ -343,8 +343,8 @@ internal class BillingPaymentMapper(
         SubscriptionOffer.Winback -> ReplacementMode.CHARGE_FULL_PRICE
     }
 
-    private fun logWarning(message: String, context: Map<String, Any?>) {
-        logger.warning("$message in ${context.toSortedMap()}")
+    private fun dispatchMessage(message: String, context: Map<String, Any?>) {
+        listeners.forEach { it.onMessage("$message in ${context.toSortedMap()}") }
     }
 }
 
