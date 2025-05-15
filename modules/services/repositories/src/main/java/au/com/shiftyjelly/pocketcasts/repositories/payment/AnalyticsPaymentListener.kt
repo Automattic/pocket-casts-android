@@ -15,7 +15,7 @@ internal class AnalyticsPaymentListener(
             "tier" to key.tier.analyticsValue,
             "frequency" to key.billingCycle.analyticsValue,
             "offer_type" to (key.offer?.analyticsValue ?: "none"),
-            "source" to "",
+            "source" to purchaseSource,
         )
         val (event, properties) = when (result) {
             is PurchaseResult.Purchased -> {
