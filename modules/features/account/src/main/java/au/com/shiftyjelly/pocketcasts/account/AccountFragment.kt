@@ -91,7 +91,7 @@ class AccountFragment : BaseFragment() {
                         flow = null,
                         fontSize = dimensionResource(CR.dimen.car_body2_size).value.sp,
                         includePadding = false,
-                        onComplete = { activity?.finish() },
+                        onComplete = { _, _ -> activity?.finish() },
                     )
                 }
             }

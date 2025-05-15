@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.GoogleSignInButtonViewMo
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.GoogleSignInState
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -31,7 +32,7 @@ fun ContinueWithGoogleButton(
     flow: OnboardingFlow?,
     fontSize: TextUnit? = null,
     includePadding: Boolean = true,
-    onComplete: (GoogleSignInState) -> Unit,
+    onComplete: (GoogleSignInState, Subscription?) -> Unit,
 ) {
     val viewModel = hiltViewModel<GoogleSignInButtonViewModel>()
     val context = LocalContext.current
