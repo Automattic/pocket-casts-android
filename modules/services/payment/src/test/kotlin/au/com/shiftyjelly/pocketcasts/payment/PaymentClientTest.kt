@@ -179,7 +179,7 @@ class PaymentClientTest {
 
     @Test
     fun `purchase subscription`() = runTest {
-        val purchaseResult = client.purchaseSubscriptionPlan(planKey, mock<Activity>())
+        val purchaseResult = client.purchaseSubscriptionPlan(planKey)
 
         assertEquals(PurchaseResult.Purchased, purchaseResult)
     }
@@ -188,7 +188,7 @@ class PaymentClientTest {
     fun `do not purchase subscription when billing result is failure`() = runTest {
         dataSource.billingFlowResultCode = PaymentResultCode.FeatureNotSupported
 
-        val purchaseResult = client.purchaseSubscriptionPlan(planKey, mock<Activity>())
+        val purchaseResult = client.purchaseSubscriptionPlan(planKey)
 
         assertEquals(PurchaseResult.Failure(PaymentResultCode.FeatureNotSupported), purchaseResult)
     }
@@ -197,7 +197,7 @@ class PaymentClientTest {
     fun `do not purchase subscription when purchase result is failure`() = runTest {
         dataSource.purchasedProductsResultCode = PaymentResultCode.Error
 
-        val purchaseResult = client.purchaseSubscriptionPlan(planKey, mock<Activity>())
+        val purchaseResult = client.purchaseSubscriptionPlan(planKey)
 
         assertEquals(PurchaseResult.Failure(PaymentResultCode.Error), purchaseResult)
     }
@@ -206,7 +206,7 @@ class PaymentClientTest {
     fun `cancel purchase subscription when purchase result is cancelled`() = runTest {
         dataSource.purchasedProductsResultCode = PaymentResultCode.UserCancelled
 
-        val purchaseResult = client.purchaseSubscriptionPlan(planKey, mock<Activity>())
+        val purchaseResult = client.purchaseSubscriptionPlan(planKey)
 
         assertEquals(PurchaseResult.Cancelled, purchaseResult)
     }
@@ -215,7 +215,7 @@ class PaymentClientTest {
     fun `do not purchase subscription when approving fails`() = runTest {
         approver.approveResultCode = PaymentResultCode.Error
 
-        val purchaseResult = client.purchaseSubscriptionPlan(planKey, mock<Activity>())
+        val purchaseResult = client.purchaseSubscriptionPlan(planKey)
 
         assertEquals(PurchaseResult.Failure(PaymentResultCode.Error), purchaseResult)
     }
@@ -224,7 +224,7 @@ class PaymentClientTest {
     fun `do not purchase subscription when acknowledging fails`() = runTest {
         dataSource.acknowledgePurchaseResultCode = PaymentResultCode.Error
 
-        val purchaseResult = client.purchaseSubscriptionPlan(planKey, mock<Activity>())
+        val purchaseResult = client.purchaseSubscriptionPlan(planKey)
 
         assertEquals(PurchaseResult.Failure(PaymentResultCode.Error), purchaseResult)
     }
@@ -233,7 +233,7 @@ class PaymentClientTest {
     fun `cancel purchase subscription when acknowledging is cancelled`() = runTest {
         dataSource.acknowledgePurchaseResultCode = PaymentResultCode.UserCancelled
 
-        val purchaseResult = client.purchaseSubscriptionPlan(planKey, mock<Activity>())
+        val purchaseResult = client.purchaseSubscriptionPlan(planKey)
 
         assertEquals(PurchaseResult.Cancelled, purchaseResult)
     }
@@ -244,7 +244,7 @@ class PaymentClientTest {
             purchase.copy(state = PurchaseState.Pending),
         )
 
-        val purchaseResult = backgroundScope.async { client.purchaseSubscriptionPlan(planKey, mock<Activity>()) }
+        val purchaseResult = backgroundScope.async { client.purchaseSubscriptionPlan(planKey) }
         yield() // Yield to make sure the job didn't cancel
 
         assertTrue(purchaseResult.isActive)
@@ -257,7 +257,7 @@ class PaymentClientTest {
             purchase.copy(isAcknowledged = true),
         )
 
-        val purchaseResult = client.purchaseSubscriptionPlan(planKey, mock<Activity>())
+        val purchaseResult = client.purchaseSubscriptionPlan(planKey)
 
         assertTrue(dataSource.receivedPurchases.isEmpty())
         assertEquals(PurchaseResult.Purchased, purchaseResult)
@@ -363,7 +363,7 @@ class PaymentClientTest {
 
     @Test
     fun `dispatch purchase result success`() = runTest {
-        client.purchaseSubscriptionPlan(planKey, mock<Activity>())
+        client.purchaseSubscriptionPlan(planKey)
 
         listener.assertEvents(
             Event.PurchaseSubscriptionPlan,
@@ -377,7 +377,7 @@ class PaymentClientTest {
     fun `dispatch purchase result cancellation`() = runTest {
         dataSource.purchasedProductsResultCode = PaymentResultCode.UserCancelled
 
-        client.purchaseSubscriptionPlan(planKey, mock<Activity>())
+        client.purchaseSubscriptionPlan(planKey)
 
         listener.assertEvents(
             Event.PurchaseSubscriptionPlan,
@@ -389,7 +389,7 @@ class PaymentClientTest {
     fun `dispatch purchase result failure`() = runTest {
         dataSource.purchasedProductsResultCode = PaymentResultCode.ServiceDisconnected
 
-        client.purchaseSubscriptionPlan(planKey, mock<Activity>())
+        client.purchaseSubscriptionPlan(planKey)
 
         listener.assertEvents(
             Event.PurchaseSubscriptionPlan,
@@ -401,7 +401,7 @@ class PaymentClientTest {
     fun `dispatch billing result failure`() = runTest {
         dataSource.billingFlowResultCode = PaymentResultCode.DeveloperError
 
-        client.purchaseSubscriptionPlan(planKey, mock<Activity>())
+        client.purchaseSubscriptionPlan(planKey)
 
         listener.assertEvents(
             Event.PurchaseSubscriptionPlan,
@@ -413,7 +413,7 @@ class PaymentClientTest {
     fun `dispatch confirm pruchase result failure`() = runTest {
         approver.approveResultCode = PaymentResultCode.DeveloperError
 
-        client.purchaseSubscriptionPlan(planKey, mock<Activity>())
+        client.purchaseSubscriptionPlan(planKey)
 
         listener.assertEvents(
             Event.PurchaseSubscriptionPlan,
@@ -421,5 +421,9 @@ class PaymentClientTest {
             Event.ConfirmPurchaseFailure,
             Event.PurchaseSubscriptionPlanFailure,
         )
+    }
+
+    private suspend fun PaymentClient.purchaseSubscriptionPlan(key: SubscriptionPlan.Key): PurchaseResult {
+        return purchaseSubscriptionPlan(key, purchaseSource = "source", mock<Activity>())
     }
 }

@@ -100,7 +100,7 @@ class WinbackViewModel @Inject constructor(
             _uiState.value = _uiState.value.withLoadedSubscriptionPlans { plans ->
                 plans.copy(isChangingPlan = true)
             }
-            when (paymentClient.purchaseSubscriptionPlan(newPlan.key, activity)) {
+            when (paymentClient.purchaseSubscriptionPlan(newPlan.key, purchaseSource = "winback", activity)) {
                 is PurchaseResult.Cancelled -> {
                     _uiState.value = _uiState.value.withLoadedSubscriptionPlans { plans ->
                         plans.copy(isChangingPlan = false)
@@ -173,7 +173,7 @@ class WinbackViewModel @Inject constructor(
                 loadedState.currentSubscription.billingCycle,
                 SubscriptionOffer.Winback,
             )
-            when (paymentClient.purchaseSubscriptionPlan(newPlanKey, activity)) {
+            when (paymentClient.purchaseSubscriptionPlan(newPlanKey, purchaseSource = "winback", activity)) {
                 is PurchaseResult.Purchased -> {
                     referralManager.redeemReferralCode(winbackState.offer.redeemCode)
                     _uiState.value = _uiState.value.withOfferState { state ->

@@ -32,7 +32,7 @@ class TestListener : PaymentClient.Listener {
         events += Event.PurchaseSubscriptionPlan
     }
 
-    override fun onSubscriptionPurchased(key: SubscriptionPlan.Key, result: PurchaseResult) {
+    override fun onSubscriptionPurchased(key: SubscriptionPlan.Key, purchaseSource: String, result: PurchaseResult) {
         events += when (result) {
             is PurchaseResult.Purchased -> Event.PurchaseSubscriptionPlanSuccess
             is PurchaseResult.Cancelled -> Event.PurchaseSubscriptionPlanCancelled

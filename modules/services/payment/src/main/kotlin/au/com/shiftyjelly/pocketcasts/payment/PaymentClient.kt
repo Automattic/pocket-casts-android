@@ -40,6 +40,7 @@ class PaymentClient @Inject constructor(
 
     suspend fun purchaseSubscriptionPlan(
         key: SubscriptionPlan.Key,
+        purchaseSource: String,
         activity: Activity,
     ): PurchaseResult = coroutineScope {
         forEachListener { onPurchaseSubscriptionPlan(key) }
@@ -58,7 +59,7 @@ class PaymentClient @Inject constructor(
             }
         }
         purchaseUpdatesJob.cancelAndJoin()
-        forEachListener { onSubscriptionPurchased(key, purchaseResult) }
+        forEachListener { onSubscriptionPurchased(key, purchaseSource, purchaseResult) }
         purchaseResult
     }
 
@@ -172,7 +173,7 @@ class PaymentClient @Inject constructor(
 
         fun onPurchaseSubscriptionPlan(key: SubscriptionPlan.Key) = Unit
 
-        fun onSubscriptionPurchased(key: SubscriptionPlan.Key, result: PurchaseResult) = Unit
+        fun onSubscriptionPurchased(key: SubscriptionPlan.Key, purchaseSource: String, result: PurchaseResult) = Unit
 
         fun onConfirmPurchase(purchase: Purchase) = Unit
 
