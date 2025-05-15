@@ -42,6 +42,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -50,7 +51,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 internal fun OnboardingLoginPage(
     theme: Theme.ThemeType,
     onBackPressed: () -> Unit,
-    onLoginComplete: () -> Unit,
+    onLoginComplete: (Subscription?) -> Unit,
     onForgotPasswordTapped: () -> Unit,
     onUpdateSystemBars: (SystemBarsStyles) -> Unit,
 ) {
@@ -77,9 +78,9 @@ internal fun OnboardingLoginPage(
     val view = LocalView.current
 
     @Suppress("NAME_SHADOWING")
-    val onLoginComplete = {
+    val onLoginComplete = { subscription: Subscription? ->
         UiUtil.hideKeyboard(view)
-        onLoginComplete()
+        onLoginComplete(subscription)
     }
 
     Column(
