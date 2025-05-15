@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.settings.notifications.data
 
 import android.content.Context
 import android.media.RingtoneManager
-import android.net.Uri
+import android.os.Build
 import androidx.core.net.toUri
 import au.com.shiftyjelly.pocketcasts.preferences.NotificationSound
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
@@ -70,7 +71,7 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
                                     preference = NotificationPreferences.NEW_EPISODES_ADVANCED
                                 )
                             )
-//                        } else {
+                        } else {
                             add(
                                 NotificationPreference.ValueHolderPreference(
                                     title = context.getString(LR.string.settings_notification_sound),
@@ -88,11 +89,11 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
                                         NotificationVibrateSetting.OnlyWhenSilent,
                                         NotificationVibrateSetting.Never,
                                     ),
-                                    preference =  NotificationPreferences.NEW_EPISODES_VIBRATION,
+                                    preference = NotificationPreferences.NEW_EPISODES_VIBRATION,
                                     displayText = context.getString(settings.notificationVibrate.value.summary)
                                 )
                             )
-//                        }
+                        }
                     }
                 }
             ),
@@ -141,9 +142,7 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
         return if (userActions.isEmpty()) context.getString(LR.string.none) else actionStrings
     }
 
-    private fun getNotificationSoundSummary() = settings.notificationSound.value.path.let { notificationSoundPath ->
-        getRingtoneValue(notificationSoundPath)
-    }
+    private fun getNotificationSoundSummary() = getRingtoneValue(settings.notificationSound.value.path)
 
     private fun getRingtoneValue(ringtonePath: String?): String {
         if (ringtonePath.isNullOrBlank()) {
@@ -165,7 +164,7 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
     override suspend fun setPreference(preference: NotificationPreference<*>) = withContext(dispatcher) {
         when (preference.preference) {
             NotificationPreferences.NEW_EPISODES_NOTIFY_ME -> {
-                val value = (preference as NotificationPreference.SwitchPreference).value
+                val value = expectTypedValue<Boolean>(preference)
                 settings.notifyRefreshPodcast.set(value = value, updateModifiedAt = true)
                 podcastManager.updateAllShowNotifications(value)
                 if (value) {
@@ -174,30 +173,39 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
             }
 
             NotificationPreferences.SETTINGS_HIDE_NOTIFICATION_ON_PAUSE -> {
-                settings.hideNotificationOnPause.set(value = (preference as NotificationPreference.SwitchPreference).value, updateModifiedAt = true)
+                val value = expectTypedValue<Boolean>(preference)
+                settings.hideNotificationOnPause.set(value = value, updateModifiedAt = true)
             }
 
             NotificationPreferences.SETTINGS_PLAY_OVER -> {
-                val setting = preference.value as? PlayOverNotificationSetting ?: return@withContext
+                val setting = expectTypedValue<PlayOverNotificationSetting>(preference)
                 settings.playOverNotification.set(value = setting, updateModifiedAt = true)
             }
 
             NotificationPreferences.NEW_EPISODES_VIBRATION -> {
-                val setting = (preference.value as? NotificationVibrateSetting) ?: NotificationVibrateSetting.DEFAULT
+                val setting = expectTypedValue<NotificationVibrateSetting>(preference, fallbackToValue = NotificationVibrateSetting.DEFAULT)
                 settings.notificationVibrate.set(value = setting, updateModifiedAt = false)
             }
 
             NotificationPreferences.NEW_EPISODES_ACTIONS -> {
-                val setting = preference as? NotificationPreference.MultiSelectPreference<*> ?: error("oopsie")
-                settings.newEpisodeNotificationActions.set(value = setting.value.filterIsInstance<NewEpisodeNotificationAction>(), updateModifiedAt = true)
+                val setting = expectTypedValue<List<NewEpisodeNotificationAction>>(preference)
+                settings.newEpisodeNotificationActions.set(value = setting, updateModifiedAt = true)
             }
 
             NotificationPreferences.NEW_EPISODES_RINGTONE -> {
-                val setting = preference.value as? String ?: error("oopsie")
+                val setting = expectTypedValue<String>(preference)
                 settings.notificationSound.set(value = NotificationSound(setting, context), updateModifiedAt = false)
             }
 
-            else -> Unit // TO BE IMPLEMENTED
+            // Add handler for new preferences here
+            else -> Timber.d("Unhandled preference received in setPreference: ${preference.preference}")
         }
     }
+
+    private inline fun <reified T> expectTypedValue(
+        preference: NotificationPreference<*>,
+        fallbackToValue: T? = null
+    ): T = (preference.value as? T)
+        ?: fallbackToValue
+        ?: error("Expected value of ${preference.preference} was ${T::class} but found ${preference.value?.javaClass}")
 }
