@@ -121,7 +121,7 @@ internal fun NotificationPreferenceCategory(
                             val onSelect: MultiChoiceListener = { dialog, _, items ->
                                 selectedActions.clear()
                                 selectedActions.addAll(NewEpisodeNotificationAction.fromLabels(items.map { it.toString() }, activity.resources))
-                                changeActionsDialog(item.numberOfItemToSelect, selectedActions, dialog)
+                                changeActionsDialog(item.maxNumberOfSelectableOptions, selectedActions, dialog)
                             }
                             val dialog = MaterialDialog(activity)
                                 .listItemsMultiChoice(
@@ -143,7 +143,7 @@ internal fun NotificationPreferenceCategory(
                                     )
                                     negativeButton(res = R.string.cancel)
                                 }
-                            changeActionsDialog(item.numberOfItemToSelect, selectedActions, dialog)
+                            changeActionsDialog(item.maxNumberOfSelectableOptions, selectedActions, dialog)
                         }
                     )
                 }

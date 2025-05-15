@@ -54,15 +54,15 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
                         add(
                             NotificationPreference.MultiSelectPreference(
                                 title = context.getString(LR.string.settings_notification_actions_title),
-                                numberOfItemToSelect = 3,
-                                value =  settings.newEpisodeNotificationActions.value,
+                                maxNumberOfSelectableOptions = 3,
+                                value = settings.newEpisodeNotificationActions.value,
                                 preference = NotificationPreferences.NEW_EPISODES_ACTIONS,
                                 options = NewEpisodeNotificationAction.entries,
                                 displayText = getActionsSummary(),
                             )
                         )
 
-//                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                             add(
                                 NotificationPreference.TextPreference(
                                     title = context.getString(LR.string.settings_notification_advanced),
