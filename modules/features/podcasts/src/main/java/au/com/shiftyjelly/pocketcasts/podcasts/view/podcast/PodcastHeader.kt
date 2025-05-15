@@ -177,6 +177,7 @@ internal fun PodcastHeader(
             PodcastImage(
                 uuid = uuid,
                 cornerSize = 8.dp,
+                elevation = 16.dp,
                 modifier = Modifier
                     .size(coverSize)
                     .combinedClickable(
