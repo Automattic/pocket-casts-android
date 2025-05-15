@@ -28,6 +28,13 @@ internal sealed interface NotificationPreference<T> {
         override val preference: NotificationPreferences,
     ): NotificationPreference<String?>
 
+    data class ValueHolderPreference<T>(
+        override val title: String,
+        override val value: T,
+        val displayValue: String,
+        override val preference: NotificationPreferences,
+    ): NotificationPreference<T>
+
     data class RadioGroupPreference<T>(
         override val title: String,
         override val value: T,
