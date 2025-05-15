@@ -70,6 +70,6 @@ internal sealed interface NotificationPreference<T> {
         override val preference: NotificationPreferences,
         val options: List<T>,
         val displayText: String?,
-        val maxNumberOfSelectableOptions: Int
+        val maxNumberOfSelectableOptions: Int = options.size
     ) : NotificationPreference<List<T>>
 }

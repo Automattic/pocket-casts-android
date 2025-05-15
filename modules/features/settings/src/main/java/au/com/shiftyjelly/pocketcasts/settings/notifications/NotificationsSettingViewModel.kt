@@ -39,32 +39,30 @@ internal class NotificationsSettingViewModel @Inject constructor(
         _state.update { it.copy(categories = preferenceRepository.getPreferenceCategories()) }
     }
 
-    internal fun onPreferenceClicked(preference: NotificationPreference<*>) {
-        when (preference.preference) {
-            NotificationPreferences.NEW_EPISODES_NOTIFY_ME -> {
-                val newValue = (preference as? NotificationPreference.SwitchPreference)?.value?.not() ?: error("Invalid value for notify me on new episode preference: ${preference.value}")
-                viewModelScope.launch {
-                    preferenceRepository.setPreference(preference.copy(value = newValue))
-                    analyticsTracker.track(
-                        AnalyticsEvent.SETTINGS_NOTIFICATIONS_NEW_EPISODES_TOGGLED,
-                        mapOf("enabled" to newValue),
-                    )
+    internal fun onPreferenceChanged(preference: NotificationPreference<*>) {
+        viewModelScope.launch {
+            when (preference.preference) {
+                NotificationPreferences.NEW_EPISODES_NOTIFY_ME -> {
+                    preferenceRepository.setPreference(preference)
+                    (preference.value as? Boolean)?.let {
+                        analyticsTracker.track(
+                            AnalyticsEvent.SETTINGS_NOTIFICATIONS_NEW_EPISODES_TOGGLED,
+                            mapOf("enabled" to it),
+                        )
+                    }
                 }
-            }
 
-            NotificationPreferences.SETTINGS_HIDE_NOTIFICATION_ON_PAUSE -> {
-                viewModelScope.launch {
-                    val newValue = (preference as? NotificationPreference.SwitchPreference)?.value?.not() ?: error("Invalid value for hide notification on pause preference: ${preference.value}")
-                    preferenceRepository.setPreference(preference.copy(value = newValue))
-                    analyticsTracker.track(
-                        AnalyticsEvent.SETTINGS_NOTIFICATIONS_HIDE_PLAYBACK_NOTIFICATION_ON_PAUSE,
-                        mapOf("enabled" to newValue),
-                    )
+                NotificationPreferences.SETTINGS_HIDE_NOTIFICATION_ON_PAUSE -> {
+                    preferenceRepository.setPreference(preference)
+                    (preference.value as? Boolean)?.let {
+                        analyticsTracker.track(
+                            AnalyticsEvent.SETTINGS_NOTIFICATIONS_HIDE_PLAYBACK_NOTIFICATION_ON_PAUSE,
+                            mapOf("enabled" to it),
+                        )
+                    }
                 }
-            }
 
-            NotificationPreferences.SETTINGS_PLAY_OVER -> {
-                viewModelScope.launch {
+                NotificationPreferences.SETTINGS_PLAY_OVER -> {
                     preferenceRepository.setPreference(preference)
                     (preference.value as? PlayOverNotificationSetting)?.let {
                         analyticsTracker.track(
@@ -76,26 +74,22 @@ internal class NotificationsSettingViewModel @Inject constructor(
                         )
                     }
                 }
-            }
 
-            NotificationPreferences.NEW_EPISODES_VIBRATION -> {
-                viewModelScope.launch {
+                NotificationPreferences.NEW_EPISODES_VIBRATION -> {
                     preferenceRepository.setPreference(preference)
                     analyticsTracker.track(
                         AnalyticsEvent.SETTINGS_NOTIFICATIONS_VIBRATION_CHANGED,
                         mapOf("value" to ((preference.value as? NotificationVibrateSetting)?.analyticsString ?: "unknown")),
                     )
                 }
-            }
 
-            NotificationPreferences.NEW_EPISODES_ADVANCED -> {
-                analyticsTracker.track(AnalyticsEvent.SETTINGS_NOTIFICATIONS_ADVANCED_SETTINGS_TAPPED)
-            }
+                NotificationPreferences.NEW_EPISODES_ADVANCED -> {
+                    analyticsTracker.track(AnalyticsEvent.SETTINGS_NOTIFICATIONS_ADVANCED_SETTINGS_TAPPED)
+                }
 
-            NotificationPreferences.NEW_EPISODES_ACTIONS -> {
-                val previousValue = state.value.categories.map { it.preferences }.flatten().find { it.preference == NotificationPreferences.NEW_EPISODES_ACTIONS }
-                if (previousValue?.value != preference.value) {
-                    viewModelScope.launch {
+                NotificationPreferences.NEW_EPISODES_ACTIONS -> {
+                    val previousValue = state.value.categories.map { it.preferences }.flatten().find { it.preference == NotificationPreferences.NEW_EPISODES_ACTIONS }
+                    if (previousValue?.value != preference.value) {
                         preferenceRepository.setPreference(preference)
 
                         val selectedActions = (preference as? NotificationPreference.MultiSelectPreference<*>)?.value?.filterIsInstance<NewEpisodeNotificationAction>() ?: emptyList()
@@ -111,19 +105,17 @@ internal class NotificationsSettingViewModel @Inject constructor(
                         )
                     }
                 }
-            }
 
-            NotificationPreferences.NEW_EPISODES_RINGTONE -> {
-                viewModelScope.launch {
+                NotificationPreferences.NEW_EPISODES_RINGTONE -> {
                     preferenceRepository.setPreference(preference)
                     analyticsTracker.track(AnalyticsEvent.SETTINGS_NOTIFICATIONS_SOUND_CHANGED)
                 }
+
+
+                else -> Unit
             }
-
-
-            else -> Unit // TO BE IMPLEMENTED LATER
+            loadPreferences()
         }
-        loadPreferences()
     }
 
     internal fun onShown() {
