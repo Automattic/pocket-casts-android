@@ -19,7 +19,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
 
 @AndroidEntryPoint
-internal class NewNotificationsSettingsFragment : BaseFragment(), PodcastSelectFragment.Listener {
+internal class NotificationsSettingsFragment : BaseFragment(), PodcastSelectFragment.Listener {
 
     private val viewModel: NotificationsSettingViewModel by viewModels()
 

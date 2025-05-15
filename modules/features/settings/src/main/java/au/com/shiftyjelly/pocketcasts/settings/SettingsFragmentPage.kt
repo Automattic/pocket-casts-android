@@ -27,7 +27,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.settings.about.AboutFragment
 import au.com.shiftyjelly.pocketcasts.settings.developer.DeveloperFragment
 import au.com.shiftyjelly.pocketcasts.settings.history.HistoryFragment
-import au.com.shiftyjelly.pocketcasts.settings.notifications.NewNotificationsSettingsFragment
+import au.com.shiftyjelly.pocketcasts.settings.notifications.NotificationsSettingsFragment
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
@@ -93,7 +93,7 @@ fun SettingsFragmentPage(
                 GeneralRow(onClick = { openFragment(PlaybackSettingsFragment()) })
             }
             item {
-                NotificationRow(onClick = { openFragment(NewNotificationsSettingsFragment()) })
+                NotificationRow(onClick = { openFragment(NotificationsSettingsFragment()) })
             }
             item {
                 AppearanceRow(
