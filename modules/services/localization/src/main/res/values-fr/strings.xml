@@ -6,7 +6,7 @@ Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
-    <string name="winback_cancel_subscription_continue_cancel_button_label">Poursuivre l’annulation</string>
+    <string name="winback_cancel_subscription_continue_cancel_button_label">UPDATE Poursuivre l’annulation</string>
     <string name="winback_cancel_subscription_accept_offer_button_label">Accepter l’offre</string>
     <string name="winback_claimed_offer_message_4">Merci d’avoir choisi Pocket Casts. La remise sur la prochaine année débute à la fin de votre période de facturation actuelle.</string>
     <string name="winback_claimed_offer_message_2">Merci d’avoir choisi Pocket Casts. Votre mois gratuit sera ajouté à votre abonnement actuel.</string>
