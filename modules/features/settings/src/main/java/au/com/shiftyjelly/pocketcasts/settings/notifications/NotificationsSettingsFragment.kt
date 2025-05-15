@@ -21,7 +21,7 @@ import kotlinx.coroutines.runBlocking
 @AndroidEntryPoint
 internal class NotificationsSettingsFragment : BaseFragment(), PodcastSelectFragment.Listener {
 
-    private val viewModel: NotificationsSettingViewModel by viewModels()
+    private val viewModel: NotificationsSettingsViewModel by viewModels()
 
     @Inject
     lateinit var settings: Settings

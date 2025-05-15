@@ -22,7 +22,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @HiltViewModel
-internal class NotificationsSettingViewModel @Inject constructor(
+internal class NotificationsSettingsViewModel @Inject constructor(
     private val preferenceRepository: NotificationsPreferenceRepository,
     private val analyticsTracker: AnalyticsTracker,
     private val podcastManager: PodcastManager,
