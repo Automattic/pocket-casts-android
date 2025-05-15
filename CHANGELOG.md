@@ -5,7 +5,7 @@
 7.89
 -----
 *   New Features
-    *   Podcast recommendations
+    *   Podcast recommendations UPDATE
         ([#3946](https://github.com/Automattic/pocket-casts-android/pull/3946))
     *   Support for Podroll 
         ([#3950](https://github.com/Automattic/pocket-casts-android/pull/3950))
