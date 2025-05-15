@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.settings.notifications.components
 
-import android.app.Activity
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.runtime.Composable
@@ -23,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationP
 import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreference.RadioGroupPreference
 import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreference.SwitchPreference
 import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreference.TextPreference
+import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreference.ValueHolderPreference
 import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreferences
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.afollestad.materialdialogs.MaterialDialog
@@ -57,6 +57,12 @@ internal fun NotificationPreferenceCategory(
                 is TextPreference -> SettingRow(
                     primaryText = item.title,
                     secondaryText = item.value,
+                    modifier = modifier.clickable { onItemClicked(item) }
+                )
+
+                is ValueHolderPreference<*> -> SettingRow(
+                    primaryText = item.title,
+                    secondaryText = item.displayValue,
                     modifier = modifier.clickable { onItemClicked(item) }
                 )
 

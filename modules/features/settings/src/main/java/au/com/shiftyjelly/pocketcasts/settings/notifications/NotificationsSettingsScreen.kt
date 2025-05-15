@@ -1,5 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.settings.notifications
 
+import android.content.Intent
+import android.media.RingtoneManager
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
+import androidx.core.content.IntentCompat.getParcelableExtra
 import androidx.fragment.compose.AndroidFragment
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
@@ -28,6 +34,8 @@ import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationP
 import au.com.shiftyjelly.pocketcasts.views.fragments.PodcastSelectFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.PodcastSelectFragmentSource
 import kotlinx.coroutines.runBlocking
+import androidx.core.net.toUri
+import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreference
 
 @Composable
 internal fun NotificationsSettingsScreen(
@@ -40,6 +48,22 @@ internal fun NotificationsSettingsScreen(
     val state: NotificationsSettingViewModel.State by viewModel.state.collectAsState()
 
     var isShowingPodcastSelector by remember { mutableStateOf(false) }
+
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        result.data?.let { data ->
+            val ringtone: Uri? = getParcelableExtra(data, RingtoneManager.EXTRA_RINGTONE_PICKED_URI, Uri::class.java)
+            val filePath = ringtone?.toString().orEmpty()
+            viewModel.onPreferenceClicked(
+                NotificationPreference.ValueHolderPreference(
+                    preference = NotificationPreferences.NEW_EPISODES_RINGTONE,
+                    title = "",
+                    value = filePath,
+                    displayValue = ""
+                )
+            )
+        }
+
+    }
 
     CallOnce {
         viewModel.onShown()
@@ -79,7 +103,22 @@ internal fun NotificationsSettingsScreen(
                                     NotificationPreferences.NEW_EPISODES_CHOOSE_PODCASTS -> {
                                         isShowingPodcastSelector = true
                                     }
-                                    
+
+                                    NotificationPreferences.NEW_EPISODES_RINGTONE -> {
+                                        launcher.launch(Intent(RingtoneManager.ACTION_RINGTONE_PICKER).apply {
+                                            putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION)
+                                            putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true)
+                                            putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, true)
+                                            putExtra(RingtoneManager.EXTRA_RINGTONE_DEFAULT_URI, android.provider.Settings.System.DEFAULT_NOTIFICATION_URI)
+                                            // Select "Silent" if empty
+                                            runCatching {
+                                                (preference.value as String).toUri()
+                                            }.getOrNull()?.let {
+                                                putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, it)
+                                            }
+                                        })
+                                    }
+
                                     else -> Unit
                                 }
                                 viewModel.onPreferenceClicked(preference)

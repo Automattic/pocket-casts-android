@@ -113,6 +113,14 @@ internal class NotificationsSettingViewModel @Inject constructor(
                 }
             }
 
+            NotificationPreferences.NEW_EPISODES_RINGTONE -> {
+                viewModelScope.launch {
+                    preferenceRepository.setPreference(preference)
+                    analyticsTracker.track(AnalyticsEvent.SETTINGS_NOTIFICATIONS_SOUND_CHANGED)
+                }
+            }
+
+
             else -> Unit // TO BE IMPLEMENTED LATER
         }
         loadPreferences()

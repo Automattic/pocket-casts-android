@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.settings.notifications.data
 import android.content.Context
 import android.media.RingtoneManager
 import android.net.Uri
+import androidx.core.net.toUri
 import au.com.shiftyjelly.pocketcasts.preferences.NotificationSound
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationAction
@@ -71,9 +72,10 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
                             )
 //                        } else {
                             add(
-                                NotificationPreference.TextPreference(
+                                NotificationPreference.ValueHolderPreference(
                                     title = context.getString(LR.string.settings_notification_sound),
-                                    value = getNotificationSoundSummary(),
+                                    value = settings.notificationSound.value.path,
+                                    displayValue = getNotificationSoundSummary(),
                                     preference = NotificationPreferences.NEW_EPISODES_RINGTONE
                                 )
                             )
@@ -140,8 +142,6 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
     }
 
     private fun getNotificationSoundSummary() = settings.notificationSound.value.path.let { notificationSoundPath ->
-        // TODO do we need to store it?
-        // it.setDefaultValue(notificationSoundPath)
         getRingtoneValue(notificationSoundPath)
     }
 
@@ -149,7 +149,7 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
         if (ringtonePath.isNullOrBlank()) {
             return context.getString(LR.string.settings_notification_silent)
         }
-        return when (val ringtone = RingtoneManager.getRingtone(context, Uri.parse(ringtonePath))) {
+        return when (val ringtone = RingtoneManager.getRingtone(context, ringtonePath.toUri())) {
             null -> ""
             else -> {
                 val title = ringtone.getTitle(context)
@@ -190,6 +190,11 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
             NotificationPreferences.NEW_EPISODES_ACTIONS -> {
                 val setting = preference as? NotificationPreference.MultiSelectPreference<*> ?: error("oopsie")
                 settings.newEpisodeNotificationActions.set(value = setting.value.filterIsInstance<NewEpisodeNotificationAction>(), updateModifiedAt = true)
+            }
+
+            NotificationPreferences.NEW_EPISODES_RINGTONE -> {
+                val setting = preference.value as? String ?: error("oopsie")
+                settings.notificationSound.set(value = NotificationSound(setting, context), updateModifiedAt = false)
             }
 
             else -> Unit // TO BE IMPLEMENTED
