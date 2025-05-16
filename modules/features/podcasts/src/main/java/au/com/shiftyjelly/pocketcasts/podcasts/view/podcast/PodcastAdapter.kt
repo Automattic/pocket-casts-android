@@ -826,7 +826,7 @@ class PodcastAdapter(
                         isHeaderExpanded = podcast.isHeaderExpanded,
                         isDescriptionExpanded = isDescriptionExpanded,
                         contentPadding = PaddingValues(
-                            top = statusBarPadding + 40.dp, // Eyeball the position inside app bar
+                            top = statusBarPadding + 56.dp, // Eyeball the position below app bar
                             start = 16.dp,
                             end = 16.dp,
                             bottom = 16.dp,
