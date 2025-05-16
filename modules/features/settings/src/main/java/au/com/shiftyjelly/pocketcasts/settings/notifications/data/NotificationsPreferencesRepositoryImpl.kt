@@ -134,7 +134,7 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
                 notificationCount,
             )
         }
-    }.take(1).firstOrNull()
+    }.firstOrNull()
 
     private fun getActionsSummary(): String {
         val userActions = settings.newEpisodeNotificationActions.value
