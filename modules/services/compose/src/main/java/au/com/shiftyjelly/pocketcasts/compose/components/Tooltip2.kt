@@ -33,12 +33,12 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 @Composable
 fun Tooltip2(
     title: String,
-    anchorPosition: AnchorPosition,
+    tipPosition: TipPosition,
     modifier: Modifier = Modifier,
     body: String? = null,
     elevation: Dp = 16.dp,
 ) {
-    val tooltipShape = Tooltip2Shape(anchorPosition)
+    val tooltipShape = Tooltip2Shape(tipPosition)
     val backgroundColor = when (MaterialTheme.theme.type) {
         Theme.ThemeType.DARK_CONTRAST -> MaterialTheme.theme.colors.primaryUi05
         else -> MaterialTheme.theme.colors.primaryUi01
@@ -54,9 +54,9 @@ fun Tooltip2(
         Column(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
         ) {
-            if (anchorPosition.isTopAligned()) {
+            if (tipPosition.isTopAligned()) {
                 Spacer(
-                    modifier = Modifier.height(AnchorHeight),
+                    modifier = Modifier.height(TipHeight),
                 )
             }
             TextH40(
@@ -71,31 +71,31 @@ fun Tooltip2(
                     color = MaterialTheme.theme.colors.primaryText02,
                 )
             }
-            if (anchorPosition.isBottomAligned()) {
+            if (tipPosition.isBottomAligned()) {
                 Spacer(
-                    modifier = Modifier.height(AnchorHeight),
+                    modifier = Modifier.height(TipHeight),
                 )
             }
         }
     }
 }
 
-enum class AnchorPosition {
+enum class TipPosition {
     TopStart,
-    Top,
+    TopCenter,
     TopEnd,
     BottomStart,
-    Bottom,
+    BottomCenter,
     BottomEnd,
     ;
 
-    internal fun isTopAligned() = this == TopStart || this == Top || this == TopEnd
+    internal fun isTopAligned() = this == TopStart || this == TopCenter || this == TopEnd
 
     internal fun isBottomAligned() = !isTopAligned()
 }
 
 private class Tooltip2Shape(
-    private val anchorPosition: AnchorPosition,
+    private val tipPosition: TipPosition,
 ) : Shape {
     override fun createOutline(
         size: Size,
@@ -103,8 +103,8 @@ private class Tooltip2Shape(
         density: Density,
     ): Outline {
         val cardPath = roundedRectPath(size, density)
-        val anchorPath = anchorPath(size, layoutDirection, density)
-        val path = Path.combine(PathOperation.Union, cardPath, anchorPath)
+        val tipPath = tipPath(size, layoutDirection, density)
+        val path = Path.combine(PathOperation.Union, cardPath, tipPath)
 
         return Outline.Generic(path)
     }
@@ -113,10 +113,10 @@ private class Tooltip2Shape(
         size: Size,
         density: Density,
     ): Path {
-        val anchorHeight = density.run { AnchorHeight.toPx() }
+        val tipHeight = density.run { TipHeight.toPx() }
         val cornerRadius = density.run { CornerRadius.toPx() }
-        val topOffset = if (anchorPosition.isTopAligned()) anchorHeight else 0f
-        val bottomOffset = if (anchorPosition.isBottomAligned()) anchorHeight else 0f
+        val topOffset = if (tipPosition.isTopAligned()) tipHeight else 0f
+        val bottomOffset = if (tipPosition.isBottomAligned()) tipHeight else 0f
 
         return Path().apply {
             val roundRect = RoundRect(
@@ -131,106 +131,106 @@ private class Tooltip2Shape(
         }
     }
 
-    private fun anchorPath(
+    private fun tipPath(
         shapeSize: Size,
         layoutDirection: LayoutDirection,
         density: Density,
-    ) = when (anchorPosition) {
-        AnchorPosition.Top -> topAnchor(shapeSize, density)
-        AnchorPosition.Bottom -> bottomAnchor(shapeSize, density)
-        AnchorPosition.TopStart -> when (layoutDirection) {
-            LayoutDirection.Ltr -> topLeftAnchor(density)
-            LayoutDirection.Rtl -> topRightAnchor(shapeSize, density)
+    ) = when (tipPosition) {
+        TipPosition.TopCenter -> topTip(shapeSize, density)
+        TipPosition.BottomCenter -> bottomTip(shapeSize, density)
+        TipPosition.TopStart -> when (layoutDirection) {
+            LayoutDirection.Ltr -> topLeftTip(density)
+            LayoutDirection.Rtl -> topRightTip(shapeSize, density)
         }
 
-        AnchorPosition.TopEnd -> when (layoutDirection) {
-            LayoutDirection.Ltr -> topRightAnchor(shapeSize, density)
-            LayoutDirection.Rtl -> topLeftAnchor(density)
+        TipPosition.TopEnd -> when (layoutDirection) {
+            LayoutDirection.Ltr -> topRightTip(shapeSize, density)
+            LayoutDirection.Rtl -> topLeftTip(density)
         }
 
-        AnchorPosition.BottomStart -> when (layoutDirection) {
-            LayoutDirection.Ltr -> bottomLeftAnchor(shapeSize, density)
-            LayoutDirection.Rtl -> bottomRightAnchor(shapeSize, density)
+        TipPosition.BottomStart -> when (layoutDirection) {
+            LayoutDirection.Ltr -> bottomLeftTip(shapeSize, density)
+            LayoutDirection.Rtl -> bottomRightTip(shapeSize, density)
         }
 
-        AnchorPosition.BottomEnd -> when (layoutDirection) {
-            LayoutDirection.Ltr -> bottomRightAnchor(shapeSize, density)
-            LayoutDirection.Rtl -> bottomLeftAnchor(shapeSize, density)
+        TipPosition.BottomEnd -> when (layoutDirection) {
+            LayoutDirection.Ltr -> bottomRightTip(shapeSize, density)
+            LayoutDirection.Rtl -> bottomLeftTip(shapeSize, density)
         }
     }
 
-    private fun topAnchor(
+    private fun topTip(
         shapeSize: Size,
         density: Density,
     ) = Path().apply {
         val scale = density.density
-        val anchorHeight = density.run { AnchorHeight.toPx() }
-        val anchorWidth = density.run { CenterAnchorWidth.toPx() }
+        val tipHeight = density.run { TipHeight.toPx() }
+        val tipWidth = density.run { CenterTipWidth.toPx() }
 
-        moveTo(shapeSize.width / 2 - anchorWidth / 2, anchorHeight)
-        addEdgeAnchor(scale)
+        moveTo(shapeSize.width / 2 - tipWidth / 2, tipHeight)
+        addEdgeTip(scale)
     }
 
-    private fun bottomAnchor(
+    private fun bottomTip(
         shapeSize: Size,
         density: Density,
     ) = Path().apply {
         val scale = density.density
-        val anchorHeight = density.run { AnchorHeight.toPx() }
-        val anchorWidth = density.run { CenterAnchorWidth.toPx() }
+        val tipHeight = density.run { TipHeight.toPx() }
+        val tipWidth = density.run { CenterTipWidth.toPx() }
 
-        moveTo(shapeSize.width / 2 - anchorWidth / 2, shapeSize.height - anchorHeight)
-        addEdgeAnchor(scale, flipVertically = true)
+        moveTo(shapeSize.width / 2 - tipWidth / 2, shapeSize.height - tipHeight)
+        addEdgeTip(scale, flipVertically = true)
     }
 
-    private fun topRightAnchor(
+    private fun topRightTip(
         shapeSize: Size,
         density: Density,
     ) = Path().apply {
         val scale = density.density
-        val anchorHeight = density.run { AnchorHeight.toPx() }
-        val anchorWidth = density.run { CornerAnchorWidth.toPx() }
+        val tipHeight = density.run { TipHeight.toPx() }
+        val tipWidth = density.run { CornerTipWidth.toPx() }
 
-        moveTo(shapeSize.width - anchorWidth, anchorHeight)
-        addCornerAnchor(scale)
+        moveTo(shapeSize.width - tipWidth, tipHeight)
+        addCornerTip(scale)
     }
 
-    private fun topLeftAnchor(
+    private fun topLeftTip(
         density: Density,
     ) = Path().apply {
         val scale = density.density
-        val anchorHeight = density.run { AnchorHeight.toPx() }
-        val anchorWidth = density.run { CornerAnchorWidth.toPx() }
+        val tipHeight = density.run { TipHeight.toPx() }
+        val tipWidth = density.run { CornerTipWidth.toPx() }
 
-        moveTo(anchorWidth, anchorHeight)
-        addCornerAnchor(scale, flipHorizontally = true)
+        moveTo(tipWidth, tipHeight)
+        addCornerTip(scale, flipHorizontally = true)
     }
 
-    private fun bottomRightAnchor(
+    private fun bottomRightTip(
         shapeSize: Size,
         density: Density,
     ) = Path().apply {
         val scale = density.density
-        val anchorHeight = density.run { AnchorHeight.toPx() }
-        val anchorWidth = density.run { CornerAnchorWidth.toPx() }
+        val tipHeight = density.run { TipHeight.toPx() }
+        val tipWidth = density.run { CornerTipWidth.toPx() }
 
-        moveTo(shapeSize.width - anchorWidth, shapeSize.height - anchorHeight)
-        addCornerAnchor(scale, flipVertically = true)
+        moveTo(shapeSize.width - tipWidth, shapeSize.height - tipHeight)
+        addCornerTip(scale, flipVertically = true)
     }
 
-    private fun bottomLeftAnchor(
+    private fun bottomLeftTip(
         shapeSize: Size,
         density: Density,
     ) = Path().apply {
         val scale = density.density
-        val anchorHeight = density.run { AnchorHeight.toPx() }
-        val anchorWidth = density.run { CornerAnchorWidth.toPx() }
+        val tipHeight = density.run { TipHeight.toPx() }
+        val tipWidth = density.run { CornerTipWidth.toPx() }
 
-        moveTo(anchorWidth, shapeSize.height - anchorHeight)
-        addCornerAnchor(scale, flipHorizontally = true, flipVertically = true)
+        moveTo(tipWidth, shapeSize.height - tipHeight)
+        addCornerTip(scale, flipHorizontally = true, flipVertically = true)
     }
 
-    private fun Path.addEdgeAnchor(
+    private fun Path.addEdgeTip(
         scale: Float,
         flipVertically: Boolean = false,
     ) {
@@ -251,7 +251,7 @@ private class Tooltip2Shape(
         relativeCubicTo(1.71f * hScale, 0.02f * vScale, 3.43f * hScale, 0.01f * vScale, 5.14f * hScale, 0.01f * vScale)
     }
 
-    private fun Path.addCornerAnchor(
+    private fun Path.addCornerTip(
         scale: Float,
         flipHorizontally: Boolean = false,
         flipVertically: Boolean = false,
@@ -272,9 +272,9 @@ private class Tooltip2Shape(
     }
 }
 
-private val AnchorHeight = 13.dp
-private val CornerAnchorWidth = 40.dp
-private val CenterAnchorWidth = 47.dp
+private val TipHeight = 13.dp
+private val CornerTipWidth = 40.dp
+private val CenterTipWidth = 47.dp
 private val CornerRadius = 10.dp
 
 @Preview
@@ -289,7 +289,7 @@ private fun Tooltip2ThemePreview(
             Tooltip2(
                 title = "Sort by “Recently Played”",
                 body = "You can now sort by Recently Played and quickly pick up where you left off.",
-                anchorPosition = AnchorPosition.BottomStart,
+                tipPosition = TipPosition.BottomStart,
                 modifier = Modifier.widthIn(max = 300.dp),
             )
         }
@@ -298,8 +298,8 @@ private fun Tooltip2ThemePreview(
 
 @Preview
 @Composable
-private fun Tooltip2AnchorPreview(
-    @PreviewParameter(AnchorPositionParameterProvider::class) anchorPosition: AnchorPosition,
+private fun Tooltip2TipPreview(
+    @PreviewParameter(TipPositionParameterProvider::class) tipPosition: TipPosition,
 ) {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         Box(
@@ -308,13 +308,13 @@ private fun Tooltip2AnchorPreview(
             Tooltip2(
                 title = "Sort by “Recently Played”",
                 body = "You can now sort by Recently Played and quickly pick up where you left off.",
-                anchorPosition = anchorPosition,
+                tipPosition = tipPosition,
                 modifier = Modifier.widthIn(max = 300.dp),
             )
         }
     }
 }
 
-private class AnchorPositionParameterProvider : PreviewParameterProvider<AnchorPosition> {
-    override val values = AnchorPosition.entries.asSequence()
+private class TipPositionParameterProvider : PreviewParameterProvider<TipPosition> {
+    override val values = TipPosition.entries.asSequence()
 }
