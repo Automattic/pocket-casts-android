@@ -37,9 +37,9 @@ fi
 # Function to display skip message and create annotation
 show_skip_message() {
   local job_type=$1
-  local message="Skipping ${BUILDKITE_LABEL:-Job} - no relevant files changed"
+  local message="Skipped ${BUILDKITE_LABEL:-Job} - no relevant files changed"
   local context="skip-$(echo "${BUILDKITE_LABEL:-$job_type}" | sed -E -e 's/[^[:alnum:]]+/-/g' | tr A-Z a-z)"
-  
+
   echo "$message" | buildkite-agent annotate --style "info" --context "$context"
   echo "$message"
 }
