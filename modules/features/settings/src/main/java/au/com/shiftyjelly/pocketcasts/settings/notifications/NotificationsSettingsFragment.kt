@@ -23,6 +23,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.NotificationSound
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreferenceType
+import au.com.shiftyjelly.pocketcasts.settings.util.TextResource
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.PodcastSelectFragment
@@ -58,7 +59,7 @@ internal class NotificationsSettingsFragment : BaseFragment(), PodcastSelectFrag
                     viewModel.onPreferenceChanged(
                         // construct a fake item to pass the new value, otherwise I'd need to hold a reference to the original preference item
                         NotificationPreferenceType.NotificationSoundPreference(
-                            title = "",
+                            title = TextResource.fromText(""),
                             notificationSound = NotificationSound(path = filePath, layoutInflater.context),
                             displayedSoundName = "",
                         ),

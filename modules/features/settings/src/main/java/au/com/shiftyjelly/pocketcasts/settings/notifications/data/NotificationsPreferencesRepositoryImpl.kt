@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreferenceCategory
 import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreferenceType
+import au.com.shiftyjelly.pocketcasts.settings.util.TextResource
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
@@ -31,25 +32,25 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
     override suspend fun getPreferenceCategories(): List<NotificationPreferenceCategory> = withContext(dispatcher) {
         listOf(
             NotificationPreferenceCategory(
-                title = context.getString(LR.string.settings_notifications_new_episodes),
+                title = TextResource.fromStringId(LR.string.settings_notifications_new_episodes),
                 preferences = buildList {
                     val isEnabled = settings.notifyRefreshPodcast.flow.value
                     add(
                         NotificationPreferenceType.NotifyMeOnNewEpisodes(
-                            title = context.getString(LR.string.settings_notification_notify_me),
+                            title = TextResource.fromStringId(LR.string.settings_notification_notify_me),
                             isEnabled = isEnabled,
                         ),
                     )
                     if (isEnabled) {
                         add(
                             NotificationPreferenceType.NotifyOnThesePodcasts(
-                                title = context.getString(LR.string.settings_notification_choose_podcasts),
-                                displayValue = getPodcastsSummary().orEmpty(),
+                                title = TextResource.fromStringId(LR.string.settings_notification_choose_podcasts),
+                                displayValue = getPodcastsSummary() ?: TextResource.fromText(""),
                             ),
                         )
                         add(
                             NotificationPreferenceType.NotificationActions(
-                                title = context.getString(LR.string.settings_notification_actions_title),
+                                title = TextResource.fromStringId(LR.string.settings_notification_actions_title),
                                 value = settings.newEpisodeNotificationActions.value,
                                 options = NewEpisodeNotificationAction.entries,
                                 displayValue = getActionsSummary(),
@@ -59,28 +60,28 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
                         if (notificationsCompatibilityProvider.hasNotificationChannels) {
                             add(
                                 NotificationPreferenceType.AdvancedSettings(
-                                    title = context.getString(LR.string.settings_notification_advanced),
-                                    description = context.getString(LR.string.settings_notification_advanced_summary),
+                                    title = TextResource.fromStringId(LR.string.settings_notification_advanced),
+                                    description = TextResource.fromStringId(LR.string.settings_notification_advanced_summary),
                                 ),
                             )
                         } else {
                             add(
                                 NotificationPreferenceType.NotificationSoundPreference(
-                                    title = context.getString(LR.string.settings_notification_sound),
+                                    title = TextResource.fromStringId(LR.string.settings_notification_sound),
                                     notificationSound = settings.notificationSound.value,
                                     displayedSoundName = getNotificationSoundSummary(),
                                 ),
                             )
                             add(
                                 NotificationPreferenceType.NotificationVibration(
-                                    title = context.getString(LR.string.settings_notification_vibrate),
+                                    title = TextResource.fromStringId(LR.string.settings_notification_vibrate),
                                     value = settings.notificationVibrate.value,
                                     options = listOf(
                                         NotificationVibrateSetting.NewEpisodes,
                                         NotificationVibrateSetting.OnlyWhenSilent,
                                         NotificationVibrateSetting.Never,
                                     ),
-                                    displayValue = context.getString(settings.notificationVibrate.value.summary),
+                                    displayValue = TextResource.fromStringId(settings.notificationVibrate.value.summary),
                                 ),
                             )
                         }
@@ -88,20 +89,20 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
                 },
             ),
             NotificationPreferenceCategory(
-                title = context.getString(LR.string.settings),
+                title = TextResource.fromStringId(LR.string.settings),
                 preferences = listOf(
                     NotificationPreferenceType.PlayOverNotifications(
-                        title = context.getString(LR.string.settings_notification_play_over),
+                        title = TextResource.fromStringId(LR.string.settings_notification_play_over),
                         value = settings.playOverNotification.value,
                         options = listOf(
                             PlayOverNotificationSetting.NEVER,
                             PlayOverNotificationSetting.DUCK,
                             PlayOverNotificationSetting.ALWAYS,
                         ),
-                        displayValue = context.getString(settings.playOverNotification.value.titleRes),
+                        displayValue = TextResource.fromStringId(settings.playOverNotification.value.titleRes),
                     ),
                     NotificationPreferenceType.HidePlaybackNotificationOnPause(
-                        title = context.getString(LR.string.settings_notification_hide_on_pause),
+                        title = TextResource.fromStringId(LR.string.settings_notification_hide_on_pause),
                         isEnabled = settings.hideNotificationOnPause.value,
                     ),
                 ),
@@ -114,10 +115,10 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
         val notificationCount = podcasts.count { it.isShowNotifications }
 
         when {
-            notificationCount == 0 -> context.getString(LR.string.settings_podcasts_selected_zero)
-            notificationCount == 1 -> context.getString(LR.string.settings_podcasts_selected_one)
-            notificationCount >= podcastCount -> context.getString(LR.string.settings_podcasts_selected_all)
-            else -> context.getString(
+            notificationCount == 0 -> TextResource.fromStringId(LR.string.settings_podcasts_selected_zero)
+            notificationCount == 1 -> TextResource.fromStringId(LR.string.settings_podcasts_selected_one)
+            notificationCount >= podcastCount -> TextResource.fromStringId(LR.string.settings_podcasts_selected_all)
+            else -> TextResource.fromStringId(
                 LR.string.settings_podcasts_selected_x,
                 notificationCount,
             )
@@ -182,7 +183,7 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
 
             is NotificationPreferenceType.AdvancedSettings,
             is NotificationPreferenceType.NotifyOnThesePodcasts,
-            -> Unit // these are not on us to set
+                -> Unit // these are not on us to set
         }
     }
 }

@@ -4,22 +4,23 @@ import au.com.shiftyjelly.pocketcasts.preferences.NotificationSound
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
+import au.com.shiftyjelly.pocketcasts.settings.util.TextResource
 
 internal sealed interface NotificationPreferenceType {
-    val title: String
+    val title: TextResource
 
     data class NotifyMeOnNewEpisodes(
-        override val title: String,
+        override val title: TextResource,
         val isEnabled: Boolean,
     ) : NotificationPreferenceType
 
     data class NotifyOnThesePodcasts(
-        override val title: String,
-        val displayValue: String,
+        override val title: TextResource,
+        val displayValue: TextResource,
     ) : NotificationPreferenceType
 
     data class NotificationActions(
-        override val title: String,
+        override val title: TextResource,
         val value: List<NewEpisodeNotificationAction>,
         val options: List<NewEpisodeNotificationAction>,
         val displayValue: String,
@@ -27,32 +28,32 @@ internal sealed interface NotificationPreferenceType {
     ) : NotificationPreferenceType
 
     data class NotificationSoundPreference(
-        override val title: String,
+        override val title: TextResource,
         val notificationSound: NotificationSound,
         val displayedSoundName: String,
     ) : NotificationPreferenceType
 
     data class NotificationVibration(
-        override val title: String,
+        override val title: TextResource,
         val value: NotificationVibrateSetting,
-        val displayValue: String,
+        val displayValue: TextResource,
         val options: List<NotificationVibrateSetting> = NotificationVibrateSetting.entries,
     ) : NotificationPreferenceType
 
     data class AdvancedSettings(
-        override val title: String,
-        val description: String,
+        override val title: TextResource,
+        val description: TextResource,
     ) : NotificationPreferenceType
 
     data class PlayOverNotifications(
-        override val title: String,
+        override val title: TextResource,
         val value: PlayOverNotificationSetting,
-        val displayValue: String,
+        val displayValue: TextResource,
         val options: List<PlayOverNotificationSetting> = PlayOverNotificationSetting.entries,
     ) : NotificationPreferenceType
 
     data class HidePlaybackNotificationOnPause(
-        override val title: String,
+        override val title: TextResource,
         val isEnabled: Boolean,
     ) : NotificationPreferenceType
 }

@@ -18,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreferenceType
+import au.com.shiftyjelly.pocketcasts.settings.util.TextResource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.list.MultiChoiceListener
@@ -41,7 +42,7 @@ internal fun NotificationPreferenceCategory(
             when (item) {
                 is NotificationPreferenceType.NotifyMeOnNewEpisodes -> {
                     SettingRow(
-                        primaryText = item.title,
+                        primaryText = item.title.asString(),
                         toggle = SettingRowToggle.Switch(checked = item.isEnabled),
                         modifier = modifier.toggleable(
                             value = item.isEnabled,
@@ -51,7 +52,7 @@ internal fun NotificationPreferenceCategory(
                 }
                 is NotificationPreferenceType.HidePlaybackNotificationOnPause -> {
                     SettingRow(
-                        primaryText = item.title,
+                        primaryText = item.title.asString(),
                         toggle = SettingRowToggle.Switch(checked = item.isEnabled),
                         modifier = modifier.toggleable(
                             value = item.isEnabled,
@@ -62,23 +63,23 @@ internal fun NotificationPreferenceCategory(
 
                 is NotificationPreferenceType.NotifyOnThesePodcasts -> {
                     SettingRow(
-                        primaryText = item.title,
-                        secondaryText = item.displayValue,
+                        primaryText = item.title.asString(),
+                        secondaryText = item.displayValue.asString(),
                         modifier = modifier.clickable { onItemClicked(item) },
                     )
                 }
 
                 is NotificationPreferenceType.AdvancedSettings -> {
                     SettingRow(
-                        primaryText = item.title,
-                        secondaryText = item.description,
+                        primaryText = item.title.asString(),
+                        secondaryText = item.description.asString(),
                         modifier = modifier.clickable { onItemClicked(item) },
                     )
                 }
 
                 is NotificationPreferenceType.NotificationSoundPreference -> {
                     SettingRow(
-                        primaryText = item.title,
+                        primaryText = item.title.asString(),
                         secondaryText = item.displayedSoundName,
                         modifier = modifier.clickable { onItemClicked(item) },
                     )
@@ -87,8 +88,8 @@ internal fun NotificationPreferenceCategory(
                 is NotificationPreferenceType.NotificationVibration -> {
                     val context = LocalContext.current
                     SettingRadioDialogRow(
-                        primaryText = item.title,
-                        secondaryText = item.displayValue,
+                        primaryText = item.title.asString(),
+                        secondaryText = item.displayValue.asString(),
                         options = item.options,
                         savedOption = item.value,
                         optionToLocalisedString = {
@@ -105,8 +106,8 @@ internal fun NotificationPreferenceCategory(
                 is NotificationPreferenceType.PlayOverNotifications -> {
                     val context = LocalContext.current
                     SettingRadioDialogRow(
-                        primaryText = item.title,
-                        secondaryText = item.displayValue,
+                        primaryText = item.title.asString(),
+                        secondaryText = item.displayValue.asString(),
                         options = item.options,
                         savedOption = item.value,
                         optionToLocalisedString = {
@@ -123,7 +124,7 @@ internal fun NotificationPreferenceCategory(
                 is NotificationPreferenceType.NotificationActions -> {
                     val activity = LocalContext.current
                     SettingRow(
-                        primaryText = item.title,
+                        primaryText = item.title.asString(),
                         secondaryText = item.displayValue,
                         modifier = modifier.clickable {
                             val initialActions = item.value
@@ -189,13 +190,13 @@ private fun NotificationCategoryPreview(
             categoryTitle = "Test Category",
             items = listOf(
                 NotificationPreferenceType.HidePlaybackNotificationOnPause(
-                    title = "text",
+                    title = TextResource.fromText("text"),
                     isEnabled = true,
                 ),
                 NotificationPreferenceType.PlayOverNotifications(
-                    title = "item 2",
+                    title = TextResource.fromText("item 2"),
                     value = PlayOverNotificationSetting.DUCK,
-                    displayValue = "duck",
+                    displayValue = TextResource.fromText("duck"),
                     options = emptyList(),
                 ),
             ),

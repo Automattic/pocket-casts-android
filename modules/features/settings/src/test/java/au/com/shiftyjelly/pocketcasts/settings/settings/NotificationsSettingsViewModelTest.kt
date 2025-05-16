@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.settings.notifications.NotificationsSettin
 import au.com.shiftyjelly.pocketcasts.settings.notifications.data.NotificationsPreferenceRepository
 import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreferenceCategory
 import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreferenceType
+import au.com.shiftyjelly.pocketcasts.settings.util.TextResource
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -100,12 +101,12 @@ internal class NotificationsSettingsViewModelTest {
 
     private companion object {
         val notifyMe = NotificationPreferenceType.NotifyMeOnNewEpisodes(
-            title = "switch",
+            title = TextResource.fromText("switch"),
             isEnabled = false,
         )
         val categories = listOf(
             NotificationPreferenceCategory(
-                title = "category1",
+                title = TextResource.fromText("category1"),
                 preferences = listOf(
                     notifyMe,
                 ),
@@ -113,22 +114,22 @@ internal class NotificationsSettingsViewModelTest {
         )
         val otherCategories = listOf(
             NotificationPreferenceCategory(
-                title = "category1",
+                title = TextResource.fromText("category1"),
                 preferences = listOf(
                     notifyMe,
                 ),
             ),
             NotificationPreferenceCategory(
-                title = "category2",
+                title = TextResource.fromText("category2"),
                 preferences = listOf(
                     NotificationPreferenceType.HidePlaybackNotificationOnPause(
-                        title = "text",
+                        title = TextResource.fromText("text"),
                         isEnabled = true,
                     ),
                     NotificationPreferenceType.PlayOverNotifications(
-                        title = "item 2",
+                        title = TextResource.fromText("item 2"),
                         value = PlayOverNotificationSetting.DUCK,
-                        displayValue = "duck",
+                        displayValue = TextResource.fromText("duck"),
                         options = emptyList(),
                     ),
                 ),

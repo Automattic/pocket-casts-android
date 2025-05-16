@@ -29,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.settings.notifications.components.NotificationPreferenceCategory
 import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreferenceType
+import au.com.shiftyjelly.pocketcasts.settings.util.TextResource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.fragments.PodcastSelectFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.PodcastSelectFragmentSource
@@ -72,7 +73,7 @@ internal fun NotificationsSettingsScreen(
                 for (category in state.categories) {
                     item {
                         NotificationPreferenceCategory(
-                            categoryTitle = category.title,
+                            categoryTitle = category.title.asString(),
                             items = category.preferences,
                             onItemClicked = { preference ->
                                 when (preference) {
@@ -116,25 +117,25 @@ private fun PreviewNotificationSettingsScreen(@PreviewParameter(ThemePreviewPara
             state = NotificationsSettingsViewModel.State(
                 categories = listOf(
                     CategoryModel(
-                        title = "My episodes",
+                        title = TextResource.fromText("My episodes"),
                         preferences = listOf(
                             NotificationPreferenceType.NotifyMeOnNewEpisodes(
-                                title = "Notify me",
+                                title = TextResource.fromText("Notify me"),
                                 isEnabled = false,
                             ),
                         ),
                     ),
                     CategoryModel(
-                        title = "Settings",
+                        title = TextResource.fromText("Settings"),
                         preferences = listOf(
                             NotificationPreferenceType.PlayOverNotifications(
-                                title = "Play over notifications",
+                                title = TextResource.fromText("Play over notifications"),
                                 value = PlayOverNotificationSetting.DUCK,
-                                displayValue = "Duck",
+                                displayValue = TextResource.fromText("Duck"),
                                 options = emptyList(),
                             ),
                             NotificationPreferenceType.HidePlaybackNotificationOnPause(
-                                title = "Hide playback notification on pause",
+                                title = TextResource.fromText("Hide playback notification on pause"),
                                 isEnabled = true,
                             ),
                         ),

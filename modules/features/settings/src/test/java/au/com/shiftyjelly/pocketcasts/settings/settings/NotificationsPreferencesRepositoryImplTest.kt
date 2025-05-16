@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.settings.notifications.data.NotificationsCompatibilityProvider
 import au.com.shiftyjelly.pocketcasts.settings.notifications.data.NotificationsPreferencesRepositoryImpl
 import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreferenceType
+import au.com.shiftyjelly.pocketcasts.settings.util.TextResource
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -102,7 +103,7 @@ class NotificationsPreferencesRepositoryImplTest {
 
         repository.setPreference(
             NotificationPreferenceType.NotifyMeOnNewEpisodes(
-                title = "",
+                title = TextResource.fromText(""),
                 isEnabled = true,
             ),
         )
