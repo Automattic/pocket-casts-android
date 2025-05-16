@@ -3,17 +3,21 @@ package au.com.shiftyjelly.pocketcasts.settings.notifications
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.PodcastSelectFragment
+import au.com.shiftyjelly.pocketcasts.views.fragments.PodcastSelectFragmentSource
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
@@ -36,8 +40,15 @@ internal class NotificationsSettingsFragment : BaseFragment(), PodcastSelectFrag
     ) = contentWithoutConsumedInsets {
         AppThemeWithBackground(theme.activeTheme) {
             val bottomInset = settings.bottomInset.collectAsStateWithLifecycle(0)
+
+            val state: NotificationsSettingsViewModel.State by viewModel.state.collectAsState()
+            CallOnce {
+                viewModel.onShown()
+            }
+
             NotificationsSettingsScreen(
-                viewModel = viewModel,
+                state = state,
+                onPreferenceChanged = viewModel::onPreferenceChanged,
                 onBackPressed = {
                     @Suppress("DEPRECATION")
                     activity?.onBackPressed()
@@ -54,5 +65,5 @@ internal class NotificationsSettingsFragment : BaseFragment(), PodcastSelectFrag
         viewModel.onSelectedPodcastsChanged(newSelection)
     }
 
-    override fun podcastSelectFragmentGetCurrentSelection() = runCatching { runBlocking { viewModel.getSelectedPodcastIds() } }.getOrDefault(emptyList())
+    override fun podcastSelectFragmentGetCurrentSelection() = runBlocking { viewModel.getSelectedPodcastIds() }
 }
