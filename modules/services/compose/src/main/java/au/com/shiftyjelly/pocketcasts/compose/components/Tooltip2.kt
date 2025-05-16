@@ -33,9 +33,9 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 @Composable
 fun Tooltip2(
     title: String,
-    body: String?,
     anchorPosition: AnchorPosition,
     modifier: Modifier = Modifier,
+    body: String? = null,
     elevation: Dp = 16.dp,
 ) {
     val tooltipShape = Tooltip2Shape(anchorPosition)
