@@ -3,10 +3,12 @@ package au.com.shiftyjelly.pocketcasts.repositories.di
 import android.content.Context
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.crashlogging.di.ProvideApplicationScope
 import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
 import au.com.shiftyjelly.pocketcasts.payment.PaymentDataSource
 import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
+import au.com.shiftyjelly.pocketcasts.repositories.payment.AnalyticsPaymentListener
 import au.com.shiftyjelly.pocketcasts.repositories.payment.LoggingPaymentListener
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
@@ -52,6 +54,12 @@ class RepositoryProviderModule {
     @IntoSet
     fun provideLoggingListener(): PaymentClient.Listener {
         return LoggingPaymentListener()
+    }
+
+    @Provides
+    @IntoSet
+    fun provideAnalyticsListener(tracker: AnalyticsTracker): PaymentClient.Listener {
+        return AnalyticsPaymentListener(tracker)
     }
 
     @Provides

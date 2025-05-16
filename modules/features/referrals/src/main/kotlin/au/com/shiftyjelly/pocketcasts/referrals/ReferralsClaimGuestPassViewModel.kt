@@ -120,7 +120,7 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
     ) {
         analyticsTracker.track(AnalyticsEvent.REFERRAL_PURCHASE_SHOWN)
         viewModelScope.launch {
-            val purchaseResult = paymentClient.purchaseSubscriptionPlan(referralPlan.key, activity)
+            val purchaseResult = paymentClient.purchaseSubscriptionPlan(referralPlan.key, purchaseSource = "referrals", activity)
             when (purchaseResult) {
                 PurchaseResult.Purchased -> {
                     analyticsTracker.track(AnalyticsEvent.REFERRAL_PURCHASE_SUCCESS)

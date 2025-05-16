@@ -38,7 +38,7 @@ internal class LoggingPaymentListener : PaymentClient.Listener {
         log("Purchasing subscrition plan: $key")
     }
 
-    override fun onSubscriptionPurchased(key: SubscriptionPlan.Key, result: PurchaseResult) {
+    override fun onSubscriptionPurchased(key: SubscriptionPlan.Key, purchaseSource: String, result: PurchaseResult) {
         val message = when (result) {
             is PurchaseResult.Purchased -> "Purchased subscription plan: $key"
             is PurchaseResult.Cancelled -> "Cancelled subscription plan purchase: $key"
