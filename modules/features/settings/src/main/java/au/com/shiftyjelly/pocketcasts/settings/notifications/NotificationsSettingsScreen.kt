@@ -46,6 +46,7 @@ internal fun NotificationsSettingsScreen(
     state: NotificationsSettingsViewModel.State,
     onPreferenceChanged: (NotificationPreference<*>) -> Unit,
     onAdvancedSettingsClicked: () -> Unit,
+    onSelectRingtoneClicked: (String?) -> Unit,
     onBackPressed: () -> Unit,
     bottomInset: Dp,
     modifier: Modifier = Modifier,
@@ -53,22 +54,6 @@ internal fun NotificationsSettingsScreen(
     // Unfortunately, PodcastSelectFragment was meant to be used from another fragment that defines a toolbar.
     // This flag is used to determine whether we should render the podcast selector inside this composable and change toolbar title and override back navigation when necessary.
     var isShowingPodcastSelector by remember { mutableStateOf(false) }
-
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        result.data?.let { data ->
-            val ringtone: Uri? = getParcelableExtra(data, RingtoneManager.EXTRA_RINGTONE_PICKED_URI, Uri::class.java)
-            val filePath = ringtone?.toString().orEmpty()
-            onPreferenceChanged(
-                // construct a fake item to pass the new value, otherwise I'd need to hold a reference to the original preference item
-                NotificationPreference.ValueHolderPreference(
-                    preference = NotificationPreferences.NEW_EPISODES_RINGTONE,
-                    title = "",
-                    value = filePath,
-                    displayValue = "",
-                ),
-            )
-        }
-    }
 
     Column(
         modifier = modifier
@@ -107,23 +92,7 @@ internal fun NotificationsSettingsScreen(
                                     }
 
                                     NotificationPreferences.NEW_EPISODES_RINGTONE -> {
-                                        launcher.launch(
-                                            Intent(RingtoneManager.ACTION_RINGTONE_PICKER).apply {
-                                                putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION)
-                                                putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true)
-                                                putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, true)
-                                                putExtra(
-                                                    RingtoneManager.EXTRA_RINGTONE_DEFAULT_URI,
-                                                    android.provider.Settings.System.DEFAULT_NOTIFICATION_URI
-                                                )
-                                                // Select "Silent" if empty
-                                                runCatching {
-                                                    (preference.value as String).toUri()
-                                                }.getOrNull()?.let {
-                                                    putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, it)
-                                                }
-                                            },
-                                        )
+                                        onSelectRingtoneClicked(preference.value as? String)
                                     }
 
                                     else -> Unit
@@ -186,5 +155,6 @@ private fun PreviewNotificationSettingsScreen(@PreviewParameter(ThemePreviewPara
             onAdvancedSettingsClicked = {},
             onBackPressed = {},
             bottomInset = 0.dp,
+            onSelectRingtoneClicked = {}
         )
     }
