@@ -45,8 +45,7 @@ fun Tooltip2(
     }
 
     Box(
-        modifier = Modifier
-            .then(if (elevation > 0.dp) Modifier.shadow(elevation, tooltipShape) else Modifier)
+        modifier = (if (elevation > 0.dp) Modifier.shadow(elevation, tooltipShape) else Modifier)
             .clip(tooltipShape)
             .background(backgroundColor)
             .then(modifier),
