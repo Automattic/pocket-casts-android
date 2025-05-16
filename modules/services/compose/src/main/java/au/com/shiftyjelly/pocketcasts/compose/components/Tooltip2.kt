@@ -33,7 +33,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 @Composable
 fun Tooltip2(
     title: String,
-    body: String,
+    body: String?,
     anchorPosition: AnchorPosition,
     modifier: Modifier = Modifier,
     elevation: Dp = 16.dp,
@@ -62,13 +62,15 @@ fun Tooltip2(
             TextH40(
                 text = title,
             )
-            Spacer(
-                modifier = Modifier.height(4.dp),
-            )
-            TextP50(
-                text = body,
-                color = MaterialTheme.theme.colors.primaryText02,
-            )
+            if (body != null) {
+                Spacer(
+                    modifier = Modifier.height(4.dp),
+                )
+                TextP50(
+                    text = body,
+                    color = MaterialTheme.theme.colors.primaryText02,
+                )
+            }
             if (anchorPosition.isBottomAligned()) {
                 Spacer(
                     modifier = Modifier.height(AnchorHeight),
