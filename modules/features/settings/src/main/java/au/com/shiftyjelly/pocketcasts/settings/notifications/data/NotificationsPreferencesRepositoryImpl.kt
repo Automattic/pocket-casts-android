@@ -8,29 +8,25 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
-import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreferenceCategory
 import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreferenceType
 import au.com.shiftyjelly.pocketcasts.settings.util.TextResource
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.withContext
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
-    @IoDispatcher private val dispatcher: CoroutineDispatcher,
     @ApplicationContext private val context: Context,
     private val settings: Settings,
     private val podcastManager: PodcastManager,
     private val notificationsCompatibilityProvider: NotificationsCompatibilityProvider,
 ) : NotificationsPreferenceRepository {
 
-    override suspend fun getPreferenceCategories(): List<NotificationPreferenceCategory> = withContext(dispatcher) {
-        listOf(
+    override suspend fun getPreferenceCategories(): List<NotificationPreferenceCategory> {
+        return listOf(
             NotificationPreferenceCategory(
                 title = TextResource.fromStringId(LR.string.settings_notifications_new_episodes),
                 preferences = buildList {
@@ -150,7 +146,7 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun setPreference(preference: NotificationPreferenceType) = withContext(dispatcher) {
+    override suspend fun setPreference(preference: NotificationPreferenceType) {
         when (preference) {
             is NotificationPreferenceType.NotifyMeOnNewEpisodes -> {
                 val enabled = preference.isEnabled
@@ -183,7 +179,7 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
 
             is NotificationPreferenceType.AdvancedSettings,
             is NotificationPreferenceType.NotifyOnThesePodcasts,
-                -> Unit // these are not on us to set
+            -> Unit // these are not on us to set
         }
     }
 }
