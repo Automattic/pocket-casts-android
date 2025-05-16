@@ -104,7 +104,6 @@ class AppLifecycleObserver constructor(
             settings.useDarkUpNextTheme.set(false, updateModifiedAt = false)
 
             // new installations default to not displaying the tooltip
-            settings.showPodcastHeaderChangesTooltip.set(false, updateModifiedAt = false)
             settings.showPodcastsRecentlyPlayedSortOrderTooltip.set(false, updateModifiedAt = false)
 
             settings.showFreeAccountEncouragement.set(false, updateModifiedAt = false)
