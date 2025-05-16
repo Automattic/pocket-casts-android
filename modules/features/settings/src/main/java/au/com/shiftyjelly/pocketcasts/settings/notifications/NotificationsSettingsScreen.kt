@@ -1,10 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.settings.notifications
 
-import android.content.Intent
-import android.media.RingtoneManager
-import android.net.Uri
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,17 +20,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.core.content.IntentCompat.getParcelableExtra
-import androidx.core.net.toUri
 import androidx.fragment.compose.AndroidFragment
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.R
+import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.settings.notifications.components.NotificationPreferenceCategory
-import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreference
-import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreferences
+import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreferenceType
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.fragments.PodcastSelectFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.PodcastSelectFragmentSource
@@ -44,7 +37,7 @@ import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationP
 @Composable
 internal fun NotificationsSettingsScreen(
     state: NotificationsSettingsViewModel.State,
-    onPreferenceChanged: (NotificationPreference<*>) -> Unit,
+    onPreferenceChanged: (NotificationPreferenceType) -> Unit,
     onAdvancedSettingsClicked: () -> Unit,
     onSelectRingtoneClicked: (String?) -> Unit,
     onBackPressed: () -> Unit,
@@ -82,17 +75,17 @@ internal fun NotificationsSettingsScreen(
                             categoryTitle = category.title,
                             items = category.preferences,
                             onItemClicked = { preference ->
-                                when (preference.preference) {
-                                    NotificationPreferences.NEW_EPISODES_ADVANCED -> {
+                                when (preference) {
+                                    is NotificationPreferenceType.AdvancedSettings -> {
                                         onAdvancedSettingsClicked()
                                     }
 
-                                    NotificationPreferences.NEW_EPISODES_CHOOSE_PODCASTS -> {
+                                    is NotificationPreferenceType.NotifyOnThesePodcasts -> {
                                         isShowingPodcastSelector = true
                                     }
 
-                                    NotificationPreferences.NEW_EPISODES_RINGTONE -> {
-                                        onSelectRingtoneClicked(preference.value as? String)
+                                    is NotificationPreferenceType.NotificationSoundPreference -> {
+                                        onSelectRingtoneClicked(preference.notificationSound.path)
                                     }
 
                                     else -> Unit
@@ -125,36 +118,33 @@ private fun PreviewNotificationSettingsScreen(@PreviewParameter(ThemePreviewPara
                     CategoryModel(
                         title = "My episodes",
                         preferences = listOf(
-                            NotificationPreference.SwitchPreference(
+                            NotificationPreferenceType.NotifyMeOnNewEpisodes(
                                 title = "Notify me",
-                                value = false,
-                                preference = NotificationPreferences.NEW_EPISODES_NOTIFY_ME
-                            )
-                        )
+                                isEnabled = false,
+                            ),
+                        ),
                     ),
                     CategoryModel(
                         title = "Settings",
                         preferences = listOf(
-                            NotificationPreference.RadioGroupPreference(
+                            NotificationPreferenceType.PlayOverNotifications(
                                 title = "Play over notifications",
-                                value = "Never",
-                                preference = NotificationPreferences.SETTINGS_PLAY_OVER,
+                                value = PlayOverNotificationSetting.DUCK,
+                                displayValue = "Duck",
                                 options = emptyList(),
-                                displayText = "Never"
                             ),
-                            NotificationPreference.SwitchPreference(
+                            NotificationPreferenceType.HidePlaybackNotificationOnPause(
                                 title = "Hide playback notification on pause",
-                                value = false,
-                                preference = NotificationPreferences.SETTINGS_HIDE_NOTIFICATION_ON_PAUSE
-                            )
-                        )
-                    )
-                )
+                                isEnabled = true,
+                            ),
+                        ),
+                    ),
+                ),
             ),
             onPreferenceChanged = {},
             onAdvancedSettingsClicked = {},
             onBackPressed = {},
             bottomInset = 0.dp,
-            onSelectRingtoneClicked = {}
+            onSelectRingtoneClicked = {},
         )
     }

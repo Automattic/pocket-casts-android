@@ -3,14 +3,13 @@ package au.com.shiftyjelly.pocketcasts.settings.settings
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.settings.notifications.NotificationsSettingsViewModel
 import au.com.shiftyjelly.pocketcasts.settings.notifications.data.NotificationsPreferenceRepository
-import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreference
 import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreferenceCategory
-import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreferences
+import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreferenceType
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -27,7 +26,6 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @RunWith(MockitoJUnitRunner::class)
-@OptIn(ExperimentalCoroutinesApi::class)
 internal class NotificationsSettingsViewModelTest {
 
     @get:Rule
@@ -86,7 +84,7 @@ internal class NotificationsSettingsViewModelTest {
     @Test
     fun `GIVEN preference WHEN preference changes THEN repository called to persist change`() = runTest {
         val viewModel = createViewModel()
-        val changedPreference = switchPreference.copy(value = !switchPreference.value)
+        val changedPreference = notifyMe.copy(isEnabled = !notifyMe.isEnabled)
         viewModel.onPreferenceChanged(changedPreference)
 
         verify(repository).setPreference(changedPreference)
@@ -101,46 +99,37 @@ internal class NotificationsSettingsViewModelTest {
     )
 
     private companion object {
+        val notifyMe = NotificationPreferenceType.NotifyMeOnNewEpisodes(
+            title = "switch",
+            isEnabled = false,
+        )
         val categories = listOf(
             NotificationPreferenceCategory(
                 title = "category1",
                 preferences = listOf(
-                    NotificationPreference.SwitchPreference(
-                        title = "switch",
-                        value = false,
-                        preference = NotificationPreferences.SETTINGS_HIDE_NOTIFICATION_ON_PAUSE,
-                    ),
+                    notifyMe,
                 ),
             ),
         )
-
-        val switchPreference = NotificationPreference.SwitchPreference(
-            title = "switch",
-            value = false,
-            preference = NotificationPreferences.SETTINGS_HIDE_NOTIFICATION_ON_PAUSE,
-        )
-
         val otherCategories = listOf(
             NotificationPreferenceCategory(
                 title = "category1",
                 preferences = listOf(
-                    switchPreference,
+                    notifyMe,
                 ),
             ),
             NotificationPreferenceCategory(
                 title = "category2",
                 preferences = listOf(
-                    NotificationPreference.TextPreference(
+                    NotificationPreferenceType.HidePlaybackNotificationOnPause(
                         title = "text",
-                        value = "text value",
-                        preference = NotificationPreferences.SETTINGS_PLAY_OVER,
+                        isEnabled = true,
                     ),
-                    NotificationPreference.RadioGroupPreference(
-                        title = "radio",
-                        value = 1,
-                        preference = NotificationPreferences.NEW_EPISODES_ACTIONS,
-                        options = (1..3).toList(),
-                        displayText = "one",
+                    NotificationPreferenceType.PlayOverNotifications(
+                        title = "item 2",
+                        value = PlayOverNotificationSetting.DUCK,
+                        displayValue = "duck",
+                        options = emptyList(),
                     ),
                 ),
             ),
