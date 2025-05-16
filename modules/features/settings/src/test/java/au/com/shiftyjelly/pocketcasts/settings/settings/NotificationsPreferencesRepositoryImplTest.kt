@@ -10,8 +10,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSett
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.settings.notifications.data.NotificationsCompatibilityProvider
 import au.com.shiftyjelly.pocketcasts.settings.notifications.data.NotificationsPreferencesRepositoryImpl
-import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreference
-import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreferences
+import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreferenceType
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -65,7 +64,7 @@ class NotificationsPreferencesRepositoryImplTest {
 
         val categories = repository.getPreferenceCategories()
 
-        assert(categories.find { it.preferences.any { it.preference == NotificationPreferences.NEW_EPISODES_NOTIFY_ME } }?.preferences?.size == 1)
+        assert(categories.find { it.preferences.any { it is NotificationPreferenceType.NotifyMeOnNewEpisodes } }?.preferences?.size == 1)
     }
 
     @Test
@@ -77,7 +76,7 @@ class NotificationsPreferencesRepositoryImplTest {
 
         val categories = repository.getPreferenceCategories()
 
-        assert(categories.map { it.preferences }.flatten().any { it.preference == NotificationPreferences.NEW_EPISODES_ADVANCED })
+        assert(categories.map { it.preferences }.flatten().any { it is NotificationPreferenceType.AdvancedSettings })
     }
 
     @Test
@@ -89,15 +88,24 @@ class NotificationsPreferencesRepositoryImplTest {
 
         val categories = repository.getPreferenceCategories()
 
-        val targetPrefs = listOf(NotificationPreferences.NEW_EPISODES_RINGTONE, NotificationPreferences.NEW_EPISODES_VIBRATION)
-        assert(categories.map { it.preferences }.flatten().filter { targetPrefs.contains(it.preference) }.size == 2)
+        assert(
+            categories.map { it.preferences }.flatten()
+                .filter {
+                    it is NotificationPreferenceType.NotificationSoundPreference || it is NotificationPreferenceType.NotificationVibration
+                }.size == 2,
+        )
     }
 
     @Test
     fun `GIVEN new preference value WHEN setting a preference THEN setting is called`() = runTest {
         val repository = createRepository()
 
-        repository.setPreference(NotificationPreference.SwitchPreference(title = "", value = true, preference = NotificationPreferences.NEW_EPISODES_NOTIFY_ME))
+        repository.setPreference(
+            NotificationPreferenceType.NotifyMeOnNewEpisodes(
+                title = "",
+                isEnabled = true,
+            ),
+        )
 
         verify(podcastManager).updateAllShowNotifications(true)
         verify(settings).setNotificationLastSeenToNow()
@@ -106,7 +114,8 @@ class NotificationsPreferencesRepositoryImplTest {
     private fun createRepository(hasNotificationChannels: Boolean = true): NotificationsPreferencesRepositoryImpl {
         if (!hasNotificationChannels) {
             val notificationSound = mock<NotificationSound>(lenient = true) {
-                on { uri } doReturn null
+                on { uri } doReturn mock()
+                on { path } doReturn ""
             }
             whenever(settings.notificationSound).thenReturn(UserSetting.Mock(notificationSound, mock()))
             whenever(settings.notificationVibrate).thenReturn(UserSetting.Mock(NotificationVibrateSetting.Never, mock()))

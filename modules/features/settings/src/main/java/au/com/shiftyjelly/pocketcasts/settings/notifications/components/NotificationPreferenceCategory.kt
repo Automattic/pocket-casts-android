@@ -16,15 +16,8 @@ import au.com.shiftyjelly.pocketcasts.compose.components.SettingSection
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationAction
-import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
-import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreference
-import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreference.MultiSelectPreference
-import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreference.RadioGroupPreference
-import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreference.SwitchPreference
-import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreference.TextPreference
-import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreference.ValueHolderPreference
-import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreferences
+import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreferenceType
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.list.MultiChoiceListener
@@ -36,8 +29,8 @@ import okhttp3.internal.toImmutableList
 @Composable
 internal fun NotificationPreferenceCategory(
     categoryTitle: String,
-    items: List<NotificationPreference<*>>,
-    onItemClicked: (NotificationPreference<*>) -> Unit,
+    items: List<NotificationPreferenceType>,
+    onItemClicked: (NotificationPreferenceType) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     SettingSection(
@@ -46,85 +39,100 @@ internal fun NotificationPreferenceCategory(
     ) {
         items.forEach { item ->
             when (item) {
-                is SwitchPreference -> {
+                is NotificationPreferenceType.NotifyMeOnNewEpisodes -> {
                     SettingRow(
                         primaryText = item.title,
-                        toggle = SettingRowToggle.Switch(checked = item.value),
+                        toggle = SettingRowToggle.Switch(checked = item.isEnabled),
                         modifier = modifier.toggleable(
-                            value = item.value,
+                            value = item.isEnabled,
                             role = Role.Switch,
-                        ) { onItemClicked(item.copy(value = !item.value)) },
+                        ) { onItemClicked(item.copy(isEnabled = !item.isEnabled)) },
+                    )
+                }
+                is NotificationPreferenceType.HidePlaybackNotificationOnPause -> {
+                    SettingRow(
+                        primaryText = item.title,
+                        toggle = SettingRowToggle.Switch(checked = item.isEnabled),
+                        modifier = modifier.toggleable(
+                            value = item.isEnabled,
+                            role = Role.Switch,
+                        ) { onItemClicked(item.copy(isEnabled = !item.isEnabled)) },
                     )
                 }
 
-                is TextPreference -> SettingRow(
-                    primaryText = item.title,
-                    secondaryText = item.value,
-                    modifier = modifier.clickable { onItemClicked(item) },
-                )
-
-                is ValueHolderPreference<*> -> SettingRow(
-                    primaryText = item.title,
-                    secondaryText = item.displayValue,
-                    modifier = modifier.clickable { onItemClicked(item) },
-                )
-
-                is RadioGroupPreference<*> -> {
-                    val context = LocalContext.current
-                    when (item.preference) {
-                        NotificationPreferences.SETTINGS_PLAY_OVER -> {
-                            val castedItem = item as RadioGroupPreference<PlayOverNotificationSetting>
-                            SettingRadioDialogRow(
-                                primaryText = item.title,
-                                secondaryText = item.displayText,
-                                options = castedItem.options,
-                                savedOption = item.value,
-                                optionToLocalisedString = {
-                                    context.getString(it.titleRes)
-                                },
-                                onSave = { value ->
-                                    onItemClicked(
-                                        item.copy(value = value),
-                                    )
-                                },
-                            )
-                        }
-
-                        NotificationPreferences.NEW_EPISODES_VIBRATION -> {
-                            val castedItem = item as RadioGroupPreference<NotificationVibrateSetting>
-                            SettingRadioDialogRow(
-                                primaryText = item.title,
-                                secondaryText = item.displayText,
-                                options = castedItem.options,
-                                savedOption = item.value,
-                                optionToLocalisedString = {
-                                    context.getString(it.summary)
-                                },
-                                onSave = { value ->
-                                    onItemClicked(
-                                        item.copy(value = value),
-                                    )
-                                },
-                            )
-                        }
-
-                        else -> Unit
-                    }
+                is NotificationPreferenceType.NotifyOnThesePodcasts -> {
+                    SettingRow(
+                        primaryText = item.title,
+                        secondaryText = item.displayValue,
+                        modifier = modifier.clickable { onItemClicked(item) },
+                    )
                 }
 
-                is MultiSelectPreference<*> -> {
+                is NotificationPreferenceType.AdvancedSettings -> {
+                    SettingRow(
+                        primaryText = item.title,
+                        secondaryText = item.description,
+                        modifier = modifier.clickable { onItemClicked(item) },
+                    )
+                }
+
+                is NotificationPreferenceType.NotificationSoundPreference -> {
+                    SettingRow(
+                        primaryText = item.title,
+                        secondaryText = item.displayedSoundName,
+                        modifier = modifier.clickable { onItemClicked(item) },
+                    )
+                }
+
+                is NotificationPreferenceType.NotificationVibration -> {
+                    val context = LocalContext.current
+                    SettingRadioDialogRow(
+                        primaryText = item.title,
+                        secondaryText = item.displayValue,
+                        options = item.options,
+                        savedOption = item.value,
+                        optionToLocalisedString = {
+                            context.getString(it.summary)
+                        },
+                        onSave = { value ->
+                            onItemClicked(
+                                item.copy(value = value),
+                            )
+                        },
+                    )
+                }
+
+                is NotificationPreferenceType.PlayOverNotifications -> {
+                    val context = LocalContext.current
+                    SettingRadioDialogRow(
+                        primaryText = item.title,
+                        secondaryText = item.displayValue,
+                        options = item.options,
+                        savedOption = item.value,
+                        optionToLocalisedString = {
+                            context.getString(it.titleRes)
+                        },
+                        onSave = { value ->
+                            onItemClicked(
+                                item.copy(value = value),
+                            )
+                        },
+                    )
+                }
+
+                is NotificationPreferenceType.NotificationActions -> {
                     val activity = LocalContext.current
                     SettingRow(
                         primaryText = item.title,
-                        secondaryText = item.displayText,
+                        secondaryText = item.displayValue,
                         modifier = modifier.clickable {
-                            val initialActions = item.value.filterIsInstance<NewEpisodeNotificationAction>()
+                            val initialActions = item.value
                             val selectedActions = initialActions.toMutableList()
                             val initialSelection = selectedActions.map(NewEpisodeNotificationAction::ordinal).toIntArray()
                             val onSelect: MultiChoiceListener = { dialog, _, items ->
                                 selectedActions.clear()
                                 selectedActions.addAll(NewEpisodeNotificationAction.fromLabels(items.map { it.toString() }, activity.resources))
-                                changeActionsDialog(item.maxNumberOfSelectableOptions, selectedActions, dialog)
+                                changeActionsDialog(3, selectedActions, dialog)
                             }
                             val dialog = MaterialDialog(activity)
                                 .listItemsMultiChoice(
@@ -140,13 +148,13 @@ internal fun NotificationPreferenceCategory(
                                         res = R.string.ok,
                                         click = {
                                             onItemClicked(
-                                                (item as MultiSelectPreference<NewEpisodeNotificationAction>).copy(value = selectedActions.toImmutableList()),
+                                                item.copy(value = selectedActions.toImmutableList()),
                                             )
                                         },
                                     )
                                     negativeButton(res = R.string.cancel)
                                 }
-                            changeActionsDialog(item.maxNumberOfSelectableOptions, selectedActions, dialog)
+                            changeActionsDialog(3, selectedActions, dialog)
                         },
                     )
                 }
@@ -180,41 +188,15 @@ private fun NotificationCategoryPreview(
         NotificationPreferenceCategory(
             categoryTitle = "Test Category",
             items = listOf(
-                SwitchPreference(
-                    title = "Off item",
-                    value = false,
-                    preference = NotificationPreferences.NEW_EPISODES_NOTIFY_ME,
+                NotificationPreferenceType.HidePlaybackNotificationOnPause(
+                    title = "text",
+                    isEnabled = true,
                 ),
-                SwitchPreference(
-                    title = "On item",
-                    value = true,
-                    preference = NotificationPreferences.NEW_EPISODES_NOTIFY_ME,
-                ),
-                TextPreference(
-                    title = "Text item",
-                    value = "Text value",
-                    preference = NotificationPreferences.NEW_EPISODES_ACTIONS,
-                ),
-                ValueHolderPreference(
-                    title = "Pi Value Holder item",
-                    value = 3.14,
-                    displayValue = "Pi",
-                    preference = NotificationPreferences.NEW_EPISODES_NOTIFY_ME,
-                ),
-                RadioGroupPreference(
-                    title = "Radio item",
-                    value = 1,
-                    preference = NotificationPreferences.NEW_EPISODES_NOTIFY_ME,
-                    options = (1..5).toList(),
-                    displayText = "one",
-                ),
-                MultiSelectPreference(
-                    title = "Multiselect item",
-                    value = (1..3).toList(),
-                    preference = NotificationPreferences.NEW_EPISODES_NOTIFY_ME,
-                    options = (1..10).toList(),
-                    displayText = (1..3).joinToString(", "),
-                    maxNumberOfSelectableOptions = 3,
+                NotificationPreferenceType.PlayOverNotifications(
+                    title = "item 2",
+                    value = PlayOverNotificationSetting.DUCK,
+                    displayValue = "duck",
+                    options = emptyList(),
                 ),
             ),
             onItemClicked = { },

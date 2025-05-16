@@ -10,17 +10,14 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetti
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreference
 import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreferenceCategory
-import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreferences
+import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreferenceType
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
@@ -38,50 +35,44 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
                 preferences = buildList {
                     val isEnabled = settings.notifyRefreshPodcast.flow.value
                     add(
-                        NotificationPreference.SwitchPreference(
+                        NotificationPreferenceType.NotifyMeOnNewEpisodes(
                             title = context.getString(LR.string.settings_notification_notify_me),
-                            value = isEnabled,
-                            preference = NotificationPreferences.NEW_EPISODES_NOTIFY_ME,
+                            isEnabled = isEnabled,
                         ),
                     )
                     if (isEnabled) {
                         add(
-                            NotificationPreference.TextPreference(
+                            NotificationPreferenceType.NotifyOnThesePodcasts(
                                 title = context.getString(LR.string.settings_notification_choose_podcasts),
-                                value = getPodcastsSummary(),
-                                preference = NotificationPreferences.NEW_EPISODES_CHOOSE_PODCASTS,
+                                displayValue = getPodcastsSummary().orEmpty(),
                             ),
                         )
                         add(
-                            NotificationPreference.MultiSelectPreference(
+                            NotificationPreferenceType.NotificationActions(
                                 title = context.getString(LR.string.settings_notification_actions_title),
-                                maxNumberOfSelectableOptions = 3,
                                 value = settings.newEpisodeNotificationActions.value,
-                                preference = NotificationPreferences.NEW_EPISODES_ACTIONS,
                                 options = NewEpisodeNotificationAction.entries,
-                                displayText = getActionsSummary(),
+                                displayValue = getActionsSummary(),
                             ),
                         )
 
                         if (notificationsCompatibilityProvider.hasNotificationChannels) {
                             add(
-                                NotificationPreference.TextPreference(
+                                NotificationPreferenceType.AdvancedSettings(
                                     title = context.getString(LR.string.settings_notification_advanced),
-                                    value = context.getString(LR.string.settings_notification_advanced_summary),
-                                    preference = NotificationPreferences.NEW_EPISODES_ADVANCED,
+                                    description = context.getString(LR.string.settings_notification_advanced_summary),
                                 ),
                             )
                         } else {
                             add(
-                                NotificationPreference.ValueHolderPreference(
+                                NotificationPreferenceType.NotificationSoundPreference(
                                     title = context.getString(LR.string.settings_notification_sound),
-                                    value = settings.notificationSound.value.path,
-                                    displayValue = getNotificationSoundSummary(),
-                                    preference = NotificationPreferences.NEW_EPISODES_RINGTONE,
+                                    notificationSound = settings.notificationSound.value,
+                                    displayedSoundName = getNotificationSoundSummary(),
                                 ),
                             )
                             add(
-                                NotificationPreference.RadioGroupPreference(
+                                NotificationPreferenceType.NotificationVibration(
                                     title = context.getString(LR.string.settings_notification_vibrate),
                                     value = settings.notificationVibrate.value,
                                     options = listOf(
@@ -89,8 +80,7 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
                                         NotificationVibrateSetting.OnlyWhenSilent,
                                         NotificationVibrateSetting.Never,
                                     ),
-                                    preference = NotificationPreferences.NEW_EPISODES_VIBRATION,
-                                    displayText = context.getString(settings.notificationVibrate.value.summary),
+                                    displayValue = context.getString(settings.notificationVibrate.value.summary),
                                 ),
                             )
                         }
@@ -100,21 +90,19 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
             NotificationPreferenceCategory(
                 title = context.getString(LR.string.settings),
                 preferences = listOf(
-                    NotificationPreference.RadioGroupPreference(
+                    NotificationPreferenceType.PlayOverNotifications(
                         title = context.getString(LR.string.settings_notification_play_over),
                         value = settings.playOverNotification.value,
-                        preference = NotificationPreferences.SETTINGS_PLAY_OVER,
                         options = listOf(
                             PlayOverNotificationSetting.NEVER,
                             PlayOverNotificationSetting.DUCK,
                             PlayOverNotificationSetting.ALWAYS,
                         ),
-                        displayText = context.getString(settings.playOverNotification.value.titleRes),
+                        displayValue = context.getString(settings.playOverNotification.value.titleRes),
                     ),
-                    NotificationPreference.SwitchPreference(
+                    NotificationPreferenceType.HidePlaybackNotificationOnPause(
                         title = context.getString(LR.string.settings_notification_hide_on_pause),
-                        value = settings.hideNotificationOnPause.value,
-                        preference = NotificationPreferences.SETTINGS_HIDE_NOTIFICATION_ON_PAUSE,
+                        isEnabled = settings.hideNotificationOnPause.value,
                     ),
                 ),
             ),
@@ -161,51 +149,40 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun setPreference(preference: NotificationPreference<*>) = withContext(dispatcher) {
-        when (preference.preference) {
-            NotificationPreferences.NEW_EPISODES_NOTIFY_ME -> {
-                val value = expectTypedValue<Boolean>(preference)
-                settings.notifyRefreshPodcast.set(value = value, updateModifiedAt = true)
-                podcastManager.updateAllShowNotifications(value)
-                if (value) {
+    override suspend fun setPreference(preference: NotificationPreferenceType) = withContext(dispatcher) {
+        when (preference) {
+            is NotificationPreferenceType.NotifyMeOnNewEpisodes -> {
+                val enabled = preference.isEnabled
+                settings.notifyRefreshPodcast.set(value = enabled, updateModifiedAt = true)
+                podcastManager.updateAllShowNotifications(enabled)
+                if (enabled) {
                     settings.setNotificationLastSeenToNow()
                 }
             }
 
-            NotificationPreferences.SETTINGS_HIDE_NOTIFICATION_ON_PAUSE -> {
-                val value = expectTypedValue<Boolean>(preference)
-                settings.hideNotificationOnPause.set(value = value, updateModifiedAt = true)
+            is NotificationPreferenceType.HidePlaybackNotificationOnPause -> {
+                settings.hideNotificationOnPause.set(value = preference.isEnabled, updateModifiedAt = true)
             }
 
-            NotificationPreferences.SETTINGS_PLAY_OVER -> {
-                val setting = expectTypedValue<PlayOverNotificationSetting>(preference)
-                settings.playOverNotification.set(value = setting, updateModifiedAt = true)
+            is NotificationPreferenceType.PlayOverNotifications -> {
+                settings.playOverNotification.set(value = preference.value, updateModifiedAt = true)
             }
 
-            NotificationPreferences.NEW_EPISODES_VIBRATION -> {
-                val setting = expectTypedValue<NotificationVibrateSetting>(preference, fallbackToValue = NotificationVibrateSetting.DEFAULT)
-                settings.notificationVibrate.set(value = setting, updateModifiedAt = false)
+            is NotificationPreferenceType.NotificationVibration -> {
+                settings.notificationVibrate.set(value = preference.value, updateModifiedAt = false)
             }
 
-            NotificationPreferences.NEW_EPISODES_ACTIONS -> {
-                val setting = expectTypedValue<List<NewEpisodeNotificationAction>>(preference)
-                settings.newEpisodeNotificationActions.set(value = setting, updateModifiedAt = true)
+            is NotificationPreferenceType.NotificationActions -> {
+                settings.newEpisodeNotificationActions.set(value = preference.value, updateModifiedAt = true)
             }
 
-            NotificationPreferences.NEW_EPISODES_RINGTONE -> {
-                val setting = expectTypedValue<String>(preference)
-                settings.notificationSound.set(value = NotificationSound(setting, context), updateModifiedAt = false)
+            is NotificationPreferenceType.NotificationSoundPreference -> {
+                settings.notificationSound.set(value = preference.notificationSound, updateModifiedAt = false)
             }
 
-            // Add handler for new preferences here
-            else -> Timber.d("Unhandled preference received in setPreference: ${preference.preference}")
+            is NotificationPreferenceType.AdvancedSettings,
+            is NotificationPreferenceType.NotifyOnThesePodcasts,
+            -> Unit // these are not on us to set
         }
     }
-
-    private inline fun <reified T> expectTypedValue(
-        preference: NotificationPreference<*>,
-        fallbackToValue: T? = null,
-    ): T = (preference.value as? T)
-        ?: fallbackToValue
-        ?: error("Expected value of ${preference.preference} was ${T::class} but found ${preference.value?.javaClass}")
 }
