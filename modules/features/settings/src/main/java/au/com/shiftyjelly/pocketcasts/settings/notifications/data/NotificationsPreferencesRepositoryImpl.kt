@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.settings.notifications.data
 
 import android.content.Context
 import android.media.RingtoneManager
-import android.os.Build
 import androidx.core.net.toUri
 import au.com.shiftyjelly.pocketcasts.preferences.NotificationSound
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -29,6 +28,7 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
     private val settings: Settings,
     private val podcastManager: PodcastManager,
+    private val notificationsCompatibilityProvider: NotificationsCompatibilityProvider,
 ) : NotificationsPreferenceRepository {
 
     override suspend fun getPreferenceCategories(): List<NotificationPreferenceCategory> = withContext(dispatcher) {
@@ -63,7 +63,7 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
                             ),
                         )
 
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        if (notificationsCompatibilityProvider.hasNotificationChannels) {
                             add(
                                 NotificationPreference.TextPreference(
                                     title = context.getString(LR.string.settings_notification_advanced),
