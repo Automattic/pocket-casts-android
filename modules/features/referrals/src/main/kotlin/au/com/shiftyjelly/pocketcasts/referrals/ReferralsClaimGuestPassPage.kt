@@ -114,22 +114,20 @@ fun ReferralsClaimGuestPassPage(
                     }
 
                     NavigationEvent.LoginOrSignup -> openOnboardingFlow(
-                        activity = activity,
+                        activity = requireNotNull(activity),
                         onboardingFlow = OnboardingFlow.ReferralLoginOrSignUp,
                     )
 
                     is NavigationEvent.LaunchBillingFlow -> {
-                        activity?.let {
-                            viewModel.launchBillingFlow(
-                                activity = activity,
-                                referralPlan = navigationEvent.plan,
-                            )
-                        }
+                        viewModel.launchBillingFlow(
+                            activity = requireNotNull(activity),
+                            referralPlan = navigationEvent.plan,
+                        )
                     }
 
                     NavigationEvent.Close -> { onDismiss() }
                     NavigationEvent.Welcome -> openOnboardingFlow(
-                        activity = activity,
+                        activity = requireNotNull(activity),
                         onboardingFlow = OnboardingFlow.Welcome,
                     )
                 }

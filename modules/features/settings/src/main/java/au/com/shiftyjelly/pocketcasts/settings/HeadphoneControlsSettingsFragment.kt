@@ -281,7 +281,7 @@ class HeadphoneControlsSettingsFragment : BaseFragment() {
         val onboardingFlow = OnboardingFlow.Upsell(
             source = OnboardingUpgradeSource.HEADPHONE_CONTROLS_SETTINGS,
         )
-        OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
+        OnboardingLauncher.openOnboardingFlow(requireActivity(), onboardingFlow)
     }
 
     @StringRes

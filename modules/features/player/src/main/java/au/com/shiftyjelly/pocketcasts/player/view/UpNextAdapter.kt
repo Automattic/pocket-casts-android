@@ -212,7 +212,10 @@ class UpNextAdapter(
 
                         settings.upNextShuffle.set(newValue, updateModifiedAt = false)
                     } else {
-                        OnboardingLauncher.openOnboardingFlow(root.context.getActivity(), OnboardingFlow.Upsell(OnboardingUpgradeSource.UP_NEXT_SHUFFLE))
+                        OnboardingLauncher.openOnboardingFlow(
+                            requireNotNull(root.context.getActivity()),
+                            OnboardingFlow.Upsell(OnboardingUpgradeSource.UP_NEXT_SHUFFLE),
+                        )
                     }
 
                     shuffle.updateShuffleButton()

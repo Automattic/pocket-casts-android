@@ -246,7 +246,7 @@ class AppearanceSettingsFragment : BaseFragment() {
         val onboardingFlow = tier?.takeIf { tier == SubscriptionTier.Patron }?.let {
             OnboardingFlow.Upsell(source = source)
         } ?: OnboardingFlow.Upsell(source)
-        OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
+        OnboardingLauncher.openOnboardingFlow(requireActivity(), onboardingFlow)
     }
 
     private fun scrollToCurrentTheme() {

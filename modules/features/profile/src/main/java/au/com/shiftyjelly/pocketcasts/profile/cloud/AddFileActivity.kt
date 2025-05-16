@@ -323,12 +323,16 @@ class AddFileActivity :
         openOnboardingFlow(OnboardingFlow.Upsell(OnboardingUpgradeSource.FILES))
     }
 
+    override fun launchIntent(onboardingFlow: OnboardingFlow): Intent {
+        return OnboardingActivity.newInstance(this, onboardingFlow)
+    }
+
     override fun openOnboardingFlow(onboardingFlow: OnboardingFlow) {
         // Just starting the activity without registering for a result because
         // we don't need the result since we don't want to break the user's flow
         // by sending them back to the Discover screen with an
         // OnboardingFinish.DoneGoToDiscover result.
-        startActivity(OnboardingActivity.newInstance(this, onboardingFlow))
+        startActivity(launchIntent(onboardingFlow))
     }
 
     @UnstableApi

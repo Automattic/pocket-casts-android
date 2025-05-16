@@ -187,7 +187,7 @@ class SuggestedFoldersFragment : BaseDialogFragment() {
                 .show(parentFragmentManager, "create_folder_card")
             finalizeAndDismiss()
         } else {
-            OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.Upsell(OnboardingUpgradeSource.SUGGESTED_FOLDERS))
+            OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.Upsell(OnboardingUpgradeSource.SUGGESTED_FOLDERS))
         }
     }
 
@@ -205,7 +205,7 @@ class SuggestedFoldersFragment : BaseDialogFragment() {
             }
         } else {
             viewModel.trackUseSuggestedFoldersTapped()
-            OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.Upsell(OnboardingUpgradeSource.SUGGESTED_FOLDERS))
+            OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.Upsell(OnboardingUpgradeSource.SUGGESTED_FOLDERS))
         }
     }
 

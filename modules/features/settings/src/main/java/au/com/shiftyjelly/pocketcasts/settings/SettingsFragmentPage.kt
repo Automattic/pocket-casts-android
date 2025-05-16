@@ -80,7 +80,7 @@ fun SettingsFragmentPage(
                 item {
                     PlusRow(onClick = {
                         OnboardingLauncher.openOnboardingFlow(
-                            context.getActivity(),
+                            requireNotNull(context.getActivity()),
                             OnboardingFlow.Upsell(
                                 OnboardingUpgradeSource.SETTINGS,
                             ),

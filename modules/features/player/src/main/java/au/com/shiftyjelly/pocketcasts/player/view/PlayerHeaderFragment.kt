@@ -498,7 +498,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         val onboardingFlow = OnboardingFlow.Upsell(
             source = source,
         )
-        OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
+        OnboardingLauncher.openOnboardingFlow(requireActivity(), onboardingFlow)
     }
 
     override fun onClosePlayer() {
