@@ -14,6 +14,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -23,9 +24,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.invisibleToUser
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
@@ -45,6 +47,8 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
+import au.com.shiftyjelly.pocketcasts.compose.components.TipPosition
+import au.com.shiftyjelly.pocketcasts.compose.components.Tooltip
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
@@ -526,13 +530,18 @@ class PodcastsFragment :
                             )
                             .semantics { invisibleToUser() },
                     ) {
-                        val density = LocalDensity.current
-                        val yOffset = with(density) { toolbarY.toDp() - 16.dp }
-                        RecentlyPlayedSortOptionTooltip(
-                            onClickClose = ::closeTooltip,
+                        Box(
                             modifier = Modifier
-                                .offset(y = yOffset),
-                        )
+                                .offset { IntOffset(x = -8.dp.roundToPx(), y = toolbarY - 8.dp.roundToPx()) }
+                                .widthIn(max = 320.dp),
+                        ) {
+                            Tooltip(
+                                title = stringResource(LR.string.podcasts_sort_by_tooltip_title),
+                                body = stringResource(LR.string.podcasts_sort_by_tooltip_message),
+                                tipPosition = TipPosition.TopEnd,
+                                modifier = Modifier.clickable(onClick = ::closeTooltip),
+                            )
+                        }
                     }
                 }
             }

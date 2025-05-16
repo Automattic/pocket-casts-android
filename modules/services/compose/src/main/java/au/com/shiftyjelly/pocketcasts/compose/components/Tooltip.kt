@@ -1,182 +1,425 @@
 package au.com.shiftyjelly.pocketcasts.compose.components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathOperation
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.invisibleToUser
-import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntRect
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupPositionProvider
+import androidx.compose.ui.window.PopupProperties
+import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
-import kotlin.math.sqrt
-import au.com.shiftyjelly.pocketcasts.images.R as IR
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun Tooltip(
+fun TooltipPopup(
+    show: Boolean,
     title: String,
-    message: String,
-    onClickClose: () -> Unit,
-    triangleHorizontalAlignment: Alignment.Horizontal,
-    triangleDirection: TriangleDirection,
-    modifier: Modifier = Modifier,
+    tipPosition: TipPosition,
+    body: String? = null,
+    elevation: Dp = 16.dp,
+    anchorOffset: DpOffset = DpOffset.Zero,
+    properties: PopupProperties = PopupProperties(dismissOnClickOutside = false),
+    onClick: (() -> Unit)? = null,
+    onClickOutside: (() -> Unit)? = null,
 ) {
-    Column(
-        modifier = modifier
-            .widthIn(max = 326.dp)
-            .clickable(
-                indication = null,
-                interactionSource = null,
-                onClick = {},
-            ),
+    Popup(
+        popupPositionProvider = rememberTooltipPositionProvider(tipPosition, anchorOffset, elevation),
+        properties = properties,
+        onDismissRequest = onClickOutside,
     ) {
-        val triangleOffset = when (triangleDirection) {
-            TriangleDirection.Up -> DpOffset(-(8).dp, 6.dp)
-            TriangleDirection.Down -> DpOffset(0.dp, -(1).dp)
-        }
-        val triangleComposable = @Composable {
-            Box(
-                modifier = Modifier
-                    .offset(x = triangleOffset.x, y = triangleOffset.y)
-                    .align(triangleHorizontalAlignment)
-                    .size(16.dp)
-                    .background(
-                        color = MaterialTheme.theme.colors.primaryUi01,
-                        shape = TriangleShape(direction = triangleDirection),
-                    )
-                    .semantics {
-                        invisibleToUser()
-                    },
-            )
-        }
-        if (triangleDirection == TriangleDirection.Up) {
-            triangleComposable()
-        }
-
-        Box(
-            modifier = Modifier.background(
-                color = MaterialTheme.theme.colors.primaryUi01,
-                shape = RoundedCornerShape(4.dp),
-            ),
+        AnimatedVisibility(
+            visible = show,
+            enter = fadeIn(),
+            exit = fadeOut(),
+            modifier = Modifier.padding(elevation),
         ) {
-            Column(
-                modifier = Modifier.padding(24.dp),
-            ) {
-                TextH30(
-                    text = title,
-                    disableAutoScale = true,
-                )
-                Spacer(
-                    modifier = Modifier.height(8.dp),
-                )
-                TextP40(
-                    text = message,
-                    color = MaterialTheme.theme.colors.primaryText02,
-                    disableAutoScale = true,
-                )
-            }
-            IconButton(
-                onClick = onClickClose,
-                modifier = Modifier.align(Alignment.TopEnd),
-            ) {
-                Icon(
-                    painter = painterResource(IR.drawable.ic_close),
-                    contentDescription = stringResource(LR.string.close),
-                    tint = MaterialTheme.theme.colors.primaryText01,
-                )
-            }
-        }
-        if (triangleDirection == TriangleDirection.Down) {
-            triangleComposable()
+            Tooltip(
+                title = title,
+                body = body,
+                tipPosition = tipPosition,
+                elevation = elevation,
+                modifier = if (onClick != null) {
+                    Modifier.clickable(onClick = onClick)
+                } else {
+                    Modifier
+                },
+            )
         }
     }
 }
 
-private class TriangleShape(val direction: TriangleDirection) : Shape {
+@Composable
+fun Tooltip(
+    title: String,
+    tipPosition: TipPosition,
+    modifier: Modifier = Modifier,
+    body: String? = null,
+    elevation: Dp = 16.dp,
+) {
+    val tooltipShape = TooltipShape(tipPosition)
+    val backgroundColor = when (MaterialTheme.theme.type) {
+        Theme.ThemeType.DARK_CONTRAST -> MaterialTheme.theme.colors.primaryUi05
+        else -> MaterialTheme.theme.colors.primaryUi01
+    }
+
+    Box(
+        modifier = (if (elevation > 0.dp) Modifier.shadow(elevation, tooltipShape) else Modifier)
+            .clip(tooltipShape)
+            .background(backgroundColor)
+            .then(modifier),
+    ) {
+        Column(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
+        ) {
+            if (tipPosition.isTopAligned()) {
+                Spacer(
+                    modifier = Modifier.height(TipHeight),
+                )
+            }
+            TextH40(
+                text = title,
+            )
+            if (body != null) {
+                Spacer(
+                    modifier = Modifier.height(4.dp),
+                )
+                TextP50(
+                    text = body,
+                    color = MaterialTheme.theme.colors.primaryText02,
+                )
+            }
+            if (tipPosition.isBottomAligned()) {
+                Spacer(
+                    modifier = Modifier.height(TipHeight),
+                )
+            }
+        }
+    }
+}
+
+enum class TipPosition {
+    TopStart,
+    TopCenter,
+    TopEnd,
+    BottomStart,
+    BottomCenter,
+    BottomEnd,
+    ;
+
+    internal fun isTopAligned() = this == TopStart || this == TopCenter || this == TopEnd
+
+    internal fun isBottomAligned() = !isTopAligned()
+
+    internal fun normalize(layoutDirection: LayoutDirection) = when (this) {
+        TopCenter -> TopCenter
+        BottomCenter -> BottomCenter
+        TopStart -> when (layoutDirection) {
+            LayoutDirection.Ltr -> TopStart
+            LayoutDirection.Rtl -> TopEnd
+        }
+
+        TopEnd -> when (layoutDirection) {
+            LayoutDirection.Ltr -> TopEnd
+            LayoutDirection.Rtl -> TopStart
+        }
+
+        BottomStart -> when (layoutDirection) {
+            LayoutDirection.Ltr -> BottomStart
+            LayoutDirection.Rtl -> BottomEnd
+        }
+
+        BottomEnd -> when (layoutDirection) {
+            LayoutDirection.Ltr -> BottomEnd
+            LayoutDirection.Rtl -> BottomStart
+        }
+    }
+}
+
+@Composable
+private fun rememberTooltipPositionProvider(
+    tipPosition: TipPosition,
+    anchorOffset: DpOffset,
+    elevation: Dp,
+): PopupPositionProvider {
+    val density = LocalDensity.current
+    return remember(tipPosition, anchorOffset, elevation, density) {
+        TooltipPositionProvider(tipPosition, anchorOffset, elevation, density)
+    }
+}
+
+private class TooltipPositionProvider(
+    private val tipPosition: TipPosition,
+    anchorOffset: DpOffset,
+    private val elevation: Dp,
+    private val density: Density,
+) : PopupPositionProvider {
+    private val anchorOffset = density.run {
+        IntOffset(anchorOffset.x.roundToPx(), anchorOffset.y.roundToPx())
+    }
+
+    override fun calculatePosition(
+        anchorBounds: IntRect,
+        windowSize: IntSize,
+        layoutDirection: LayoutDirection,
+        popupContentSize: IntSize,
+    ): IntOffset {
+        val elevationPx = density.run { elevation.roundToPx() }
+        return anchorOffset + when (tipPosition.normalize(layoutDirection)) {
+            TipPosition.TopStart -> {
+                val tipOffset = IntOffset(density.run { CornerTipPeakPosition.roundToPx() }, 0)
+                val elevationOffset = IntOffset(elevationPx, elevationPx)
+                anchorBounds.bottomCenter - elevationOffset - tipOffset
+            }
+
+            TipPosition.TopCenter -> anchorBounds.bottomCenter
+            TipPosition.TopEnd -> anchorBounds.topCenter
+            TipPosition.BottomStart -> anchorBounds.topCenter
+            TipPosition.BottomCenter -> anchorBounds.topCenter
+            TipPosition.BottomEnd -> anchorBounds.topCenter
+        }
+    }
+}
+
+private class TooltipShape(
+    private val tipPosition: TipPosition,
+) : Shape {
     override fun createOutline(
         size: Size,
         layoutDirection: LayoutDirection,
         density: Density,
-    ) = Outline.Generic(
-        Path().apply {
-            val edgeLength = (size.height * 3 / 2) / sqrt(3f)
-            val triangleHeight = edgeLength * sqrt(3f) / 2
-            when (direction) {
-                TriangleDirection.Up -> {
-                    moveTo(size.width / 2, 0f)
-                    lineTo(0f, triangleHeight)
-                    lineTo(size.width, triangleHeight)
-                    close()
-                }
-                TriangleDirection.Down -> {
-                    moveTo(0f, 0f)
-                    lineTo(size.width, 0f)
-                    lineTo(size.width / 2, triangleHeight)
-                    close()
-                }
-            }
-        },
-    )
+    ): Outline {
+        val cardPath = roundedRectPath(size, density)
+        val tipPath = tipPath(size, layoutDirection, density)
+        val path = Path.combine(PathOperation.Union, cardPath, tipPath)
+
+        return Outline.Generic(path)
+    }
+
+    private fun roundedRectPath(
+        size: Size,
+        density: Density,
+    ): Path {
+        val tipHeight = density.run { TipHeight.toPx() }
+        val cornerRadius = density.run { CornerRadius.toPx() }
+        val topOffset = if (tipPosition.isTopAligned()) tipHeight else 0f
+        val bottomOffset = if (tipPosition.isBottomAligned()) tipHeight else 0f
+
+        return Path().apply {
+            val roundRect = RoundRect(
+                left = 0f,
+                top = topOffset,
+                right = size.width,
+                bottom = size.height - bottomOffset,
+                radiusX = cornerRadius,
+                radiusY = cornerRadius,
+            )
+            addRoundRect(roundRect)
+        }
+    }
+
+    private fun tipPath(
+        shapeSize: Size,
+        layoutDirection: LayoutDirection,
+        density: Density,
+    ) = when (tipPosition.normalize(layoutDirection)) {
+        TipPosition.TopCenter -> topTip(shapeSize, density)
+        TipPosition.BottomCenter -> bottomTip(shapeSize, density)
+        TipPosition.TopStart -> topLeftTip(density)
+        TipPosition.TopEnd -> topRightTip(shapeSize, density)
+        TipPosition.BottomStart -> bottomLeftTip(shapeSize, density)
+        TipPosition.BottomEnd -> bottomRightTip(shapeSize, density)
+    }
+
+    private fun topTip(
+        shapeSize: Size,
+        density: Density,
+    ) = Path().apply {
+        val scale = density.density
+        val tipHeight = density.run { TipHeight.toPx() }
+        val tipWidth = density.run { CenterTipWidth.toPx() }
+
+        moveTo(shapeSize.width / 2 - tipWidth / 2, tipHeight)
+        addEdgeTip(scale)
+    }
+
+    private fun bottomTip(
+        shapeSize: Size,
+        density: Density,
+    ) = Path().apply {
+        val scale = density.density
+        val tipHeight = density.run { TipHeight.toPx() }
+        val tipWidth = density.run { CenterTipWidth.toPx() }
+
+        moveTo(shapeSize.width / 2 - tipWidth / 2, shapeSize.height - tipHeight)
+        addEdgeTip(scale, flipVertically = true)
+    }
+
+    private fun topRightTip(
+        shapeSize: Size,
+        density: Density,
+    ) = Path().apply {
+        val scale = density.density
+        val tipHeight = density.run { TipHeight.toPx() }
+        val tipWidth = density.run { CornerTipWidth.toPx() }
+
+        moveTo(shapeSize.width - tipWidth, tipHeight)
+        addCornerTip(scale)
+    }
+
+    private fun topLeftTip(
+        density: Density,
+    ) = Path().apply {
+        val scale = density.density
+        val tipHeight = density.run { TipHeight.toPx() }
+        val tipWidth = density.run { CornerTipWidth.toPx() }
+
+        moveTo(tipWidth, tipHeight)
+        addCornerTip(scale, flipHorizontally = true)
+    }
+
+    private fun bottomRightTip(
+        shapeSize: Size,
+        density: Density,
+    ) = Path().apply {
+        val scale = density.density
+        val tipHeight = density.run { TipHeight.toPx() }
+        val tipWidth = density.run { CornerTipWidth.toPx() }
+
+        moveTo(shapeSize.width - tipWidth, shapeSize.height - tipHeight)
+        addCornerTip(scale, flipVertically = true)
+    }
+
+    private fun bottomLeftTip(
+        shapeSize: Size,
+        density: Density,
+    ) = Path().apply {
+        val scale = density.density
+        val tipHeight = density.run { TipHeight.toPx() }
+        val tipWidth = density.run { CornerTipWidth.toPx() }
+
+        moveTo(tipWidth, shapeSize.height - tipHeight)
+        addCornerTip(scale, flipHorizontally = true, flipVertically = true)
+    }
+
+    private fun Path.addEdgeTip(
+        scale: Float,
+        flipVertically: Boolean = false,
+    ) {
+        val hScale = scale
+        val vScale = scale * (if (flipVertically) -1 else 1)
+
+        relativeCubicTo(1.71f * hScale, 0f * vScale, 3.42f * hScale, 0.01f * vScale, 5.14f * hScale, -0.01f * vScale)
+        relativeCubicTo(1.62f * hScale, -0.02f * vScale, 3.47f * hScale, -0.04f * vScale, 5.07f * hScale, -0.65f * vScale)
+        relativeCubicTo(1.72f * hScale, -0.65f * vScale, 2.86f * hScale, -1.79f * vScale, 4.01f * hScale, -3.12f * vScale)
+        relativeCubicTo(0.83f * hScale, -0.96f * vScale, 2.45f * hScale, -3.01f * vScale, 3.24f * hScale, -4.01f * vScale)
+        relativeCubicTo(0.65f * hScale, -0.81f * vScale, 1.91f * hScale, -2.42f * vScale, 2.6f * hScale, -3.2f * vScale)
+        relativeCubicTo(0.87f * hScale, -0.98f * vScale, 1.95f * hScale, -2.02f * vScale, 3.44f * hScale, -2.02f * vScale)
+        relativeCubicTo(1.49f * hScale, 0f * vScale, 2.57f * hScale, 1.04f * vScale, 3.44f * hScale, 2.02f * vScale)
+        relativeCubicTo(0.69f * hScale, 0.78f * vScale, 1.96f * hScale, 2.38f * vScale, 2.6f * hScale, 3.2f * vScale)
+        relativeCubicTo(0.79f * hScale, 0.99f * vScale, 2.41f * hScale, 3.04f * vScale, 3.24f * hScale, 4.01f * vScale)
+        relativeCubicTo(1.15f * hScale, 1.34f * vScale, 2.29f * hScale, 2.47f * vScale, 4.01f * hScale, 3.12f * vScale)
+        relativeCubicTo(1.6f * hScale, 0.6f * vScale, 3.43f * hScale, 0.63f * vScale, 5.07f * hScale, 0.65f * vScale)
+        relativeCubicTo(1.71f * hScale, 0.02f * vScale, 3.43f * hScale, 0.01f * vScale, 5.14f * hScale, 0.01f * vScale)
+    }
+
+    private fun Path.addCornerTip(
+        scale: Float,
+        flipHorizontally: Boolean = false,
+        flipVertically: Boolean = false,
+    ) {
+        val hScale = scale * (if (flipHorizontally) -1 else 1)
+        val vScale = scale * (if (flipVertically) -1 else 1)
+
+        relativeCubicTo(1.71f * hScale, 0f * vScale, 3.42f * hScale, 0.01f * vScale, 5.14f * hScale, -0.01f * vScale)
+        relativeCubicTo(1.62f * hScale, -0.02f * vScale, 3.47f * hScale, -0.04f * vScale, 5.07f * hScale, -0.65f * vScale)
+        relativeCubicTo(1.72f * hScale, -0.65f * vScale, 2.86f * hScale, -1.79f * vScale, 4.01f * hScale, -3.12f * vScale)
+        relativeCubicTo(0.83f * hScale, -0.96f * vScale, 2.45f * hScale, -3.01f * vScale, 3.24f * hScale, -4.01f * vScale)
+        relativeCubicTo(0.65f * hScale, -0.81f * vScale, 1.91f * hScale, -2.42f * vScale, 2.6f * hScale, -3.2f * vScale)
+        relativeCubicTo(0.87f * hScale, -0.98f * vScale, 1.95f * hScale, -2.02f * vScale, 3.44f * hScale, -2.02f * vScale)
+        relativeCubicTo(1.49f * hScale, 0f * vScale, 2.57f * hScale, 1.04f * vScale, 3.44f * hScale, 2.02f * vScale)
+        relativeCubicTo(0.69f * hScale, 0.78f * vScale, 1.96f * hScale, 2.38f * vScale, 2.6f * hScale, 3.2f * vScale)
+        relativeCubicTo(0.79f * hScale, 0.99f * vScale, 2.41f * hScale, 3.04f * vScale, 3.24f * hScale, 4.01f * vScale)
+        relativeCubicTo(7.22f * hScale, 8.4f * vScale, 7.22f * hScale, 8.4f * vScale, 7.22f * hScale, 20.28f * vScale)
+    }
 }
 
-enum class TriangleDirection {
-    Up,
-    Down,
-}
+private val TipHeight = 13.dp
+private val CornerTipWidth = 40.dp
+private val CornerTipPeakPosition = 16.5.dp
+private val CenterTipWidth = 47.dp
+private val CornerRadius = 10.dp
 
 @Preview
 @Composable
-private fun TooltipUpPreview() {
-    AppTheme(ThemeType.DARK) {
-        Tooltip(
-            title = "Title",
-            message = "This is a tooltip!",
-            onClickClose = {},
-            triangleHorizontalAlignment = Alignment.End,
-            triangleDirection = TriangleDirection.Up,
-            modifier = Modifier,
-        )
+private fun Tooltip2ThemePreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
+) {
+    AppThemeWithBackground(themeType) {
+        Box(
+            modifier = Modifier.padding(16.dp),
+        ) {
+            Tooltip(
+                title = "Sort by “Recently Played”",
+                body = "You can now sort by Recently Played and quickly pick up where you left off.",
+                tipPosition = TipPosition.BottomStart,
+                modifier = Modifier.widthIn(max = 300.dp),
+            )
+        }
     }
 }
 
 @Preview
 @Composable
-private fun TooltipDownPreview() {
-    AppTheme(ThemeType.LIGHT) {
-        Tooltip(
-            title = "Title",
-            message = "This is a tooltip!",
-            onClickClose = {},
-            triangleHorizontalAlignment = Alignment.CenterHorizontally,
-            triangleDirection = TriangleDirection.Down,
-            modifier = Modifier,
-        )
+private fun Tooltip2TipPreview(
+    @PreviewParameter(TipPositionParameterProvider::class) tipPosition: TipPosition,
+) {
+    AppThemeWithBackground(Theme.ThemeType.LIGHT) {
+        Box(
+            modifier = Modifier.padding(16.dp),
+        ) {
+            Tooltip(
+                title = "Sort by “Recently Played”",
+                body = "You can now sort by Recently Played and quickly pick up where you left off.",
+                tipPosition = tipPosition,
+                modifier = Modifier.widthIn(max = 300.dp),
+            )
+        }
     }
+}
+
+private class TipPositionParameterProvider : PreviewParameterProvider<TipPosition> {
+    override val values = TipPosition.entries.asSequence()
 }

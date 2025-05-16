@@ -558,7 +558,6 @@ interface Settings {
 
     val useRealTimeForPlaybackRemaingTime: UserSetting<Boolean>
 
-    val showPodcastHeaderChangesTooltip: UserSetting<Boolean>
     val showPodcastsRecentlyPlayedSortOrderTooltip: UserSetting<Boolean>
 
     val showEmptyFiltersListTooltip: UserSetting<Boolean>
