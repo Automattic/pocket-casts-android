@@ -10,6 +10,9 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.IntentCompat.getParcelableExtra
@@ -27,12 +30,13 @@ import au.com.shiftyjelly.pocketcasts.settings.util.TextResource
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.PodcastSelectFragment
+import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
 
 @AndroidEntryPoint
-internal class NotificationsSettingsFragment : BaseFragment(), PodcastSelectFragment.Listener {
+internal class NotificationsSettingsFragment : BaseFragment(), PodcastSelectFragment.Listener, HasBackstack {
 
     private val viewModel: NotificationsSettingsViewModel by viewModels()
 
@@ -41,6 +45,8 @@ internal class NotificationsSettingsFragment : BaseFragment(), PodcastSelectFrag
 
     @Inject
     lateinit var notificationHelper: NotificationHelper
+
+    private val backPressHandlerHolder = OnBackPressHandlerHolder { super.onBackPressed() }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -70,6 +76,10 @@ internal class NotificationsSettingsFragment : BaseFragment(), PodcastSelectFrag
             CallOnce {
                 viewModel.onShown()
             }
+
+            // Unfortunately, PodcastSelectFragment was meant to be used from another fragment that defines a toolbar.
+            // This flag is used to determine whether we should render the podcast selector inside this composable and change toolbar title and override back navigation when necessary.
+            var isShowingPodcastSelector by rememberSaveable { mutableStateOf(false) }
 
             NotificationsSettingsScreen(
                 state = state,
@@ -101,6 +111,8 @@ internal class NotificationsSettingsFragment : BaseFragment(), PodcastSelectFrag
                         },
                     )
                 },
+                onBackPressHandlerHolder = backPressHandlerHolder,
+
             )
         }
     }
@@ -110,4 +122,8 @@ internal class NotificationsSettingsFragment : BaseFragment(), PodcastSelectFrag
     }
 
     override fun podcastSelectFragmentGetCurrentSelection() = runBlocking { viewModel.getSelectedPodcastIds() }
+
+    override fun onBackPressed(): Boolean {
+        return backPressHandlerHolder.onBackPress() || super.onBackPressed()
+    }
 }
