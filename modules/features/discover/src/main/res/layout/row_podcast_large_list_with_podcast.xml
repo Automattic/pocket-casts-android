@@ -53,9 +53,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 tools:text="The Daily"
-                style="@style/H20"
+                style="@style/H30"
                 android:includeFontPadding="false"
-                android:maxLines="2"
+                android:maxLines="1"
                 android:ellipsize="end"
                 android:textColor="?attr/primary_text_01"/>
 

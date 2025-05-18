@@ -1793,7 +1793,7 @@
     <string name="discover_select_categories">Select a category</string>
     <string name="discover_show_all_categories">Show all categories</string>
     <string name="discover_dismiss_selected_category">Dismiss selected category</string>
-    <string name="recommendations_if_you_like">If you like</string>
+    <string name="recommendations_because_you_like">Because you like</string>
     <string name="recommendations_loved_by_listeners">Loved by listeners of</string>
     <string name="recommended_by_creator">Recommended shows by the creator</string>
     <string name="similar_shows_to">Shows similar to \"%s\"</string>
