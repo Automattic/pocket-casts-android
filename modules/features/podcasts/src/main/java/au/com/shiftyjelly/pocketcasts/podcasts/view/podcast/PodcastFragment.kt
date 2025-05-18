@@ -1055,6 +1055,7 @@ class PodcastFragment : BaseFragment() {
         viewModel.tintColor.observe(viewLifecycleOwner) { tintColor ->
             adapter?.setTint(tintColor)
         }
+
         viewModel.uiState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is PodcastViewModel.UiState.Loading -> {
