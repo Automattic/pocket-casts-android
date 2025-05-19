@@ -5,15 +5,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.account.watchsync.WatchSync
 import au.com.shiftyjelly.pocketcasts.account.watchsync.WatchSyncAuthData
-import au.com.shiftyjelly.pocketcasts.models.to.SignInState
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsTask
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
-import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import com.google.android.horologist.auth.data.tokenshare.TokenBundleRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -33,22 +30,18 @@ class WearMainActivityViewModel @Inject constructor(
     private val playbackManager: PlaybackManager,
     private val podcastManager: PodcastManager,
     tokenBundleRepository: TokenBundleRepository<WatchSyncAuthData?>,
-    subscriptionManager: SubscriptionManager,
     private val userManager: UserManager,
     private val settings: Settings,
-    private val syncManager: SyncManager,
     watchSync: WatchSync,
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
     data class State(
-        val email: String?,
         val showLoggingInScreen: Boolean = false,
-        val signInState: SignInState? = null,
-        val subscriptionStatus: SubscriptionStatus? = null,
+        val signInState: SignInState = SignInState.SignedOut,
     )
 
-    private val _state = MutableStateFlow(State(email = syncManager.getEmail()))
+    private val _state = MutableStateFlow(State())
     val state = _state.asStateFlow()
 
     init {
@@ -69,20 +62,6 @@ class WearMainActivityViewModel @Inject constructor(
                     _state.update { it.copy(signInState = signInState) }
                 }
         }
-
-        viewModelScope.launch {
-            subscriptionManager
-                .observeSubscriptionStatus()
-                .asFlow()
-                .collect { subscriptionStatus ->
-                    _state.update {
-                        it.copy(
-                            email = syncManager.getEmail(),
-                            subscriptionStatus = subscriptionStatus.get(),
-                        )
-                    }
-                }
-        }
     }
 
     private fun onLoginFromPhoneResult(loginResult: LoginResult) {
@@ -93,24 +72,15 @@ class WearMainActivityViewModel @Inject constructor(
                     podcastManager.refreshPodcastsAfterSignIn()
                 }
                 _state.update {
-                    it.copy(
-                        email = syncManager.getEmail(),
-                        showLoggingInScreen = true,
-                    )
+                    it.copy(showLoggingInScreen = true)
                 }
             }
         }
     }
 
-    /**
-     * This should be invoked when the UI has handled showing or hiding the sign in confirmation.
-     */
     fun onSignInConfirmationActionHandled() {
         _state.update {
-            it.copy(
-                email = syncManager.getEmail(),
-                showLoggingInScreen = false,
-            )
+            it.copy(showLoggingInScreen = false)
         }
     }
 

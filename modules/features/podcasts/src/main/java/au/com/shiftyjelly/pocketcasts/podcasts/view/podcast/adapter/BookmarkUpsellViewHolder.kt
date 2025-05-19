@@ -36,7 +36,7 @@ class BookmarkUpsellViewHolder(
                         val onboardingFlow = OnboardingFlow.Upsell(
                             source = OnboardingUpgradeSource.BOOKMARKS,
                         )
-                        OnboardingLauncher.openOnboardingFlow(context.getActivity(), onboardingFlow)
+                        OnboardingLauncher.openOnboardingFlow(requireNotNull(context.getActivity()), onboardingFlow)
                     },
                     modifier = Modifier.padding(vertical = 24.dp),
                 )

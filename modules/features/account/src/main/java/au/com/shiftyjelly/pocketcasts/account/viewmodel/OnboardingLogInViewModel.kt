@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
@@ -53,7 +54,7 @@ class OnboardingLogInViewModel @Inject constructor(
         _state.update { it.copy(password = password) }
     }
 
-    fun logIn(onSuccessfulLogin: () -> Unit) {
+    fun logIn(onSuccessfulLogin: (Subscription?) -> Unit) {
         _state.update { it.copy(hasAttemptedLogIn = true, isNetworkAvailable = Network.isConnected(getApplication())) }
 
         val state = state.value
@@ -68,7 +69,7 @@ class OnboardingLogInViewModel @Inject constructor(
             )
         }
 
-        subscriptionManager.clearCachedStatus()
+        subscriptionManager.clearCachedSubscription()
 
         viewModelScope.launch {
             val result = syncManager.loginWithEmailAndPassword(
@@ -80,7 +81,7 @@ class OnboardingLogInViewModel @Inject constructor(
                 is LoginResult.Success -> {
                     podcastManager.refreshPodcastsAfterSignIn()
                     experiments.refreshExperiments()
-                    onSuccessfulLogin()
+                    onSuccessfulLogin(subscriptionManager.fetchFreshSubscription())
                 }
 
                 is LoginResult.Failed -> {

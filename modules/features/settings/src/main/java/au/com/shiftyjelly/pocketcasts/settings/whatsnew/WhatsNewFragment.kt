@@ -97,7 +97,7 @@ class WhatsNewFragment : BaseFragment() {
         val onboardingFlow = OnboardingFlow.Upsell(
             source = source,
         )
-        OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
+        OnboardingLauncher.openOnboardingFlow(requireActivity(), onboardingFlow)
     }
 
     companion object {

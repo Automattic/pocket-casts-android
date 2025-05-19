@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.analytics
 
 import android.content.Context
 import android.content.SharedPreferences
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.di.PublicSharedPreferences
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
@@ -63,17 +62,13 @@ class TracksAnalyticsTracker @Inject constructor(
     }
 
     private fun updatePredefinedEventProperties() {
-        val paidSubscription = settings.cachedSubscriptionStatus.value as? SubscriptionStatus.Paid
+        val subscription = settings.cachedSubscription.value
         val isLoggedIn = accountStatusInfo.isLoggedIn()
-        val hasSubscription = paidSubscription != null
-        val isPocketCastsChampion = paidSubscription?.isPocketCastsChampion
-            ?: false
-        val subscriptionTier = paidSubscription?.tier?.toString()
-            ?: INVALID_OR_NULL_VALUE
-        val subscriptionPlatform = paidSubscription?.platform?.toString()
-            ?: INVALID_OR_NULL_VALUE
-        val subscriptionFrequency = paidSubscription?.frequency?.toString()
-            ?: INVALID_OR_NULL_VALUE
+        val hasSubscription = subscription != null
+        val isPocketCastsChampion = subscription?.isChampion == true
+        val subscriptionTier = subscription?.tier?.analyticsValue ?: INVALID_OR_NULL_VALUE
+        val subscriptionPlatform = subscription?.platform?.analyticsValue ?: INVALID_OR_NULL_VALUE
+        val subscriptionFrequency = subscription?.billingCycle?.analyticsValue ?: INVALID_OR_NULL_VALUE
 
         predefinedEventProperties = mapOf(
             PredefinedEventProperty.HAS_DYNAMIC_FONT_SIZE to displayUtil.hasDynamicFontSize(),

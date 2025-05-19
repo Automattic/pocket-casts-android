@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts.payment.billing
 import au.com.shiftyjelly.pocketcasts.payment.Price
 import au.com.shiftyjelly.pocketcasts.payment.PricingSchedule
 import au.com.shiftyjelly.pocketcasts.payment.PurchaseState
-import au.com.shiftyjelly.pocketcasts.payment.TestLogger
+import au.com.shiftyjelly.pocketcasts.payment.TestListener
 import com.android.billingclient.api.GoogleOfferDetails
 import com.android.billingclient.api.GooglePricingPhase
 import com.android.billingclient.api.GoogleProductDetails
@@ -21,8 +21,8 @@ import org.robolectric.annotation.Config
 @Config(manifest = Config.NONE)
 @RunWith(RobolectricTestRunner::class)
 class BillingPaymentMapperTest {
-    private val logger = TestLogger()
-    private val mapper = BillingPaymentMapper(logger)
+    private val listener = TestListener()
+    private val mapper = BillingPaymentMapper(setOf(listener))
 
     @Test
     fun `map product`() {
@@ -33,7 +33,7 @@ class BillingPaymentMapperTest {
     fun `no errors are logged when product is mapped successfully`() {
         mapper.toProduct(GoogleProductDetails())
 
-        logger.assertNoLogs()
+        listener.assertMessages()
     }
 
     @Test
@@ -301,7 +301,7 @@ class BillingPaymentMapperTest {
         )
 
         assertNull(mapper.toProduct(googleProduct))
-        logger.assertWarnings("Unrecognized product type 'foo' in {productId=Product ID}")
+        listener.assertMessages("Unrecognized product type 'foo' in {productId=Product ID}")
     }
 
     @Test
@@ -312,7 +312,7 @@ class BillingPaymentMapperTest {
         )
 
         assertNull(mapper.toProduct(googleProduct))
-        logger.assertWarnings("No subscription offers in {productId=Product ID}")
+        listener.assertMessages("No subscription offers in {productId=Product ID}")
     }
 
     @Test
@@ -323,7 +323,7 @@ class BillingPaymentMapperTest {
         )
 
         assertNull(mapper.toProduct(googleProduct))
-        logger.assertWarnings("No subscription offers in {productId=Product ID}")
+        listener.assertMessages("No subscription offers in {productId=Product ID}")
     }
 
     @Test
@@ -336,7 +336,7 @@ class BillingPaymentMapperTest {
         )
 
         assertNull(mapper.toProduct(googleProduct))
-        logger.assertWarnings("No single base offer in {productId=Product ID}")
+        listener.assertMessages("No single base offer in {productId=Product ID}")
     }
 
     @Test
@@ -350,7 +350,7 @@ class BillingPaymentMapperTest {
         )
 
         assertNull(mapper.toProduct(googleProduct))
-        logger.assertWarnings("No single base offer in {productId=Product ID}")
+        listener.assertMessages("No single base offer in {productId=Product ID}")
     }
 
     @Test
@@ -368,7 +368,7 @@ class BillingPaymentMapperTest {
         )
 
         assertNull(mapper.toProduct(googleProduct))
-        logger.assertWarnings("Unrecognized recurrence mode '-100' in {basePlanId=Base plan ID, offerId=Offer ID, productId=Product ID}")
+        listener.assertMessages("Unrecognized recurrence mode '-100' in {basePlanId=Base plan ID, offerId=Offer ID, productId=Product ID}")
     }
 
     @Test
@@ -389,7 +389,7 @@ class BillingPaymentMapperTest {
         val products = googleProducts.map(mapper::toProduct)
 
         assertTrue(products.all { it == null })
-        logger.assertWarnings(
+        listener.assertMessages(
             "Missing billing period duration designator in {basePlanId=Base plan ID, productId=Product ID, rawDuration=1M}",
             "Missing billing period duration designator in {basePlanId=Base plan ID, productId=Product ID, rawDuration=D1M}",
             "Invalid billing period interval count '' in {basePlanId=Base plan ID, productId=Product ID, rawDuration=PM}",
@@ -409,7 +409,7 @@ class BillingPaymentMapperTest {
     fun `no errors are logged when purchase is mapped`() {
         mapper.toPurchase(GooglePurchase())
 
-        logger.assertNoLogs()
+        listener.assertMessages()
     }
 
     @Test

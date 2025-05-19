@@ -87,11 +87,12 @@ import au.com.shiftyjelly.pocketcasts.localization.helper.LocaliseHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
-import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
+import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.navigation.BottomNavigator
 import au.com.shiftyjelly.pocketcasts.navigation.FragmentInfo
 import au.com.shiftyjelly.pocketcasts.navigation.NavigatorAction
+import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
 import au.com.shiftyjelly.pocketcasts.player.view.PlayerBottomSheet
 import au.com.shiftyjelly.pocketcasts.player.view.PlayerContainerFragment
 import au.com.shiftyjelly.pocketcasts.player.view.UpNextFragment
@@ -127,7 +128,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsTask
 import au.com.shiftyjelly.pocketcasts.repositories.shortcuts.PocketCastsShortcuts
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.search.SearchFragment
 import au.com.shiftyjelly.pocketcasts.servers.ServerCallback
@@ -225,8 +225,6 @@ class MainActivity :
 
     @Inject lateinit var settings: Settings
 
-    @Inject lateinit var subscriptionManager: SubscriptionManager
-
     @Inject lateinit var userEpisodeManager: UserEpisodeManager
 
     @Inject lateinit var warningsHelper: WarningsHelper
@@ -245,6 +243,8 @@ class MainActivity :
     lateinit var applicationScope: CoroutineScope
 
     @Inject lateinit var crashLogging: CrashLogging
+
+    @Inject lateinit var paymentClient: PaymentClient
 
     private val viewModel: MainActivityViewModel by viewModels()
     private val disposables = CompositeDisposable()
@@ -519,8 +519,12 @@ class MainActivity :
         }
     }
 
+    override fun launchIntent(onboardingFlow: OnboardingFlow): Intent {
+        return OnboardingActivity.newInstance(this, onboardingFlow)
+    }
+
     override fun openOnboardingFlow(onboardingFlow: OnboardingFlow) {
-        onboardingLauncher.launch(OnboardingActivity.newInstance(this, onboardingFlow))
+        onboardingLauncher.launch(launchIntent(onboardingFlow))
     }
 
     override fun onStart() {
@@ -613,7 +617,7 @@ class MainActivity :
                 source = PocketCastsShortcuts.Source.REFRESH_APP,
             )
 
-            subscriptionManager.refresh()
+            paymentClient.acknowledgePendingPurchases()
         }
 
         // Schedule next refresh in the background
@@ -865,7 +869,7 @@ class MainActivity :
         }
 
         viewModel.signInState.observe(this) { signinState ->
-            val status = (signinState as? SignInState.SignedIn)?.subscriptionStatus
+            val subscription = (signinState as? SignInState.SignedIn)?.subscription
 
             if (signinState.isSignedIn) {
                 if (viewModel.waitingForSignInToShowStories) {
@@ -877,12 +881,10 @@ class MainActivity :
                 }
             }
 
-            if (signinState.isSignedInAsPlusOrPatron) {
-                status?.let {
-                    if (viewModel.shouldShowCancelled(it)) {
-                        val cancelledFragment = SubCancelledFragment.newInstance()
-                        showBottomSheet(cancelledFragment)
-                    }
+            if (subscription != null) {
+                if (viewModel.shouldShowCancelled(subscription)) {
+                    val cancelledFragment = SubCancelledFragment.newInstance()
+                    showBottomSheet(cancelledFragment)
                 }
             } else {
                 applicationScope.launch { userEpisodeManager.removeCloudStatusFromFiles(playbackManager) }
@@ -1386,9 +1388,6 @@ class MainActivity :
     }
 
     private fun openReferralClaim(code: String) {
-        if (!FeatureFlag.isEnabled(Feature.REFERRALS_CLAIM)) {
-            return
-        }
         settings.referralClaimCode.set(code, false)
         openTab(VR.id.navigation_profile)
         val fragment = ReferralsGuestPassFragment.newInstance(ReferralsGuestPassFragment.ReferralsPageType.Claim)

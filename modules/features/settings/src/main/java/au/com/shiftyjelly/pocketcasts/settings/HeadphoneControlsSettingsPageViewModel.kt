@@ -7,11 +7,8 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.plusGold
 import au.com.shiftyjelly.pocketcasts.images.R
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,7 +22,6 @@ import timber.log.Timber
 class HeadphoneControlsSettingsPageViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTracker,
     private val settings: Settings,
-    private val bookmarkFeature: BookmarkFeatureControl,
 ) : ViewModel() {
 
     private val _state: MutableStateFlow<UiState> = MutableStateFlow(UiState())
@@ -33,19 +29,16 @@ class HeadphoneControlsSettingsPageViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            settings.cachedSubscriptionStatus.flow
+            settings.cachedSubscription.flow
                 .stateIn(viewModelScope)
-                .collect {
-                    val userTier = (it as? SubscriptionStatus.Paid)?.tier?.toUserTier() ?: UserTier.Free
-                    val isAddBookmarkEnabled = bookmarkFeature.isAvailable(userTier)
+                .collect { subscription ->
+                    val isPaidUser = subscription != null
 
                     _state.update { state ->
                         state.copy(
-                            isAddBookmarkEnabled = isAddBookmarkEnabled,
-                            addBookmarkIconId = R.drawable.ic_plus
-                                .takeIf { !isAddBookmarkEnabled },
-                            addBookmarkIconColor = Color.plusGold
-                                .takeIf { !isAddBookmarkEnabled } ?: Color.plusGold,
+                            isAddBookmarkEnabled = isPaidUser,
+                            addBookmarkIconId = R.drawable.ic_plus.takeIf { !isPaidUser },
+                            addBookmarkIconColor = Color.plusGold,
                         )
                     }
 
@@ -115,6 +108,7 @@ class HeadphoneControlsSettingsPageViewModel @Inject constructor(
         HeadphoneAction.SKIP_BACK,
         HeadphoneAction.SKIP_FORWARD,
         -> true
+
         HeadphoneAction.ADD_BOOKMARK -> state.value.isAddBookmarkEnabled
         HeadphoneAction.NEXT_CHAPTER,
         HeadphoneAction.PREVIOUS_CHAPTER,

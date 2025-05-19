@@ -6,7 +6,10 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
+import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.search.BookmarkSearchHandler
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
@@ -19,8 +22,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
+import java.time.Instant
 import java.util.Date
 import java.util.UUID
 import junit.framework.TestCase.assertFalse
@@ -38,7 +41,6 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.any
-import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
@@ -74,24 +76,29 @@ class BookmarksViewModelTest {
     @Mock
     private lateinit var theme: Theme
 
-    @Mock
-    private lateinit var bookmarkFeature: BookmarkFeatureControl
-
     private lateinit var bookmarkSearchHandler: BookmarkSearchHandler
 
     private lateinit var bookmarksViewModel: BookmarksViewModel
 
     private val episodeUuid = UUID.randomUUID().toString()
     private val episode = UserEpisode(episodeUuid, publishedDate = Date())
-    private val cachedSubscriptionStatus = SubscriptionStatus.Free()
+    private val cachedSubscription = MutableStateFlow<Subscription?>(
+        Subscription(
+            tier = SubscriptionTier.Plus,
+            billingCycle = BillingCycle.Monthly,
+            platform = SubscriptionPlatform.Android,
+            expiryDate = Instant.now(),
+            isAutoRenewing = true,
+            giftDays = 0,
+        ),
+    )
 
     @Before
     fun setUp() = runTest {
-        val userSetting = mock<UserSetting<SubscriptionStatus?>>()
-        whenever(userSetting.flow).thenReturn(MutableStateFlow(cachedSubscriptionStatus))
-        whenever(settings.cachedSubscriptionStatus).thenReturn(userSetting)
+        val userSetting = mock<UserSetting<Subscription?>>()
+        whenever(userSetting.flow).thenReturn(cachedSubscription)
+        whenever(settings.cachedSubscription).thenReturn(userSetting)
         whenever(episodeManager.findEpisodeByUuid(episodeUuid)).thenReturn(episode)
-        whenever(bookmarkFeature.isAvailable(anyOrNull())).thenReturn(true)
         whenever(bookmarkManager.findEpisodeBookmarksFlow(episode, BookmarksSortTypeDefault.TIMESTAMP)).thenReturn(flowOf(emptyList()))
         val playerBookmarksSortType = mock<UserSetting<BookmarksSortTypeDefault>> {
             on { flow } doReturn MutableStateFlow(BookmarksSortTypeDefault.TIMESTAMP)
@@ -120,7 +127,6 @@ class BookmarksViewModelTest {
             settings = settings,
             playbackManager = playbackManager,
             theme = theme,
-            bookmarkFeature = bookmarkFeature,
             ioDispatcher = UnconfinedTestDispatcher(),
             bookmarkSearchHandler = bookmarkSearchHandler,
         )
@@ -128,7 +134,7 @@ class BookmarksViewModelTest {
 
     @Test
     fun `given feature not available, when bookmarks loaded, then Upsell state shown`() = runTest {
-        whenever(bookmarkFeature.isAvailable(any())).thenReturn(false)
+        cachedSubscription.value = null
 
         bookmarksViewModel.loadBookmarks(episodeUuid, SourceView.PLAYER)
 
@@ -137,8 +143,6 @@ class BookmarksViewModelTest {
 
     @Test
     fun `given feature available, when bookmarks loaded, then Upsell state not shown`() = runTest {
-        whenever(bookmarkFeature.isAvailable(any())).thenReturn(true)
-
         bookmarksViewModel.loadBookmarks(episodeUuid, SourceView.PLAYER)
 
         assertFalse(bookmarksViewModel.uiState.value is BookmarksViewModel.UiState.Upsell)

@@ -52,8 +52,8 @@ fun Date.timeIntervalSinceNow(): Long {
     return Date().time - this.time
 }
 
-fun Date.toDurationFromNow(): Duration {
-    return JavaDuration.between(Instant.now(), toInstant())
+fun Instant.toDurationFromNow(): Duration {
+    return JavaDuration.between(Instant.now(), this)
         .toKotlinDuration()
         .coerceAtLeast(Duration.ZERO)
 }

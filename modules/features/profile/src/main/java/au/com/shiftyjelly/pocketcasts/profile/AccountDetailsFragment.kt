@@ -120,7 +120,7 @@ class AccountDetailsFragment : BaseFragment() {
                 analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_UPGRADE_BUTTON_TAPPED)
                 val source = OnboardingUpgradeSource.PROFILE
                 val onboardingFlow = OnboardingFlow.PlusAccountUpgrade(source, planKey.tier, planKey.billingCycle)
-                OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
+                OnboardingLauncher.openOnboardingFlow(requireActivity(), onboardingFlow)
             },
             onChangeFeatureCard = { planKey ->
                 analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_SUBSCRIPTION_TIER_CHANGED, mapOf("value" to planKey.tier.analyticsValue))
@@ -140,7 +140,7 @@ class AccountDetailsFragment : BaseFragment() {
             onUpgradeToPatron = {
                 val source = OnboardingUpgradeSource.ACCOUNT_DETAILS
                 val onboardingFlow = OnboardingFlow.PatronAccountUpgrade(source)
-                OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
+                OnboardingLauncher.openOnboardingFlow(requireActivity(), onboardingFlow)
             },
             onCancelSubscription = { winbackParams ->
                 analyticsTracker.track(AnalyticsEvent.ACCOUNT_DETAILS_CANCEL_TAPPED)

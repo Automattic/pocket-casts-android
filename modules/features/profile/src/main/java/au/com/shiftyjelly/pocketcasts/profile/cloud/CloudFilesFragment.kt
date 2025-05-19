@@ -29,9 +29,8 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.EmptyState
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
-import au.com.shiftyjelly.pocketcasts.models.to.SignInState
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
+import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.EpisodeListAdapter
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.EpisodeListBookmarkViewModel
@@ -271,8 +270,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             }
         }
         viewModel.signInState.observe(viewLifecycleOwner) {
-            binding?.swipeRefreshLayout?.isEnabled =
-                it is SignInState.SignedIn && it.subscriptionStatus is SubscriptionStatus.Paid
+            binding?.swipeRefreshLayout?.isEnabled = it is SignInState.SignedIn && it.subscription != null
         }
 
         binding?.fab?.setOnClickListener {

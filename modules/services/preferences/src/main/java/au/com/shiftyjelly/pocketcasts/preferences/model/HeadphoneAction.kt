@@ -1,10 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.preferences.model
 
 import android.content.SharedPreferences
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -46,17 +44,15 @@ class HeadphoneActionUserSetting(
     sharedPrefKey: String,
     defaultAction: HeadphoneAction,
     sharedPrefs: SharedPreferences,
-    subscriptionStatusFlow: StateFlow<SubscriptionStatus?>,
-    bookmarkFeature: BookmarkFeatureControl,
+    subscriptionFlow: StateFlow<Subscription?>,
 ) : UserSetting.PrefFromInt<HeadphoneAction>(
     sharedPrefKey = sharedPrefKey,
     defaultValue = defaultAction,
     sharedPrefs = sharedPrefs,
     fromInt = {
-        val userTier = (subscriptionStatusFlow.value as? SubscriptionStatus.Paid)?.tier?.toUserTier()
-            ?: UserTier.Free
+        val hasNoSubscription = subscriptionFlow.value == null
         val nextAction = HeadphoneAction.entries[it]
-        if (nextAction == HeadphoneAction.ADD_BOOKMARK && !bookmarkFeature.isAvailable(userTier)) {
+        if (nextAction == HeadphoneAction.ADD_BOOKMARK && hasNoSubscription) {
             defaultAction
         } else {
             nextAction
@@ -74,7 +70,7 @@ class HeadphoneActionUserSetting(
         // since it is doing so little work (also, we don't have a relevant lifecycle
         // to let us know when to cancel it).
         coroutineScope.launch {
-            subscriptionStatusFlow.collect { _ ->
+            subscriptionFlow.collect { _ ->
                 // Update the flow value because the subscription status has changed, so
                 // some actions (like bookmarks) might now be/not-be valid. We're using
                 // _flow.value here instead of set() because we don't want to persist a

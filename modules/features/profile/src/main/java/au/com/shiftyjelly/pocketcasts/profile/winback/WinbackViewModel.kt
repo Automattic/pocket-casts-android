@@ -21,7 +21,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager.Ref
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.pocketcasts.service.api.WinbackResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.util.Date
+import java.time.Instant
 import javax.inject.Inject
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
@@ -44,8 +44,8 @@ class WinbackViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            settings.cachedSubscriptionStatus.flow.collect { status ->
-                _uiState.value = _uiState.value.copy(currentSubscriptionExpirationDate = status?.expiryDate)
+            settings.cachedSubscription.flow.collect { subscription ->
+                _uiState.value = _uiState.value.copy(currentSubscriptionExpirationDate = subscription?.expiryDate)
             }
         }
     }
@@ -100,7 +100,7 @@ class WinbackViewModel @Inject constructor(
             _uiState.value = _uiState.value.withLoadedSubscriptionPlans { plans ->
                 plans.copy(isChangingPlan = true)
             }
-            when (paymentClient.purchaseSubscriptionPlan(newPlan.key, activity)) {
+            when (paymentClient.purchaseSubscriptionPlan(newPlan.key, purchaseSource = "winback", activity)) {
                 is PurchaseResult.Cancelled -> {
                     _uiState.value = _uiState.value.withLoadedSubscriptionPlans { plans ->
                         plans.copy(isChangingPlan = false)
@@ -173,7 +173,7 @@ class WinbackViewModel @Inject constructor(
                 loadedState.currentSubscription.billingCycle,
                 SubscriptionOffer.Winback,
             )
-            when (paymentClient.purchaseSubscriptionPlan(newPlanKey, activity)) {
+            when (paymentClient.purchaseSubscriptionPlan(newPlanKey, purchaseSource = "winback", activity)) {
                 is PurchaseResult.Purchased -> {
                     referralManager.redeemReferralCode(winbackState.offer.redeemCode)
                     _uiState.value = _uiState.value.withOfferState { state ->
@@ -409,7 +409,7 @@ class WinbackViewModel @Inject constructor(
     }
 
     internal data class UiState(
-        val currentSubscriptionExpirationDate: Date?,
+        val currentSubscriptionExpirationDate: Instant?,
         val winbackOfferState: WinbackOfferState?,
         val subscriptionPlansState: SubscriptionPlansState,
     ) {

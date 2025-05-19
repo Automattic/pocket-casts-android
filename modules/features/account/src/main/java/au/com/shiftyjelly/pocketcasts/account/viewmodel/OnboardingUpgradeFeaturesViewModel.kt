@@ -8,7 +8,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
-import au.com.shiftyjelly.pocketcasts.payment.PaymentResultCode
 import au.com.shiftyjelly.pocketcasts.payment.PurchaseResult
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
@@ -89,8 +88,7 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
             val planKey = loadedState.selectedPlan.key
             trackPaymentFrequencyButtonTapped(planKey)
             viewModelScope.launch {
-                val purchaseResult = paymentClient.purchaseSubscriptionPlan(planKey, activity)
-                trackPurchaseResult(planKey, purchaseResult)
+                val purchaseResult = paymentClient.purchaseSubscriptionPlan(planKey, flow.source.analyticsValue, activity)
 
                 when (purchaseResult) {
                     is PurchaseResult.Purchased -> {
@@ -115,33 +113,6 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
                 "product" to plan.productId,
             ),
         )
-    }
-
-    private fun trackPurchaseResult(
-        plan: SubscriptionPlan.Key,
-        purchaseResult: PurchaseResult,
-    ) {
-        val productValue = when (plan.tier) {
-            SubscriptionTier.Plus -> plan.billingCycle.analyticsValue
-            SubscriptionTier.Patron -> plan.productId
-        }
-        val analyticsProperties = buildMap {
-            put("product", productValue)
-            put("offer_type", plan.offer?.analyticsValue ?: "none")
-            put("source", flow.source.analyticsValue)
-        }
-        when (purchaseResult) {
-            is PurchaseResult.Purchased -> analyticsTracker.track(AnalyticsEvent.PURCHASE_SUCCESSFUL, analyticsProperties)
-
-            is PurchaseResult.Cancelled -> analyticsTracker.track(AnalyticsEvent.PURCHASE_CANCELLED)
-
-            is PurchaseResult.Failure -> {
-                analyticsTracker.track(
-                    AnalyticsEvent.PURCHASE_FAILED,
-                    analyticsProperties + purchaseResult.code.analyticProperties(),
-                )
-            }
-        }
     }
 
     fun onShown(flow: OnboardingFlow, source: OnboardingUpgradeSource) {
@@ -182,13 +153,6 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
             "flow" to flow.analyticsValue,
             "source" to source.analyticsValue,
         )
-    }
-}
-
-private fun PaymentResultCode.analyticProperties() = buildMap {
-    put("error", analyticsValue)
-    if (this@analyticProperties is PaymentResultCode.Unknown) {
-        put("error_code", code)
     }
 }
 

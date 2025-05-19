@@ -12,7 +12,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkArguments
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.HeaderRowColors
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.MessageViewColors
@@ -30,8 +29,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.combine
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
@@ -62,7 +59,6 @@ class BookmarksViewModel
     private val settings: Settings,
     private val playbackManager: PlaybackManager,
     private val theme: Theme,
-    private val bookmarkFeature: BookmarkFeatureControl,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val bookmarkSearchHandler: BookmarkSearchHandler,
 ) : ViewModel() {
@@ -168,12 +164,12 @@ class BookmarksViewModel
             bookmarksFlow,
             isMultiSelectingFlow,
             selectedListFlow,
-            settings.cachedSubscriptionStatus.flow,
+            settings.cachedSubscription.flow,
             settings.artworkConfiguration.flow,
             bookmarkSearchResults,
-        ) { bookmarks, isMultiSelecting, selectedList, cachedSubscriptionStatus, artworkConfiguration, searchResults ->
-            val userTier = (cachedSubscriptionStatus as? SubscriptionStatus.Paid)?.tier?.toUserTier() ?: UserTier.Free
-            _uiState.value = if (!bookmarkFeature.isAvailable(userTier)) {
+        ) { bookmarks, isMultiSelecting, selectedList, subscription, artworkConfiguration, searchResults ->
+            val isPaidUser = subscription != null
+            _uiState.value = if (!isPaidUser) {
                 UiState.Upsell(sourceView)
             } else if (bookmarks.isEmpty()) {
                 UiState.Empty(sourceView)

@@ -27,6 +27,8 @@ dependencies {
     api(libs.rx2.java)
     api(libs.timber)
 
+    api(projects.modules.services.payment)
+
     implementation(platform(libs.compose.bom))
     implementation(platform(libs.firebase.bom))
 
@@ -47,4 +49,6 @@ dependencies {
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)
     testImplementation(libs.turbine)
+
+    testImplementation(projects.modules.services.sharedtest)
 }

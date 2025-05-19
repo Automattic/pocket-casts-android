@@ -23,7 +23,8 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.SystemBarsStyles
-import au.com.shiftyjelly.pocketcasts.models.to.SignInState
+import au.com.shiftyjelly.pocketcasts.models.type.SignInState
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingExitInfo
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
@@ -217,11 +218,11 @@ private fun Content(
                 },
                 onSignUpClicked = { navController.navigate(OnboardingNavRoute.createFreeAccount) },
                 onLoginClicked = { navController.navigate(OnboardingNavRoute.logIn) },
-                onContinueWithGoogleComplete = { state ->
+                onContinueWithGoogleComplete = { state, subscription ->
                     if (state.isNewAccount) {
                         onAccountCreated()
                     } else {
-                        onLoginToExistingAccount(flow, exitOnboarding, navController)
+                        onLoginToExistingAccount(flow, subscription, exitOnboarding, navController)
                     }
                 },
                 onUpdateSystemBars = onUpdateSystemBars,
@@ -241,8 +242,8 @@ private fun Content(
             OnboardingLoginPage(
                 theme = theme,
                 onBackPressed = { navController.popBackStack() },
-                onLoginComplete = {
-                    onLoginToExistingAccount(flow, exitOnboarding, navController)
+                onLoginComplete = { subscription ->
+                    onLoginToExistingAccount(flow, subscription, exitOnboarding, navController)
                 },
                 onForgotPasswordTapped = { navController.navigate(OnboardingNavRoute.forgotPassword) },
                 onUpdateSystemBars = onUpdateSystemBars,
@@ -366,6 +367,7 @@ private fun Content(
 
 private fun onLoginToExistingAccount(
     flow: OnboardingFlow,
+    subscription: Subscription?,
     exitOnboarding: (OnboardingExitInfo) -> Unit,
     navController: NavHostController,
 ) {
@@ -385,9 +387,15 @@ private fun onLoginToExistingAccount(
         is OnboardingFlow.PatronAccountUpgrade,
         is OnboardingFlow.PlusAccountUpgradeNeedsLogin,
         is OnboardingFlow.Upsell,
-        -> navController.navigate(OnboardingNavRoute.PlusUpgrade.routeWithSource(OnboardingUpgradeSource.LOGIN)) {
-            // clear backstack after successful login
-            popUpTo(OnboardingNavRoute.logInOrSignUp) { inclusive = true }
+        -> {
+            if (subscription == null) {
+                navController.navigate(OnboardingNavRoute.PlusUpgrade.routeWithSource(OnboardingUpgradeSource.LOGIN)) {
+                    // clear backstack after successful login
+                    popUpTo(OnboardingNavRoute.logInOrSignUp) { inclusive = true }
+                }
+            } else {
+                exitOnboarding(OnboardingExitInfo())
+            }
         }
     }
 }

@@ -7,8 +7,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SignInSource
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
@@ -25,7 +27,6 @@ import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.CommonStatusCodes
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import java.lang.IllegalArgumentException
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -37,6 +38,7 @@ class GoogleSignInButtonViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val podcastManager: PodcastManager,
     private val syncManager: SyncManager,
+    private val subscriptionManager: SubscriptionManager,
 ) : ViewModel() {
 
     companion object {
@@ -111,7 +113,7 @@ class GoogleSignInButtonViewModel @Inject constructor(
                 } else {
                     signInWithGoogleToken(
                         idToken = idToken,
-                        onSuccess = {},
+                        onSuccess = { _, _ -> },
                         onError = onError,
                     )
                 }
@@ -127,7 +129,7 @@ class GoogleSignInButtonViewModel @Inject constructor(
      */
     fun onGoogleOneTapSignInResult(
         result: ActivityResult,
-        onSuccess: (GoogleSignInState) -> Unit,
+        onSuccess: (GoogleSignInState, Subscription?) -> Unit,
         onError: suspend () -> Unit,
     ) {
         viewModelScope.launch {
@@ -153,7 +155,7 @@ class GoogleSignInButtonViewModel @Inject constructor(
     /**
      * Handle the response from the legacy Google Sign-In intent.
      */
-    fun onGoogleLegacySignInResult(result: ActivityResult, onSuccess: (GoogleSignInState) -> Unit, onError: () -> Unit) {
+    fun onGoogleLegacySignInResult(result: ActivityResult, onSuccess: (GoogleSignInState, Subscription?) -> Unit, onError: () -> Unit) {
         viewModelScope.launch {
             try {
                 onGoogleSignInResult(
@@ -174,7 +176,7 @@ class GoogleSignInButtonViewModel @Inject constructor(
 
     private suspend fun onGoogleSignInResult(
         result: ActivityResult,
-        onSuccess: (GoogleSignInState) -> Unit,
+        onSuccess: (GoogleSignInState, Subscription?) -> Unit,
         onError: suspend () -> Unit,
     ) {
         val credential = Identity.getSignInClient(context).getSignInCredentialFromIntent(result.data)
@@ -188,13 +190,14 @@ class GoogleSignInButtonViewModel @Inject constructor(
 
     private suspend fun signInWithGoogleToken(
         idToken: String,
-        onSuccess: (GoogleSignInState) -> Unit,
+        onSuccess: (GoogleSignInState, Subscription?) -> Unit,
         onError: suspend () -> Unit,
     ) =
         when (val authResult = syncManager.loginWithGoogle(idToken = idToken, signInSource = SignInSource.UserInitiated.Onboarding)) {
             is LoginResult.Success -> {
                 podcastManager.refreshPodcastsAfterSignIn()
-                onSuccess(GoogleSignInState(isNewAccount = authResult.result.isNewAccount))
+                val subscritpion = subscriptionManager.fetchFreshSubscription()
+                onSuccess(GoogleSignInState(isNewAccount = authResult.result.isNewAccount), subscritpion)
             }
             is LoginResult.Failed -> {
                 onError()

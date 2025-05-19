@@ -23,7 +23,7 @@ import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRow
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.models.to.SignInState
+import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.settings.about.AboutFragment
 import au.com.shiftyjelly.pocketcasts.settings.developer.DeveloperFragment
 import au.com.shiftyjelly.pocketcasts.settings.history.HistoryFragment
@@ -80,7 +80,7 @@ fun SettingsFragmentPage(
                 item {
                     PlusRow(onClick = {
                         OnboardingLauncher.openOnboardingFlow(
-                            context.getActivity(),
+                            requireNotNull(context.getActivity()),
                             OnboardingFlow.Upsell(
                                 OnboardingUpgradeSource.SETTINGS,
                             ),

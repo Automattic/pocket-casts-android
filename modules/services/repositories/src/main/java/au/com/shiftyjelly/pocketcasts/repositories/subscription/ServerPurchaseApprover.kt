@@ -7,10 +7,10 @@ import au.com.shiftyjelly.pocketcasts.payment.PurchaseApprover
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionPurchaseRequest
-import au.com.shiftyjelly.pocketcasts.servers.sync.toStatus
+import au.com.shiftyjelly.pocketcasts.servers.sync.toSubscription
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.rx2.await
 
 class ServerPurchaseApprover @Inject constructor(
     private val syncManager: SyncManager,
@@ -19,14 +19,15 @@ class ServerPurchaseApprover @Inject constructor(
     override suspend fun approve(purchase: Purchase): PaymentResult<Purchase> {
         return runCatching {
             val request = SubscriptionPurchaseRequest(purchase.token, purchase.productIds.first())
-            val response = syncManager.subscriptionPurchaseRxSingle(request).await()
-            settings.cachedSubscriptionStatus.set(response.toStatus(), updateModifiedAt = false)
+            val subscription = syncManager.subscriptionPurchase(request).toSubscription()
+            settings.cachedSubscription.set(subscription, updateModifiedAt = false)
             PaymentResult.Success(purchase)
         }.getOrElse { error ->
             if (error is CancellationException) {
                 throw error
             } else {
-                PaymentResult.Failure(PaymentResultCode.Unknown(0), error.message ?: "Server confirmation error")
+                LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, error, "Failed to approve a purchase")
+                PaymentResult.Failure(PaymentResultCode.ItemNotApproved, error.message ?: "Server confirmation error")
             }
         }
     }

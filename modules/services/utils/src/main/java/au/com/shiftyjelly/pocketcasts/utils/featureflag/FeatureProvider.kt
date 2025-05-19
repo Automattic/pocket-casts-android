@@ -9,6 +9,8 @@ package au.com.shiftyjelly.pocketcasts.utils.featureflag
  */
 interface FeatureProvider {
     val priority: Int
+    val currentReleaseVersion: ReleaseVersion
+        get() = ReleaseVersion.currentReleaseVersion
     fun hasFeature(feature: Feature): Boolean
     fun isEnabled(feature: Feature): Boolean
 }

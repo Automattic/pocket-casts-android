@@ -105,13 +105,10 @@ interface SyncService {
     fun episodeProgressSync(@Header("Authorization") authorization: String, @Body request: EpisodeSyncRequest): Completable
 
     @GET("/subscription/status")
-    fun subscriptionStatusRxSingle(@Header("Authorization") authorization: String): Single<SubscriptionStatusResponse>
-
-    @GET("/subscription/status")
     suspend fun subscriptionStatus(@Header("Authorization") authorization: String): SubscriptionStatusResponse
 
     @POST("/subscription/purchase/android")
-    fun subscriptionPurchase(@Header("Authorization") authorization: String, @Body request: SubscriptionPurchaseRequest): Single<SubscriptionStatusResponse>
+    suspend fun subscriptionPurchase(@Header("Authorization") authorization: String, @Body request: SubscriptionPurchaseRequest): SubscriptionStatusResponse
 
     @GET("/files")
     fun getFiles(@Header("Authorization") authorization: String): Single<Response<FilesResponse>>

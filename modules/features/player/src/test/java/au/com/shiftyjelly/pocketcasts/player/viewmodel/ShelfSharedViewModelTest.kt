@@ -7,6 +7,10 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
+import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.NavigationState
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.ShelfItemSource
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.SnackbarMessage
@@ -22,8 +26,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
 import io.reactivex.Observable
+import java.time.Instant
 import java.util.Date
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -37,7 +41,6 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito.mock
 import org.mockito.junit.MockitoJUnitRunner
-import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -55,9 +58,6 @@ class ShelfSharedViewModelTest {
 
     @Mock
     private lateinit var analyticsTracker: AnalyticsTracker
-
-    @Mock
-    private lateinit var bookmarkFeature: BookmarkFeatureControl
 
     @Mock
     private lateinit var chromeCastAnalytics: ChromeCastAnalytics
@@ -81,6 +81,15 @@ class ShelfSharedViewModelTest {
     private lateinit var userEpisodeManager: UserEpisodeManager
 
     private lateinit var shelfSharedViewModel: ShelfSharedViewModel
+
+    private val plusSubscription = Subscription(
+        tier = SubscriptionTier.Plus,
+        billingCycle = BillingCycle.Monthly,
+        platform = SubscriptionPlatform.Android,
+        expiryDate = Instant.now(),
+        isAutoRenewing = true,
+        giftDays = 0,
+    )
 
     @Test
     fun `when effects button clicked, then effects options are shown`() = runTest {
@@ -216,7 +225,6 @@ class ShelfSharedViewModelTest {
     @Test
     fun `given bookmark feature available, when add bookmark button clicked, then add bookmark is shown`() =
         runTest {
-            whenever(bookmarkFeature.isAvailable(anyOrNull())).thenReturn(true)
             initViewModel()
 
             shelfSharedViewModel.navigationState.test {
@@ -231,8 +239,7 @@ class ShelfSharedViewModelTest {
     @Test
     fun `given bookmark feature not available, when add bookmark button clicked, then upsell flow is started`() =
         runTest {
-            whenever(bookmarkFeature.isAvailable(anyOrNull())).thenReturn(false)
-            initViewModel()
+            initViewModel(subscription = null)
 
             shelfSharedViewModel.navigationState.test {
                 shelfSharedViewModel.onAddBookmarkClick(
@@ -282,7 +289,9 @@ class ShelfSharedViewModelTest {
         }
     }
 
-    private fun initViewModel() {
+    private fun initViewModel(
+        subscription: Subscription? = plusSubscription,
+    ) {
         whenever(playbackManager.upNextQueue).thenReturn(upNextQueue)
         whenever(
             upNextQueue.getChangesObservableWithLiveCurrentEpisode(
@@ -290,13 +299,18 @@ class ShelfSharedViewModelTest {
                 podcastManager,
             ),
         ).thenReturn(Observable.just(UpNextQueue.State.Empty))
+
         val userSetting = mock<UserSetting<List<ShelfItem>>>()
         whenever(userSetting.flow).thenReturn(MutableStateFlow(ShelfItem.entries))
         whenever(settings.shelfItems).thenReturn(userSetting)
+
+        val userSubscriptionSetting = mock<UserSetting<Subscription?>>()
+        whenever(userSubscriptionSetting.value).thenReturn(subscription)
+        whenever(settings.cachedSubscription).thenReturn(userSubscriptionSetting)
+
         shelfSharedViewModel = ShelfSharedViewModel(
             analyticsTracker = analyticsTracker,
             applicationScope = applicationScope,
-            bookmarkFeature = bookmarkFeature,
             chromeCastAnalytics = chromeCastAnalytics,
             episodeManager = episodeManager,
             playbackManager = playbackManager,

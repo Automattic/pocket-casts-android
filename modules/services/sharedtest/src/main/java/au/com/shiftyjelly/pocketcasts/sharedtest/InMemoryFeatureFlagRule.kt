@@ -1,15 +1,19 @@
 package au.com.shiftyjelly.pocketcasts.sharedtest
 
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.InMemoryFeatureProvider
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.ReleaseVersion
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 
 class InMemoryFeatureFlagRule : TestWatcher() {
+    private var provider = InMemoryFeatureProvider()
+
+    fun setReleaseVersion(releaseVersion: ReleaseVersion) {
+        provider.currentReleaseVersion = releaseVersion
+    }
+
     override fun starting(description: Description) {
-        FeatureFlag.initialize(
-            listOf(InMemoryFeatureProvider()),
-        )
+        FeatureFlag.initialize(listOf(provider))
     }
 
     override fun finished(description: Description) {

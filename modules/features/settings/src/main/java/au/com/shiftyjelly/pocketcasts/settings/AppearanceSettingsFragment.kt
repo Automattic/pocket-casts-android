@@ -16,7 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.settings.databinding.FragmentSettingsAppearanceBinding
@@ -243,10 +243,10 @@ class AppearanceSettingsFragment : BaseFragment() {
     }
 
     private fun openOnboardingFlow(tier: SubscriptionTier? = null, source: OnboardingUpgradeSource = OnboardingUpgradeSource.APPEARANCE) {
-        val onboardingFlow = tier?.takeIf { tier == SubscriptionTier.PATRON }?.let {
+        val onboardingFlow = tier?.takeIf { tier == SubscriptionTier.Patron }?.let {
             OnboardingFlow.Upsell(source = source)
         } ?: OnboardingFlow.Upsell(source)
-        OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
+        OnboardingLauncher.openOnboardingFlow(requireActivity(), onboardingFlow)
     }
 
     private fun scrollToCurrentTheme() {

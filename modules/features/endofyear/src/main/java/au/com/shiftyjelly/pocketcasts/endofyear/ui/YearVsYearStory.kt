@@ -43,7 +43,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.extensions.nonScaledSp
 import au.com.shiftyjelly.pocketcasts.endofyear.StoryCaptureController
 import au.com.shiftyjelly.pocketcasts.models.to.Story
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import dev.shreyaspatil.capturable.capturable
 import java.io.File
 import kotlin.math.roundToInt
@@ -272,9 +272,9 @@ private fun TextInfo(
 ) {
     Column {
         val badgeId = when (story.subscriptionTier) {
-            SubscriptionTier.PLUS -> IR.drawable.end_of_year_2024_year_vs_year_plus_badge
-            SubscriptionTier.PATRON -> IR.drawable.end_of_year_2024_year_vs_year_patron_badge
-            SubscriptionTier.NONE -> null
+            SubscriptionTier.Plus -> IR.drawable.end_of_year_2024_year_vs_year_plus_badge
+            SubscriptionTier.Patron -> IR.drawable.end_of_year_2024_year_vs_year_patron_badge
+            null -> null
         }
         if (badgeId != null) {
             Image(
@@ -347,7 +347,7 @@ private fun TotalTimePreview(
             story = Story.YearVsYear(
                 lastYearDuration = durations.first.hours,
                 thisYearDuration = durations.second.hours,
-                subscriptionTier = SubscriptionTier.PLUS,
+                subscriptionTier = SubscriptionTier.Plus,
             ),
             measurements = measurements,
             areCirclesVisible = true,
@@ -365,7 +365,7 @@ private fun YearVsYearPatronPreview() {
             story = Story.YearVsYear(
                 lastYearDuration = 100.hours,
                 thisYearDuration = 100.hours,
-                subscriptionTier = SubscriptionTier.PATRON,
+                subscriptionTier = SubscriptionTier.Patron,
             ),
             measurements = measurements,
             areCirclesVisible = true,
