@@ -32,10 +32,12 @@ import kotlinx.coroutines.launch
 class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
     private val paymentClient: PaymentClient,
     private val analyticsTracker: AnalyticsTracker,
+       private val notificationManager: NotificationManager,
     @Assisted private val flow: OnboardingFlow,
 ) : ViewModel() {
     private val _state = MutableStateFlow<OnboardingUpgradeFeaturesState>(OnboardingUpgradeFeaturesState.Loading)
     val state = _state.asStateFlow()
+ 
 
     init {
         viewModelScope.launch {
@@ -92,6 +94,7 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
 
                 when (purchaseResult) {
                     is PurchaseResult.Purchased -> {
+                        notificationManager.updateUserFeatureInteraction(OnboardingNotificationType.PlusUpsell)
                         onComplete()
                     }
 
