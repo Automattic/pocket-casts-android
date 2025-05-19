@@ -197,10 +197,9 @@ private class TooltipPositionProvider(
         layoutDirection: LayoutDirection,
         popupContentSize: IntSize,
     ): IntOffset {
-        val normalizedTipPosition = tipPosition.normalize(layoutDirection)
         val elevationPx = density.run { elevation.roundToPx() }
 
-        return anchorOffset + when (normalizedTipPosition) {
+        return anchorOffset + when (tipPosition.normalize(layoutDirection)) {
             TipPosition.TopStart -> {
                 val elevationOffset = IntOffset(elevationPx, elevationPx)
                 val tipOffset = IntOffset(density.run { CornerTipPeakPosition.roundToPx() }, 0)
@@ -410,7 +409,6 @@ private val TipHeight = 13.dp
 private val CornerTipWidth = 40.dp
 private val CornerTipPeakPosition = 16.5.dp
 private val CenterTipWidth = 47.dp
-private val CenterPeakPosition = 23.5.dp
 private val CornerRadius = 10.dp
 
 @Preview
