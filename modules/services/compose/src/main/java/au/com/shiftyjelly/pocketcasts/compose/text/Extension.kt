@@ -33,8 +33,12 @@ fun Spanned.toAnnotatedString(urlColor: Int? = null): AnnotatedString = buildAnn
     append(trimmedText)
     // Step 3: Go through each span
     getSpans(0, length, Any::class.java).forEach { span ->
-        val start = getSpanStart(span) - startOffset
-        val end = (getSpanEnd(span) - startOffset).coerceAtMost(length)
+        val start = (getSpanStart(span) - startOffset).coerceIn(0, length)
+        val end = (getSpanEnd(span) - startOffset).coerceIn(0, length)
+        if (start >= end) {
+            // Skip if the span is invalid
+            return@forEach
+        }
         when (span) {
             // Bold, Italic, Bold-Italic
             is StyleSpan -> {

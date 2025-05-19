@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.podcast
 
-import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -35,7 +34,7 @@ class RecommendationsHandler @Inject constructor(
         }
     }
 
-    fun getRecommendationsFlowable(podcast: Podcast): Flowable<RecommendationsResult> {
+    fun getRecommendationsFlowable(podcastUuid: String): Flowable<RecommendationsResult> {
         return Flowable
             .combineLatest(
                 enabledObservable.toFlowable(BackpressureStrategy.LATEST).distinctUntilChanged(),
@@ -43,8 +42,9 @@ class RecommendationsHandler @Inject constructor(
             ) { enabled, _ -> enabled }
             .switchMap { enabled ->
                 if (enabled) {
-                    getRecommendationsMaybe(podcast)
+                    getRecommendationsMaybe(podcastUuid)
                         .toFlowable()
+                        .removePodcast(podcastUuid)
                         .addSubscribedStatusFlowable()
                         .map { listFeed ->
                             if (listFeed.podcasts.isNullOrEmpty()) {
@@ -60,14 +60,21 @@ class RecommendationsHandler @Inject constructor(
                 } else {
                     Flowable.just(RecommendationsResult.Empty)
                 }
-            }
+            }.startWith(RecommendationsResult.Loading)
     }
 
-    private fun getRecommendationsMaybe(podcast: Podcast): Maybe<ListFeed> = rxMaybe {
+    private fun getRecommendationsMaybe(podcastUuid: String): Maybe<ListFeed> = rxMaybe {
         listRepository.getPodcastRecommendations(
-            podcastUuid = podcast.uuid,
+            podcastUuid = podcastUuid,
             countryCode = settings.discoverCountryCode.value,
         )
+    }
+
+    private fun Flowable<ListFeed>.removePodcast(podcastUuid: String): Flowable<ListFeed> {
+        return map { list ->
+            val filteredPodcasts = list.podcasts?.filter { it.uuid != podcastUuid }
+            list.copy(podcasts = filteredPodcasts)
+        }
     }
 
     private fun Flowable<ListFeed>.addSubscribedStatusFlowable(): Flowable<ListFeed> {

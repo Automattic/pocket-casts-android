@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
@@ -42,11 +43,10 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.BookmarkHeaderViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.BookmarkUpsellViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.BookmarkViewHolder
-import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.DividerLineViewHolder
+import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.DividerSubTitleViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.EmptyListViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.LoadingViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.PaddingViewHolder
-import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.PodrollViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.RecommendedPodcastViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.TabsViewHolder
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel
@@ -197,10 +197,11 @@ class PodcastAdapter(
         val onButtonClick: () -> Unit,
     )
 
-    data class PodrollHeaderRow(
-        val onClick: () -> Unit,
+    data class DividerSubTitleRow(
+        @DrawableRes val icon: Int,
+        val title: String,
+        val onClick: (() -> Unit)? = null,
     )
-    object DividerLineRow
     data class PaddingRow(
         val padding: Dp,
     )
@@ -226,10 +227,9 @@ class PodcastAdapter(
         private const val VIEW_TYPE_EMPTY_LIST = 104
         const val VIEW_TYPE_PODCAST_HEADER = 105
         private const val VIEW_TYPE_RECOMMENDED_PODCAST = 106
-        private const val VIEW_TYPE_PODROLL_HEADER = 107
-        private const val VIEW_TYPE_DIVIDER_LINE = 108
-        private const val VIEW_TYPE_PADDING_ROW = 109
-        private const val VIEW_TYPE_LOADING_ROW = 110
+        private const val VIEW_TYPE_DIVIDER_SUBTITLE = 107
+        private const val VIEW_TYPE_PADDING_ROW = 108
+        private const val VIEW_TYPE_LOADING_ROW = 109
         val VIEW_TYPE_EPISODE_HEADER = R.layout.adapter_episode_header
         val VIEW_TYPE_EPISODE_LIMIT_ROW = R.layout.adapter_episode_limit
         val VIEW_TYPE_NO_RESULTS = R.layout.adapter_no_results
@@ -299,8 +299,7 @@ class PodcastAdapter(
             VIEW_TYPE_BOOKMARK_UPSELL -> BookmarkUpsellViewHolder(ComposeView(parent.context), onGetBookmarksClicked, theme)
             VIEW_TYPE_EMPTY_LIST -> EmptyListViewHolder(ComposeView(parent.context), theme)
             VIEW_TYPE_RECOMMENDED_PODCAST -> RecommendedPodcastViewHolder(ComposeView(parent.context), theme)
-            VIEW_TYPE_PODROLL_HEADER -> PodrollViewHolder(ComposeView(parent.context), theme)
-            VIEW_TYPE_DIVIDER_LINE -> DividerLineViewHolder(ComposeView(parent.context), theme)
+            VIEW_TYPE_DIVIDER_SUBTITLE -> DividerSubTitleViewHolder(ComposeView(parent.context), theme)
             VIEW_TYPE_PADDING_ROW -> PaddingViewHolder(ComposeView(parent.context))
             VIEW_TYPE_LOADING_ROW -> LoadingViewHolder(ComposeView(parent.context), theme)
             else -> EpisodeViewHolder(
@@ -342,8 +341,7 @@ class PodcastAdapter(
             is BookmarkUpsellViewHolder -> holder.bind()
             is EmptyListViewHolder -> holder.bind(getItem(position) as EmptyList)
             is RecommendedPodcastViewHolder -> holder.bind(getItem(position) as RecommendedPodcast)
-            is PodrollViewHolder -> holder.bind(getItem(position) as PodrollHeaderRow)
-            is DividerLineViewHolder -> holder.bind()
+            is DividerSubTitleViewHolder -> holder.bind(getItem(position) as DividerSubTitleRow)
             is PaddingViewHolder -> holder.bind(getItem(position) as PaddingRow)
             is LoadingViewHolder -> holder.bind()
         }
@@ -643,7 +641,14 @@ class PodcastAdapter(
                     // Podroll
                     val podroll = list.podroll
                     if (!podroll.isNullOrEmpty()) {
-                        add(PodrollHeaderRow(onClick = onPodrollHeaderClicked))
+                        val resources = context.resources
+                        add(
+                            DividerSubTitleRow(
+                                icon = IR.drawable.ic_author_small,
+                                title = resources.getString(LR.string.recommended_by_creator),
+                                onClick = onPodrollHeaderClicked,
+                            ),
+                        )
                         podroll.forEachIndexed { index, podcast ->
                             add(
                                 RecommendedPodcast(
@@ -655,9 +660,13 @@ class PodcastAdapter(
                             )
                         }
                         add(PaddingRow(12.dp))
-                        add(DividerLineRow)
+                        add(
+                            DividerSubTitleRow(
+                                icon = IR.drawable.ic_duplicate,
+                                title = resources.getString(LR.string.similar_shows_to, podcast.title),
+                            ),
+                        )
                     }
-                    add(PaddingRow(12.dp))
                     // Recommended "You might like" podcasts
                     val podcasts = list.podcasts
                     podcasts?.forEachIndexed { index, podcast ->
@@ -699,8 +708,7 @@ class PodcastAdapter(
             is BookmarkUpsell -> VIEW_TYPE_BOOKMARK_UPSELL
             is EmptyList -> VIEW_TYPE_EMPTY_LIST
             is RecommendedPodcast -> VIEW_TYPE_RECOMMENDED_PODCAST
-            is PodrollHeaderRow -> VIEW_TYPE_PODROLL_HEADER
-            is DividerLineRow -> VIEW_TYPE_DIVIDER_LINE
+            is DividerSubTitleRow -> VIEW_TYPE_DIVIDER_SUBTITLE
             is PaddingRow -> VIEW_TYPE_PADDING_ROW
             is LoadingRow -> VIEW_TYPE_LOADING_ROW
             else -> R.layout.adapter_episode
@@ -722,10 +730,9 @@ class PodcastAdapter(
             is PodcastEpisode -> item.adapterId
             is BookmarkItemData -> item.bookmark.adapterId
             is RecommendedPodcast -> item.podcast.adapterId
-            is PodrollHeaderRow -> Long.MAX_VALUE - 8
-            is DividerLineRow -> Long.MAX_VALUE - 9
-            is PaddingRow -> Long.MAX_VALUE - 10
-            is LoadingRow -> Long.MAX_VALUE - 11
+            is DividerSubTitleRow -> Long.MAX_VALUE - 8
+            is PaddingRow -> Long.MAX_VALUE - 9
+            is LoadingRow -> Long.MAX_VALUE - 10
             else -> throw IllegalStateException("Unknown item type")
         }
     }
