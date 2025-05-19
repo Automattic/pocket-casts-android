@@ -55,8 +55,11 @@ fun TooltipPopup(
     onClick: (() -> Unit)? = null,
     onClickOutside: (() -> Unit)? = null,
 ) {
+    // We're adding additional padding to the popup box in order to prevent shadow clipping.
+    // There's no API to determine how much padding is needed. We just eyeball it to 150%.
+    val elevationPadding = elevation * 1.5f
     Popup(
-        popupPositionProvider = rememberTooltipPositionProvider(tipPosition, anchorOffset, elevation),
+        popupPositionProvider = rememberTooltipPositionProvider(tipPosition, anchorOffset, elevationPadding),
         properties = properties,
         onDismissRequest = onClickOutside,
     ) {
@@ -64,7 +67,7 @@ fun TooltipPopup(
             visible = show,
             enter = fadeIn(),
             exit = fadeOut(),
-            modifier = Modifier.padding(elevation),
+            modifier = Modifier.padding(elevationPadding),
         ) {
             Tooltip(
                 title = title,
@@ -197,18 +200,46 @@ private class TooltipPositionProvider(
         popupContentSize: IntSize,
     ): IntOffset {
         val elevationPx = density.run { elevation.roundToPx() }
+
         return anchorOffset + when (tipPosition.normalize(layoutDirection)) {
             TipPosition.TopStart -> {
-                val tipOffset = IntOffset(density.run { CornerTipPeakPosition.roundToPx() }, 0)
                 val elevationOffset = IntOffset(elevationPx, elevationPx)
+                val tipOffset = IntOffset(density.run { CornerTipPeakPosition.roundToPx() }, 0)
                 anchorBounds.bottomCenter - elevationOffset - tipOffset
             }
 
-            TipPosition.TopCenter -> anchorBounds.bottomCenter
-            TipPosition.TopEnd -> anchorBounds.topCenter
-            TipPosition.BottomStart -> anchorBounds.topCenter
-            TipPosition.BottomCenter -> anchorBounds.topCenter
-            TipPosition.BottomEnd -> anchorBounds.topCenter
+            TipPosition.TopCenter -> {
+                val elevationOffset = IntOffset(0, elevationPx)
+                val contentOffset = IntOffset(popupContentSize.width / 2, 0)
+                anchorBounds.bottomCenter - elevationOffset - contentOffset
+            }
+
+            TipPosition.TopEnd -> {
+                val elevationOffset = IntOffset(-elevationPx, elevationPx)
+                val contentOffset = IntOffset(popupContentSize.width, 0)
+                val tipOffset = IntOffset(density.run { CornerTipPeakPosition.roundToPx() }, 0)
+                anchorBounds.bottomCenter - elevationOffset - contentOffset + tipOffset
+            }
+
+            TipPosition.BottomStart -> {
+                val elevationOffset = IntOffset(elevationPx, -elevationPx)
+                val contentOffset = IntOffset(0, popupContentSize.height)
+                val tipOffset = IntOffset(density.run { CornerTipPeakPosition.roundToPx() }, 0)
+                anchorBounds.topCenter - elevationOffset - contentOffset - tipOffset
+            }
+
+            TipPosition.BottomCenter -> {
+                val elevationOffset = IntOffset(0, -elevationPx)
+                val contentOffset = IntOffset(popupContentSize.width / 2, popupContentSize.height)
+                anchorBounds.topCenter - elevationOffset - contentOffset
+            }
+
+            TipPosition.BottomEnd -> {
+                val elevationOffset = IntOffset(elevationPx, elevationPx)
+                val contentOffset = IntOffset(popupContentSize.width, popupContentSize.height)
+                val tipOffset = IntOffset(density.run { CornerTipPeakPosition.roundToPx() }, 0)
+                anchorBounds.topCenter + elevationOffset - contentOffset + tipOffset
+            }
         }
     }
 }
@@ -384,7 +415,7 @@ private val CornerRadius = 10.dp
 
 @Preview
 @Composable
-private fun Tooltip2ThemePreview(
+private fun TooltipThemePreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppThemeWithBackground(themeType) {
@@ -403,7 +434,7 @@ private fun Tooltip2ThemePreview(
 
 @Preview
 @Composable
-private fun Tooltip2TipPreview(
+private fun TooltipTipPreview(
     @PreviewParameter(TipPositionParameterProvider::class) tipPosition: TipPosition,
 ) {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
