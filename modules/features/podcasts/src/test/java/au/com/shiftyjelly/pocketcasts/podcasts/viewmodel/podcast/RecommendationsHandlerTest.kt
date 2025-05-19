@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.podcast
 
-import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
@@ -31,7 +30,7 @@ class RecommendationsHandlerTest {
     private lateinit var listWebService: ListWebService
     private lateinit var podcastManager: PodcastManager
     private lateinit var recommendations: RecommendationsHandler
-    private lateinit var testPodcast: Podcast
+    private lateinit var testPodcastUuid: String
     private lateinit var testListFeed: ListFeed
     private lateinit var testDiscoverPodcasts: List<DiscoverPodcast>
 
@@ -48,7 +47,7 @@ class RecommendationsHandlerTest {
 
         recommendations = RecommendationsHandler(listRepository, podcastManager, settings)
 
-        testPodcast = Podcast(uuid = UUID.randomUUID().toString())
+        testPodcastUuid = UUID.randomUUID().toString()
         testDiscoverPodcasts = listOf(
             DiscoverPodcast(uuid = UUID.randomUUID().toString(), title = "Test Podcast 1", url = null, author = null, category = null, description = null, language = null, mediaType = null),
             DiscoverPodcast(uuid = UUID.randomUUID().toString(), title = "Test Podcast 2", url = null, author = null, category = null, description = null, language = null, mediaType = null),
@@ -63,15 +62,15 @@ class RecommendationsHandlerTest {
 
         recommendations.setEnabled(true)
 
-        val list = recommendations.getRecommendationsFlowable(testPodcast)
+        val values = recommendations.getRecommendationsFlowable(testPodcastUuid)
             .test()
-            .awaitCount(1)
+            .awaitCount(2)
             .assertNoErrors()
             .values()
-            .first()
 
         // no podcasts should be found
-        assertTrue(list is RecommendationsResult.Empty)
+        assertTrue(values[0] is RecommendationsResult.Loading)
+        assertTrue(values[1] is RecommendationsResult.Empty)
     }
 
     @Test
@@ -80,7 +79,7 @@ class RecommendationsHandlerTest {
         recommendations.setEnabled(true)
 
         // expected URL for the list recommendation
-        val listUrl = "${Settings.SERVER_API_URL}/recommendations/podcast/${testPodcast.uuid}?country=us"
+        val listUrl = "${Settings.SERVER_API_URL}/recommendations/podcast/$testPodcastUuid?country=us"
         whenever(listWebService.getListFeed(listUrl)).thenReturn(testListFeed)
 
         // mark the first podcast as subscribed
@@ -89,17 +88,17 @@ class RecommendationsHandlerTest {
         whenever(podcastManager.podcastSubscriptionsRxFlowable()).thenReturn(Flowable.just(emptyList()))
 
         // call the method to test
-        val list = recommendations.getRecommendationsFlowable(testPodcast)
+        val values = recommendations.getRecommendationsFlowable(testPodcastUuid)
             .test()
-            .awaitCount(1)
+            .awaitCount(2)
             .assertNoErrors()
             .values()
-            .first()
 
         // check that the podcasts are fetched correctly
-        assertTrue(list is RecommendationsResult.Success)
+        assertTrue(values[0] is RecommendationsResult.Loading)
+        assertTrue(values[1] is RecommendationsResult.Success)
 
-        val podcasts = (list as RecommendationsResult.Success).listFeed.podcasts
+        val podcasts = (values[1] as RecommendationsResult.Success).listFeed.podcasts
         assertEquals(testListFeed.podcasts?.size, podcasts?.size)
 
         // check that the subscribed status is set correctly

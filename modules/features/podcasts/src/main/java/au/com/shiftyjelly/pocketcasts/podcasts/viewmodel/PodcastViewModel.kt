@@ -21,7 +21,6 @@ import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkArguments
 import au.com.shiftyjelly.pocketcasts.podcasts.helper.search.BookmarkSearchHandler
 import au.com.shiftyjelly.pocketcasts.podcasts.helper.search.EpisodeSearchHandler
 import au.com.shiftyjelly.pocketcasts.podcasts.helper.search.SearchHandler
-import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastViewModel.PodcastTab
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.podcast.RecommendationsHandler
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.podcast.RecommendationsResult
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -45,11 +44,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.Maybe
-import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
@@ -128,7 +125,8 @@ class PodcastViewModel
         val bookmarkSearchResults = bookmarkSearchHandler.getSearchResultsObservable(uuid)
 
         disposables.clear()
-        podcastManager.findPodcastByUuidRxMaybe(uuid)
+
+        val podcastFlowable = podcastManager.findPodcastByUuidRxMaybe(uuid)
             .subscribeOn(Schedulers.io())
             .flatMap {
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Loaded podcast $uuid from database")
@@ -161,21 +159,24 @@ class PodcastViewModel
                 tintColor.value = theme.getPodcastTintColor(newPodcast)
                 podcast.postValue(newPodcast)
             }
-            .switchMap {
-                Observables.combineLatest(
-                    Observable.just(it),
-                    episodeSearchResults,
-                    bookmarkSearchResults,
-                ) { podcast, episodeSearchResults, bookmarkSearchResults ->
-                    CombinedEpisodeAndBookmarkData(
-                        podcast = podcast,
-                        showingArchived = podcast.showArchived,
-                        episodeSearchResult = episodeSearchResults,
-                        bookmarkSearchResult = bookmarkSearchResults,
-                    )
-                }.toFlowable(BackpressureStrategy.LATEST)
-            }
-            .loadEpisodesAndBookmarks(episodeManager, bookmarkManager, recommendationsHandler, settings)
+
+        val recommendationsFlowable = recommendationsHandler.getRecommendationsFlowable(uuid)
+
+        Flowable.combineLatest(
+            podcastFlowable,
+            episodeSearchResults.toFlowable(BackpressureStrategy.LATEST),
+            bookmarkSearchResults.toFlowable(BackpressureStrategy.LATEST),
+            recommendationsFlowable,
+        ) { podcast, episodeSearch, bookmarkSearch, recommendations ->
+            CombinedData(
+                podcast = podcast,
+                showingArchived = podcast.showArchived,
+                episodeSearchResult = episodeSearch,
+                bookmarkSearchResult = bookmarkSearch,
+                recommendationsResult = recommendations,
+            )
+        }
+            .buildUiState(episodeManager, bookmarkManager, recommendationsHandler, settings)
             .doOnNext {
                 if (it is UiState.Loaded) {
                     val groups = it.podcast.grouping.formGroups(it.episodes, it.podcast, resources)
@@ -736,21 +737,22 @@ private fun Maybe<Podcast>.filterKeepSubscribed(): Maybe<Podcast> {
 
 private class EpisodeLimitPlaceholder
 
-private data class CombinedEpisodeAndBookmarkData(
+private data class CombinedData(
     val podcast: Podcast,
     val showingArchived: Boolean,
     val episodeSearchResult: SearchHandler.SearchResult,
     val bookmarkSearchResult: SearchHandler.SearchResult,
+    val recommendationsResult: RecommendationsResult,
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
-private fun Flowable<CombinedEpisodeAndBookmarkData>.loadEpisodesAndBookmarks(
+private fun Flowable<CombinedData>.buildUiState(
     episodeManager: EpisodeManager,
     bookmarkManager: BookmarkManager,
     recommendationsHandler: RecommendationsHandler,
     settings: Settings,
 ): Flowable<PodcastViewModel.UiState> {
-    return this.switchMap { (podcast, showArchived, episodeSearchResults, bookmarkSearchResults) ->
+    return this.switchMap { (podcast, showArchived, episodeSearchResults, bookmarkSearchResults, recommendationsResult) ->
         LogBuffer.i(
             LogBuffer.TAG_BACKGROUND_TASKS,
             "Observing podcast ${podcast.uuid} episode changes",
@@ -780,8 +782,7 @@ private fun Flowable<CombinedEpisodeAndBookmarkData>.loadEpisodesAndBookmarks(
                     { bookmarkSearchResults.searchUuids?.contains(it.uuid) ?: false },
                     searchResults = bookmarkSearchResults,
                 ),
-            recommendationsHandler.getRecommendationsFlowable(podcast),
-        ) { (searchList, episodeList), (bookmarks, _), recommendations ->
+        ) { (searchList, episodeList), (bookmarks, _) ->
             val episodeCount = episodeList.size
             val archivedCount = episodeList.count { it.isArchived }
             val showArchivedWithSearch = episodeSearchResults.searchUuids != null || showArchived
@@ -815,7 +816,7 @@ private fun Flowable<CombinedEpisodeAndBookmarkData>.loadEpisodesAndBookmarks(
                 podcast = podcast,
                 episodes = filteredList,
                 bookmarks = bookmarks,
-                recommendations = recommendations,
+                recommendations = recommendationsResult,
                 showingArchived = showArchivedWithSearch,
                 episodeCount = episodeCount,
                 archivedCount = archivedCount,
