@@ -226,7 +226,6 @@ enum class Feature(
         hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
     ),
-    ;
 
     // This is set of features used only for testing purposes.
     TEST_FREE_FEATURE(

@@ -2,11 +2,11 @@ package au.com.shiftyjelly.pocketcasts.discover.util
 
 import android.content.res.Resources
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.servers.model.Discover
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRow
 import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
 import au.com.shiftyjelly.pocketcasts.servers.model.transformWithRegion
-import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -20,7 +20,7 @@ class DiscoverDeepLinkManager @Inject constructor(
     }
 
     suspend fun getDiscoverList(listId: String, resources: Resources): NetworkLoadableList? = withContext(Dispatchers.IO) {
-        val discover: Discover = repository.getDiscoverFeedSuspend()
+        val discover: Discover = repository.getDiscoverFeed()
         val currentRegionCode: String = settings.discoverCountryCode.value
         val defaultRegion: String = discover.defaultRegionCode
         val region = discover.regions[currentRegionCode] ?: discover.regions[defaultRegion] ?: return@withContext null

@@ -15,6 +15,8 @@ import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlans
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.payment.flatMap
 import au.com.shiftyjelly.pocketcasts.payment.getOrNull
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManager
+import au.com.shiftyjelly.pocketcasts.repositories.notification.OnboardingNotificationType
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -32,12 +34,11 @@ import kotlinx.coroutines.launch
 class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
     private val paymentClient: PaymentClient,
     private val analyticsTracker: AnalyticsTracker,
-       private val notificationManager: NotificationManager,
+    private val notificationManager: NotificationManager,
     @Assisted private val flow: OnboardingFlow,
 ) : ViewModel() {
     private val _state = MutableStateFlow<OnboardingUpgradeFeaturesState>(OnboardingUpgradeFeaturesState.Loading)
     val state = _state.asStateFlow()
- 
 
     init {
         viewModelScope.launch {

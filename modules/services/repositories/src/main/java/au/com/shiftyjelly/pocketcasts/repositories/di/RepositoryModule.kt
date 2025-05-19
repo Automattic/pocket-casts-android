@@ -202,9 +202,6 @@ abstract class RepositoryModule {
     abstract fun providePurchaseApprover(approver: ServerPurchaseApprover): PurchaseApprover
 
     @Binds
-    abstract fun provideUpNextHistoryManager(upNextHistoryManagerImpl: UpNextHistoryManagerImpl): UpNextHistoryManager
-
-    @Binds
     abstract fun provideNotificationManager(notificationManagerImpl: NotificationManagerImpl): NotificationManager
 
     @Binds
