@@ -105,13 +105,37 @@ class NotificationHelperImpl @Inject constructor(@ApplicationContext private val
         }
         channelList.add(fixDownloadsCompleteChannel)
 
-        val onboardingChannel = NotificationChannel(Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_ONBOARDING.id, "Onboarding", NotificationManager.IMPORTANCE_DEFAULT).apply {
-            description = context.getString(LR.string.notification_channel_description_onboarding)
+        val dailyRemindersChannel = NotificationChannel(Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_DAILY_REMINDERS.id, "Daily Reminders", NotificationManager.IMPORTANCE_DEFAULT).apply {
+            description = context.getString(LR.string.notification_channel_description_daily_reminders)
             setShowBadge(false)
             enableVibration(true)
             lockscreenVisibility = Notification.VISIBILITY_PUBLIC
         }
-        channelList.add(onboardingChannel)
+        channelList.add(dailyRemindersChannel)
+
+        val trendingAndRecommendationsChannel = NotificationChannel(Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_TRENDING_AND_RECOMMENDATIONS.id, "Trending & Recommendations", NotificationManager.IMPORTANCE_DEFAULT).apply {
+            description = context.getString(LR.string.notification_channel_description_trending_and_recommendations)
+            setShowBadge(false)
+            enableVibration(true)
+            lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+        }
+        channelList.add(trendingAndRecommendationsChannel)
+
+        val newFeaturesAndTipsChannel = NotificationChannel(Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_NEW_FEATURES_AND_TIPS.id, "New Features & Tips", NotificationManager.IMPORTANCE_DEFAULT).apply {
+            description = context.getString(LR.string.notification_channel_description_new_features_and_tips)
+            setShowBadge(false)
+            enableVibration(true)
+            lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+        }
+        channelList.add(newFeaturesAndTipsChannel)
+
+        val offersChannel = NotificationChannel(Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_OFFERS.id, "Offers", NotificationManager.IMPORTANCE_DEFAULT).apply {
+            description = context.getString(LR.string.notification_channel_description_offers)
+            setShowBadge(false)
+            enableVibration(true)
+            lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+        }
+        channelList.add(offersChannel)
 
         notificationManager.createNotificationChannels(channelList)
     }
@@ -148,8 +172,20 @@ class NotificationHelperImpl @Inject constructor(@ApplicationContext private val
         return NotificationCompat.Builder(context, Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_FIX_DOWNLOADS_COMPLETE.id)
     }
 
-    override fun onboardingChannelBuilder(): NotificationCompat.Builder {
-        return NotificationCompat.Builder(context, Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_ONBOARDING.id)
+    override fun dailyRemindersChannelBuilder(): NotificationCompat.Builder {
+        return NotificationCompat.Builder(context, Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_DAILY_REMINDERS.id)
+    }
+
+    override fun trendingAndRecommendationsChannelBuilder(): NotificationCompat.Builder {
+        return NotificationCompat.Builder(context, Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_TRENDING_AND_RECOMMENDATIONS.id)
+    }
+
+    override fun featuresAndTipsChannelBuilder(): NotificationCompat.Builder {
+        return NotificationCompat.Builder(context, Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_NEW_FEATURES_AND_TIPS.id)
+    }
+
+    override fun offersChannelBuilder(): NotificationCompat.Builder {
+        return NotificationCompat.Builder(context, Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_OFFERS.id)
     }
 
     /**

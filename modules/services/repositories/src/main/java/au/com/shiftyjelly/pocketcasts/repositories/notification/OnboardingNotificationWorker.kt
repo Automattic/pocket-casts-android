@@ -51,7 +51,7 @@ class OnboardingNotificationWorker @AssistedInject constructor(
     }
 
     private fun getNotificationBuilder(type: OnboardingNotificationType): NotificationCompat.Builder {
-        return notificationHelper.onboardingChannelBuilder()
+        return notificationHelper.dailyRemindersChannelBuilder()
             .setSmallIcon(IR.drawable.notification)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setContentTitle(applicationContext.resources.getString(type.titleRes))
