@@ -82,7 +82,7 @@ object LocaliseHelper {
         "popular in [regionname]" to R.string.discover_popular_in,
         "most popular in [category]" to R.string.discover_most_popular_in,
         "loved by listeners of" to R.string.recommendations_loved_by_listeners,
-        "if you like" to R.string.recommendations_if_you_like,
+        "because you like" to R.string.recommendations_because_you_like,
     )
 
     private val serverMessageIdToStringId = mapOf(

@@ -44,6 +44,7 @@ class RecommendationsHandler @Inject constructor(
                 if (enabled) {
                     getRecommendationsMaybe(podcastUuid)
                         .toFlowable()
+                        .removePodcast(podcastUuid)
                         .addSubscribedStatusFlowable()
                         .map { listFeed ->
                             if (listFeed.podcasts.isNullOrEmpty()) {
@@ -67,6 +68,13 @@ class RecommendationsHandler @Inject constructor(
             podcastUuid = podcastUuid,
             countryCode = settings.discoverCountryCode.value,
         )
+    }
+
+    private fun Flowable<ListFeed>.removePodcast(podcastUuid: String): Flowable<ListFeed> {
+        return map { list ->
+            val filteredPodcasts = list.podcasts?.filter { it.uuid != podcastUuid }
+            list.copy(podcasts = filteredPodcasts)
+        }
     }
 
     private fun Flowable<ListFeed>.addSubscribedStatusFlowable(): Flowable<ListFeed> {
