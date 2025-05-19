@@ -47,6 +47,8 @@ class AppLifecycleObserverTest {
 
     @Mock private lateinit var autoDownloadOnFollowPodcastSetting: UserSetting<Boolean>
 
+    @Mock private lateinit var dailyRemindersNotificationSetting: UserSetting<Boolean>
+
     @Mock private lateinit var appLifecycleAnalytics: AppLifecycleAnalytics
 
     @Mock private lateinit var preferencesFeatureProvider: PreferencesFeatureProvider
@@ -67,6 +69,7 @@ class AppLifecycleObserverTest {
     fun setUp() {
         whenever(settings.autoPlayNextEpisodeOnEmpty).thenReturn(autoPlayNextEpisodeSetting)
         whenever(settings.autoDownloadOnFollowPodcast).thenReturn(autoDownloadOnFollowPodcastSetting)
+        whenever(settings.dailyRemindersNotification).thenReturn(dailyRemindersNotificationSetting)
         whenever(settings.useDarkUpNextTheme).thenReturn(useUpNextDarkThemeSetting)
         whenever(settings.showPodcastsRecentlyPlayedSortOrderTooltip).thenReturn(showPodcastsRecentlyPlayedSortOrderSetting)
         whenever(settings.showFreeAccountEncouragement).thenReturn(showAccountEncouragementSetting)
@@ -101,6 +104,7 @@ class AppLifecycleObserverTest {
         verify(appLifecycleAnalytics).onNewApplicationInstall()
         verify(autoPlayNextEpisodeSetting).set(true, updateModifiedAt = false)
         verify(autoDownloadOnFollowPodcastSetting).set(true, updateModifiedAt = false)
+        verify(dailyRemindersNotificationSetting).set(true, updateModifiedAt = false)
         verify(useUpNextDarkThemeSetting).set(false, updateModifiedAt = false)
 
         verify(appLifecycleAnalytics, never()).onApplicationUpgrade(any())
@@ -119,6 +123,7 @@ class AppLifecycleObserverTest {
 
         verify(autoPlayNextEpisodeSetting, never()).set(any(), any(), any(), any())
         verify(autoDownloadOnFollowPodcastSetting, never()).set(any(), any(), any(), any())
+        verify(dailyRemindersNotificationSetting, never()).set(any(), any(), any(), any())
         verify(useUpNextDarkThemeSetting).set(false, updateModifiedAt = false)
         verify(appLifecycleAnalytics, never()).onApplicationUpgrade(any())
     }
@@ -136,6 +141,7 @@ class AppLifecycleObserverTest {
 
         verify(autoPlayNextEpisodeSetting, never()).set(any(), any(), any(), any())
         verify(autoDownloadOnFollowPodcastSetting, never()).set(any(), any(), any(), any())
+        verify(dailyRemindersNotificationSetting, never()).set(any(), any(), any(), any())
         verify(useUpNextDarkThemeSetting).set(false, updateModifiedAt = false)
         verify(appLifecycleAnalytics, never()).onApplicationUpgrade(any())
     }
@@ -153,6 +159,7 @@ class AppLifecycleObserverTest {
         verify(appLifecycleAnalytics, never()).onNewApplicationInstall()
         verify(autoPlayNextEpisodeSetting, never()).set(any(), any(), any(), any())
         verify(autoDownloadOnFollowPodcastSetting, never()).set(any(), any(), any(), any())
+        verify(dailyRemindersNotificationSetting, never()).set(any(), any(), any(), any())
         verify(useUpNextDarkThemeSetting, never()).set(any(), any(), any(), any())
     }
 }

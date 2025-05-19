@@ -121,6 +121,9 @@ class AppLifecycleObserver constructor(
 
                     // For new users we want to auto download on follow podcast by default
                     settings.autoDownloadOnFollowPodcast.set(true, updateModifiedAt = false)
+
+                    // For new users we want to enable the daily reminders notification by default
+                    settings.dailyRemindersNotification.set(true, updateModifiedAt = false)
                 }
             }
         } else if (previousVersionCode < versionCode) {
