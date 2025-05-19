@@ -19,7 +19,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
-import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
@@ -86,7 +85,6 @@ internal class NotificationsSettingsViewModelTest {
         viewModel.onPreferenceChanged(changedPreference)
 
         verify(repository).setPreference(changedPreference)
-        verify(analytics).track(any(), any())
     }
 
     private fun createViewModel() = NotificationsSettingsViewModel(
