@@ -55,6 +55,8 @@ fun TooltipPopup(
     onClick: (() -> Unit)? = null,
     onClickOutside: (() -> Unit)? = null,
 ) {
+    // We're adding additional padding to the popup box in order to prevent shadow clipping.
+    // There's no API to determine how much padding is needed. We just eyeball it to 150%.
     val elevationPadding = elevation * 1.5f
     Popup(
         popupPositionProvider = rememberTooltipPositionProvider(tipPosition, anchorOffset, elevationPadding),
