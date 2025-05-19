@@ -5,24 +5,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.fragment.compose.AndroidFragment
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
@@ -33,14 +25,7 @@ import au.com.shiftyjelly.pocketcasts.settings.notifications.components.Notifica
 import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreferenceType
 import au.com.shiftyjelly.pocketcasts.settings.util.TextResource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.views.fragments.PodcastSelectFragment
-import au.com.shiftyjelly.pocketcasts.views.fragments.PodcastSelectFragmentSource
 import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreferenceCategory as CategoryModel
-
-@Stable
-class OnBackPressHandlerHolder(
-    var onBackPress: () -> Boolean,
-)
 
 @Composable
 internal fun NotificationsSettingsScreen(
@@ -48,41 +33,20 @@ internal fun NotificationsSettingsScreen(
     onPreferenceChanged: (NotificationPreferenceType) -> Unit,
     onAdvancedSettingsClicked: () -> Unit,
     onSelectRingtoneClicked: (String?) -> Unit,
-    onBackPressHandlerHolder: OnBackPressHandlerHolder,
+    onSelectPodcastsClicked: () -> Unit,
     onBackPressed: () -> Unit,
     bottomInset: Dp,
     modifier: Modifier = Modifier,
 ) {
-    // Unfortunately, PodcastSelectFragment was meant to be used from another fragment that defines a toolbar.
-    // This flag is used to determine whether we should render the podcast selector inside this composable and change toolbar title and override back navigation when necessary.
-    var isShowingPodcastSelector by rememberSaveable { mutableStateOf(false) }
-
-    LaunchedEffect(isShowingPodcastSelector) {
-        onBackPressHandlerHolder.onBackPress = {
-            if (isShowingPodcastSelector) {
-                isShowingPodcastSelector = false
-                true
-            } else {
-                false
-            }
-        }
-    }
-
     Column(
         modifier = modifier
             .background(MaterialTheme.theme.colors.primaryUi02)
             .fillMaxHeight(),
     ) {
         ThemedTopAppBar(
-            title = stringResource(if (isShowingPodcastSelector) R.string.settings_select_podcasts else R.string.settings_title_notifications),
+            title = stringResource(R.string.settings_title_notifications),
             bottomShadow = true,
-            onNavigationClick = {
-                if (isShowingPodcastSelector) {
-                    isShowingPodcastSelector = false
-                } else {
-                    onBackPressed()
-                }
-            },
+            onNavigationClick = onBackPressed,
         )
 
         Box {
@@ -101,7 +65,7 @@ internal fun NotificationsSettingsScreen(
                                     }
 
                                     is NotificationPreferenceType.NotifyOnThesePodcasts -> {
-                                        isShowingPodcastSelector = true
+                                        onSelectPodcastsClicked()
                                     }
 
                                     is NotificationPreferenceType.NotificationSoundPreference -> {
@@ -116,13 +80,6 @@ internal fun NotificationsSettingsScreen(
                         )
                     }
                 }
-            }
-            if (isShowingPodcastSelector) {
-                AndroidFragment(
-                    modifier = Modifier.fillMaxSize(),
-                    clazz = PodcastSelectFragment::class.java,
-                    arguments = PodcastSelectFragment.createArgs(source = PodcastSelectFragmentSource.NOTIFICATIONS),
-                )
             }
         }
     }
@@ -166,6 +123,6 @@ private fun PreviewNotificationSettingsScreen(@PreviewParameter(ThemePreviewPara
             onBackPressed = {},
             bottomInset = 0.dp,
             onSelectRingtoneClicked = {},
-            onBackPressHandlerHolder = OnBackPressHandlerHolder { false },
+            onSelectPodcastsClicked = {},
         )
     }
