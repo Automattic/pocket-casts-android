@@ -55,8 +55,9 @@ fun TooltipPopup(
     onClick: (() -> Unit)? = null,
     onClickOutside: (() -> Unit)? = null,
 ) {
+    val elevationPadding = elevation * 1.5f
     Popup(
-        popupPositionProvider = rememberTooltipPositionProvider(tipPosition, anchorOffset, elevation),
+        popupPositionProvider = rememberTooltipPositionProvider(tipPosition, anchorOffset, elevationPadding),
         properties = properties,
         onDismissRequest = onClickOutside,
     ) {
@@ -64,7 +65,7 @@ fun TooltipPopup(
             visible = show,
             enter = fadeIn(),
             exit = fadeOut(),
-            modifier = Modifier.padding(elevation),
+            modifier = Modifier.padding(elevationPadding),
         ) {
             Tooltip(
                 title = title,
