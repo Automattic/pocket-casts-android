@@ -196,19 +196,48 @@ private class TooltipPositionProvider(
         layoutDirection: LayoutDirection,
         popupContentSize: IntSize,
     ): IntOffset {
+        val normalizedTipPosition = tipPosition.normalize(layoutDirection)
         val elevationPx = density.run { elevation.roundToPx() }
-        return anchorOffset + when (tipPosition.normalize(layoutDirection)) {
+
+        return anchorOffset + when (normalizedTipPosition) {
             TipPosition.TopStart -> {
-                val tipOffset = IntOffset(density.run { CornerTipPeakPosition.roundToPx() }, 0)
                 val elevationOffset = IntOffset(elevationPx, elevationPx)
+                val tipOffset = IntOffset(density.run { CornerTipPeakPosition.roundToPx() }, 0)
                 anchorBounds.bottomCenter - elevationOffset - tipOffset
             }
 
-            TipPosition.TopCenter -> anchorBounds.bottomCenter
-            TipPosition.TopEnd -> anchorBounds.topCenter
-            TipPosition.BottomStart -> anchorBounds.topCenter
-            TipPosition.BottomCenter -> anchorBounds.topCenter
-            TipPosition.BottomEnd -> anchorBounds.topCenter
+            TipPosition.TopCenter -> {
+                val elevationOffset = IntOffset(0, elevationPx)
+                val contentOffset = IntOffset(popupContentSize.width / 2, 0)
+                anchorBounds.bottomCenter - elevationOffset - contentOffset
+            }
+
+            TipPosition.TopEnd -> {
+                val elevationOffset = IntOffset(-elevationPx, elevationPx)
+                val contentOffset = IntOffset(popupContentSize.width, 0)
+                val tipOffset = IntOffset(density.run { CornerTipPeakPosition.roundToPx() }, 0)
+                anchorBounds.bottomCenter - elevationOffset - contentOffset + tipOffset
+            }
+
+            TipPosition.BottomStart -> {
+                val elevationOffset = IntOffset(elevationPx, -elevationPx)
+                val contentOffset = IntOffset(0, popupContentSize.height)
+                val tipOffset = IntOffset(density.run { CornerTipPeakPosition.roundToPx() }, 0)
+                anchorBounds.topCenter - elevationOffset - contentOffset - tipOffset
+            }
+
+            TipPosition.BottomCenter -> {
+                val elevationOffset = IntOffset(0, -elevationPx)
+                val contentOffset = IntOffset(popupContentSize.width / 2, popupContentSize.height)
+                anchorBounds.topCenter - elevationOffset - contentOffset
+            }
+
+            TipPosition.BottomEnd -> {
+                val elevationOffset = IntOffset(elevationPx, elevationPx)
+                val contentOffset = IntOffset(popupContentSize.width, popupContentSize.height)
+                val tipOffset = IntOffset(density.run { CornerTipPeakPosition.roundToPx() }, 0)
+                anchorBounds.topCenter + elevationOffset - contentOffset + tipOffset
+            }
         }
     }
 }
@@ -380,11 +409,12 @@ private val TipHeight = 13.dp
 private val CornerTipWidth = 40.dp
 private val CornerTipPeakPosition = 16.5.dp
 private val CenterTipWidth = 47.dp
+private val CenterPeakPosition = 23.5.dp
 private val CornerRadius = 10.dp
 
 @Preview
 @Composable
-private fun Tooltip2ThemePreview(
+private fun TooltipThemePreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppThemeWithBackground(themeType) {
@@ -403,7 +433,7 @@ private fun Tooltip2ThemePreview(
 
 @Preview
 @Composable
-private fun Tooltip2TipPreview(
+private fun TooltipTipPreview(
     @PreviewParameter(TipPositionParameterProvider::class) tipPosition: TipPosition,
 ) {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
