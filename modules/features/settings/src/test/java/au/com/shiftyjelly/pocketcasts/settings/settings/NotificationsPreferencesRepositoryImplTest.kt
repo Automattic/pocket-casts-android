@@ -12,14 +12,9 @@ import au.com.shiftyjelly.pocketcasts.settings.notifications.data.NotificationsC
 import au.com.shiftyjelly.pocketcasts.settings.notifications.data.NotificationsPreferencesRepositoryImpl
 import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreferenceType
 import au.com.shiftyjelly.pocketcasts.settings.util.TextResource
-import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
@@ -32,10 +27,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @RunWith(MockitoJUnitRunner::class)
-@OptIn(ExperimentalCoroutinesApi::class)
 class NotificationsPreferencesRepositoryImplTest {
-
-    private val dispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
 
     @Mock
     private lateinit var context: Context
@@ -45,9 +37,6 @@ class NotificationsPreferencesRepositoryImplTest {
 
     @Mock
     private lateinit var podcastManager: PodcastManager
-
-    @get:Rule
-    val coroutineRule = MainCoroutineRule()
 
     @Before
     fun setup() {
@@ -123,7 +112,6 @@ class NotificationsPreferencesRepositoryImplTest {
         }
 
         return NotificationsPreferencesRepositoryImpl(
-            dispatcher = dispatcher,
             context = context,
             settings = settings,
             podcastManager = podcastManager,

@@ -22,7 +22,6 @@ import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.stub
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -69,8 +68,6 @@ internal class NotificationsSettingsViewModelTest {
 
             assertEquals(state.categories, otherCategories)
         }
-
-        verify(repository, times(2)).getPreferenceCategories()
     }
 
     @Test
@@ -90,7 +87,6 @@ internal class NotificationsSettingsViewModelTest {
 
         verify(repository).setPreference(changedPreference)
         verify(analytics).track(any(), any())
-        verify(repository, times(2)).getPreferenceCategories()
     }
 
     private fun createViewModel() = NotificationsSettingsViewModel(

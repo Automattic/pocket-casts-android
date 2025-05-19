@@ -179,7 +179,7 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
 
             is NotificationPreferenceType.AdvancedSettings,
             is NotificationPreferenceType.NotifyOnThesePodcasts,
-            -> Unit // these are not on us to set
+            -> Unit
         }
     }
 }

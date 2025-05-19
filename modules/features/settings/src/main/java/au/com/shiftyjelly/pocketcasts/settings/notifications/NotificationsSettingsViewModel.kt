@@ -13,12 +13,11 @@ import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationP
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import kotlinx.coroutines.withContext
 
 @HiltViewModel
 internal class NotificationsSettingsViewModel @Inject constructor(
@@ -123,14 +122,10 @@ internal class NotificationsSettingsViewModel @Inject constructor(
         }
     }
 
-    internal suspend fun getSelectedPodcastIds(): List<String> = runCatching {
-        viewModelScope.async(Dispatchers.Default) {
-            val uuids = podcastManager.findSubscribedBlocking().filter { it.isShowNotifications }.map { it.uuid }
-            uuids
-        }.await()
-    }.onFailure {
-        Timber.d("Failed to get selected podcast ids: $it")
-    }.getOrDefault(emptyList())
+    internal suspend fun getSelectedPodcastIds(): List<String> = withContext(Dispatchers.IO) {
+        val uuids = podcastManager.findSubscribedBlocking().filter { it.isShowNotifications }.map { it.uuid }
+        uuids
+    }
 
     internal data class State(
         val categories: List<NotificationPreferenceCategory>,

@@ -26,7 +26,6 @@ import com.afollestad.materialdialogs.list.listItemsMultiChoice
 import com.afollestad.materialdialogs.list.updateListItemsMultiChoice
 import okhttp3.internal.toImmutableList
 
-@Suppress("UNCHECKED_CAST")
 @Composable
 internal fun NotificationPreferenceCategory(
     categoryTitle: String,
@@ -122,7 +121,7 @@ internal fun NotificationPreferenceCategory(
                 }
 
                 is NotificationPreferenceType.NotificationActions -> {
-                    val activity = LocalContext.current
+                    val context = LocalContext.current
                     SettingRow(
                         primaryText = item.title.asString(),
                         secondaryText = item.displayValue,
@@ -132,12 +131,12 @@ internal fun NotificationPreferenceCategory(
                             val initialSelection = selectedActions.map(NewEpisodeNotificationAction::ordinal).toIntArray()
                             val onSelect: MultiChoiceListener = { dialog, _, items ->
                                 selectedActions.clear()
-                                selectedActions.addAll(NewEpisodeNotificationAction.fromLabels(items.map { it.toString() }, activity.resources))
+                                selectedActions.addAll(NewEpisodeNotificationAction.fromLabels(items.map { it.toString() }, context.resources))
                                 changeActionsDialog(3, selectedActions, dialog)
                             }
-                            val dialog = MaterialDialog(activity)
+                            val dialog = MaterialDialog(context)
                                 .listItemsMultiChoice(
-                                    items = NewEpisodeNotificationAction.labels(activity.resources),
+                                    items = NewEpisodeNotificationAction.labels(context.resources),
                                     waitForPositiveButton = false,
                                     allowEmptySelection = true,
                                     initialSelection = initialSelection,
