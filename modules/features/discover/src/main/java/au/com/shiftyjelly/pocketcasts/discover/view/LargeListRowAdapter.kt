@@ -10,13 +10,16 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsParameter.listDate
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsParameter.listId
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsParameter.podcastUuid
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.discoverListPodcastSubscribed
+import au.com.shiftyjelly.pocketcasts.analytics.discoverListPodcastTapped
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.extensions.updateSubscribeButtonIcon
 import au.com.shiftyjelly.pocketcasts.discover.util.DISCOVER_PODCAST_DIFF_CALLBACK
-import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.LIST_ID_KEY
-import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.PODCAST_UUID_KEY
+import au.com.shiftyjelly.pocketcasts.discover.viewmodel.PodcastList
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory.PlaceholderType
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
@@ -27,11 +30,11 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 internal class LargeListRowAdapter(
     context: Context,
-    val onPodcastClicked: ((DiscoverPodcast, String?) -> Unit),
-    val onPodcastSubscribe: ((DiscoverPodcast, String?) -> Unit),
+    val onPodcastClicked: ((DiscoverPodcast, String?, String?) -> Unit),
+    val onPodcastSubscribe: ((DiscoverPodcast, String?, String?) -> Unit),
     private val analyticsTracker: AnalyticsTracker,
 ) : ListAdapter<Any, LargeListRowAdapter.LargeListItemViewHolder>(DISCOVER_PODCAST_DIFF_CALLBACK) {
-    private var fromListId: String? = null
+    var list: PodcastList? = null
 
     class LargeListItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val placeholderDrawable = itemView.context.getThemeDrawable(UR.attr.defaultArtworkSmall)
@@ -62,18 +65,14 @@ internal class LargeListRowAdapter(
             holder.lblSubtitle.text = podcast.author
             holder.itemView.isClickable = true
             holder.itemView.setOnClickListener {
-                fromListId?.let {
-                    analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED, mapOf(LIST_ID_KEY to it, PODCAST_UUID_KEY to podcast.uuid))
-                }
-                onPodcastClicked(podcast, fromListId)
+                analyticsTracker.discoverListPodcastTapped(podcastUuid = podcast.uuid, listId = list?.listId, listDate = list?.date)
+                onPodcastClicked(podcast, list?.listId, list?.date)
             }
             holder.btnSubscribe.isClickable = true
             holder.btnSubscribe.setOnClickListener {
                 holder.btnSubscribe.updateSubscribeButtonIcon(subscribed = true, colorSubscribed = UR.attr.contrast_01, colorUnsubscribed = UR.attr.contrast_01)
-                fromListId?.let {
-                    analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_SUBSCRIBED, mapOf(LIST_ID_KEY to it, PODCAST_UUID_KEY to podcast.uuid))
-                }
-                onPodcastSubscribe(podcast, fromListId)
+                analyticsTracker.discoverListPodcastSubscribed(podcastUuid = podcast.uuid, listId = list?.listId, listDate = list?.date)
+                onPodcastSubscribe(podcast, list?.listId, list?.date)
             }
             holder.btnSubscribe.updateSubscribeButtonIcon(subscribed = podcast.isSubscribed, colorSubscribed = UR.attr.contrast_01, colorUnsubscribed = UR.attr.contrast_01)
             holder.btnSubscribe.isVisible = true
@@ -86,11 +85,9 @@ internal class LargeListRowAdapter(
             holder.btnSubscribe.isVisible = false
         }
     }
+
     fun showLoadingList() {
         val loadingList = listOf(MutableList(NUMBER_OF_LOADING_ITEMS) { LoadingItem() })
         submitList(loadingList)
-    }
-    fun setFromListId(value: String) {
-        this.fromListId = value
     }
 }

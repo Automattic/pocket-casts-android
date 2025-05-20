@@ -15,8 +15,11 @@ import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.analytics.discoverListShowAllTapped
+import au.com.shiftyjelly.pocketcasts.analytics.discoverShowAllTapped
 import au.com.shiftyjelly.pocketcasts.discover.databinding.FragmentDiscoverBinding
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.DiscoverViewModel
+import au.com.shiftyjelly.pocketcasts.discover.viewmodel.PodcastList
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastFragment
@@ -67,12 +70,12 @@ class DiscoverFragment :
         adapter?.enablePageTracking(enable = true)
     }
 
-    override fun onPodcastClicked(podcast: DiscoverPodcast, listUuid: String?, isFeatured: Boolean) {
+    override fun onPodcastClicked(podcast: DiscoverPodcast, listUuid: String?, listDate: String?, isFeatured: Boolean) {
         val fragment = PodcastFragment.newInstance(podcastUuid = podcast.uuid, fromListUuid = listUuid, sourceView = SourceView.DISCOVER, featuredPodcast = isFeatured)
         (activity as FragmentHostListener).addFragment(fragment)
     }
 
-    override fun onPodcastSubscribe(podcast: DiscoverPodcast, listUuid: String?) {
+    override fun onPodcastSubscribe(podcast: DiscoverPodcast, listUuid: String?, listDate: String?) {
         viewModel.subscribeToPodcast(podcast)
         analyticsTracker.track(
             AnalyticsEvent.PODCAST_SUBSCRIBED,
@@ -80,19 +83,20 @@ class DiscoverFragment :
         )
     }
 
-    override fun onPodcastListClicked(list: NetworkLoadableList) {
-        val transformedList = viewModel.transformNetworkLoadableList(list, resources) // Replace any [regionCode] etc references
-        val listId = list.listUuid
+    override fun onPodcastListClicked(contentList: NetworkLoadableList, podcastList: PodcastList?) {
+        val transformedList = viewModel.transformNetworkLoadableList(contentList, resources) // Replace any [regionCode] etc references
+        val listId = contentList.listUuid
+        val listDate = podcastList?.date ?: ""
         if (listId != null) {
-            analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_SHOW_ALL_TAPPED, mapOf(LIST_ID_KEY to listId))
+            analyticsTracker.discoverListShowAllTapped(listId = listId, listDate = listDate)
         } else {
-            analyticsTracker.track(AnalyticsEvent.DISCOVER_SHOW_ALL_TAPPED, mapOf(LIST_ID_KEY to transformedList.inferredId()))
+            analyticsTracker.discoverShowAllTapped(listId = transformedList.inferredId(), listDate = listDate)
         }
-        if (list is DiscoverCategory) {
-            trackCategoryShownImpression(list)
+        if (contentList is DiscoverCategory) {
+            trackCategoryShownImpression(contentList)
         }
 
-        if (list.expandedStyle is ExpandedStyle.GridList) {
+        if (contentList.expandedStyle is ExpandedStyle.GridList) {
             val fragment = PodcastGridFragment.newInstance(transformedList)
             (activity as FragmentHostListener).addFragment(fragment)
         } else {

@@ -14,6 +14,8 @@ import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.analytics.discoverListPodcastSubscribed
+import au.com.shiftyjelly.pocketcasts.analytics.discoverListPodcastTapped
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.EPISODE_UUID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.LIST_ID_KEY
@@ -118,22 +120,19 @@ open class PodcastGridListFragment : BaseFragment(), Toolbar.OnMenuItemClickList
     protected val viewModel: PodcastListViewModel by viewModels()
 
     val onPodcastClicked: (DiscoverPodcast) -> Unit = { podcast ->
-        listUuid?.let {
-            analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED, mapOf(LIST_ID_KEY to it, PODCAST_UUID_KEY to podcast.uuid))
-        }
+        val listDate = viewModel.listFeed?.date
+        analyticsTracker.discoverListPodcastTapped(podcastUuid = podcast.uuid, listId = listUuid, listDate = listDate)
         val sourceView = when (expandedStyle) {
             is ExpandedStyle.RankedList -> SourceView.DISCOVER_RANKED_LIST
             is ExpandedStyle.PlainList -> SourceView.DISCOVER_PLAIN_LIST
             else -> SourceView.DISCOVER
         }
-        val fragment = PodcastFragment.newInstance(podcastUuid = podcast.uuid, fromListUuid = listUuid, sourceView = sourceView)
+        val fragment = PodcastFragment.newInstance(podcastUuid = podcast.uuid, fromListUuid = listUuid, fromListDate = listDate, sourceView = sourceView)
         (activity as FragmentHostListener).addFragment(fragment)
     }
 
     val onPodcastSubscribe: (String) -> Unit = { podcastUuid ->
-        listUuid?.let {
-            analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_SUBSCRIBED, mapOf(LIST_ID_KEY to it, PODCAST_UUID_KEY to podcastUuid))
-        }
+        analyticsTracker.discoverListPodcastSubscribed(podcastUuid = podcastUuid, listId = listUuid, listDate = viewModel.listFeed?.date)
         var podcastSubscribedSource = SourceView.DISCOVER
         if (expandedStyle is ExpandedStyle.RankedList) {
             podcastSubscribedSource = SourceView.DISCOVER_RANKED_LIST
