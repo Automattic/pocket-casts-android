@@ -80,7 +80,7 @@ internal class NotificationsSettingsViewModel @Inject constructor(
                 }
 
                 is NotificationPreferenceType.NotificationActions -> {
-                    val previousValue = state.value.categories.map { it.preferences }.flatten<NotificationPreferenceType>()
+                    val previousValue = state.value.categories.map { it.preferences }.flatten()
                         .find { it is NotificationPreferenceType.NotificationActions }
                     if ((previousValue as? NotificationPreferenceType.NotificationActions)?.value != preference.value) {
                         preferenceRepository.setPreference(preference)
@@ -113,6 +113,17 @@ internal class NotificationsSettingsViewModel @Inject constructor(
 
                 is NotificationPreferenceType.DailyReminderSettings -> {
                     analyticsTracker.track(AnalyticsEvent.SETTINGS_DAILY_REMINDERS_ADVANCED_SETTINGS_TAPPED)
+                }
+
+                is NotificationPreferenceType.EnableRecommendations -> {
+                    preferenceRepository.setPreference(preference)
+                    analyticsTracker.track(
+                        AnalyticsEvent.SETTINGS_NOTIFICATIONS_TRENDING_AND_RECOMMENDATIONS_TOGGLED,
+                        mapOf("enabled" to preference.isEnabled),
+                    )
+                }
+                is NotificationPreferenceType.RecommendationSettings -> {
+                    analyticsTracker.track(AnalyticsEvent.SETTINGS_TRENDING_AND_RECOMMENDATIONS_ADVANCED_SETTINGS_TAPPED)
                 }
 
                 is NotificationPreferenceType.NotifyOnThesePodcasts -> Unit

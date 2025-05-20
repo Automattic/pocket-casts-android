@@ -7,13 +7,13 @@ import javax.inject.Inject
 
 internal class NotificationFeaturesProvider(
     val hasNotificationChannels: Boolean,
-    val isRevampFeatureEnabled: Boolean
+    val isRevampFeatureEnabled: Boolean,
 ) {
     @Inject
     constructor() : this(
         hasNotificationChannels = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O,
         isRevampFeatureEnabled = FeatureFlag.isEnabled(
-            Feature.NOTIFICATIONS_REVAMP
-        )
+            Feature.NOTIFICATIONS_REVAMP,
+        ),
     )
 }

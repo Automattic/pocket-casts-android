@@ -47,6 +47,7 @@ class NotificationsPreferencesRepositoryImplTest {
         whenever(settings.playOverNotification).thenReturn(UserSetting.Mock(PlayOverNotificationSetting.DUCK, mock()))
         whenever(settings.hideNotificationOnPause).thenReturn(UserSetting.Mock(false, mock()))
         whenever(settings.dailyRemindersNotification).thenReturn(UserSetting.Mock(false, mock()))
+        whenever(settings.recommendationsNotification).thenReturn(UserSetting.Mock(false, mock()))
     }
 
     @Test
@@ -123,9 +124,30 @@ class NotificationsPreferencesRepositoryImplTest {
         assert(updatedCategories.map { it.preferences }.flatten().filterIsInstance<NotificationPreferenceType.DailyReminderSettings>().isNotEmpty())
     }
 
+    @Test
+    fun `GIVEN feature off WHEN categories queried THEN enable trending and recommendations toggle is absent`() = runTest {
+        val repository = createRepository(isRevampFeatureEnabled = false)
+
+        val categories = repository.getPreferenceCategories()
+
+        assert(categories.map { it.preferences }.flatten().filterIsInstance<NotificationPreferenceType.EnableRecommendations>().isEmpty())
+    }
+
+    @Test
+    fun `GIVEN feature ON WHEN categories queried THEN trending and recommendations settings appear when expected`() = runTest {
+        val repository = createRepository(isRevampFeatureEnabled = true)
+        val categories = repository.getPreferenceCategories()
+        assert(categories.map { it.preferences }.flatten().filterIsInstance<NotificationPreferenceType.EnableRecommendations>().isNotEmpty())
+        assert(categories.map { it.preferences }.flatten().filterIsInstance<NotificationPreferenceType.RecommendationSettings>().isEmpty())
+
+        whenever(settings.recommendationsNotification).thenReturn(UserSetting.Mock(true, mock()))
+        val updatedCategories = repository.getPreferenceCategories()
+        assert(updatedCategories.map { it.preferences }.flatten().filterIsInstance<NotificationPreferenceType.RecommendationSettings>().isNotEmpty())
+    }
+
     private fun createRepository(
         hasNotificationChannels: Boolean = true,
-        isRevampFeatureEnabled: Boolean = true
+        isRevampFeatureEnabled: Boolean = true,
     ): NotificationsPreferencesRepositoryImpl {
         if (!hasNotificationChannels) {
             val notificationSound = mock<NotificationSound>(lenient = true) {
@@ -142,7 +164,7 @@ class NotificationsPreferencesRepositoryImplTest {
             podcastManager = podcastManager,
             notificationFeaturesProvider = NotificationFeaturesProvider(
                 hasNotificationChannels = hasNotificationChannels,
-                isRevampFeatureEnabled = isRevampFeatureEnabled
+                isRevampFeatureEnabled = isRevampFeatureEnabled,
             ),
         )
     }

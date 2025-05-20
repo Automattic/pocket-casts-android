@@ -616,7 +616,9 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_NOTIFICATIONS_SOUND_CHANGED("settings_notifications_sound_changed"),
     SETTINGS_NOTIFICATIONS_VIBRATION_CHANGED("settings_notifications_vibration_changed"),
     SETTINGS_NOTIFICATIONS_DAILY_REMINDERS_TOGGLED("settings_notifications_daily_reminders_toggled"),
+    SETTINGS_NOTIFICATIONS_TRENDING_AND_RECOMMENDATIONS_TOGGLED("settings_notifications_trending_toggled"),
     SETTINGS_DAILY_REMINDERS_ADVANCED_SETTINGS_TAPPED("settings_daily_reminders_advanced_settings_tapped"),
+    SETTINGS_TRENDING_AND_RECOMMENDATIONS_ADVANCED_SETTINGS_TAPPED("settings_trending_advanced_settings_tapped"),
 
     /* Settings - Storage & Data Use */
     SETTINGS_STORAGE_SHOWN("settings_storage_shown"),

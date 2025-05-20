@@ -69,7 +69,7 @@ class SettingsAppearanceViewModelTest {
             Flowable.just(
                 SignInState.SignedIn(
                     email = "",
-                    subscription = null
+                    subscription = null,
                 ),
             ),
         )
