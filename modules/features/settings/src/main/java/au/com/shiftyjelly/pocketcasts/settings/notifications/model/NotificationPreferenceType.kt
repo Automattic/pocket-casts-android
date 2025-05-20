@@ -56,4 +56,14 @@ internal sealed interface NotificationPreferenceType {
         override val title: TextResource,
         val isEnabled: Boolean,
     ) : NotificationPreferenceType
+
+    data class EnableDailyReminders(
+        override val title: TextResource,
+        val isEnabled: Boolean
+    ) : NotificationPreferenceType
+
+    data class DailyReminderSettings(
+        override val title: TextResource,
+        val description: TextResource,
+    ) : NotificationPreferenceType
 }

@@ -2,8 +2,7 @@ package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.models.to.SignInState
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
@@ -70,7 +69,7 @@ class SettingsAppearanceViewModelTest {
             Flowable.just(
                 SignInState.SignedIn(
                     email = "",
-                    subscriptionStatus = SubscriptionStatus.Free(),
+                    subscription = null
                 ),
             ),
         )

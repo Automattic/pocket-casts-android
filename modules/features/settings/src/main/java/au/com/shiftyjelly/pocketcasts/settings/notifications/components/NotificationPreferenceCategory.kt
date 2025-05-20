@@ -49,6 +49,18 @@ internal fun NotificationPreferenceCategory(
                         ) { onItemClicked(item.copy(isEnabled = !item.isEnabled)) },
                     )
                 }
+
+                is NotificationPreferenceType.EnableDailyReminders -> {
+                    SettingRow(
+                        primaryText = item.title.asString(),
+                        toggle = SettingRowToggle.Switch(checked = item.isEnabled),
+                        modifier = modifier.toggleable(
+                            value = item.isEnabled,
+                            role = Role.Switch,
+                        ) { onItemClicked(item.copy(isEnabled = !item.isEnabled)) },
+                    )
+                }
+
                 is NotificationPreferenceType.HidePlaybackNotificationOnPause -> {
                     SettingRow(
                         primaryText = item.title.asString(),
@@ -69,6 +81,14 @@ internal fun NotificationPreferenceCategory(
                 }
 
                 is NotificationPreferenceType.AdvancedSettings -> {
+                    SettingRow(
+                        primaryText = item.title.asString(),
+                        secondaryText = item.description.asString(),
+                        modifier = modifier.clickable { onItemClicked(item) },
+                    )
+                }
+
+                is NotificationPreferenceType.DailyReminderSettings -> {
                     SettingRow(
                         primaryText = item.title.asString(),
                         secondaryText = item.description.asString(),

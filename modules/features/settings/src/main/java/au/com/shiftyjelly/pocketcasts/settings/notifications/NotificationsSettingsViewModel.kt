@@ -103,6 +103,18 @@ internal class NotificationsSettingsViewModel @Inject constructor(
                     analyticsTracker.track(AnalyticsEvent.SETTINGS_NOTIFICATIONS_SOUND_CHANGED)
                 }
 
+                is NotificationPreferenceType.EnableDailyReminders -> {
+                    preferenceRepository.setPreference(preference)
+                    analyticsTracker.track(
+                        AnalyticsEvent.SETTINGS_NOTIFICATIONS_DAILY_REMINDERS_TOGGLED,
+                        mapOf("enabled" to preference.isEnabled),
+                    )
+                }
+
+                is NotificationPreferenceType.DailyReminderSettings -> {
+                    analyticsTracker.track(AnalyticsEvent.SETTINGS_DAILY_REMINDERS_ADVANCED_SETTINGS_TAPPED)
+                }
+
                 is NotificationPreferenceType.NotifyOnThesePodcasts -> Unit
             }
             loadPreferences()
