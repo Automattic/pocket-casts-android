@@ -24,7 +24,7 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.list.MultiChoiceListener
 import com.afollestad.materialdialogs.list.listItemsMultiChoice
 import com.afollestad.materialdialogs.list.updateListItemsMultiChoice
-import okhttp3.internal.toImmutableList
+import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 internal fun NotificationPreferenceCategory(
