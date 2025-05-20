@@ -97,6 +97,7 @@ private fun Content(
         is OnboardingFlow.PlusAccountUpgrade,
         is OnboardingFlow.PatronAccountUpgrade,
         is OnboardingFlow.Upsell,
+        is OnboardingFlow.UpsellSuggestedFolder,
         -> OnboardingNavRoute.PlusUpgrade.route
 
         is OnboardingFlow.Welcome -> OnboardingNavRoute.welcome
@@ -105,29 +106,50 @@ private fun Content(
     }
 
     val onAccountCreated: () -> Unit = {
-        when {
-            flow is OnboardingFlow.ReferralLoginOrSignUp -> {
-                exitOnboarding(OnboardingExitInfo(showWelcomeInReferralFlow = true))
+        fun goBack() {
+            navController.navigate(OnboardingRecommendationsFlow.route) {
+                // clear backstack after account is created
+                popUpTo(OnboardingNavRoute.logInOrSignUp) {
+                    inclusive = true
+                }
+            }
+        }
+
+        fun goToUpsell() {
+            navController.navigate(OnboardingNavRoute.PlusUpgrade.routeWithSource(flow.source, forcePurchase = true)) {
+                // clear backstack after account is created
+                popUpTo(OnboardingNavRoute.logInOrSignUp) {
+                    inclusive = true
+                }
+            }
+        }
+
+        when (flow) {
+            is OnboardingFlow.ReferralLoginOrSignUp -> {
+                exitOnboarding(OnboardingExitInfo.ShowReferralWelcome)
             }
 
-            flow is OnboardingFlow.Upsell && flow.source in forcedPurchaseSources -> {
-                navController.navigate(OnboardingNavRoute.PlusUpgrade.routeWithSource(flow.source, forcePurchase = true)) {
-                    // clear backstack after account is created
-                    popUpTo(OnboardingNavRoute.logInOrSignUp) {
-                        inclusive = true
-                    }
+            is OnboardingFlow.Upsell, is OnboardingFlow.UpsellSuggestedFolder -> {
+                if (flow.source in forcedPurchaseSources) {
+                    goToUpsell()
+                } else {
+                    goBack()
                 }
             }
 
             else -> {
-                navController.navigate(OnboardingRecommendationsFlow.route) {
-                    // clear backstack after account is created
-                    popUpTo(OnboardingNavRoute.logInOrSignUp) {
-                        inclusive = true
-                    }
-                }
+                goBack()
             }
         }
+    }
+
+    fun finishOnboardingFlow() {
+        val exitInfo = if (flow is OnboardingFlow.UpsellSuggestedFolder) {
+            OnboardingExitInfo.ApplySuggestedFolders(flow.action)
+        } else {
+            OnboardingExitInfo.Simple
+        }
+        exitOnboarding(exitInfo)
     }
 
     NavHost(navController, startDestination) {
@@ -136,7 +158,7 @@ private fun Content(
         onboardingRecommendationsFlowGraph(
             theme,
             flow = flow,
-            onBackPressed = { exitOnboarding(OnboardingExitInfo()) },
+            onBackPressed = { exitOnboarding(OnboardingExitInfo.Simple) },
             onComplete = {
                 navController.navigate(
                     if (signInState.isSignedInAsPlusOrPatron) {
@@ -177,7 +199,7 @@ private fun Content(
                     },
                     onClose = {
                         viewModel.onDismissClick()
-                        exitOnboarding(OnboardingExitInfo())
+                        exitOnboarding(OnboardingExitInfo.Simple)
                     },
                     onBenefitShown = { benefit ->
                         viewModel.onBenefitShown(benefit.analyticsValue)
@@ -202,10 +224,11 @@ private fun Content(
                         is OnboardingFlow.AccountEncouragement,
                         is OnboardingFlow.PlusAccountUpgradeNeedsLogin,
                         is OnboardingFlow.Upsell,
+                        is OnboardingFlow.UpsellSuggestedFolder,
                         -> {
                             val popped = navController.popBackStack()
                             if (!popped) {
-                                exitOnboarding(OnboardingExitInfo())
+                                exitOnboarding(OnboardingExitInfo.Simple)
                             }
                         }
 
@@ -213,7 +236,7 @@ private fun Content(
                         is OnboardingFlow.LoggedOut,
                         is OnboardingFlow.EngageSdk,
                         is OnboardingFlow.ReferralLoginOrSignUp,
-                        -> exitOnboarding(OnboardingExitInfo())
+                        -> exitOnboarding(OnboardingExitInfo.Simple)
                     }
                 },
                 onSignUpClicked = { navController.navigate(OnboardingNavRoute.createFreeAccount) },
@@ -254,7 +277,7 @@ private fun Content(
             OnboardingForgotPasswordPage(
                 theme = theme,
                 onBackPressed = { navController.popBackStack() },
-                onCompleted = { exitOnboarding(OnboardingExitInfo()) },
+                onCompleted = { exitOnboarding(OnboardingExitInfo.Simple) },
                 onUpdateSystemBars = onUpdateSystemBars,
             )
         }
@@ -266,12 +289,23 @@ private fun Content(
                     type = NavType.EnumType(OnboardingUpgradeSource::class.java)
                     /* Set default value for onboarding flows with startDestination. */
                     when (flow) {
+                        is OnboardingFlow.PatronAccountUpgrade,
                         is OnboardingFlow.PlusAccountUpgrade,
                         is OnboardingFlow.Upsell,
-                        is OnboardingFlow.PatronAccountUpgrade,
-                        -> defaultValue = flow.source
+                        is OnboardingFlow.UpsellSuggestedFolder,
+                        -> {
+                            defaultValue = flow.source
+                        }
 
-                        else -> Unit // Not a startDestination, default value should not be set.
+                        // Not a startDestination, default value should not be set.
+                        is OnboardingFlow.AccountEncouragement,
+                        is OnboardingFlow.EngageSdk,
+                        is OnboardingFlow.InitialOnboarding,
+                        is OnboardingFlow.LoggedOut,
+                        is OnboardingFlow.PlusAccountUpgradeNeedsLogin,
+                        is OnboardingFlow.ReferralLoginOrSignUp,
+                        is OnboardingFlow.Welcome,
+                        -> Unit
                     }
                 },
                 navArgument(OnboardingNavRoute.PlusUpgrade.forcePurchaseArgumentKey) {
@@ -328,7 +362,7 @@ private fun Content(
                     if (userCreatedNewAccount) {
                         navController.popBackStack()
                     } else {
-                        exitOnboarding(OnboardingExitInfo())
+                        exitOnboarding(OnboardingExitInfo.Simple)
                     }
                 },
                 onNeedLogin = { navController.navigate(OnboardingNavRoute.logInOrSignUp) },
@@ -336,7 +370,7 @@ private fun Content(
                     if (userCreatedNewAccount || forcePurchase) {
                         navController.navigate(OnboardingNavRoute.welcome)
                     } else {
-                        exitOnboarding(OnboardingExitInfo())
+                        finishOnboardingFlow()
                     }
                 },
                 onUpdateSystemBars = onUpdateSystemBars,
@@ -348,13 +382,15 @@ private fun Content(
                 theme = theme,
                 flow = flow,
                 isSignedInAsPlusOrPatron = signInState.isSignedInAsPlusOrPatron,
-                onDone = { exitOnboarding(OnboardingExitInfo()) },
+                onDone = {
+                    finishOnboardingFlow()
+                },
                 onContinueToDiscover = completeOnboardingToDiscover,
                 onImportTapped = { navController.navigate(OnboardingImportFlow.route) },
                 onBackPressed = {
                     // Don't allow navigation back to the upgrade screen after the user upgrades
                     if (signInState.isSignedInAsPlusOrPatron) {
-                        exitOnboarding(OnboardingExitInfo())
+                        finishOnboardingFlow()
                     } else {
                         navController.popBackStack()
                     }
@@ -376,9 +412,9 @@ private fun onLoginToExistingAccount(
         is OnboardingFlow.InitialOnboarding,
         is OnboardingFlow.LoggedOut,
         is OnboardingFlow.EngageSdk,
-        -> exitOnboarding(OnboardingExitInfo(showPlusPromotionForFreeUser = true))
+        -> exitOnboarding(OnboardingExitInfo.ShowPlusPromotion)
 
-        is OnboardingFlow.ReferralLoginOrSignUp -> exitOnboarding(OnboardingExitInfo(showPlusPromotionForFreeUser = false))
+        is OnboardingFlow.ReferralLoginOrSignUp -> exitOnboarding(OnboardingExitInfo.Simple)
 
         // this should never happens, login is not initiated from welcome screen
         is OnboardingFlow.Welcome -> Unit
@@ -387,6 +423,7 @@ private fun onLoginToExistingAccount(
         is OnboardingFlow.PatronAccountUpgrade,
         is OnboardingFlow.PlusAccountUpgradeNeedsLogin,
         is OnboardingFlow.Upsell,
+        is OnboardingFlow.UpsellSuggestedFolder,
         -> {
             if (subscription == null) {
                 navController.navigate(OnboardingNavRoute.PlusUpgrade.routeWithSource(OnboardingUpgradeSource.LOGIN)) {
@@ -394,7 +431,12 @@ private fun onLoginToExistingAccount(
                     popUpTo(OnboardingNavRoute.logInOrSignUp) { inclusive = true }
                 }
             } else {
-                exitOnboarding(OnboardingExitInfo())
+                val exitInfo = if (flow is OnboardingFlow.UpsellSuggestedFolder) {
+                    OnboardingExitInfo.ApplySuggestedFolders(flow.action)
+                } else {
+                    OnboardingExitInfo.Simple
+                }
+                exitOnboarding(exitInfo)
             }
         }
     }

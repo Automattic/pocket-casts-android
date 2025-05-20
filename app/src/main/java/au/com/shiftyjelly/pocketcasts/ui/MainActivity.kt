@@ -281,22 +281,22 @@ class MainActivity :
 
     private val onboardingLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(OnboardingActivityContract()) { result ->
         when (result) {
-            OnboardingFinish.Done -> {
+            is OnboardingFinish.Done -> {
                 settings.setHasDoneInitialOnboarding()
             }
-            OnboardingFinish.DoneGoToDiscover -> {
+            is OnboardingFinish.DoneGoToDiscover -> {
                 settings.setHasDoneInitialOnboarding()
                 openTab(VR.id.navigation_discover)
             }
-            OnboardingFinish.DoneShowPlusPromotion -> {
+            is OnboardingFinish.DoneShowPlusPromotion -> {
                 settings.setHasDoneInitialOnboarding()
                 OnboardingLauncher.openOnboardingFlow(this, OnboardingFlow.Upsell(OnboardingUpgradeSource.LOGIN_PLUS_PROMOTION))
             }
-            OnboardingFinish.DoneShowWelcomeInReferralFlow -> {
+            is OnboardingFinish.DoneShowWelcomeInReferralFlow -> {
                 settings.showReferralWelcome.set(true, updateModifiedAt = false)
             }
-            null -> {
-                Timber.e("Unexpected null result from onboarding activity")
+            is OnboardingFinish.DoneApplySuggestedFolders, null -> {
+                Timber.e("Unexpected result $result from onboarding activity")
             }
         }
     }

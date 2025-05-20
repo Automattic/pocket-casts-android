@@ -54,6 +54,14 @@ sealed interface OnboardingFlow : Parcelable {
     }
 
     @Parcelize
+    data class UpsellSuggestedFolder(
+        val action: SuggestedFoldersAction,
+    ) : OnboardingFlow {
+        override val analyticsValue get() = "suggested_folders"
+        override val source get() = OnboardingUpgradeSource.SUGGESTED_FOLDERS
+    }
+
+    @Parcelize
     data class PatronAccountUpgrade(
         override val source: OnboardingUpgradeSource,
     ) : OnboardingFlow {
@@ -69,4 +77,9 @@ sealed interface OnboardingFlow : Parcelable {
     data object AccountEncouragement : OnboardingFlow {
         override val analyticsValue get() = "account_encouragement"
     }
+}
+
+enum class SuggestedFoldersAction {
+    UseSuggestion,
+    CreateCustom,
 }
