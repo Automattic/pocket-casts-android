@@ -30,15 +30,15 @@ class BookmarkUpsellViewHolder(
                     title = stringResource(LR.string.bookmarks_empty_state_title),
                     subtitle = stringResource(LR.string.bookmarks_free_user_empty_state_message),
                     iconResourceId = IR.drawable.ic_bookmark,
-                    buttonText = stringResource(LR.string.bookmarks_free_user_empty_state_button),
-                    onButtonClick = {
+                    primaryButtonText = stringResource(LR.string.bookmarks_free_user_empty_state_button),
+                    onPrimaryButtonClick = {
                         onGetBookmarksClicked()
                         val onboardingFlow = OnboardingFlow.Upsell(
                             source = OnboardingUpgradeSource.BOOKMARKS,
                         )
                         OnboardingLauncher.openOnboardingFlow(requireNotNull(context.getActivity()), onboardingFlow)
                     },
-                    modifier = Modifier.padding(vertical = 24.dp),
+                    modifier = Modifier.padding(top = 56.dp),
                 )
             }
         }
