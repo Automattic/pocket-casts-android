@@ -557,7 +557,6 @@ Language: ko_KR
     <string name="log_in_on_phone">스마트폰에서 로그인</string>
     <string name="log_in_with_google">Google로 로그인</string>
     <string name="log_in_subtitle">즐겨 찾는 팟캐스트 청취 시작</string>
-    <string name="onboarding_upgrade_no_subscriptions_found">구독을 찾을 수 없습니다.</string>
     <string name="trial_then_per_year">%1$s 평가 후 %2$s/년</string>
     <string name="trial_then_per_month">%1$s 평가 후 %2$s/월</string>
     <string name="trial_start">내 무료 평가판 시작</string>

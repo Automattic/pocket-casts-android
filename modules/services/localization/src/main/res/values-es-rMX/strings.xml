@@ -557,7 +557,6 @@ Language: es
     <string name="log_in_on_phone">Accede en un teléfono</string>
     <string name="log_in_with_google">Accede con Google</string>
     <string name="log_in_subtitle">Empieza a escuchar tus pódcast favoritos</string>
-    <string name="onboarding_upgrade_no_subscriptions_found">No se han encontrado suscripciones.</string>
     <string name="trial_then_per_year">Disfruta de una %1$s. Después, el precio será de %2$s al año.</string>
     <string name="trial_then_per_month">Disfruta de una %1$s. Después, el precio será de %2$s al mes.</string>
     <string name="trial_start">Empezar mi prueba gratuita</string>

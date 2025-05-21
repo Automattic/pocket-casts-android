@@ -557,7 +557,6 @@ Language: ja_JP
     <string name="log_in_on_phone">スマートフォンでログイン</string>
     <string name="log_in_with_google">Google でログイン</string>
     <string name="log_in_subtitle">お気に入りのポッドキャストの視聴を開始</string>
-    <string name="onboarding_upgrade_no_subscriptions_found">サブスクリプションが見つかりません。</string>
     <string name="trial_then_per_year">%1$sをお試し、その後は年間%2$s</string>
     <string name="trial_then_per_month">%1$sをお試し、その後は月間%2$s</string>
     <string name="trial_start">無料お試しを開始</string>

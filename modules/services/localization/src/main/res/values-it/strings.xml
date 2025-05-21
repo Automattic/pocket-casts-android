@@ -557,7 +557,6 @@ Language: it
     <string name="log_in_on_phone">Accedi al telefono</string>
     <string name="log_in_with_google">Accedi con Google</string>
     <string name="log_in_subtitle">Inizia ad ascoltare i tuoi podcast preferiti</string>
-    <string name="onboarding_upgrade_no_subscriptions_found">Nessun abbonamento trovato.</string>
     <string name="trial_then_per_year">Prova %1$s, quindi %2$s all\'anno</string>
     <string name="trial_then_per_month">Prova %1$s, quindi %2$s al mese</string>
     <string name="trial_start">Inizio la mia prova gratuita</string>

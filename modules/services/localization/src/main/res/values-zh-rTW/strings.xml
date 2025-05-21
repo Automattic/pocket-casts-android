@@ -557,7 +557,6 @@ Language: zh_TW
     <string name="log_in_on_phone">在手機上登入</string>
     <string name="log_in_with_google">透過 Google 登入</string>
     <string name="log_in_subtitle">開始聆聽你喜愛的 Podcast</string>
-    <string name="onboarding_upgrade_no_subscriptions_found">找不到訂閱。</string>
     <string name="trial_then_per_year">試用只要 %1$s，接著每年 %2$s</string>
     <string name="trial_then_per_month">試用只要 %1$s，接著每月 %2$s</string>
     <string name="trial_start">開始我的免費試用</string>

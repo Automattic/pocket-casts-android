@@ -557,7 +557,6 @@ Language: pt_BR
     <string name="log_in_on_phone">Fazer login no celular</string>
     <string name="log_in_with_google">Fazer login com o Google</string>
     <string name="log_in_subtitle">Comece a escutar seus podcasts favoritos</string>
-    <string name="onboarding_upgrade_no_subscriptions_found">Nenhuma assinatura encontrada.</string>
     <string name="trial_then_per_year">Experimente o %1$s (depois %2$s por ano)</string>
     <string name="trial_then_per_month">Experimente o %1$s (depois %2$s por mês)</string>
     <string name="trial_start">Iniciar meu teste gratuito</string>

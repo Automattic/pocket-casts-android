@@ -555,7 +555,6 @@ Language: el_GR
     <string name="log_in_on_phone">Σύνδεση στο τηλέφωνο</string>
     <string name="log_in_with_google">Σύνδεση με Google</string>
     <string name="log_in_subtitle">Ξεκίνα να ακούς τα αγαπημένα σου podcasts</string>
-    <string name="onboarding_upgrade_no_subscriptions_found">Δεν βρέθηκαν συνδρομές.</string>
     <string name="trial_then_per_year">Δοκίμασε %1$s, έπειτα %2$s το χρόνο</string>
     <string name="trial_then_per_month">Δοκίμασε %1$s, μετά %2$s το μήνα</string>
     <string name="trial_start">Ξεκίνα τη δωρεάν δοκιμή μου</string>

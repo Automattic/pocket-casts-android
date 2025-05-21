@@ -557,7 +557,6 @@ Language: ca
     <string name="log_in_on_phone">Inicia sessió al telèfon</string>
     <string name="log_in_with_google">Inicia sessió amb Google</string>
     <string name="log_in_subtitle">Comença a escoltar els teus pòdcasts favorits</string>
-    <string name="onboarding_upgrade_no_subscriptions_found">No s\'han trobat subscripcions.</string>
     <string name="trial_then_per_year">Prova per %1$s, i després %2$s cada any</string>
     <string name="trial_then_per_month">Prova per %1$s, després %2$s al mes</string>
     <string name="trial_start">Comença el període de prova</string>

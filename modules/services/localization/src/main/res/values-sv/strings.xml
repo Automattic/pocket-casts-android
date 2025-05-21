@@ -557,7 +557,6 @@ Language: sv_SE
     <string name="log_in_on_phone">Logga in på telefon</string>
     <string name="log_in_with_google">Logga in med Google</string>
     <string name="log_in_subtitle">Börja lyssna på dina favoritpodcasts</string>
-    <string name="onboarding_upgrade_no_subscriptions_found">Inga prenumerationer hittades.</string>
     <string name="trial_then_per_year">Testa %1$s och därefter %2$s per år</string>
     <string name="trial_then_per_month">Testa %1$s och därefter %2$s per månad</string>
     <string name="trial_start">Starta min gratis provperiod</string>

@@ -120,7 +120,6 @@ Language: en_GB
     <string name="log_in_with_google">Log in with Google</string>
     <string name="log_in_watch_from_phone_instructions_2">The next time you open Pocket Casts on your watch and have a network connection, you will be logged in.</string>
     <string name="log_in_subtitle">Start listening to your favourite podcasts</string>
-    <string name="onboarding_upgrade_no_subscriptions_found">No subscriptions found.</string>
     <string name="trial_start">Start my free trial</string>
     <string name="trial_then_per_year">Try %1$s, then %2$s per year</string>
     <string name="subscribe_to">Subscribe to %s</string>

@@ -557,7 +557,6 @@ Language: ru
     <string name="log_in_on_phone">Войти на телефоне</string>
     <string name="log_in_with_google">Войти через Google</string>
     <string name="log_in_subtitle">Начните слушать любимые подкасты</string>
-    <string name="onboarding_upgrade_no_subscriptions_found">Подписки не найдены.</string>
     <string name="trial_then_per_year">Попробуйте %1$s, затем %2$s в год</string>
     <string name="trial_then_per_month">Попробуйте %1$s, затем %2$s в месяц</string>
     <string name="trial_start">Начать бесплатный пробный период</string>

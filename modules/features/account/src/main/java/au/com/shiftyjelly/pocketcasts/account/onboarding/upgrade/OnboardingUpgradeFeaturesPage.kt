@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -72,6 +73,7 @@ import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationIconButton
 import au.com.shiftyjelly.pocketcasts.compose.bars.SystemBarsStyles
 import au.com.shiftyjelly.pocketcasts.compose.components.AutoResizeText
+import au.com.shiftyjelly.pocketcasts.compose.components.EmptyState
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalPagerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.components.SegmentedTabBar
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
@@ -83,6 +85,7 @@ import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private const val MAX_OFFER_BADGE_TEXT_LENGTH = 23
@@ -138,8 +141,9 @@ internal fun OnboardingUpgradeFeaturesPage(
         is OnboardingUpgradeFeaturesState.NoSubscriptions -> {
             NoSubscriptionsLayout(
                 showNotNow = source == OnboardingUpgradeSource.RECOMMENDATIONS,
-                onBackPressed = onBackPressed,
+                onTryAgain = { viewModel.loadSubscriptionPlans() },
                 onNotNowPressed = onNotNowPressed,
+                onBackPressed = onBackPressed,
             )
         }
     }
@@ -500,16 +504,18 @@ internal fun BoxWithConstraintsScope.calculateMinimumHeightWithInsets(): Dp {
 @Composable
 fun NoSubscriptionsLayout(
     showNotNow: Boolean,
-    onBackPressed: () -> Unit,
+    onTryAgain: () -> Unit,
     onNotNowPressed: () -> Unit,
+    onBackPressed: () -> Unit,
 ) {
     Column(
         Modifier
             .windowInsetsPadding(WindowInsets.statusBars)
             .windowInsetsPadding(WindowInsets.navigationBars)
-            .fillMaxWidth(),
+            .fillMaxSize(),
     ) {
         Spacer(Modifier.height(8.dp))
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -522,26 +528,20 @@ fun NoSubscriptionsLayout(
                     .height(48.dp)
                     .width(48.dp),
             )
-            if (showNotNow) {
-                TextH30(
-                    text = stringResource(LR.string.not_now),
-                    color = MaterialTheme.theme.colors.primaryText01,
-                    modifier = Modifier
-                        .padding(horizontal = 24.dp)
-                        .clickable { onNotNowPressed() },
-                )
-            }
         }
         Spacer(modifier = Modifier.weight(1f))
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center,
-        ) {
-            TextH30(
-                text = stringResource(id = LR.string.onboarding_upgrade_no_subscriptions_found),
-            )
-        }
-        Spacer(modifier = Modifier.weight(1f))
+
+        EmptyState(
+            title = stringResource(LR.string.onboarding_upgrade_no_plans_found_title),
+            subtitle = stringResource(LR.string.onboarding_upgrade_no_plans_found_body),
+            iconResourceId = IR.drawable.ic_warning,
+            primaryButtonText = stringResource(LR.string.try_again),
+            onPrimaryButtonClick = onTryAgain,
+            secondaryButtonText = if (showNotNow) stringResource(LR.string.skip_for_now) else null,
+            onSecondaryButtonClick = onNotNowPressed,
+        )
+
+        Spacer(modifier = Modifier.weight(1.5f))
     }
 }
 

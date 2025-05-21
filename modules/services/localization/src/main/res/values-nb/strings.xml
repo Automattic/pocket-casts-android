@@ -112,7 +112,6 @@ Language: nb_NO
     <string name="trial_start">Start gratis prøveperiode</string>
     <string name="trial_then_per_month">Prøv %1$s, deretter %2$s per måned</string>
     <string name="trial_then_per_year">Prøv %1$s, deretter %2$s per år</string>
-    <string name="onboarding_upgrade_no_subscriptions_found">Fant ingen abonnementer.</string>
     <string name="player_up_next_empty_desc_watch">Du kan legge til episoder i Neste-køen på detaljskjermbildet for episoder.</string>
     <string name="settings_description_advanced">Disse innstillingene er eksperimentelle. Vi anbefaler de fleste brukere å ikke endre disse fra standardverdiene.</string>
     <string name="settings_title_advanced">Avansert</string>
