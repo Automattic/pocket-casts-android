@@ -1,6 +1,13 @@
 package au.com.shiftyjelly.pocketcasts.settings.onboarding
 
-data class OnboardingExitInfo(
-    val showPlusPromotionForFreeUser: Boolean = false,
-    val showWelcomeInReferralFlow: Boolean = false,
-)
+sealed interface OnboardingExitInfo {
+    data object Simple : OnboardingExitInfo
+
+    data object ShowPlusPromotion : OnboardingExitInfo
+
+    data object ShowReferralWelcome : OnboardingExitInfo
+
+    data class ApplySuggestedFolders(
+        val action: SuggestedFoldersAction,
+    ) : OnboardingExitInfo
+}
