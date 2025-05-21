@@ -7,10 +7,12 @@ import androidx.annotation.StringRes
 import au.com.shiftyjelly.pocketcasts.deeplink.CreateAccountDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.DownloadsDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ImportDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.RecommendationsDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowFiltersDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowUpNextTabDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.StaffPicksDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ThemesDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.TrendingDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.UpsellDeepLink
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.NotificationId
@@ -33,11 +35,18 @@ sealed interface NotificationType {
         messagePluralRes?.takeIf { count > 0 }?.let { pluralRes ->
             return context.resources.getQuantityString(pluralRes, count, count)
         }
-        return messageRes?.let { context.getString(it) } ?: ""
+        return messageRes?.let { context.getString(it) }.orEmpty()
     }
 
     fun toIntent(context: Context): Intent
     fun isSettingsToggleOn(settings: Settings): Boolean
+
+    companion object {
+        fun fromSubCategory(subCategory: String): NotificationType? {
+            val allSupportedNotifications = OnboardingNotificationType.values + ReEngagementNotificationType.values + TrendingAndRecommendationsNotificationType.values
+            return allSupportedNotifications.find { it.subcategory == subCategory }
+        }
+    }
 }
 
 sealed class OnboardingNotificationType(
@@ -54,7 +63,7 @@ sealed class OnboardingNotificationType(
 
     override val messagePluralRes: Int? get() = null
 
-    object Sync : OnboardingNotificationType(
+    data object Sync : OnboardingNotificationType(
         notificationId = NotificationId.ONBOARDING_SYNC.value,
         subcategory = SUBCATEGORY_SYNC,
         titleRes = LR.string.notification_sync_title,
@@ -64,7 +73,7 @@ sealed class OnboardingNotificationType(
         override fun toIntent(context: Context) = CreateAccountDeepLink.toIntent(context)
     }
 
-    object Import : OnboardingNotificationType(
+    data object Import : OnboardingNotificationType(
         notificationId = NotificationId.ONBOARDING_IMPORT.value,
         subcategory = SUBCATEGORY_IMPORT,
         titleRes = LR.string.notification_import_title,
@@ -74,7 +83,7 @@ sealed class OnboardingNotificationType(
         override fun toIntent(context: Context) = ImportDeepLink.toIntent(context)
     }
 
-    object UpNext : OnboardingNotificationType(
+    data object UpNext : OnboardingNotificationType(
         notificationId = NotificationId.ONBOARDING_UPNEXT.value,
         subcategory = SUBCATEGORY_UP_NEXT,
         titleRes = LR.string.notification_up_next_title,
@@ -84,7 +93,7 @@ sealed class OnboardingNotificationType(
         override fun toIntent(context: Context) = ShowUpNextTabDeepLink.toIntent(context)
     }
 
-    object Filters : OnboardingNotificationType(
+    data object Filters : OnboardingNotificationType(
         notificationId = NotificationId.ONBOARDING_FILTERS.value,
         subcategory = SUBCATEGORY_FILTERS,
         titleRes = LR.string.notification_filters_title,
@@ -94,7 +103,7 @@ sealed class OnboardingNotificationType(
         override fun toIntent(context: Context) = ShowFiltersDeepLink.toIntent(context)
     }
 
-    object Themes : OnboardingNotificationType(
+    data object Themes : OnboardingNotificationType(
         notificationId = NotificationId.ONBOARDING_THEMES.value,
         subcategory = SUBCATEGORY_THEMES,
         titleRes = LR.string.notification_themes_title,
@@ -104,7 +113,7 @@ sealed class OnboardingNotificationType(
         override fun toIntent(context: Context) = ThemesDeepLink.toIntent(context)
     }
 
-    object StaffPicks : OnboardingNotificationType(
+    data object StaffPicks : OnboardingNotificationType(
         notificationId = NotificationId.ONBOARDING_STAFF_PICKS.value,
         subcategory = SUBCATEGORY_STAFF_PICKS,
         titleRes = LR.string.notification_staff_picks_title,
@@ -114,7 +123,7 @@ sealed class OnboardingNotificationType(
         override fun toIntent(context: Context) = StaffPicksDeepLink.toIntent(context)
     }
 
-    object PlusUpsell : OnboardingNotificationType(
+    data object PlusUpsell : OnboardingNotificationType(
         notificationId = NotificationId.ONBOARDING_UPSELL.value,
         subcategory = SUBCATEGORY_PLUS_UP_SELL,
         titleRes = LR.string.notification_plus_upsell_title,
@@ -143,10 +152,6 @@ sealed class OnboardingNotificationType(
                 StaffPicks,
                 PlusUpsell,
             )
-
-        fun fromSubcategory(subcategory: String): OnboardingNotificationType? {
-            return values.firstOrNull { it.subcategory == subcategory }
-        }
     }
 }
 
@@ -164,7 +169,7 @@ sealed class ReEngagementNotificationType(
         return settings.dailyRemindersNotification.value
     }
 
-    object WeMissYou : ReEngagementNotificationType(
+    data object WeMissYou : ReEngagementNotificationType(
         subcategory = SUBCATEGORY_REENGAGE_WE_MISS_YOU,
         titleRes = LR.string.notification_reengage_we_miss_you_title,
         messageRes = LR.string.notification_reengage_we_miss_you_message,
@@ -172,7 +177,7 @@ sealed class ReEngagementNotificationType(
         override fun toIntent(context: Context): Intent = StaffPicksDeepLink.toIntent(context)
     }
 
-    object CatchUpOffline : ReEngagementNotificationType(
+    data object CatchUpOffline : ReEngagementNotificationType(
         subcategory = SUBCATEGORY_REENGAGE_CATCH_UP_OFFLINE,
         titleRes = LR.string.notification_reengage_catch_up_offline_title,
         messagePluralRes = LR.plurals.notification_reengage_catch_up_offline_message,
@@ -192,9 +197,44 @@ sealed class ReEngagementNotificationType(
                 WeMissYou,
                 CatchUpOffline,
             )
+    }
+}
 
-        fun fromSubcategory(subcategory: String): ReEngagementNotificationType? {
-            return values.firstOrNull { it.subcategory == subcategory }
-        }
+sealed class TrendingAndRecommendationsNotificationType(
+    override val notificationId: Int,
+    override val subcategory: String,
+    @StringRes override val titleRes: Int,
+    @StringRes override val messageRes: Int? = null,
+    @PluralsRes override val messagePluralRes: Int? = null,
+) : NotificationType {
+
+    override fun isSettingsToggleOn(settings: Settings) = settings.recommendationsNotification.value
+
+    data object Trending : TrendingAndRecommendationsNotificationType(
+        notificationId = NotificationId.CONTENT_RECOMMENDATIONS.value,
+        subcategory = SUBCATEGORY_TRENDING,
+        titleRes = LR.string.notification_content_recommendations_trending_title,
+        messageRes = LR.string.notification_content_recommendations_trending_message,
+    ) {
+        override fun toIntent(context: Context) = TrendingDeepLink.toIntent(context)
+    }
+
+    data object Recommendations : TrendingAndRecommendationsNotificationType(
+        notificationId = NotificationId.CONTENT_RECOMMENDATIONS.value,
+        subcategory = SUBCATEGORY_RECOMMENDATIONS,
+        titleRes = LR.string.notification_content_recommendations_title,
+        messageRes = LR.string.notification_content_recommendations_message,
+    ) {
+        override fun toIntent(context: Context) = RecommendationsDeepLink.toIntent(context)
+    }
+
+    companion object {
+        const val SUBCATEGORY_RECOMMENDATIONS = "recommendations"
+        const val SUBCATEGORY_TRENDING = "trending"
+
+        val values = listOf(
+            Trending,
+            Recommendations
+        )
     }
 }

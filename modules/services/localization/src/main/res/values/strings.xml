@@ -2422,4 +2422,10 @@
         <item quantity="other">You have %d new episodes downloaded and ready to go!</item>
     </plurals>
 
+    <string name="notification_content_recommendations_trending_title">Trending this week</string>
+    <string name="notification_content_recommendations_trending_message">Everyone is listening to ...</string> <!-- TODO: figure out where the message comes from -->
+
+    <string name="notification_content_recommendations_title">Trending this week</string>
+    <string name="notification_content_recommendations_message">Wondering what to listen to next? Check out these shows!</string>
+
 </resources>
