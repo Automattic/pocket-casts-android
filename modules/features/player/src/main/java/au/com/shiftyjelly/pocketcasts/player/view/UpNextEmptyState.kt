@@ -17,10 +17,8 @@ fun UpNextEmptyState(
         title = stringResource(LR.string.player_up_next_empty_title),
         subtitle = stringResource(LR.string.player_up_next_empty_subtitle),
         iconResourceId = R.drawable.mini_player_upnext,
-        buttonText = stringResource(LR.string.go_to_discover),
-        onButtonClick = {
-            onDiscoverTapped()
-        },
+        primaryButtonText = stringResource(LR.string.go_to_discover),
+        onPrimaryButtonClick = onDiscoverTapped,
         modifier = modifier,
     )
 }

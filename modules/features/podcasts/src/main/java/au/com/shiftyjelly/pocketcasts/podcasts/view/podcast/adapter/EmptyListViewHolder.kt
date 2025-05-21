@@ -21,9 +21,9 @@ class EmptyListViewHolder(
                     title = emptyList.title,
                     subtitle = emptyList.subtitle,
                     iconResourceId = emptyList.iconResourceId,
-                    buttonText = emptyList.buttonText,
-                    onButtonClick = emptyList.onButtonClick,
-                    modifier = Modifier.padding(vertical = 36.dp),
+                    primaryButtonText = emptyList.buttonText,
+                    onPrimaryButtonClick = emptyList.onButtonClick,
+                    modifier = Modifier.padding(top = 56.dp),
                 )
             }
         }

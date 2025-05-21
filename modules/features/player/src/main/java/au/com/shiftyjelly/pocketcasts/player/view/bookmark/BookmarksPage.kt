@@ -11,8 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -151,6 +149,7 @@ private fun Content(
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
+            .fillMaxSize()
             .background(color = backgroundColor)
             .padding(bottom = if (sourceView == SourceView.PROFILE) 0.dp else 28.dp),
     ) {
@@ -173,22 +172,18 @@ private fun Content(
                 title = stringResource(LR.string.bookmarks_empty_state_title),
                 subtitle = stringResource(LR.string.bookmarks_paid_user_empty_state_message),
                 iconResourceId = IR.drawable.ic_bookmark,
-                buttonText = stringResource(LR.string.bookmarks_headphone_settings),
-                onButtonClick = {
+                primaryButtonText = stringResource(LR.string.bookmarks_headphone_settings),
+                onPrimaryButtonClick = {
                     onHeadphoneControlsButtonTapped()
                     openFragment(HeadphoneControlsSettingsFragment())
                 },
-                modifier = Modifier.verticalScroll(rememberScrollState()),
             )
             is UiState.Upsell -> EmptyState(
                 title = stringResource(LR.string.bookmarks_empty_state_title),
                 subtitle = stringResource(LR.string.bookmarks_free_user_empty_state_message),
                 iconResourceId = IR.drawable.ic_bookmark,
-                buttonText = stringResource(LR.string.bookmarks_free_user_empty_state_button),
-                onButtonClick = {
-                    onUpgradeClicked.invoke()
-                },
-                modifier = Modifier.verticalScroll(rememberScrollState()),
+                primaryButtonText = stringResource(LR.string.bookmarks_free_user_empty_state_button),
+                onPrimaryButtonClick = onUpgradeClicked,
             )
         }
     }

@@ -9,6 +9,9 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import androidx.annotation.ColorInt
 import androidx.appcompat.widget.TooltipCompat
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.DiffUtil
@@ -183,7 +186,10 @@ class UpNextAdapter(
                 binding.emptyUpNextComposeView.setContentWithViewCompositionStrategy {
                     AppTheme(theme) {
                         if (header.episodePlaying && header.episodeCount == 0) {
-                            UpNextEmptyState(onDiscoverTapped = { listener.onDiscoverTapped() })
+                            UpNextEmptyState(
+                                onDiscoverTapped = listener::onDiscoverTapped,
+                                modifier = Modifier.padding(top = 24.dp),
+                            )
                         }
                     }
                 }
