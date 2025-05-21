@@ -128,9 +128,9 @@ internal class DiscoverAdapter(
     private val analyticsTracker: AnalyticsTracker,
 ) : ListAdapter<Any, RecyclerView.ViewHolder>(DiscoverRowDiffCallback()) {
     interface Listener {
-        fun onPodcastClicked(podcast: DiscoverPodcast, listUuid: String?, isFeatured: Boolean = false)
-        fun onPodcastSubscribe(podcast: DiscoverPodcast, listUuid: String?)
-        fun onPodcastListClicked(list: NetworkLoadableList)
+        fun onPodcastClicked(podcast: DiscoverPodcast, listUuid: String?, listDate: String? = null, isFeatured: Boolean = false)
+        fun onPodcastSubscribe(podcast: DiscoverPodcast, listUuid: String?, listDate: String? = null)
+        fun onPodcastListClicked(contentList: NetworkLoadableList, podcastList: PodcastList? = null)
         fun onCollectionHeaderClicked(list: NetworkLoadableList)
         fun onEpisodeClicked(episode: DiscoverEpisode, listUuid: String?)
         fun onEpisodePlayClicked(episode: DiscoverEpisode)
@@ -196,27 +196,40 @@ internal class DiscoverAdapter(
         val showAllButton: TextView
     }
 
-    inner class LargeListViewHolder(val binding: RowPodcastLargeListBinding) : NetworkLoadableViewHolder(binding.root), ShowAllRow {
-        val adapter = LargeListRowAdapter(context, listener::onPodcastClicked, listener::onPodcastSubscribe, analyticsTracker)
-        override val showAllButton: TextView
-            get() = binding.btnShowAll
+    inner class LargeListViewHolder(val binding: RowPodcastLargeListBinding) : NetworkLoadableViewHolder(binding.root) {
+        private val adapter = LargeListRowAdapter(context, listener::onPodcastClicked, listener::onPodcastSubscribe, analyticsTracker)
 
         init {
             val linearLayoutManager = LinearLayoutManager(itemView.context, RecyclerView.HORIZONTAL, false)
             linearLayoutManager.initialPrefetchItemCount = 3
             recyclerView?.layoutManager = linearLayoutManager
             recyclerView?.itemAnimator = null
-
             recyclerView?.adapter = adapter
-
             adapter.showLoadingList()
+        }
+
+        fun loading(row: DiscoverRow) {
+            binding.lblTitle.text = row.title.tryToLocalise(context.resources)
+            binding.btnShowAll.setOnClickListener(null)
+            adapter.showLoadingList()
+        }
+
+        fun bind(list: PodcastList, row: DiscoverRow) {
+            adapter.list = list
+            adapter.submitList(list.podcasts) { onRestoreInstanceState(this) }
+            binding.btnShowAll.setOnClickListener {
+                listener.onPodcastListClicked(contentList = row, podcastList = list)
+            }
+            if (list.podcasts.isEmpty()) {
+                hideRow()
+            } else {
+                showRow()
+            }
         }
     }
 
-    inner class LargeListWithPodcastViewHolder(val binding: RowPodcastLargeListWithPodcastBinding) : NetworkLoadableViewHolder(binding.root), ShowAllRow {
-        val adapter = LargeListRowAdapter(context, listener::onPodcastClicked, listener::onPodcastSubscribe, analyticsTracker)
-        override val showAllButton: TextView
-            get() = binding.btnShowAll
+    inner class LargeListWithPodcastViewHolder(val binding: RowPodcastLargeListWithPodcastBinding) : NetworkLoadableViewHolder(binding.root) {
+        private val adapter = LargeListRowAdapter(context, listener::onPodcastClicked, listener::onPodcastSubscribe, analyticsTracker)
 
         init {
             val linearLayoutManager = LinearLayoutManager(itemView.context, RecyclerView.HORIZONTAL, false)
@@ -225,6 +238,31 @@ internal class DiscoverAdapter(
             recyclerView?.itemAnimator = null
             recyclerView?.adapter = adapter
             adapter.showLoadingList()
+        }
+
+        fun loading() {
+            binding.title.text = ""
+            binding.subtitle.text = ""
+            binding.podcastImage.setImageResource(placeholderDrawable)
+            binding.btnShowAll.setOnClickListener(null)
+            adapter.showLoadingList()
+        }
+
+        fun bind(list: PodcastList, row: DiscoverRow) {
+            val resources = context.resources
+            adapter.list = list
+            adapter.submitList(list.podcasts) { onRestoreInstanceState(this) }
+            binding.title.text = list.title?.tryToLocalise(resources)
+            binding.subtitle.text = list.subtitle?.tryToLocalise(resources).orEmpty()
+            binding.btnShowAll.setOnClickListener {
+                listener.onPodcastListClicked(contentList = row, podcastList = list)
+            }
+            imageRequestFactory.createForPodcast(list.featureImage).loadInto(binding.podcastImage)
+            if (list.podcasts.isEmpty()) {
+                hideRow()
+            } else {
+                showRow()
+            }
         }
     }
 
@@ -436,14 +474,7 @@ internal class DiscoverAdapter(
     }
 
     inner class RemainingPodcastsByCategoryViewHolder(val binding: RowRemainingPodcastsByCategoryBinding) : NetworkLoadableViewHolder(binding.root) {
-        val adapter = RemainingPodcastsAdapter(
-            onPodcastClick = { podcast, listUuid ->
-                listener.onPodcastClicked(podcast, listUuid)
-            },
-            onPodcastSubscribe = { podcast, listUuid ->
-                listener.onPodcastSubscribe(podcast, listUuid)
-            },
-        )
+        val adapter = RemainingPodcastsAdapter(listener::onPodcastClicked, listener::onPodcastSubscribe)
 
         init {
             recyclerView?.layoutManager = LinearLayoutManager(itemView.context, RecyclerView.VERTICAL, false)
@@ -682,12 +713,11 @@ internal class DiscoverAdapter(
         if (row is DiscoverRow) {
             when (holder) {
                 is LargeListViewHolder -> {
-                    holder.binding.lblTitle.text = row.title.tryToLocalise(resources)
+                    holder.loading(row)
                     holder.loadFlowable(
                         loadPodcastList(row.source, row.authenticated),
-                        onNext = {
-                            row.listUuid?.let { listUuid -> holder.adapter.setFromListId(listUuid) }
-                            holder.adapter.submitList(it.podcasts) { onRestoreInstanceState(holder) }
+                        onNext = { list ->
+                            holder.bind(list, row)
                         },
                         onError = { error ->
                             Timber.e(error, "Could not load feed ${row.source}")
@@ -701,23 +731,11 @@ internal class DiscoverAdapter(
                 }
 
                 is LargeListWithPodcastViewHolder -> {
-                    holder.binding.title.text = ""
-                    holder.binding.subtitle.text = ""
-                    holder.binding.podcastImage.setImageResource(placeholderDrawable)
-
+                    holder.loading()
                     holder.loadFlowable(
                         loadPodcastList(row.source, row.authenticated),
                         onNext = { list ->
-                            if (list.podcasts.isEmpty()) {
-                                holder.hideRow()
-                            } else {
-                                holder.showRow()
-                                row.listUuid?.let { listUuid -> holder.adapter.setFromListId(listUuid) }
-                                holder.adapter.submitList(list.podcasts) { onRestoreInstanceState(holder) }
-                                holder.binding.title.text = list.title?.tryToLocalise(resources)
-                                holder.binding.subtitle.text = list.subtitle?.tryToLocalise(resources).orEmpty()
-                                imageRequestFactory.createForPodcast(list.featureImage).loadInto(holder.binding.podcastImage)
-                            }
+                            holder.bind(list, row)
                         },
                         onError = { error ->
                             Timber.e(error, "Could not load feed ${row.source}")
@@ -769,10 +787,10 @@ internal class DiscoverAdapter(
                     holder.binding.lblTitle.text = row.title.tryToLocalise(resources)
                     holder.loadFlowable(
                         loadPodcastList(row.source, row.authenticated),
-                        onNext = {
-                            val podcasts = it.podcasts.subList(0, Math.min(MAX_ROWS_SMALL_LIST, it.podcasts.count()))
+                        onNext = { list ->
+                            val podcasts = list.podcasts.subList(0, Math.min(MAX_ROWS_SMALL_LIST, list.podcasts.count()))
                             holder.binding.pageIndicatorView.count = Math.ceil(podcasts.count().toDouble() / SmallListRowAdapter.SmallListViewHolder.NUMBER_OF_ROWS_PER_PAGE.toDouble()).toInt()
-                            row.listUuid?.let { listUuid -> holder.adapter.setFromListId(listUuid) }
+                            holder.adapter.list = list
                             holder.adapter.submitPodcastList(podcasts) { onRestoreInstanceState(holder) }
                         },
                     )
@@ -825,7 +843,7 @@ internal class DiscoverAdapter(
                             holder.itemView.setOnClickListener {
                                 row.listUuid?.let { listUuid ->
                                     trackDiscoverListPodcastTapped(listUuid, podcast.uuid)
-                                    listener.onPodcastClicked(podcast, row.listUuid)
+                                    listener.onPodcastClicked(podcast = podcast, listUuid = row.listUuid)
                                 }
                             }
 

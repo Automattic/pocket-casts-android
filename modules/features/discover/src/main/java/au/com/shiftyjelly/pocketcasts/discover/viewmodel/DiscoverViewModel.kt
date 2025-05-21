@@ -166,6 +166,7 @@ class DiscoverViewModel @Inject constructor(
                     tintColors = it.tintColors,
                     images = it.collageImages,
                     listId = it.listId,
+                    date = it.date,
                 )
             }
             .flatMapPublisher { addSubscriptionStateToPodcasts(it) }
@@ -402,6 +403,7 @@ data class PodcastList(
     val tintColors: DiscoverFeedTintColors?,
     val images: List<DiscoverFeedImage>?,
     val listId: String? = null,
+    val date: String? = null,
 )
 
 data class CarouselSponsoredPodcast(

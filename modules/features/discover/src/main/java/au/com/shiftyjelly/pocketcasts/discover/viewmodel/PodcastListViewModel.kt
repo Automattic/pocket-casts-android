@@ -39,6 +39,9 @@ class PodcastListViewModel @Inject constructor(
     val state: MutableLiveData<PodcastListViewState> = MutableLiveData()
     val disposables: CompositeDisposable = CompositeDisposable()
 
+    val listFeed: ListFeed?
+        get() = (state.value as? PodcastListViewState.ListLoaded)?.feed
+
     init {
         state.value = PodcastListViewState.Loading()
     }
