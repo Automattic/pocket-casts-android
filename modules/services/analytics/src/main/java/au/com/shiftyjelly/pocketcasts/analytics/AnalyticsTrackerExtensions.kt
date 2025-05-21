@@ -53,7 +53,7 @@ private fun AnalyticsTracker.discoverListPodcastEvent(analyticsEvent: AnalyticsE
         properties = mapOf(
             AnalyticsParameter.podcastUuid to podcastUuid,
             AnalyticsParameter.listId to listId,
-            AnalyticsParameter.listDate to (listDate ?: ""),
+            AnalyticsParameter.listDate to listDate.orEmpty(),
         ),
     )
 }

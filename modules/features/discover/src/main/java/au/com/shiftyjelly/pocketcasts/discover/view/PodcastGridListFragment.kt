@@ -127,7 +127,12 @@ open class PodcastGridListFragment : BaseFragment(), Toolbar.OnMenuItemClickList
             is ExpandedStyle.PlainList -> SourceView.DISCOVER_PLAIN_LIST
             else -> SourceView.DISCOVER
         }
-        val fragment = PodcastFragment.newInstance(podcastUuid = podcast.uuid, fromListUuid = listUuid, fromListDate = listDate, sourceView = sourceView)
+        val fragment = PodcastFragment.newInstance(
+            podcastUuid = podcast.uuid,
+            fromListUuid = listUuid,
+            fromListDate = listDate,
+            sourceView = sourceView,
+        )
         (activity as FragmentHostListener).addFragment(fragment)
     }
 
