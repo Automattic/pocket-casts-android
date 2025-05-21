@@ -1988,6 +1988,7 @@
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Everything you love about Pocket&#160;Casts, plus more</string>
     <string name="onboarding_upgrade_no_plans_found_title">Couldn’t load plans</string>
     <string name="onboarding_upgrade_no_plans_found_body">Please check your connection or try again later.</string>
+    <string name="onboarding_upgrade_purchase_failure_message">Something went wrong. Please try again later.</string>
     <string name="onboarding_patron_features_title">Believe in what we’re doing and want to show your support?</string>
     <string name="onboarding_patron_feature_everything_in_plus_title">Everything in Plus</string>
     <string name="onboarding_patron_feature_early_access_title">Early access to features</string>

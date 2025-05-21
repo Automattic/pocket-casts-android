@@ -3,6 +3,8 @@
 *   Updates
     *   Add dropshadow to the podcast artwork and move it below toolbar.
         ([#4006](https://github.com/Automattic/pocket-casts-android/pull/4006))
+    *   Improve error handling when purchasing subscriptions.
+        ([#4006](https://github.com/Automattic/pocket-casts-android/pull/4006))
 
 7.89
 -----

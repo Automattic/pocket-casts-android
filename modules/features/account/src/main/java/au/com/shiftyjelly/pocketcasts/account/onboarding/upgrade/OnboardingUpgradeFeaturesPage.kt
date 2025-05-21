@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade
 import androidx.activity.SystemBarStyle
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -26,6 +27,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
@@ -38,6 +40,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Snackbar
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -54,10 +59,12 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -77,6 +84,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.EmptyState
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalPagerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.components.SegmentedTabBar
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH60
 import au.com.shiftyjelly.pocketcasts.compose.images.OfferBadge
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -168,6 +176,7 @@ private fun UpgradeLayout(
         contentAlignment = Alignment.BottomCenter,
     ) {
         val focusPager = remember { FocusRequester() }
+        val snackbarHostState = remember { SnackbarHostState() }
 
         // Need this BoxWithConstraints so we can force the inner column to fill the screen with vertical scroll enabled
         BoxWithConstraints(
@@ -274,6 +283,40 @@ private fun UpgradeLayout(
             upFocusRequester = focusPager,
             onClickSubscribe = onClickSubscribe,
         )
+
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier
+                .windowInsetsPadding(WindowInsets.navigationBars)
+                .padding(horizontal = 20.dp, vertical = 42.dp),
+        ) { snackbarData ->
+            Snackbar(
+                backgroundColor = Color.White,
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    Image(
+                        painter = painterResource(IR.drawable.ic_warning),
+                        colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.support05),
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp),
+                    )
+                    TextH60(
+                        text = snackbarData.message,
+                        color = Color.Black,
+                    )
+                }
+            }
+        }
+
+        if (state.purchaseFailed) {
+            val message = stringResource(LR.string.onboarding_upgrade_purchase_failure_message)
+            LaunchedEffect(state.purchaseFailed) {
+                snackbarHostState.showSnackbar(message)
+            }
+        }
     }
 }
 
