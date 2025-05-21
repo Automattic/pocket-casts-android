@@ -552,7 +552,8 @@ fun NoSubscriptionsLayout(
     onBackPressed: () -> Unit,
 ) {
     Column(
-        Modifier
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
             .windowInsetsPadding(WindowInsets.statusBars)
             .windowInsetsPadding(WindowInsets.navigationBars)
             .fillMaxSize(),
