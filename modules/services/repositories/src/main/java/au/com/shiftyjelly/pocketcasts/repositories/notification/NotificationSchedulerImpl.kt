@@ -74,4 +74,26 @@ class NotificationSchedulerImpl @Inject constructor(
             notificationWork,
         )
     }
+
+    override suspend fun setupTrendingAndRecommendationsNotifications() {
+        TrendingAndRecommendationsNotificationType.values.forEachIndexed { index, notification ->
+            val initialDelay = delayCalculator.calculateDelayForRecommendations(index)
+            val workData = workDataOf(
+                SUBCATEGORY to notification.subcategory,
+            )
+
+            val tag = "trending_and_recommendations-${notification.subcategory}"
+            val notificationWork = PeriodicWorkRequest.Builder(NotificationWorker::class.java, 7, TimeUnit.DAYS)
+                .setInputData(workData)
+                .setInitialDelay(initialDelay, TimeUnit.MILLISECONDS)
+                .addTag(tag)
+                .build()
+
+            WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+                tag,
+                ExistingPeriodicWorkPolicy.UPDATE,
+                notificationWork,
+            )
+        }
+    }
 }

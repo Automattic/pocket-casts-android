@@ -234,7 +234,7 @@ sealed class TrendingAndRecommendationsNotificationType(
 
         val values = listOf(
             Trending,
-            Recommendations
+            Recommendations,
         )
     }
 }

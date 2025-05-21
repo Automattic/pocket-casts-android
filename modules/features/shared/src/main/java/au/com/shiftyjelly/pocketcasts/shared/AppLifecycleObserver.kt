@@ -68,6 +68,7 @@ class AppLifecycleObserver(
         networkConnectionWatcher.startWatching()
         applicationScope.launch {
             notificationScheduler.setupReEngagementNotification()
+            notificationScheduler.setupTrendingAndRecommendationsNotifications()
         }
     }
 

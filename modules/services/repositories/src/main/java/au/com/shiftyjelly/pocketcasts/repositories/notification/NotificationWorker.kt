@@ -19,7 +19,6 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 @HiltWorker
 class NotificationWorker @AssistedInject constructor(
@@ -69,6 +68,11 @@ class NotificationWorker @AssistedInject constructor(
     }
 
     private fun openPageIntent(type: NotificationType): PendingIntent {
-        return PendingIntent.getActivity(applicationContext, 0, type.toIntent(applicationContext), PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        return PendingIntent.getActivity(
+            applicationContext,
+            0,
+            type.toIntent(applicationContext),
+            PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
     }
 }

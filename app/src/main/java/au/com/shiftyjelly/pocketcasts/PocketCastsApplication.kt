@@ -187,6 +187,7 @@ class PocketCastsApplication : Application(), Configuration.Provider {
             notificationHelper.setupNotificationChannels()
             notificationManager.setupOnboardingNotifications()
             notificationManager.setupReEngagementNotifications()
+            notificationManager.setupTrendingAndRecommendationsNotifications()
             notificationManager.updateUserFeatureInteraction(ReEngagementNotificationType.notificationId)
             appLifecycleObserver.setup()
 
