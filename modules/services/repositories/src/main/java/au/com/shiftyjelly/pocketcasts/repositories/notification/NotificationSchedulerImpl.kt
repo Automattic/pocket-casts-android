@@ -22,6 +22,8 @@ class NotificationSchedulerImpl @Inject constructor(
     companion object {
         const val SUBCATEGORY = "subcategory"
         const val DOWNLOADED_EPISODES = "downloaded_episodes"
+
+        private const val TAG_TRENDING_RECOMMENDATIONS = "trending_and_recommendations"
     }
 
     override fun setupOnboardingNotifications() {
@@ -82,7 +84,7 @@ class NotificationSchedulerImpl @Inject constructor(
                 SUBCATEGORY to notification.subcategory,
             )
 
-            val tag = "trending_and_recommendations-${notification.subcategory}"
+            val tag = "$TAG_TRENDING_RECOMMENDATIONS-${notification.subcategory}"
             val notificationWork = PeriodicWorkRequest.Builder(NotificationWorker::class.java, 7, TimeUnit.DAYS)
                 .setInputData(workData)
                 .setInitialDelay(initialDelay, TimeUnit.MILLISECONDS)
@@ -91,9 +93,15 @@ class NotificationSchedulerImpl @Inject constructor(
 
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(
                 tag,
-                ExistingPeriodicWorkPolicy.UPDATE,
+                ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
                 notificationWork,
             )
+        }
+    }
+
+    override fun cancelScheduledTrendingAndRecommendationsNotifications() {
+        TrendingAndRecommendationsNotificationType.values.forEach {
+            WorkManager.getInstance(context).cancelUniqueWork("$TAG_TRENDING_RECOMMENDATIONS-${it.subcategory}")
         }
     }
 }

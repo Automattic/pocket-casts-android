@@ -4,4 +4,5 @@ interface NotificationScheduler {
     fun setupOnboardingNotifications()
     suspend fun setupReEngagementNotification()
     suspend fun setupTrendingAndRecommendationsNotifications()
+    fun cancelScheduledTrendingAndRecommendationsNotifications()
 }
