@@ -32,6 +32,7 @@ internal fun NotificationPreferenceCategory(
     items: List<NotificationPreferenceType>,
     onItemClicked: (NotificationPreferenceType) -> Unit,
     modifier: Modifier = Modifier,
+    isEnabled: Boolean = true,
 ) {
     SettingSection(
         modifier = modifier,

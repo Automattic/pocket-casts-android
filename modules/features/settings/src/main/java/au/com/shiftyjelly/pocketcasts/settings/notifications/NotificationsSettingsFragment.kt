@@ -106,6 +106,11 @@ internal class NotificationsSettingsFragment : BaseFragment(), PodcastSelectFrag
         return binding.root
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.onResumed()
+    }
+
     override fun podcastSelectFragmentSelectionChanged(newSelection: List<String>) {
         viewModel.onSelectedPodcastsChanged(newSelection)
     }

@@ -6,6 +6,7 @@ import androidx.core.app.NotificationCompat
 
 interface NotificationHelper {
 
+    fun hasNotificationsPermission(): Boolean
     fun setupNotificationChannels()
 
     fun downloadChannelBuilder(): NotificationCompat.Builder
