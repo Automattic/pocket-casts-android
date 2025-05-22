@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 @HiltWorker
 class NotificationWorker @AssistedInject constructor(
@@ -55,15 +56,19 @@ class NotificationWorker @AssistedInject constructor(
         val downloadedEpisodes = inputData.getInt(DOWNLOADED_EPISODES, 0)
 
         val builder = when (type) {
-            is TrendingAndRecommendationsNotificationType -> notificationHelper.trendingAndRecommendationsChannelBuilder()
+            is TrendingAndRecommendationsNotificationType -> {
+                notificationHelper.trendingAndRecommendationsChannelBuilder()
+            }
             else -> notificationHelper.dailyRemindersChannelBuilder()
         }
 
         return builder
+            .setSmallIcon(IR.drawable.notification)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setContentTitle(applicationContext.resources.getString(type.titleRes))
             .setContentText(type.formattedMessage(applicationContext, downloadedEpisodes))
             .setColor(ContextCompat.getColor(applicationContext, R.color.notification_color))
+            .setAutoCancel(true)
             .setContentIntent(openPageIntent(type))
     }
 

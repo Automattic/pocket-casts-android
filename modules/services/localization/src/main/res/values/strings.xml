@@ -1386,7 +1386,7 @@
     <string name="settings_notification_hide_on_pause">Hide playback notification on pause</string>
     <string name="settings_notification_notify_me">Notify me</string>
     <string name="settings_notification_daily_reminders">Daily Reminders</string>
-    <string name="settings_notification_recommendations">Trending &amp; recommendations</string>
+    <string name="settings_notification_recommendations">Trending &amp; Recommendations</string>
     <string name="settings_notification_play_over">Play over notifications</string>
     <string name="settings_notification_play_over_never">Never</string>
     <string name="settings_notification_play_over_duck">Duck volume</string>
@@ -2425,7 +2425,7 @@
     <string name="notification_content_recommendations_trending_title">Trending this week</string>
     <string name="notification_content_recommendations_trending_message">Check out what everyone else is listening this week.</string>
 
-    <string name="notification_content_recommendations_title">Trending this week</string>
+    <string name="notification_content_recommendations_title">New recommendations for you</string>
     <string name="notification_content_recommendations_message">Wondering what to listen to next? Check out these shows!</string>
 
 </resources>
