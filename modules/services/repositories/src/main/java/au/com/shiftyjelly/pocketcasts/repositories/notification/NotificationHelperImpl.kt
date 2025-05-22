@@ -26,6 +26,14 @@ class NotificationHelperImpl @Inject constructor(@ApplicationContext private val
     override fun hasNotificationsPermission() = Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
         ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
 
+    override fun openNotificationSettings(activity: Activity?) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O || activity == null) return
+
+        val intent = Intent(OsSettings.ACTION_APP_NOTIFICATION_SETTINGS)
+        intent.putExtra(OsSettings.EXTRA_APP_PACKAGE, activity.packageName)
+        activity.startActivity(intent)
+    }
+
     override fun isShowing(notificationId: Int): Boolean {
         return notificationManager?.activeNotifications?.firstOrNull { it.id == notificationId } != null
     }
