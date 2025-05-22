@@ -1,5 +1,8 @@
 7.90
 -----
+*   New Features
+    *   Add Recently Played sorting option for podcasts
+        ([#3816](https://github.com/Automattic/pocket-casts-android/pull/3816)) 
 *   Updates
     *   Add dropshadow to the podcast artwork and move it below toolbar.
         ([#4006](https://github.com/Automattic/pocket-casts-android/pull/4006))
