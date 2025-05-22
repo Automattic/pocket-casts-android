@@ -23,6 +23,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -38,14 +39,7 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
     val state = _state.asStateFlow()
 
     init {
-        viewModelScope.launch {
-            val subscriptionPlans = paymentClient.loadSubscriptionPlans().getOrNull()
-            if (subscriptionPlans == null) {
-                _state.value = OnboardingUpgradeFeaturesState.NoSubscriptions
-            } else {
-                _state.value = createInitialLoadedState(subscriptionPlans)
-            }
-        }
+        loadSubscriptionPlans()
     }
 
     private fun createInitialLoadedState(
@@ -59,6 +53,22 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
             showOnlyPatronPlans = showPatronOnly,
             purchaseFailed = false,
         )
+    }
+
+    private var subscriptionPlansJob: Job? = null
+
+    fun loadSubscriptionPlans() {
+        if (subscriptionPlansJob?.isActive == true) {
+            return
+        }
+        subscriptionPlansJob = viewModelScope.launch {
+            val subscriptionPlans = paymentClient.loadSubscriptionPlans().getOrNull()
+            if (subscriptionPlans == null) {
+                _state.value = OnboardingUpgradeFeaturesState.NoSubscriptions
+            } else {
+                _state.value = createInitialLoadedState(subscriptionPlans)
+            }
+        }
     }
 
     fun changeBillingCycle(billingCycle: BillingCycle) {

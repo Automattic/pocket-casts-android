@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade
 import androidx.activity.SystemBarStyle
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,11 +21,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
@@ -37,6 +40,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Snackbar
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -53,10 +59,12 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -72,9 +80,11 @@ import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationIconButton
 import au.com.shiftyjelly.pocketcasts.compose.bars.SystemBarsStyles
 import au.com.shiftyjelly.pocketcasts.compose.components.AutoResizeText
+import au.com.shiftyjelly.pocketcasts.compose.components.EmptyState
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalPagerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.components.SegmentedTabBar
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH60
 import au.com.shiftyjelly.pocketcasts.compose.images.OfferBadge
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -83,6 +93,7 @@ import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private const val MAX_OFFER_BADGE_TEXT_LENGTH = 23
@@ -138,8 +149,9 @@ internal fun OnboardingUpgradeFeaturesPage(
         is OnboardingUpgradeFeaturesState.NoSubscriptions -> {
             NoSubscriptionsLayout(
                 showNotNow = source == OnboardingUpgradeSource.RECOMMENDATIONS,
-                onBackPressed = onBackPressed,
+                onTryAgain = { viewModel.loadSubscriptionPlans() },
                 onNotNowPressed = onNotNowPressed,
+                onBackPressed = onBackPressed,
             )
         }
     }
@@ -164,6 +176,7 @@ private fun UpgradeLayout(
         contentAlignment = Alignment.BottomCenter,
     ) {
         val focusPager = remember { FocusRequester() }
+        val snackbarHostState = remember { SnackbarHostState() }
 
         // Need this BoxWithConstraints so we can force the inner column to fill the screen with vertical scroll enabled
         BoxWithConstraints(
@@ -270,6 +283,40 @@ private fun UpgradeLayout(
             upFocusRequester = focusPager,
             onClickSubscribe = onClickSubscribe,
         )
+
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier
+                .windowInsetsPadding(WindowInsets.navigationBars)
+                .padding(horizontal = 20.dp, vertical = 42.dp),
+        ) { snackbarData ->
+            Snackbar(
+                backgroundColor = Color.White,
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    Image(
+                        painter = painterResource(IR.drawable.ic_warning),
+                        colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.support05),
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp),
+                    )
+                    TextH60(
+                        text = snackbarData.message,
+                        color = Color.Black,
+                    )
+                }
+            }
+        }
+
+        if (state.purchaseFailed) {
+            val message = stringResource(LR.string.onboarding_upgrade_purchase_failure_message)
+            LaunchedEffect(state.purchaseFailed) {
+                snackbarHostState.showSnackbar(message)
+            }
+        }
     }
 }
 
@@ -500,16 +547,19 @@ internal fun BoxWithConstraintsScope.calculateMinimumHeightWithInsets(): Dp {
 @Composable
 fun NoSubscriptionsLayout(
     showNotNow: Boolean,
-    onBackPressed: () -> Unit,
+    onTryAgain: () -> Unit,
     onNotNowPressed: () -> Unit,
+    onBackPressed: () -> Unit,
 ) {
     Column(
-        Modifier
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
             .windowInsetsPadding(WindowInsets.statusBars)
             .windowInsetsPadding(WindowInsets.navigationBars)
-            .fillMaxWidth(),
+            .fillMaxSize(),
     ) {
         Spacer(Modifier.height(8.dp))
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -522,26 +572,20 @@ fun NoSubscriptionsLayout(
                     .height(48.dp)
                     .width(48.dp),
             )
-            if (showNotNow) {
-                TextH30(
-                    text = stringResource(LR.string.not_now),
-                    color = MaterialTheme.theme.colors.primaryText01,
-                    modifier = Modifier
-                        .padding(horizontal = 24.dp)
-                        .clickable { onNotNowPressed() },
-                )
-            }
         }
         Spacer(modifier = Modifier.weight(1f))
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center,
-        ) {
-            TextH30(
-                text = stringResource(id = LR.string.onboarding_upgrade_no_subscriptions_found),
-            )
-        }
-        Spacer(modifier = Modifier.weight(1f))
+
+        EmptyState(
+            title = stringResource(LR.string.onboarding_upgrade_no_plans_found_title),
+            subtitle = stringResource(LR.string.onboarding_upgrade_no_plans_found_body),
+            iconResourceId = IR.drawable.ic_warning,
+            primaryButtonText = stringResource(LR.string.try_again),
+            onPrimaryButtonClick = onTryAgain,
+            secondaryButtonText = if (showNotNow) stringResource(LR.string.skip_for_now) else null,
+            onSecondaryButtonClick = onNotNowPressed,
+        )
+
+        Spacer(modifier = Modifier.weight(1.5f))
     }
 }
 

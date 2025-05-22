@@ -554,7 +554,6 @@ Language: ar
     <string name="log_in_on_phone">تسجيل الدخول على الهاتف</string>
     <string name="log_in_with_google">تسجيل الدخول باستخدام غوغل.</string>
     <string name="log_in_subtitle">بدء الاستماع إلى حلقات البودكاست التي تفضلها</string>
-    <string name="onboarding_upgrade_no_subscriptions_found">لم يتم العثور على أي اشتراكات.</string>
     <string name="trial_then_per_year">جرب ⁦%1$s⁩، ثم ⁦%2$s⁩ في العام</string>
     <string name="trial_then_per_month">جرب ⁦%1$s⁩، ثم ⁦%2$s⁩ في الشهر</string>
     <string name="trial_start">بدء الإصدار التجريبي المجاني الخاص بي</string>

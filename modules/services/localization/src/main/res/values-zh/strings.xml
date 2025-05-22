@@ -557,7 +557,6 @@ Language: zh_CN
     <string name="log_in_on_phone">在手机上登录</string>
     <string name="log_in_with_google">使用 Google 登录</string>
     <string name="log_in_subtitle">开始收听您最喜欢的播客节目</string>
-    <string name="onboarding_upgrade_no_subscriptions_found">未找到订阅。</string>
     <string name="trial_then_per_year">试用 %1$s，之后每年 %2$s</string>
     <string name="trial_then_per_month">试用 %1$s，之后每月 %2$s</string>
     <string name="trial_start">开始免费试用</string>

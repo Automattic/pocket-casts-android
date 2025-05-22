@@ -557,7 +557,6 @@ Language: nl
     <string name="log_in_on_phone">Log in op telefoon</string>
     <string name="log_in_with_google">Log in met Google</string>
     <string name="log_in_subtitle">Luister naar je favoriete podcasts</string>
-    <string name="onboarding_upgrade_no_subscriptions_found">Geen abonnementen gevonden.</string>
     <string name="trial_then_per_year">Probeer %1$s, daarna %2$s per jaar</string>
     <string name="trial_then_per_month">Probeer %1$s, daarna %2$s per maand</string>
     <string name="trial_start">Mijn gratis proefversie starten</string>
