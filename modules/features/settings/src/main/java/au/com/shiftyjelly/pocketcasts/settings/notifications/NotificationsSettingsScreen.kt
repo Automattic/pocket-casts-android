@@ -31,7 +31,7 @@ import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationP
 internal fun NotificationsSettingsScreen(
     state: NotificationsSettingsViewModel.State,
     onPreferenceChanged: (NotificationPreferenceType) -> Unit,
-    onAdvancedSettingsClicked: () -> Unit,
+    onAdvancedSettingsClicked: (type: NotificationPreferenceType) -> Unit,
     onSelectRingtoneClicked: (String?) -> Unit,
     onSelectPodcastsClicked: () -> Unit,
     onBackPressed: () -> Unit,
@@ -60,8 +60,10 @@ internal fun NotificationsSettingsScreen(
                             items = category.preferences,
                             onItemClicked = { preference ->
                                 when (preference) {
-                                    is NotificationPreferenceType.AdvancedSettings -> {
-                                        onAdvancedSettingsClicked()
+                                    is NotificationPreferenceType.AdvancedSettings,
+                                    is NotificationPreferenceType.DailyReminderSettings,
+                                    is NotificationPreferenceType.RecommendationSettings -> {
+                                        onAdvancedSettingsClicked(preference)
                                     }
 
                                     is NotificationPreferenceType.NotifyOnThesePodcasts -> {

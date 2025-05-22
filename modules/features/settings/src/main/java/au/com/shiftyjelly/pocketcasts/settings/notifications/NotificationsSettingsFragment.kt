@@ -88,8 +88,14 @@ internal class NotificationsSettingsFragment : BaseFragment(), PodcastSelectFrag
                         activity?.onBackPressed()
                     },
                     bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
-                    onAdvancedSettingsClicked = {
-                        notificationHelper.openEpisodeNotificationSettings(requireActivity())
+                    onAdvancedSettingsClicked = { preference ->
+                        when (preference) {
+                            is NotificationPreferenceType.AdvancedSettings -> notificationHelper.openEpisodeNotificationSettings(requireActivity())
+                            is NotificationPreferenceType.DailyReminderSettings -> notificationHelper.openDailyReminderNotificationSettings(requireActivity())
+                            is NotificationPreferenceType.RecommendationSettings -> notificationHelper.openTrendingAndRecommendationsNotificationSettings(requireActivity())
+                            else -> Unit
+                        }
+
                     },
                     onSelectRingtoneClicked = ::showRingtoneSelector,
                     onSelectPodcastsClicked = ::showPodcastSelector,
