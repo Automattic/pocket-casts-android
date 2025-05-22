@@ -165,9 +165,9 @@ enum class Feature(
     PODCASTS_SORT_CHANGES(
         key = "podcasts_sort_changes",
         title = "Podcasts Sort Changes",
-        defaultValue = BuildConfig.DEBUG,
+        defaultValue = true,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
     GUEST_LISTS_NETWORK_HIGHLIGHTS_REDESIGN(
