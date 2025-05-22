@@ -75,7 +75,7 @@ class NotificationDelayCalculator @Inject constructor(
             set(Calendar.SECOND, 0)
             set(Calendar.MILLISECOND, 0)
 
-            if (timeInMillis <= currentTimeMillis) {
+            if (dayOffset > 1 || timeInMillis <= currentTimeMillis) {
                 add(Calendar.DAY_OF_YEAR, dayOffset)
             }
         }

@@ -206,7 +206,7 @@ class NotificationDelayCalculatorTest {
         val t = getFixedTime(2025, Calendar.MAY, 21, 15, 0)
         val calculatedDelay = calculatorAt(t).calculateDelayForRecommendations(0, 2)
         val calculatedTrendingTriggerTime = t + calculatedDelay
-        val expectedTrendingTime = getFixedTime(2025, Calendar.MAY, 22, 16, 0)
+        val expectedTrendingTime = getFixedTime(2025, Calendar.MAY, 21, 16, 0)
         assertEquals(expectedTrendingTime, calculatedTrendingTriggerTime)
 
         val calculatedRecommendationsDelay = calculatorAt(t).calculateDelayForRecommendations(1, 2)
