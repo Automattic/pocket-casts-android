@@ -2428,4 +2428,8 @@
     <string name="notification_content_recommendations_title">New recommendations for you</string>
     <string name="notification_content_recommendations_message">Wondering what to listen to next? Check out these shows!</string>
 
+    <string name="notifications_settings_turn_on_push_title">Turn on push notifications?</string>
+    <string name="notifications_settings_turn_on_push_message">To get notifications from Pocket Casts, you'll need to torun them on in your device settings.</string>
+    <string name="notifications_settings_turn_on_push_button">Go to device settings</string>
+
 </resources>
