@@ -343,6 +343,7 @@ private val KnownCategoryIds = mapOf(
     "fiction" to 17,
     "history" to 18,
     "true crime" to 19,
+    "series" to 20,
 )
 
 private fun getCategoryIdForName(name: String) = KnownCategoryIds[name.trim().lowercase()]
