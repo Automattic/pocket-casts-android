@@ -116,7 +116,7 @@ internal class NotificationsSettingsViewModelTest {
         preferenceRepository = repository,
         analyticsTracker = analytics,
         podcastManager = podcastManager,
-        notificationScheduler = notificationScheduler
+        notificationScheduler = notificationScheduler,
     )
 
     private companion object {

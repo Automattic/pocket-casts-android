@@ -95,7 +95,6 @@ internal class NotificationsSettingsFragment : BaseFragment(), PodcastSelectFrag
                             is NotificationPreferenceType.RecommendationSettings -> notificationHelper.openTrendingAndRecommendationsNotificationSettings(requireActivity())
                             else -> Unit
                         }
-
                     },
                     onSelectRingtoneClicked = ::showRingtoneSelector,
                     onSelectPodcastsClicked = ::showPodcastSelector,
