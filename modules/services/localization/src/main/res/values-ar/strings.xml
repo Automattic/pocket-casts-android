@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-04-29 12:54:03+0000
+Translation-Revision-Date: 2025-05-22 14:10:05+0000
 Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;
 Generator: GlotPress/2.4.0-alpha
 Language: ar
 -->
 <resources>
+    <string name="skip_for_now">التخطي الآن</string>
+    <string name="onboarding_plus_feature_libro_title">كتاب صوتي مجّاني من &lt;a href=\"https://libro.fm/\"&gt;Libro.fm&lt;/a&gt;</string>
+    <string name="you_might_like">ربما ينال إعجابك</string>
+    <string name="podroll_information_button">فهمت</string>
+    <string name="podroll_information_summary">مختارات المبدعين هي مدونات بث صوتية يوصي بها مبدعي البرامج باستخدام Podroll.</string>
+    <string name="podroll_information_title">ما مختارات المبدعين؟</string>
+    <string name="recommended_by_creator">العروض التي يوصي بها المبدعون</string>
     <string name="winback_cancel_subscription_continue_cancel_button_label">الاستمرار مع الإلغاء</string>
     <string name="winback_cancel_subscription_accept_offer_button_label">قبول العرض</string>
     <string name="winback_claimed_offer_message_4">شكرًا على اختيار Pocket Casts. يبدأ عامك المخفَّض بعد فترة الفوترة الحالية الخاصة بك.</string>
@@ -15,7 +22,6 @@ Language: ar
     <string name="winback_offer_free_offer_yearly_title">الحصول على خصم قدره 50%% على عامك التالي وتوفير ⁦%1$s⁩</string>
     <string name="winback_offer_free_offer_title">الحصول على شهرك التالي مجانًا وتوفير ⁦%1$s⁩</string>
     <string name="recommendations_loved_by_listeners">محبوب من قِبل مستمعي</string>
-    <string name="recommendations_if_you_like">إذا كنت ترغب</string>
     <string name="winback_cancel_subscription_header_title">أشياء يجب أن تعرفها قبل أن تقوم بالإلغاء</string>
     <string name="winback_offer_header">هل تفكر في المغادرة؟\nدعنا نساعدك أولا</string>
     <string name="account_benefit_recommendations_description">احصل على اقتراحات بودكاست مخصصة استنادًا إلى عادات الاستماع الخاصة بك.</string>
@@ -371,7 +377,6 @@ Language: ar
     <string name="widget_nothing_in_up_next">لا يوجد شيء في التالي</string>
     <string name="widget_no_episode_playing">لا توجد حلقة قيد التشغيل</string>
     <string name="clear_search">مسح البحث</string>
-    <string name="bookmarks_search_results_not_found">لم نتمكن من العثور على أي إشارة مرجعية لذلك البحث.</string>
     <string name="podcast_and_episode">البث الصوتي والحلقة</string>
     <string name="skip_chapters">تحديد الفصول سابقًا</string>
     <string name="settings_use_episode_artwork_details">تحتوي بعض العروض على أعمال فنية مخصصة لحلقات معينة. قم بتمكين هذا الخيار، وسيقوم Pocket Casts بعرضها بدلاً من العمل الفني للعرض.</string>
@@ -431,7 +436,6 @@ Language: ar
     <string name="bookmarks_upsell_instructions_early_access">احصل على وصول مبكر إلى هذه الميزة باستخدام Pocket Casts Patron واحفظ الطوابع الزمنية لحلقاتك المفضلة. متاح لمشتركي Plus قريبًا.</string>
     <string name="bookmarks_upsell_instructions">احفظ الطوابع الزمنية لحلقاتك المفضلة وافتح العديد من الميزات الأخرى باستخدام Pocket Casts Plus.</string>
     <string name="error_loading_show_notes">يتعذر العثور على ملحوظات العرض لهذه الحلقة.</string>
-    <string name="podcast_no_bookmarks_matching">لا يتضمن هذا البث الصوتي أي إشارات مرجعية تتطابق مع معايير بحثك.</string>
     <string name="podcast_no_bookmarks_found">لم يتم العثور على أي إشارات مرجعية</string>
     <string name="player_tab_notes">تفاصيل</string>
     <string name="bookmark_updated">تم تحديث الإشارة المرجعية \"%s\"</string>
@@ -554,7 +558,6 @@ Language: ar
     <string name="log_in_on_phone">تسجيل الدخول على الهاتف</string>
     <string name="log_in_with_google">تسجيل الدخول باستخدام غوغل.</string>
     <string name="log_in_subtitle">بدء الاستماع إلى حلقات البودكاست التي تفضلها</string>
-    <string name="onboarding_upgrade_no_subscriptions_found">لم يتم العثور على أي اشتراكات.</string>
     <string name="trial_then_per_year">جرب ⁦%1$s⁩، ثم ⁦%2$s⁩ في العام</string>
     <string name="trial_then_per_month">جرب ⁦%1$s⁩، ثم ⁦%2$s⁩ في الشهر</string>
     <string name="trial_start">بدء الإصدار التجريبي المجاني الخاص بي</string>
@@ -1653,7 +1656,6 @@ Language: ar
     <string name="podcast_released_daily">يتم إصدارها يوميًا</string>
     <string name="podcast_playback_effects">تأثيرات التشغيل</string>
     <string name="podcast_notifications">التنبيهات</string>
-    <string name="podcast_no_episodes_matching">لا يتضمن هذا البث الصوتي أي حلقات تطابق معايير بحثك.</string>
     <string name="podcast_no_episodes_all_archived">تمت أرشفة جميع %d من حلقات هذا البث الصوتي.</string>
     <string name="podcast_no_episodes">لا توجد أي حلقات في هذا البث الصوتي</string>
     <string name="podcast_no_episodes_found">لم يتم العثور على أي حلقات</string>
@@ -1687,7 +1689,6 @@ Language: ar
     <string name="podcast_archive_all_played">أرشفة جميع الملفات التي تم تشغيلها</string>
     <string name="podcast_archive_all">أرشفة الكل</string>
     <string name="podcasts_unarchive">إلغاء الأرشفة</string>
-    <string name="podcasts_time_to_add_some_podcasts_summary">يمكنك إضافة حلقات بث صوتي عن طريق البحث في الجزء العلوي أو إذا كنت تبحث عن بعض الإلهام، فجرب علامة تبويب \"اكتشاف\".</string>
     <string name="podcasts_time_to_add_some_podcasts">حان الوقت لإضافة بعض حلقات البث الصوتي!</string>
     <string name="podcasts_sort_order">فرز الطلب</string>
     <string name="podcasts_sort_by_title">\"الاسم (من A إلى Z)\"</string>
@@ -1942,6 +1943,14 @@ Language: ar
         <item quantity="many">أيام</item>
         <item quantity="other">أيام</item>
     </plurals>
+    <plurals name="day_with_count">
+        <item quantity="zero">⁦%1$d⁩ من الأيام</item>
+        <item quantity="one">⁦%1$d⁩ من الأيام</item>
+        <item quantity="two">⁦%1$d⁩ من الأيام</item>
+        <item quantity="few">⁦%1$d⁩ من الأيام</item>
+        <item quantity="many">⁦%1$d⁩ من الأيام</item>
+        <item quantity="other">⁦%1$d⁩ من الأيام</item>
+    </plurals>
     <plurals name="episode_count">
         <item quantity="zero">%d من الحلقات</item>
         <item quantity="one">%d من الحلقات</item>
@@ -1965,6 +1974,14 @@ Language: ar
         <item quantity="few">دقائق</item>
         <item quantity="many">دقائق</item>
         <item quantity="other">دقائق</item>
+    </plurals>
+    <plurals name="month_with_count">
+        <item quantity="zero"> ⁦%1$d⁩ من الأشهر</item>
+        <item quantity="one">⁦%1$d⁩ من الأشهر</item>
+        <item quantity="two">⁦%1$d⁩ من الأشهر</item>
+        <item quantity="few">⁦%1$d⁩ من الأشهر</item>
+        <item quantity="many">⁦%1$d⁩ من الأشهر</item>
+        <item quantity="other">⁦%1$d⁩ من الأشهر</item>
     </plurals>
     <plurals name="player_up_next_header_title">
         <item quantity="zero">⁦%1$d⁩ من الحلقات - ⁦%2$s⁩ لليسار</item>
@@ -2069,5 +2086,21 @@ Language: ar
         <item quantity="few">ثوانٍ</item>
         <item quantity="many">ثوانٍ</item>
         <item quantity="other">ثوانٍ</item>
+    </plurals>
+    <plurals name="week_with_count">
+        <item quantity="zero">⁦%1$d⁩ من الأسابيع</item>
+        <item quantity="one">⁦%1$d⁩ من الأسابيع</item>
+        <item quantity="two">⁦%1$d⁩ من الأسابيع</item>
+        <item quantity="few">⁦%1$d⁩ من الأسابيع</item>
+        <item quantity="many">⁦%1$d⁩ من الأسابيع</item>
+        <item quantity="other">⁦%1$d⁩ من الأسابيع</item>
+    </plurals>
+    <plurals name="year_with_count">
+        <item quantity="zero">⁦%1$d⁩ من الأعوام</item>
+        <item quantity="one">⁦%1$d⁩ من الأعوام</item>
+        <item quantity="two">⁦%1$d⁩ من الأعوام</item>
+        <item quantity="few">⁦%1$d⁩ من الأعوام</item>
+        <item quantity="many">⁦%1$d⁩ من الأعوام</item>
+        <item quantity="other">⁦%1$d⁩ من الأعوام</item>
     </plurals>
 </resources>

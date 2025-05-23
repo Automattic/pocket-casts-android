@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-04-30 14:54:04+0000
+Translation-Revision-Date: 2025-05-22 14:10:05+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="skip_for_now">暂时跳过</string>
+    <string name="plus_week">周</string>
+    <string name="onboarding_plus_recurring_after_intro_offer">第一年 (%2$s) 后按 %1$s 定期付款</string>
+    <string name="you_might_like_empty_title">无法加载推荐内容</string>
+    <string name="onboarding_plus_feature_libro_title">来自 &lt;a href=\"https://libro.fm/\"&gt;Libro.fm&lt;/a&gt; 的免费有声读物</string>
+    <string name="you_might_like">您可能会喜欢</string>
+    <string name="podroll_information_button">知道了</string>
+    <string name="podroll_information_summary">“创作者精选”是节目创作者使用 Podroll 推荐的播客。</string>
+    <string name="podroll_information_title">什么是“创作者精选”？</string>
+    <string name="recommended_by_creator">创作者推荐的节目</string>
     <string name="winback_cancel_subscription_continue_cancel_button_label">继续取消</string>
     <string name="winback_cancel_subscription_accept_offer_button_label">接受优惠</string>
     <string name="winback_claimed_offer_message_4">感谢您选用 Pocket Casts。 您的年度折扣套餐将从您当前的计费周期结束后开始计算。</string>
@@ -15,7 +25,6 @@ Language: zh_CN
     <string name="winback_offer_free_offer_yearly_title">下一年获享 50%% 优惠，可节省 %1$s</string>
     <string name="winback_offer_free_offer_title">下个月免费，可节省 %1$s</string>
     <string name="recommendations_loved_by_listeners">深受听众喜爱，包括</string>
-    <string name="recommendations_if_you_like">如果您喜欢</string>
     <string name="price_per_week_usd">\u0024%1$.2f/周</string>
     <string name="price_per_week">%1$.2f %2$s/周</string>
     <string name="winback_cancel_subscription_header_title">取消前的须知事项</string>
@@ -30,7 +39,6 @@ Language: zh_CN
     <string name="account_encourage_description">创建账户或登录，即可尽情使用 Pocket Casts。</string>
     <string name="account_encourage_title">我们注意到您尚未登录</string>
     <string name="onboarding_get_started">开始</string>
-    <string name="onboarding_plus_feature_libro_title"><![CDATA[来自 <a href="https://libro.fm/">Libro.fm</a> 的免费有声读物]]></string>
     <string name="encourage_account_history_banner_description">创建一个免费账户，即可随时随地同步您的收听历史记录。</string>
     <string name="encourage_account_history_banner_title">记录播放历史</string>
     <string name="encourage_account_filters_banner_description">创建一个免费账户，即可在任何设备上同步您的筛选条件。</string>
@@ -374,7 +382,6 @@ Language: zh_CN
     <string name="widget_nothing_in_up_next">“接下来播放”列表无内容</string>
     <string name="widget_no_episode_playing">未播放剧集</string>
     <string name="clear_search">清除搜索</string>
-    <string name="bookmarks_search_results_not_found">我们未搜索到任何相关书签。</string>
     <string name="podcast_and_episode">播客与剧集</string>
     <string name="skip_chapters">预选章节</string>
     <string name="settings_use_episode_artwork_details">有些节目会为特定剧集定制插图。 启用此选项后，Pocket Casts 将显示剧集的插图，而非节目的插图。</string>
@@ -434,7 +441,6 @@ Language: zh_CN
     <string name="bookmarks_upsell_instructions_early_access">通过 Pocket Casts Patron 尽早使用此功能，并保存收藏剧集的时间戳。 即将面向 Plus 订阅用户推出。</string>
     <string name="bookmarks_upsell_instructions">通过 Pocket Casts Plus 保存收藏剧集的时间戳，并解锁更多功能。</string>
     <string name="error_loading_show_notes">无法找到本剧集的节目注释。</string>
-    <string name="podcast_no_bookmarks_matching">此播客没有符合您搜索条件的书签。</string>
     <string name="podcast_no_bookmarks_found">未找到书签</string>
     <string name="player_tab_notes">详细信息</string>
     <string name="bookmark_updated">已更新书签“%s”</string>
@@ -557,7 +563,6 @@ Language: zh_CN
     <string name="log_in_on_phone">在手机上登录</string>
     <string name="log_in_with_google">使用 Google 登录</string>
     <string name="log_in_subtitle">开始收听您最喜欢的播客节目</string>
-    <string name="onboarding_upgrade_no_subscriptions_found">未找到订阅。</string>
     <string name="trial_then_per_year">试用 %1$s，之后每年 %2$s</string>
     <string name="trial_then_per_month">试用 %1$s，之后每月 %2$s</string>
     <string name="trial_start">开始免费试用</string>
@@ -691,6 +696,7 @@ Language: zh_CN
     <string name="onboarding_welcome_recommendations_title">发现新事物</string>
     <string name="onboarding_welcome_get_you_listening_plus">谢谢，现在开始聆听吧！</string>
     <string name="onboarding_welcome_get_you_listening">欢迎，现在开始聆听吧！</string>
+    <string name="onboarding_plus_recurring_after_free_trial">定期付款将在您的 %1$s (%2$s) 后开始</string>
     <string name="onboarding_plus_start_free_trial_and_subscribe">开始免费试用版并订阅</string>
     <string name="onboarding_plus_terms_and_conditions">条款和条件</string>
     <string name="onboarding_plus_privacy_policy">隐私政策</string>
@@ -1656,7 +1662,6 @@ Language: zh_CN
     <string name="podcast_released_daily">每天发布一次</string>
     <string name="podcast_playback_effects">播放效果</string>
     <string name="podcast_notifications">通知</string>
-    <string name="podcast_no_episodes_matching">此播客没有符合您搜索条件的剧集。</string>
     <string name="podcast_no_episodes_all_archived">此播客的所有 %d 集都已存档</string>
     <string name="podcast_no_episodes">此播客中没有剧集</string>
     <string name="podcast_no_episodes_found">未找到剧集</string>
@@ -1690,7 +1695,6 @@ Language: zh_CN
     <string name="podcast_archive_all_played">存档所有已播放内容</string>
     <string name="podcast_archive_all">全部存档</string>
     <string name="podcasts_unarchive">取消存档</string>
-    <string name="podcasts_time_to_add_some_podcasts_summary">您可以通过在上方搜索来添加播客，或者如果您正在寻找灵感，请尝试“发现”选项卡。</string>
     <string name="podcasts_time_to_add_some_podcasts">是时候添加一些播客了！</string>
     <string name="podcasts_sort_order">排序</string>
     <string name="podcasts_sort_by_title">“标题 (A - Z)”</string>
@@ -1935,6 +1939,9 @@ Language: zh_CN
     <plurals name="day">
         <item quantity="other">天</item>
     </plurals>
+    <plurals name="day_with_count">
+        <item quantity="other">%1$d 天</item>
+    </plurals>
     <plurals name="episode_count">
         <item quantity="other">%d 集</item>
     </plurals>
@@ -1943,6 +1950,9 @@ Language: zh_CN
     </plurals>
     <plurals name="minute">
         <item quantity="other">分钟</item>
+    </plurals>
+    <plurals name="month_with_count">
+        <item quantity="other">%1$d 个月</item>
     </plurals>
     <plurals name="player_up_next_header_title">
         <item quantity="other" formatted="true">%1$d 集 — 剩余 %2$s</item>
@@ -1985,5 +1995,11 @@ Language: zh_CN
     </plurals>
     <plurals name="settings_auto_download_on_follow_podcast_description">
         <item quantity="other">自动下载所关注新节目的最新 %s 集。</item>
+    </plurals>
+    <plurals name="week_with_count">
+        <item quantity="other">%1$d 周</item>
+    </plurals>
+    <plurals name="year_with_count">
+        <item quantity="other">%1$d 年</item>
     </plurals>
 </resources>
