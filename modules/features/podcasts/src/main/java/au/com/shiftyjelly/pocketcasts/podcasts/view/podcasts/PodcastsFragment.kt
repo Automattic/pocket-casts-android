@@ -598,7 +598,7 @@ private fun NoPodcastsBanner(
 ) {
     NoContentBanner(
         title = stringResource(LR.string.podcasts_time_to_add_some_podcasts),
-        subtitle = stringResource(LR.string.podcasts_time_to_add_some_podcasts_summary),
+        body = stringResource(LR.string.podcasts_time_to_add_some_podcasts_summary),
         iconResourceId = IR.drawable.ic_podcasts,
         primaryButtonText = stringResource(LR.string.podcasts_discover),
         onPrimaryButtonClick = onClickButton,
@@ -611,7 +611,7 @@ private fun NoFolderPodcastsBanner(
 ) {
     NoContentBanner(
         title = stringResource(LR.string.podcasts_empty_folder),
-        subtitle = stringResource(LR.string.podcasts_empty_folder_summary),
+        body = stringResource(LR.string.podcasts_empty_folder_summary),
         iconResourceId = IR.drawable.ic_folder,
         primaryButtonText = stringResource(LR.string.add_podcasts),
         onPrimaryButtonClick = onClickButton,

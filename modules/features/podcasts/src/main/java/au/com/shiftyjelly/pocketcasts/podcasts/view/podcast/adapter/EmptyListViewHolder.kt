@@ -27,7 +27,7 @@ class EmptyListViewHolder(
                 ) {
                     NoContentBanner(
                         title = emptyList.title,
-                        subtitle = emptyList.subtitle,
+                        body = emptyList.subtitle,
                         iconResourceId = emptyList.iconResourceId,
                         primaryButtonText = emptyList.buttonText,
                         onPrimaryButtonClick = emptyList.onButtonClick,

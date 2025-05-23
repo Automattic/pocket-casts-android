@@ -172,7 +172,7 @@ private fun Content(
             ) {
                 NoContentBanner(
                     title = stringResource(LR.string.bookmarks_empty_state_title),
-                    subtitle = stringResource(LR.string.bookmarks_paid_user_empty_state_message),
+                    body = stringResource(LR.string.bookmarks_paid_user_empty_state_message),
                     iconResourceId = IR.drawable.ic_bookmark,
                     primaryButtonText = stringResource(LR.string.bookmarks_headphone_settings),
                     onPrimaryButtonClick = {
@@ -186,7 +186,7 @@ private fun Content(
             ) {
                 NoContentBanner(
                     title = stringResource(LR.string.bookmarks_empty_state_title),
-                    subtitle = stringResource(LR.string.bookmarks_free_user_empty_state_message),
+                    body = stringResource(LR.string.bookmarks_free_user_empty_state_message),
                     iconResourceId = IR.drawable.ic_bookmark,
                     primaryButtonText = stringResource(LR.string.bookmarks_free_user_empty_state_button),
                     onPrimaryButtonClick = onUpgradeClicked,

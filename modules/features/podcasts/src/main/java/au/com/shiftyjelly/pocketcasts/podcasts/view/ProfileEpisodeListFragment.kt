@@ -484,7 +484,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
                     ) {
                         NoContentBanner(
                             title = stringResource(state.titleRes),
-                            subtitle = stringResource(state.summaryRes),
+                            body = stringResource(state.summaryRes),
                             iconResourceId = state.iconRes,
                             primaryButtonText = buttonText,
                             onPrimaryButtonClick = {

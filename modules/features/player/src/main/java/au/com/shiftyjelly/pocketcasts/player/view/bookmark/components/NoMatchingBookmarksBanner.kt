@@ -16,7 +16,7 @@ fun NoMatchingBookmarksBanner(
 ) {
     NoContentBanner(
         title = stringResource(LR.string.podcast_no_bookmarks_found),
-        subtitle = stringResource(LR.string.bookmarks_search_results_not_found),
+        body = stringResource(LR.string.bookmarks_search_results_not_found),
         iconResourceId = R.drawable.ic_bookmark,
         modifier = modifier,
     )

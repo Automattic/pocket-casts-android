@@ -187,7 +187,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                 ) {
                     NoContentBanner(
                         title = stringResource(LR.string.profile_files_empty_title),
-                        subtitle = stringResource(LR.string.profile_files_empty_summary),
+                        body = stringResource(LR.string.profile_files_empty_summary),
                         iconResourceId = IR.drawable.ic_file,
                         modifier = Modifier.padding(vertical = 24.dp),
                     )

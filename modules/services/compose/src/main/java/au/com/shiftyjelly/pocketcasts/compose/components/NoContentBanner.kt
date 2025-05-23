@@ -42,7 +42,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 @Composable
 fun NoContentBanner(
     title: String,
-    subtitle: String,
+    body: String,
     @DrawableRes iconResourceId: Int,
     modifier: Modifier = Modifier,
     primaryButtonText: String? = null,
@@ -77,9 +77,9 @@ fun NoContentBanner(
             fontWeight = FontWeight.W500,
         )
 
-        if (subtitle.isNotEmpty()) {
+        if (body.isNotEmpty()) {
             TextP40(
-                text = subtitle,
+                text = body,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.theme.colors.primaryText02,
                 fontSize = 15.sp,
@@ -154,7 +154,7 @@ private fun UpNextNoContentBannerPreview(
     AppThemeWithBackground(themeType = themeType) {
         NoContentBanner(
             title = "Time to add some podcasts",
-            subtitle = "Discover and subscribe to your favorite podcasts.",
+            body = "Discover and subscribe to your favorite podcasts.",
             iconResourceId = IR.drawable.ic_podcasts,
             primaryButtonText = "Discover",
             secondaryButtonText = "How do I do that?",
@@ -168,7 +168,7 @@ private fun UpNextNoContentBannerWithoutSubtitlePreview() {
     AppThemeWithBackground(themeType = Theme.ThemeType.LIGHT) {
         NoContentBanner(
             title = "Time to add some podcasts",
-            subtitle = "",
+            body = "",
             iconResourceId = IR.drawable.ic_podcasts,
             primaryButtonText = "Discover",
             secondaryButtonText = "How do I do that?",
@@ -182,7 +182,7 @@ private fun UpNextNoContentBannerWithoutPrimaryButtonPreview() {
     AppThemeWithBackground(themeType = Theme.ThemeType.LIGHT) {
         NoContentBanner(
             title = "Time to add some podcasts",
-            subtitle = "Discover and subscribe to your favorite podcasts.",
+            body = "Discover and subscribe to your favorite podcasts.",
             iconResourceId = IR.drawable.ic_podcasts,
             secondaryButtonText = "How do I do that?",
         )
@@ -195,7 +195,7 @@ private fun UpNextNoContentBannerWithoutSecondaryButtonPreview() {
     AppThemeWithBackground(themeType = Theme.ThemeType.LIGHT) {
         NoContentBanner(
             title = "Time to add some podcasts",
-            subtitle = "Discover and subscribe to your favorite podcasts.",
+            body = "Discover and subscribe to your favorite podcasts.",
             iconResourceId = IR.drawable.ic_podcasts,
             primaryButtonText = "Discover",
         )

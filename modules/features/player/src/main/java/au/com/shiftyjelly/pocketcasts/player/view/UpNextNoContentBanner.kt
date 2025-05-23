@@ -15,7 +15,7 @@ fun UpNextNoContentBanner(
 ) {
     NoContentBanner(
         title = stringResource(LR.string.player_up_next_empty_title),
-        subtitle = stringResource(LR.string.player_up_next_empty_subtitle),
+        body = stringResource(LR.string.player_up_next_empty_subtitle),
         iconResourceId = R.drawable.mini_player_upnext,
         primaryButtonText = stringResource(LR.string.go_to_discover),
         onPrimaryButtonClick = onDiscoverTapped,

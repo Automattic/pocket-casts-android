@@ -577,7 +577,7 @@ fun NoSubscriptionsLayout(
 
         NoContentBanner(
             title = stringResource(LR.string.onboarding_upgrade_no_plans_found_title),
-            subtitle = stringResource(LR.string.onboarding_upgrade_no_plans_found_body),
+            body = stringResource(LR.string.onboarding_upgrade_no_plans_found_body),
             iconResourceId = IR.drawable.ic_warning,
             primaryButtonText = stringResource(LR.string.try_again),
             onPrimaryButtonClick = onTryAgain,
