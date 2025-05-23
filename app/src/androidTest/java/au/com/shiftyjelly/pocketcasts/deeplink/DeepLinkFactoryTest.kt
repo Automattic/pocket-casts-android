@@ -1145,4 +1145,15 @@ class DeepLinkFactoryTest {
 
         assertEquals(ThemesDeepLink, deepLink)
     }
+
+    @Test
+    fun smartFolders() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("pktc://features/suggestedFolders"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(SmartFoldersDeepLink, deepLink)
+    }
 }
