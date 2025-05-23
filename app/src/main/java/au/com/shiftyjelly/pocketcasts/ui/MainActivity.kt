@@ -82,6 +82,7 @@ import au.com.shiftyjelly.pocketcasts.deeplink.ShowPodcastsDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowUpNextModalDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowUpNextTabDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.SignInDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.SmartFoldersDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.SonosDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.StaffPicksDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ThemesDeepLink
@@ -1388,6 +1389,9 @@ class MainActivity :
                 }
                 is UpsellDeepLink -> {
                     openOnboardingFlow(OnboardingFlow.Upsell(OnboardingUpgradeSource.DEEP_LINK))
+                }
+                is SmartFoldersDeepLink -> {
+                    // TODO figure out what to do with it
                 }
                 is UpgradeAccountDeepLink -> {
                     showAccountUpgradeNowDialog(shouldClose = true)
