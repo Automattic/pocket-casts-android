@@ -13,7 +13,6 @@ import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationP
 import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreferenceType
 import au.com.shiftyjelly.pocketcasts.settings.util.TextResource
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
-import com.google.protobuf.value
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -145,7 +144,7 @@ internal class NotificationsSettingsViewModelTest {
         notificationHelper.stub {
             onBlocking { hasNotificationsPermission() }.doReturn(true)
         }
-        viewModel.onResumed()
+        viewModel.checkNotificationPermission()
 
         assertEquals(viewModel.state.value.areSystemNotificationsEnabled, true)
     }

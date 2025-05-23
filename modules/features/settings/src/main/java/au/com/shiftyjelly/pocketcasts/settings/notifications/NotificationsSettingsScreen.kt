@@ -59,9 +59,10 @@ internal fun NotificationsSettingsScreen(
             contentPadding = PaddingValues(bottom = bottomInset),
         ) {
             if (!state.areSystemNotificationsEnabled) {
-                stickyHeader {
+                item {
                     Banner(
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
                             .padding(horizontal = 16.dp)
                             .padding(top = 16.dp),
                         title = stringResource(LR.string.notifications_settings_turn_on_push_title),
@@ -69,7 +70,7 @@ internal fun NotificationsSettingsScreen(
                         actionLabel = stringResource(LR.string.notifications_settings_turn_on_push_button),
                         icon = painterResource(IR.drawable.ic_notifications),
                         onActionClick = onSystemNotificationsSettingsClicked,
-                        onDismiss = null
+                        onDismiss = null,
                     )
                 }
             }
@@ -111,51 +112,9 @@ internal fun NotificationsSettingsScreen(
 
 @Preview
 @Composable
-private fun PreviewNotificationSettingsScreen(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) =
-    AppTheme(themeType) {
-        NotificationsSettingsScreen(
-            state = NotificationsSettingsViewModel.State(
-                areSystemNotificationsEnabled = true,
-                categories = listOf(
-                    CategoryModel(
-                        title = TextResource.fromText("My episodes"),
-                        preferences = listOf(
-                            NotificationPreferenceType.NotifyMeOnNewEpisodes(
-                                title = TextResource.fromText("Notify me"),
-                                isEnabled = false,
-                            ),
-                        ),
-                    ),
-                    CategoryModel(
-                        title = TextResource.fromText("Settings"),
-                        preferences = listOf(
-                            NotificationPreferenceType.PlayOverNotifications(
-                                title = TextResource.fromText("Play over notifications"),
-                                value = PlayOverNotificationSetting.DUCK,
-                                displayValue = TextResource.fromText("Duck"),
-                                options = emptyList(),
-                            ),
-                            NotificationPreferenceType.HidePlaybackNotificationOnPause(
-                                title = TextResource.fromText("Hide playback notification on pause"),
-                                isEnabled = true,
-                            ),
-                        ),
-                    ),
-                ),
-            ),
-            onPreferenceChanged = {},
-            onAdvancedSettingsClicked = {},
-            onBackPressed = {},
-            bottomInset = 0.dp,
-            onSelectRingtoneClicked = {},
-            onSelectPodcastsClicked = {},
-            onSystemNotificationsSettingsClicked = {},
-        )
-    }
-
-@Preview
-@Composable
-private fun PreviewDisabledNotificationSettingsScreen(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) =
+private fun PreviewNotificationSettingsScreen(
+    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
+) =
     AppTheme(themeType) {
         NotificationsSettingsScreen(
             state = NotificationsSettingsViewModel.State(
@@ -196,3 +155,46 @@ private fun PreviewDisabledNotificationSettingsScreen(@PreviewParameter(ThemePre
             onSystemNotificationsSettingsClicked = {},
         )
     }
+
+@Preview
+@Composable
+private fun PreviewDisabledNotificationsSettingsScreen() = AppTheme(Theme.ThemeType.INDIGO) {
+    NotificationsSettingsScreen(
+        state = NotificationsSettingsViewModel.State(
+            areSystemNotificationsEnabled = true,
+            categories = listOf(
+                CategoryModel(
+                    title = TextResource.fromText("My episodes"),
+                    preferences = listOf(
+                        NotificationPreferenceType.NotifyMeOnNewEpisodes(
+                            title = TextResource.fromText("Notify me"),
+                            isEnabled = false,
+                        ),
+                    ),
+                ),
+                CategoryModel(
+                    title = TextResource.fromText("Settings"),
+                    preferences = listOf(
+                        NotificationPreferenceType.PlayOverNotifications(
+                            title = TextResource.fromText("Play over notifications"),
+                            value = PlayOverNotificationSetting.DUCK,
+                            displayValue = TextResource.fromText("Duck"),
+                            options = emptyList(),
+                        ),
+                        NotificationPreferenceType.HidePlaybackNotificationOnPause(
+                            title = TextResource.fromText("Hide playback notification on pause"),
+                            isEnabled = true,
+                        ),
+                    ),
+                ),
+            ),
+        ),
+        onPreferenceChanged = {},
+        onAdvancedSettingsClicked = {},
+        onBackPressed = {},
+        bottomInset = 0.dp,
+        onSelectRingtoneClicked = {},
+        onSelectPodcastsClicked = {},
+        onSystemNotificationsSettingsClicked = {},
+    )
+}

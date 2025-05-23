@@ -111,7 +111,7 @@ internal class NotificationsSettingsFragment : BaseFragment(), PodcastSelectFrag
 
     override fun onResume() {
         super.onResume()
-        viewModel.onResumed()
+        viewModel.checkNotificationPermission()
     }
 
     override fun podcastSelectFragmentSelectionChanged(newSelection: List<String>) {

@@ -156,7 +156,7 @@ internal class NotificationsSettingsViewModel @Inject constructor(
         analyticsTracker.track(AnalyticsEvent.SETTINGS_NOTIFICATIONS_SHOWN)
     }
 
-    internal fun onResumed() {
+    internal fun checkNotificationPermission() {
         _state.update {
             it.copy(areSystemNotificationsEnabled = notificationHelper.hasNotificationsPermission())
         }
