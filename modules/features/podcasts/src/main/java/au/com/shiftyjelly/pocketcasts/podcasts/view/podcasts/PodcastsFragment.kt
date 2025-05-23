@@ -228,7 +228,7 @@ class PodcastsFragment :
                         toolbarColors = ToolbarColors.theme(
                             theme = theme,
                             context = requireContext(),
-                            excludeMenuItems = listOf(R.id.folders_locked)
+                            excludeMenuItems = listOf(R.id.folders_locked),
                         )
                         navigationIcon = NavigationIcon.None
                     } else {
