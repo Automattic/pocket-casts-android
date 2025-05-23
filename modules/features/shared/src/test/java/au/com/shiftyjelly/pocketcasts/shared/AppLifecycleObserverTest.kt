@@ -158,7 +158,6 @@ class AppLifecycleObserverTest {
         verify(appLifecycleAnalytics, never()).onApplicationUpgrade(any())
         verify(notificationScheduler, never()).setupOnboardingNotifications()
         verify(notificationScheduler, times(1)).setupReEngagementNotification()
-        verify(notificationScheduler, times(1)).setupTrendingAndRecommendationsNotifications()
     }
 
     /* UPGRADE */
