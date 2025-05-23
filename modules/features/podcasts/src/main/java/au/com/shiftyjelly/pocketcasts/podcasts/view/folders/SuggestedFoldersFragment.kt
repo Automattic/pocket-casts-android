@@ -232,6 +232,9 @@ class SuggestedFoldersFragment : BaseDialogFragment() {
         ToolbarButton(
             analyticsValue = "podcasts_list",
         ),
+        DEEPLINK(
+            analyticsValue = "deeplink"
+        )
     }
 
     @Parcelize
