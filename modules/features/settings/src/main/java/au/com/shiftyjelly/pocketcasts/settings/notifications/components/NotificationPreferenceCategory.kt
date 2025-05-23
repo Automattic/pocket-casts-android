@@ -81,11 +81,9 @@ internal fun NotificationPreferenceCategory(
 
                 is NotificationPreferenceType.HidePlaybackNotificationOnPause -> {
                     SettingRow(
-                        enabled = isEnabled,
                         primaryText = item.title.asString(),
-                        toggle = SettingRowToggle.Switch(checked = item.isEnabled, enabled = isEnabled),
+                        toggle = SettingRowToggle.Switch(checked = item.isEnabled,),
                         modifier = modifier.toggleable(
-                            enabled = isEnabled,
                             value = item.isEnabled,
                             role = Role.Switch,
                         ) { onItemClicked(item.copy(isEnabled = !item.isEnabled)) },
@@ -159,7 +157,6 @@ internal fun NotificationPreferenceCategory(
                 is NotificationPreferenceType.PlayOverNotifications -> {
                     val context = LocalContext.current
                     SettingRadioDialogRow(
-                        enabled = isEnabled,
                         primaryText = item.title.asString(),
                         secondaryText = item.displayValue.asString(),
                         options = item.options,
