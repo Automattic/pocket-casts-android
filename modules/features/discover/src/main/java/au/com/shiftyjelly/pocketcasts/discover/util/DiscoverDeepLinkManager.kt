@@ -17,7 +17,7 @@ class DiscoverDeepLinkManager @Inject constructor(
 ) {
     companion object {
         const val STAFF_PICKS_LIST_ID = "staff-picks"
-        const val RECOMMENDATIONS_USER = "recommendations_user_podcast"
+        const val RECOMMENDATIONS_USER = "recommendations_user"
     }
 
     suspend fun getDiscoverList(listId: String, resources: Resources): NetworkLoadableList? = withContext(Dispatchers.IO) {
