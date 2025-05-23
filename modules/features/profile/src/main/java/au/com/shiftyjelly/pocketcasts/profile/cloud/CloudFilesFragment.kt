@@ -7,7 +7,15 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.Toolbar
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
@@ -171,11 +179,19 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         binding?.emptyLayout?.isVisible = false
         binding?.emptyLayout?.setContentWithViewCompositionStrategy {
             AppTheme(theme.activeTheme) {
-                EmptyState(
-                    title = stringResource(LR.string.profile_files_empty_title),
-                    subtitle = stringResource(LR.string.profile_files_empty_summary),
-                    iconResourceId = IR.drawable.ic_file,
-                )
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState()),
+                ) {
+                    EmptyState(
+                        title = stringResource(LR.string.profile_files_empty_title),
+                        subtitle = stringResource(LR.string.profile_files_empty_summary),
+                        iconResourceId = IR.drawable.ic_file,
+                        modifier = Modifier.padding(vertical = 24.dp),
+                    )
+                }
             }
         }
 

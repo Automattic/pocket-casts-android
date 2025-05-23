@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,6 +12,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -168,23 +171,31 @@ private fun Content(
                 isDarkTheme = isDarkTheme,
             )
 
-            is UiState.Empty -> EmptyState(
-                title = stringResource(LR.string.bookmarks_empty_state_title),
-                subtitle = stringResource(LR.string.bookmarks_paid_user_empty_state_message),
-                iconResourceId = IR.drawable.ic_bookmark,
-                primaryButtonText = stringResource(LR.string.bookmarks_headphone_settings),
-                onPrimaryButtonClick = {
-                    onHeadphoneControlsButtonTapped()
-                    openFragment(HeadphoneControlsSettingsFragment())
-                },
-            )
-            is UiState.Upsell -> EmptyState(
-                title = stringResource(LR.string.bookmarks_empty_state_title),
-                subtitle = stringResource(LR.string.bookmarks_free_user_empty_state_message),
-                iconResourceId = IR.drawable.ic_bookmark,
-                primaryButtonText = stringResource(LR.string.bookmarks_free_user_empty_state_button),
-                onPrimaryButtonClick = onUpgradeClicked,
-            )
+            is UiState.Empty -> Column(
+                modifier = Modifier.verticalScroll(rememberScrollState()),
+            ) {
+                EmptyState(
+                    title = stringResource(LR.string.bookmarks_empty_state_title),
+                    subtitle = stringResource(LR.string.bookmarks_paid_user_empty_state_message),
+                    iconResourceId = IR.drawable.ic_bookmark,
+                    primaryButtonText = stringResource(LR.string.bookmarks_headphone_settings),
+                    onPrimaryButtonClick = {
+                        onHeadphoneControlsButtonTapped()
+                        openFragment(HeadphoneControlsSettingsFragment())
+                    },
+                )
+            }
+            is UiState.Upsell -> Column(
+                modifier = Modifier.verticalScroll(rememberScrollState()),
+            ) {
+                EmptyState(
+                    title = stringResource(LR.string.bookmarks_empty_state_title),
+                    subtitle = stringResource(LR.string.bookmarks_free_user_empty_state_message),
+                    iconResourceId = IR.drawable.ic_bookmark,
+                    primaryButtonText = stringResource(LR.string.bookmarks_free_user_empty_state_button),
+                    onPrimaryButtonClick = onUpgradeClicked,
+                )
+            }
         }
     }
 }

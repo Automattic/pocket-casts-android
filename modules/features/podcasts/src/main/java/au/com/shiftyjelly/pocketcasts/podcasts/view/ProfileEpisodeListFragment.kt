@@ -10,9 +10,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -472,16 +476,23 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
                 AppTheme(theme.activeTheme) {
                     val buttonText = if (mode is Mode.History) stringResource(LR.string.go_to_discover) else null
 
-                    EmptyState(
-                        title = stringResource(state.titleRes),
-                        subtitle = stringResource(state.summaryRes),
-                        iconResourceId = state.iconRes,
-                        primaryButtonText = buttonText,
-                        onPrimaryButtonClick = {
-                            analyticsTracker.track(AnalyticsEvent.LISTENING_HISTORY_DISCOVER_BUTTON_TAPPED)
-                            (activity as FragmentHostListener).openTab(VR.id.navigation_discover)
-                        },
-                    )
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .verticalScroll(rememberScrollState()),
+                    ) {
+                        EmptyState(
+                            title = stringResource(state.titleRes),
+                            subtitle = stringResource(state.summaryRes),
+                            iconResourceId = state.iconRes,
+                            primaryButtonText = buttonText,
+                            onPrimaryButtonClick = {
+                                analyticsTracker.track(AnalyticsEvent.LISTENING_HISTORY_DISCOVER_BUTTON_TAPPED)
+                                (activity as FragmentHostListener).openTab(VR.id.navigation_discover)
+                            },
+                        )
+                    }
                 }
             }
         }

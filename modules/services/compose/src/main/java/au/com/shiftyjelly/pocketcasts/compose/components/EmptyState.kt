@@ -30,6 +30,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
@@ -60,7 +61,7 @@ fun EmptyState(
         verticalArrangement = Arrangement.spacedBy(itemSpaceHeight),
         modifier = modifier
             .padding(horizontal = 32.dp)
-            .widthIn(max = 330.dp),
+            .widthIn(max = if (isTablet || isLandscape) 450.dp else 330.dp),
     ) {
         if (isPortraitOrTablet) {
             Image(

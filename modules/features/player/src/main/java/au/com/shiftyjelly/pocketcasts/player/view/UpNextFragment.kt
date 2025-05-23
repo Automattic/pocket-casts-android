@@ -8,15 +8,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.Toolbar
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -210,7 +216,15 @@ class UpNextFragment :
 
             AppTheme(theme.activeTheme) {
                 if (upNextState is UpNextQueue.State.Empty) {
-                    UpNextEmptyState(onDiscoverTapped = ::onDiscoverTapped)
+                    Column(
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier.verticalScroll(rememberScrollState()),
+                    ) {
+                        UpNextEmptyState(
+                            onDiscoverTapped = ::onDiscoverTapped,
+                            modifier = Modifier.padding(vertical = 24.dp),
+                        )
+                    }
                 }
             }
         }

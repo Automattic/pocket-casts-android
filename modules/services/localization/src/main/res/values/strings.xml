@@ -520,7 +520,7 @@
     <string name="podcasts_sort_order">Sort order</string>
     <string name="podcasts_subscribe_on_phone">Follow podcasts on your phone and they\'ll appear here.</string>
     <string name="podcasts_time_to_add_some_podcasts">Time to add some Podcasts!</string>
-    <string name="podcasts_time_to_add_some_podcasts_summary">You can add podcasts by searching above or if you are looking for some inspiration try the Discover tab.</string>
+    <string name="podcasts_time_to_add_some_podcasts_summary">Coming from another app? Import your podcasts via Profile > Settings > Import and Export.\n\nIf you’re looking for inspiration try the Discover tab.</string>
     <string name="podcasts_empty_folder">Your folder is empty</string>
     <string name="podcasts_empty_folder_summary">Add podcasts to your folder and they’ll appear here.</string>
     <string name="podcasts_unarchive">Unarchive</string>
