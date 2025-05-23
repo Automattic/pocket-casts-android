@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.payment
 
+import androidx.annotation.Keep
 import java.math.BigDecimal
 
 data class Product(
@@ -255,6 +256,7 @@ sealed interface SubscriptionPlan {
     }
 }
 
+@Keep
 enum class SubscriptionTier(
     val analyticsValue: String,
 ) {
@@ -266,6 +268,7 @@ enum class SubscriptionTier(
     ),
 }
 
+@Keep
 enum class BillingCycle(
     val analyticsValue: String,
 ) {
@@ -281,7 +284,7 @@ enum class SubscriptionOffer(
     val analyticsValue: String,
 ) {
     IntroOffer(
-        analyticsValue = "into_offer",
+        analyticsValue = "intro_offer",
     ),
     Trial(
         analyticsValue = "free_trial",

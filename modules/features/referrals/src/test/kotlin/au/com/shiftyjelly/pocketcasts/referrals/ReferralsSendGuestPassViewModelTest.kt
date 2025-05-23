@@ -4,16 +4,20 @@ import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfo
-import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfoPlayStore
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
+import au.com.shiftyjelly.pocketcasts.payment.FakePaymentDataSource
+import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlans
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.payment.flatMap
+import au.com.shiftyjelly.pocketcasts.payment.getOrNull
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsSendGuestPassViewModel.ReferralSendGuestPassError
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsSendGuestPassViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager
 import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager.ReferralResult.EmptyResult
 import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager.ReferralResult.ErrorResult
 import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager.ReferralResult.SuccessResult
-import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralOfferInfoProvider
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.sharing.SharingClient
 import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
@@ -38,28 +42,32 @@ class ReferralsSendGuestPassViewModelTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule()
 
+    private val paymentDataSource = FakePaymentDataSource()
+    private val paymentClient = PaymentClient.test(paymentDataSource)
     private val referralManager = mock<ReferralManager>()
     private val sharingClient = mock<SharingClient>()
-    private val referralOfferInfoProvider = mock<ReferralOfferInfoProvider>()
-    private val referralOfferInfo = mock<ReferralsOfferInfoPlayStore>()
     private val analyticsTracker = mock<AnalyticsTracker>()
     private lateinit var viewModel: ReferralsSendGuestPassViewModel
 
     private val referralCodeResponse = mock<ReferralCodeResponse>()
     private val referralCodeSuccessResult = SuccessResult(referralCodeResponse)
     private val referralCode = "referral_code"
+    private val referralPlan = SubscriptionPlans.Preview
+        .findOfferPlan(SubscriptionTier.Plus, BillingCycle.Yearly, SubscriptionOffer.Referral)
+        .flatMap(ReferralSubscriptionPlan::create)
+        .getOrNull()!!
 
     @Before
     fun setUp() = runTest {
-        whenever(referralOfferInfo.subscriptionWithOffer).thenReturn(mock<Subscription.Trial>())
         whenever(referralCodeResponse.code).thenReturn(referralCode)
         whenever(referralManager.getReferralCode()).thenReturn(referralCodeSuccessResult)
     }
 
     @Test
     fun `given referral subscription offer not found, when vm init, then error state shown`() = runTest {
-        whenever(referralOfferInfo.subscriptionWithOffer).thenReturn(null)
-        initViewModel(offerInfo = referralOfferInfo)
+        paymentDataSource.loadedProducts = emptyList()
+
+        initViewModel()
 
         viewModel.state.test {
             assertTrue(awaitItem() == UiState.Error(ReferralSendGuestPassError.FailedToLoad))
@@ -69,10 +77,11 @@ class ReferralsSendGuestPassViewModelTest {
     @Test
     fun `given referral subscription offer found, when vm init, then loaded state shown`() = runTest {
         whenever(referralManager.getReferralCode()).thenReturn(referralCodeSuccessResult)
-        initViewModel(offerInfo = referralOfferInfo)
+
+        initViewModel()
 
         viewModel.state.test {
-            assertEquals(referralOfferInfo, (awaitItem() as UiState.Loaded).referralsOfferInfo)
+            assertEquals(referralPlan, (awaitItem() as UiState.Loaded).referralPlan)
         }
     }
 
@@ -80,10 +89,10 @@ class ReferralsSendGuestPassViewModelTest {
     fun `given referral code success, when getting referral code, then state is loaded`() = runTest {
         whenever(referralManager.getReferralCode()).thenReturn(referralCodeSuccessResult)
 
-        initViewModel(offerInfo = referralOfferInfo)
+        initViewModel()
 
         viewModel.state.test {
-            assertEquals(UiState.Loaded(referralCode, referralOfferInfo), awaitItem())
+            assertEquals(UiState.Loaded(referralPlan, referralCode), awaitItem())
         }
     }
 
@@ -135,7 +144,7 @@ class ReferralsSendGuestPassViewModelTest {
         whenever(referralManager.getReferralCode()).thenReturn(referralCodeSuccessResult)
 
         initViewModel()
-        viewModel.onShareClick(referralCode)
+        viewModel.onShareClick(referralCode, "offer-name", "offer-duration")
 
         verify(referralManager).getReferralCode()
         verify(sharingClient).share(requestCaptor.capture())
@@ -156,14 +165,11 @@ class ReferralsSendGuestPassViewModelTest {
         }
     }
 
-    private suspend fun initViewModel(
-        offerInfo: ReferralsOfferInfo? = referralOfferInfo,
-    ) {
-        whenever(referralOfferInfoProvider.referralOfferInfo()).thenReturn(offerInfo)
+    private suspend fun initViewModel() {
         viewModel = ReferralsSendGuestPassViewModel(
+            paymentClient = paymentClient,
             referralsManager = referralManager,
             sharingClient = sharingClient,
-            referralOfferInfoProvider = referralOfferInfoProvider,
             analyticsTracker = analyticsTracker,
         )
     }

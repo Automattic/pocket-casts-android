@@ -1,19 +1,21 @@
 package au.com.shiftyjelly.pocketcasts.referrals
 
-import androidx.appcompat.app.AppCompatActivity
+import android.app.Activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfo
-import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfoPlayStore
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
+import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
 import au.com.shiftyjelly.pocketcasts.payment.PurchaseResult
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.payment.flatMap
+import au.com.shiftyjelly.pocketcasts.payment.getOrNull
+import au.com.shiftyjelly.pocketcasts.payment.onFailure
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager
 import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager.ReferralResult
-import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralOfferInfoProvider
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.exception.NoNetworkException
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -24,19 +26,16 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
-import timber.log.Timber
 
 @HiltViewModel
 class ReferralsClaimGuestPassViewModel @Inject constructor(
-    private val referralOfferInfoProvider: ReferralOfferInfoProvider,
     private val referralManager: ReferralManager,
     private val userManager: UserManager,
-    private val subscriptionManager: SubscriptionManager,
+    private val paymentClient: PaymentClient,
     private val settings: Settings,
     private val analyticsTracker: AnalyticsTracker,
 ) : ViewModel() {
@@ -57,18 +56,15 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
 
     private fun loadReferralClaimOffer() {
         viewModelScope.launch {
-            val referralsOfferInfo = referralOfferInfoProvider.referralOfferInfo() as? ReferralsOfferInfoPlayStore
-            referralsOfferInfo?.subscriptionWithOffer?.let {
-                _state.update {
-                    UiState.Loaded(
-                        referralsOfferInfo = referralsOfferInfo,
-                    )
-                }
-            } ?: run {
-                val message = "Failed to load referral offer info"
-                LogBuffer.e(LogBuffer.TAG_INVALID_STATE, message)
-                Timber.e(message)
-                _state.update { UiState.Error(ReferralsClaimGuestPassError.FailedToLoadOffer) }
+            val referralPlan = paymentClient.loadSubscriptionPlans()
+                .flatMap { plans -> plans.findOfferPlan(SubscriptionTier.Plus, BillingCycle.Yearly, SubscriptionOffer.Referral) }
+                .flatMap(ReferralSubscriptionPlan::create)
+                .onFailure { code, message -> LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Failed to load referral offer: $code, $message") }
+                .getOrNull()
+            _state.value = if (referralPlan != null) {
+                UiState.Loaded(referralPlan)
+            } else {
+                UiState.Error(ReferralsClaimGuestPassError.FailedToLoadOffer)
             }
         }
     }
@@ -88,8 +84,10 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
 
                         when (result) {
                             is ReferralResult.SuccessResult -> {
-                                val offerInfo = loadedState?.referralsOfferInfo as? ReferralsOfferInfoPlayStore
-                                offerInfo?.subscriptionWithOffer?.let { subscriptionWithOffer -> triggerBillingFlowAndObservePurchaseEvents(subscriptionWithOffer) }
+                                loadedState?.referralPlan?.let { plan ->
+                                    _navigationEvent.emit(NavigationEvent.LaunchBillingFlow(plan))
+                                }
+                                job?.cancel()
                             }
 
                             is ReferralResult.EmptyResult -> {
@@ -97,6 +95,7 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
                                 LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Empty validation result for redeem code: ${settings.referralClaimCode.value}")
                                 _navigationEvent.emit(NavigationEvent.InValidOffer)
                             }
+
                             is ReferralResult.ErrorResult -> {
                                 if (result.error is NoNetworkException) {
                                     _snackBarEvent.emit(SnackbarEvent.NoNetwork)
@@ -115,47 +114,26 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
         }
     }
 
-    private suspend fun triggerBillingFlowAndObservePurchaseEvents(
-        subscriptionWithOffer: Subscription.WithOffer,
-    ) {
-        _navigationEvent.emit(NavigationEvent.LaunchBillingFlow(subscriptionWithOffer))
-
-        val purchaseResult = subscriptionManager
-            .observePurchaseEvents()
-            .asFlow()
-            .firstOrNull()
-
-        when (purchaseResult) {
-            PurchaseResult.Purchased -> {
-                analyticsTracker.track(AnalyticsEvent.REFERRAL_PURCHASE_SUCCESS)
-                redeemReferralCode(settings.referralClaimCode.value)
-            }
-
-            is PurchaseResult.Cancelled -> {
-                LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "PurchaseEvent.Cancelled")
-                // User cancelled subscription creation. Do nothing.
-            }
-
-            is PurchaseResult.Failure -> {
-                _snackBarEvent.emit(SnackbarEvent.PurchaseFailed)
-            }
-
-            null -> {
-                Timber.e("Purchase event was null. This should never happen.")
-            }
-        }
-    }
-
     fun launchBillingFlow(
-        activity: AppCompatActivity,
-        subscriptionWithOffer: Subscription.WithOffer,
+        referralPlan: ReferralSubscriptionPlan,
+        activity: Activity,
     ) {
         analyticsTracker.track(AnalyticsEvent.REFERRAL_PURCHASE_SHOWN)
-        subscriptionManager.launchBillingFlow(
-            activity,
-            subscriptionWithOffer.productDetails,
-            subscriptionWithOffer.offerToken,
-        )
+        viewModelScope.launch {
+            val purchaseResult = paymentClient.purchaseSubscriptionPlan(referralPlan.key, purchaseSource = "referrals", activity)
+            when (purchaseResult) {
+                PurchaseResult.Purchased -> {
+                    analyticsTracker.track(AnalyticsEvent.REFERRAL_PURCHASE_SUCCESS)
+                    redeemReferralCode(settings.referralClaimCode.value)
+                }
+
+                is PurchaseResult.Failure -> {
+                    _snackBarEvent.emit(SnackbarEvent.PurchaseFailed)
+                }
+
+                is PurchaseResult.Cancelled -> Unit
+            }
+        }
     }
 
     private suspend fun redeemReferralCode(code: String) {
@@ -179,6 +157,7 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
                 LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Empty redemption result for redeem code: ${settings.referralClaimCode.value}")
                 _snackBarEvent.emit(SnackbarEvent.RedeemFailed)
             }
+
             is ReferralResult.ErrorResult -> {
                 if (result.error is NoNetworkException) {
                     _snackBarEvent.emit(SnackbarEvent.NoNetwork)
@@ -220,7 +199,7 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
     sealed class NavigationEvent {
         data object LoginOrSignup : NavigationEvent()
         data object InValidOffer : NavigationEvent()
-        data class LaunchBillingFlow(val subscriptionWithOffer: Subscription.WithOffer) : NavigationEvent()
+        data class LaunchBillingFlow(val plan: ReferralSubscriptionPlan) : NavigationEvent()
         data object Close : NavigationEvent()
         data object Welcome : NavigationEvent()
     }
@@ -233,8 +212,9 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
 
     sealed class UiState {
         data object Loading : UiState()
+
         data class Loaded(
-            val referralsOfferInfo: ReferralsOfferInfo,
+            val referralPlan: ReferralSubscriptionPlan,
             val isLoading: Boolean = false,
             val flowComplete: Boolean = false,
         ) : UiState()

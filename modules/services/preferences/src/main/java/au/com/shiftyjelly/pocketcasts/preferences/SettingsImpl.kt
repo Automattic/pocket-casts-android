@@ -12,9 +12,9 @@ import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.AutoDownloadLimitSetting
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.DEFAULT_MAX_AUTO_ADD_LIMIT
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.GLOBAL_AUTO_DOWNLOAD_NONE
@@ -44,8 +44,6 @@ import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.config.FirebaseConfig
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getString
 import au.com.shiftyjelly.pocketcasts.utils.extensions.splitIgnoreEmpty
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.squareup.moshi.Moshi
@@ -78,7 +76,6 @@ class SettingsImpl @Inject constructor(
     @ApplicationContext private val context: Context,
     private val firebaseRemoteConfig: FirebaseRemoteConfig,
     private val moshi: Moshi,
-    private val bookmarkFeature: BookmarkFeatureControl,
 ) : Settings {
 
     companion object {
@@ -389,6 +386,19 @@ class SettingsImpl @Inject constructor(
         editor.apply()
     }
 
+    override fun getStringForKey(key: String, isPrivate: Boolean): String? {
+        return if (isPrivate) {
+            decrypt(privatePreferences.getString(key))
+        } else {
+            sharedPreferences.getString(key)
+        }
+    }
+
+    override fun deleteKey(key: String, isPrivate: Boolean) {
+        val preferences = if (isPrivate) privatePreferences else sharedPreferences
+        preferences.edit { remove(key) }
+    }
+
     override val discoverCountryCode = UserSetting.StringPref(
         sharedPrefKey = "discovery_country_code",
         defaultValue = getDefaultCountryCode(),
@@ -496,8 +506,9 @@ class SettingsImpl @Inject constructor(
         }
     }
 
-    override fun contains(key: String): Boolean {
-        return sharedPreferences.contains(key)
+    override fun contains(key: String, isPrivate: Boolean): Boolean {
+        val preferences = if (isPrivate) privatePreferences else sharedPreferences
+        return preferences.contains(key)
     }
 
     @SuppressLint("HardwareIds")
@@ -1035,49 +1046,38 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override val cachedSubscriptionStatus = UserSetting.PrefFromString<SubscriptionStatus?>(
-        sharedPrefKey = "accountstatus",
+    private val subscriptionAdapter = moshi.adapter(Subscription::class.java)
+
+    override val cachedSubscription = UserSetting.PrefFromString<Subscription?>(
+        sharedPrefKey = "user_subscription",
         defaultValue = null,
         sharedPrefs = privatePreferences,
-        fromString = {
-            if (it.isEmpty()) {
-                return@PrefFromString null
-            }
-            val str = decrypt(it) ?: return@PrefFromString null
-            try {
-                val adapter = moshi.adapter(SubscriptionStatus.Paid::class.java)
-                adapter.fromJson(str)
-            } catch (e: Exception) {
-                null
-            }
+        fromString = { value ->
+            value
+                .takeIf(String::isNotEmpty)
+                ?.let(::decrypt)
+                ?.let { decryptedValue -> runCatching { subscriptionAdapter.fromJson(decryptedValue) }.getOrNull() }
         },
-        toString = {
-            (it as? SubscriptionStatus.Paid)?.let { paidSubscriptionStatus ->
-                val adapter = moshi.adapter(SubscriptionStatus.Paid::class.java)
-                val str = adapter.toJson(paidSubscriptionStatus)
-                encrypt(str)
-            } ?: ""
+        toString = { value ->
+            value
+                ?.let(subscriptionAdapter::toJson)
+                ?.let(::encrypt)
+                .orEmpty()
         },
     )
-
-    // This is passed to the feature module which cannot access subscription tier to determine feature availability
-    override val userTier: UserTier
-        get() = (cachedSubscriptionStatus.value as? SubscriptionStatus.Paid)?.tier?.toUserTier() ?: UserTier.Free
 
     override val headphoneControlsNextAction = HeadphoneActionUserSetting(
         sharedPrefKey = "headphone_controls_next_action",
         defaultAction = HeadphoneAction.SKIP_FORWARD,
         sharedPrefs = sharedPreferences,
-        subscriptionStatusFlow = cachedSubscriptionStatus.flow,
-        bookmarkFeature = bookmarkFeature,
+        subscriptionFlow = cachedSubscription.flow,
     )
 
     override val headphoneControlsPreviousAction = HeadphoneActionUserSetting(
         sharedPrefKey = "headphone_controls_previous_action",
         defaultAction = HeadphoneAction.SKIP_BACK,
         sharedPrefs = sharedPreferences,
-        subscriptionStatusFlow = cachedSubscriptionStatus.flow,
-        bookmarkFeature = bookmarkFeature,
+        subscriptionFlow = cachedSubscription.flow,
     )
 
     override val headphoneControlsPlayBookmarkConfirmationSound = UserSetting.BoolPref(
@@ -1552,11 +1552,6 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override val showPodcastHeaderChangesTooltip: UserSetting<Boolean> = UserSetting.BoolPref(
-        sharedPrefKey = "show_podcast_header_ui_changes_tooltip",
-        defaultValue = true,
-        sharedPrefs = sharedPreferences,
-    )
     override val showEmptyFiltersListTooltip: UserSetting<Boolean> = UserSetting.BoolPref(
         sharedPrefKey = "show_empty_filters_list_tooltip",
         defaultValue = true,

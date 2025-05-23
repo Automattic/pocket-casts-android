@@ -20,9 +20,8 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
-import au.com.shiftyjelly.pocketcasts.models.to.SignInState
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
+import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksContainerFragment
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -297,7 +296,7 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
                 binding.layoutLockedCloud.setOnClickListener {
                     viewModel.trackOptionTapped(UPLOAD_UPGRADE_REQUIRED)
                     OnboardingLauncher.openOnboardingFlow(
-                        activity,
+                        requireActivity(),
                         OnboardingFlow.Upsell(OnboardingUpgradeSource.FILES),
                     )
                 }
@@ -330,7 +329,7 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
                 val layoutLockedCloud = binding.layoutLockedCloud
                 when (signInState) {
                     is SignInState.SignedIn -> {
-                        if (signInState.subscriptionStatus is SubscriptionStatus.Paid) {
+                        if (signInState.subscription != null) {
                             layoutCloud.isVisible = true
                             layoutLockedCloud.isVisible = false
                         } else {

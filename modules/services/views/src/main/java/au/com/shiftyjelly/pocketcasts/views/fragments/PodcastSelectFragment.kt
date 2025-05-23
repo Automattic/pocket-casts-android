@@ -35,22 +35,32 @@ class PodcastSelectFragment : BaseFragment() {
     companion object {
         private const val NEW_INSTANCE_ARG = "tintColor"
 
+        fun createArgs(
+            @ColorInt tintColor: Int? = null,
+            showToolbar: Boolean = false,
+            source: PodcastSelectFragmentSource,
+        ) = Bundle().apply {
+            putParcelable(
+                NEW_INSTANCE_ARG,
+                PodcastSelectFragmentArgs(
+                    tintColor = tintColor,
+                    showToolbar = showToolbar,
+                    source = source,
+                ),
+            )
+        }
+
         fun newInstance(
             @ColorInt tintColor: Int? = null,
             showToolbar: Boolean = false,
             source: PodcastSelectFragmentSource,
         ): PodcastSelectFragment =
             PodcastSelectFragment().apply {
-                arguments = Bundle().apply {
-                    putParcelable(
-                        NEW_INSTANCE_ARG,
-                        PodcastSelectFragmentArgs(
-                            tintColor = tintColor,
-                            showToolbar = showToolbar,
-                            source = source,
-                        ),
-                    )
-                }
+                arguments = createArgs(
+                    tintColor = tintColor,
+                    showToolbar = showToolbar,
+                    source = source,
+                )
             }
 
         private fun extractArgs(bundle: Bundle?): PodcastSelectFragmentArgs? =

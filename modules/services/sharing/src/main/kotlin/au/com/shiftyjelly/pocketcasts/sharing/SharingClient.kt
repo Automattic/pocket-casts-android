@@ -23,7 +23,6 @@ import au.com.shiftyjelly.pocketcasts.localization.helper.StatsHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Story
-import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfo
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.sharing.BuildConfig.META_APP_ID
 import au.com.shiftyjelly.pocketcasts.sharing.BuildConfig.SERVER_SHORT_URL
@@ -134,8 +133,8 @@ class SharingClient(
         }
 
         is SharingRequest.Data.ReferralLink -> {
-            val shareText = "${context.getString(LR.string.referrals_share_text, data.referralsOfferInfo.localizedOfferDurationAdjective.lowercase())}\n\n${data.sharingUrl(webBasedHost)}"
-            val shareSubject = context.getString(LR.string.referrals_share_subject, data.referralsOfferInfo.localizedOfferDurationNoun)
+            val shareText = "${context.getString(LR.string.referrals_share_text, data.offerName)}\n\n${data.sharingUrl(webBasedHost)}"
+            val shareSubject = context.getString(LR.string.referrals_share_subject, data.offerDuration)
             Intent()
                 .setAction(Intent.ACTION_SEND)
                 .setType("text/plain")
@@ -397,13 +396,9 @@ data class SharingRequest internal constructor(
 
         fun referralLink(
             referralCode: String,
-            referralsOfferInfo: ReferralsOfferInfo,
-        ) = Builder(
-            Data.ReferralLink(
-                referralCode = referralCode,
-                referralsOfferInfo = referralsOfferInfo,
-            ),
-        )
+            offerName: String,
+            offerDuration: String,
+        ) = Builder(Data.ReferralLink(referralCode, offerName, offerDuration))
             .setAnalyticsEvent(AnalyticsEvent.REFERRAL_PASS_SHARED)
             .addAnalyticsProperty("code", referralCode)
 
@@ -595,7 +590,8 @@ data class SharingRequest internal constructor(
 
         class ReferralLink internal constructor(
             val referralCode: String,
-            val referralsOfferInfo: ReferralsOfferInfo,
+            val offerName: String,
+            val offerDuration: String,
         ) : Data {
             override val podcast = null
 

@@ -6,7 +6,6 @@ import androidx.test.platform.app.InstrumentationRegistry
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.SettingsImpl
 import au.com.shiftyjelly.pocketcasts.servers.di.ServersModule
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import kotlin.time.Duration.Companion.days
 import org.junit.Assert.assertFalse
@@ -34,7 +33,6 @@ class SettingsImplTest {
             context = context,
             firebaseRemoteConfig = firebaseRemoteConfig,
             moshi = moshi,
-            bookmarkFeature = BookmarkFeatureControl(),
         )
     }
 

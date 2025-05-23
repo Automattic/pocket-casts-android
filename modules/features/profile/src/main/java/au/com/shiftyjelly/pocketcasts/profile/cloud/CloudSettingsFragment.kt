@@ -147,7 +147,7 @@ class CloudSettingsFragment : BaseFragment() {
 
     private fun openUpgradeSheet() {
         OnboardingLauncher.openOnboardingFlow(
-            activity,
+            requireActivity(),
             OnboardingFlow.Upsell(OnboardingUpgradeSource.FILES),
         )
     }

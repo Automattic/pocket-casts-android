@@ -2,26 +2,37 @@ package au.com.shiftyjelly.pocketcasts.account.onboarding
 
 import android.content.Context
 import android.content.Intent
-import android.os.Build
+import android.os.Parcelable
 import androidx.activity.result.contract.ActivityResultContract
+import androidx.core.content.IntentCompat
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.SuggestedFoldersAction
+import kotlinx.parcelize.Parcelize
 
 class OnboardingActivityContract : ActivityResultContract<Intent, OnboardingActivityContract.OnboardingFinish?>() {
 
     override fun createIntent(context: Context, input: Intent): Intent = input
 
-    override fun parseResult(resultCode: Int, intent: Intent?): OnboardingFinish? =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent?.getSerializableExtra(FINISH_KEY, OnboardingFinish::class.java)
-        } else {
-            @Suppress("DEPRECATION")
-            intent?.getSerializableExtra(FINISH_KEY) as? OnboardingFinish
-        }
+    override fun parseResult(resultCode: Int, intent: Intent?): OnboardingFinish? {
+        return intent?.let { IntentCompat.getParcelableExtra(it, FINISH_KEY, OnboardingFinish::class.java) }
+    }
 
-    enum class OnboardingFinish {
-        Done,
-        DoneGoToDiscover,
-        DoneShowPlusPromotion,
-        DoneShowWelcomeInReferralFlow,
+    sealed interface OnboardingFinish : Parcelable {
+        @Parcelize
+        data object Done : OnboardingFinish
+
+        @Parcelize
+        data object DoneGoToDiscover : OnboardingFinish
+
+        @Parcelize
+        data object DoneShowPlusPromotion : OnboardingFinish
+
+        @Parcelize
+        data object DoneShowWelcomeInReferralFlow : OnboardingFinish
+
+        @Parcelize
+        data class DoneApplySuggestedFolders(
+            val action: SuggestedFoldersAction,
+        ) : OnboardingFinish
     }
 
     companion object {

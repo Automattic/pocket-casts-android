@@ -20,14 +20,12 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.DeleteState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
-import kotlin.collections.List
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -41,7 +39,6 @@ import kotlinx.coroutines.rx2.asFlow
 class ShelfSharedViewModel @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val analyticsTracker: AnalyticsTracker,
-    private val bookmarkFeature: BookmarkFeatureControl,
     private val chromeCastAnalytics: ChromeCastAnalytics,
     private val episodeManager: EpisodeManager,
     private val playbackManager: PlaybackManager,
@@ -210,7 +207,8 @@ class ShelfSharedViewModel @Inject constructor(
     ) {
         trackShelfAction(ShelfItem.Bookmark, source)
         viewModelScope.launch {
-            if (bookmarkFeature.isAvailable(settings.userTier)) {
+            val isPaidUser = settings.cachedSubscription.value != null
+            if (isPaidUser) {
                 _navigationState.emit(NavigationState.ShowAddBookmark)
             } else {
                 _navigationState.emit(NavigationState.StartUpsellFlow(onboardingUpgradeSource))

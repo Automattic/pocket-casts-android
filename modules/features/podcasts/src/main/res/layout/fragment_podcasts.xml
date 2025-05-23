@@ -5,11 +5,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:importantForAccessibility="no">
+        android:importantForAccessibility="no"
+        android:orientation="vertical">
 
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/appBarLayout"
@@ -29,133 +30,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <ScrollView
-                android:id="@+id/emptyViewPodcasts"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:fillViewport="true"
-                android:visibility="gone"
-                tools:visibility="visible">
-
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:clipToPadding="false"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:padding="16dp"
-                        android:layout_marginTop="16dp">
-
-                        <ImageView
-                            android:id="@+id/add_podcast_image"
-                            android:layout_width="39dp"
-                            android:layout_height="39dp"
-                            android:layout_marginBottom="16dp"
-                            app:tint="?attr/primary_icon_01"
-                            android:src="@drawable/ic_podcasts" />
-
-                        <TextView
-                            android:id="@+id/title"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center"
-                            android:layout_marginBottom="16dp"
-                            android:text="@string/podcasts_time_to_add_some_podcasts"
-                            style="?attr/textH2" />
-
-                        <TextView
-                            android:id="@+id/submessage"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:layout_marginBottom="32dp"
-                            android:text="@string/podcasts_time_to_add_some_podcasts_summary"
-                            style="?attr/textBody2"
-                            android:gravity="center" />
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btnDiscover"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textAllCaps="false"
-                            style="@style/MaterialButtonStyle"
-                            android:text="@string/podcasts_discover" />
-
-                    </LinearLayout>
-
-                </FrameLayout>
-
-            </ScrollView>
-
-            <ScrollView
-                android:id="@+id/emptyViewFolders"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:fillViewport="true"
-                android:visibility="gone"
-                tools:visibility="visible">
-
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:padding="16dp">
-
-                        <au.com.shiftyjelly.pocketcasts.views.component.GradientIcon
-                            android:layout_width="160dp"
-                            android:layout_height="160dp"
-                            android:layout_gravity="center_horizontal|top"
-                            android:layout_marginBottom="16dp"
-                            app:src="@drawable/gradient_nothing_podcasts"
-                            app:gradient="gradient_2" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center"
-                            android:layout_marginBottom="16dp"
-                            android:text="@string/podcasts_empty_folder"
-                            android:textColor="?attr/primary_text_01"
-                            style="?attr/textH2" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:layout_marginBottom="24dp"
-                            android:text="@string/podcasts_empty_folder_summary"
-                            android:maxWidth="220dp"
-                            style="?attr/textBody1"
-                            android:textColor="?attr/primary_text_02"
-                            android:gravity="center" />
-
-                        <Button
-                            android:id="@+id/addToFolderButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/add_podcasts"
-                            android:textAllCaps="false"
-                            android:textSize="16sp"
-                            style="@style/Widget.MaterialComponents.Button.TextButton" />
-
-                    </LinearLayout>
-
-                </FrameLayout>
-
-            </ScrollView>
+            <androidx.compose.ui.platform.ComposeView
+                android:id="@+id/emptyView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:visibility="gone" />
 
             <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
                 android:id="@+id/swipeRefreshLayout"
@@ -166,8 +47,8 @@
                     android:id="@+id/recyclerView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:clipToPadding="false"
                     android:clipChildren="false"
+                    android:clipToPadding="false"
                     android:scrollbarStyle="outsideOverlay"
                     android:scrollbars="vertical" />
 
@@ -175,9 +56,10 @@
 
         </FrameLayout>
     </LinearLayout>
+
     <androidx.compose.ui.platform.ComposeView
         android:id="@+id/tooltipComposeView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 </FrameLayout>

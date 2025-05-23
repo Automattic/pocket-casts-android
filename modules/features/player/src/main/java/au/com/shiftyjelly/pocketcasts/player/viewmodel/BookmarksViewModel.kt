@@ -1,5 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.player.viewmodel
 
+import androidx.compose.material.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
@@ -8,14 +11,13 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.bookmark.BookmarkRowColors
 import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButtonStyle
+import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkArguments
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.HeaderRowColors
-import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.MessageViewColors
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.search.BookmarkSearchHandler
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
@@ -30,8 +32,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.combine
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
@@ -62,7 +62,6 @@ class BookmarksViewModel
     private val settings: Settings,
     private val playbackManager: PlaybackManager,
     private val theme: Theme,
-    private val bookmarkFeature: BookmarkFeatureControl,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val bookmarkSearchHandler: BookmarkSearchHandler,
 ) : ViewModel() {
@@ -168,12 +167,12 @@ class BookmarksViewModel
             bookmarksFlow,
             isMultiSelectingFlow,
             selectedListFlow,
-            settings.cachedSubscriptionStatus.flow,
+            settings.cachedSubscription.flow,
             settings.artworkConfiguration.flow,
             bookmarkSearchResults,
-        ) { bookmarks, isMultiSelecting, selectedList, cachedSubscriptionStatus, artworkConfiguration, searchResults ->
-            val userTier = (cachedSubscriptionStatus as? SubscriptionStatus.Paid)?.tier?.toUserTier() ?: UserTier.Free
-            _uiState.value = if (!bookmarkFeature.isAvailable(userTier)) {
+        ) { bookmarks, isMultiSelecting, selectedList, subscription, artworkConfiguration, searchResults ->
+            val isPaidUser = subscription != null
+            _uiState.value = if (!isPaidUser) {
                 UiState.Upsell(sourceView)
             } else if (bookmarks.isEmpty()) {
                 UiState.Empty(sourceView)
@@ -351,10 +350,6 @@ class BookmarksViewModel
         return sortType as UserSetting<BookmarksSortType>
     }
 
-    fun clearSearchTapped() {
-        analyticsTracker.track(AnalyticsEvent.BOOKMARKS_CLEAR_SEARCH_TAPPED)
-    }
-
     fun searchBarClearButtonTapped() {
         analyticsTracker.track(AnalyticsEvent.BOOKMARKS_SEARCHBAR_CLEAR_BUTTON_TAPPED)
     }
@@ -411,7 +406,7 @@ class BookmarksViewModel
         }
 
         data class Upsell(val sourceView: SourceView) : UiState() {
-            val colors: MessageViewColors
+            internal val colors: MessageViewColors
                 get() = when (sourceView) {
                     SourceView.PLAYER -> MessageViewColors.Player
                     else -> MessageViewColors.Default
@@ -422,5 +417,38 @@ class BookmarksViewModel
     sealed class BookmarkMessage {
         data object BookmarkEpisodeNotFound : BookmarkMessage()
         data class PlayingBookmark(val bookmarkTitle: String) : BookmarkMessage()
+    }
+}
+
+internal sealed class MessageViewColors {
+    @Composable
+    abstract fun backgroundColor(): Color
+
+    @Composable
+    abstract fun textColor(): Color
+
+    @Composable
+    abstract fun buttonTextColor(): Color
+
+    object Default : MessageViewColors() {
+        @Composable
+        override fun backgroundColor(): Color = MaterialTheme.theme.colors.primaryUi01Active
+
+        @Composable
+        override fun textColor(): Color = MaterialTheme.theme.colors.primaryText02
+
+        @Composable
+        override fun buttonTextColor(): Color = MaterialTheme.theme.colors.primaryInteractive01
+    }
+
+    object Player : MessageViewColors() {
+        @Composable
+        override fun backgroundColor(): Color = MaterialTheme.theme.colors.playerContrast06
+
+        @Composable
+        override fun textColor(): Color = MaterialTheme.theme.colors.playerContrast02
+
+        @Composable
+        override fun buttonTextColor(): Color = MaterialTheme.theme.colors.playerContrast01
     }
 }

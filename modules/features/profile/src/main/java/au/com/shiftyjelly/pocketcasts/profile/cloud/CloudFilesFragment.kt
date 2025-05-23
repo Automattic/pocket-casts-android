@@ -7,10 +7,15 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.Toolbar
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
@@ -29,9 +34,8 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.EmptyState
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
-import au.com.shiftyjelly.pocketcasts.models.to.SignInState
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
+import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.EpisodeListAdapter
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.EpisodeListBookmarkViewModel
@@ -175,12 +179,19 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         binding?.emptyLayout?.isVisible = false
         binding?.emptyLayout?.setContentWithViewCompositionStrategy {
             AppTheme(theme.activeTheme) {
-                EmptyState(
-                    title = stringResource(LR.string.profile_files_empty_title),
-                    subtitle = stringResource(LR.string.profile_files_empty_summary),
-                    iconResourceId = IR.drawable.ic_file,
-                    modifier = Modifier.verticalScroll(rememberScrollState()),
-                )
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState()),
+                ) {
+                    EmptyState(
+                        title = stringResource(LR.string.profile_files_empty_title),
+                        subtitle = stringResource(LR.string.profile_files_empty_summary),
+                        iconResourceId = IR.drawable.ic_file,
+                        modifier = Modifier.padding(vertical = 24.dp),
+                    )
+                }
             }
         }
 
@@ -271,8 +282,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             }
         }
         viewModel.signInState.observe(viewLifecycleOwner) {
-            binding?.swipeRefreshLayout?.isEnabled =
-                it is SignInState.SignedIn && it.subscriptionStatus is SubscriptionStatus.Paid
+            binding?.swipeRefreshLayout?.isEnabled = it is SignInState.SignedIn && it.subscription != null
         }
 
         binding?.fab?.setOnClickListener {

@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.utils.featureflag
 
 import au.com.shiftyjelly.pocketcasts.helper.BuildConfig
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.ReleaseVersion.Companion.comparedToEarlyPatronAccess
 
 enum class Feature(
     val key: String,
@@ -40,14 +39,6 @@ enum class Feature(
         title = "Slumber Studios Yearly Promo",
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Plus(null),
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
-    ),
-    DESELECT_CHAPTERS(
-        key = "deselect_chapters_enabled",
-        title = "Deselect Chapters",
-        defaultValue = true,
-        tier = FeatureTier.Plus(patronExclusiveAccessRelease = null),
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
@@ -91,22 +82,6 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = false,
     ),
-    REFERRALS_CLAIM(
-        key = "referrals_claim",
-        title = "Referrals Claim",
-        defaultValue = true,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
-    ),
-    REFERRALS_SEND(
-        key = "referrals_send",
-        title = "Referrals Send",
-        defaultValue = true,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
-    ),
     AUTO_DOWNLOAD(
         key = "auto_download",
         title = "Auto download episodes after subscribing to a podcast",
@@ -119,7 +94,7 @@ enum class Feature(
         key = "up_next_shuffle",
         title = "Up Next Shuffle",
         defaultValue = BuildConfig.DEBUG,
-        tier = FeatureTier.Plus(patronExclusiveAccessRelease = null),
+        tier = FeatureTier.Plus(),
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
@@ -190,9 +165,9 @@ enum class Feature(
     PODCASTS_SORT_CHANGES(
         key = "podcasts_sort_changes",
         title = "Podcasts Sort Changes",
-        defaultValue = BuildConfig.DEBUG,
+        defaultValue = true,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
     GUEST_LISTS_NETWORK_HIGHLIGHTS_REDESIGN(
@@ -223,7 +198,7 @@ enum class Feature(
         key = "libro_fm",
         title = "Libro FM in Upsell",
         defaultValue = BuildConfig.DEBUG,
-        tier = FeatureTier.Plus(null),
+        tier = FeatureTier.Plus(),
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
@@ -243,84 +218,48 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
-    ;
 
-    companion object {
-
-        fun isUserEntitled(
-            feature: Feature,
-            userTier: UserTier,
-            releaseVersion: ReleaseVersionWrapper = ReleaseVersionWrapper(),
-        ) = when (userTier) {
-            // Patron users can use all features
-            UserTier.Patron -> when (feature.tier) {
-                FeatureTier.Patron,
-                is FeatureTier.Plus,
-                FeatureTier.Free,
-                -> true
-            }
-
-            UserTier.Plus -> {
-                when (feature.tier) {
-                    // Patron features can only be used by Patrons
-                    FeatureTier.Patron -> false
-
-                    // Plus users cannot use Plus features during early access for patrons except when the app is in beta
-                    is FeatureTier.Plus -> {
-                        val isReleaseCandidate = releaseVersion.currentReleaseVersion.releaseCandidate != null
-                        val relativeToEarlyAccess = feature.tier.patronExclusiveAccessRelease?.let {
-                            releaseVersion.currentReleaseVersion.comparedToEarlyPatronAccess(it)
-                        }
-                        when (relativeToEarlyAccess) {
-                            null -> true // no early access release
-                            EarlyAccessState.Before,
-                            EarlyAccessState.During,
-                            -> isReleaseCandidate
-                            EarlyAccessState.After -> true
-                        }
-                    }
-
-                    FeatureTier.Free -> true
-                }
-            }
-
-            // Free users can only use free features
-            UserTier.Free -> when (feature.tier) {
-                FeatureTier.Patron -> false
-                is FeatureTier.Plus -> false
-                FeatureTier.Free -> true
-            }
-        }
-    }
-
-    // Please do not delete this method because sometimes we need it
-    fun isCurrentlyExclusiveToPatron(
-        releaseVersion: ReleaseVersionWrapper = ReleaseVersionWrapper(),
-    ): Boolean {
-        val isReleaseCandidate = releaseVersion.currentReleaseVersion.releaseCandidate != null
-        val relativeToEarlyAccessState = (this.tier as? FeatureTier.Plus)?.patronExclusiveAccessRelease?.let {
-            releaseVersion.currentReleaseVersion.comparedToEarlyPatronAccess(it)
-        }
-        return when (relativeToEarlyAccessState) {
-            null -> false
-            EarlyAccessState.Before,
-            EarlyAccessState.During,
-            -> !isReleaseCandidate
-            EarlyAccessState.After -> false
-        }
-    }
-}
-
-// It would be nice to be able to use SubscriptionTier here, but that's in the
-// models module, which already depends on this featureflag module, so we can't depend on it
-enum class UserTier {
-    Patron,
-    Plus,
-    Free,
+    // This is set of features used only for testing purposes.
+    TEST_FREE_FEATURE(
+        key = "test_free_feautre",
+        title = "Free feature used for testing",
+        defaultValue = true,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = false,
+    ),
+    TEST_PLUS_FEATURE(
+        key = "test_plus_feautre",
+        title = "Plus feature used for testing",
+        defaultValue = true,
+        tier = FeatureTier.Plus(),
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = false,
+    ),
+    TEST_PLUS_RESTRICTED_FEATURE(
+        key = "test_plus_restricted_feautre",
+        title = "Plus feature with Patron exclusive access used for testing",
+        defaultValue = true,
+        tier = FeatureTier.Plus(ReleaseVersion(1, 0)),
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = false,
+    ),
+    TEST_PATRON_FEATURE(
+        key = "test_patron_feautre",
+        title = "Patron feature used for testing",
+        defaultValue = true,
+        tier = FeatureTier.Patron,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = false,
+    ),
 }
 
 sealed class FeatureTier {
-    data object Patron : FeatureTier()
-    class Plus(val patronExclusiveAccessRelease: ReleaseVersion?) : FeatureTier()
     data object Free : FeatureTier()
+
+    class Plus(
+        val patronExclusiveAccessRelease: ReleaseVersion? = null,
+    ) : FeatureTier()
+
+    data object Patron : FeatureTier()
 }

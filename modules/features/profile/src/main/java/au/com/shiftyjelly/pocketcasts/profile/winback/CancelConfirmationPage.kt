@@ -52,7 +52,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 internal fun CancelConfirmationPage(
-    expirationDate: Date?,
+    expirationDate: Instant?,
     onKeepSubscription: () -> Unit,
     onCancelSubscription: () -> Unit,
     modifier: Modifier = Modifier,
@@ -112,7 +112,7 @@ private fun Header(
 
 @Composable
 private fun Perks(
-    expirationDate: Date?,
+    expirationDate: Instant?,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -122,7 +122,7 @@ private fun Perks(
         PerkRow(
             image = painterResource(IR.drawable.ic_subscription),
             text = if (expirationDate != null) {
-                val formattedDate = expirationDate.toLocalizedFormatLongStyle()
+                val formattedDate = expirationDate.let(Date::from).toLocalizedFormatLongStyle()
                 val text = stringResource(LR.string.winback_cancel_subscription_perk_active_with_date, formattedDate)
                 buildAnnotatedString {
                     append(text)
@@ -239,7 +239,7 @@ private fun CancelConfirmationPagePreview(
 ) {
     AppThemeWithBackground(theme) {
         CancelConfirmationPage(
-            expirationDate = Date.from(Instant.ofEpochSecond(1700000000)),
+            expirationDate = Instant.ofEpochSecond(1700000000),
             onKeepSubscription = {},
             onCancelSubscription = {},
         )

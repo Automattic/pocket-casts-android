@@ -4,8 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.models.to.SignInState
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SuggestedFoldersManager
@@ -191,10 +190,7 @@ class SuggestedFoldersViewModel @AssistedInject constructor(
         val userTypeAnalyticsValue
             get() = when (signInState) {
                 is SignInState.SignedOut -> "unsigned"
-                is SignInState.SignedIn -> when (signInState.subscriptionStatus) {
-                    is SubscriptionStatus.Free -> "free"
-                    is SubscriptionStatus.Paid -> "paid"
-                }
+                is SignInState.SignedIn -> if (signInState.subscription == null) "free" else "paid"
             }
 
         companion object {

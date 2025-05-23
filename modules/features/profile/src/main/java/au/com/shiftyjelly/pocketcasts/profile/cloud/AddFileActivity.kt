@@ -41,8 +41,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.deeplink.CloudFilesDeepLink
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
-import au.com.shiftyjelly.pocketcasts.models.to.SignInState
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -222,8 +220,7 @@ class AddFileActivity :
 
         updateForm(readOnly = true, loading = true)
         viewModel.signInState.observe(this) { signInState ->
-            freeSubscription = (signInState is SignInState.SignedOut) ||
-                (signInState is SignInState.SignedIn && signInState.subscriptionStatus is SubscriptionStatus.Free)
+            freeSubscription = signInState.isNoAccountOrFree
             updateForm(freeSubscription, false)
 
             if (!freeSubscription) {
@@ -326,12 +323,16 @@ class AddFileActivity :
         openOnboardingFlow(OnboardingFlow.Upsell(OnboardingUpgradeSource.FILES))
     }
 
+    override fun launchIntent(onboardingFlow: OnboardingFlow): Intent {
+        return OnboardingActivity.newInstance(this, onboardingFlow)
+    }
+
     override fun openOnboardingFlow(onboardingFlow: OnboardingFlow) {
         // Just starting the activity without registering for a result because
         // we don't need the result since we don't want to break the user's flow
         // by sending them back to the Discover screen with an
         // OnboardingFinish.DoneGoToDiscover result.
-        startActivity(OnboardingActivity.newInstance(this, onboardingFlow))
+        startActivity(launchIntent(onboardingFlow))
     }
 
     @UnstableApi

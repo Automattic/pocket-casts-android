@@ -13,7 +13,11 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
+import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
@@ -26,8 +30,10 @@ import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import java.time.Instant
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.json.JSONObject
 import timber.log.Timber
 
 @HiltWorker
@@ -59,6 +65,7 @@ class VersionMigrationsWorker @AssistedInject constructor(
                     podcastManager.reloadFoldersFromServer()
                 }
             }
+            migrateSubsriptionStatusToSubscription(settings)
         }
 
         private fun performUpdateIfRequired(updateKey: String, settings: Settings, update: () -> Unit) {
@@ -71,6 +78,47 @@ class VersionMigrationsWorker @AssistedInject constructor(
             Timber.i("Successfully completed update $updateKey")
 
             settings.setBooleanForKey(key = updateKey, value = true)
+        }
+
+        private fun migrateSubsriptionStatusToSubscription(settings: Settings) {
+            if (settings.contains("accountstatus", isPrivate = true)) {
+                val rawStatus = settings.getStringForKey("accountstatus", isPrivate = true) ?: return
+                runCatching { mapToSubscriptionOrThrow(rawStatus) }
+                    .onFailure { error -> LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, error, "Failed to migrate subscription") }
+                    .onSuccess { subscription -> settings.cachedSubscription.set(subscription, updateModifiedAt = false) }
+                settings.deleteKey("accountstatus", isPrivate = true)
+            }
+        }
+
+        private fun mapToSubscriptionOrThrow(rawStatus: String): Subscription? {
+            val jsonStatus = JSONObject(rawStatus)
+            return Subscription(
+                tier = when (val tier = jsonStatus.getString("tier")) {
+                    "PATRON" -> SubscriptionTier.Patron
+                    "PLUS" -> SubscriptionTier.Plus
+                    "FREE" -> return null
+                    else -> error("Unknown tier: $tier")
+                },
+                billingCycle = when (jsonStatus.getString("frequency")) {
+                    "MONTHLY" -> BillingCycle.Monthly
+                    "YEARLY" -> BillingCycle.Yearly
+                    "NONE" -> null
+                    else -> return null
+                },
+                platform = when (jsonStatus.getString("platform")) {
+                    "IOS" -> SubscriptionPlatform.iOS
+                    "ANDROID" -> SubscriptionPlatform.Android
+                    "WEB" -> SubscriptionPlatform.Web
+                    "GIFT" -> SubscriptionPlatform.Gift
+                    else -> SubscriptionPlatform.Unknown
+                },
+                expiryDate = Instant.parse(jsonStatus.getString("expiry")),
+                isAutoRenewing = jsonStatus
+                    .getJSONArray("subscriptions")
+                    .getJSONObject(jsonStatus.getInt("index"))
+                    .getBoolean("autoRenewing"),
+                giftDays = jsonStatus.getInt("giftDays"),
+            )
         }
 
         /**

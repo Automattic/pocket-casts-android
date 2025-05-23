@@ -6,8 +6,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
-import au.com.shiftyjelly.pocketcasts.models.to.SignInState
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
@@ -227,10 +226,7 @@ class MainActivityViewModelTest {
 
         whenever(userManager.getSignInState()).thenReturn(
             Flowable.just(
-                SignInState.SignedIn(
-                    email = "",
-                    subscriptionStatus = SubscriptionStatus.Free(),
-                ),
+                SignInState.SignedIn(email = "", subscription = null),
             ),
         )
 

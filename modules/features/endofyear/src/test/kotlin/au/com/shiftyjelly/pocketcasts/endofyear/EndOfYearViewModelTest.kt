@@ -19,7 +19,12 @@ import au.com.shiftyjelly.pocketcasts.models.to.Story.TopShows
 import au.com.shiftyjelly.pocketcasts.models.to.Story.TotalTime
 import au.com.shiftyjelly.pocketcasts.models.to.Story.YearVsYear
 import au.com.shiftyjelly.pocketcasts.models.to.TopPodcast
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
+import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearStats
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearSync
@@ -28,6 +33,7 @@ import au.com.shiftyjelly.pocketcasts.servers.list.PodcastList
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
 import au.com.shiftyjelly.pocketcasts.sharing.SharingResponse
+import java.time.Instant
 import java.time.Year
 import java.util.Date
 import junit.framework.TestCase.assertEquals
@@ -41,8 +47,8 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import au.com.shiftyjelly.pocketcasts.models.to.LongestEpisode as LongestEpisodeData
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -55,7 +61,16 @@ class EndOfYearViewModelTest {
     private val endOfYearSync = FakeEndOfYearSync()
     private val endOfYearManager = FakeEofYearManager()
     private val listServiceManager = FakeListServiceManager()
-    private val subscriptionTier = MutableStateFlow(SubscriptionTier.PLUS)
+    private val plusSubscription = Subscription(
+        tier = SubscriptionTier.Plus,
+        billingCycle = BillingCycle.Monthly,
+        platform = SubscriptionPlatform.Android,
+        expiryDate = Instant.now(),
+        isAutoRenewing = true,
+        giftDays = 0,
+    )
+    private val patronSubscription = plusSubscription.copy(tier = SubscriptionTier.Patron)
+    private val subscriptionFlow = MutableStateFlow<Subscription?>(plusSubscription)
 
     private val stats = EndOfYearStats(
         playedEpisodeCount = 100,
@@ -91,13 +106,18 @@ class EndOfYearViewModelTest {
 
     @Before
     fun setUp() {
+        val settings = mock<Settings>()
+        val userSetting = mock<UserSetting<Subscription?>>()
+        whenever(userSetting.flow).thenReturn(subscriptionFlow)
+        whenever(settings.cachedSubscription).thenReturn(userSetting)
+
         viewModel = EndOfYearViewModel(
             year = Year.of(1000),
             topListTitle = "Top list title",
             source = StoriesActivity.StoriesSource.UNKNOWN,
             endOfYearSync = endOfYearSync,
             endOfYearManager = endOfYearManager,
-            subscriptionManager = mock { on { subscriptionTier() }.doReturn(subscriptionTier) },
+            settings = settings,
             listServiceManager = listServiceManager,
             sharingClient = FakeSharingClient(),
             analyticsTracker = AnalyticsTracker.test(),
@@ -136,7 +156,7 @@ class EndOfYearViewModelTest {
     fun `stories are in correct order`() = runTest {
         endOfYearSync.isSynced.add(true)
         endOfYearManager.stats.add(stats)
-        subscriptionTier.emit(SubscriptionTier.NONE)
+        subscriptionFlow.value = null
 
         viewModel.syncData()
         viewModel.uiState.test {
@@ -385,7 +405,7 @@ class EndOfYearViewModelTest {
     fun `plus interstitial for regular user`() = runTest {
         endOfYearSync.isSynced.add(true)
         endOfYearManager.stats.add(stats)
-        subscriptionTier.emit(SubscriptionTier.NONE)
+        subscriptionFlow.value = null
 
         viewModel.syncData()
         viewModel.uiState.test {
@@ -399,7 +419,6 @@ class EndOfYearViewModelTest {
     fun `plus interstitial for Plus user`() = runTest {
         endOfYearSync.isSynced.add(true)
         endOfYearManager.stats.add(stats)
-        subscriptionTier.emit(SubscriptionTier.PLUS)
 
         viewModel.syncData()
         viewModel.uiState.test {
@@ -413,7 +432,7 @@ class EndOfYearViewModelTest {
     fun `plus interstitial for Patron user`() = runTest {
         endOfYearSync.isSynced.add(true)
         endOfYearManager.stats.add(stats)
-        subscriptionTier.emit(SubscriptionTier.PATRON)
+        subscriptionFlow.value = patronSubscription
 
         viewModel.syncData()
         viewModel.uiState.test {
@@ -436,7 +455,7 @@ class EndOfYearViewModelTest {
                 YearVsYear(
                     lastYearDuration = stats.lastYearPlaybackTime,
                     thisYearDuration = stats.playbackTime,
-                    subscriptionTier = SubscriptionTier.PLUS,
+                    subscriptionTier = SubscriptionTier.Plus,
                 ),
                 story,
             )
@@ -456,7 +475,7 @@ class EndOfYearViewModelTest {
                 CompletionRate(
                     listenedCount = stats.playedEpisodeCount,
                     completedCount = stats.completedEpisodeCount,
-                    subscriptionTier = SubscriptionTier.PLUS,
+                    subscriptionTier = SubscriptionTier.Plus,
                 ),
                 story,
             )
@@ -467,17 +486,17 @@ class EndOfYearViewModelTest {
     fun `update stories with subscription tier`() = runTest {
         endOfYearSync.isSynced.add(true)
         endOfYearManager.stats.add(stats)
-        subscriptionTier.emit(SubscriptionTier.NONE)
+        subscriptionFlow.value = null
 
         viewModel.syncData()
         viewModel.uiState.test {
             assertHasStory<PlusInterstitial>(awaitStories())
 
-            subscriptionTier.emit(SubscriptionTier.PLUS)
+            subscriptionFlow.value = plusSubscription
             endOfYearManager.stats.add(stats)
             assertDoesNotHaveStory<PlusInterstitial>(awaitStories())
 
-            subscriptionTier.emit(SubscriptionTier.NONE)
+            subscriptionFlow.value = null
             endOfYearManager.stats.add(stats)
             assertHasStory<PlusInterstitial>(awaitStories())
         }
@@ -487,7 +506,7 @@ class EndOfYearViewModelTest {
     fun `auto switch stories`() = runTest {
         endOfYearSync.isSynced.add(true)
         endOfYearManager.stats.add(stats)
-        subscriptionTier.emit(SubscriptionTier.NONE)
+        subscriptionFlow.value = null
 
         viewModel.syncData()
         viewModel.resumeStoryAutoProgress(StoryProgressPauseReason.ScreenInBackground)
@@ -535,7 +554,7 @@ class EndOfYearViewModelTest {
     fun `resume and pause stories auto switching`() = runTest {
         endOfYearSync.isSynced.add(true)
         endOfYearManager.stats.add(stats)
-        subscriptionTier.emit(SubscriptionTier.NONE)
+        subscriptionFlow.value = null
 
         viewModel.syncData()
         val stories = (viewModel.uiState.first() as UiState.Synced).stories
@@ -562,7 +581,7 @@ class EndOfYearViewModelTest {
     fun `pause story auto progress as long as there is at least one reason`() = runTest {
         endOfYearSync.isSynced.add(true)
         endOfYearManager.stats.add(stats)
-        subscriptionTier.emit(SubscriptionTier.NONE)
+        subscriptionFlow.value = null
 
         viewModel.syncData()
         val stories = (viewModel.uiState.first() as UiState.Synced).stories
@@ -591,7 +610,6 @@ class EndOfYearViewModelTest {
     fun `get index of next story for paid account`() = runTest {
         endOfYearSync.isSynced.add(true)
         endOfYearManager.stats.add(stats)
-        subscriptionTier.emit(SubscriptionTier.PLUS)
 
         viewModel.syncData()
         val stories = (viewModel.uiState.first() as UiState.Synced).stories
@@ -612,7 +630,6 @@ class EndOfYearViewModelTest {
     fun `get index of previous story for paid account`() = runTest {
         endOfYearSync.isSynced.add(true)
         endOfYearManager.stats.add(stats)
-        subscriptionTier.emit(SubscriptionTier.PLUS)
 
         viewModel.syncData()
         val stories = (viewModel.uiState.first() as UiState.Synced).stories
@@ -633,7 +650,7 @@ class EndOfYearViewModelTest {
     fun `get index of next story for free account`() = runTest {
         endOfYearSync.isSynced.add(true)
         endOfYearManager.stats.add(stats)
-        subscriptionTier.emit(SubscriptionTier.NONE)
+        subscriptionFlow.value = null
 
         viewModel.syncData()
         val stories = (viewModel.uiState.first() as UiState.Synced).stories
@@ -655,7 +672,7 @@ class EndOfYearViewModelTest {
     fun `get index of previous story for free account`() = runTest {
         endOfYearSync.isSynced.add(true)
         endOfYearManager.stats.add(stats)
-        subscriptionTier.emit(SubscriptionTier.NONE)
+        subscriptionFlow.value = null
 
         viewModel.syncData()
         val stories = (viewModel.uiState.first() as UiState.Synced).stories
@@ -677,7 +694,7 @@ class EndOfYearViewModelTest {
     fun `plus interstitial has max progress`() = runTest {
         endOfYearSync.isSynced.add(true)
         endOfYearManager.stats.add(stats)
-        subscriptionTier.emit(SubscriptionTier.NONE)
+        subscriptionFlow.value = null
 
         viewModel.syncData()
         viewModel.uiState.test {

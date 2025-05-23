@@ -63,6 +63,7 @@ import au.com.shiftyjelly.pocketcasts.compose.images.HorizontalLogo
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.settings.consent.TrackingConsentDialog
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.ui.extensions.inLandscape
@@ -78,7 +79,7 @@ internal fun OnboardingLoginOrSignUpPage(
     onDismiss: () -> Unit,
     onSignUpClicked: () -> Unit,
     onLoginClicked: () -> Unit,
-    onContinueWithGoogleComplete: (GoogleSignInState) -> Unit,
+    onContinueWithGoogleComplete: (GoogleSignInState, Subscription?) -> Unit,
     onUpdateSystemBars: (SystemBarsStyles) -> Unit,
     viewModel: OnboardingLoginOrSignUpViewModel = hiltViewModel(),
 ) {
@@ -134,7 +135,7 @@ private fun Content(
     onNavigationClick: () -> Unit,
     onSignUpClicked: () -> Unit,
     onLoginClicked: () -> Unit,
-    onContinueWithGoogleComplete: (GoogleSignInState) -> Unit,
+    onContinueWithGoogleComplete: (GoogleSignInState, Subscription?) -> Unit,
     onUpdateTrackingConsent: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -348,7 +349,7 @@ private fun OnboardingLoginOrSignUpPagePreview(@PreviewParameter(ThemePreviewPar
             onDismiss = {},
             onSignUpClicked = {},
             onLoginClicked = {},
-            onContinueWithGoogleComplete = {},
+            onContinueWithGoogleComplete = { _, _ -> },
             onUpdateSystemBars = {},
         )
     }

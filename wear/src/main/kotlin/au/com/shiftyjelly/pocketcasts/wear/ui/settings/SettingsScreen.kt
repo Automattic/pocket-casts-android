@@ -24,8 +24,7 @@ import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import androidx.wear.compose.material.ToggleChipDefaults
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
-import au.com.shiftyjelly.pocketcasts.models.to.SignInState
-import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ScreenHeaderChip
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.SectionHeaderChip
@@ -261,7 +260,7 @@ private fun SettingsScreenPreview_unchecked() {
             state = SettingsViewModel.State(
                 signInState = SignInState.SignedIn(
                     email = "matt@pocketcasts.com",
-                    subscriptionStatus = SubscriptionStatus.Free(),
+                    subscription = null,
                 ),
                 showDataWarning = false,
                 refreshInBackground = false,
@@ -292,7 +291,7 @@ private fun SettingsScreenPreview_checked() {
             state = SettingsViewModel.State(
                 signInState = SignInState.SignedIn(
                     email = "matt@pocketcasts.com",
-                    subscriptionStatus = SubscriptionStatus.Free(),
+                    subscription = null,
                 ),
                 showDataWarning = true,
                 refreshInBackground = true,

@@ -263,12 +263,12 @@ data class OnboardingSubscriptionPlan private constructor(
 
                         plan.pricingPhases[0].price.amount.stripTrailingZeros() != BigDecimal.ZERO -> PaymentResult.Failure(
                             PaymentResultCode.DeveloperError,
-                            "${plan.offer} should have free initial period: ${plan.pricingPhases[0].price.amount}",
+                            "${plan.offer} should have free initial period. Found ${plan.pricingPhases[0].price}",
                         )
 
                         plan.pricingPhases[0].schedule.recurrenceMode !is RecurrenceMode.Recurring -> PaymentResult.Failure(
                             PaymentResultCode.DeveloperError,
-                            "${plan.offer} should have recurring schedule",
+                            "${plan.offer} should have recurring initial period",
                         )
 
                         plan.pricingPhases[1].schedule.recurrenceMode != RecurrenceMode.Infinite -> PaymentResult.Failure(

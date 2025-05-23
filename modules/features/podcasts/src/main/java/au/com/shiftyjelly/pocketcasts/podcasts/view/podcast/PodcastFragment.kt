@@ -557,7 +557,7 @@ class PodcastFragment : BaseFragment() {
             analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_FOLDER_TAPPED)
             val isSignedInAsPlusOrPatron = viewModel.signInState.value?.isSignedInAsPlusOrPatron == true
             if (!isSignedInAsPlusOrPatron) {
-                OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.Upsell(OnboardingUpgradeSource.FOLDERS_PODCAST_SCREEN))
+                OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.Upsell(OnboardingUpgradeSource.FOLDERS_PODCAST_SCREEN))
                 return@launch
             }
             val folder = viewModel.getFolder()

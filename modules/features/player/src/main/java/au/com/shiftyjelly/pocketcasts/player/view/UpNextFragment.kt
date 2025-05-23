@@ -8,16 +8,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.Toolbar
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -29,6 +34,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.player.R
@@ -203,15 +209,21 @@ class UpNextFragment :
             analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHOWN, mapOf("source" to "tab_bar"))
         }
 
-        binding.emptyUpNextView.apply {
-            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-            setContent {
-                val upNextState by remember {
-                    playerViewModel.upNextStateObservable.asFlow()
-                }.collectAsStateWithLifecycle(null)
-                AppTheme(theme.activeTheme) {
-                    if (upNextState is UpNextQueue.State.Empty) {
-                        UpNextEmptyState(onDiscoverTapped = ::onDiscoverTapped)
+        binding.emptyUpNextView.setContentWithViewCompositionStrategy {
+            val upNextState by remember {
+                playerViewModel.upNextStateObservable.asFlow()
+            }.collectAsStateWithLifecycle(null)
+
+            AppTheme(theme.activeTheme) {
+                if (upNextState is UpNextQueue.State.Empty) {
+                    Column(
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier.verticalScroll(rememberScrollState()),
+                    ) {
+                        UpNextEmptyState(
+                            onDiscoverTapped = ::onDiscoverTapped,
+                            modifier = Modifier.padding(vertical = 24.dp),
+                        )
                     }
                 }
             }

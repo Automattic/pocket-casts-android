@@ -120,9 +120,9 @@ Language: en_GB
     <string name="log_in_on_phone">Log in on phone</string>
     <string name="log_in_with_google">Log in with Google</string>
     <string name="log_in_subtitle">Start listening to your favourite podcasts</string>
+    <string name="trial_start">Start my free trial</string>
     <string name="trial_then_per_year">Try %1$s, then %2$s per year</string>
     <string name="trial_then_per_month">Try %1$s, then %2$s per month</string>
-    <string name="trial_start">Start my free trial</string>
     <string name="subscribe_to">Subscribe to %s</string>
     <string name="settings_description_advanced">These settings are experimental. We recommend that most users not change these from their default values.</string>
     <string name="player_up_next_empty_desc_watch">You can queue episodes to play next in the episode details screen.</string>

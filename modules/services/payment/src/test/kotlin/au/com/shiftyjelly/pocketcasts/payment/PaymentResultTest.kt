@@ -99,7 +99,7 @@ class PaymentResultTest {
     fun `recover for success`() {
         val result = PaymentResult.Success(10)
 
-        val recovered = result.recover { code, message -> PaymentResult.Success(55) }
+        val recovered = result.recover { _, _ -> PaymentResult.Success(55) }
 
         assertEquals(10, recovered.getOrNull())
     }

@@ -49,7 +49,12 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.extensions.plusBackgroundBrush
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
-import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfoMock
+import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlans
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.payment.flatMap
+import au.com.shiftyjelly.pocketcasts.payment.getOrNull
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.pageCornerRadius
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.pageWidthPercent
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.shouldShowFullScreen
@@ -102,7 +107,7 @@ private fun ReferralsSendGuestPassContent(
     state: UiState,
     onRetry: () -> Unit,
     onDismiss: () -> Unit,
-    onShare: (String) -> Unit,
+    onShare: (String, String, String) -> Unit,
 ) {
     BoxWithConstraints(
         contentAlignment = Alignment.Center,
@@ -140,21 +145,25 @@ private fun ReferralsSendGuestPassContent(
                 UiState.Loading ->
                     LoadingView(color = Color.White)
 
-                is UiState.Loaded ->
+                is UiState.Loaded -> {
+                    val offerName = state.referralPlan.offerName
+                    val offerDuration = state.referralPlan.offerDurationText
                     SendGuestPassContent(
                         state = state,
                         showFullScreen = showFullScreen,
                         windowHeightSizeClass = windowHeightSizeClass,
                         pageWidth = pageWidth,
                         onDismiss = onDismiss,
-                        onShare = { onShare(state.code) },
+                        onShare = { onShare(state.code, offerName, offerDuration) },
                     )
+                }
 
                 is UiState.Error -> {
                     val errorMessage = when (state.error) {
                         ReferralSendGuestPassError.Empty,
                         ReferralSendGuestPassError.FailedToLoad,
                         -> stringResource(LR.string.error_generic_message)
+
                         ReferralSendGuestPassError.NoNetwork -> stringResource(LR.string.error_no_network)
                     }
                     ReferralsGuestPassError(errorMessage, onRetry, onDismiss)
@@ -200,7 +209,7 @@ private fun SendGuestPassContent(
         Spacer(modifier = Modifier.height(24.dp))
 
         TextH10(
-            text = stringResource(LR.string.referrals_send_guest_pass_title, state.referralsOfferInfo.localizedOfferDurationNoun),
+            text = stringResource(LR.string.referrals_send_guest_pass_title, state.referralPlan.offerDurationText),
             textAlign = TextAlign.Center,
         )
 
@@ -245,12 +254,12 @@ private fun ReferralsPassCardsStack(
             val cardHeight = (cardWidth.value * ReferralGuestPassCardDefaults.cardAspectRatio).dp
             val cardOffset = (10 * ((cardsCount - 1) - index)).dp
             ReferralGuestPassCardView(
+                referralPlan = state.referralPlan,
+                source = ReferralGuestPassCardViewSource.Send,
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
                     .size(cardWidth, cardHeight)
                     .offset(y = cardOffset),
-                source = ReferralGuestPassCardViewSource.Send,
-                referralsOfferInfo = state.referralsOfferInfo,
             )
         }
     }
@@ -301,9 +310,15 @@ fun ReferralsSendGuestPassContentPreview(
         ReferralsSendGuestPassContent(
             windowWidthSizeClass = windowWidthSizeClass,
             windowHeightSizeClass = windowHeightSizeClass,
-            state = UiState.Loaded("", ReferralsOfferInfoMock),
+            state = UiState.Loaded(
+                referralPlan = SubscriptionPlans.Preview
+                    .findOfferPlan(SubscriptionTier.Plus, BillingCycle.Yearly, SubscriptionOffer.Referral)
+                    .flatMap(ReferralSubscriptionPlan::create)
+                    .getOrNull()!!,
+                code = "",
+            ),
             onDismiss = {},
-            onShare = {},
+            onShare = { _, _, _ -> },
             onRetry = {},
         )
     }

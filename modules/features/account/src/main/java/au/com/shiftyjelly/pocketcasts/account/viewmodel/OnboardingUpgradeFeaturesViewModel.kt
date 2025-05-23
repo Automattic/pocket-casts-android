@@ -8,7 +8,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
-import au.com.shiftyjelly.pocketcasts.payment.PaymentResultCode
 import au.com.shiftyjelly.pocketcasts.payment.PurchaseResult
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
@@ -24,6 +23,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -39,14 +39,7 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
     val state = _state.asStateFlow()
 
     init {
-        viewModelScope.launch {
-            val subscriptionPlans = paymentClient.loadSubscriptionPlans().getOrNull()
-            if (subscriptionPlans == null) {
-                _state.value = OnboardingUpgradeFeaturesState.NoSubscriptions
-            } else {
-                _state.value = createInitialLoadedState(subscriptionPlans)
-            }
-        }
+        loadSubscriptionPlans()
     }
 
     private fun createInitialLoadedState(
@@ -60,6 +53,22 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
             showOnlyPatronPlans = showPatronOnly,
             purchaseFailed = false,
         )
+    }
+
+    private var subscriptionPlansJob: Job? = null
+
+    fun loadSubscriptionPlans() {
+        if (subscriptionPlansJob?.isActive == true) {
+            return
+        }
+        subscriptionPlansJob = viewModelScope.launch {
+            val subscriptionPlans = paymentClient.loadSubscriptionPlans().getOrNull()
+            if (subscriptionPlans == null) {
+                _state.value = OnboardingUpgradeFeaturesState.NoSubscriptions
+            } else {
+                _state.value = createInitialLoadedState(subscriptionPlans)
+            }
+        }
     }
 
     fun changeBillingCycle(billingCycle: BillingCycle) {
@@ -89,8 +98,7 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
             val planKey = loadedState.selectedPlan.key
             trackPaymentFrequencyButtonTapped(planKey)
             viewModelScope.launch {
-                val purchaseResult = paymentClient.purchaseSubscriptionPlan(planKey, activity)
-                trackPurchaseResult(planKey, purchaseResult)
+                val purchaseResult = paymentClient.purchaseSubscriptionPlan(planKey, flow.source.analyticsValue, activity)
 
                 when (purchaseResult) {
                     is PurchaseResult.Purchased -> {
@@ -115,33 +123,6 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
                 "product" to plan.productId,
             ),
         )
-    }
-
-    private fun trackPurchaseResult(
-        plan: SubscriptionPlan.Key,
-        purchaseResult: PurchaseResult,
-    ) {
-        val productValue = when (plan.tier) {
-            SubscriptionTier.Plus -> plan.billingCycle.analyticsValue
-            SubscriptionTier.Patron -> plan.productId
-        }
-        val analyticsProperties = buildMap {
-            put("product", productValue)
-            put("offer_type", plan.offer?.analyticsValue ?: "none")
-            put("source", flow.source.analyticsValue)
-        }
-        when (purchaseResult) {
-            is PurchaseResult.Purchased -> analyticsTracker.track(AnalyticsEvent.PURCHASE_SUCCESSFUL, analyticsProperties)
-
-            is PurchaseResult.Cancelled -> analyticsTracker.track(AnalyticsEvent.PURCHASE_CANCELLED)
-
-            is PurchaseResult.Failure -> {
-                analyticsTracker.track(
-                    AnalyticsEvent.PURCHASE_FAILED,
-                    analyticsProperties + purchaseResult.code.analyticProperties(),
-                )
-            }
-        }
     }
 
     fun onShown(flow: OnboardingFlow, source: OnboardingUpgradeSource) {
@@ -182,13 +163,6 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
             "flow" to flow.analyticsValue,
             "source" to source.analyticsValue,
         )
-    }
-}
-
-private fun PaymentResultCode.analyticProperties() = buildMap {
-    put("error", analyticsValue)
-    if (this@analyticProperties is PaymentResultCode.Unknown) {
-        put("error_code", code)
     }
 }
 

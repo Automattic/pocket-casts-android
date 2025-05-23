@@ -1,13 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.payment
 
 import android.app.Activity
-import com.android.billingclient.api.BillingFlowParams
-import com.android.billingclient.api.BillingResult
-import com.android.billingclient.api.ProductDetails
-import com.android.billingclient.api.PurchaseHistoryRecord
-import com.android.billingclient.api.QueryProductDetailsParams
-import com.android.billingclient.api.QueryPurchaseHistoryParams
-import com.android.billingclient.api.QueryPurchasesParams
 import java.util.Collections
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
@@ -17,7 +10,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -25,33 +17,33 @@ import kotlinx.coroutines.launch
 class PaymentClient @Inject constructor(
     private val dataSource: PaymentDataSource,
     private val purchaseApprover: PurchaseApprover,
-    private val logger: Logger,
+    private val listeners: Set<@JvmSuppressWildcards PaymentClient.Listener>,
 ) {
     private val _purchaseEvents = MutableSharedFlow<PurchaseResult>()
     private val pendingPurchases = Collections.newSetFromMap(ConcurrentHashMap<String, Boolean>())
 
     suspend fun loadSubscriptionPlans(): PaymentResult<SubscriptionPlans> {
-        logger.info("Load subscription plans")
+        forEachListener { onLoadSubscriptionPlans() }
         return dataSource
             .loadProducts()
             .flatMap(SubscriptionPlans::create)
-            .onSuccess { plans -> logger.info("Subscription plans loaded: $plans") }
-            .onFailure { code, message -> logger.warning("Failed to load subscription plans. $code, $message") }
+            .also { forEachListener { onSubscriptionPlansLoaded(it) } }
     }
 
     suspend fun loadAcknowledgedSubscriptions(): PaymentResult<List<AcknowledgedSubscription>> {
-        logger.info("Loading acknowledged subscriptions")
+        forEachListener { onloadAcknowledgedSubscriptions() }
         return dataSource
             .loadPurchases()
             .map { purchases -> purchases.toAcknowledgedSubscriptions() }
-            .onSuccess { subscriptions -> logger.info("Acknowledged subscriptions loaded: $subscriptions") }
-            .onFailure { code, message -> logger.warning("Failed to load acknowledged subscriptions. $code, $message") }
+            .also { forEachListener { onAcknowledgedSubscriptionsLoaded(it) } }
     }
 
     suspend fun purchaseSubscriptionPlan(
         key: SubscriptionPlan.Key,
+        purchaseSource: String,
         activity: Activity,
     ): PurchaseResult = coroutineScope {
+        forEachListener { onPurchaseSubscriptionPlan(key) }
         val purchaseUpdatesJob = launch(start = CoroutineStart.UNDISPATCHED) { listenToPurchaseUpdates() }
         val purchaseConfirmationDeferred = async { _purchaseEvents.first() }
 
@@ -62,12 +54,12 @@ class PaymentClient @Inject constructor(
             }
 
             is PaymentResult.Failure -> {
-                logger.warning("Launching billing flow failed: ${billingResult.code}, ${billingResult.message}")
                 purchaseConfirmationDeferred.cancel()
                 billingResult.toPurchaseResult()
             }
         }
         purchaseUpdatesJob.cancelAndJoin()
+        forEachListener { onSubscriptionPurchased(key, purchaseSource, purchaseResult) }
         purchaseResult
     }
 
@@ -79,7 +71,7 @@ class PaymentClient @Inject constructor(
         }
     }
 
-    suspend fun listenToPurchaseUpdates(): Nothing {
+    private suspend fun listenToPurchaseUpdates(): Nothing {
         dataSource.purchaseResults.collect { result ->
             val recoveredResult = result.recover { code, message ->
                 when (code) {
@@ -96,7 +88,6 @@ class PaymentClient @Inject constructor(
                 }
 
                 is PaymentResult.Failure -> {
-                    logger.warning("Purchase failure: ${recoveredResult.code}, ${recoveredResult.message}")
                     _purchaseEvents.emit(recoveredResult.toPurchaseResult())
                 }
             }
@@ -108,22 +99,23 @@ class PaymentClient @Inject constructor(
         dispatchConfirmation: Boolean,
     ) {
         if (purchase.state is PurchaseState.Purchased && pendingPurchases.add(purchase.state.orderId)) {
-            logger.info("Confirm purchase: $purchase")
-
-            val confirmResult = purchaseApprover.approve(purchase)
-                .flatMap { approvedPurchase ->
-                    if (!approvedPurchase.isAcknowledged) {
-                        dataSource.acknowledgePurchase(approvedPurchase)
-                    } else {
-                        PaymentResult.Success(approvedPurchase)
+            try {
+                forEachListener { onConfirmPurchase(purchase) }
+                val confirmResult = purchaseApprover.approve(purchase)
+                    .flatMap { approvedPurchase ->
+                        if (!approvedPurchase.isAcknowledged) {
+                            dataSource.acknowledgePurchase(approvedPurchase)
+                        } else {
+                            PaymentResult.Success(approvedPurchase)
+                        }
                     }
+                forEachListener { onPurchaseConfirmed(confirmResult) }
+                if (dispatchConfirmation) {
+                    _purchaseEvents.emit(confirmResult.toPurchaseResult())
                 }
-                .onSuccess { logger.info("Purchase confirmed: $it") }
-                .onFailure { code, message -> logger.warning("Failed to confirm purchase: $purchase. $code, $message") }
-            if (dispatchConfirmation) {
-                _purchaseEvents.emit(confirmResult.toPurchaseResult())
+            } finally {
+                pendingPurchases.remove(purchase.state.orderId)
             }
-            pendingPurchases.remove(purchase.state.orderId)
         }
     }
 
@@ -133,12 +125,12 @@ class PaymentClient @Inject constructor(
         if (!isAcknowledged || state !is PurchaseState.Purchased) return null
 
         if (productIds.isEmpty()) {
-            logger.warning("Skipping purchase ${state.orderId}. No associated products.")
+            dispatchMessage("Skipping purchase ${state.orderId}. No associated products.")
             return null
         }
 
         if (productIds.size > 1) {
-            logger.warning("Skipping purchase ${state.orderId}. Too many associated products: $productIds")
+            dispatchMessage("Skipping purchase ${state.orderId}. Too many associated products: $productIds")
             return null
         }
 
@@ -146,7 +138,7 @@ class PaymentClient @Inject constructor(
         val productKey = findMatchingProductKey(productId)
 
         if (productKey == null) {
-            logger.warning("Skipping purchase ${state.orderId}. Couldn't find matching product key for $productId")
+            dispatchMessage("Skipping purchase ${state.orderId}. Couldn't find matching product key for $productId")
             return null
         }
 
@@ -162,47 +154,45 @@ class PaymentClient @Inject constructor(
         return keys.firstOrNull { it.productId == productId }
     }
 
-    // <editor-fold desc="Temporarily extracted old interface">
-    val purchaseEvents = _purchaseEvents.asSharedFlow()
-
-    suspend fun loadProducts(
-        params: QueryProductDetailsParams,
-    ): Pair<BillingResult, List<ProductDetails>> {
-        return dataSource.loadProducts(params)
+    private fun forEachListener(block: Listener.() -> Unit) {
+        listeners.forEach { it.block() }
     }
 
-    suspend fun loadPurchaseHistory(
-        params: QueryPurchaseHistoryParams,
-    ): Pair<BillingResult, List<PurchaseHistoryRecord>> {
-        return dataSource.loadPurchaseHistory(params)
+    private fun dispatchMessage(message: String) {
+        forEachListener { onMessage(message) }
     }
 
-    suspend fun loadPurchases(
-        params: QueryPurchasesParams,
-    ): Pair<BillingResult, List<com.android.billingclient.api.Purchase>> {
-        return dataSource.loadPurchases(params)
-    }
+    interface Listener {
+        fun onLoadSubscriptionPlans() = Unit
 
-    suspend fun launchBillingFlow(
-        activity: Activity,
-        params: BillingFlowParams,
-    ): BillingResult {
-        return dataSource.launchBillingFlow(activity, params)
+        fun onSubscriptionPlansLoaded(result: PaymentResult<SubscriptionPlans>) = Unit
+
+        fun onloadAcknowledgedSubscriptions() = Unit
+
+        fun onAcknowledgedSubscriptionsLoaded(result: PaymentResult<List<AcknowledgedSubscription>>) = Unit
+
+        fun onPurchaseSubscriptionPlan(key: SubscriptionPlan.Key) = Unit
+
+        fun onSubscriptionPurchased(key: SubscriptionPlan.Key, purchaseSource: String, result: PurchaseResult) = Unit
+
+        fun onConfirmPurchase(purchase: Purchase) = Unit
+
+        fun onPurchaseConfirmed(result: PaymentResult<Purchase>) = Unit
+
+        fun onMessage(message: String) = Unit
     }
-    // </editor-fold>
 
     companion object {
-        fun test(dataSource: PaymentDataSource = PaymentDataSource.fake()) = PaymentClient(
-            dataSource,
+        fun test(
+            dataSource: PaymentDataSource = PaymentDataSource.fake(),
+            vararg listeners: Listener,
+        ) = PaymentClient(
+            dataSource = dataSource,
+            listeners = listeners.toSet(),
             purchaseApprover = object : PurchaseApprover {
                 override suspend fun approve(purchase: Purchase): PaymentResult<Purchase> {
                     return PaymentResult.Success(purchase)
                 }
-            },
-            logger = object : Logger {
-                override fun info(message: String) = Unit
-                override fun warning(message: String) = Unit
-                override fun error(message: String, exception: Throwable) = Unit
             },
         )
     }

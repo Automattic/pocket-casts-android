@@ -53,6 +53,10 @@ steps:
 
   - label: 'Spotless formatting check'
     command: |
+      if .buildkite/commands/should-skip-job.sh --job-type validation; then
+        exit 0
+      fi
+
       echo "--- 🔎 Checking formatting with Spotless"
       ./gradlew spotlessCheck
     plugins: [$CI_TOOLKIT]

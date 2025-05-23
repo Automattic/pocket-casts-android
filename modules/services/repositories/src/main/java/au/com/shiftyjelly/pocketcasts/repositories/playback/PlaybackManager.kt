@@ -64,7 +64,6 @@ import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isPositive
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.android.tracks.crashlogging.CrashLogging
 import com.jakewharton.rxrelay2.BehaviorRelay
@@ -135,7 +134,6 @@ open class PlaybackManager @Inject constructor(
     private val showNotesManager: ShowNotesManager,
     private val chapterManager: ChapterManager,
     private val sleepTimer: SleepTimer,
-    bookmarkFeature: BookmarkFeatureControl,
     private val playbackManagerNetworkWatcherFactory: PlaybackManagerNetworkWatcher.Factory,
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val crashLogging: CrashLogging,
@@ -218,7 +216,6 @@ open class PlaybackManager @Inject constructor(
         episodeAnalytics = episodeAnalytics,
         bookmarkManager = bookmarkManager,
         applicationScope = applicationScope,
-        bookmarkFeature = bookmarkFeature,
     )
 
     var player: Player? = null

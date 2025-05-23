@@ -18,7 +18,7 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.AccountFragmentViewModel
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
-import au.com.shiftyjelly.pocketcasts.models.to.SignInState
+import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeTintedDrawable
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.observeOnce
@@ -91,7 +91,7 @@ class AccountFragment : BaseFragment() {
                         flow = null,
                         fontSize = dimensionResource(CR.dimen.car_body2_size).value.sp,
                         includePadding = false,
-                        onComplete = { activity?.finish() },
+                        onComplete = { _, _ -> activity?.finish() },
                     )
                 }
             }

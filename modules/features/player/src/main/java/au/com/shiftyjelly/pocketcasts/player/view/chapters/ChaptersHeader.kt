@@ -20,9 +20,8 @@ import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionIconForTier
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -116,7 +115,7 @@ private fun TextButton(
 
         if (showSubscriptionIcon) {
             Spacer(modifier = Modifier.width(8.dp))
-            SubscriptionIconForTier(SubscriptionTier.fromFeatureTier(Feature.DESELECT_CHAPTERS))
+            SubscriptionIconForTier(SubscriptionTier.Plus)
         }
     }
 }

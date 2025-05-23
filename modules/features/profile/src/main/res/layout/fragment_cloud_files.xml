@@ -107,13 +107,6 @@
                 android:layout_height="@dimen/divider_height"
                 android:background="?attr/primary_ui_05" />
 
-            <androidx.compose.ui.platform.ComposeView
-                android:id="@+id/emptyLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="4dp"
-                />
-
             <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
                 android:id="@+id/swipeRefreshLayout"
                 android:layout_width="match_parent"
@@ -128,6 +121,12 @@
                     android:paddingBottom="64dp" />
             </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
         </LinearLayout>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/emptyLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab"
