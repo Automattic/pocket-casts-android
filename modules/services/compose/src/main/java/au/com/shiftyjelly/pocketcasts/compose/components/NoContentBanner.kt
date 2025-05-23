@@ -14,9 +14,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.LocalRippleConfiguration
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.RippleConfiguration
 import androidx.compose.material.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,7 +35,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
@@ -41,9 +45,9 @@ import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 @Composable
-fun EmptyState(
+fun NoContentBanner(
     title: String,
-    subtitle: String,
+    body: String,
     @DrawableRes iconResourceId: Int,
     modifier: Modifier = Modifier,
     primaryButtonText: String? = null,
@@ -78,9 +82,9 @@ fun EmptyState(
             fontWeight = FontWeight.W500,
         )
 
-        if (subtitle.isNotEmpty()) {
+        if (body.isNotEmpty()) {
             TextP40(
-                text = subtitle,
+                text = body,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.theme.colors.primaryText02,
                 fontSize = 15.sp,
@@ -97,6 +101,7 @@ fun EmptyState(
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun EmptyStateButtons(
     primaryButtonText: String? = null,
@@ -111,25 +116,30 @@ private fun EmptyStateButtons(
             modifier = Modifier.fillMaxWidth(),
         ) {
             if (primaryButtonText != null) {
-                RowButton(
-                    text = primaryButtonText,
-                    onClick = { onPrimaryButtonClick?.invoke() },
-                    includePadding = false,
-                    textColor = MaterialTheme.theme.colors.primaryInteractive02,
-                    colors = ButtonDefaults.buttonColors(
-                        backgroundColor = MaterialTheme.theme.colors.primaryInteractive01,
-                    ),
-                )
+                CompositionLocalProvider(
+                    LocalRippleConfiguration provides RippleConfiguration(MaterialTheme.theme.colors.primaryUi01),
+                ) {
+                    RowButton(
+                        text = primaryButtonText,
+                        onClick = { onPrimaryButtonClick?.invoke() },
+                        includePadding = false,
+                        textColor = MaterialTheme.theme.colors.primaryInteractive02,
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = MaterialTheme.theme.colors.primaryInteractive01,
+                        ),
+                    )
+                }
             }
 
             if (secondaryButtonText != null) {
+                val rippleColors = MaterialTheme.theme.colors.primaryInteractive01
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
                         .heightIn(min = 48.dp)
                         .clip(RoundedCornerShape(12.dp))
                         .clickable(
-                            indication = ripple(color = MaterialTheme.theme.colors.primaryInteractive01),
+                            indication = remember(rippleColors) { ripple(color = rippleColors) },
                             interactionSource = null,
                             role = Role.Button,
                             onClick = { onSecondaryButtonClick?.invoke() },
@@ -149,13 +159,13 @@ private fun EmptyStateButtons(
 
 @Preview
 @Composable
-private fun EmptyStatePreview(
+private fun UpNextNoContentBannerPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppThemeWithBackground(themeType = themeType) {
-        EmptyState(
+        NoContentBanner(
             title = "Time to add some podcasts",
-            subtitle = "Discover and subscribe to your favorite podcasts.",
+            body = "Discover and subscribe to your favorite podcasts.",
             iconResourceId = IR.drawable.ic_podcasts,
             primaryButtonText = "Discover",
             secondaryButtonText = "How do I do that?",
@@ -165,11 +175,11 @@ private fun EmptyStatePreview(
 
 @Preview
 @Composable
-private fun EmptyStateNoSubtitlePreview() {
+private fun UpNextNoContentBannerWithoutSubtitlePreview() {
     AppThemeWithBackground(themeType = Theme.ThemeType.LIGHT) {
-        EmptyState(
+        NoContentBanner(
             title = "Time to add some podcasts",
-            subtitle = "",
+            body = "",
             iconResourceId = IR.drawable.ic_podcasts,
             primaryButtonText = "Discover",
             secondaryButtonText = "How do I do that?",
@@ -179,11 +189,11 @@ private fun EmptyStateNoSubtitlePreview() {
 
 @Preview
 @Composable
-private fun EmptyStateNoPrimaryButtonPreview() {
+private fun UpNextNoContentBannerWithoutPrimaryButtonPreview() {
     AppThemeWithBackground(themeType = Theme.ThemeType.LIGHT) {
-        EmptyState(
+        NoContentBanner(
             title = "Time to add some podcasts",
-            subtitle = "Discover and subscribe to your favorite podcasts.",
+            body = "Discover and subscribe to your favorite podcasts.",
             iconResourceId = IR.drawable.ic_podcasts,
             secondaryButtonText = "How do I do that?",
         )
@@ -192,11 +202,11 @@ private fun EmptyStateNoPrimaryButtonPreview() {
 
 @Preview
 @Composable
-private fun EmptyStateNoSecondaryButtonPreview() {
+private fun UpNextNoContentBannerWithoutSecondaryButtonPreview() {
     AppThemeWithBackground(themeType = Theme.ThemeType.LIGHT) {
-        EmptyState(
+        NoContentBanner(
             title = "Time to add some podcasts",
-            subtitle = "Discover and subscribe to your favorite podcasts.",
+            body = "Discover and subscribe to your favorite podcasts.",
             iconResourceId = IR.drawable.ic_podcasts,
             primaryButtonText = "Discover",
         )

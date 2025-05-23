@@ -220,7 +220,7 @@ class UpNextFragment :
                         verticalArrangement = Arrangement.Center,
                         modifier = Modifier.verticalScroll(rememberScrollState()),
                     ) {
-                        UpNextEmptyState(
+                        UpNextNoContentBanner(
                             onDiscoverTapped = ::onDiscoverTapped,
                             modifier = Modifier.padding(vertical = 24.dp),
                         )
