@@ -201,4 +201,43 @@ class NotificationDelayCalculatorTest {
         val expected = 23 * HOUR_IN_MILLIS
         assertEquals(expected, calc.calculateDelayForReEngagementCheck())
     }
+
+    @Test fun testRecommendations_Before4PM() {
+        val t = getFixedTime(2025, Calendar.MAY, 21, 15, 0)
+        val calculatedDelay = calculatorAt(t).calculateDelayForRecommendations(0, 2)
+        val calculatedTrendingTriggerTime = t + calculatedDelay
+        val expectedTrendingTime = getFixedTime(2025, Calendar.MAY, 21, 16, 0)
+        assertEquals(expectedTrendingTime, calculatedTrendingTriggerTime)
+
+        val calculatedRecommendationsDelay = calculatorAt(t).calculateDelayForRecommendations(1, 2)
+        val calculatedRecommendationsTriggerTime = t + calculatedRecommendationsDelay
+        val expectedRecommendationsTime = getFixedTime(2025, Calendar.MAY, 25, 16, 0)
+        assertEquals(expectedRecommendationsTime, calculatedRecommendationsTriggerTime)
+    }
+
+    @Test fun testRecommendations_At4PM() {
+        val t = getFixedTime(2025, Calendar.MAY, 21, 16, 0)
+        val calculatedDelay = calculatorAt(t).calculateDelayForRecommendations(0, 2)
+        val calculatedTriggerTime = t + calculatedDelay
+        val expected = getFixedTime(2025, Calendar.MAY, 22, 16, 0)
+        assertEquals(expected, calculatedTriggerTime)
+
+        val calculatedRecommendationsDelay = calculatorAt(t).calculateDelayForRecommendations(1, 2)
+        val calculatedRecommendationsTriggerTime = t + calculatedRecommendationsDelay
+        val expectedRecommendationsTime = getFixedTime(2025, Calendar.MAY, 25, 16, 0)
+        assertEquals(expectedRecommendationsTime, calculatedRecommendationsTriggerTime)
+    }
+
+    @Test fun testRecommendations_After4PM() {
+        val t = getFixedTime(2025, Calendar.MAY, 21, 17, 0)
+        val calculatedDelay = calculatorAt(t).calculateDelayForRecommendations(0, 2)
+        val calculatedTriggerTime = t + calculatedDelay
+        val expected = getFixedTime(2025, Calendar.MAY, 22, 16, 0)
+        assertEquals(expected, calculatedTriggerTime)
+
+        val calculatedRecommendationsDelay = calculatorAt(t).calculateDelayForRecommendations(1, 2)
+        val calculatedRecommendationsTriggerTime = t + calculatedRecommendationsDelay
+        val expectedRecommendationsTime = getFixedTime(2025, Calendar.MAY, 25, 16, 0)
+        assertEquals(expectedRecommendationsTime, calculatedRecommendationsTriggerTime)
+    }
 }

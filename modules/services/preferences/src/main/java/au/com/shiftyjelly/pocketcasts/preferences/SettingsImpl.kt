@@ -570,6 +570,12 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
+    override val recommendationsNotification = UserSetting.BoolPref(
+        sharedPrefKey = "trendingAndRecommendationsNotification",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
+
     override val streamingMode: UserSetting<Boolean> = UserSetting.BoolPref(
         sharedPrefKey = Settings.PREFERENCE_GLOBAL_STREAMING_MODE,
         defaultValue = true,

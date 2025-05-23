@@ -32,8 +32,7 @@ class NotificationWorker @AssistedInject constructor(
     override suspend fun doWork(): Result {
         val subcategory = inputData.getString(SUBCATEGORY) ?: return Result.failure()
 
-        val type =
-            OnboardingNotificationType.fromSubcategory(subcategory) ?: ReEngagementNotificationType.fromSubcategory(subcategory) ?: return Result.failure()
+        val type = NotificationType.fromSubCategory(subcategory) ?: return Result.failure()
 
         if (!type.isSettingsToggleOn(settings)) {
             return Result.failure()
@@ -56,16 +55,29 @@ class NotificationWorker @AssistedInject constructor(
     private fun getNotificationBuilder(type: NotificationType): NotificationCompat.Builder {
         val downloadedEpisodes = inputData.getInt(DOWNLOADED_EPISODES, 0)
 
-        return notificationHelper.dailyRemindersChannelBuilder()
+        val builder = when (type) {
+            is TrendingAndRecommendationsNotificationType -> {
+                notificationHelper.trendingAndRecommendationsChannelBuilder()
+            }
+            else -> notificationHelper.dailyRemindersChannelBuilder()
+        }
+
+        return builder
             .setSmallIcon(IR.drawable.notification)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setContentTitle(applicationContext.resources.getString(type.titleRes))
             .setContentText(type.formattedMessage(applicationContext, downloadedEpisodes))
             .setColor(ContextCompat.getColor(applicationContext, R.color.notification_color))
+            .setAutoCancel(true)
             .setContentIntent(openPageIntent(type))
     }
 
     private fun openPageIntent(type: NotificationType): PendingIntent {
-        return PendingIntent.getActivity(applicationContext, 0, type.toIntent(applicationContext), PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        return PendingIntent.getActivity(
+            applicationContext,
+            0,
+            type.toIntent(applicationContext),
+            PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
     }
 }

@@ -150,6 +150,7 @@ interface Settings {
         ONBOARDING_STAFF_PICKS(21483658),
         ONBOARDING_UPSELL(21483659),
         RE_ENGAGEMENT(21483660),
+        CONTENT_RECOMMENDATIONS(21483661),
     }
 
     enum class UpNextAction(val serverId: Int) {
@@ -344,6 +345,7 @@ interface Settings {
 
     val hideNotificationOnPause: UserSetting<Boolean>
     val dailyRemindersNotification: UserSetting<Boolean>
+    val recommendationsNotification: UserSetting<Boolean>
 
     val streamingMode: UserSetting<Boolean>
     val keepScreenAwake: UserSetting<Boolean>

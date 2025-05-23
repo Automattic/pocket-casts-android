@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.sync.NotificationBroadcastReceiver.Companion.INTENT_EXTRA_NOTIFICATION_TAG
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
+import android.provider.Settings as OsSettings
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 class NotificationHelperImpl @Inject constructor(@ApplicationContext private val context: Context) : NotificationHelper {
@@ -192,12 +193,15 @@ class NotificationHelperImpl @Inject constructor(@ApplicationContext private val
      * Opens the system notification activity for the episode channel.
      */
     override fun openEpisodeNotificationSettings(activity: Activity?) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O || activity == null) return
+        openNotificationChannelSettings(activity, Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_EPISODE.id)
+    }
 
-        val intent = Intent(android.provider.Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS)
-        intent.putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, activity.packageName)
-        intent.putExtra(android.provider.Settings.EXTRA_CHANNEL_ID, Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_EPISODE.id)
-        activity.startActivity(intent)
+    override fun openDailyReminderNotificationSettings(activity: Activity?) {
+        openNotificationChannelSettings(activity, Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_DAILY_REMINDERS.id)
+    }
+
+    override fun openTrendingAndRecommendationsNotificationSettings(activity: Activity?) {
+        openNotificationChannelSettings(activity, Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_TRENDING_AND_RECOMMENDATIONS.id)
     }
 
     override fun removeNotification(intentExtras: Bundle?, notificationId: Int) {
@@ -206,5 +210,14 @@ class NotificationHelperImpl @Inject constructor(@ApplicationContext private val
         if (!notificationTag.isNullOrBlank()) {
             manager.cancel(notificationId)
         }
+    }
+
+    private fun openNotificationChannelSettings(activity: Activity?, channelId: String) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O || activity == null) return
+
+        val intent = Intent(OsSettings.ACTION_CHANNEL_NOTIFICATION_SETTINGS)
+        intent.putExtra(OsSettings.EXTRA_APP_PACKAGE, activity.packageName)
+        intent.putExtra(OsSettings.EXTRA_CHANNEL_ID, channelId)
+        activity.startActivity(intent)
     }
 }

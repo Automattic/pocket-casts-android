@@ -6,6 +6,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationScheduler
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.settings.notifications.data.NotificationsPreferenceRepository
 import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreferenceCategory
@@ -24,6 +25,7 @@ internal class NotificationsSettingsViewModel @Inject constructor(
     private val preferenceRepository: NotificationsPreferenceRepository,
     private val analyticsTracker: AnalyticsTracker,
     private val podcastManager: PodcastManager,
+    private val notificationScheduler: NotificationScheduler,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(State(emptyList()))
@@ -80,7 +82,7 @@ internal class NotificationsSettingsViewModel @Inject constructor(
                 }
 
                 is NotificationPreferenceType.NotificationActions -> {
-                    val previousValue = state.value.categories.map { it.preferences }.flatten<NotificationPreferenceType>()
+                    val previousValue = state.value.categories.map { it.preferences }.flatten()
                         .find { it is NotificationPreferenceType.NotificationActions }
                     if ((previousValue as? NotificationPreferenceType.NotificationActions)?.value != preference.value) {
                         preferenceRepository.setPreference(preference)
@@ -109,10 +111,31 @@ internal class NotificationsSettingsViewModel @Inject constructor(
                         AnalyticsEvent.SETTINGS_NOTIFICATIONS_DAILY_REMINDERS_TOGGLED,
                         mapOf("enabled" to preference.isEnabled),
                     )
+                    if (preference.isEnabled) {
+                        notificationScheduler.setupOnboardingNotifications()
+                    } else {
+                        notificationScheduler.cancelScheduledOnboardingNotifications()
+                    }
                 }
 
                 is NotificationPreferenceType.DailyReminderSettings -> {
                     analyticsTracker.track(AnalyticsEvent.SETTINGS_DAILY_REMINDERS_ADVANCED_SETTINGS_TAPPED)
+                }
+
+                is NotificationPreferenceType.EnableRecommendations -> {
+                    preferenceRepository.setPreference(preference)
+                    analyticsTracker.track(
+                        AnalyticsEvent.SETTINGS_NOTIFICATIONS_TRENDING_AND_RECOMMENDATIONS_TOGGLED,
+                        mapOf("enabled" to preference.isEnabled),
+                    )
+                    if (preference.isEnabled) {
+                        notificationScheduler.setupTrendingAndRecommendationsNotifications()
+                    } else {
+                        notificationScheduler.cancelScheduledTrendingAndRecommendationsNotifications()
+                    }
+                }
+                is NotificationPreferenceType.RecommendationSettings -> {
+                    analyticsTracker.track(AnalyticsEvent.SETTINGS_TRENDING_AND_RECOMMENDATIONS_ADVANCED_SETTINGS_TAPPED)
                 }
 
                 is NotificationPreferenceType.NotifyOnThesePodcasts -> Unit

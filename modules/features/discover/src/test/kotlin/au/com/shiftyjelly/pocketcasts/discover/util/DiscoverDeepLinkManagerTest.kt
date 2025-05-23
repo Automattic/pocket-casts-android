@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.discover.util
 import android.content.res.Resources
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
+import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.servers.model.Discover
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRegion
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRow
@@ -10,7 +11,6 @@ import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.servers.model.SponsoredPodcast
-import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -57,7 +57,7 @@ class DiscoverDeepLinkManagerTest {
         )
         val discover = createTestDiscover(layout = listOf(staffPicksRow))
 
-        whenever(mockRepository.getDiscoverFeedSuspend()).thenReturn(discover)
+        whenever(mockRepository.getDiscoverFeed()).thenReturn(discover)
 
         val discoverCountryCodeMock: UserSetting<String> = mock()
         whenever(discoverCountryCodeMock.flow).thenReturn(MutableStateFlow("US"))
@@ -79,7 +79,7 @@ class DiscoverDeepLinkManagerTest {
         )
         val discover = createTestDiscover(layout = listOf(row))
 
-        whenever(mockRepository.getDiscoverFeedSuspend()).thenReturn(discover)
+        whenever(mockRepository.getDiscoverFeed()).thenReturn(discover)
 
         val discoverCountryCodeMock: UserSetting<String> = mock()
         whenever(discoverCountryCodeMock.flow).thenReturn(MutableStateFlow("US"))
