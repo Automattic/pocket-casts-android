@@ -13,7 +13,6 @@ Language: el_GR
     <string name="winback_offer_free_offer_yearly_title">Πάρε 50%% έκπτωση στον επόμενο χρόνο σου και κέρδισε %1$s</string>
     <string name="winback_offer_free_offer_title">Πάρε τον επόμενο μήνα σου δωρεάν και κέρδισε %1$s</string>
     <string name="recommendations_loved_by_listeners">Λατρεύτηκε από ακροατές του</string>
-    <string name="recommendations_if_you_like">Αν σου αρέσει</string>
     <string name="price_per_week_usd">\u0024%1$.2f/βδομάδα</string>
     <string name="price_per_week">%1$.2f %2$s/βδομάδα</string>
     <string name="winback_cancel_subscription_header_title">Τι πρέπει να ξέρεις πριν ακυρώσεις</string>
@@ -28,7 +27,6 @@ Language: el_GR
     <string name="account_encourage_description">Δημιούργησε έναν λογαριασμό ή συνδέσου για να απολαύσεις το Pocket Casts στο έπακρο.</string>
     <string name="account_encourage_title">Προσέξαμε ότι δεν έχεις συνδεθεί</string>
     <string name="onboarding_get_started">Ας ξεκινήσουμε</string>
-    <string name="onboarding_plus_feature_libro_title"><![CDATA[Δωρεάν ηχητικό βιβλίο από <a href="https://libro.fm/">Libro.fm</a>]]></string>
     <string name="encourage_account_history_banner_description">Δημιούργησε έναν δωρέαν λογαριασμό για να συγχρονίζεις το ιστορικό ακρόασής σου παντού.</string>
     <string name="encourage_account_history_banner_title">Παρακολούθα τι έχεις ακούσει</string>
     <string name="encourage_account_filters_banner_description">Δημιούργησε έναν δωρέαν λογαριασμό για να συγχρονίζεις τα φίλτρα σου σε κάθε συσκευή.</string>
@@ -372,7 +370,6 @@ Language: el_GR
     <string name="widget_nothing_in_up_next">Τίποτα στο Επόμενο</string>
     <string name="widget_no_episode_playing">Δεν παίζει επεισόδιο</string>
     <string name="clear_search">Εκκαθάριση Αναζήτησης</string>
-    <string name="bookmarks_search_results_not_found">Δεν μπορέσαμε να βρούμε κανένα σελιδοδείκτη για αυτή την αναζήτηση.</string>
     <string name="podcast_and_episode">Podcast &amp; Επεισόδιο</string>
     <string name="skip_chapters">Προεπιλογή κεφαλαίων</string>
     <string name="settings_use_episode_artwork_details">Ορισμένες εκπομπές έχουν προσαρμοσμένα εξώφυλλα για συγκεκριμένα επεισόδια. Ενεργοποίησε αυτή την επιλογή και το Pocket Casts θα τα εμφανίζει αντί για το εξώφυλλο της εκπομπής.</string>
@@ -432,7 +429,6 @@ Language: el_GR
     <string name="bookmarks_upsell_instructions_early_access">Απόκτησε πρώιμη πρόσβαση σε αυτή τη δυνατότητα με το Pocket Casts Patron και αποθήκευσε τις χρονοσφραγίδες των αγαπημένων σου επεισοδίων. Διαθέσιμο σύντομα για τους συνδρομητές Plus.</string>
     <string name="bookmarks_upsell_instructions">Αποθήκευσε τις χρονοσφραγίδες των αγαπημένων σου επεισοδίων και ξεκλείδωσε πολλές ακόμα δυνατότητες με το Pocket Casts Plus.</string>
     <string name="error_loading_show_notes">Αδυναμία εύρεσης σημειώσεων για αυτό το επεισόδιο.</string>
-    <string name="podcast_no_bookmarks_matching">Αυτό το podcast δεν έχει σελιδοδείκτες που να ταιριάζουν με τα κριτήρια αναζήτησής σου.</string>
     <string name="podcast_no_bookmarks_found">Δεν βρέθηκαν σελιδοδείκτες</string>
     <string name="player_tab_notes">Λεπτομέρειες</string>
     <string name="bookmark_updated">Ο σελιδοδείκτης «%s» ενημερώθηκε</string>
@@ -555,7 +551,6 @@ Language: el_GR
     <string name="log_in_on_phone">Σύνδεση στο τηλέφωνο</string>
     <string name="log_in_with_google">Σύνδεση με Google</string>
     <string name="log_in_subtitle">Ξεκίνα να ακούς τα αγαπημένα σου podcasts</string>
-    <string name="onboarding_upgrade_no_subscriptions_found">Δεν βρέθηκαν συνδρομές.</string>
     <string name="trial_then_per_year">Δοκίμασε %1$s, έπειτα %2$s το χρόνο</string>
     <string name="trial_then_per_month">Δοκίμασε %1$s, μετά %2$s το μήνα</string>
     <string name="trial_start">Ξεκίνα τη δωρεάν δοκιμή μου</string>
@@ -1654,7 +1649,6 @@ Language: el_GR
     <string name="podcast_released_daily">Κυκλοφορεί καθημερινά</string>
     <string name="podcast_playback_effects">Εφέ Αναπαραγωγής</string>
     <string name="podcast_notifications">Ειδοποιήσεις</string>
-    <string name="podcast_no_episodes_matching">Αυτό το podcast δεν έχει επεισόδια που να ταιριάζουν με τα κριτήρια αναζήτησής σου.</string>
     <string name="podcast_no_episodes_all_archived">Και τα %d επεισόδια αυτού του podcast έχουν αρχειοθετηθεί</string>
     <string name="podcast_no_episodes">Δεν υπάρχουν επεισόδια σε αυτό το podcast</string>
     <string name="podcast_no_episodes_found">Δεν βρέθηκαν επεισόδια</string>
@@ -1688,7 +1682,6 @@ Language: el_GR
     <string name="podcast_archive_all_played">Αρχειοθέτηση όλων των παιγμένων</string>
     <string name="podcast_archive_all">Αρχειοθέτηση όλων</string>
     <string name="podcasts_unarchive">Αποαρχειοθέτηση</string>
-    <string name="podcasts_time_to_add_some_podcasts_summary">Μπορείς να προσθέσεις podcasts αναζητώντας παραπάνω ή αν ψάχνεις για λίγη έμπνευση δοκίμασε την καρτέλα Ανακάλυψη.</string>
     <string name="podcasts_time_to_add_some_podcasts">Ώρα να προσθέσουμε μερικά Podcasts!</string>
     <string name="podcasts_sort_order">Σειρά ταξινόμησης</string>
     <string name="podcasts_sort_by_title">«Τίτλος (Α - Ω)»</string>

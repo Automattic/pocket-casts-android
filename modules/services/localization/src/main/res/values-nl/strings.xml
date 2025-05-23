@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-05-02 13:54:03+0000
+Translation-Revision-Date: 2025-05-22 14:10:05+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="skip_for_now">Tijdelijk overslaan</string>
+    <string name="plus_week">week</string>
+    <string name="onboarding_plus_recurring_after_intro_offer">Herhaaldelijke betaling op %1$s na je eerste jaar (%2$s)</string>
+    <string name="you_might_like_empty_title">Aanbevelingen konden niet worden geladen</string>
+    <string name="onboarding_plus_feature_libro_title">Gratis audioboek van &lt;a href=\"https://libro.fm/\"&gt;Libro.fm&lt;/a&gt; </string>
+    <string name="you_might_like">Dit vind je misschien ook leuk</string>
+    <string name="podroll_information_button">Duidelijk</string>
+    <string name="podroll_information_summary">Creator Picks zijn podcasts die door de maker van de show worden aanbevolen met behulp van Podroll.</string>
+    <string name="podroll_information_title">Wat is een Creator Pick, oftewel keuze van de maker?</string>
+    <string name="recommended_by_creator">Aanbevolen shows van de maker</string>
     <string name="winback_cancel_subscription_continue_cancel_button_label">Doorgaan met annuleren</string>
     <string name="winback_cancel_subscription_accept_offer_button_label">Aanbieding accepteren</string>
     <string name="winback_claimed_offer_message_4">Bedankt dat je voor Pocket Casts kiest. Je abonnement met een jaar lang korting gaat in na je huidige factuurperiode.</string>
@@ -15,7 +25,6 @@ Language: nl
     <string name="winback_offer_free_offer_yearly_title">Krijg 50%% korting op je volgende jaar en bespaar %1$s</string>
     <string name="winback_offer_free_offer_title">Krijg je volgende maand gratis en bespaar %1$s</string>
     <string name="recommendations_loved_by_listeners">Geliefd bij luisteraars van</string>
-    <string name="recommendations_if_you_like">Als je dit leuk vindt</string>
     <string name="price_per_week_usd">\u0024%1$.2f/week</string>
     <string name="price_per_week">%1$.2f %2$s/week</string>
     <string name="winback_cancel_subscription_header_title">Dingen die je moet weten voordat je annuleert</string>
@@ -30,7 +39,6 @@ Language: nl
     <string name="account_encourage_description">Maak een account aan of log in om optimaal van Pocket Casts te genieten.</string>
     <string name="account_encourage_title">We hebben gemerkt dat je niet bent ingelogd</string>
     <string name="onboarding_get_started">Aan de slag</string>
-    <string name="onboarding_plus_feature_libro_title"><![CDATA[Gratis audioboek van <a href="https://libro.fm/">Libro.fm</a>]]></string>
     <string name="encourage_account_history_banner_description">Maak een gratis account aan om je luistergeschiedenis overal te synchroniseren.</string>
     <string name="encourage_account_history_banner_title">Houd bij wat je hebt afgespeeld</string>
     <string name="encourage_account_filters_banner_description">Maak een gratis account aan om je filters op elk apparaat te synchroniseren.</string>
@@ -374,7 +382,6 @@ Language: nl
     <string name="widget_nothing_in_up_next">Niets in Hierna</string>
     <string name="widget_no_episode_playing">Er wordt geen aflevering afgespeeld</string>
     <string name="clear_search">Zoekopdracht wissen</string>
-    <string name="bookmarks_search_results_not_found">We kunnen geen bladwijzer vinden voor die zoekopdracht.</string>
     <string name="podcast_and_episode">Podcast en aflevering</string>
     <string name="skip_chapters">Hoofdstukken voorselecteren</string>
     <string name="settings_use_episode_artwork_details">Sommige shows hebben apart artwork voor bepaalde afleveringen Als je deze optie inschakelt, zal dit worden weergegeven in plaats van het artwork van de show.</string>
@@ -434,7 +441,6 @@ Language: nl
     <string name="bookmarks_upsell_instructions_early_access">Krijg vroegtijdige toegang tot deze functie met Pocket Casts Patron en sla tijdstempels op van je favoriete afleveringen. Binnenkort beschikbaar voor Plus-abonnees.</string>
     <string name="bookmarks_upsell_instructions">Sla tijdstempels op van je favoriete afleveringen en ontgrendel nog veel meer functies met Pocket Casts Plus.</string>
     <string name="error_loading_show_notes">Kan geen shownotes vinden voor deze aflevering.</string>
-    <string name="podcast_no_bookmarks_matching">Deze podcast heeft geen bladwijzers die overeenkomen met je zoekcriteria.</string>
     <string name="podcast_no_bookmarks_found">Geen bladwijzers gevonden</string>
     <string name="player_tab_notes">Details</string>
     <string name="bookmark_updated">Bladwijzer \'%s\' bijgewerkt</string>
@@ -557,7 +563,6 @@ Language: nl
     <string name="log_in_on_phone">Log in op telefoon</string>
     <string name="log_in_with_google">Log in met Google</string>
     <string name="log_in_subtitle">Luister naar je favoriete podcasts</string>
-    <string name="onboarding_upgrade_no_subscriptions_found">Geen abonnementen gevonden.</string>
     <string name="trial_then_per_year">Probeer %1$s, daarna %2$s per jaar</string>
     <string name="trial_then_per_month">Probeer %1$s, daarna %2$s per maand</string>
     <string name="trial_start">Mijn gratis proefversie starten</string>
@@ -691,6 +696,7 @@ Language: nl
     <string name="onboarding_welcome_recommendations_title">Ontdek iets nieuws</string>
     <string name="onboarding_welcome_get_you_listening_plus">Bedankt, veel luisterplezier!</string>
     <string name="onboarding_welcome_get_you_listening">Welkom, veel luisterplezier!</string>
+    <string name="onboarding_plus_recurring_after_free_trial">Herhaaldelijke betalingen beginnen na je %1$s (%2$s)</string>
     <string name="onboarding_plus_start_free_trial_and_subscribe">Start gratis proefversie en abonneer je</string>
     <string name="onboarding_plus_terms_and_conditions">Algemene voorwaarden</string>
     <string name="onboarding_plus_privacy_policy">Privacybeleid</string>
@@ -1656,7 +1662,6 @@ Language: nl
     <string name="podcast_released_daily">Dagelijks uitgegeven</string>
     <string name="podcast_playback_effects">Afspeeleffecten</string>
     <string name="podcast_notifications">Meldingen</string>
-    <string name="podcast_no_episodes_matching">Deze podcast heeft geen afleveringen die overeenkomen met je zoekcriteria.</string>
     <string name="podcast_no_episodes_all_archived">Alle %d afleveringen van deze podcast zijn gearchiveerd</string>
     <string name="podcast_no_episodes">Er zijn geen afleveringen in deze podcast</string>
     <string name="podcast_no_episodes_found">Geen afleveringen gevonden</string>
@@ -1690,7 +1695,6 @@ Language: nl
     <string name="podcast_archive_all_played">Alle afgespeelde archiveren</string>
     <string name="podcast_archive_all">Alles archiveren</string>
     <string name="podcasts_unarchive">Dearchiveren</string>
-    <string name="podcasts_time_to_add_some_podcasts_summary">Je kunt podcasts toevoegen door hierboven te zoeken of als je op zoek bent naar inspiratie kun je het tabblad Ontdekken gebruiken.</string>
     <string name="podcasts_time_to_add_some_podcasts">Tijd om wat podcasts toe te voegen!</string>
     <string name="podcasts_sort_order">Sorteervolgorde</string>
     <string name="podcasts_sort_by_title">\"Titel (A-Z)\"</string>
@@ -1937,6 +1941,10 @@ Language: nl
         <item quantity="one">dag</item>
         <item quantity="other">dagen</item>
     </plurals>
+    <plurals name="day_with_count">
+        <item quantity="one">%1$d dag</item>
+        <item quantity="other">%1$d dagen</item>
+    </plurals>
     <plurals name="episode_count">
         <item quantity="one">%d aflevering</item>
         <item quantity="other">%d afleveringen</item>
@@ -1948,6 +1956,10 @@ Language: nl
     <plurals name="minute">
         <item quantity="one">minuut</item>
         <item quantity="other">minuten</item>
+    </plurals>
+    <plurals name="month_with_count">
+        <item quantity="one">%1$d maand</item>
+        <item quantity="other">%1$d maanden</item>
     </plurals>
     <plurals name="player_up_next_header_title">
         <item quantity="one" formatted="true">%1$d aflevering - nog %2$s</item>
@@ -2004,5 +2016,13 @@ Language: nl
     <plurals name="settings_auto_download_on_follow_podcast_description">
         <item quantity="one">Download automatisch de nieuwste aflevering van nieuwe shows die je volgt.</item>
         <item quantity="other">Download automatisch de nieuwste %s afleveringen van nieuwe shows die je volgt.</item>
+    </plurals>
+    <plurals name="week_with_count">
+        <item quantity="one">%1$d week</item>
+        <item quantity="other">%1$d weken</item>
+    </plurals>
+    <plurals name="year_with_count">
+        <item quantity="one">%1$d jaar</item>
+        <item quantity="other">%1$d jaar</item>
     </plurals>
 </resources>

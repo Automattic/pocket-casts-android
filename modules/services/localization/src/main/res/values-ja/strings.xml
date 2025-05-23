@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-04-30 09:54:03+0000
+Translation-Revision-Date: 2025-05-22 14:10:05+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="skip_for_now">今はスキップ</string>
+    <string name="plus_week">週</string>
+    <string name="onboarding_plus_recurring_after_intro_offer">初年 (%2$s) 後、%1$sに定期支払い</string>
+    <string name="you_might_like_empty_title">おすすめを読み込めませんでした</string>
+    <string name="onboarding_plus_feature_libro_title">&lt;a href=\"https://libro.fm/\"&gt;Libro.fm&lt;/a&gt; の無料オーディオブック</string>
+    <string name="you_might_like">おすすめ</string>
+    <string name="podroll_information_button">OK</string>
+    <string name="podroll_information_summary">Creator Picks は、番組のクリエイターが Podroll を使用しておすすめするポッドキャストです。</string>
+    <string name="podroll_information_title">クリエイターのおすすめは何ですか ?</string>
+    <string name="recommended_by_creator">クリエイターのおすすめ番組</string>
     <string name="winback_cancel_subscription_continue_cancel_button_label">キャンセルを続行</string>
     <string name="winback_cancel_subscription_accept_offer_button_label">オファーを受理</string>
     <string name="winback_claimed_offer_message_4">Pocket Casts をお選びいただきありがとうございます。 年間割引は現在の請求期間の後に開始します。</string>
@@ -15,7 +25,6 @@ Language: ja_JP
     <string name="winback_offer_free_offer_yearly_title">次年度50%% オフを獲得して%1$s節約</string>
     <string name="winback_offer_free_offer_title">来月分を無料で利用して%1$s節約</string>
     <string name="recommendations_loved_by_listeners">次のリスナーから高い評価を得ています:</string>
-    <string name="recommendations_if_you_like">次がお好きな方におすすめ:</string>
     <string name="price_per_week_usd">\u0024%1$.2f/ 週</string>
     <string name="price_per_week">%1$.2f %2$s/ 週</string>
     <string name="winback_cancel_subscription_header_title">解約前に知っておくべきこと</string>
@@ -30,7 +39,6 @@ Language: ja_JP
     <string name="account_encourage_description">アカウントを作成またはログインして、Pocket Casts を最大限に楽しみましょう。</string>
     <string name="account_encourage_title">ログインしていないようです</string>
     <string name="onboarding_get_started">開始する</string>
-    <string name="onboarding_plus_feature_libro_title"><![CDATA[<a href="https://libro.fm/">Libro.fm</a> の無料オーディオブック]]></string>
     <string name="encourage_account_history_banner_description">無料アカウントを作成すると、どこでも聴取履歴を同期できます。</string>
     <string name="encourage_account_history_banner_title">再生内容の追跡を継続</string>
     <string name="encourage_account_filters_banner_description">無料アカウントを作成すると、どの端末でもフィルターを同期できます。</string>
@@ -374,7 +382,6 @@ Language: ja_JP
     <string name="widget_nothing_in_up_next">次のエピソードには何もありません</string>
     <string name="widget_no_episode_playing">再生中のエピソードはありません</string>
     <string name="clear_search">検索をクリア</string>
-    <string name="bookmarks_search_results_not_found">その検索に該当するブックマークは見つかりませんでした。</string>
     <string name="podcast_and_episode">ポッドキャストとエピソード</string>
     <string name="skip_chapters">チャプターを事前に選択</string>
     <string name="settings_use_episode_artwork_details">一部の番組には特定のエピソードにカスタムのアートワークがあります。 このオプションを有効化すると、Pocket Casts は番組のアートワークではなく、そのカスタムのアートワークを表示します。</string>
@@ -434,7 +441,6 @@ Language: ja_JP
     <string name="bookmarks_upsell_instructions_early_access">お早めに Pocket Casts Patron でこの機能にアクセスすると、お気に入りのエピソードのタイムスタンプを保存できます。 まもなく Plus にご登録の皆さまもご利用いただけるようになります。</string>
     <string name="bookmarks_upsell_instructions">Pocket Casts Plus でお気に入りのエピソードのタイムスタンプを保存し、その他多くの機能のロックを解除します。</string>
     <string name="error_loading_show_notes">このエピソードのショーノートが見つかりません。</string>
-    <string name="podcast_no_bookmarks_matching">このポッドキャストには検索条件に一致するブックマークがありません。</string>
     <string name="podcast_no_bookmarks_found">ブックマークが見つかりません</string>
     <string name="player_tab_notes">詳細</string>
     <string name="bookmark_updated">ブックマーク「%s」を更新しました</string>
@@ -557,7 +563,6 @@ Language: ja_JP
     <string name="log_in_on_phone">スマートフォンでログイン</string>
     <string name="log_in_with_google">Google でログイン</string>
     <string name="log_in_subtitle">お気に入りのポッドキャストの視聴を開始</string>
-    <string name="onboarding_upgrade_no_subscriptions_found">サブスクリプションが見つかりません。</string>
     <string name="trial_then_per_year">%1$sをお試し、その後は年間%2$s</string>
     <string name="trial_then_per_month">%1$sをお試し、その後は月間%2$s</string>
     <string name="trial_start">無料お試しを開始</string>
@@ -691,6 +696,7 @@ Language: ja_JP
     <string name="onboarding_welcome_recommendations_title">新しいものを見つける</string>
     <string name="onboarding_welcome_get_you_listening_plus">ありがとうございます。どうぞお聞きください !</string>
     <string name="onboarding_welcome_get_you_listening">ようこそ、どうぞお聞きください !</string>
+    <string name="onboarding_plus_recurring_after_free_trial">%1$s (%2$s) 後に定期支払いが開始します</string>
     <string name="onboarding_plus_start_free_trial_and_subscribe">無料お試しとサブスクリプションを開始</string>
     <string name="onboarding_plus_terms_and_conditions">利用規約</string>
     <string name="onboarding_plus_privacy_policy">プライバシーポリシー</string>
@@ -1656,7 +1662,6 @@ Language: ja_JP
     <string name="podcast_released_daily">1日に一度リリース</string>
     <string name="podcast_playback_effects">再生エフェクト</string>
     <string name="podcast_notifications">通知</string>
-    <string name="podcast_no_episodes_matching">このポッドキャストには検索条件に一致するエピソードがありません。</string>
     <string name="podcast_no_episodes_all_archived">このポッドキャストの%d件のエピソードがすべてアーカイブされました</string>
     <string name="podcast_no_episodes">このポッドキャストにはエピソードがありません</string>
     <string name="podcast_no_episodes_found">エピソードがありません</string>
@@ -1690,7 +1695,6 @@ Language: ja_JP
     <string name="podcast_archive_all_played">再生済みをすべてアーカイブ</string>
     <string name="podcast_archive_all">すべてアーカイブ</string>
     <string name="podcasts_unarchive">アーカイブを解除</string>
-    <string name="podcasts_time_to_add_some_podcasts_summary">上から検索することでポッドキャストを追加できます。アイデアを得たい場合は「ディスカバー」タブを試してみてください。</string>
     <string name="podcasts_time_to_add_some_podcasts">ポッドキャストを追加しましょう !</string>
     <string name="podcasts_sort_order">ソート順</string>
     <string name="podcasts_sort_by_title">\"タイトル (A - Z)\"</string>
@@ -1935,6 +1939,9 @@ Language: ja_JP
     <plurals name="day">
         <item quantity="other">日</item>
     </plurals>
+    <plurals name="day_with_count">
+        <item quantity="other">%1$d日間</item>
+    </plurals>
     <plurals name="episode_count">
         <item quantity="other">%d件のエピソード</item>
     </plurals>
@@ -1943,6 +1950,9 @@ Language: ja_JP
     </plurals>
     <plurals name="minute">
         <item quantity="other">分</item>
+    </plurals>
+    <plurals name="month_with_count">
+        <item quantity="other">%1$d月</item>
     </plurals>
     <plurals name="player_up_next_header_title">
         <item quantity="other" formatted="true">%1$d件のエピソード - 残り%2$s</item>
@@ -1985,5 +1995,11 @@ Language: ja_JP
     </plurals>
     <plurals name="settings_auto_download_on_follow_podcast_description">
         <item quantity="other">フォローする新しい番組から最新エピソード%s件を自動でダウンロードします。</item>
+    </plurals>
+    <plurals name="week_with_count">
+        <item quantity="other">%1$d週</item>
+    </plurals>
+    <plurals name="year_with_count">
+        <item quantity="other">%1$d年</item>
     </plurals>
 </resources>
