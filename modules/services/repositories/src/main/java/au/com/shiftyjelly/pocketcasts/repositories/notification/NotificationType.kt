@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.deeplink.ImportDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.RecommendationsDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowFiltersDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowUpNextTabDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.SmartFoldersDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.StaffPicksDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ThemesDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.TrendingDeepLink
@@ -43,7 +44,7 @@ sealed interface NotificationType {
 
     companion object {
         fun fromSubCategory(subCategory: String): NotificationType? {
-            val allSupportedNotifications = OnboardingNotificationType.values + ReEngagementNotificationType.values + TrendingAndRecommendationsNotificationType.values
+            val allSupportedNotifications = OnboardingNotificationType.values + ReEngagementNotificationType.values + TrendingAndRecommendationsNotificationType.values + NewFeaturesAndTipsNotificationType.values
             return allSupportedNotifications.find { it.subcategory == subCategory }
         }
     }
@@ -235,6 +236,34 @@ sealed class TrendingAndRecommendationsNotificationType(
         val values = listOf(
             Trending,
             Recommendations,
+        )
+    }
+}
+
+sealed class NewFeaturesAndTipsNotificationType(
+    override val notificationId: Int,
+    override val subcategory: String,
+    @StringRes override val titleRes: Int,
+    @StringRes override val messageRes: Int? = null,
+    @PluralsRes override val messagePluralRes: Int? = null,
+) : NotificationType {
+
+    override fun isSettingsToggleOn(settings: Settings) = settings.newFeaturesNotification.value
+
+    data object SmartFolders : TrendingAndRecommendationsNotificationType(
+        notificationId = NotificationId.FEATURES_AND_TIPS.value,
+        subcategory = SUBCATEGORY_SMART_FOLDERS,
+        titleRes = LR.string.notification_new_features_smart_folders_title,
+        messageRes = LR.string.notification_new_features_smart_folders_message,
+    ) {
+        override fun toIntent(context: Context) = SmartFoldersDeepLink.toIntent(context)
+    }
+
+    companion object {
+        const val SUBCATEGORY_SMART_FOLDERS = "smart_folders"
+
+        val values = listOf(
+            SmartFolders
         )
     }
 }

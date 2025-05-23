@@ -59,6 +59,9 @@ class NotificationWorker @AssistedInject constructor(
             is TrendingAndRecommendationsNotificationType -> {
                 notificationHelper.trendingAndRecommendationsChannelBuilder()
             }
+            is NewFeaturesAndTipsNotificationType -> {
+                notificationHelper.featuresAndTipsChannelBuilder()
+            }
             else -> notificationHelper.dailyRemindersChannelBuilder()
         }
 

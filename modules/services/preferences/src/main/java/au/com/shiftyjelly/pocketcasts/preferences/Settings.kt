@@ -151,6 +151,7 @@ interface Settings {
         ONBOARDING_UPSELL(21483659),
         RE_ENGAGEMENT(21483660),
         CONTENT_RECOMMENDATIONS(21483661),
+        FEATURES_AND_TIPS(21483662)
     }
 
     enum class UpNextAction(val serverId: Int) {

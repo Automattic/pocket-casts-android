@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.notification
 
 import android.content.Context
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
@@ -26,6 +27,7 @@ class NotificationSchedulerImpl @Inject constructor(
         private const val TAG_TRENDING_RECOMMENDATIONS = "trending_and_recommendations"
         private const val TAG_REENGAGEMENT = "daily_re_engagement_check"
         private const val TAG_ONBOARDING = "onboarding_notification"
+        private const val TAG_FEATURES = "features_and_tips"
     }
 
     override fun setupOnboardingNotifications() {
@@ -101,6 +103,24 @@ class NotificationSchedulerImpl @Inject constructor(
         }
     }
 
+    override suspend fun setupNewFeaturesAndTipsNotifications() {
+        // this should be later updated to fire the desired feature for the given release
+        val workData = workDataOf(
+            SUBCATEGORY to NewFeaturesAndTipsNotificationType.SmartFolders.subcategory
+        )
+        val notificationWork = OneTimeWorkRequest.Builder(NotificationWorker::class.java)
+            .setInputData(workData)
+            .setInitialDelay(delayCalculator.calculateDelayForNewFeatures(), TimeUnit.MILLISECONDS)
+            .addTag(TAG_FEATURES)
+            .build()
+
+        WorkManager.getInstance(context).enqueueUniqueWork(
+            TAG_FEATURES,
+            ExistingWorkPolicy.KEEP,
+            notificationWork
+        )
+    }
+
     override fun cancelScheduledReEngagementNotifications() {
         WorkManager.getInstance(context).cancelUniqueWork(TAG_REENGAGEMENT)
     }
@@ -115,5 +135,9 @@ class NotificationSchedulerImpl @Inject constructor(
         TrendingAndRecommendationsNotificationType.values.forEach {
             WorkManager.getInstance(context).cancelUniqueWork("$TAG_TRENDING_RECOMMENDATIONS-${it.subcategory}")
         }
+    }
+
+    override fun cancelScheduledNewFeaturesAndTipsNotifications() {
+        WorkManager.getInstance(context).cancelAllWorkByTag(TAG_FEATURES)
     }
 }
