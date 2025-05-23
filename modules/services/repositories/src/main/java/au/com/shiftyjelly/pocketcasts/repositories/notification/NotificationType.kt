@@ -233,7 +233,7 @@ sealed class TrendingAndRecommendationsNotificationType(
         const val SUBCATEGORY_RECOMMENDATIONS = "recommendations"
         const val SUBCATEGORY_TRENDING = "trending"
 
-        val values = listOf(
+        val values: List<NotificationType> get() = listOf(
             Trending,
             Recommendations,
         )
@@ -250,7 +250,7 @@ sealed class NewFeaturesAndTipsNotificationType(
 
     override fun isSettingsToggleOn(settings: Settings) = settings.newFeaturesNotification.value
 
-    data object SmartFolders : TrendingAndRecommendationsNotificationType(
+    data object SmartFolders : NewFeaturesAndTipsNotificationType(
         notificationId = NotificationId.FEATURES_AND_TIPS.value,
         subcategory = SUBCATEGORY_SMART_FOLDERS,
         titleRes = LR.string.notification_new_features_smart_folders_title,
@@ -262,7 +262,7 @@ sealed class NewFeaturesAndTipsNotificationType(
     companion object {
         const val SUBCATEGORY_SMART_FOLDERS = "smart_folders"
 
-        val values = listOf(
+        val values: List<NotificationType> get() = listOf(
             SmartFolders
         )
     }
