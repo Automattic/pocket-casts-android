@@ -1179,7 +1179,6 @@ Language: nb_NO
     <string name="podcast_released_daily">Utgis daglig</string>
     <string name="podcast_playback_effects">Avspillingseffekter</string>
     <string name="podcast_notifications">Varslinger</string>
-    <string name="podcast_no_episodes_matching">Denne podcasten har ingen episoder som samsvarer med søkekriteriene.</string>
     <string name="podcast_no_episodes_all_archived">Alle %d episoder av denne podcasten er arkivert</string>
     <string name="podcast_no_episodes">Det er ingen episoder i denne podcasten</string>
     <string name="podcast_no_episodes_found">Fant ingen episoder</string>
@@ -1213,7 +1212,6 @@ Language: nb_NO
     <string name="podcast_archive_all_played">Arkiver alle avspilte</string>
     <string name="podcast_archive_all">Arkiver alle</string>
     <string name="podcasts_unarchive">Fjern fra arkiv</string>
-    <string name="podcasts_time_to_add_some_podcasts_summary">Du kan legge til podcaster ved å søke ovenfor, eller du kan prøve Oppdag-fanen hvis du leter etter litt inspirasjon.</string>
     <string name="podcasts_time_to_add_some_podcasts">På tide å legge til noen podcaster!</string>
     <string name="podcasts_sort_order">Sorteringsrekkefølge</string>
     <string name="podcasts_sort_by_title">\"Tittel (A - Å)\"</string>

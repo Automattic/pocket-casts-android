@@ -132,7 +132,7 @@ class PodcastsViewModel @AssistedInject constructor(
     private fun buildHomeFolderItems(podcasts: List<Podcast>, folders: List<FolderItem>, podcastSortType: PodcastsSortType) = when (podcastSortType) {
         PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST,
         PodcastsSortType.RECENTLY_PLAYED,
-            -> {
+        -> {
             val folderUuids = folders.mapTo(mutableSetOf()) { it.uuid }
             val items = mutableListOf<FolderItem>()
             val uuidToFolder = folders.associateByTo(mutableMapOf(), FolderItem::uuid)
@@ -172,7 +172,7 @@ class PodcastsViewModel @AssistedInject constructor(
         return when (podcastSortType) {
             PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST,
             PodcastsSortType.RECENTLY_PLAYED,
-                -> items
+            -> items
 
             else -> items.sortedWith(podcastSortType.folderComparator)
         }
@@ -301,11 +301,11 @@ class PodcastsViewModel @AssistedInject constructor(
 
         old.zip(new).all { (oldPodcast, newPodcast) ->
             oldPodcast.uuid == newPodcast.uuid &&
-                    oldPodcast.title == newPodcast.title &&
-                    oldPodcast.author == newPodcast.author &&
-                    oldPodcast.addedDate == newPodcast.addedDate &&
-                    oldPodcast.podcastCategory == newPodcast.podcastCategory &&
-                    oldPodcast.folderUuid == newPodcast.folderUuid
+                oldPodcast.title == newPodcast.title &&
+                oldPodcast.author == newPodcast.author &&
+                oldPodcast.addedDate == newPodcast.addedDate &&
+                oldPodcast.podcastCategory == newPodcast.podcastCategory &&
+                oldPodcast.folderUuid == newPodcast.folderUuid
         }
     }
 

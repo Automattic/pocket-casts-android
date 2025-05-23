@@ -80,8 +80,8 @@ import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationIconButton
 import au.com.shiftyjelly.pocketcasts.compose.bars.SystemBarsStyles
 import au.com.shiftyjelly.pocketcasts.compose.components.AutoResizeText
-import au.com.shiftyjelly.pocketcasts.compose.components.EmptyState
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalPagerWrapper
+import au.com.shiftyjelly.pocketcasts.compose.components.NoContentBanner
 import au.com.shiftyjelly.pocketcasts.compose.components.SegmentedTabBar
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH60
@@ -575,9 +575,9 @@ fun NoSubscriptionsLayout(
         }
         Spacer(modifier = Modifier.weight(1f))
 
-        EmptyState(
+        NoContentBanner(
             title = stringResource(LR.string.onboarding_upgrade_no_plans_found_title),
-            subtitle = stringResource(LR.string.onboarding_upgrade_no_plans_found_body),
+            body = stringResource(LR.string.onboarding_upgrade_no_plans_found_body),
             iconResourceId = IR.drawable.ic_warning,
             primaryButtonText = stringResource(LR.string.try_again),
             onPrimaryButtonClick = onTryAgain,

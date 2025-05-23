@@ -32,7 +32,13 @@ private val differ: DiffUtil.ItemCallback<Any> = object : DiffUtil.ItemCallback<
     }
 }
 
-internal class CarouselListRowAdapter(var pillText: String?, val theme: Theme, val onPodcastClicked: ((DiscoverPodcast, String?, Boolean) -> Unit), val onPodcastSubscribe: ((DiscoverPodcast, String?) -> Unit), private val analyticsTracker: AnalyticsTracker) : ListAdapter<Any, CarouselItemViewHolder>(differ) {
+internal class CarouselListRowAdapter(
+    var pillText: String?,
+    val theme: Theme,
+    val onPodcastClicked: ((DiscoverPodcast, String?, String?, Boolean) -> Unit),
+    val onPodcastSubscribe: ((DiscoverPodcast, String?) -> Unit),
+    private val analyticsTracker: AnalyticsTracker,
+) : ListAdapter<Any, CarouselItemViewHolder>(differ) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CarouselItemViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_carousel, parent, false)
         return CarouselItemViewHolder(theme, view)
@@ -52,7 +58,7 @@ internal class CarouselListRowAdapter(var pillText: String?, val theme: Theme, v
             holder.setTaglineText(tagLineText)
             holder.itemView.setOnClickListener {
                 val isFeatured = podcast.isSponsored || podcast.listId == null
-                onPodcastClicked(podcast, podcast.listId, isFeatured)
+                onPodcastClicked(podcast, podcast.listId, null, isFeatured)
 
                 if (podcast.listId != null) {
                     val listId = podcast.listId as String

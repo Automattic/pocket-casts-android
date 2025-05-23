@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-04-30 09:54:03+0000
+Translation-Revision-Date: 2025-05-22 14:10:05+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="skip_for_now">당분간 건너뛰기</string>
+    <string name="plus_week">주</string>
+    <string name="onboarding_plus_recurring_after_intro_offer">첫해(%2$s) 이후 %1$s 시 반복 결제</string>
+    <string name="you_might_like_empty_title">추천 항목을 로드할 수 없음</string>
+    <string name="onboarding_plus_feature_libro_title">&lt;a href=\"https://libro.fm/\"&gt;Libro.fm&lt;/a&gt;의 무료 오디오북</string>
+    <string name="you_might_like">좋아할 만한 콘텐츠</string>
+    <string name="podroll_information_button">확인</string>
+    <string name="podroll_information_summary">크리에이터 추천이란 프로그램의 크리에이터가 팟롤을 사용하여 추천하는 팟캐스트입니다.</string>
+    <string name="podroll_information_title">크리에이터 추천이란 무엇인가요?</string>
+    <string name="recommended_by_creator">크리에이터가 추천하는 프로그램</string>
     <string name="winback_cancel_subscription_continue_cancel_button_label">취소 계속하기</string>
     <string name="winback_cancel_subscription_accept_offer_button_label">혜택 받기</string>
     <string name="winback_claimed_offer_message_4">Pocket Casts를 선택해 주셔서 감사합니다. 할인된 1년 구독은 현재 청구 기간 후에 시작됩니다.</string>
@@ -15,7 +25,6 @@ Language: ko_KR
     <string name="winback_offer_free_offer_yearly_title">다음 해에 50%% 할인을 받아 %1$s을(를) 절약하세요</string>
     <string name="winback_offer_free_offer_title">다음 달에 무료로 이용하여 %1$s을(를) 절약하세요</string>
     <string name="recommendations_loved_by_listeners">다음 팟캐스트의 청취자들이 좋아합니다:</string>
-    <string name="recommendations_if_you_like">다음이 마음에 드는 경우:</string>
     <string name="price_per_week_usd">\u0024%1$.2f/주</string>
     <string name="price_per_week">%1$.2f %2$s/주</string>
     <string name="winback_cancel_subscription_header_title">취소하기 전에 알아두어야 할 사항</string>
@@ -30,7 +39,6 @@ Language: ko_KR
     <string name="account_encourage_description">계정을 생성하거나 로그인하여 Pocket Casts를 마음껏 즐기세요.</string>
     <string name="account_encourage_title">로그인되지 않았음</string>
     <string name="onboarding_get_started">시작하기</string>
-    <string name="onboarding_plus_feature_libro_title"><![CDATA[<a href="https://libro.fm/">Libro.fm</a>에서 무료 오디오북 듣기]]></string>
     <string name="encourage_account_history_banner_description">무료 계정을 만들어 청취 기록을 어디에서나 동기화하세요.</string>
     <string name="encourage_account_history_banner_title">재생한 내용 추적</string>
     <string name="encourage_account_filters_banner_description">무료 계정을 만들어 모든 기기에서 필터를 동기화하세요.</string>
@@ -374,7 +382,6 @@ Language: ko_KR
     <string name="widget_nothing_in_up_next">다음 차례에 아무것도 없음</string>
     <string name="widget_no_episode_playing">재생 중인 에피소드 없음</string>
     <string name="clear_search">검색 지우기</string>
-    <string name="bookmarks_search_results_not_found">해당 검색에 대한 북마크를 찾을 수 없습니다.</string>
     <string name="podcast_and_episode">팟캐스트 &amp; 에피소드</string>
     <string name="skip_chapters">챕터 미리 선택</string>
     <string name="settings_use_episode_artwork_details">일부 프로그램에는 특정 에피소드에 대한 사용자 정의 아트워크가 있습니다. 이 옵션을 활성화하면 프로그램의 아트워크 대신에 이 아트워크가 Pocket Casts를 통해 표시됩니다.</string>
@@ -434,7 +441,6 @@ Language: ko_KR
     <string name="bookmarks_upsell_instructions_early_access">Pocket Casts Patron으로 이 기능을 미리 이용해 보고 좋아하는 에피소드의 타임스탬프를 저장하세요. 곧 Plus 구독자가 이용할 수 있습니다.</string>
     <string name="bookmarks_upsell_instructions">Pocket Casts Plus로 좋아하는 에피소드의 타임스탬프를 저장하고 다양한 기능을 이용해보세요.</string>
     <string name="error_loading_show_notes">이 에피소드의 프로그램 메모를 찾을 수 없습니다.</string>
-    <string name="podcast_no_bookmarks_matching">이 팟캐스트에는 검색 기준과 일치하는 북마크가 없습니다.</string>
     <string name="podcast_no_bookmarks_found">북마크를 찾을 수 없음</string>
     <string name="player_tab_notes">상세 정보</string>
     <string name="bookmark_updated">\"%s\" 북마크 업데이트됨</string>
@@ -690,6 +696,7 @@ Language: ko_KR
     <string name="onboarding_welcome_recommendations_title">새로운 내용 발견</string>
     <string name="onboarding_welcome_get_you_listening_plus">감사합니다. 이제 들려드리겠습니다!</string>
     <string name="onboarding_welcome_get_you_listening">환영합니다. 이제 들려드리겠습니다!</string>
+    <string name="onboarding_plus_recurring_after_free_trial">%1$s(%2$s) 이후 반복 결제 시작 예정</string>
     <string name="onboarding_plus_start_free_trial_and_subscribe">무료 평가판 시작 및 구독</string>
     <string name="onboarding_plus_terms_and_conditions">이용 약관</string>
     <string name="onboarding_plus_privacy_policy">개인정보 취급방침</string>
@@ -1655,7 +1662,6 @@ Language: ko_KR
     <string name="podcast_released_daily">매일 릴리스됨</string>
     <string name="podcast_playback_effects">재생 효과</string>
     <string name="podcast_notifications">알림</string>
-    <string name="podcast_no_episodes_matching">이 팟캐스트에는 검색 기준과 일치하는 에피소드가 없습니다.</string>
     <string name="podcast_no_episodes_all_archived">이 팟캐스트의 에피소드 %d개가 모두 아카이빙되었습니다.</string>
     <string name="podcast_no_episodes">이 팟캐스트에 에피소드가 없습니다.</string>
     <string name="podcast_no_episodes_found">에피소드를 찾을 수 없음</string>
@@ -1689,7 +1695,6 @@ Language: ko_KR
     <string name="podcast_archive_all_played">재생된 모두 아카이빙</string>
     <string name="podcast_archive_all">모두 아카이빙</string>
     <string name="podcasts_unarchive">아카이빙 취소</string>
-    <string name="podcasts_time_to_add_some_podcasts_summary">위에서 검색하여 팟캐스트를 추가할 수 있습니다. 약간의 영감을 원하면 검색 탭을 사용해 보세요.</string>
     <string name="podcasts_time_to_add_some_podcasts">약간의 팟캐스트를 추가할 시간입니다!</string>
     <string name="podcasts_sort_order">정렬 순서</string>
     <string name="podcasts_sort_by_title">\"제목(A~Z)\"</string>
@@ -1934,6 +1939,9 @@ Language: ko_KR
     <plurals name="day">
         <item quantity="other">일</item>
     </plurals>
+    <plurals name="day_with_count">
+        <item quantity="other">%1$d일</item>
+    </plurals>
     <plurals name="episode_count">
         <item quantity="other">에피소드 %d개</item>
     </plurals>
@@ -1942,6 +1950,9 @@ Language: ko_KR
     </plurals>
     <plurals name="minute">
         <item quantity="other">분</item>
+    </plurals>
+    <plurals name="month_with_count">
+        <item quantity="other">%1$d개월</item>
     </plurals>
     <plurals name="player_up_next_header_title">
         <item quantity="other" formatted="true">%1$d 에피소드 - %2$s 남음</item>
@@ -1984,5 +1995,11 @@ Language: ko_KR
     </plurals>
     <plurals name="settings_auto_download_on_follow_podcast_description">
         <item quantity="other">팔로우하는 새 프로그램의 최신 에피소드 %s개를 자동으로 다운로드하세요.</item>
+    </plurals>
+    <plurals name="week_with_count">
+        <item quantity="other">%1$d주</item>
+    </plurals>
+    <plurals name="year_with_count">
+        <item quantity="other">%1$d년</item>
     </plurals>
 </resources>

@@ -186,7 +186,7 @@ class UpNextAdapter(
                 binding.emptyUpNextComposeView.setContentWithViewCompositionStrategy {
                     AppTheme(theme) {
                         if (header.episodePlaying && header.episodeCount == 0) {
-                            UpNextEmptyState(
+                            UpNextNoContentBanner(
                                 onDiscoverTapped = listener::onDiscoverTapped,
                                 modifier = Modifier.padding(top = 24.dp),
                             )

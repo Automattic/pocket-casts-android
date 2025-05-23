@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-04-30 11:54:03+0000
+Translation-Revision-Date: 2025-05-22 14:10:05+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="skip_for_now">Hoppa över just nu</string>
+    <string name="plus_week">vecka</string>
+    <string name="onboarding_plus_recurring_after_intro_offer">Återkommande betalning på %1$s efter ditt första år (%2$s)</string>
+    <string name="you_might_like_empty_title">Kunde inte ladda rekommendationer</string>
+    <string name="onboarding_plus_feature_libro_title">Gratis ljudbok från &lt;a href=\"https://libro.fm/\"&gt;Libro.fm&lt;/a&gt;</string>
+    <string name="you_might_like">Du kanske gillar</string>
+    <string name="podroll_information_button">Uppfattat</string>
+    <string name="podroll_information_summary">Creator Picks är podcasts som rekommenderas av showens skapare med hjälp av Podroll.</string>
+    <string name="podroll_information_title">Vad är Creator Picks?</string>
+    <string name="recommended_by_creator">Shower rekommenderade av skaparen</string>
     <string name="winback_cancel_subscription_continue_cancel_button_label">Fortsätt med annullering</string>
     <string name="winback_cancel_subscription_accept_offer_button_label">Acceptera erbjudandet</string>
     <string name="winback_claimed_offer_message_4">Tack för att du väljer Pocket Casts. Din rabatterade år börjar efter din nuvarande faktureringsperiod.</string>
@@ -15,7 +25,6 @@ Language: sv_SE
     <string name="winback_offer_free_offer_yearly_title">Få 50 %% rabatt på ditt nästa år och spara %1$s</string>
     <string name="winback_offer_free_offer_title">Få nästa månad gratis och spara %1$s</string>
     <string name="recommendations_loved_by_listeners">Älskad av lyssnare på</string>
-    <string name="recommendations_if_you_like">Om du gillar</string>
     <string name="price_per_week_usd">\u0024%1$.2f/vecka</string>
     <string name="price_per_week">%1$.2f %2$s/vecka</string>
     <string name="winback_cancel_subscription_header_title">Saker du bör veta innan du avslutar</string>
@@ -30,7 +39,6 @@ Language: sv_SE
     <string name="account_encourage_description">Skapa ett konto eller logga in för att ta del av Pocket Casts fullt ut.</string>
     <string name="account_encourage_title">Vi har noterat att du inte är inloggad</string>
     <string name="onboarding_get_started">Kom igång</string>
-    <string name="onboarding_plus_feature_libro_title"><![CDATA[Gratis ljudbok från <a href="https://libro.fm/">Libro.fm</a>]]></string>
     <string name="encourage_account_history_banner_description">Skapa ett gratis konto för att synkronisera din lyssningshistorik överallt.</string>
     <string name="encourage_account_history_banner_title">Håll koll på vad du har spelat upp</string>
     <string name="encourage_account_filters_banner_description">Skapa ett gratis konto för att synkronisera dina filter på vilken enhet som helst.</string>
@@ -374,7 +382,6 @@ Language: sv_SE
     <string name="widget_nothing_in_up_next">Inget i Nästa</string>
     <string name="widget_no_episode_playing">Inget avsnitt spelas</string>
     <string name="clear_search">Rensa sökning</string>
-    <string name="bookmarks_search_results_not_found">Vi kunde inte hitta något bokmärke för denna sökning.</string>
     <string name="podcast_and_episode">Podcast och avsnitt</string>
     <string name="skip_chapters">Förvalda kapitel</string>
     <string name="settings_use_episode_artwork_details">Vissa shower har anpassade omslag för specifika avsnitt. Aktivera det här alternativet så visar Pocket Casts dem istället för showens omslag.</string>
@@ -434,7 +441,6 @@ Language: sv_SE
     <string name="bookmarks_upsell_instructions_early_access">Få tidig åtkomst till den här funktionen med Pocket Casts Patron och spara tidsstämplar för dina favoritavsnitt. Snart tillgänglig för Plus-prenumeranter.</string>
     <string name="bookmarks_upsell_instructions">Spara tidsstämplar för dina favoritavsnitt och lås upp många fler funktioner med Pocket Casts Plus.</string>
     <string name="error_loading_show_notes">Det gick inte att hitta programnotiser för detta avsnitt.</string>
-    <string name="podcast_no_bookmarks_matching">Den här podcasten har inga bokmärken som matchar dina sökkriterier.</string>
     <string name="podcast_no_bookmarks_found">Inga bokmärken hittades</string>
     <string name="player_tab_notes">Detaljer</string>
     <string name="bookmark_updated">Bokmärket \"%s\" har uppdaterats</string>
@@ -690,6 +696,7 @@ Language: sv_SE
     <string name="onboarding_welcome_recommendations_title">Upptäck något nytt</string>
     <string name="onboarding_welcome_get_you_listening_plus">Tack, nu kan du börja lyssna.</string>
     <string name="onboarding_welcome_get_you_listening">Välkommen, nu kan du börja lyssna.</string>
+    <string name="onboarding_plus_recurring_after_free_trial">Återkommande betalningar börjar efter din %1$s (%2$s)</string>
     <string name="onboarding_plus_start_free_trial_and_subscribe">Starta gratis provperiod och prenumerera</string>
     <string name="onboarding_plus_terms_and_conditions">Villkor</string>
     <string name="onboarding_plus_privacy_policy">Integritetspolicy</string>
@@ -1655,7 +1662,6 @@ Language: sv_SE
     <string name="podcast_released_daily">Släpps varje dag</string>
     <string name="podcast_playback_effects">Uppspelningseffekter</string>
     <string name="podcast_notifications">Aviseringar</string>
-    <string name="podcast_no_episodes_matching">Den här podcasten har inga avsnitt som matchar dina sökkriterier.</string>
     <string name="podcast_no_episodes_all_archived">Alla %d avsnitt av den här podcasten har arkiverats</string>
     <string name="podcast_no_episodes">Det finns inga avsnitt i den här podcasten</string>
     <string name="podcast_no_episodes_found">Inga avsnitt hittades</string>
@@ -1689,7 +1695,6 @@ Language: sv_SE
     <string name="podcast_archive_all_played">Arkivera alla uppspelade</string>
     <string name="podcast_archive_all">Arkivera alla</string>
     <string name="podcasts_unarchive">Avarkivera</string>
-    <string name="podcasts_time_to_add_some_podcasts_summary">Du kan lägga till podcasts genom att söka ovan eller om du letar efter lite inspiration prova fliken ”Upptäck”.</string>
     <string name="podcasts_time_to_add_some_podcasts">Det är dags att lägga till några podcasts!</string>
     <string name="podcasts_sort_order">Sorteringsordning</string>
     <string name="podcasts_sort_by_title">”Titel (A - Ö)”</string>
@@ -1936,6 +1941,10 @@ Language: sv_SE
         <item quantity="one">dag</item>
         <item quantity="other">dagar</item>
     </plurals>
+    <plurals name="day_with_count">
+        <item quantity="one">%1$d dag</item>
+        <item quantity="other">%1$d dagar</item>
+    </plurals>
     <plurals name="episode_count">
         <item quantity="one">%d avsnitt</item>
         <item quantity="other">%d avsnitt</item>
@@ -1947,6 +1956,10 @@ Language: sv_SE
     <plurals name="minute">
         <item quantity="one">minut</item>
         <item quantity="other">minuter</item>
+    </plurals>
+    <plurals name="month_with_count">
+        <item quantity="one">%1$d månad</item>
+        <item quantity="other">%1$d månader</item>
     </plurals>
     <plurals name="player_up_next_header_title">
         <item quantity="one" formatted="true">%1$d avsnitt - %2$s kvar</item>
@@ -2003,5 +2016,13 @@ Language: sv_SE
     <plurals name="settings_auto_download_on_follow_podcast_description">
         <item quantity="one">Ladda automatiskt ner det senaste avsnittet från nya shower som du följer.</item>
         <item quantity="other">Ladda automatiskt ner de %s avsnitten från nya shower som du följer.</item>
+    </plurals>
+    <plurals name="week_with_count">
+        <item quantity="one">%1$d vecka</item>
+        <item quantity="other">%1$d veckor</item>
+    </plurals>
+    <plurals name="year_with_count">
+        <item quantity="one">%1$d år</item>
+        <item quantity="other">%1$d år</item>
     </plurals>
 </resources>
