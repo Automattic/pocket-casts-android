@@ -602,8 +602,8 @@
     <string name="podcast_no_episodes_found">No episodes found</string>
     <string name="podcast_no_episodes">There are no episodes in this podcast</string>
     <string name="podcast_no_episodes_all_archived">All %d episodes of this podcast have been archived</string>
-    <string name="podcast_no_bookmarks_matching">This podcast has no bookmarks matching your search criteria.</string>
-    <string name="podcast_no_episodes_matching">This podcast has no episodes matching your search criteria.</string>
+    <string name="podcast_no_bookmarks_matching">This podcast has no bookmarks matching your search criteria. Try another keyword.</string>
+    <string name="podcast_no_episodes_matching">We couldn’t find any episode for that search. Try another keyword.</string>
     <string name="podcast_notification_new_episode" translatable="false"><![CDATA[<i>%1$s</i> %2$s]]></string>
     <string name="podcast_notifications">Notifications</string>
     <string name="podcast_notifications_on">Notifications on</string>
