@@ -221,7 +221,7 @@ internal data class ProfilePageState(
     val headerState: ProfileHeaderState,
     val statsState: ProfileStatsState,
     val referralsState: ReferralsViewModel.UiState,
-    val refreshState: RefreshState?,
+    val refreshState: RefreshState,
 )
 
 private val horizontalPadding = 16.dp

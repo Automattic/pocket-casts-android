@@ -36,9 +36,6 @@ abstract class FolderDao {
     abstract fun findByUuidFlow(uuid: String): Flow<List<Folder>>
 
     @Query("SELECT * FROM folders WHERE deleted = 0")
-    abstract fun findFoldersRxFlowable(): Flowable<List<Folder>>
-
-    @Query("SELECT * FROM folders WHERE deleted = 0")
     abstract fun findFoldersFlow(): Flow<List<Folder>>
 
     @Query("SELECT * FROM folders WHERE deleted = 0")

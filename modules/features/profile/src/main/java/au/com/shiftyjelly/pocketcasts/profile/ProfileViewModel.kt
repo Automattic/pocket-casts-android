@@ -118,11 +118,7 @@ class ProfileViewModel @Inject constructor(
         initialValue = false,
     )
 
-    internal val refreshState = settings.refreshStateObservable.asFlow().stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.Eagerly,
-        initialValue = null,
-    )
+    internal val refreshState = settings.refreshStateFlow
 
     internal val showUpgradeBanner = combine(
         settings.upgradeProfileClosed.flow,

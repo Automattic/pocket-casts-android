@@ -40,11 +40,14 @@ interface PodcastManager {
     suspend fun findPodcastsInFolder(folderUuid: String): List<Podcast>
     fun findPodcastsInFolderRxSingle(folderUuid: String): Single<List<Podcast>>
     suspend fun findPodcastsNotInFolder(): List<Podcast>
-    fun podcastsInFolderOrderByUserChoiceRxFlowable(folder: Folder): Flowable<List<Podcast>>
     suspend fun findSubscribedUuids(): List<String>
 
+    fun observePodcastsSortedByLatestEpisode(): Flow<List<Podcast>>
+    fun observePodcastsBySortedRecentlyPlayed(): Flow<List<Podcast>>
+    fun observePodcastsSortedByUserChoice(folder: Folder): Flow<List<Podcast>>
     fun podcastsOrderByLatestEpisodeRxFlowable(): Flowable<List<Podcast>>
     fun podcastsOrderByRecentlyPlayedEpisodeRxFlowable(): Flowable<List<Podcast>>
+
     fun subscribedRxFlowable(): Flowable<List<Podcast>>
     suspend fun findPodcastsOrderByTitle(): List<Podcast>
     fun findPodcastsToSyncBlocking(): List<Podcast>

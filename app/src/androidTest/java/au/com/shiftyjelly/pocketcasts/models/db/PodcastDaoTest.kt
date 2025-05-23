@@ -13,7 +13,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import com.squareup.moshi.Moshi
 import java.util.Date
 import java.util.UUID
-import kotlinx.coroutines.reactive.awaitFirst
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -118,21 +118,21 @@ class PodcastDaoTest {
     }
 
     @Test
-    fun testFindPodcastsOrderByRecentlyPlayedEpisodeEpisodeRxFlowable() = runTest {
+    fun testObservePodcastsOrderByRecentlyPlayedEpisode() = runTest {
         val (podcast1, podcast2, _) = insertTestPodcastsAndEpisodes()
 
-        val subscribedList = podcastDao.findPodcastsOrderByRecentlyPlayedEpisodeRxFlowable().awaitFirst()
+        val subscribedList = podcastDao.observePodcastsOrderByRecentlyPlayedEpisode().first()
         assertEquals("Should only be 2 results", 2, subscribedList.size)
         assertEquals("First podcast should be most recently played", podcast2.uuid, subscribedList[0].uuid)
         assertEquals("Second podcast should be least recently played", podcast1.uuid, subscribedList[1].uuid)
     }
 
     @Test
-    fun testFindFolderPodcastsOrderByRecentlyPlayedRxFlowable() = runTest {
+    fun testObserveFolderPodcastsOrderByRecentlyPlayedEpisode() = runTest {
         val folderId = 1L.toString()
         val (podcast1, podcast2, _) = insertTestPodcastsAndEpisodes(folderId)
 
-        val folderPodcasts = podcastDao.findPodcastsOrderByRecentlyPlayedEpisodeRxFlowable(folderUuid = folderId).awaitFirst()
+        val folderPodcasts = podcastDao.observePodcastsOrderByRecentlyPlayedEpisode(folderUuid = folderId).first()
         assertEquals("Should only be 2 results", 2, folderPodcasts.size)
         assertEquals("First podcast should be most recently played", podcast2.uuid, folderPodcasts[0].uuid)
         assertEquals("Second podcast should be least recently played", podcast1.uuid, folderPodcasts[1].uuid)

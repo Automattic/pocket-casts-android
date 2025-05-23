@@ -24,7 +24,6 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.rx2.asFlow
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
@@ -137,7 +136,7 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat() {
             updateRefreshSummary(RefreshState.Refreshing)
             true
         }
-        settings.refreshStateObservable.asFlow()
+        settings.refreshStateFlow
             .flatMapLatest { state ->
                 flow {
                     while (true) {

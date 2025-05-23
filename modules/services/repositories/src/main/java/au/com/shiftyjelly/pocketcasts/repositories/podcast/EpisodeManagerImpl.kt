@@ -705,12 +705,12 @@ class EpisodeManagerImpl @Inject constructor(
         episodeDao.unarchiveBlocking(episode.uuid, System.currentTimeMillis())
     }
 
-    override fun getPodcastUuidToBadgeUnfinishedRxFlowable(): Flowable<Map<String, Int>> {
-        return episodeDao.podcastUuidToUnfinishedEpisodeCountRxFlowable()
+    override fun observePodcastUuidToBadgeUnfinished(): Flow<Map<String, Int>> {
+        return episodeDao.observeUuidToUnfinishedEpisodeCount()
     }
 
-    override fun getPodcastUuidToBadgeLatestRxFlowable(): Flowable<Map<String, Int>> {
-        return episodeDao.podcastUuidToLatestEpisodeCountRxFlowable()
+    override fun observePodcastUuidToBadgeLatest(): Flow<Map<String, Int>> {
+        return episodeDao.observeUuidToLatestEpisodeCount()
     }
 
     override fun markAsPlaybackErrorBlocking(episode: BaseEpisode?, errorMessage: String?) {

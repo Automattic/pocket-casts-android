@@ -47,7 +47,7 @@ class FolderEditViewModelTest {
         whenever(podcastManager.subscribedRxFlowable()).thenReturn(Flowable.just(emptyList()))
 
         val folderManager = mock<FolderManager>()
-        whenever(folderManager.findFoldersFlow()).thenReturn(flowOf(emptyList()))
+        whenever(folderManager.observeFolders()).thenReturn(flowOf(emptyList()))
 
         whenever(settings.selectPodcastSortTypeObservable).thenReturn(Observable.just(PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST))
 

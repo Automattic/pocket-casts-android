@@ -100,7 +100,7 @@ class FolderEditViewModel
                 searchText,
                 selectedUuids,
                 settings.selectPodcastSortTypeObservable.asFlow(),
-                folderManager.findFoldersFlow().combine(folderUuid) { folders, uuidOptional ->
+                folderManager.observeFolders().combine(folderUuid) { folders, uuidOptional ->
                     val foldersSorted = folders.sortedBy { it.name.lowercase(Locale.getDefault()) }
                     // find the current open folder
                     val uuid = uuidOptional.orElse(null)

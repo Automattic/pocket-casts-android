@@ -22,6 +22,7 @@ import io.reactivex.Maybe
 import io.reactivex.Single
 import java.util.Date
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 @Dao
 abstract class EpisodeDao {
@@ -390,17 +391,17 @@ abstract class EpisodeDao {
     abstract suspend fun markAllSynced(episodeUuids: List<String>)
 
     @Query("SELECT podcasts.uuid AS uuid, count(podcast_episodes.uuid) AS count FROM podcast_episodes, podcasts WHERE podcast_episodes.podcast_id = podcasts.uuid AND (podcast_episodes.playing_status = :playingStatusNotPlayed OR podcast_episodes.playing_status = :playingStatusInProgress) AND podcast_episodes.archived = 0 GROUP BY podcasts.uuid")
-    protected abstract fun podcastToUnfinishedEpisodeCountRxFlowable(playingStatusNotPlayed: Int = EpisodePlayingStatus.NOT_PLAYED.ordinal, playingStatusInProgress: Int = EpisodePlayingStatus.IN_PROGRESS.ordinal): Flowable<List<UuidCount>>
+    protected abstract fun podcastToUnfinishedEpisodeCount(playingStatusNotPlayed: Int = EpisodePlayingStatus.NOT_PLAYED.ordinal, playingStatusInProgress: Int = EpisodePlayingStatus.IN_PROGRESS.ordinal): Flow<List<UuidCount>>
 
     @Query("SELECT podcasts.uuid AS uuid, count(podcast_episodes.uuid) AS count FROM podcast_episodes, podcasts WHERE podcasts.latest_episode_uuid = podcast_episodes.uuid AND podcast_episodes.playing_status = :playingStatusNotPlayed AND podcast_episodes.archived = 0 GROUP BY podcasts.uuid")
-    protected abstract fun podcastToLatestEpisodeCountRxFlowable(playingStatusNotPlayed: Int = EpisodePlayingStatus.NOT_PLAYED.ordinal): Flowable<List<UuidCount>>
+    protected abstract fun podcastToLatestEpisodeCount(playingStatusNotPlayed: Int = EpisodePlayingStatus.NOT_PLAYED.ordinal): Flow<List<UuidCount>>
 
-    fun podcastUuidToUnfinishedEpisodeCountRxFlowable(): Flowable<Map<String, Int>> {
-        return podcastToUnfinishedEpisodeCountRxFlowable().map { it.associateBy({ it.uuid }, { it.count }) }
+    fun observeUuidToUnfinishedEpisodeCount(): Flow<Map<String, Int>> {
+        return podcastToUnfinishedEpisodeCount().map { it.associateBy({ it.uuid }, { it.count }) }
     }
 
-    fun podcastUuidToLatestEpisodeCountRxFlowable(): Flowable<Map<String, Int>> {
-        return podcastToLatestEpisodeCountRxFlowable().map { it.associateBy({ it.uuid }, { it.count }) }
+    fun observeUuidToLatestEpisodeCount(): Flow<Map<String, Int>> {
+        return podcastToLatestEpisodeCount().map { it.associateBy({ it.uuid }, { it.count }) }
     }
 
     @Query("SELECT podcast_episodes.* FROM podcast_episodes JOIN podcasts ON podcast_episodes.podcast_id = podcasts.uuid WHERE podcasts.subscribed = 1 AND podcast_episodes.playing_status != 2 AND podcast_episodes.archived = 0 ORDER BY podcast_episodes.published_date DESC LIMIT 1")
