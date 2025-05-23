@@ -153,9 +153,9 @@ internal class NotificationsSettingsViewModel @Inject constructor(
                         mapOf("enabled" to preference.isEnabled),
                     )
                     if (preference.isEnabled) {
-                        // notificationScheduler.setup
+                        notificationScheduler.cancelScheduledNewFeaturesAndTipsNotifications()
                     } else {
-                        //
+                        notificationScheduler.cancelScheduledNewFeaturesAndTipsNotifications()
                     }
                 }
 
