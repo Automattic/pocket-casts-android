@@ -1,5 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.player.viewmodel
 
+import androidx.compose.material.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
@@ -8,13 +11,13 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.bookmark.BookmarkRowColors
 import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButtonStyle
+import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkArguments
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.HeaderRowColors
-import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.MessageViewColors
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.search.BookmarkSearchHandler
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
@@ -347,10 +350,6 @@ class BookmarksViewModel
         return sortType as UserSetting<BookmarksSortType>
     }
 
-    fun clearSearchTapped() {
-        analyticsTracker.track(AnalyticsEvent.BOOKMARKS_CLEAR_SEARCH_TAPPED)
-    }
-
     fun searchBarClearButtonTapped() {
         analyticsTracker.track(AnalyticsEvent.BOOKMARKS_SEARCHBAR_CLEAR_BUTTON_TAPPED)
     }
@@ -407,7 +406,7 @@ class BookmarksViewModel
         }
 
         data class Upsell(val sourceView: SourceView) : UiState() {
-            val colors: MessageViewColors
+            internal val colors: MessageViewColors
                 get() = when (sourceView) {
                     SourceView.PLAYER -> MessageViewColors.Player
                     else -> MessageViewColors.Default
@@ -418,5 +417,38 @@ class BookmarksViewModel
     sealed class BookmarkMessage {
         data object BookmarkEpisodeNotFound : BookmarkMessage()
         data class PlayingBookmark(val bookmarkTitle: String) : BookmarkMessage()
+    }
+}
+
+internal sealed class MessageViewColors {
+    @Composable
+    abstract fun backgroundColor(): Color
+
+    @Composable
+    abstract fun textColor(): Color
+
+    @Composable
+    abstract fun buttonTextColor(): Color
+
+    object Default : MessageViewColors() {
+        @Composable
+        override fun backgroundColor(): Color = MaterialTheme.theme.colors.primaryUi01Active
+
+        @Composable
+        override fun textColor(): Color = MaterialTheme.theme.colors.primaryText02
+
+        @Composable
+        override fun buttonTextColor(): Color = MaterialTheme.theme.colors.primaryInteractive01
+    }
+
+    object Player : MessageViewColors() {
+        @Composable
+        override fun backgroundColor(): Color = MaterialTheme.theme.colors.playerContrast06
+
+        @Composable
+        override fun textColor(): Color = MaterialTheme.theme.colors.playerContrast02
+
+        @Composable
+        override fun buttonTextColor(): Color = MaterialTheme.theme.colors.playerContrast01
     }
 }
