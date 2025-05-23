@@ -218,6 +218,10 @@ class NotificationHelperImpl @Inject constructor(@ApplicationContext private val
         openNotificationChannelSettings(activity, Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_TRENDING_AND_RECOMMENDATIONS.id)
     }
 
+    override fun openNewFeaturesAndTipsNotificationSettings(activity: Activity?) {
+        openNotificationChannelSettings(activity, Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_NEW_FEATURES_AND_TIPS.id)
+    }
+
     override fun removeNotification(intentExtras: Bundle?, notificationId: Int) {
         val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val notificationTag = intentExtras?.getString(INTENT_EXTRA_NOTIFICATION_TAG, null)

@@ -21,6 +21,7 @@ interface NotificationHelper {
     fun openEpisodeNotificationSettings(activity: Activity?)
     fun openDailyReminderNotificationSettings(activity: Activity?)
     fun openTrendingAndRecommendationsNotificationSettings(activity: Activity?)
+    fun openNewFeaturesAndTipsNotificationSettings(activity: Activity?)
     fun dailyRemindersChannelBuilder(): NotificationCompat.Builder
     fun trendingAndRecommendationsChannelBuilder(): NotificationCompat.Builder
     fun featuresAndTipsChannelBuilder(): NotificationCompat.Builder

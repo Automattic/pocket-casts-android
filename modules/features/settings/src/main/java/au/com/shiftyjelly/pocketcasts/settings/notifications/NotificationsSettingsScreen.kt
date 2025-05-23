@@ -32,7 +32,6 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreferenceCategory as CategoryModel
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun NotificationsSettingsScreen(
     state: NotificationsSettingsViewModel.State,
@@ -86,6 +85,7 @@ internal fun NotificationsSettingsScreen(
                                 is NotificationPreferenceType.AdvancedSettings,
                                 is NotificationPreferenceType.DailyReminderSettings,
                                 is NotificationPreferenceType.RecommendationSettings,
+                                is NotificationPreferenceType.NewFeaturesAndTipsSettings,
                                 -> {
                                     onAdvancedSettingsClicked(preference)
                                 }
