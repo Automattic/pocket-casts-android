@@ -9,7 +9,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.compose.components.EmptyState
+import au.com.shiftyjelly.pocketcasts.compose.components.NoContentBanner
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastAdapter
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -25,7 +25,7 @@ class EmptyListViewHolder(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    EmptyState(
+                    NoContentBanner(
                         title = emptyList.title,
                         subtitle = emptyList.subtitle,
                         iconResourceId = emptyList.iconResourceId,

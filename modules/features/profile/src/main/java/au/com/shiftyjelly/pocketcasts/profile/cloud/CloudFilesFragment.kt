@@ -31,7 +31,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.compose.components.EmptyState
+import au.com.shiftyjelly.pocketcasts.compose.components.NoContentBanner
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
@@ -185,7 +185,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                         .fillMaxWidth()
                         .verticalScroll(rememberScrollState()),
                 ) {
-                    EmptyState(
+                    NoContentBanner(
                         title = stringResource(LR.string.profile_files_empty_title),
                         subtitle = stringResource(LR.string.profile_files_empty_summary),
                         iconResourceId = IR.drawable.ic_file,

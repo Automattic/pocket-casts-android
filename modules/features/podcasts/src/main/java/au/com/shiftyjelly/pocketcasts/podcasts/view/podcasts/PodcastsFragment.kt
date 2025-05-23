@@ -53,7 +53,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
-import au.com.shiftyjelly.pocketcasts.compose.components.EmptyState
+import au.com.shiftyjelly.pocketcasts.compose.components.NoContentBanner
 import au.com.shiftyjelly.pocketcasts.compose.components.TipPosition
 import au.com.shiftyjelly.pocketcasts.compose.components.Tooltip
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
@@ -451,7 +451,7 @@ class PodcastsFragment :
                     modifier = Modifier.verticalScroll(rememberScrollState()),
                 ) {
                     if (isFolder) {
-                        FoldersEmptyState(
+                        NoFolderPodcastsBanner(
                             onClickButton = {
                                 viewModel.folder?.let { folder ->
                                     FolderEditPodcastsFragment.newInstance(folderUuid = folder.uuid).show(parentFragmentManager, "add_podcasts_card")
@@ -459,7 +459,7 @@ class PodcastsFragment :
                             },
                         )
                     } else {
-                        PodcastsEmptyState(
+                        NoPodcastsBanner(
                             onClickButton = {
                                 analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_DISCOVER_BUTTON_TAPPED)
                                 (activity as FragmentHostListener).openTab(VR.id.navigation_discover)
@@ -593,10 +593,10 @@ class PodcastsFragment :
 }
 
 @Composable
-private fun PodcastsEmptyState(
+private fun NoPodcastsBanner(
     onClickButton: () -> Unit,
 ) {
-    EmptyState(
+    NoContentBanner(
         title = stringResource(LR.string.podcasts_time_to_add_some_podcasts),
         subtitle = stringResource(LR.string.podcasts_time_to_add_some_podcasts_summary),
         iconResourceId = IR.drawable.ic_podcasts,
@@ -606,10 +606,10 @@ private fun PodcastsEmptyState(
 }
 
 @Composable
-private fun FoldersEmptyState(
+private fun NoFolderPodcastsBanner(
     onClickButton: () -> Unit,
 ) {
-    EmptyState(
+    NoContentBanner(
         title = stringResource(LR.string.podcasts_empty_folder),
         subtitle = stringResource(LR.string.podcasts_empty_folder_summary),
         iconResourceId = IR.drawable.ic_folder,

@@ -35,14 +35,14 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.bookmark.BookmarkRow
 import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButtonColors
-import au.com.shiftyjelly.pocketcasts.compose.components.EmptyState
+import au.com.shiftyjelly.pocketcasts.compose.components.NoContentBanner
 import au.com.shiftyjelly.pocketcasts.compose.components.SearchBar
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.HeaderRow
-import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.NoMatchingBookmarks
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.NoMatchingBookmarksBanner
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel.BookmarkMessage
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel.UiState
@@ -170,7 +170,7 @@ private fun Content(
             is UiState.Empty -> Column(
                 modifier = Modifier.verticalScroll(rememberScrollState()),
             ) {
-                EmptyState(
+                NoContentBanner(
                     title = stringResource(LR.string.bookmarks_empty_state_title),
                     subtitle = stringResource(LR.string.bookmarks_paid_user_empty_state_message),
                     iconResourceId = IR.drawable.ic_bookmark,
@@ -184,7 +184,7 @@ private fun Content(
             is UiState.Upsell -> Column(
                 modifier = Modifier.verticalScroll(rememberScrollState()),
             ) {
-                EmptyState(
+                NoContentBanner(
                     title = stringResource(LR.string.bookmarks_empty_state_title),
                     subtitle = stringResource(LR.string.bookmarks_free_user_empty_state_message),
                     iconResourceId = IR.drawable.ic_bookmark,
@@ -235,7 +235,7 @@ private fun BookmarksView(
             state.bookmarks.isEmpty()
         ) {
             item {
-                NoMatchingBookmarks(
+                NoMatchingBookmarksBanner(
                     modifier = Modifier.padding(top = 24.dp),
                 )
             }

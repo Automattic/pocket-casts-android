@@ -5,16 +5,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.compose.components.EmptyState
+import au.com.shiftyjelly.pocketcasts.compose.components.NoContentBanner
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-fun NoMatchingBookmarks(
+fun NoMatchingBookmarksBanner(
     modifier: Modifier = Modifier,
 ) {
-    EmptyState(
+    NoContentBanner(
         title = stringResource(LR.string.podcast_no_bookmarks_found),
         subtitle = stringResource(LR.string.bookmarks_search_results_not_found),
         iconResourceId = R.drawable.ic_bookmark,
@@ -24,8 +24,8 @@ fun NoMatchingBookmarks(
 
 @Preview
 @Composable
-private fun NoMatchingBookmarksPreview() {
+private fun NoMatchingBookmarksBannerPreview() {
     AppTheme(themeType = Theme.ThemeType.LIGHT) {
-        NoMatchingBookmarks()
+        NoMatchingBookmarksBanner()
     }
 }

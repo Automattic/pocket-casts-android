@@ -30,7 +30,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
@@ -41,7 +40,7 @@ import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 @Composable
-fun EmptyState(
+fun NoContentBanner(
     title: String,
     subtitle: String,
     @DrawableRes iconResourceId: Int,
@@ -149,11 +148,11 @@ private fun EmptyStateButtons(
 
 @Preview
 @Composable
-private fun EmptyStatePreview(
+private fun UpNextNoContentBannerPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppThemeWithBackground(themeType = themeType) {
-        EmptyState(
+        NoContentBanner(
             title = "Time to add some podcasts",
             subtitle = "Discover and subscribe to your favorite podcasts.",
             iconResourceId = IR.drawable.ic_podcasts,
@@ -165,9 +164,9 @@ private fun EmptyStatePreview(
 
 @Preview
 @Composable
-private fun EmptyStateNoSubtitlePreview() {
+private fun UpNextNoContentBannerWithoutSubtitlePreview() {
     AppThemeWithBackground(themeType = Theme.ThemeType.LIGHT) {
-        EmptyState(
+        NoContentBanner(
             title = "Time to add some podcasts",
             subtitle = "",
             iconResourceId = IR.drawable.ic_podcasts,
@@ -179,9 +178,9 @@ private fun EmptyStateNoSubtitlePreview() {
 
 @Preview
 @Composable
-private fun EmptyStateNoPrimaryButtonPreview() {
+private fun UpNextNoContentBannerWithoutPrimaryButtonPreview() {
     AppThemeWithBackground(themeType = Theme.ThemeType.LIGHT) {
-        EmptyState(
+        NoContentBanner(
             title = "Time to add some podcasts",
             subtitle = "Discover and subscribe to your favorite podcasts.",
             iconResourceId = IR.drawable.ic_podcasts,
@@ -192,9 +191,9 @@ private fun EmptyStateNoPrimaryButtonPreview() {
 
 @Preview
 @Composable
-private fun EmptyStateNoSecondaryButtonPreview() {
+private fun UpNextNoContentBannerWithoutSecondaryButtonPreview() {
     AppThemeWithBackground(themeType = Theme.ThemeType.LIGHT) {
-        EmptyState(
+        NoContentBanner(
             title = "Time to add some podcasts",
             subtitle = "Discover and subscribe to your favorite podcasts.",
             iconResourceId = IR.drawable.ic_podcasts,
