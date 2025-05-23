@@ -46,9 +46,7 @@ class LoggingInScreenViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            settings.refreshStateObservable
-                .asFlow()
-                .collect(::onRefreshStateChange)
+            settings.refreshStateFlow.collect(::onRefreshStateChange)
         }
     }
 

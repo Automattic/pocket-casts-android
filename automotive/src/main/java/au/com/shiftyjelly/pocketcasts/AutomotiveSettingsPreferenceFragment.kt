@@ -137,7 +137,7 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat() {
             updateRefreshSummary(RefreshState.Refreshing)
             true
         }
-        settings.refreshStateObservable.asFlow()
+        settings.refreshStateFlow
             .flatMapLatest { state ->
                 flow {
                     while (true) {

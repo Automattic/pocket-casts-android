@@ -53,8 +53,7 @@ class SettingsViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            settings.refreshStateObservable
-                .asFlow()
+            settings.refreshStateFlow
                 .collectLatest { refreshState ->
                     _state.update { it.copy(refreshState = refreshState) }
                 }

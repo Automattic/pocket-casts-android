@@ -15,8 +15,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface EpisodeManager {
 
-    fun getPodcastUuidToBadgeUnfinishedRxFlowable(): Flowable<Map<String, Int>>
-    fun getPodcastUuidToBadgeLatestRxFlowable(): Flowable<Map<String, Int>>
+    fun observePodcastUuidToBadgeUnfinished(): Flow<Map<String, Int>>
+    fun observePodcastUuidToBadgeLatest(): Flow<Map<String, Int>>
 
     /** Find methods  */
 
