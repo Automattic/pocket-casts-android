@@ -1742,6 +1742,7 @@
     <string name="discover_category_technology">Technology</string>
     <string name="discover_category_crime">True Crime</string>
     <string name="discover_category_tv"><![CDATA[TV & Film]]></string>
+    <string name="discover_category_series">Series</string>
     <string name="discover_featured">Featured</string>
     <string name="discover_trending">Trending</string>
     <string name="discover_network_highlight">Network Highlight</string>
