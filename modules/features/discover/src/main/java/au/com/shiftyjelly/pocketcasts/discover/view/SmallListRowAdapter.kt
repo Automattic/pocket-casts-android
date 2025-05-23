@@ -5,11 +5,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.discoverListPodcastSubscribed
+import au.com.shiftyjelly.pocketcasts.analytics.discoverListPodcastTapped
 import au.com.shiftyjelly.pocketcasts.discover.databinding.ItemSmallListBinding
-import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.LIST_ID_KEY
-import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.PODCAST_UUID_KEY
+import au.com.shiftyjelly.pocketcasts.discover.viewmodel.PodcastList
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 
 val SmallListDiffer = object : DiffUtil.ItemCallback<List<Any>>() {
@@ -32,8 +32,8 @@ val SmallListDiffer = object : DiffUtil.ItemCallback<List<Any>>() {
 }
 
 internal class SmallListRowAdapter(
-    val onPodcastClicked: ((DiscoverPodcast, String?) -> Unit),
-    val onPodcastSubscribe: (DiscoverPodcast, String?) -> Unit,
+    val onPodcastClicked: ((DiscoverPodcast, String?, String?) -> Unit),
+    val onPodcastSubscribe: (DiscoverPodcast, String?, String?) -> Unit,
     val analyticsTracker: AnalyticsTracker,
 ) : ListAdapter<List<Any>, SmallListRowAdapter.SmallListViewHolder>(SmallListDiffer) {
     class SmallListViewHolder(val binding: ItemSmallListBinding) : RecyclerView.ViewHolder(binding.root) {
@@ -45,7 +45,7 @@ internal class SmallListRowAdapter(
         val rows = listOf(binding.row0, binding.row1, binding.row2, binding.row3)
     }
 
-    private var fromListId: String? = null
+    var list: PodcastList? = null
 
     fun submitPodcastList(list: List<DiscoverPodcast>, commitCallback: Runnable?) {
         submitList(list.chunked(SmallListViewHolder.NUMBER_OF_ROWS_PER_PAGE), commitCallback)
@@ -74,24 +74,17 @@ internal class SmallListRowAdapter(
                 podcastRow.podcast = podcast
                 podcastRow.isClickable = true
                 podcastRow.setOnClickListener {
-                    fromListId?.let {
-                        analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED, mapOf(LIST_ID_KEY to it, PODCAST_UUID_KEY to podcast.uuid))
-                    }
-                    onPodcastClicked(podcast, fromListId)
+                    analyticsTracker.discoverListPodcastTapped(podcastUuid = podcast.uuid, listId = list?.listId, listDate = list?.date)
+                    onPodcastClicked(podcast, list?.listId, list?.date)
                 }
                 podcastRow.onSubscribeClicked = {
-                    fromListId?.let {
-                        analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_SUBSCRIBED, mapOf(LIST_ID_KEY to it, PODCAST_UUID_KEY to podcast.uuid))
-                    }
-                    onPodcastSubscribe(podcast, fromListId)
+                    analyticsTracker.discoverListPodcastSubscribed(podcastUuid = podcast.uuid, listId = list?.listId, listDate = list?.date)
+                    onPodcastSubscribe(podcast, list?.listId, list?.date)
                 }
             } else {
                 podcastRow.podcast = null
                 podcastRow.isClickable = false
             }
         }
-    }
-    fun setFromListId(value: String) {
-        this.fromListId = value
     }
 }

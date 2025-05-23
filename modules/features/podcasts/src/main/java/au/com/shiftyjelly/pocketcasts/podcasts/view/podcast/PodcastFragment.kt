@@ -38,6 +38,7 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.analytics.discoverListPodcastSubscribed
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
@@ -137,6 +138,7 @@ class PodcastFragment : BaseFragment() {
             podcastUuid: String,
             sourceView: SourceView,
             fromListUuid: String? = null,
+            fromListDate: String? = null,
             featuredPodcast: Boolean = false,
         ): PodcastFragment = PodcastFragment().apply {
             arguments = bundleOf(
@@ -144,6 +146,7 @@ class PodcastFragment : BaseFragment() {
                     podcastUuid = podcastUuid,
                     sourceView = sourceView,
                     fromListUuid = fromListUuid,
+                    fromListDate = fromListDate,
                     featuredPodcast = featuredPodcast,
                 ),
             )
@@ -287,9 +290,7 @@ class PodcastFragment : BaseFragment() {
     }
 
     private val onSubscribeClicked: () -> Unit = {
-        fromListUuid?.let {
-            analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_SUBSCRIBED, mapOf(LIST_ID_KEY to it, PODCAST_UUID_KEY to podcastUuid))
-        }
+        analyticsTracker.discoverListPodcastSubscribed(podcastUuid = podcastUuid, listId = fromListUuid, listDate = fromListDate)
         if (featuredPodcast) {
             viewModel.podcast.value?.uuid?.let { podcastUuid ->
                 analyticsTracker.track(AnalyticsEvent.DISCOVER_FEATURED_PODCAST_SUBSCRIBED, mapOf(PODCAST_UUID_KEY to podcastUuid))
@@ -679,6 +680,9 @@ class PodcastFragment : BaseFragment() {
 
     private val fromListUuid: String?
         get() = args.fromListUuid
+
+    private val fromListDate: String
+        get() = args.fromListDate.orEmpty()
 
     private var lastSearchTerm: String? = null
 
@@ -1306,6 +1310,7 @@ class PodcastFragment : BaseFragment() {
         val podcastUuid: String,
         val sourceView: SourceView,
         val fromListUuid: String?,
+        val fromListDate: String?,
         val featuredPodcast: Boolean,
     ) : Parcelable
 }

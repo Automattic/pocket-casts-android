@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-04-23 17:21:04+0000
+Translation-Revision-Date: 2025-05-18 22:37:37+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: ca
 -->
 <resources>
+    <string name="you_might_like">Et podria agradar</string>
     <string name="winback_cancel_subscription_continue_cancel_button_label">Continua amb la cancel·lació</string>
     <string name="winback_cancel_subscription_accept_offer_button_label">Acceptar l\'oferta</string>
     <string name="winback_claimed_offer_message_4">Gràcies per triar Pocket Casts. El teu any amb descompte comença després del teu període de facturació actual.</string>
@@ -15,7 +16,6 @@ Language: ca
     <string name="winback_offer_free_offer_yearly_title">Aconsegueix un 50%% de descompte en el teu pròxim any i estalvia %1$s</string>
     <string name="winback_offer_free_offer_title">Aconsegueix el teu pròxim mes gratis i estalvia %1$s</string>
     <string name="recommendations_loved_by_listeners">Estimat pels oients de</string>
-    <string name="recommendations_if_you_like">Si t\'agrada</string>
     <string name="price_per_week_usd">\u0024%1$.2f/setmana</string>
     <string name="price_per_week">%1$.2f %2$s/setmana</string>
     <string name="winback_cancel_subscription_header_title">Coses que hauries de saber abans de cancel·lar</string>
@@ -30,7 +30,6 @@ Language: ca
     <string name="account_encourage_description">Crea un compte o inicia sessió per gaudir de Pocket Casts al màxim.</string>
     <string name="account_encourage_title">Hem detectat que no has iniciat sessió</string>
     <string name="onboarding_get_started">Comença</string>
-    <string name="onboarding_plus_feature_libro_title"><![CDATA[Àudiollibre gratuït des de  <a href="https://libro.fm/">Libro.fm</a>]]></string>
     <string name="encourage_account_history_banner_description">Crea un compte gratuït per sincronitzar el teu historial d\'escolta a tot arreu.</string>
     <string name="encourage_account_history_banner_title">Fes un seguiment del que has escoltat</string>
     <string name="encourage_account_filters_banner_description">Crea un compte gratuït per sincronitzar els teus filtres en qualsevol dispositiu.</string>
@@ -374,7 +373,6 @@ Language: ca
     <string name="widget_nothing_in_up_next">No hi ha res a la cua de \'Tot seguit\'</string>
     <string name="widget_no_episode_playing">No s\'està reproduint cap episodi</string>
     <string name="clear_search">Esborrar la cerca</string>
-    <string name="bookmarks_search_results_not_found">No hem pogut trobar cap marcador per aquesta cerca.</string>
     <string name="podcast_and_episode">Pòdcast i episodi</string>
     <string name="skip_chapters">Capítols preseleccionats</string>
     <string name="settings_use_episode_artwork_details">Alguns pòdcasts tenen il·lustracions personalitzades per a certs episodis. Activa aquesta opció i Pocket Casts les mostrarà en lloc de la il·lustració del pòdcast.</string>
@@ -434,7 +432,6 @@ Language: ca
     <string name="bookmarks_upsell_instructions_early_access">Aconsegueix accés anticipat a aquesta funció amb Pocket Casts Patron i guarda els marcadors de temps dels teus episodis preferits. Disponible aviat per als subscriptors Plus.</string>
     <string name="bookmarks_upsell_instructions">Desa les marques de temps dels teus episodis favorits i desbloqueja moltes més funcions amb Pocket Casts Plus.</string>
     <string name="error_loading_show_notes">No s\'han pogut trobar les notes d\'aquest episodi.</string>
-    <string name="podcast_no_bookmarks_matching">Aquest pòdcast no té marcadors que coincideixin amb els teus criteris de cerca.</string>
     <string name="podcast_no_bookmarks_found">No s\'han trobat marcadors</string>
     <string name="player_tab_notes">Notes</string>
     <string name="bookmark_updated">Marcador \"%s\" actualitzat</string>
@@ -1655,7 +1652,6 @@ Language: ca
     <string name="podcast_released_daily">Es publica diàriament</string>
     <string name="podcast_playback_effects">Efectes de reproducció</string>
     <string name="podcast_notifications">Notificacions</string>
-    <string name="podcast_no_episodes_matching">Aquest pòdcast no té episodis que coincideixis amb els teus criteris de cerca.</string>
     <string name="podcast_no_episodes_all_archived">S\'han arxivat %d episodis d\'aquest pòdcast</string>
     <string name="podcast_no_episodes">Aquest pòdcast no té episodis</string>
     <string name="podcast_no_episodes_found">No s\'han trobat episodis</string>
@@ -1689,7 +1685,6 @@ Language: ca
     <string name="podcast_archive_all_played">Arxivar tots els reproduïts</string>
     <string name="podcast_archive_all">Arxiva-ho tot</string>
     <string name="podcasts_unarchive">Desarxivar</string>
-    <string name="podcasts_time_to_add_some_podcasts_summary">Pots afegir pòdcasts si els busques amb la lupa de dalt. I si vols una mica d\'inspiració, ves a la pestanya Descobrir. Tot teu!</string>
     <string name="podcasts_time_to_add_some_podcasts">És hora d\'afegir alguns pòdcasts!</string>
     <string name="podcasts_sort_order">Tipus d\'ordenació</string>
     <string name="podcasts_sort_by_title">\"Títol (A - Z)\"</string>

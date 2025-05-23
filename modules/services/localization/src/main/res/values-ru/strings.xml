@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-04-30 16:54:03+0000
+Translation-Revision-Date: 2025-05-22 14:10:05+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="skip_for_now">Пропустить</string>
+    <string name="plus_week">неделя</string>
+    <string name="onboarding_plus_recurring_after_intro_offer">Регулярный платёж в %1$s по истечении первого года (%2$s)</string>
+    <string name="you_might_like_empty_title">Не удалось загрузить рекомендации</string>
+    <string name="onboarding_plus_feature_libro_title">Бесплатная аудиокнига от &lt;a href=\"https://libro.fm/\"&gt;Libro.fm&lt;/a&gt;</string>
+    <string name="you_might_like">Вам может понравиться</string>
+    <string name="podroll_information_button">Понятно</string>
+    <string name="podroll_information_summary">Creator Picks — это подкасты, рекомендованные создателем шоу с помощью Podroll.</string>
+    <string name="podroll_information_title">Что выбирает автор?</string>
+    <string name="recommended_by_creator">Рекомендованные шоу автора</string>
     <string name="winback_cancel_subscription_continue_cancel_button_label">Отменить и продолжить</string>
     <string name="winback_cancel_subscription_accept_offer_button_label">Принять предложение</string>
     <string name="winback_claimed_offer_message_4">Благодарим за то, что выбрали Pocket Casts. Ваш годовой тарифный план со скидкой начнёт действовать по окончании текущего расчётного периода.</string>
@@ -15,7 +25,6 @@ Language: ru
     <string name="winback_offer_free_offer_yearly_title">Получите скидку 50 %% на следующий год и сэкономьте %1$s</string>
     <string name="winback_offer_free_offer_title">Пользуйтесь весь следующий месяц бесплатно и сэкономьте %1$s</string>
     <string name="recommendations_loved_by_listeners">Нравится слушателям</string>
-    <string name="recommendations_if_you_like">Если вам нравится</string>
     <string name="price_per_week_usd">\u0024%1$.2f в неделю</string>
     <string name="price_per_week">%1$.2f %2$s в неделю</string>
     <string name="winback_cancel_subscription_header_title">Что нужно знать до отмены</string>
@@ -30,7 +39,6 @@ Language: ru
     <string name="account_encourage_description">Создайте учётную запись или войдите, чтобы пользоваться всеми возможностями Pocket Casts.</string>
     <string name="account_encourage_title">Мы заметили, что вы не вошли в систему</string>
     <string name="onboarding_get_started">Начать</string>
-    <string name="onboarding_plus_feature_libro_title"><![CDATA[Бесплатная аудиокнига от <a href="https://libro.fm/">Libro.fm</a>]]></string>
     <string name="encourage_account_history_banner_description">Создайте бесплатную учётную запись, чтобы синхронизировать журнал прослушивания на всех устройствах.</string>
     <string name="encourage_account_history_banner_title">Следите за тем, что вы прослушали</string>
     <string name="encourage_account_filters_banner_description">Создайте бесплатную учётную запись, чтобы синхронизировать фильтры на всех устройствах.</string>
@@ -374,7 +382,6 @@ Language: ru
     <string name="widget_nothing_in_up_next">Очередь пуста</string>
     <string name="widget_no_episode_playing">Ни один выпуск не воспроизводится</string>
     <string name="clear_search">Очистить поле поиска</string>
-    <string name="bookmarks_search_results_not_found">Не удалось найти закладку по этому запросу.</string>
     <string name="podcast_and_episode">Подкаст и выпуск</string>
     <string name="skip_chapters">Предварительный выбор глав</string>
     <string name="settings_use_episode_artwork_details">В некоторых шоу есть специальное оформление отдельных выпусков. Включите эту опцию, и Pocket Casts будет отображать его вместо общего оформления шоу.</string>
@@ -434,7 +441,6 @@ Language: ru
     <string name="bookmarks_upsell_instructions_early_access">Получите ранний доступ к этой и многим другим функциям с Pocket Casts Patron и сохраняйте отметки времени понравившихся вам эпизодов. Уже скоро станет доступным для подписчиков Plus.</string>
     <string name="bookmarks_upsell_instructions">Сохраняйте отметки времени понравившихся вам эпизодов и разблокируйте многие другие функции с Pocket Casts Plus.</string>
     <string name="error_loading_show_notes">Не удалось найти заметки для показа к этому эпизоду.</string>
-    <string name="podcast_no_bookmarks_matching">В этом подкасте нет закладок, соответствующих вашим условиям поиска.</string>
     <string name="podcast_no_bookmarks_found">Закладки не найдены</string>
     <string name="player_tab_notes">Сведения</string>
     <string name="bookmark_updated">Закладка «%s» обновлена</string>
@@ -690,6 +696,7 @@ Language: ru
     <string name="onboarding_welcome_recommendations_title">Найдите для себя что-то новое</string>
     <string name="onboarding_welcome_get_you_listening_plus">Спасибо. А теперь давайте что-нибудь послушаем!</string>
     <string name="onboarding_welcome_get_you_listening">Добро пожаловать. Давайте что-нибудь послушаем!</string>
+    <string name="onboarding_plus_recurring_after_free_trial">Регулярные платежи начнутся после %1$s (%2$s)</string>
     <string name="onboarding_plus_start_free_trial_and_subscribe">Начать бесплатный пробный период и подписаться</string>
     <string name="onboarding_plus_terms_and_conditions">Условия предоставления услуг</string>
     <string name="onboarding_plus_privacy_policy">Политику конфиденциальности</string>
@@ -1655,7 +1662,6 @@ Language: ru
     <string name="podcast_released_daily">Выходит ежедневно</string>
     <string name="podcast_playback_effects">Эффекты воспроизведения</string>
     <string name="podcast_notifications">Уведомления</string>
-    <string name="podcast_no_episodes_matching">В этом подкасте нет выпусков, соответствующих вашим условиям поиска.</string>
     <string name="podcast_no_episodes_all_archived">Все выпуски этого подкаста (%d) архивированы</string>
     <string name="podcast_no_episodes">В этом подкасте нет выпусков</string>
     <string name="podcast_no_episodes_found">Выпуски не найдены</string>
@@ -1689,7 +1695,6 @@ Language: ru
     <string name="podcast_archive_all_played">Архивировать все прослушанные</string>
     <string name="podcast_archive_all">Архивировать все</string>
     <string name="podcasts_unarchive">Из архива</string>
-    <string name="podcasts_time_to_add_some_podcasts_summary">Вы можете добавить подкасты с помощью поиска выше, а если вы ищете немного вдохновения, попробуйте вкладку «Поиск».</string>
     <string name="podcasts_time_to_add_some_podcasts">Пора добавить подкасты!</string>
     <string name="podcasts_sort_order">Порядок сортировки</string>
     <string name="podcasts_sort_by_title">По заголовку (A–Я)</string>
@@ -1938,6 +1943,11 @@ Language: ru
         <item quantity="few">дн.</item>
         <item quantity="many">дн</item>
     </plurals>
+    <plurals name="day_with_count">
+        <item quantity="one">%1$d дн.</item>
+        <item quantity="few">%1$d дн.</item>
+        <item quantity="many">%1$d дн.</item>
+    </plurals>
     <plurals name="episode_count">
         <item quantity="one">%d вып.</item>
         <item quantity="few">%d вып.</item>
@@ -1952,6 +1962,11 @@ Language: ru
         <item quantity="one">мин</item>
         <item quantity="few">мин</item>
         <item quantity="many">мин</item>
+    </plurals>
+    <plurals name="month_with_count">
+        <item quantity="one">%1$d мес.</item>
+        <item quantity="few">%1$d мес.</item>
+        <item quantity="many">%1$d мес.</item>
     </plurals>
     <plurals name="player_up_next_header_title">
         <item quantity="one" formatted="true">%1$d выпуск — %2$s осталось</item>
@@ -2022,5 +2037,15 @@ Language: ru
         <item quantity="one">Автоматически загружать свежие выпуски новых шоу, на которые вы подписаны.</item>
         <item quantity="few">Автоматически загружать свежие выпуски (%s) новых шоу, на которые вы подписаны.</item>
         <item quantity="many">Автоматически загружать свежие выпуски (%s) новых шоу, на которые вы подписаны.</item>
+    </plurals>
+    <plurals name="week_with_count">
+        <item quantity="one">%1$d нед.</item>
+        <item quantity="few">%1$d нед.</item>
+        <item quantity="many">%1$d нед.</item>
+    </plurals>
+    <plurals name="year_with_count">
+        <item quantity="one">%1$d год</item>
+        <item quantity="few">%1$d года</item>
+        <item quantity="many">%1$d лет</item>
     </plurals>
 </resources>

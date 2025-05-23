@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-05-02 13:54:03+0000
+Translation-Revision-Date: 2025-05-22 14:10:05+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="skip_for_now">暫時略過</string>
+    <string name="plus_week">週</string>
+    <string name="onboarding_plus_recurring_after_intro_offer">第一年 (%2$s) 後，於%1$s後開始定期付款</string>
+    <string name="you_might_like_empty_title">無法載入推薦內容</string>
+    <string name="onboarding_plus_feature_libro_title">來自 &lt;a href=\"https://libro.fm/\"&gt;Libro.fm&lt;/a&gt; 的免費有聲書</string>
+    <string name="you_might_like">你可能喜歡</string>
+    <string name="podroll_information_button">知道了</string>
+    <string name="podroll_information_summary">「創作者精選」列出由節目創作者使用 Podroll 推薦的 Podcast。</string>
+    <string name="podroll_information_title">什麼是「創作者精選」？</string>
+    <string name="recommended_by_creator">由創作者推薦的節目</string>
     <string name="winback_cancel_subscription_continue_cancel_button_label">繼續取消</string>
     <string name="winback_cancel_subscription_accept_offer_button_label">接受優惠</string>
     <string name="winback_claimed_offer_message_4">感謝選用 Pocket Casts。 折扣年份會在目前的帳單週期結束後開始。</string>
@@ -15,7 +25,6 @@ Language: zh_TW
     <string name="winback_offer_free_offer_yearly_title">次年享有 50%% 的優惠並省下 %1$s</string>
     <string name="winback_offer_free_offer_title">下個月免費使用並省下 %1$s</string>
     <string name="recommendations_loved_by_listeners">深受下列頻道聽眾的喜愛：</string>
-    <string name="recommendations_if_you_like">如果你喜歡</string>
     <string name="price_per_week_usd">\u0024%1$.2f/週</string>
     <string name="price_per_week">%1$.2f %2$s/週</string>
     <string name="winback_cancel_subscription_header_title">取消前應了解的事項</string>
@@ -30,7 +39,6 @@ Language: zh_TW
     <string name="account_encourage_description">建立帳號或登入，即可充分暢聽 Pocket Casts。</string>
     <string name="account_encourage_title">我們注意到你並未登入</string>
     <string name="onboarding_get_started">開始使用</string>
-    <string name="onboarding_plus_feature_libro_title"><![CDATA[來自「<a href="https://libro.fm/">Libro.fm</a>」的免費有聲書]]></string>
     <string name="encourage_account_history_banner_description">建立免費帳號，隨處同步收聽記錄。</string>
     <string name="encourage_account_history_banner_title">追蹤播放過的內容</string>
     <string name="encourage_account_filters_banner_description">建立免費帳號，將篩選條件同步至任何裝置。</string>
@@ -374,7 +382,6 @@ Language: zh_TW
     <string name="widget_nothing_in_up_next">「接下來播放」沒有內容</string>
     <string name="widget_no_episode_playing">沒有正在播放的單集</string>
     <string name="clear_search">清除搜尋</string>
-    <string name="bookmarks_search_results_not_found">找不到符合搜尋內容的書籤。</string>
     <string name="podcast_and_episode">Podcast 與節目</string>
     <string name="skip_chapters">預先選取的章節</string>
     <string name="settings_use_episode_artwork_details">有些節目會針對特定單集推出自訂封面圖片。 若啟用此選項，Pocket Casts 就會顯示這些封面圖片，而非節目的封面圖片。</string>
@@ -434,7 +441,6 @@ Language: zh_TW
     <string name="bookmarks_upsell_instructions_early_access">利用 Pocket Casts Patron 搶先體驗此功能，還能儲存所愛單集的時間戳記。 即將開放 Plus 訂閱者使用。</string>
     <string name="bookmarks_upsell_instructions">利用 Pocket Casts Plus 儲存你所愛單集的時間戳記，並解鎖其他許多功能。</string>
     <string name="error_loading_show_notes">找不到此單集的節目說明。</string>
-    <string name="podcast_no_bookmarks_matching">此 Podcast 沒有符合您搜尋條件的書籤。</string>
     <string name="podcast_no_bookmarks_found">找不到書籤</string>
     <string name="player_tab_notes">詳細資料</string>
     <string name="bookmark_updated">已更新書籤「%s」</string>
@@ -690,6 +696,7 @@ Language: zh_TW
     <string name="onboarding_welcome_recommendations_title">探索新事物</string>
     <string name="onboarding_welcome_get_you_listening_plus">謝謝，立刻讓你聽聽看！</string>
     <string name="onboarding_welcome_get_you_listening">歡迎，立刻讓你聽聽看！</string>
+    <string name="onboarding_plus_recurring_after_free_trial">定期付款將在%1$s後開始 (%2$s)</string>
     <string name="onboarding_plus_start_free_trial_and_subscribe">開始免費試用和訂閱</string>
     <string name="onboarding_plus_terms_and_conditions">條款與細則</string>
     <string name="onboarding_plus_privacy_policy">隱私權政策</string>
@@ -1655,7 +1662,6 @@ Language: zh_TW
     <string name="podcast_released_daily">每天發佈</string>
     <string name="podcast_playback_effects">播放效果</string>
     <string name="podcast_notifications">通知</string>
-    <string name="podcast_no_episodes_matching">此 Podcast 沒有符合搜尋條件的單集。</string>
     <string name="podcast_no_episodes_all_archived">已封存此 Podcast 全部 %d 集</string>
     <string name="podcast_no_episodes">此 Podcast 沒有任何單集</string>
     <string name="podcast_no_episodes_found">找不到任何單集</string>
@@ -1689,7 +1695,6 @@ Language: zh_TW
     <string name="podcast_archive_all_played">封存所有已播放單集</string>
     <string name="podcast_archive_all">全部封存</string>
     <string name="podcasts_unarchive">取消封存</string>
-    <string name="podcasts_time_to_add_some_podcasts_summary">在上方搜尋即可新增 Podcast；如果需要一點靈感，不妨試試「探索」分頁。</string>
     <string name="podcasts_time_to_add_some_podcasts">是時候新增一些 Podcast 節目了！</string>
     <string name="podcasts_sort_order">排序</string>
     <string name="podcasts_sort_by_title">「標題 (A - Z)」</string>
@@ -1934,6 +1939,9 @@ Language: zh_TW
     <plurals name="day">
         <item quantity="other">天</item>
     </plurals>
+    <plurals name="day_with_count">
+        <item quantity="other">%1$d 天</item>
+    </plurals>
     <plurals name="episode_count">
         <item quantity="other">%d 集</item>
     </plurals>
@@ -1942,6 +1950,9 @@ Language: zh_TW
     </plurals>
     <plurals name="minute">
         <item quantity="other">分</item>
+    </plurals>
+    <plurals name="month_with_count">
+        <item quantity="other">%1$d 個月</item>
     </plurals>
     <plurals name="player_up_next_header_title">
         <item quantity="other" formatted="true">%1$d 集單集 - 剩餘 %2$s</item>
@@ -1984,5 +1995,11 @@ Language: zh_TW
     </plurals>
     <plurals name="settings_auto_download_on_follow_podcast_description">
         <item quantity="other">自動下載所追蹤新節目的最新 %s 集。</item>
+    </plurals>
+    <plurals name="week_with_count">
+        <item quantity="other">%1$d 週</item>
+    </plurals>
+    <plurals name="year_with_count">
+        <item quantity="other">%1$d 年</item>
     </plurals>
 </resources>
