@@ -1,15 +1,17 @@
 package au.com.shiftyjelly.pocketcasts.settings.notifications
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -17,6 +19,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
+import au.com.shiftyjelly.pocketcasts.compose.components.Banner
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.R
@@ -25,8 +28,11 @@ import au.com.shiftyjelly.pocketcasts.settings.notifications.components.Notifica
 import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreferenceType
 import au.com.shiftyjelly.pocketcasts.settings.util.TextResource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.images.R as IR
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreferenceCategory as CategoryModel
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun NotificationsSettingsScreen(
     state: NotificationsSettingsViewModel.State,
@@ -34,6 +40,7 @@ internal fun NotificationsSettingsScreen(
     onAdvancedSettingsClicked: (type: NotificationPreferenceType) -> Unit,
     onSelectRingtoneClicked: (String?) -> Unit,
     onSelectPodcastsClicked: () -> Unit,
+    onSystemNotificationsSettingsClicked: () -> Unit,
     onBackPressed: () -> Unit,
     bottomInset: Dp,
     modifier: Modifier = Modifier,
@@ -48,40 +55,55 @@ internal fun NotificationsSettingsScreen(
             bottomShadow = true,
             onNavigationClick = onBackPressed,
         )
+        LazyColumn(
+            contentPadding = PaddingValues(bottom = bottomInset),
+        ) {
+            if (!state.areSystemNotificationsEnabled) {
+                item {
+                    Banner(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                            .padding(top = 16.dp),
+                        title = stringResource(LR.string.notifications_settings_turn_on_push_title),
+                        description = stringResource(LR.string.notifications_settings_turn_on_push_message),
+                        actionLabel = stringResource(LR.string.notifications_settings_turn_on_push_button),
+                        icon = painterResource(IR.drawable.ic_notifications),
+                        onActionClick = onSystemNotificationsSettingsClicked,
+                        onDismiss = null,
+                    )
+                }
+            }
 
-        Box {
-            LazyColumn(
-                contentPadding = PaddingValues(bottom = bottomInset),
-            ) {
-                for (category in state.categories) {
-                    item {
-                        NotificationPreferenceCategory(
-                            categoryTitle = category.title.asString(),
-                            items = category.preferences,
-                            onItemClicked = { preference ->
-                                when (preference) {
-                                    is NotificationPreferenceType.AdvancedSettings,
-                                    is NotificationPreferenceType.DailyReminderSettings,
-                                    is NotificationPreferenceType.RecommendationSettings,
-                                    -> {
-                                        onAdvancedSettingsClicked(preference)
-                                    }
-
-                                    is NotificationPreferenceType.NotifyOnThesePodcasts -> {
-                                        onSelectPodcastsClicked()
-                                    }
-
-                                    is NotificationPreferenceType.NotificationSoundPreference -> {
-                                        onSelectRingtoneClicked(preference.notificationSound.path)
-                                    }
-
-                                    else -> Unit
+            for (category in state.categories) {
+                item {
+                    NotificationPreferenceCategory(
+                        isEnabled = state.areSystemNotificationsEnabled,
+                        categoryTitle = category.title.asString(),
+                        items = category.preferences,
+                        onItemClicked = { preference ->
+                            when (preference) {
+                                is NotificationPreferenceType.AdvancedSettings,
+                                is NotificationPreferenceType.DailyReminderSettings,
+                                is NotificationPreferenceType.RecommendationSettings,
+                                -> {
+                                    onAdvancedSettingsClicked(preference)
                                 }
-                                onPreferenceChanged(preference)
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                    }
+
+                                is NotificationPreferenceType.NotifyOnThesePodcasts -> {
+                                    onSelectPodcastsClicked()
+                                }
+
+                                is NotificationPreferenceType.NotificationSoundPreference -> {
+                                    onSelectRingtoneClicked(preference.notificationSound.path)
+                                }
+
+                                else -> Unit
+                            }
+                            onPreferenceChanged(preference)
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
                 }
             }
         }
@@ -90,10 +112,13 @@ internal fun NotificationsSettingsScreen(
 
 @Preview
 @Composable
-private fun PreviewNotificationSettingsScreen(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) =
+private fun PreviewNotificationSettingsScreen(
+    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
+) =
     AppTheme(themeType) {
         NotificationsSettingsScreen(
             state = NotificationsSettingsViewModel.State(
+                areSystemNotificationsEnabled = false,
                 categories = listOf(
                     CategoryModel(
                         title = TextResource.fromText("My episodes"),
@@ -127,5 +152,49 @@ private fun PreviewNotificationSettingsScreen(@PreviewParameter(ThemePreviewPara
             bottomInset = 0.dp,
             onSelectRingtoneClicked = {},
             onSelectPodcastsClicked = {},
+            onSystemNotificationsSettingsClicked = {},
         )
     }
+
+@Preview
+@Composable
+private fun PreviewDisabledNotificationsSettingsScreen() = AppTheme(Theme.ThemeType.INDIGO) {
+    NotificationsSettingsScreen(
+        state = NotificationsSettingsViewModel.State(
+            areSystemNotificationsEnabled = true,
+            categories = listOf(
+                CategoryModel(
+                    title = TextResource.fromText("My episodes"),
+                    preferences = listOf(
+                        NotificationPreferenceType.NotifyMeOnNewEpisodes(
+                            title = TextResource.fromText("Notify me"),
+                            isEnabled = false,
+                        ),
+                    ),
+                ),
+                CategoryModel(
+                    title = TextResource.fromText("Settings"),
+                    preferences = listOf(
+                        NotificationPreferenceType.PlayOverNotifications(
+                            title = TextResource.fromText("Play over notifications"),
+                            value = PlayOverNotificationSetting.DUCK,
+                            displayValue = TextResource.fromText("Duck"),
+                            options = emptyList(),
+                        ),
+                        NotificationPreferenceType.HidePlaybackNotificationOnPause(
+                            title = TextResource.fromText("Hide playback notification on pause"),
+                            isEnabled = true,
+                        ),
+                    ),
+                ),
+            ),
+        ),
+        onPreferenceChanged = {},
+        onAdvancedSettingsClicked = {},
+        onBackPressed = {},
+        bottomInset = 0.dp,
+        onSelectRingtoneClicked = {},
+        onSelectPodcastsClicked = {},
+        onSystemNotificationsSettingsClicked = {},
+    )
+}

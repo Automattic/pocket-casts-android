@@ -32,6 +32,7 @@ internal fun NotificationPreferenceCategory(
     items: List<NotificationPreferenceType>,
     onItemClicked: (NotificationPreferenceType) -> Unit,
     modifier: Modifier = Modifier,
+    isEnabled: Boolean = true,
 ) {
     SettingSection(
         modifier = modifier,
@@ -41,9 +42,11 @@ internal fun NotificationPreferenceCategory(
             when (item) {
                 is NotificationPreferenceType.NotifyMeOnNewEpisodes -> {
                     SettingRow(
+                        enabled = isEnabled,
                         primaryText = item.title.asString(),
-                        toggle = SettingRowToggle.Switch(checked = item.isEnabled),
+                        toggle = SettingRowToggle.Switch(checked = item.isEnabled, enabled = isEnabled),
                         modifier = modifier.toggleable(
+                            enabled = isEnabled,
                             value = item.isEnabled,
                             role = Role.Switch,
                         ) { onItemClicked(item.copy(isEnabled = !item.isEnabled)) },
@@ -52,9 +55,11 @@ internal fun NotificationPreferenceCategory(
 
                 is NotificationPreferenceType.EnableDailyReminders -> {
                     SettingRow(
+                        enabled = isEnabled,
                         primaryText = item.title.asString(),
-                        toggle = SettingRowToggle.Switch(checked = item.isEnabled),
+                        toggle = SettingRowToggle.Switch(checked = item.isEnabled, enabled = isEnabled),
                         modifier = modifier.toggleable(
+                            enabled = isEnabled,
                             value = item.isEnabled,
                             role = Role.Switch,
                         ) { onItemClicked(item.copy(isEnabled = !item.isEnabled)) },
@@ -63,9 +68,11 @@ internal fun NotificationPreferenceCategory(
 
                 is NotificationPreferenceType.EnableRecommendations -> {
                     SettingRow(
+                        enabled = isEnabled,
                         primaryText = item.title.asString(),
-                        toggle = SettingRowToggle.Switch(checked = item.isEnabled),
+                        toggle = SettingRowToggle.Switch(checked = item.isEnabled, enabled = isEnabled),
                         modifier = modifier.toggleable(
+                            enabled = isEnabled,
                             value = item.isEnabled,
                             role = Role.Switch,
                         ) { onItemClicked(item.copy(isEnabled = !item.isEnabled)) },
@@ -85,47 +92,53 @@ internal fun NotificationPreferenceCategory(
 
                 is NotificationPreferenceType.NotifyOnThesePodcasts -> {
                     SettingRow(
+                        enabled = isEnabled,
                         primaryText = item.title.asString(),
                         secondaryText = item.displayValue.asString(),
-                        modifier = modifier.clickable { onItemClicked(item) },
+                        modifier = modifier.clickable(enabled = isEnabled) { onItemClicked(item) },
                     )
                 }
 
                 is NotificationPreferenceType.AdvancedSettings -> {
                     SettingRow(
+                        enabled = isEnabled,
                         primaryText = item.title.asString(),
                         secondaryText = item.description.asString(),
-                        modifier = modifier.clickable { onItemClicked(item) },
+                        modifier = modifier.clickable(enabled = isEnabled) { onItemClicked(item) },
                     )
                 }
 
                 is NotificationPreferenceType.DailyReminderSettings -> {
                     SettingRow(
+                        enabled = isEnabled,
                         primaryText = item.title.asString(),
                         secondaryText = item.description.asString(),
-                        modifier = modifier.clickable { onItemClicked(item) },
+                        modifier = modifier.clickable(enabled = isEnabled) { onItemClicked(item) },
                     )
                 }
 
                 is NotificationPreferenceType.RecommendationSettings -> {
                     SettingRow(
+                        enabled = isEnabled,
                         primaryText = item.title.asString(),
                         secondaryText = item.description.asString(),
-                        modifier = modifier.clickable { onItemClicked(item) },
+                        modifier = modifier.clickable(enabled = isEnabled) { onItemClicked(item) },
                     )
                 }
 
                 is NotificationPreferenceType.NotificationSoundPreference -> {
                     SettingRow(
+                        enabled = isEnabled,
                         primaryText = item.title.asString(),
                         secondaryText = item.displayedSoundName,
-                        modifier = modifier.clickable { onItemClicked(item) },
+                        modifier = modifier.clickable(enabled = isEnabled) { onItemClicked(item) },
                     )
                 }
 
                 is NotificationPreferenceType.NotificationVibration -> {
                     val context = LocalContext.current
                     SettingRadioDialogRow(
+                        enabled = isEnabled,
                         primaryText = item.title.asString(),
                         secondaryText = item.displayValue.asString(),
                         options = item.options,
@@ -162,9 +175,10 @@ internal fun NotificationPreferenceCategory(
                 is NotificationPreferenceType.NotificationActions -> {
                     val context = LocalContext.current
                     SettingRow(
+                        enabled = isEnabled,
                         primaryText = item.title.asString(),
                         secondaryText = item.displayValue,
-                        modifier = modifier.clickable {
+                        modifier = modifier.clickable(enabled = isEnabled) {
                             val initialActions = item.value
                             val selectedActions = initialActions.toMutableList()
                             val initialSelection = selectedActions.map(NewEpisodeNotificationAction::ordinal).toIntArray()

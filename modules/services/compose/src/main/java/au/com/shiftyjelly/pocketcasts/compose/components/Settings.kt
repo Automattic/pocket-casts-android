@@ -32,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
@@ -124,15 +125,16 @@ fun SettingSectionHeader(
 @Composable
 fun <T> SettingRadioDialogRow(
     primaryText: String,
+    options: List<T>,
+    savedOption: T,
+    optionToLocalisedString: (T) -> String,
+    onSave: (T) -> Unit,
     modifier: Modifier = Modifier,
     secondaryText: String? = null,
     icon: Painter? = null,
     iconGradientColors: List<Color>? = null,
-    options: List<T>,
     indent: Boolean = true,
-    savedOption: T,
-    optionToLocalisedString: (T) -> String,
-    onSave: (T) -> Unit,
+    enabled: Boolean = true,
 ) {
     var showDialog by remember { mutableStateOf(false) }
     SettingRow(
@@ -140,7 +142,13 @@ fun <T> SettingRadioDialogRow(
         secondaryText = secondaryText,
         icon = icon,
         iconGradientColors = iconGradientColors,
-        modifier = modifier.clickable { showDialog = true },
+        modifier = modifier.clickable(enabled = enabled) { showDialog = true }.then(
+            if (!enabled) {
+                Modifier.graphicsLayer(alpha = .38f)
+            } else {
+                Modifier
+            },
+        ),
         indent = indent,
     ) {
         if (showDialog) {
@@ -169,6 +177,7 @@ fun SettingRow(
     @DrawableRes primaryTextEndDrawable: Int? = null,
     toggle: SettingRowToggle = SettingRowToggle.None,
     indent: Boolean = true,
+    enabled: Boolean = true,
     showFlashWithDelay: Duration? = null, // if null, no flash is shown
     additionalContent: @Composable () -> Unit = {},
 ) {
@@ -198,6 +207,12 @@ fun SettingRow(
                 end = horizontalPadding,
                 top = verticalPadding,
                 bottom = verticalPadding,
+            ).then(
+                if (!enabled) {
+                    Modifier.graphicsLayer(alpha = .38f)
+                } else {
+                    Modifier
+                },
             ),
     ) {
         Box(
