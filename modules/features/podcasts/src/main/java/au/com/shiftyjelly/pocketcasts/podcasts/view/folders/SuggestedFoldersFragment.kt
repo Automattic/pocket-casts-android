@@ -90,6 +90,7 @@ class SuggestedFoldersFragment : BaseDialogFragment() {
     ) = content {
         CallOnce {
             viewModel.trackPageShown()
+            viewModel.registerFeatureInteraction()
         }
 
         val state by viewModel.state.collectAsState()
