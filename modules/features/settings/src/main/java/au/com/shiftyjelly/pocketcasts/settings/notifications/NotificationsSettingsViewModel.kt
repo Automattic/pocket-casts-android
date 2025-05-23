@@ -111,6 +111,11 @@ internal class NotificationsSettingsViewModel @Inject constructor(
                         AnalyticsEvent.SETTINGS_NOTIFICATIONS_DAILY_REMINDERS_TOGGLED,
                         mapOf("enabled" to preference.isEnabled),
                     )
+                    if (preference.isEnabled) {
+                        notificationScheduler.setupOnboardingNotifications()
+                    } else {
+                        notificationScheduler.cancelScheduledOnboardingNotifications()
+                    }
                 }
 
                 is NotificationPreferenceType.DailyReminderSettings -> {

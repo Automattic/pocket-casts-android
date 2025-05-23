@@ -24,6 +24,8 @@ class NotificationSchedulerImpl @Inject constructor(
         const val DOWNLOADED_EPISODES = "downloaded_episodes"
 
         private const val TAG_TRENDING_RECOMMENDATIONS = "trending_and_recommendations"
+        private const val TAG_REENGAGEMENT = "daily_re_engagement_check"
+        private const val TAG_ONBOARDING = "onboarding_notification"
     }
 
     override fun setupOnboardingNotifications() {
@@ -45,7 +47,7 @@ class NotificationSchedulerImpl @Inject constructor(
             val notificationWork = OneTimeWorkRequest.Builder(NotificationWorker::class.java)
                 .setInputData(workData)
                 .setInitialDelay(delay, TimeUnit.MILLISECONDS)
-                .addTag("onboarding_notification_${type.subcategory}")
+                .addTag("${TAG_ONBOARDING}_${type.subcategory}")
                 .build()
 
             WorkManager.getInstance(context).enqueue(notificationWork)
@@ -67,11 +69,11 @@ class NotificationSchedulerImpl @Inject constructor(
         val notificationWork = PeriodicWorkRequest.Builder(NotificationWorker::class.java, 1, TimeUnit.DAYS)
             .setInputData(workData)
             .setInitialDelay(initialDelay, TimeUnit.MILLISECONDS)
-            .addTag("daily_re_engagement_check")
+            .addTag(TAG_REENGAGEMENT)
             .build()
 
         WorkManager.getInstance(context).enqueueUniquePeriodicWork(
-            "daily_re_engagement_check",
+            TAG_REENGAGEMENT,
             ExistingPeriodicWorkPolicy.UPDATE,
             notificationWork,
         )
@@ -96,6 +98,16 @@ class NotificationSchedulerImpl @Inject constructor(
                 ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
                 notificationWork,
             )
+        }
+    }
+
+    override fun cancelScheduledReEngagementNotifications() {
+        WorkManager.getInstance(context).cancelUniqueWork(TAG_REENGAGEMENT)
+    }
+
+    override fun cancelScheduledOnboardingNotifications() {
+        OnboardingNotificationType.values.forEach {
+            WorkManager.getInstance(context).cancelAllWorkByTag("${TAG_ONBOARDING}_${it.subcategory}")
         }
     }
 
