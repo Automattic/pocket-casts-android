@@ -8,6 +8,9 @@
         ([#4006](https://github.com/Automattic/pocket-casts-android/pull/4006))
     *   Improve error handling when purchasing subscriptions.
         ([#4024](https://github.com/Automattic/pocket-casts-android/pull/4024))
+*   Bug Fixes
+    *   Updates datastore dependency to prevent crashes
+        ([#3982](https://github.com/Automattic/pocket-casts-android/pull/3982)
 
 7.89
 -----
@@ -23,6 +26,7 @@
         ([#3947](https://github.com/Automattic/pocket-casts-android/pull/3947))
     *   Fix issue with podcast description crashing the app
         ([#3994](https://github.com/Automattic/pocket-casts-android/pull/3994))
+
 
 7.88
 -----
