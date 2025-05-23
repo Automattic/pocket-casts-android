@@ -34,7 +34,7 @@ internal class NotificationsSettingsViewModel @Inject constructor(
         State(
             areSystemNotificationsEnabled = notificationHelper.hasNotificationsPermission(),
             categories = emptyList(),
-        )
+        ),
     )
     val state: StateFlow<State> = _state
 

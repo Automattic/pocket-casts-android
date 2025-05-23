@@ -61,7 +61,7 @@ internal fun NotificationsSettingsScreen(
                         onSettingsClicked = onSystemNotificationsSettingsClicked,
                         modifier = Modifier.fillMaxWidth()
                             .padding(horizontal = 16.dp)
-                            .padding(top = 16.dp)
+                            .padding(top = 16.dp),
                     )
                 }
             }
@@ -77,7 +77,7 @@ internal fun NotificationsSettingsScreen(
                                 is NotificationPreferenceType.AdvancedSettings,
                                 is NotificationPreferenceType.DailyReminderSettings,
                                 is NotificationPreferenceType.RecommendationSettings,
-                                    -> {
+                                -> {
                                     onAdvancedSettingsClicked(preference)
                                 }
 
@@ -141,10 +141,9 @@ private fun PreviewNotificationSettingsScreen(@PreviewParameter(ThemePreviewPara
             bottomInset = 0.dp,
             onSelectRingtoneClicked = {},
             onSelectPodcastsClicked = {},
-            onSystemNotificationsSettingsClicked = {}
+            onSystemNotificationsSettingsClicked = {},
         )
     }
-
 
 @Preview
 @Composable
@@ -186,6 +185,6 @@ private fun PreviewDisabledNotificationSettingsScreen(@PreviewParameter(ThemePre
             bottomInset = 0.dp,
             onSelectRingtoneClicked = {},
             onSelectPodcastsClicked = {},
-            onSystemNotificationsSettingsClicked = {}
+            onSystemNotificationsSettingsClicked = {},
         )
     }

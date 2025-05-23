@@ -100,7 +100,7 @@ internal class NotificationsSettingsFragment : BaseFragment(), PodcastSelectFrag
                     onSelectPodcastsClicked = ::showPodcastSelector,
                     onSystemNotificationsSettingsClicked = {
                         notificationHelper.openNotificationSettings(requireActivity())
-                    }
+                    },
                 )
             }
         }

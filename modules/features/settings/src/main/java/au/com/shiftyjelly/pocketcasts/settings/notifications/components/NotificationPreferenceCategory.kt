@@ -82,7 +82,7 @@ internal fun NotificationPreferenceCategory(
                 is NotificationPreferenceType.HidePlaybackNotificationOnPause -> {
                     SettingRow(
                         primaryText = item.title.asString(),
-                        toggle = SettingRowToggle.Switch(checked = item.isEnabled,),
+                        toggle = SettingRowToggle.Switch(checked = item.isEnabled),
                         modifier = modifier.toggleable(
                             value = item.isEnabled,
                             role = Role.Switch,

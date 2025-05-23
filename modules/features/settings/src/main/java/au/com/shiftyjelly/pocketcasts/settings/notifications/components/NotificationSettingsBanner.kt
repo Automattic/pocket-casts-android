@@ -31,25 +31,25 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 internal fun NotificationSettingsBanner(
     onSettingsClicked: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier
             .background(
                 color = MaterialTheme.theme.colors.primaryUi02Active,
-                shape = RoundedCornerShape(8.dp)
+                shape = RoundedCornerShape(8.dp),
             )
             .clip(RoundedCornerShape(8.dp))
             .padding(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Icon(
             contentDescription = "Notification icon",
             painter = painterResource(IR.drawable.ic_notifications),
-            tint = MaterialTheme.theme.colors.primaryIcon03
+            tint = MaterialTheme.theme.colors.primaryIcon03,
         )
         Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             TextH40(
                 text = stringResource(LR.string.notifications_settings_turn_on_push_title),
@@ -57,12 +57,12 @@ internal fun NotificationSettingsBanner(
             )
             TextH70(
                 text = stringResource(LR.string.notifications_settings_turn_on_push_message),
-                color = MaterialTheme.theme.colors.primaryText02
+                color = MaterialTheme.theme.colors.primaryText02,
             )
             TextH60(
                 modifier = Modifier.clickable { onSettingsClicked() },
                 text = stringResource(LR.string.notifications_settings_turn_on_push_button),
-                color = MaterialTheme.theme.colors.primaryText02Selected
+                color = MaterialTheme.theme.colors.primaryText02Selected,
             )
         }
     }
@@ -70,12 +70,13 @@ internal fun NotificationSettingsBanner(
 
 @Preview
 @Composable
-private fun PreviewNotificationSettingsBanner(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
+private fun PreviewNotificationSettingsBanner(
+    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppTheme(themeType) {
         NotificationSettingsBanner(
             onSettingsClicked = {},
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
     }
 }
