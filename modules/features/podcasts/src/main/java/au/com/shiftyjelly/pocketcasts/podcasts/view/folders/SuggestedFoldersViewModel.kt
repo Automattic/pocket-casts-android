@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NewFeaturesAndTipsNotificationType
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SuggestedFoldersManager
@@ -34,6 +36,7 @@ class SuggestedFoldersViewModel @AssistedInject constructor(
     private val podcastManager: PodcastManager,
     private val userManager: UserManager,
     private val analyticsTracker: AnalyticsTracker,
+    private val notificationManager: NotificationManager,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(State.Empty)
@@ -168,6 +171,10 @@ class SuggestedFoldersViewModel @AssistedInject constructor(
                 "podcast_count" to folder.podcastIds.size,
             ),
         )
+    }
+
+    fun registerFeatureInteraction() = viewModelScope.launch {
+        notificationManager.updateUserFeatureInteraction(NewFeaturesAndTipsNotificationType.SmartFolders)
     }
 
     data class State(
