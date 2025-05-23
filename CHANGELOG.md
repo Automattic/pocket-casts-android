@@ -10,7 +10,7 @@
         ([#4024](https://github.com/Automattic/pocket-casts-android/pull/4024))
 *   Bug Fixes
     *   Updates datastore dependency to prevent crashes
-        ([#3982](https://github.com/Automattic/pocket-casts-android/pull/3982)
+        ([#4031](https://github.com/Automattic/pocket-casts-android/pull/4031)
 
 7.89
 -----
