@@ -60,7 +60,8 @@ internal fun NotificationsSettingsScreen(
                     NotificationSettingsBanner(
                         onSettingsClicked = onSystemNotificationsSettingsClicked,
                         modifier = Modifier.fillMaxWidth()
-                            .padding(16.dp)
+                            .padding(horizontal = 16.dp)
+                            .padding(top = 16.dp)
                     )
                 }
             }
