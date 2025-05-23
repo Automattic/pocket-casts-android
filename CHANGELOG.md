@@ -27,7 +27,6 @@
     *   Fix issue with podcast description crashing the app
         ([#3994](https://github.com/Automattic/pocket-casts-android/pull/3994))
 
-
 7.88
 -----
 *   New Features
