@@ -132,7 +132,7 @@ class PodcastsViewModel @AssistedInject constructor(
     private fun buildHomeFolderItems(podcasts: List<Podcast>, folders: List<FolderItem>, podcastSortType: PodcastsSortType) = when (podcastSortType) {
         PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST,
         PodcastsSortType.RECENTLY_PLAYED,
-        -> {
+            -> {
             val folderUuids = folders.mapTo(mutableSetOf()) { it.uuid }
             val items = mutableListOf<FolderItem>()
             val uuidToFolder = folders.associateByTo(mutableMapOf(), FolderItem::uuid)
@@ -172,7 +172,7 @@ class PodcastsViewModel @AssistedInject constructor(
         return when (podcastSortType) {
             PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST,
             PodcastsSortType.RECENTLY_PLAYED,
-            -> items
+                -> items
 
             else -> items.sortedWith(podcastSortType.folderComparator)
         }
@@ -187,11 +187,11 @@ class PodcastsViewModel @AssistedInject constructor(
             }
         }
 
-    // We only want the current badge type when loading for this observable or else it will rebind the adapter every time the badge changes. We use take(1) for this.
-    val layoutChangedLiveData = settings.podcastGridLayout.flow
+    // We only want the current badge type when loading for this flow or else it will rebind the adapter every time the badge changes. We use take(1) for this.
+    val layoutChangedFlow = settings.podcastGridLayout.flow
         .combine(settings.podcastBadgeType.flow.take(1), ::Pair)
 
-    val refreshObservable = settings.refreshStateFlow
+    val refreshStateFlow = settings.refreshStateFlow
 
     private var adapterState: MutableList<FolderItem> = mutableListOf()
 
@@ -301,11 +301,11 @@ class PodcastsViewModel @AssistedInject constructor(
 
         old.zip(new).all { (oldPodcast, newPodcast) ->
             oldPodcast.uuid == newPodcast.uuid &&
-                oldPodcast.title == newPodcast.title &&
-                oldPodcast.author == newPodcast.author &&
-                oldPodcast.addedDate == newPodcast.addedDate &&
-                oldPodcast.podcastCategory == newPodcast.podcastCategory &&
-                oldPodcast.folderUuid == newPodcast.folderUuid
+                    oldPodcast.title == newPodcast.title &&
+                    oldPodcast.author == newPodcast.author &&
+                    oldPodcast.addedDate == newPodcast.addedDate &&
+                    oldPodcast.podcastCategory == newPodcast.podcastCategory &&
+                    oldPodcast.folderUuid == newPodcast.folderUuid
         }
     }
 

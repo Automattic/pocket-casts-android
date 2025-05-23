@@ -259,7 +259,7 @@ class PodcastsFragment :
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.layoutChangedLiveData.collect {
+                viewModel.layoutChangedFlow.collect {
                     setupGridView()
                 }
             }
@@ -277,7 +277,7 @@ class PodcastsFragment :
         this.viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 // Once the refresh is complete stop the swipe to refresh animation
-                viewModel.refreshObservable.collect { refreshState ->
+                viewModel.refreshStateFlow.collect { refreshState ->
                     // Once the refresh is complete stop the swipe to refresh animation
                     if (refreshState !is RefreshState.Refreshing) {
                         realBinding?.swipeRefreshLayout?.isRefreshing = false
