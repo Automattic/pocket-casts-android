@@ -6,6 +6,7 @@ import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
 import au.com.shiftyjelly.pocketcasts.payment.PaymentResultCode
 import au.com.shiftyjelly.pocketcasts.payment.PurchaseResult
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 
 internal class AnalyticsPaymentListener(
     private val tracker: AnalyticsTracker,
@@ -15,6 +16,7 @@ internal class AnalyticsPaymentListener(
             "tier" to key.tier.analyticsValue,
             "frequency" to key.billingCycle.analyticsValue,
             "offer_type" to (key.offer?.analyticsValue ?: "none"),
+            "product" to key.productLegacyAnalyticsValue(),
             "source" to purchaseSource,
         )
         val (event, properties) = when (result) {
@@ -40,5 +42,10 @@ internal class AnalyticsPaymentListener(
         if (this@analyticProperties is PaymentResultCode.Unknown) {
             put("error_code", code)
         }
+    }
+
+    private fun SubscriptionPlan.Key.productLegacyAnalyticsValue() = when (tier) {
+        SubscriptionTier.Plus -> billingCycle.analyticsValue
+        SubscriptionTier.Patron -> productId
     }
 }
