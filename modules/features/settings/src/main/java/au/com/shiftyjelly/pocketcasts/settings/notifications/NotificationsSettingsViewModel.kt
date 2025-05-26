@@ -170,9 +170,9 @@ internal class NotificationsSettingsViewModel @Inject constructor(
                         mapOf("enabled" to preference.isEnabled),
                     )
                     if (preference.isEnabled) {
-                        // TODO implement
+                        notificationScheduler.setupOffersNotifications()
                     } else {
-                        // TODO implement
+                        notificationScheduler.cancelScheduledOffersNotifications()
                     }
                 }
 

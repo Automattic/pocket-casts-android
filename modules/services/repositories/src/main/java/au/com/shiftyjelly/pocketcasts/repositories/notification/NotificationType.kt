@@ -44,7 +44,7 @@ sealed interface NotificationType {
 
     companion object {
         fun fromSubCategory(subCategory: String): NotificationType? {
-            val allSupportedNotifications = OnboardingNotificationType.values + ReEngagementNotificationType.values + TrendingAndRecommendationsNotificationType.values + NewFeaturesAndTipsNotificationType.values
+            val allSupportedNotifications = OnboardingNotificationType.values + ReEngagementNotificationType.values + TrendingAndRecommendationsNotificationType.values + NewFeaturesAndTipsNotificationType.values + OffersNotificationType.values
             return allSupportedNotifications.find { it.subcategory == subCategory }
         }
     }
@@ -264,6 +264,34 @@ sealed class NewFeaturesAndTipsNotificationType(
 
         val values: List<NotificationType> get() = listOf(
             SmartFolders,
+        )
+    }
+}
+
+sealed class OffersNotificationType(
+    override val notificationId: Int,
+    override val subcategory: String,
+    @StringRes override val titleRes: Int,
+    @StringRes override val messageRes: Int? = null,
+    @PluralsRes override val messagePluralRes: Int? = null,
+) : NotificationType {
+
+    override fun isSettingsToggleOn(settings: Settings) = settings.offersNotification.value
+
+    data object UpgradeNow : OffersNotificationType(
+        notificationId = NotificationId.OFFERS.value,
+        subcategory = UPGRADE_NOW,
+        titleRes = LR.string.notification_offers_upgrade_title,
+        messageRes = LR.string.notification_offers_upgrade_message,
+    ) {
+        override fun toIntent(context: Context) = UpsellDeepLink.toIntent(context)
+    }
+
+    companion object {
+        const val UPGRADE_NOW = "upgrade_now"
+
+        val values: List<NotificationType> get() = listOf(
+            UpgradeNow,
         )
     }
 }

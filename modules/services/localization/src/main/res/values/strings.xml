@@ -2437,4 +2437,7 @@
     <string name="notification_new_features_smart_folders_title">Your podcasts organized</string>
     <string name="notification_new_features_smart_folders_message">Try Plus and automatically organize your shows with folders</string>
 
+    <string name="notification_offers_upgrade_title">Level up your podcast game</string>
+    <string name="notification_offers_upgrade_message">Unblock exclusive features like folders, bookmarks, and more with Plus!</string>
+
 </resources>
