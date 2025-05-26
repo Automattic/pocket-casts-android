@@ -6,6 +6,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationScheduler
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.settings.notifications.data.NotificationsPreferenceRepository
@@ -25,10 +26,16 @@ internal class NotificationsSettingsViewModel @Inject constructor(
     private val preferenceRepository: NotificationsPreferenceRepository,
     private val analyticsTracker: AnalyticsTracker,
     private val podcastManager: PodcastManager,
+    private val notificationHelper: NotificationHelper,
     private val notificationScheduler: NotificationScheduler,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(State(emptyList()))
+    private val _state = MutableStateFlow(
+        State(
+            areSystemNotificationsEnabled = notificationHelper.hasNotificationsPermission(),
+            categories = emptyList(),
+        ),
+    )
     val state: StateFlow<State> = _state
 
     init {
@@ -134,6 +141,7 @@ internal class NotificationsSettingsViewModel @Inject constructor(
                         notificationScheduler.cancelScheduledTrendingAndRecommendationsNotifications()
                     }
                 }
+
                 is NotificationPreferenceType.RecommendationSettings -> {
                     analyticsTracker.track(AnalyticsEvent.SETTINGS_TRENDING_AND_RECOMMENDATIONS_ADVANCED_SETTINGS_TAPPED)
                 }
@@ -146,6 +154,12 @@ internal class NotificationsSettingsViewModel @Inject constructor(
 
     internal fun onShown() {
         analyticsTracker.track(AnalyticsEvent.SETTINGS_NOTIFICATIONS_SHOWN)
+    }
+
+    internal fun checkNotificationPermission() {
+        _state.update {
+            it.copy(areSystemNotificationsEnabled = notificationHelper.hasNotificationsPermission())
+        }
     }
 
     internal fun onSelectedPodcastsChanged(newSelection: List<String>) {
@@ -163,6 +177,7 @@ internal class NotificationsSettingsViewModel @Inject constructor(
     }
 
     internal data class State(
+        val areSystemNotificationsEnabled: Boolean,
         val categories: List<NotificationPreferenceCategory>,
     )
 }

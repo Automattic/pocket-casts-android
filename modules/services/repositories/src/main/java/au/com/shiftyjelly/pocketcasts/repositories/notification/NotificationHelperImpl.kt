@@ -1,13 +1,16 @@
 package au.com.shiftyjelly.pocketcasts.repositories.notification
 
+import android.Manifest
 import android.app.Activity
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.sync.NotificationBroadcastReceiver.Companion.INTENT_EXTRA_NOTIFICATION_TAG
@@ -19,6 +22,17 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 class NotificationHelperImpl @Inject constructor(@ApplicationContext private val context: Context) : NotificationHelper {
 
     private val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
+
+    override fun hasNotificationsPermission() = Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+        ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
+
+    override fun openNotificationSettings(activity: Activity?) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O || activity == null) return
+
+        val intent = Intent(OsSettings.ACTION_APP_NOTIFICATION_SETTINGS)
+        intent.putExtra(OsSettings.EXTRA_APP_PACKAGE, activity.packageName)
+        activity.startActivity(intent)
+    }
 
     override fun isShowing(notificationId: Int): Boolean {
         return notificationManager?.activeNotifications?.firstOrNull { it.id == notificationId } != null

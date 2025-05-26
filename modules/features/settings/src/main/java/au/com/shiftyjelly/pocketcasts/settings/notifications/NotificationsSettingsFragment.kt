@@ -98,12 +98,20 @@ internal class NotificationsSettingsFragment : BaseFragment(), PodcastSelectFrag
                     },
                     onSelectRingtoneClicked = ::showRingtoneSelector,
                     onSelectPodcastsClicked = ::showPodcastSelector,
+                    onSystemNotificationsSettingsClicked = {
+                        notificationHelper.openNotificationSettings(requireActivity())
+                    },
                 )
             }
         }
         binding.root.addView(composeView, 0)
 
         return binding.root
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.checkNotificationPermission()
     }
 
     override fun podcastSelectFragmentSelectionChanged(newSelection: List<String>) {
