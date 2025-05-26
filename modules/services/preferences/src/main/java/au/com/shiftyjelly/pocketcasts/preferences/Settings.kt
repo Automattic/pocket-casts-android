@@ -348,6 +348,7 @@ interface Settings {
     val dailyRemindersNotification: UserSetting<Boolean>
     val recommendationsNotification: UserSetting<Boolean>
     val newFeaturesNotification: UserSetting<Boolean>
+    val offersNotification: UserSetting<Boolean>
 
     val streamingMode: UserSetting<Boolean>
     val keepScreenAwake: UserSetting<Boolean>

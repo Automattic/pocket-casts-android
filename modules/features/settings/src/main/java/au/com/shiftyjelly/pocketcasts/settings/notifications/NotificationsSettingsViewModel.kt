@@ -163,6 +163,23 @@ internal class NotificationsSettingsViewModel @Inject constructor(
                     analyticsTracker.track(AnalyticsEvent.SETTINGS_NOTIFICATIONS_NEW_FEATURES_AND_TIPS_ADVANCED_SETTINGS_TAPPED)
                 }
 
+                is NotificationPreferenceType.EnableOffers -> {
+                    preferenceRepository.setPreference(preference)
+                    analyticsTracker.track(
+                        AnalyticsEvent.SETTINGS_NOTIFICATIONS_OFFERS_TOGGLED,
+                        mapOf("enabled" to preference.isEnabled),
+                    )
+                    if (preference.isEnabled) {
+                        // TODO implement
+                    } else {
+                        // TODO implement
+                    }
+                }
+
+                is NotificationPreferenceType.OffersSettings -> {
+                    analyticsTracker.track(AnalyticsEvent.SETTINGS_NOTIFICATIONS_OFFERS_ADVANCED_SETTINGS_TAPPED)
+                }
+
                 is NotificationPreferenceType.NotifyOnThesePodcasts -> Unit
             }
             loadPreferences()

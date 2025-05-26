@@ -582,6 +582,12 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
+    override val offersNotification = UserSetting.BoolPref(
+        sharedPrefKey = "offersNotification",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
+
     override val streamingMode: UserSetting<Boolean> = UserSetting.BoolPref(
         sharedPrefKey = Settings.PREFERENCE_GLOBAL_STREAMING_MODE,
         defaultValue = true,
@@ -968,7 +974,7 @@ class SettingsImpl @Inject constructor(
             AppPlatform.Automotive -> true
             AppPlatform.Phone,
             AppPlatform.WearOs,
-            -> false
+                -> false
         },
         sharedPrefs = sharedPreferences,
     )
@@ -1158,19 +1164,19 @@ class SettingsImpl @Inject constructor(
     override val deleteLocalFileAfterPlaying = UserSetting.BoolPref(
         sharedPrefKey = "deleteLocalFileAfterPlaying",
         defaultValue =
-        // Use value stored under previous key if it exists
-        getBoolean("cloudDeleteAfterPlaying", false),
+            // Use value stored under previous key if it exists
+            getBoolean("cloudDeleteAfterPlaying", false),
         sharedPrefs = sharedPreferences,
     )
 
     override val deleteCloudFileAfterPlaying = UserSetting.BoolPref(
         sharedPrefKey = "deleteCloudFileAfterPlaying",
         defaultValue =
-        // Use value stored under previous key if it exists
-        sharedPreferences.getBoolean("cloudDeleteCloudAfterPlaying", false),
+            // Use value stored under previous key if it exists
+            sharedPreferences.getBoolean("cloudDeleteCloudAfterPlaying", false),
         sharedPrefs = sharedPreferences,
 
-    )
+        )
 
     override val cloudAutoUpload = UserSetting.BoolPref(
         sharedPrefKey = "cloudAutoUpload",
@@ -1475,6 +1481,7 @@ class SettingsImpl @Inject constructor(
         dates.add(Date().toString())
         sharedPreferences.edit().putStringSet(Settings.APP_REVIEW_REQUESTED_DATES, dates.toSet()).apply()
     }
+
     override fun getReviewRequestedDates(): List<String> {
         return sharedPreferences.getStringSet(Settings.APP_REVIEW_REQUESTED_DATES, emptySet())?.toList() ?: emptyList()
     }

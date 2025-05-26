@@ -1388,6 +1388,7 @@
     <string name="settings_notification_daily_reminders">Daily Reminders</string>
     <string name="settings_notification_recommendations">Trending &amp; Recommendations</string>
     <string name="settings_notification_new_features">New Features &amp; Tips</string>
+    <string name="settings_notification_offers">Pocket Casts Offers</string>
     <string name="settings_notification_play_over">Play over notifications</string>
     <string name="settings_notification_play_over_never">Never</string>
     <string name="settings_notification_play_over_duck">Duck volume</string>
