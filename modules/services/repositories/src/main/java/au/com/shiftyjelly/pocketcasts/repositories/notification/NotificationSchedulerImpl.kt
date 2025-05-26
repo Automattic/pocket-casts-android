@@ -106,7 +106,7 @@ class NotificationSchedulerImpl @Inject constructor(
     override suspend fun setupNewFeaturesAndTipsNotifications() {
         // this should be later updated to fire the desired feature for the given release
         val workData = workDataOf(
-            SUBCATEGORY to NewFeaturesAndTipsNotificationType.SmartFolders.subcategory
+            SUBCATEGORY to NewFeaturesAndTipsNotificationType.SmartFolders.subcategory,
         )
         val notificationWork = OneTimeWorkRequest.Builder(NotificationWorker::class.java)
             .setInputData(workData)
@@ -117,7 +117,7 @@ class NotificationSchedulerImpl @Inject constructor(
         WorkManager.getInstance(context).enqueueUniqueWork(
             TAG_FEATURES,
             ExistingWorkPolicy.KEEP,
-            notificationWork
+            notificationWork,
         )
     }
 

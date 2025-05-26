@@ -428,7 +428,6 @@ private class FeaturesAdapter : DeepLinkAdapter {
                 "suggestedFolders" -> SmartFoldersDeepLink
                 else -> null
             }
-
         } else {
             null
         }
@@ -481,7 +480,7 @@ private class ShareLinkNativeAdapter : DeepLinkAdapter {
             "redeem",
             "settings",
             "discover",
-            "features"
+            "features",
         )
     }
 }
@@ -608,7 +607,7 @@ private class OpmlAdapter(
             "discover",
             "open",
             "signup",
-            "features"
+            "features",
         )
     }
 }

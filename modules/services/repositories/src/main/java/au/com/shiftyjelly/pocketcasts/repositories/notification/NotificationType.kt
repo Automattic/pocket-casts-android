@@ -263,7 +263,7 @@ sealed class NewFeaturesAndTipsNotificationType(
         const val SUBCATEGORY_SMART_FOLDERS = "smart_folders"
 
         val values: List<NotificationType> get() = listOf(
-            SmartFolders
+            SmartFolders,
         )
     }
 }

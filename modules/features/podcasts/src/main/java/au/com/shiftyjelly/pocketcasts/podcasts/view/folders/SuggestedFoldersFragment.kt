@@ -234,8 +234,8 @@ class SuggestedFoldersFragment : BaseDialogFragment() {
             analyticsValue = "podcasts_list",
         ),
         DEEPLINK(
-            analyticsValue = "deeplink"
-        )
+            analyticsValue = "deeplink",
+        ),
     }
 
     @Parcelize

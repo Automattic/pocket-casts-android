@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.settings.notifications
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues

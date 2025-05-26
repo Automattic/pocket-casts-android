@@ -311,7 +311,7 @@ data object ThemesDeepLink : IntentableDeepLink {
 
 data object SmartFoldersDeepLink : IntentableDeepLink {
     override fun toIntent(context: Context) = Intent(ACTION_VIEW)
-    .setData(Uri.parse("pktc://features/suggestedFolders"))
+        .setData(Uri.parse("pktc://features/suggestedFolders"))
 }
 
 private val Context.launcherIntent get() = requireNotNull(packageManager.getLaunchIntentForPackage(packageName)) {

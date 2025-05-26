@@ -576,7 +576,7 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override val newFeaturesNotification  = UserSetting.BoolPref(
+    override val newFeaturesNotification = UserSetting.BoolPref(
         sharedPrefKey = "newFeaturesAndTipsNotification",
         defaultValue = false,
         sharedPrefs = sharedPreferences,
