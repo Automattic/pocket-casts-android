@@ -40,9 +40,16 @@ fun SubscriptionStatusResponse.toSubscription(): Subscription? {
     }
 
     val subscriptionResponse = subscriptions?.getOrNull(index) ?: fallbackSubscription
+    // Some older accounts use an empty string for the subscription tier inside their subscriptions.
+    // In these cases, the correct tier is only available at the top-level subscription status object.
+    //
+    // Therefore, we need to explicitly fall back to the top level object.
+    val tier = subscriptionResponse.tier
+        ?.takeUnless(String::isNullOrBlank)
+        ?: fallbackSubscription.tier
 
     return Subscription(
-        tier = when (subscriptionResponse.tier?.lowercase()) {
+        tier = when (tier?.lowercase()) {
             "plus" -> SubscriptionTier.Plus
             "patron" -> SubscriptionTier.Patron
             else -> return null
