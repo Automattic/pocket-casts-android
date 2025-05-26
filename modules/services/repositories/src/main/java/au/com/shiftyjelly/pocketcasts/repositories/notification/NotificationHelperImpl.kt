@@ -223,7 +223,7 @@ class NotificationHelperImpl @Inject constructor(@ApplicationContext private val
     }
 
     override fun openOffersNotificationSettings(activity: Activity?) {
-        openNotificationChannelSettings(activity,Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_OFFERS.id)
+        openNotificationChannelSettings(activity, Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_OFFERS.id)
     }
 
     override fun removeNotification(intentExtras: Bundle?, notificationId: Int) {

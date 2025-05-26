@@ -974,7 +974,7 @@ class SettingsImpl @Inject constructor(
             AppPlatform.Automotive -> true
             AppPlatform.Phone,
             AppPlatform.WearOs,
-                -> false
+            -> false
         },
         sharedPrefs = sharedPreferences,
     )
@@ -1164,19 +1164,19 @@ class SettingsImpl @Inject constructor(
     override val deleteLocalFileAfterPlaying = UserSetting.BoolPref(
         sharedPrefKey = "deleteLocalFileAfterPlaying",
         defaultValue =
-            // Use value stored under previous key if it exists
-            getBoolean("cloudDeleteAfterPlaying", false),
+        // Use value stored under previous key if it exists
+        getBoolean("cloudDeleteAfterPlaying", false),
         sharedPrefs = sharedPreferences,
     )
 
     override val deleteCloudFileAfterPlaying = UserSetting.BoolPref(
         sharedPrefKey = "deleteCloudFileAfterPlaying",
         defaultValue =
-            // Use value stored under previous key if it exists
-            sharedPreferences.getBoolean("cloudDeleteCloudAfterPlaying", false),
+        // Use value stored under previous key if it exists
+        sharedPreferences.getBoolean("cloudDeleteCloudAfterPlaying", false),
         sharedPrefs = sharedPreferences,
 
-        )
+    )
 
     override val cloudAutoUpload = UserSetting.BoolPref(
         sharedPrefKey = "cloudAutoUpload",

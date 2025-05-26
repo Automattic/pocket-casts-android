@@ -172,7 +172,7 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
                                 )
                             }
                         },
-                    )
+                    ),
                 )
             }
             add(

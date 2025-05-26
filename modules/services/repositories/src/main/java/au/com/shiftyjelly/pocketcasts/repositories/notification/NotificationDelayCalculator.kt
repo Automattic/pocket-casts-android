@@ -69,7 +69,7 @@ class NotificationDelayCalculator @Inject constructor(
 
     fun calculateDelayForNewFeatures() = calculateBase4PM(clock.instant().toEpochMilli())
 
-    fun calculateDelayForOffers() = calculateBase4PM(clock.instant().toEpochMilli())
+    fun calculateDelayForOffers() = TimeUnit.SECONDS.toMillis(10L)
 
     private fun calculateBase4PM(currentTimeMillis: Long, dayOffset: Int = 1): Long {
         val calendar = Calendar.getInstance().apply {
