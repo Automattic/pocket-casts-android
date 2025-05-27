@@ -48,6 +48,8 @@ class NotificationsPreferencesRepositoryImplTest {
         whenever(settings.hideNotificationOnPause).thenReturn(UserSetting.Mock(false, mock()))
         whenever(settings.dailyRemindersNotification).thenReturn(UserSetting.Mock(false, mock()))
         whenever(settings.recommendationsNotification).thenReturn(UserSetting.Mock(false, mock()))
+        whenever(settings.newFeaturesNotification).thenReturn(UserSetting.Mock(false, mock()))
+        whenever(settings.offersNotification).thenReturn(UserSetting.Mock(false, mock()))
     }
 
     @Test
