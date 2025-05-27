@@ -44,7 +44,13 @@ sealed interface NotificationType {
 
     companion object {
         fun fromSubCategory(subCategory: String): NotificationType? {
-            val allSupportedNotifications = OnboardingNotificationType.values + ReEngagementNotificationType.values + TrendingAndRecommendationsNotificationType.values + NewFeaturesAndTipsNotificationType.values + OffersNotificationType.values
+            val allSupportedNotifications = buildList {
+                addAll(OnboardingNotificationType.values)
+                addAll(ReEngagementNotificationType.values)
+                addAll(TrendingAndRecommendationsNotificationType.values)
+                addAll(NewFeaturesAndTipsNotificationType.values)
+                addAll(OffersNotificationType.values)
+            }
             return allSupportedNotifications.find { it.subcategory == subCategory }
         }
     }

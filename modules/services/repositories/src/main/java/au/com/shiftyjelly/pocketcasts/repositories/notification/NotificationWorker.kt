@@ -20,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.rx2.await
 import java.time.Instant
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
@@ -55,9 +56,9 @@ class NotificationWorker @AssistedInject constructor(
         return Result.success()
     }
 
-    private fun shouldSchedule(type: NotificationType): Boolean {
+    private suspend fun shouldSchedule(type: NotificationType): Boolean {
         return when (type) {
-            is NewFeaturesAndTipsNotificationType.SmartFolders -> podcastManager.getSubscribedPodcastUuidsRxSingle().blockingGet().isNotEmpty()
+            is NewFeaturesAndTipsNotificationType.SmartFolders -> podcastManager.getSubscribedPodcastUuidsRxSingle().await().isNotEmpty()
             is OffersNotificationType.UpgradeNow -> {
                 val subscription = settings.cachedSubscription.value
                 subscription == null || subscription.expiryDate.isBefore(Instant.now())
