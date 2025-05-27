@@ -36,7 +36,7 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -250,7 +250,7 @@ private fun ScrollableTranscriptView(
                     add(CustomMenuItemOption.Share)
                 }
             },
-            clipboardManager = LocalClipboardManager.current,
+            clipboard = LocalClipboard.current,
         ),
     ) {
         SelectionContainer {

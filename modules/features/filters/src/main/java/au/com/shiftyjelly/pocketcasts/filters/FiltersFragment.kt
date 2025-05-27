@@ -25,7 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.invisibleToUser
+import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -283,7 +283,7 @@ class FiltersFragment :
                                 indication = null,
                                 onClick = ::closeTooltip,
                             )
-                            .semantics { invisibleToUser() },
+                            .semantics { hideFromAccessibility() },
                     ) {
                         Box(
                             modifier = Modifier
