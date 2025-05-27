@@ -134,7 +134,7 @@ fun EmailField(
 ) {
     val formModifier = modifier.focusRequester(focusRequester)
         .semantics {
-            contentType = if (isCreatingAccount) ContentType.NewUsername else ContentType.Username
+            contentType = (if (isCreatingAccount) ContentType.NewUsername else ContentType.Username) + ContentType.EmailAddress
         }
 
     FormField(
