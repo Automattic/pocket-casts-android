@@ -56,7 +56,7 @@ class PodcastsViewModel @AssistedInject constructor(
     private val userManager: UserManager,
     @Assisted private val folderUuid: String?,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(UiState())
+    private val _uiState = MutableStateFlow(UiState(isLoadingItems = true))
     val uiState = _uiState.asStateFlow()
 
     val areSuggestedFoldersAvailable = suggestedFoldersManager.observeSuggestedFolders()
@@ -322,6 +322,7 @@ class PodcastsViewModel @AssistedInject constructor(
     }
 
     data class UiState(
+        val isLoadingItems: Boolean = false,
         val items: List<FolderItem> = emptyList(),
         val folder: Folder? = null,
         val isSignedInAsPlusOrPatron: Boolean = false,
