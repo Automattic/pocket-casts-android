@@ -20,7 +20,7 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.flow.lastOrNull
+import kotlinx.coroutines.flow.firstOrNull
 import java.time.Instant
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
@@ -59,7 +59,9 @@ class NotificationWorker @AssistedInject constructor(
     private suspend fun shouldSchedule(type: NotificationType): Boolean {
         return when (type) {
             is NewFeaturesAndTipsNotificationType.SmartFolders -> {
-                !suggestedFoldersManager.observeSuggestedFolders().lastOrNull().isNullOrEmpty()
+                suggestedFoldersManager.refreshSuggestedFolders()
+                val folders = suggestedFoldersManager.observeSuggestedFolders().firstOrNull()
+                !folders.isNullOrEmpty()
             }
             is OffersNotificationType.UpgradeNow -> {
                 val subscription = settings.cachedSubscription.value

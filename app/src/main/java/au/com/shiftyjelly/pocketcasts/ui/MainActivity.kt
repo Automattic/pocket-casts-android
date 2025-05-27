@@ -1392,10 +1392,10 @@ class MainActivity :
                     openOnboardingFlow(OnboardingFlow.Upsell(OnboardingUpgradeSource.DEEP_LINK))
                 }
                 is SmartFoldersDeepLink -> {
-                    openTab(VR.id.navigation_podcasts)
-                    if (supportFragmentManager.findFragmentByTag("smart_folders") == null) {
-                        SuggestedFoldersFragment.newInstance(SuggestedFoldersFragment.Source.DEEPLINK).show(supportFragmentManager, "smart_folders")
+                    if (supportFragmentManager.findFragmentByTag("suggested_folders") == null) {
+                        SuggestedFoldersFragment.newInstance(SuggestedFoldersFragment.Source.DEEPLINK).showNow(supportFragmentManager, "suggested_folders")
                     }
+                    openTab(VR.id.navigation_podcasts)
                 }
                 is UpgradeAccountDeepLink -> {
                     showAccountUpgradeNowDialog(shouldClose = true)
