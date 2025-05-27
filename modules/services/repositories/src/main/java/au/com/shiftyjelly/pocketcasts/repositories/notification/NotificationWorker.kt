@@ -15,12 +15,12 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.R
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationSchedulerImpl.Companion.DOWNLOADED_EPISODES
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationSchedulerImpl.Companion.SUBCATEGORY
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.SuggestedFoldersManager
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.rx2.await
+import kotlinx.coroutines.flow.lastOrNull
 import java.time.Instant
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
@@ -31,7 +31,7 @@ class NotificationWorker @AssistedInject constructor(
     private val settings: Settings,
     private val notificationHelper: NotificationHelper,
     private val notificationManager: NotificationManager,
-    private val podcastManager: PodcastManager,
+    private val suggestedFoldersManager: SuggestedFoldersManager,
 ) : CoroutineWorker(context, params) {
     override suspend fun doWork(): Result {
         val subcategory = inputData.getString(SUBCATEGORY) ?: return Result.failure()
@@ -42,7 +42,7 @@ class NotificationWorker @AssistedInject constructor(
             return Result.failure()
         }
 
-        if (notificationManager.hasUserInteractedWithFeature(type) && shouldSchedule(type)) {
+        if (notificationManager.hasUserInteractedWithFeature(type) || !shouldSchedule(type)) {
             return Result.failure()
         }
 
@@ -58,7 +58,9 @@ class NotificationWorker @AssistedInject constructor(
 
     private suspend fun shouldSchedule(type: NotificationType): Boolean {
         return when (type) {
-            is NewFeaturesAndTipsNotificationType.SmartFolders -> podcastManager.getSubscribedPodcastUuidsRxSingle().await().isNotEmpty()
+            is NewFeaturesAndTipsNotificationType.SmartFolders -> {
+                !suggestedFoldersManager.observeSuggestedFolders().lastOrNull().isNullOrEmpty()
+            }
             is OffersNotificationType.UpgradeNow -> {
                 val subscription = settings.cachedSubscription.value
                 subscription == null || subscription.expiryDate.isBefore(Instant.now())
