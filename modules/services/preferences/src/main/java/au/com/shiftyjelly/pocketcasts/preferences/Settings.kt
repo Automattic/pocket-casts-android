@@ -152,6 +152,7 @@ interface Settings {
         RE_ENGAGEMENT(21483660),
         CONTENT_RECOMMENDATIONS(21483661),
         FEATURES_AND_TIPS(21483662),
+        OFFERS(21483663),
     }
 
     enum class UpNextAction(val serverId: Int) {
@@ -348,6 +349,7 @@ interface Settings {
     val dailyRemindersNotification: UserSetting<Boolean>
     val recommendationsNotification: UserSetting<Boolean>
     val newFeaturesNotification: UserSetting<Boolean>
+    val offersNotification: UserSetting<Boolean>
 
     val streamingMode: UserSetting<Boolean>
     val keepScreenAwake: UserSetting<Boolean>

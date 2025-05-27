@@ -152,6 +152,28 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
                         },
                     ),
                 )
+
+                add(
+                    NotificationPreferenceCategory(
+                        title = TextResource.fromStringId(LR.string.settings_notification_offers),
+                        preferences = buildList {
+                            add(
+                                NotificationPreferenceType.EnableOffers(
+                                    title = TextResource.fromStringId(LR.string.settings_notification_notify_me),
+                                    isEnabled = settings.offersNotification.value,
+                                ),
+                            )
+                            if (settings.offersNotification.value && notificationFeaturesProvider.hasNotificationChannels) {
+                                add(
+                                    NotificationPreferenceType.OffersSettings(
+                                        title = TextResource.fromStringId(LR.string.settings_notification_advanced),
+                                        description = TextResource.fromStringId(LR.string.settings_notification_advanced_summary),
+                                    ),
+                                )
+                            }
+                        },
+                    ),
+                )
             }
             add(
                 NotificationPreferenceCategory(
@@ -260,6 +282,11 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
                 settings.newFeaturesNotification.set(value = preference.isEnabled, updateModifiedAt = true)
             }
 
+            is NotificationPreferenceType.EnableOffers -> {
+                settings.offersNotification.set(value = preference.isEnabled, updateModifiedAt = true)
+            }
+
+            is NotificationPreferenceType.OffersSettings,
             is NotificationPreferenceType.NewFeaturesAndTipsSettings,
             is NotificationPreferenceType.RecommendationSettings,
             is NotificationPreferenceType.DailyReminderSettings,
