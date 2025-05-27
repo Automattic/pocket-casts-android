@@ -1,6 +1,8 @@
 7.91
 -----
-
+*   Updates
+    *   Upgrade to the latest version of Jetpack Compose
+        ([#4049](https://github.com/Automattic/pocket-casts-android/pull/4049))
 
 7.90
 -----

@@ -1,6 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.repositories.support.Support
@@ -44,5 +47,10 @@ class LogsViewModel @Inject constructor(
             )
             context.startActivity(intent)
         }
+    }
+
+    fun copyToClipboard(context: Context, logs: String?) {
+        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        clipboard.setPrimaryClip(ClipData.newPlainText("Logs", logs.orEmpty()))
     }
 }
