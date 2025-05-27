@@ -1,9 +1,12 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.notifications
 
+import android.Manifest
 import android.content.DialogInterface
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -19,15 +22,20 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.unit.dp
-import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 internal class EnableNotificationsPromptFragment : BaseDialogFragment() {
+
+    @Inject
+    lateinit var analyticsTracker: AnalyticsTracker
 
     companion object {
         fun newInstance(): EnableNotificationsPromptFragment {
@@ -35,7 +43,17 @@ internal class EnableNotificationsPromptFragment : BaseDialogFragment() {
         }
     }
 
-    private val viewModel by viewModels<EnableNotificationsPromptViewModel>()
+    private val permissionRequester = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        if (granted) {
+            analyticsTracker.track(AnalyticsEvent.NOTIFICATIONS_OPT_IN_ALLOWED)
+        } else {
+            analyticsTracker.track(AnalyticsEvent.NOTIFICATIONS_OPT_IN_DENIED)
+        }
+
+        dismiss()
+    }
+
+    private var wasDismissedViaCloseButton = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,13 +66,18 @@ internal class EnableNotificationsPromptFragment : BaseDialogFragment() {
         savedInstanceState: Bundle?,
     ) = content {
         CallOnce {
-            viewModel.reportShown()
+            analyticsTracker.track(AnalyticsEvent.NOTIFICATIONS_PERMISSIONS_SHOWN)
         }
 
         Box(
             modifier = Modifier
                 .fillMaxHeight(0.93f)
-                .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)),
+                .clip(
+                    RoundedCornerShape(
+                        topStart = 16.dp,
+                        topEnd = 16.dp,
+                    )
+                ),
         ) {
             AppThemeWithBackground(theme.activeTheme) {
                 Box(
@@ -70,9 +93,16 @@ internal class EnableNotificationsPromptFragment : BaseDialogFragment() {
                             horizontal = 16.dp,
                         ),
                         onCtaClicked = {
-                            viewModel.reportCtaTapped()
+                            analyticsTracker.track(AnalyticsEvent.NOTIFICATIONS_PERMISSIONS_ALLOW_TAPPED)
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                permissionRequester.launch(Manifest.permission.POST_NOTIFICATIONS)
+                                analyticsTracker.track(AnalyticsEvent.NOTIFICATIONS_OPT_IN_SHOWN)
+                            }
                         },
-                        onDismissClicked = ::dismiss
+                        onDismissClicked = {
+                            wasDismissedViaCloseButton = true
+                            dismiss()
+                        }
                     )
                 }
             }
@@ -81,6 +111,8 @@ internal class EnableNotificationsPromptFragment : BaseDialogFragment() {
 
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
-        viewModel.reportDismissed()
+        if (wasDismissedViaCloseButton) {
+            analyticsTracker.track(AnalyticsEvent.NOTIFICATIONS_PERMISSIONS_DISMISSED)
+        }
     }
 }
