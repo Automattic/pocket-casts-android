@@ -53,6 +53,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import java.util.UUID
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.min
@@ -744,21 +745,18 @@ class PodcastViewModel
     sealed interface SnackBarMessage {
         val message: TextResource
         val cta: TextResource?
-        var consumed: Boolean
 
         data class ShowNotificationsDisabledMessage(
             override val message: TextResource,
             override val cta: TextResource,
-        ) : SnackBarMessage {
-            override var consumed: Boolean = false
-        }
+            private val uniqueUuid: UUID = UUID.randomUUID(),
+        ) : SnackBarMessage
 
         data class ShowNotifyOnNewEpisodesMessage(
             override val message: TextResource,
             override val cta: TextResource? = null,
-        ) : SnackBarMessage {
-            override var consumed: Boolean = false
-        }
+            private val uniqueUuid: UUID = UUID.randomUUID(),
+        ) : SnackBarMessage
     }
 
     private object AnalyticsProp {

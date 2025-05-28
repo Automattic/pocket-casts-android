@@ -108,8 +108,6 @@ import javax.inject.Inject
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asObservable
@@ -917,9 +915,7 @@ class PodcastFragment : BaseFragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.showNotificationSnack.flowWithLifecycle(lifecycle)
-                .distinctUntilChanged()
                 .filterNotNull()
-                .filter { !it.consumed }
                 .collect { message ->
                     currentSnackBar?.dismiss()
                     when (message) {
@@ -935,7 +931,6 @@ class PodcastFragment : BaseFragment() {
                             duration = 3000,
                         )
                     }
-                    message.consumed = true
                 }
         }
     }
