@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -56,11 +57,13 @@ internal fun EnableNotificationsPromptScreen(
         )
         Spacer(modifier = Modifier.height(24.dp))
         TextH10(
+            modifier = Modifier.padding(horizontal = 22.dp),
             text = stringResource(LR.string.notification_prompt_title),
             color = MaterialTheme.theme.colors.primaryText01,
         )
         Spacer(modifier = Modifier.height(16.dp))
         TextP40(
+            modifier = Modifier.padding(horizontal = 32.dp),
             text = stringResource(LR.string.notification_prompt_message),
             color = MaterialTheme.theme.colors.secondaryText02,
             textAlign = TextAlign.Center
