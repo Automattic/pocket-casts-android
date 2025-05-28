@@ -4,7 +4,7 @@
     *   Upgrade to the latest version of Jetpack Compose
         ([#4049](https://github.com/Automattic/pocket-casts-android/pull/4049))
     *   Improve accessibility of the follow button in some of the Discover sections
-        ([#4049](https://github.com/Automattic/pocket-casts-android/pull/4049))
+        ([#4050](https://github.com/Automattic/pocket-casts-android/pull/4050))
 
 7.90
 -----
