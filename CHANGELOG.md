@@ -3,6 +3,8 @@
 *   Updates
     *   Upgrade to the latest version of Jetpack Compose
         ([#4049](https://github.com/Automattic/pocket-casts-android/pull/4049))
+    *   Make full screen Player less sensitive to the hide fling gesture
+        ([#4052](https://github.com/Automattic/pocket-casts-android/pull/4052))
 
 7.90
 -----
