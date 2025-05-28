@@ -79,7 +79,7 @@ internal fun PodcastRow(
                 onClick = onClickSubscribe,
                 modifier = Modifier
                     .align(Alignment.CenterEnd)
-                    .offset(x = paddingOffset + (touchTargetSize - iconSize) / 2),
+                    .offset(x = paddingOffset + (TouchTargetSize - IconSize) / 2),
             )
         }
     }
@@ -90,7 +90,7 @@ internal fun PodcastRowPlaceholder(
     modifier: Modifier = Modifier,
 ) {
     PodcastRow(
-        podcast = dummyPodcast,
+        podcast = DiscoverPodcastPreview,
         onClickSubscribe = {},
         modifier = modifier,
     )
@@ -147,7 +147,7 @@ private fun SubscribeIcon(
             },
         ),
         modifier = Modifier
-            .size(iconSize)
+            .size(IconSize)
             .indication(interactionSource, ripple),
     )
 }
@@ -161,7 +161,7 @@ private fun SubscribeInteractionBox(
 ) {
     Box(
         modifier = modifier
-            .size(touchTargetSize)
+            .size(TouchTargetSize)
             .clickable(
                 interactionSource = interactionSource,
                 indication = null,
@@ -172,9 +172,9 @@ private fun SubscribeInteractionBox(
     )
 }
 
-private val iconSize = 24.dp
-private val touchTargetSize = 48.dp
-private val dummyPodcast = DiscoverPodcast(
+private val IconSize = 24.dp
+private val TouchTargetSize = 48.dp
+internal val DiscoverPodcastPreview = DiscoverPodcast(
     uuid = "uuid",
     title = "Title",
     author = "Author",
@@ -192,23 +192,23 @@ private fun PodcastRowPreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         Column {
             PodcastRow(
-                podcast = dummyPodcast,
+                podcast = DiscoverPodcastPreview,
                 onClickSubscribe = {},
             )
             PodcastRow(
-                podcast = dummyPodcast.copy(isSubscribed = true),
+                podcast = DiscoverPodcastPreview.copy(isSubscribed = true),
                 onClickSubscribe = {},
             )
             PodcastRow(
-                podcast = dummyPodcast.copy(title = "Lorem ipsum dolor sit amet consectetur adipiscing elit"),
+                podcast = DiscoverPodcastPreview.copy(title = "Lorem ipsum dolor sit amet consectetur adipiscing elit"),
                 onClickSubscribe = {},
             )
             PodcastRow(
-                podcast = dummyPodcast.copy(author = "Lorem ipsum dolor sit amet consectetur adipiscing elit"),
+                podcast = DiscoverPodcastPreview.copy(author = "Lorem ipsum dolor sit amet consectetur adipiscing elit"),
                 onClickSubscribe = {},
             )
             PodcastRow(
-                podcast = dummyPodcast.copy(
+                podcast = DiscoverPodcastPreview.copy(
                     title = "Lorem ipsum dolor sit amet consectetur adipiscing elit",
                     author = "Lorem ipsum dolor sit amet consectetur adipiscing elit",
                 ),
@@ -226,11 +226,11 @@ private fun PodcastRowThemePreview(
     AppThemeWithBackground(themeType) {
         Column {
             PodcastRow(
-                podcast = dummyPodcast,
+                podcast = DiscoverPodcastPreview,
                 onClickSubscribe = {},
             )
             PodcastRow(
-                podcast = dummyPodcast.copy(isSubscribed = true),
+                podcast = DiscoverPodcastPreview.copy(isSubscribed = true),
                 onClickSubscribe = {},
             )
         }
