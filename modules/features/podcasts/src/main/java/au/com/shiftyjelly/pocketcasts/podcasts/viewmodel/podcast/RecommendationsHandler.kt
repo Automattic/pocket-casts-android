@@ -47,7 +47,7 @@ class RecommendationsHandler @Inject constructor(
                         .removePodcast(podcastUuid)
                         .addSubscribedStatusFlowable()
                         .map { listFeed ->
-                            if (listFeed.podcasts.isNullOrEmpty()) {
+                            if (listFeed.podcasts.isNullOrEmpty() && listFeed.podroll.isNullOrEmpty()) {
                                 RecommendationsResult.Empty
                             } else {
                                 RecommendationsResult.Success(listFeed)

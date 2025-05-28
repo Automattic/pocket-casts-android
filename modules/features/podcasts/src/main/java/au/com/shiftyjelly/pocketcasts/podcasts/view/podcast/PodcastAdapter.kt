@@ -626,11 +626,11 @@ class PodcastAdapter(
                     )
                 }
                 is RecommendationsResult.Success -> {
+                    val resources = context.resources
                     val list = result.listFeed
                     // Podroll
                     val podroll = list.podroll
                     if (!podroll.isNullOrEmpty()) {
-                        val resources = context.resources
                         add(
                             DividerSubTitleRow(
                                 icon = IR.drawable.ic_author_small,
@@ -649,26 +649,28 @@ class PodcastAdapter(
                             )
                         }
                         add(PaddingRow(12.dp))
+                    }
+                    // Recommended "You might like" podcasts
+                    val podcasts = list.podcasts
+                    if (!podcasts.isNullOrEmpty()) {
                         add(
                             DividerSubTitleRow(
                                 icon = IR.drawable.ic_duplicate,
                                 title = resources.getString(LR.string.similar_shows_to, podcast.title),
                             ),
                         )
+                        podcasts.forEachIndexed { index, podcast ->
+                            add(
+                                RecommendedPodcast(
+                                    listDate = list.date ?: "",
+                                    podcast = podcast,
+                                    onRowClick = onRecommendedPodcastClicked,
+                                    onSubscribeClick = onRecommendedPodcastSubscribeClicked,
+                                ),
+                            )
+                        }
+                        add(PaddingRow(12.dp))
                     }
-                    // Recommended "You might like" podcasts
-                    val podcasts = list.podcasts
-                    podcasts?.forEachIndexed { index, podcast ->
-                        add(
-                            RecommendedPodcast(
-                                listDate = list.date ?: "",
-                                podcast = podcast,
-                                onRowClick = onRecommendedPodcastClicked,
-                                onSubscribeClick = onRecommendedPodcastSubscribeClicked,
-                            ),
-                        )
-                    }
-                    add(PaddingRow(12.dp))
                 }
             }
         }
