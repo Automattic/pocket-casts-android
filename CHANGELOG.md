@@ -3,6 +3,9 @@
 *   Updates
     *   Upgrade to the latest version of Jetpack Compose
         ([#4049](https://github.com/Automattic/pocket-casts-android/pull/4049))
+*   Bug Fixes
+    *   Fix bottom sheet animation used by Up Next and other screens
+        ([#4051](https://github.com/Automattic/pocket-casts-android/pull/4051))
 
 7.90
 -----
