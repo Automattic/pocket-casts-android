@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.SuggestedFoldersPopupPolicy
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -38,6 +39,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.rx2.asObservable
 import timber.log.Timber
 
@@ -51,6 +53,7 @@ class PodcastsViewModel
     private val analyticsTracker: AnalyticsTracker,
     private val suggestedFoldersManager: SuggestedFoldersManager,
     private val suggestedFoldersPopupPolicy: SuggestedFoldersPopupPolicy,
+    private val notificationHelper: NotificationHelper,
     userManager: UserManager,
 ) : ViewModel(), CoroutineScope {
     var isFragmentChangingConfigurations: Boolean = false
@@ -61,11 +64,22 @@ class PodcastsViewModel
 
     init {
         viewModelScope.launch {
-            suggestedFoldersManager.observeSuggestedFolders().collect { folders ->
-                _suggestedFoldersState.value = if (folders.isEmpty()) {
-                    SuggestedFoldersState.Empty
+            suggestedFoldersManager.observeSuggestedFolders().combine(userManager.getSignInState().asFlow()) { suggestedFolders, isSignedIn ->
+                Pair(suggestedFolders, isSignedIn)
+            }.collect { pair ->
+                if (notificationHelper.hasNotificationsPermission() || !pair.second.isSignedIn) {
+                    _suggestedFoldersState.value = if (pair.first.isEmpty()) {
+                        SuggestedFoldersState.Empty
+                    } else {
+                        SuggestedFoldersState.Available
+                    }
+                    _notificationsState.value = if (notificationHelper.hasNotificationsPermission()) {
+                        NotificationsPromptState.AlreadyHasPermissions
+                    } else {
+                        NotificationsPromptState.NotSignedInYet
+                    }
                 } else {
-                    SuggestedFoldersState.Available
+                    _notificationsState.value = NotificationsPromptState.ShowPrompt
                 }
             }
         }
@@ -156,10 +170,13 @@ class PodcastsViewModel
     private val _suggestedFoldersState = MutableStateFlow<SuggestedFoldersState>(SuggestedFoldersState.Empty)
     val suggestedFoldersState = _suggestedFoldersState.asStateFlow()
 
+    private val _notificationsState = MutableStateFlow<NotificationsPromptState>(NotificationsPromptState.NotSignedInYet)
+    val notificationPromptState = _notificationsState.asStateFlow()
+
     private fun buildHomeFolderItems(podcasts: List<Podcast>, folders: List<FolderItem>, podcastSortType: PodcastsSortType) = when (podcastSortType) {
         PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST,
         PodcastsSortType.RECENTLY_PLAYED,
-        -> {
+            -> {
             val folderUuids = folders.mapTo(mutableSetOf()) { it.uuid }
             val items = mutableListOf<FolderItem>()
             val uuidToFolder = folders.associateByTo(mutableMapOf(), FolderItem::uuid)
@@ -199,7 +216,7 @@ class PodcastsViewModel
         return when (podcastSortType) {
             PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST,
             PodcastsSortType.RECENTLY_PLAYED,
-            -> items
+                -> items
 
             else -> items.sortedWith(podcastSortType.folderComparator)
         }
@@ -352,6 +369,7 @@ class PodcastsViewModel
     fun onTooltipShown() {
         analyticsTracker.track(AnalyticsEvent.EPISODE_RECENTLY_PLAYED_SORT_OPTION_TOOLTIP_SHOWN)
     }
+
     fun onTooltipClosed() {
         settings.showPodcastsRecentlyPlayedSortOrderTooltip.set(false, updateModifiedAt = false)
         analyticsTracker.track(AnalyticsEvent.EPISODE_RECENTLY_PLAYED_SORT_OPTION_TOOLTIP_DISMISSED)
@@ -361,6 +379,12 @@ class PodcastsViewModel
         data object Empty : SuggestedFoldersState()
 
         data object Available : SuggestedFoldersState()
+    }
+
+    sealed class NotificationsPromptState {
+        data object ShowPrompt : NotificationsPromptState()
+        data object AlreadyHasPermissions : NotificationsPromptState()
+        data object NotSignedInYet : NotificationsPromptState()
     }
 
     companion object {
