@@ -39,7 +39,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.rx2.asObservable
 import timber.log.Timber
 
@@ -64,21 +63,15 @@ class PodcastsViewModel
 
     init {
         viewModelScope.launch {
-            suggestedFoldersManager.observeSuggestedFolders().combine(userManager.getSignInState().asFlow()) { suggestedFolders, isSignedIn ->
-                Pair(suggestedFolders, isSignedIn)
-            }.collect { pair ->
-                if (notificationHelper.hasNotificationsPermission() || !pair.second.isSignedIn) {
-                    _suggestedFoldersState.value = if (pair.first.isEmpty()) {
+            suggestedFoldersManager.observeSuggestedFolders().collect { folders ->
+                if (notificationHelper.hasNotificationsPermission()) {
+                    _suggestedFoldersState.value = if (folders.isEmpty()) {
                         SuggestedFoldersState.Empty
                     } else {
                         SuggestedFoldersState.Available
                     }
-                    _notificationsState.value = if (notificationHelper.hasNotificationsPermission()) {
-                        NotificationsPromptState.AlreadyHasPermissions
-                    } else {
-                        NotificationsPromptState.NotSignedInYet
-                    }
-                } else {
+                    _notificationsState.value = NotificationsPromptState.AlreadyHasPermissions
+                } else if (!settings.notificationsPromptAcknowledged.value) {
                     _notificationsState.value = NotificationsPromptState.ShowPrompt
                 }
             }
@@ -170,7 +163,7 @@ class PodcastsViewModel
     private val _suggestedFoldersState = MutableStateFlow<SuggestedFoldersState>(SuggestedFoldersState.Empty)
     val suggestedFoldersState = _suggestedFoldersState.asStateFlow()
 
-    private val _notificationsState = MutableStateFlow<NotificationsPromptState>(NotificationsPromptState.NotSignedInYet)
+    private val _notificationsState = MutableStateFlow<NotificationsPromptState?>(null)
     val notificationPromptState = _notificationsState.asStateFlow()
 
     private fun buildHomeFolderItems(podcasts: List<Podcast>, folders: List<FolderItem>, podcastSortType: PodcastsSortType) = when (podcastSortType) {
@@ -293,6 +286,8 @@ class PodcastsViewModel
     fun checkNotificationPermission() {
         if (notificationHelper.hasNotificationsPermission()) {
             _notificationsState.value = NotificationsPromptState.AlreadyHasPermissions
+        } else if (settings.notificationsPromptAcknowledged.value) {
+            _notificationsState.value = null
         }
     }
 
@@ -390,7 +385,6 @@ class PodcastsViewModel
     sealed class NotificationsPromptState {
         data object ShowPrompt : NotificationsPromptState()
         data object AlreadyHasPermissions : NotificationsPromptState()
-        data object NotSignedInYet : NotificationsPromptState()
     }
 
     companion object {

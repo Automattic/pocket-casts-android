@@ -27,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -40,6 +41,9 @@ internal class EnableNotificationsPromptFragment : BaseDialogFragment() {
 
     @Inject
     lateinit var notificationHelper: NotificationHelper
+
+    @Inject
+    lateinit var settings: Settings
 
     companion object {
         fun newInstance(): EnableNotificationsPromptFragment {
@@ -119,6 +123,7 @@ internal class EnableNotificationsPromptFragment : BaseDialogFragment() {
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
         if (wasDismissedViaCloseButton) {
+            settings.notificationsPromptAcknowledged.set(value = true, updateModifiedAt = true)
             analyticsTracker.track(AnalyticsEvent.NOTIFICATIONS_PERMISSIONS_DISMISSED)
         }
     }

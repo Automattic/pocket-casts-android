@@ -350,6 +350,7 @@ interface Settings {
     val recommendationsNotification: UserSetting<Boolean>
     val newFeaturesNotification: UserSetting<Boolean>
     val offersNotification: UserSetting<Boolean>
+    val notificationsPromptAcknowledged: UserSetting<Boolean>
 
     val streamingMode: UserSetting<Boolean>
     val keepScreenAwake: UserSetting<Boolean>
