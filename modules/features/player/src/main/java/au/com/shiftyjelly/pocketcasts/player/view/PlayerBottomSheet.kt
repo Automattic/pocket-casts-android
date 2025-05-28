@@ -28,6 +28,8 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.isHidden
 import au.com.shiftyjelly.pocketcasts.views.extensions.isVisible
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.ViewPager2AwareBottomSheetBehavior
+import com.google.android.material.bottomsheet.ViewPager2AwareBottomSheetBehavior.PreFlingInterceptor
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -96,6 +98,10 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
         sheetBehavior = BottomSheetBehavior.from(this).apply {
             val callback = createBottomSheetCallback(rootView = parent as CoordinatorLayout)
             addBottomSheetCallback(callback)
+
+            val preFlingInterceptor = createPreFlingInterceptor(behavior = this as ViewPager2AwareBottomSheetBehavior)
+            setPreFlingInterceptor(preFlingInterceptor)
+
             doOnLayout {
                 if (state == BottomSheetBehavior.STATE_EXPANDED) {
                     callback.onSlide(this@PlayerBottomSheet, 1f)
@@ -213,6 +219,22 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
                     BottomSheetBehavior.STATE_SETTLING -> onSettling()
                     BottomSheetBehavior.STATE_EXPANDED -> onExpanded()
                 }
+            }
+        }
+    }
+
+    private fun createPreFlingInterceptor(
+        behavior: BottomSheetBehavior<*>,
+    ) = object : PreFlingInterceptor {
+        override fun shouldInterceptFlingGesture(velocityX: Float, velocityY: Float): Boolean {
+            return velocityY in -4000f..0f
+        }
+
+        override fun onFlingIntercepted(velocityX: Float, velocityY: Float) {
+            behavior.state = if (velocityY >= 0f) {
+                BottomSheetBehavior.STATE_COLLAPSED
+            } else {
+                BottomSheetBehavior.STATE_EXPANDED
             }
         }
     }
