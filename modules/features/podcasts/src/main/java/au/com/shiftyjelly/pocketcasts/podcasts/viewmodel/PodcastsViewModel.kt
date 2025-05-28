@@ -176,7 +176,7 @@ class PodcastsViewModel
     private fun buildHomeFolderItems(podcasts: List<Podcast>, folders: List<FolderItem>, podcastSortType: PodcastsSortType) = when (podcastSortType) {
         PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST,
         PodcastsSortType.RECENTLY_PLAYED,
-            -> {
+        -> {
             val folderUuids = folders.mapTo(mutableSetOf()) { it.uuid }
             val items = mutableListOf<FolderItem>()
             val uuidToFolder = folders.associateByTo(mutableMapOf(), FolderItem::uuid)
@@ -216,7 +216,7 @@ class PodcastsViewModel
         return when (podcastSortType) {
             PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST,
             PodcastsSortType.RECENTLY_PLAYED,
-                -> items
+            -> items
 
             else -> items.sortedWith(podcastSortType.folderComparator)
         }
@@ -288,6 +288,12 @@ class PodcastsViewModel
 
     fun setFolderUuid(folderUuid: String?) {
         folderUuidObservable.accept(Optional.ofNullable(folderUuid))
+    }
+
+    fun checkNotificationPermission() {
+        if (notificationHelper.hasNotificationsPermission()) {
+            _notificationsState.value = NotificationsPromptState.AlreadyHasPermissions
+        }
     }
 
     fun isFolderOpen(): Boolean {

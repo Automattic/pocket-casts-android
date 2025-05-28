@@ -27,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -36,6 +37,9 @@ internal class EnableNotificationsPromptFragment : BaseDialogFragment() {
 
     @Inject
     lateinit var analyticsTracker: AnalyticsTracker
+
+    @Inject
+    lateinit var notificationHelper: NotificationHelper
 
     companion object {
         fun newInstance(): EnableNotificationsPromptFragment {
@@ -76,7 +80,7 @@ internal class EnableNotificationsPromptFragment : BaseDialogFragment() {
                     RoundedCornerShape(
                         topStart = 16.dp,
                         topEnd = 16.dp,
-                    )
+                    ),
                 ),
         ) {
             AppThemeWithBackground(theme.activeTheme) {
@@ -86,7 +90,6 @@ internal class EnableNotificationsPromptFragment : BaseDialogFragment() {
                         .fillMaxSize()
                         .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)),
                 ) {
-
                     EnableNotificationsPromptScreen(
                         modifier = Modifier.padding(
                             vertical = 16.dp,
@@ -95,14 +98,18 @@ internal class EnableNotificationsPromptFragment : BaseDialogFragment() {
                         onCtaClicked = {
                             analyticsTracker.track(AnalyticsEvent.NOTIFICATIONS_PERMISSIONS_ALLOW_TAPPED)
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                permissionRequester.launch(Manifest.permission.POST_NOTIFICATIONS)
-                                analyticsTracker.track(AnalyticsEvent.NOTIFICATIONS_OPT_IN_SHOWN)
+                                if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
+                                    permissionRequester.launch(Manifest.permission.POST_NOTIFICATIONS)
+                                    analyticsTracker.track(AnalyticsEvent.NOTIFICATIONS_OPT_IN_SHOWN)
+                                } else {
+                                    notificationHelper.openNotificationSettings(requireActivity())
+                                }
                             }
                         },
                         onDismissClicked = {
                             wasDismissedViaCloseButton = true
                             dismiss()
-                        }
+                        },
                     )
                 }
             }
