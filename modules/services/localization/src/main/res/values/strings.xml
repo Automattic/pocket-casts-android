@@ -1387,6 +1387,8 @@
     <string name="settings_notification_notify_me">Notify me</string>
     <string name="settings_notification_daily_reminders">Daily Reminders</string>
     <string name="settings_notification_recommendations">Trending &amp; Recommendations</string>
+    <string name="settings_notification_new_features">New Features &amp; Tips</string>
+    <string name="settings_notification_offers">Pocket Casts Offers</string>
     <string name="settings_notification_play_over">Play over notifications</string>
     <string name="settings_notification_play_over_never">Never</string>
     <string name="settings_notification_play_over_duck">Duck volume</string>
@@ -2431,5 +2433,11 @@
     <string name="notifications_settings_turn_on_push_title">Turn on push notifications?</string>
     <string name="notifications_settings_turn_on_push_message">To get notifications from Pocket Casts, you\'ll need to turn them on in your device settings.</string>
     <string name="notifications_settings_turn_on_push_button">Go to device settings</string>
+
+    <string name="notification_new_features_smart_folders_title">Your podcasts organized</string>
+    <string name="notification_new_features_smart_folders_message">Try Plus and automatically organize your shows with folders</string>
+
+    <string name="notification_offers_upgrade_title">Level up your podcast game</string>
+    <string name="notification_offers_upgrade_message">Unblock exclusive features like folders, bookmarks, and more with Plus!</string>
 
 </resources>

@@ -309,6 +309,11 @@ data object ThemesDeepLink : IntentableDeepLink {
         .setData(Uri.parse("pktc://settings/themes"))
 }
 
+data object SmartFoldersDeepLink : IntentableDeepLink {
+    override fun toIntent(context: Context) = Intent(ACTION_VIEW)
+        .setData(Uri.parse("pktc://features/suggestedFolders"))
+}
+
 private val Context.launcherIntent get() = requireNotNull(packageManager.getLaunchIntentForPackage(packageName)) {
     "Missing launcher intent for $packageName"
 }

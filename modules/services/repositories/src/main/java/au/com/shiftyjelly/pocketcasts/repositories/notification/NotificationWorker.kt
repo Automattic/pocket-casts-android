@@ -15,10 +15,13 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.R
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationSchedulerImpl.Companion.DOWNLOADED_EPISODES
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationSchedulerImpl.Companion.SUBCATEGORY
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.SuggestedFoldersManager
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import java.time.Instant
+import kotlinx.coroutines.flow.firstOrNull
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 @HiltWorker
@@ -28,6 +31,7 @@ class NotificationWorker @AssistedInject constructor(
     private val settings: Settings,
     private val notificationHelper: NotificationHelper,
     private val notificationManager: NotificationManager,
+    private val suggestedFoldersManager: SuggestedFoldersManager,
 ) : CoroutineWorker(context, params) {
     override suspend fun doWork(): Result {
         val subcategory = inputData.getString(SUBCATEGORY) ?: return Result.failure()
@@ -38,7 +42,7 @@ class NotificationWorker @AssistedInject constructor(
             return Result.failure()
         }
 
-        if (notificationManager.hasUserInteractedWithFeature(type)) {
+        if (notificationManager.hasUserInteractedWithFeature(type) || !shouldSchedule(type)) {
             return Result.failure()
         }
 
@@ -52,6 +56,21 @@ class NotificationWorker @AssistedInject constructor(
         return Result.success()
     }
 
+    private suspend fun shouldSchedule(type: NotificationType): Boolean {
+        return when (type) {
+            is NewFeaturesAndTipsNotificationType.SmartFolders -> {
+                suggestedFoldersManager.refreshSuggestedFolders()
+                val folders = suggestedFoldersManager.observeSuggestedFolders().firstOrNull()
+                !folders.isNullOrEmpty()
+            }
+            is OffersNotificationType.UpgradeNow -> {
+                val subscription = settings.cachedSubscription.value
+                subscription == null || subscription.expiryDate.isBefore(Instant.now())
+            }
+            else -> true
+        }
+    }
+
     private fun getNotificationBuilder(type: NotificationType): NotificationCompat.Builder {
         val downloadedEpisodes = inputData.getInt(DOWNLOADED_EPISODES, 0)
 
@@ -59,6 +78,15 @@ class NotificationWorker @AssistedInject constructor(
             is TrendingAndRecommendationsNotificationType -> {
                 notificationHelper.trendingAndRecommendationsChannelBuilder()
             }
+
+            is NewFeaturesAndTipsNotificationType -> {
+                notificationHelper.featuresAndTipsChannelBuilder()
+            }
+
+            is OffersNotificationType -> {
+                notificationHelper.offersChannelBuilder()
+            }
+
             else -> notificationHelper.dailyRemindersChannelBuilder()
         }
 

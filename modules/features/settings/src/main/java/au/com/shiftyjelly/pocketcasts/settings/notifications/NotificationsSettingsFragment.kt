@@ -93,6 +93,8 @@ internal class NotificationsSettingsFragment : BaseFragment(), PodcastSelectFrag
                             is NotificationPreferenceType.AdvancedSettings -> notificationHelper.openEpisodeNotificationSettings(requireActivity())
                             is NotificationPreferenceType.DailyReminderSettings -> notificationHelper.openDailyReminderNotificationSettings(requireActivity())
                             is NotificationPreferenceType.RecommendationSettings -> notificationHelper.openTrendingAndRecommendationsNotificationSettings(requireActivity())
+                            is NotificationPreferenceType.NewFeaturesAndTipsSettings -> notificationHelper.openNewFeaturesAndTipsNotificationSettings(requireActivity())
+                            is NotificationPreferenceType.OffersSettings -> notificationHelper.openOffersNotificationSettings(requireActivity())
                             else -> Unit
                         }
                     },

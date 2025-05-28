@@ -56,6 +56,7 @@ class DeepLinkFactory(
         CloudFilesAdapter(),
         UpsellAdapter(),
         UpgradeAccountAdapter(),
+        FeaturesAdapter(),
         PromoCodeAdapter(),
         ShareLinkNativeAdapter(),
         SignInAdapter(shareHost),
@@ -416,6 +417,23 @@ private class UpgradeAccountAdapter : DeepLinkAdapter {
     }
 }
 
+private class FeaturesAdapter : DeepLinkAdapter {
+    override fun create(intent: Intent): DeepLink? {
+        val uriData = intent.data
+        val scheme = uriData?.scheme
+        val host = uriData?.host
+
+        return if (intent.action == ACTION_VIEW && scheme == "pktc" && host == "features") {
+            when (val path = uriData.pathSegments.firstOrNull()) {
+                "suggestedFolders" -> SmartFoldersDeepLink
+                else -> null
+            }
+        } else {
+            null
+        }
+    }
+}
+
 private class PromoCodeAdapter : DeepLinkAdapter {
     override fun create(intent: Intent): DeepLink? {
         val uriData = intent.data
@@ -462,6 +480,7 @@ private class ShareLinkNativeAdapter : DeepLinkAdapter {
             "redeem",
             "settings",
             "discover",
+            "features",
         )
     }
 }
@@ -588,6 +607,7 @@ private class OpmlAdapter(
             "discover",
             "open",
             "signup",
+            "features",
         )
     }
 }

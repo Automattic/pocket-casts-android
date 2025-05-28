@@ -619,6 +619,10 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_NOTIFICATIONS_TRENDING_AND_RECOMMENDATIONS_TOGGLED("settings_notifications_trending_toggle"),
     SETTINGS_DAILY_REMINDERS_ADVANCED_SETTINGS_TAPPED("settings_daily_reminders_advanced_settings_tapped"),
     SETTINGS_TRENDING_AND_RECOMMENDATIONS_ADVANCED_SETTINGS_TAPPED("settings_trending_advanced_settings_tapped"),
+    SETTINGS_NOTIFICATIONS_NEW_FEATURES_AND_TIPS_TOGGLED("settings_notifications_new_features_toggle"),
+    SETTINGS_NOTIFICATIONS_NEW_FEATURES_AND_TIPS_ADVANCED_SETTINGS_TAPPED("settings_notifications_new_features_advanced_settings_tapped"),
+    SETTINGS_NOTIFICATIONS_OFFERS_TOGGLED("settings_notifications_offers_toggle"),
+    SETTINGS_NOTIFICATIONS_OFFERS_ADVANCED_SETTINGS_TAPPED("settings_notifications_offers_advanced_settings_tapped"),
 
     /* Settings - Storage & Data Use */
     SETTINGS_STORAGE_SHOWN("settings_storage_shown"),

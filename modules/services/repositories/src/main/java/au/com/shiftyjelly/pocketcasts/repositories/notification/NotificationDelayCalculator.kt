@@ -67,6 +67,16 @@ class NotificationDelayCalculator @Inject constructor(
         return next4PM - now
     }
 
+    fun calculateDelayForNewFeatures(): Long {
+        val currentTimeMillis = clock.instant().toEpochMilli()
+        return calculateBase4PM(currentTimeMillis) - currentTimeMillis
+    }
+
+    fun calculateDelayForOffers(): Long {
+        val currentTimeMillis = clock.instant().toEpochMilli()
+        return calculateBase4PM(currentTimeMillis) - currentTimeMillis
+    }
+
     private fun calculateBase4PM(currentTimeMillis: Long, dayOffset: Int = 1): Long {
         val calendar = Calendar.getInstance().apply {
             timeInMillis = currentTimeMillis

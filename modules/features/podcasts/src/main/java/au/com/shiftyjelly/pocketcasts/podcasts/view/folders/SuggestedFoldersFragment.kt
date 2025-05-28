@@ -90,6 +90,7 @@ class SuggestedFoldersFragment : BaseDialogFragment() {
     ) = content {
         CallOnce {
             viewModel.trackPageShown()
+            viewModel.registerFeatureInteraction()
         }
 
         val state by viewModel.state.collectAsState()
@@ -231,6 +232,9 @@ class SuggestedFoldersFragment : BaseDialogFragment() {
         ),
         ToolbarButton(
             analyticsValue = "podcasts_list",
+        ),
+        DEEPLINK(
+            analyticsValue = "deeplink",
         ),
     }
 

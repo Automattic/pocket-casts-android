@@ -76,4 +76,24 @@ internal sealed interface NotificationPreferenceType {
         override val title: TextResource,
         val description: TextResource,
     ) : NotificationPreferenceType
+
+    data class EnableNewFeaturesAndTips(
+        override val title: TextResource,
+        val isEnabled: Boolean,
+    ) : NotificationPreferenceType
+
+    data class NewFeaturesAndTipsSettings(
+        override val title: TextResource,
+        val description: TextResource,
+    ) : NotificationPreferenceType
+
+    data class EnableOffers(
+        override val title: TextResource,
+        val isEnabled: Boolean,
+    ) : NotificationPreferenceType
+
+    data class OffersSettings(
+        override val title: TextResource,
+        val description: TextResource,
+    ) : NotificationPreferenceType
 }

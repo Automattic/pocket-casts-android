@@ -79,6 +79,32 @@ internal fun NotificationPreferenceCategory(
                     )
                 }
 
+                is NotificationPreferenceType.EnableNewFeaturesAndTips -> {
+                    SettingRow(
+                        enabled = isEnabled,
+                        primaryText = item.title.asString(),
+                        toggle = SettingRowToggle.Switch(checked = item.isEnabled, enabled = isEnabled),
+                        modifier = modifier.toggleable(
+                            enabled = isEnabled,
+                            value = item.isEnabled,
+                            role = Role.Switch,
+                        ) { onItemClicked(item.copy(isEnabled = !item.isEnabled)) },
+                    )
+                }
+
+                is NotificationPreferenceType.EnableOffers -> {
+                    SettingRow(
+                        enabled = isEnabled,
+                        primaryText = item.title.asString(),
+                        toggle = SettingRowToggle.Switch(checked = item.isEnabled, enabled = isEnabled),
+                        modifier = modifier.toggleable(
+                            enabled = isEnabled,
+                            value = item.isEnabled,
+                            role = Role.Switch,
+                        ) { onItemClicked(item.copy(isEnabled = !item.isEnabled)) },
+                    )
+                }
+
                 is NotificationPreferenceType.HidePlaybackNotificationOnPause -> {
                     SettingRow(
                         primaryText = item.title.asString(),
@@ -118,6 +144,24 @@ internal fun NotificationPreferenceCategory(
                 }
 
                 is NotificationPreferenceType.RecommendationSettings -> {
+                    SettingRow(
+                        enabled = isEnabled,
+                        primaryText = item.title.asString(),
+                        secondaryText = item.description.asString(),
+                        modifier = modifier.clickable(enabled = isEnabled) { onItemClicked(item) },
+                    )
+                }
+
+                is NotificationPreferenceType.NewFeaturesAndTipsSettings -> {
+                    SettingRow(
+                        enabled = isEnabled,
+                        primaryText = item.title.asString(),
+                        secondaryText = item.description.asString(),
+                        modifier = modifier.clickable(enabled = isEnabled) { onItemClicked(item) },
+                    )
+                }
+
+                is NotificationPreferenceType.OffersSettings -> {
                     SettingRow(
                         enabled = isEnabled,
                         primaryText = item.title.asString(),
