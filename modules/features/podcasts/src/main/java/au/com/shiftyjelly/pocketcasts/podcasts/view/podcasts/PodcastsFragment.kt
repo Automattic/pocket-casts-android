@@ -33,6 +33,7 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -60,6 +61,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.FolderCreateSharedVi
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.FolderEditFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.FolderEditPodcastsFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.SuggestedFoldersFragment
+import au.com.shiftyjelly.pocketcasts.podcasts.view.notifications.EnableNotificationsPromptFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastsViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastsViewModel.SuggestedFoldersState
@@ -303,6 +305,26 @@ class PodcastsFragment :
                 }
             }
         }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.notificationPromptState.collect { state ->
+                    when (state) {
+                        is PodcastsViewModel.NotificationsPromptState.ShowPrompt -> {
+                            if (FeatureFlag.isEnabled(Feature.NOTIFICATIONS_REVAMP)) {
+                                if (parentFragmentManager.findFragmentByTag("notifications_prompt") == null) {
+                                    EnableNotificationsPromptFragment
+                                        .newInstance()
+                                        .show(parentFragmentManager, "notifications_prompt")
+                                }
+                            }
+                        }
+
+                        else -> (parentFragmentManager.findFragmentByTag("notifications_prompt") as? DialogFragment)?.dismiss()
+                    }
+                }
+            }
+        }
     }
 
     override fun onDestroyView() {
@@ -425,6 +447,7 @@ class PodcastsFragment :
         super.onResume()
 
         viewModel.setFolderUuid(folderUuid)
+        viewModel.checkNotificationPermission()
 
         adjustViewIfNeeded()
     }

@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.SuggestedFoldersPopupPolicy
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -51,6 +52,7 @@ class PodcastsViewModel
     private val analyticsTracker: AnalyticsTracker,
     private val suggestedFoldersManager: SuggestedFoldersManager,
     private val suggestedFoldersPopupPolicy: SuggestedFoldersPopupPolicy,
+    private val notificationHelper: NotificationHelper,
     userManager: UserManager,
 ) : ViewModel(), CoroutineScope {
     var isFragmentChangingConfigurations: Boolean = false
@@ -62,10 +64,15 @@ class PodcastsViewModel
     init {
         viewModelScope.launch {
             suggestedFoldersManager.observeSuggestedFolders().collect { folders ->
-                _suggestedFoldersState.value = if (folders.isEmpty()) {
-                    SuggestedFoldersState.Empty
-                } else {
-                    SuggestedFoldersState.Available
+                if (notificationHelper.hasNotificationsPermission()) {
+                    _suggestedFoldersState.value = if (folders.isEmpty()) {
+                        SuggestedFoldersState.Empty
+                    } else {
+                        SuggestedFoldersState.Available
+                    }
+                    _notificationsState.value = NotificationsPromptState.AlreadyHasPermissions
+                } else if (!settings.notificationsPromptAcknowledged.value) {
+                    _notificationsState.value = NotificationsPromptState.ShowPrompt
                 }
             }
         }
@@ -155,6 +162,9 @@ class PodcastsViewModel
 
     private val _suggestedFoldersState = MutableStateFlow<SuggestedFoldersState>(SuggestedFoldersState.Empty)
     val suggestedFoldersState = _suggestedFoldersState.asStateFlow()
+
+    private val _notificationsState = MutableStateFlow<NotificationsPromptState?>(null)
+    val notificationPromptState = _notificationsState.asStateFlow()
 
     private fun buildHomeFolderItems(podcasts: List<Podcast>, folders: List<FolderItem>, podcastSortType: PodcastsSortType) = when (podcastSortType) {
         PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST,
@@ -273,6 +283,14 @@ class PodcastsViewModel
         folderUuidObservable.accept(Optional.ofNullable(folderUuid))
     }
 
+    fun checkNotificationPermission() {
+        if (notificationHelper.hasNotificationsPermission()) {
+            _notificationsState.value = NotificationsPromptState.AlreadyHasPermissions
+        } else if (settings.notificationsPromptAcknowledged.value) {
+            _notificationsState.value = null
+        }
+    }
+
     fun isFolderOpen(): Boolean {
         return folderUuidObservable.value?.isPresent ?: false
     }
@@ -352,6 +370,7 @@ class PodcastsViewModel
     fun onTooltipShown() {
         analyticsTracker.track(AnalyticsEvent.EPISODE_RECENTLY_PLAYED_SORT_OPTION_TOOLTIP_SHOWN)
     }
+
     fun onTooltipClosed() {
         settings.showPodcastsRecentlyPlayedSortOrderTooltip.set(false, updateModifiedAt = false)
         analyticsTracker.track(AnalyticsEvent.EPISODE_RECENTLY_PLAYED_SORT_OPTION_TOOLTIP_DISMISSED)
@@ -361,6 +380,11 @@ class PodcastsViewModel
         data object Empty : SuggestedFoldersState()
 
         data object Available : SuggestedFoldersState()
+    }
+
+    sealed class NotificationsPromptState {
+        data object ShowPrompt : NotificationsPromptState()
+        data object AlreadyHasPermissions : NotificationsPromptState()
     }
 
     companion object {
