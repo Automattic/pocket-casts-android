@@ -29,6 +29,7 @@ import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -107,6 +108,9 @@ import javax.inject.Inject
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asObservable
 import kotlinx.coroutines.withContext
@@ -594,14 +598,7 @@ class PodcastFragment : BaseFragment() {
     }
 
     private val onNotificationsClicked: (Podcast, Boolean) -> Unit = { podcast, show ->
-        viewModel.showNotifications(podcast.uuid, show)
-        currentSnackBar?.dismiss()
-        if (show) {
-            showSnackBar(
-                message = getString(LR.string.notifications_enabled_message, podcast.title),
-                duration = 3000,
-            )
-        }
+        viewModel.showNotifications(podcast.uuid, podcast.title, show)
     }
 
     private val onDonateClicked: (Uri?) -> Unit = { uri ->
@@ -917,6 +914,30 @@ class PodcastFragment : BaseFragment() {
                 }
             }
         }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.showNotificationSnack.flowWithLifecycle(lifecycle)
+                .distinctUntilChanged()
+                .filterNotNull()
+                .filter { !it.consumed }
+                .collect { message ->
+                    currentSnackBar?.dismiss()
+                    when (message) {
+                        is PodcastViewModel.SnackBarMessage.ShowNotificationsDisabledMessage -> showSnackBar(
+                            message = message.message.asString(requireContext()),
+                            cta = message.cta.asString(requireContext()),
+                            onCtaClick = {
+                                viewModel.onOpenNotificationSettingsClicked(requireActivity())
+                            }
+                        )
+                        is PodcastViewModel.SnackBarMessage.ShowNotifyOnNewEpisodesMessage -> showSnackBar(
+                            message = message.message.asString(requireContext()),
+                            duration = 3000
+                        )
+                    }
+                    message.consumed = true
+                }
+        }
     }
 
     override fun onResume() {
@@ -1092,6 +1113,7 @@ class PodcastFragment : BaseFragment() {
 
                             adapter?.notifyDataSetChanged()
                         }
+
                         PodcastTab.RECOMMENDATIONS -> {
                             adapter?.setRecommendations(state.recommendations)
                         }
@@ -1133,7 +1155,7 @@ class PodcastFragment : BaseFragment() {
                         if (state.type == PodcastViewModel.RefreshType.PULL_TO_REFRESH) {
                             binding?.swipeRefreshLayout?.isRefreshing = true
                         } else {
-                            showSnackBar(getString(LR.string.podcast_refreshing_episode_list), Snackbar.LENGTH_INDEFINITE)
+                            showSnackBar(message = getString(LR.string.podcast_refreshing_episode_list), duration = Snackbar.LENGTH_INDEFINITE)
                         }
                     }
                 }
@@ -1211,7 +1233,7 @@ class PodcastFragment : BaseFragment() {
         analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_SHARE_TAPPED)
 
         if (!podcast.canShare) {
-            showSnackBar(getString(LR.string.sharing_is_not_available_for_private_podcasts))
+            showSnackBar(message = getString(LR.string.sharing_is_not_available_for_private_podcasts))
             return
         }
 
@@ -1237,9 +1259,19 @@ class PodcastFragment : BaseFragment() {
         dialog?.show(parentFragmentManager, "download_confirm")
     }
 
-    private fun showSnackBar(message: String, duration: Int = Snackbar.LENGTH_LONG) {
+    private fun showSnackBar(
+        message: String,
+        cta: String? = null,
+        onCtaClick: (() -> Unit)? = null,
+        duration: Int = Snackbar.LENGTH_LONG
+    ) {
         (activity as? FragmentHostListener)?.snackBarView()?.let { snackBarView ->
             currentSnackBar = Snackbar.make(snackBarView, message, duration).apply {
+                if (onCtaClick != null && cta != null) {
+                    setAction(cta) {
+                        onCtaClick()
+                    }
+                }
                 show()
             }
         }

@@ -2443,5 +2443,7 @@
     <string name="notification_prompt_title">Stay up to date!</string>
     <string name="notification_prompt_message">Notifications are the best way to keep track of new episodes, get recommendations of new shows and tips about Pocket Casts.</string>
     <string name="notification_prompt_cta">Allow Notifications</string>
+    <string name="notification_snack_message">Please allow notifications in your device settings</string>
+    <string name="notification_snack_cta">Open Settings</string>
 
 </resources>

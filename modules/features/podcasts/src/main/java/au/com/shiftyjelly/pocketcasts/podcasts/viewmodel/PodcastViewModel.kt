@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.viewmodel
 
+import android.app.Activity
 import android.content.res.Resources
 import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
@@ -31,11 +32,13 @@ import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.settings.util.TextResource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
@@ -58,7 +61,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlowable
@@ -86,6 +91,7 @@ class PodcastViewModel
     val multiSelectBookmarksHelper: MultiSelectBookmarksHelper,
     private val settings: Settings,
     private val podcastAndEpisodeDetailsCoordinator: PodcastAndEpisodeDetailsCoordinator,
+    private val notificationHelper: NotificationHelper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel(), CoroutineScope {
@@ -103,6 +109,8 @@ class PodcastViewModel
 
     val groupedEpisodes: MutableLiveData<List<List<PodcastEpisode>>> = MutableLiveData()
     val signInState = userManager.getSignInState().toLiveData()
+    private val _showNotificationSnack = MutableStateFlow<SnackBarMessage?>(null)
+    val showNotificationSnack = _showNotificationSnack.asStateFlow()
 
     val tintColor = MutableLiveData<Int>()
 
@@ -332,10 +340,22 @@ class PodcastViewModel
         }
     }
 
-    fun showNotifications(podcastUuid: String, show: Boolean) {
+    fun showNotifications(podcastUuid: String, podcastTitle: String, show: Boolean) {
         analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_NOTIFICATIONS_TAPPED, AnalyticsProp.notificationEnabled(show))
         viewModelScope.launch {
-            podcastManager.updateShowNotifications(podcastUuid, show)
+            if (!notificationHelper.hasNotificationsPermission()) {
+                _showNotificationSnack.value = SnackBarMessage.ShowNotificationsDisabledMessage(
+                    message = TextResource.fromStringId(LR.string.notification_snack_message),
+                    cta = TextResource.fromStringId(LR.string.notification_prompt_cta),
+                )
+            } else {
+                podcastManager.updateShowNotifications(podcastUuid, show)
+                if (show) {
+                    _showNotificationSnack.value = SnackBarMessage.ShowNotifyOnNewEpisodesMessage(
+                        message = TextResource.fromStringId(LR.string.notifications_enabled_message, podcastTitle)
+                    )
+                }
+            }
         }
     }
 
@@ -669,6 +689,10 @@ class PodcastViewModel
         )
     }
 
+    fun onOpenNotificationSettingsClicked(activity: Activity) {
+        notificationHelper.openNotificationSettings(activity)
+    }
+
     enum class PodcastTab(@StringRes val labelResId: Int, val analyticsValue: String) {
         EPISODES(
             labelResId = LR.string.episodes,
@@ -715,6 +739,26 @@ class PodcastViewModel
     enum class RefreshType(val analyticsValue: String) {
         PULL_TO_REFRESH("pull_to_refresh"),
         REFRESH_BUTTON("refresh_button"),
+    }
+
+    sealed interface SnackBarMessage {
+        val message: TextResource
+        val cta: TextResource?
+        var consumed: Boolean
+
+        data class ShowNotificationsDisabledMessage(
+            override val message: TextResource,
+            override val cta: TextResource,
+        ) : SnackBarMessage {
+            override var consumed: Boolean = false
+        }
+
+        data class ShowNotifyOnNewEpisodesMessage(
+            override val message: TextResource,
+            override val cta: TextResource? = null
+        ) : SnackBarMessage {
+            override var consumed: Boolean = false
+        }
     }
 
     private object AnalyticsProp {
