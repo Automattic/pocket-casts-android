@@ -22,7 +22,6 @@ import androidx.appcompat.widget.Toolbar
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.util.lerp
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.isVisible
@@ -146,7 +145,6 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.Util
-import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -158,6 +156,7 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.showAllowingStateLoss
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.TopScrollable
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
+import au.com.shiftyjelly.pocketcasts.views.helper.OffsettingBottomSheetCallback
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
 import com.automattic.android.tracks.crashlogging.CrashLogging
@@ -1012,31 +1011,7 @@ class MainActivity :
     }
 
     private fun setupBottomSheetTranslation() {
-        // The bottom sheet, when collapsed, slightly peeks over our content at the bottom.
-        // I'm not entirely sure about the root cause, but as far as I can tell, it seems to be
-        // related to edge-to-edge interaction with the Material library. I haven't found a way
-        // to customize or fix it.
-        //
-        // As a workaround, adding an arbitrary offset of 100dp to the bottom sheet helps by
-        // pushing the content further down when it should be hidden. 100dp is an arbitrary value
-        // big enough to hide the content.
-        val slideTranslation = 100.dpToPx(this).toFloat()
-
-        fun calculateSlideTranslation(slideOffset: Float): Float {
-            return lerp(slideTranslation, 0f, slideOffset).coerceIn(0f, slideTranslation)
-        }
-
-        binding.frameBottomSheet.post {
-            binding.frameBottomSheet.translationY = calculateSlideTranslation(frameBottomSheetBehavior.calculateSlideOffset())
-        }
-
-        frameBottomSheetBehavior.addBottomSheetCallback(object : BottomSheetCallback() {
-            override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                bottomSheet.translationY = calculateSlideTranslation(slideOffset)
-            }
-
-            override fun onStateChanged(bottomSheet: View, newState: Int) = Unit
-        })
+        frameBottomSheetBehavior.addBottomSheetCallback(OffsettingBottomSheetCallback(binding.frameBottomSheet))
     }
 
     override fun whatsNewDismissed(fromConfirmAction: Boolean) {
