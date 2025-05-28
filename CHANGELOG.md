@@ -5,6 +5,9 @@
         ([#4049](https://github.com/Automattic/pocket-casts-android/pull/4049))
     *   Improve accessibility of the follow button in some of the Discover sections
         ([#4050](https://github.com/Automattic/pocket-casts-android/pull/4050))
+*   Bug Fixes
+    *   Fix bottom sheet animation used by Up Next and other screens
+        ([#4051](https://github.com/Automattic/pocket-casts-android/pull/4051))
 
 7.90
 -----
