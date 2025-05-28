@@ -347,7 +347,7 @@ class PodcastViewModel
             if (!notificationHelper.hasNotificationsPermission()) {
                 _showNotificationSnack.value = SnackBarMessage.ShowNotificationsDisabledMessage(
                     message = TextResource.fromStringId(LR.string.notification_snack_message),
-                    cta = TextResource.fromStringId(LR.string.notification_prompt_cta),
+                    cta = TextResource.fromStringId(LR.string.notification_snack_cta),
                 )
             } else {
                 podcastManager.updateShowNotifications(podcastUuid, show)
