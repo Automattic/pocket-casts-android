@@ -231,7 +231,7 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
         }
 
         override fun onFlingIntercepted(velocityX: Float, velocityY: Float) {
-            behavior.state = if (velocityY >= 0f) {
+            behavior.state = if (velocityY > 0f) {
                 BottomSheetBehavior.STATE_COLLAPSED
             } else {
                 BottomSheetBehavior.STATE_EXPANDED
