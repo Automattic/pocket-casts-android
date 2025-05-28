@@ -99,8 +99,8 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
             val callback = createBottomSheetCallback(rootView = parent as CoordinatorLayout)
             addBottomSheetCallback(callback)
 
-            val preFlingInterceptor = createPreFlingInterceptor(behavior = this as ViewPager2AwareBottomSheetBehavior)
-            setPreFlingInterceptor(preFlingInterceptor)
+            val preFlingInterceptor = createPreFlingInterceptor(behavior = this)
+            (this as ViewPager2AwareBottomSheetBehavior).setPreFlingInterceptor(preFlingInterceptor)
 
             doOnLayout {
                 if (state == BottomSheetBehavior.STATE_EXPANDED) {
