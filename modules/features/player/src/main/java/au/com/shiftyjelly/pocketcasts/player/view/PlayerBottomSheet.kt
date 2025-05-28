@@ -227,7 +227,7 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
         behavior: BottomSheetBehavior<*>,
     ) = object : PreFlingInterceptor {
         override fun shouldInterceptFlingGesture(velocityX: Float, velocityY: Float): Boolean {
-            return velocityY in -4000f..0f
+            return behavior.calculateSlideOffset() > 0.75f && velocityY in -4000f..0f
         }
 
         override fun onFlingIntercepted(velocityX: Float, velocityY: Float) {
