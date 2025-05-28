@@ -352,7 +352,7 @@ class PodcastViewModel
                 podcastManager.updateShowNotifications(podcastUuid, show)
                 if (show) {
                     _showNotificationSnack.value = SnackBarMessage.ShowNotifyOnNewEpisodesMessage(
-                        message = TextResource.fromStringId(LR.string.notifications_enabled_message, podcastTitle)
+                        message = TextResource.fromStringId(LR.string.notifications_enabled_message, podcastTitle),
                     )
                 }
             }
@@ -755,7 +755,7 @@ class PodcastViewModel
 
         data class ShowNotifyOnNewEpisodesMessage(
             override val message: TextResource,
-            override val cta: TextResource? = null
+            override val cta: TextResource? = null,
         ) : SnackBarMessage {
             override var consumed: Boolean = false
         }

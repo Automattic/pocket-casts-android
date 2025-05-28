@@ -928,11 +928,11 @@ class PodcastFragment : BaseFragment() {
                             cta = message.cta.asString(requireContext()),
                             onCtaClick = {
                                 viewModel.onOpenNotificationSettingsClicked(requireActivity())
-                            }
+                            },
                         )
                         is PodcastViewModel.SnackBarMessage.ShowNotifyOnNewEpisodesMessage -> showSnackBar(
                             message = message.message.asString(requireContext()),
-                            duration = 3000
+                            duration = 3000,
                         )
                     }
                     message.consumed = true
@@ -1263,7 +1263,7 @@ class PodcastFragment : BaseFragment() {
         message: String,
         cta: String? = null,
         onCtaClick: (() -> Unit)? = null,
-        duration: Int = Snackbar.LENGTH_LONG
+        duration: Int = Snackbar.LENGTH_LONG,
     ) {
         (activity as? FragmentHostListener)?.snackBarView()?.let { snackBarView ->
             currentSnackBar = Snackbar.make(snackBarView, message, duration).apply {

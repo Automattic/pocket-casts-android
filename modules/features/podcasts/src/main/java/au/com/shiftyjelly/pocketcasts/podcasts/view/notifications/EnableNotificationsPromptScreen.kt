@@ -34,7 +34,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 internal fun EnableNotificationsPromptScreen(
     onCtaClicked: () -> Unit,
     onDismissClicked: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier,
@@ -47,7 +47,7 @@ internal fun EnableNotificationsPromptScreen(
             Icon(
                 painter = painterResource(IR.drawable.ic_close),
                 contentDescription = "close icon",
-                tint = MaterialTheme.theme.colors.primaryText01
+                tint = MaterialTheme.theme.colors.primaryText01,
             )
         }
         Spacer(modifier = Modifier.height(42.dp))
@@ -66,7 +66,7 @@ internal fun EnableNotificationsPromptScreen(
             modifier = Modifier.padding(horizontal = 32.dp),
             text = stringResource(LR.string.notification_prompt_message),
             color = MaterialTheme.theme.colors.secondaryText02,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
         )
         Spacer(modifier = Modifier.weight(1f))
         RowButton(
@@ -86,10 +86,10 @@ internal fun EnableNotificationsPromptScreen(
 @Preview
 @Composable
 private fun EnableNotificationsPromptScreenPreview(
-    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType
+    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) = AppThemeWithBackground(themeType) {
     EnableNotificationsPromptScreen(
         onDismissClicked = {},
-        onCtaClicked = {}
+        onCtaClicked = {},
     )
 }
