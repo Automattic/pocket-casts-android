@@ -22,6 +22,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.util.lerp
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.isVisible
@@ -145,6 +146,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -160,6 +162,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
 import com.automattic.android.tracks.crashlogging.CrashLogging
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.Observable
@@ -204,6 +207,7 @@ class MainActivity :
     companion object {
         private const val INITIAL_KEY = "initial"
         private const val SOURCE_KEY = "source"
+
         init {
             AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
         }
@@ -211,40 +215,57 @@ class MainActivity :
         const val PROMOCODE_REQUEST_CODE = 2
     }
 
-    @Inject lateinit var playbackManager: PlaybackManager
+    @Inject
+    lateinit var playbackManager: PlaybackManager
 
-    @Inject lateinit var podcastManager: PodcastManager
+    @Inject
+    lateinit var podcastManager: PodcastManager
 
-    @Inject lateinit var playlistManager: PlaylistManager
+    @Inject
+    lateinit var playlistManager: PlaylistManager
 
-    @Inject lateinit var episodeManager: EpisodeManager
+    @Inject
+    lateinit var episodeManager: EpisodeManager
 
-    @Inject lateinit var serviceManager: ServiceManager
+    @Inject
+    lateinit var serviceManager: ServiceManager
 
-    @Inject lateinit var theme: Theme
+    @Inject
+    lateinit var theme: Theme
 
-    @Inject lateinit var settings: Settings
+    @Inject
+    lateinit var settings: Settings
 
-    @Inject lateinit var userEpisodeManager: UserEpisodeManager
+    @Inject
+    lateinit var userEpisodeManager: UserEpisodeManager
 
-    @Inject lateinit var warningsHelper: WarningsHelper
+    @Inject
+    lateinit var warningsHelper: WarningsHelper
 
-    @Inject lateinit var analyticsTracker: AnalyticsTracker
+    @Inject
+    lateinit var analyticsTracker: AnalyticsTracker
 
-    @Inject lateinit var episodeAnalytics: EpisodeAnalytics
+    @Inject
+    lateinit var episodeAnalytics: EpisodeAnalytics
 
-    @Inject lateinit var syncManager: SyncManager
+    @Inject
+    lateinit var syncManager: SyncManager
 
-    @Inject lateinit var watchSync: WatchSync
+    @Inject
+    lateinit var watchSync: WatchSync
 
-    @Inject lateinit var notificationHelper: NotificationHelper
+    @Inject
+    lateinit var notificationHelper: NotificationHelper
 
-    @Inject @ApplicationScope
+    @Inject
+    @ApplicationScope
     lateinit var applicationScope: CoroutineScope
 
-    @Inject lateinit var crashLogging: CrashLogging
+    @Inject
+    lateinit var crashLogging: CrashLogging
 
-    @Inject lateinit var paymentClient: PaymentClient
+    @Inject
+    lateinit var paymentClient: PaymentClient
 
     private val viewModel: MainActivityViewModel by viewModels()
     private val disposables = CompositeDisposable()
@@ -284,17 +305,21 @@ class MainActivity :
             is OnboardingFinish.Done -> {
                 settings.setHasDoneInitialOnboarding()
             }
+
             is OnboardingFinish.DoneGoToDiscover -> {
                 settings.setHasDoneInitialOnboarding()
                 openTab(VR.id.navigation_discover)
             }
+
             is OnboardingFinish.DoneShowPlusPromotion -> {
                 settings.setHasDoneInitialOnboarding()
                 OnboardingLauncher.openOnboardingFlow(this, OnboardingFlow.Upsell(OnboardingUpgradeSource.LOGIN_PLUS_PROMOTION))
             }
+
             is OnboardingFinish.DoneShowWelcomeInReferralFlow -> {
                 settings.showReferralWelcome.set(true, updateModifiedAt = false)
             }
+
             is OnboardingFinish.DoneApplySuggestedFolders, null -> {
                 Timber.e("Unexpected result $result from onboarding activity")
             }
@@ -322,6 +347,7 @@ class MainActivity :
                 ) == PackageManager.PERMISSION_GRANTED -> {
                     onPermissionGranted()
                 }
+
                 shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) -> {
                     if (settings.isNotificationsDisabledMessageShown()) return
                     Snackbar.make(
@@ -341,6 +367,7 @@ class MainActivity :
                     }.show()
                     settings.setNotificationsDisabledMessageShown(true)
                 }
+
                 else -> {
                     notificationPermissionLauncher.launch(
                         Manifest.permission.POST_NOTIFICATIONS,
@@ -449,6 +476,8 @@ class MainActivity :
         setupPlayerViews(
             animateMiniPlayer = savedInstanceState == null,
         )
+
+        setupBottomSheetTranslation()
 
         if (savedInstanceState == null) {
             trackTabOpened(selectedTab, isInitial = true)
@@ -937,6 +966,7 @@ class MainActivity :
                                 autoPlay = false,
                             )
                         }
+
                         is NavigationState.BookmarksForUserEpisode -> {
                             // Bookmarks container is directly shown for user episode
                             val fragment = BookmarksContainerFragment.newInstance(navigationState.episode.uuid, SourceView.NOTIFICATION_BOOKMARK)
@@ -978,6 +1008,34 @@ class MainActivity :
                     binding.playerBottomSheet.isDragEnabled = false
                 }
             }
+        })
+    }
+
+    private fun setupBottomSheetTranslation() {
+        // The bottom sheet, when collapsed, slightly peeks over our content at the bottom.
+        // I'm not entirely sure about the root cause, but as far as I can tell, it seems to be
+        // related to edge-to-edge interaction with the Material library. I haven't found a way
+        // to customize or fix it.
+        //
+        // As a workaround, adding an arbitrary offset of 100dp to the bottom sheet helps by
+        // pushing the content further down when it should be hidden. 100dp is an arbitrary value
+        // big enough to hide the content.
+        val slideTranslation = 100.dpToPx(this).toFloat()
+
+        fun calculateSlideTranslation(slideOffset: Float): Float {
+            return lerp(slideTranslation, 0f, slideOffset).coerceIn(0f, slideTranslation)
+        }
+
+        binding.frameBottomSheet.post {
+            binding.frameBottomSheet.translationY = calculateSlideTranslation(frameBottomSheetBehavior.calculateSlideOffset())
+        }
+
+        frameBottomSheetBehavior.addBottomSheetCallback(object : BottomSheetCallback() {
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                bottomSheet.translationY = calculateSlideTranslation(slideOffset)
+            }
+
+            override fun onStateChanged(bottomSheet: View, newState: Int) = Unit
         })
     }
 
@@ -1276,27 +1334,33 @@ class MainActivity :
                     closeToRoot()
                     addFragment(ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.Downloaded))
                 }
+
                 is AddBookmarkDeepLink -> {
                     viewModel.buildBookmarkArguments { args ->
                         bookmarkActivityLauncher.launch(args.getIntent(this))
                     }
                 }
+
                 is ChangeBookmarkTitleDeepLink -> {
                     viewModel.buildBookmarkArguments(deepLink.bookmarkUuid) { args ->
                         bookmarkActivityLauncher.launch(args.getIntent(this))
                     }
                     notificationHelper.removeNotification(intent.extras, Settings.NotificationId.BOOKMARK.value)
                 }
+
                 is ShowBookmarkDeepLink -> {
                     viewModel.viewBookmark(deepLink.bookmarkUuid)
                 }
+
                 is DeleteBookmarkDeepLink -> {
                     viewModel.deleteBookmark(deepLink.bookmarkUuid)
                     notificationHelper.removeNotification(intent.extras, Settings.NotificationId.BOOKMARK.value)
                 }
+
                 is ShowPodcastDeepLink -> {
                     openPodcastPage(deepLink.podcastUuid, deepLink.sourceView)
                 }
+
                 is ShowEpisodeDeepLink -> {
                     openEpisodeDialog(
                         episodeUuid = deepLink.episodeUuid,
@@ -1308,15 +1372,19 @@ class MainActivity :
                         endTimestamp = deepLink.endTimestamp,
                     )
                 }
+
                 is ShowPodcastsDeepLink -> {
                     openTab(VR.id.navigation_podcasts)
                 }
+
                 is ShowDiscoverDeepLink -> {
                     openTab(VR.id.navigation_discover)
                 }
+
                 is ShowUpNextDeepLink -> {
                     // Do nothig, handled in onMiniPlayerVisible()
                 }
+
                 is ShowFilterDeepLink -> {
                     launch(Dispatchers.Default) {
                         playlistManager.findByIdBlocking(deepLink.filterId)?.let {
@@ -1330,46 +1398,59 @@ class MainActivity :
                         }
                     }
                 }
+
                 is PocketCastsWebsiteGetDeepLink -> {
                     // Do nothing when the user goes to https://pocketcasts.com/get it should either open the play store or the user's app
                 }
+
                 is ReferralsDeepLink -> {
                     openReferralClaim(deepLink.code)
                 }
+
                 is ShowPodcastFromUrlDeepLink -> {
                     openPodcastUrl(deepLink.url)
                 }
+
                 is SonosDeepLink -> {
                     startActivityForResult(
                         SonosAppLinkActivity.buildIntent(deepLink.state, this),
                         SonosAppLinkActivity.SONOS_APP_ACTIVITY_RESULT,
                     )
                 }
+
                 is ShareListDeepLink -> {
                     addFragment(ShareListIncomingFragment.newInstance(deepLink.path, SourceView.fromString(deepLink.sourceView)))
                 }
+
                 is CloudFilesDeepLink -> {
                     openCloudFiles()
                 }
+
                 is UpgradeAccountDeepLink -> {
                     showAccountUpgradeNowDialog(shouldClose = true)
                 }
+
                 is PromoCodeDeepLink -> {
                     openPromoCode(deepLink.code)
                 }
+
                 is NativeShareDeepLink -> {
                     openSharingUrl(deepLink)
                 }
+
                 is OpmlImportDeepLink -> {
                     OpmlImportTask.run(deepLink.uri, this)
                 }
+
                 is PlayFromSearchDeepLink -> {
                     playbackManager.mediaSessionManager.playFromSearchExternal(deepLink.query)
                 }
+
                 is AssistantDeepLink -> {
                     // This is what the assistant sends us when it doesn't know what to do and just opens the app. Assume the user wants to play.
                     playbackManager.playQueue()
                 }
+
                 is SignInDeepLink -> {
                     val onboardingFlow = when (SourceView.fromString(deepLink.sourceView)) {
                         SourceView.ENGAGE_SDK_SIGN_IN -> OnboardingFlow.EngageSdk
@@ -1377,6 +1458,7 @@ class MainActivity :
                     }
                     openOnboardingFlow(onboardingFlow)
                 }
+
                 null -> {
                     LogBuffer.i("DeepLink", "Did not find any matching deep link for: $intent")
                 }
@@ -1439,6 +1521,7 @@ class MainActivity :
                 is UserEpisode -> {
                     CloudFileBottomSheetFragment.newInstance(localEpisode.uuid, forceDark = true, source)
                 }
+
                 is PodcastEpisode -> {
                     EpisodeContainerFragment.newInstance(
                         episodeUuid = localEpisode.uuid,
@@ -1449,6 +1532,7 @@ class MainActivity :
                         autoPlay = autoPlay,
                     )
                 }
+
                 null -> {
                     val dialog = android.app.ProgressDialog.show(this@MainActivity, getString(LR.string.loading), getString(LR.string.please_wait), true)
                     val searchResult = serviceManager.getSharedItemDetailsSuspend("/social/share/show/$episodeUuid")
