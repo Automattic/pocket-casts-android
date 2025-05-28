@@ -29,11 +29,11 @@ open class ViewPager2AwareBottomSheetBehavior<V : View> @JvmOverloads constructo
 
     override fun onNestedPreFling(coordinatorLayout: CoordinatorLayout, child: V, target: View, velocityX: Float, velocityY: Float): Boolean {
         val shouldDisableFling = preFlingInterceptor?.shouldInterceptFlingGesture(velocityX, velocityY) ?: false
-        if (shouldDisableFling) {
+        return if (shouldDisableFling) {
             preFlingInterceptor?.onFlingIntercepted(velocityX, velocityY)
-            return false
+            false
         } else {
-            return super.onNestedPreFling(coordinatorLayout, child, target, velocityX, velocityY)
+            super.onNestedPreFling(coordinatorLayout, child, target, velocityX, velocityY)
         }
     }
 
