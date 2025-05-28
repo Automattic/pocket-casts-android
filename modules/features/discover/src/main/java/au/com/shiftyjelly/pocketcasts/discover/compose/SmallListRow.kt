@@ -86,8 +86,8 @@ private fun SmallListRowPreview(
         SmallListRow(
             pagerState = pagerState,
             podcasts = podcasts,
-            onClickPodcast = { },
-            onClickSubscribe = { },
+            onClickPodcast = {},
+            onClickSubscribe = {},
         )
     }
 }
