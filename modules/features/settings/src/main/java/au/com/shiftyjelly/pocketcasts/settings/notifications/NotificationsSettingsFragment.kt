@@ -101,6 +101,7 @@ internal class NotificationsSettingsFragment : BaseFragment(), PodcastSelectFrag
                     onSelectRingtoneClicked = ::showRingtoneSelector,
                     onSelectPodcastsClicked = ::showPodcastSelector,
                     onSystemNotificationsSettingsClicked = {
+                        viewModel.reportSystemNotificationsSettingsOpened()
                         notificationHelper.openNotificationSettings(requireActivity())
                     },
                 )

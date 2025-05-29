@@ -69,7 +69,7 @@ class NotificationSchedulerImpl @Inject constructor(
             DOWNLOADED_EPISODES to downloadedEpisodes,
         )
 
-        val notificationWork = PeriodicWorkRequest.Builder(NotificationWorker::class.java, 1, TimeUnit.DAYS)
+        val notificationWork = PeriodicWorkRequest.Builder(NotificationWorker::class.java, 7, TimeUnit.DAYS)
             .setInputData(workData)
             .setInitialDelay(initialDelay, TimeUnit.MILLISECONDS)
             .addTag(TAG_REENGAGEMENT)
@@ -77,7 +77,7 @@ class NotificationSchedulerImpl @Inject constructor(
 
         WorkManager.getInstance(context).enqueueUniquePeriodicWork(
             TAG_REENGAGEMENT,
-            ExistingPeriodicWorkPolicy.UPDATE,
+            ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
             notificationWork,
         )
     }

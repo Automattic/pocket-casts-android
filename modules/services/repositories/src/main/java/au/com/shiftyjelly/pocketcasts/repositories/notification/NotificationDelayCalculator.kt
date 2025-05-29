@@ -39,13 +39,13 @@ class NotificationDelayCalculator @Inject constructor(
 
     /**
      * Calculates the delay until the re-engagement check worker should be triggered.
-     * The worker is set to run daily at 4 PM.
+     * The worker is set to run in 7 days at 4 PM.
      *
-     * @return Delay in milliseconds until the next 4 PM.
+     * @return Delay in milliseconds until the next trigger time.
      */
     fun calculateDelayForReEngagementCheck(): Long {
         val now = clock.instant().toEpochMilli()
-        val next4PM = calculateBase4PM(now)
+        val next4PM = calculateBase4PM(now, dayOffset = 7)
         return next4PM - now
     }
 

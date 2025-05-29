@@ -631,6 +631,7 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_NOTIFICATIONS_NEW_FEATURES_AND_TIPS_ADVANCED_SETTINGS_TAPPED("settings_notifications_new_features_advanced_settings_tapped"),
     SETTINGS_NOTIFICATIONS_OFFERS_TOGGLED("settings_notifications_offers_toggle"),
     SETTINGS_NOTIFICATIONS_OFFERS_ADVANCED_SETTINGS_TAPPED("settings_notifications_offers_advanced_settings_tapped"),
+    SETTINGS_NOTIFICATIONS_PERMISSION_OPEN_SYSTEM_SETTINGS("notifications_permissions_open_system_settings"),
 
     /* Settings - Storage & Data Use */
     SETTINGS_STORAGE_SHOWN("settings_storage_shown"),

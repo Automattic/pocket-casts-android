@@ -183,23 +183,26 @@ class NotificationDelayCalculatorTest {
 
     @Test fun testReEngagementCheck_Before4PM() {
         val t = getFixedTime(2025, Calendar.APRIL, 10, 15, 0)
-        val calc = calculatorAt(t)
-        val expected = 1 * HOUR_IN_MILLIS
-        assertEquals(expected, calc.calculateDelayForReEngagementCheck())
+        val calculatedDelay = calculatorAt(t).calculateDelayForReEngagementCheck()
+        val calculatedTriggerTime = t + calculatedDelay
+        val expected = getFixedTime(2025, Calendar.APRIL, 17, 16, 0)
+        assertEquals(expected, calculatedTriggerTime)
     }
 
     @Test fun testReEngagementCheck_Exactly4PM() {
         val t = getFixedTime(2025, Calendar.APRIL, 10, 16, 0)
-        val calc = calculatorAt(t)
-        val expected = 24 * HOUR_IN_MILLIS
-        assertEquals(expected, calc.calculateDelayForReEngagementCheck())
+        val calculatedDelay = calculatorAt(t).calculateDelayForReEngagementCheck()
+        val calculatedTriggerTime = t + calculatedDelay
+        val expected = getFixedTime(2025, Calendar.APRIL, 17, 16, 0)
+        assertEquals(expected, calculatedTriggerTime)
     }
 
     @Test fun testReEngagementCheck_After4PM() {
         val t = getFixedTime(2025, Calendar.APRIL, 10, 17, 0)
-        val calc = calculatorAt(t)
-        val expected = 23 * HOUR_IN_MILLIS
-        assertEquals(expected, calc.calculateDelayForReEngagementCheck())
+        val calculatedDelay = calculatorAt(t).calculateDelayForReEngagementCheck()
+        val calculatedTriggerTime = t + calculatedDelay
+        val expected = getFixedTime(2025, Calendar.APRIL, 17, 16, 0)
+        assertEquals(expected, calculatedTriggerTime)
     }
 
     @Test fun testRecommendations_Before4PM() {

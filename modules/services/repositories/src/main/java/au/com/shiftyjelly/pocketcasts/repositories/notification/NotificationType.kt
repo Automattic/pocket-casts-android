@@ -173,7 +173,7 @@ sealed class ReEngagementNotificationType(
         get() = ReEngagementNotificationType.notificationId
 
     override fun isSettingsToggleOn(settings: Settings): Boolean {
-        return settings.dailyRemindersNotification.value
+        return settings.newFeaturesNotification.value
     }
 
     data object WeMissYou : ReEngagementNotificationType(
