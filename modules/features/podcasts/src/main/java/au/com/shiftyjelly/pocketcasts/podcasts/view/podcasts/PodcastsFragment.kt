@@ -199,9 +199,7 @@ class PodcastsFragment :
 
         viewLifecycleOwner.lifecycleScope.launch {
             if (viewModel.shouldShowTooltip()) {
-                binding.toolbar.post {
-                    showTooltip()
-                }
+                showTooltip()
             }
         }
 

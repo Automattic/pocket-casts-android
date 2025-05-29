@@ -106,7 +106,9 @@ class PodcastsViewModel @AssistedInject constructor(
             userManager.getSignInState().asFlow(),
         ) { podcasts, folders, sortType, signInState ->
             withContext(Dispatchers.Default) {
-                buildUiState(podcasts, folders, sortType, signInState)
+                val state = buildUiState(podcasts, folders, sortType, signInState)
+                adapterState = state.items.toMutableList()
+                state
             }
         }
     }
