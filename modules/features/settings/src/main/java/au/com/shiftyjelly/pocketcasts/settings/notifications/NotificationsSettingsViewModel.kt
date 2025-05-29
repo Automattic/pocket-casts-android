@@ -120,8 +120,10 @@ internal class NotificationsSettingsViewModel @Inject constructor(
                     )
                     if (preference.isEnabled) {
                         notificationScheduler.setupOnboardingNotifications()
+                        notificationScheduler.setupReEngagementNotification()
                     } else {
                         notificationScheduler.cancelScheduledOnboardingNotifications()
+                        notificationScheduler.cancelScheduledReEngagementNotifications()
                     }
                 }
 

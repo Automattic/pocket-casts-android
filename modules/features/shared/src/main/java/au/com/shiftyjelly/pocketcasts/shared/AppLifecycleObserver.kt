@@ -132,6 +132,7 @@ class AppLifecycleObserver(
                     settings.autoDownloadOnFollowPodcast.set(true, updateModifiedAt = false)
 
                     // For new users we want to enable all notifications by default
+                    settings.notifyRefreshPodcast.set(true, updateModifiedAt = false)
                     settings.dailyRemindersNotification.set(true, updateModifiedAt = false)
                     settings.recommendationsNotification.set(true, updateModifiedAt = false)
                     settings.newFeaturesNotification.set(true, updateModifiedAt = false)
