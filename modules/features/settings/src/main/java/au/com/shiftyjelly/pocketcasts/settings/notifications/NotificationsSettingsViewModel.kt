@@ -207,6 +207,10 @@ internal class NotificationsSettingsViewModel @Inject constructor(
         }
     }
 
+    internal fun reportSystemNotificationsSettingsOpened() {
+        analyticsTracker.track(AnalyticsEvent.SETTINGS_NOTIFICATIONS_PERMISSION_OPEN_SYSTEM_SETTINGS)
+    }
+
     internal suspend fun getSelectedPodcastIds(): List<String> = withContext(Dispatchers.IO) {
         val uuids = podcastManager.findSubscribedBlocking().filter { it.isShowNotifications }.map { it.uuid }
         uuids
