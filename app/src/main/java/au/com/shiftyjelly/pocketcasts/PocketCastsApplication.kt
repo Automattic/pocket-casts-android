@@ -188,7 +188,8 @@ class PocketCastsApplication : Application(), Configuration.Provider {
             notificationManager.setupOnboardingNotifications()
             notificationManager.setupReEngagementNotifications()
             notificationManager.setupTrendingAndRecommendationsNotifications()
-            notificationManager.updateUserFeatureInteraction(ReEngagementNotificationType.notificationId)
+            notificationManager.setupNewFeaturesNotifications()
+            notificationManager.setupOffersNotifications()
             appLifecycleObserver.setup()
 
             Coil.setImageLoader(coilImageLoader)
