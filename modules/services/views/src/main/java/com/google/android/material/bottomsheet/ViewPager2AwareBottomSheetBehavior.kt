@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.forEach
 import androidx.core.view.get
@@ -20,6 +21,22 @@ open class ViewPager2AwareBottomSheetBehavior<V : View> @JvmOverloads constructo
     context: Context,
     attrs: AttributeSet? = null,
 ) : BottomSheetBehavior<V>(context, attrs) {
+    private var preFlingInterceptor: PreFlingInterceptor? = null
+
+    fun setPreFlingInterceptor(interceptor: PreFlingInterceptor) {
+        preFlingInterceptor = interceptor
+    }
+
+    override fun onNestedPreFling(coordinatorLayout: CoordinatorLayout, child: V, target: View, velocityX: Float, velocityY: Float): Boolean {
+        val shouldDisableFling = preFlingInterceptor?.shouldInterceptFlingGesture(velocityX, velocityY) ?: false
+        return if (shouldDisableFling) {
+            preFlingInterceptor?.onFlingIntercepted(velocityX, velocityY)
+            false
+        } else {
+            super.onNestedPreFling(coordinatorLayout, child, target, velocityX, velocityY)
+        }
+    }
+
     override fun findScrollingChild(view: View): View? {
         if (!view.isVisible) {
             return null
@@ -44,5 +61,11 @@ open class ViewPager2AwareBottomSheetBehavior<V : View> @JvmOverloads constructo
             }
         }
         return null
+    }
+
+    interface PreFlingInterceptor {
+        fun shouldInterceptFlingGesture(velocityX: Float, velocityY: Float): Boolean
+
+        fun onFlingIntercepted(velocityX: Float, velocityY: Float)
     }
 }

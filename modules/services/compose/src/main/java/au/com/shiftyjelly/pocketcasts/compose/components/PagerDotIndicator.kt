@@ -18,13 +18,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 import kotlin.math.sign
-
-private val dotWidth = 8.dp
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -33,6 +32,7 @@ fun PagerDotIndicator(
     modifier: Modifier = Modifier,
     activeDotColor: Color = Color.White,
     inactiveDotColor: Color = activeDotColor.copy(alpha = 0.3f),
+    dotWidth: Dp = 8.dp,
 ) {
     if (state.pageCount <= 0) {
         return

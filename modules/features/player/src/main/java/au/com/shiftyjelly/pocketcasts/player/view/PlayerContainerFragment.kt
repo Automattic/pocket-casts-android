@@ -40,6 +40,7 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.NavigationBarColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
+import au.com.shiftyjelly.pocketcasts.views.helper.OffsettingBottomSheetCallback
 import au.com.shiftyjelly.pocketcasts.views.tour.TourStep
 import au.com.shiftyjelly.pocketcasts.views.tour.TourViewTag
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -140,6 +141,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
                 }
             }
         })
+        upNextBottomSheetBehavior.addBottomSheetCallback(OffsettingBottomSheetCallback(binding.upNextFrameBottomSheet))
 
         val viewPager = binding.viewPager
 

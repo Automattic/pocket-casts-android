@@ -2,26 +2,28 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:orientation="vertical"
     android:paddingTop="16dp">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingRight="16dp"
-        android:paddingLeft="16dp">
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp">
+
         <TextView
             android:id="@+id/lblTitle"
+            style="?attr/textH3"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
-            style="?attr/textH3"
-            android:textColor="?attr/primary_text_01"
+            android:layout_weight="1"
             android:letterSpacing="0.005"
-            tools:text="Popular"/>
+            android:textColor="?attr/primary_text_01"
+            tools:text="Popular" />
 
         <TextView
             android:id="@+id/btnShowAll"
@@ -33,20 +35,10 @@
             android:textColor="?attr/primary_interactive_01" />
     </LinearLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rowRecyclerView"
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/smallList"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
-        android:clipToPadding="false"
-        tools:listItem="@layout/item_small_list"/>
-
-    <au.com.shiftyjelly.pocketcasts.views.component.PagerIndicator
-        android:id="@+id/pageIndicatorView"
-        android:layout_width="wrap_content"
-        android:layout_height="8dp"
-        android:layout_gravity="bottom|center_horizontal" />
+        android:layout_height="wrap_content" />
 
     <View style="@style/row_divider" />
 </LinearLayout>

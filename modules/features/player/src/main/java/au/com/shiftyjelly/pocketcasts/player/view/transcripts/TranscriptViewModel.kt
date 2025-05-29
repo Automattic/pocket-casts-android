@@ -192,7 +192,9 @@ class TranscriptViewModel @Inject constructor(
             val previousItemEndIndex = if (index == 0) 0 else items[index - 1].endIndex
             val currentItemStartIndex = formattedText.indexOf(currentItem, previousItemEndIndex)
             val isSpeaker = currentItemStartIndex in speakerIndices
-            items.add(DisplayItem(currentItem, isSpeaker, currentItemStartIndex, currentItemStartIndex + currentItem.length))
+            // As we are removing new lines, add a space after each item so copying the text doesn't merge items together.
+            val text = "$currentItem "
+            items.add(DisplayItem(text, isSpeaker, currentItemStartIndex, currentItemStartIndex + currentItem.length))
         }
         DisplayInfo(
             text = formattedText,
