@@ -74,14 +74,6 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
-    MANAGE_DOWNLOADED_EPISODES(
-        key = "manage_downloaded_episodes",
-        title = "Manage Downloaded Episodes",
-        defaultValue = BuildConfig.DEBUG,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
-    ),
     PODCASTS_SORT_CHANGES(
         key = "podcasts_sort_changes",
         title = "Podcasts Sort Changes",
