@@ -85,8 +85,6 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.images.CoilManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
@@ -470,9 +468,7 @@ class PodcastFragment : BaseFragment() {
     private val onEpisodesOptionsClicked: () -> Unit = {
         analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_OPTIONS_TAPPED)
         var optionsDialog = OptionsDialog()
-
-        if (FeatureFlag.isEnabled(Feature.PODCAST_FEED_UPDATE)) {
-            optionsDialog = optionsDialog.addTextOption(
+            .addTextOption(
                 titleId = LR.string.podcast_refresh_episodes,
                 imageId = IR.drawable.ic_refresh,
                 click = {
@@ -481,9 +477,6 @@ class PodcastFragment : BaseFragment() {
                     }
                 },
             )
-        }
-
-        optionsDialog
             .addTextOption(
                 titleId = LR.string.podcast_sort_episodes,
                 imageId = IR.drawable.ic_sort,
@@ -699,7 +692,6 @@ class PodcastFragment : BaseFragment() {
     ): View {
         val binding = FragmentPodcastBinding.inflate(inflater, container, false).also { binding = it }
 
-        binding.swipeRefreshLayout.isEnabled = FeatureFlag.isEnabled(Feature.PODCAST_FEED_UPDATE)
         toolbarController.setUpToolbar(
             view = binding.toolbar,
             theme = theme,
