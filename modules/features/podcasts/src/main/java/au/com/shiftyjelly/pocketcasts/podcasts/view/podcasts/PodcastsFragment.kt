@@ -76,8 +76,6 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSourc
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.hideShadow
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.adapter.PodcastTouchCallback
 import au.com.shiftyjelly.pocketcasts.views.extensions.quickScrollToTop
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -181,12 +179,8 @@ class PodcastsFragment :
         toolbar.setOnMenuItemClickListener(this)
 
         toolbar.menu.findItem(R.id.folders_locked).setOnMenuItemClickListener {
-            if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS)) {
-                if (viewModel.areSuggestedFoldersAvailable.value) {
-                    showSuggestedFoldersCreation(SuggestedFoldersFragment.Source.ToolbarButton)
-                } else {
-                    OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.Upsell(OnboardingUpgradeSource.FOLDERS))
-                }
+            if (viewModel.areSuggestedFoldersAvailable.value) {
+                showSuggestedFoldersCreation(SuggestedFoldersFragment.Source.ToolbarButton)
             } else {
                 OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.Upsell(OnboardingUpgradeSource.FOLDERS))
             }
@@ -303,7 +297,7 @@ class PodcastsFragment :
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.areSuggestedFoldersAvailable.collect { areAvailable ->
-                    if (areAvailable && FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS) && viewModel.isEligibleForSuggestedFoldersPopup()) {
+                    if (areAvailable && viewModel.isEligibleForSuggestedFoldersPopup()) {
                         showSuggestedFoldersCreation(SuggestedFoldersFragment.Source.Popup)
                     }
                 }
@@ -382,11 +376,7 @@ class PodcastsFragment :
 
     private fun handleFolderCreation() {
         if (viewModel.areSuggestedFoldersAvailable.value) {
-            if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS)) {
-                showSuggestedFoldersCreation(SuggestedFoldersFragment.Source.ToolbarButton)
-            } else {
-                showCustomFolderCreation()
-            }
+            showSuggestedFoldersCreation(SuggestedFoldersFragment.Source.ToolbarButton)
         } else {
             showCustomFolderCreation()
         }

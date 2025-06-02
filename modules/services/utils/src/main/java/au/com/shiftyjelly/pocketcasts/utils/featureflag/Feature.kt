@@ -154,14 +154,6 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
-    SUGGESTED_FOLDERS(
-        key = "suggested_folders",
-        title = "Suggested Folders",
-        defaultValue = BuildConfig.DEBUG,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
-    ),
     PODCASTS_SORT_CHANGES(
         key = "podcasts_sort_changes",
         title = "Podcasts Sort Changes",
