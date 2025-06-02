@@ -82,14 +82,6 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
-    RESET_EPISODE_CACHE_ON_416_ERROR(
-        key = "reset_episode_cache_on_416_error",
-        title = "Reset episode cache on 416 error",
-        defaultValue = true,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = false,
-    ),
     PODCASTS_SORT_CHANGES(
         key = "podcasts_sort_changes",
         title = "Podcasts Sort Changes",
