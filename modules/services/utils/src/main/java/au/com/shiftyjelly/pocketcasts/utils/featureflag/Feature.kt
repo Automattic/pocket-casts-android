@@ -82,14 +82,6 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
-    UP_NEXT_SHUFFLE(
-        key = "up_next_shuffle",
-        title = "Up Next Shuffle",
-        defaultValue = BuildConfig.DEBUG,
-        tier = FeatureTier.Plus(),
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
-    ),
     MANAGE_DOWNLOADED_EPISODES(
         key = "manage_downloaded_episodes",
         title = "Manage Downloaded Episodes",
