@@ -596,7 +596,7 @@ class PodcastFragment : BaseFragment() {
     }
 
     private val onNotificationsClicked: (Podcast, Boolean) -> Unit = { podcast, show ->
-        viewModel.showNotifications(podcast.uuid, podcast.title, show)
+        viewModel.showNotifications(podcast.uuid, show)
     }
 
     private val onDonateClicked: (Uri?) -> Unit = { uri ->

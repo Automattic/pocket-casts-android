@@ -2445,5 +2445,6 @@
     <string name="notification_prompt_cta">Allow Notifications</string>
     <string name="notification_snack_message">Please allow notifications in your device settings</string>
     <string name="notification_snack_cta">Open Settings</string>
+    <string name="notification_mockup_image_description">Mockup image</string>
 
 </resources>

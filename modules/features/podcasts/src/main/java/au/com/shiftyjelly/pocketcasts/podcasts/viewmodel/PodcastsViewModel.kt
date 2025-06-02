@@ -64,15 +64,10 @@ class PodcastsViewModel
     init {
         viewModelScope.launch {
             suggestedFoldersManager.observeSuggestedFolders().collect { folders ->
-                if (notificationHelper.hasNotificationsPermission()) {
-                    _suggestedFoldersState.value = if (folders.isEmpty()) {
-                        SuggestedFoldersState.Empty
-                    } else {
-                        SuggestedFoldersState.Available
-                    }
-                    _notificationsState.value = NotificationsPromptState.AlreadyHasPermissions
-                } else if (!settings.notificationsPromptAcknowledged.value) {
-                    _notificationsState.value = NotificationsPromptState.ShowPrompt
+                _suggestedFoldersState.value = if (folders.isEmpty()) {
+                    SuggestedFoldersState.Empty
+                } else {
+                    SuggestedFoldersState.Available
                 }
             }
         }
@@ -163,7 +158,12 @@ class PodcastsViewModel
     private val _suggestedFoldersState = MutableStateFlow<SuggestedFoldersState>(SuggestedFoldersState.Empty)
     val suggestedFoldersState = _suggestedFoldersState.asStateFlow()
 
-    private val _notificationsState = MutableStateFlow<NotificationsPromptState?>(null)
+    private val _notificationsState = MutableStateFlow(
+        NotificationsPermissionState(
+            hasPermission = notificationHelper.hasNotificationsPermission(),
+            hasShownPromptBefore = settings.notificationsPromptAcknowledged.value,
+        ),
+    )
     val notificationPromptState = _notificationsState.asStateFlow()
 
     private fun buildHomeFolderItems(podcasts: List<Podcast>, folders: List<FolderItem>, podcastSortType: PodcastsSortType) = when (podcastSortType) {
@@ -283,12 +283,11 @@ class PodcastsViewModel
         folderUuidObservable.accept(Optional.ofNullable(folderUuid))
     }
 
-    fun checkNotificationPermission() {
-        if (notificationHelper.hasNotificationsPermission()) {
-            _notificationsState.value = NotificationsPromptState.AlreadyHasPermissions
-        } else if (settings.notificationsPromptAcknowledged.value) {
-            _notificationsState.value = null
-        }
+    fun updateNotificationsPermissionState() {
+        _notificationsState.value = NotificationsPermissionState(
+            hasPermission = notificationHelper.hasNotificationsPermission(),
+            hasShownPromptBefore = settings.notificationsPromptAcknowledged.value,
+        )
     }
 
     fun isFolderOpen(): Boolean {
@@ -382,10 +381,10 @@ class PodcastsViewModel
         data object Available : SuggestedFoldersState()
     }
 
-    sealed class NotificationsPromptState {
-        data object ShowPrompt : NotificationsPromptState()
-        data object AlreadyHasPermissions : NotificationsPromptState()
-    }
+    data class NotificationsPermissionState(
+        val hasPermission: Boolean,
+        val hasShownPromptBefore: Boolean,
+    )
 
     companion object {
         private const val NUMBER_OF_FOLDERS_KEY = "number_of_folders"

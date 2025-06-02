@@ -46,14 +46,14 @@ internal fun EnableNotificationsPromptScreen(
         ) {
             Icon(
                 painter = painterResource(IR.drawable.ic_close),
-                contentDescription = "close icon",
+                contentDescription = stringResource(LR.string.close),
                 tint = MaterialTheme.theme.colors.primaryText01,
             )
         }
         Spacer(modifier = Modifier.height(42.dp))
         Image(
             painter = painterResource(IR.drawable.android_mockup),
-            contentDescription = "android mockup",
+            contentDescription = stringResource(LR.string.notification_mockup_image_description),
         )
         Spacer(modifier = Modifier.height(24.dp))
         TextH10(

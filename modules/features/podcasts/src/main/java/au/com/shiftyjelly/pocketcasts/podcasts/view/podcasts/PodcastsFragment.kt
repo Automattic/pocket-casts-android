@@ -88,6 +88,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
@@ -292,35 +293,27 @@ class PodcastsFragment :
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.suggestedFoldersState.collect { state ->
-                    when (state) {
-                        is SuggestedFoldersState.Available -> {
-                            if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS) && viewModel.isEligibleForSuggestedFoldersPopup()) {
-                                showSuggestedFoldersCreation(SuggestedFoldersFragment.Source.Popup)
-                            }
+                viewModel.suggestedFoldersState.combine(viewModel.notificationPromptState) { foldersState, notificationsState ->
+                    foldersState to notificationsState
+                }.collect { (folderState, notificationState) ->
+                    // Don't stack popups, notification prompt takes precedence over suggested folders popup
+                    if (!notificationState.hasPermission && !notificationState.hasShownPromptBefore && FeatureFlag.isEnabled(Feature.NOTIFICATIONS_REVAMP)) {
+                        if (parentFragmentManager.findFragmentByTag("notifications_prompt") == null) {
+                            EnableNotificationsPromptFragment
+                                .newInstance()
+                                .show(parentFragmentManager, "notifications_prompt")
                         }
-
-                        is SuggestedFoldersState.Empty -> Unit
-                    }
-                }
-            }
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.notificationPromptState.collect { state ->
-                    when (state) {
-                        is PodcastsViewModel.NotificationsPromptState.ShowPrompt -> {
-                            if (FeatureFlag.isEnabled(Feature.NOTIFICATIONS_REVAMP)) {
-                                if (parentFragmentManager.findFragmentByTag("notifications_prompt") == null) {
-                                    EnableNotificationsPromptFragment
-                                        .newInstance()
-                                        .show(parentFragmentManager, "notifications_prompt")
+                    } else {
+                        (parentFragmentManager.findFragmentByTag("notifications_prompt") as? DialogFragment)?.dismissNow()
+                        when (folderState) {
+                            is SuggestedFoldersState.Available -> {
+                                if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS) && viewModel.isEligibleForSuggestedFoldersPopup()) {
+                                    showSuggestedFoldersCreation(SuggestedFoldersFragment.Source.Popup)
                                 }
                             }
-                        }
 
-                        else -> (parentFragmentManager.findFragmentByTag("notifications_prompt") as? DialogFragment)?.dismiss()
+                            is SuggestedFoldersState.Empty -> Unit
+                        }
                     }
                 }
             }
@@ -447,7 +440,7 @@ class PodcastsFragment :
         super.onResume()
 
         viewModel.setFolderUuid(folderUuid)
-        viewModel.checkNotificationPermission()
+        viewModel.updateNotificationsPermissionState()
 
         adjustViewIfNeeded()
     }

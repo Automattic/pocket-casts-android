@@ -53,7 +53,6 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
-import java.util.UUID
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.min
@@ -62,9 +61,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlowable
@@ -110,8 +107,8 @@ class PodcastViewModel
 
     val groupedEpisodes: MutableLiveData<List<List<PodcastEpisode>>> = MutableLiveData()
     val signInState = userManager.getSignInState().toLiveData()
-    private val _showNotificationSnack = MutableStateFlow<SnackBarMessage?>(null)
-    val showNotificationSnack = _showNotificationSnack.asStateFlow()
+    private val _showNotificationSnack = MutableSharedFlow<SnackBarMessage>()
+    val showNotificationSnack = _showNotificationSnack.asSharedFlow()
 
     val tintColor = MutableLiveData<Int>()
 
@@ -341,19 +338,23 @@ class PodcastViewModel
         }
     }
 
-    fun showNotifications(podcastUuid: String, podcastTitle: String, show: Boolean) {
+    fun showNotifications(podcastUuid: String, show: Boolean) {
         analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_NOTIFICATIONS_TAPPED, AnalyticsProp.notificationEnabled(show))
         viewModelScope.launch {
             if (!notificationHelper.hasNotificationsPermission()) {
-                _showNotificationSnack.value = SnackBarMessage.ShowNotificationsDisabledMessage(
-                    message = TextResource.fromStringId(LR.string.notification_snack_message),
-                    cta = TextResource.fromStringId(LR.string.notification_snack_cta),
+                _showNotificationSnack.tryEmit(
+                    SnackBarMessage.ShowNotificationsDisabledMessage(
+                        message = TextResource.fromStringId(LR.string.notification_snack_message),
+                        cta = TextResource.fromStringId(LR.string.notification_snack_cta),
+                    ),
                 )
             } else {
                 podcastManager.updateShowNotifications(podcastUuid, show)
                 if (show) {
-                    _showNotificationSnack.value = SnackBarMessage.ShowNotifyOnNewEpisodesMessage(
-                        message = TextResource.fromStringId(LR.string.notifications_enabled_message, podcastTitle),
+                    _showNotificationSnack.tryEmit(
+                        SnackBarMessage.ShowNotifyOnNewEpisodesMessage(
+                            message = TextResource.fromStringId(LR.string.notifications_enabled_message, podcastManager.findPodcastByUuid(podcastUuid)?.title.orEmpty()),
+                        ),
                     )
                 }
             }
@@ -502,6 +503,7 @@ class PodcastViewModel
                     }
                 }
             }
+
             is Bookmark -> {
                 val startIndex = uiState.bookmarks.indexOf(multiSelectable)
                 if (startIndex > -1) {
@@ -526,6 +528,7 @@ class PodcastViewModel
                     }
                 }
             }
+
             is Bookmark -> {
                 val startIndex = uiState.bookmarks.indexOf(multiSelectable)
                 if (startIndex > -1) {
@@ -724,9 +727,11 @@ class PodcastViewModel
             val episodeLimitIndex: Int?,
             val showTab: PodcastTab = PodcastTab.EPISODES,
         ) : UiState()
+
         data class Error(
             val errorMessage: String,
         ) : UiState()
+
         data object Loading : UiState()
     }
 
@@ -744,18 +749,14 @@ class PodcastViewModel
 
     sealed interface SnackBarMessage {
         val message: TextResource
-        val cta: TextResource?
 
         data class ShowNotificationsDisabledMessage(
             override val message: TextResource,
-            override val cta: TextResource,
-            private val uniqueUuid: UUID = UUID.randomUUID(),
+            val cta: TextResource,
         ) : SnackBarMessage
 
         data class ShowNotifyOnNewEpisodesMessage(
             override val message: TextResource,
-            override val cta: TextResource? = null,
-            private val uniqueUuid: UUID = UUID.randomUUID(),
         ) : SnackBarMessage
     }
 
@@ -766,8 +767,10 @@ class PodcastViewModel
         private const val UUID_KEY = "uuid"
         fun archiveToggled(archived: Boolean) =
             mapOf(SHOW_ARCHIVED to archived)
+
         fun notificationEnabled(show: Boolean) =
             mapOf(ENABLED_KEY to show)
+
         fun podcastSubscribeToggled(source: SourceView, uuid: String) =
             mapOf(SOURCE_KEY to source.analyticsValue, UUID_KEY to uuid)
     }
