@@ -287,7 +287,7 @@ class PodcastsViewModel @AssistedInject constructor(
     private var refreshSuggestedFoldersJob: Job? = null
 
     fun refreshSuggestedFolders() {
-        if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS) && refreshSuggestedFoldersJob?.isActive != true) {
+        if (refreshSuggestedFoldersJob?.isActive != true) {
             refreshSuggestedFoldersJob = viewModelScope.launch {
                 suggestedFoldersManager.refreshSuggestedFolders()
             }

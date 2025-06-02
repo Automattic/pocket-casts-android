@@ -33,13 +33,9 @@ import au.com.shiftyjelly.pocketcasts.settings.SettingsFragment
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
-import au.com.shiftyjelly.pocketcasts.sharing.SharingClient
-import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.R
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -77,9 +73,6 @@ class BookmarksFragment : BaseFragment() {
 
     @Inject
     lateinit var settings: Settings
-
-    @Inject
-    lateinit var sharingClient: SharingClient
 
     private val sourceView: SourceView
         get() = SourceView.fromString(arguments?.getString(ARG_SOURCE_VIEW))
@@ -220,16 +213,9 @@ class BookmarksFragment : BaseFragment() {
             val (podcast, episode, bookmark) = bookmarksViewModel.getSharedBookmark() ?: return@launch
             bookmarksViewModel.onShare(podcast.uuid, episode.uuid, sourceView)
             val timestamp = bookmark.timeSecs.seconds
-            if (FeatureFlag.isEnabled(Feature.REIMAGINE_SHARING)) {
-                ShareEpisodeTimestampFragment
-                    .forBookmark(episode, timestamp, podcast.backgroundColor, sourceView)
-                    .show(parentFragmentManager, "share_screen")
-            } else {
-                val request = SharingRequest.bookmark(podcast, episode, timestamp)
-                    .setSourceView(sourceView)
-                    .build()
-                sharingClient.share(request)
-            }
+            ShareEpisodeTimestampFragment
+                .forBookmark(episode, timestamp, podcast.backgroundColor, sourceView)
+                .show(parentFragmentManager, "share_screen")
         }
     }
 

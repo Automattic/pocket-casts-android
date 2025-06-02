@@ -208,7 +208,7 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override val cacheEntirePlayingEpisode = UserSetting.CacheEntirePlayingEpisodePref(
+    override val cacheEntirePlayingEpisode = UserSetting.BoolPref(
         sharedPrefKey = "cacheEntirePlayingEpisode",
         defaultValue = firebaseRemoteConfig.getBoolean(FirebaseConfig.EXOPLAYER_CACHE_ENTIRE_PLAYING_EPISODE_SETTING_DEFAULT),
         sharedPrefs = sharedPreferences,

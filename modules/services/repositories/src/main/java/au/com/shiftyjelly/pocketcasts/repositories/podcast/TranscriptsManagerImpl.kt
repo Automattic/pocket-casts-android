@@ -13,15 +13,12 @@ import au.com.shiftyjelly.pocketcasts.utils.NetworkWrapper
 import au.com.shiftyjelly.pocketcasts.utils.exception.EmptyDataException
 import au.com.shiftyjelly.pocketcasts.utils.exception.NoNetworkException
 import au.com.shiftyjelly.pocketcasts.utils.exception.ParsingException
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import java.net.UnknownHostException
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.CacheControl
@@ -68,13 +65,6 @@ class TranscriptsManagerImpl @Inject constructor(
 
     override fun observeTranscriptForEpisode(episodeUuid: String) = transcriptDao
         .observeTranscriptForEpisode(episodeUuid)
-        .map { transcript ->
-            if (FeatureFlag.isEnabled(Feature.GENERATED_TRANSCRIPTS)) {
-                transcript
-            } else {
-                transcript?.takeIf { !it.isGenerated }
-            }
-        }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     fun findBestTranscript(transcripts: List<Transcript>): Transcript? {
