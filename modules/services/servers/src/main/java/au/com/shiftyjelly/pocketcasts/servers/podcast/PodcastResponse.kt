@@ -52,11 +52,11 @@ data class PodcastInfo(
         val podcast = Podcast()
         podcast.uuid = uuid
         podcast.podcastUrl = url
-        podcast.title = title ?: ""
-        podcast.author = author ?: ""
-        podcast.podcastCategory = category ?: ""
-        podcast.podcastHtmlDescription = descriptionHtml ?: ""
-        podcast.podcastDescription = description ?: ""
+        podcast.title = title.orEmpty()
+        podcast.author = author.orEmpty()
+        podcast.podcastCategory = category.orEmpty()
+        podcast.podcastHtmlDescription = descriptionHtml.orEmpty()
+        podcast.podcastDescription = description.orEmpty()
         podcast.episodesSortType = if (showType == "serial") EpisodesSortType.EPISODES_SORT_BY_DATE_ASC else EpisodesSortType.EPISODES_SORT_BY_DATE_DESC
         episodes?.mapNotNull { it.toEpisode(uuid) }?.let { episodes ->
             podcast.episodes.addAll(episodes)
@@ -89,7 +89,7 @@ data class EpisodeInfo(
 
     fun toEpisode(podcastUuid: String): PodcastEpisode? {
         val publishedDate = published.parseIsoDate() ?: return null
-        val episodeTitle = title ?: ""
+        val episodeTitle = title.orEmpty()
         return PodcastEpisode(
             uuid = uuid,
             downloadUrl = url,
