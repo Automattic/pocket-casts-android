@@ -79,8 +79,6 @@ import au.com.shiftyjelly.pocketcasts.settings.SettingsFragment
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
-import au.com.shiftyjelly.pocketcasts.sharing.SharingClient
-import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
 import au.com.shiftyjelly.pocketcasts.ui.extensions.openUrl
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
@@ -186,9 +184,6 @@ class PodcastFragment : BaseFragment() {
 
     @Inject
     lateinit var analyticsTracker: AnalyticsTracker
-
-    @Inject
-    lateinit var sharingClient: SharingClient
 
     @Inject
     lateinit var colorAnalyzer: PodcastImageColorAnalyzer
@@ -939,16 +934,9 @@ class PodcastFragment : BaseFragment() {
             val (podcast, episode, bookmark) = viewModel.getSharedBookmark() ?: return@launch
             viewModel.onBookmarkShare(podcast.uuid, episode.uuid, sourceView)
             val timestamp = bookmark.timeSecs.seconds
-            if (FeatureFlag.isEnabled(Feature.REIMAGINE_SHARING)) {
-                ShareEpisodeTimestampFragment
-                    .forBookmark(episode, timestamp, podcast.backgroundColor, SourceView.PODCAST_SCREEN)
-                    .show(parentFragmentManager, "share_screen")
-            } else {
-                val request = SharingRequest.bookmark(podcast, episode, timestamp)
-                    .setSourceView(SourceView.PODCAST_SCREEN)
-                    .build()
-                sharingClient.share(request)
-            }
+            ShareEpisodeTimestampFragment
+                .forBookmark(episode, timestamp, podcast.backgroundColor, SourceView.PODCAST_SCREEN)
+                .show(parentFragmentManager, "share_screen")
         }
     }
 
@@ -1219,18 +1207,9 @@ class PodcastFragment : BaseFragment() {
             return
         }
 
-        if (FeatureFlag.isEnabled(Feature.REIMAGINE_SHARING)) {
-            SharePodcastFragment
-                .newInstance(podcast, SourceView.PODCAST_SCREEN)
-                .show(parentFragmentManager, "share_screen")
-        } else {
-            lifecycleScope.launch {
-                val request = SharingRequest.podcast(podcast)
-                    .setSourceView(SourceView.PODCAST_SCREEN)
-                    .build()
-                sharingClient.share(request)
-            }
-        }
+        SharePodcastFragment
+            .newInstance(podcast, SourceView.PODCAST_SCREEN)
+            .show(parentFragmentManager, "share_screen")
     }
 
     private fun downloadAll() {

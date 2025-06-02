@@ -22,8 +22,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewFragment
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
@@ -91,7 +89,7 @@ class MainActivityViewModel
         val lastSeenVersionCode = settings.getWhatsNewVersionCode()
         val migratedVersion = settings.getMigratedVersionCode()
         if (migratedVersion != 0) { // We don't want to show this to new users, there is a race condition between this and the version migration
-            val whatsNewShouldBeShown = WhatsNewFragment.isWhatsNewNewerThan(lastSeenVersionCode) && FeatureFlag.isEnabled(Feature.REIMAGINE_SHARING)
+            val whatsNewShouldBeShown = WhatsNewFragment.isWhatsNewNewerThan(lastSeenVersionCode)
             _state.update { state -> state.copy(shouldShowWhatsNew = whatsNewShouldBeShown) }
         }
     }

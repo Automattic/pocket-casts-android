@@ -58,14 +58,6 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
-    REIMAGINE_SHARING(
-        key = "reimagine_sharing",
-        title = "Use new sharing designs",
-        defaultValue = true,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
-    ),
     EXPLAT_EXPERIMENT(
         key = "explat_experiment",
         title = "ExPlat Experiment",
