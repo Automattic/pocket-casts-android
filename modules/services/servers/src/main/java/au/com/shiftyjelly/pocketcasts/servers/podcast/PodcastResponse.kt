@@ -4,8 +4,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import java.util.Date
@@ -57,9 +55,7 @@ data class PodcastInfo(
         podcast.title = title ?: ""
         podcast.author = author ?: ""
         podcast.podcastCategory = category ?: ""
-        if (FeatureFlag.isEnabled(Feature.PODCAST_HTML_DESCRIPTION)) {
-            podcast.podcastHtmlDescription = descriptionHtml ?: ""
-        }
+        podcast.podcastHtmlDescription = descriptionHtml ?: ""
         podcast.podcastDescription = description ?: ""
         podcast.episodesSortType = if (showType == "serial") EpisodesSortType.EPISODES_SORT_BY_DATE_ASC else EpisodesSortType.EPISODES_SORT_BY_DATE_DESC
         episodes?.mapNotNull { it.toEpisode(uuid) }?.let { episodes ->

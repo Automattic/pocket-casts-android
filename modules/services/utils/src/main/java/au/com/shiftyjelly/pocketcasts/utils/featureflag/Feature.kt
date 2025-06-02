@@ -106,14 +106,6 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
-    PODCAST_HTML_DESCRIPTION(
-        key = "podcast_html_description",
-        title = "Use HTML in the podcast description",
-        defaultValue = true,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
-    ),
     SHARE_PODCAST_PRIVATE_NOT_AVAILABLE(
         key = "share_podcast_private_not_available",
         title = "Sharing is not available for private podcasts",
