@@ -89,28 +89,6 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
             if (notificationFeaturesProvider.isRevampFeatureEnabled) {
                 add(
                     NotificationPreferenceCategory(
-                        title = TextResource.fromStringId(LR.string.settings_notification_daily_reminders),
-                        preferences = buildList {
-                            add(
-                                NotificationPreferenceType.EnableDailyReminders(
-                                    title = TextResource.fromStringId(LR.string.settings_notification_notify_me),
-                                    isEnabled = settings.dailyRemindersNotification.value,
-                                ),
-                            )
-                            if (settings.dailyRemindersNotification.value && notificationFeaturesProvider.hasNotificationChannels) {
-                                add(
-                                    NotificationPreferenceType.DailyReminderSettings(
-                                        title = TextResource.fromStringId(LR.string.settings_notification_advanced),
-                                        description = TextResource.fromStringId(LR.string.settings_notification_advanced_summary),
-                                    ),
-                                )
-                            }
-                        },
-                    ),
-                )
-
-                add(
-                    NotificationPreferenceCategory(
                         title = TextResource.fromStringId(LR.string.settings_notification_recommendations),
                         preferences = buildList {
                             add(
@@ -122,6 +100,28 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
                             if (settings.recommendationsNotification.value && notificationFeaturesProvider.hasNotificationChannels) {
                                 add(
                                     NotificationPreferenceType.RecommendationSettings(
+                                        title = TextResource.fromStringId(LR.string.settings_notification_advanced),
+                                        description = TextResource.fromStringId(LR.string.settings_notification_advanced_summary),
+                                    ),
+                                )
+                            }
+                        },
+                    ),
+                )
+
+                add(
+                    NotificationPreferenceCategory(
+                        title = TextResource.fromStringId(LR.string.settings_notification_daily_reminders),
+                        preferences = buildList {
+                            add(
+                                NotificationPreferenceType.EnableDailyReminders(
+                                    title = TextResource.fromStringId(LR.string.settings_notification_notify_me),
+                                    isEnabled = settings.dailyRemindersNotification.value,
+                                ),
+                            )
+                            if (settings.dailyRemindersNotification.value && notificationFeaturesProvider.hasNotificationChannels) {
+                                add(
+                                    NotificationPreferenceType.DailyReminderSettings(
                                         title = TextResource.fromStringId(LR.string.settings_notification_advanced),
                                         description = TextResource.fromStringId(LR.string.settings_notification_advanced_summary),
                                     ),

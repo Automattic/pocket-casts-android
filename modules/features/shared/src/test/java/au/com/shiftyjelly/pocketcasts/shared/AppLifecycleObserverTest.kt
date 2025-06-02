@@ -52,6 +52,14 @@ class AppLifecycleObserverTest {
 
     @Mock private lateinit var dailyRemindersNotificationSetting: UserSetting<Boolean>
 
+    @Mock private lateinit var notifyNewEpisodesSetting: UserSetting<Boolean>
+
+    @Mock private lateinit var recommendationsNotificationSetting: UserSetting<Boolean>
+
+    @Mock private lateinit var newFeaturesNotificationSetting: UserSetting<Boolean>
+
+    @Mock private lateinit var offerNotificationSetting: UserSetting<Boolean>
+
     @Mock private lateinit var appLifecycleAnalytics: AppLifecycleAnalytics
 
     @Mock private lateinit var preferencesFeatureProvider: PreferencesFeatureProvider
@@ -75,6 +83,10 @@ class AppLifecycleObserverTest {
         whenever(settings.autoPlayNextEpisodeOnEmpty).thenReturn(autoPlayNextEpisodeSetting)
         whenever(settings.autoDownloadOnFollowPodcast).thenReturn(autoDownloadOnFollowPodcastSetting)
         whenever(settings.dailyRemindersNotification).thenReturn(dailyRemindersNotificationSetting)
+        whenever(settings.notifyRefreshPodcast).thenReturn(notifyNewEpisodesSetting)
+        whenever(settings.recommendationsNotification).thenReturn(recommendationsNotificationSetting)
+        whenever(settings.newFeaturesNotification).thenReturn(newFeaturesNotificationSetting)
+        whenever(settings.offersNotification).thenReturn(offerNotificationSetting)
         whenever(settings.useDarkUpNextTheme).thenReturn(useUpNextDarkThemeSetting)
         whenever(settings.showPodcastsRecentlyPlayedSortOrderTooltip).thenReturn(showPodcastsRecentlyPlayedSortOrderSetting)
         whenever(settings.showFreeAccountEncouragement).thenReturn(showAccountEncouragementSetting)
@@ -111,6 +123,10 @@ class AppLifecycleObserverTest {
         verify(autoPlayNextEpisodeSetting).set(true, updateModifiedAt = false)
         verify(autoDownloadOnFollowPodcastSetting).set(true, updateModifiedAt = false)
         verify(dailyRemindersNotificationSetting).set(true, updateModifiedAt = false)
+        verify(notifyNewEpisodesSetting).set(true, updateModifiedAt = false)
+        verify(recommendationsNotificationSetting).set(true, updateModifiedAt = false)
+        verify(newFeaturesNotificationSetting).set(true, updateModifiedAt = false)
+        verify(offerNotificationSetting).set(true, updateModifiedAt = false)
         verify(useUpNextDarkThemeSetting).set(false, updateModifiedAt = false)
 
         verify(appLifecycleAnalytics, never()).onApplicationUpgrade(any())
