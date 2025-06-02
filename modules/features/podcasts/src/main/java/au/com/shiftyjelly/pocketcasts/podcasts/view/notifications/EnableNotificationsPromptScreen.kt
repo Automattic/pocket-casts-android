@@ -1,10 +1,14 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.notifications
 
+import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -12,6 +16,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -36,6 +41,9 @@ internal fun EnableNotificationsPromptScreen(
     onDismissClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val configuration = LocalConfiguration.current
+    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -51,35 +59,77 @@ internal fun EnableNotificationsPromptScreen(
             )
         }
         Spacer(modifier = Modifier.height(42.dp))
-        Image(
-            painter = painterResource(IR.drawable.android_mockup),
-            contentDescription = stringResource(LR.string.notification_mockup_image_description),
-        )
-        Spacer(modifier = Modifier.height(24.dp))
-        TextH10(
-            modifier = Modifier.padding(horizontal = 22.dp),
-            text = stringResource(LR.string.notification_prompt_title),
-            color = MaterialTheme.theme.colors.primaryText01,
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        TextP40(
-            modifier = Modifier.padding(horizontal = 32.dp),
-            text = stringResource(LR.string.notification_prompt_message),
-            color = MaterialTheme.theme.colors.secondaryText02,
-            textAlign = TextAlign.Center,
-        )
-        Spacer(modifier = Modifier.weight(1f))
-        RowButton(
-            text = stringResource(LR.string.notification_prompt_cta),
-            textColor = MaterialTheme.theme.colors.primaryInteractive02,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.W500,
-            colors = ButtonDefaults.buttonColors(
-                backgroundColor = MaterialTheme.theme.colors.primaryInteractive01,
-            ),
-            includePadding = false,
-            onClick = onCtaClicked,
-        )
+
+        if (isLandscape) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Image(
+                    painter = painterResource(IR.drawable.android_mockup),
+                    contentDescription = stringResource(LR.string.notification_mockup_image_description),
+                )
+                Spacer(modifier = Modifier.width(32.dp))
+                Column(
+                    modifier = Modifier.padding(vertical = 24.dp),
+                ) {
+                    TextH10(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = stringResource(LR.string.notification_prompt_title),
+                        color = MaterialTheme.theme.colors.primaryText01,
+                        textAlign = TextAlign.Center,
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    TextP40(
+                        modifier = Modifier.padding(horizontal = 32.dp),
+                        text = stringResource(LR.string.notification_prompt_message),
+                        color = MaterialTheme.theme.colors.secondaryText02,
+                        textAlign = TextAlign.Center,
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
+                    RowButton(
+                        text = stringResource(LR.string.notification_prompt_cta),
+                        textColor = MaterialTheme.theme.colors.primaryInteractive02,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.W500,
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = MaterialTheme.theme.colors.primaryInteractive01,
+                        ),
+                        includePadding = false,
+                        onClick = onCtaClicked,
+                    )
+                }
+            }
+        } else {
+            Image(
+                painter = painterResource(IR.drawable.android_mockup),
+                contentDescription = stringResource(LR.string.notification_mockup_image_description),
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+            TextH10(
+                modifier = Modifier.padding(horizontal = 22.dp),
+                text = stringResource(LR.string.notification_prompt_title),
+                color = MaterialTheme.theme.colors.primaryText01,
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            TextP40(
+                modifier = Modifier.padding(horizontal = 32.dp),
+                text = stringResource(LR.string.notification_prompt_message),
+                color = MaterialTheme.theme.colors.secondaryText02,
+                textAlign = TextAlign.Center,
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            RowButton(
+                text = stringResource(LR.string.notification_prompt_cta),
+                textColor = MaterialTheme.theme.colors.primaryInteractive02,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.W500,
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = MaterialTheme.theme.colors.primaryInteractive01,
+                ),
+                includePadding = false,
+                onClick = onCtaClicked,
+            )
+        }
     }
 }
 
