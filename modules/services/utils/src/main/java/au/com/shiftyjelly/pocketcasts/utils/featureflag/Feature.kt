@@ -178,14 +178,6 @@ enum class Feature(
         hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
     ),
-    GENERATED_TRANSCRIPTS(
-        key = "generated_transcripts",
-        title = "Generated transcripts",
-        defaultValue = BuildConfig.DEBUG,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
-    ),
     APPSFLYER_ANALYTICS(
         key = "appsflyer_analytics",
         title = "AppsFlyer Analytics",
