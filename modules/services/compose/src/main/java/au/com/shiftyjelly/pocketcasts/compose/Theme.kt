@@ -8,6 +8,7 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -97,6 +98,13 @@ data class PocketCastsTheme(
 ) {
     val isDark get() = type.darkTheme
     val isLight get() = !isDark
+
+    @Composable
+    fun rememberPlayerColors(): PlayerColors? {
+        return LocalPodcastColors.current?.let { podcastColors ->
+            remember(podcastColors) { PlayerColors(type, podcastColors) }
+        }
+    }
 }
 
 @SuppressLint("ConflictingOnColor")
