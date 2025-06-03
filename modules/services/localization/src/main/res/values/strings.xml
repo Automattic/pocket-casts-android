@@ -111,6 +111,7 @@
     <string name="star_episode">Star episode</string>
     <string name="clean_history">Remove from history</string>
     <string name="try_again">Try again</string>
+    <string name="skip_for_now">Skip for now</string>
     <string name="token_refresh_sign_in_error_title">Sign In Error</string>
     <string name="token_refresh_sign_in_error_description">There was a problem and you\'ve been signed out. Tap here to sign back in.</string>
     <string name="transcript">Transcript</string>
@@ -164,7 +165,7 @@
     <string name="episodes">Episodes</string>
     <string name="none">None</string>
     <string name="expand_details">Expand details</string>
-    <string name="add_podcasts">Add podcasts</string>
+    <string name="add_podcasts">Add Podcasts</string>
     <string name="please_try_again">Please try again</string>
     <string name="next">Next</string>
     <string name="select_podcasts">Select podcasts</string>
@@ -519,7 +520,7 @@
     <string name="podcasts_sort_order">Sort order</string>
     <string name="podcasts_subscribe_on_phone">Follow podcasts on your phone and they\'ll appear here.</string>
     <string name="podcasts_time_to_add_some_podcasts">Time to add some Podcasts!</string>
-    <string name="podcasts_time_to_add_some_podcasts_summary">You can add podcasts by searching above or if you are looking for some inspiration try the Discover tab.</string>
+    <string name="podcasts_time_to_add_some_podcasts_summary">Coming from another app? Import your podcasts via Profile > Settings > Import and Export.\n\nIf you’re looking for inspiration try the Discover tab.</string>
     <string name="podcasts_empty_folder">Your folder is empty</string>
     <string name="podcasts_empty_folder_summary">Add podcasts to your folder and they’ll appear here.</string>
     <string name="podcasts_unarchive">Unarchive</string>
@@ -601,8 +602,8 @@
     <string name="podcast_no_episodes_found">No episodes found</string>
     <string name="podcast_no_episodes">There are no episodes in this podcast</string>
     <string name="podcast_no_episodes_all_archived">All %d episodes of this podcast have been archived</string>
-    <string name="podcast_no_bookmarks_matching">This podcast has no bookmarks matching your search criteria.</string>
-    <string name="podcast_no_episodes_matching">This podcast has no episodes matching your search criteria.</string>
+    <string name="podcast_no_bookmarks_matching">This podcast has no bookmarks matching your search criteria. Try another keyword.</string>
+    <string name="podcast_no_episodes_matching">We couldn’t find any episode for that search. Try another keyword.</string>
     <string name="podcast_notification_new_episode" translatable="false"><![CDATA[<i>%1$s</i> %2$s]]></string>
     <string name="podcast_notifications">Notifications</string>
     <string name="podcast_notifications_on">Notifications on</string>
@@ -1989,8 +1990,10 @@
     <string name="onboarding_recommendations_import">Import</string>
     <string name="onboarding_recommendations_more">More %s</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Everything you love about Pocket&#160;Casts, plus more</string>
-    <string name="onboarding_upgrade_no_subscriptions_found">No subscriptions found.</string>
-    <string name="onboarding_patron_features_title">Believe in what we\’re doing and want to show your support?</string>
+    <string name="onboarding_upgrade_no_plans_found_title">Couldn’t load plans</string>
+    <string name="onboarding_upgrade_no_plans_found_body">Please check your connection or try again later.</string>
+    <string name="onboarding_upgrade_purchase_failure_message">Something went wrong. Please try again later.</string>
+    <string name="onboarding_patron_features_title">Believe in what we’re doing and want to show your support?</string>
     <string name="onboarding_patron_feature_everything_in_plus_title">Everything in Plus</string>
     <string name="onboarding_patron_feature_early_access_title">Early access to features</string>
     <string name="onboarding_patron_feature_cloud_storage_title">100GB Cloud Storage</string>
@@ -2107,7 +2110,7 @@
     <string name="bookmark_notification_action_delete_title" translatable="false">@string/delete</string>
     <string name="bookmarks_upsell_instructions">Save timestamps of your favorite episodes and unlock many more features with Pocket&#160;Casts Plus.</string>
     <string name="bookmarks_upsell_instructions_early_access">Get early access to this feature with Pocket&#160;Casts Patron and save timestamps of your favorite episodes. Available for Plus subscribers soon.</string>
-    <string name="bookmarks_search_results_not_found">We couldn\'t find any bookmark for that search.</string>
+    <string name="bookmarks_search_results_not_found">We couldn\'t find any bookmark matching your search criteria. Try another keyword.</string>
     <string name="bookmarks_empty_state_title">Bookmark that moment</string>
     <string name="bookmarks_free_user_empty_state_message">You can save timestamps of important moments in an episode.</string>
     <string name="bookmarks_free_user_empty_state_button">Get Bookmarks</string>

@@ -20,8 +20,6 @@ import androidx.media3.extractor.mp3.Mp3Extractor
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.di.Player
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.android.tracks.crashlogging.CrashLogging
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -144,7 +142,7 @@ class ExoPlayerDataSourceFactory @Inject constructor(
         }
     }
 
-    private fun BaseEpisode.shouldUseCache() = !isDownloaded && !isDownloading && settings.cacheEntirePlayingEpisode.value && FeatureFlag.isEnabled(Feature.CACHE_ENTIRE_PLAYING_EPISODE)
+    private fun BaseEpisode.shouldUseCache() = !isDownloaded && !isDownloading && settings.cacheEntirePlayingEpisode.value
 
     private fun ClosedRange<Long>.toClippingConfiguration() = ClippingConfiguration.Builder()
         .setStartPositionMs(start)

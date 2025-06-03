@@ -10,6 +10,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
@@ -20,7 +28,13 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent.DISCOVER_AD_CATEGORY_SUBSCRIBED
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent.DISCOVER_AD_CATEGORY_TAPPED
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.discoverListPodcastSubscribed
+import au.com.shiftyjelly.pocketcasts.analytics.discoverListPodcastTapped
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.discover.R
+import au.com.shiftyjelly.pocketcasts.discover.compose.SmallListRow
+import au.com.shiftyjelly.pocketcasts.discover.compose.SmallListRowPlaceholder
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowCarouselListBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowCategoriesBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowCategoryAdBinding
@@ -96,6 +110,7 @@ import java.util.Locale
 import kotlin.math.ceil
 import kotlin.math.min
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -128,9 +143,9 @@ internal class DiscoverAdapter(
     private val analyticsTracker: AnalyticsTracker,
 ) : ListAdapter<Any, RecyclerView.ViewHolder>(DiscoverRowDiffCallback()) {
     interface Listener {
-        fun onPodcastClicked(podcast: DiscoverPodcast, listUuid: String?, isFeatured: Boolean = false)
-        fun onPodcastSubscribe(podcast: DiscoverPodcast, listUuid: String?)
-        fun onPodcastListClicked(list: NetworkLoadableList)
+        fun onPodcastClicked(podcast: DiscoverPodcast, listUuid: String?, listDate: String? = null, isFeatured: Boolean = false)
+        fun onPodcastSubscribe(podcast: DiscoverPodcast, listUuid: String?, listDate: String? = null)
+        fun onPodcastListClicked(contentList: NetworkLoadableList, podcastList: PodcastList? = null)
         fun onCollectionHeaderClicked(list: NetworkLoadableList)
         fun onEpisodeClicked(episode: DiscoverEpisode, listUuid: String?)
         fun onEpisodePlayClicked(episode: DiscoverEpisode)
@@ -196,27 +211,40 @@ internal class DiscoverAdapter(
         val showAllButton: TextView
     }
 
-    inner class LargeListViewHolder(val binding: RowPodcastLargeListBinding) : NetworkLoadableViewHolder(binding.root), ShowAllRow {
-        val adapter = LargeListRowAdapter(context, listener::onPodcastClicked, listener::onPodcastSubscribe, analyticsTracker)
-        override val showAllButton: TextView
-            get() = binding.btnShowAll
+    inner class LargeListViewHolder(val binding: RowPodcastLargeListBinding) : NetworkLoadableViewHolder(binding.root) {
+        private val adapter = LargeListRowAdapter(context, listener::onPodcastClicked, listener::onPodcastSubscribe, analyticsTracker)
 
         init {
             val linearLayoutManager = LinearLayoutManager(itemView.context, RecyclerView.HORIZONTAL, false)
             linearLayoutManager.initialPrefetchItemCount = 3
             recyclerView?.layoutManager = linearLayoutManager
             recyclerView?.itemAnimator = null
-
             recyclerView?.adapter = adapter
-
             adapter.showLoadingList()
+        }
+
+        fun loading(row: DiscoverRow) {
+            binding.lblTitle.text = row.title.tryToLocalise(context.resources)
+            binding.btnShowAll.setOnClickListener(null)
+            adapter.showLoadingList()
+        }
+
+        fun bind(list: PodcastList, row: DiscoverRow) {
+            adapter.list = list
+            adapter.submitList(list.podcasts) { onRestoreInstanceState(this) }
+            binding.btnShowAll.setOnClickListener {
+                listener.onPodcastListClicked(contentList = row, podcastList = list)
+            }
+            if (list.podcasts.isEmpty()) {
+                hideRow()
+            } else {
+                showRow()
+            }
         }
     }
 
-    inner class LargeListWithPodcastViewHolder(val binding: RowPodcastLargeListWithPodcastBinding) : NetworkLoadableViewHolder(binding.root), ShowAllRow {
-        val adapter = LargeListRowAdapter(context, listener::onPodcastClicked, listener::onPodcastSubscribe, analyticsTracker)
-        override val showAllButton: TextView
-            get() = binding.btnShowAll
+    inner class LargeListWithPodcastViewHolder(val binding: RowPodcastLargeListWithPodcastBinding) : NetworkLoadableViewHolder(binding.root) {
+        private val adapter = LargeListRowAdapter(context, listener::onPodcastClicked, listener::onPodcastSubscribe, analyticsTracker)
 
         init {
             val linearLayoutManager = LinearLayoutManager(itemView.context, RecyclerView.HORIZONTAL, false)
@@ -225,6 +253,31 @@ internal class DiscoverAdapter(
             recyclerView?.itemAnimator = null
             recyclerView?.adapter = adapter
             adapter.showLoadingList()
+        }
+
+        fun loading() {
+            binding.title.text = ""
+            binding.subtitle.text = ""
+            binding.podcastImage.setImageResource(placeholderDrawable)
+            binding.btnShowAll.setOnClickListener(null)
+            adapter.showLoadingList()
+        }
+
+        fun bind(list: PodcastList, row: DiscoverRow) {
+            val resources = context.resources
+            adapter.list = list
+            adapter.submitList(list.podcasts) { onRestoreInstanceState(this) }
+            binding.title.text = list.title?.tryToLocalise(resources)
+            binding.subtitle.text = list.subtitle?.tryToLocalise(resources).orEmpty()
+            binding.btnShowAll.setOnClickListener {
+                listener.onPodcastListClicked(contentList = row, podcastList = list)
+            }
+            imageRequestFactory.createForPodcast(list.featureImage).loadInto(binding.podcastImage)
+            if (list.podcasts.isEmpty()) {
+                hideRow()
+            } else {
+                showRow()
+            }
         }
     }
 
@@ -353,41 +406,65 @@ internal class DiscoverAdapter(
     }
 
     inner class SmallListViewHolder(val binding: RowPodcastSmallListBinding) : NetworkLoadableViewHolder(binding.root), ShowAllRow {
-        val adapter = SmallListRowAdapter(listener::onPodcastClicked, listener::onPodcastSubscribe, analyticsTracker)
+        var currentPage = 0
+            private set
 
         override val showAllButton: TextView
             get() = binding.btnShowAll
 
-        private val linearLayoutManager =
-            LinearLayoutManager(itemView.context, RecyclerView.HORIZONTAL, false).apply {
-                initialPrefetchItemCount = 2
-            }
-
         init {
-            recyclerView?.layoutManager = linearLayoutManager
-            recyclerView?.itemAnimator = null
-            val snapHelper = HorizontalPeekSnapHelper(0.dpToPx(itemView.context))
-            snapHelper.attachToRecyclerView(recyclerView)
-            snapHelper.onSnapPositionChanged = { position ->
-                binding.pageIndicatorView.position = position
-                val row = getItem(bindingAdapterPosition) as? DiscoverRow
-                row?.let {
-                    analyticsTracker.track(
-                        AnalyticsEvent.DISCOVER_SMALL_LIST_PAGE_CHANGED,
-                        mapOf(CURRENT_PAGE to position, TOTAL_PAGES to adapter.itemCount, LIST_ID_KEY to it.inferredId()),
+            binding.smallList.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool)
+            binding.smallList.setContent {
+                AppTheme(theme.activeTheme) {
+                    SmallListRowPlaceholder(
+                        podcastCount = 4,
                     )
                 }
             }
-
-            recyclerView?.adapter = adapter
-
-            adapter.showLoadingList()
         }
 
-        override fun onRestoreInstanceState(state: Parcelable?) {
-            super.onRestoreInstanceState(state)
-            recyclerView?.post {
-                binding.pageIndicatorView.position = linearLayoutManager.findFirstVisibleItemPosition()
+        fun bind(list: PodcastList, displayedPage: Int?) {
+            binding.smallList.setContentWithViewCompositionStrategy {
+                var podcasts by remember(list.podcasts) { mutableStateOf(list.podcasts.chunked(4)) }
+                val pagerState = rememberPagerState { podcasts.size }
+
+                AppTheme(theme.activeTheme) {
+                    SmallListRow(
+                        pagerState = pagerState,
+                        podcasts = podcasts,
+                        onClickPodcast = { podcast ->
+                            analyticsTracker.discoverListPodcastTapped(podcast.uuid, list.listId, list.date)
+                            listener.onPodcastClicked(podcast, list.listId, list.date)
+                        },
+                        onClickSubscribe = { podcast ->
+                            podcasts = podcasts.markPodcastAsSubscribed(podcast.uuid)
+                            analyticsTracker.discoverListPodcastSubscribed(podcast.uuid, list.listId, list.date)
+                            listener.onPodcastSubscribe(podcast, list.listId, list.date)
+                        },
+                    )
+                }
+
+                LaunchedEffect(Unit) {
+                    snapshotFlow { pagerState.currentPage }.collect { page ->
+                        currentPage = page
+                    }
+                }
+
+                LaunchedEffect(list.listId) {
+                    if (displayedPage != null) {
+                        pagerState.scrollToPage(displayedPage)
+                    }
+                }
+            }
+        }
+
+        private fun List<List<DiscoverPodcast>>.markPodcastAsSubscribed(uuid: String) = map { podcasts ->
+            podcasts.map { podcast ->
+                if (podcast.uuid == uuid) {
+                    podcast.copy(isSubscribed = true)
+                } else {
+                    podcast
+                }
             }
         }
     }
@@ -436,14 +513,7 @@ internal class DiscoverAdapter(
     }
 
     inner class RemainingPodcastsByCategoryViewHolder(val binding: RowRemainingPodcastsByCategoryBinding) : NetworkLoadableViewHolder(binding.root) {
-        val adapter = RemainingPodcastsAdapter(
-            onPodcastClick = { podcast, listUuid ->
-                listener.onPodcastClicked(podcast, listUuid)
-            },
-            onPodcastSubscribe = { podcast, listUuid ->
-                listener.onPodcastSubscribe(podcast, listUuid)
-            },
-        )
+        val adapter = RemainingPodcastsAdapter(listener::onPodcastClicked, listener::onPodcastSubscribe)
 
         init {
             recyclerView?.layoutManager = LinearLayoutManager(itemView.context, RecyclerView.VERTICAL, false)
@@ -640,6 +710,7 @@ internal class DiscoverAdapter(
                         is DisplayStyle.SinglePodcast -> R.layout.row_single_podcast
                         is DisplayStyle.CollectionList ->
                             if (FeatureFlag.isEnabled(GUEST_LISTS_NETWORK_HIGHLIGHTS_REDESIGN)) R.layout.row_collection_list else R.layout.row_collection_list_deprecated
+
                         else -> R.layout.row_error
                     }
                 } else if (row.type is ListType.EpisodeList) {
@@ -647,6 +718,7 @@ internal class DiscoverAdapter(
                         is DisplayStyle.SingleEpisode -> R.layout.row_single_episode
                         is DisplayStyle.CollectionList ->
                             if (FeatureFlag.isEnabled(GUEST_LISTS_NETWORK_HIGHLIGHTS_REDESIGN)) R.layout.row_collection_list else R.layout.row_collection_list_deprecated
+
                         else -> R.layout.row_error
                     }
                 } else if (row.type is ListType.Categories && row.displayStyle is DisplayStyle.Pills) {
@@ -682,12 +754,11 @@ internal class DiscoverAdapter(
         if (row is DiscoverRow) {
             when (holder) {
                 is LargeListViewHolder -> {
-                    holder.binding.lblTitle.text = row.title.tryToLocalise(resources)
+                    holder.loading(row)
                     holder.loadFlowable(
                         loadPodcastList(row.source, row.authenticated),
-                        onNext = {
-                            row.listUuid?.let { listUuid -> holder.adapter.setFromListId(listUuid) }
-                            holder.adapter.submitList(it.podcasts) { onRestoreInstanceState(holder) }
+                        onNext = { list ->
+                            holder.bind(list, row)
                         },
                         onError = { error ->
                             Timber.e(error, "Could not load feed ${row.source}")
@@ -701,23 +772,11 @@ internal class DiscoverAdapter(
                 }
 
                 is LargeListWithPodcastViewHolder -> {
-                    holder.binding.title.text = ""
-                    holder.binding.subtitle.text = ""
-                    holder.binding.podcastImage.setImageResource(placeholderDrawable)
-
+                    holder.loading()
                     holder.loadFlowable(
                         loadPodcastList(row.source, row.authenticated),
                         onNext = { list ->
-                            if (list.podcasts.isEmpty()) {
-                                holder.hideRow()
-                            } else {
-                                holder.showRow()
-                                row.listUuid?.let { listUuid -> holder.adapter.setFromListId(listUuid) }
-                                holder.adapter.submitList(list.podcasts) { onRestoreInstanceState(holder) }
-                                holder.binding.title.text = list.title?.tryToLocalise(resources)
-                                holder.binding.subtitle.text = list.subtitle?.tryToLocalise(resources).orEmpty()
-                                imageRequestFactory.createForPodcast(list.featureImage).loadInto(holder.binding.podcastImage)
-                            }
+                            holder.bind(list, row)
                         },
                         onError = { error ->
                             Timber.e(error, "Could not load feed ${row.source}")
@@ -769,11 +828,9 @@ internal class DiscoverAdapter(
                     holder.binding.lblTitle.text = row.title.tryToLocalise(resources)
                     holder.loadFlowable(
                         loadPodcastList(row.source, row.authenticated),
-                        onNext = {
-                            val podcasts = it.podcasts.subList(0, Math.min(MAX_ROWS_SMALL_LIST, it.podcasts.count()))
-                            holder.binding.pageIndicatorView.count = Math.ceil(podcasts.count().toDouble() / SmallListRowAdapter.SmallListViewHolder.NUMBER_OF_ROWS_PER_PAGE.toDouble()).toInt()
-                            row.listUuid?.let { listUuid -> holder.adapter.setFromListId(listUuid) }
-                            holder.adapter.submitPodcastList(podcasts) { onRestoreInstanceState(holder) }
+                        onNext = { list ->
+                            val truncatedList = list.copy(podcasts = list.podcasts.take(MAX_ROWS_SMALL_LIST))
+                            holder.bind(truncatedList, smallListCurrentPage.remove(holder.itemId))
                         },
                     )
                     row.listUuid?.let { trackListImpression(it) }
@@ -825,7 +882,7 @@ internal class DiscoverAdapter(
                             holder.itemView.setOnClickListener {
                                 row.listUuid?.let { listUuid ->
                                     trackDiscoverListPodcastTapped(listUuid, podcast.uuid)
-                                    listener.onPodcastClicked(podcast, row.listUuid)
+                                    listener.onPodcastClicked(podcast = podcast, listUuid = row.listUuid)
                                 }
                             }
 
@@ -960,6 +1017,7 @@ internal class DiscoverAdapter(
                         },
                     )
                 }
+
                 is CollectionListViewHolder -> {
                     holder.loadFlowable(
                         loadPodcastList(row.source, row.authenticated),
@@ -1079,19 +1137,21 @@ internal class DiscoverAdapter(
         }
     }
 
-    private val savedState: MutableMap<Long, Parcelable?> = mutableMapOf()
+    private val savedState = mutableMapOf<Long, Parcelable?>()
+
+    private val smallListCurrentPage = mutableMapOf<Long, Int>()
 
     private fun onRestoreInstanceState(holder: NetworkLoadableViewHolder) {
         holder.onRestoreInstanceState(savedState[holder.itemId])
     }
 
     override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
-        super.onViewRecycled(holder)
-        when (holder) {
-            is NetworkLoadableViewHolder -> {
-                holder.cancelLoading()
-                savedState[holder.itemId] = holder.onSaveInstanceState()
-            }
+        if (holder is NetworkLoadableViewHolder) {
+            holder.cancelLoading()
+            savedState[holder.itemId] = holder.onSaveInstanceState()
+        }
+        if (holder is SmallListViewHolder) {
+            smallListCurrentPage[holder.itemId] = holder.currentPage
         }
     }
 

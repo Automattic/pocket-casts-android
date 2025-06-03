@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -34,14 +35,14 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.bookmark.BookmarkRow
 import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButtonColors
-import au.com.shiftyjelly.pocketcasts.compose.components.EmptyState
+import au.com.shiftyjelly.pocketcasts.compose.components.NoContentBanner
 import au.com.shiftyjelly.pocketcasts.compose.components.SearchBar
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.HeaderRow
-import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.NoBookmarksInSearchView
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.NoMatchingBookmarksBanner
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel.BookmarkMessage
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel.UiState
@@ -69,7 +70,6 @@ fun BookmarksPage(
     onUpgradeClicked: () -> Unit,
     showOptionsDialog: (Int) -> Unit,
     openFragment: (Fragment) -> Unit,
-    onClearSearchTapped: () -> Unit,
     onSearchBarClearButtonTapped: () -> Unit,
     onHeadphoneControlsButtonTapped: () -> Unit,
     bottomInset: Dp,
@@ -92,7 +92,6 @@ fun BookmarksPage(
         onUpgradeClicked = onUpgradeClicked,
         openFragment = openFragment,
         bottomInset = bottomInset,
-        onClearSearchTapped = onClearSearchTapped,
         onSearchBarClearButtonTapped = onSearchBarClearButtonTapped,
         onHeadphoneControlsButtonTapped = onHeadphoneControlsButtonTapped,
         isDarkTheme = isDarkTheme,
@@ -142,7 +141,6 @@ private fun Content(
     onSearchTextChanged: (String) -> Unit,
     onUpgradeClicked: () -> Unit,
     openFragment: (Fragment) -> Unit,
-    onClearSearchTapped: () -> Unit,
     onSearchBarClearButtonTapped: () -> Unit,
     onHeadphoneControlsButtonTapped: () -> Unit,
     bottomInset: Dp,
@@ -151,6 +149,7 @@ private fun Content(
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
+            .fillMaxSize()
             .background(color = backgroundColor)
             .padding(bottom = if (sourceView == SourceView.PROFILE) 0.dp else 28.dp),
     ) {
@@ -164,32 +163,35 @@ private fun Content(
                 onPlayClick = onPlayClick,
                 onSearchTextChanged = onSearchTextChanged,
                 bottomInset = bottomInset,
-                onClearSearchTapped = onClearSearchTapped,
                 onSearchBarClearButtonTapped = onSearchBarClearButtonTapped,
                 isDarkTheme = isDarkTheme,
             )
 
-            is UiState.Empty -> EmptyState(
-                title = stringResource(LR.string.bookmarks_empty_state_title),
-                subtitle = stringResource(LR.string.bookmarks_paid_user_empty_state_message),
-                iconResourceId = IR.drawable.ic_bookmark,
-                buttonText = stringResource(LR.string.bookmarks_headphone_settings),
-                onButtonClick = {
-                    onHeadphoneControlsButtonTapped()
-                    openFragment(HeadphoneControlsSettingsFragment())
-                },
+            is UiState.Empty -> Column(
                 modifier = Modifier.verticalScroll(rememberScrollState()),
-            )
-            is UiState.Upsell -> EmptyState(
-                title = stringResource(LR.string.bookmarks_empty_state_title),
-                subtitle = stringResource(LR.string.bookmarks_free_user_empty_state_message),
-                iconResourceId = IR.drawable.ic_bookmark,
-                buttonText = stringResource(LR.string.bookmarks_free_user_empty_state_button),
-                onButtonClick = {
-                    onUpgradeClicked.invoke()
-                },
+            ) {
+                NoContentBanner(
+                    title = stringResource(LR.string.bookmarks_empty_state_title),
+                    body = stringResource(LR.string.bookmarks_paid_user_empty_state_message),
+                    iconResourceId = IR.drawable.ic_bookmark,
+                    primaryButtonText = stringResource(LR.string.bookmarks_headphone_settings),
+                    onPrimaryButtonClick = {
+                        onHeadphoneControlsButtonTapped()
+                        openFragment(HeadphoneControlsSettingsFragment())
+                    },
+                )
+            }
+            is UiState.Upsell -> Column(
                 modifier = Modifier.verticalScroll(rememberScrollState()),
-            )
+            ) {
+                NoContentBanner(
+                    title = stringResource(LR.string.bookmarks_empty_state_title),
+                    body = stringResource(LR.string.bookmarks_free_user_empty_state_message),
+                    iconResourceId = IR.drawable.ic_bookmark,
+                    primaryButtonText = stringResource(LR.string.bookmarks_free_user_empty_state_button),
+                    onPrimaryButtonClick = onUpgradeClicked,
+                )
+            }
         }
     }
 }
@@ -202,16 +204,15 @@ private fun BookmarksView(
     onOptionsMenuClicked: () -> Unit,
     onPlayClick: (Bookmark) -> Unit,
     onSearchTextChanged: (String) -> Unit,
-    onClearSearchTapped: () -> Unit,
     onSearchBarClearButtonTapped: () -> Unit,
     bottomInset: Dp,
     isDarkTheme: Boolean,
 ) {
     val focusRequester = remember { FocusRequester() }
     LazyColumn(
+        horizontalAlignment = Alignment.CenterHorizontally,
         contentPadding = PaddingValues(bottom = bottomInset),
-        modifier = Modifier
-            .fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
     ) {
         if (state.searchEnabled) {
             item {
@@ -234,11 +235,8 @@ private fun BookmarksView(
             state.bookmarks.isEmpty()
         ) {
             item {
-                NoBookmarksInSearchView(
-                    onActionClick = {
-                        onClearSearchTapped()
-                        onSearchTextChanged("")
-                    },
+                NoMatchingBookmarksBanner(
+                    modifier = Modifier.padding(top = 24.dp),
                 )
             }
         } else {
@@ -330,7 +328,6 @@ private fun BookmarksPreview(
             onSearchTextChanged = {},
             onUpgradeClicked = {},
             openFragment = {},
-            onClearSearchTapped = {},
             onSearchBarClearButtonTapped = {},
             onHeadphoneControlsButtonTapped = {},
             bottomInset = 0.dp,

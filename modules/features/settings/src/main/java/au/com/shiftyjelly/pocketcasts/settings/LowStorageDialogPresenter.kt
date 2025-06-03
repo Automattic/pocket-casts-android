@@ -6,8 +6,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.utils.Util
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.isDeviceRunningOnLowStorage
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -22,8 +20,7 @@ class LowStorageDialogPresenter(
 
     suspend fun shouldShow(downloadedFiles: Long): Boolean = isDeviceRunningOnLowStorage() &&
         downloadedFiles != 0L &&
-        settings.shouldShowLowStorageModalAfterSnooze() &&
-        FeatureFlag.isEnabled(Feature.MANAGE_DOWNLOADED_EPISODES)
+        settings.shouldShowLowStorageModalAfterSnooze()
 
     fun getDialog(
         totalDownloadSize: Long,

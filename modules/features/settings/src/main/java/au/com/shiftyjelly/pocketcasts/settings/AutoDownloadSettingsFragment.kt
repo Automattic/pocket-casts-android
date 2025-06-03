@@ -37,8 +37,6 @@ import au.com.shiftyjelly.pocketcasts.settings.viewmodel.ManualCleanupViewModel
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.toAutoDownloadStatus
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.fragments.FilterSelectFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.PodcastSelectFragment
@@ -128,13 +126,8 @@ class AutoDownloadSettingsFragment :
         toolbar?.setup(title = getString(LR.string.settings_title_auto_download), navigationIcon = BackArrow, activity = activity, theme = theme)
         toolbar?.isVisible = showToolbar
 
-        if (FeatureFlag.isEnabled(Feature.AUTO_DOWNLOAD)) {
-            onFollowPodcastPreference?.let { podcastsCategory?.addPreference(it) }
-            podcastsAutoDownloadLimitPreference?.let { podcastsCategory?.addPreference(it) }
-        } else {
-            onFollowPodcastPreference?.let { podcastsCategory?.removePreference(it) }
-            podcastsAutoDownloadLimitPreference?.let { podcastsCategory?.removePreference(it) }
-        }
+        onFollowPodcastPreference?.let { podcastsCategory?.addPreference(it) }
+        podcastsAutoDownloadLimitPreference?.let { podcastsCategory?.addPreference(it) }
 
         if (!showToolbar) {
             val listContainer = view.findViewById<View>(android.R.id.list_container)
@@ -396,9 +389,7 @@ class AutoDownloadSettingsFragment :
         setupOnFollowPodcastToggleStatusCheck()
         autoDownloadOnlyDownloadOnWifi.isChecked = viewModel.getAutoDownloadUnmeteredOnly()
         autoDownloadOnlyWhenCharging.isChecked = viewModel.getAutoDownloadOnlyWhenCharging()
-        if (FeatureFlag.isEnabled(Feature.AUTO_DOWNLOAD)) {
-            newEpisodesPreference?.summary = getString(LR.string.settings_auto_download_new_episodes_description)
-        }
+        newEpisodesPreference?.summary = getString(LR.string.settings_auto_download_new_episodes_description)
     }
 
     @SuppressLint("CheckResult")

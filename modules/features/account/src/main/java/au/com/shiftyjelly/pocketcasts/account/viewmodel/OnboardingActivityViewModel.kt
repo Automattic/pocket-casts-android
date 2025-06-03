@@ -42,6 +42,7 @@ class OnboardingActivityViewModel @Inject constructor(
                                 _finishState.emit(OnboardingFinish.DoneShowPlusPromotion)
                             }
                         }
+
                         is SignInState.SignedOut -> Unit
                     }
                 }
@@ -50,14 +51,27 @@ class OnboardingActivityViewModel @Inject constructor(
     }
 
     fun onExitOnboarding(exitInfo: OnboardingExitInfo) {
-        when {
-            exitInfo.showPlusPromotionForFreeUser -> showPlusPromotionForFreeUserFlow.value = true
-            exitInfo.showWelcomeInReferralFlow -> viewModelScope.launch {
-                _finishState.emit(OnboardingFinish.DoneShowWelcomeInReferralFlow)
+        when (exitInfo) {
+            is OnboardingExitInfo.Simple -> {
+                viewModelScope.launch {
+                    _finishState.emit(OnboardingFinish.Done)
+                }
             }
 
-            else -> viewModelScope.launch {
-                _finishState.emit(OnboardingFinish.Done)
+            is OnboardingExitInfo.ShowPlusPromotion -> {
+                showPlusPromotionForFreeUserFlow.value = true
+            }
+
+            is OnboardingExitInfo.ShowReferralWelcome -> {
+                viewModelScope.launch {
+                    _finishState.emit(OnboardingFinish.DoneShowWelcomeInReferralFlow)
+                }
+            }
+
+            is OnboardingExitInfo.ApplySuggestedFolders -> {
+                viewModelScope.launch {
+                    _finishState.emit(OnboardingFinish.DoneApplySuggestedFolders(exitInfo.action))
+                }
             }
         }
     }

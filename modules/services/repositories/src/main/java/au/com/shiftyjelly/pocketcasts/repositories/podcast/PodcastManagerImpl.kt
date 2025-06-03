@@ -51,6 +51,7 @@ import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.rx2.asFlowable
 import kotlinx.coroutines.rx2.rxMaybe
 import timber.log.Timber
 
@@ -378,22 +379,30 @@ class PodcastManagerImpl @Inject constructor(
         return podcastDao.findSubscribedFlow()
     }
 
+    override fun observePodcastsSortedByLatestEpisode(): Flow<List<Podcast>> {
+        return podcastDao.observeSubscribedOrderByLatestEpisode(orderAsc = false)
+    }
+
+    override fun observePodcastsBySortedRecentlyPlayed(): Flow<List<Podcast>> {
+        return podcastDao.observePodcastsOrderByRecentlyPlayedEpisode()
+    }
+
     override fun podcastsOrderByLatestEpisodeRxFlowable(): Flowable<List<Podcast>> {
-        return podcastDao.findSubscribedOrderByLatestEpisodeRxFlowable(orderAsc = false)
+        return observePodcastsSortedByLatestEpisode().asFlowable()
     }
 
     override fun podcastsOrderByRecentlyPlayedEpisodeRxFlowable(): Flowable<List<Podcast>> {
-        return podcastDao.findPodcastsOrderByRecentlyPlayedEpisodeRxFlowable()
+        return observePodcastsBySortedRecentlyPlayed().asFlowable()
     }
 
-    override fun podcastsInFolderOrderByUserChoiceRxFlowable(folder: Folder): Flowable<List<Podcast>> {
+    override fun observePodcastsSortedByUserChoice(folder: Folder): Flow<List<Podcast>> {
         val sort = folder.podcastsSortType
         return when (sort) {
-            PodcastsSortType.DATE_ADDED_NEWEST_TO_OLDEST -> podcastDao.findFolderOrderByAddedDateRxFlowable(folder.uuid, sort.isAsc())
-            PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST -> podcastDao.findFolderOrderByLatestEpisodeRxFlowable(folder.uuid, sort.isAsc())
-            PodcastsSortType.RECENTLY_PLAYED -> podcastDao.findPodcastsOrderByRecentlyPlayedEpisodeRxFlowable(folder.uuid)
-            PodcastsSortType.DRAG_DROP -> podcastDao.findFolderOrderByUserSortRxFlowable(folder.uuid)
-            else -> podcastDao.findFolderOrderByNameRxFlowable(folder.uuid, sort.isAsc())
+            PodcastsSortType.DATE_ADDED_NEWEST_TO_OLDEST -> podcastDao.observeFolderOrderByAddedDate(folder.uuid, sort.isAsc())
+            PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST -> podcastDao.observeFolderOrderByLatestEpisode(folder.uuid, sort.isAsc())
+            PodcastsSortType.RECENTLY_PLAYED -> podcastDao.observePodcastsOrderByRecentlyPlayedEpisode(folder.uuid)
+            PodcastsSortType.DRAG_DROP -> podcastDao.observeFolderOrderByUserSort(folder.uuid)
+            else -> podcastDao.observeFolderOrderByName(folder.uuid, sort.isAsc())
         }
     }
 

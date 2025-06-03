@@ -9,6 +9,9 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import androidx.annotation.ColorInt
 import androidx.appcompat.widget.TooltipCompat
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.DiffUtil
@@ -44,8 +47,6 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
 import au.com.shiftyjelly.pocketcasts.views.helper.setEpisodeTimeLeft
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
@@ -183,7 +184,10 @@ class UpNextAdapter(
                 binding.emptyUpNextComposeView.setContentWithViewCompositionStrategy {
                     AppTheme(theme) {
                         if (header.episodePlaying && header.episodeCount == 0) {
-                            UpNextEmptyState(onDiscoverTapped = { listener.onDiscoverTapped() })
+                            UpNextNoContentBanner(
+                                onDiscoverTapped = listener::onDiscoverTapped,
+                                modifier = Modifier.padding(top = 24.dp),
+                            )
                         }
                     }
                 }
@@ -196,7 +200,7 @@ class UpNextAdapter(
                     root.resources.getQuantityString(LR.plurals.player_up_next_header_title, header.episodeCount, header.episodeCount, time)
                 }
 
-                shuffle.isVisible = isUpNextNotEmpty && FeatureFlag.isEnabled(Feature.UP_NEXT_SHUFFLE)
+                shuffle.isVisible = isUpNextNotEmpty
                 shuffle.updateShuffleButton()
 
                 shuffle.setOnClickListener {
@@ -226,8 +230,6 @@ class UpNextAdapter(
         }
 
         private fun ImageButton.updateShuffleButton() {
-            if (!FeatureFlag.isEnabled(Feature.UP_NEXT_SHUFFLE)) return
-
             this.setImageResource(
                 when {
                     !isSignedInAsPaidUser -> IR.drawable.shuffle_plus_feature_icon

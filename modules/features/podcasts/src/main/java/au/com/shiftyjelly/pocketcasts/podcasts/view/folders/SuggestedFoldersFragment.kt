@@ -32,6 +32,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContract
+import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContract.OnboardingFinish
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.extensions.slideInToEnd
@@ -41,12 +43,13 @@ import au.com.shiftyjelly.pocketcasts.compose.extensions.slideOutToStart
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.SuggestedFoldersViewModel.UseFoldersState.Applied
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
-import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.SuggestedFoldersAction
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import kotlinx.parcelize.Parcelize
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as VR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -80,6 +83,24 @@ class SuggestedFoldersFragment : BaseDialogFragment() {
             }
         },
     )
+
+    private val onboardingLauncher = registerForActivityResult(OnboardingActivityContract()) { result ->
+        when (result) {
+            is OnboardingFinish.DoneApplySuggestedFolders -> {
+                resolveSuggestedFolders(result)
+            }
+
+            is OnboardingFinish.Done -> Unit
+
+            is OnboardingFinish.DoneGoToDiscover,
+            is OnboardingFinish.DoneShowPlusPromotion,
+            is OnboardingFinish.DoneShowWelcomeInReferralFlow,
+            null,
+            -> {
+                Timber.w("Unexpected onboarding result: $result")
+            }
+        }
+    }
 
     private var isFinalizingActionUsed = false
 
@@ -188,7 +209,7 @@ class SuggestedFoldersFragment : BaseDialogFragment() {
                 .show(parentFragmentManager, "create_folder_card")
             finalizeAndDismiss()
         } else {
-            OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.Upsell(OnboardingUpgradeSource.SUGGESTED_FOLDERS))
+            launchOnboarding(SuggestedFoldersAction.CreateCustom)
         }
     }
 
@@ -199,6 +220,7 @@ class SuggestedFoldersFragment : BaseDialogFragment() {
                     viewModel.trackUseSuggestedFoldersTapped()
                     viewModel.useSuggestedFolders()
                 }
+
                 SuggestedAction.ReplaceFolders -> {
                     viewModel.trackReplaceFolderTapped()
                     showConfirmationDialog()
@@ -206,8 +228,14 @@ class SuggestedFoldersFragment : BaseDialogFragment() {
             }
         } else {
             viewModel.trackUseSuggestedFoldersTapped()
-            OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.Upsell(OnboardingUpgradeSource.SUGGESTED_FOLDERS))
+            launchOnboarding(SuggestedFoldersAction.UseSuggestion)
         }
+    }
+
+    private fun launchOnboarding(action: SuggestedFoldersAction) {
+        val launchFlow = OnboardingFlow.UpsellSuggestedFolder(action)
+        val launchIntent = OnboardingLauncher.launchIntent(requireActivity(), launchFlow)
+        onboardingLauncher.launch(launchIntent)
     }
 
     private fun showConfirmationDialog() {
@@ -222,6 +250,23 @@ class SuggestedFoldersFragment : BaseDialogFragment() {
             .setIconId(VR.drawable.ic_replace)
             .setIconTint(UR.attr.primary_interactive_01)
             .show(childFragmentManager, "suggested-folders-confirmation-dialog")
+    }
+
+    private fun resolveSuggestedFolders(result: OnboardingFinish.DoneApplySuggestedFolders) {
+        when (result.action) {
+            SuggestedFoldersAction.UseSuggestion -> {
+                val suggestedAction = viewModel.state.value.action
+                if (suggestedAction != null) {
+                    handleSuggestedAction(suggestedAction, isUserPlusOrPatreon = true)
+                } else {
+                    Timber.w("Missing suggested action after onboarding process")
+                }
+            }
+
+            SuggestedFoldersAction.CreateCustom -> {
+                handleCustomFolderCreation(isUserPlusOrPatreon = true)
+            }
+        }
     }
 
     enum class Source(

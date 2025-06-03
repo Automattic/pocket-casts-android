@@ -30,6 +30,7 @@ import io.reactivex.Observable
 import java.time.Instant
 import java.util.Date
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -270,8 +271,8 @@ interface Settings {
     }
 
     val selectPodcastSortTypeObservable: Observable<PodcastsSortType>
-    val refreshStateObservable: Observable<RefreshState>
     val multiSelectItemsObservable: Observable<List<String>>
+    val refreshStateFlow: StateFlow<RefreshState>
 
     val shelfItems: UserSetting<List<ShelfItem>>
 

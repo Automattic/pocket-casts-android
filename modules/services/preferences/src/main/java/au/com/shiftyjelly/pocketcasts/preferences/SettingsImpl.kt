@@ -118,16 +118,17 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override val refreshStateObservable = BehaviorRelay.create<RefreshState>().apply {
-        val lastError = getLastRefreshError()
-        val refreshDate = getLastRefreshDate()
-        val state = when {
-            lastError != null -> RefreshState.Failed(lastError)
-            refreshDate != null -> RefreshState.Success(refreshDate)
-            else -> RefreshState.Never
-        }
-        accept(state)
-    }
+    override val refreshStateFlow = MutableStateFlow<RefreshState>(
+        run {
+            val lastError = getLastRefreshError()
+            val refreshDate = getLastRefreshDate()
+            when {
+                lastError != null -> RefreshState.Failed(lastError)
+                refreshDate != null -> RefreshState.Success(refreshDate)
+                else -> RefreshState.Never
+            }
+        },
+    )
 
     override fun getVersion(): String {
         return BuildConfig.VERSION_NAME
@@ -207,7 +208,7 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override val cacheEntirePlayingEpisode = UserSetting.CacheEntirePlayingEpisodePref(
+    override val cacheEntirePlayingEpisode = UserSetting.BoolPref(
         sharedPrefKey = "cacheEntirePlayingEpisode",
         defaultValue = firebaseRemoteConfig.getBoolean(FirebaseConfig.EXOPLAYER_CACHE_ENTIRE_PLAYING_EPISODE_SETTING_DEFAULT),
         sharedPrefs = sharedPreferences,
@@ -315,7 +316,7 @@ class SettingsImpl @Inject constructor(
             is RefreshState.Failed -> setLastRefreshError(refreshState.error)
             else -> {}
         }
-        refreshStateObservable.accept(refreshState)
+        refreshStateFlow.value = refreshState
     }
 
     override fun setDismissLowStorageModalTime(lastUpdateTime: Long) {
@@ -351,7 +352,7 @@ class SettingsImpl @Inject constructor(
     }
 
     override fun getRefreshState(): RefreshState? {
-        return refreshStateObservable.value
+        return refreshStateFlow.value
     }
 
     override fun getLastSuccessRefreshState(): RefreshState? {

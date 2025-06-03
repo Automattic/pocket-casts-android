@@ -6,7 +6,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import io.reactivex.Flowable
 import io.reactivex.Single
 import java.util.Date
 import java.util.UUID
@@ -110,11 +109,7 @@ class FolderManagerImpl @Inject constructor(
         podcastManager.updateFolderUuid(folderUuid = null, podcastUuids = listOf(podcast.uuid))
     }
 
-    override fun observeFolders(): Flowable<List<Folder>> {
-        return folderDao.findFoldersRxFlowable()
-    }
-
-    override fun findFoldersFlow(): Flow<List<Folder>> {
+    override fun observeFolders(): Flow<List<Folder>> {
         return folderDao.findFoldersFlow()
     }
 

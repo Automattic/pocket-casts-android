@@ -24,7 +24,6 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -64,8 +63,6 @@ import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
@@ -161,7 +158,6 @@ class PodcastAdapter(
 
     data class EpisodeLimitRow(val episodeLimit: Int)
     class DividerRow(val grouping: PodcastGrouping, val groupIndex: Int)
-    data class NoResultsMessage(val title: String, val bodyText: String, val showButton: Boolean)
     data class EpisodeHeader(val showingArchived: Boolean, val episodeCount: Int, val archivedCount: Int, val searchTerm: String, val episodeLimit: Int?)
     data class TabsHeader(
         val selectedTab: PodcastTab,
@@ -194,7 +190,7 @@ class PodcastAdapter(
         val subtitle: String = "",
         val iconResourceId: Int,
         val buttonText: String? = null,
-        val onButtonClick: () -> Unit,
+        val onButtonClick: (() -> Unit)? = null,
     )
 
     data class DividerSubTitleRow(
@@ -232,7 +228,6 @@ class PodcastAdapter(
         private const val VIEW_TYPE_LOADING_ROW = 109
         val VIEW_TYPE_EPISODE_HEADER = R.layout.adapter_episode_header
         val VIEW_TYPE_EPISODE_LIMIT_ROW = R.layout.adapter_episode_limit
-        val VIEW_TYPE_NO_RESULTS = R.layout.adapter_no_results
         val VIEW_TYPE_DIVIDER_TITLE = R.layout.adapter_divider_row
     }
 
@@ -292,7 +287,6 @@ class PodcastAdapter(
             VIEW_TYPE_TABS -> TabsViewHolder(ComposeView(parent.context), theme)
             VIEW_TYPE_EPISODE_HEADER -> EpisodeHeaderViewHolder(AdapterEpisodeHeaderBinding.inflate(inflater, parent, false), onEpisodesOptionsClicked, onSearchFocus)
             VIEW_TYPE_EPISODE_LIMIT_ROW -> EpisodeLimitViewHolder(inflater.inflate(R.layout.adapter_episode_limit, parent, false))
-            VIEW_TYPE_NO_RESULTS -> NoResultsViewHolder(inflater.inflate(R.layout.adapter_no_results, parent, false))
             VIEW_TYPE_DIVIDER_TITLE -> DividerTitleViewHolder(inflater.inflate(R.layout.adapter_divider_row, parent, false))
             VIEW_TYPE_BOOKMARKS -> BookmarkViewHolder(ComposeView(parent.context), theme)
             VIEW_TYPE_BOOKMARK_HEADER -> BookmarkHeaderViewHolder(ComposeView(parent.context), theme)
@@ -334,7 +328,6 @@ class PodcastAdapter(
             is TabsViewHolder -> holder.bind(getItem(position) as TabsHeader)
             is EpisodeHeaderViewHolder -> bindingEpisodeHeaderViewHolder(holder, position)
             is EpisodeLimitViewHolder -> bindEpisodeLimitRow(holder, position)
-            is NoResultsViewHolder -> bindNoResultsMessage(holder, position)
             is DividerTitleViewHolder -> bindDividerRow(holder, position)
             is BookmarkViewHolder -> holder.bind(getItem(position) as BookmarkItemData)
             is BookmarkHeaderViewHolder -> holder.bind(getItem(position) as BookmarkHeader)
@@ -415,14 +408,6 @@ class PodcastAdapter(
         holder.lblTitle.text = holder.itemView.resources.getString(LR.string.podcast_episodes_limited, limit)
     }
 
-    private fun bindNoResultsMessage(holder: NoResultsViewHolder, position: Int) {
-        val noResultsMessage = getItem(position) as? NoResultsMessage ?: return
-        holder.lblTitle.text = noResultsMessage.title
-        holder.lblBody.text = noResultsMessage.bodyText
-        holder.btnShowArchived.setOnClickListener { onShowArchivedClicked() }
-        holder.btnShowArchived.isVisible = noResultsMessage.showButton
-    }
-
     private fun bindDividerRow(holder: DividerTitleViewHolder, position: Int) {
         val dividerRow = getItem(position) as? DividerRow ?: return
         val title = dividerRow.grouping.groupTitles(dividerRow.groupIndex, holder.lblTitle.context)
@@ -443,7 +428,7 @@ class PodcastAdapter(
             onHeaderSummaryToggled(headerExpanded, false)
         }
         this.podcast = podcast
-        val isHtmlDescription = FeatureFlag.isEnabled(Feature.PODCAST_HTML_DESCRIPTION) && podcast.podcastHtmlDescription.isNotEmpty()
+        val isHtmlDescription = podcast.podcastHtmlDescription.isNotEmpty()
         val rawDescription = if (isHtmlDescription) { podcast.podcastHtmlDescription } else { podcast.podcastDescription }
         this.podcastDescription = HtmlCompat.fromHtml(
             rawDescription,
@@ -517,27 +502,29 @@ class PodcastAdapter(
             if (searchTerm.isEmpty()) {
                 if (archivedCount == 0) {
                     content.add(
-                        NoResultsMessage(
+                        EmptyList(
                             title = context.getString(LR.string.podcast_no_episodes_found),
-                            bodyText = context.getString(LR.string.podcast_no_episodes),
-                            showButton = false,
+                            subtitle = context.getString(LR.string.podcast_no_episodes),
+                            iconResourceId = IR.drawable.ic_exclamation_circle,
                         ),
                     )
                 } else {
                     content.add(
-                        NoResultsMessage(
+                        EmptyList(
                             title = context.getString(LR.string.podcast_no_episodes_found),
-                            bodyText = context.getString(LR.string.podcast_no_episodes_all_archived, archivedCount),
-                            showButton = true,
+                            subtitle = context.getString(LR.string.podcast_no_episodes_all_archived, archivedCount),
+                            iconResourceId = IR.drawable.ic_exclamation_circle,
+                            buttonText = context.getString(LR.string.show_archived),
+                            onButtonClick = onShowArchivedClicked,
                         ),
                     )
                 }
             } else {
                 content.add(
-                    NoResultsMessage(
+                    EmptyList(
                         title = context.getString(LR.string.podcast_no_episodes_found),
-                        bodyText = context.getString(LR.string.podcast_no_episodes_matching),
-                        showButton = false,
+                        subtitle = context.getString(LR.string.podcast_no_episodes_matching),
+                        iconResourceId = IR.drawable.ic_exclamation_circle,
                     ),
                 )
             }
@@ -581,10 +568,10 @@ class PodcastAdapter(
                 )
                 if (searchTerm.isNotEmpty() && bookmarks.isEmpty()) {
                     add(
-                        NoResultsMessage(
+                        EmptyList(
                             title = context.getString(LR.string.podcast_no_bookmarks_found),
-                            bodyText = context.getString(LR.string.podcast_no_bookmarks_matching),
-                            showButton = false,
+                            subtitle = context.getString(LR.string.podcast_no_bookmarks_matching),
+                            iconResourceId = IR.drawable.ic_bookmark,
                         ),
                     )
                 } else {
@@ -637,11 +624,11 @@ class PodcastAdapter(
                     )
                 }
                 is RecommendationsResult.Success -> {
+                    val resources = context.resources
                     val list = result.listFeed
                     // Podroll
                     val podroll = list.podroll
                     if (!podroll.isNullOrEmpty()) {
-                        val resources = context.resources
                         add(
                             DividerSubTitleRow(
                                 icon = IR.drawable.ic_author_small,
@@ -660,26 +647,28 @@ class PodcastAdapter(
                             )
                         }
                         add(PaddingRow(12.dp))
+                    }
+                    // Recommended "You might like" podcasts
+                    val podcasts = list.podcasts
+                    if (!podcasts.isNullOrEmpty()) {
                         add(
                             DividerSubTitleRow(
                                 icon = IR.drawable.ic_duplicate,
                                 title = resources.getString(LR.string.similar_shows_to, podcast.title),
                             ),
                         )
+                        podcasts.forEachIndexed { index, podcast ->
+                            add(
+                                RecommendedPodcast(
+                                    listDate = list.date ?: "",
+                                    podcast = podcast,
+                                    onRowClick = onRecommendedPodcastClicked,
+                                    onSubscribeClick = onRecommendedPodcastSubscribeClicked,
+                                ),
+                            )
+                        }
+                        add(PaddingRow(12.dp))
                     }
-                    // Recommended "You might like" podcasts
-                    val podcasts = list.podcasts
-                    podcasts?.forEachIndexed { index, podcast ->
-                        add(
-                            RecommendedPodcast(
-                                listDate = list.date ?: "",
-                                podcast = podcast,
-                                onRowClick = onRecommendedPodcastClicked,
-                                onSubscribeClick = onRecommendedPodcastSubscribeClicked,
-                            ),
-                        )
-                    }
-                    add(PaddingRow(12.dp))
                 }
             }
         }
@@ -700,7 +689,6 @@ class PodcastAdapter(
             is Podcast -> VIEW_TYPE_PODCAST_HEADER
             is EpisodeHeader -> R.layout.adapter_episode_header
             is EpisodeLimitRow -> R.layout.adapter_episode_limit
-            is NoResultsMessage -> R.layout.adapter_no_results
             is DividerRow -> R.layout.adapter_divider_row
             is TabsHeader -> VIEW_TYPE_TABS
             is BookmarkItemData -> VIEW_TYPE_BOOKMARKS
@@ -721,7 +709,6 @@ class PodcastAdapter(
             is Podcast -> Long.MAX_VALUE
             is EpisodeHeader -> Long.MAX_VALUE - 1
             is EpisodeLimitRow -> Long.MAX_VALUE - 2
-            is NoResultsMessage -> Long.MAX_VALUE - 3
             is TabsHeader -> Long.MAX_VALUE - 4
             is BookmarkHeader -> Long.MAX_VALUE - 5
             is BookmarkUpsell -> Long.MAX_VALUE - 6
@@ -757,12 +744,6 @@ class PodcastAdapter(
 
     internal class EpisodeLimitViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val lblTitle = itemView.findViewById<TextView>(R.id.lblTitle)
-    }
-
-    internal class NoResultsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val lblTitle = itemView.findViewById<TextView>(R.id.lblTitle)
-        val lblBody = itemView.findViewById<TextView>(R.id.lblBody)
-        val btnShowArchived = itemView.findViewById<View>(R.id.btnShowArchived)
     }
 
     internal class DividerTitleViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

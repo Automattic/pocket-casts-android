@@ -1,8 +1,29 @@
+7.91
+-----
+*   Updates
+    *   Upgrade to the latest version of Jetpack Compose
+        ([#4049](https://github.com/Automattic/pocket-casts-android/pull/4049))
+    *   Improve accessibility of the follow button in some of the Discover sections
+        ([#4050](https://github.com/Automattic/pocket-casts-android/pull/4050))
+    *   Make full screen Player less sensitive to the hide fling gesture
+        ([#4052](https://github.com/Automattic/pocket-casts-android/pull/4052))
+*   Bug Fixes
+    *   Fix bottom sheet animation used by Up Next and other screens
+        ([#4051](https://github.com/Automattic/pocket-casts-android/pull/4051))
+
 7.90
 -----
+*   New Features
+    *   Add Recently Played sorting option for podcasts
+        ([#3816](https://github.com/Automattic/pocket-casts-android/pull/3816)) 
 *   Updates
     *   Add dropshadow to the podcast artwork and move it below toolbar.
         ([#4006](https://github.com/Automattic/pocket-casts-android/pull/4006))
+    *   Improve error handling when purchasing subscriptions.
+        ([#4024](https://github.com/Automattic/pocket-casts-android/pull/4024))
+*   Bug Fixes
+    *   Updates datastore dependency to prevent crashes
+        ([#4031](https://github.com/Automattic/pocket-casts-android/pull/4031)
 
 7.89
 -----

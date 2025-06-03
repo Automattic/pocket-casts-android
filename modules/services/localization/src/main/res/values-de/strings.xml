@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-05-02 13:54:03+0000
+Translation-Revision-Date: 2025-05-22 14:10:05+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="skip_for_now">Zunächst überspringen</string>
+    <string name="plus_week">Woche</string>
+    <string name="onboarding_plus_recurring_after_intro_offer">Wiederkehrende Zahlung in Höhe von %1$s nach deinem ersten Jahr (%2$s)</string>
+    <string name="you_might_like_empty_title">Empfehlungen konnten nicht geladen werden</string>
+    <string name="onboarding_plus_feature_libro_title">Kostenloses Hörbuch von &lt;a href=\"https://libro.fm/\"&gt;Libro.fm&lt;/a&gt; </string>
+    <string name="you_might_like">Das gefällt dir vielleicht</string>
+    <string name="podroll_information_button">Verstanden</string>
+    <string name="podroll_information_summary">Ersteller-Empfehlungen sind Podcasts, die vom Ersteller der Show mithilfe von PodRoll empfohlen werden.</string>
+    <string name="podroll_information_title">Was ist eine Ersteller-Empfehlung?</string>
+    <string name="recommended_by_creator">Vom Ersteller empfohlene Shows</string>
     <string name="winback_cancel_subscription_continue_cancel_button_label">Mit Kündigung fortfahren</string>
     <string name="winback_cancel_subscription_accept_offer_button_label">Angebot annehmen</string>
     <string name="winback_claimed_offer_message_4">Vielen Dank, dass du dich für Pocket Casts entschieden hast. Dein vergünstigtes Jahr beginnt nach Ablauf deines aktuellen Abrechnungszeitraums.</string>
@@ -15,7 +25,6 @@ Language: de
     <string name="winback_offer_free_offer_yearly_title">50 %% Rabatt auf das nächste Jahr erhalten und %1$s sparen</string>
     <string name="winback_offer_free_offer_title">Den nächsten Monat kostenlos erhalten und %1$s sparen</string>
     <string name="recommendations_loved_by_listeners">Beliebt bei Hörern von</string>
-    <string name="recommendations_if_you_like">Wenn du diesen Inhalt magst</string>
     <string name="price_per_week_usd">\u0024%1$.2f/Woche</string>
     <string name="price_per_week">%1$.2f %2$s/Woche</string>
     <string name="winback_cancel_subscription_header_title">Was du vor deiner Kündigung wissen solltest</string>
@@ -30,7 +39,6 @@ Language: de
     <string name="account_encourage_description">Erstelle ein Konto oder melde dich an, um Pocket Casts in vollen Zügen genießen zu können.</string>
     <string name="account_encourage_title">Wir haben festgestellt, dass du nicht angemeldet bist</string>
     <string name="onboarding_get_started">Los geht’s</string>
-    <string name="onboarding_plus_feature_libro_title"><![CDATA[Kostenloses Hörbuch von <a href="https://libro.fm/">Libro.fm</a>]]></string>
     <string name="encourage_account_history_banner_description">Erstelle ein kostenloses Konto, um deinen Hörverlauf überall zu synchronisieren.</string>
     <string name="encourage_account_history_banner_title">Überblick über wiedergegebene Titel behalten</string>
     <string name="encourage_account_filters_banner_description">Erstelle ein kostenloses Konto, um deine Filter auf jedem Gerät zu synchronisieren.</string>
@@ -374,7 +382,6 @@ Language: de
     <string name="widget_nothing_in_up_next">Keine Inhalte in „Als Nächstes“</string>
     <string name="widget_no_episode_playing">Es wird keine Folge abgespielt</string>
     <string name="clear_search">Suche löschen</string>
-    <string name="bookmarks_search_results_not_found">Wir konnten kein Lesezeichen für diese Suche finden.</string>
     <string name="podcast_and_episode">Podcast &amp; Folge</string>
     <string name="skip_chapters">Kapitel vorauswählen</string>
     <string name="settings_use_episode_artwork_details">Für manche Shows stehen für bestimmte Folgen individuelle Cover zur Verfügung. Aktiviere diese Option, damit Pocket Casts diese anstelle des Show-Covers anzeigt.</string>
@@ -434,7 +441,6 @@ Language: de
     <string name="bookmarks_upsell_instructions_early_access">Profitiere mit Pocket Casts Patron von frühzeitigem Zugriff auf diese Funktion und speichere Zeitstempel für deine Lieblingsfolgen. Bald für Plus-Abonnenten verfügbar.</string>
     <string name="bookmarks_upsell_instructions">Speichere Zeitstempel für deine Lieblingsfolgen und schalte viele weitere Funktionen mit Pocket Casts Plus frei.</string>
     <string name="error_loading_show_notes">Notizen zur Show konnten für diese Folge nicht gefunden werden.</string>
-    <string name="podcast_no_bookmarks_matching">Dieser Podcast enthält keine Lesezeichen, die deinen Suchkriterien entsprechen.</string>
     <string name="podcast_no_bookmarks_found">Keine Lesezeichen gefunden</string>
     <string name="player_tab_notes">Details</string>
     <string name="bookmark_updated">Lesezeichen „%s“ aktualisiert</string>
@@ -557,7 +563,6 @@ Language: de
     <string name="log_in_on_phone">Auf Smartphone anmelden</string>
     <string name="log_in_with_google">Mit Google anmelden</string>
     <string name="log_in_subtitle">Beginne damit, dir deine liebsten Podcasts anzuhören</string>
-    <string name="onboarding_upgrade_no_subscriptions_found">Keine Abonnements gefunden.</string>
     <string name="trial_then_per_year">%1$s ausprobieren, dann %2$s pro Jahr</string>
     <string name="trial_then_per_month">%1$s ausprobieren, dann %2$s pro Monat</string>
     <string name="trial_start">Gratis-Test starten</string>
@@ -691,6 +696,7 @@ Language: de
     <string name="onboarding_welcome_recommendations_title">Entdecke etwas Neues</string>
     <string name="onboarding_welcome_get_you_listening_plus">Vielen Dank. Viel Spaß beim Hören!</string>
     <string name="onboarding_welcome_get_you_listening">Willkommen. Viel Spaß beim Hören!</string>
+    <string name="onboarding_plus_recurring_after_free_trial">Wiederkehrende Zahlungen beginnen nach deinem %1$s (%2$s)</string>
     <string name="onboarding_plus_start_free_trial_and_subscribe">Gratis-Test starten und abonnieren</string>
     <string name="onboarding_plus_terms_and_conditions">Geschäftsbedingungen</string>
     <string name="onboarding_plus_privacy_policy">Datenschutzerklärung</string>
@@ -1656,7 +1662,6 @@ Language: de
     <string name="podcast_released_daily">Erscheint täglich</string>
     <string name="podcast_playback_effects">Wiedergabeoptionen</string>
     <string name="podcast_notifications">Benachrichtigungen</string>
-    <string name="podcast_no_episodes_matching">Dieser Podcast enthält keine Folgen, die deinen Suchkriterien entsprechen.</string>
     <string name="podcast_no_episodes_all_archived">Alle %d Folgen dieses Podcasts wurden archiviert.</string>
     <string name="podcast_no_episodes">In diesem Podcast befinden sich keine Folgen</string>
     <string name="podcast_no_episodes_found">Keine Folgen gefunden</string>
@@ -1690,7 +1695,6 @@ Language: de
     <string name="podcast_archive_all_played">Alle angehörten Folgen archivieren</string>
     <string name="podcast_archive_all">Alle archivieren</string>
     <string name="podcasts_unarchive">Wiederherstellen</string>
-    <string name="podcasts_time_to_add_some_podcasts_summary">Du kannst Podcasts hinzufügen, indem du die Suchfunktion oben nutzt oder dir im Tab „Entdecken“ Anregungen holst.</string>
     <string name="podcasts_time_to_add_some_podcasts">Zeit für Podcasts!</string>
     <string name="podcasts_sort_order">Sortierung</string>
     <string name="podcasts_sort_by_title">„Titel (A-Z)“</string>
@@ -1937,6 +1941,10 @@ Language: de
         <item quantity="one">Tag</item>
         <item quantity="other">Tage</item>
     </plurals>
+    <plurals name="day_with_count">
+        <item quantity="one">%1$d Tag</item>
+        <item quantity="other">%1$d Tage</item>
+    </plurals>
     <plurals name="episode_count">
         <item quantity="one">%d Folge</item>
         <item quantity="other">%d Folgen</item>
@@ -1948,6 +1956,10 @@ Language: de
     <plurals name="minute">
         <item quantity="one">Minute</item>
         <item quantity="other">Minuten</item>
+    </plurals>
+    <plurals name="month_with_count">
+        <item quantity="one">%1$d Monat</item>
+        <item quantity="other">%1$d Monate</item>
     </plurals>
     <plurals name="player_up_next_header_title">
         <item quantity="one" formatted="true">%1$d Folge - %2$s verbleibend</item>
@@ -2004,5 +2016,13 @@ Language: de
     <plurals name="settings_auto_download_on_follow_podcast_description">
         <item quantity="one">Lade automatisch die aktuellste Folge von Shows herunter, denen du seit Neuestem folgst.</item>
         <item quantity="other">Lade automatisch die %s aktuellsten Folgen von Shows herunter, denen du seit Neuestem folgst.</item>
+    </plurals>
+    <plurals name="week_with_count">
+        <item quantity="one">%1$d Woche</item>
+        <item quantity="other">%1$d Wochen</item>
+    </plurals>
+    <plurals name="year_with_count">
+        <item quantity="one">%1$d Jahr</item>
+        <item quantity="other">%1$d Jahre</item>
     </plurals>
 </resources>

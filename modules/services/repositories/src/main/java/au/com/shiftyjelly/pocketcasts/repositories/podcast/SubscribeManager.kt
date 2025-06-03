@@ -22,8 +22,6 @@ import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastEpisodesResponse
 import au.com.shiftyjelly.pocketcasts.utils.Optional
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import coil.executeBlocking
 import coil.imageLoader
@@ -210,8 +208,7 @@ class SubscribeManager @Inject constructor(
         shouldAutoDownload: Boolean,
     ): Boolean = subscribed &&
         settings.autoDownloadOnFollowPodcast.value &&
-        shouldAutoDownload &&
-        FeatureFlag.isEnabled(Feature.AUTO_DOWNLOAD)
+        shouldAutoDownload
 
     private fun downloadPodcastRxSingle(podcastUuid: String): Single<Podcast> {
         // download the podcast

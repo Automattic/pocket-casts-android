@@ -15,8 +15,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.UpNextSyncWorker
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.jakewharton.rxrelay2.Relay
@@ -243,7 +241,7 @@ class UpNextQueueImpl @Inject constructor(
 
     override suspend fun removeEpisode(episode: BaseEpisode, shouldShuffleUpNext: Boolean) {
         if (contains(episode.uuid)) {
-            if (shouldShuffleUpNext && FeatureFlag.isEnabled(Feature.UP_NEXT_SHUFFLE)) {
+            if (shouldShuffleUpNext) {
                 saveChangesBlocking(UpNextAction.RemoveAndShuffle(episode))
             } else {
                 saveChangesBlocking(UpNextAction.Remove(episode))

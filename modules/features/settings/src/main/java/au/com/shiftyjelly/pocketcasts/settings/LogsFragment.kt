@@ -29,11 +29,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
@@ -93,12 +91,11 @@ fun LogsPage(
     val state by viewModel.state.collectAsState()
     val logs = state.logs
     val logLines = state.logLines
-    val clipboardManager = LocalClipboardManager.current
     val context = LocalContext.current
 
     LogsContent(
         onBackPressed = onBackPressed,
-        onCopyToClipboard = { logs?.let { clipboardManager.setText(AnnotatedString(it)) } },
+        onCopyToClipboard = { viewModel.copyToClipboard(context, logs) },
         onShareLogs = { viewModel.shareLogs(context) },
         includeAppBar = !Util.isAutomotive(context),
         logLines = logLines,

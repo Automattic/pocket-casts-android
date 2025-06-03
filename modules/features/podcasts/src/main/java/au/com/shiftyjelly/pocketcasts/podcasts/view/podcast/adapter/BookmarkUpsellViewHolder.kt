@@ -8,7 +8,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.compose.components.EmptyState
+import au.com.shiftyjelly.pocketcasts.compose.components.NoContentBanner
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
@@ -26,19 +26,19 @@ class BookmarkUpsellViewHolder(
         composeView.setContent {
             AppTheme(theme.activeTheme) {
                 val context = LocalContext.current
-                EmptyState(
+                NoContentBanner(
                     title = stringResource(LR.string.bookmarks_empty_state_title),
-                    subtitle = stringResource(LR.string.bookmarks_free_user_empty_state_message),
+                    body = stringResource(LR.string.bookmarks_free_user_empty_state_message),
                     iconResourceId = IR.drawable.ic_bookmark,
-                    buttonText = stringResource(LR.string.bookmarks_free_user_empty_state_button),
-                    onButtonClick = {
+                    primaryButtonText = stringResource(LR.string.bookmarks_free_user_empty_state_button),
+                    onPrimaryButtonClick = {
                         onGetBookmarksClicked()
                         val onboardingFlow = OnboardingFlow.Upsell(
                             source = OnboardingUpgradeSource.BOOKMARKS,
                         )
                         OnboardingLauncher.openOnboardingFlow(requireNotNull(context.getActivity()), onboardingFlow)
                     },
-                    modifier = Modifier.padding(vertical = 24.dp),
+                    modifier = Modifier.padding(top = 56.dp),
                 )
             }
         }

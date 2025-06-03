@@ -4,31 +4,29 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import au.com.shiftyjelly.pocketcasts.compose.components.EmptyState
+import au.com.shiftyjelly.pocketcasts.compose.components.NoContentBanner
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-fun UpNextEmptyState(
+fun UpNextNoContentBanner(
     onDiscoverTapped: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    EmptyState(
+    NoContentBanner(
         title = stringResource(LR.string.player_up_next_empty_title),
-        subtitle = stringResource(LR.string.player_up_next_empty_subtitle),
+        body = stringResource(LR.string.player_up_next_empty_subtitle),
         iconResourceId = R.drawable.mini_player_upnext,
-        buttonText = stringResource(LR.string.go_to_discover),
-        onButtonClick = {
-            onDiscoverTapped()
-        },
+        primaryButtonText = stringResource(LR.string.go_to_discover),
+        onPrimaryButtonClick = onDiscoverTapped,
         modifier = modifier,
     )
 }
 
 @Preview(showBackground = true)
 @Composable
-private fun UpNextEmptyStatePreview() {
-    UpNextEmptyState(
+private fun UpNextNoContentBannerPreview() {
+    UpNextNoContentBanner(
         onDiscoverTapped = {},
     )
 }

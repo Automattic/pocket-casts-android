@@ -1,8 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.servers.interceptors
 
-import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.mockwebserver.MockResponse
@@ -13,10 +10,6 @@ import org.junit.Rule
 import org.junit.Test
 
 class BasicAuthInterceptorTest {
-
-    @get:Rule
-    val featureFlagRule = InMemoryFeatureFlagRule()
-
     @get:Rule
     val server = MockWebServer()
 
@@ -84,26 +77,6 @@ class BasicAuthInterceptorTest {
     fun `when missing credentials don't add authorization header`() {
         val request = Request.Builder()
             .url(url)
-            .build()
-
-        server.enqueue(
-            MockResponse()
-                .setResponseCode(401)
-                .setHeader("WWW-Authenticate", "Basic realm=\"Please enter username and password\""),
-        )
-        client.newCall(request).execute()
-
-        assertEquals(1, server.requestCount)
-        val serverRequest = server.takeRequest()
-        assertNull(serverRequest.getHeader("Authorization"))
-    }
-
-    @Test
-    fun `when feature flag is off don't add authorization header`() {
-        FeatureFlag.setEnabled(Feature.BASIC_AUTHENTICATION, false)
-
-        val request = Request.Builder()
-            .url(urlWithCredentials)
             .build()
 
         server.enqueue(
