@@ -605,6 +605,14 @@ enum class AnalyticsEvent(val key: String) {
     OPML_IMPORT_FAILED("opml_import_failed"),
     OPML_IMPORT_FINISHED("opml_import_finished"),
 
+    /* Notification Opt In*/
+    NOTIFICATIONS_OPT_IN_SHOWN("notifications_opt_in_shown"),
+    NOTIFICATIONS_OPT_IN_ALLOWED("notifications_opt_in_allowed"),
+    NOTIFICATIONS_OPT_IN_DENIED("notifications_opt_in_denied"),
+    NOTIFICATIONS_PERMISSIONS_SHOWN("notifications_permissions_shown"),
+    NOTIFICATIONS_PERMISSIONS_ALLOW_TAPPED("notifications_permissions_allow_tapped"),
+    NOTIFICATIONS_PERMISSIONS_DISMISSED("notifications_permissions_not_now_tapped"),
+
     /* Settings - Notifications */
     SETTINGS_NOTIFICATIONS_SHOWN("settings_notifications_shown"),
     SETTINGS_NOTIFICATIONS_NEW_EPISODES_TOGGLED("settings_notifications_new_episodes_toggled"),
@@ -623,6 +631,7 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_NOTIFICATIONS_NEW_FEATURES_AND_TIPS_ADVANCED_SETTINGS_TAPPED("settings_notifications_new_features_advanced_settings_tapped"),
     SETTINGS_NOTIFICATIONS_OFFERS_TOGGLED("settings_notifications_offers_toggle"),
     SETTINGS_NOTIFICATIONS_OFFERS_ADVANCED_SETTINGS_TAPPED("settings_notifications_offers_advanced_settings_tapped"),
+    SETTINGS_NOTIFICATIONS_PERMISSION_OPEN_SYSTEM_SETTINGS("notifications_permissions_open_system_settings"),
 
     /* Settings - Storage & Data Use */
     SETTINGS_STORAGE_SHOWN("settings_storage_shown"),

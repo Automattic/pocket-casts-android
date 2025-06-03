@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.viewmodel
 
+import android.app.Activity
 import android.content.res.Resources
 import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
@@ -31,11 +32,13 @@ import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.settings.util.TextResource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
@@ -86,6 +89,7 @@ class PodcastViewModel
     val multiSelectBookmarksHelper: MultiSelectBookmarksHelper,
     private val settings: Settings,
     private val podcastAndEpisodeDetailsCoordinator: PodcastAndEpisodeDetailsCoordinator,
+    private val notificationHelper: NotificationHelper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel(), CoroutineScope {
@@ -103,6 +107,8 @@ class PodcastViewModel
 
     val groupedEpisodes: MutableLiveData<List<List<PodcastEpisode>>> = MutableLiveData()
     val signInState = userManager.getSignInState().toLiveData()
+    private val _showNotificationSnack = MutableSharedFlow<SnackBarMessage>()
+    val showNotificationSnack = _showNotificationSnack.asSharedFlow()
 
     val tintColor = MutableLiveData<Int>()
 
@@ -335,7 +341,23 @@ class PodcastViewModel
     fun showNotifications(podcastUuid: String, show: Boolean) {
         analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_NOTIFICATIONS_TAPPED, AnalyticsProp.notificationEnabled(show))
         viewModelScope.launch {
-            podcastManager.updateShowNotifications(podcastUuid, show)
+            if (!notificationHelper.hasNotificationsPermission()) {
+                _showNotificationSnack.emit(
+                    SnackBarMessage.ShowNotificationsDisabledMessage(
+                        message = TextResource.fromStringId(LR.string.notification_snack_message),
+                        cta = TextResource.fromStringId(LR.string.notification_snack_cta),
+                    ),
+                )
+            } else {
+                podcastManager.updateShowNotifications(podcastUuid, show)
+                if (show) {
+                    _showNotificationSnack.emit(
+                        SnackBarMessage.ShowNotifyOnNewEpisodesMessage(
+                            message = TextResource.fromStringId(LR.string.notifications_enabled_message, podcastManager.findPodcastByUuid(podcastUuid)?.title.orEmpty()),
+                        ),
+                    )
+                }
+            }
         }
     }
 
@@ -481,6 +503,7 @@ class PodcastViewModel
                     }
                 }
             }
+
             is Bookmark -> {
                 val startIndex = uiState.bookmarks.indexOf(multiSelectable)
                 if (startIndex > -1) {
@@ -505,6 +528,7 @@ class PodcastViewModel
                     }
                 }
             }
+
             is Bookmark -> {
                 val startIndex = uiState.bookmarks.indexOf(multiSelectable)
                 if (startIndex > -1) {
@@ -669,6 +693,10 @@ class PodcastViewModel
         )
     }
 
+    fun onOpenNotificationSettingsClicked(activity: Activity) {
+        notificationHelper.openNotificationSettings(activity)
+    }
+
     enum class PodcastTab(@StringRes val labelResId: Int, val analyticsValue: String) {
         EPISODES(
             labelResId = LR.string.episodes,
@@ -699,9 +727,11 @@ class PodcastViewModel
             val episodeLimitIndex: Int?,
             val showTab: PodcastTab = PodcastTab.EPISODES,
         ) : UiState()
+
         data class Error(
             val errorMessage: String,
         ) : UiState()
+
         data object Loading : UiState()
     }
 
@@ -717,6 +747,19 @@ class PodcastViewModel
         REFRESH_BUTTON("refresh_button"),
     }
 
+    sealed interface SnackBarMessage {
+        val message: TextResource
+
+        data class ShowNotificationsDisabledMessage(
+            override val message: TextResource,
+            val cta: TextResource,
+        ) : SnackBarMessage
+
+        data class ShowNotifyOnNewEpisodesMessage(
+            override val message: TextResource,
+        ) : SnackBarMessage
+    }
+
     private object AnalyticsProp {
         private const val ENABLED_KEY = "enabled"
         private const val SHOW_ARCHIVED = "show_archived"
@@ -724,8 +767,10 @@ class PodcastViewModel
         private const val UUID_KEY = "uuid"
         fun archiveToggled(archived: Boolean) =
             mapOf(SHOW_ARCHIVED to archived)
+
         fun notificationEnabled(show: Boolean) =
             mapOf(ENABLED_KEY to show)
+
         fun podcastSubscribeToggled(source: SourceView, uuid: String) =
             mapOf(SOURCE_KEY to source.analyticsValue, UUID_KEY to uuid)
     }

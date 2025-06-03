@@ -120,8 +120,10 @@ internal class NotificationsSettingsViewModel @Inject constructor(
                     )
                     if (preference.isEnabled) {
                         notificationScheduler.setupOnboardingNotifications()
+                        notificationScheduler.setupReEngagementNotification()
                     } else {
                         notificationScheduler.cancelScheduledOnboardingNotifications()
+                        notificationScheduler.cancelScheduledReEngagementNotifications()
                     }
                 }
 
@@ -203,6 +205,10 @@ internal class NotificationsSettingsViewModel @Inject constructor(
             }
             loadPreferences()
         }
+    }
+
+    internal fun reportSystemNotificationsSettingsOpened() {
+        analyticsTracker.track(AnalyticsEvent.SETTINGS_NOTIFICATIONS_PERMISSION_OPEN_SYSTEM_SETTINGS)
     }
 
     internal suspend fun getSelectedPodcastIds(): List<String> = withContext(Dispatchers.IO) {
