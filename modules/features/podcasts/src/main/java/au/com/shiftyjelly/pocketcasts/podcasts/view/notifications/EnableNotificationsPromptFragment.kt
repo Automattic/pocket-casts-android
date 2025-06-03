@@ -19,8 +19,6 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.unit.dp
 import androidx.fragment.compose.content
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
@@ -63,11 +61,6 @@ internal class EnableNotificationsPromptFragment : BaseDialogFragment() {
 
     private var wasDismissedViaCloseButton = false
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        isCancelable = false
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -88,34 +81,30 @@ internal class EnableNotificationsPromptFragment : BaseDialogFragment() {
                 ),
         ) {
             AppThemeWithBackground(theme.activeTheme) {
-                Box(
+                EnableNotificationsPromptScreen(
                     modifier = Modifier
-                        .nestedScroll(rememberNestedScrollInteropConnection())
                         .fillMaxSize()
-                        .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)),
-                ) {
-                    EnableNotificationsPromptScreen(
-                        modifier = Modifier.padding(
+                        .padding(
                             vertical = 16.dp,
                             horizontal = 16.dp,
-                        ),
-                        onCtaClicked = {
-                            analyticsTracker.track(AnalyticsEvent.NOTIFICATIONS_PERMISSIONS_ALLOW_TAPPED)
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
-                                    permissionRequester.launch(Manifest.permission.POST_NOTIFICATIONS)
-                                    analyticsTracker.track(AnalyticsEvent.NOTIFICATIONS_OPT_IN_SHOWN)
-                                } else {
-                                    notificationHelper.openNotificationSettings(requireActivity())
-                                }
+                        )
+                        .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)),
+                    onCtaClicked = {
+                        analyticsTracker.track(AnalyticsEvent.NOTIFICATIONS_PERMISSIONS_ALLOW_TAPPED)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
+                                permissionRequester.launch(Manifest.permission.POST_NOTIFICATIONS)
+                                analyticsTracker.track(AnalyticsEvent.NOTIFICATIONS_OPT_IN_SHOWN)
+                            } else {
+                                notificationHelper.openNotificationSettings(requireActivity())
                             }
-                        },
-                        onDismissClicked = {
-                            wasDismissedViaCloseButton = true
-                            dismiss()
-                        },
-                    )
-                }
+                        }
+                    },
+                    onDismissClicked = {
+                        wasDismissedViaCloseButton = true
+                        dismiss()
+                    },
+                )
             }
         }
     }
