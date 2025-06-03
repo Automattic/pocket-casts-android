@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.SuggestedFoldersPopupPolicy
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -54,6 +55,7 @@ class PodcastsViewModel @AssistedInject constructor(
     private val suggestedFoldersManager: SuggestedFoldersManager,
     private val suggestedFoldersPopupPolicy: SuggestedFoldersPopupPolicy,
     private val userManager: UserManager,
+    private val notificationHelper: NotificationHelper,
     @Assisted private val folderUuid: String?,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(UiState(isLoadingItems = true))
@@ -62,6 +64,14 @@ class PodcastsViewModel @AssistedInject constructor(
     val areSuggestedFoldersAvailable = suggestedFoldersManager.observeSuggestedFolders()
         .map { it.isNotEmpty() }
         .stateIn(viewModelScope, SharingStarted.Eagerly, initialValue = false)
+
+    private val _notificationsState = MutableStateFlow(
+        NotificationsPermissionState(
+            hasPermission = notificationHelper.hasNotificationsPermission(),
+            hasShownPromptBefore = settings.notificationsPromptAcknowledged.value,
+        ),
+    )
+    val notificationPromptState = _notificationsState.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -236,6 +246,13 @@ class PodcastsViewModel @AssistedInject constructor(
         podcastManager.refreshPodcasts("Pull down")
     }
 
+    fun updateNotificationsPermissionState() {
+        _notificationsState.value = NotificationsPermissionState(
+            hasPermission = notificationHelper.hasNotificationsPermission(),
+            hasShownPromptBefore = settings.notificationsPromptAcknowledged.value,
+        )
+    }
+
     private suspend fun saveSortOrder() {
         folderManager.updateSortPosition(adapterState)
 
@@ -334,6 +351,11 @@ class PodcastsViewModel @AssistedInject constructor(
     interface Factory {
         fun create(folderUuid: String?): PodcastsViewModel
     }
+
+    data class NotificationsPermissionState(
+        val hasPermission: Boolean,
+        val hasShownPromptBefore: Boolean,
+    )
 
     companion object {
         private const val NUMBER_OF_FOLDERS_KEY = "number_of_folders"

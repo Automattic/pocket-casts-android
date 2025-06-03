@@ -565,6 +565,36 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
+    override val dailyRemindersNotification = UserSetting.BoolPref(
+        sharedPrefKey = "dailyRemindersNotification",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val recommendationsNotification = UserSetting.BoolPref(
+        sharedPrefKey = "trendingAndRecommendationsNotification",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val newFeaturesNotification = UserSetting.BoolPref(
+        sharedPrefKey = "newFeaturesAndTipsNotification",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val offersNotification = UserSetting.BoolPref(
+        sharedPrefKey = "offersNotification",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val notificationsPromptAcknowledged = UserSetting.BoolPref(
+        sharedPrefKey = "notificationPromptAcknowledged",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
+
     override val streamingMode: UserSetting<Boolean> = UserSetting.BoolPref(
         sharedPrefKey = Settings.PREFERENCE_GLOBAL_STREAMING_MODE,
         defaultValue = true,
@@ -1458,6 +1488,7 @@ class SettingsImpl @Inject constructor(
         dates.add(Date().toString())
         sharedPreferences.edit().putStringSet(Settings.APP_REVIEW_REQUESTED_DATES, dates.toSet()).apply()
     }
+
     override fun getReviewRequestedDates(): List<String> {
         return sharedPreferences.getStringSet(Settings.APP_REVIEW_REQUESTED_DATES, emptySet())?.toList() ?: emptyList()
     }

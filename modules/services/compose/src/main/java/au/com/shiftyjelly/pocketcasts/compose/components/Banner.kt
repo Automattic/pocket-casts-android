@@ -29,7 +29,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -50,7 +49,7 @@ fun Banner(
     actionLabel: String,
     icon: Painter,
     onActionClick: () -> Unit,
-    onDismiss: () -> Unit,
+    onDismiss: (() -> Unit)?,
     modifier: Modifier = Modifier,
     backgroundColor: Color = MaterialTheme.theme.colors.primaryUi02Active,
     titleColor: Color = MaterialTheme.theme.colors.primaryText01,
@@ -115,31 +114,35 @@ fun Banner(
                 modifier = Modifier.width(16.dp),
             )
 
-            Icon(
-                painter = painterResource(IR.drawable.ic_close),
-                contentDescription = null,
-                tint = iconTint,
-                modifier = Modifier.size(24.dp),
-            )
+            onDismiss?.let {
+                Icon(
+                    painter = painterResource(IR.drawable.ic_close),
+                    contentDescription = null,
+                    tint = iconTint,
+                    modifier = Modifier.size(24.dp),
+                )
+            }
         }
 
-        CompositionLocalProvider(
-            LocalRippleConfiguration provides RippleConfiguration(color = iconTint),
-        ) {
-            val dismissText = stringResource(LR.string.dismiss)
-            Box(
-                modifier = Modifier
-                    .offset(x = 12.dp, y = -12.dp)
-                    .align(Alignment.TopEnd)
-                    .size(48.dp)
-                    .clickable(
-                        onClick = onDismiss,
-                        role = Role.Button,
-                        indication = dismissRipple,
-                        interactionSource = null,
-                    )
-                    .semantics { contentDescription = dismissText },
-            )
+        onDismiss?.let {
+            CompositionLocalProvider(
+                LocalRippleConfiguration provides RippleConfiguration(color = iconTint),
+            ) {
+                val dismissText = stringResource(LR.string.dismiss)
+                Box(
+                    modifier = Modifier
+                        .offset(x = 12.dp, y = -12.dp)
+                        .align(Alignment.TopEnd)
+                        .size(48.dp)
+                        .clickable(
+                            onClick = onDismiss,
+                            role = Role.Button,
+                            indication = dismissRipple,
+                            interactionSource = null,
+                        )
+                        .semantics { contentDescription = dismissText },
+                )
+            }
         }
     }
 }
@@ -159,6 +162,23 @@ private fun BannerPreview(
             icon = painterResource(IR.drawable.ic_heart_2),
             onActionClick = {},
             onDismiss = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun BannerPreviewWithoutDismiss(
+    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
+) {
+    AppTheme(themeType) {
+        Banner(
+            title = "Your shows, on any device",
+            description = "Create a free account to sync your shows and listen anywhere.",
+            actionLabel = "Create a free account",
+            icon = painterResource(IR.drawable.ic_heart_2),
+            onActionClick = {},
+            onDismiss = null,
         )
     }
 }

@@ -263,6 +263,12 @@ abstract class EpisodeDao {
     @Query("SELECT * FROM podcast_episodes WHERE episode_status == :downloadEpisodeStatusEnum ORDER BY last_download_attempt_date DESC")
     abstract fun findDownloadedEpisodesRxFlowable(downloadEpisodeStatusEnum: EpisodeStatusEnum = EpisodeStatusEnum.DOWNLOADED): Flowable<List<PodcastEpisode>>
 
+    @Query("SELECT COUNT(*) FROM podcast_episodes WHERE episode_status == :downloadEpisodeStatusEnum AND playing_status == :playingStatus")
+    abstract suspend fun downloadedEpisodesThatHaveNotBeenPlayedCount(
+        downloadEpisodeStatusEnum: EpisodeStatusEnum = EpisodeStatusEnum.DOWNLOADED,
+        playingStatus: EpisodePlayingStatus = EpisodePlayingStatus.NOT_PLAYED,
+    ): Int
+
     @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE starred = 1")
     abstract fun findStarredEpisodesRxFlowable(): Flowable<List<PodcastEpisode>>

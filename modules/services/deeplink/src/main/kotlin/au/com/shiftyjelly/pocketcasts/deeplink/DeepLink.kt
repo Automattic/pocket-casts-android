@@ -8,7 +8,6 @@ import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_AD
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_BOOKMARK
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_CHANGE_BOOKMARK_TITLE
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_DELETE_BOOKMARK
-import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_DOWNLOADS
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_EPISODE
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_PODCAST
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_AUTO_PLAY
@@ -51,8 +50,10 @@ sealed interface UriDeepLink : DeepLink {
 }
 
 data object DownloadsDeepLink : IntentableDeepLink {
-    override fun toIntent(context: Context) = context.launcherIntent
-        .setAction(ACTION_OPEN_DOWNLOADS)
+    private val uri = Uri.parse("pktc://profile/downloads")
+
+    override fun toIntent(context: Context): Intent = Intent(ACTION_VIEW, uri)
+        .setPackage(context.packageName)
 }
 
 data object AddBookmarkDeepLink : IntentableDeepLink {
@@ -160,7 +161,7 @@ data object ShowDiscoverDeepLink : ShowPageDeepLink {
     override val pageId = "search"
 }
 
-data object ShowUpNextDeepLink : ShowPageDeepLink {
+data object ShowUpNextModalDeepLink : ShowPageDeepLink {
     override val pageId = "upnext"
 }
 
@@ -171,6 +172,21 @@ data class ShowFilterDeepLink(
 
     override fun toIntent(context: Context) = super.toIntent(context)
         .putExtra(EXTRA_FILTER_ID, filterId)
+}
+
+data object ShowFiltersDeepLink : IntentableDeepLink {
+    override fun toIntent(context: Context) = Intent(ACTION_VIEW)
+        .setData(Uri.parse("pktc://filters"))
+}
+
+data object CreateAccountDeepLink : IntentableDeepLink {
+    override fun toIntent(context: Context) = Intent(ACTION_VIEW)
+        .setData(Uri.parse("pktc://signup"))
+}
+
+data object ShowUpNextTabDeepLink : IntentableDeepLink {
+    override fun toIntent(context: Context) = Intent(ACTION_VIEW)
+        .setData(Uri.parse("pktc://upnext?location=tab"))
 }
 
 data object PocketCastsWebsiteGetDeepLink : DeepLink
@@ -202,6 +218,11 @@ data object CloudFilesDeepLink : IntentableDeepLink {
         .setData(Uri.parse("pktc://cloudfiles"))
 }
 
+data object UpsellDeepLink : IntentableDeepLink {
+    override fun toIntent(context: Context) = Intent(ACTION_VIEW)
+        .setData(Uri.parse("pktc://upsell"))
+}
+
 data object UpgradeAccountDeepLink : DeepLink
 
 data class PromoCodeDeepLink(
@@ -224,6 +245,31 @@ data class NativeShareDeepLink(
 data class OpmlImportDeepLink(
     val uri: Uri,
 ) : DeepLink
+
+data object ImportDeepLink : IntentableDeepLink {
+    override fun toIntent(context: Context) = Intent(ACTION_VIEW)
+        .setData(Uri.parse("pktc://settings/import"))
+}
+
+data object StaffPicksDeepLink : IntentableDeepLink {
+    override fun toIntent(context: Context) = Intent(ACTION_VIEW)
+        .setData(Uri.parse("pktc://discover/staffpicks"))
+}
+
+data object TrendingDeepLink : IntentableDeepLink {
+    override fun toIntent(context: Context) = Intent(ACTION_VIEW)
+        .setData(Uri.parse("pktc://discover/trending"))
+}
+
+data object RecommendationsDeepLink : IntentableDeepLink {
+    override fun toIntent(context: Context) = Intent(ACTION_VIEW)
+        .setData(Uri.parse("pktc://discover/recommendations"))
+}
+
+data object AppOpenDeepLink : IntentableDeepLink {
+    override fun toIntent(context: Context) = Intent(ACTION_VIEW)
+        .setData(Uri.parse("pktc://open"))
+}
 
 data class PlayFromSearchDeepLink(
     val query: String,
@@ -256,6 +302,16 @@ data class ReferralsDeepLink(
             .appendPath(code)
             .build()
     }
+}
+
+data object ThemesDeepLink : IntentableDeepLink {
+    override fun toIntent(context: Context) = Intent(ACTION_VIEW)
+        .setData(Uri.parse("pktc://settings/themes"))
+}
+
+data object SmartFoldersDeepLink : IntentableDeepLink {
+    override fun toIntent(context: Context) = Intent(ACTION_VIEW)
+        .setData(Uri.parse("pktc://features/suggestedFolders"))
 }
 
 private val Context.launcherIntent get() = requireNotNull(packageManager.getLaunchIntentForPackage(packageName)) {

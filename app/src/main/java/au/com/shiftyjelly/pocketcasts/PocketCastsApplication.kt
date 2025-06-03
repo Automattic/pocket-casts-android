@@ -20,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.file.StorageOptions
 import au.com.shiftyjelly.pocketcasts.repositories.jobs.VersionMigrationsWorker
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepTimerRestartWhenShakingDevice
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -121,6 +122,8 @@ class PocketCastsApplication : Application(), Configuration.Provider {
 
     @Inject lateinit var endOfYearSync: EndOfYearSync
 
+    @Inject lateinit var notificationManager: NotificationManager
+
     override fun onCreate() {
         if (BuildConfig.DEBUG) {
             StrictMode.setThreadPolicy(
@@ -181,6 +184,11 @@ class PocketCastsApplication : Application(), Configuration.Provider {
             appIcon.enableSelectedAlias(appIcon.activeAppIcon)
 
             notificationHelper.setupNotificationChannels()
+            notificationManager.setupOnboardingNotifications()
+            notificationManager.setupReEngagementNotifications()
+            notificationManager.setupTrendingAndRecommendationsNotifications()
+            notificationManager.setupNewFeaturesNotifications()
+            notificationManager.setupOffersNotifications()
             appLifecycleObserver.setup()
 
             Coil.setImageLoader(coilImageLoader)

@@ -6,6 +6,8 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationScheduler
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.settings.notifications.data.NotificationsPreferenceRepository
 import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationPreferenceCategory
@@ -24,9 +26,16 @@ internal class NotificationsSettingsViewModel @Inject constructor(
     private val preferenceRepository: NotificationsPreferenceRepository,
     private val analyticsTracker: AnalyticsTracker,
     private val podcastManager: PodcastManager,
+    private val notificationHelper: NotificationHelper,
+    private val notificationScheduler: NotificationScheduler,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(State(emptyList()))
+    private val _state = MutableStateFlow(
+        State(
+            areSystemNotificationsEnabled = notificationHelper.hasNotificationsPermission(),
+            categories = emptyList(),
+        ),
+    )
     val state: StateFlow<State> = _state
 
     init {
@@ -80,7 +89,7 @@ internal class NotificationsSettingsViewModel @Inject constructor(
                 }
 
                 is NotificationPreferenceType.NotificationActions -> {
-                    val previousValue = state.value.categories.map { it.preferences }.flatten<NotificationPreferenceType>()
+                    val previousValue = state.value.categories.map { it.preferences }.flatten()
                         .find { it is NotificationPreferenceType.NotificationActions }
                     if ((previousValue as? NotificationPreferenceType.NotificationActions)?.value != preference.value) {
                         preferenceRepository.setPreference(preference)
@@ -103,6 +112,76 @@ internal class NotificationsSettingsViewModel @Inject constructor(
                     analyticsTracker.track(AnalyticsEvent.SETTINGS_NOTIFICATIONS_SOUND_CHANGED)
                 }
 
+                is NotificationPreferenceType.EnableDailyReminders -> {
+                    preferenceRepository.setPreference(preference)
+                    analyticsTracker.track(
+                        AnalyticsEvent.SETTINGS_NOTIFICATIONS_DAILY_REMINDERS_TOGGLED,
+                        mapOf("enabled" to preference.isEnabled),
+                    )
+                    if (preference.isEnabled) {
+                        notificationScheduler.setupOnboardingNotifications()
+                        notificationScheduler.setupReEngagementNotification()
+                    } else {
+                        notificationScheduler.cancelScheduledOnboardingNotifications()
+                        notificationScheduler.cancelScheduledReEngagementNotifications()
+                    }
+                }
+
+                is NotificationPreferenceType.DailyReminderSettings -> {
+                    analyticsTracker.track(AnalyticsEvent.SETTINGS_DAILY_REMINDERS_ADVANCED_SETTINGS_TAPPED)
+                }
+
+                is NotificationPreferenceType.EnableRecommendations -> {
+                    preferenceRepository.setPreference(preference)
+                    analyticsTracker.track(
+                        AnalyticsEvent.SETTINGS_NOTIFICATIONS_TRENDING_AND_RECOMMENDATIONS_TOGGLED,
+                        mapOf("enabled" to preference.isEnabled),
+                    )
+                    if (preference.isEnabled) {
+                        notificationScheduler.setupTrendingAndRecommendationsNotifications()
+                    } else {
+                        notificationScheduler.cancelScheduledTrendingAndRecommendationsNotifications()
+                    }
+                }
+
+                is NotificationPreferenceType.RecommendationSettings -> {
+                    analyticsTracker.track(AnalyticsEvent.SETTINGS_TRENDING_AND_RECOMMENDATIONS_ADVANCED_SETTINGS_TAPPED)
+                }
+
+                is NotificationPreferenceType.EnableNewFeaturesAndTips -> {
+                    preferenceRepository.setPreference(preference)
+                    analyticsTracker.track(
+                        AnalyticsEvent.SETTINGS_NOTIFICATIONS_NEW_FEATURES_AND_TIPS_TOGGLED,
+                        mapOf("enabled" to preference.isEnabled),
+                    )
+                    if (preference.isEnabled) {
+                        notificationScheduler.setupNewFeaturesAndTipsNotifications()
+                    } else {
+                        notificationScheduler.cancelScheduledNewFeaturesAndTipsNotifications()
+                    }
+                }
+
+                is NotificationPreferenceType.NewFeaturesAndTipsSettings -> {
+                    analyticsTracker.track(AnalyticsEvent.SETTINGS_NOTIFICATIONS_NEW_FEATURES_AND_TIPS_ADVANCED_SETTINGS_TAPPED)
+                }
+
+                is NotificationPreferenceType.EnableOffers -> {
+                    preferenceRepository.setPreference(preference)
+                    analyticsTracker.track(
+                        AnalyticsEvent.SETTINGS_NOTIFICATIONS_OFFERS_TOGGLED,
+                        mapOf("enabled" to preference.isEnabled),
+                    )
+                    if (preference.isEnabled) {
+                        notificationScheduler.setupOffersNotifications()
+                    } else {
+                        notificationScheduler.cancelScheduledOffersNotifications()
+                    }
+                }
+
+                is NotificationPreferenceType.OffersSettings -> {
+                    analyticsTracker.track(AnalyticsEvent.SETTINGS_NOTIFICATIONS_OFFERS_ADVANCED_SETTINGS_TAPPED)
+                }
+
                 is NotificationPreferenceType.NotifyOnThesePodcasts -> Unit
             }
             loadPreferences()
@@ -111,6 +190,12 @@ internal class NotificationsSettingsViewModel @Inject constructor(
 
     internal fun onShown() {
         analyticsTracker.track(AnalyticsEvent.SETTINGS_NOTIFICATIONS_SHOWN)
+    }
+
+    internal fun checkNotificationPermission() {
+        _state.update {
+            it.copy(areSystemNotificationsEnabled = notificationHelper.hasNotificationsPermission())
+        }
     }
 
     internal fun onSelectedPodcastsChanged(newSelection: List<String>) {
@@ -122,12 +207,17 @@ internal class NotificationsSettingsViewModel @Inject constructor(
         }
     }
 
+    internal fun reportSystemNotificationsSettingsOpened() {
+        analyticsTracker.track(AnalyticsEvent.SETTINGS_NOTIFICATIONS_PERMISSION_OPEN_SYSTEM_SETTINGS)
+    }
+
     internal suspend fun getSelectedPodcastIds(): List<String> = withContext(Dispatchers.IO) {
         val uuids = podcastManager.findSubscribedBlocking().filter { it.isShowNotifications }.map { it.uuid }
         uuids
     }
 
     internal data class State(
+        val areSystemNotificationsEnabled: Boolean,
         val categories: List<NotificationPreferenceCategory>,
     )
 }

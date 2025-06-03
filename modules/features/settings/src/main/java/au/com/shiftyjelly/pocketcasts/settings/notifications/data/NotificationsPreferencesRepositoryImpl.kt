@@ -22,88 +22,181 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
     private val settings: Settings,
     private val podcastManager: PodcastManager,
-    private val notificationsCompatibilityProvider: NotificationsCompatibilityProvider,
+    private val notificationFeaturesProvider: NotificationFeaturesProvider,
 ) : NotificationsPreferenceRepository {
 
     override suspend fun getPreferenceCategories(): List<NotificationPreferenceCategory> {
-        return listOf(
-            NotificationPreferenceCategory(
-                title = TextResource.fromStringId(LR.string.settings_notifications_new_episodes),
-                preferences = buildList {
-                    val isEnabled = settings.notifyRefreshPodcast.flow.value
-                    add(
-                        NotificationPreferenceType.NotifyMeOnNewEpisodes(
-                            title = TextResource.fromStringId(LR.string.settings_notification_notify_me),
-                            isEnabled = isEnabled,
-                        ),
-                    )
-                    if (isEnabled) {
+        return buildList {
+            add(
+                NotificationPreferenceCategory(
+                    title = TextResource.fromStringId(LR.string.settings_notifications_new_episodes),
+                    preferences = buildList {
+                        val isEnabled = settings.notifyRefreshPodcast.flow.value
                         add(
-                            NotificationPreferenceType.NotifyOnThesePodcasts(
-                                title = TextResource.fromStringId(LR.string.settings_notification_choose_podcasts),
-                                displayValue = getPodcastsSummary() ?: TextResource.fromText(""),
+                            NotificationPreferenceType.NotifyMeOnNewEpisodes(
+                                title = TextResource.fromStringId(LR.string.settings_notification_notify_me),
+                                isEnabled = isEnabled,
                             ),
                         )
-                        add(
-                            NotificationPreferenceType.NotificationActions(
-                                title = TextResource.fromStringId(LR.string.settings_notification_actions_title),
-                                value = settings.newEpisodeNotificationActions.value,
-                                options = NewEpisodeNotificationAction.entries,
-                                displayValue = getActionsSummary(),
-                            ),
-                        )
+                        if (isEnabled) {
+                            add(
+                                NotificationPreferenceType.NotifyOnThesePodcasts(
+                                    title = TextResource.fromStringId(LR.string.settings_notification_choose_podcasts),
+                                    displayValue = getPodcastsSummary() ?: TextResource.fromText(""),
+                                ),
+                            )
+                            add(
+                                NotificationPreferenceType.NotificationActions(
+                                    title = TextResource.fromStringId(LR.string.settings_notification_actions_title),
+                                    value = settings.newEpisodeNotificationActions.value,
+                                    options = NewEpisodeNotificationAction.entries,
+                                    displayValue = getActionsSummary(),
+                                ),
+                            )
 
-                        if (notificationsCompatibilityProvider.hasNotificationChannels) {
-                            add(
-                                NotificationPreferenceType.AdvancedSettings(
-                                    title = TextResource.fromStringId(LR.string.settings_notification_advanced),
-                                    description = TextResource.fromStringId(LR.string.settings_notification_advanced_summary),
-                                ),
-                            )
-                        } else {
-                            add(
-                                NotificationPreferenceType.NotificationSoundPreference(
-                                    title = TextResource.fromStringId(LR.string.settings_notification_sound),
-                                    notificationSound = settings.notificationSound.value,
-                                    displayedSoundName = getNotificationSoundSummary(),
-                                ),
-                            )
-                            add(
-                                NotificationPreferenceType.NotificationVibration(
-                                    title = TextResource.fromStringId(LR.string.settings_notification_vibrate),
-                                    value = settings.notificationVibrate.value,
-                                    options = listOf(
-                                        NotificationVibrateSetting.NewEpisodes,
-                                        NotificationVibrateSetting.OnlyWhenSilent,
-                                        NotificationVibrateSetting.Never,
+                            if (notificationFeaturesProvider.hasNotificationChannels) {
+                                add(
+                                    NotificationPreferenceType.AdvancedSettings(
+                                        title = TextResource.fromStringId(LR.string.settings_notification_advanced),
+                                        description = TextResource.fromStringId(LR.string.settings_notification_advanced_summary),
                                     ),
-                                    displayValue = TextResource.fromStringId(settings.notificationVibrate.value.summary),
+                                )
+                            } else {
+                                add(
+                                    NotificationPreferenceType.NotificationSoundPreference(
+                                        title = TextResource.fromStringId(LR.string.settings_notification_sound),
+                                        notificationSound = settings.notificationSound.value,
+                                        displayedSoundName = getNotificationSoundSummary(),
+                                    ),
+                                )
+                                add(
+                                    NotificationPreferenceType.NotificationVibration(
+                                        title = TextResource.fromStringId(LR.string.settings_notification_vibrate),
+                                        value = settings.notificationVibrate.value,
+                                        options = listOf(
+                                            NotificationVibrateSetting.NewEpisodes,
+                                            NotificationVibrateSetting.OnlyWhenSilent,
+                                            NotificationVibrateSetting.Never,
+                                        ),
+                                        displayValue = TextResource.fromStringId(settings.notificationVibrate.value.summary),
+                                    ),
+                                )
+                            }
+                        }
+                    },
+                ),
+            )
+            if (notificationFeaturesProvider.isRevampFeatureEnabled) {
+                add(
+                    NotificationPreferenceCategory(
+                        title = TextResource.fromStringId(LR.string.settings_notification_recommendations),
+                        preferences = buildList {
+                            add(
+                                NotificationPreferenceType.EnableRecommendations(
+                                    title = TextResource.fromStringId(LR.string.settings_notification_notify_me),
+                                    isEnabled = settings.recommendationsNotification.value,
                                 ),
                             )
-                        }
-                    }
-                },
-            ),
-            NotificationPreferenceCategory(
-                title = TextResource.fromStringId(LR.string.settings),
-                preferences = listOf(
-                    NotificationPreferenceType.PlayOverNotifications(
-                        title = TextResource.fromStringId(LR.string.settings_notification_play_over),
-                        value = settings.playOverNotification.value,
-                        options = listOf(
-                            PlayOverNotificationSetting.NEVER,
-                            PlayOverNotificationSetting.DUCK,
-                            PlayOverNotificationSetting.ALWAYS,
-                        ),
-                        displayValue = TextResource.fromStringId(settings.playOverNotification.value.titleRes),
+                            if (settings.recommendationsNotification.value && notificationFeaturesProvider.hasNotificationChannels) {
+                                add(
+                                    NotificationPreferenceType.RecommendationSettings(
+                                        title = TextResource.fromStringId(LR.string.settings_notification_advanced),
+                                        description = TextResource.fromStringId(LR.string.settings_notification_advanced_summary),
+                                    ),
+                                )
+                            }
+                        },
                     ),
-                    NotificationPreferenceType.HidePlaybackNotificationOnPause(
-                        title = TextResource.fromStringId(LR.string.settings_notification_hide_on_pause),
-                        isEnabled = settings.hideNotificationOnPause.value,
+                )
+
+                add(
+                    NotificationPreferenceCategory(
+                        title = TextResource.fromStringId(LR.string.settings_notification_daily_reminders),
+                        preferences = buildList {
+                            add(
+                                NotificationPreferenceType.EnableDailyReminders(
+                                    title = TextResource.fromStringId(LR.string.settings_notification_notify_me),
+                                    isEnabled = settings.dailyRemindersNotification.value,
+                                ),
+                            )
+                            if (settings.dailyRemindersNotification.value && notificationFeaturesProvider.hasNotificationChannels) {
+                                add(
+                                    NotificationPreferenceType.DailyReminderSettings(
+                                        title = TextResource.fromStringId(LR.string.settings_notification_advanced),
+                                        description = TextResource.fromStringId(LR.string.settings_notification_advanced_summary),
+                                    ),
+                                )
+                            }
+                        },
+                    ),
+                )
+
+                add(
+                    NotificationPreferenceCategory(
+                        title = TextResource.fromStringId(LR.string.settings_notification_new_features),
+                        preferences = buildList {
+                            add(
+                                NotificationPreferenceType.EnableNewFeaturesAndTips(
+                                    title = TextResource.fromStringId(LR.string.settings_notification_notify_me),
+                                    isEnabled = settings.newFeaturesNotification.value,
+                                ),
+                            )
+                            if (settings.newFeaturesNotification.value && notificationFeaturesProvider.hasNotificationChannels) {
+                                add(
+                                    NotificationPreferenceType.NewFeaturesAndTipsSettings(
+                                        title = TextResource.fromStringId(LR.string.settings_notification_advanced),
+                                        description = TextResource.fromStringId(LR.string.settings_notification_advanced_summary),
+                                    ),
+                                )
+                            }
+                        },
+                    ),
+                )
+
+                add(
+                    NotificationPreferenceCategory(
+                        title = TextResource.fromStringId(LR.string.settings_notification_offers),
+                        preferences = buildList {
+                            add(
+                                NotificationPreferenceType.EnableOffers(
+                                    title = TextResource.fromStringId(LR.string.settings_notification_notify_me),
+                                    isEnabled = settings.offersNotification.value,
+                                ),
+                            )
+                            if (settings.offersNotification.value && notificationFeaturesProvider.hasNotificationChannels) {
+                                add(
+                                    NotificationPreferenceType.OffersSettings(
+                                        title = TextResource.fromStringId(LR.string.settings_notification_advanced),
+                                        description = TextResource.fromStringId(LR.string.settings_notification_advanced_summary),
+                                    ),
+                                )
+                            }
+                        },
+                    ),
+                )
+            }
+            add(
+                NotificationPreferenceCategory(
+                    title = TextResource.fromStringId(LR.string.settings),
+                    preferences = listOf(
+                        NotificationPreferenceType.PlayOverNotifications(
+                            title = TextResource.fromStringId(LR.string.settings_notification_play_over),
+                            value = settings.playOverNotification.value,
+                            options = listOf(
+                                PlayOverNotificationSetting.NEVER,
+                                PlayOverNotificationSetting.DUCK,
+                                PlayOverNotificationSetting.ALWAYS,
+                            ),
+                            displayValue = TextResource.fromStringId(settings.playOverNotification.value.titleRes),
+                        ),
+                        NotificationPreferenceType.HidePlaybackNotificationOnPause(
+                            title = TextResource.fromStringId(LR.string.settings_notification_hide_on_pause),
+                            isEnabled = settings.hideNotificationOnPause.value,
+                        ),
                     ),
                 ),
-            ),
-        )
+            )
+        }
     }
 
     private suspend fun getPodcastsSummary() = podcastManager.findSubscribedFlow().map { podcasts ->
@@ -177,6 +270,26 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
                 settings.notificationSound.set(value = preference.notificationSound, updateModifiedAt = false)
             }
 
+            is NotificationPreferenceType.EnableDailyReminders -> {
+                settings.dailyRemindersNotification.set(value = preference.isEnabled, updateModifiedAt = true)
+            }
+
+            is NotificationPreferenceType.EnableRecommendations -> {
+                settings.recommendationsNotification.set(value = preference.isEnabled, updateModifiedAt = true)
+            }
+
+            is NotificationPreferenceType.EnableNewFeaturesAndTips -> {
+                settings.newFeaturesNotification.set(value = preference.isEnabled, updateModifiedAt = true)
+            }
+
+            is NotificationPreferenceType.EnableOffers -> {
+                settings.offersNotification.set(value = preference.isEnabled, updateModifiedAt = true)
+            }
+
+            is NotificationPreferenceType.OffersSettings,
+            is NotificationPreferenceType.NewFeaturesAndTipsSettings,
+            is NotificationPreferenceType.RecommendationSettings,
+            is NotificationPreferenceType.DailyReminderSettings,
             is NotificationPreferenceType.AdvancedSettings,
             is NotificationPreferenceType.NotifyOnThesePodcasts,
             -> Unit

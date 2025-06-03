@@ -11,12 +11,14 @@ import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.analytics.discoverListPodcastSubscribed
 import au.com.shiftyjelly.pocketcasts.analytics.discoverListPodcastTapped
 import au.com.shiftyjelly.pocketcasts.discover.R
+import au.com.shiftyjelly.pocketcasts.discover.util.DiscoverDeepLinkManager.Companion.STAFF_PICKS_LIST_ID
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.EPISODE_UUID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.LIST_ID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.PODCAST_UUID_KEY
@@ -28,6 +30,8 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastFragment
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManager
+import au.com.shiftyjelly.pocketcasts.repositories.notification.OnboardingNotificationType
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverEpisode
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
@@ -45,6 +49,7 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import coil.load
 import coil.transform.CircleCropTransformation
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -55,6 +60,8 @@ open class PodcastGridListFragment : BaseFragment(), Toolbar.OnMenuItemClickList
     @Inject lateinit var settings: Settings
 
     @Inject lateinit var analyticsTracker: AnalyticsTracker
+
+    @Inject lateinit var notificationManager: NotificationManager
 
     companion object {
         internal const val ARG_LIST_UUID = "listUuid"
@@ -105,7 +112,7 @@ open class PodcastGridListFragment : BaseFragment(), Toolbar.OnMenuItemClickList
     val listUuid: String?
         get() = arguments?.getString(ARG_LIST_UUID)
 
-    private val inferredId: String
+    val inferredId: String
         get() = arguments?.getString(ARG_INFERRED_ID) ?: NetworkLoadableList.Companion.NONE
 
     val sourceUrl: String?
@@ -172,6 +179,15 @@ open class PodcastGridListFragment : BaseFragment(), Toolbar.OnMenuItemClickList
 
     val onEpisodeStopClick: () -> Unit = {
         viewModel.stopPlayback()
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        if (listUuid == STAFF_PICKS_LIST_ID) {
+            lifecycleScope.launch {
+                notificationManager.updateUserFeatureInteraction(OnboardingNotificationType.StaffPicks)
+            }
+        }
+        super.onViewCreated(view, savedInstanceState)
     }
 
     override fun onMenuItemClick(item: MenuItem): Boolean {

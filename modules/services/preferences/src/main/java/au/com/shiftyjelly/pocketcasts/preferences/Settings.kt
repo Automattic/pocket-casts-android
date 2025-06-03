@@ -129,6 +129,10 @@ interface Settings {
         NOTIFICATION_CHANNEL_ID_BOOKMARK("bookmark"),
         NOTIFICATION_CHANNEL_ID_FIX_DOWNLOADS("fixDownloads"),
         NOTIFICATION_CHANNEL_ID_FIX_DOWNLOADS_COMPLETE("fixDownloadsComplete"),
+        NOTIFICATION_CHANNEL_ID_DAILY_REMINDERS("dailyReminders"),
+        NOTIFICATION_CHANNEL_ID_TRENDING_AND_RECOMMENDATIONS("trendingAndRecommendations"),
+        NOTIFICATION_CHANNEL_ID_NEW_FEATURES_AND_TIPS("newFeaturesAndTips"),
+        NOTIFICATION_CHANNEL_ID_OFFERS("offers"),
     }
 
     enum class NotificationId(val value: Int) {
@@ -139,6 +143,17 @@ interface Settings {
         BOOKMARK(21483650),
         FIX_DOWNLOADS(21483651),
         FIX_DOWNLOADS_COMPLETE(21483652),
+        ONBOARDING_SYNC(21483653),
+        ONBOARDING_IMPORT(21483654),
+        ONBOARDING_UPNEXT(21483655),
+        ONBOARDING_FILTERS(21483656),
+        ONBOARDING_THEMES(21483657),
+        ONBOARDING_STAFF_PICKS(21483658),
+        ONBOARDING_UPSELL(21483659),
+        RE_ENGAGEMENT(21483660),
+        CONTENT_RECOMMENDATIONS(21483661),
+        FEATURES_AND_TIPS(21483662),
+        OFFERS(21483663),
     }
 
     enum class UpNextAction(val serverId: Int) {
@@ -332,6 +347,11 @@ interface Settings {
     fun shouldShowLowStorageBannerAfterSnooze(): Boolean
 
     val hideNotificationOnPause: UserSetting<Boolean>
+    val dailyRemindersNotification: UserSetting<Boolean>
+    val recommendationsNotification: UserSetting<Boolean>
+    val newFeaturesNotification: UserSetting<Boolean>
+    val offersNotification: UserSetting<Boolean>
+    val notificationsPromptAcknowledged: UserSetting<Boolean>
 
     val streamingMode: UserSetting<Boolean>
     val keepScreenAwake: UserSetting<Boolean>

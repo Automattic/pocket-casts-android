@@ -12,6 +12,8 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.calculateCombinedIconId
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManager
+import au.com.shiftyjelly.pocketcasts.repositories.notification.OnboardingNotificationType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.shortcuts.PocketCastsShortcuts
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
@@ -35,6 +37,7 @@ class PlaylistManagerImpl @Inject constructor(
     private val downloadManager: DownloadManager,
     private val playlistUpdateAnalytics: PlaylistUpdateAnalytics,
     private val syncManager: SyncManager,
+    private val notificationManager: NotificationManager,
     @ApplicationContext private val context: Context,
     appDatabase: AppDatabase,
 ) : PlaylistManager, CoroutineScope {
@@ -219,6 +222,11 @@ class PlaylistManagerImpl @Inject constructor(
         userPlaylistUpdate: UserPlaylistUpdate?,
         isCreatingFilter: Boolean,
     ) {
+        if (isCreatingFilter) {
+            launch(Dispatchers.IO) {
+                notificationManager.updateUserFeatureInteraction(OnboardingNotificationType.Filters)
+            }
+        }
         playlistDao.updateBlocking(playlist)
         playlistUpdateAnalytics.update(playlist, userPlaylistUpdate, isCreatingFilter)
     }

@@ -114,6 +114,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
+    NOTIFICATIONS_REVAMP(
+        key = "notifications_revamp",
+        title = "Notifications Revamp",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = true,
+    ),
 
     // This is set of features used only for testing purposes.
     TEST_FREE_FEATURE(

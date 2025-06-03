@@ -1386,6 +1386,10 @@
     <string name="settings_notification_choose_podcasts">Choose podcasts</string>
     <string name="settings_notification_hide_on_pause">Hide playback notification on pause</string>
     <string name="settings_notification_notify_me">Notify me</string>
+    <string name="settings_notification_daily_reminders">Daily Reminders</string>
+    <string name="settings_notification_recommendations">Trending &amp; Recommendations</string>
+    <string name="settings_notification_new_features">New Features &amp; Tips</string>
+    <string name="settings_notification_offers">Pocket Casts Offers</string>
     <string name="settings_notification_play_over">Play over notifications</string>
     <string name="settings_notification_play_over_never">Never</string>
     <string name="settings_notification_play_over_duck">Duck volume</string>
@@ -2076,6 +2080,10 @@
     <string name="notification_channel_description_bookmark">Shows when bookmark is added using headphones</string>
     <string name="notification_channel_description_fix_downloads">Shows when downloads fix is triggered</string>
     <string name="notification_channel_description_fix_downloads_complete">Shows when downloads fix is complete</string>
+    <string name="notification_channel_description_daily_reminders">Shows helpful suggestions to support your listening routine.</string>
+    <string name="notification_channel_description_trending_and_recommendations">Shows trending podcasts and curated recommendations to help you discover new favorites</string>
+    <string name="notification_channel_description_new_features_and_tips">Shows notifications about new features, updates, and handy tips to help you optimize your Pocket Casts experience</string>
+    <string name="notification_channel_description_offers">Shows notifications about exclusive offers, discounts, and promotions to help you make the most of your Pocket Casts experience</string>
 
     <!-- Bookmarks -->
 
@@ -2387,4 +2395,59 @@
     <string name="encourage_account_filters_banner_description">Create a free account to sync your filters on any device.</string>
     <string name="encourage_account_history_banner_title">Keep track of what you’ve played</string>
     <string name="encourage_account_history_banner_description">Create a free account to sync your listening history everywhere.</string>
+
+    <!-- Notifications -->
+    <string name="notification_sync_title">Your shows, on any device!</string>
+    <string name="notification_sync_message">Create a free account to sync your shows and listen anywhere.</string>
+
+    <string name="notification_import_title">Easily import your podcasts</string>
+    <string name="notification_import_message">Switching from another app? Bring all your favorite shows to Pocket Casts.</string>
+
+    <string name="notification_up_next_title">Simplify your queue</string>
+    <string name="notification_up_next_message">Build a playback queue and say goodbye to jumping around between episodes.</string>
+
+    <string name="notification_filters_title">Organize your episodes</string>
+    <string name="notification_filters_message">Create smart filters to organize your episodes.</string>
+
+    <string name="notification_themes_title">Time for a new look</string>
+    <string name="notification_themes_message">Browse our themes and find the one that suits your style.</string>
+
+    <string name="notification_staff_picks_title">Explore our Staff Picks</string>
+    <string name="notification_staff_picks_message">Perfectly ripe podcasts, picked just for you by real, podcast-loving humans.</string>
+
+    <string name="notification_plus_upsell_title">Level up your podcast game</string>
+    <string name="notification_plus_upsell_message">Unlock exclusive features like folders, bookmarks, and more with Plus!</string>
+
+    <string name="notification_reengage_we_miss_you_title">We miss you!</string>
+    <string name="notification_reengage_we_miss_you_message">It\'s been a while since you\'ve listened. Jump back in and enjoy!</string>
+
+    <string name="notification_reengage_catch_up_offline_title">Catch up offline</string>
+    <plurals name="notification_reengage_catch_up_offline_message">
+        <item quantity="one">You have %d new episode downloaded and ready to go!</item>
+        <item quantity="other">You have %d new episodes downloaded and ready to go!</item>
+    </plurals>
+
+    <string name="notification_content_recommendations_trending_title">Trending this week</string>
+    <string name="notification_content_recommendations_trending_message">Check out what everyone else is listening this week.</string>
+
+    <string name="notification_content_recommendations_title">New recommendations for you</string>
+    <string name="notification_content_recommendations_message">Wondering what to listen to next? Check out these shows!</string>
+
+    <string name="notifications_settings_turn_on_push_title">Turn on push notifications?</string>
+    <string name="notifications_settings_turn_on_push_message">To get notifications from Pocket Casts, you\'ll need to turn them on in your device settings.</string>
+    <string name="notifications_settings_turn_on_push_button">Go to device settings</string>
+
+    <string name="notification_new_features_smart_folders_title">Your podcasts organized</string>
+    <string name="notification_new_features_smart_folders_message">Try Plus and automatically organize your shows with folders</string>
+
+    <string name="notification_offers_upgrade_title">Level up your podcast game</string>
+    <string name="notification_offers_upgrade_message">Unblock exclusive features like folders, bookmarks, and more with Plus!</string>
+
+    <string name="notification_prompt_title">Stay up to date!</string>
+    <string name="notification_prompt_message">Notifications are the best way to keep track of new episodes, get recommendations of new shows and tips about Pocket Casts.</string>
+    <string name="notification_prompt_cta">Allow Notifications</string>
+    <string name="notification_snack_message">Please allow notifications in your device settings</string>
+    <string name="notification_snack_cta">Open Settings</string>
+    <string name="notification_mockup_image_description">Mockup image</string>
+
 </resources>
