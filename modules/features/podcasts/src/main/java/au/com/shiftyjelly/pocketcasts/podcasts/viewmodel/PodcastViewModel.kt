@@ -342,7 +342,7 @@ class PodcastViewModel
         analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_NOTIFICATIONS_TAPPED, AnalyticsProp.notificationEnabled(show))
         viewModelScope.launch {
             if (!notificationHelper.hasNotificationsPermission()) {
-                _showNotificationSnack.tryEmit(
+                _showNotificationSnack.emit(
                     SnackBarMessage.ShowNotificationsDisabledMessage(
                         message = TextResource.fromStringId(LR.string.notification_snack_message),
                         cta = TextResource.fromStringId(LR.string.notification_snack_cta),
@@ -351,7 +351,7 @@ class PodcastViewModel
             } else {
                 podcastManager.updateShowNotifications(podcastUuid, show)
                 if (show) {
-                    _showNotificationSnack.tryEmit(
+                    _showNotificationSnack.emit(
                         SnackBarMessage.ShowNotifyOnNewEpisodesMessage(
                             message = TextResource.fromStringId(LR.string.notifications_enabled_message, podcastManager.findPodcastByUuid(podcastUuid)?.title.orEmpty()),
                         ),
