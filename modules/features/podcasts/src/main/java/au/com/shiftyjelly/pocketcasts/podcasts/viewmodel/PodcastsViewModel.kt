@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.compose.ad.BlazeAd
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
@@ -72,6 +73,26 @@ class PodcastsViewModel @AssistedInject constructor(
         ),
     )
     val notificationPromptState = _notificationsState.asStateFlow()
+
+    val activeAds = if (folderUuid == null) {
+        userManager.getSignInState().asFlow()
+            .flatMapLatest { signInState ->
+                if (signInState.isNoAccountOrFree && FeatureFlag.isEnabled(Feature.BANNER_ADS)) {
+                    val mockAd = BlazeAd(
+                        id = "ad-id",
+                        title = "wordpress.com",
+                        ctaText = "Democratize publishing and eCommerce one website at a time.",
+                        ctaUrl = "https://wordpress.com/",
+                        imageUrl = "https://s.w.org/style/images/about/WordPress-logotype-simplified.png",
+                    )
+                    flowOf(listOf(mockAd))
+                } else {
+                    flowOf(emptyList())
+                }
+            }
+    } else {
+        flowOf(emptyList())
+    }.stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = emptyList())
 
     init {
         viewModelScope.launch {

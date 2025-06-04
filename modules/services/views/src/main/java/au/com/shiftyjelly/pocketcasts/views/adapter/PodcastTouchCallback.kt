@@ -19,12 +19,19 @@ class PodcastTouchCallback(val adapter: ItemTouchHelperAdapter, val context: Con
     }
 
     override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
-        val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT or ItemTouchHelper.START or ItemTouchHelper.END
+        val dragFlags = if (viewHolder is ItemTouchHelperViewHolder) {
+            ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT or ItemTouchHelper.START or ItemTouchHelper.END
+        } else {
+            0
+        }
         val swipeFlags = 0
         return ItemTouchHelper.SimpleCallback.makeMovementFlags(dragFlags, swipeFlags)
     }
 
     override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+        if (target !is ItemTouchHelperViewHolder) {
+            return false
+        }
         val position = viewHolder.bindingAdapterPosition
         val targetPosition = target.bindingAdapterPosition
         if (position == RecyclerView.NO_POSITION || targetPosition == RecyclerView.NO_POSITION) {

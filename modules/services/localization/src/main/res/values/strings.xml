@@ -202,11 +202,11 @@
     <string name="price_per_week">%1$.2f %2$s/week</string>
     <!-- %1$.2f is price with 2 decimal points precision, \u0024 is a dollar sign -->
     <string name="price_per_week_usd">\u0024%1$.2f/week</string>
-    <!-- "Ad" means here advertisment. It should be a short form if possible. -->
+    <!-- "Ad" means here advertisement. It should be a short form if possible. -->
     <string name="ad">Ad</string>
-    <string name="ad_options">Advertisment options</string>
-    <string name="ad_image">Advertisment image</string>
-    <string name="go_to_advertisment">Go to advertisment</string>
+    <string name="ad_options">Advertisement options</string>
+    <string name="ad_image">Advertisement image</string>
+    <string name="go_to_ad">Go to advertisement: %1$s</string>
 
     <string name="multiselect_actions_shown">Shortcut in toolbar</string>
     <string name="multiselect_actions_hidden">In overflow</string>
