@@ -157,7 +157,7 @@ private fun AdTitle(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = stringResource(LR.string.ad),
+            text = stringResource(LR.string.ad).uppercase(),
             color = colors.adLabel,
             fontSize = 8.sp,
             lineHeight = 8.sp,
