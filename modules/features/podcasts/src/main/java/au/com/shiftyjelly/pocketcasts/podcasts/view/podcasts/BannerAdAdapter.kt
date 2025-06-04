@@ -36,9 +36,9 @@ internal class BannerAdAdapter(
 }
 
 private object BannerAdDiffCallback : DiffUtil.ItemCallback<BlazeAd>() {
-    override fun areItemsTheSame(oldItem: BlazeAd, newItem: BlazeAd) = oldItem == newItem
+    override fun areItemsTheSame(oldItem: BlazeAd, newItem: BlazeAd) = oldItem.id == newItem.id
 
-    override fun areContentsTheSame(oldItem: BlazeAd, newItem: BlazeAd) = oldItem.id == newItem.id
+    override fun areContentsTheSame(oldItem: BlazeAd, newItem: BlazeAd) = oldItem == newItem
 }
 
 private class BannerAdViewHolder(
