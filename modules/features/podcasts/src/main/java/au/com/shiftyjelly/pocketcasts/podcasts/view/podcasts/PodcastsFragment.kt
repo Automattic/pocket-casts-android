@@ -485,7 +485,7 @@ class PodcastsFragment :
         val folderUuid = folderUuid
 
         binding.emptyView.setContentWithViewCompositionStrategy {
-            val ads by viewModel.activeAds.collectAsState(emptyList())
+            val ads by viewModel.activeAds.collectAsState()
 
             AppTheme(themeType = theme.activeTheme) {
                 Column(

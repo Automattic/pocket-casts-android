@@ -32,6 +32,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -74,31 +75,29 @@ class PodcastsViewModel @AssistedInject constructor(
     )
     val notificationPromptState = _notificationsState.asStateFlow()
 
-    val activeAds: Flow<List<BlazeAd>>
+    val activeAds = if (folderUuid == null) {
+        userManager.getSignInState().asFlow()
+            .flatMapLatest { signInState ->
+                if (signInState.isNoAccountOrFree && FeatureFlag.isEnabled(Feature.BANNER_ADS)) {
+                    val mockAd = BlazeAd(
+                        id = "ad-id",
+                        title = "wordpress.com",
+                        ctaText = "Democratize publishing and eCommerce one website at a time.",
+                        ctaUrl = "https://wordpress.com/",
+                        imageUrl = "https://s.w.org/style/images/about/WordPress-logotype-simplified.png",
+                    )
+                    flowOf(listOf(mockAd))
+                } else {
+                    flowOf(emptyList())
+                }
+            }
+    } else {
+        flowOf(emptyList())
+    }.stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = emptyList())
 
     init {
         viewModelScope.launch {
             observeUiState().collect { _uiState.value = it }
-        }
-
-        activeAds = if (folderUuid == null) {
-            userManager.getSignInState().asFlow()
-                .flatMapLatest { signInState ->
-                    if (signInState.isNoAccountOrFree && FeatureFlag.isEnabled(Feature.BANNER_ADS)) {
-                        val mockAd = BlazeAd(
-                            id = "ad-id",
-                            title = "wordpress.com",
-                            ctaText = "Democratize publishing and eCommerce one website at a time.",
-                            ctaUrl = "https://wordpress.com/",
-                            imageUrl = "https://s.w.org/style/images/about/WordPress-logotype-simplified.png",
-                        )
-                        flowOf(listOf(mockAd))
-                    } else {
-                        flowOf(emptyList())
-                    }
-                }
-        } else {
-            flowOf(emptyList())
         }
     }
 
