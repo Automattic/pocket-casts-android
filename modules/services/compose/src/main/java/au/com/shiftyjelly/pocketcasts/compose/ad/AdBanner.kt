@@ -106,7 +106,8 @@ fun AdBanner(
                     verticalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier
                         .fillMaxHeight()
-                        .weight(1f),
+                        .weight(1f)
+                        .padding(vertical = 4.dp),
                 ) {
                     Text(
                         text = ad.ctaText,
