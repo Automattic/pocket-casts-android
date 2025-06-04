@@ -13,19 +13,19 @@ data class PlayerColors(
 
     val background02 = Color(ThemeColor.playerBackground02(theme, podcastColors.background.toArgb()))
 
-    val highlight01 = Color(ThemeColor.playerHighlight01(theme, podcastColors.tint.toArgb()))
+    val highlight01 = Color(ThemeColor.playerHighlight01(theme, podcastColors.playerTint.toArgb()))
 
-    val highlight02 = Color(ThemeColor.playerHighlight02(theme, podcastColors.tint.toArgb()))
+    val highlight02 = Color(ThemeColor.playerHighlight02(theme, podcastColors.playerTint.toArgb()))
 
-    val highlight03 = Color(ThemeColor.playerHighlight03(theme, podcastColors.tint.toArgb()))
+    val highlight03 = Color(ThemeColor.playerHighlight03(theme, podcastColors.playerTint.toArgb()))
 
-    val highlight04 = Color(ThemeColor.playerHighlight04(theme, podcastColors.tint.toArgb()))
+    val highlight04 = Color(ThemeColor.playerHighlight04(theme, podcastColors.playerTint.toArgb()))
 
-    val highlight05 = Color(ThemeColor.playerHighlight05(theme, podcastColors.tint.toArgb()))
+    val highlight05 = Color(ThemeColor.playerHighlight05(theme, podcastColors.playerTint.toArgb()))
 
-    val highlight06 = Color(ThemeColor.playerHighlight06(theme, podcastColors.tint.toArgb()))
+    val highlight06 = Color(ThemeColor.playerHighlight06(theme, podcastColors.playerTint.toArgb()))
 
-    val highlight07 = Color(ThemeColor.playerHighlight07(theme, podcastColors.tint.toArgb()))
+    val highlight07 = Color(ThemeColor.playerHighlight07(theme, podcastColors.playerTint.toArgb()))
 
     val contrast01 = Color(ThemeColor.playerContrast01(theme))
 
