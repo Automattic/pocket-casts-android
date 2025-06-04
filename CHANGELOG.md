@@ -13,6 +13,8 @@
 *   Bug Fixes
     *   Fix bottom sheet animation used by Up Next and other screens
         ([#4051](https://github.com/Automattic/pocket-casts-android/pull/4051))
+    *   Fix duration render issue on podcasts without `<itunes:duration>` tag
+        ([#4077](https://github.com/Automattic/pocket-casts-android/pull/4077))
 
 7.90
 -----
