@@ -191,7 +191,7 @@ private fun OverflowMenuInteractionBox(
 ) {
     Box(
         modifier = modifier
-            .size(48.dp)
+            .size(TouchTargetSize)
             .clickable(
                 interactionSource = interactionSource,
                 indication = null,
