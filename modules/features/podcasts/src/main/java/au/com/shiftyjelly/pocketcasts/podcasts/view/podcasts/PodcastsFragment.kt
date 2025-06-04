@@ -90,6 +90,7 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.hideShadow
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.adapter.PodcastTouchCallback
 import au.com.shiftyjelly.pocketcasts.views.extensions.quickScrollToTop
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -668,7 +669,7 @@ class PodcastsFragment :
         runCatching {
             val intent = Intent(Intent.ACTION_VIEW, ad.ctaUrl.toUri())
             startActivity(intent)
-        }
+        }.onFailure { LogBuffer.e("Ads", it, "Failed to open an ad: ${ad.id}") }
     }
 
     inner class SpaceItemDecoration : RecyclerView.ItemDecoration() {
