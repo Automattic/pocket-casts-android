@@ -131,7 +131,7 @@ class PodcastsFragment :
 
     private var podcastOptionsDialog: PodcastsOptionsDialog? = null
     private var folderOptionsDialog: FolderOptionsDialog? = null
-    private var adapter: FolderAdapter? = null
+    private var folderAdapter: FolderAdapter? = null
 
     private var realBinding: FragmentPodcastsBinding? = null
     private val binding: FragmentPodcastsBinding get() = realBinding ?: throw IllegalStateException("Trying to access the binding outside of the view lifecycle.")
@@ -158,15 +158,15 @@ class PodcastsFragment :
         val context = context ?: return null
         realBinding = FragmentPodcastsBinding.inflate(inflater, container, false)
 
-        if (adapter == null) {
-            adapter = FolderAdapter(this, settings, context, theme)
+        if (folderAdapter == null) {
+            folderAdapter = FolderAdapter(this, settings, context, theme)
         }
 
         binding.appBarLayout.hideShadow()
 
         gridOuterPadding = resources.getDimensionPixelSize(VR.dimen.grid_outer_padding)
         binding.recyclerView.let {
-            it.adapter = adapter
+            it.adapter = folderAdapter
             it.addItemDecoration(SpaceItemDecoration())
             ItemTouchHelper(PodcastTouchCallback(this, context)).attachToRecyclerView(it)
         }
@@ -243,7 +243,7 @@ class PodcastsFragment :
                     toolbar.menu.findItem(R.id.create_folder)?.isVisible = rootFolder && isSignedInAsPlusOrPatron
                     toolbar.menu.findItem(R.id.search_podcasts)?.isVisible = rootFolder
 
-                    adapter?.setFolderItems(uiState.items)
+                    folderAdapter?.setFolderItems(uiState.items)
 
                     val isEmpty = uiState.items.isEmpty()
                     binding.emptyView.isVisible = isEmpty && !uiState.isLoadingItems
@@ -265,8 +265,8 @@ class PodcastsFragment :
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.podcastUuidToBadge.collect { podcastUuidToBadge ->
-                    adapter?.badgeType = settings.podcastBadgeType.value
-                    adapter?.setBadges(podcastUuidToBadge)
+                    folderAdapter?.badgeType = settings.podcastBadgeType.value
+                    folderAdapter?.setBadges(podcastUuidToBadge)
                 }
             }
         }
@@ -487,12 +487,12 @@ class PodcastsFragment :
         val currentLayoutManager = realBinding?.recyclerView?.layoutManager
 
         // We only want to reset the adapter if something actually changed, or else it will flash
-        if (adapter?.badgeType != badgeType ||
+        if (folderAdapter?.badgeType != badgeType ||
             (currentLayoutManager != null && currentLayoutManager::class.java != layoutManager::class.java) ||
             (currentLayoutManager is GridLayoutManager && layoutManager is GridLayoutManager && currentLayoutManager.spanCount != layoutManager.spanCount)
         ) {
-            adapter?.badgeType = badgeType
-            realBinding?.recyclerView?.adapter = adapter
+            folderAdapter?.badgeType = badgeType
+            realBinding?.recyclerView?.adapter = folderAdapter
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -508,7 +508,7 @@ class PodcastsFragment :
 
     override fun onPodcastMove(fromPosition: Int, toPosition: Int) {
         val newList = viewModel.moveFolderItem(fromPosition, toPosition)
-        adapter?.submitList(newList)
+        folderAdapter?.submitList(newList)
     }
 
     override fun onPodcastMoveFinished() {
