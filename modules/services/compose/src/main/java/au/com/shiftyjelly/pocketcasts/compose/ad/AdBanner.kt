@@ -283,6 +283,7 @@ private fun AdBannerFontSizePreview() {
 }
 
 private val BlazeAdPreview = BlazeAd(
+    id = "",
     title = "pocketcasts.com",
     ctaText = "Empower People to Discover, Share and Grow their Passion for Podcasts.",
     ctaUrl = "",
