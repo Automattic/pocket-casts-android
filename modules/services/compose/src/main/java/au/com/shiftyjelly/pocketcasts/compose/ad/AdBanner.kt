@@ -132,16 +132,16 @@ fun AdBanner(
                         .semantics { hideFromAccessibility() },
                 )
             }
-            val horionztalOffset = -ContentPadding.calculateRightPadding(LocalLayoutDirection.current)
-            val verticalOffsset = ContentPadding.calculateTopPadding()
+            val horizontalOffset = -ContentPadding.calculateRightPadding(LocalLayoutDirection.current)
+            val verticalOffset = ContentPadding.calculateTopPadding()
             OverflowMenuInteractionBox(
                 interactionSource = interactionSource,
                 onClick = onOptionsClick,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .offset(
-                        x = horionztalOffset + (TouchTargetSize - IconSize) / 2,
-                        y = verticalOffsset - (TouchTargetSize - IconSize) / 2,
+                        x = horizontalOffset + (TouchTargetSize - IconSize) / 2,
+                        y = verticalOffset - (TouchTargetSize - IconSize) / 2,
                     ),
             )
         }
