@@ -67,14 +67,14 @@ class FolderAdapter(
 
     override fun getItemViewType(position: Int): Int {
         return when (getItem(position)) {
-            is FolderItem.Podcast -> FolderItem.Podcast.viewTypeId
-            is FolderItem.Folder -> FolderItem.Folder.viewTypeId
+            is FolderItem.Podcast -> AdapterViewTypeIds.PodcastId
+            is FolderItem.Folder -> AdapterViewTypeIds.FolderId
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
-            FolderItem.Podcast.viewTypeId -> {
+            AdapterViewTypeIds.PodcastId -> {
                 val isLayoutListView = settings.podcastGridLayout.value == PodcastGridLayoutType.LIST_VIEW
                 val layoutId = if (isLayoutListView) R.layout.adapter_podcast_list else R.layout.adapter_podcast_grid
                 val view = parent.inflate(layoutId, attachToThis = false)
@@ -87,7 +87,7 @@ class FolderAdapter(
                 )
             }
 
-            FolderItem.Folder.viewTypeId -> {
+            AdapterViewTypeIds.FolderId -> {
                 val podcastsLayout = settings.podcastGridLayout.value
                 FolderViewHolder(
                     composeView = ComposeView(parent.context),
