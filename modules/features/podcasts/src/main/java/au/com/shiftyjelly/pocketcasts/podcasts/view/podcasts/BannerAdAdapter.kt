@@ -12,7 +12,7 @@ import au.com.shiftyjelly.pocketcasts.compose.ad.BlazeAd
 import au.com.shiftyjelly.pocketcasts.compose.ad.rememberAdColors
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 
-class BannerAdAdapter(
+internal class BannerAdAdapter(
     private val themeType: Theme.ThemeType,
     private val onAdClick: (BlazeAd) -> Unit,
     private val onAdOptionsClick: (BlazeAd) -> Unit,
