@@ -55,7 +55,9 @@ class PodcastRefresherImpl @Inject constructor(
                     existingEpisode.downloadUrl = newEpisode.downloadUrl
                     existingEpisode.fileType = newEpisode.fileType
                     existingEpisode.sizeInBytes = newEpisode.sizeInBytes
-                    existingEpisode.duration = newEpisode.duration
+                    if (newEpisode.duration != 0.0) {
+                        existingEpisode.duration = newEpisode.duration
+                    }
                     existingEpisode.publishedDate = newEpisode.publishedDate
                     existingEpisode.season = newEpisode.season
                     existingEpisode.number = newEpisode.number
