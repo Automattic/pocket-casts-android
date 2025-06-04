@@ -497,7 +497,7 @@ class PodcastsFragment :
                         .verticalScroll(rememberScrollState())
                         .padding(16.dp),
                 ) {
-                    ads.take(1).forEach { ad ->
+                    ads.firstOrNull()?.let { ad ->
                         AdBanner(
                             ad = ad,
                             colors = rememberAdColors().bannerAd,
