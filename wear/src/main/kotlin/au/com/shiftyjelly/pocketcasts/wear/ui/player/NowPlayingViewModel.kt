@@ -79,7 +79,7 @@ class NowPlayingViewModel @Inject constructor(
                         val podcast = playbackState.podcast
                         episode.displaySubtitle(podcast)
                     },
-                    tintColor = playbackState.podcast?.getPlayerTintColor(theme.isDarkTheme),
+                    tintColor = playbackState.podcast?.getTintColor(theme.isDarkTheme),
                     episodeUuid = playbackState.episodeUuid,
                     playing = playbackState.isPlaying,
                     theme = theme,

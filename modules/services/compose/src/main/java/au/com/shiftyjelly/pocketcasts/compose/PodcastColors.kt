@@ -7,36 +7,36 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 
 data class PodcastColors(
     val background: Color,
-    val tint: Color,
+    val playerTint: Color,
 ) {
     constructor(podcast: Podcast) : this(
         background = Color(podcast.backgroundColor),
-        tint = Color(podcast.darkThemeTint()),
+        playerTint = Color(podcast.getPlayerTintColor(isDarkTheme = true)),
     )
 
     companion object {
         val TheDailyPreview
             get() = PodcastColors(
                 background = Color(0xFF0477C2),
-                tint = Color(0xFFCFEB7B),
+                playerTint = Color(0xFFCFEB7B),
             )
 
         val ThisAmericanLifePreview
             get() = PodcastColors(
                 background = Color(0xFFEC0404),
-                tint = Color(0xFFF47C84),
+                playerTint = Color(0xFFF47C84),
             )
 
         val ConanPreview
             get() = PodcastColors(
                 background = Color(0xFF37444F),
-                tint = Color(0xFFF87509),
+                playerTint = Color(0xFFF87509),
             )
 
         val DarknetDiariesPreview
             get() = PodcastColors(
                 background = Color(0xFF2E2D2D),
-                tint = Color(0xFFFF3232),
+                playerTint = Color(0xFFFF3232),
             )
     }
 }
