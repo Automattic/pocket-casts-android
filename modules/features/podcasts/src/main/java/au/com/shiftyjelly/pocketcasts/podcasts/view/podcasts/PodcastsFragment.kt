@@ -12,15 +12,19 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.Toolbar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -55,6 +59,9 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
+import au.com.shiftyjelly.pocketcasts.compose.ad.AdBanner
+import au.com.shiftyjelly.pocketcasts.compose.ad.BlazeAd
+import au.com.shiftyjelly.pocketcasts.compose.ad.rememberAdColors
 import au.com.shiftyjelly.pocketcasts.compose.components.NoContentBanner
 import au.com.shiftyjelly.pocketcasts.compose.components.TipPosition
 import au.com.shiftyjelly.pocketcasts.compose.components.Tooltip
@@ -136,7 +143,7 @@ class PodcastsFragment :
     private var folderOptionsDialog: FolderOptionsDialog? = null
     private var folderAdapter: FolderAdapter? = null
     private var bannerAdAdapter: BannerAdAdapter? = null
-    private var adapter: RecyclerView.Adapter<*>? = null
+    private var adapter: ConcatAdapter? = null
 
     private var realBinding: FragmentPodcastsBinding? = null
     private val binding: FragmentPodcastsBinding get() = realBinding ?: throw IllegalStateException("Trying to access the binding outside of the view lifecycle.")
@@ -170,24 +177,15 @@ class PodcastsFragment :
         this.folderAdapter = folderAdapter
         val bannerAdAdapter = BannerAdAdapter(
             themeType = theme.activeTheme,
-            onAdClick = { ad ->
-                runCatching {
-                    val intent = Intent(Intent.ACTION_VIEW, ad.ctaUrl.toUri())
-                    startActivity(intent)
-                }
-            },
+            onAdClick = ::openAd,
             onAdOptionsClick = {},
         )
         this.bannerAdAdapter = bannerAdAdapter
 
-        val adapter = if (folderUuid == null) {
-            val config = ConcatAdapter.Config.Builder()
-                .setIsolateViewTypes(false)
-                .build()
-            ConcatAdapter(config, bannerAdAdapter, folderAdapter)
-        } else {
-            folderAdapter
-        }
+        val config = ConcatAdapter.Config.Builder()
+            .setIsolateViewTypes(false)
+            .build()
+        val adapter = ConcatAdapter(config, bannerAdAdapter, folderAdapter)
         this.adapter = adapter
 
         binding.appBarLayout.hideShadow()
@@ -487,10 +485,30 @@ class PodcastsFragment :
         val folderUuid = folderUuid
 
         binding.emptyView.setContentWithViewCompositionStrategy {
+            val ads by viewModel.activeAds.collectAsState(emptyList())
+
             AppTheme(themeType = theme.activeTheme) {
                 Column(
-                    modifier = Modifier.verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .padding(16.dp),
                 ) {
+                    ads.take(1).forEach { ad ->
+                        AdBanner(
+                            ad = ad,
+                            colors = rememberAdColors().bannerAd,
+                            onAdClick = { openAd(ad) },
+                            onOptionsClick = {},
+                        )
+                    }
+
+                    Spacer(
+                        modifier = Modifier.weight(1f),
+                    )
+
                     if (folderUuid != null) {
                         NoFolderPodcastsBanner(
                             onClickButton = {
@@ -505,6 +523,10 @@ class PodcastsFragment :
                             },
                         )
                     }
+
+                    Spacer(
+                        modifier = Modifier.weight(2f),
+                    )
                 }
             }
         }
@@ -640,6 +662,13 @@ class PodcastsFragment :
         binding.tooltipComposeView.isGone = true
         binding.tooltipComposeView.disposeComposition()
         viewModel.onTooltipClosed()
+    }
+
+    private fun openAd(ad: BlazeAd) {
+        runCatching {
+            val intent = Intent(Intent.ACTION_VIEW, ad.ctaUrl.toUri())
+            startActivity(intent)
+        }
     }
 
     inner class SpaceItemDecoration : RecyclerView.ItemDecoration() {

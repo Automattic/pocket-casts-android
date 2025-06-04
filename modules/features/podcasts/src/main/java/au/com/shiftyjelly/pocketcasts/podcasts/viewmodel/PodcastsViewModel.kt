@@ -81,21 +81,25 @@ class PodcastsViewModel @AssistedInject constructor(
             observeUiState().collect { _uiState.value = it }
         }
 
-        activeAds = userManager.getSignInState().asFlow()
-            .flatMapLatest { signInState ->
-                if (signInState.isNoAccountOrFree && FeatureFlag.isEnabled(Feature.BANNER_ADS)) {
-                    val mockAd = BlazeAd(
-                        id = "ad-id",
-                        title = "wordpress.com",
-                        ctaText = "Democratize publishing and eCommerce one website at a time.",
-                        ctaUrl = "https://wordpress.com/",
-                        imageUrl = "https://pngimg.com/uploads/wordpress/wordpress_PNG28.png",
-                    )
-                    flowOf(listOf(mockAd))
-                } else {
-                    flowOf(emptyList())
+        activeAds = if (folderUuid == null) {
+            userManager.getSignInState().asFlow()
+                .flatMapLatest { signInState ->
+                    if (signInState.isNoAccountOrFree && FeatureFlag.isEnabled(Feature.BANNER_ADS)) {
+                        val mockAd = BlazeAd(
+                            id = "ad-id",
+                            title = "wordpress.com",
+                            ctaText = "Democratize publishing and eCommerce one website at a time.",
+                            ctaUrl = "https://wordpress.com/",
+                            imageUrl = "https://pngimg.com/uploads/wordpress/wordpress_PNG28.png",
+                        )
+                        flowOf(listOf(mockAd))
+                    } else {
+                        flowOf(emptyList())
+                    }
                 }
-            }
+        } else {
+            flowOf(emptyList())
+        }
     }
 
     private fun observeUiState(): Flow<UiState> {
