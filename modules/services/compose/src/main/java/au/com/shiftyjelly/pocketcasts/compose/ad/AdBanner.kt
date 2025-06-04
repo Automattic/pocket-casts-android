@@ -37,6 +37,8 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -71,6 +73,7 @@ fun AdBanner(
             modifier = modifier,
         ) {
             val interactionSource = remember { MutableInteractionSource() }
+            val contentDescription = stringResource(LR.string.go_to_advertisment, ad.ctaText)
 
             Row(
                 modifier = Modifier
@@ -79,11 +82,11 @@ fun AdBanner(
                     .border(1.dp, colors.border, AdBannerShape)
                     .clickable(
                         role = Role.Button,
-                        onClickLabel = stringResource(LR.string.go_to_advertisment),
                         onClick = onAdClick,
                     )
                     .padding(ContentPadding)
-                    .height(IntrinsicSize.Min),
+                    .height(IntrinsicSize.Min)
+                    .clearAndSetSemantics { this.contentDescription = contentDescription },
 
             ) {
                 val context = LocalContext.current
