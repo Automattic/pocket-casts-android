@@ -83,7 +83,7 @@ class PodcastsViewModel @AssistedInject constructor(
 
         activeAds = userManager.getSignInState().asFlow()
             .flatMapLatest { signInState ->
-                if (signInState.isNoAccountOrFree) {
+                if (signInState.isNoAccountOrFree && FeatureFlag.isEnabled(Feature.BANNER_ADS)) {
                     val mockAd = BlazeAd(
                         id = "ad-id",
                         title = "wordpress.com",
