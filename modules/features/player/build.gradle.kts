@@ -53,6 +53,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.preference.ktx)
     implementation(libs.androidx.webkit)
+    implementation(libs.coil.compose)
     implementation(libs.compose.animation)
     implementation(libs.compose.livedata)
     implementation(libs.compose.material)

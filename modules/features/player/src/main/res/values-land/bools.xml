@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <bool name="is_landscape_layout_for_player">true</bool>
     <bool name="transcript_show_seekbar_and_player_controls">false</bool>
 </resources>

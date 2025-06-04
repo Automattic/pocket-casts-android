@@ -16,44 +16,19 @@
         <androidx.compose.ui.platform.ComposeView
             android:id="@+id/artworkSectionComposeView"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             app:layout_constraintBottom_toTopOf="@+id/shelfComposeView"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
-        <au.com.shiftyjelly.pocketcasts.player.view.video.VideoView
-            android:id="@+id/videoView"
-            android:layout_width="wrap_content"
-            android:layout_height="192dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <androidx.constraintlayout.widget.Barrier
-            android:id="@+id/artworkTopBarrier"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:barrierAllowsGoneWidgets="false"
-            app:barrierDirection="top"
-            app:constraint_referenced_ids="artworkSectionComposeView,videoView" />
-
-        <androidx.constraintlayout.widget.Barrier
-            android:id="@+id/artworkEndBarrier"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:barrierAllowsGoneWidgets="false"
-            app:barrierDirection="end"
-            app:constraint_referenced_ids="artworkSectionComposeView,videoView" />
 
         <androidx.compose.ui.platform.ComposeView
             android:id="@+id/playerHeadingSectionComposeView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintStart_toEndOf="@id/artworkEndBarrier"
+            app:layout_constraintBottom_toTopOf="@+id/seekBar"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/artworkTopBarrier"
-            app:layout_constraintBottom_toTopOf="@id/seekBar"/>
+            app:layout_constraintStart_toEndOf="@+id/artworkSectionComposeView"
+            app:layout_constraintTop_toTopOf="@+id/artworkSectionComposeView" />
 
         <androidx.compose.ui.platform.ComposeView
             android:id="@+id/transcriptPage"

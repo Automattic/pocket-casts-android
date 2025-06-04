@@ -11,15 +11,27 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.doOnPreDraw
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.view.marginTop
+import androidx.core.view.updateLayoutParams
 import androidx.dynamicanimation.animation.SpringAnimation
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.asFlow
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
@@ -30,9 +42,11 @@ import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.binding.setSeekBarState
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterPlayerHeaderBinding
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContract
-import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.ArtworkSection
 import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.PlayerControls
 import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.PlayerHeadingSection
+import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.PlayerVisuals
+import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.PlayerVisualsState
+import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.VisualContentState
 import au.com.shiftyjelly.pocketcasts.player.view.shelf.PlayerShelf
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptPageWrapper
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptSearchViewModel
@@ -66,6 +80,9 @@ import javax.inject.Inject
 import kotlin.math.abs
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -125,9 +142,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         setupPlayerControlsComposeView()
         setupShelfComposeView()
 
-        binding.videoView.playbackManager = playbackManager
-        binding.videoView.setOnClickListener { onFullScreenVideoClick() }
-
         setupTranscriptPage()
         observeTranscriptPageTransition()
 
@@ -148,11 +162,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 theme = headerViewModel.theme,
             )
 
-            binding.videoView.show = headerViewModel.isVideo
-            binding.videoView.updatePlayerPrepared(headerViewModel.isPrepared)
-
             binding.playerGroup.setBackgroundColor(headerViewModel.backgroundColor)
-            binding.videoView.isVisible = headerViewModel.isVideoVisible()
             binding.seekBar.setSeekBarState(
                 duration = headerViewModel.durationMs.milliseconds,
                 position = headerViewModel.positionMs.milliseconds,
@@ -218,11 +228,35 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     }
 
     private fun setupArtworkSectionComposeView() {
-        binding?.artworkSectionComposeView?.setContentWithViewCompositionStrategy {
+        val isLandscapeLayout = resources.getBoolean(R.bool.is_landscape_layout_for_player)
+        val binding = binding ?: return
+        if (isLandscapeLayout) {
+            binding.artworkSectionComposeView.doOnPreDraw { view ->
+                val expectedHeight = binding.playerControlsComposeView.bottom - binding.playerHeadingSectionComposeView.top
+                view.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                    height = expectedHeight
+                }
+            }
+        }
+
+        binding.artworkSectionComposeView.setContentWithViewCompositionStrategy {
+            val state by remember { playerVisualsStateFlow() }.collectAsState(PlayerVisualsState.Empty)
+            val player by viewModel.playerFlow.collectAsState()
+
             AppTheme(theme.activeTheme) {
-                ArtworkSection(
-                    playerViewModel = viewModel,
-                )
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.padding(16.dp),
+                ) {
+                    PlayerVisuals(
+                        state = state,
+                        player = player,
+                        onChapterUrlClick = viewModel::onChapterUrlClick,
+                        configureVideoView = { videoView ->
+                            videoView.setOnClickListener { onFullScreenVideoClick() }
+                        },
+                    )
+                }
             }
         }
     }
@@ -396,6 +430,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                                 hidePlayerControls = !transitionState.showPlayerControls || !resources.getBoolean(R.bool.transcript_show_seekbar_and_player_controls),
                             )
                         }
+
                         is TransitionState.CloseTranscript -> {
                             val event = if (uiState.showPaywall) {
                                 AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_DISMISSED
@@ -553,5 +588,36 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 .setTextColor(ThemeColor.primaryText01(Theme.ThemeType.LIGHT))
                 .show()
         }
+    }
+
+    private fun playerVisualsStateFlow(): Flow<PlayerVisualsState> {
+        return viewModel.listDataLive.asFlow()
+            .distinctUntilChanged(::isListDataEquivalentForVisuals)
+            .map(::createPlayerVisualState)
+    }
+
+    private fun isListDataEquivalentForVisuals(old: PlayerViewModel.ListData, new: PlayerViewModel.ListData): Boolean {
+        return old.podcastHeader.episode?.uuid == new.podcastHeader.episode?.uuid &&
+            old.podcastHeader.useEpisodeArtwork == new.podcastHeader.useEpisodeArtwork &&
+            old.podcastHeader.chapter?.index == new.podcastHeader.chapter?.index &&
+            old.podcastHeader.isPrepared == new.podcastHeader.isPrepared
+    }
+
+    private fun createPlayerVisualState(listData: PlayerViewModel.ListData): PlayerVisualsState {
+        val header = listData.podcastHeader
+        val contentState = when {
+            header.isVideo -> VisualContentState.DisplayVideo(
+                chapterUrl = header.chapter?.url,
+            )
+
+            header.episode == null -> VisualContentState.NoContent
+            else -> VisualContentState.DisplayArtwork(
+                episode = header.episode,
+                chapterArtworkPath = header.chapter?.imagePath,
+                chapterUrl = header.chapter?.url,
+                canDisplayEpisodeArtwork = header.useEpisodeArtwork,
+            )
+        }
+        return PlayerVisualsState(contentState, header.isPrepared)
     }
 }

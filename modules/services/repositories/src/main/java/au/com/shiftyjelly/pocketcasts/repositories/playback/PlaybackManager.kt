@@ -96,6 +96,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -221,7 +223,14 @@ open class PlaybackManager @Inject constructor(
         applicationScope = applicationScope,
     )
 
-    var player: Player? = null
+    private val _playerFlow = MutableStateFlow<Player?>(null)
+    val playerFlow = _playerFlow.asStateFlow()
+
+    var player: Player?
+        get() = _playerFlow.value
+        set(value) {
+            _playerFlow.value = value
+        }
 
     val mediaSession: MediaSessionCompat
         get() = mediaSessionManager.mediaSession

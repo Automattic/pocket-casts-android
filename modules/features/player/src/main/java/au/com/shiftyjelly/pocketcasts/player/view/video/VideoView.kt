@@ -9,7 +9,7 @@ import android.widget.FrameLayout
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.AspectRatioFrameLayout
 import au.com.shiftyjelly.pocketcasts.player.R
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.Player
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SimplePlayer
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 
@@ -19,7 +19,7 @@ class VideoView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         private const val TAG = "VideoView"
     }
 
-    var playbackManager: PlaybackManager? = null
+    var player: Player? = null
     var show: Boolean = false
         set(value) {
             field = value
@@ -45,7 +45,7 @@ class VideoView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         super.setVisibility(visibility)
         if (visibility == GONE) {
             isSurfaceSet = false
-            (playbackManager?.player as? SimplePlayer)?.setDisplay(null)
+            (player as? SimplePlayer)?.setDisplay(null)
         }
     }
 
@@ -58,7 +58,7 @@ class VideoView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
             return
         }
 
-        val player = playbackManager?.player
+        val player = this.player
         if (player == null || !player.supportsVideo() || player.isRemote || player.isPip) {
             return
         }
