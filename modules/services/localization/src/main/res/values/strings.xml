@@ -206,7 +206,7 @@
     <string name="ad">Ad</string>
     <string name="ad_options">Advertisement options</string>
     <string name="ad_image">Advertisement image</string>
-    <string name="go_to_advertisment">Go to advertisement: %1$s</string>
+    <string name="go_to_ad">Go to advertisement: %1$s</string>
 
     <string name="multiselect_actions_shown">Shortcut in toolbar</string>
     <string name="multiselect_actions_hidden">In overflow</string>

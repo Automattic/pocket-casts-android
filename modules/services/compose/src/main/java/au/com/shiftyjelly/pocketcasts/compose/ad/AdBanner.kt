@@ -73,7 +73,7 @@ fun AdBanner(
             modifier = modifier,
         ) {
             val interactionSource = remember { MutableInteractionSource() }
-            val contentDescription = stringResource(LR.string.go_to_advertisment, ad.ctaText)
+            val contentDescription = stringResource(LR.string.go_to_ad, ad.ctaText)
 
             Row(
                 modifier = Modifier
