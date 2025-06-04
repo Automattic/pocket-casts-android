@@ -359,9 +359,9 @@ private fun SubscriptionRow(
                 val currencyCode = plan.pricingPhase.price.currencyCode
                 TextP40(
                     text = if (currencyCode == "USD") {
-                        stringResource(LR.string.price_per_week_usd, plan.pricePerWeek)
+                        stringResource(LR.string.price_per_month_usd, plan.pricePerMonth)
                     } else {
-                        stringResource(LR.string.price_per_week, plan.pricePerWeek, currencyCode)
+                        stringResource(LR.string.price_per_month, plan.pricePerMonth, currencyCode)
                     },
                     color = MaterialTheme.theme.colors.primaryText02,
                     fontSize = 15.sp,
@@ -440,12 +440,12 @@ private fun ManageSubscriptions(
     }
 }
 
-private val SubscriptionPlan.Base.pricePerWeek: Float
+private val SubscriptionPlan.Base.pricePerMonth: Float
     get() {
         val pricePerWeek = when (billingCycle) {
-            BillingCycle.Monthly -> pricingPhase.price.amount * 12.toBigDecimal()
-            BillingCycle.Yearly -> pricingPhase.price.amount
-        } / 52.toBigDecimal()
+            BillingCycle.Monthly -> pricingPhase.price.amount
+            BillingCycle.Yearly -> pricingPhase.price.amount / 12.toBigDecimal()
+        }
         return pricePerWeek.toFloat()
     }
 
