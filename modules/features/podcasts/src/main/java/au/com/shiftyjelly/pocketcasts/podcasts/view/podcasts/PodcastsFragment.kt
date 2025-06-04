@@ -43,6 +43,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -132,6 +133,8 @@ class PodcastsFragment :
     private var podcastOptionsDialog: PodcastsOptionsDialog? = null
     private var folderOptionsDialog: FolderOptionsDialog? = null
     private var folderAdapter: FolderAdapter? = null
+    private var bannerAdAdapter: BannerAdAdapter? = null
+    private var adapter: RecyclerView.Adapter<*>? = null
 
     private var realBinding: FragmentPodcastsBinding? = null
     private val binding: FragmentPodcastsBinding get() = realBinding ?: throw IllegalStateException("Trying to access the binding outside of the view lifecycle.")
@@ -152,21 +155,38 @@ class PodcastsFragment :
     private val folderUuid: String?
         get() = arguments?.getString(ARG_FOLDER_UUID)
 
-    private var gridOuterPadding: Int = 0
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val context = context ?: return null
         realBinding = FragmentPodcastsBinding.inflate(inflater, container, false)
 
-        if (folderAdapter == null) {
-            folderAdapter = FolderAdapter(this, settings, context, theme)
+        val folderAdapter = FolderAdapter(
+            clickListener = this,
+            settings = settings,
+            context = context,
+            theme = theme,
+        )
+        this.folderAdapter = folderAdapter
+        val bannerAdAdapter = BannerAdAdapter(
+            themeType = theme.activeTheme,
+            onAdClick = {},
+            onAdOptionsClick = {},
+        )
+        this.bannerAdAdapter = bannerAdAdapter
+
+        val adapter = if (folderUuid == null) {
+            val config = ConcatAdapter.Config.Builder()
+                .setIsolateViewTypes(false)
+                .build()
+            ConcatAdapter(config, bannerAdAdapter, folderAdapter)
+        } else {
+            folderAdapter
         }
+        this.adapter = adapter
 
         binding.appBarLayout.hideShadow()
 
-        gridOuterPadding = resources.getDimensionPixelSize(VR.dimen.grid_outer_padding)
         binding.recyclerView.let {
-            it.adapter = folderAdapter
+            it.adapter = adapter
             it.addItemDecoration(SpaceItemDecoration())
             ItemTouchHelper(PodcastTouchCallback(this, context)).attachToRecyclerView(it)
         }
@@ -249,6 +269,12 @@ class PodcastsFragment :
                     binding.emptyView.isVisible = isEmpty && !uiState.isLoadingItems
                     binding.swipeRefreshLayout.isGone = isEmpty
                 }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.activeAds.collect { activeAds ->
+                bannerAdAdapter?.submitList(activeAds)
             }
         }
 
@@ -479,8 +505,8 @@ class PodcastsFragment :
 
     private fun setupGridView(savedInstanceState: Parcelable? = listState) {
         val layoutManager = when (settings.podcastGridLayout.value) {
-            PodcastGridLayoutType.LARGE_ARTWORK -> GridLayoutManager(activity, UiUtil.getGridColumnCount(false, context))
-            PodcastGridLayoutType.SMALL_ARTWORK -> GridLayoutManager(activity, UiUtil.getGridColumnCount(true, context))
+            PodcastGridLayoutType.LARGE_ARTWORK -> createAdGridLayoutManager(UiUtil.getGridColumnCount(false, context))
+            PodcastGridLayoutType.SMALL_ARTWORK -> createAdGridLayoutManager(UiUtil.getGridColumnCount(true, context))
             PodcastGridLayoutType.LIST_VIEW -> LinearLayoutManager(activity, RecyclerView.VERTICAL, false)
         }
         val badgeType = settings.podcastBadgeType.value
@@ -492,18 +518,38 @@ class PodcastsFragment :
             (currentLayoutManager is GridLayoutManager && layoutManager is GridLayoutManager && currentLayoutManager.spanCount != layoutManager.spanCount)
         ) {
             folderAdapter?.badgeType = badgeType
-            realBinding?.recyclerView?.adapter = folderAdapter
+            realBinding?.recyclerView?.adapter = adapter
         }
 
+        val listOuterPadding = resources.getDimensionPixelSize(VR.dimen.list_outer_adding)
+        val gridOuterPadding = resources.getDimensionPixelSize(VR.dimen.grid_outer_padding)
         viewLifecycleOwner.lifecycleScope.launch {
             settings.bottomInset.collect {
-                val gridOuterPadding = if (settings.podcastGridLayout.value == PodcastGridLayoutType.LIST_VIEW) 0 else gridOuterPadding
-                realBinding?.recyclerView?.updatePadding(gridOuterPadding, gridOuterPadding, gridOuterPadding, gridOuterPadding + it)
+                val padding = when (settings.podcastGridLayout.value) {
+                    PodcastGridLayoutType.LARGE_ARTWORK, PodcastGridLayoutType.SMALL_ARTWORK -> gridOuterPadding
+                    PodcastGridLayoutType.LIST_VIEW -> listOuterPadding
+                }
+                realBinding?.recyclerView?.updatePadding(padding, padding, padding, padding + it)
             }
         }
 
         realBinding?.recyclerView?.layoutManager = layoutManager
         layoutManager.onRestoreInstanceState(savedInstanceState)
+    }
+
+    private fun createAdGridLayoutManager(spanCount: Int): GridLayoutManager {
+        return GridLayoutManager(requireActivity(), spanCount).apply {
+            val defaultLookup = GridLayoutManager.DefaultSpanSizeLookup()
+            spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+                override fun getSpanSize(position: Int): Int {
+                    val itemViewTtype = adapter?.getItemViewType(position)
+                    return when (itemViewTtype) {
+                        AdapterViewTypeIds.BannerAdId -> spanCount
+                        else -> defaultLookup.getSpanSize(position)
+                    }
+                }
+            }
+        }
     }
 
     override fun onPodcastMove(fromPosition: Int, toPosition: Int) {
@@ -590,10 +636,14 @@ class PodcastsFragment :
     }
 
     inner class SpaceItemDecoration : RecyclerView.ItemDecoration() {
-        private val spacing = resources.getDimensionPixelSize(VR.dimen.grid_item_padding)
+        private val gridItemPadding = resources.getDimensionPixelSize(VR.dimen.grid_item_padding)
         override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
-            val margin = if (settings.podcastGridLayout.value != PodcastGridLayoutType.LIST_VIEW) spacing else 0
-            outRect.set(margin, margin, margin, margin)
+            when (settings.podcastGridLayout.value) {
+                PodcastGridLayoutType.LARGE_ARTWORK, PodcastGridLayoutType.SMALL_ARTWORK -> {
+                    outRect.set(gridItemPadding, gridItemPadding, gridItemPadding, gridItemPadding)
+                }
+                PodcastGridLayoutType.LIST_VIEW -> Unit
+            }
         }
     }
 }

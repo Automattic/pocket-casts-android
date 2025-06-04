@@ -26,7 +26,7 @@ class BannerAdAdapter(
             composeView = ComposeView(parent.context),
             themeType = themeType,
             onAdClick = onAdClick,
-            onAdOptionsClick = onAdOptionsClick
+            onAdOptionsClick = onAdOptionsClick,
         )
     }
 

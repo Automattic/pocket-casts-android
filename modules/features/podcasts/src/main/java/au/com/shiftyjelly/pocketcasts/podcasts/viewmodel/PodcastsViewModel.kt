@@ -89,7 +89,7 @@ class PodcastsViewModel @AssistedInject constructor(
                         title = "wordpress.com",
                         ctaText = "Democratize publishing and eCommerce one website at a time.",
                         ctaUrl = "https://wordpress.com/",
-                        imageUrl = "https://pngimg.com/uploads/wordpress/wordpress_PNG28.png"
+                        imageUrl = "https://pngimg.com/uploads/wordpress/wordpress_PNG28.png",
                     )
                     flowOf(listOf(mockAd))
                 } else {

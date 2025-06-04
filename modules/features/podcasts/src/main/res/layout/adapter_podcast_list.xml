@@ -10,34 +10,31 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="?android:attr/selectableItemBackground"
-        android:foreground="@drawable/focus_border_white"
         android:clickable="true"
-        android:focusable="true" />
+        android:focusable="true"
+        android:foreground="@drawable/focus_border_white" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:weightSum="1"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="16dp"
+        android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:weightSum="1">
 
         <androidx.cardview.widget.CardView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:elevation="2dp"
             app:cardCornerRadius="4dp"
-            android:layout_marginStart="6dp">
+            app:elevation="2dp">
 
             <ImageView
                 android:id="@+id/podcast_artwork"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
                 android:layout_gravity="center_vertical"
+                android:importantForAccessibility="no"
                 android:scaleType="centerCrop"
-                android:transitionName="podcast_artwork"
-                android:importantForAccessibility="no" />
+                android:transitionName="podcast_artwork" />
 
         </androidx.cardview.widget.CardView>
 
@@ -55,18 +52,18 @@
                 android:ellipsize="end"
                 android:maxLines="2"
                 android:paddingBottom="2dp"
-                android:textColor="?attr/primary_text_01"
-                android:textAppearance="?attr/textSubtitle1" />
+                android:textAppearance="?attr/textSubtitle1"
+                android:textColor="?attr/primary_text_01" />
 
             <TextView
                 android:id="@+id/podcast_author"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
-                android:singleLine="true"
                 android:paddingTop="2dp"
-                android:textColor="?attr/primary_text_02"
-                android:textAppearance="?attr/textCaption" />
+                android:singleLine="true"
+                android:textAppearance="?attr/textCaption"
+                android:textColor="?attr/primary_text_02" />
         </LinearLayout>
 
         <androidx.compose.ui.platform.ComposeView
@@ -74,14 +71,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
     </LinearLayout>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="@dimen/divider_height"
-        android:background="?attr/primary_ui_05"
-        android:layout_gravity="bottom" />
+        android:layout_gravity="bottom"
+        android:background="?attr/primary_ui_05" />
 
 </FrameLayout>
