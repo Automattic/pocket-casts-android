@@ -236,19 +236,6 @@ class FeatureFlagTest {
     }
 
     @Test
-    fun `feature flag values are updated with refresh`() = runTest {
-        FeatureFlag.isEnabledFlow(Feature.TEST_FREE_FEATURE).test {
-            assertTrue(awaitItem())
-
-            featureFlagRule.provider.setEnabled(Feature.TEST_FREE_FEATURE, false)
-            expectNoEvents()
-
-            FeatureFlag.refresh()
-            assertFalse(awaitItem())
-        }
-    }
-
-    @Test
     fun `feature flag flow is cached`() {
         val flow1 = FeatureFlag.isEnabledFlow(Feature.TEST_FREE_FEATURE)
         val flow2 = FeatureFlag.isEnabledFlow(Feature.TEST_FREE_FEATURE)

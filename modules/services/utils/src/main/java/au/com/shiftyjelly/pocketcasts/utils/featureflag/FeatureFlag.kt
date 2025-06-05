@@ -61,7 +61,6 @@ object FeatureFlag {
 
     fun refresh() {
         providers.filterIsInstance<RemoteFeatureProvider>().forEach { it.refresh() }
-        updateFeatureFlowValues()
     }
 
     fun clearProviders() {
