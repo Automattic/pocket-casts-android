@@ -68,7 +68,7 @@ private suspend fun FirebaseRemoteConfig.fetchSuspending() = suspendCoroutine<Re
                 Result.success(Unit)
             } else {
                 Result.failure(exception)
-            }
+            },
         )
     }
 }
@@ -81,7 +81,7 @@ private suspend fun FirebaseRemoteConfig.activateSuspending() = suspendCoroutine
                 Result.success(Unit)
             } else {
                 Result.failure(exception)
-            }
+            },
         )
     }
 }
