@@ -17,6 +17,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -57,7 +58,10 @@ internal fun AdReportReasonsColumn(
                     colors = colors,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable(onClick = { onReportAd(reason) })
+                        .clickable(
+                            onClick = { onReportAd(reason) },
+                            role = Role.Button,
+                        )
                         .padding(horizontal = 24.dp),
                 )
                 if (index != AdReportReason.entries.lastIndex) {

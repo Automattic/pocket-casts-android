@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -52,7 +53,10 @@ internal fun AdDecisionsColumn(
                 colors = colors,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable(onClick = onClickRemoveAds)
+                    .clickable(
+                        onClick = onClickRemoveAds,
+                        role = Role.Button,
+                    )
                     .padding(horizontal = 24.dp),
             )
             Divider(
@@ -65,7 +69,10 @@ internal fun AdDecisionsColumn(
                 colors = colors,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable(onClick = onClickReportAd)
+                    .clickable(
+                        onClick = onClickReportAd,
+                        role = Role.Button,
+                    )
                     .padding(horizontal = 24.dp),
             )
         }
