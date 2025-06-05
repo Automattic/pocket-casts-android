@@ -3,12 +3,14 @@ package au.com.shiftyjelly.pocketcasts.utils.featureflag.providers
 import au.com.shiftyjelly.pocketcasts.utils.config.FirebaseConfig
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureProvider
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.MAX_PRIORITY
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.RemoteFeatureProvider
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.configUpdates
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -18,7 +20,7 @@ import timber.log.Timber
 class FirebaseRemoteFeatureProvider(
     private val firebaseRemoteConfig: FirebaseRemoteConfig,
     private val scope: CoroutineScope,
-) : RemoteFeatureProvider {
+) : FeatureProvider {
     @Inject constructor(firebaseRemoteConfig: FirebaseRemoteConfig) : this(
         firebaseRemoteConfig,
         @Suppress("OPT_IN_USAGE")
@@ -32,7 +34,15 @@ class FirebaseRemoteFeatureProvider(
 
     init {
         scope.launch {
+            firebaseRemoteConfig.fetchSuspending()
+                .map { firebaseRemoteConfig.activateSuspending().getOrThrow() }
+                .onSuccess { Timber.i("Firebase feature flag refreshed") }
+                .onFailure { Timber.e(it, "Failed to refresh Firebase feature flags") }
+
             firebaseRemoteConfig.configUpdates.collect {
+                firebaseRemoteConfig.activateSuspending()
+                    .onSuccess { Timber.i("Firebase feature flag refreshed") }
+                    .onFailure { Timber.e(it, "Failed to refresh Firebase feature flags") }
                 FeatureFlag.updateFeatureFlowValues()
             }
         }
@@ -47,17 +57,31 @@ class FirebaseRemoteFeatureProvider(
         else -> firebaseRemoteConfig.getBoolean(feature.key)
     }
 
-    override fun hasFeature(feature: Feature) =
-        feature.hasFirebaseRemoteFlag
+    override fun hasFeature(feature: Feature) = feature.hasFirebaseRemoteFlag
+}
 
-    override fun refresh() {
-        firebaseRemoteConfig.fetch().addOnCompleteListener {
-            if (it.isSuccessful) {
-                firebaseRemoteConfig.activate()
-                Timber.i("Firebase feature flag refreshed")
+private suspend fun FirebaseRemoteConfig.fetchSuspending() = suspendCoroutine<Result<Unit>> { continuation ->
+    fetch().addOnCompleteListener { task ->
+        val exception = task.exception
+        continuation.resume(
+            if (exception == null) {
+                Result.success(Unit)
             } else {
-                Timber.e("Could not fetch remote config: ${it.exception?.message ?: "Unknown error"}")
+                Result.failure(exception)
             }
-        }
+        )
+    }
+}
+
+private suspend fun FirebaseRemoteConfig.activateSuspending() = suspendCoroutine<Result<Unit>> { continuation ->
+    activate().addOnCompleteListener { task ->
+        val exception = task.exception
+        continuation.resume(
+            if (exception == null) {
+                Result.success(Unit)
+            } else {
+                Result.failure(exception)
+            }
+        )
     }
 }

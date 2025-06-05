@@ -19,9 +19,5 @@ interface ModifiableFeatureProvider : FeatureProvider {
     fun setEnabled(feature: Feature, enabled: Boolean)
 }
 
-interface RemoteFeatureProvider : FeatureProvider {
-    fun refresh()
-}
-
 const val MAX_PRIORITY = 1
 const val MIN_PRIORITY = 2
