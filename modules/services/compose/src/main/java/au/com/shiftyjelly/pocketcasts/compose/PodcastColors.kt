@@ -1,14 +1,20 @@
 package au.com.shiftyjelly.pocketcasts.compose
 
+import android.os.Parcelable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.utils.parceler.ColorParceler
+import kotlinx.parcelize.Parcelize
+import kotlinx.parcelize.TypeParceler
 
+@Parcelize
+@TypeParceler<Color, ColorParceler>
 data class PodcastColors(
     val background: Color,
     val playerTint: Color,
-) {
+) : Parcelable {
     constructor(podcast: Podcast) : this(
         background = Color(podcast.backgroundColor),
         playerTint = Color(podcast.getPlayerTintColor(isDarkTheme = true)),
