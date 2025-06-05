@@ -1,7 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.utils.featureflag
 
+import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -217,5 +220,39 @@ class FeatureFlagTest {
         assertFalse(FeatureFlag.isEnabledForUser(Feature.TEST_FREE_FEATURE, SubscriptionTier.Patron))
         assertFalse(FeatureFlag.isEnabledForUser(Feature.TEST_FREE_FEATURE, SubscriptionTier.Plus))
         assertFalse(FeatureFlag.isEnabledForUser(Feature.TEST_FREE_FEATURE, subscriptionTier = null))
+    }
+
+    @Test
+    fun `feature flag values are updated`() = runTest {
+        FeatureFlag.isEnabledFlow(Feature.TEST_FREE_FEATURE).test {
+            assertTrue(awaitItem())
+
+            FeatureFlag.setEnabled(Feature.TEST_FREE_FEATURE, false)
+            assertFalse(awaitItem())
+
+            FeatureFlag.setEnabled(Feature.TEST_FREE_FEATURE, true)
+            assertTrue(awaitItem())
+        }
+    }
+
+    @Test
+    fun `feature flag values are updated with refresh`() = runTest {
+        FeatureFlag.isEnabledFlow(Feature.TEST_FREE_FEATURE).test {
+            assertTrue(awaitItem())
+
+            featureFlagRule.provider.setEnabled(Feature.TEST_FREE_FEATURE, false)
+            expectNoEvents()
+
+            FeatureFlag.refresh()
+            assertFalse(awaitItem())
+        }
+    }
+
+    @Test
+    fun `feature flag flow is cached`() {
+        val flow1 = FeatureFlag.isEnabledFlow(Feature.TEST_FREE_FEATURE)
+        val flow2 = FeatureFlag.isEnabledFlow(Feature.TEST_FREE_FEATURE)
+
+        assertEquals(flow1, flow2)
     }
 }
