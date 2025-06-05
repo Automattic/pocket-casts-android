@@ -36,6 +36,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -75,21 +76,26 @@ class PodcastsViewModel @AssistedInject constructor(
     val notificationPromptState = _notificationsState.asStateFlow()
 
     val activeAds = if (folderUuid == null) {
-        userManager.getSignInState().asFlow()
-            .flatMapLatest { signInState ->
-                if (signInState.isNoAccountOrFree && FeatureFlag.isEnabled(Feature.BANNER_ADS)) {
-                    val mockAd = BlazeAd(
-                        id = "ad-id",
-                        title = "wordpress.com",
-                        ctaText = "Democratize publishing and eCommerce one website at a time.",
-                        ctaUrl = "https://wordpress.com/",
-                        imageUrl = "https://s.w.org/style/images/about/WordPress-logotype-simplified.png",
-                    )
-                    flowOf(listOf(mockAd))
-                } else {
-                    flowOf(emptyList())
+        combine(
+            userManager.getSignInState().asFlow(),
+            FeatureFlag.isEnabledFlow(Feature.BANNER_ADS),
+            ::Pair,
+        ).flatMapLatest { (signInState, isEnabled) ->
+            if (isEnabled && signInState.isNoAccountOrFree) {
+                val mockAd = BlazeAd(
+                    id = "ad-id",
+                    title = "wordpress.com",
+                    ctaText = "Democratize publishing and eCommerce one website at a time.",
+                    ctaUrl = "https://wordpress.com/",
+                    imageUrl = "https://s.w.org/style/images/about/WordPress-logotype-simplified.png",
+                )
+                flow {
+                    emit(listOf(mockAd))
                 }
+            } else {
+                flowOf(emptyList())
             }
+        }
     } else {
         flowOf(emptyList())
     }.stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = emptyList())
