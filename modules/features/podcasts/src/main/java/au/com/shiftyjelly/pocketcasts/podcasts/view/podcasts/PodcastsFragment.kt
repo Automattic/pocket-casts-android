@@ -93,6 +93,7 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.adapter.PodcastTouchCallback
 import au.com.shiftyjelly.pocketcasts.views.extensions.quickScrollToTop
+import au.com.shiftyjelly.pocketcasts.views.fragments.AdReportFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ChromeCastButton.Shown
 import au.com.shiftyjelly.pocketcasts.views.fragments.TopScrollable
@@ -179,7 +180,7 @@ class PodcastsFragment :
         val bannerAdAdapter = BannerAdAdapter(
             themeType = theme.activeTheme,
             onAdClick = ::openAd,
-            onAdOptionsClick = {},
+            onAdOptionsClick = ::openAdReportFlow,
         )
         this.bannerAdAdapter = bannerAdAdapter
 
@@ -502,7 +503,7 @@ class PodcastsFragment :
                             ad = ad,
                             colors = rememberAdColors().bannerAd,
                             onAdClick = { openAd(ad) },
-                            onOptionsClick = {},
+                            onOptionsClick = { openAdReportFlow(ad) },
                         )
                     }
 
@@ -670,6 +671,14 @@ class PodcastsFragment :
             val intent = Intent(Intent.ACTION_VIEW, ad.ctaUrl.toUri())
             startActivity(intent)
         }.onFailure { LogBuffer.e("Ads", it, "Failed to open an ad: ${ad.id}") }
+    }
+
+    private fun openAdReportFlow(ad: BlazeAd) {
+        if (parentFragmentManager.findFragmentByTag("ad_report") == null) {
+            AdReportFragment
+                .newInstance(ad, podcastColors = null)
+                .show(parentFragmentManager, "ad_report")
+        }
     }
 
     inner class SpaceItemDecoration : RecyclerView.ItemDecoration() {
