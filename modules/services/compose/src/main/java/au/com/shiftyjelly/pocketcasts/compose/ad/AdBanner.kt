@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.LocalRippleConfiguration
 import androidx.compose.material.MaterialTheme
@@ -44,6 +45,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -65,12 +67,13 @@ fun AdBanner(
     onAdClick: () -> Unit,
     onOptionsClick: () -> Unit,
     modifier: Modifier = Modifier,
+    maxWidth: Dp = 400.dp,
 ) {
     CompositionLocalProvider(
         LocalRippleConfiguration provides RippleConfiguration(colors.ripple),
     ) {
         Box(
-            modifier = modifier,
+            modifier = modifier.widthIn(max = maxWidth),
         ) {
             val interactionSource = remember { MutableInteractionSource() }
             val contentDescription = stringResource(LR.string.go_to_ad, ad.ctaText)
