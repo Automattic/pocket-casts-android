@@ -11,8 +11,16 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
-import androidx.compose.foundation.layout.Box
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -34,6 +42,11 @@ import androidx.lifecycle.repeatOnLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
+import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
+import au.com.shiftyjelly.pocketcasts.compose.ad.AdBanner
+import au.com.shiftyjelly.pocketcasts.compose.ad.rememberAdColors
+import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedNonNullVisibility
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.player.binding.setSeekBarState
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterPlayerHeaderBinding
@@ -77,6 +90,7 @@ import kotlin.math.abs
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -226,13 +240,31 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     private fun setupArtworkSectionComposeView() {
         binding?.artworkSectionComposeView?.setContentWithViewCompositionStrategy {
             val state by remember { playerVisualsStateFlow() }.collectAsState(PlayerVisualsState.Empty)
+            val podcastColors by remember { podcastColorsFlow() }.collectAsState(null)
+            val ads by viewModel.activeAds.collectAsState()
             val player by viewModel.playerFlow.collectAsState()
 
             AppTheme(theme.activeTheme) {
-                Box(
-                    contentAlignment = Alignment.Center,
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
                     modifier = Modifier.padding(16.dp),
                 ) {
+                    AnimatedNonNullVisibility(
+                        item = ads.firstOrNull().takeIf { podcastColors != null },
+                        enter = adEnterTransition,
+                        exit = adExitTransition,
+                    ) { ad ->
+                        CompositionLocalProvider(LocalPodcastColors provides podcastColors) {
+                            AdBanner(
+                                ad = ad,
+                                colors = rememberAdColors().bannerAd,
+                                onAdClick = {},
+                                onOptionsClick = {},
+                                modifier = Modifier.padding(bottom = 16.dp, top = 8.dp),
+                            )
+                        }
+                    }
                     PlayerVisuals(
                         state = state,
                         player = player,
@@ -605,4 +637,25 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         }
         return PlayerVisualsState(contentState, header.isPrepared)
     }
+
+    private fun podcastColorsFlow(): Flow<PodcastColors?> {
+        return combine(
+            viewModel.episodeFlow,
+            viewModel.podcastFlow,
+        ) { episode, podcast ->
+            if (episode != null) {
+                podcast?.let(::PodcastColors) ?: PodcastColors.ForUserEpisode
+            } else {
+                null
+            }
+        }
+    }
 }
+
+private val fadeIn = fadeIn(spring(stiffness = Spring.StiffnessVeryLow))
+private val fadeOut = fadeOut(spring(stiffness = Spring.StiffnessVeryLow))
+private val expandVertically = expandVertically(spring(stiffness = Spring.StiffnessMediumLow))
+private val shrinkVertically = shrinkVertically(spring(stiffness = Spring.StiffnessMediumLow))
+
+private val adEnterTransition = fadeIn + expandVertically
+private val adExitTransition = fadeOut + shrinkVertically
