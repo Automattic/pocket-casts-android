@@ -28,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.view.marginTop
@@ -75,6 +76,7 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog.ButtonType.Danger
 import au.com.shiftyjelly.pocketcasts.views.extensions.spring
@@ -259,7 +261,12 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                             AdBanner(
                                 ad = ad,
                                 colors = rememberAdColors().bannerAd,
-                                onAdClick = {},
+                                onAdClick = {
+                                    runCatching {
+                                        val intent = Intent(Intent.ACTION_VIEW, ad.ctaUrl.toUri())
+                                        startActivity(intent)
+                                    }.onFailure { LogBuffer.e("Ads", it, "Failed to open an ad: ${ad.id}") }
+                                },
                                 onOptionsClick = {},
                                 modifier = Modifier.padding(bottom = 16.dp, top = 8.dp),
                             )
