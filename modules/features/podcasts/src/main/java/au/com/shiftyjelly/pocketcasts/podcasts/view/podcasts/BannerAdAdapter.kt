@@ -1,6 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.podcasts
 
 import android.view.ViewGroup
+import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.recyclerview.widget.DiffUtil
@@ -54,12 +56,16 @@ private class BannerAdViewHolder(
     fun bind(ad: BlazeAd) {
         composeView.setContent {
             AppTheme(themeType) {
-                AdBanner(
-                    ad = ad,
-                    colors = rememberAdColors().bannerAd,
-                    onAdClick = { onAdClick(ad) },
-                    onOptionsClick = { onAdOptionsClick(ad) },
-                )
+                Box(
+                    contentAlignment = Alignment.Center,
+                ) {
+                    AdBanner(
+                        ad = ad,
+                        colors = rememberAdColors().bannerAd,
+                        onAdClick = { onAdClick(ad) },
+                        onOptionsClick = { onAdOptionsClick(ad) },
+                    )
+                }
             }
         }
     }
