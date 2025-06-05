@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.views.fragments
+package au.com.shiftyjelly.pocketcasts.ads
 
 import android.content.res.ColorStateList
 import android.os.Bundle
@@ -19,6 +19,10 @@ import au.com.shiftyjelly.pocketcasts.compose.ad.AdReportContent
 import au.com.shiftyjelly.pocketcasts.compose.ad.BlazeAd
 import au.com.shiftyjelly.pocketcasts.compose.ad.rememberAdColors
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
+import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.parcelize.Parcelize
 import timber.log.Timber
@@ -52,7 +56,10 @@ class AdReportFragment : BaseDialogFragment() {
                 val sheetColors = rememberAdColors().reportSheet
                 AdReportContent(
                     colors = sheetColors,
-                    onClickRemoveAds = { Timber.i("Remove ads") },
+                    onClickRemoveAds = {
+                        OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.Upsell(OnboardingUpgradeSource.BANNER_AD))
+                        dismiss()
+                    },
                     onReportAd = { reason -> Timber.i("Report ad: $reason, ${args.ad.id}") },
                 )
 
