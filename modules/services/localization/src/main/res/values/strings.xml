@@ -218,6 +218,7 @@
     <string name="ad_report_reason_malicious">This is a malicious ad</string>
     <string name="ad_report_reason_too_often">See this ad too often</string>
     <string name="ad_report_reason_other">Other</string>
+    <string name="banner_ad_plus_prompt">Say goodbye to banner ads and more with Pocket Casts Plus</string>
 
     <string name="multiselect_actions_shown">Shortcut in toolbar</string>
     <string name="multiselect_actions_hidden">In overflow</string>
@@ -2019,6 +2020,7 @@
     <string name="onboarding_patron_subscribe">Subscribe to Pocket&#160;Casts Patron</string>
     <string name="onboarding_plus_features_title" translatable="false">@string/onboarding_upgrade_everything_you_love_about_pocket_casts_plus</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Listen in more places with our Windows, macOS, and Web apps.</string>
+    <string name="onboarding_plus_feature_no_banner_ads">No banner ads</string>
     <string name="onboarding_plus_feature_folders_title">Folders</string>
     <string name="onboarding_plus_feature_up_next_shuffle_title">Up Next Shuffle</string>
     <string name="onboarding_plus_feature_bookmarks_title">Bookmarks</string>
