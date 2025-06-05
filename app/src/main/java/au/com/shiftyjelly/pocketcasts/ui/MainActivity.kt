@@ -406,7 +406,7 @@ class MainActivity :
         WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
         theme.setupThemeForConfig(this, resources.configuration)
-        requestPortiraitOrientation()
+        requestPortraitOrientation()
         enableEdgeToEdge(navigationBarStyle = theme.getNavigationBarStyle(this))
         bottomSheetTag = savedInstanceState?.getString(SAVEDSTATE_BOTTOM_SHEET_TAG)
 
@@ -1778,7 +1778,7 @@ class MainActivity :
     }
 
     @SuppressLint("SourceLockedOrientationActivity")
-    private fun requestPortiraitOrientation() {
+    private fun requestPortraitOrientation() {
         if (resources.getBoolean(R.bool.force_portrait_orientation)) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT)
         }
