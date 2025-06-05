@@ -20,12 +20,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.view.doOnPreDraw
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.view.marginTop
-import androidx.core.view.updateLayoutParams
 import androidx.dynamicanimation.animation.SpringAnimation
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -38,7 +35,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
-import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.binding.setSeekBarState
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterPlayerHeaderBinding
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContract
@@ -228,18 +224,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     }
 
     private fun setupArtworkSectionComposeView() {
-        val isLandscapeLayout = resources.getBoolean(R.bool.is_landscape_layout_for_player)
-        val binding = binding ?: return
-        if (isLandscapeLayout) {
-            binding.artworkSectionComposeView.doOnPreDraw { view ->
-                val expectedHeight = binding.playerControlsComposeView.bottom - binding.playerHeadingSectionComposeView.top
-                view.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                    height = expectedHeight
-                }
-            }
-        }
-
-        binding.artworkSectionComposeView.setContentWithViewCompositionStrategy {
+        binding?.artworkSectionComposeView?.setContentWithViewCompositionStrategy {
             val state by remember { playerVisualsStateFlow() }.collectAsState(PlayerVisualsState.Empty)
             val player by viewModel.playerFlow.collectAsState()
 
@@ -427,7 +412,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                                 transcriptViewModel.track(AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_SHOWN, uiState.podcastAndEpisode)
                             }
                             binding?.openTranscript(
-                                hidePlayerControls = !transitionState.showPlayerControls || !resources.getBoolean(R.bool.transcript_show_seekbar_and_player_controls),
+                                hidePlayerControls = !transitionState.showPlayerControls,
                             )
                         }
 
