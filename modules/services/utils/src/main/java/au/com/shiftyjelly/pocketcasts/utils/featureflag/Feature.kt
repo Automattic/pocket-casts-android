@@ -133,7 +133,7 @@ enum class Feature(
 
     // This is set of features used only for testing purposes.
     TEST_FREE_FEATURE(
-        key = "test_free_feautre",
+        key = "test_free_feature",
         title = "Free feature used for testing",
         defaultValue = true,
         tier = FeatureTier.Free,
@@ -141,7 +141,7 @@ enum class Feature(
         hasDevToggle = false,
     ),
     TEST_PLUS_FEATURE(
-        key = "test_plus_feautre",
+        key = "test_plus_feature",
         title = "Plus feature used for testing",
         defaultValue = true,
         tier = FeatureTier.Plus(),
@@ -149,7 +149,7 @@ enum class Feature(
         hasDevToggle = false,
     ),
     TEST_PLUS_RESTRICTED_FEATURE(
-        key = "test_plus_restricted_feautre",
+        key = "test_plus_restricted_feature",
         title = "Plus feature with Patron exclusive access used for testing",
         defaultValue = true,
         tier = FeatureTier.Plus(ReleaseVersion(1, 0)),
@@ -157,7 +157,7 @@ enum class Feature(
         hasDevToggle = false,
     ),
     TEST_PATRON_FEATURE(
-        key = "test_patron_feautre",
+        key = "test_patron_feature",
         title = "Patron feature used for testing",
         defaultValue = true,
         tier = FeatureTier.Patron,
