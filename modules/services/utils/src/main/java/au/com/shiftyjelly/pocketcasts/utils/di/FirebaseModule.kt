@@ -8,7 +8,6 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
-import timber.log.Timber
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -22,13 +21,6 @@ class FirebaseModule {
                 .build()
             setConfigSettingsAsync(config)
             setDefaultsAsync(FirebaseConfig.defaults)
-            fetch().addOnCompleteListener {
-                if (it.isSuccessful) {
-                    activate()
-                } else {
-                    Timber.e("Could not fetch remote config: ${it.exception?.message ?: "Unknown error"}")
-                }
-            }
         }
     }
 }

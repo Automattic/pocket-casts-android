@@ -75,7 +75,6 @@ class AppLifecycleObserver(
     override fun onResume(owner: LifecycleOwner) {
         super.onResume(owner)
         appLifecycleAnalytics.onApplicationEnterForeground()
-        FeatureFlag.refresh()
     }
 
     override fun onPause(owner: LifecycleOwner) {

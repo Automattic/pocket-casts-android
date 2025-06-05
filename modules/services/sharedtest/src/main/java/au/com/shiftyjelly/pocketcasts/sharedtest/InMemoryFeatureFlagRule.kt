@@ -6,7 +6,7 @@ import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 
 class InMemoryFeatureFlagRule : TestWatcher() {
-    private var provider = InMemoryFeatureProvider()
+    private val provider = InMemoryFeatureProvider()
 
     fun setReleaseVersion(releaseVersion: ReleaseVersion) {
         provider.currentReleaseVersion = releaseVersion

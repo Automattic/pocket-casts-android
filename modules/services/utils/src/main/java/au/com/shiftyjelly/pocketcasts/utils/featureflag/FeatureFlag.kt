@@ -2,7 +2,10 @@ package au.com.shiftyjelly.pocketcasts.utils.featureflag
 
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.ReleaseVersion.Companion.comparedToEarlyPatronAccess
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 /**
  * Manages feature flags in the application with a list of different feature providers.
@@ -14,11 +17,13 @@ import java.util.concurrent.CopyOnWriteArrayList
  */
 object FeatureFlag {
     private val providers = CopyOnWriteArrayList<FeatureProvider>()
+    private val featureFlows = ConcurrentHashMap<Feature, MutableStateFlow<Boolean>>()
 
     fun initialize(
         providers: List<FeatureProvider>,
     ) {
         this.providers.addAll(providers)
+        updateFeatureFlowValues()
     }
 
     fun isEnabled(
@@ -27,6 +32,12 @@ object FeatureFlag {
         return findProviderForFeature<FeatureProvider>(feature)
             ?.isEnabled(feature)
             ?: feature.defaultValue
+    }
+
+    fun isEnabledFlow(
+        feature: Feature,
+    ): StateFlow<Boolean> {
+        return featureFlows.computeIfAbsent(feature) { MutableStateFlow(isEnabled(feature)) }
     }
 
     fun isEnabledForUser(
@@ -45,14 +56,18 @@ object FeatureFlag {
         enabled: Boolean,
     ) {
         findProviderForFeature<ModifiableFeatureProvider>(feature)?.setEnabled(feature, enabled)
-    }
-
-    fun refresh() {
-        providers.filterIsInstance<RemoteFeatureProvider>().forEach { it.refresh() }
+        updateFeatureFlowValues()
     }
 
     fun clearProviders() {
         providers.clear()
+        updateFeatureFlowValues()
+    }
+
+    fun updateFeatureFlowValues() {
+        for ((feature, flow) in featureFlows) {
+            flow.value = isEnabled(feature)
+        }
     }
 
     private fun isFeatureAllowedForCurrentVersion(
