@@ -130,7 +130,7 @@ fun AdBanner(
                 }
 
                 Image(
-                    painter = painterResource(IR.drawable.ic_overflow),
+                    painter = painterResource(IR.drawable.ic_close),
                     contentDescription = null,
                     colorFilter = ColorFilter.tint(colors.icon),
                     modifier = Modifier
