@@ -202,6 +202,10 @@
     <string name="price_per_week">%1$.2f %2$s/week</string>
     <!-- %1$.2f is price with 2 decimal points precision, \u0024 is a dollar sign -->
     <string name="price_per_week_usd">\u0024%1$.2f/week</string>
+    <!-- %1$.2f is price with 2 decimal points precision, %1$s is the currency -->
+    <string name="price_per_month">%1$.2f %2$s/month</string>
+    <!-- %1$.2f is price with 2 decimal points precision, \u0024 is a dollar sign -->
+    <string name="price_per_month_usd">\u0024%1$.2f/month</string>
     <!-- "Ad" means here advertisement. It should be a short form if possible. -->
     <string name="ad">Ad</string>
     <string name="ad_options">Advertisement options</string>
