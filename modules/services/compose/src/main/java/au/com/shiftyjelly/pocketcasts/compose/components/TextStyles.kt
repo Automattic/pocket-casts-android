@@ -459,13 +459,14 @@ fun TextH70(
 fun TextC50(
     text: String,
     modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.theme.colors.primaryText02,
     maxLines: Int = Int.MAX_VALUE,
     disableAutoScale: Boolean = false,
     fontScale: Float = 1f,
 ) {
     Text(
         text = text.uppercase(Locale.getDefault()),
-        color = MaterialTheme.theme.colors.primaryText02,
+        color = color,
         fontFamily = FontFamily.SansSerif,
         fontSize = 13.sp.scaled(disableAutoScale, fontScale),
         lineHeight = 19.sp.scaled(disableAutoScale, fontScale),
