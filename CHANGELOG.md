@@ -11,7 +11,7 @@
     *   Make full screen Player less sensitive to the hide fling gesture
         ([#4052](https://github.com/Automattic/pocket-casts-android/pull/4052))
     *   Lock general UI to portrait mode on regular phone devices
-        ([#4052](https://github.com/Automattic/pocket-casts-android/pull/4052))
+        ([#4083](https://github.com/Automattic/pocket-casts-android/pull/4083))
 *   Bug Fixes
     *   Fix bottom sheet animation used by Up Next and other screens
         ([#4051](https://github.com/Automattic/pocket-casts-android/pull/4051))
