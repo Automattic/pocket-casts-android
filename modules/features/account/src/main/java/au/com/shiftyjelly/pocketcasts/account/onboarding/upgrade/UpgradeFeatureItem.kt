@@ -23,6 +23,13 @@ enum class PlusUpgradeFeatureItem(
     override val image: Int,
     override val title: Int,
 ) : UpgradeFeatureItem {
+    BannerAds(
+        image = IR.drawable.ic_remove_ads,
+        title = LR.string.onboarding_plus_feature_no_banner_ads,
+    ) {
+        override val isYearlyFeature get() = FeatureFlag.isEnabled(Feature.BANNER_ADS)
+        override val isMonthlyFeature get() = FeatureFlag.isEnabled(Feature.BANNER_ADS)
+    },
     Folders(
         image = IR.drawable.ic_plus_feature_folder,
         title = LR.string.onboarding_plus_feature_folders_title,
