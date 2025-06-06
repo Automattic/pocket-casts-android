@@ -9,15 +9,12 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.compose.bookmark.BookmarkRowColors
-import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButtonStyle
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkArguments
-import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.HeaderRowColors
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.search.BookmarkSearchHandler
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
@@ -387,23 +384,7 @@ class BookmarksViewModel
             val searchText: String = "",
             val searchEnabled: Boolean = false,
             val showEpisodeTitle: Boolean = false,
-        ) : UiState() {
-            val headerRowColors: HeaderRowColors
-                get() = when (sourceView) {
-                    SourceView.PLAYER -> HeaderRowColors.Player
-                    else -> HeaderRowColors.Default
-                }
-            val bookmarkRowColors: BookmarkRowColors
-                get() = when (sourceView) {
-                    SourceView.PLAYER -> BookmarkRowColors.Player
-                    else -> BookmarkRowColors.Default
-                }
-            val timePlayButtonStyle: TimePlayButtonStyle
-                get() = when (sourceView) {
-                    SourceView.PLAYER -> TimePlayButtonStyle.Solid
-                    else -> TimePlayButtonStyle.Outlined
-                }
-        }
+        ) : UiState()
 
         data class Upsell(val sourceView: SourceView) : UiState() {
             internal val colors: MessageViewColors

@@ -52,7 +52,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -213,7 +213,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 podcastColorsFlow().collect { podcastColors ->
-                    val playerColors = PlayerColors(theme.activeTheme, podcastColors ?: PodcastColors.ForUserEpisode)
+                    val playerColors = PlayerColors(theme.activeTheme, podcastColors)
                     view.setBackgroundColor(playerColors.background01.toArgb())
                 }
             }
@@ -349,16 +349,9 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
     private val isTranscriptVisible: Boolean
         get() = binding?.tabHolder?.isVisible == false
 
-    private fun podcastColorsFlow(): Flow<PodcastColors?> {
-        return combine(
-            viewModel.episodeFlow,
-            viewModel.podcastFlow,
-        ) { episode, podcast ->
-            if (episode != null) {
-                podcast?.let(::PodcastColors) ?: PodcastColors.ForUserEpisode
-            } else {
-                null
-            }
+    private fun podcastColorsFlow(): Flow<PodcastColors> {
+        return viewModel.podcastFlow.map { podcast ->
+            podcast?.let(::PodcastColors) ?: PodcastColors.ForUserEpisode
         }
     }
 
