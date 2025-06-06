@@ -17,6 +17,8 @@
         ([#4051](https://github.com/Automattic/pocket-casts-android/pull/4051))
     *   Fix duration render issue on podcasts without `<itunes:duration>` tag
         ([#4077](https://github.com/Automattic/pocket-casts-android/pull/4077))
+    *   Fix player's theming responsivness
+        ([#4091](https://github.com/Automattic/pocket-casts-android/pull/4091))
 
 7.90
 -----
