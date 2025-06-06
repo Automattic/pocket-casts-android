@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
@@ -312,29 +313,16 @@ class BookmarksViewModel
         }
     }
 
-    fun buildBookmarkArguments(onSuccess: (BookmarkArguments) -> Unit) {
-        (_uiState.value as? UiState.Loaded)?.let {
-            val bookmark =
-                it.bookmarks.firstOrNull { bookmark -> multiSelectHelper.isSelected(bookmark) }
-            bookmark?.let {
-                val episodeUuid = bookmark.episodeUuid
-                viewModelScope.launch(ioDispatcher) {
-                    val podcast = podcastManager.findPodcastByUuid(bookmark.podcastUuid)
-                    val backgroundColor =
-                        if (podcast == null) 0xFF000000.toInt() else theme.playerBackgroundColor(podcast)
-                    val tintColor =
-                        if (podcast == null) 0xFFFFFFFF.toInt() else theme.playerHighlightColor(podcast)
-                    val arguments = BookmarkArguments(
-                        bookmarkUuid = bookmark.uuid,
-                        episodeUuid = episodeUuid,
-                        timeSecs = bookmark.timeSecs,
-                        backgroundColor = backgroundColor,
-                        tintColor = tintColor,
-                    )
-                    onSuccess(arguments)
-                }
-            }
-        }
+    suspend fun createBookmarkArguments(): BookmarkArguments? {
+        val loadedState = _uiState.value as? UiState.Loaded ?: return null
+        val bookmark = loadedState.bookmarks.firstOrNull(multiSelectHelper::isSelected) ?: return null
+        val podcast = podcastManager.findPodcastByUuid(bookmark.podcastUuid)
+        return BookmarkArguments(
+            bookmarkUuid = bookmark.uuid,
+            episodeUuid = bookmark.episodeUuid,
+            timeSecs = bookmark.timeSecs,
+            podcastColors = podcast?.let(::PodcastColors) ?: PodcastColors.ForUserEpisode,
+        )
     }
 
     private fun SourceView.mapToBookmarksSortTypeUserSetting(): UserSetting<BookmarksSortType> {

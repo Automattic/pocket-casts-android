@@ -214,8 +214,11 @@ class BookmarksFragment : BaseFragment() {
     }
 
     private fun onEditBookmarkClick() {
-        bookmarksViewModel.buildBookmarkArguments { arguments ->
-            startActivity(arguments.getIntent(requireContext()))
+        viewLifecycleOwner.lifecycleScope.launch {
+            val bookmarkArguments = bookmarksViewModel.createBookmarkArguments()
+            if (bookmarkArguments != null) {
+                startActivity(BookmarkActivity.launchIntent(requireContext(), bookmarkArguments))
+            }
         }
     }
 

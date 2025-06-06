@@ -7,7 +7,7 @@ import kotlinx.parcelize.Parceler
 object ColorParceler : Parceler<Color?> {
     override fun create(parcel: Parcel): Color? {
         val isPresent = parcel.readByte() == 1.toByte()
-        return if (isPresent) Color(parcel.readLong()) else null
+        return if (isPresent) Color(parcel.readLong().toULong()) else null
     }
 
     override fun Color?.write(parcel: Parcel, flags: Int) {
