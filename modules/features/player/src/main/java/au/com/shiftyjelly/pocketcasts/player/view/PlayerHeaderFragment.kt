@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.player.view
 import android.animation.LayoutTransition
 import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.GestureDetector
 import android.view.LayoutInflater
@@ -27,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.core.view.isInvisible
@@ -45,6 +45,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
+import au.com.shiftyjelly.pocketcasts.compose.PlayerColors
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.ad.AdBanner
 import au.com.shiftyjelly.pocketcasts.compose.ad.rememberAdColors
@@ -161,32 +162,29 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         setupUpNextDrag(binding)
 
         viewModel.listDataLive.observe(viewLifecycleOwner) {
-            val headerViewModel = it.podcastHeader
+            val podcastHeader = it.podcastHeader
 
+            binding.playerGroup.setBackgroundColor(podcastHeader.backgroundColor)
             binding.seekBar.setSeekBarState(
-                duration = headerViewModel.durationMs.milliseconds,
-                position = headerViewModel.positionMs.milliseconds,
-                chapters = headerViewModel.chapters,
-                playbackSpeed = headerViewModel.playbackEffects.playbackSpeed,
-                adjustDuration = headerViewModel.adjustRemainingTimeDuration,
-                tintColor = headerViewModel.iconTintColor,
-                bufferedUpTo = headerViewModel.bufferedUpToMs,
-                isBuffering = headerViewModel.isBuffering,
-                theme = headerViewModel.theme,
+                duration = podcastHeader.durationMs.milliseconds,
+                position = podcastHeader.positionMs.milliseconds,
+                chapters = podcastHeader.chapters,
+                playbackSpeed = podcastHeader.playbackEffects.playbackSpeed,
+                adjustDuration = podcastHeader.adjustRemainingTimeDuration,
+                bufferedUpTo = podcastHeader.bufferedUpToMs,
+                isBuffering = podcastHeader.isBuffering,
             )
+        }
 
-            binding.playerGroup.setBackgroundColor(headerViewModel.backgroundColor)
-            binding.seekBar.setSeekBarState(
-                duration = headerViewModel.durationMs.milliseconds,
-                position = headerViewModel.positionMs.milliseconds,
-                chapters = headerViewModel.chapters,
-                playbackSpeed = headerViewModel.playbackEffects.playbackSpeed,
-                adjustDuration = headerViewModel.adjustRemainingTimeDuration,
-                tintColor = headerViewModel.iconTintColor,
-                bufferedUpTo = headerViewModel.bufferedUpToMs,
-                isBuffering = headerViewModel.isBuffering,
-                theme = headerViewModel.theme,
-            )
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                podcastColorsFlow().collect { podcastColors ->
+                    val playerColors = PlayerColors(theme.activeTheme, podcastColors ?: PodcastColors.ForUserEpisode)
+
+                    binding.playerGroup.setBackgroundColor(playerColors.background01.toArgb())
+                    binding.seekBar.setTintColor(playerColors.highlight01.toArgb(), theme.activeTheme)
+                }
+            }
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -226,7 +224,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                         is PlayerViewModel.NavigationState.OpenChapterUrl -> {
                             val chapterUrl = navigationState.chapterUrl
                             val intent = Intent(Intent.ACTION_VIEW)
-                            intent.data = Uri.parse(chapterUrl)
+                            intent.data = chapterUrl.toUri()
                             try {
                                 startActivity(intent)
                             } catch (e: ActivityNotFoundException) {
