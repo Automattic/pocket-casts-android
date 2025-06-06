@@ -1,12 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-05-22 14:10:05+0000
+Translation-Revision-Date: 2025-05-26 12:54:04+0000
 Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;
 Generator: GlotPress/2.4.0-alpha
 Language: ar
 -->
 <resources>
+    <string name="bookmarks_search_results_not_found">لم نعثر على أي إشارة مرجعية تطابق معايير البحث. جرِّب كلمة مفتاحية أخرى.</string>
+    <string name="podcast_no_episodes_matching">لم نعثر على أي حلقة تطابق هذا البحث. جرِّب كلمة مفتاحية أخرى.</string>
+    <string name="podcast_no_bookmarks_matching">لا يتضمن هذا البث الصوتي أي إشارات مرجعية تطابق معايير البحث. جرِّب كلمة مفتاحية أخرى.</string>
+    <string name="podcasts_time_to_add_some_podcasts_summary">هل أتيت من تطبيق آخر؟ يمكنك استيراد حلقات البث الصوتي عبر الملف الشخصي &gt; الإعدادات &gt; الاستيراد والتصدير.\n\nإذا كنت تبحث عن الإلهام، جرب علامة تبويب \"اكتشاف\".</string>
+    <string name="onboarding_upgrade_purchase_failure_message">حدث خطأ ما. يرجى إعادة المحاولة لاحقًا.</string>
+    <string name="onboarding_upgrade_no_plans_found_body">يرجى التحقّق من اتصالك بالإنترنت أو إعادة المحاولة لاحقًا.</string>
+    <string name="onboarding_upgrade_no_plans_found_title">يتعذر تحميل الخطط</string>
     <string name="skip_for_now">التخطي الآن</string>
+    <string name="similar_shows_to">عروض مشابهة لـ \"%s\"</string>
+    <string name="recommendations_because_you_like">اقتراحات مشابهة لما أعجبك</string>
+    <string name="plus_week">أسبوع</string>
+    <string name="onboarding_plus_recurring_after_intro_offer">الدفع المتكرر في ⁦%1$s⁩ بعد عامك الأول (⁦%2$s⁩)</string>
+    <string name="you_might_like_empty_title">يتعذر تحميل التوصيات</string>
     <string name="onboarding_plus_feature_libro_title">كتاب صوتي مجّاني من &lt;a href=\"https://libro.fm/\"&gt;Libro.fm&lt;/a&gt;</string>
     <string name="you_might_like">ربما ينال إعجابك</string>
     <string name="podroll_information_button">فهمت</string>
@@ -691,6 +703,7 @@ Language: ar
     <string name="onboarding_welcome_recommendations_title">اكتشاف شيء جديد</string>
     <string name="onboarding_welcome_get_you_listening_plus">شكرًا لك، لنجعلك تستمع الآن!</string>
     <string name="onboarding_welcome_get_you_listening">مرحبًا بك، لنجعلك تستمع الآن!</string>
+    <string name="onboarding_plus_recurring_after_free_trial">ستبدأ المدفوعات المتكررة بعد ⁦%1$s⁩ الخاص بك⁦%2$s⁩</string>
     <string name="onboarding_plus_start_free_trial_and_subscribe">بدء الإصدار التجريبي المجاني والاشتراك</string>
     <string name="onboarding_plus_terms_and_conditions">الشروط والأحكام</string>
     <string name="onboarding_plus_privacy_policy">سياسة الخصوصية</string>

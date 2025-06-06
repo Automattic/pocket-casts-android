@@ -1,12 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-05-22 14:10:05+0000
+Translation-Revision-Date: 2025-05-26 16:54:03+0000
 Plural-Forms: nplurals=2; plural=(n > 1);
 Generator: GlotPress/2.4.0-alpha
 Language: pt_BR
 -->
 <resources>
+    <string name="bookmarks_search_results_not_found">Não encontramos nenhum favorito que corresponda aos seus critérios de pesquisa. Tente outra palavra-chave.</string>
+    <string name="podcast_no_episodes_matching">Não encontramos nenhum episódio para essa pesquisa. Tente outra palavra-chave.</string>
+    <string name="podcast_no_bookmarks_matching">Este podcast não tem favoritos correspondentes aos seus critérios de pesquisa. Tente outra palavra-chave.</string>
+    <string name="podcasts_time_to_add_some_podcasts_summary">Vindo de outro aplicativo? Importe seus podcasts em Perfil &gt; Configurações &gt; Importar e exportar.\n\nSe você estiver buscando inspiração, experimente a guia Explorar.</string>
+    <string name="onboarding_upgrade_purchase_failure_message">Ocorreu um erro. Tente novamente mais tarde.</string>
+    <string name="onboarding_upgrade_no_plans_found_body">Verifique sua conexão ou tente novamente.</string>
+    <string name="onboarding_upgrade_no_plans_found_title">Não foi possível carregar os planos</string>
     <string name="skip_for_now">Pular por enquanto</string>
+    <string name="similar_shows_to">Programas semelhantes a \"%s\"</string>
+    <string name="recommendations_because_you_like">Porque você curte</string>
     <string name="plus_week">semana</string>
     <string name="onboarding_plus_recurring_after_intro_offer">Pagamento recorrente de %1$s depois do primeiro ano (%2$s)</string>
     <string name="you_might_like_empty_title">Não foi possível carregar as recomendações</string>

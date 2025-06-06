@@ -1,12 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-05-22 14:10:05+0000
+Translation-Revision-Date: 2025-05-26 14:54:04+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="bookmarks_search_results_not_found">Wir konnten kein Lesezeichen finden, das deinen Suchkriterien entspricht. Versuche es mit einem anderen Stichwort.</string>
+    <string name="podcast_no_episodes_matching">Wir konnten keine Folge für diese Suche finden. Versuche es mit einem anderen Stichwort.</string>
+    <string name="podcast_no_bookmarks_matching">Dieser Podcast enthält keine Lesezeichen, die deinen Suchkriterien entsprechen. Versuche es mit einem anderen Stichwort.</string>
+    <string name="podcasts_time_to_add_some_podcasts_summary">Hast du vorher eine andere App genutzt? Importiere deine Podcasts über „Profile“ &gt; „Einstellungen“ &gt; „Importieren &amp; exportieren“.\n\nFinde Inspiration auf dem Tab „Entdecken“.</string>
+    <string name="onboarding_upgrade_purchase_failure_message">Es ist ein Fehler aufgetreten. Bitte versuche es später erneut.</string>
+    <string name="onboarding_upgrade_no_plans_found_body">Überprüfe deine Verbindung oder versuche es später erneut.</string>
+    <string name="onboarding_upgrade_no_plans_found_title">Tarife konnten nicht geladen werden</string>
     <string name="skip_for_now">Zunächst überspringen</string>
+    <string name="similar_shows_to">Ähnliche Shows wie „%s“</string>
+    <string name="recommendations_because_you_like">Weil du Folgendes magst</string>
     <string name="plus_week">Woche</string>
     <string name="onboarding_plus_recurring_after_intro_offer">Wiederkehrende Zahlung in Höhe von %1$s nach deinem ersten Jahr (%2$s)</string>
     <string name="you_might_like_empty_title">Empfehlungen konnten nicht geladen werden</string>

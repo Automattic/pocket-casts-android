@@ -1,12 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-05-22 14:10:05+0000
+Translation-Revision-Date: 2025-05-27 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="bookmarks_search_results_not_found">我们找不到任何符合您搜索条件的书签。 请尝试使用其他关键字。</string>
+    <string name="podcast_no_episodes_matching">我们找不到任何符合该搜索条件的剧集。 请尝试使用其他关键字。</string>
+    <string name="podcast_no_bookmarks_matching">此播客没有符合您搜索条件的书签。 请尝试使用其他关键字。</string>
+    <string name="podcasts_time_to_add_some_podcasts_summary">来自其他应用程序？ 通过“配置文件 &gt; 设置 &gt; 导入和导出”导入您的播客。\n\n如果您正在寻找灵感，请尝试使用“发现”选项卡。</string>
+    <string name="onboarding_upgrade_purchase_failure_message">出错了。 请稍后重试。</string>
+    <string name="onboarding_upgrade_no_plans_found_body">请检查您的连接，或稍后重试。</string>
+    <string name="onboarding_upgrade_no_plans_found_title">无法加载套餐</string>
     <string name="skip_for_now">暂时跳过</string>
+    <string name="similar_shows_to">“%s”的类似节目</string>
+    <string name="recommendations_because_you_like">因为您喜欢</string>
     <string name="plus_week">周</string>
     <string name="onboarding_plus_recurring_after_intro_offer">第一年 (%2$s) 后按 %1$s 定期付款</string>
     <string name="you_might_like_empty_title">无法加载推荐内容</string>

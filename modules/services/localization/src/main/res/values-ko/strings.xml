@@ -1,12 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-05-22 14:10:05+0000
+Translation-Revision-Date: 2025-05-27 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="bookmarks_search_results_not_found">검색 기준과 일치하는 북마크가 없습니다. 다른 키워드를 사용해 보세요.</string>
+    <string name="podcast_no_episodes_matching">해당 검색어와 일치하는 에피소드가 없습니다. 다른 키워드를 사용해 보세요.</string>
+    <string name="podcast_no_bookmarks_matching">이 팟캐스트에 검색 기준과 일치하는 북마크가 없습니다. 다른 키워드를 사용해 보세요.</string>
+    <string name="podcasts_time_to_add_some_podcasts_summary">다른 앱에서 이전하는 경우 프로필 &gt; 설정 &gt; 가져오기 및 내보내기를 통해 팟캐스트를 가져옵니다.\n\n영감이 필요하면 발견 탭을 이용해 보세요.</string>
+    <string name="onboarding_upgrade_purchase_failure_message">문제가 발생했습니다. 나중에 다시 시도해 주세요.</string>
+    <string name="onboarding_upgrade_no_plans_found_body">연결 상태를 확인하고 나중에 다시 시도해 주세요.</string>
+    <string name="onboarding_upgrade_no_plans_found_title">요금제를 로드할 수 없음</string>
     <string name="skip_for_now">당분간 건너뛰기</string>
+    <string name="similar_shows_to">\"%s\"과(와) 비슷한 프로그램</string>
+    <string name="recommendations_because_you_like">비슷한 프로그램 추천</string>
     <string name="plus_week">주</string>
     <string name="onboarding_plus_recurring_after_intro_offer">첫해(%2$s) 이후 %1$s 시 반복 결제</string>
     <string name="you_might_like_empty_title">추천 항목을 로드할 수 없음</string>
