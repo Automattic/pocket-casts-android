@@ -305,10 +305,16 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
     private fun setupPlayerControlsComposeView() {
         binding?.playerControlsComposeView?.setContentWithViewCompositionStrategy {
+            val podcastColors by remember { podcastColorsFlow() }.collectAsState(null)
+
             AppTheme(theme.activeTheme) {
-                PlayerControls(
-                    playerViewModel = viewModel,
-                )
+                CompositionLocalProvider(
+                    LocalPodcastColors provides podcastColors,
+                ) {
+                    PlayerControls(
+                        playerViewModel = viewModel,
+                    )
+                }
             }
         }
     }
