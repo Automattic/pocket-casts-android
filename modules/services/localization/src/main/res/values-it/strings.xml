@@ -1,12 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-05-22 14:10:05+0000
+Translation-Revision-Date: 2025-05-26 16:54:04+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
+    <string name="bookmarks_search_results_not_found">Non abbiamo trovato alcun segnalibro che corrisponda ai tuoi criteri di ricerca. Prova un\'altra parola chiave.</string>
+    <string name="podcast_no_episodes_matching">Non abbiamo trovato alcun episodio per la ricerca. Prova un\'altra parola chiave.</string>
+    <string name="podcast_no_bookmarks_matching">In questo podcast non sono presenti segnalibri che corrispondano ai tuoi criteri di ricerca. Prova un\'altra parola chiave.</string>
+    <string name="podcasts_time_to_add_some_podcasts_summary">Utilizzavi un\'altra app in precedenza? Importa i tuoi podcast tramite Profilo &gt; Impostazioni &gt; Importa ed esporta.\n\nSe stai cercando ispirazione, prova la scheda Scopri.</string>
+    <string name="onboarding_upgrade_purchase_failure_message">Si è verificato un problema. Riprova più tardi.</string>
+    <string name="onboarding_upgrade_no_plans_found_body">Controlla la connessione o riprova più tardi.</string>
+    <string name="onboarding_upgrade_no_plans_found_title">Impossibile caricare i piani</string>
     <string name="skip_for_now">Ignora per adesso</string>
+    <string name="similar_shows_to">Show simili a \"%s\"</string>
+    <string name="recommendations_because_you_like">Perché ti piace</string>
     <string name="plus_week">settimana</string>
     <string name="onboarding_plus_recurring_after_intro_offer">Pagamento ricorrente a %1$s dopo il primo anno (%2$s)</string>
     <string name="you_might_like_empty_title">Impossibile caricare i consigli</string>

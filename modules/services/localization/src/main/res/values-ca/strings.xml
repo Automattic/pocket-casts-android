@@ -1,12 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-05-18 22:37:37+0000
+Translation-Revision-Date: 2025-06-05 17:37:31+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: ca
 -->
 <resources>
+    <string name="price_per_month_usd">\u0024%1$.2f/mes</string>
+    <string name="price_per_month">%1$.2f %2$s/mes</string>
+    <string name="go_to_ad">Vés a l\'anunci: %1$s</string>
+    <string name="ad_image">Imatge de publicitat</string>
+    <string name="ad_options">Opcions de publicitat</string>
+    <string name="ad">Anunci</string>
+    <string name="notification_mockup_image_description">Imatge de mockup</string>
+    <string name="notification_snack_cta">Obre la configuració</string>
+    <string name="notification_snack_message">Si us plau, permeteu notificacions a la configuració del vostre dispositiu</string>
+    <string name="notification_prompt_cta">Permetre notificacions</string>
+    <string name="notification_prompt_message">Les notificacions són la millor manera de fer un seguiment dels nous episodis, obtenir recomanacions de nous espectacles i consells sobre Pocket Casts.</string>
+    <string name="notification_prompt_title">Posa\'t al dia!</string>
+    <string name="notification_offers_upgrade_message">Desbloqueja funcions exclusives com carpetes, marcadors i més amb Plus!</string>
+    <string name="notification_offers_upgrade_title">Fes un salt de nivell en el món dels pòdcasts</string>
+    <string name="notification_new_features_smart_folders_message">Prova Plus i organitza automàticament els teus pòdcasts amb carpetes</string>
+    <string name="notification_new_features_smart_folders_title">Els teus pòdcasts organitzats</string>
+    <string name="notifications_settings_turn_on_push_button">Vés a la configuració del dispositiu</string>
+    <string name="notifications_settings_turn_on_push_message">Per rebre notificacions de Pocket Casts, hauràs d\'activar-les a la configuració del teu dispositiu.</string>
+    <string name="notifications_settings_turn_on_push_title">Activar les notificacions push?</string>
+    <string name="notification_content_recommendations_message">Et preguntes què escoltar tot seguit? Mira aquests pòdcasts!</string>
+    <string name="notification_content_recommendations_title">Noves recomanacions per a tu</string>
+    <string name="notification_content_recommendations_trending_message">Consulta el que tothom està escoltant aquesta setmana.</string>
+    <string name="notification_content_recommendations_trending_title">Tendències d\'aquesta setmana</string>
+    <string name="notification_reengage_catch_up_offline_title">Posa\'t al dia fora de línia</string>
+    <string name="notification_reengage_we_miss_you_message">Fa temps que no has escoltat cap pòdcast. Torna a entrar i gaudeix!</string>
+    <string name="notification_reengage_we_miss_you_title">Et trobem a faltar!</string>
+    <string name="notification_plus_upsell_message">Desbloqueja funcions exclusives com carpetes, marcadors i més amb Plus!</string>
+    <string name="notification_plus_upsell_title">Fes un salt de nivell en el món dels pòdcasts</string>
+    <string name="notification_staff_picks_message">Pòdcasts madurs, escollits només per a tu per humans reals que estimen els pòdcasts.</string>
+    <string name="notification_staff_picks_title">Explora les nostres seleccions</string>
+    <string name="notification_themes_message">Explora els nostres temes i troba el que s\'adapti al teu estil.</string>
+    <string name="notification_themes_title">És l\'hora de renovar l\'aspecte</string>
+    <string name="notification_filters_message">Crear filtres intel·ligents per organitzar els teus episodis.</string>
+    <string name="notification_filters_title">Organitzar els teus episodis</string>
+    <string name="notification_up_next_message">Crea una cua de reproducció i digues adéu a saltar entre episodis.</string>
+    <string name="notification_up_next_title">Simplificar la teva cua</string>
+    <string name="notification_import_message">Vens des d\'una altra app? Porta tots els teus pòdcasts favorits a Pocket Casts.</string>
+    <string name="notification_import_title">Importa els teus pòdcasts fàcilment</string>
+    <string name="notification_sync_message">Crea un compte gratuït per sincronitzar els teus pòdcasts i escoltar-los des de qualsevol lloc.</string>
+    <string name="notification_sync_title">Els teus pòdcasts, a qualsevol dispositiu!</string>
+    <string name="notification_channel_description_offers">Mostra notificacions sobre ofertes exclusives, descomptes i promocions per ajudar-te a treure el màxim profit de la teva experiència amb Pocket Casts</string>
+    <string name="notification_channel_description_new_features_and_tips">Mostra notificacions sobre noves funcions, actualitzacions i consells útils per ajudar-te a optimitzar la teva experiència amb Pocket Casts</string>
+    <string name="notification_channel_description_trending_and_recommendations">Mostra pòdcasts en tendència i recomanacions seleccionades per ajudar-te a descobrir nous favorits</string>
+    <string name="notification_channel_description_daily_reminders">Mostra suggeriments útils per ajudar la teva rutina d\'escolta.</string>
+    <string name="settings_notification_offers">Ofertes de Pocket Casts</string>
+    <string name="settings_notification_new_features">Noves funcions i consells</string>
+    <string name="settings_notification_recommendations">Tendències i recomanacions</string>
+    <string name="settings_notification_daily_reminders">Recordatoris diaris</string>
+    <string name="bookmarks_search_results_not_found">No hem pogut trobar cap marcador que coincideixi amb els teus criteris de cerca. Prova amb una altra paraula clau.</string>
+    <string name="podcast_no_episodes_matching">No hem pogut trobar cap episodi per a aquesta cerca. Prova amb una altra paraula clau.</string>
+    <string name="podcast_no_bookmarks_matching">Aquest pòdcast no té cap marcador que coincideixi amb els teus criteris de cerca. Prova amb una altra paraula clau.</string>
+    <string name="podcasts_time_to_add_some_podcasts_summary">Vens des d\'una altra aplicació? Importa els teus pòdcasts anant a Perfil &gt; Configuració &gt; Importar i exportar. \n\nSi vols noves idees, vés a la pestanya Descobrir.</string>
+    <string name="onboarding_upgrade_purchase_failure_message">Alguna cosa ha anat malament. Torneu-ho a provar més tard.</string>
+    <string name="onboarding_upgrade_no_plans_found_body">Comprova la teva connexió o torna a provar-ho més tard.</string>
+    <string name="onboarding_upgrade_no_plans_found_title">No es poden carregar els plans</string>
+    <string name="skip_for_now">Omet per ara</string>
+    <string name="similar_shows_to">Pòdcasts similars a %s</string>
+    <string name="recommendations_because_you_like">Perquè t\'agrada</string>
+    <string name="plus_week">setmana</string>
+    <string name="onboarding_plus_recurring_after_intro_offer">Pagament recurrent a %1$s després del teu primer any (%2$s)</string>
+    <string name="you_might_like_empty_title">No s\'han pogut carregar les recomanacions</string>
+    <string name="onboarding_plus_feature_libro_title">Àudiollibre gratuït de &lt;a href=\"https://libro.fm/\"&gt;Libro.fm&lt;/a&gt;</string>
     <string name="you_might_like">Et podria agradar</string>
+    <string name="podroll_information_button">D\'acord</string>
+    <string name="podroll_information_summary">Les seleccions del creador són pòdcasts recomanats pel creador  mitjançant Podroll.</string>
+    <string name="podroll_information_title">Què són les seleccions del creador?</string>
+    <string name="recommended_by_creator">Pòdcasts recomants pel creador</string>
     <string name="winback_cancel_subscription_continue_cancel_button_label">Continua amb la cancel·lació</string>
     <string name="winback_cancel_subscription_accept_offer_button_label">Acceptar l\'oferta</string>
     <string name="winback_claimed_offer_message_4">Gràcies per triar Pocket Casts. El teu any amb descompte comença després del teu període de facturació actual.</string>
@@ -687,6 +753,7 @@ Language: ca
     <string name="onboarding_welcome_recommendations_title">Descobreix alguna cosa nova</string>
     <string name="onboarding_welcome_get_you_listening_plus">Gràcies. I ara, comença a escoltar contingut!</string>
     <string name="onboarding_welcome_get_you_listening">Benvingut. I ara, a escoltar!</string>
+    <string name="onboarding_plus_recurring_after_free_trial">Els pagaments recurrents començaran després del teu %1$s (%2$s)</string>
     <string name="onboarding_plus_start_free_trial_and_subscribe">Comença la prova gratuïta i subscriu-te</string>
     <string name="onboarding_plus_terms_and_conditions">Termes i condicions</string>
     <string name="onboarding_plus_privacy_policy">Política de privadesa</string>
@@ -1931,6 +1998,10 @@ Language: ca
         <item quantity="one">dia</item>
         <item quantity="other">dies</item>
     </plurals>
+    <plurals name="day_with_count">
+        <item quantity="one">%1$d dia</item>
+        <item quantity="other">%1$d dies</item>
+    </plurals>
     <plurals name="episode_count">
         <item quantity="one">%d episodi</item>
         <item quantity="other">%d episodis</item>
@@ -1942,6 +2013,14 @@ Language: ca
     <plurals name="minute">
         <item quantity="one">minut</item>
         <item quantity="other">minuts</item>
+    </plurals>
+    <plurals name="month_with_count">
+        <item quantity="one">%1$d mes</item>
+        <item quantity="other">%1$d mesos</item>
+    </plurals>
+    <plurals name="notification_reengage_catch_up_offline_message">
+        <item quantity="one">Tens %d episodi nou descarregat i llest per començar!</item>
+        <item quantity="other">Tens %d episodis nous descarregats i llestos per començar!</item>
     </plurals>
     <plurals name="player_up_next_header_title">
         <item quantity="one" formatted="true">%1$d episodi - queden %2$s</item>
@@ -1998,5 +2077,13 @@ Language: ca
     <plurals name="settings_auto_download_on_follow_podcast_description">
         <item quantity="one">Descarrega automàticament l\'últim episodi dels nous pòdcasts que segueixes.</item>
         <item quantity="other">Descarrega automàticament els últims %s episodis dels nous pòdcasts que segueixes.</item>
+    </plurals>
+    <plurals name="week_with_count">
+        <item quantity="one">%1$d setmana</item>
+        <item quantity="other">%1$d setmanes</item>
+    </plurals>
+    <plurals name="year_with_count">
+        <item quantity="one">%1$d any</item>
+        <item quantity="other">%1$d anys</item>
     </plurals>
 </resources>

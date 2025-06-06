@@ -1,12 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-05-22 14:10:05+0000
+Translation-Revision-Date: 2025-06-05 18:08:27+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="price_per_month_usd">\u0024%1$.2f/månad</string>
+    <string name="price_per_month">%1$.2f %2$s/månad</string>
+    <string name="notification_snack_cta">Öppna inställningar</string>
+    <string name="notification_snack_message">Tillåt aviseringar i dina enhetsinställningar</string>
+    <string name="notification_prompt_cta">Tillåt aviseringar</string>
+    <string name="notification_prompt_title">Håll dig uppdaterad!</string>
+    <string name="notification_content_recommendations_title">Nya rekommendationer för dig</string>
+    <string name="notification_content_recommendations_trending_title">Trendande denna vecka</string>
+    <string name="notification_reengage_we_miss_you_title">Vi saknar dig!</string>
+    <string name="notification_themes_title">Dags för ett nytt utseende</string>
+    <string name="notification_filters_message">Skapa smarta filter för att organisera dina avsnitt.</string>
+    <string name="notification_filters_title">Organisera dina avsnitt</string>
+    <string name="settings_notification_new_features">Nya funktioner och tips</string>
+    <string name="settings_notification_recommendations">Trendande och rekommendationer</string>
+    <string name="settings_notification_daily_reminders">Dagliga påminnelser</string>
+    <string name="bookmarks_search_results_not_found">Vi kunde inte hitta något bokmärke som matchar dina sökkriterier. Prova med ett annat nyckelord.</string>
+    <string name="podcast_no_episodes_matching">Vi kunde inte hitta något avsnitt för denna sökning. Prova med ett annat nyckelord.</string>
+    <string name="podcast_no_bookmarks_matching">Den här podcasten har inga bokmärken som matchar dina sökkriterier. Prova med ett annat nyckelord.</string>
+    <string name="podcasts_time_to_add_some_podcasts_summary">Kommer du från en annan app? Importera dina podcasts via Profil &gt; Inställningar &gt; Import och export.\n\nOm du behöver inspiration, prova fliken Upptäck.</string>
+    <string name="onboarding_upgrade_purchase_failure_message">Något gick fel. Försök igen senare.</string>
+    <string name="onboarding_upgrade_no_plans_found_body">Kontrollera din anslutning och försök igen senare.</string>
+    <string name="onboarding_upgrade_no_plans_found_title">Kunde inte ladda paket</string>
     <string name="skip_for_now">Hoppa över just nu</string>
+    <string name="similar_shows_to">Shower som liknar \"%s\"</string>
+    <string name="recommendations_because_you_like">För att du gillar</string>
     <string name="plus_week">vecka</string>
     <string name="onboarding_plus_recurring_after_intro_offer">Återkommande betalning på %1$s efter ditt första år (%2$s)</string>
     <string name="you_might_like_empty_title">Kunde inte ladda rekommendationer</string>

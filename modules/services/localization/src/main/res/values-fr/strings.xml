@@ -1,12 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-05-22 14:10:05+0000
+Translation-Revision-Date: 2025-05-27 09:54:03+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="bookmarks_search_results_not_found">Nous n’avons trouvé aucun signet correspondant à vos critères de recherche. Essayez un autre mot-clé.</string>
+    <string name="podcast_no_episodes_matching">Nous n’avons trouvé aucun épisode correspondant à cette recherche. Essayez un autre mot-clé.</string>
+    <string name="podcast_no_bookmarks_matching">Ce podcast n’a aucun signet correspondant à vos critères de recherche. Essayez un autre mot-clé.</string>
+    <string name="podcasts_time_to_add_some_podcasts_summary">Vous utilisiez une autre application auparavant ? Importez vos podcasts via Profil &gt; Réglages &gt; Importer et exporter.\n\nSi vous cherchez l’inspiration, essayez l’onglet Découvrir.</string>
+    <string name="onboarding_upgrade_purchase_failure_message">Un problème est survenu. Veuillez réessayer plus tard.</string>
+    <string name="onboarding_upgrade_no_plans_found_body">Veuillez vérifier votre connexion ou réessayer plus tard.</string>
+    <string name="onboarding_upgrade_no_plans_found_title">Impossible de charger les plans</string>
     <string name="skip_for_now">Ignorer pour le moment</string>
+    <string name="similar_shows_to">Émissions similaires à « %s »</string>
+    <string name="recommendations_because_you_like">Parce que vous aimez</string>
     <string name="plus_week">semaine</string>
     <string name="onboarding_plus_recurring_after_intro_offer">Paiement récurrent de %1$s après la première année (%2$s)</string>
     <string name="you_might_like_empty_title">Impossible de charger les recommandations</string>
