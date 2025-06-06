@@ -53,6 +53,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedNonNullVisibili
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.player.binding.setSeekBarState
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterPlayerHeaderBinding
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivity
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContract
 import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.PlayerControls
 import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.PlayerHeadingSection
@@ -421,8 +422,9 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                         }
 
                         NavigationState.ShowAddBookmark -> {
-                            viewModel.buildBookmarkArguments { arguments ->
-                                activityLauncher.launch(arguments.getIntent(requireContext()))
+                            val bookmarkArguments = viewModel.createBookmarkArguments()
+                            if (bookmarkArguments != null) {
+                                activityLauncher.launch(BookmarkActivity.launchIntent(requireContext(), bookmarkArguments))
                             }
                         }
 
