@@ -15,6 +15,11 @@ data class PodcastColors(
     )
 
     companion object {
+        val ForUserEpisode = PodcastColors(
+            background = Color(0xFF3D3D3D),
+            playerTint = Color.White,
+        )
+
         val TheDailyPreview
             get() = PodcastColors(
                 background = Color(0xFF0477C2),
