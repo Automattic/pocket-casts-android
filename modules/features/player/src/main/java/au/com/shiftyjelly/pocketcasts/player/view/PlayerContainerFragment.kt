@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.StringRes
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.compose.ui.graphics.toArgb
 import androidx.core.view.doOnLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -23,6 +24,8 @@ import androidx.viewpager2.widget.ViewPager2
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.compose.PlayerColors
+import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentPlayerContainerBinding
@@ -48,6 +51,8 @@ import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -203,8 +208,15 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
                 analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHOWN, mapOf(SOURCE_KEY to UpNextSource.PLAYER.analyticsValue))
                 openUpNext()
             }
+        }
 
-            view.setBackgroundColor(it.podcastHeader.backgroundColor)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                podcastColorsFlow().collect { podcastColors ->
+                    val playerColors = PlayerColors(theme.activeTheme, podcastColors ?: PodcastColors.ForUserEpisode)
+                    view.setBackgroundColor(playerColors.background01.toArgb())
+                }
+            }
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -336,6 +348,19 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
 
     private val isTranscriptVisible: Boolean
         get() = binding?.tabHolder?.isVisible == false
+
+    private fun podcastColorsFlow(): Flow<PodcastColors?> {
+        return combine(
+            viewModel.episodeFlow,
+            viewModel.podcastFlow,
+        ) { episode, podcast ->
+            if (episode != null) {
+                podcast?.let(::PodcastColors) ?: PodcastColors.ForUserEpisode
+            } else {
+                null
+            }
+        }
+    }
 
     companion object {
         private const val INVALID_TAB_POSITION = -1
