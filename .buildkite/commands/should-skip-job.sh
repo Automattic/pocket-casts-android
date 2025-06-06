@@ -23,7 +23,6 @@ COMMON_PATTERNS=(
   "fastlane/**"
   "Gemfile"
   "Gemfile.lock"
-  "gradle/**"
   "version.properties"
 )
 

@@ -1,6 +1,22 @@
 7.91
 -----
-
+*   New Features
+    *   Notifications Revamp
+        ([#4073](https://github.com/Automattic/pocket-casts-android/pull/4073))
+*   Updates
+    *   Upgrade to the latest version of Jetpack Compose
+        ([#4049](https://github.com/Automattic/pocket-casts-android/pull/4049))
+    *   Improve accessibility of the follow button in some of the Discover sections
+        ([#4050](https://github.com/Automattic/pocket-casts-android/pull/4050))
+    *   Make full screen Player less sensitive to the hide fling gesture
+        ([#4052](https://github.com/Automattic/pocket-casts-android/pull/4052))
+    *   Lock general UI to portrait mode on regular phone devices
+        ([#4083](https://github.com/Automattic/pocket-casts-android/pull/4083))
+*   Bug Fixes
+    *   Fix bottom sheet animation used by Up Next and other screens
+        ([#4051](https://github.com/Automattic/pocket-casts-android/pull/4051))
+    *   Fix duration render issue on podcasts without `<itunes:duration>` tag
+        ([#4077](https://github.com/Automattic/pocket-casts-android/pull/4077))
 
 7.90
 -----

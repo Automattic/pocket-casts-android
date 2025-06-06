@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.net.Uri
@@ -53,32 +54,48 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.databinding.ActivityMainBinding
 import au.com.shiftyjelly.pocketcasts.deeplink.AddBookmarkDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.AppOpenDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.AssistantDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ChangeBookmarkTitleDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.CloudFilesDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.CreateAccountDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_PAGE
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLinkFactory
 import au.com.shiftyjelly.pocketcasts.deeplink.DeleteBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.DownloadsDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.ImportDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.NativeShareDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.OpmlImportDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.PlayFromSearchDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.PocketCastsWebsiteGetDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.PromoCodeDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.RecommendationsDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ReferralsDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShareListDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowDiscoverDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowEpisodeDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowFilterDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.ShowFiltersDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowPodcastDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowPodcastFromUrlDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowPodcastsDeepLink
-import au.com.shiftyjelly.pocketcasts.deeplink.ShowUpNextDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.ShowUpNextModalDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.ShowUpNextTabDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.SignInDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.SmartFoldersDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.SonosDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.StaffPicksDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.ThemesDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.TrendingDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.UpgradeAccountDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.UpsellDeepLink
+import au.com.shiftyjelly.pocketcasts.discover.util.DiscoverDeepLinkManager
+import au.com.shiftyjelly.pocketcasts.discover.util.DiscoverDeepLinkManager.Companion.RECOMMENDATIONS_USER
+import au.com.shiftyjelly.pocketcasts.discover.util.DiscoverDeepLinkManager.Companion.STAFF_PICKS_LIST_ID
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment
+import au.com.shiftyjelly.pocketcasts.discover.view.PodcastGridListFragment
+import au.com.shiftyjelly.pocketcasts.discover.view.PodcastListFragment
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesActivity
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesActivity.StoriesSource
 import au.com.shiftyjelly.pocketcasts.endofyear.ui.EndOfYearLaunchBottomSheet
@@ -102,6 +119,7 @@ import au.com.shiftyjelly.pocketcasts.player.view.dialog.MiniPlayerDialog
 import au.com.shiftyjelly.pocketcasts.player.view.video.VideoActivity
 import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFragment
+import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.SuggestedFoldersFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcasts.PodcastsFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.share.ShareListIncomingFragment
@@ -133,6 +151,10 @@ import au.com.shiftyjelly.pocketcasts.search.SearchFragment
 import au.com.shiftyjelly.pocketcasts.servers.ServerCallback
 import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.discover.PodcastSearch
+import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList.Companion.TRENDING
+import au.com.shiftyjelly.pocketcasts.settings.AppearanceSettingsFragment
+import au.com.shiftyjelly.pocketcasts.settings.ExportSettingsFragment
+import au.com.shiftyjelly.pocketcasts.settings.SettingsFragment
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
@@ -156,6 +178,7 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.showAllowingStateLoss
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.TopScrollable
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
+import au.com.shiftyjelly.pocketcasts.views.helper.OffsettingBottomSheetCallback
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
 import com.automattic.android.tracks.crashlogging.CrashLogging
@@ -204,6 +227,7 @@ class MainActivity :
     companion object {
         private const val INITIAL_KEY = "initial"
         private const val SOURCE_KEY = "source"
+
         init {
             AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
         }
@@ -211,40 +235,60 @@ class MainActivity :
         const val PROMOCODE_REQUEST_CODE = 2
     }
 
-    @Inject lateinit var playbackManager: PlaybackManager
+    @Inject
+    lateinit var playbackManager: PlaybackManager
 
-    @Inject lateinit var podcastManager: PodcastManager
+    @Inject
+    lateinit var podcastManager: PodcastManager
 
-    @Inject lateinit var playlistManager: PlaylistManager
+    @Inject
+    lateinit var playlistManager: PlaylistManager
 
-    @Inject lateinit var episodeManager: EpisodeManager
+    @Inject
+    lateinit var episodeManager: EpisodeManager
 
-    @Inject lateinit var serviceManager: ServiceManager
+    @Inject
+    lateinit var serviceManager: ServiceManager
 
-    @Inject lateinit var theme: Theme
+    @Inject
+    lateinit var theme: Theme
 
-    @Inject lateinit var settings: Settings
+    @Inject
+    lateinit var settings: Settings
 
-    @Inject lateinit var userEpisodeManager: UserEpisodeManager
+    @Inject
+    lateinit var userEpisodeManager: UserEpisodeManager
 
-    @Inject lateinit var warningsHelper: WarningsHelper
+    @Inject
+    lateinit var warningsHelper: WarningsHelper
 
-    @Inject lateinit var analyticsTracker: AnalyticsTracker
+    @Inject
+    lateinit var analyticsTracker: AnalyticsTracker
 
-    @Inject lateinit var episodeAnalytics: EpisodeAnalytics
+    @Inject
+    lateinit var episodeAnalytics: EpisodeAnalytics
 
-    @Inject lateinit var syncManager: SyncManager
+    @Inject
+    lateinit var syncManager: SyncManager
 
-    @Inject lateinit var watchSync: WatchSync
+    @Inject
+    lateinit var watchSync: WatchSync
 
-    @Inject lateinit var notificationHelper: NotificationHelper
+    @Inject
+    lateinit var notificationHelper: NotificationHelper
 
-    @Inject @ApplicationScope
+    @Inject
+    lateinit var discoverDeepLinkManager: DiscoverDeepLinkManager
+
+    @Inject
+    @ApplicationScope
     lateinit var applicationScope: CoroutineScope
 
-    @Inject lateinit var crashLogging: CrashLogging
+    @Inject
+    lateinit var crashLogging: CrashLogging
 
-    @Inject lateinit var paymentClient: PaymentClient
+    @Inject
+    lateinit var paymentClient: PaymentClient
 
     private val viewModel: MainActivityViewModel by viewModels()
     private val disposables = CompositeDisposable()
@@ -284,17 +328,21 @@ class MainActivity :
             is OnboardingFinish.Done -> {
                 settings.setHasDoneInitialOnboarding()
             }
+
             is OnboardingFinish.DoneGoToDiscover -> {
                 settings.setHasDoneInitialOnboarding()
                 openTab(VR.id.navigation_discover)
             }
+
             is OnboardingFinish.DoneShowPlusPromotion -> {
                 settings.setHasDoneInitialOnboarding()
                 OnboardingLauncher.openOnboardingFlow(this, OnboardingFlow.Upsell(OnboardingUpgradeSource.LOGIN_PLUS_PROMOTION))
             }
+
             is OnboardingFinish.DoneShowWelcomeInReferralFlow -> {
                 settings.showReferralWelcome.set(true, updateModifiedAt = false)
             }
+
             is OnboardingFinish.DoneApplySuggestedFolders, null -> {
                 Timber.e("Unexpected result $result from onboarding activity")
             }
@@ -322,6 +370,7 @@ class MainActivity :
                 ) == PackageManager.PERMISSION_GRANTED -> {
                     onPermissionGranted()
                 }
+
                 shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) -> {
                     if (settings.isNotificationsDisabledMessageShown()) return
                     Snackbar.make(
@@ -341,6 +390,7 @@ class MainActivity :
                     }.show()
                     settings.setNotificationsDisabledMessageShown(true)
                 }
+
                 else -> {
                     notificationPermissionLauncher.launch(
                         Manifest.permission.POST_NOTIFICATIONS,
@@ -356,6 +406,7 @@ class MainActivity :
         WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
         theme.setupThemeForConfig(this, resources.configuration)
+        requestPortraitOrientation()
         enableEdgeToEdge(navigationBarStyle = theme.getNavigationBarStyle(this))
         bottomSheetTag = savedInstanceState?.getString(SAVEDSTATE_BOTTOM_SHEET_TAG)
 
@@ -449,6 +500,8 @@ class MainActivity :
         setupPlayerViews(
             animateMiniPlayer = savedInstanceState == null,
         )
+
+        setupBottomSheetTranslation()
 
         if (savedInstanceState == null) {
             trackTabOpened(selectedTab, isInitial = true)
@@ -937,6 +990,7 @@ class MainActivity :
                                 autoPlay = false,
                             )
                         }
+
                         is NavigationState.BookmarksForUserEpisode -> {
                             // Bookmarks container is directly shown for user episode
                             val fragment = BookmarksContainerFragment.newInstance(navigationState.episode.uuid, SourceView.NOTIFICATION_BOOKMARK)
@@ -979,6 +1033,10 @@ class MainActivity :
                 }
             }
         })
+    }
+
+    private fun setupBottomSheetTranslation() {
+        frameBottomSheetBehavior.addBottomSheetCallback(OffsettingBottomSheetCallback(binding.frameBottomSheet))
     }
 
     override fun whatsNewDismissed(fromConfirmAction: Boolean) {
@@ -1036,7 +1094,7 @@ class MainActivity :
         settings.updateBottomInset(miniPlayerHeight)
 
         // Handle up next shortcut
-        if (intent.getStringExtra(EXTRA_PAGE) == ShowUpNextDeepLink.pageId) {
+        if (intent.getStringExtra(EXTRA_PAGE) == ShowUpNextModalDeepLink.pageId) {
             intent.removeExtra(EXTRA_PAGE)
             binding.playerBottomSheet.openPlayer()
             showUpNextFragment(UpNextSource.UP_NEXT_SHORTCUT)
@@ -1272,31 +1330,40 @@ class MainActivity :
             val safeUri = intent.data?.buildUpon()?.clearQuery()?.build() // Remove query parameters from logging
             LogBuffer.i("DeepLink", "Opening deep link: $intent. Safe URI: $safeUri")
             when (val deepLink = deepLinkFactory.create(intent)) {
+                is AppOpenDeepLink -> {
+                    closeToRoot()
+                }
                 is DownloadsDeepLink -> {
                     closeToRoot()
                     addFragment(ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.Downloaded))
                 }
+
                 is AddBookmarkDeepLink -> {
                     viewModel.buildBookmarkArguments { args ->
                         bookmarkActivityLauncher.launch(args.getIntent(this))
                     }
                 }
+
                 is ChangeBookmarkTitleDeepLink -> {
                     viewModel.buildBookmarkArguments(deepLink.bookmarkUuid) { args ->
                         bookmarkActivityLauncher.launch(args.getIntent(this))
                     }
                     notificationHelper.removeNotification(intent.extras, Settings.NotificationId.BOOKMARK.value)
                 }
+
                 is ShowBookmarkDeepLink -> {
                     viewModel.viewBookmark(deepLink.bookmarkUuid)
                 }
+
                 is DeleteBookmarkDeepLink -> {
                     viewModel.deleteBookmark(deepLink.bookmarkUuid)
                     notificationHelper.removeNotification(intent.extras, Settings.NotificationId.BOOKMARK.value)
                 }
+
                 is ShowPodcastDeepLink -> {
                     openPodcastPage(deepLink.podcastUuid, deepLink.sourceView)
                 }
+
                 is ShowEpisodeDeepLink -> {
                     openEpisodeDialog(
                         episodeUuid = deepLink.episodeUuid,
@@ -1314,8 +1381,12 @@ class MainActivity :
                 is ShowDiscoverDeepLink -> {
                     openTab(VR.id.navigation_discover)
                 }
-                is ShowUpNextDeepLink -> {
+                is ShowUpNextModalDeepLink -> {
                     // Do nothig, handled in onMiniPlayerVisible()
+                }
+                is ShowUpNextTabDeepLink -> {
+                    closePlayer()
+                    openTab(VR.id.navigation_upnext)
                 }
                 is ShowFilterDeepLink -> {
                     launch(Dispatchers.Default) {
@@ -1329,6 +1400,13 @@ class MainActivity :
                             }
                         }
                     }
+                }
+                is CreateAccountDeepLink -> {
+                    openOnboardingFlow(OnboardingFlow.LoggedOut)
+                }
+                is ShowFiltersDeepLink -> {
+                    closePlayer()
+                    openTab(VR.id.navigation_filters)
                 }
                 is PocketCastsWebsiteGetDeepLink -> {
                     // Do nothing when the user goes to https://pocketcasts.com/get it should either open the play store or the user's app
@@ -1351,6 +1429,15 @@ class MainActivity :
                 is CloudFilesDeepLink -> {
                     openCloudFiles()
                 }
+                is UpsellDeepLink -> {
+                    openOnboardingFlow(OnboardingFlow.Upsell(OnboardingUpgradeSource.DEEP_LINK))
+                }
+                is SmartFoldersDeepLink -> {
+                    if (supportFragmentManager.findFragmentByTag("suggested_folders") == null) {
+                        SuggestedFoldersFragment.newInstance(SuggestedFoldersFragment.Source.DEEPLINK).showNow(supportFragmentManager, "suggested_folders")
+                    }
+                    openTab(VR.id.navigation_podcasts)
+                }
                 is UpgradeAccountDeepLink -> {
                     showAccountUpgradeNowDialog(shouldClose = true)
                 }
@@ -1362,6 +1449,27 @@ class MainActivity :
                 }
                 is OpmlImportDeepLink -> {
                     OpmlImportTask.run(deepLink.uri, this)
+                }
+                is ImportDeepLink -> {
+                    openImport()
+                }
+                is StaffPicksDeepLink -> {
+                    val podcastListFragment = supportFragmentManager.fragments.find { it is PodcastGridListFragment } as? PodcastGridListFragment
+                    if (podcastListFragment?.listUuid != STAFF_PICKS_LIST_ID) {
+                        openDiscoverListDeeplink(STAFF_PICKS_LIST_ID)
+                    }
+                }
+                is TrendingDeepLink -> {
+                    val podcastListFragment = supportFragmentManager.fragments.find { it is PodcastGridListFragment } as? PodcastGridListFragment
+                    if (podcastListFragment?.inferredId != TRENDING) {
+                        openDiscoverListDeeplink(TRENDING)
+                    }
+                }
+                is RecommendationsDeepLink -> {
+                    val podcastListFragment = supportFragmentManager.fragments.find { it is PodcastGridListFragment } as? PodcastGridListFragment
+                    if (podcastListFragment?.inferredId != RECOMMENDATIONS_USER) {
+                        openDiscoverListDeeplink(RECOMMENDATIONS_USER)
+                    }
                 }
                 is PlayFromSearchDeepLink -> {
                     playbackManager.mediaSessionManager.playFromSearchExternal(deepLink.query)
@@ -1377,6 +1485,9 @@ class MainActivity :
                     }
                     openOnboardingFlow(onboardingFlow)
                 }
+                is ThemesDeepLink -> {
+                    addFragment(AppearanceSettingsFragment.newInstance())
+                }
                 null -> {
                     LogBuffer.i("DeepLink", "Did not find any matching deep link for: $intent")
                 }
@@ -1384,6 +1495,15 @@ class MainActivity :
         } catch (e: Exception) {
             Timber.e(e)
             crashLogging.sendReport(e)
+        }
+    }
+
+    private fun openDiscoverListDeeplink(listId: String) {
+        openTab(VR.id.navigation_discover)
+        lifecycleScope.launch {
+            val discoverList = discoverDeepLinkManager.getDiscoverList(listId, resources) ?: return@launch
+            val fragment = PodcastListFragment.newInstance(discoverList)
+            addFragment(fragment)
         }
     }
 
@@ -1439,6 +1559,7 @@ class MainActivity :
                 is UserEpisode -> {
                     CloudFileBottomSheetFragment.newInstance(localEpisode.uuid, forceDark = true, source)
                 }
+
                 is PodcastEpisode -> {
                     EpisodeContainerFragment.newInstance(
                         episodeUuid = localEpisode.uuid,
@@ -1449,6 +1570,7 @@ class MainActivity :
                         autoPlay = autoPlay,
                     )
                 }
+
                 null -> {
                     val dialog = android.app.ProgressDialog.show(this@MainActivity, getString(LR.string.loading), getString(LR.string.please_wait), true)
                     val searchResult = serviceManager.getSharedItemDetailsSuspend("/social/share/show/$episodeUuid")
@@ -1646,5 +1768,19 @@ class MainActivity :
             .setBackgroundTint(ThemeColor.primaryUi01(Theme.ThemeType.DARK))
             .setTextColor(ThemeColor.primaryText01(Theme.ThemeType.DARK))
             .show()
+    }
+
+    private fun openImport() {
+        closePlayer()
+        openTab(VR.id.navigation_profile)
+        addFragment(SettingsFragment())
+        addFragment(ExportSettingsFragment())
+    }
+
+    @SuppressLint("SourceLockedOrientationActivity")
+    private fun requestPortraitOrientation() {
+        if (resources.getBoolean(R.bool.force_portrait_orientation)) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT)
+        }
     }
 }

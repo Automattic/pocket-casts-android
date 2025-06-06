@@ -1,7 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.servers.interceptors
 
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import java.net.HttpURLConnection
 import okhttp3.Credentials
 import okhttp3.Interceptor
@@ -12,7 +10,7 @@ internal class BasicAuthInterceptor : Interceptor {
         val originalRequest = chain.request()
         val response = chain.proceed(originalRequest)
 
-        if (!FeatureFlag.isEnabled(Feature.BASIC_AUTHENTICATION) || response.code != HttpURLConnection.HTTP_UNAUTHORIZED) {
+        if (response.code != HttpURLConnection.HTTP_UNAUTHORIZED) {
             return response
         }
 

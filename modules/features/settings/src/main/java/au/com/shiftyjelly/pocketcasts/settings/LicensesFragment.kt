@@ -18,13 +18,13 @@ import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import com.mikepenz.aboutlibraries.Libs
 import com.mikepenz.aboutlibraries.ui.compose.LibrariesContainer
 import com.mikepenz.aboutlibraries.ui.compose.LibraryDefaults
+import com.mikepenz.aboutlibraries.ui.compose.android.rememberLibraries
 import com.mikepenz.aboutlibraries.ui.compose.libraryColors
 import com.mikepenz.aboutlibraries.ui.compose.util.author
 import com.mikepenz.aboutlibraries.util.withContext
@@ -32,6 +32,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
 class LicensesFragment : BaseFragment() {
@@ -68,7 +69,7 @@ class LicensesFragment : BaseFragment() {
     private fun LicensesPage(onBackPressed: () -> Unit, modifier: Modifier = Modifier) {
         Column {
             ThemedTopAppBar(
-                title = stringResource(R.string.settings_about_acknowledgements),
+                title = stringResource(LR.string.settings_about_acknowledgements),
                 onNavigationClick = onBackPressed,
             )
             LibrariesContainer(
@@ -77,16 +78,15 @@ class LicensesFragment : BaseFragment() {
                 showVersion = false,
                 showLicenseBadges = true,
                 colors = LibraryDefaults.libraryColors(
-                    backgroundColor = MaterialTheme.colors.background,
                     contentColor = MaterialTheme.theme.colors.primaryText01,
                 ),
-                librariesBlock = { context ->
-                    val libs = Libs.Builder().withContext(context).build()
+                libraries = rememberLibraries {
+                    val libs = Libs.Builder().withContext(requireContext()).build()
                     // without displaying the artifact id the libraries seem to appear twice
                     libs.copy(
                         libs.libraries.distinctBy { "${it.name}##${it.author}" }.toImmutableList(),
                     )
-                },
+                }.value,
             )
         }
     }

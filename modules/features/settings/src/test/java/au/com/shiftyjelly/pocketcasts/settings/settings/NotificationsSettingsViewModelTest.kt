@@ -4,6 +4,8 @@ import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationScheduler
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.settings.notifications.NotificationsSettingsViewModel
 import au.com.shiftyjelly.pocketcasts.settings.notifications.data.NotificationsPreferenceRepository
@@ -39,10 +41,19 @@ internal class NotificationsSettingsViewModelTest {
     @Mock
     private lateinit var podcastManager: PodcastManager
 
+    @Mock
+    private lateinit var notificationScheduler: NotificationScheduler
+
+    @Mock
+    private lateinit var notificationHelper: NotificationHelper
+
     @Before
     fun setup() {
         repository.stub {
             onBlocking { getPreferenceCategories() }.doReturn(categories)
+        }
+        notificationHelper.stub {
+            onBlocking { hasNotificationsPermission() }.doReturn(false)
         }
     }
 
@@ -87,10 +98,63 @@ internal class NotificationsSettingsViewModelTest {
         verify(repository).setPreference(changedPreference)
     }
 
+    @Test
+    fun `GIVEN disabled recommendations WHEN recommendations are enabled THEN scheduling notifications`() = runTest {
+        val viewModel = createViewModel()
+        val preference = NotificationPreferenceType.EnableRecommendations(title = TextResource.fromText(""), isEnabled = true)
+
+        viewModel.onPreferenceChanged(preference)
+
+        verify(notificationScheduler).setupTrendingAndRecommendationsNotifications()
+    }
+
+    @Test
+    fun `GIVEN enabled recommendations WHEN recommendations are enabled THEN cancelling scheduled notifications`() = runTest {
+        val viewModel = createViewModel()
+        val preference = NotificationPreferenceType.EnableRecommendations(title = TextResource.fromText(""), isEnabled = false)
+
+        viewModel.onPreferenceChanged(preference)
+
+        verify(notificationScheduler).cancelScheduledTrendingAndRecommendationsNotifications()
+    }
+
+    @Test
+    fun `GIVEN notifications disabled WHEN initializing viewmodel THEN state reflects it`() = runTest {
+        val viewModel = createViewModel()
+
+        assertEquals(viewModel.state.value.areSystemNotificationsEnabled, false)
+    }
+
+    @Test
+    fun `GIVEN notifications enabled WHEN initializing viewmodel THEN state reflects it`() = runTest {
+        notificationHelper.stub {
+            onBlocking { hasNotificationsPermission() }.doReturn(true)
+        }
+
+        val viewModel = createViewModel()
+
+        assertEquals(viewModel.state.value.areSystemNotificationsEnabled, true)
+    }
+
+    @Test
+    fun `GIVEN notification setting changes WHEN viewmodel resumes THEN state updates`() = runTest {
+        val viewModel = createViewModel()
+        assertEquals(viewModel.state.value.areSystemNotificationsEnabled, false)
+
+        notificationHelper.stub {
+            onBlocking { hasNotificationsPermission() }.doReturn(true)
+        }
+        viewModel.checkNotificationPermission()
+
+        assertEquals(viewModel.state.value.areSystemNotificationsEnabled, true)
+    }
+
     private fun createViewModel() = NotificationsSettingsViewModel(
         preferenceRepository = repository,
         analyticsTracker = analytics,
         podcastManager = podcastManager,
+        notificationScheduler = notificationScheduler,
+        notificationHelper = notificationHelper,
     )
 
     private companion object {

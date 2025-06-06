@@ -43,6 +43,8 @@ class DeepLinkFactory(
         ShowPodcastAdapter(),
         ShowEpisodeAdapter(),
         ShowPageAdapter(),
+        ShowFiltersAdapter(),
+        UpNextAdapter(),
         PocketCastsWebsiteGetAdapter(webBaseHost),
         ReferralsAdapter(webBaseHost),
         PodloveAdapter(),
@@ -52,16 +54,23 @@ class DeepLinkFactory(
         SubscribeOnAndroidAdapter(),
         AppleAdapter(),
         CloudFilesAdapter(),
+        UpsellAdapter(),
         UpgradeAccountAdapter(),
+        FeaturesAdapter(),
         PromoCodeAdapter(),
         ShareLinkNativeAdapter(),
         SignInAdapter(shareHost),
         ShareLinkAdapter(shareHost),
         WebPlayerShareLinkAdapter(webBaseHost = webBaseHost, webPlayerHost = webPlayerHost),
         OpmlAdapter(listOf(listHost, shareHost)),
+        ImportAdapter(),
+        DiscoverAdapter(),
         PodcastUrlSchemeAdapter(listOf(listHost, shareHost, webBaseHost)),
         PlayFromSearchAdapter(),
         AssistantAdapter(),
+        ThemesAdapter(),
+        AppOpenAdapter(),
+        CreateAccountAdapter(),
     )
 
     fun create(intent: Intent): DeepLink? {
@@ -94,10 +103,20 @@ private interface DeepLinkAdapter {
 }
 
 private class DownloadsAdapter : DeepLinkAdapter {
-    override fun create(intent: Intent) = if (intent.action == ACTION_OPEN_DOWNLOADS) {
-        DownloadsDeepLink
-    } else {
-        null
+    override fun create(intent: Intent): DeepLink? {
+        return when {
+            isUriMatch(intent) -> DownloadsDeepLink
+            intent.action == ACTION_OPEN_DOWNLOADS -> DownloadsDeepLink
+            else -> null
+        }
+    }
+
+    private fun isUriMatch(intent: Intent): Boolean {
+        val uri = intent.data ?: return false
+        return intent.action == ACTION_VIEW &&
+            uri.scheme == "pktc" &&
+            uri.host == "profile" &&
+            uri.path == "/downloads"
     }
 }
 
@@ -171,12 +190,54 @@ private class ShowPageAdapter : DeepLinkAdapter {
         when (intent.getStringExtra(EXTRA_PAGE)) {
             "podcasts" -> ShowPodcastsDeepLink
             "search" -> ShowDiscoverDeepLink
-            "upnext" -> ShowUpNextDeepLink
+            "upnext" -> ShowUpNextModalDeepLink
             "playlist" -> ShowFilterDeepLink(filterId = intent.getLongExtra(EXTRA_FILTER_ID, -1))
             else -> null
         }
     } else {
         null
+    }
+}
+
+private class ShowFiltersAdapter : DeepLinkAdapter {
+    override fun create(intent: Intent): DeepLink? {
+        val uriData = intent.data
+        val scheme = uriData?.scheme
+        val host = uriData?.host
+
+        return if (intent.action == ACTION_VIEW && scheme == "pktc" && host == "filters") {
+            ShowFiltersDeepLink
+        } else {
+            null
+        }
+    }
+}
+
+private class CreateAccountAdapter : DeepLinkAdapter {
+    override fun create(intent: Intent): DeepLink? {
+        val uriData = intent.data
+        val scheme = uriData?.scheme
+        val host = uriData?.host
+
+        return if (intent.action == ACTION_VIEW && scheme == "pktc" && host == "signup") {
+            CreateAccountDeepLink
+        } else {
+            null
+        }
+    }
+}
+
+private class UpNextAdapter : DeepLinkAdapter {
+    override fun create(intent: Intent): DeepLink? {
+        val uriData = intent.data ?: return null
+        val scheme = uriData.scheme
+        val host = uriData.host
+        val location = uriData.getQueryParameter("location")
+
+        if (intent.action == ACTION_VIEW && scheme == "pktc" && host == "upnext" && location == "tab") {
+            return ShowUpNextTabDeepLink
+        }
+        return null
     }
 }
 
@@ -328,6 +389,20 @@ private class CloudFilesAdapter : DeepLinkAdapter {
     }
 }
 
+private class UpsellAdapter : DeepLinkAdapter {
+    override fun create(intent: Intent): DeepLink? {
+        val uriData = intent.data
+        val scheme = uriData?.scheme
+        val host = uriData?.host
+
+        return if (intent.action == ACTION_VIEW && scheme == "pktc" && host == "upsell") {
+            UpsellDeepLink
+        } else {
+            null
+        }
+    }
+}
+
 private class UpgradeAccountAdapter : DeepLinkAdapter {
     override fun create(intent: Intent): DeepLink? {
         val uriData = intent.data
@@ -336,6 +411,23 @@ private class UpgradeAccountAdapter : DeepLinkAdapter {
 
         return if (intent.action == ACTION_VIEW && scheme == "pktc" && host == "upgrade") {
             UpgradeAccountDeepLink
+        } else {
+            null
+        }
+    }
+}
+
+private class FeaturesAdapter : DeepLinkAdapter {
+    override fun create(intent: Intent): DeepLink? {
+        val uriData = intent.data
+        val scheme = uriData?.scheme
+        val host = uriData?.host
+
+        return if (intent.action == ACTION_VIEW && scheme == "pktc" && host == "features") {
+            when (val path = uriData.pathSegments.firstOrNull()) {
+                "suggestedFolders" -> SmartFoldersDeepLink
+                else -> null
+            }
         } else {
             null
         }
@@ -386,6 +478,9 @@ private class ShareLinkNativeAdapter : DeepLinkAdapter {
             "cloudfiles",
             "upgrade",
             "redeem",
+            "settings",
+            "discover",
+            "features",
         )
     }
 }
@@ -506,9 +601,67 @@ private class OpmlAdapter(
             "cloudfiles",
             "upgrade",
             "redeem",
+            "settings",
             "subscribeonandroid.com",
             "www.subscribeonandroid.com",
+            "discover",
+            "open",
+            "signup",
+            "features",
         )
+    }
+}
+
+private class ImportAdapter : DeepLinkAdapter {
+    override fun create(intent: Intent): DeepLink? {
+        val uriData = intent.data ?: return null
+        val scheme = uriData.scheme
+        val host = uriData.host
+        val path = uriData.path
+
+        return if (intent.action == ACTION_VIEW && scheme == "pktc" && host == "settings" && path == "/import") {
+            ImportDeepLink
+        } else {
+            null
+        }
+    }
+}
+
+private class AppOpenAdapter : DeepLinkAdapter {
+    override fun create(intent: Intent): DeepLink? {
+        val uriData = intent.data ?: return null
+        val scheme = uriData.scheme
+        val host = uriData.host
+
+        return if (intent.action == ACTION_VIEW && scheme == "pktc" && host == "open") {
+            AppOpenDeepLink
+        } else {
+            null
+        }
+    }
+}
+
+private class DiscoverAdapter : DeepLinkAdapter {
+    override fun create(intent: Intent): DeepLink? {
+        val uriData = intent.data ?: return null
+        val scheme = uriData.scheme
+        val host = uriData.host
+        val path = uriData.path
+
+        return if (intent.action == ACTION_VIEW && scheme == "pktc" && host == "discover") {
+            when (path) {
+                "/staffpicks" -> {
+                    StaffPicksDeepLink
+                }
+                "/trending" -> {
+                    TrendingDeepLink
+                }
+                "/recommendations" -> {
+                    RecommendationsDeepLink
+                }
+                else -> { null }
+            }
+        } else { null }
     }
 }
 
@@ -579,6 +732,21 @@ private class SignInAdapter(
 
         return if (intent.action == ACTION_VIEW && scheme in listOf("http", "https") && host == webBaseHost && path == "/sign-in") {
             SignInDeepLink(source)
+        } else {
+            null
+        }
+    }
+}
+
+private class ThemesAdapter : DeepLinkAdapter {
+    override fun create(intent: Intent): DeepLink? {
+        val uriData = intent.data ?: return null
+        val scheme = uriData.scheme
+        val host = uriData.host
+        val path = uriData.path
+
+        return if (intent.action == ACTION_VIEW && scheme == "pktc" && host == "settings" && path == "/themes") {
+            ThemesDeepLink
         } else {
             null
         }

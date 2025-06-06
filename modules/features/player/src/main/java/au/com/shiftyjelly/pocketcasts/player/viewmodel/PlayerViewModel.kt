@@ -28,7 +28,6 @@ import au.com.shiftyjelly.pocketcasts.player.view.dialog.ClearUpNextDialog
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
-import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -40,7 +39,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -76,7 +74,6 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 class PlayerViewModel @Inject constructor(
     private val playbackManager: PlaybackManager,
     private val episodeManager: EpisodeManager,
-    private val userEpisodeManager: UserEpisodeManager,
     private val podcastManager: PodcastManager,
     private val bookmarkManager: BookmarkManager,
     private val downloadManager: DownloadManager,
@@ -86,7 +83,6 @@ class PlayerViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTracker,
     private val episodeAnalytics: EpisodeAnalytics,
     @ApplicationContext private val context: Context,
-    @ApplicationScope private val applicationScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel(), CoroutineScope {
 
@@ -288,6 +284,7 @@ class PlayerViewModel @Inject constructor(
         get() {
             return settings.getSleepTimerCustomMins()
         }
+    val playerFlow = playbackManager.playerFlow
 
     fun setSleepEndOfChapters(chapters: Int = 1, shouldCallUpdateTimer: Boolean = true) {
         val newValue = chapters.coerceIn(1, 240)

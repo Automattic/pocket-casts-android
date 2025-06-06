@@ -30,8 +30,6 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.AdvancedSettingsViewModel
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 /**
@@ -99,9 +97,7 @@ fun AdvancedSettingsView(
                     heading = stringResource(LR.string.settings_advanced_heading_playback),
                     indent = false,
                 ) {
-                    if (FeatureFlag.isEnabled(Feature.CACHE_ENTIRE_PLAYING_EPISODE)) {
-                        CacheEntirePlayingEpisodeRow(state.cacheEntirePlayingEpisodeState)
-                    }
+                    CacheEntirePlayingEpisodeRow(state.cacheEntirePlayingEpisodeState)
                     PrioritizeSeekAccuracydRow(state.prioritizeSeekAccuracyState)
                 }
             }

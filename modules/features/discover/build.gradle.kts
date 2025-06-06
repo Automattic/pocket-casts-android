@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.compose.compiler)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
 }
@@ -10,7 +11,7 @@ android {
     buildFeatures {
         buildConfig = true
         viewBinding = true
-        compose = false
+        compose = true
     }
 }
 
@@ -42,6 +43,8 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.preference.ktx)
     implementation(libs.coil)
+    implementation(libs.compose.ui)
+    implementation(libs.compose.ui.tooling)
     implementation(libs.coroutines.core)
     implementation(libs.coroutines.rx2)
     implementation(libs.fragment.ktx)
@@ -52,6 +55,7 @@ dependencies {
     implementation(libs.rx2.relay)
     implementation(libs.timber)
 
+    implementation(projects.modules.services.compose)
     implementation(projects.modules.features.podcasts)
     implementation(projects.modules.features.search)
     implementation(projects.modules.services.images)
@@ -65,4 +69,6 @@ dependencies {
     testImplementation(libs.okhttp)
     testImplementation(libs.retrofit)
     testImplementation(libs.retrofit.moshi)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(projects.modules.services.sharedtest)
 }

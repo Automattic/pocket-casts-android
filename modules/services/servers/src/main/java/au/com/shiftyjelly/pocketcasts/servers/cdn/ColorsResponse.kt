@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.servers.cdn
 
 import android.graphics.Color
+import androidx.core.graphics.toColorInt
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
@@ -12,22 +13,14 @@ data class ColorsResponse(
     fun toArtworkColors(): ArtworkColors {
         return ArtworkColors(
             background = parseColor(colors?.background),
-            tintForLightBg = resetDefaultTint(parseColor(colors?.tintForLightBg), isTintLightColor = true),
-            tintForDarkBg = resetDefaultTint(parseColor(colors?.tintForDarkBg), isTintLightColor = false),
+            tintForLightBg = parseColor(colors?.tintForLightBg),
+            tintForDarkBg = parseColor(colors?.tintForDarkBg),
             timeDownloadedMs = System.currentTimeMillis(),
         )
     }
 
     private fun parseColor(colorString: String?): Int {
-        return if (colorString.isNullOrEmpty()) 0 else Color.parseColor(colorString)
-    }
-
-    private fun resetDefaultTint(color: Int, isTintLightColor: Boolean): Int {
-        return if (isTintLightColor) {
-            if (color == DEFAULT_SERVER_LIGHT_TINT_COLOR) DEFAULT_LIGHT_TINT_COLOR else color
-        } else {
-            if (color == DEFAULT_SERVER_DARK_TINT_COLOR) DEFAULT_DARK_TINT_COLOR else color
-        }
+        return if (colorString.isNullOrEmpty()) Color.BLACK else colorString.toColorInt()
     }
 }
 
@@ -37,9 +30,3 @@ data class Colors(
     @field:Json(name = "tintForDarkBg") val tintForDarkBg: String,
     @field:Json(name = "tintForLightBg") val tintForLightBg: String,
 )
-
-const val DEFAULT_LIGHT_TINT_COLOR = 0xFF1E1F1E.toInt()
-const val DEFAULT_DARK_TINT_COLOR = 0xFFFFFFFF.toInt()
-
-const val DEFAULT_SERVER_LIGHT_TINT_COLOR = 0xFFF44336.toInt()
-const val DEFAULT_SERVER_DARK_TINT_COLOR = 0xFFC62828.toInt()

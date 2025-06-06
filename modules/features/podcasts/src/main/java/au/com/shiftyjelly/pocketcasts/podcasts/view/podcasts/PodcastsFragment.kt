@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.podcasts
 
+import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Rect
 import android.os.Bundle
@@ -11,15 +12,19 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.Toolbar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -29,19 +34,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.invisibleToUser
+import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -51,6 +59,9 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
+import au.com.shiftyjelly.pocketcasts.compose.ad.AdBanner
+import au.com.shiftyjelly.pocketcasts.compose.ad.BlazeAd
+import au.com.shiftyjelly.pocketcasts.compose.ad.rememberAdColors
 import au.com.shiftyjelly.pocketcasts.compose.components.NoContentBanner
 import au.com.shiftyjelly.pocketcasts.compose.components.TipPosition
 import au.com.shiftyjelly.pocketcasts.compose.components.Tooltip
@@ -65,6 +76,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.FolderCreateSharedVi
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.FolderEditFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.FolderEditPodcastsFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.SuggestedFoldersFragment
+import au.com.shiftyjelly.pocketcasts.podcasts.view.notifications.EnableNotificationsPromptFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastsViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -78,6 +90,7 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.hideShadow
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.adapter.PodcastTouchCallback
 import au.com.shiftyjelly.pocketcasts.views.extensions.quickScrollToTop
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -89,6 +102,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -128,7 +142,9 @@ class PodcastsFragment :
 
     private var podcastOptionsDialog: PodcastsOptionsDialog? = null
     private var folderOptionsDialog: FolderOptionsDialog? = null
-    private var adapter: FolderAdapter? = null
+    private var folderAdapter: FolderAdapter? = null
+    private var bannerAdAdapter: BannerAdAdapter? = null
+    private var adapter: ConcatAdapter? = null
 
     private var realBinding: FragmentPodcastsBinding? = null
     private val binding: FragmentPodcastsBinding get() = realBinding ?: throw IllegalStateException("Trying to access the binding outside of the view lifecycle.")
@@ -149,19 +165,32 @@ class PodcastsFragment :
     private val folderUuid: String?
         get() = arguments?.getString(ARG_FOLDER_UUID)
 
-    private var gridOuterPadding: Int = 0
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val context = context ?: return null
         realBinding = FragmentPodcastsBinding.inflate(inflater, container, false)
 
-        if (adapter == null) {
-            adapter = FolderAdapter(this, settings, context, theme)
-        }
+        val folderAdapter = FolderAdapter(
+            clickListener = this,
+            settings = settings,
+            context = context,
+            theme = theme,
+        )
+        this.folderAdapter = folderAdapter
+        val bannerAdAdapter = BannerAdAdapter(
+            themeType = theme.activeTheme,
+            onAdClick = ::openAd,
+            onAdOptionsClick = {},
+        )
+        this.bannerAdAdapter = bannerAdAdapter
+
+        val config = ConcatAdapter.Config.Builder()
+            .setIsolateViewTypes(false)
+            .build()
+        val adapter = ConcatAdapter(config, bannerAdAdapter, folderAdapter)
+        this.adapter = adapter
 
         binding.appBarLayout.hideShadow()
 
-        gridOuterPadding = resources.getDimensionPixelSize(VR.dimen.grid_outer_padding)
         binding.recyclerView.let {
             it.adapter = adapter
             it.addItemDecoration(SpaceItemDecoration())
@@ -181,12 +210,8 @@ class PodcastsFragment :
         toolbar.setOnMenuItemClickListener(this)
 
         toolbar.menu.findItem(R.id.folders_locked).setOnMenuItemClickListener {
-            if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS)) {
-                if (viewModel.areSuggestedFoldersAvailable.value) {
-                    showSuggestedFoldersCreation(SuggestedFoldersFragment.Source.ToolbarButton)
-                } else {
-                    OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.Upsell(OnboardingUpgradeSource.FOLDERS))
-                }
+            if (viewModel.areSuggestedFoldersAvailable.value) {
+                showSuggestedFoldersCreation(SuggestedFoldersFragment.Source.ToolbarButton)
             } else {
                 OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.Upsell(OnboardingUpgradeSource.FOLDERS))
             }
@@ -244,12 +269,18 @@ class PodcastsFragment :
                     toolbar.menu.findItem(R.id.create_folder)?.isVisible = rootFolder && isSignedInAsPlusOrPatron
                     toolbar.menu.findItem(R.id.search_podcasts)?.isVisible = rootFolder
 
-                    adapter?.setFolderItems(uiState.items)
+                    folderAdapter?.setFolderItems(uiState.items)
 
                     val isEmpty = uiState.items.isEmpty()
                     binding.emptyView.isVisible = isEmpty && !uiState.isLoadingItems
                     binding.swipeRefreshLayout.isGone = isEmpty
                 }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.activeAds.collect { activeAds ->
+                bannerAdAdapter?.submitList(activeAds)
             }
         }
 
@@ -266,8 +297,8 @@ class PodcastsFragment :
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.podcastUuidToBadge.collect { podcastUuidToBadge ->
-                    adapter?.badgeType = settings.podcastBadgeType.value
-                    adapter?.setBadges(podcastUuidToBadge)
+                    folderAdapter?.badgeType = settings.podcastBadgeType.value
+                    folderAdapter?.setBadges(podcastUuidToBadge)
                 }
             }
         }
@@ -302,9 +333,22 @@ class PodcastsFragment :
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.areSuggestedFoldersAvailable.collect { areAvailable ->
-                    if (areAvailable && FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS) && viewModel.isEligibleForSuggestedFoldersPopup()) {
-                        showSuggestedFoldersCreation(SuggestedFoldersFragment.Source.Popup)
+                viewModel.areSuggestedFoldersAvailable.combine(viewModel.notificationPromptState) { areFoldersAvailable, notificationsState ->
+                    areFoldersAvailable to notificationsState
+                }.collect { (areFoldersAvailable, notificationState) ->
+                    // Don't stack popups, notification prompt takes precedence over suggested folders popup
+                    if (!notificationState.hasPermission && !notificationState.hasShownPromptBefore && FeatureFlag.isEnabled(Feature.NOTIFICATIONS_REVAMP)) {
+                        if (parentFragmentManager.findFragmentByTag("notifications_prompt") == null) {
+                            EnableNotificationsPromptFragment
+                                .newInstance()
+                                .show(parentFragmentManager, "notifications_prompt")
+                        }
+                    } else {
+                        (parentFragmentManager.findFragmentByTag("notifications_prompt") as? DialogFragment)?.dismissNow()
+
+                        if (areFoldersAvailable && viewModel.isEligibleForSuggestedFoldersPopup()) {
+                            showSuggestedFoldersCreation(SuggestedFoldersFragment.Source.Popup)
+                        }
                     }
                 }
             }
@@ -382,11 +426,7 @@ class PodcastsFragment :
 
     private fun handleFolderCreation() {
         if (viewModel.areSuggestedFoldersAvailable.value) {
-            if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS)) {
-                showSuggestedFoldersCreation(SuggestedFoldersFragment.Source.ToolbarButton)
-            } else {
-                showCustomFolderCreation()
-            }
+            showSuggestedFoldersCreation(SuggestedFoldersFragment.Source.ToolbarButton)
         } else {
             showCustomFolderCreation()
         }
@@ -423,6 +463,9 @@ class PodcastsFragment :
 
     override fun onResume() {
         super.onResume()
+
+        viewModel.updateNotificationsPermissionState()
+
         adjustViewIfNeeded()
     }
 
@@ -443,10 +486,30 @@ class PodcastsFragment :
         val folderUuid = folderUuid
 
         binding.emptyView.setContentWithViewCompositionStrategy {
+            val ads by viewModel.activeAds.collectAsState()
+
             AppTheme(themeType = theme.activeTheme) {
                 Column(
-                    modifier = Modifier.verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .padding(16.dp),
                 ) {
+                    ads.firstOrNull()?.let { ad ->
+                        AdBanner(
+                            ad = ad,
+                            colors = rememberAdColors().bannerAd,
+                            onAdClick = { openAd(ad) },
+                            onOptionsClick = {},
+                        )
+                    }
+
+                    Spacer(
+                        modifier = Modifier.weight(1f),
+                    )
+
                     if (folderUuid != null) {
                         NoFolderPodcastsBanner(
                             onClickButton = {
@@ -461,6 +524,10 @@ class PodcastsFragment :
                             },
                         )
                     }
+
+                    Spacer(
+                        modifier = Modifier.weight(2f),
+                    )
                 }
             }
         }
@@ -468,26 +535,31 @@ class PodcastsFragment :
 
     private fun setupGridView(savedInstanceState: Parcelable? = listState) {
         val layoutManager = when (settings.podcastGridLayout.value) {
-            PodcastGridLayoutType.LARGE_ARTWORK -> GridLayoutManager(activity, UiUtil.getGridColumnCount(false, context))
-            PodcastGridLayoutType.SMALL_ARTWORK -> GridLayoutManager(activity, UiUtil.getGridColumnCount(true, context))
+            PodcastGridLayoutType.LARGE_ARTWORK -> createAdGridLayoutManager(UiUtil.getGridColumnCount(false, context))
+            PodcastGridLayoutType.SMALL_ARTWORK -> createAdGridLayoutManager(UiUtil.getGridColumnCount(true, context))
             PodcastGridLayoutType.LIST_VIEW -> LinearLayoutManager(activity, RecyclerView.VERTICAL, false)
         }
         val badgeType = settings.podcastBadgeType.value
         val currentLayoutManager = realBinding?.recyclerView?.layoutManager
 
         // We only want to reset the adapter if something actually changed, or else it will flash
-        if (adapter?.badgeType != badgeType ||
+        if (folderAdapter?.badgeType != badgeType ||
             (currentLayoutManager != null && currentLayoutManager::class.java != layoutManager::class.java) ||
             (currentLayoutManager is GridLayoutManager && layoutManager is GridLayoutManager && currentLayoutManager.spanCount != layoutManager.spanCount)
         ) {
-            adapter?.badgeType = badgeType
+            folderAdapter?.badgeType = badgeType
             realBinding?.recyclerView?.adapter = adapter
         }
 
+        val listOuterPadding = resources.getDimensionPixelSize(VR.dimen.list_outer_adding)
+        val gridOuterPadding = resources.getDimensionPixelSize(VR.dimen.grid_outer_padding)
         viewLifecycleOwner.lifecycleScope.launch {
             settings.bottomInset.collect {
-                val gridOuterPadding = if (settings.podcastGridLayout.value == PodcastGridLayoutType.LIST_VIEW) 0 else gridOuterPadding
-                realBinding?.recyclerView?.updatePadding(gridOuterPadding, gridOuterPadding, gridOuterPadding, gridOuterPadding + it)
+                val padding = when (settings.podcastGridLayout.value) {
+                    PodcastGridLayoutType.LARGE_ARTWORK, PodcastGridLayoutType.SMALL_ARTWORK -> gridOuterPadding
+                    PodcastGridLayoutType.LIST_VIEW -> listOuterPadding
+                }
+                realBinding?.recyclerView?.updatePadding(padding, padding, padding, padding + it)
             }
         }
 
@@ -495,9 +567,24 @@ class PodcastsFragment :
         layoutManager.onRestoreInstanceState(savedInstanceState)
     }
 
+    private fun createAdGridLayoutManager(spanCount: Int): GridLayoutManager {
+        return GridLayoutManager(requireActivity(), spanCount).apply {
+            val defaultLookup = GridLayoutManager.DefaultSpanSizeLookup()
+            spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+                override fun getSpanSize(position: Int): Int {
+                    val itemViewTtype = adapter?.getItemViewType(position)
+                    return when (itemViewTtype) {
+                        AdapterViewTypeIds.BannerAdId -> spanCount
+                        else -> defaultLookup.getSpanSize(position)
+                    }
+                }
+            }
+        }
+    }
+
     override fun onPodcastMove(fromPosition: Int, toPosition: Int) {
         val newList = viewModel.moveFolderItem(fromPosition, toPosition)
-        adapter?.submitList(newList)
+        folderAdapter?.submitList(newList)
     }
 
     override fun onPodcastMoveFinished() {
@@ -552,7 +639,7 @@ class PodcastsFragment :
                                 indication = null,
                                 onClick = ::closeTooltip,
                             )
-                            .semantics { invisibleToUser() },
+                            .semantics { hideFromAccessibility() },
                     ) {
                         Box(
                             modifier = Modifier
@@ -578,11 +665,22 @@ class PodcastsFragment :
         viewModel.onTooltipClosed()
     }
 
+    private fun openAd(ad: BlazeAd) {
+        runCatching {
+            val intent = Intent(Intent.ACTION_VIEW, ad.ctaUrl.toUri())
+            startActivity(intent)
+        }.onFailure { LogBuffer.e("Ads", it, "Failed to open an ad: ${ad.id}") }
+    }
+
     inner class SpaceItemDecoration : RecyclerView.ItemDecoration() {
-        private val spacing = resources.getDimensionPixelSize(VR.dimen.grid_item_padding)
+        private val gridItemPadding = resources.getDimensionPixelSize(VR.dimen.grid_item_padding)
         override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
-            val margin = if (settings.podcastGridLayout.value != PodcastGridLayoutType.LIST_VIEW) spacing else 0
-            outRect.set(margin, margin, margin, margin)
+            when (settings.podcastGridLayout.value) {
+                PodcastGridLayoutType.LARGE_ARTWORK, PodcastGridLayoutType.SMALL_ARTWORK -> {
+                    outRect.set(gridItemPadding, gridItemPadding, gridItemPadding, gridItemPadding)
+                }
+                PodcastGridLayoutType.LIST_VIEW -> Unit
+            }
         }
     }
 }

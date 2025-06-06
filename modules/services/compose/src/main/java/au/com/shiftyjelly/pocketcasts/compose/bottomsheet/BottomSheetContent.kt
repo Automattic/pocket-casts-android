@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -95,7 +96,7 @@ fun BottomSheetContent(
             Spacer(modifier = modifier.height(16.dp))
 
             state.content.imageContent?.let { imageContent ->
-                if (context.resources.configuration.inPortrait() || Util.isTablet(context)) {
+                if (LocalConfiguration.current.inPortrait() || Util.isTablet(context)) {
                     imageContent.invoke()
                     Spacer(modifier = modifier.height(16.dp))
                 }

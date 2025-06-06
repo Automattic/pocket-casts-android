@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.compose.ad.BlazeAd
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
@@ -12,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.SuggestedFoldersPopupPolicy
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -54,6 +56,7 @@ class PodcastsViewModel @AssistedInject constructor(
     private val suggestedFoldersManager: SuggestedFoldersManager,
     private val suggestedFoldersPopupPolicy: SuggestedFoldersPopupPolicy,
     private val userManager: UserManager,
+    private val notificationHelper: NotificationHelper,
     @Assisted private val folderUuid: String?,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(UiState(isLoadingItems = true))
@@ -62,6 +65,34 @@ class PodcastsViewModel @AssistedInject constructor(
     val areSuggestedFoldersAvailable = suggestedFoldersManager.observeSuggestedFolders()
         .map { it.isNotEmpty() }
         .stateIn(viewModelScope, SharingStarted.Eagerly, initialValue = false)
+
+    private val _notificationsState = MutableStateFlow(
+        NotificationsPermissionState(
+            hasPermission = notificationHelper.hasNotificationsPermission(),
+            hasShownPromptBefore = settings.notificationsPromptAcknowledged.value,
+        ),
+    )
+    val notificationPromptState = _notificationsState.asStateFlow()
+
+    val activeAds = if (folderUuid == null) {
+        userManager.getSignInState().asFlow()
+            .flatMapLatest { signInState ->
+                if (signInState.isNoAccountOrFree && FeatureFlag.isEnabled(Feature.BANNER_ADS)) {
+                    val mockAd = BlazeAd(
+                        id = "ad-id",
+                        title = "wordpress.com",
+                        ctaText = "Democratize publishing and eCommerce one website at a time.",
+                        ctaUrl = "https://wordpress.com/",
+                        imageUrl = "https://s.w.org/style/images/about/WordPress-logotype-simplified.png",
+                    )
+                    flowOf(listOf(mockAd))
+                } else {
+                    flowOf(emptyList())
+                }
+            }
+    } else {
+        flowOf(emptyList())
+    }.stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = emptyList())
 
     init {
         viewModelScope.launch {
@@ -236,6 +267,13 @@ class PodcastsViewModel @AssistedInject constructor(
         podcastManager.refreshPodcasts("Pull down")
     }
 
+    fun updateNotificationsPermissionState() {
+        _notificationsState.value = NotificationsPermissionState(
+            hasPermission = notificationHelper.hasNotificationsPermission(),
+            hasShownPromptBefore = settings.notificationsPromptAcknowledged.value,
+        )
+    }
+
     private suspend fun saveSortOrder() {
         folderManager.updateSortPosition(adapterState)
 
@@ -287,7 +325,7 @@ class PodcastsViewModel @AssistedInject constructor(
     private var refreshSuggestedFoldersJob: Job? = null
 
     fun refreshSuggestedFolders() {
-        if (FeatureFlag.isEnabled(Feature.SUGGESTED_FOLDERS) && refreshSuggestedFoldersJob?.isActive != true) {
+        if (refreshSuggestedFoldersJob?.isActive != true) {
             refreshSuggestedFoldersJob = viewModelScope.launch {
                 suggestedFoldersManager.refreshSuggestedFolders()
             }
@@ -334,6 +372,11 @@ class PodcastsViewModel @AssistedInject constructor(
     interface Factory {
         fun create(folderUuid: String?): PodcastsViewModel
     }
+
+    data class NotificationsPermissionState(
+        val hasPermission: Boolean,
+        val hasShownPromptBefore: Boolean,
+    )
 
     companion object {
         private const val NUMBER_OF_FOLDERS_KEY = "number_of_folders"

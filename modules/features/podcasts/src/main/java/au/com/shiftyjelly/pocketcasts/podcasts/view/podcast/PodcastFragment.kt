@@ -29,6 +29,7 @@ import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -79,16 +80,12 @@ import au.com.shiftyjelly.pocketcasts.settings.SettingsFragment
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
-import au.com.shiftyjelly.pocketcasts.sharing.SharingClient
-import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
 import au.com.shiftyjelly.pocketcasts.ui.extensions.openUrl
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.images.CoilManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
@@ -186,9 +183,6 @@ class PodcastFragment : BaseFragment() {
 
     @Inject
     lateinit var analyticsTracker: AnalyticsTracker
-
-    @Inject
-    lateinit var sharingClient: SharingClient
 
     @Inject
     lateinit var colorAnalyzer: PodcastImageColorAnalyzer
@@ -475,9 +469,7 @@ class PodcastFragment : BaseFragment() {
     private val onEpisodesOptionsClicked: () -> Unit = {
         analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_OPTIONS_TAPPED)
         var optionsDialog = OptionsDialog()
-
-        if (FeatureFlag.isEnabled(Feature.PODCAST_FEED_UPDATE)) {
-            optionsDialog = optionsDialog.addTextOption(
+            .addTextOption(
                 titleId = LR.string.podcast_refresh_episodes,
                 imageId = IR.drawable.ic_refresh,
                 click = {
@@ -486,9 +478,6 @@ class PodcastFragment : BaseFragment() {
                     }
                 },
             )
-        }
-
-        optionsDialog
             .addTextOption(
                 titleId = LR.string.podcast_sort_episodes,
                 imageId = IR.drawable.ic_sort,
@@ -596,13 +585,6 @@ class PodcastFragment : BaseFragment() {
 
     private val onNotificationsClicked: (Podcast, Boolean) -> Unit = { podcast, show ->
         viewModel.showNotifications(podcast.uuid, show)
-        currentSnackBar?.dismiss()
-        if (show) {
-            showSnackBar(
-                message = getString(LR.string.notifications_enabled_message, podcast.title),
-                duration = 3000,
-            )
-        }
     }
 
     private val onDonateClicked: (Uri?) -> Unit = { uri ->
@@ -704,7 +686,6 @@ class PodcastFragment : BaseFragment() {
     ): View {
         val binding = FragmentPodcastBinding.inflate(inflater, container, false).also { binding = it }
 
-        binding.swipeRefreshLayout.isEnabled = FeatureFlag.isEnabled(Feature.PODCAST_FEED_UPDATE)
         toolbarController.setUpToolbar(
             view = binding.toolbar,
             theme = theme,
@@ -921,6 +902,26 @@ class PodcastFragment : BaseFragment() {
                 }
             }
         }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.showNotificationSnack.flowWithLifecycle(lifecycle)
+                .collect { message ->
+                    currentSnackBar?.dismiss()
+                    when (message) {
+                        is PodcastViewModel.SnackBarMessage.ShowNotificationsDisabledMessage -> showSnackBar(
+                            message = message.message.asString(requireContext()),
+                            cta = message.cta.asString(requireContext()),
+                            onCtaClick = {
+                                viewModel.onOpenNotificationSettingsClicked(requireActivity())
+                            },
+                        )
+                        is PodcastViewModel.SnackBarMessage.ShowNotifyOnNewEpisodesMessage -> showSnackBar(
+                            message = message.message.asString(requireContext()),
+                            duration = 3000,
+                        )
+                    }
+                }
+        }
     }
 
     override fun onResume() {
@@ -939,16 +940,9 @@ class PodcastFragment : BaseFragment() {
             val (podcast, episode, bookmark) = viewModel.getSharedBookmark() ?: return@launch
             viewModel.onBookmarkShare(podcast.uuid, episode.uuid, sourceView)
             val timestamp = bookmark.timeSecs.seconds
-            if (FeatureFlag.isEnabled(Feature.REIMAGINE_SHARING)) {
-                ShareEpisodeTimestampFragment
-                    .forBookmark(episode, timestamp, podcast.backgroundColor, SourceView.PODCAST_SCREEN)
-                    .show(parentFragmentManager, "share_screen")
-            } else {
-                val request = SharingRequest.bookmark(podcast, episode, timestamp)
-                    .setSourceView(SourceView.PODCAST_SCREEN)
-                    .build()
-                sharingClient.share(request)
-            }
+            ShareEpisodeTimestampFragment
+                .forBookmark(episode, timestamp, podcast.backgroundColor, SourceView.PODCAST_SCREEN)
+                .show(parentFragmentManager, "share_screen")
         }
     }
 
@@ -1096,6 +1090,7 @@ class PodcastFragment : BaseFragment() {
 
                             adapter?.notifyDataSetChanged()
                         }
+
                         PodcastTab.RECOMMENDATIONS -> {
                             adapter?.setRecommendations(state.recommendations)
                         }
@@ -1137,7 +1132,7 @@ class PodcastFragment : BaseFragment() {
                         if (state.type == PodcastViewModel.RefreshType.PULL_TO_REFRESH) {
                             binding?.swipeRefreshLayout?.isRefreshing = true
                         } else {
-                            showSnackBar(getString(LR.string.podcast_refreshing_episode_list), Snackbar.LENGTH_INDEFINITE)
+                            showSnackBar(message = getString(LR.string.podcast_refreshing_episode_list), duration = Snackbar.LENGTH_INDEFINITE)
                         }
                     }
                 }
@@ -1215,22 +1210,13 @@ class PodcastFragment : BaseFragment() {
         analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_SHARE_TAPPED)
 
         if (!podcast.canShare) {
-            showSnackBar(getString(LR.string.sharing_is_not_available_for_private_podcasts))
+            showSnackBar(message = getString(LR.string.sharing_is_not_available_for_private_podcasts))
             return
         }
 
-        if (FeatureFlag.isEnabled(Feature.REIMAGINE_SHARING)) {
-            SharePodcastFragment
-                .newInstance(podcast, SourceView.PODCAST_SCREEN)
-                .show(parentFragmentManager, "share_screen")
-        } else {
-            lifecycleScope.launch {
-                val request = SharingRequest.podcast(podcast)
-                    .setSourceView(SourceView.PODCAST_SCREEN)
-                    .build()
-                sharingClient.share(request)
-            }
-        }
+        SharePodcastFragment
+            .newInstance(podcast, SourceView.PODCAST_SCREEN)
+            .show(parentFragmentManager, "share_screen")
     }
 
     private fun downloadAll() {
@@ -1241,9 +1227,19 @@ class PodcastFragment : BaseFragment() {
         dialog?.show(parentFragmentManager, "download_confirm")
     }
 
-    private fun showSnackBar(message: String, duration: Int = Snackbar.LENGTH_LONG) {
+    private fun showSnackBar(
+        message: String,
+        cta: String? = null,
+        onCtaClick: (() -> Unit)? = null,
+        duration: Int = Snackbar.LENGTH_LONG,
+    ) {
         (activity as? FragmentHostListener)?.snackBarView()?.let { snackBarView ->
             currentSnackBar = Snackbar.make(snackBarView, message, duration).apply {
+                if (onCtaClick != null && cta != null) {
+                    setAction(cta) {
+                        onCtaClick()
+                    }
+                }
                 show()
             }
         }

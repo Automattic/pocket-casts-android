@@ -18,22 +18,15 @@ sealed class FolderItem(
         addedDate = podcast.addedDate ?: Date(Long.MIN_VALUE),
         sortPosition = podcast.sortPosition,
         subscribed = podcast.isSubscribed,
-    ) {
-        companion object {
-            const val viewTypeId = 0
-        }
-    }
+    )
+
     data class Folder(val folder: FolderModel, val podcasts: List<PodcastModel>) : FolderItem(
         uuid = folder.uuid,
         title = folder.name,
         addedDate = folder.addedDate,
         sortPosition = folder.sortPosition,
         subscribed = true,
-    ) {
-        companion object {
-            const val viewTypeId = 1
-        }
-    }
+    )
 
     val adapterId: Long
         get() = UUID.nameUUIDFromBytes(uuid.toByteArray()).mostSignificantBits

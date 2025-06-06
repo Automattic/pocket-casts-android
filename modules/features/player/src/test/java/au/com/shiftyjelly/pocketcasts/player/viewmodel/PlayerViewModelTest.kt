@@ -29,13 +29,11 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue.State
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.jakewharton.rxrelay2.BehaviorRelay
 import io.reactivex.Flowable
 import io.reactivex.Observable
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -81,9 +79,6 @@ class PlayerViewModelTest {
     private lateinit var podcastManager: PodcastManager
 
     @Mock
-    private lateinit var userEpisodeManager: UserEpisodeManager
-
-    @Mock
     private lateinit var theme: Theme
 
     @Mock
@@ -97,9 +92,6 @@ class PlayerViewModelTest {
 
     @Mock
     private lateinit var context: Context
-
-    @Mock
-    private lateinit var applicationScope: CoroutineScope
 
     @Mock
     private lateinit var upNextQueue: UpNextQueue
@@ -281,7 +273,6 @@ class PlayerViewModelTest {
         viewModel = PlayerViewModel(
             playbackManager = playbackManager,
             episodeManager = episodeManager,
-            userEpisodeManager = userEpisodeManager,
             podcastManager = podcastManager,
             bookmarkManager = bookmarkManager,
             downloadManager = downloadManager,
@@ -291,7 +282,6 @@ class PlayerViewModelTest {
             analyticsTracker = analyticsTracker,
             episodeAnalytics = episodeAnalytics,
             context = context,
-            applicationScope = applicationScope,
             ioDispatcher = UnconfinedTestDispatcher(),
         )
     }

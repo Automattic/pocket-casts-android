@@ -1,23 +1,38 @@
 package au.com.shiftyjelly.pocketcasts.repositories.notification
 
+import android.Manifest
 import android.app.Activity
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.sync.NotificationBroadcastReceiver.Companion.INTENT_EXTRA_NOTIFICATION_TAG
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
+import android.provider.Settings as OsSettings
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 class NotificationHelperImpl @Inject constructor(@ApplicationContext private val context: Context) : NotificationHelper {
 
     private val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
+
+    override fun hasNotificationsPermission() = Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+        ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
+
+    override fun openNotificationSettings(activity: Activity?) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O || activity == null) return
+
+        val intent = Intent(OsSettings.ACTION_APP_NOTIFICATION_SETTINGS)
+        intent.putExtra(OsSettings.EXTRA_APP_PACKAGE, activity.packageName)
+        activity.startActivity(intent)
+    }
 
     override fun isShowing(notificationId: Int): Boolean {
         return notificationManager?.activeNotifications?.firstOrNull { it.id == notificationId } != null
@@ -105,6 +120,38 @@ class NotificationHelperImpl @Inject constructor(@ApplicationContext private val
         }
         channelList.add(fixDownloadsCompleteChannel)
 
+        val dailyRemindersChannel = NotificationChannel(Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_DAILY_REMINDERS.id, "Daily Reminders", NotificationManager.IMPORTANCE_DEFAULT).apply {
+            description = context.getString(LR.string.notification_channel_description_daily_reminders)
+            setShowBadge(false)
+            enableVibration(true)
+            lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+        }
+        channelList.add(dailyRemindersChannel)
+
+        val trendingAndRecommendationsChannel = NotificationChannel(Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_TRENDING_AND_RECOMMENDATIONS.id, "Trending & Recommendations", NotificationManager.IMPORTANCE_DEFAULT).apply {
+            description = context.getString(LR.string.notification_channel_description_trending_and_recommendations)
+            setShowBadge(false)
+            enableVibration(true)
+            lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+        }
+        channelList.add(trendingAndRecommendationsChannel)
+
+        val newFeaturesAndTipsChannel = NotificationChannel(Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_NEW_FEATURES_AND_TIPS.id, "New Features & Tips", NotificationManager.IMPORTANCE_DEFAULT).apply {
+            description = context.getString(LR.string.notification_channel_description_new_features_and_tips)
+            setShowBadge(false)
+            enableVibration(true)
+            lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+        }
+        channelList.add(newFeaturesAndTipsChannel)
+
+        val offersChannel = NotificationChannel(Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_OFFERS.id, "Offers", NotificationManager.IMPORTANCE_DEFAULT).apply {
+            description = context.getString(LR.string.notification_channel_description_offers)
+            setShowBadge(false)
+            enableVibration(true)
+            lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+        }
+        channelList.add(offersChannel)
+
         notificationManager.createNotificationChannels(channelList)
     }
 
@@ -140,16 +187,43 @@ class NotificationHelperImpl @Inject constructor(@ApplicationContext private val
         return NotificationCompat.Builder(context, Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_FIX_DOWNLOADS_COMPLETE.id)
     }
 
+    override fun dailyRemindersChannelBuilder(): NotificationCompat.Builder {
+        return NotificationCompat.Builder(context, Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_DAILY_REMINDERS.id)
+    }
+
+    override fun trendingAndRecommendationsChannelBuilder(): NotificationCompat.Builder {
+        return NotificationCompat.Builder(context, Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_TRENDING_AND_RECOMMENDATIONS.id)
+    }
+
+    override fun featuresAndTipsChannelBuilder(): NotificationCompat.Builder {
+        return NotificationCompat.Builder(context, Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_NEW_FEATURES_AND_TIPS.id)
+    }
+
+    override fun offersChannelBuilder(): NotificationCompat.Builder {
+        return NotificationCompat.Builder(context, Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_OFFERS.id)
+    }
+
     /**
      * Opens the system notification activity for the episode channel.
      */
     override fun openEpisodeNotificationSettings(activity: Activity?) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O || activity == null) return
+        openNotificationChannelSettings(activity, Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_EPISODE.id)
+    }
 
-        val intent = Intent(android.provider.Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS)
-        intent.putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, activity.packageName)
-        intent.putExtra(android.provider.Settings.EXTRA_CHANNEL_ID, Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_EPISODE.id)
-        activity.startActivity(intent)
+    override fun openDailyReminderNotificationSettings(activity: Activity?) {
+        openNotificationChannelSettings(activity, Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_DAILY_REMINDERS.id)
+    }
+
+    override fun openTrendingAndRecommendationsNotificationSettings(activity: Activity?) {
+        openNotificationChannelSettings(activity, Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_TRENDING_AND_RECOMMENDATIONS.id)
+    }
+
+    override fun openNewFeaturesAndTipsNotificationSettings(activity: Activity?) {
+        openNotificationChannelSettings(activity, Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_NEW_FEATURES_AND_TIPS.id)
+    }
+
+    override fun openOffersNotificationSettings(activity: Activity?) {
+        openNotificationChannelSettings(activity, Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_OFFERS.id)
     }
 
     override fun removeNotification(intentExtras: Bundle?, notificationId: Int) {
@@ -158,5 +232,14 @@ class NotificationHelperImpl @Inject constructor(@ApplicationContext private val
         if (!notificationTag.isNullOrBlank()) {
             manager.cancel(notificationId)
         }
+    }
+
+    private fun openNotificationChannelSettings(activity: Activity?, channelId: String) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O || activity == null) return
+
+        val intent = Intent(OsSettings.ACTION_CHANNEL_NOTIFICATION_SETTINGS)
+        intent.putExtra(OsSettings.EXTRA_APP_PACKAGE, activity.packageName)
+        intent.putExtra(OsSettings.EXTRA_CHANNEL_ID, channelId)
+        activity.startActivity(intent)
     }
 }

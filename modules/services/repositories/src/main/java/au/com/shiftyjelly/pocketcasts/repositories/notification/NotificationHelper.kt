@@ -6,6 +6,8 @@ import androidx.core.app.NotificationCompat
 
 interface NotificationHelper {
 
+    fun hasNotificationsPermission(): Boolean
+    fun openNotificationSettings(activity: Activity?)
     fun setupNotificationChannels()
 
     fun downloadChannelBuilder(): NotificationCompat.Builder
@@ -17,6 +19,14 @@ interface NotificationHelper {
     fun downloadsFixChannelBuilder(): NotificationCompat.Builder
     fun downloadsFixCompleteChannelBuilder(): NotificationCompat.Builder
     fun openEpisodeNotificationSettings(activity: Activity?)
+    fun openDailyReminderNotificationSettings(activity: Activity?)
+    fun openTrendingAndRecommendationsNotificationSettings(activity: Activity?)
+    fun openNewFeaturesAndTipsNotificationSettings(activity: Activity?)
+    fun openOffersNotificationSettings(activity: Activity?)
+    fun dailyRemindersChannelBuilder(): NotificationCompat.Builder
+    fun trendingAndRecommendationsChannelBuilder(): NotificationCompat.Builder
+    fun featuresAndTipsChannelBuilder(): NotificationCompat.Builder
+    fun offersChannelBuilder(): NotificationCompat.Builder
     fun isShowing(notificationId: Int): Boolean
     fun removeNotification(intentExtras: Bundle?, notificationId: Int)
 }
