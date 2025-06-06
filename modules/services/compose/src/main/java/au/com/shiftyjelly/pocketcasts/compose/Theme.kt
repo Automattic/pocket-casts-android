@@ -102,8 +102,18 @@ data class PocketCastsTheme(
     @Composable
     fun rememberPlayerColors(): PlayerColors? {
         return LocalPodcastColors.current?.let { podcastColors ->
-            remember(podcastColors) { PlayerColors(type, podcastColors) }
+            rememberPlayerColors(podcastColors)
         }
+    }
+
+    @Composable
+    fun rememberPlayerColorsOrDefault(): PlayerColors {
+        return rememberPlayerColors(LocalPodcastColors.current ?: PodcastColors.ForUserEpisode)
+    }
+
+    @Composable
+    private fun rememberPlayerColors(podcastColors: PodcastColors): PlayerColors {
+        return remember(podcastColors) { PlayerColors(type, podcastColors) }
     }
 }
 
