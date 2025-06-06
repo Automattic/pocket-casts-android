@@ -7,9 +7,6 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.bookmark.BookmarkRow
-import au.com.shiftyjelly.pocketcasts.compose.bookmark.BookmarkRowColors
-import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButtonColors
-import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButtonStyle
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastAdapter
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 
@@ -24,9 +21,12 @@ class BookmarkViewHolder(
                 BookmarkRow(
                     bookmark = data.bookmark,
                     episode = data.episode,
-                    isMultiSelecting = data.isMultiSelecting,
-                    isSelected = data.isSelected,
-                    onPlayClick = { data.onBookmarkPlayClicked(it) },
+                    isSelecting = data.isMultiSelecting(),
+                    isSelected = data.isSelected(data.bookmark),
+                    showIcon = true,
+                    useEpisodeArtwork = data.useEpisodeArtwork,
+                    showEpisodeTitle = true,
+                    onPlayClick = { data.onBookmarkPlayClicked(data.bookmark) },
                     modifier = Modifier
                         .pointerInput(data.bookmark.adapterId) {
                             detectTapGestures(
@@ -34,13 +34,6 @@ class BookmarkViewHolder(
                                 onTap = { data.onBookmarkRowClick(data.bookmark, bindingAdapterPosition) },
                             )
                         },
-                    colors = BookmarkRowColors.Default,
-                    timePlayButtonStyle = TimePlayButtonStyle.Outlined,
-                    timePlayButtonColors = TimePlayButtonColors.Default,
-                    showIcon = true,
-                    useEpisodeArtwork = data.useEpisodeArtwork,
-                    showEpisodeTitle = true,
-                    isDarkTheme = false,
                 )
             }
         }

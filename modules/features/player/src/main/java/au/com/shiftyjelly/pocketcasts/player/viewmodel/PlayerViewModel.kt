@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.ad.BlazeAd
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -541,23 +542,17 @@ class PlayerViewModel @Inject constructor(
         }
     }
 
-    fun buildBookmarkArguments(onSuccess: (BookmarkArguments) -> Unit) {
-        val episode = episode ?: return
+    suspend fun createBookmarkArguments(): BookmarkArguments? {
+        val episode = episode ?: return null
         val timeSecs = playbackPositionMs / 1000
-        launch {
-            val bookmark = bookmarkManager.findByEpisodeTime(episode, timeSecs)
-            val podcast = podcast
-            val backgroundColor = if (podcast == null) 0xFF000000.toInt() else theme.playerBackgroundColor(podcast)
-            val tintColor = if (podcast == null) 0xFFFFFFFF.toInt() else theme.playerHighlightColor(podcast)
-            val arguments = BookmarkArguments(
-                bookmarkUuid = bookmark?.uuid,
-                episodeUuid = episode.uuid,
-                timeSecs = timeSecs,
-                backgroundColor = backgroundColor,
-                tintColor = tintColor,
-            )
-            onSuccess(arguments)
-        }
+        val bookmark = bookmarkManager.findByEpisodeTime(episode, timeSecs)
+        val podcast = podcast
+        return BookmarkArguments(
+            bookmarkUuid = bookmark?.uuid,
+            episodeUuid = episode.uuid,
+            timeSecs = timeSecs,
+            podcastColors = podcast?.let(::PodcastColors) ?: PodcastColors.ForUserEpisode,
+        )
     }
 
     fun handleDownloadClickFromPlaybackActions(onDeleteStart: () -> Unit, onDownloadStart: () -> Unit) {

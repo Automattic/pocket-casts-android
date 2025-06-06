@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -460,25 +461,15 @@ class PodcastViewModel
         }
     }
 
-    fun buildBookmarkArguments(onSuccess: (BookmarkArguments) -> Unit) {
-        multiSelectBookmarksHelper.selectedListLive.value?.firstOrNull()?.let { bookmark ->
-            val episodeUuid = bookmark.episodeUuid
-            viewModelScope.launch(ioDispatcher) {
-                val podcast = podcastManager.findPodcastByUuid(bookmark.podcastUuid)
-                val backgroundColor =
-                    if (podcast == null) 0xFF000000.toInt() else theme.playerBackgroundColor(podcast)
-                val tintColor =
-                    if (podcast == null) 0xFFFFFFFF.toInt() else theme.playerHighlightColor(podcast)
-                val arguments = BookmarkArguments(
-                    bookmarkUuid = bookmark.uuid,
-                    episodeUuid = episodeUuid,
-                    timeSecs = bookmark.timeSecs,
-                    backgroundColor = backgroundColor,
-                    tintColor = tintColor,
-                )
-                onSuccess(arguments)
-            }
-        }
+    suspend fun createBookmarkArguments(): BookmarkArguments? {
+        val bookmark = multiSelectBookmarksHelper.selectedListLive.value?.firstOrNull() ?: return null
+        val podcast = podcastManager.findPodcastByUuid(bookmark.podcastUuid)
+        return BookmarkArguments(
+            bookmarkUuid = bookmark.uuid,
+            episodeUuid = bookmark.episodeUuid,
+            timeSecs = bookmark.timeSecs,
+            podcastColors = podcast?.let(::PodcastColors) ?: PodcastColors.ForUserEpisode,
+        )
     }
 
     fun multiSelectSelectNone() {

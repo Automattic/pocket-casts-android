@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,7 +45,6 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.SimpleColorFilter
 import com.airbnb.lottie.compose.LottieAnimation
@@ -63,16 +63,16 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun PlayerControls(
     playerViewModel: PlayerViewModel,
 ) {
-    val playerControlsData by playerViewModel.listDataLive
-        .map {
-            PlayerControlsData(
-                it.podcastHeader.isPlaying,
-                it.podcastHeader.theme,
-                it.podcastHeader.skipBackwardInSecs.toDuration(DurationUnit.SECONDS),
-                it.podcastHeader.skipForwardInSecs.toDuration(DurationUnit.SECONDS),
-            )
-        }
-        .observeAsState(PlayerControlsData())
+    val playerControlsData by remember {
+        playerViewModel.listDataLive
+            .map {
+                PlayerControlsData(
+                    it.podcastHeader.isPlaying,
+                    it.podcastHeader.skipBackwardInSecs.toDuration(DurationUnit.SECONDS),
+                    it.podcastHeader.skipForwardInSecs.toDuration(DurationUnit.SECONDS),
+                )
+            }
+    }.observeAsState(PlayerControlsData())
 
     Content(
         playerControlsData = playerControlsData,
@@ -92,7 +92,7 @@ private fun Content(
     onSkipBackClick: () -> Unit,
     onSkipForwardLongPress: () -> Unit,
 ) {
-    val tintColor = Color(ThemeColor.playerContrast01(playerControlsData.theme))
+    val playerColors = MaterialTheme.theme.rememberPlayerColorsOrDefault()
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -108,22 +108,22 @@ private fun Content(
         SkipButton(
             skipDuration = playerControlsData.skipBackInSecs,
             contentDescription = stringResource(LR.string.skip_back),
-            tintColor = tintColor,
+            tintColor = playerColors.contrast01,
             onClick = onSkipBackClick,
         )
 
         AnimatedPlayPauseButton(
             isPlaying = playerControlsData.playing,
             onClick = onPlayPauseClick,
-            iconTint = MaterialTheme.theme.colors.playerContrast06,
-            circleColor = tintColor,
+            iconTint = playerColors.background01,
+            circleColor = playerColors.contrast01,
         )
 
         SkipButton(
             skipDuration = playerControlsData.skipForwardInSecs,
             scaleX = -1f,
             contentDescription = stringResource(LR.string.skip_forward),
-            tintColor = tintColor,
+            tintColor = playerColors.contrast01,
             onClick = onSkipForwardClick,
             onLongClick = onSkipForwardLongPress,
         )
@@ -210,7 +210,6 @@ private fun SkipButton(
 
 data class PlayerControlsData(
     val playing: Boolean = false,
-    val theme: Theme.ThemeType = Theme.ThemeType.DARK,
     val skipBackInSecs: Duration = 30.toDuration(DurationUnit.SECONDS),
     val skipForwardInSecs: Duration = 15.toDuration(DurationUnit.SECONDS),
 )
@@ -222,9 +221,7 @@ private fun PlayerControlsPreview(
 ) {
     AppTheme(theme) {
         Content(
-            playerControlsData = PlayerControlsData(
-                theme = theme,
-            ),
+            playerControlsData = PlayerControlsData(),
             onPlayPauseClick = {},
             onSkipForwardClick = {},
             onSkipBackClick = {},

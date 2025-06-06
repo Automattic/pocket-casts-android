@@ -25,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -37,6 +38,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.PlayerColors
+import au.com.shiftyjelly.pocketcasts.compose.ThemeColors
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -44,12 +47,42 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
+data class NoContentBannerColors(
+    val primaryText: Color,
+    val secondaryText: Color,
+    val button: Color,
+    val buttonText: Color,
+    val buttonRipple: Color,
+    val icon: Color,
+) {
+    companion object {
+        fun default(colors: ThemeColors) = NoContentBannerColors(
+            primaryText = colors.primaryText01,
+            secondaryText = colors.primaryText02,
+            button = colors.primaryInteractive01,
+            buttonText = colors.primaryInteractive02,
+            buttonRipple = colors.primaryUi01,
+            icon = colors.primaryIcon03,
+        )
+
+        fun player(colors: PlayerColors) = NoContentBannerColors(
+            primaryText = colors.contrast01,
+            secondaryText = colors.contrast02,
+            button = colors.contrast01,
+            buttonText = colors.background01,
+            buttonRipple = colors.highlight01,
+            icon = colors.contrast02,
+        )
+    }
+}
+
 @Composable
 fun NoContentBanner(
     title: String,
     body: String,
     @DrawableRes iconResourceId: Int,
     modifier: Modifier = Modifier,
+    colors: NoContentBannerColors = NoContentBannerColors.default(MaterialTheme.theme.colors),
     primaryButtonText: String? = null,
     onPrimaryButtonClick: (() -> Unit)? = null,
     secondaryButtonText: String? = null,
@@ -72,13 +105,14 @@ fun NoContentBanner(
                 painter = painterResource(id = iconResourceId),
                 contentDescription = null,
                 modifier = Modifier.size(32.dp),
-                colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.primaryIcon03),
+                colorFilter = ColorFilter.tint(colors.icon),
             )
         }
 
         TextH30(
             text = title,
             textAlign = TextAlign.Center,
+            color = colors.primaryText,
             fontWeight = FontWeight.W500,
         )
 
@@ -86,13 +120,14 @@ fun NoContentBanner(
             TextP40(
                 text = body,
                 textAlign = TextAlign.Center,
-                color = MaterialTheme.theme.colors.primaryText02,
+                color = colors.secondaryText,
                 fontSize = 15.sp,
                 fontWeight = FontWeight.W400,
             )
         }
 
         EmptyStateButtons(
+            colors = colors,
             primaryButtonText = primaryButtonText,
             onPrimaryButtonClick = onPrimaryButtonClick,
             secondaryButtonText = secondaryButtonText,
@@ -104,6 +139,7 @@ fun NoContentBanner(
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun EmptyStateButtons(
+    colors: NoContentBannerColors,
     primaryButtonText: String? = null,
     onPrimaryButtonClick: (() -> Unit)? = null,
     secondaryButtonText: String? = null,
@@ -117,22 +153,22 @@ private fun EmptyStateButtons(
         ) {
             if (primaryButtonText != null) {
                 CompositionLocalProvider(
-                    LocalRippleConfiguration provides RippleConfiguration(MaterialTheme.theme.colors.primaryUi01),
+                    LocalRippleConfiguration provides RippleConfiguration(colors.buttonRipple),
                 ) {
                     RowButton(
                         text = primaryButtonText,
                         onClick = { onPrimaryButtonClick?.invoke() },
                         includePadding = false,
-                        textColor = MaterialTheme.theme.colors.primaryInteractive02,
+                        textColor = colors.buttonText,
                         colors = ButtonDefaults.buttonColors(
-                            backgroundColor = MaterialTheme.theme.colors.primaryInteractive01,
+                            backgroundColor = colors.button,
                         ),
                     )
                 }
             }
 
             if (secondaryButtonText != null) {
-                val rippleColors = MaterialTheme.theme.colors.primaryInteractive01
+                val rippleColors = colors.button
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
@@ -149,7 +185,7 @@ private fun EmptyStateButtons(
                     TextP40(
                         text = secondaryButtonText,
                         fontSize = 17.sp,
-                        color = MaterialTheme.theme.colors.primaryInteractive01,
+                        color = colors.button,
                     )
                 }
             }

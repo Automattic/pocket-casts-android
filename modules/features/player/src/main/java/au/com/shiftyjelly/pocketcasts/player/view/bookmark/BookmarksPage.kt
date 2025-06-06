@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -22,7 +23,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -33,15 +33,17 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.bookmark.BookmarkColors
 import au.com.shiftyjelly.pocketcasts.compose.bookmark.BookmarkRow
-import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButtonColors
+import au.com.shiftyjelly.pocketcasts.compose.bookmark.HeaderRow
+import au.com.shiftyjelly.pocketcasts.compose.bookmark.rememberBookmarkColors
 import au.com.shiftyjelly.pocketcasts.compose.components.NoContentBanner
 import au.com.shiftyjelly.pocketcasts.compose.components.SearchBar
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
+import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
-import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.HeaderRow
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.NoMatchingBookmarksBanner
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel.BookmarkMessage
@@ -59,9 +61,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun BookmarksPage(
     episodeUuid: String?,
-    backgroundColor: Color,
-    textColor: Color,
     sourceView: SourceView,
+    bottomInset: Dp,
     bookmarksViewModel: BookmarksViewModel,
     multiSelectHelper: MultiSelectBookmarksHelper,
     onRowLongPressed: (Bookmark) -> Unit,
@@ -72,17 +73,16 @@ fun BookmarksPage(
     openFragment: (Fragment) -> Unit,
     onSearchBarClearButtonTapped: () -> Unit,
     onHeadphoneControlsButtonTapped: () -> Unit,
-    bottomInset: Dp,
-    isDarkTheme: Boolean,
 ) {
     val context = LocalContext.current
     val state by bookmarksViewModel.uiState.collectAsStateWithLifecycle()
+    val bookmarkColors = rememberBookmarkColors()
 
     Content(
         state = state,
         sourceView = sourceView,
-        backgroundColor = backgroundColor,
-        textColor = textColor,
+        colors = bookmarkColors,
+        bottomInset = bottomInset,
         onRowLongPressed = onRowLongPressed,
         onBookmarksOptionsMenuClicked = { bookmarksViewModel.onOptionsMenuClicked() },
         onPlayClick = { bookmark ->
@@ -91,10 +91,8 @@ fun BookmarksPage(
         onSearchTextChanged = { bookmarksViewModel.onSearchTextChanged(it) },
         onUpgradeClicked = onUpgradeClicked,
         openFragment = openFragment,
-        bottomInset = bottomInset,
         onSearchBarClearButtonTapped = onSearchBarClearButtonTapped,
         onHeadphoneControlsButtonTapped = onHeadphoneControlsButtonTapped,
-        isDarkTheme = isDarkTheme,
     )
     LaunchedEffect(episodeUuid) {
         bookmarksViewModel.loadBookmarks(
@@ -133,8 +131,8 @@ fun BookmarksPage(
 private fun Content(
     state: UiState,
     sourceView: SourceView,
-    backgroundColor: Color,
-    textColor: Color,
+    colors: BookmarkColors,
+    bottomInset: Dp,
     onRowLongPressed: (Bookmark) -> Unit,
     onPlayClick: (Bookmark) -> Unit,
     onBookmarksOptionsMenuClicked: () -> Unit,
@@ -143,28 +141,27 @@ private fun Content(
     openFragment: (Fragment) -> Unit,
     onSearchBarClearButtonTapped: () -> Unit,
     onHeadphoneControlsButtonTapped: () -> Unit,
-    bottomInset: Dp,
-    isDarkTheme: Boolean,
 ) {
+    val playerColors = MaterialTheme.theme.rememberPlayerColors()
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .fillMaxSize()
-            .background(color = backgroundColor)
+            .background(color = playerColors?.background01 ?: MaterialTheme.theme.colors.primaryUi01)
             .padding(bottom = if (sourceView == SourceView.PROFILE) 0.dp else 28.dp),
     ) {
         when (state) {
             is UiState.Loading -> LoadingView()
+
             is UiState.Loaded -> BookmarksView(
                 state = state,
-                textColor = textColor,
+                colors = colors,
+                bottomInset = bottomInset,
                 onRowLongPressed = onRowLongPressed,
                 onOptionsMenuClicked = onBookmarksOptionsMenuClicked,
                 onPlayClick = onPlayClick,
                 onSearchTextChanged = onSearchTextChanged,
-                bottomInset = bottomInset,
                 onSearchBarClearButtonTapped = onSearchBarClearButtonTapped,
-                isDarkTheme = isDarkTheme,
             )
 
             is UiState.Empty -> Column(
@@ -175,12 +172,14 @@ private fun Content(
                     body = stringResource(LR.string.bookmarks_paid_user_empty_state_message),
                     iconResourceId = IR.drawable.ic_bookmark,
                     primaryButtonText = stringResource(LR.string.bookmarks_headphone_settings),
+                    colors = colors.noContent,
                     onPrimaryButtonClick = {
                         onHeadphoneControlsButtonTapped()
                         openFragment(HeadphoneControlsSettingsFragment())
                     },
                 )
             }
+
             is UiState.Upsell -> Column(
                 modifier = Modifier.verticalScroll(rememberScrollState()),
             ) {
@@ -189,6 +188,7 @@ private fun Content(
                     body = stringResource(LR.string.bookmarks_free_user_empty_state_message),
                     iconResourceId = IR.drawable.ic_bookmark,
                     primaryButtonText = stringResource(LR.string.bookmarks_free_user_empty_state_button),
+                    colors = colors.noContent,
                     onPrimaryButtonClick = onUpgradeClicked,
                 )
             }
@@ -199,14 +199,13 @@ private fun Content(
 @Composable
 private fun BookmarksView(
     state: UiState.Loaded,
-    textColor: Color,
+    bottomInset: Dp,
+    colors: BookmarkColors,
     onRowLongPressed: (Bookmark) -> Unit,
     onOptionsMenuClicked: () -> Unit,
     onPlayClick: (Bookmark) -> Unit,
     onSearchTextChanged: (String) -> Unit,
     onSearchBarClearButtonTapped: () -> Unit,
-    bottomInset: Dp,
-    isDarkTheme: Boolean,
 ) {
     val focusRequester = remember { FocusRequester() }
     LazyColumn(
@@ -253,35 +252,28 @@ private fun BookmarksView(
                 HeaderRow(
                     title = title,
                     onOptionsMenuClicked = onOptionsMenuClicked,
-                    style = state.headerRowColors,
+                    colors = colors.headerRow,
                 )
             }
         }
         items(state.bookmarks, key = { it }) { bookmark ->
             val episode = state.bookmarkIdAndEpisodeMap[bookmark.uuid]
             BookmarkRow(
-                bookmark = bookmark.copy(episodeTitle = episode?.title ?: ""),
+                bookmark = bookmark.copy(episodeTitle = episode?.title.orEmpty()),
                 episode = episode,
-                isMultiSelecting = { state.isMultiSelecting },
-                isSelected = state.isSelected,
-                onPlayClick = onPlayClick,
-                modifier = Modifier
-                    .pointerInput(bookmark.adapterId) {
-                        detectTapGestures(
-                            onLongPress = { onRowLongPressed(bookmark) },
-                            onTap = { state.onRowClick(bookmark) },
-                        )
-                    },
-                colors = state.bookmarkRowColors,
-                timePlayButtonStyle = state.timePlayButtonStyle,
-                timePlayButtonColors = when (state.sourceView) {
-                    SourceView.PLAYER -> TimePlayButtonColors.Player(textColor = textColor)
-                    else -> TimePlayButtonColors.Default
-                },
+                isSelecting = state.isMultiSelecting,
+                isSelected = state.isSelected(bookmark),
                 showIcon = state.showIcon,
                 useEpisodeArtwork = state.useEpisodeArtwork,
                 showEpisodeTitle = state.showEpisodeTitle,
-                isDarkTheme = isDarkTheme,
+                colors = colors,
+                onPlayClick = { onPlayClick(bookmark) },
+                modifier = Modifier.pointerInput(bookmark.adapterId) {
+                    detectTapGestures(
+                        onLongPress = { onRowLongPressed(bookmark) },
+                        onTap = { state.onRowClick(bookmark) },
+                    )
+                },
             )
         }
     }
@@ -320,8 +312,8 @@ private fun BookmarksPreview(
                 sourceView = SourceView.PLAYER,
             ),
             sourceView = SourceView.PLAYER,
-            backgroundColor = Color.Black,
-            textColor = Color.Black,
+            bottomInset = 0.dp,
+            colors = rememberBookmarkColors(),
             onPlayClick = {},
             onRowLongPressed = {},
             onBookmarksOptionsMenuClicked = {},
@@ -330,8 +322,6 @@ private fun BookmarksPreview(
             openFragment = {},
             onSearchBarClearButtonTapped = {},
             onHeadphoneControlsButtonTapped = {},
-            bottomInset = 0.dp,
-            isDarkTheme = false,
         )
     }
 }
