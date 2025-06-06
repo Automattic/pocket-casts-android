@@ -1,6 +1,8 @@
 7.92
 -----
-
+*   Bug Fixes
+    *   Fix player's theming responsivness
+        ([#4091](https://github.com/Automattic/pocket-casts-android/pull/4091))
 
 7.91
 -----
