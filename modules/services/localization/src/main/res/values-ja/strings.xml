@@ -1,12 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-05-22 14:10:05+0000
+Translation-Revision-Date: 2025-05-27 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="bookmarks_search_results_not_found">検索条件に一致するブックマークが見つかりませんでした。 別のキーワードを試してください。</string>
+    <string name="podcast_no_episodes_matching">その検索に該当するエピソードは見つかりませんでした。 別のキーワードを試してください。</string>
+    <string name="podcast_no_bookmarks_matching">このポッドキャストには検索条件に一致するブックマークがありません。 別のキーワードを試してください。</string>
+    <string name="podcasts_time_to_add_some_podcasts_summary">新規ユーザーですか ? ポッドキャストをインポートするには「プロフィール」 &gt; 「設定」 &gt; 「インポート &amp; エクスポート」の順に移動します。\n\n新しいポッドキャストは「ディスカバー」タブで見つかります。</string>
+    <string name="onboarding_upgrade_purchase_failure_message">エラーが発生しました。 しばらくしてからもう一度お試しください。</string>
+    <string name="onboarding_upgrade_no_plans_found_body">接続を確認するか、後でもう一度お試しください。</string>
+    <string name="onboarding_upgrade_no_plans_found_title">プランをロードできませんでした</string>
     <string name="skip_for_now">今はスキップ</string>
+    <string name="similar_shows_to">「%s」に類似した番組</string>
+    <string name="recommendations_because_you_like">次が好きな方におすすめ: </string>
     <string name="plus_week">週</string>
     <string name="onboarding_plus_recurring_after_intro_offer">初年 (%2$s) 後、%1$sに定期支払い</string>
     <string name="you_might_like_empty_title">おすすめを読み込めませんでした</string>

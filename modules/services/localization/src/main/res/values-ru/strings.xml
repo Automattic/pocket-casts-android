@@ -1,12 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-05-22 14:10:05+0000
+Translation-Revision-Date: 2025-05-27 17:54:03+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="bookmarks_search_results_not_found">Не удалось найти закладки по вашему запросу. Попробуйте поискать по другому ключевому слову.</string>
+    <string name="podcast_no_episodes_matching">Не удалось найти выпуски по этому запросу. Попробуйте поискать по другому ключевому слову.</string>
+    <string name="podcast_no_bookmarks_matching">В этом подкасте нет закладок, соответствующих вашему запросу. Попробуйте поискать по другому ключевому слову.</string>
+    <string name="podcasts_time_to_add_some_podcasts_summary">Переходите из другого приложения? Импортируйте свои подкасты в меню «Профиль &gt; Настройки &gt; Импорт и экспорт».\n\nЕсли вы ищете новые идеи, загляните на вкладку «Новинки».</string>
+    <string name="onboarding_upgrade_purchase_failure_message">Что-то пошло не так. Повторите попытку позже.</string>
+    <string name="onboarding_upgrade_no_plans_found_body">Проверьте подключение или повторите попытку позже.</string>
+    <string name="onboarding_upgrade_no_plans_found_title">Не удалось загрузить тарифные планы</string>
     <string name="skip_for_now">Пропустить</string>
+    <string name="similar_shows_to">Шоу, похожие на «%s»</string>
+    <string name="recommendations_because_you_like">Потому что вам нравится</string>
     <string name="plus_week">неделя</string>
     <string name="onboarding_plus_recurring_after_intro_offer">Регулярный платёж в %1$s по истечении первого года (%2$s)</string>
     <string name="you_might_like_empty_title">Не удалось загрузить рекомендации</string>

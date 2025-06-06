@@ -1,12 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-05-22 14:10:05+0000
+Translation-Revision-Date: 2025-05-27 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="bookmarks_search_results_not_found">找不到任何符合搜尋條件的書籤。 請嘗試其他關鍵字。</string>
+    <string name="podcast_no_episodes_matching">找不到符合該搜尋條件的單集。 請嘗試其他關鍵字。</string>
+    <string name="podcast_no_bookmarks_matching">此 Podcast 沒有符合搜尋條件的書籤。 請嘗試其他關鍵字。</string>
+    <string name="podcasts_time_to_add_some_podcasts_summary">來自其他應用程式嗎？ 若想匯入 Podcast，可依序從「個人檔案」&gt;「設定」&gt;「匯入和匯出」進行。\n\n如果你想尋找靈感，試試看 「探索」分頁吧。</string>
+    <string name="onboarding_upgrade_purchase_failure_message">發生錯誤。 請稍後再試。</string>
+    <string name="onboarding_upgrade_no_plans_found_body">請檢查你的連線，或稍後再試。</string>
+    <string name="onboarding_upgrade_no_plans_found_title">無法載入方案</string>
     <string name="skip_for_now">暫時略過</string>
+    <string name="similar_shows_to">類似《%s》的節目</string>
+    <string name="recommendations_because_you_like">因為你喜歡</string>
     <string name="plus_week">週</string>
     <string name="onboarding_plus_recurring_after_intro_offer">第一年 (%2$s) 後，於%1$s後開始定期付款</string>
     <string name="you_might_like_empty_title">無法載入推薦內容</string>
