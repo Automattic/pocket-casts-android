@@ -1,13 +1,13 @@
 package au.com.shiftyjelly.pocketcasts
 
 import android.annotation.SuppressLint
-import android.net.Uri
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaDescriptionCompat
 import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.core.net.toUri
 import androidx.core.os.bundleOf
 import androidx.media.utils.MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_BROWSABLE
 import androidx.media.utils.MediaConstants.DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_LIST_ITEM
@@ -52,9 +52,11 @@ const val PROFILE_LISTENING_HISTORY = "__LISTENING_HISTORY__"
 @AndroidEntryPoint
 class AutoPlaybackService : PlaybackService() {
 
-    @Inject lateinit var listSource: ListRepository
+    @Inject
+    lateinit var listSource: ListRepository
 
-    @Inject @ApplicationScope
+    @Inject
+    @ApplicationScope
     lateinit var applicationScope: CoroutineScope
 
     override fun onCreate() {
@@ -181,10 +183,10 @@ class AutoPlaybackService : PlaybackService() {
         val updatedList = discoverFeed.layout.transformWithRegion(region, replacements, resources)
             .filter {
                 it.type is ListType.PodcastList &&
-                    it.displayStyle !is DisplayStyle.CollectionList &&
-                    !it.sponsored &&
-                    it.authenticated == false &&
-                    it.displayStyle !is DisplayStyle.SinglePodcast
+                        it.displayStyle !is DisplayStyle.CollectionList &&
+                        !it.sponsored &&
+                        it.authenticated == false &&
+                        it.displayStyle !is DisplayStyle.SinglePodcast
             }
             .mapNotNull<DiscoverRow, Pair<String, List<DiscoverPodcast>>> { discoverItem ->
                 Log.d(Settings.LOG_TAG_AUTO, "Loading discover feed ${discoverItem.source}")
@@ -206,7 +208,7 @@ class AutoPlaybackService : PlaybackService() {
                     extras.putString(EXTRA_CONTENT_STYLE_GROUP_TITLE_HINT, groupTitle)
 
                     val artworkUri = PodcastImage.getArtworkUrl(size = 480, uuid = it.uuid)
-                    val localUri = AutoConverter.getArtworkUriForContentProvider(Uri.parse(artworkUri), this)
+                    val localUri = AutoConverter.getArtworkUriForContentProvider(artworkUri.toUri(), this)
 
                     val discoverDescription = MediaDescriptionCompat.Builder()
                         .setTitle(it.title)
@@ -222,8 +224,3 @@ class AutoPlaybackService : PlaybackService() {
         return updatedList
     }
 }
-
-private const val ERROR_RESOLUTION_ACTION_LABEL =
-    "android.media.extras.ERROR_RESOLUTION_ACTION_LABEL"
-private const val ERROR_RESOLUTION_ACTION_INTENT =
-    "android.media.extras.ERROR_RESOLUTION_ACTION_INTENT"
