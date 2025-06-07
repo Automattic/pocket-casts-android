@@ -1,5 +1,8 @@
 7.92
 -----
+*   Bug Fixes
+    *   Respect embedded file artwork in media notifications
+        ([#4094](https://github.com/Automattic/pocket-casts-android/pull/4094))
 
 
 7.91
