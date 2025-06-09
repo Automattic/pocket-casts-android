@@ -208,6 +208,7 @@ data class OnboardingSubscriptionPlan private constructor(
 
     fun customFeatureTitle(source: OnboardingUpgradeSource) = when (key.tier) {
         SubscriptionTier.Plus -> when (source) {
+            OnboardingUpgradeSource.BANNER_AD -> LR.string.banner_ad_plus_prompt
             OnboardingUpgradeSource.SKIP_CHAPTERS -> LR.string.skip_chapters_plus_prompt
             OnboardingUpgradeSource.UP_NEXT_SHUFFLE -> LR.string.up_next_shuffle_plus_prompt
             OnboardingUpgradeSource.THEMES -> LR.string.themes_plus_prompt
