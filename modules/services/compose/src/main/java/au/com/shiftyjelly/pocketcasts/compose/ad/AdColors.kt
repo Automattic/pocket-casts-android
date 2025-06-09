@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 
 data class AdColors(
     val bannerAd: Banner,
+    val reportSheet: ReportSheet,
 ) {
     data class Banner(
         val background: Color,
@@ -18,6 +19,15 @@ data class AdColors(
         val icon: Color,
         val border: Color,
         val ripple: Color,
+    )
+
+    data class ReportSheet(
+        val surface: Color,
+        val primaryText: Color,
+        val highlightText: Color,
+        val icon: Color,
+        val ripple: Color,
+        val divider: Color,
     )
 }
 
@@ -38,6 +48,14 @@ fun rememberAdColors(): AdColors {
                     border = Color.Unspecified,
                     ripple = playerColors.contrast01,
                 ),
+                AdColors.ReportSheet(
+                    surface = playerColors.background01,
+                    primaryText = playerColors.contrast01,
+                    highlightText = playerColors.contrast01,
+                    icon = playerColors.contrast01,
+                    ripple = playerColors.contrast01,
+                    divider = playerColors.contrast05,
+                ),
             )
         } else {
             val themeColors = theme.colors
@@ -51,6 +69,14 @@ fun rememberAdColors(): AdColors {
                     icon = themeColors.primaryIcon02,
                     border = themeColors.primaryUi05,
                     ripple = themeColors.primaryInteractive01,
+                ),
+                AdColors.ReportSheet(
+                    surface = themeColors.primaryUi01,
+                    primaryText = themeColors.primaryText01,
+                    highlightText = themeColors.support01,
+                    icon = themeColors.primaryIcon03,
+                    ripple = themeColors.primaryInteractive01,
+                    divider = themeColors.primaryUi05,
                 ),
             )
         }

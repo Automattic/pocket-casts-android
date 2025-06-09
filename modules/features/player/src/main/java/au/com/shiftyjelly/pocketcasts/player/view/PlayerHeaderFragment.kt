@@ -80,6 +80,7 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog.ButtonType.Danger
 import au.com.shiftyjelly.pocketcasts.views.extensions.spring
+import au.com.shiftyjelly.pocketcasts.views.fragments.AdReportFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
@@ -267,7 +268,13 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                                         startActivity(intent)
                                     }.onFailure { LogBuffer.e("Ads", it, "Failed to open an ad: ${ad.id}") }
                                 },
-                                onOptionsClick = {},
+                                onOptionsClick = {
+                                    if (parentFragmentManager.findFragmentByTag("ad_report") == null) {
+                                        AdReportFragment
+                                            .newInstance(ad, podcastColors)
+                                            .show(parentFragmentManager, "ad_report")
+                                    }
+                                },
                                 modifier = Modifier.padding(bottom = 16.dp, top = 8.dp),
                             )
                         }
