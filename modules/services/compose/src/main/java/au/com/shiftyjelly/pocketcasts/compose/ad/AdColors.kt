@@ -4,7 +4,9 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.ui.helper.ColorUtils
 
 data class AdColors(
     val bannerAd: Banner,
@@ -37,11 +39,17 @@ fun rememberAdColors(): AdColors {
     val playerColors = theme.rememberPlayerColors()
     return remember(theme.type, playerColors) {
         if (playerColors != null) {
+            val adBackgroundColor = playerColors.contrast06.compositeOver(playerColors.background01)
+            val titleLabelContrast = ColorUtils.calculateContrast(
+                backgroundColor = adBackgroundColor.copy(alpha = 1f),
+                foregroundColor = playerColors.highlight01.copy(alpha = 1f),
+            )
+
             AdColors(
                 AdColors.Banner(
                     background = playerColors.contrast06,
                     ctaLabel = playerColors.contrast01,
-                    titleLabel = playerColors.highlight01,
+                    titleLabel = if (titleLabelContrast >= WcagAaTextContrastRequirement) playerColors.highlight01 else Color.White,
                     adLabelBackground = playerColors.contrast06,
                     adLabel = playerColors.contrast01,
                     icon = playerColors.contrast02,
@@ -82,3 +90,5 @@ fun rememberAdColors(): AdColors {
         }
     }
 }
+
+private const val WcagAaTextContrastRequirement = 4.5
