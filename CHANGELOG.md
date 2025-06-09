@@ -1,8 +1,9 @@
+7.92
+-----
+
+
 7.91
 -----
-*   New Features
-    *   Notifications Revamp
-        ([#4073](https://github.com/Automattic/pocket-casts-android/pull/4073))
 *   Updates
     *   Upgrade to the latest version of Jetpack Compose
         ([#4049](https://github.com/Automattic/pocket-casts-android/pull/4049))
