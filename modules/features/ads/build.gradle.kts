@@ -11,7 +11,7 @@ android {
     namespace = "au.com.shiftyjelly.pocketcasts.ads"
     buildFeatures {
         buildConfig = true
-        viewBinding = true
+        viewBinding = false
         compose = true
     }
 }
