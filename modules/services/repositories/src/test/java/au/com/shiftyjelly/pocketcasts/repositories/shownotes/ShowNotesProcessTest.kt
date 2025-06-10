@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.shownotes
 
 import au.com.shiftyjelly.pocketcasts.models.to.DbChapter
-import au.com.shiftyjelly.pocketcasts.models.to.Transcript
+import au.com.shiftyjelly.pocketcasts.models.entity.Transcript
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ImageUrlUpdate

@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.podcast
 import androidx.media3.extractor.text.SubtitleParser
 import au.com.shiftyjelly.pocketcasts.models.converter.TranscriptCue
 import au.com.shiftyjelly.pocketcasts.models.converter.TranscriptJsonConverter
-import au.com.shiftyjelly.pocketcasts.models.to.Transcript
+import au.com.shiftyjelly.pocketcasts.models.entity.Transcript
 import au.com.shiftyjelly.pocketcasts.utils.exception.EmptyDataException
 import au.com.shiftyjelly.pocketcasts.utils.exception.ParsingException
 import kotlinx.coroutines.test.runTest
