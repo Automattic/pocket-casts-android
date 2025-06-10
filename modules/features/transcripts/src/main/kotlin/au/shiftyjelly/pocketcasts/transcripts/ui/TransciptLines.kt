@@ -31,7 +31,7 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.R
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
-import au.shiftyjelly.pocketcasts.transcripts.TranscriptEntry
+import au.shiftyjelly.pocketcasts.transcripts.data.TranscriptEntry
 
 @Composable
 internal fun TranscriptLines(

@@ -1,4 +1,4 @@
-package au.shiftyjelly.pocketcasts.transcripts
+package au.shiftyjelly.pocketcasts.transcripts.data
 
 sealed interface TranscriptEntry {
     data class Text(
