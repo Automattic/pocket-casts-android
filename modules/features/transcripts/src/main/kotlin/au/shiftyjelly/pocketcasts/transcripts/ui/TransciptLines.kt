@@ -51,7 +51,7 @@ internal fun TranscriptLines(
             TranscriptLine(
                 entry = entry,
                 colors = colors,
-                modifier = Modifier.padding(entry.style.toPadding()),
+                modifier = Modifier.padding(entry.padding()),
             )
         }
     }
@@ -64,21 +64,26 @@ private fun TranscriptLine(
     modifier: Modifier = Modifier,
 ) {
     Text(
-        text = entry.text,
-        style = entry.style.toTextStyle(),
+        text = entry.text(),
+        style = entry.textStyle(),
         color = colors.text,
         modifier = modifier,
     )
 }
 
-private fun TranscriptEntry.Style.toTextStyle() = when (this) {
-    TranscriptEntry.Style.Simple -> SimpleTextStyle
-    TranscriptEntry.Style.Speaker -> SpeakerTextStyle
+private fun TranscriptEntry.text() = when (this) {
+    is TranscriptEntry.Text -> value
+    is TranscriptEntry.Speaker -> name
 }
 
-private fun TranscriptEntry.Style.toPadding() = when (this) {
-    TranscriptEntry.Style.Simple -> SimplePadding
-    TranscriptEntry.Style.Speaker -> SpeakerPadding
+private fun TranscriptEntry.textStyle() = when (this) {
+    is TranscriptEntry.Text -> SimpleTextStyle
+    is TranscriptEntry.Speaker -> SpeakerTextStyle
+}
+
+private fun TranscriptEntry.padding() = when (this) {
+    is TranscriptEntry.Text -> SimplePadding
+    is TranscriptEntry.Speaker -> SpeakerPadding
 }
 
 internal val RobotoSerifFontFamily = FontFamily(Font(R.font.roboto_serif))
