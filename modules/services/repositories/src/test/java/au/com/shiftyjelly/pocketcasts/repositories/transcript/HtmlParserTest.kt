@@ -21,6 +21,9 @@ class HtmlParserTest {
             |    Text
             |</p>
             |<p>
+            |    Peter: Text with speaker
+            |</p>
+            |<p>
             |    <!-- Comment -->
             |    Text with comment
             |</p>
@@ -38,6 +41,8 @@ class HtmlParserTest {
         assertEquals(
             listOf(
                 TranscriptEntry.Text("Text"),
+                TranscriptEntry.Speaker("Peter"),
+                TranscriptEntry.Text("Text with speaker"),
                 TranscriptEntry.Text("Text with comment"),
                 TranscriptEntry.Text("Text with tags"),
                 TranscriptEntry.Text("Text with special characters \" & ' < > \" ' & < >"),

@@ -23,6 +23,10 @@ class SrtParserTest {
             |2
             |00:00:01,000 --> 00:00:02,000
             |<i>Text</i> <b>with</b> <font color="white">HTML</font> tags
+            |
+            |3
+            |00:00:02,000 --> 00:00:03,000
+            |Speaker 1: Text with speaker
         """.trimMargin()
         val source = Buffer().writeUtf8(subtitles)
 
@@ -32,6 +36,8 @@ class SrtParserTest {
             listOf(
                 TranscriptEntry.Text("Text"),
                 TranscriptEntry.Text("Text with HTML tags"),
+                TranscriptEntry.Speaker("Speaker 1"),
+                TranscriptEntry.Text("Text with speaker"),
             ),
             entries,
         )

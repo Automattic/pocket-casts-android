@@ -73,7 +73,19 @@ internal class SrtParser : SubtitleParser(SubripParser()) {
             return emptyList()
         }
 
-        return listOf(TranscriptEntry.Text(cueText.toString()))
+        return buildList {
+            val speakerGroups = SpeakerRegex.matchEntire(cueText)?.groupValues
+            if (speakerGroups != null) {
+                add(TranscriptEntry.Speaker(speakerGroups[1]))
+                add(TranscriptEntry.Text(speakerGroups[2]))
+            } else {
+                add(TranscriptEntry.Text(cueText))
+            }
+        }
+    }
+
+    private companion object {
+        val SpeakerRegex = """^\s*([a-zA-Z0-9 ]+):\s(.*)""".toRegex()
     }
 }
 
@@ -87,13 +99,25 @@ internal class HtmlParser : TranscriptParser {
 
         HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_COMPACT)
             .lines()
-            .mapNotNull { line ->
-                val trimmedLine = line.trim().takeIf(String::isNotEmpty)
-                trimmedLine?.let(TranscriptEntry::Text)
+            .mapNotNull { line -> line.trim().takeIf(String::isNotEmpty) }
+            .flatMap { line ->
+                buildList {
+                    val speakerGroups = SpeakerRegex.matchEntire(line)?.groupValues
+                    if (speakerGroups != null) {
+                        add(TranscriptEntry.Speaker(speakerGroups[1]))
+                        add(TranscriptEntry.Text(speakerGroups[2]))
+                    } else {
+                        add(TranscriptEntry.Text(line))
+                    }
+                }
             }
     }
 
     class ScriptDetectedException : RuntimeException()
+
+    private companion object {
+        val SpeakerRegex = """^([a-zA-Z0-9 ]+):\s(.*)""".toRegex()
+    }
 }
 
 internal class JsonParser(
