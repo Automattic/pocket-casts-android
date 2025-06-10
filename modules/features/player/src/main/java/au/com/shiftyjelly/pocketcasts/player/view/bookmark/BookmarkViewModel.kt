@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.player.view.bookmark
 
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
@@ -43,8 +42,6 @@ class BookmarkViewModel
     data class UiState(
         val bookmarkUuid: String? = null,
         val title: TextFieldValue = buildSelectedTextFieldValue(DEFAULT_TITLE),
-        val backgroundColor: Color = Color.Black,
-        val tintColor: Color = Color.Blue,
     ) {
         val isNewBookmark: Boolean = bookmarkUuid == null
     }
@@ -59,8 +56,6 @@ class BookmarkViewModel
         val bookmarkUuid = arguments.bookmarkUuid
         mutableUiState.value = mutableUiState.value.copy(
             bookmarkUuid = bookmarkUuid,
-            backgroundColor = Color(arguments.backgroundColor),
-            tintColor = Color(arguments.tintColor),
         )
         viewModelScope.launch {
             // load the existing bookmark

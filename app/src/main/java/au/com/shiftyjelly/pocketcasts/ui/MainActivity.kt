@@ -113,6 +113,7 @@ import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
 import au.com.shiftyjelly.pocketcasts.player.view.PlayerBottomSheet
 import au.com.shiftyjelly.pocketcasts.player.view.PlayerContainerFragment
 import au.com.shiftyjelly.pocketcasts.player.view.UpNextFragment
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivity
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContract
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksContainerFragment
 import au.com.shiftyjelly.pocketcasts.player.view.dialog.MiniPlayerDialog
@@ -1339,16 +1340,22 @@ class MainActivity :
                 }
 
                 is AddBookmarkDeepLink -> {
-                    viewModel.buildBookmarkArguments { args ->
-                        bookmarkActivityLauncher.launch(args.getIntent(this))
+                    launch {
+                        val bookmarkArguments = viewModel.createBookmarkArguments(bookmarkUuid = null)
+                        if (bookmarkArguments != null) {
+                            bookmarkActivityLauncher.launch(BookmarkActivity.launchIntent(this@MainActivity, bookmarkArguments))
+                        }
                     }
                 }
 
                 is ChangeBookmarkTitleDeepLink -> {
-                    viewModel.buildBookmarkArguments(deepLink.bookmarkUuid) { args ->
-                        bookmarkActivityLauncher.launch(args.getIntent(this))
+                    launch {
+                        val bookmarkArguments = viewModel.createBookmarkArguments(deepLink.bookmarkUuid)
+                        if (bookmarkArguments != null) {
+                            bookmarkActivityLauncher.launch(BookmarkActivity.launchIntent(this@MainActivity, bookmarkArguments))
+                        }
+                        notificationHelper.removeNotification(intent.extras, Settings.NotificationId.BOOKMARK.value)
                     }
-                    notificationHelper.removeNotification(intent.extras, Settings.NotificationId.BOOKMARK.value)
                 }
 
                 is ShowBookmarkDeepLink -> {

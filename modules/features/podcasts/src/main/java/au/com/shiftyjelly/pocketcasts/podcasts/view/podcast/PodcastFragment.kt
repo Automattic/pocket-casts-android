@@ -50,6 +50,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivity
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksSortByDialog
 import au.com.shiftyjelly.pocketcasts.podcasts.BuildConfig
 import au.com.shiftyjelly.pocketcasts.podcasts.R
@@ -946,9 +947,10 @@ class PodcastFragment : BaseFragment() {
         }
     }
 
-    private fun onEditBookmarkClick() {
-        viewModel.buildBookmarkArguments { arguments ->
-            startActivity(arguments.getIntent(requireContext()))
+    private suspend fun onEditBookmarkClick() {
+        val bookmarkArguments = viewModel.createBookmarkArguments()
+        if (bookmarkArguments != null) {
+            startActivity(BookmarkActivity.launchIntent(requireContext(), bookmarkArguments))
         }
     }
 
