@@ -1,6 +1,6 @@
 @file:OptIn(UnstableApi::class)
 
-package au.shiftyjelly.pocketcasts.transcripts.data
+package au.com.shiftyjelly.pocketcasts.repositories.transcript
 
 import android.text.SpannedString
 import androidx.annotation.OptIn
@@ -14,6 +14,7 @@ import androidx.media3.extractor.text.subrip.SubripParser
 import androidx.media3.extractor.text.webvtt.WebvttParser
 import au.com.shiftyjelly.pocketcasts.models.converter.TranscriptCue
 import au.com.shiftyjelly.pocketcasts.models.converter.TranscriptSegments
+import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
 import com.squareup.moshi.Moshi
 import okio.BufferedSource
 import okio.use

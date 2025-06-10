@@ -1,5 +1,6 @@
-package au.shiftyjelly.pocketcasts.transcripts.data
+package au.com.shiftyjelly.pocketcasts.repositories.transcript
 
+import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
 import okio.Buffer
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -38,7 +39,7 @@ class WebVttParserTest {
 
         assertEquals(
             listOf(
-                TranscriptEntry.Text("Text without speaker"),
+                TranscriptEntry.Text("Text"),
                 TranscriptEntry.Speaker("Alice"),
                 TranscriptEntry.Text("Text with speaker"),
                 TranscriptEntry.Text("Text with decorations"),

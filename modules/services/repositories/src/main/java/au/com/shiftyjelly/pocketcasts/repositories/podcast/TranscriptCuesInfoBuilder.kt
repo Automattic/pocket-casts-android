@@ -6,8 +6,8 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.extractor.text.CuesWithTiming
 import androidx.media3.extractor.text.SubtitleParser
 import au.com.shiftyjelly.pocketcasts.models.converter.TranscriptJsonConverter
-import au.com.shiftyjelly.pocketcasts.models.to.CuesAdditionalInfo
 import au.com.shiftyjelly.pocketcasts.models.entity.Transcript
+import au.com.shiftyjelly.pocketcasts.models.to.CuesAdditionalInfo
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptCuesInfo
 import au.com.shiftyjelly.pocketcasts.utils.exception.EmptyDataException
 import au.com.shiftyjelly.pocketcasts.utils.exception.ParsingException

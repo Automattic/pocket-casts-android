@@ -1,5 +1,6 @@
-package au.shiftyjelly.pocketcasts.transcripts.data
+package au.com.shiftyjelly.pocketcasts.repositories.transcript
 
+import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
 import com.squareup.moshi.Moshi
 import okio.Buffer
 import org.junit.Assert.assertEquals

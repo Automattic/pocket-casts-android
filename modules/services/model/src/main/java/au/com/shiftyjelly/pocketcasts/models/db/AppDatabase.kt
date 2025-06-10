@@ -63,6 +63,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.models.entity.SearchHistoryItem
 import au.com.shiftyjelly.pocketcasts.models.entity.SuggestedFolder
+import au.com.shiftyjelly.pocketcasts.models.entity.Transcript
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextChange
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextHistory
@@ -70,7 +71,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserNotifications
 import au.com.shiftyjelly.pocketcasts.models.entity.UserPodcastRating
 import au.com.shiftyjelly.pocketcasts.models.to.DbChapter
-import au.com.shiftyjelly.pocketcasts.models.entity.Transcript
 import java.io.File
 import java.util.Arrays
 import java.util.Date
