@@ -8,15 +8,15 @@ import javax.inject.Inject
 
 @JsonClass(generateAdapter = true)
 data class TranscriptSegments(
-    @field:Json(name = "segments") var segments: List<TranscriptCue>,
+    @Json(name = "segments") val segments: List<TranscriptCue>,
 )
 
 @JsonClass(generateAdapter = true)
 data class TranscriptCue(
-    @field:Json(name = "body") var body: String?,
-    @field:Json(name = "startTime") var startTime: Double?,
-    @field:Json(name = "endTime") var endTime: Double?,
-    @field:Json(name = "speaker") var speaker: String?,
+    @Json(name = "body") val body: String,
+    @Json(name = "startTime") val startTime: Double?,
+    @Json(name = "endTime") val endTime: Double?,
+    @Json(name = "speaker") val speaker: String?,
 )
 
 class TranscriptJsonConverter @Inject constructor(
