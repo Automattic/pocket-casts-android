@@ -1,17 +1,21 @@
 package au.com.shiftyjelly.pocketcasts.player.view.bookmark
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -26,49 +30,81 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
-import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
-import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
+import au.com.shiftyjelly.pocketcasts.compose.PlayerColors
+import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
+import au.com.shiftyjelly.pocketcasts.compose.PodcastColorsParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.extensions.onEnter
 import au.com.shiftyjelly.pocketcasts.compose.extensions.onTabMoveFocus
+import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.R
+import au.com.shiftyjelly.pocketcasts.ui.helper.ColorUtils
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.images.R as IR
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 /***
  * A page for to set a title for a bookmark and save it.
  */
 @Composable
-fun BookmarkPage(isNewBookmark: Boolean, title: TextFieldValue, tintColor: Color, backgroundColor: Color, onTitleChange: (TextFieldValue) -> Unit, onSave: () -> Unit, onClose: () -> Unit, modifier: Modifier = Modifier) {
-    Column(modifier = modifier) {
-        Box(contentAlignment = Alignment.Center) {
-            ThemedTopAppBar(
-                backgroundColor = Color.Transparent,
-                navigationButton = NavigationButton.Close,
-                onNavigationClick = onClose,
-                iconColor = tintColor,
-                modifier = Modifier.fillMaxWidth(),
-            )
-            Text(
-                text = stringResource(if (isNewBookmark) R.string.add_bookmark_title else R.string.change_title),
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-            )
+fun BookmarkPage(
+    isNewBookmark: Boolean,
+    title: TextFieldValue,
+    playerColors: PlayerColors,
+    onTitleChange: (TextFieldValue) -> Unit,
+    onSave: () -> Unit,
+    onClose: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier,
+    ) {
+        Box(
+            contentAlignment = Alignment.Center,
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                IconButton(
+                    onClick = onClose,
+                ) {
+                    Icon(
+                        painter = painterResource(IR.drawable.ic_close),
+                        contentDescription = stringResource(LR.string.close),
+                        tint = playerColors.contrast01,
+                    )
+                }
+                Text(
+                    text = stringResource(if (isNewBookmark) R.string.add_bookmark_title else R.string.change_title),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    color = playerColors.contrast01,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f),
+                )
+                Spacer(
+                    modifier = Modifier.size(48.dp),
+                )
+            }
         }
         Content(
             isNewBookmark = isNewBookmark,
             title = title,
-            tintColor = tintColor,
-            backgroundColor = backgroundColor,
+            colors = playerColors,
             onTitleChange = onTitleChange,
             onSave = onSave,
         )
@@ -76,9 +112,15 @@ fun BookmarkPage(isNewBookmark: Boolean, title: TextFieldValue, tintColor: Color
 }
 
 @Composable
-private fun Content(isNewBookmark: Boolean, title: TextFieldValue, tintColor: Color, backgroundColor: Color, onTitleChange: (TextFieldValue) -> Unit, onSave: () -> Unit, modifier: Modifier = Modifier) {
+private fun Content(
+    isNewBookmark: Boolean,
+    title: TextFieldValue,
+    colors: PlayerColors,
+    onTitleChange: (TextFieldValue) -> Unit,
+    onSave: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val focusRequester = remember { FocusRequester() }
-    val buttonColor = if (tintColor == Color.White) MaterialTheme.colors.primary else tintColor
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
@@ -89,16 +131,17 @@ private fun Content(isNewBookmark: Boolean, title: TextFieldValue, tintColor: Co
         val titleRes = if (isNewBookmark) R.string.add_bookmark_title_hint else R.string.change_bookmark_title_hint
         TextP40(
             text = stringResource(titleRes),
-            color = Color.White.copy(alpha = 0.5f),
+            color = colors.contrast02,
             textAlign = TextAlign.Center,
-            modifier = Modifier.widthIn(100.dp, 240.dp),
         )
 
-        Spacer(Modifier.weight(1f))
+        Spacer(
+            modifier = Modifier.weight(1f),
+        )
 
         val tintTextSelectionColors = TextSelectionColors(
-            handleColor = buttonColor,
-            backgroundColor = buttonColor.copy(alpha = 0.4f),
+            handleColor = colors.highlight01,
+            backgroundColor = colors.highlight01.copy(alpha = 0.4f),
         )
         CompositionLocalProvider(LocalTextSelectionColors provides tintTextSelectionColors) {
             TextField(
@@ -110,11 +153,11 @@ private fun Content(isNewBookmark: Boolean, title: TextFieldValue, tintColor: Co
                     fontWeight = FontWeight.Bold,
                 ),
                 colors = TextFieldDefaults.textFieldColors(
-                    textColor = Color.White,
+                    textColor = colors.contrast01,
                     backgroundColor = Color.Transparent,
-                    cursorColor = buttonColor,
-                    focusedIndicatorColor = Color(0x33FFFFFF),
-                    unfocusedIndicatorColor = Color(0x33FFFFFF),
+                    cursorColor = colors.highlight01,
+                    focusedIndicatorColor = colors.highlight01,
+                    unfocusedIndicatorColor = colors.highlight01,
 
                 ),
                 modifier = Modifier
@@ -125,14 +168,26 @@ private fun Content(isNewBookmark: Boolean, title: TextFieldValue, tintColor: Co
             )
         }
 
-        Spacer(Modifier.weight(1f))
+        Spacer(
+            modifier = Modifier.weight(1f),
+        )
+
         val isTitleBlank = title.text.isBlank()
+        val textColor = remember(colors) {
+            val backgroundForContrast = colors.background01.copy(alpha = 1f)
+            val highlightForContrast = colors.highlight01.copy(alpha = 1f)
+            when {
+                ColorUtils.calculateContrast(backgroundForContrast, highlightForContrast) > 4.5 -> colors.background01
+                ColorUtils.calculateContrast(Color.White, highlightForContrast) > 4.5 -> Color.White
+                else -> Color.Black
+            }
+        }
+
         RowButton(
             text = stringResource(if (isNewBookmark) R.string.save_bookmark else R.string.change_title),
-            colors = ButtonDefaults.buttonColors(backgroundColor = buttonColor),
+            colors = ButtonDefaults.buttonColors(backgroundColor = colors.highlight01),
             enabled = !isTitleBlank,
-            // if the tint color is too light use the background color for the text
-            textColor = if (buttonColor.luminance() > 0.5) backgroundColor else Color.White,
+            textColor = textColor,
             includePadding = false,
             onClick = onSave,
         )
@@ -144,16 +199,23 @@ private fun Content(isNewBookmark: Boolean, title: TextFieldValue, tintColor: Co
 
 @Preview
 @Composable
-private fun BookmarkPagePreview() {
-    AppThemeWithBackground(Theme.ThemeType.DARK) {
-        BookmarkPage(
-            isNewBookmark = true,
-            title = TextFieldValue(""),
-            tintColor = Color.White,
-            backgroundColor = Color.Black,
-            onTitleChange = {},
-            onSave = {},
-            onClose = {},
-        )
+private fun BookmarkPagePreview(
+    @PreviewParameter(PodcastColorsParameterProvider::class) podcastColors: PodcastColors,
+) {
+    AppTheme(Theme.ThemeType.ROSE) {
+        CompositionLocalProvider(
+            LocalPodcastColors provides podcastColors,
+        ) {
+            val colors = MaterialTheme.theme.rememberPlayerColorsOrDefault()
+            BookmarkPage(
+                isNewBookmark = true,
+                title = TextFieldValue(""),
+                playerColors = colors,
+                onTitleChange = {},
+                onSave = {},
+                onClose = {},
+                modifier = Modifier.background(colors.background01),
+            )
+        }
     }
 }

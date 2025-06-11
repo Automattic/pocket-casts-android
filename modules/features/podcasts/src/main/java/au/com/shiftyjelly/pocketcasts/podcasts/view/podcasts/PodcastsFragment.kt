@@ -54,6 +54,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import au.com.shiftyjelly.pocketcasts.ads.AdReportFragment
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
@@ -179,7 +180,7 @@ class PodcastsFragment :
         val bannerAdAdapter = BannerAdAdapter(
             themeType = theme.activeTheme,
             onAdClick = ::openAd,
-            onAdOptionsClick = {},
+            onAdOptionsClick = ::openAdReportFlow,
         )
         this.bannerAdAdapter = bannerAdAdapter
 
@@ -502,7 +503,7 @@ class PodcastsFragment :
                             ad = ad,
                             colors = rememberAdColors().bannerAd,
                             onAdClick = { openAd(ad) },
-                            onOptionsClick = {},
+                            onOptionsClick = { openAdReportFlow(ad) },
                         )
                     }
 
@@ -670,6 +671,14 @@ class PodcastsFragment :
             val intent = Intent(Intent.ACTION_VIEW, ad.ctaUrl.toUri())
             startActivity(intent)
         }.onFailure { LogBuffer.e("Ads", it, "Failed to open an ad: ${ad.id}") }
+    }
+
+    private fun openAdReportFlow(ad: BlazeAd) {
+        if (parentFragmentManager.findFragmentByTag("ad_report") == null) {
+            AdReportFragment
+                .newInstance(ad, podcastColors = null)
+                .show(parentFragmentManager, "ad_report")
+        }
     }
 
     inner class SpaceItemDecoration : RecyclerView.ItemDecoration() {

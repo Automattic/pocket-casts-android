@@ -327,6 +327,7 @@ private fun Content(
                 OnboardingUpgradeSource.APPEARANCE,
                 OnboardingUpgradeSource.ICONS,
                 OnboardingUpgradeSource.THEMES,
+                OnboardingUpgradeSource.BANNER_AD,
                 OnboardingUpgradeSource.BOOKMARKS,
                 OnboardingUpgradeSource.BOOKMARKS_SHELF_ACTION,
                 OnboardingUpgradeSource.END_OF_YEAR,

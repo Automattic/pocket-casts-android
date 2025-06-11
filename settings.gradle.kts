@@ -49,6 +49,7 @@ include(":wear")
 
 // features
 include(":modules:features:account")
+include(":modules:features:ads")
 include(":modules:features:cartheme")
 include(":modules:features:discover")
 include(":modules:features:endofyear")
@@ -65,6 +66,7 @@ include(":modules:features:shared")
 include(":modules:features:reimagine")
 include(":modules:features:referrals")
 include(":modules:features:taskerplugin")
+include(":modules:features:transcripts")
 include(":modules:features:widgets")
 
 // services

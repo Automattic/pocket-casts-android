@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.player.view
 import android.animation.LayoutTransition
 import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.GestureDetector
 import android.view.LayoutInflater
@@ -11,15 +10,25 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
-import androidx.compose.foundation.layout.Box
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.view.marginTop
@@ -31,12 +40,20 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import au.com.shiftyjelly.pocketcasts.ads.AdReportFragment
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
+import au.com.shiftyjelly.pocketcasts.compose.PlayerColors
+import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
+import au.com.shiftyjelly.pocketcasts.compose.ad.AdBanner
+import au.com.shiftyjelly.pocketcasts.compose.ad.rememberAdColors
+import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedNonNullVisibility
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.player.binding.setSeekBarState
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterPlayerHeaderBinding
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivity
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContract
 import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.PlayerControls
 import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.PlayerHeadingSection
@@ -62,6 +79,7 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog.ButtonType.Danger
 import au.com.shiftyjelly.pocketcasts.views.extensions.spring
@@ -77,6 +95,7 @@ import kotlin.math.abs
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -144,32 +163,29 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         setupUpNextDrag(binding)
 
         viewModel.listDataLive.observe(viewLifecycleOwner) {
-            val headerViewModel = it.podcastHeader
+            val podcastHeader = it.podcastHeader
 
+            binding.playerGroup.setBackgroundColor(podcastHeader.backgroundColor)
             binding.seekBar.setSeekBarState(
-                duration = headerViewModel.durationMs.milliseconds,
-                position = headerViewModel.positionMs.milliseconds,
-                chapters = headerViewModel.chapters,
-                playbackSpeed = headerViewModel.playbackEffects.playbackSpeed,
-                adjustDuration = headerViewModel.adjustRemainingTimeDuration,
-                tintColor = headerViewModel.iconTintColor,
-                bufferedUpTo = headerViewModel.bufferedUpToMs,
-                isBuffering = headerViewModel.isBuffering,
-                theme = headerViewModel.theme,
+                duration = podcastHeader.durationMs.milliseconds,
+                position = podcastHeader.positionMs.milliseconds,
+                chapters = podcastHeader.chapters,
+                playbackSpeed = podcastHeader.playbackEffects.playbackSpeed,
+                adjustDuration = podcastHeader.adjustRemainingTimeDuration,
+                bufferedUpTo = podcastHeader.bufferedUpToMs,
+                isBuffering = podcastHeader.isBuffering,
             )
+        }
 
-            binding.playerGroup.setBackgroundColor(headerViewModel.backgroundColor)
-            binding.seekBar.setSeekBarState(
-                duration = headerViewModel.durationMs.milliseconds,
-                position = headerViewModel.positionMs.milliseconds,
-                chapters = headerViewModel.chapters,
-                playbackSpeed = headerViewModel.playbackEffects.playbackSpeed,
-                adjustDuration = headerViewModel.adjustRemainingTimeDuration,
-                tintColor = headerViewModel.iconTintColor,
-                bufferedUpTo = headerViewModel.bufferedUpToMs,
-                isBuffering = headerViewModel.isBuffering,
-                theme = headerViewModel.theme,
-            )
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                podcastColorsFlow().collect { podcastColors ->
+                    val playerColors = PlayerColors(theme.activeTheme, podcastColors ?: PodcastColors.ForUserEpisode)
+
+                    binding.playerGroup.setBackgroundColor(playerColors.background01.toArgb())
+                    binding.seekBar.setTintColor(playerColors.highlight01.toArgb(), theme.activeTheme)
+                }
+            }
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -209,7 +225,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                         is PlayerViewModel.NavigationState.OpenChapterUrl -> {
                             val chapterUrl = navigationState.chapterUrl
                             val intent = Intent(Intent.ACTION_VIEW)
-                            intent.data = Uri.parse(chapterUrl)
+                            intent.data = chapterUrl.toUri()
                             try {
                                 startActivity(intent)
                             } catch (e: ActivityNotFoundException) {
@@ -226,13 +242,42 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     private fun setupArtworkSectionComposeView() {
         binding?.artworkSectionComposeView?.setContentWithViewCompositionStrategy {
             val state by remember { playerVisualsStateFlow() }.collectAsState(PlayerVisualsState.Empty)
+            val podcastColors by remember { podcastColorsFlow() }.collectAsState(null)
+            val ads by viewModel.activeAds.collectAsState()
             val player by viewModel.playerFlow.collectAsState()
 
             AppTheme(theme.activeTheme) {
-                Box(
-                    contentAlignment = Alignment.Center,
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
                     modifier = Modifier.padding(16.dp),
                 ) {
+                    AnimatedNonNullVisibility(
+                        item = ads.firstOrNull().takeIf { podcastColors != null },
+                        enter = adEnterTransition,
+                        exit = adExitTransition,
+                    ) { ad ->
+                        CompositionLocalProvider(LocalPodcastColors provides podcastColors) {
+                            AdBanner(
+                                ad = ad,
+                                colors = rememberAdColors().bannerAd,
+                                onAdClick = {
+                                    runCatching {
+                                        val intent = Intent(Intent.ACTION_VIEW, ad.ctaUrl.toUri())
+                                        startActivity(intent)
+                                    }.onFailure { LogBuffer.e("Ads", it, "Failed to open an ad: ${ad.id}") }
+                                },
+                                onOptionsClick = {
+                                    if (parentFragmentManager.findFragmentByTag("ad_report") == null) {
+                                        AdReportFragment
+                                            .newInstance(ad, podcastColors)
+                                            .show(parentFragmentManager, "ad_report")
+                                    }
+                                },
+                                modifier = Modifier.padding(bottom = 16.dp, top = 8.dp),
+                            )
+                        }
+                    }
                     PlayerVisuals(
                         state = state,
                         player = player,
@@ -259,10 +304,16 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
     private fun setupPlayerControlsComposeView() {
         binding?.playerControlsComposeView?.setContentWithViewCompositionStrategy {
+            val podcastColors by remember { podcastColorsFlow() }.collectAsState(null)
+
             AppTheme(theme.activeTheme) {
-                PlayerControls(
-                    playerViewModel = viewModel,
-                )
+                CompositionLocalProvider(
+                    LocalPodcastColors provides podcastColors,
+                ) {
+                    PlayerControls(
+                        playerViewModel = viewModel,
+                    )
+                }
             }
         }
     }
@@ -371,8 +422,9 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                         }
 
                         NavigationState.ShowAddBookmark -> {
-                            viewModel.buildBookmarkArguments { arguments ->
-                                activityLauncher.launch(arguments.getIntent(requireContext()))
+                            val bookmarkArguments = viewModel.createBookmarkArguments()
+                            if (bookmarkArguments != null) {
+                                activityLauncher.launch(BookmarkActivity.launchIntent(requireContext(), bookmarkArguments))
                             }
                         }
 
@@ -605,4 +657,25 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         }
         return PlayerVisualsState(contentState, header.isPrepared)
     }
+
+    private fun podcastColorsFlow(): Flow<PodcastColors?> {
+        return combine(
+            viewModel.episodeFlow,
+            viewModel.podcastFlow,
+        ) { episode, podcast ->
+            if (episode != null) {
+                podcast?.let(::PodcastColors) ?: PodcastColors.ForUserEpisode
+            } else {
+                null
+            }
+        }
+    }
 }
+
+private val fadeIn = fadeIn(spring(stiffness = Spring.StiffnessVeryLow))
+private val fadeOut = fadeOut(spring(stiffness = Spring.StiffnessVeryLow))
+private val expandVertically = expandVertically(spring(stiffness = Spring.StiffnessMediumLow))
+private val shrinkVertically = shrinkVertically(spring(stiffness = Spring.StiffnessMediumLow))
+
+private val adEnterTransition = fadeIn + expandVertically
+private val adExitTransition = fadeOut + shrinkVertically

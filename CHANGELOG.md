@@ -1,12 +1,18 @@
 7.92
 -----
-
+*   Bug Fixes
+    *   Fix keyboard blocking WebView input fields in Help & Feedback page
+        ([#4109](https://github.com/Automattic/pocket-casts-android/pull/4109))
+    *   Fix player's theming responsivness
+        ([#4091](https://github.com/Automattic/pocket-casts-android/pull/4091))
+    *   Respect embedded file artwork in media notifications
+        ([#4103](https://github.com/Automattic/pocket-casts-android/pull/4103))
 
 7.91
 -----
 *   New Features
-    *   Notifications Revamp
-        ([#4073](https://github.com/Automattic/pocket-casts-android/pull/4073))
+    *   Introduce new notifications and give better control over them
+        ([#4107](https://github.com/Automattic/pocket-casts-android/pull/4107))
 *   Updates
     *   Upgrade to the latest version of Jetpack Compose
         ([#4049](https://github.com/Automattic/pocket-casts-android/pull/4049))
