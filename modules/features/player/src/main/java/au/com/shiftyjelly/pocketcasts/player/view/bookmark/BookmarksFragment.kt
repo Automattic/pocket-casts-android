@@ -3,14 +3,12 @@ package au.com.shiftyjelly.pocketcasts.player.view.bookmark
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
@@ -23,8 +21,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
+import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
-import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -43,7 +42,10 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -85,7 +87,7 @@ class BookmarksFragment : BaseFragment() {
 
     private val overrideTheme: Theme.ThemeType
         get() = when (sourceView) {
-            SourceView.PLAYER -> if (Theme.isDark(context)) theme.activeTheme else Theme.ThemeType.DARK
+            SourceView.PLAYER -> theme.activeTheme
             else -> if (forceDarkTheme && theme.isLightTheme) Theme.ThemeType.DARK else theme.activeTheme
         }
 
@@ -98,7 +100,7 @@ class BookmarksFragment : BaseFragment() {
             // Hack to allow nested scrolling inside bottom sheet viewpager
             // https://stackoverflow.com/a/70195667/193545
             Surface(modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection())) {
-                val listData = remember {
+                val listData by remember {
                     playerViewModel.listDataLive.asFlow()
                         // ignore the episode progress
                         .distinctUntilChanged { t1, t2 ->
@@ -107,76 +109,68 @@ class BookmarksFragment : BaseFragment() {
                         }
                 }.collectAsState(initial = null)
 
+                val podcastColors by remember { podcastColorsFlow() }.collectAsState(
+                    if (sourceView == SourceView.PLAYER) {
+                        PodcastColors.ForUserEpisode
+                    } else {
+                        null
+                    },
+                )
+
                 val episodeUuid = episodeUuid(listData)
                 val bottomInset = settings.bottomInset.collectAsStateWithLifecycle(initialValue = 0)
-                BookmarksPage(
-                    episodeUuid = episodeUuid,
-                    backgroundColor = backgroundColor(listData),
-                    textColor = textColor(listData),
-                    sourceView = sourceView,
-                    bookmarksViewModel = bookmarksViewModel,
-                    multiSelectHelper = bookmarksViewModel.multiSelectHelper,
-                    onRowLongPressed = { bookmark ->
-                        bookmarksViewModel.multiSelectHelper.defaultLongPress(
-                            multiSelectable = bookmark,
-                            fragmentManager = childFragmentManager,
-                            forceDarkTheme = sourceView == SourceView.PLAYER,
-                        )
-                    },
-                    onShareBookmarkClick = ::onShareBookmarkClick,
-                    onEditBookmarkClick = ::onEditBookmarkClick,
-                    onUpgradeClicked = ::onUpgradeClicked,
-                    showOptionsDialog = { showOptionsDialog(it) },
-                    openFragment = { fragment ->
-                        val bottomSheet = (parentFragment as? BottomSheetDialogFragment)
-                        if (sourceView != SourceView.PROFILE) bottomSheet?.dismiss() // Do not close bookmarks container dialog if opened from profile
-                        val fragmentHostListener = (activity as? FragmentHostListener)
-                        fragmentHostListener?.apply {
-                            closePlayer() // Closes player if open
-                            openTab(R.id.navigation_profile)
-                            addFragment(SettingsFragment())
-                            addFragment(fragment)
-                        }
-                    },
-                    onSearchBarClearButtonTapped = {
-                        bookmarksViewModel.searchBarClearButtonTapped()
-                    },
-                    onHeadphoneControlsButtonTapped = {
-                        bookmarksViewModel.onHeadphoneControlsButtonTapped()
-                    },
-                    bottomInset = if (sourceView == SourceView.PROFILE) {
-                        0.dp + bottomInset.value.pxToDp(LocalContext.current).dp
-                    } else {
-                        28.dp
-                    },
-                    isDarkTheme = overrideTheme.darkTheme,
-                )
+
+                CompositionLocalProvider(
+                    LocalPodcastColors provides podcastColors,
+                ) {
+                    BookmarksPage(
+                        episodeUuid = episodeUuid,
+                        sourceView = sourceView,
+                        bookmarksViewModel = bookmarksViewModel,
+                        multiSelectHelper = bookmarksViewModel.multiSelectHelper,
+                        onRowLongPressed = { bookmark ->
+                            bookmarksViewModel.multiSelectHelper.defaultLongPress(
+                                multiSelectable = bookmark,
+                                fragmentManager = childFragmentManager,
+                                forceDarkTheme = sourceView == SourceView.PLAYER,
+                            )
+                        },
+                        onShareBookmarkClick = ::onShareBookmarkClick,
+                        onEditBookmarkClick = ::onEditBookmarkClick,
+                        onUpgradeClicked = ::onUpgradeClicked,
+                        showOptionsDialog = { showOptionsDialog(it) },
+                        openFragment = { fragment ->
+                            val bottomSheet = (parentFragment as? BottomSheetDialogFragment)
+                            if (sourceView != SourceView.PROFILE) bottomSheet?.dismiss() // Do not close bookmarks container dialog if opened from profile
+                            val fragmentHostListener = (activity as? FragmentHostListener)
+                            fragmentHostListener?.apply {
+                                closePlayer() // Closes player if open
+                                openTab(R.id.navigation_profile)
+                                addFragment(SettingsFragment())
+                                addFragment(fragment)
+                            }
+                        },
+                        onSearchBarClearButtonTapped = {
+                            bookmarksViewModel.searchBarClearButtonTapped()
+                        },
+                        onHeadphoneControlsButtonTapped = {
+                            bookmarksViewModel.onHeadphoneControlsButtonTapped()
+                        },
+                        bottomInset = if (sourceView == SourceView.PROFILE) {
+                            0.dp + bottomInset.value.pxToDp(LocalContext.current).dp
+                        } else {
+                            28.dp
+                        },
+                    )
+                }
             }
         }
     }
 
-    @Composable
-    private fun episodeUuid(listData: State<PlayerViewModel.ListData?>) =
-        when (sourceView) {
-            SourceView.PLAYER -> listData.value?.podcastHeader?.episodeUuid
-            else -> episodeUuid
-        }
-
-    @Composable
-    private fun backgroundColor(listData: State<PlayerViewModel.ListData?>) =
-        when (sourceView) {
-            SourceView.PLAYER -> listData.value?.let { Color(it.podcastHeader.backgroundColor) }
-                ?: MaterialTheme.theme.colors.primaryUi01
-            else -> MaterialTheme.theme.colors.primaryUi01
-        }
-
-    @Composable
-    private fun textColor(listData: State<PlayerViewModel.ListData?>) =
-        when (sourceView) {
-            SourceView.PLAYER -> listData.value?.let { Color(it.podcastHeader.backgroundColor) }
-                ?: MaterialTheme.theme.colors.primaryUi01
-            else -> MaterialTheme.theme.colors.primaryText02
-        }
+    private fun episodeUuid(listData: PlayerViewModel.ListData?) = when (sourceView) {
+        SourceView.PLAYER -> listData?.podcastHeader?.episodeUuid
+        else -> episodeUuid
+    }
 
     private val showOptionsDialog: (Int) -> Unit = { selectedValue ->
         activity?.supportFragmentManager?.let {
@@ -220,8 +214,11 @@ class BookmarksFragment : BaseFragment() {
     }
 
     private fun onEditBookmarkClick() {
-        bookmarksViewModel.buildBookmarkArguments { arguments ->
-            startActivity(arguments.getIntent(requireContext()))
+        viewLifecycleOwner.lifecycleScope.launch {
+            val bookmarkArguments = bookmarksViewModel.createBookmarkArguments()
+            if (bookmarkArguments != null) {
+                startActivity(BookmarkActivity.launchIntent(requireContext(), bookmarkArguments))
+            }
         }
     }
 
@@ -239,5 +236,15 @@ class BookmarksFragment : BaseFragment() {
 
     fun onPlayerClose() {
         bookmarksViewModel.onPlayerClose()
+    }
+
+    private fun podcastColorsFlow(): Flow<PodcastColors?> {
+        return if (sourceView == SourceView.PLAYER) {
+            playerViewModel.podcastFlow.map { podcast ->
+                podcast?.let(::PodcastColors)
+            }
+        } else {
+            emptyFlow()
+        }
     }
 }

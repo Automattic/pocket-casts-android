@@ -4,7 +4,7 @@ import androidx.annotation.OptIn
 import androidx.annotation.VisibleForTesting
 import androidx.media3.common.util.UnstableApi
 import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
-import au.com.shiftyjelly.pocketcasts.models.to.Transcript
+import au.com.shiftyjelly.pocketcasts.models.entity.Transcript
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.shownotes.findTranscripts
 import au.com.shiftyjelly.pocketcasts.servers.ShowNotesServiceManager

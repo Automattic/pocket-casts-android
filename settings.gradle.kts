@@ -66,6 +66,7 @@ include(":modules:features:shared")
 include(":modules:features:reimagine")
 include(":modules:features:referrals")
 include(":modules:features:taskerplugin")
+include(":modules:features:transcripts")
 include(":modules:features:widgets")
 
 // services
