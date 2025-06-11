@@ -17,7 +17,7 @@ import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyleMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyleMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.servers.model.ListTypeMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheService
-import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptCacheService
+import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptService
 import au.com.shiftyjelly.pocketcasts.servers.server.ListWebService
 import au.com.shiftyjelly.pocketcasts.servers.sync.LoginIdentity
 import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
@@ -299,7 +299,7 @@ class ServersModule {
 
     @Provides
     @Singleton
-    fun provideTranscriptCacheServer(@TranscriptRetrofit retrofit: Retrofit): TranscriptCacheService = retrofit.create()
+    fun provideTranscriptCacheServer(@TranscriptRetrofit retrofit: Retrofit): TranscriptService = retrofit.create()
 }
 
 @Qualifier
