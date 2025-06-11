@@ -15,12 +15,15 @@ import androidx.media3.extractor.text.webvtt.WebvttParser
 import au.com.shiftyjelly.pocketcasts.models.converter.TranscriptCue
 import au.com.shiftyjelly.pocketcasts.models.converter.TranscriptSegments
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
+import au.com.shiftyjelly.pocketcasts.models.to.TranscriptType
 import com.squareup.moshi.Moshi
 import okio.BufferedSource
 import okio.use
 import androidx.media3.extractor.text.SubtitleParser as Media3SubtitleParser
 
-internal interface TranscriptParser {
+interface TranscriptParser {
+    val type: TranscriptType
+
     fun parse(source: BufferedSource): Result<List<TranscriptEntry>>
 }
 
@@ -46,6 +49,8 @@ internal abstract class SubtitleParser(
 }
 
 internal class WebVttParser : SubtitleParser(WebvttParser()) {
+    override val type get() = TranscriptType.Vtt
+
     override fun toEntries(cue: Cue): List<TranscriptEntry> {
         val cueText = cue.text
         if (cueText.isNullOrEmpty()) {
@@ -67,6 +72,8 @@ internal class WebVttParser : SubtitleParser(WebvttParser()) {
 }
 
 internal class SrtParser : SubtitleParser(SubripParser()) {
+    override val type get() = TranscriptType.Srt
+
     override fun toEntries(cue: Cue): List<TranscriptEntry> {
         val cueText = cue.text?.toString()
         if (cueText.isNullOrEmpty()) {
@@ -90,6 +97,8 @@ internal class SrtParser : SubtitleParser(SubripParser()) {
 }
 
 internal class HtmlParser : TranscriptParser {
+    override val type get() = TranscriptType.Html
+
     override fun parse(source: BufferedSource) = runCatching {
         val text = source.use { it.readUtf8() }
         // Having a script tag most likely means that we should redirect to a web page
@@ -123,6 +132,8 @@ internal class HtmlParser : TranscriptParser {
 internal class JsonParser(
     moshi: Moshi,
 ) : TranscriptParser {
+    override val type get() = TranscriptType.Json
+
     private val adapter = moshi.adapter(TranscriptSegments::class.java)
 
     override fun parse(source: BufferedSource) = runCatching {

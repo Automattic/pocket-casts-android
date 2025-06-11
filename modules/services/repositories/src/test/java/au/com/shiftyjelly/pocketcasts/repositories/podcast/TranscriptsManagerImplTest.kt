@@ -8,7 +8,7 @@ import au.com.shiftyjelly.pocketcasts.servers.podcast.ShowNotesEpisode
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ShowNotesPodcast
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ShowNotesResponse
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ShowNotesTranscript
-import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptCacheService
+import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptService
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.NetworkWrapper
 import au.com.shiftyjelly.pocketcasts.utils.exception.EmptyDataException
@@ -43,7 +43,7 @@ class TranscriptsManagerImplTest {
     val coroutineRule = MainCoroutineRule()
 
     private val transcriptDao: TranscriptDao = mock()
-    private val transcriptCacheService: TranscriptCacheService = mock()
+    private val transcriptCacheService: TranscriptService = mock()
     private val networkWrapper: NetworkWrapper = mock()
     private val transcriptCuesInfoBuilder: TranscriptCuesInfoBuilder = mock()
     private val showNotesServiceManager: ShowNotesServiceManager = mock()
