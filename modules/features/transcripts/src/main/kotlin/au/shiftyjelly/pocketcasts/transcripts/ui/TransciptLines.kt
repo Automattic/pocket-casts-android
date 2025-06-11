@@ -29,9 +29,9 @@ import au.com.shiftyjelly.pocketcasts.compose.components.FadedLazyColumn
 import au.com.shiftyjelly.pocketcasts.compose.extensions.verticalScrollBar
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
 import au.com.shiftyjelly.pocketcasts.ui.R
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
-import au.shiftyjelly.pocketcasts.transcripts.TranscriptEntry
 
 @Composable
 internal fun TranscriptLines(

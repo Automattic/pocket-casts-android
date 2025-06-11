@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
 import androidx.annotation.OptIn
 import androidx.media3.common.util.UnstableApi
-import au.com.shiftyjelly.pocketcasts.models.to.Transcript
+import au.com.shiftyjelly.pocketcasts.models.entity.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptCuesInfo
 import kotlinx.coroutines.flow.Flow
 

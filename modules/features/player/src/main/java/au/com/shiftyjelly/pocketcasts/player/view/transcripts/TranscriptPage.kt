@@ -65,7 +65,7 @@ import au.com.shiftyjelly.pocketcasts.compose.extensions.verticalScrollBar
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.compose.toolbars.textselection.CustomMenuItemOption
 import au.com.shiftyjelly.pocketcasts.compose.toolbars.textselection.CustomTextToolbar
-import au.com.shiftyjelly.pocketcasts.models.to.Transcript
+import au.com.shiftyjelly.pocketcasts.models.entity.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptCuesInfo
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults.TranscriptColors
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults.TranscriptFontFamily

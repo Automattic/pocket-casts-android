@@ -27,4 +27,5 @@ dependencies {
     implementation(libs.compose.ui.tooling.preview)
 
     implementation(projects.modules.services.ui)
+    implementation(projects.modules.services.model)
 }

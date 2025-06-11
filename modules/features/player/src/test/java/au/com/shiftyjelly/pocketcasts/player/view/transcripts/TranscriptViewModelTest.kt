@@ -4,7 +4,7 @@ import androidx.media3.common.text.Cue
 import androidx.media3.extractor.text.CuesWithTiming
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
-import au.com.shiftyjelly.pocketcasts.models.to.Transcript
+import au.com.shiftyjelly.pocketcasts.models.entity.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptCuesInfo
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform

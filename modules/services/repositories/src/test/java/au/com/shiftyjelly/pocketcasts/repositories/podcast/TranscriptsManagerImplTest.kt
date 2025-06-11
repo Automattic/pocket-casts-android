@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
 import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
-import au.com.shiftyjelly.pocketcasts.models.to.Transcript
+import au.com.shiftyjelly.pocketcasts.models.entity.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptCuesInfo
 import au.com.shiftyjelly.pocketcasts.servers.ShowNotesServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ShowNotesEpisode
