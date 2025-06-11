@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.fragment.compose.content
@@ -21,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.settings.status.StatusFragment
 import au.com.shiftyjelly.pocketcasts.ui.extensions.setupKeyboardModePan
 import au.com.shiftyjelly.pocketcasts.ui.extensions.setupKeyboardModeResize
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
+import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import dagger.hilt.android.AndroidEntryPoint
@@ -39,17 +41,21 @@ class HelpFragment : BaseFragment(), HasBackstack {
         savedInstanceState: Bundle?,
     ) = content {
         AppThemeWithBackground(theme.activeTheme) {
+            val context = LocalContext.current
             val density = LocalDensity.current
             val imeInsets = WindowInsets.ime
             val keyboardHeight = with(density) { imeInsets.getBottom(density).toDp() }
-            
+
+            val bottomPadding by settings.bottomInset.collectAsState(0)
+            val miniPlayerPadding = bottomPadding.pxToDp(context).dp
+
             val basePadding = 16.dp
             val keyboardPadding = if (keyboardHeight > 0.dp) {
                 24.dp
             } else {
                 0.dp
             }
-            val totalPadding = basePadding + keyboardPadding
+            val totalPadding = basePadding + keyboardPadding + miniPlayerPadding
 
             HelpPage(
                 activity = requireActivity(),
