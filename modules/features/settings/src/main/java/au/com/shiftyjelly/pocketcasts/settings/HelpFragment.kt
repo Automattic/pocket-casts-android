@@ -39,15 +39,12 @@ class HelpFragment : BaseFragment(), HasBackstack {
         savedInstanceState: Bundle?,
     ) = content {
         AppThemeWithBackground(theme.activeTheme) {
-            // Dynamic padding based on actual keyboard height
             val density = LocalDensity.current
             val imeInsets = WindowInsets.ime
             val keyboardHeight = with(density) { imeInsets.getBottom(density).toDp() }
             
-            // Base padding when no keyboard, plus additional when keyboard is visible
             val basePadding = 16.dp
             val keyboardPadding = if (keyboardHeight > 0.dp) {
-                // Add 24dp extra clearance above the keyboard
                 24.dp
             } else {
                 0.dp
