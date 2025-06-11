@@ -5,11 +5,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.webkit.WebView
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.fragment.compose.content
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -36,6 +39,21 @@ class HelpFragment : BaseFragment(), HasBackstack {
         savedInstanceState: Bundle?,
     ) = content {
         AppThemeWithBackground(theme.activeTheme) {
+            // Dynamic padding based on actual keyboard height
+            val density = LocalDensity.current
+            val imeInsets = WindowInsets.ime
+            val keyboardHeight = with(density) { imeInsets.getBottom(density).toDp() }
+            
+            // Base padding when no keyboard, plus additional when keyboard is visible
+            val basePadding = 16.dp
+            val keyboardPadding = if (keyboardHeight > 0.dp) {
+                // Add 24dp extra clearance above the keyboard
+                24.dp
+            } else {
+                0.dp
+            }
+            val totalPadding = basePadding + keyboardPadding
+
             HelpPage(
                 activity = requireActivity(),
                 onShowLogs = {
@@ -52,7 +70,7 @@ class HelpFragment : BaseFragment(), HasBackstack {
                 onWebViewDisposed = { webView = null },
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(bottom = 14.dp),
+                    .padding(bottom = totalPadding),
             )
         }
     }
