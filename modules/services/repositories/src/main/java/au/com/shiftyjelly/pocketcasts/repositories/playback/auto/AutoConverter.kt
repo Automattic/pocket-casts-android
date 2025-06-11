@@ -13,6 +13,7 @@ import android.support.v4.media.MediaDescriptionCompat.STATUS_DOWNLOADED
 import android.support.v4.media.MediaDescriptionCompat.STATUS_NOT_DOWNLOADED
 import androidx.annotation.DrawableRes
 import androidx.core.graphics.drawable.toBitmap
+import androidx.core.net.toUri
 import androidx.core.os.bundleOf
 import androidx.media.utils.MediaConstants.DESCRIPTION_EXTRAS_KEY_COMPLETION_PERCENTAGE
 import androidx.media.utils.MediaConstants.DESCRIPTION_EXTRAS_KEY_COMPLETION_STATUS
@@ -34,10 +35,12 @@ import au.com.shiftyjelly.pocketcasts.repositories.extensions.getArtworkUrl
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getSummaryText
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.playback.EXTRA_CONTENT_STYLE_GROUP_TITLE_HINT
+import au.com.shiftyjelly.pocketcasts.repositories.playback.EpisodeFileMetadata
 import au.com.shiftyjelly.pocketcasts.repositories.playback.FOLDER_ROOT_PREFIX
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import coil.executeBlocking
 import coil.imageLoader
+import java.io.File
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -86,7 +89,7 @@ object AutoConverter {
 
     fun convertPodcastToMediaItem(podcast: Podcast, context: Context, useEpisodeArtwork: Boolean): MediaBrowserCompat.MediaItem? {
         return try {
-            val localUri = getPodcastArtworkUri(podcast = podcast, episode = null, context = context, showRssArtwork = useEpisodeArtwork)
+            val localUri = getPodcastArtworkUri(podcast = podcast, episode = null, context = context, useEpisodeArtwork = useEpisodeArtwork)
 
             val podcastDesc = MediaDescriptionCompat.Builder()
                 .setTitle(podcast.title)
@@ -126,22 +129,30 @@ object AutoConverter {
         return MediaBrowserCompat.MediaItem(mediaDescription, MediaBrowserCompat.MediaItem.FLAG_BROWSABLE)
     }
 
-    fun getPodcastArtworkUri(podcast: Podcast?, episode: BaseEpisode?, context: Context, showRssArtwork: Boolean): Uri? {
-        val url = if (episode is PodcastEpisode && (!episode.imageUrl.isNullOrBlank()) && showRssArtwork) {
-            episode.imageUrl
-        } else if (episode is UserEpisode) {
-            // the artwork for user uploaded episodes are stored on each episode
-            episode.artworkUrl
-        } else {
-            podcast?.getArtworkUrl(480)
-        }
+    fun getPodcastArtworkUri(podcast: Podcast?, episode: BaseEpisode?, context: Context, useEpisodeArtwork: Boolean): Uri? {
+        val artworkUri = when (episode) {
+            is PodcastEpisode -> if (useEpisodeArtwork) {
+                episode.imageUrl ?: EpisodeFileMetadata.artworkCacheFile(context, episode.uuid).takeIf(File::exists)?.path ?: podcast?.getArtworkUrl(480)
+            } else {
+                podcast?.getArtworkUrl(480)
+            }
 
-        if (url.isNullOrBlank()) {
+            is UserEpisode -> if (useEpisodeArtwork) {
+                EpisodeFileMetadata.artworkCacheFile(context, episode.uuid).takeIf(File::exists)?.path ?: episode.artworkUrl
+            } else {
+                episode.artworkUrl
+            }
+
+            null -> {
+                podcast?.getArtworkUrl(480)
+            }
+        }?.toUri()
+
+        if (artworkUri == null) {
             return null
         }
 
-        val podcastArtUri = Uri.parse(url)
-        return getArtworkUriForContentProvider(podcastArtUri, context)
+        return getArtworkUriForContentProvider(artworkUri, context)
     }
 
     fun getPodcastArtworkBitmap(episode: BaseEpisode, context: Context, useEpisodeArtwork: Boolean): Bitmap? {
@@ -170,8 +181,8 @@ object AutoConverter {
     /**
      * This creates a Uri that will call the AlbumArtContentProvider to download and cache the artwork
      */
-    fun getArtworkUriForContentProvider(podcastArtUri: Uri?, context: Context): Uri? {
-        return podcastArtUri?.asAlbumArtContentUri(context)
+    fun getArtworkUriForContentProvider(podcastArtUri: Uri, context: Context): Uri {
+        return podcastArtUri.asAlbumArtContentUri(context)
     }
 
     fun getPodcastsBitmapUri(context: Context): Uri {
@@ -221,10 +232,12 @@ object AutoConverter {
                 completionStatus = DESCRIPTION_EXTRAS_VALUE_COMPLETION_STATUS_NOT_PLAYED
                 completionPercentage = 0.0
             }
+
             EpisodePlayingStatus.IN_PROGRESS -> {
                 completionStatus = DESCRIPTION_EXTRAS_VALUE_COMPLETION_STATUS_PARTIALLY_PLAYED
                 completionPercentage = if (episode.duration == 0.0) 0.0 else (episode.playedUpTo / episode.duration).coerceIn(0.0, 1.0)
             }
+
             EpisodePlayingStatus.COMPLETED -> {
                 completionStatus = DESCRIPTION_EXTRAS_VALUE_COMPLETION_STATUS_FULLY_PLAYED
                 completionPercentage = 1.0

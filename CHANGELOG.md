@@ -3,6 +3,8 @@
 *   Bug Fixes
     *   Fix player's theming responsivness
         ([#4091](https://github.com/Automattic/pocket-casts-android/pull/4091))
+    *   Respect embedded file artwork in media notifications
+        ([#4103](https://github.com/Automattic/pocket-casts-android/pull/4103))
 
 7.91
 -----
