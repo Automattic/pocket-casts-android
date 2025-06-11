@@ -119,7 +119,7 @@ enum class Feature(
         title = "Notifications Revamp",
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
     BANNER_ADS(

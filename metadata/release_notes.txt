@@ -1,3 +1,6 @@
+*   New Features
+    *   Introduce new notifications and give better control over them
+        ([#4107](https://github.com/Automattic/pocket-casts-android/pull/4107))
 *   Updates
     *   Upgrade to the latest version of Jetpack Compose
         ([#4049](https://github.com/Automattic/pocket-casts-android/pull/4049))

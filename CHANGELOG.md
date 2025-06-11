@@ -7,9 +7,12 @@
         ([#4091](https://github.com/Automattic/pocket-casts-android/pull/4091))
     *   Respect embedded file artwork in media notifications
         ([#4103](https://github.com/Automattic/pocket-casts-android/pull/4103))
-        
+
 7.91
 -----
+*   New Features
+    *   Introduce new notifications and give better control over them
+        ([#4107](https://github.com/Automattic/pocket-casts-android/pull/4107))
 *   Updates
     *   Upgrade to the latest version of Jetpack Compose
         ([#4049](https://github.com/Automattic/pocket-casts-android/pull/4049))
