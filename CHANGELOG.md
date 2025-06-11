@@ -1,5 +1,8 @@
 7.92
 -----
+*   Bug Fixes
+    *   Fix keyboard blocking WebView input fields in Help & Feedback page
+        ([#4109](https://github.com/Automattic/pocket-casts-android/pull/4109))
 
 
 7.91
