@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.webkit.WebView
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
@@ -13,7 +14,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.fragment.compose.content
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -42,9 +42,7 @@ class HelpFragment : BaseFragment(), HasBackstack {
     ) = content {
         AppThemeWithBackground(theme.activeTheme) {
             val context = LocalContext.current
-            val density = LocalDensity.current
-            val imeInsets = WindowInsets.ime
-            val keyboardHeight = with(density) { imeInsets.getBottom(density).toDp() }
+            val keyboardHeight = WindowInsets.ime.asPaddingValues().calculateBottomPadding()
 
             val bottomPadding by settings.bottomInset.collectAsState(0)
             val miniPlayerPadding = bottomPadding.pxToDp(context).dp
