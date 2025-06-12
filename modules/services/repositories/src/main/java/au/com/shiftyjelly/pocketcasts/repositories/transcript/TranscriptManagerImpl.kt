@@ -93,7 +93,7 @@ class TranscriptManagerImpl @Inject constructor(
             .mapCatching { body ->
                 val transcriptEntries = withContext(Dispatchers.Default) {
                     val entries = body.use { parser.parse(it.source()) }.getOrThrow()
-                    entries.sanitize()
+                    entries.sanitize(parser.type)
                 }
                 Transcript.Text(
                     entries = transcriptEntries,
@@ -134,10 +134,16 @@ class TranscriptManagerImpl @Inject constructor(
     }
 }
 
-private fun List<TranscriptEntry>.sanitize(): List<TranscriptEntry> {
+private fun List<TranscriptEntry>.sanitize(type: TranscriptType): List<TranscriptEntry> {
     return map(TranscriptEntry::sanitize)
         .removeTheSameConsecutiveSpeakers()
-        .joinSplitSentneces()
+        .let { entries ->
+            if (type.usesEntryCues) {
+                entries.joinSplitSentneces()
+            } else {
+                entries
+            }
+        }
         .map(TranscriptEntry::trim)
         .filter(TranscriptEntry::isNotEmpty)
 }
@@ -189,7 +195,7 @@ private fun List<TranscriptEntry>.joinSplitSentneces(): List<TranscriptEntry> {
                     entry.value
                 }
 
-                val textParts = prependedText.split(SentenceStoppers)
+                val textParts = prependedText.split(EndOfSentencePunctuation)
                 carryOverText = textParts.lastOrNull()?.takeUnless(String::isSentence)?.trim()
 
                 val fullSentences = if (carryOverText != null) {
@@ -223,9 +229,9 @@ private fun String.split(delimiters: List<Char>): List<String> {
     return texts
 }
 
-private fun String.isSentence() = lastOrNull() in SentenceStoppers
+private fun String.isSentence() = lastOrNull() in EndOfSentencePunctuation
 
-private val SentenceStoppers = listOf('.', '!', '?')
+private val EndOfSentencePunctuation = listOf('.', '!', '?')
 
 private fun TranscriptEntry.trim() = when (this) {
     is TranscriptEntry.Speaker -> copy(name = name.trim())
@@ -250,3 +256,10 @@ private val TranscriptType?.priority
         TranscriptType.Html -> 3
         null -> Int.MAX_VALUE
     }
+
+private val TranscriptType.usesEntryCues get() = when (this) {
+    TranscriptType.Vtt -> true
+    TranscriptType.Srt -> true
+    TranscriptType.Json -> false
+    TranscriptType.Html -> false
+}
