@@ -25,39 +25,26 @@ import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
-import au.com.shiftyjelly.pocketcasts.models.entity.Transcript
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults.TranscriptColors
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults.TranscriptFontFamily
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults.bottomPadding
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.TranscriptError
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.TranscriptState
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptFormat
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun TranscriptError(
-    state: TranscriptState.Error,
+    state: TranscriptState.Failure,
     colors: TranscriptColors,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val errorMessage = when (val error = state.error) {
-        is TranscriptError.Empty ->
-            stringResource(LR.string.transcript_empty)
+    val errorMessage = when (state.error) {
+        TranscriptError.Empty -> stringResource(LR.string.transcript_empty)
 
-        is TranscriptError.NotSupported ->
-            stringResource(LR.string.error_transcript_format_not_supported, error.format)
-
-        is TranscriptError.NoNetwork ->
-            stringResource(LR.string.error_no_network)
-
-        is TranscriptError.FailedToParse ->
-            stringResource(LR.string.error_transcript_failed_to_parse)
-
-        is TranscriptError.FailedToLoad ->
-            stringResource(LR.string.error_transcript_failed_to_load)
+        TranscriptError.FailedToLoad -> stringResource(LR.string.error_transcript_failed_to_load)
     }
 
     Column(
@@ -116,14 +103,8 @@ private fun ErrorTabletPreview() = ErrorPreview()
 private fun ErrorPreview() {
     AppThemeWithBackground(Theme.ThemeType.DARK) {
         TranscriptError(
-            state = TranscriptState.Error(
-                error = TranscriptError.NotSupported(TranscriptFormat.HTML.mimeType),
-                transcript = Transcript(
-                    episodeUuid = "uuid",
-                    type = TranscriptFormat.HTML.mimeType,
-                    url = "url",
-                    isGenerated = false,
-                ),
+            state = TranscriptState.Failure(
+                error = TranscriptError.FailedToLoad,
             ),
             onRetry = {},
             colors = TranscriptColors(Color.Black),

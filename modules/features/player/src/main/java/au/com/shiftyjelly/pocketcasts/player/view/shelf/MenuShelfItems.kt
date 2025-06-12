@@ -119,8 +119,8 @@ private fun MenuShelfItemsNonEditableContentPreview(
                     addAll(ShelfItem.entries.toList().take(6))
                 },
                 episode = PodcastEpisode("", publishedDate = Date()),
-                transcript = null,
                 isEditable = false,
+                isTranscriptAvailable = false,
             ),
             selectedBackgroundColor = Color.Transparent,
             normalBackgroundColor = Color.Transparent,
@@ -143,8 +143,8 @@ private fun MenuShelfItemsEditableContentPreview(
                     add(5, moreActionsTitle)
                 },
                 episode = PodcastEpisode("", publishedDate = Date()),
-                transcript = null,
                 isEditable = true,
+                isTranscriptAvailable = false,
             ),
             selectedBackgroundColor = Color.Transparent,
             normalBackgroundColor = Color.Transparent,

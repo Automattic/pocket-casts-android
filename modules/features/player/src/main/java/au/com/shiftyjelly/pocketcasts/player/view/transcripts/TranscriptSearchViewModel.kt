@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.PodcastAndEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.di.DefaultDispatcher
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,7 +27,8 @@ class TranscriptSearchViewModel @Inject constructor(
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private var _searchSourceText: String = ""
-    private var _podcastAndEpisode: PodcastAndEpisode? = null
+    private var episodeUuid: String? = null
+    private var podcastUuid: String? = null
 
     private val _searchQueryFlow = MutableStateFlow("")
     val searchQueryFlow = _searchQueryFlow.asStateFlow()
@@ -48,11 +48,13 @@ class TranscriptSearchViewModel @Inject constructor(
 
     fun setSearchInput(
         searchSourceText: String,
-        podcastAndEpisode: PodcastAndEpisode?,
+        episodeUuid: String?,
+        podcastUuid: String?,
     ) {
         resetSearch()
         this._searchSourceText = searchSourceText
-        this._podcastAndEpisode = podcastAndEpisode
+        this.episodeUuid = episodeUuid
+        this.podcastUuid = podcastUuid
     }
 
     fun onSearchQueryChanged(searchQuery: String) {
@@ -120,8 +122,8 @@ class TranscriptSearchViewModel @Inject constructor(
         analyticsTracker.track(
             event,
             mapOf(
-                "episode_uuid" to _podcastAndEpisode?.episodeUuid.orEmpty(),
-                "podcast_uuid" to _podcastAndEpisode?.podcast?.uuid.orEmpty(),
+                "episode_uuid" to podcastUuid.orEmpty(),
+                "podcast_uuid" to episodeUuid.orEmpty(),
             ),
         )
     }

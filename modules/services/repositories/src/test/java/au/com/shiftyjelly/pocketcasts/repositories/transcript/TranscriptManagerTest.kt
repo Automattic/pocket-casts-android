@@ -26,7 +26,6 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import retrofit2.Response
 import au.com.shiftyjelly.pocketcasts.models.entity.Transcript as DbTranscript
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -372,10 +371,6 @@ private class TestParser(
 
 private class TestTranscriptService : TranscriptService {
     var shouldThrow = false
-
-    override suspend fun getTranscript(url: String, cacheControl: CacheControl): Response<ResponseBody> {
-        return Response.error(404, "Not found".toResponseBody())
-    }
 
     override suspend fun getTranscriptOrThrow(url: String, cacheControl: CacheControl): ResponseBody {
         return if (shouldThrow) {
