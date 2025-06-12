@@ -24,7 +24,7 @@ private fun TranscriptEntry.compactWhiteSpace() = when (this) {
 }
 
 private val AnyWhiteSpace = """\s+""".toRegex()
-private val TwoOrMoreEmptySpaces = """[ \t]+""".toRegex()
+private val TwoOrMoreEmptySpaces = """[ \t]{2,}""".toRegex()
 private val ThreeOrMoreNewLines = """\n{3,}""".toRegex()
 
 private fun List<TranscriptEntry>.joinSplitSentences(): List<TranscriptEntry> {
