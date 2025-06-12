@@ -144,6 +144,40 @@ class TranscriptSanitizationTest {
         }
 
         @Test
+        fun `remove repeated speakers`() {
+            val input = buildTranscript {
+                speaker("Speaker 1")
+                text("Text 1.")
+                speaker("Speaker 1")
+                text("Text 2.")
+                speaker("Speaker 1")
+                text("Text 3.")
+                text("Text 4.")
+                speaker("Speaker 2")
+                text("Text 5.")
+                speaker("Speaker 1")
+                text("Text 6.")
+            }
+
+            val output = input.sanitize()
+
+            assertEquals(
+                buildTranscript {
+                    speaker("Speaker 1")
+                    text("Text 1.")
+                    text("Text 2.")
+                    text("Text 3.")
+                    text("Text 4.")
+                    speaker("Speaker 2")
+                    text("Text 5.")
+                    speaker("Speaker 1")
+                    text("Text 6.")
+                },
+                output,
+            )
+        }
+
+        @Test
         fun `join split texts`() {
             val input = buildTranscript {
                 text("Text 1")

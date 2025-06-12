@@ -5,6 +5,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
 internal fun List<TranscriptEntry>.sanitize() = map(TranscriptEntry::compactWhiteSpace)
     .joinSplitSentences()
     .joinConsecutiveSpeakers()
+    .removeRepeatedSpeakers()
     .map(TranscriptEntry::trim)
     .filter(TranscriptEntry::isNotEmpty)
 
@@ -109,6 +110,24 @@ private fun List<TranscriptEntry>.joinConsecutiveSpeakers(): List<TranscriptEntr
         entries += TranscriptEntry.Speaker(names)
     }
     return entries
+}
+
+private fun List<TranscriptEntry>.removeRepeatedSpeakers(): List<TranscriptEntry> {
+    var lastSpeaker: String? = null
+    return mapNotNull { entry ->
+        when (entry) {
+            is TranscriptEntry.Speaker -> {
+                if (lastSpeaker != entry.name) {
+                    lastSpeaker = entry.name
+                    entry
+                } else {
+                    null
+                }
+            }
+
+            is TranscriptEntry.Text -> entry
+        }
+    }
 }
 
 private fun TranscriptEntry.trim() = when (this) {
