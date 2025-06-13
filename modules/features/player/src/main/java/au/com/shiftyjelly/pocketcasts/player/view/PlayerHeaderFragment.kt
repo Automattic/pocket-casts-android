@@ -22,7 +22,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -39,8 +38,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
@@ -77,6 +76,7 @@ import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.PlayerVisuals
 import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.PlayerVisualsState
 import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.VisualContentState
 import au.com.shiftyjelly.pocketcasts.player.view.shelf.PlayerShelf
+import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptPageWrapper
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptSearchViewModel
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel
 import au.com.shiftyjelly.pocketcasts.player.view.video.VideoActivity
@@ -150,8 +150,8 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val enter = fadeIn() + slideInVertically(initialOffsetY = { it })
-        val exit = fadeOut() + slideOutVertically(targetOffsetY = { it },)
+        val enter = fadeIn(spring(stiffness = Spring.StiffnessVeryLow)) + slideInVertically(initialOffsetY = { it })
+        val exit = fadeOut(spring(stiffness = Spring.StiffnessHigh))// + slideOutVertically(targetOffsetY = { it })
         val enter2 = fadeIn() + expandIn(expandFrom = Alignment.TopCenter)
         val exit2 = fadeOut() + shrinkOut(shrinkTowards = Alignment.TopCenter)
 
@@ -163,25 +163,20 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             val player by viewModel.playerFlow.collectAsState()
 
             val transcriptTransitionState by shelfSharedViewModel.transitionState.collectAsState(TransitionState.CloseTranscript)
-            val showPlayer = transcriptTransitionState is TransitionState.CloseTranscript
+            val showPlayerTransition = updateTransition(transcriptTransitionState is TransitionState.CloseTranscript)
+            val playerElementsAlpha by showPlayerTransition.animateFloat { showPlayer ->
+                if (showPlayer) 1f else 0f
+            }
+            val playbackButtonsScale by showPlayerTransition.animateFloat { showPlayer ->
+                if (showPlayer) 1f else 0.6f
+            }
+            val controlsOffsetValue = LocalDensity.current.run { 80.dp.roundToPx() }
+            val controlsOffset by showPlayerTransition.animateIntOffset { showPlayer ->
+                if (showPlayer) IntOffset.Zero else IntOffset(x = 0, y = controlsOffsetValue)
+            }
             val showPlayerControls = when (val state = transcriptTransitionState) {
                 is TransitionState.CloseTranscript -> true
                 is TransitionState.OpenTranscript -> state.showPlayerControls
-            }
-
-            val transition = updateTransition(transcriptTransitionState)
-            val playbackButtonsScale by transition.animateFloat { transitionState ->
-                when (transitionState) {
-                    is TransitionState.CloseTranscript -> 1f
-                    is TransitionState.OpenTranscript -> 0.6f
-                }
-            }
-            val controlsOffsetValue = LocalDensity.current.run { 80.dp.roundToPx() }
-            val controlsOffset by transition.animateIntOffset { transitionState ->
-                when (transitionState) {
-                    is TransitionState.CloseTranscript -> IntOffset.Zero
-                    is TransitionState.OpenTranscript -> IntOffset(x = 0, y = controlsOffsetValue)
-                }
             }
             val seekBarOffset = controlsOffset * 0.9f
 
@@ -199,20 +194,29 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                             visible = transcriptTransitionState is TransitionState.OpenTranscript,
                             enter = enter,
                             exit = exit,
+                            modifier = Modifier.fillMaxSize(),
                         ) {
-                            Box(
-                                modifier = Modifier
-                                    .background(Color.Red.copy(alpha = 0.3f))
-                                    .fillMaxSize(),
+                            TranscriptPageWrapper(
+                                transitionState = transcriptTransitionState,
+                                shelfSharedViewModel = shelfSharedViewModel,
+                                transcriptViewModel = transcriptViewModel,
+                                searchViewModel = transcriptSearchViewModel,
+                                onClickSubscribe = {
+                                    transcriptViewModel.track(AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_SUBSCRIBE_TAPPED)
+                                    OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.Upsell(OnboardingUpgradeSource.GENERATED_TRANSCRIPTS))
+                                },
+                                modifier = Modifier.fillMaxSize(),
                             )
                         }
                         Column {
                             Column(
                                 verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
                                 horizontalAlignment = Alignment.CenterHorizontally,
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .alpha(playerElementsAlpha)
                             ) {
-                                if (showPlayer) {
+                                if (showPlayerTransition.targetState) {
                                     AnimatedNonNullVisibility(
                                         item = ads.firstOrNull(),
                                         enter = adEnterTransition,
@@ -235,11 +239,12 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                                     )
                                 }
                             }
-                            if (showPlayer) {
+                            if (showPlayerTransition.targetState) {
                                 PlayerHeadingSection(
                                     playerColors = playerColors,
                                     playerViewModel = viewModel,
                                     shelfSharedViewModel = shelfSharedViewModel,
+                                    modifier = Modifier.alpha(playerElementsAlpha),
                                 )
                             }
                             AnimatedVisibility(
@@ -272,7 +277,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                                 }
                             }
                             AnimatedVisibility(
-                                visible = showPlayer,
+                                visible = showPlayerTransition.targetState,
                                 enter = enter2,
                                 exit = exit2,
                             ) {

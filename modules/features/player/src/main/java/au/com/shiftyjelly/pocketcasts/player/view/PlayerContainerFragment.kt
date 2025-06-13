@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.player.view
 
+import android.animation.LayoutTransition
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater

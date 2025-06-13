@@ -79,18 +79,17 @@ private val SearchBarPlaceholderColor = SearchBarIconColor
 
 @Composable
 fun TranscriptPageWrapper(
+    transitionState: TransitionState,
     shelfSharedViewModel: ShelfSharedViewModel,
     transcriptViewModel: TranscriptViewModel,
     searchViewModel: TranscriptSearchViewModel,
     onClickSubscribe: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     AppTheme(Theme.ThemeType.DARK) {
-        val transitionState by shelfSharedViewModel.transitionState.collectAsStateWithLifecycle(null)
         val uiState by transcriptViewModel.uiState.collectAsStateWithLifecycle()
         val searchState by searchViewModel.searchState.collectAsStateWithLifecycle()
         val searchQuery by searchViewModel.searchQueryFlow.collectAsStateWithLifecycle()
-
-        val configuration = LocalConfiguration.current
 
         var showPaywall by remember { mutableStateOf(false) }
         var showSearch by remember { mutableStateOf(false) }
@@ -106,14 +105,8 @@ fun TranscriptPageWrapper(
             else -> Unit
         }
 
-        val playerColors = MaterialTheme.theme.rememberPlayerColors()
-        val playerBackgroundColor = playerColors?.background01 ?: Color(0xFF3D3D3D)
-
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(configuration.screenHeightDp.dp)
-                .background(playerBackgroundColor),
+            modifier = modifier,
         ) {
             TranscriptToolbar(
                 onCloseClick = {
@@ -178,7 +171,7 @@ fun TranscriptPageWrapper(
                         }
                     }
                 }
-                is TransitionState.CloseTranscript, null -> Unit
+                is TransitionState.CloseTranscript -> Unit
             }
         }
 
