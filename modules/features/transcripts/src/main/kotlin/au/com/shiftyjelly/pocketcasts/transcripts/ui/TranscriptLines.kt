@@ -30,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.compose.extensions.verticalScrollBar
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
+import au.com.shiftyjelly.pocketcasts.transcripts.SearchCoordinates
 import au.com.shiftyjelly.pocketcasts.transcripts.SearchState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 
@@ -82,7 +83,10 @@ private fun TranscriptLine(
         text = buildAnnotatedString {
             append(entryText)
             searchHighlights.forEach { (startIndex, endIndex) ->
-                val highlightCoordinates = entryIndex to startIndex
+                val highlightCoordinates = SearchCoordinates(
+                    lineIndex = entryIndex,
+                    matchIndex = startIndex,
+                )
                 val style = if (highlightCoordinates == searchState.selectedSearchCoordinates) {
                     theme.searchHighlightSpanStyle
                 } else {
@@ -177,7 +181,10 @@ private fun TranscriptLinesPlayerPreview(
 private val SearchStatePreview
     get() = SearchState(
         searchTerm = "lorem",
-        selectedSearchCoordinates = 0 to TranscriptEntry.PreviewList[0].text().lastIndexOf("lorem", ignoreCase = true),
+        selectedSearchCoordinates = SearchCoordinates(
+            lineIndex = 0,
+            matchIndex = TranscriptEntry.PreviewList[0].text().lastIndexOf("lorem", ignoreCase = true),
+        ),
         searchResultIndices = TranscriptEntry.PreviewList
             .mapIndexedNotNull { index, entry ->
                 val text = entry.text()
