@@ -300,103 +300,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         setupUpNextDrag()
     }
 
-//    private fun setupArtworkSectionComposeView() {
-//        binding?.artworkSectionComposeView?.setContentWithViewCompositionStrategy {
-//            val state by remember { playerVisualsStateFlow() }.collectAsState(PlayerVisualsState.Empty)
-//            val podcastColors by remember { podcastColorsFlow() }.collectAsState(null)
-//            val ads by viewModel.activeAds.collectAsState()
-//            val player by viewModel.playerFlow.collectAsState()
-//
-//            AppTheme(theme.activeTheme) {
-//                Column(
-//                    horizontalAlignment = Alignment.CenterHorizontally,
-//                    verticalArrangement = Arrangement.Center,
-//                    modifier = Modifier.padding(16.dp),
-//                ) {
-//                    AnimatedNonNullVisibility(
-//                        item = ads.firstOrNull().takeIf { podcastColors != null },
-//                        enter = adEnterTransition,
-//                        exit = adExitTransition,
-//                    ) { ad ->
-//                        CompositionLocalProvider(LocalPodcastColors provides podcastColors) {
-//                            AdBanner(
-//                                ad = ad,
-//                                colors = rememberAdColors().bannerAd,
-//                                onAdClick = {
-//                                    runCatching {
-//                                        val intent = Intent(Intent.ACTION_VIEW, ad.ctaUrl.toUri())
-//                                        startActivity(intent)
-//                                    }.onFailure { LogBuffer.e("Ads", it, "Failed to open an ad: ${ad.id}") }
-//                                },
-//                                onOptionsClick = {
-//                                    if (parentFragmentManager.findFragmentByTag("ad_report") == null) {
-//                                        AdReportFragment
-//                                            .newInstance(ad, podcastColors)
-//                                            .show(parentFragmentManager, "ad_report")
-//                                    }
-//                                },
-//                                modifier = Modifier.padding(bottom = 16.dp, top = 8.dp),
-//                            )
-//                        }
-//                    }
-//                    PlayerVisuals(
-//                        state = state,
-//                        player = player,
-//                        onChapterUrlClick = viewModel::onChapterUrlClick,
-//                        configureVideoView = { videoView ->
-//                            videoView.setOnClickListener { onFullScreenVideoClick() }
-//                        },
-//                    )
-//                }
-//            }
-//        }
-//    }
-
-//    private fun setupPlayerHeadingSectionComposeView() {
-//        binding?.playerHeadingSectionComposeView?.setContentWithViewCompositionStrategy {
-//            AppTheme(theme.activeTheme) {
-//                PlayerHeadingSection(
-//                    playerViewModel = viewModel,
-//                    shelfSharedViewModel = shelfSharedViewModel,
-//                )
-//            }
-//        }
-//    }
-//
-//    private fun setupPlayerControlsComposeView() {
-//        binding?.playerControlsComposeView?.setContentWithViewCompositionStrategy {
-//            val podcastColors by remember { podcastColorsFlow() }.collectAsState(null)
-//
-//            AppTheme(theme.activeTheme) {
-//                CompositionLocalProvider(
-//                    LocalPodcastColors provides podcastColors,
-//                ) {
-//                    PlayerControls(
-//                        playerViewModel = viewModel,
-//                    )
-//                }
-//            }
-//        }
-//    }
-
-//    private fun setupShelfComposeView() {
-//        binding?.shelfComposeView?.setContentWithViewCompositionStrategy {
-//            AppTheme(theme.activeTheme) {
-//                PlayerShelf(
-//                    theme = theme,
-//                    shelfSharedViewModel = shelfSharedViewModel,
-//                    playerViewModel = viewModel,
-//                )
-//                LaunchedEffect(Unit) {
-//                    observeShelfItemNavigationState()
-//                }
-//                LaunchedEffect(Unit) {
-//                    observeShelfItemSnackbarMessages()
-//                }
-//            }
-//        }
-//    }
-
     private fun observeNavigationState() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -577,31 +480,11 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         }
     }
 
-//    private fun setupTranscriptPage() {
-//        binding?.transcriptPage?.setContent {
-//            val podcastColors by remember { podcastColorsFlow() }.collectAsState(null)
-//
-//            CompositionLocalProvider(LocalPodcastColors provides podcastColors) {
-//                TranscriptPageWrapper(
-//                    shelfSharedViewModel = shelfSharedViewModel,
-//                    transcriptViewModel = transcriptViewModel,
-//                    searchViewModel = transcriptSearchViewModel,
-//                    onClickSubscribe = {
-//                        transcriptViewModel.track(AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_SUBSCRIBE_TAPPED)
-//                        OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.Upsell(OnboardingUpgradeSource.GENERATED_TRANSCRIPTS))
-//                    },
-//                )
-//            }
-//        }
-//    }
-
     private fun setupUpNextDrag() {
         val flingGestureDetector = GestureDetector(
             requireContext(),
             object : GestureDetector.SimpleOnGestureListener() {
                 override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
-                    // TODO
-                    // if (binding.transcriptPage.isVisible) return false
                     val containerFragment = parentFragment as? PlayerContainerFragment ?: return false
                     val upNextBottomSheetBehavior = containerFragment.upNextBottomSheetBehavior
 
