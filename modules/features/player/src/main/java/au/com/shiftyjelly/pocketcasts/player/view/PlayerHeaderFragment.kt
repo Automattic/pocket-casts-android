@@ -84,6 +84,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlin.math.abs
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -145,6 +146,21 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                             Spacer(
                                 modifier = Modifier.weight(1f),
                             )
+                            PlayerSeekBar(
+                                playbackPosition = headerData.positionMs.milliseconds,
+                                playbackDuration = headerData.durationMs.milliseconds,
+                                adjustPlaybackDuration = headerData.adjustRemainingTimeDuration,
+                                playbackSpeed = headerData.playbackEffects.playbackSpeed,
+                                chapters = headerData.chapters,
+                                isBuffering = headerData.isBuffering,
+                                bufferedUpTo = headerData.bufferedUpToMs.milliseconds,
+                                playerColors = playerColors,
+                                onSeekToPosition = { progress, onSeekComplete ->
+                                    val progressMs = progress.inWholeMilliseconds.toInt()
+                                    viewModel.seekToMs(progressMs, onSeekComplete)
+                                    playbackManager.trackPlaybackSeek(progressMs, SourceView.PLAYER)
+                                },
+                            )
                             PlayerControls(
                                 playerColors = playerColors,
                                 playerViewModel = viewModel,
@@ -159,19 +175,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 }
             }
         }
-
-//        binding.seekBar.changeListener = object : PlayerSeekBar.OnUserSeekListener {
-//            override fun onSeekPositionChangeStop(progress: Duration, seekComplete: () -> Unit) {
-//                val progressMs = progress.inWholeMilliseconds.toInt()
-//                viewModel.seekToMs(progressMs, seekComplete)
-//                playbackManager.trackPlaybackSeek(progressMs, SourceView.PLAYER)
-//            }
-//
-//            override fun onSeekPositionChanging(progress: Duration) {}
-//
-//            override fun onSeekPositionChangeStart() {
-//            }
-//        }
 
         observeNavigationState()
         observeShelfItemNavigationState()
