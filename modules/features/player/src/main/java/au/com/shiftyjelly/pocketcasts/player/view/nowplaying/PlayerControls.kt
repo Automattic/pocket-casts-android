@@ -165,10 +165,10 @@ private fun SkipButton(
 
     CompositionLocalProvider(
         LocalRippleConfiguration provides
-                RippleConfiguration(
-                    color = Color.White,
-                    rippleAlpha = RippleDefaults.rippleAlpha(Color.White, true),
-                ),
+            RippleConfiguration(
+                color = Color.White,
+                rippleAlpha = RippleDefaults.rippleAlpha(Color.White, true),
+            ),
     ) {
         Box(
             modifier = modifier

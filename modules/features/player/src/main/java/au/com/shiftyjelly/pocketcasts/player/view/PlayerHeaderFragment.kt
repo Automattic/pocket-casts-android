@@ -9,18 +9,27 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateIntOffset
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.updateTransition
+import androidx.compose.animation.expandIn
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -30,7 +39,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.net.toUri
@@ -137,12 +150,40 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val enter = fadeIn() + slideInVertically(initialOffsetY = { it })
+        val exit = fadeOut() + slideOutVertically(targetOffsetY = { it },)
+        val enter2 = fadeIn() + expandIn(expandFrom = Alignment.TopCenter)
+        val exit2 = fadeOut() + shrinkOut(shrinkTowards = Alignment.TopCenter)
+
         requireNotNull(binding).composeContent.setContentWithViewCompositionStrategy {
             val headerData by remember { playerHeaderFlow() }.collectAsState(PlayerViewModel.PlayerHeader())
             val podcastColors by remember { podcastColorsFlow() }.collectAsState(PodcastColors.ForUserEpisode)
             val ads by viewModel.activeAds.collectAsState()
             val visualsState by remember { playerVisualsStateFlow() }.collectAsState(PlayerVisualsState.Empty)
             val player by viewModel.playerFlow.collectAsState()
+
+            val transcriptTransitionState by shelfSharedViewModel.transitionState.collectAsState(TransitionState.CloseTranscript)
+            val showPlayer = transcriptTransitionState is TransitionState.CloseTranscript
+            val showPlayerControls = when (val state = transcriptTransitionState) {
+                is TransitionState.CloseTranscript -> true
+                is TransitionState.OpenTranscript -> state.showPlayerControls
+            }
+
+            val transition = updateTransition(transcriptTransitionState)
+            val playbackButtonsScale by transition.animateFloat { transitionState ->
+                when (transitionState) {
+                    is TransitionState.CloseTranscript -> 1f
+                    is TransitionState.OpenTranscript -> 0.6f
+                }
+            }
+            val controlsOffsetValue = LocalDensity.current.run { 80.dp.roundToPx() }
+            val controlsOffset by transition.animateIntOffset { transitionState ->
+                when (transitionState) {
+                    is TransitionState.CloseTranscript -> IntOffset.Zero
+                    is TransitionState.OpenTranscript -> IntOffset(x = 0, y = controlsOffsetValue)
+                }
+            }
+            val seekBarOffset = controlsOffset * 0.9f
 
             AppTheme(theme.activeTheme) {
                 CompositionLocalProvider(LocalPodcastColors provides podcastColors) {
@@ -152,64 +193,95 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                         modifier = Modifier
                             .background(playerColors.background01)
                             .fillMaxSize()
-                            .padding(16.dp)
+                            .padding(16.dp),
                     ) {
+                        AnimatedVisibility(
+                            visible = transcriptTransitionState is TransitionState.OpenTranscript,
+                            enter = enter,
+                            exit = exit,
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .background(Color.Red.copy(alpha = 0.3f))
+                                    .fillMaxSize(),
+                            )
+                        }
                         Column {
                             Column(
                                 verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
                                 horizontalAlignment = Alignment.CenterHorizontally,
-                                modifier = Modifier.weight(1f),
+                                modifier = Modifier.weight(1f)
                             ) {
-                                AnimatedNonNullVisibility(
-                                    item = ads.firstOrNull(),
-                                    enter = adEnterTransition,
-                                    exit = adExitTransition,
-                                ) { ad ->
-                                    AdBanner(
-                                        ad = ad,
-                                        colors = rememberAdColors().bannerAd,
-                                        onAdClick = { openAd(ad) },
-                                        onOptionsClick = { openAdReportSheet(ad, podcastColors) },
+                                if (showPlayer) {
+                                    AnimatedNonNullVisibility(
+                                        item = ads.firstOrNull(),
+                                        enter = adEnterTransition,
+                                        exit = adExitTransition,
+                                    ) { ad ->
+                                        AdBanner(
+                                            ad = ad,
+                                            colors = rememberAdColors().bannerAd,
+                                            onAdClick = { openAd(ad) },
+                                            onOptionsClick = { openAdReportSheet(ad, podcastColors) },
+                                        )
+                                    }
+                                    PlayerVisuals(
+                                        state = visualsState,
+                                        player = player,
+                                        onChapterUrlClick = viewModel::onChapterUrlClick,
+                                        configureVideoView = { videoView ->
+                                            videoView.setOnClickListener { onFullScreenVideoClick() }
+                                        },
                                     )
                                 }
-                                PlayerVisuals(
-                                    state = visualsState,
-                                    player = player,
-                                    onChapterUrlClick = viewModel::onChapterUrlClick,
-                                    configureVideoView = { videoView ->
-                                        videoView.setOnClickListener { onFullScreenVideoClick() }
-                                    },
+                            }
+                            if (showPlayer) {
+                                PlayerHeadingSection(
+                                    playerColors = playerColors,
+                                    playerViewModel = viewModel,
+                                    shelfSharedViewModel = shelfSharedViewModel,
                                 )
                             }
-                            PlayerHeadingSection(
-                                playerColors = playerColors,
-                                playerViewModel = viewModel,
-                                shelfSharedViewModel = shelfSharedViewModel,
-                            )
-                            PlayerSeekBar(
-                                playbackPosition = headerData.positionMs.milliseconds,
-                                playbackDuration = headerData.durationMs.milliseconds,
-                                adjustPlaybackDuration = headerData.adjustRemainingTimeDuration,
-                                playbackSpeed = headerData.playbackEffects.playbackSpeed,
-                                chapters = headerData.chapters,
-                                isBuffering = headerData.isBuffering,
-                                bufferedUpTo = headerData.bufferedUpToMs.milliseconds,
-                                playerColors = playerColors,
-                                onSeekToPosition = { progress, onSeekComplete ->
-                                    val progressMs = progress.inWholeMilliseconds.toInt()
-                                    viewModel.seekToMs(progressMs, onSeekComplete)
-                                    playbackManager.trackPlaybackSeek(progressMs, SourceView.PLAYER)
-                                },
-                            )
-                            PlayerControls(
-                                playerColors = playerColors,
-                                playerViewModel = viewModel,
-                            )
-                            PlayerShelf(
-                                playerColors = playerColors,
-                                shelfSharedViewModel = shelfSharedViewModel,
-                                playerViewModel = viewModel,
-                            )
+                            AnimatedVisibility(
+                                visible = showPlayerControls,
+                            ) {
+                                Column {
+                                    PlayerSeekBar(
+                                        playbackPosition = headerData.positionMs.milliseconds,
+                                        playbackDuration = headerData.durationMs.milliseconds,
+                                        adjustPlaybackDuration = headerData.adjustRemainingTimeDuration,
+                                        playbackSpeed = headerData.playbackEffects.playbackSpeed,
+                                        chapters = headerData.chapters,
+                                        isBuffering = headerData.isBuffering,
+                                        bufferedUpTo = headerData.bufferedUpToMs.milliseconds,
+                                        playerColors = playerColors,
+                                        onSeekToPosition = { progress, onSeekComplete ->
+                                            val progressMs = progress.inWholeMilliseconds.toInt()
+                                            viewModel.seekToMs(progressMs, onSeekComplete)
+                                            playbackManager.trackPlaybackSeek(progressMs, SourceView.PLAYER)
+                                        },
+                                        modifier = Modifier.offset { seekBarOffset },
+                                    )
+                                    PlayerControls(
+                                        playerColors = playerColors,
+                                        playerViewModel = viewModel,
+                                        modifier = Modifier
+                                            .scale(playbackButtonsScale)
+                                            .offset { controlsOffset },
+                                    )
+                                }
+                            }
+                            AnimatedVisibility(
+                                visible = showPlayer,
+                                enter = enter2,
+                                exit = exit2,
+                            ) {
+                                PlayerShelf(
+                                    playerColors = playerColors,
+                                    shelfSharedViewModel = shelfSharedViewModel,
+                                    playerViewModel = viewModel,
+                                )
+                            }
                         }
                     }
                 }
@@ -721,7 +793,6 @@ private fun PlayerSeekBar(
         modifier = modifier.fillMaxWidth(),
     )
 }
-
 
 private val fadeIn = fadeIn(spring(stiffness = Spring.StiffnessVeryLow))
 private val fadeOut = fadeOut(spring(stiffness = Spring.StiffnessVeryLow))
