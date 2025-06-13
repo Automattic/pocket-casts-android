@@ -41,6 +41,7 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito.mock
 import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -317,6 +318,7 @@ class ShelfSharedViewModelTest {
             podcastManager = podcastManager,
             settings = settings,
             userEpisodeManager = userEpisodeManager,
+            transcriptManager = mock(),
         )
     }
 }

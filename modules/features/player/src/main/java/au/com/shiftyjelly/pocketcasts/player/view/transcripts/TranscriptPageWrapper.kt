@@ -23,6 +23,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.LocalRippleConfiguration
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.RippleConfiguration
 import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
@@ -52,16 +53,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.buttons.CloseButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.IconButtonSmall
 import au.com.shiftyjelly.pocketcasts.compose.components.SearchBar
 import au.com.shiftyjelly.pocketcasts.compose.components.SearchBarDefaults
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
+import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.images.R
+import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults.TranscriptColors
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptSearchViewModel.SearchUiState
-import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
+import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.TranscriptState
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.TransitionState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -75,11 +79,9 @@ private val SearchBarPlaceholderColor = SearchBarIconColor
 
 @Composable
 fun TranscriptPageWrapper(
-    playerViewModel: PlayerViewModel,
     shelfSharedViewModel: ShelfSharedViewModel,
     transcriptViewModel: TranscriptViewModel,
     searchViewModel: TranscriptSearchViewModel,
-    theme: Theme,
     onClickSubscribe: () -> Unit,
 ) {
     AppTheme(Theme.ThemeType.DARK) {
@@ -104,7 +106,9 @@ fun TranscriptPageWrapper(
             else -> Unit
         }
 
-        val playerBackgroundColor = Color(theme.playerBackgroundColor(uiState.podcastAndEpisode?.podcast))
+        val playerColors = MaterialTheme.theme.rememberPlayerColors()
+        val playerBackgroundColor = playerColors?.background01 ?: Color(0xFF3D3D3D)
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -140,7 +144,6 @@ fun TranscriptPageWrapper(
                     shelfSharedViewModel = shelfSharedViewModel,
                     transcriptViewModel = transcriptViewModel,
                     searchViewModel = searchViewModel,
-                    theme = theme,
                 )
 
                 if (showPaywall) {
@@ -176,6 +179,24 @@ fun TranscriptPageWrapper(
                     }
                 }
                 is TransitionState.CloseTranscript, null -> Unit
+            }
+        }
+
+        val isTranscriptOpen = (transitionState is TransitionState.OpenTranscript)
+        val transcript = (uiState.transcriptState as? TranscriptState.Loaded)?.transcript
+
+        LaunchedEffect(showPaywall, isTranscriptOpen, transcript?.episodeUuid, transcript?.url) {
+            if (!showPaywall && isTranscriptOpen && transcript != null) {
+                transcriptViewModel.track(
+                    AnalyticsEvent.TRANSCRIPT_SHOWN,
+                    mapOf(
+                        "type" to transcript.type.analyticsValue,
+                        "show_as_webpage" to (transcript is Transcript.Web).toString(),
+                    ),
+                )
+            }
+            if (showPaywall) {
+                transcriptViewModel.track(AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_SHOWN)
             }
         }
     }

@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import okhttp3.CacheControl
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.models.entity.Transcript as DbTranscript
 
 @Singleton
@@ -41,21 +42,27 @@ class TranscriptManagerImpl @Inject constructor(
     override suspend fun loadTranscript(
         episodeUuid: String,
     ): Transcript? {
-        val cachedTranscript = lruCache[episodeUuid]
-        if (cachedTranscript != null) {
-            return cachedTranscript
-        }
+        val transcript = lruCache[episodeUuid] ?: findAndCacheTranscript(episodeUuid)
 
+        val message = if (transcript != null) {
+            "Transcript loaded for episode $episodeUuid: ${transcript.type} ${transcript.url}"
+        } else {
+            "Couldn't load transcript for episode $episodeUuid"
+        }
+        Timber.tag("Transcripts").d(message)
+
+        return transcript
+    }
+
+    private suspend fun findAndCacheTranscript(episodeUuid: String): Transcript? {
         val transcript = loadLocalTranscripts(episodeUuid)
             .asFlow()
             .mapNotNull(::associateWithParser)
             .mapNotNull(::readTranscript)
             .firstOrNull()
-
         if (transcript != null) {
             lruCache.put(episodeUuid, transcript)
         }
-
         return transcript
     }
 

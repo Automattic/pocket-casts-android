@@ -63,13 +63,16 @@ object InterceptorModule {
     private val cacheControlTranscriptsInterceptor = Interceptor { chain ->
         val request = chain.request()
         val originalResponse = chain.proceed(request)
-        var responseBuilder = originalResponse.newBuilder().removeHeader("Pragma")
-        if (request.cacheControl.noCache) {
-            responseBuilder = responseBuilder.header(cacheControlHeader, "public, max-age=$fiveMinutes")
-        } else if (request.cacheControl.onlyIfCached) {
-            responseBuilder.header(cacheControlHeader, "public, only-if-cached, max-stale=${request.cacheControl.maxStaleSeconds}")
-        }
-        responseBuilder.build()
+        originalResponse.newBuilder()
+            .removeHeader("Pragma") // Remove a header that prevents using cached repsonses
+            .let { builder ->
+                if (request.cacheControl.noCache) {
+                    builder.header(cacheControlHeader, "public, max-age=$fiveMinutes")
+                } else {
+                    builder
+                }
+            }
+            .build()
     }
 
     private val cleanAndRetryInterceptor = CleanAndRetryInterceptor(

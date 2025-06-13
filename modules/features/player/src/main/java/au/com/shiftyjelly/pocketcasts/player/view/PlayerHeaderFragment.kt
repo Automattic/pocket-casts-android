@@ -324,7 +324,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 PlayerShelf(
                     theme = theme,
                     shelfSharedViewModel = shelfSharedViewModel,
-                    transcriptViewModel = transcriptViewModel,
                     playerViewModel = viewModel,
                 )
                 LaunchedEffect(Unit) {
@@ -437,18 +436,19 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
     private fun setupTranscriptPage() {
         binding?.transcriptPage?.setContent {
-            TranscriptPageWrapper(
-                playerViewModel = viewModel,
-                shelfSharedViewModel = shelfSharedViewModel,
-                transcriptViewModel = transcriptViewModel,
-                searchViewModel = transcriptSearchViewModel,
-                theme = theme,
-                onClickSubscribe = {
-                    val uiState = transcriptViewModel.uiState.value
-                    transcriptViewModel.track(AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_SUBSCRIBE_TAPPED, uiState.podcastAndEpisode)
-                    OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.Upsell(OnboardingUpgradeSource.GENERATED_TRANSCRIPTS))
-                },
-            )
+            val podcastColors by remember { podcastColorsFlow() }.collectAsState(null)
+
+            CompositionLocalProvider(LocalPodcastColors provides podcastColors) {
+                TranscriptPageWrapper(
+                    shelfSharedViewModel = shelfSharedViewModel,
+                    transcriptViewModel = transcriptViewModel,
+                    searchViewModel = transcriptSearchViewModel,
+                    onClickSubscribe = {
+                        transcriptViewModel.track(AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_SUBSCRIBE_TAPPED)
+                        OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.Upsell(OnboardingUpgradeSource.GENERATED_TRANSCRIPTS))
+                    },
+                )
+            }
         }
     }
 
@@ -460,9 +460,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
                     when (transitionState) {
                         is TransitionState.OpenTranscript -> {
-                            if (uiState.showPaywall) {
-                                transcriptViewModel.track(AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_SHOWN, uiState.podcastAndEpisode)
-                            }
                             binding?.openTranscript(
                                 hidePlayerControls = !transitionState.showPlayerControls,
                             )
@@ -474,7 +471,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                             } else {
                                 AnalyticsEvent.TRANSCRIPT_DISMISSED
                             }
-                            transcriptViewModel.track(event, uiState.podcastAndEpisode)
+                            transcriptViewModel.track(event)
                             binding?.closeTranscript()
                         }
                     }

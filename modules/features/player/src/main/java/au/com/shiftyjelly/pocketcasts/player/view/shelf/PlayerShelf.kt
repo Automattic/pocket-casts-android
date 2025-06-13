@@ -33,8 +33,6 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.player.R
-import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel
-import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.TranscriptState
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.PlayerShelfData
@@ -63,10 +61,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun PlayerShelf(
     theme: Theme,
     shelfSharedViewModel: ShelfSharedViewModel,
-    transcriptViewModel: TranscriptViewModel,
     playerViewModel: PlayerViewModel,
 ) {
-    val transcriptUiState by transcriptViewModel.uiState.collectAsStateWithLifecycle()
     val shelfItemsState by shelfSharedViewModel.uiState.collectAsStateWithLifecycle()
     val playerShelfData by playerViewModel.listDataLive
         .map {
@@ -98,7 +94,7 @@ fun PlayerShelf(
 
     PlayerShelfContent(
         shelfItems = shelfItemsState.playerShelfItems,
-        transcriptUiState = transcriptUiState,
+        isTranscriptAvailable = shelfItemsState.isTranscriptAvailable,
         iconColors = iconColors,
         playerShelfData = playerShelfData,
         onEffectsClick = {
@@ -162,7 +158,7 @@ fun PlayerShelf(
 @Composable
 private fun PlayerShelfContent(
     shelfItems: List<ShelfItem>,
-    transcriptUiState: TranscriptViewModel.UiState,
+    isTranscriptAvailable: Boolean,
     iconColors: PlayerShelfIconColors,
     playerShelfData: PlayerShelfData,
     onEffectsClick: () -> Unit,
@@ -207,7 +203,7 @@ private fun PlayerShelfContent(
                     onClick = onStarClick,
                 )
                 ShelfItem.Transcript -> TranscriptButton(
-                    isTranscriptAvailable = transcriptUiState.transcriptState !is TranscriptState.Empty,
+                    isTranscriptAvailable = isTranscriptAvailable,
                     iconColors = iconColors,
                     onClick = onTranscriptClick,
                 )
@@ -490,7 +486,7 @@ private fun PlayerShelfPreview(
     AppTheme(themeType) {
         PlayerShelfContent(
             shelfItems = ShelfItem.entries.toList().take(4),
-            transcriptUiState = TranscriptViewModel.UiState.Empty,
+            isTranscriptAvailable = false,
             iconColors = PlayerShelfIconColors(
                 normalColor = MaterialTheme.theme.colors.playerContrast03,
                 highlightColor = MaterialTheme.theme.colors.playerContrast01,
