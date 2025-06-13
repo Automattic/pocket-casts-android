@@ -60,7 +60,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.mediarouter)
-    implementation(libs.appsflyer)
+//    implementation(libs.appsflyer)
     implementation(libs.automattic.crashlogging)
     implementation(libs.coil)
     implementation(libs.compose.ui)

@@ -25,7 +25,7 @@ dependencies {
 
     implementation(platform(libs.firebase.bom))
 
-    implementation(libs.appsflyer)
+//    implementation(libs.appsflyer)
     implementation(libs.automattic.explat)
     implementation(libs.automattic.tracks)
     implementation(libs.firebase.analytics)

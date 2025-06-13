@@ -44,16 +44,7 @@ object TrackerModule {
 
     @Provides
     @Singleton
-    internal fun provideAppsFlyerAnalytics(settings: Settings, @ApplicationContext context: Context): AppsFlyerAnalyticsWrapper {
-        val appsFlyerLib = if (FeatureFlag.isEnabled(Feature.APPSFLYER_ANALYTICS)) {
-            AppsFlyerAnalyticsWrapper.setupAppsFlyerLib(context)
-        } else {
-            null
-        }
-
-        return AppsFlyerAnalyticsWrapper(
-            appsFlyerLib = appsFlyerLib,
-            context = context,
-        )
+    internal fun provideAppsFlyerAnalytics(): AppsFlyerAnalyticsWrapper {
+        return AppsFlyerAnalyticsWrapper()
     }
 }
