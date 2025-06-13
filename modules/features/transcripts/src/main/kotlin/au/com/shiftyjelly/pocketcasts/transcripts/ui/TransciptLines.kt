@@ -1,4 +1,4 @@
-package au.shiftyjelly.pocketcasts.transcripts.ui
+package au.com.shiftyjelly.pocketcasts.transcripts.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column

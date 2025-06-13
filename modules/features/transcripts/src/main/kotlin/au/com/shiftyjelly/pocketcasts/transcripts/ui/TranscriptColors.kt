@@ -1,4 +1,4 @@
-package au.shiftyjelly.pocketcasts.transcripts.ui
+package au.com.shiftyjelly.pocketcasts.transcripts.ui
 
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
