@@ -53,6 +53,7 @@ import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterPlayerHeaderBind
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivity
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContract
 import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.PlayerControls
+import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.PlayerHeadingSection
 import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.PlayerVisualsState
 import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.VisualContentState
 import au.com.shiftyjelly.pocketcasts.player.view.shelf.PlayerShelf
@@ -145,6 +146,11 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                         Column {
                             Spacer(
                                 modifier = Modifier.weight(1f),
+                            )
+                            PlayerHeadingSection(
+                                playerColors = playerColors,
+                                playerViewModel = viewModel,
+                                shelfSharedViewModel = shelfSharedViewModel,
                             )
                             PlayerSeekBar(
                                 playbackPosition = headerData.positionMs.milliseconds,
