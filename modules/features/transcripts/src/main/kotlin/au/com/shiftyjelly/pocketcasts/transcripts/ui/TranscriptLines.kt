@@ -1,20 +1,20 @@
-package au.shiftyjelly.pocketcasts.transcripts.ui
+package au.com.shiftyjelly.pocketcasts.transcripts.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -30,27 +30,31 @@ import au.com.shiftyjelly.pocketcasts.compose.extensions.verticalScrollBar
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
-import au.com.shiftyjelly.pocketcasts.ui.R
+import au.com.shiftyjelly.pocketcasts.transcripts.SearchCoordinates
+import au.com.shiftyjelly.pocketcasts.transcripts.SearchState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 
 @Composable
 internal fun TranscriptLines(
     entries: List<TranscriptEntry>,
+    searchState: SearchState,
     modifier: Modifier = Modifier,
     state: LazyListState = rememberLazyListState(),
-    colors: TranscriptColors = TranscriptColors.default(MaterialTheme.theme.colors),
+    theme: TranscriptTheme = TranscriptTheme.default(MaterialTheme.theme.colors),
 ) {
     FadedLazyColumn(
         contentPadding = PaddingValues(vertical = 16.dp),
         modifier = modifier.verticalScrollBar(
             scrollState = state,
-            thumbColor = colors.secondaryElement,
+            thumbColor = theme.secondaryElement,
         ),
     ) {
-        items(entries) { entry ->
+        itemsIndexed(entries) { index, entry ->
             TranscriptLine(
+                entryIndex = index,
                 entry = entry,
-                colors = colors,
+                searchState = searchState,
+                theme = theme,
                 modifier = Modifier.padding(entry.padding()),
             )
         }
@@ -59,14 +63,40 @@ internal fun TranscriptLines(
 
 @Composable
 private fun TranscriptLine(
+    entryIndex: Int,
     entry: TranscriptEntry,
-    colors: TranscriptColors,
+    searchState: SearchState,
+    theme: TranscriptTheme,
     modifier: Modifier = Modifier,
 ) {
+    val entryText = entry.text()
+    val searchHighlights = remember(entryIndex, entryText, searchState) {
+        val searchTermLength = searchState.searchTerm?.length ?: 0
+        searchState
+            .searchResultIndices[entryIndex]
+            ?.map { start -> start to start + searchTermLength }
+            ?.filter { (start, end) -> isValidHighlightRange(start, end, entryText.length) }
+            .orEmpty()
+    }
+
     Text(
-        text = entry.text(),
+        text = buildAnnotatedString {
+            append(entryText)
+            searchHighlights.forEach { (startIndex, endIndex) ->
+                val highlightCoordinates = SearchCoordinates(
+                    lineIndex = entryIndex,
+                    matchIndex = startIndex,
+                )
+                val style = if (highlightCoordinates == searchState.selectedSearchCoordinates) {
+                    theme.searchHighlightSpanStyle
+                } else {
+                    theme.searchDefaultSpanStyle
+                }
+                addStyle(style, startIndex, endIndex)
+            }
+        },
         style = entry.textStyle(),
-        color = colors.text,
+        color = theme.text,
         modifier = modifier,
     )
 }
@@ -86,12 +116,14 @@ private fun TranscriptEntry.padding() = when (this) {
     is TranscriptEntry.Speaker -> SpeakerPadding
 }
 
-internal val RobotoSerifFontFamily = FontFamily(Font(R.font.roboto_serif))
+private fun isValidHighlightRange(start: Int, end: Int, maxLength: Int): Boolean {
+    return start < end && start >= 0 && end <= maxLength
+}
 
 private val SimpleTextStyle = TextStyle(
     fontSize = 16.sp,
     fontWeight = FontWeight.Medium,
-    fontFamily = RobotoSerifFontFamily,
+    fontFamily = TranscriptTheme.RobotoSerifFontFamily,
 )
 private val SpeakerTextStyle = SimpleTextStyle.copy(
     fontSize = 12.sp,
@@ -109,6 +141,7 @@ private fun TranscriptLinesPreview(
         Column {
             TranscriptLines(
                 entries = TranscriptEntry.PreviewList,
+                searchState = remember { SearchStatePreview },
             )
         }
     }
@@ -121,15 +154,39 @@ private fun TranscriptLinesPlayerPreview(
 ) {
     AppTheme(ThemeType.ROSE) {
         CompositionLocalProvider(LocalPodcastColors provides podcastColors) {
-            val transciptColors = rememberTranscriptColors()
+            val transcriptTheme = rememberTranscriptTheme()
             Column(
-                modifier = Modifier.background(transciptColors.background),
+                modifier = Modifier.background(transcriptTheme.background),
             ) {
                 TranscriptLines(
                     entries = TranscriptEntry.PreviewList,
-                    colors = transciptColors,
+                    theme = transcriptTheme,
+                    searchState = remember { SearchStatePreview },
                 )
             }
         }
     }
 }
+
+private val SearchStatePreview: SearchState
+    get() {
+        val searchTerm = "lorem"
+        return SearchState(
+            searchTerm = searchTerm,
+            selectedSearchCoordinates = SearchCoordinates(
+                lineIndex = 0,
+                matchIndex = TranscriptEntry.PreviewList[0].text().lastIndexOf(searchTerm, ignoreCase = true),
+            ),
+            searchResultIndices = TranscriptEntry.PreviewList
+                .mapIndexedNotNull { index, entry ->
+                    val text = entry.text()
+                    val startIndices = searchTerm.toRegex(RegexOption.IGNORE_CASE)
+                        .findAll(text)
+                        .map { it.range.first }
+                        .toList()
+                        .takeIf { it.isNotEmpty() }
+                    startIndices?.let { index to it }
+                }
+                .toMap(),
+        )
+    }
