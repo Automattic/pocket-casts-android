@@ -117,17 +117,7 @@ private fun TranscriptEntry.padding() = when (this) {
 }
 
 private fun isValidHighlightRange(start: Int, end: Int, maxLength: Int): Boolean {
-    if (start > end) {
-        return false
-    }
-    if (start < 0 || end < 0) {
-        return false
-    }
-    if (start > maxLength || end > maxLength) {
-        return false
-    }
-
-    return true
+    return start < end && start >= 0 && end <= maxLength
 }
 
 private val SimpleTextStyle = TextStyle(
@@ -178,22 +168,25 @@ private fun TranscriptLinesPlayerPreview(
     }
 }
 
-private val SearchStatePreview
-    get() = SearchState(
-        searchTerm = "lorem",
-        selectedSearchCoordinates = SearchCoordinates(
-            lineIndex = 0,
-            matchIndex = TranscriptEntry.PreviewList[0].text().lastIndexOf("lorem", ignoreCase = true),
-        ),
-        searchResultIndices = TranscriptEntry.PreviewList
-            .mapIndexedNotNull { index, entry ->
-                val text = entry.text()
-                val startIndices = "lorem".toRegex(RegexOption.IGNORE_CASE)
-                    .findAll(text)
-                    .map { it.range.first }
-                    .toList()
-                    .takeIf { it.isNotEmpty() }
-                startIndices?.let { index to it }
-            }
-            .toMap(),
-    )
+private val SearchStatePreview: SearchState
+    get() {
+        val searchTerm = "lorem"
+        return SearchState(
+            searchTerm = searchTerm,
+            selectedSearchCoordinates = SearchCoordinates(
+                lineIndex = 0,
+                matchIndex = TranscriptEntry.PreviewList[0].text().lastIndexOf(searchTerm, ignoreCase = true),
+            ),
+            searchResultIndices = TranscriptEntry.PreviewList
+                .mapIndexedNotNull { index, entry ->
+                    val text = entry.text()
+                    val startIndices = searchTerm.toRegex(RegexOption.IGNORE_CASE)
+                        .findAll(text)
+                        .map { it.range.first }
+                        .toList()
+                        .takeIf { it.isNotEmpty() }
+                    startIndices?.let { index to it }
+                }
+                .toMap(),
+        )
+    }
