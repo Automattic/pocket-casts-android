@@ -3,7 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <application
-        tools:replace="android:allowBackup,android:fullBackupContent"
+        tools:replace="android:allowBackup,android:fullBackupContent,android:dataExtractionRules"
         android:allowBackup="true"
-        android:fullBackupContent="@xml/backup_scheme" />
+        android:fullBackupContent="@xml/backup_scheme"
+        android:dataExtractionRules="@xml/extraction_rules"/>
 </manifest>
