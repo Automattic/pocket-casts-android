@@ -44,7 +44,7 @@ internal fun TranscriptLines(
     searchState: SearchState,
     modifier: Modifier = Modifier,
     state: LazyListState = rememberLazyListState(),
-    colors: TranscriptColors = TranscriptColors.default(MaterialTheme.theme.colors),
+    colors: TranscriptTheme = TranscriptTheme.default(MaterialTheme.theme.colors),
 ) {
     FadedLazyColumn(
         contentPadding = PaddingValues(vertical = 16.dp),
@@ -70,7 +70,7 @@ private fun TranscriptLine(
     entryIndex: Int,
     entry: TranscriptEntry,
     searchState: SearchState,
-    colors: TranscriptColors,
+    colors: TranscriptTheme,
     modifier: Modifier = Modifier,
 ) {
     val entryText = entry.text()

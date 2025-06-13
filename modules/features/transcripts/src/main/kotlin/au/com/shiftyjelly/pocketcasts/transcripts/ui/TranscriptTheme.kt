@@ -8,19 +8,19 @@ import au.com.shiftyjelly.pocketcasts.compose.PlayerColors
 import au.com.shiftyjelly.pocketcasts.compose.ThemeColors
 import au.com.shiftyjelly.pocketcasts.compose.theme
 
-data class TranscriptColors(
+data class TranscriptTheme(
     val background: Color,
     val text: Color,
     val secondaryElement: Color,
 ) {
     companion object {
-        fun default(colors: ThemeColors) = TranscriptColors(
+        fun default(colors: ThemeColors) = TranscriptTheme(
             background = colors.primaryUi01,
             text = colors.primaryText01,
             secondaryElement = colors.primaryUi05,
         )
 
-        fun player(colors: PlayerColors) = TranscriptColors(
+        fun player(colors: PlayerColors) = TranscriptTheme(
             background = colors.background01,
             text = colors.contrast02,
             secondaryElement = colors.contrast05,
@@ -29,15 +29,15 @@ data class TranscriptColors(
 }
 
 @Composable
-fun rememberTranscriptColors(): TranscriptColors {
+fun rememberTranscriptColors(): TranscriptTheme {
     val theme = MaterialTheme.theme
     val playerColors = theme.rememberPlayerColors()
 
     return remember(theme.type, playerColors) {
         if (playerColors != null) {
-            TranscriptColors.player(playerColors)
+            TranscriptTheme.player(playerColors)
         } else {
-            TranscriptColors.default(theme.colors)
+            TranscriptTheme.default(theme.colors)
         }
     }
 }
