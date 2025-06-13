@@ -151,7 +151,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         super.onViewCreated(view, savedInstanceState)
 
         val enter = fadeIn(spring(stiffness = Spring.StiffnessVeryLow)) + slideInVertically(initialOffsetY = { it })
-        val exit = fadeOut(spring(stiffness = Spring.StiffnessHigh))// + slideOutVertically(targetOffsetY = { it })
+        val exit = fadeOut(spring(stiffness = Spring.StiffnessHigh)) // + slideOutVertically(targetOffsetY = { it })
         val enter2 = fadeIn() + expandIn(expandFrom = Alignment.TopCenter)
         val exit2 = fadeOut() + shrinkOut(shrinkTowards = Alignment.TopCenter)
 
@@ -170,7 +170,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             val playbackButtonsScale by showPlayerTransition.animateFloat { showPlayer ->
                 if (showPlayer) 1f else 0.6f
             }
-            val controlsOffsetValue = LocalDensity.current.run { 80.dp.roundToPx() }
+            val controlsOffsetValue = LocalDensity.current.run { 64.dp.roundToPx() }
             val controlsOffset by showPlayerTransition.animateIntOffset { showPlayer ->
                 if (showPlayer) IntOffset.Zero else IntOffset(x = 0, y = controlsOffsetValue)
             }
@@ -214,7 +214,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 modifier = Modifier
                                     .weight(1f)
-                                    .alpha(playerElementsAlpha)
+                                    .alpha(playerElementsAlpha),
                             ) {
                                 if (showPlayerTransition.targetState) {
                                     AnimatedNonNullVisibility(
@@ -730,9 +730,9 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
     private fun isListDataEquivalentForVisuals(old: PlayerViewModel.ListData, new: PlayerViewModel.ListData): Boolean {
         return old.podcastHeader.episode?.uuid == new.podcastHeader.episode?.uuid &&
-                old.podcastHeader.useEpisodeArtwork == new.podcastHeader.useEpisodeArtwork &&
-                old.podcastHeader.chapter?.index == new.podcastHeader.chapter?.index &&
-                old.podcastHeader.isPrepared == new.podcastHeader.isPrepared
+            old.podcastHeader.useEpisodeArtwork == new.podcastHeader.useEpisodeArtwork &&
+            old.podcastHeader.chapter?.index == new.podcastHeader.chapter?.index &&
+            old.podcastHeader.isPrepared == new.podcastHeader.isPrepared
     }
 
     private fun createPlayerVisualState(listData: PlayerViewModel.ListData): PlayerVisualsState {
