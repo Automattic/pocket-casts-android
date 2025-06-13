@@ -208,12 +208,15 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                                 modifier = Modifier.fillMaxSize(),
                             )
                         }
-                        Column {
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
                             Column(
                                 verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 modifier = Modifier
                                     .weight(1f)
+                                    .fillMaxWidth()
                                     .alpha(playerElementsAlpha),
                             ) {
                                 if (showPlayerTransition.targetState) {
