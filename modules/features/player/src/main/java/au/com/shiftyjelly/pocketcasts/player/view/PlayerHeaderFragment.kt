@@ -41,10 +41,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -67,6 +69,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedNonNullVisibili
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
+import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterPlayerHeaderBinding
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivity
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContract
@@ -252,8 +255,11 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                             }
                             AnimatedVisibility(
                                 visible = showPlayerControls,
+                                modifier = Modifier.fillMaxWidth(),
                             ) {
-                                Column {
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                ) {
                                     PlayerSeekBar(
                                         playbackPosition = headerData.positionMs.milliseconds,
                                         playbackDuration = headerData.durationMs.milliseconds,
@@ -268,7 +274,9 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                                             viewModel.seekToMs(progressMs, onSeekComplete)
                                             playbackManager.trackPlaybackSeek(progressMs, SourceView.PLAYER)
                                         },
-                                        modifier = Modifier.offset { seekBarOffset },
+                                        modifier = Modifier
+                                            .fillMaxWidth(fraction = ResourcesCompat.getFloat(resources, R.dimen.seekbar_width_percentage))
+                                            .offset { seekBarOffset },
                                     )
                                     PlayerControls(
                                         playerColors = playerColors,
