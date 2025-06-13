@@ -16,9 +16,9 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -28,6 +28,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
@@ -40,12 +41,17 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import au.com.shiftyjelly.pocketcasts.ads.AdReportFragment
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.PlayerColors
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
+import au.com.shiftyjelly.pocketcasts.compose.ad.AdBanner
+import au.com.shiftyjelly.pocketcasts.compose.ad.BlazeAd
+import au.com.shiftyjelly.pocketcasts.compose.ad.rememberAdColors
+import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedNonNullVisibility
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
@@ -54,6 +60,7 @@ import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivity
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContract
 import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.PlayerControls
 import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.PlayerHeadingSection
+import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.PlayerVisuals
 import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.PlayerVisualsState
 import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.VisualContentState
 import au.com.shiftyjelly.pocketcasts.player.view.shelf.PlayerShelf
@@ -73,6 +80,7 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSourc
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog.ButtonType.Danger
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -132,6 +140,9 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         requireNotNull(binding).composeContent.setContentWithViewCompositionStrategy {
             val headerData by remember { playerHeaderFlow() }.collectAsState(PlayerViewModel.PlayerHeader())
             val podcastColors by remember { podcastColorsFlow() }.collectAsState(PodcastColors.ForUserEpisode)
+            val ads by viewModel.activeAds.collectAsState()
+            val visualsState by remember { playerVisualsStateFlow() }.collectAsState(PlayerVisualsState.Empty)
+            val player by viewModel.playerFlow.collectAsState()
 
             AppTheme(theme.activeTheme) {
                 CompositionLocalProvider(LocalPodcastColors provides podcastColors) {
@@ -144,9 +155,32 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                             .padding(16.dp)
                     ) {
                         Column {
-                            Spacer(
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
+                                horizontalAlignment = Alignment.CenterHorizontally,
                                 modifier = Modifier.weight(1f),
-                            )
+                            ) {
+                                AnimatedNonNullVisibility(
+                                    item = ads.firstOrNull(),
+                                    enter = adEnterTransition,
+                                    exit = adExitTransition,
+                                ) { ad ->
+                                    AdBanner(
+                                        ad = ad,
+                                        colors = rememberAdColors().bannerAd,
+                                        onAdClick = { openAd(ad) },
+                                        onOptionsClick = { openAdReportSheet(ad, podcastColors) },
+                                    )
+                                }
+                                PlayerVisuals(
+                                    state = visualsState,
+                                    player = player,
+                                    onChapterUrlClick = viewModel::onChapterUrlClick,
+                                    configureVideoView = { videoView ->
+                                        videoView.setOnClickListener { onFullScreenVideoClick() }
+                                    },
+                                )
+                            }
                             PlayerHeadingSection(
                                 playerColors = playerColors,
                                 playerViewModel = viewModel,
@@ -174,7 +208,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                             PlayerShelf(
                                 playerColors = playerColors,
                                 shelfSharedViewModel = shelfSharedViewModel,
-                                playerViewModel = viewModel
+                                playerViewModel = viewModel,
                             )
                         }
                     }
@@ -583,6 +617,21 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 .setBackgroundTint(ThemeColor.primaryUi01(Theme.ThemeType.LIGHT))
                 .setTextColor(ThemeColor.primaryText01(Theme.ThemeType.LIGHT))
                 .show()
+        }
+    }
+
+    private fun openAd(ad: BlazeAd) {
+        runCatching {
+            val intent = Intent(Intent.ACTION_VIEW, ad.ctaUrl.toUri())
+            startActivity(intent)
+        }.onFailure { LogBuffer.e("Ads", it, "Failed to open an ad: ${ad.id}") }
+    }
+
+    private fun openAdReportSheet(ad: BlazeAd, podcastColors: PodcastColors) {
+        if (parentFragmentManager.findFragmentByTag("ad_report") == null) {
+            AdReportFragment
+                .newInstance(ad, podcastColors)
+                .show(parentFragmentManager, "ad_report")
         }
     }
 
