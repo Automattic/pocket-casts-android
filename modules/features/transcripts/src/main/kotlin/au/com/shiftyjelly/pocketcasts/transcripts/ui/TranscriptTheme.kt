@@ -27,10 +27,12 @@ data class TranscriptTheme(
             text = colors.primaryText01,
             secondaryElement = colors.primaryUi05,
             searchDefaultSpanStyle = SpanStyle(
-                background = colors.primaryUi05.copy(alpha = 0.6f),
+                background = colors.primaryText01.copy(alpha = 0.6f),
+                color = colors.primaryUi01,
             ),
             searchHighlightSpanStyle = SpanStyle(
-                background = colors.primaryUi05,
+                background = colors.primaryText01,
+                color = colors.primaryUi01,
             ),
         )
 
