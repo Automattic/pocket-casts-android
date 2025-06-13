@@ -17,6 +17,8 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -52,6 +54,7 @@ import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivity
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContract
 import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.PlayerVisualsState
 import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.VisualContentState
+import au.com.shiftyjelly.pocketcasts.player.view.shelf.PlayerShelf
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptSearchViewModel
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel
 import au.com.shiftyjelly.pocketcasts.player.view.video.VideoActivity
@@ -136,7 +139,18 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                             .background(playerColors.background01)
                             .fillMaxSize()
                             .padding(16.dp)
-                    )
+                    ) {
+                        Column {
+                            Spacer(
+                                modifier = Modifier.weight(1f),
+                            )
+                            PlayerShelf(
+                                playerColors = playerColors,
+                                shelfSharedViewModel = shelfSharedViewModel,
+                                playerViewModel = viewModel
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -576,9 +590,9 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
     private fun isListDataEquivalentForVisuals(old: PlayerViewModel.ListData, new: PlayerViewModel.ListData): Boolean {
         return old.podcastHeader.episode?.uuid == new.podcastHeader.episode?.uuid &&
-            old.podcastHeader.useEpisodeArtwork == new.podcastHeader.useEpisodeArtwork &&
-            old.podcastHeader.chapter?.index == new.podcastHeader.chapter?.index &&
-            old.podcastHeader.isPrepared == new.podcastHeader.isPrepared
+                old.podcastHeader.useEpisodeArtwork == new.podcastHeader.useEpisodeArtwork &&
+                old.podcastHeader.chapter?.index == new.podcastHeader.chapter?.index &&
+                old.podcastHeader.isPrepared == new.podcastHeader.isPrepared
     }
 
     private fun createPlayerVisualState(listData: PlayerViewModel.ListData): PlayerVisualsState {
