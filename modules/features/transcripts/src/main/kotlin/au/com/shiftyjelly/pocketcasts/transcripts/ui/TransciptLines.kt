@@ -13,12 +13,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -35,7 +31,6 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
 import au.com.shiftyjelly.pocketcasts.transcripts.SearchState
-import au.com.shiftyjelly.pocketcasts.ui.R
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 
 @Composable
@@ -89,9 +84,9 @@ private fun TranscriptLine(
             searchHighlights.forEach { (startIndex, endIndex) ->
                 val highlightCoordinates = entryIndex to startIndex
                 val style = if (highlightCoordinates == searchState.selectedSearchCoordinates) {
-                    SpanStyle(Color.Red)
+                    colors.searchHighlightSpanStyle
                 } else {
-                    SpanStyle(Color.Blue)
+                    colors.searchDefaultSpanStyle
                 }
                 addStyle(style, startIndex, endIndex)
             }
@@ -131,12 +126,10 @@ private fun isValidHighlightRange(start: Int, end: Int, maxLength: Int): Boolean
     return true
 }
 
-internal val RobotoSerifFontFamily = FontFamily(Font(R.font.roboto_serif))
-
 private val SimpleTextStyle = TextStyle(
     fontSize = 16.sp,
     fontWeight = FontWeight.Medium,
-    fontFamily = RobotoSerifFontFamily,
+    fontFamily = TranscriptTheme.RobotoSerifFontFamily,
 )
 private val SpeakerTextStyle = SimpleTextStyle.copy(
     fontSize = 12.sp,
