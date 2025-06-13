@@ -39,13 +39,13 @@ internal fun TranscriptLines(
     searchState: SearchState,
     modifier: Modifier = Modifier,
     state: LazyListState = rememberLazyListState(),
-    colors: TranscriptTheme = TranscriptTheme.default(MaterialTheme.theme.colors),
+    theme: TranscriptTheme = TranscriptTheme.default(MaterialTheme.theme.colors),
 ) {
     FadedLazyColumn(
         contentPadding = PaddingValues(vertical = 16.dp),
         modifier = modifier.verticalScrollBar(
             scrollState = state,
-            thumbColor = colors.secondaryElement,
+            thumbColor = theme.secondaryElement,
         ),
     ) {
         itemsIndexed(entries) { index, entry ->
@@ -53,7 +53,7 @@ internal fun TranscriptLines(
                 entryIndex = index,
                 entry = entry,
                 searchState = searchState,
-                colors = colors,
+                theme = theme,
                 modifier = Modifier.padding(entry.padding()),
             )
         }
@@ -65,7 +65,7 @@ private fun TranscriptLine(
     entryIndex: Int,
     entry: TranscriptEntry,
     searchState: SearchState,
-    colors: TranscriptTheme,
+    theme: TranscriptTheme,
     modifier: Modifier = Modifier,
 ) {
     val entryText = entry.text()
@@ -84,15 +84,15 @@ private fun TranscriptLine(
             searchHighlights.forEach { (startIndex, endIndex) ->
                 val highlightCoordinates = entryIndex to startIndex
                 val style = if (highlightCoordinates == searchState.selectedSearchCoordinates) {
-                    colors.searchHighlightSpanStyle
+                    theme.searchHighlightSpanStyle
                 } else {
-                    colors.searchDefaultSpanStyle
+                    theme.searchDefaultSpanStyle
                 }
                 addStyle(style, startIndex, endIndex)
             }
         },
         style = entry.textStyle(),
-        color = colors.text,
+        color = theme.text,
         modifier = modifier,
     )
 }
@@ -160,13 +160,13 @@ private fun TranscriptLinesPlayerPreview(
 ) {
     AppTheme(ThemeType.ROSE) {
         CompositionLocalProvider(LocalPodcastColors provides podcastColors) {
-            val transciptColors = rememberTranscriptColors()
+            val transcriptTheme = rememberTranscriptTheme()
             Column(
-                modifier = Modifier.background(transciptColors.background),
+                modifier = Modifier.background(transcriptTheme.background),
             ) {
                 TranscriptLines(
                     entries = TranscriptEntry.PreviewList,
-                    colors = transciptColors,
+                    theme = transcriptTheme,
                     searchState = remember { SearchStatePreview },
                 )
             }

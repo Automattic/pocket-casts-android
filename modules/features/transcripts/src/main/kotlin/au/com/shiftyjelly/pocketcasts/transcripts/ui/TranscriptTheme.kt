@@ -51,7 +51,7 @@ data class TranscriptTheme(
 }
 
 @Composable
-fun rememberTranscriptColors(): TranscriptTheme {
+fun rememberTranscriptTheme(): TranscriptTheme {
     val theme = MaterialTheme.theme
     val playerColors = theme.rememberPlayerColors()
 
