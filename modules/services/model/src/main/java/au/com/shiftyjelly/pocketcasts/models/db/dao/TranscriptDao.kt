@@ -14,4 +14,7 @@ abstract class TranscriptDao {
 
     @Query("SELECT * FROM episode_transcript WHERE episode_uuid IS :episodeUuid")
     abstract fun observeTranscriptForEpisode(episodeUuid: String): Flow<Transcript?>
+
+    @Query("SELECT * FROM episode_transcript WHERE episode_uuid IS :episodeUuid")
+    abstract fun observeTranscripts(episodeUuid: String): Flow<List<Transcript>>
 }

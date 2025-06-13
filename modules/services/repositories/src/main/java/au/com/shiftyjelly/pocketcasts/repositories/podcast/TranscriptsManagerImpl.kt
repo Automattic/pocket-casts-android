@@ -8,7 +8,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Transcript
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.shownotes.findTranscripts
 import au.com.shiftyjelly.pocketcasts.servers.ShowNotesServiceManager
-import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptCacheService
+import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptService
 import au.com.shiftyjelly.pocketcasts.utils.NetworkWrapper
 import au.com.shiftyjelly.pocketcasts.utils.exception.EmptyDataException
 import au.com.shiftyjelly.pocketcasts.utils.exception.NoNetworkException
@@ -28,7 +28,7 @@ import timber.log.Timber
 @OptIn(UnstableApi::class)
 class TranscriptsManagerImpl @Inject constructor(
     private val transcriptDao: TranscriptDao,
-    private val service: TranscriptCacheService,
+    private val service: TranscriptService,
     private val networkWrapper: NetworkWrapper,
     private val showNotesServiceManager: ShowNotesServiceManager,
     @ApplicationScope private val scope: CoroutineScope,
