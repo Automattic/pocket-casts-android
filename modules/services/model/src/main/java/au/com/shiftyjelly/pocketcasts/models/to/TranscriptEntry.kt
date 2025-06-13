@@ -11,10 +11,10 @@ sealed interface TranscriptEntry {
 
     companion object {
         val PreviewList = listOf(
-            Text("Lorem ipsum odor amet, consectetuer adipiscing elit."),
-            Speaker("Speaker 1"),
+            Text("Lorem ipsum odor amet, lorem consectetuer adipiscing elit."),
+            Speaker("Speaker Lorem 1"),
             Text("Sodales sem fusce elementum commodo risus purus auctor neque."),
-            Text("Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere."),
+            Text("Tempus leo eu aenean lorem sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere."),
             Speaker("Speaker 2"),
             Text("Duis elementum condimentum interdum. Vivamus sollicitudin blandit luctus. In vulputate ipsum dolor, vitae lacinia augue sollicitudin vel. Phasellus eget augue odio. Cras pharetra libero et lorem laoreet varius. Mauris libero massa, dictum eu dapibus at, condimentum nec eros. Morbi varius lobortis odio a fermentum."),
             Text("Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi."),
