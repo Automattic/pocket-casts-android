@@ -15,11 +15,9 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateIntOffset
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.updateTransition
-import androidx.compose.animation.expandIn
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
@@ -152,11 +150,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val enter = fadeIn(spring(stiffness = Spring.StiffnessVeryLow)) + slideInVertically(initialOffsetY = { it })
-        val exit = fadeOut(spring(stiffness = Spring.StiffnessHigh)) // + slideOutVertically(targetOffsetY = { it })
-        val enter2 = fadeIn() + expandIn(expandFrom = Alignment.TopCenter)
-        val exit2 = fadeOut() + shrinkOut(shrinkTowards = Alignment.TopCenter)
-
         requireNotNull(binding).composeContent.setContentWithViewCompositionStrategy {
             val headerData by remember { playerHeaderFlow() }.collectAsState(PlayerViewModel.PlayerHeader())
             val podcastColors by remember { podcastColorsFlow() }.collectAsState(PodcastColors.ForUserEpisode)
@@ -194,8 +187,8 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                     ) {
                         AnimatedVisibility(
                             visible = transcriptTransitionState is TransitionState.OpenTranscript,
-                            enter = enter,
-                            exit = exit,
+                            enter = transcriptEnterTransition,
+                            exit = transcriptExitTranscition,
                             modifier = Modifier.fillMaxSize(),
                         ) {
                             TranscriptPageWrapper(
@@ -288,8 +281,8 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                             }
                             AnimatedVisibility(
                                 visible = showPlayerTransition.targetState,
-                                enter = enter2,
-                                exit = exit2,
+                                enter = shelfEnterTransition,
+                                exit = shelfExitTransition,
                             ) {
                                 PlayerShelf(
                                     playerColors = playerColors,
@@ -692,10 +685,11 @@ private fun PlayerSeekBar(
     )
 }
 
-private val fadeIn = fadeIn(spring(stiffness = Spring.StiffnessVeryLow))
-private val fadeOut = fadeOut(spring(stiffness = Spring.StiffnessVeryLow))
-private val expandVertically = expandVertically(spring(stiffness = Spring.StiffnessMediumLow))
-private val shrinkVertically = shrinkVertically(spring(stiffness = Spring.StiffnessMediumLow))
+private val adEnterTransition = fadeIn(spring(stiffness = Spring.StiffnessVeryLow)) + expandVertically(spring(stiffness = Spring.StiffnessMediumLow))
+private val adExitTransition = fadeOut(spring(stiffness = Spring.StiffnessVeryLow)) + shrinkVertically(spring(stiffness = Spring.StiffnessMediumLow))
 
-private val adEnterTransition = fadeIn + expandVertically
-private val adExitTransition = fadeOut + shrinkVertically
+private val transcriptEnterTransition = fadeIn(spring(stiffness = Spring.StiffnessVeryLow)) + slideInVertically(initialOffsetY = { it })
+private val transcriptExitTranscition = fadeOut(spring(stiffness = Spring.StiffnessHigh))
+
+private val shelfEnterTransition = fadeIn() + expandVertically(expandFrom = Alignment.Top)
+private val shelfExitTransition = fadeOut() + shrinkVertically(shrinkTowards = Alignment.Top)
