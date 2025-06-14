@@ -43,6 +43,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.map
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.PlayerColors
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
@@ -60,8 +61,10 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun PlayerHeadingSection(
+    playerColors: PlayerColors,
     playerViewModel: PlayerViewModel,
     shelfSharedViewModel: ShelfSharedViewModel,
+    modifier: Modifier = Modifier,
 ) {
     val state by remember {
         playerViewModel.listDataLive.map {
@@ -85,10 +88,12 @@ fun PlayerHeadingSection(
     Content(
         state = state,
         disableAccessibility = disableAccessibility,
+        playerColors = playerColors,
         onPreviousChapterClick = { playerViewModel.onPreviousChapterClick() },
         onNextChapterClick = { playerViewModel.onNextChapterClick() },
         onChapterTitleClick = { playerViewModel.onChapterTitleClick(it) },
         onPodcastTitleClick = { playerViewModel.onPodcastTitleClick(state.episodeUuid, state.podcastUuid) },
+        modifier = modifier,
     )
 
     LaunchedEffect(Unit) {
@@ -107,13 +112,14 @@ private fun Content(
     onNextChapterClick: () -> Unit,
     onChapterTitleClick: (Chapter) -> Unit,
     onPodcastTitleClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    playerColors: PlayerColors = MaterialTheme.theme.rememberPlayerColorsOrDefault(),
 ) {
     CompositionLocalProvider(
         LocalRippleConfiguration provides RippleConfiguration(Color.White, RippleDefaults.rippleAlpha(Color.White, true)),
     ) {
-        val playerColors = MaterialTheme.theme.rememberPlayerColorsOrDefault()
         Column(
-            modifier = Modifier
+            modifier = modifier
                 .padding(horizontal = 8.dp)
                 .then(
                     if (disableAccessibility) {
@@ -283,7 +289,7 @@ private fun ChapterNextButtonWithChapterProgressCircle(
     }
 }
 
-data class PlayerHeadingSectionState(
+private data class PlayerHeadingSectionState(
     val episodeUuid: String = "",
     val title: String = "",
     val podcastUuid: String? = null,

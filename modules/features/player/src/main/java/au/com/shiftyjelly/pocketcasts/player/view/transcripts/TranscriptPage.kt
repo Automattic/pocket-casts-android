@@ -181,9 +181,7 @@ private fun TranscriptContent(
                 TextP40(
                     text = stringResource(LR.string.transcript_empty),
                     color = TranscriptColors.textColor(),
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .padding(top = 60.dp),
+                    modifier = Modifier.padding(top = 60.dp),
                 )
             } else {
                 ScrollableTranscriptView(
@@ -296,11 +294,11 @@ private fun TranscriptItems(
                 fontSize = 12.sp,
                 lineHeight = 18.sp,
                 color = TranscriptColors.textColor(),
-                modifier = Modifier.padding(horizontal = 32.dp, vertical = 16.dp),
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp),
             )
             Box(
                 modifier = Modifier
-                    .padding(horizontal = 32.dp)
+                    .padding(horizontal = 16.dp)
                     .background(TranscriptColors.accentColor())
                     .width(48.dp)
                     .height(1.dp),
@@ -349,7 +347,7 @@ private fun TranscriptItem(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 32.dp)
+            .padding(horizontal = 16.dp)
             .padding(bottom = if (item.isSpeaker) 8.dp else 16.dp)
             .padding(top = if (item.isSpeaker) 16.dp else 0.dp),
     ) {

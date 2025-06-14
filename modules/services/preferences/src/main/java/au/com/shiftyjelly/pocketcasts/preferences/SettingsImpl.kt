@@ -1250,22 +1250,6 @@ class SettingsImpl @Inject constructor(
         multiSelectItemsObservable.accept(items)
     }
 
-    override fun getSeenPlayerTour(): Boolean {
-        return getBoolean("player_tour_shown", false)
-    }
-
-    override fun setSeenPlayerTour(value: Boolean) {
-        setBoolean("player_tour_shown", value)
-    }
-
-    override fun getSeenUpNextTour(): Boolean {
-        return getBoolean("upnext_tour_shown", false)
-    }
-
-    override fun setSeenUpNextTour(value: Boolean) {
-        setBoolean("upnext_tour_shown", value)
-    }
-
     override val autoAddUpNextLimit = UserSetting.IntPref(
         sharedPrefKey = "auto_add_up_next_limit",
         defaultValue = DEFAULT_MAX_AUTO_ADD_LIMIT,

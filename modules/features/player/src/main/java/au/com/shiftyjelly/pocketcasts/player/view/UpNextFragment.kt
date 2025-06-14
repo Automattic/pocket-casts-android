@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.player.view
 import android.content.Context
 import android.os.Bundle
 import android.view.ContextThemeWrapper
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -65,8 +64,6 @@ import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutViewModel
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectToolbar
-import au.com.shiftyjelly.pocketcasts.views.tour.TourStep
-import au.com.shiftyjelly.pocketcasts.views.tour.TourViewTag
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -103,15 +100,20 @@ class UpNextFragment :
         }
     }
 
-    @Inject lateinit var settings: Settings
+    @Inject
+    lateinit var settings: Settings
 
-    @Inject lateinit var episodeManager: EpisodeManager
+    @Inject
+    lateinit var episodeManager: EpisodeManager
 
-    @Inject lateinit var playbackManager: PlaybackManager
+    @Inject
+    lateinit var playbackManager: PlaybackManager
 
-    @Inject lateinit var multiSelectHelper: MultiSelectEpisodesHelper
+    @Inject
+    lateinit var multiSelectHelper: MultiSelectEpisodesHelper
 
-    @Inject lateinit var analyticsTracker: AnalyticsTracker
+    @Inject
+    lateinit var analyticsTracker: AnalyticsTracker
 
     lateinit var adapter: UpNextAdapter
     private val sourceView = SourceView.UP_NEXT
@@ -320,10 +322,12 @@ class UpNextFragment :
                     multiSelectHelper.isMultiSelecting = true
                     true
                 }
+
                 R.id.clear_up_next -> {
                     onClearUpNext()
                     true
                 }
+
                 else -> false
             }
         }
@@ -389,10 +393,6 @@ class UpNextFragment :
         multiSelectHelper.context = view.context
         multiSelectToolbar.setup(viewLifecycleOwner, multiSelectHelper, menuRes = VR.menu.menu_multiselect_upnext, activity = requireActivity())
 
-        if (!isEmbedded) {
-            startTour()
-        }
-
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 settings.bottomInset.collect {
@@ -411,21 +411,10 @@ class UpNextFragment :
 
     fun onExpanded() {
         multiSelectHelper.listener = multiSelectListener
-        startTour()
     }
 
     fun onCollapsed() {
         multiSelectHelper.listener = null
-    }
-
-    private fun startTour() {
-        val upNextTourView = realBinding?.upNextTourView ?: return
-        if (settings.getSeenUpNextTour()) {
-            (upNextTourView.parent as? ViewGroup)?.removeView(upNextTourView)
-        } else {
-            settings.setSeenUpNextTour(true)
-            upNextTourView.startTour(tour, UPNEXT_TOUR_NAME)
-        }
     }
 
     private fun close() {
@@ -563,27 +552,3 @@ class UpNextFragment :
         binding.recyclerView.quickScrollToTop()
     }
 }
-
-private const val UPNEXT_TOUR_NAME = "upnext"
-private val step1 = TourStep(
-    "Discover the changes to Up Next",
-    "In this update Up Next has been moved into its own screen. We’ve also added some new features.",
-    "Take a quick tour",
-    null,
-    Gravity.BOTTOM,
-)
-private val step2 = TourStep(
-    "Now Playing",
-    "The Now Playing row shows your progress in the current episode. You can tap here to quickly jump to the player.",
-    "Next",
-    TourViewTag.ViewId(R.id.itemContainer),
-    Gravity.BOTTOM,
-)
-private val step3 = TourStep(
-    "Multi-select",
-    "Tap the Select Button to enter multi-select mode. You can then select multiple episodes and perform actions in bulk. Actions will appear at the top of the screen.",
-    "Finish",
-    TourViewTag.ChildWithClass(R.id.toolbar, androidx.appcompat.widget.ActionMenuView::class.java),
-    Gravity.BOTTOM,
-)
-private val tour = listOf(step1, step2, step3)
