@@ -3,6 +3,8 @@
 *   Updates
     *   Improve transcripts parsing and loading
         ([#4115](https://github.com/Automattic/pocket-casts-android/pull/4115))
+    *   Remove buttom padding with empty episode list #4121
+        ([#4121](https://github.com/Automattic/pocket-casts-android/pull/4121))
 *   Bug Fixes
     *   Fix keyboard blocking WebView input fields in Help & Feedback page
         ([#4109](https://github.com/Automattic/pocket-casts-android/pull/4109))
@@ -10,6 +12,7 @@
         ([#4091](https://github.com/Automattic/pocket-casts-android/pull/4091))
     *   Respect embedded file artwork in media notifications
         ([#4103](https://github.com/Automattic/pocket-casts-android/pull/4103))
+    
 
 7.91
 -----
