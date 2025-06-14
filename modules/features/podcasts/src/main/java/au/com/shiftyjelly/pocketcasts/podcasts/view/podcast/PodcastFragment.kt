@@ -1158,22 +1158,26 @@ class PodcastFragment : BaseFragment() {
      * Episode search needs at least a page worth of space under the search box so the user can see the results below.
      */
     private fun addPaddingForEpisodeSearch(episodes: List<PodcastEpisode>) {
-        val rowCount = episodes.size
         val binding = binding ?: return
+        val rowCount = episodes.size
+
+        // No padding if there are no episodes
+        if (rowCount == 0) {
+            binding.episodesRecyclerView.updatePadding(bottom = 0)
+            return
+        }
+
         val pageHeight = binding.episodesRecyclerView.height
         val context = binding.episodesRecyclerView.context
         val episodeHeaderHeightPx = 90.dpToPx(context)
-        val rowHeightPx: Int = 80.dpToPx(context)
-
+        val rowHeightPx = 80.dpToPx(context)
         val actualHeight = episodeHeaderHeightPx + (rowCount * rowHeightPx)
-
         val missingHeightPx = pageHeight - actualHeight
 
-        // only add padding to stop the screen jumping to the wrong location
-        if (binding.episodesRecyclerView.paddingBottom > missingHeightPx) {
-            return
+        // Only add padding if needed to prevent screen jump
+        if (binding.episodesRecyclerView.paddingBottom <= missingHeightPx && missingHeightPx > 0) {
+            binding.episodesRecyclerView.updatePadding(bottom = missingHeightPx)
         }
-        binding.episodesRecyclerView.updatePadding(bottom = if (missingHeightPx < 0) 0 else missingHeightPx)
     }
 
     override fun onDestroyView() {
