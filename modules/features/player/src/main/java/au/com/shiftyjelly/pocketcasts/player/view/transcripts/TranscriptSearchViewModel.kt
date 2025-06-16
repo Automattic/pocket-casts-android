@@ -6,6 +6,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.repositories.di.DefaultDispatcher
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import au.com.shiftyjelly.pocketcasts.utils.search.kmpSearch
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
@@ -22,7 +23,6 @@ private const val SEARCH_DEBOUNCE = 300L
 
 @HiltViewModel
 class TranscriptSearchViewModel @Inject constructor(
-    private val kmpSearch: KMPSearch,
     private val analyticsTracker: AnalyticsTracker,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
@@ -63,12 +63,10 @@ class TranscriptSearchViewModel @Inject constructor(
 
     private suspend fun performSearch(searchTerm: String) = withContext(defaultDispatcher) {
         try {
-            kmpSearch.setPattern(searchTerm)
-            val searchResultIndices = kmpSearch.search(_searchSourceText)
             _searchState.update {
                 it.copy(
                     searchTerm = searchTerm,
-                    searchResultIndices = searchResultIndices,
+                    searchResultIndices = _searchSourceText.kmpSearch(searchTerm),
                     currentSearchIndex = 0,
                 )
             }
