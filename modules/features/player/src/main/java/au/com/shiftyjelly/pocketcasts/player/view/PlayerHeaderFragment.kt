@@ -188,7 +188,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                         AnimatedVisibility(
                             visible = transcriptTransitionState is TransitionState.OpenTranscript,
                             enter = transcriptEnterTransition,
-                            exit = transcriptExitTranscition,
+                            exit = transcriptExitTransition,
                             modifier = Modifier.fillMaxSize(),
                         ) {
                             TranscriptPageWrapper(
@@ -689,7 +689,7 @@ private val adEnterTransition = fadeIn(spring(stiffness = Spring.StiffnessVeryLo
 private val adExitTransition = fadeOut(spring(stiffness = Spring.StiffnessVeryLow)) + shrinkVertically(spring(stiffness = Spring.StiffnessMediumLow))
 
 private val transcriptEnterTransition = fadeIn(spring(stiffness = Spring.StiffnessVeryLow)) + slideInVertically(initialOffsetY = { it })
-private val transcriptExitTranscition = fadeOut(spring(stiffness = Spring.StiffnessHigh))
+private val transcriptExitTransition = fadeOut(spring(stiffness = Spring.StiffnessHigh))
 
 private val shelfEnterTransition = fadeIn() + expandVertically(expandFrom = Alignment.Top)
 private val shelfExitTransition = fadeOut() + shrinkVertically(shrinkTowards = Alignment.Top)
