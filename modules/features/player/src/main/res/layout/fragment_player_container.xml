@@ -119,9 +119,4 @@
         app:behavior_peekHeight="0dp"
         app:layout_behavior="com.google.android.material.bottomsheet.ViewPager2AwareBottomSheetBehavior" />
 
-    <au.com.shiftyjelly.pocketcasts.views.tour.TourView
-        android:id="@+id/tourView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.player.view
 
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -44,8 +43,6 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import au.com.shiftyjelly.pocketcasts.views.helper.OffsettingBottomSheetCallback
-import au.com.shiftyjelly.pocketcasts.views.tour.TourStep
-import au.com.shiftyjelly.pocketcasts.views.tour.TourViewTag
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
@@ -228,15 +225,6 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
         }
 
         binding.btnClosePlayer.setOnClickListener { (activity as? FragmentHostListener)?.closePlayer() }
-        view.doOnLayout {
-            val tourView = binding.tourView
-            if (settings.getSeenPlayerTour()) {
-                (tourView.parent as? ViewGroup)?.removeView(tourView)
-            } else {
-                settings.setSeenPlayerTour(true)
-                tourView.startTour(tour, PLAYER_TOUR_NAME)
-            }
-        }
 
         bookmarksViewModel.multiSelectHelper.isMultiSelectingLive.observe(viewLifecycleOwner) { isMultiSelecting ->
             binding.multiSelectToolbar.isVisible = isMultiSelecting
@@ -465,34 +453,3 @@ private class ViewPagerAdapter(fragmentManager: FragmentManager, lifecycle: Life
     fun isBookmarksTab(position: Int) = sections[position] is Section.Bookmarks
     fun isChaptersTab(position: Int) = sections[position] is Section.Chapters
 }
-
-private const val PLAYER_TOUR_NAME = "player"
-private val step1 = TourStep(
-    "Explore the new player update",
-    "We’ve made lots of improvements to the player in this update. To make sure you get the most out of this update, we prepared a quick tour.",
-    "Take a quick tour",
-    null,
-    Gravity.BOTTOM,
-)
-private val step2 = TourStep(
-    "Tabbed Layout",
-    "You can now swipe between Now Playing, Notes and Chapters (if available).",
-    "Next",
-    TourViewTag.ViewId(R.id.tabLayout),
-    Gravity.BOTTOM,
-)
-private val step3 = TourStep(
-    "Up Next",
-    "As well as swiping up to access Up Next, you can now see how many you have queued here.",
-    "Next",
-    TourViewTag.ViewId(R.id.upNextButton),
-    Gravity.BOTTOM,
-)
-private val step4 = TourStep(
-    "More Actions",
-    "You can now easily access more actions, as well as customise which actions appear in the player menu.",
-    "Finish",
-    TourViewTag.ViewId(R.id.shelfComposeView),
-    Gravity.TOP,
-)
-private val tour = listOf(step1, step2, step3, step4)

@@ -38,6 +38,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.map
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.PlayerColors
 import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedPlayPauseButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
@@ -61,7 +62,9 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun PlayerControls(
+    playerColors: PlayerColors,
     playerViewModel: PlayerViewModel,
+    modifier: Modifier = Modifier,
 ) {
     val playerControlsData by remember {
         playerViewModel.listDataLive
@@ -75,11 +78,13 @@ fun PlayerControls(
     }.observeAsState(PlayerControlsData())
 
     Content(
+        playerColors = playerColors,
         playerControlsData = playerControlsData,
         onPlayPauseClick = { playerViewModel.onPlayPauseClicked() },
         onSkipForwardClick = { playerViewModel.onSkipForwardClick() },
         onSkipBackClick = { playerViewModel.onSkipBackwardClick() },
         onSkipForwardLongPress = { playerViewModel.onSkipForwardLongClick() },
+        modifier = modifier,
     )
 }
 
@@ -91,10 +96,11 @@ private fun Content(
     onSkipForwardClick: () -> Unit,
     onSkipBackClick: () -> Unit,
     onSkipForwardLongPress: () -> Unit,
+    modifier: Modifier = Modifier,
+    playerColors: PlayerColors = MaterialTheme.theme.rememberPlayerColorsOrDefault(),
 ) {
-    val playerColors = MaterialTheme.theme.rememberPlayerColorsOrDefault()
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .wrapContentHeight()
             .padding(bottom = dimensionResource(R.dimen.large_play_button_margin_bottom)),
@@ -208,7 +214,7 @@ private fun SkipButton(
     }
 }
 
-data class PlayerControlsData(
+private data class PlayerControlsData(
     val playing: Boolean = false,
     val skipBackInSecs: Duration = 30.toDuration(DurationUnit.SECONDS),
     val skipForwardInSecs: Duration = 15.toDuration(DurationUnit.SECONDS),
