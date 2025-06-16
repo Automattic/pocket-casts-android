@@ -2,4 +2,6 @@
 <full-backup-content>
     <include domain="database" path="pocketcasts" />
     <include domain="sharedpref" path="au.com.shiftyjelly.pocketcasts_preferences.xml" />
+    <!-- https://dev.appsflyer.com/hc/docs/install-android-sdk#merge-backup-rules-in-android-11-and-below -->
+    <exclude domain="sharedpref" path="appsflyer-data"/>
 </full-backup-content>
