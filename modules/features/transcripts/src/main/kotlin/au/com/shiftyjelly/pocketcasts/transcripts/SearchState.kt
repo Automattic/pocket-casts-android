@@ -1,12 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.transcripts
 
-data class SearchState(
-    val searchTerm: String?,
-    val selectedSearchCoordinates: SearchCoordinates?,
-    val searchResultIndices: Map<Int, List<Int>>,
-)
+import au.com.shiftyjelly.pocketcasts.utils.search.SearchMatches
 
-data class SearchCoordinates(
-    val lineIndex: Int,
-    val matchIndex: Int,
+data class SearchState(
+    val searchTerm: String,
+    val matches: SearchMatches,
 )
