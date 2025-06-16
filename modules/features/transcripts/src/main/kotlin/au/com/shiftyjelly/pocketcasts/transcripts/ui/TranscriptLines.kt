@@ -75,7 +75,7 @@ private fun TranscriptLine(
         val searchTermLength = searchState.searchTerm.length
         searchState
             .matches
-            .lineMatches[entryIndex]
+            .matchingCoordinates[entryIndex]
             ?.map { start -> start to start + searchTermLength }
             ?.filter { (start, end) -> isValidHighlightRange(start, end, entryText.length) }
             .orEmpty()
@@ -86,7 +86,7 @@ private fun TranscriptLine(
             append(entryText)
             searchHighlights.forEach { (startIndex, endIndex) ->
                 val highlightCoordinates = SearchCoordinates(line = entryIndex, match = startIndex)
-                val style = if (highlightCoordinates == searchState.matches.selectedMatch) {
+                val style = if (highlightCoordinates == searchState.matches.selectedCoordinate) {
                     theme.searchHighlightSpanStyle
                 } else {
                     theme.searchDefaultSpanStyle
@@ -173,11 +173,11 @@ private val SearchStatePreview: SearchState
         return SearchState(
             searchTerm = searchTerm,
             matches = SearchMatches(
-                selectedMatch = SearchCoordinates(
+                selectedCoordinate = SearchCoordinates(
                     line = 0,
                     match = TranscriptEntry.PreviewList[0].text().lastIndexOf(searchTerm, ignoreCase = true),
                 ),
-                lineMatches = TranscriptEntry.PreviewList
+                matchingCoordinates = TranscriptEntry.PreviewList
                     .mapIndexedNotNull { index, entry ->
                         val text = entry.text()
                         val startIndices = searchTerm.toRegex(RegexOption.IGNORE_CASE)

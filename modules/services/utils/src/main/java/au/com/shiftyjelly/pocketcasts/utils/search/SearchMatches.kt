@@ -1,25 +1,25 @@
 package au.com.shiftyjelly.pocketcasts.utils.search
 
 data class SearchMatches(
-    val selectedMatch: SearchCoordinates?,
-    val lineMatches: Map<Int, List<Int>>,
+    val selectedCoordinate: SearchCoordinates?,
+    val matchingCoordinates: Map<Int, List<Int>>,
 ) {
     init {
-        if (selectedMatch != null) {
-            val matchCoordinates = requireNotNull(lineMatches[selectedMatch.line]) {
-                "Match result is missing for line ${selectedMatch.line}"
+        if (selectedCoordinate != null) {
+            val matchCoordinates = requireNotNull(matchingCoordinates[selectedCoordinate.line]) {
+                "Match result is missing for line ${selectedCoordinate.line}"
             }
-            require(selectedMatch.match in matchCoordinates) {
-                "Match result is missing for coordinates $selectedMatch"
+            require(selectedCoordinate.match in matchCoordinates) {
+                "Match result is missing for coordinates $selectedCoordinate"
             }
         }
     }
 
-    val selectedMatchIndex = if (selectedMatch != null) {
-        lineMatches.entries.sumOf { (line, matches) ->
+    val selectedMatchIndex = if (selectedCoordinate != null) {
+        matchingCoordinates.entries.sumOf { (line, matches) ->
             when {
-                line < selectedMatch.line -> matches.size
-                line == selectedMatch.line -> matches.indexOf(selectedMatch.match)
+                line < selectedCoordinate.line -> matches.size
+                line == selectedCoordinate.line -> matches.indexOf(selectedCoordinate.match)
                 else -> 0
             }
         }
@@ -27,53 +27,53 @@ data class SearchMatches(
         0
     }
 
-    val count = lineMatches.values.sumOf { it.size }
+    val count = matchingCoordinates.values.sumOf { it.size }
 
     fun next() = when {
-        selectedMatch == null || count == 1 -> this
+        selectedCoordinate == null || count == 1 -> this
 
         selectedMatchIndex + 1 == count -> {
-            val (firstLine, firstLineMatches) = lineMatches.entries.first()
+            val (firstLine, firstLineMatches) = matchingCoordinates.entries.first()
             val firstMatch = firstLineMatches.first()
-            copy(selectedMatch = SearchCoordinates(firstLine, firstMatch))
+            copy(selectedCoordinate = SearchCoordinates(firstLine, firstMatch))
         }
 
         else -> {
-            val lineMatches = lineMatches.getValue(selectedMatch.line)
-            val nextSearchCoordaintes = if (selectedMatch.match == lineMatches.last()) {
-                val lines = this.lineMatches.keys.toList()
-                val nextLine = lines[lines.indexOf(selectedMatch.line) + 1]
-                val nextLineMatch = this.lineMatches.getValue(nextLine).first()
+            val lineMatches = matchingCoordinates.getValue(selectedCoordinate.line)
+            val nextSearchCoordaintes = if (selectedCoordinate.match == lineMatches.last()) {
+                val lines = matchingCoordinates.keys.toList()
+                val nextLine = lines[lines.indexOf(selectedCoordinate.line) + 1]
+                val nextLineMatch = matchingCoordinates.getValue(nextLine).first()
                 SearchCoordinates(nextLine, nextLineMatch)
             } else {
-                val nextMatch = lineMatches[lineMatches.indexOf(selectedMatch.match) + 1]
-                selectedMatch.copy(match = nextMatch)
+                val nextMatch = lineMatches[lineMatches.indexOf(selectedCoordinate.match) + 1]
+                selectedCoordinate.copy(match = nextMatch)
             }
-            copy(selectedMatch = nextSearchCoordaintes)
+            copy(selectedCoordinate = nextSearchCoordaintes)
         }
     }
 
     fun previous() = when {
-        selectedMatch == null || count == 1 -> this
+        selectedCoordinate == null || count == 1 -> this
 
         selectedMatchIndex == 0 -> {
-            val (lastLine, lastLineMatches) = lineMatches.entries.last()
+            val (lastLine, lastLineMatches) = matchingCoordinates.entries.last()
             val lastMatch = lastLineMatches.last()
-            copy(selectedMatch = SearchCoordinates(lastLine, lastMatch))
+            copy(selectedCoordinate = SearchCoordinates(lastLine, lastMatch))
         }
 
         else -> {
-            val lineMatches = lineMatches.getValue(selectedMatch.line)
-            val nextSearchCoordaintes = if (selectedMatch.match == lineMatches.first()) {
-                val lines = this.lineMatches.keys.toList()
-                val previousLine = lines[lines.lastIndexOf(selectedMatch.line) - 1]
-                val previousLineMatch = this.lineMatches.getValue(previousLine).last()
+            val lineMatches = matchingCoordinates.getValue(selectedCoordinate.line)
+            val nextSearchCoordaintes = if (selectedCoordinate.match == lineMatches.first()) {
+                val lines = matchingCoordinates.keys.toList()
+                val previousLine = lines[lines.lastIndexOf(selectedCoordinate.line) - 1]
+                val previousLineMatch = matchingCoordinates.getValue(previousLine).last()
                 SearchCoordinates(previousLine, previousLineMatch)
             } else {
-                val previousMatch = lineMatches[lineMatches.indexOf(selectedMatch.match) - 1]
-                selectedMatch.copy(match = previousMatch)
+                val previousMatch = lineMatches[lineMatches.indexOf(selectedCoordinate.match) - 1]
+                selectedCoordinate.copy(match = previousMatch)
             }
-            copy(selectedMatch = nextSearchCoordaintes)
+            copy(selectedCoordinate = nextSearchCoordaintes)
         }
     }
 }

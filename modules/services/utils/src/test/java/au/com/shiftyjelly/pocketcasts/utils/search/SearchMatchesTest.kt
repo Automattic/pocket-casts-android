@@ -9,11 +9,11 @@ class SearchMatchesTest {
     fun `fail to create matches with invalid line coordinate`() {
         val exception = assertThrows(IllegalArgumentException::class.java) {
             SearchMatches(
-                selectedMatch = SearchCoordinates(
+                selectedCoordinate = SearchCoordinates(
                     line = 1,
                     match = 0,
                 ),
-                lineMatches = mapOf(
+                matchingCoordinates = mapOf(
                     0 to listOf(1),
                     2 to listOf(1),
                 ),
@@ -29,8 +29,8 @@ class SearchMatchesTest {
 
         val exception = assertThrows(IllegalArgumentException::class.java) {
             SearchMatches(
-                selectedMatch = coordinates,
-                lineMatches = mapOf(
+                selectedCoordinate = coordinates,
+                matchingCoordinates = mapOf(
                     0 to listOf(1),
                     1 to listOf(1),
                 ),
@@ -43,11 +43,11 @@ class SearchMatchesTest {
     @Test
     fun `calculate correct selected index`() {
         var matches = SearchMatches(
-            selectedMatch = SearchCoordinates(
+            selectedCoordinate = SearchCoordinates(
                 line = 1,
                 match = 5,
             ),
-            lineMatches = mapOf(
+            matchingCoordinates = mapOf(
                 1 to listOf(5, 10, 25),
                 3 to listOf(3, 6),
                 8 to listOf(7),
@@ -66,11 +66,11 @@ class SearchMatchesTest {
     @Test
     fun `calculate match count`() {
         val matches = SearchMatches(
-            selectedMatch = SearchCoordinates(
+            selectedCoordinate = SearchCoordinates(
                 line = 1,
                 match = 5,
             ),
-            lineMatches = mapOf(
+            matchingCoordinates = mapOf(
                 1 to listOf(5, 10, 25),
                 3 to listOf(3, 6),
                 8 to listOf(7),
@@ -83,11 +83,11 @@ class SearchMatchesTest {
     @Test
     fun `cycle next search`() {
         var matches = SearchMatches(
-            selectedMatch = SearchCoordinates(
+            selectedCoordinate = SearchCoordinates(
                 line = 1,
                 match = 5,
             ),
-            lineMatches = mapOf(
+            matchingCoordinates = mapOf(
                 1 to listOf(5, 10, 25),
                 3 to listOf(3, 6),
                 8 to listOf(7),
@@ -96,7 +96,7 @@ class SearchMatchesTest {
 
         val result = List(6) {
             matches = matches.next()
-            matches.selectedMatch
+            matches.selectedCoordinate
         }
 
         assertEquals(
@@ -115,11 +115,11 @@ class SearchMatchesTest {
     @Test
     fun `cycle previous search`() {
         var matches = SearchMatches(
-            selectedMatch = SearchCoordinates(
+            selectedCoordinate = SearchCoordinates(
                 line = 15,
                 match = 3,
             ),
-            lineMatches = mapOf(
+            matchingCoordinates = mapOf(
                 1 to listOf(5, 11),
                 6 to listOf(8, 20, 55),
                 15 to listOf(1, 3),
@@ -128,7 +128,7 @@ class SearchMatchesTest {
 
         val result = List(7) {
             matches = matches.previous()
-            matches.selectedMatch
+            matches.selectedCoordinate
         }
 
         assertEquals(
