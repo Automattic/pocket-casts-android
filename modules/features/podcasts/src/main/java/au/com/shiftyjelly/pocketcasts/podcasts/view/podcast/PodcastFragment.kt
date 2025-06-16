@@ -1161,7 +1161,7 @@ class PodcastFragment : BaseFragment() {
         val binding = binding ?: return
         val rowCount = episodes.size
 
-        // No padding if there are no episodes
+        // No padding for empty state to avoid excessive whitespace
         if (rowCount == 0) {
             binding.episodesRecyclerView.updatePadding(bottom = 0)
             return
