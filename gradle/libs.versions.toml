@@ -286,7 +286,7 @@ reorderable = "sh.calvin.reorderable:reorderable:2.5.1"
 robolectric = "org.robolectric:robolectric:4.14.1"
 security-lint = { module = "com.android.security.lint:lint", version.ref = "security-lint" }
 timber = "com.jakewharton.timber:timber:5.0.1"
-turbine = "app.cash.turbine:turbine:1.2.0"
+turbine = "app.cash.turbine:turbine:1.2.1"
 
 [plugins]
 aboutlibraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "aboutlibraries" }
