@@ -90,10 +90,10 @@ object SearchBarDefaults {
 fun SearchBar(
     text: String,
     onTextChanged: (String) -> Unit,
-    onClearButtonTapped: () -> Unit = {},
     modifier: Modifier = Modifier,
-    leadingIcon: @Composable (() -> Unit)? = null,
-    trailingIcon: @Composable (() -> Unit)? = null,
+    onClearButtonTapped: () -> Unit = {},
+    leadingContent: @Composable (() -> Unit)? = null,
+    trailingContent: @Composable (() -> Unit)? = null,
     placeholder: String = stringResource(LR.string.search_podcasts_or_add_url),
     onSearch: () -> Unit = {},
     enabled: Boolean = true,
@@ -154,13 +154,13 @@ fun SearchBar(
                         overflow = TextOverflow.Ellipsis,
                     )
                 },
-                leadingIcon = leadingIcon ?: {
+                leadingIcon = leadingContent ?: {
                     Icon(
                         painter = painterResource(IR.drawable.ic_search),
                         contentDescription = null,
                     )
                 },
-                trailingIcon = trailingIcon ?: {
+                trailingIcon = trailingContent ?: {
                     if (text.isNotEmpty()) {
                         IconButton(
                             onClick = {
@@ -182,6 +182,7 @@ fun SearchBar(
                 interactionSource = remember { MutableInteractionSource() },
                 visualTransformation = VisualTransformation.None,
                 contentPadding = contentPadding,
+                shape = shape,
             )
         },
     )
