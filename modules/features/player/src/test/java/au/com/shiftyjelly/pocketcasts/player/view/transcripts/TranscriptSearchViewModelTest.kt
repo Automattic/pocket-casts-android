@@ -12,12 +12,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.any
-import org.mockito.kotlin.anyOrNull
-import org.mockito.kotlin.doNothing
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TranscriptSearchViewModelTest {
@@ -26,116 +21,107 @@ class TranscriptSearchViewModelTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule(testDispatcher)
     private lateinit var viewModel: TranscriptSearchViewModel
-    private val kmpSearch: KMPSearch = mock()
-    private val searchResultIndices = listOf(1, 2, 3)
-    private val searchTerm = "test"
 
     @Before
     fun setUp() {
-        doNothing().whenever(kmpSearch).setPattern(anyOrNull())
-        whenever(kmpSearch.search(any())).thenReturn(searchResultIndices)
         viewModel = TranscriptSearchViewModel(
-            kmpSearch = kmpSearch,
             analyticsTracker = mock(),
             defaultDispatcher = testDispatcher,
         )
+        viewModel.setSearchInput(searchSourceText = "text text text", "", "")
     }
 
     @Test
     fun `search is performed when search query changes`() = runTest {
-        viewModel.onSearchQueryChanged(searchTerm)
+        viewModel.onSearchQueryChanged("text")
         advanceUntilIdle()
 
         viewModel.searchState.test {
-            verify(kmpSearch).setPattern(searchTerm)
-            verify(kmpSearch).search(any())
-            assertTrue(
-                awaitItem() == TranscriptSearchViewModel.SearchUiState(
-                    searchTerm = searchTerm,
-                    searchResultIndices = searchResultIndices,
+            assertEquals(
+                TranscriptSearchViewModel.SearchUiState(
+                    searchTerm = "text",
+                    searchResultIndices = listOf(0, 5, 10),
                     currentSearchIndex = 0,
                 ),
+                awaitItem(),
             )
         }
     }
 
     @Test
-    fun `search index is updated when searching previous`() = runTest {
-        viewModel.onSearchQueryChanged(searchTerm)
+    fun `search index is updated when searching next`() = runTest {
+        viewModel.onSearchQueryChanged("text")
         advanceUntilIdle()
-
         viewModel.onSearchNext()
 
         viewModel.searchState.test {
-            assertTrue((awaitItem().currentSearchIndex == 1))
+            assertEquals(1, awaitItem().currentSearchIndex)
         }
     }
 
     @Test
-    fun `search index is updated when searching next`() = runTest {
-        viewModel.onSearchQueryChanged(searchTerm)
+    fun `search index is updated when searching previous`() = runTest {
+        viewModel.onSearchQueryChanged("text")
         advanceUntilIdle()
-        viewModel.onSearchNext()
-        advanceUntilIdle()
-
         viewModel.onSearchPrevious()
 
         viewModel.searchState.test {
-            assertTrue((awaitItem().currentSearchIndex == 0))
+            assertEquals(2, awaitItem().currentSearchIndex)
         }
     }
 
     @Test
     fun `current search index is reset to zero on new search`() = runTest {
-        viewModel.onSearchQueryChanged("test1")
+        viewModel.onSearchQueryChanged("text")
         advanceUntilIdle()
         viewModel.onSearchNext()
-        viewModel.onSearchNext() // currentSearchIndex = 2
-
-        viewModel.onSearchQueryChanged("test2")
 
         viewModel.searchState.test {
-            assertTrue((awaitItem().currentSearchIndex == 2))
-            assertTrue((awaitItem().currentSearchIndex == 0))
+            assertEquals(1, awaitItem().currentSearchIndex)
+
+            viewModel.onSearchQueryChanged("tex")
+            assertEquals(0, awaitItem().currentSearchIndex)
         }
     }
 
     @Test
     fun `search state is reset when search is done`() = runTest {
-        viewModel.onSearchQueryChanged(searchTerm)
+        viewModel.onSearchQueryChanged("text")
         advanceUntilIdle()
 
-        viewModel.onSearchDone()
-
         viewModel.searchState.test {
-            assertTrue(
-                (
-                    awaitItem() == TranscriptSearchViewModel.SearchUiState(
-                        searchTerm = "",
-                        searchResultIndices = emptyList(),
-                        currentSearchIndex = 0,
-                    )
-                    ),
+            skipItems(1)
+
+            viewModel.onSearchDone()
+
+            assertEquals(
+                TranscriptSearchViewModel.SearchUiState(
+                    searchTerm = "",
+                    searchResultIndices = emptyList(),
+                    currentSearchIndex = 0,
+                ),
+                awaitItem(),
             )
         }
     }
 
     @Test
     fun `search state is reset when search is cleared`() = runTest {
-        viewModel.onSearchQueryChanged(searchTerm)
+        viewModel.onSearchQueryChanged("text")
         advanceUntilIdle()
 
-        viewModel.onSearchCleared()
-
         viewModel.searchState.test {
-            assertTrue(
-                (
-                    awaitItem() == TranscriptSearchViewModel.SearchUiState(
-                        searchTerm = "",
-                        searchResultIndices = emptyList(),
-                        currentSearchIndex = 0,
-                    )
-                    ),
+            skipItems(1)
+
+            viewModel.onSearchCleared()
+
+            assertEquals(
+                TranscriptSearchViewModel.SearchUiState(
+                    searchTerm = "",
+                    searchResultIndices = emptyList(),
+                    currentSearchIndex = 0,
+                ),
+                awaitItem(),
             )
         }
     }
@@ -143,8 +129,8 @@ class TranscriptSearchViewModelTest {
     @Test
     fun `searchOccurrencesText returns correct format when searchResultIndices is not empty`() {
         val searchUiState = TranscriptSearchViewModel.SearchUiState(
-            searchTerm = searchTerm,
-            searchResultIndices = searchResultIndices,
+            searchTerm = "text",
+            searchResultIndices = listOf(0, 1, 2),
             currentSearchIndex = 1,
         )
 
@@ -154,7 +140,7 @@ class TranscriptSearchViewModelTest {
     @Test
     fun `searchOccurrencesText returns zero when searchResultIndices is empty`() {
         val searchUiState = TranscriptSearchViewModel.SearchUiState(
-            searchTerm = searchTerm,
+            searchTerm = "text",
             searchResultIndices = emptyList(),
             currentSearchIndex = 0,
         )
@@ -165,7 +151,7 @@ class TranscriptSearchViewModelTest {
     @Test
     fun `prev next buttons enabled when search results found`() {
         val searchUiState = TranscriptSearchViewModel.SearchUiState(
-            searchTerm = searchTerm,
+            searchTerm = "text",
             searchResultIndices = listOf(1),
             currentSearchIndex = 0,
         )
@@ -176,7 +162,7 @@ class TranscriptSearchViewModelTest {
     @Test
     fun `prev next buttons disabled when search results not found`() {
         val searchUiState = TranscriptSearchViewModel.SearchUiState(
-            searchTerm = searchTerm,
+            searchTerm = "text",
             searchResultIndices = emptyList(),
             currentSearchIndex = 0,
         )
