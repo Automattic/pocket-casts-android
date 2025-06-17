@@ -21,7 +21,7 @@ fun List<String>.kmpSearch(pattern: String): Map<Int, List<Int>> {
 private class KmpSearch(
     pattern: String,
 ) {
-    private val sanitizedPattern = pattern.sanitze()
+    private val sanitizedPattern = pattern.sanitize()
     private val lps = IntArray(sanitizedPattern.size)
 
     init {
@@ -33,7 +33,7 @@ private class KmpSearch(
             return emptyList()
         }
 
-        val sanitizedText = text.sanitze()
+        val sanitizedText = text.sanitize()
         val result = mutableListOf<Int>()
         var i = 0
         var j = 0
@@ -82,5 +82,5 @@ private class KmpSearch(
         }
     }
 
-    private fun String.sanitze() = removeAccents().lowercase().toCharArray()
+    private fun String.sanitize() = removeAccents().lowercase().toCharArray()
 }
