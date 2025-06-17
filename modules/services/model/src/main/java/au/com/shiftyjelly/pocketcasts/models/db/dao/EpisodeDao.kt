@@ -260,6 +260,10 @@ abstract class EpisodeDao {
     abstract suspend fun findStaleDownloads(notDownloaded: EpisodeStatusEnum = EpisodeStatusEnum.NOT_DOWNLOADED): List<PodcastEpisode>
 
     @Transaction
+    @Query("SELECT * FROM podcast_episodes WHERE (download_task_id IS NOT NULL AND episode_status != :status)")
+    abstract suspend fun findNotFinishedDownloads(status: EpisodeStatusEnum = EpisodeStatusEnum.DOWNLOADED): List<PodcastEpisode>
+
+    @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE episode_status == :downloadEpisodeStatusEnum ORDER BY last_download_attempt_date DESC")
     abstract fun findDownloadedEpisodesRxFlowable(downloadEpisodeStatusEnum: EpisodeStatusEnum = EpisodeStatusEnum.DOWNLOADED): Flowable<List<PodcastEpisode>>
 
