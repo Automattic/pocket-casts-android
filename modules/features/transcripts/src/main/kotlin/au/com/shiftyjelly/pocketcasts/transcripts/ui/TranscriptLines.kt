@@ -30,9 +30,10 @@ import au.com.shiftyjelly.pocketcasts.compose.extensions.verticalScrollBar
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
-import au.com.shiftyjelly.pocketcasts.transcripts.SearchCoordinates
 import au.com.shiftyjelly.pocketcasts.transcripts.SearchState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
+import au.com.shiftyjelly.pocketcasts.utils.search.SearchCoordinates
+import au.com.shiftyjelly.pocketcasts.utils.search.SearchMatches
 
 @Composable
 internal fun TranscriptLines(
@@ -71,9 +72,10 @@ private fun TranscriptLine(
 ) {
     val entryText = entry.text()
     val searchHighlights = remember(entryIndex, entryText, searchState) {
-        val searchTermLength = searchState.searchTerm?.length ?: 0
+        val searchTermLength = searchState.searchTerm.length
         searchState
-            .searchResultIndices[entryIndex]
+            .matches
+            .matchingCoordinates[entryIndex]
             ?.map { start -> start to start + searchTermLength }
             ?.filter { (start, end) -> isValidHighlightRange(start, end, entryText.length) }
             .orEmpty()
@@ -83,11 +85,8 @@ private fun TranscriptLine(
         text = buildAnnotatedString {
             append(entryText)
             searchHighlights.forEach { (startIndex, endIndex) ->
-                val highlightCoordinates = SearchCoordinates(
-                    lineIndex = entryIndex,
-                    matchIndex = startIndex,
-                )
-                val style = if (highlightCoordinates == searchState.selectedSearchCoordinates) {
+                val highlightCoordinates = SearchCoordinates(line = entryIndex, match = startIndex)
+                val style = if (highlightCoordinates == searchState.matches.selectedCoordinate) {
                     theme.searchHighlightSpanStyle
                 } else {
                     theme.searchDefaultSpanStyle
@@ -173,20 +172,22 @@ private val SearchStatePreview: SearchState
         val searchTerm = "lorem"
         return SearchState(
             searchTerm = searchTerm,
-            selectedSearchCoordinates = SearchCoordinates(
-                lineIndex = 0,
-                matchIndex = TranscriptEntry.PreviewList[0].text().lastIndexOf(searchTerm, ignoreCase = true),
+            matches = SearchMatches(
+                selectedCoordinate = SearchCoordinates(
+                    line = 0,
+                    match = TranscriptEntry.PreviewList[0].text().lastIndexOf(searchTerm, ignoreCase = true),
+                ),
+                matchingCoordinates = TranscriptEntry.PreviewList
+                    .mapIndexedNotNull { index, entry ->
+                        val text = entry.text()
+                        val startIndices = searchTerm.toRegex(RegexOption.IGNORE_CASE)
+                            .findAll(text)
+                            .map { it.range.first }
+                            .toList()
+                            .takeIf { it.isNotEmpty() }
+                        startIndices?.let { index to it }
+                    }
+                    .toMap(),
             ),
-            searchResultIndices = TranscriptEntry.PreviewList
-                .mapIndexedNotNull { index, entry ->
-                    val text = entry.text()
-                    val startIndices = searchTerm.toRegex(RegexOption.IGNORE_CASE)
-                        .findAll(text)
-                        .map { it.range.first }
-                        .toList()
-                        .takeIf { it.isNotEmpty() }
-                    startIndices?.let { index to it }
-                }
-                .toMap(),
         )
     }
