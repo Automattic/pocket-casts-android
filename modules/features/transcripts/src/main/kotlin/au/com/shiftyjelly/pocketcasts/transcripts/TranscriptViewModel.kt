@@ -67,7 +67,6 @@ class TranscriptViewModel @Inject constructor(
             _uiState.update { state ->
                 state.copy(
                     transcriptState = TranscriptState.Loading,
-                    isSearchOpen = false,
                     searchState = SearchState.Empty,
                 )
             }
@@ -108,13 +107,16 @@ class TranscriptViewModel @Inject constructor(
     fun openSearch() {
         track(AnalyticsEvent.TRANSCRIPT_SEARCH_SHOWN)
         _uiState.update { state ->
-            state.copy(isSearchOpen = true)
+            state.copy(searchState = state.searchState.copy(isSearchOpen = true))
         }
     }
 
     fun hideSearch() {
-        _uiState.update { state ->
-            state.copy(isSearchOpen = false, searchState = SearchState.Empty)
+        viewModelScope.launch {
+            searchJob?.cancelAndJoin()
+            _uiState.update { state ->
+                state.copy(searchState = SearchState.Empty)
+            }
         }
     }
 
@@ -136,15 +138,17 @@ class TranscriptViewModel @Inject constructor(
             val firstCooridantes = matchingCoordinates.entries.firstOrNull()?.let { (line, matches) ->
                 matches.firstOrNull()?.let { match -> SearchCoordinates(line, match) }
             }
-            val searchState = SearchState(
-                searchTerm = searchTerm,
-                matches = SearchMatches(
-                    selectedCoordinate = firstCooridantes,
-                    matchingCoordinates = matchingCoordinates,
-                ),
+            val searchMatches = SearchMatches(
+                selectedCoordinate = firstCooridantes,
+                matchingCoordinates = matchingCoordinates,
             )
 
             _uiState.update { state ->
+                val searchState = state.searchState.copy(
+                    isSearchOpen = true,
+                    searchTerm = searchTerm,
+                    matches = searchMatches,
+                )
                 state.copy(searchState = searchState)
             }
         }
@@ -200,7 +204,6 @@ class TranscriptViewModel @Inject constructor(
 internal data class UiState(
     val transcriptState: TranscriptState,
     val searchState: SearchState,
-    val isSearchOpen: Boolean,
     val isPlusUser: Boolean,
     val isFreeTrialAvailable: Boolean,
 ) {
@@ -208,7 +211,6 @@ internal data class UiState(
         val Empty = UiState(
             transcriptState = TranscriptState.Loading,
             searchState = SearchState.Empty,
-            isSearchOpen = false,
             isPlusUser = false,
             isFreeTrialAvailable = false,
         )
@@ -228,11 +230,13 @@ internal sealed interface TranscriptState {
 }
 
 internal data class SearchState(
+    val isSearchOpen: Boolean,
     val searchTerm: String,
     val matches: SearchMatches,
 ) {
     companion object {
         val Empty = SearchState(
+            isSearchOpen = false,
             searchTerm = "",
             matches = SearchMatches(
                 selectedCoordinate = null,

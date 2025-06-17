@@ -132,10 +132,10 @@ class TranscriptViewModelTest {
             skipItems(1)
 
             viewModel.openSearch()
-            assertTrue(awaitItem().isSearchOpen)
+            assertTrue(awaitItem().searchState.isSearchOpen)
 
             viewModel.hideSearch()
-            assertFalse(awaitItem().isSearchOpen)
+            assertFalse(awaitItem().searchState.isSearchOpen)
         }
     }
 
@@ -157,6 +157,7 @@ class TranscriptViewModelTest {
             viewModel.searchInTranscript("text")
             assertEquals(
                 SearchState(
+                    isSearchOpen = true,
                     searchTerm = "text",
                     matches = SearchMatches(
                         selectedCoordinate = SearchCoordinates(line = 0, match = 5),
@@ -216,7 +217,7 @@ class TranscriptViewModelTest {
             viewModel.loadTranscript("episode-uuid-2")
             val state = awaitItem()
             assertEquals(SearchState.Empty, state.searchState)
-            assertFalse(state.isSearchOpen)
+            assertFalse(state.searchState.isSearchOpen)
 
             assertEquals(TranscriptState.Loaded(transcriptManager.avaiableTranscript), awaitItem().transcriptState)
         }
