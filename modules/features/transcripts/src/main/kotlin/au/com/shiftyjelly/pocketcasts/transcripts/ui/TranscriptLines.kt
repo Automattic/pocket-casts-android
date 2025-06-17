@@ -95,7 +95,7 @@ private fun TranscriptLine(
             }
         },
         style = entry.textStyle(),
-        color = theme.text,
+        color = theme.primaryText,
         modifier = modifier,
     )
 }
