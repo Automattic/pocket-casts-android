@@ -247,9 +247,10 @@ class Support @Inject constructor(
             val podcastsOutput = StringBuilder()
             podcastsOutput.append("Podcasts").append(eol).append("--------").append(eol).append(eol)
             val uuidToPodcast = HashMap<String, Podcast>()
-            try {
+            val hasAnyPodcastWithAddUpNext = try {
                 val podcasts = podcastManager.findSubscribedBlocking()
-                for (podcast in podcasts) {
+                val upNextSettings = Array(podcasts.size) { false }
+                podcasts.forEachIndexed { index, podcast ->
                     podcastsOutput.append(podcast.uuid).append(eol)
                     podcastsOutput.append(if (podcast.title.isEmpty()) "-" else podcast.title).append(eol)
                     podcastsOutput.append("Last episode: ").append(podcast.latestEpisodeUuid).append(eol)
@@ -270,9 +271,12 @@ class Support @Inject constructor(
                     podcastsOutput.append(eol)
 
                     uuidToPodcast[podcast.uuid] = podcast
+                    upNextSettings[index] = podcast.autoAddToUpNext != Podcast.AutoAddUpNext.OFF
                 }
+                upNextSettings.any { it }
             } catch (e: Exception) {
                 Timber.e(e)
+                false
             }
             val isAutoDownloadEnabled = podcastManager.hasEpisodesWithAutoDownloadStatus(AUTO_DOWNLOAD_NEW_EPISODES)
 
@@ -288,6 +292,7 @@ class Support @Inject constructor(
             output.append("  New episodes? ").append(yesNoString(settings.autoDownloadNewEpisodes.value == AUTO_DOWNLOAD_NEW_EPISODES)).append(eol)
             output.append("  On follow? ").append(yesNoString(settings.autoDownloadOnFollowPodcast.value)).append(eol)
             output.append("  Limit downloads: ").append(settings.autoDownloadLimit.value).append(eol)
+            output.append("  Any podcast new episode up next? ").append(yesNoString(hasAnyPodcastWithAddUpNext)).append(eol)
             output.append("  Up Next? ").append(yesNoString(settings.autoDownloadUpNext.value)).append(eol)
             output.append("  Only on unmetered WiFi? ").append(yesNoString(settings.autoDownloadUnmeteredOnly.value)).append(eol)
             output.append("  Only when charging? ").append(yesNoString(settings.autoDownloadOnlyWhenCharging.value)).append(eol)
