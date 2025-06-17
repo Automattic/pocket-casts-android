@@ -246,14 +246,10 @@ class Support @Inject constructor(
 
             val podcastsOutput = StringBuilder()
             podcastsOutput.append("Podcasts").append(eol).append("--------").append(eol).append(eol)
-            val autoDownloadOn = booleanArrayOf(false)
             val uuidToPodcast = HashMap<String, Podcast>()
             try {
                 val podcasts = podcastManager.findSubscribedBlocking()
                 for (podcast in podcasts) {
-                    if (podcast.isAutoDownloadNewEpisodes) {
-                        autoDownloadOn[0] = true
-                    }
                     podcastsOutput.append(podcast.uuid).append(eol)
                     podcastsOutput.append(if (podcast.title.isEmpty()) "-" else podcast.title).append(eol)
                     podcastsOutput.append("Last episode: ").append(podcast.latestEpisodeUuid).append(eol)
@@ -278,6 +274,7 @@ class Support @Inject constructor(
             } catch (e: Exception) {
                 Timber.e(e)
             }
+            val isAutoDownloadEnabled = podcastManager.hasEpisodesWithAutoDownloadStatus(AUTO_DOWNLOAD_NEW_EPISODES)
 
             output.append(eol)
             output.append("Auto archive settings").append(eol)
@@ -287,7 +284,7 @@ class Support @Inject constructor(
 
             output.append(eol)
             output.append("Auto downloads").append(eol)
-            output.append("  Any podcast? ").append(yesNoString(autoDownloadOn[0])).append(eol)
+            output.append("  Any podcast? ").append(yesNoString(isAutoDownloadEnabled)).append(eol)
             output.append("  New episodes? ").append(yesNoString(settings.autoDownloadNewEpisodes.value == AUTO_DOWNLOAD_NEW_EPISODES)).append(eol)
             output.append("  On follow? ").append(yesNoString(settings.autoDownloadOnFollowPodcast.value)).append(eol)
             output.append("  Limit downloads: ").append(settings.autoDownloadLimit.value).append(eol)
