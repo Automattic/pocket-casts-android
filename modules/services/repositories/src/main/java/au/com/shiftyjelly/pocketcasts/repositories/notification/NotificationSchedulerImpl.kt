@@ -24,7 +24,7 @@ class NotificationSchedulerImpl @Inject constructor(
         const val SUBCATEGORY = "subcategory"
         const val DOWNLOADED_EPISODES = "downloaded_episodes"
 
-        private const val TAG_TRENDING_RECOMMENDATIONS = "trending_and_recommendations"
+        const val TAG_TRENDING_RECOMMENDATIONS = "trending_and_recommendations"
         private const val TAG_REENGAGEMENT = "daily_re_engagement_check"
         private const val TAG_ONBOARDING = "onboarding_notification"
         private const val TAG_FEATURES = "features_and_tips"
@@ -161,5 +161,13 @@ class NotificationSchedulerImpl @Inject constructor(
 
     override fun cancelScheduledOffersNotifications() {
         WorkManager.getInstance(context).cancelAllWorkByTag(TAG_OFFERS)
+    }
+
+    override fun cancelScheduledWorksByTag(list: List<String>) {
+        with(WorkManager.getInstance(context)) {
+            list.forEach {
+                cancelAllWorkByTag(it)
+            }
+        }
     }
 }
