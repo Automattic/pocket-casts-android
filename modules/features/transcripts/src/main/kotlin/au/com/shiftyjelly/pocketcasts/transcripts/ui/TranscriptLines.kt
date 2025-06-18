@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -65,22 +66,24 @@ internal fun TranscriptLines(
             )
         }
 
-        FadedLazyColumn(
-            state = state,
-            modifier = Modifier.verticalScrollBar(
-                scrollState = state,
-                thumbColor = theme.secondaryElement,
-                contentPadding = PaddingValues(bottom = 64.dp),
-            ),
-        ) {
-            itemsIndexed(transcript.entries) { index, entry ->
-                TranscriptLine(
-                    entryIndex = index,
-                    entry = entry,
-                    searchState = searchState,
-                    theme = theme,
-                    modifier = Modifier.padding(entry.padding()),
-                )
+        SelectionContainer {
+            FadedLazyColumn(
+                state = state,
+                modifier = Modifier.verticalScrollBar(
+                    scrollState = state,
+                    thumbColor = theme.secondaryElement,
+                    contentPadding = PaddingValues(bottom = 64.dp),
+                ),
+            ) {
+                itemsIndexed(transcript.entries) { index, entry ->
+                    TranscriptLine(
+                        entryIndex = index,
+                        entry = entry,
+                        searchState = searchState,
+                        theme = theme,
+                        modifier = Modifier.padding(entry.padding()),
+                    )
+                }
             }
         }
     }
