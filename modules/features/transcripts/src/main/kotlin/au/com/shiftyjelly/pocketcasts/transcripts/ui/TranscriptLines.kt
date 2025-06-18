@@ -171,6 +171,7 @@ private val SearchStatePreview: SearchState
     get() {
         val searchTerm = "lorem"
         return SearchState(
+            isSearchOpen = false,
             searchTerm = searchTerm,
             matches = SearchMatches(
                 selectedCoordinate = SearchCoordinates(

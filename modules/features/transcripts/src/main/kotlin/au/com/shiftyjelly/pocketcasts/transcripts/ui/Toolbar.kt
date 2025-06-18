@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
@@ -74,9 +75,12 @@ internal data class ToolbarColors(
     val searchBarBackground: Color,
     val searchBarText: Color,
     val searchBarTextPlaceholder: Color,
-    val searchBarCursor: Color,
     val searchBarContent: Color,
+    val searchBarCursor: Color,
+    val searchBarHandle: Color,
 ) {
+    val serachBarSelectionBackground = searchBarHandle.copy(alpha = searchBarHandle.alpha * 0.3f)
+
     companion object {
         fun default(colors: ThemeColors) = ToolbarColors(
             button = colors.primaryIcon01,
@@ -84,8 +88,9 @@ internal data class ToolbarColors(
             searchBarBackground = colors.primaryField01,
             searchBarText = colors.primaryText01,
             searchBarTextPlaceholder = colors.primaryText01.copy(alpha = 0.6f),
-            searchBarCursor = colors.primaryText02,
             searchBarContent = colors.primaryText01.copy(alpha = 0.4f),
+            searchBarCursor = colors.primaryText02,
+            searchBarHandle = colors.primaryText01,
         )
 
         fun player(colors: PlayerColors) = ToolbarColors(
@@ -94,8 +99,9 @@ internal data class ToolbarColors(
             searchBarBackground = Color.White,
             searchBarText = Color.Black,
             searchBarTextPlaceholder = Color.Black.copy(alpha = 0.5f),
-            searchBarCursor = Color.Black.copy(alpha = 0.5f),
             searchBarContent = Color.Black.copy(alpha = 0.5f),
+            searchBarCursor = Color.Black.copy(alpha = 0.5f),
+            searchBarHandle = colors.highlight01,
         )
     }
 }
@@ -103,7 +109,6 @@ internal data class ToolbarColors(
 @Composable
 internal fun Toolbar(
     searchState: SearchState,
-    showSearchBar: Boolean,
     onClickClose: () -> Unit,
     onUpdateSearchTerm: (String) -> Unit,
     onClearSearchTerm: () -> Unit,
@@ -113,9 +118,10 @@ internal fun Toolbar(
     onHideSearchBar: () -> Unit,
     modifier: Modifier = Modifier,
     colors: ToolbarColors = ToolbarColors.default(MaterialTheme.theme.colors),
+    hideSearchBar: Boolean = false,
 ) {
     val focusRequester = remember { FocusRequester() }
-    val showSearchTransition = updateTransition(showSearchBar)
+    val showSearchTransition = updateTransition(searchState.isSearchOpen)
 
     CompositionLocalProvider(
         LocalRippleConfiguration provides RippleConfiguration(color = colors.button),
@@ -128,46 +134,53 @@ internal fun Toolbar(
             CloseTranscriptButton(
                 colors = colors,
                 onClick = onClickClose,
+                modifier = Modifier.offset(x = -12.dp),
             )
             Spacer(
                 modifier = Modifier.width(16.dp),
             )
-            Box {
-                showSearchTransition.AnimatedVisibility(
-                    visible = { !it },
-                    enter = SearchButtonEnterTransition,
-                    exit = SearchButtonExitTransition,
-                ) {
-                    ShowSearchButton(
-                        colors = colors,
-                        onClick = onShowSearchBar,
-                    )
-                }
-                showSearchTransition.AnimatedVisibility(
-                    visible = { it },
-                    enter = SearchBarEnterTransition,
-                    exit = SearchBarExitTransition,
-                    modifier = Modifier.widthIn(max = 420.dp),
-                ) {
-                    SearchBar(
-                        searchState = searchState,
-                        colors = colors,
-                        onUpdateSearchTerm = onUpdateSearchTerm,
-                        onClickHide = onHideSearchBar,
-                        onClickClear = onClearSearchTerm,
-                        onSelectPreviousSearch = onSelectPreviousSearch,
-                        onSelectNextSearch = onSelectNextSearch,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .focusRequester(focusRequester),
-                    )
+            AnimatedVisibility(
+                visible = !hideSearchBar,
+                enter = SearchEnterTransition,
+                exit = SearchExitTransition,
+            ) {
+                Box {
+                    showSearchTransition.AnimatedVisibility(
+                        visible = { !it },
+                        enter = SearchButtonEnterTransition,
+                        exit = SearchButtonExitTransition,
+                    ) {
+                        ShowSearchButton(
+                            colors = colors,
+                            onClick = onShowSearchBar,
+                        )
+                    }
+                    showSearchTransition.AnimatedVisibility(
+                        visible = { it },
+                        enter = SearchBarEnterTransition,
+                        exit = SearchBarExitTransition,
+                        modifier = Modifier.widthIn(max = 420.dp),
+                    ) {
+                        SearchBar(
+                            searchState = searchState,
+                            colors = colors,
+                            onUpdateSearchTerm = onUpdateSearchTerm,
+                            onClickHide = onHideSearchBar,
+                            onClickClear = onClearSearchTerm,
+                            onSelectPreviousSearch = onSelectPreviousSearch,
+                            onSelectNextSearch = onSelectNextSearch,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .focusRequester(focusRequester),
+                        )
+                    }
                 }
             }
         }
     }
 
-    LaunchedEffect(focusRequester, showSearchBar) {
-        if (showSearchBar) {
+    LaunchedEffect(focusRequester, searchState.isSearchOpen) {
+        if (searchState.isSearchOpen) {
             focusRequester.requestFocus()
         }
     }
@@ -240,8 +253,8 @@ private fun SearchBar(
 ) {
     CompositionLocalProvider(
         LocalTextSelectionColors provides TextSelectionColors(
-            handleColor = colors.searchBarText,
-            backgroundColor = colors.searchBarText.copy(alpha = 0.2f),
+            handleColor = colors.searchBarHandle,
+            backgroundColor = colors.serachBarSelectionBackground,
         ),
         LocalRippleConfiguration provides RippleConfiguration(
             color = colors.searchBarContent,
@@ -392,6 +405,9 @@ private val SearchBarExitTransition = fadeOut() + shrinkHorizontally()
 private val SearchControlsEnterTransition = fadeIn()
 private val SearchControlsExitTransition = fadeOut()
 
+private val SearchEnterTransition = fadeIn()
+private val SearchExitTransition = fadeOut()
+
 @Preview(widthDp = 600)
 @Composable
 private fun ToolbarPreview(
@@ -403,11 +419,16 @@ private fun ToolbarPreview(
             modifier = Modifier.padding(16.dp),
         ) {
             Toolbar(
-                showSearch = false,
+                hideSearchBar = true,
+                initialSearchState = SearchState.Empty,
                 modifier = Modifier.fillMaxWidth(),
             )
             Toolbar(
                 initialSearchState = SearchState.Empty,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Toolbar(
+                initialSearchState = SearchState.Empty.copy(isSearchOpen = true),
                 modifier = Modifier.fillMaxWidth(),
             )
             Toolbar(
@@ -432,12 +453,18 @@ private fun ToolbarPlayerPreview(
                     .padding(16.dp),
             ) {
                 Toolbar(
-                    showSearch = false,
+                    hideSearchBar = true,
+                    initialSearchState = SearchState.Empty,
                     colors = transcriptTheme.toolbarColors,
                     modifier = Modifier.fillMaxWidth(),
                 )
                 Toolbar(
                     initialSearchState = SearchState.Empty,
+                    colors = transcriptTheme.toolbarColors,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Toolbar(
+                    initialSearchState = SearchState.Empty.copy(isSearchOpen = true),
                     colors = transcriptTheme.toolbarColors,
                     modifier = Modifier.fillMaxWidth(),
                 )
@@ -453,8 +480,9 @@ private fun ToolbarPlayerPreview(
 @Composable
 private fun Toolbar(
     modifier: Modifier = Modifier,
-    showSearch: Boolean = true,
+    hideSearchBar: Boolean = false,
     initialSearchState: SearchState = SearchState(
+        isSearchOpen = true,
         searchTerm = "Lorem ipsum",
         matches = SearchMatches(
             selectedCoordinate = SearchCoordinates(0, 0),
@@ -468,11 +496,11 @@ private fun Toolbar(
     colors: ToolbarColors = ToolbarColors.default(MaterialTheme.theme.colors),
 ) {
     var searchState by remember { mutableStateOf(initialSearchState) }
-    var showSearchBar by remember { mutableStateOf(showSearch) }
+    var isSearchBarOpen by remember { mutableStateOf(searchState.isSearchOpen) }
 
     Toolbar(
         searchState = searchState,
-        showSearchBar = showSearchBar,
+        hideSearchBar = hideSearchBar,
         colors = colors,
         onUpdateSearchTerm = { searchTerm ->
             searchState = searchState.copy(searchTerm = searchTerm)
@@ -486,8 +514,8 @@ private fun Toolbar(
         onSelectPreviousSearch = {
             searchState = searchState.copy(matches = searchState.matches.previous())
         },
-        onShowSearchBar = { showSearchBar = true },
-        onHideSearchBar = { showSearchBar = false },
+        onShowSearchBar = { isSearchBarOpen = true },
+        onHideSearchBar = { isSearchBarOpen = false },
         onClickClose = {},
         modifier = modifier,
     )
