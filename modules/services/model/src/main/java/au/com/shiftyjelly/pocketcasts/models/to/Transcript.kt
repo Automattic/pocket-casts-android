@@ -24,4 +24,24 @@ sealed interface Transcript {
     ) : Transcript {
         override val type get() = TranscriptType.Html
     }
+
+    companion object {
+        val TextPreview
+            get() = Transcript.Text(
+                entries = TranscriptEntry.PreviewList,
+                type = TranscriptType.Vtt,
+                url = "https://pocketacsts.com/transcript.json",
+                isGenerated = false,
+                episodeUuid = "episode-uuid",
+                podcastUuid = "podcast-uuid",
+            )
+
+        val WebPreview
+            get() = Transcript.Web(
+                url = "https://pocketacsts.com/transcript.json",
+                isGenerated = false,
+                episodeUuid = "episode-uuid",
+                podcastUuid = "podcast-uuid",
+            )
+    }
 }

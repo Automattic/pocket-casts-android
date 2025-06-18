@@ -1,9 +1,14 @@
 package au.com.shiftyjelly.pocketcasts.transcripts.ui
 
+import android.os.Build
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -13,6 +18,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -29,6 +37,8 @@ import au.com.shiftyjelly.pocketcasts.compose.components.FadedLazyColumn
 import au.com.shiftyjelly.pocketcasts.compose.extensions.verticalScrollBar
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.localization.R
+import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
 import au.com.shiftyjelly.pocketcasts.transcripts.SearchState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
@@ -37,28 +47,66 @@ import au.com.shiftyjelly.pocketcasts.utils.search.SearchMatches
 
 @Composable
 internal fun TranscriptLines(
-    entries: List<TranscriptEntry>,
+    transcript: Transcript.Text,
     searchState: SearchState,
     modifier: Modifier = Modifier,
+    isContentObscured: Boolean = false,
     state: LazyListState = rememberLazyListState(),
     theme: TranscriptTheme = TranscriptTheme.default(MaterialTheme.theme.colors),
 ) {
-    FadedLazyColumn(
-        contentPadding = PaddingValues(vertical = 16.dp),
-        modifier = modifier.verticalScrollBar(
-            scrollState = state,
-            thumbColor = theme.secondaryElement,
-        ),
+    Column(
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = modifier
+            .then(if (isContentObscured) Modifier.obsureContent() else Modifier),
     ) {
-        itemsIndexed(entries) { index, entry ->
-            TranscriptLine(
-                entryIndex = index,
-                entry = entry,
-                searchState = searchState,
+        if (transcript.isGenerated) {
+            GeneratedTranscriptHeader(
                 theme = theme,
-                modifier = Modifier.padding(entry.padding()),
             )
         }
+
+        FadedLazyColumn(
+            state = state,
+            modifier = Modifier.verticalScrollBar(
+                scrollState = state,
+                thumbColor = theme.secondaryElement,
+                contentPadding = PaddingValues(bottom = 64.dp),
+            ),
+        ) {
+            itemsIndexed(transcript.entries) { index, entry ->
+                TranscriptLine(
+                    entryIndex = index,
+                    entry = entry,
+                    searchState = searchState,
+                    theme = theme,
+                    modifier = Modifier.padding(entry.padding()),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun GeneratedTranscriptHeader(
+    theme: TranscriptTheme,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = modifier,
+    ) {
+        Text(
+            text = stringResource(R.string.transcript_generated_header),
+            fontSize = 12.sp,
+            lineHeight = 18.sp,
+            color = theme.primaryText,
+        )
+        Box(
+            modifier = Modifier
+                .background(theme.secondaryElement)
+                .width(48.dp)
+                .height(1.dp),
+        )
     }
 }
 
@@ -95,9 +143,17 @@ private fun TranscriptLine(
             }
         },
         style = entry.textStyle(),
-        color = theme.text,
+        color = theme.primaryText,
         modifier = modifier,
     )
+}
+
+private fun Modifier.obsureContent(): Modifier {
+    return if (Build.VERSION.SDK_INT >= 31) {
+        blur(6.dp)
+    } else {
+        alpha(0.1f)
+    }
 }
 
 private fun TranscriptEntry.text() = when (this) {
@@ -128,8 +184,35 @@ private val SpeakerTextStyle = SimpleTextStyle.copy(
     fontSize = 12.sp,
 )
 
-private val SimplePadding = PaddingValues(start = 32.dp, end = 32.dp, bottom = 16.dp)
-private val SpeakerPadding = PaddingValues(start = 32.dp, end = 32.dp, bottom = 8.dp, top = 16.dp)
+private val SimplePadding = PaddingValues(bottom = 16.dp)
+private val SpeakerPadding = PaddingValues(bottom = 8.dp, top = 16.dp)
+
+@Preview
+@Composable
+private fun TranscriptLinesNonGeneratedPreview() {
+    AppThemeWithBackground(ThemeType.DARK) {
+        Column {
+            TranscriptLines(
+                transcript = Transcript.TextPreview.copy(isGenerated = false),
+                searchState = SearchState.Empty,
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun TranscriptLinesObsucredPreview() {
+    AppThemeWithBackground(ThemeType.DARK) {
+        Column {
+            TranscriptLines(
+                transcript = Transcript.TextPreview.copy(isGenerated = false),
+                searchState = SearchState.Empty,
+                isContentObscured = true,
+            )
+        }
+    }
+}
 
 @Preview
 @Composable
@@ -139,7 +222,7 @@ private fun TranscriptLinesPreview(
     AppThemeWithBackground(theme) {
         Column {
             TranscriptLines(
-                entries = TranscriptEntry.PreviewList,
+                transcript = Transcript.TextPreview.copy(isGenerated = true),
                 searchState = remember { SearchStatePreview },
             )
         }
@@ -158,9 +241,9 @@ private fun TranscriptLinesPlayerPreview(
                 modifier = Modifier.background(transcriptTheme.background),
             ) {
                 TranscriptLines(
-                    entries = TranscriptEntry.PreviewList,
-                    theme = transcriptTheme,
+                    transcript = Transcript.TextPreview.copy(isGenerated = true),
                     searchState = remember { SearchStatePreview },
+                    theme = transcriptTheme,
                 )
             }
         }
