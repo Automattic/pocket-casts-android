@@ -160,11 +160,11 @@ fun TranscriptPageWrapper(
                 is TransitionState.OpenTranscript -> {
                     if (state.showPlayerControls) {
                         if (showPaywall) {
-                            shelfSharedViewModel.openTranscript(showPlayerControls = false)
+                            shelfSharedViewModel.openTranscript()
                         }
                     } else {
                         if (!showPaywall) {
-                            shelfSharedViewModel.openTranscript(showPlayerControls = true)
+                            shelfSharedViewModel.openTranscript()
                         }
                     }
                 }

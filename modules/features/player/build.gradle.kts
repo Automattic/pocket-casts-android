@@ -37,6 +37,7 @@ dependencies {
     api(libs.showkase)
 
     api(projects.modules.features.settings)
+    api(projects.modules.features.transcripts)
     api(projects.modules.services.analytics)
     api(projects.modules.services.compose)
     api(projects.modules.services.localization)

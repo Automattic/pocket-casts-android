@@ -79,6 +79,7 @@ import com.kevinnzou.web.LoadingState
 import com.kevinnzou.web.WebView
 import com.kevinnzou.web.rememberWebViewNavigator
 import com.kevinnzou.web.rememberWebViewState
+import kotlinx.coroutines.flow.emptyFlow
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @kotlin.OptIn(ExperimentalMaterialApi::class)
@@ -91,7 +92,7 @@ fun TranscriptPage(
 ) {
     val uiState by transcriptViewModel.uiState.collectAsStateWithLifecycle()
     val transcriptState = uiState.transcriptState
-    val transitionState by shelfSharedViewModel.transitionState.collectAsStateWithLifecycle(null)
+    val transitionState by emptyFlow<TransitionState>().collectAsStateWithLifecycle(null)
     val searchState by searchViewModel.searchState.collectAsStateWithLifecycle()
     val playerColors = MaterialTheme.theme.rememberPlayerColors()
     val colors = TranscriptColors(playerColors?.background01 ?: Color(0xFF3D3D3D))

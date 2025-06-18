@@ -24,6 +24,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
@@ -31,6 +32,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -40,6 +42,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -76,20 +79,18 @@ import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.PlayerVisuals
 import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.PlayerVisualsState
 import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.VisualContentState
 import au.com.shiftyjelly.pocketcasts.player.view.shelf.PlayerShelf
-import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptPageWrapper
-import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptSearchViewModel
-import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel
 import au.com.shiftyjelly.pocketcasts.player.view.video.VideoActivity
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.NavigationState
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.SnackbarMessage
-import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.TransitionState
 import au.com.shiftyjelly.pocketcasts.reimagine.ShareDialogFragment
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
+import au.com.shiftyjelly.pocketcasts.transcripts.TranscriptViewModel
+import au.com.shiftyjelly.pocketcasts.transcripts.ui.TranscriptPage
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
@@ -129,7 +130,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     private val viewModel: PlayerViewModel by activityViewModels()
     private val shelfSharedViewModel: ShelfSharedViewModel by activityViewModels()
     private val transcriptViewModel by viewModels<TranscriptViewModel>({ requireParentFragment() })
-    private val transcriptSearchViewModel by viewModels<TranscriptSearchViewModel>({ requireParentFragment() })
     private var binding: AdapterPlayerHeaderBinding? = null
     private val sourceView = SourceView.PLAYER
 
@@ -156,24 +156,26 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             val ads by viewModel.activeAds.collectAsState()
             val visualsState by remember { playerVisualsStateFlow() }.collectAsState(PlayerVisualsState.Empty)
             val player by viewModel.playerFlow.collectAsState()
+            val transcriptUiState by transcriptViewModel.uiState.collectAsState()
 
-            val transcriptTransitionState by shelfSharedViewModel.transitionState.collectAsState(TransitionState.CloseTranscript)
-            val showPlayerTransition = updateTransition(transcriptTransitionState is TransitionState.CloseTranscript)
-            val playerElementsAlpha by showPlayerTransition.animateFloat { showPlayer ->
-                if (showPlayer) 1f else 0f
+            val isTranscriptOpen by shelfSharedViewModel.isTranscriptOpen.collectAsState()
+            val showTranscriptTransition = updateTransition(isTranscriptOpen)
+            val playerElementsAlpha by showTranscriptTransition.animateFloat { showTranscript ->
+                if (showTranscript) 0f else 1f
             }
-            val playbackButtonsScale by showPlayerTransition.animateFloat { showPlayer ->
-                if (showPlayer) 1f else 0.6f
+            val playbackButtonsScale by showTranscriptTransition.animateFloat { showTranscript ->
+                if (showTranscript) 0.6f else 1f
             }
             val controlsOffsetValue = LocalDensity.current.run { 64.dp.roundToPx() }
-            val controlsOffset by showPlayerTransition.animateIntOffset { showPlayer ->
-                if (showPlayer) IntOffset.Zero else IntOffset(x = 0, y = controlsOffsetValue)
-            }
-            val showPlayerControls = when (val state = transcriptTransitionState) {
-                is TransitionState.CloseTranscript -> true
-                is TransitionState.OpenTranscript -> state.showPlayerControls
+            val controlsOffset by showTranscriptTransition.animateIntOffset { showTranscript ->
+                if (showTranscript) IntOffset(x = 0, y = controlsOffsetValue) else IntOffset.Zero
             }
             val seekBarOffset = controlsOffset * 0.9f
+            val showPlayerControls = if (isTranscriptOpen) {
+                !transcriptUiState.isPaywallVisible
+            } else {
+                true
+            }
 
             AppTheme(theme.activeTheme) {
                 CompositionLocalProvider(LocalPodcastColors provides podcastColors) {
@@ -185,22 +187,31 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                             .fillMaxSize()
                             .padding(16.dp),
                     ) {
-                        AnimatedVisibility(
-                            visible = transcriptTransitionState is TransitionState.OpenTranscript,
+                        showTranscriptTransition.AnimatedVisibility(
+                            visible = { it },
                             enter = transcriptEnterTransition,
                             exit = transcriptExitTransition,
                             modifier = Modifier.fillMaxSize(),
                         ) {
-                            TranscriptPageWrapper(
-                                transitionState = transcriptTransitionState,
-                                shelfSharedViewModel = shelfSharedViewModel,
-                                transcriptViewModel = transcriptViewModel,
-                                searchViewModel = transcriptSearchViewModel,
+                            TranscriptPage(
+                                uiState = transcriptUiState,
+                                contentPadding = PaddingValues(bottom = dimensionResource(id = R.dimen.transcript_text_bottom_padding)),
+                                onClickClose = {
+                                    transcriptViewModel.hideSearch()
+                                    shelfSharedViewModel.closeTranscript()
+                                },
+                                onClickReload = transcriptViewModel::reloadTranscript,
+                                onUpdateSearchTerm = transcriptViewModel::searchInTranscript,
+                                onClearSearchTerm = transcriptViewModel::clearSearch,
+                                onSelectPreviousSearch = transcriptViewModel::selectPreviousSearchMatch,
+                                onSelectNextSearch = transcriptViewModel::selectNextSearchMatch,
+                                onShowSearchBar = transcriptViewModel::openSearch,
+                                onHideSearchBar = transcriptViewModel::hideSearch,
                                 onClickSubscribe = {
                                     transcriptViewModel.track(AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_SUBSCRIBE_TAPPED)
                                     OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.Upsell(OnboardingUpgradeSource.GENERATED_TRANSCRIPTS))
                                 },
-                                modifier = Modifier.fillMaxSize(),
+                                modifier = Modifier.fillMaxWidth(fraction = ResourcesCompat.getFloat(resources, R.dimen.seekbar_width_percentage)),
                             )
                         }
                         Column(
@@ -214,7 +225,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                                     .fillMaxWidth()
                                     .alpha(playerElementsAlpha),
                             ) {
-                                if (showPlayerTransition.targetState) {
+                                if (!isTranscriptOpen) {
                                     AnimatedNonNullVisibility(
                                         item = ads.firstOrNull(),
                                         enter = adEnterTransition,
@@ -237,11 +248,10 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                                     )
                                 }
                             }
-                            if (showPlayerTransition.targetState) {
+                            if (!isTranscriptOpen) {
                                 PlayerHeadingSection(
                                     playerColors = playerColors,
                                     playerViewModel = viewModel,
-                                    shelfSharedViewModel = shelfSharedViewModel,
                                     modifier = Modifier.alpha(playerElementsAlpha),
                                 )
                             }
@@ -280,7 +290,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                                 }
                             }
                             AnimatedVisibility(
-                                visible = showPlayerTransition.targetState,
+                                visible = !isTranscriptOpen,
                                 enter = shelfEnterTransition,
                                 exit = shelfExitTransition,
                             ) {
@@ -292,6 +302,14 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                             }
                         }
                     }
+                }
+            }
+
+            val playerEpisodeUuid = headerData.episodeUuid
+            val transcriptEpisodeUuid = transcriptUiState.transcriptEpisodeUuid
+            LaunchedEffect(isTranscriptOpen, playerEpisodeUuid, transcriptEpisodeUuid) {
+                if (isTranscriptOpen && playerEpisodeUuid != transcriptEpisodeUuid) {
+                    transcriptViewModel.loadTranscript(playerEpisodeUuid)
                 }
             }
         }
@@ -430,27 +448,23 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     private fun observeTranscriptPageTransition() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                shelfSharedViewModel.transitionState.collect { transitionState ->
+                shelfSharedViewModel.isTranscriptOpen.collect { isTranscriptOpen ->
                     val uiState = transcriptViewModel.uiState.value
 
-                    when (transitionState) {
-                        is TransitionState.OpenTranscript -> {
-                            val containerFragment = parentFragment as? PlayerContainerFragment
-                            containerFragment?.updateTabsVisibility(false)
-                            binding?.root?.setScrollingEnabled(false)
+                    if (isTranscriptOpen) {
+                        val containerFragment = parentFragment as? PlayerContainerFragment
+                        containerFragment?.updateTabsVisibility(false)
+                        binding?.root?.setScrollingEnabled(false)
+                    } else {
+                        val event = if (uiState.isPaywallVisible) {
+                            AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_DISMISSED
+                        } else {
+                            AnalyticsEvent.TRANSCRIPT_DISMISSED
                         }
-
-                        is TransitionState.CloseTranscript -> {
-                            val event = if (uiState.showPaywall) {
-                                AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_DISMISSED
-                            } else {
-                                AnalyticsEvent.TRANSCRIPT_DISMISSED
-                            }
-                            transcriptViewModel.track(event)
-                            val containerFragment = parentFragment as? PlayerContainerFragment
-                            containerFragment?.updateTabsVisibility(true)
-                            binding?.root?.setScrollingEnabled(true)
-                        }
+                        transcriptViewModel.track(event)
+                        val containerFragment = parentFragment as? PlayerContainerFragment
+                        containerFragment?.updateTabsVisibility(true)
+                        binding?.root?.setScrollingEnabled(true)
                     }
                 }
             }
