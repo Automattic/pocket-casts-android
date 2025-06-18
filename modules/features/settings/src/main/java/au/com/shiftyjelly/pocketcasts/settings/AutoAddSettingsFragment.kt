@@ -6,6 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -27,7 +29,6 @@ import au.com.shiftyjelly.pocketcasts.settings.databinding.AdapterOptionRowBindi
 import au.com.shiftyjelly.pocketcasts.settings.databinding.AdapterPlainTextRowBinding
 import au.com.shiftyjelly.pocketcasts.settings.databinding.FragmentAutoAddSettingsBinding
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.AutoAddSettingsViewModel
-import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
@@ -164,13 +165,52 @@ class AutoAddSettingsFragment : BaseFragment(), PodcastSelectFragment.Listener {
     }
 
     private fun openPodcastsList() {
+        view?.let {
+            ViewCompat.setOnApplyWindowInsetsListener(FragmentAutoAddSettingsBinding.bind(it).fragmentContainer) { v, insets ->
+                val bars = insets.getInsets(
+                    WindowInsetsCompat.Type.systemBars()
+                        or WindowInsetsCompat.Type.displayCutout(),
+                )
+                v.updatePadding(
+                    left = bars.left,
+                    top = bars.top,
+                    right = bars.right,
+                    bottom = bars.bottom,
+                )
+                WindowInsetsCompat.CONSUMED
+            }
+        }
+
         val fragment = PodcastSelectFragment.newInstance(
             tintColor = ThemeColor.primaryInteractive01(theme.activeTheme),
             showToolbar = true,
             source = PodcastSelectFragmentSource.AUTO_ADD,
         )
         fragment.listener = this
-        (activity as? FragmentHostListener)?.addFragment(fragment)
+        childFragmentManager.beginTransaction()
+            .replace(
+                R.id.fragment_container,
+                fragment,
+            )
+            .addToBackStack("podcast_selector")
+            .commit()
+    }
+
+    override fun onBackPressed(): Boolean {
+        if (childFragmentManager.backStackEntryCount > 0) {
+            childFragmentManager.popBackStack()
+
+            view?.let {
+                FragmentAutoAddSettingsBinding.bind(it).fragmentContainer.updatePadding(
+                    top = 0,
+                    bottom = 0,
+                )
+            }
+
+            return true
+        }
+
+        return super.onBackPressed()
     }
 
     override fun podcastSelectFragmentSelectionChanged(newSelection: List<String>) {
