@@ -11,4 +11,5 @@ interface NotificationScheduler {
     fun cancelScheduledTrendingAndRecommendationsNotifications()
     fun cancelScheduledNewFeaturesAndTipsNotifications()
     fun cancelScheduledOffersNotifications()
+    fun cancelScheduledWorksByTag(tags: List<String>)
 }

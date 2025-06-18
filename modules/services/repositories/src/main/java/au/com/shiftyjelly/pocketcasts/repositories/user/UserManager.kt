@@ -12,6 +12,9 @@ import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearSync
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationScheduler
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationSchedulerImpl.Companion.TAG_TRENDING_RECOMMENDATIONS
+import au.com.shiftyjelly.pocketcasts.repositories.notification.TrendingAndRecommendationsNotificationType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -61,6 +64,7 @@ class UserManagerImpl @Inject constructor(
     private val crashLogging: CrashLogging,
     private val experimentProvider: ExperimentProvider,
     private val endOfYearSync: EndOfYearSync,
+    private val notificationScheduler: NotificationScheduler,
 ) : UserManager, CoroutineScope {
 
     companion object {
@@ -91,6 +95,10 @@ class UserManagerImpl @Inject constructor(
         return syncManager.isLoggedInObservable.toFlowable(BackpressureStrategy.LATEST)
             .switchMap { isLoggedIn ->
                 if (isLoggedIn) {
+                    launch(coroutineContext) {
+                        notificationScheduler.setupTrendingAndRecommendationsNotifications()
+                    }
+
                     settings.cachedSubscription.flow
                         .map { Optional.of(it) }
                         .asFlowable()
@@ -111,6 +119,9 @@ class UserManagerImpl @Inject constructor(
                             SignInState.SignedIn(syncManager.getEmail() ?: "", subscription = null)
                         }
                 } else {
+                    launch(coroutineContext) {
+                        notificationScheduler.cancelScheduledWorksByTag(listOf("$TAG_TRENDING_RECOMMENDATIONS-${TrendingAndRecommendationsNotificationType.Recommendations.subcategory}"))
+                    }
                     Flowable.just(SignInState.SignedOut)
                 }
             }
