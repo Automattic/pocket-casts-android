@@ -120,7 +120,7 @@ class TranscriptViewModelTest {
             viewModel.loadTranscript("episode-uuid")
             assertEquals(TranscriptState.Failure, awaitItem().transcriptState)
 
-            viewModel.reloadTranscripts()
+            viewModel.reloadTranscript()
             assertEquals(TranscriptState.Loading, awaitItem().transcriptState)
             assertEquals(TranscriptState.Loaded(transcriptManager.avaiableTranscript), awaitItem().transcriptState)
         }
@@ -155,6 +155,7 @@ class TranscriptViewModelTest {
             skipItems(1)
 
             viewModel.searchInTranscript("text")
+            assertEquals(SearchState.Empty.copy(searchTerm = "text"), awaitItem().searchState)
             assertEquals(
                 SearchState(
                     isSearchOpen = true,
@@ -188,6 +189,7 @@ class TranscriptViewModelTest {
             skipItems(1)
 
             viewModel.searchInTranscript("text")
+            skipItems(1)
             assertEquals(0, awaitItem().searchState.matches.selectedMatchIndex)
 
             viewModel.selectNextSearchMatch()
@@ -232,16 +234,19 @@ class TranscriptViewModelTest {
             skipItems(1)
 
             viewModel.searchInTranscript("lorem")
+            assertEquals("lorem", awaitItem().searchState.searchTerm)
             advanceTimeBy(200)
             expectNoEvents()
 
             viewModel.searchInTranscript("lore")
+            assertEquals("lore", awaitItem().searchState.searchTerm)
             advanceTimeBy(299)
             expectNoEvents()
 
             viewModel.searchInTranscript("lor")
-            advanceTimeBy(300)
             assertEquals("lor", awaitItem().searchState.searchTerm)
+            advanceTimeBy(300)
+            assertTrue(awaitItem().searchState.matches.matchingCoordinates.isNotEmpty())
         }
     }
 
@@ -254,14 +259,16 @@ class TranscriptViewModelTest {
             skipItems(1)
 
             viewModel.searchInTranscript("lorem")
-            skipItems(1)
+            skipItems(2)
 
             // Trigger search to make sure that clearing ignores debounce
             // and no search event is emitted afterwards
             viewModel.searchInTranscript("lor")
+            skipItems(1)
             advanceTimeBy(200)
+
             viewModel.clearSearch()
-            assertEquals(SearchState.Empty, awaitItem().searchState)
+            assertEquals(SearchState.Empty.copy(isSearchOpen = true), awaitItem().searchState)
         }
     }
 }

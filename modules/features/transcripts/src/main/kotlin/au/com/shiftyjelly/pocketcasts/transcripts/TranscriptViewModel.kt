@@ -38,17 +38,21 @@ class TranscriptViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTracker,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(UiState.Empty)
-    internal val uiState = _uiState.asStateFlow()
+    val uiState = _uiState.asStateFlow()
 
     init {
         viewModelScope.launch {
             val subscriptionPlans = paymentClient.loadSubscriptionPlans().getOrNull()
             val trialOffer = subscriptionPlans?.findOfferPlan(SubscriptionTier.Plus, BillingCycle.Monthly, SubscriptionOffer.Trial)
-            _uiState.update { state -> state.copy(isFreeTrialAvailable = trialOffer != null) }
+            _uiState.update { state ->
+                state.copy(isFreeTrialAvailable = trialOffer != null)
+            }
         }
         viewModelScope.launch {
             userManager.getSignInState().asFlow().collect { signInState ->
-                _uiState.update { state -> state.copy(isPlusUser = signInState.isSignedInAsPlusOrPatron) }
+                _uiState.update { state ->
+                    state.copy(isPlusUser = signInState.isSignedInAsPlusOrPatron)
+                }
             }
         }
     }
@@ -59,7 +63,7 @@ class TranscriptViewModel @Inject constructor(
     private var loadTranscriptJob: Job? = null
     private var searchJob: Job? = null
 
-    internal fun loadTranscript(episodeUuid: String) {
+    fun loadTranscript(episodeUuid: String) {
         loadTranscriptJob?.cancel()
         loadTranscriptJob = viewModelScope.launch {
             searchJob?.cancelAndJoin()
@@ -93,7 +97,7 @@ class TranscriptViewModel @Inject constructor(
         }
     }
 
-    internal fun reloadTranscripts() {
+    fun reloadTranscript() {
         if (loadTranscriptJob?.isActive == true) {
             return
         }
@@ -120,7 +124,11 @@ class TranscriptViewModel @Inject constructor(
         }
     }
 
-    internal fun searchInTranscript(searchTerm: String) {
+    fun searchInTranscript(searchTerm: String) {
+        _uiState.update { state ->
+            state.copy(searchState = state.searchState.copy(searchTerm = searchTerm))
+        }
+
         val loadedTranscript = uiState.value.transcriptState as? TranscriptState.Loaded ?: return
         val transcript = loadedTranscript.transcript as? Transcript.Text ?: return
 
@@ -146,7 +154,6 @@ class TranscriptViewModel @Inject constructor(
             _uiState.update { state ->
                 val searchState = state.searchState.copy(
                     isSearchOpen = true,
-                    searchTerm = searchTerm,
                     matches = searchMatches,
                 )
                 state.copy(searchState = searchState)
@@ -154,16 +161,17 @@ class TranscriptViewModel @Inject constructor(
         }
     }
 
-    internal fun clearSearch() {
+    fun clearSearch() {
         viewModelScope.launch {
             searchJob?.cancelAndJoin()
             _uiState.update { state ->
-                state.copy(searchState = SearchState.Empty)
+                val isSearchOpen = state.searchState.isSearchOpen
+                state.copy(searchState = SearchState.Empty.copy(isSearchOpen = isSearchOpen))
             }
         }
     }
 
-    internal fun selectPreviousSearchMatch() {
+    fun selectPreviousSearchMatch() {
         track(AnalyticsEvent.TRANSCRIPT_SEARCH_PREVIOUS_RESULT)
         _uiState.update { state ->
             val previousMatches = state.searchState.matches.previous()
@@ -171,7 +179,7 @@ class TranscriptViewModel @Inject constructor(
         }
     }
 
-    internal fun selectNextSearchMatch() {
+    fun selectNextSearchMatch() {
         track(AnalyticsEvent.TRANSCRIPT_SEARCH_NEXT_RESULT)
         _uiState.update { state ->
             val nextMatches = state.searchState.matches.next()
@@ -179,7 +187,7 @@ class TranscriptViewModel @Inject constructor(
         }
     }
 
-    internal fun track(
+    fun track(
         event: AnalyticsEvent,
         additionalProperties: Map<String, Any> = emptyMap(),
     ) {
@@ -201,7 +209,7 @@ class TranscriptViewModel @Inject constructor(
     }
 }
 
-internal data class UiState(
+data class UiState(
     val transcriptState: TranscriptState,
     val searchState: SearchState,
     val isPlusUser: Boolean,
@@ -217,7 +225,7 @@ internal data class UiState(
     }
 }
 
-internal sealed interface TranscriptState {
+sealed interface TranscriptState {
     data object Loading : TranscriptState
 
     data class Loaded(
@@ -229,7 +237,7 @@ internal sealed interface TranscriptState {
     data object Failure : TranscriptState
 }
 
-internal data class SearchState(
+data class SearchState(
     val isSearchOpen: Boolean,
     val searchTerm: String,
     val matches: SearchMatches,
