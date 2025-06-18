@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -16,6 +17,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.RippleConfiguration
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -57,57 +59,82 @@ internal fun TranscriptsPaywall(
             .fillMaxSize()
             .clickable(indication = null, interactionSource = null, onClick = {})
             .verticalScroll(rememberScrollState())
-            .padding(top = 24.dp, end = 16.dp, start = 16.dp)
             .then(modifier),
     ) {
-        SubscriptionBadge(
-            iconRes = R.drawable.ic_plus,
-            shortNameRes = LR.string.pocket_casts_plus_short,
-            fontSize = 16.sp,
-            padding = 6.dp,
-            textColor = Color.Black,
-            iconColor = Color.Black,
-            backgroundBrush = Brush.horizontalGradient(
-                0f to Color.plusGoldLight,
-                1f to Color.plusGoldDark,
-            ),
-        )
-        Spacer(
-            modifier = Modifier.height(24.dp),
-        )
-        TextH20(
-            text = stringResource(LR.string.transcript_generated_paywall_title),
-            color = theme.primaryText,
-            textAlign = TextAlign.Center,
-        )
-        Spacer(
-            modifier = Modifier.height(16.dp),
-        )
-        TextH50(
-            text = stringResource(LR.string.transcript_generated_paywall_description),
-            color = theme.secondaryText,
-            textAlign = TextAlign.Center,
-        )
-        Spacer(
-            modifier = Modifier.weight(1f),
-        )
-        CompositionLocalProvider(
-            LocalRippleConfiguration provides RippleConfiguration(color = Color.Black),
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(theme.background)
+                .padding(top = 24.dp),
         ) {
-            RowButton(
-                text = if (isFreeTrialAvailable) {
-                    stringResource(LR.string.profile_start_free_trial)
-                } else {
-                    stringResource(LR.string.onboarding_subscribe_to_plus)
-                },
+            SubscriptionBadge(
+                iconRes = R.drawable.ic_plus,
+                shortNameRes = LR.string.pocket_casts_plus_short,
+                fontSize = 16.sp,
+                padding = 6.dp,
                 textColor = Color.Black,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.SemiBold,
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = Color.plusGoldLight,
+                iconColor = Color.Black,
+                backgroundBrush = Brush.horizontalGradient(
+                    0f to Color.plusGoldLight,
+                    1f to Color.plusGoldDark,
                 ),
-                onClick = onClickSubscribe,
             )
+            Spacer(
+                modifier = Modifier.height(24.dp),
+            )
+            TextH20(
+                text = stringResource(LR.string.transcript_generated_paywall_title),
+                color = theme.primaryText,
+                textAlign = TextAlign.Center,
+            )
+            Spacer(
+                modifier = Modifier.height(16.dp),
+            )
+            TextH50(
+                text = stringResource(LR.string.transcript_generated_paywall_description),
+                color = theme.secondaryText,
+                textAlign = TextAlign.Center,
+            )
+        }
+        val gradientBrush = remember(theme.background) {
+            val colorsStops = arrayOf(
+                0.0f to theme.background,
+                0.05f to theme.background,
+                0.15f to Color.Transparent,
+                1f to Color.Transparent,
+            )
+            Brush.verticalGradient(colorStops = colorsStops)
+        }
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .background(gradientBrush),
+        ) {
+            Spacer(
+                modifier = Modifier.weight(1f),
+            )
+            CompositionLocalProvider(
+                LocalRippleConfiguration provides RippleConfiguration(color = Color.Black),
+            ) {
+                RowButton(
+                    text = if (isFreeTrialAvailable) {
+                        stringResource(LR.string.profile_start_free_trial)
+                    } else {
+                        stringResource(LR.string.onboarding_subscribe_to_plus)
+                    },
+                    textColor = Color.Black,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color.plusGoldLight,
+                    ),
+                    includePadding = false,
+                    onClick = onClickSubscribe,
+                    modifier = Modifier.padding(bottom = 24.dp),
+                )
+            }
         }
     }
 }
@@ -121,6 +148,7 @@ private fun TranscriptsPaywallPreview(
         TranscriptsPaywall(
             isFreeTrialAvailable = false,
             onClickSubscribe = {},
+            modifier = Modifier.padding(horizontal = 16.dp),
         )
     }
 }
@@ -136,7 +164,8 @@ private fun TranscriptsPaywallPreview(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(transcriptTheme.background),
+                    .background(transcriptTheme.background)
+                    .padding(horizontal = 16.dp),
             ) {
                 TranscriptsPaywall(
                     isFreeTrialAvailable = true,
