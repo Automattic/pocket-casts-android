@@ -20,6 +20,28 @@ data class Subscription(
 
     val isChampion
         get() = platform == SubscriptionPlatform.Gift && giftDays > ChampionGiftLowerBound
+
+    companion object {
+        val PlusPreview
+            get() = Subscription(
+                tier = SubscriptionTier.Plus,
+                billingCycle = BillingCycle.Monthly,
+                platform = SubscriptionPlatform.Android,
+                expiryDate = Instant.MAX,
+                isAutoRenewing = true,
+                giftDays = 0,
+            )
+
+        val PatronPreview
+            get() = Subscription(
+                tier = SubscriptionTier.Patron,
+                billingCycle = BillingCycle.Monthly,
+                platform = SubscriptionPlatform.Android,
+                expiryDate = Instant.MAX,
+                isAutoRenewing = true,
+                giftDays = 0,
+            )
+    }
 }
 
 private const val ChampionGiftLowerBound = 10 * 365

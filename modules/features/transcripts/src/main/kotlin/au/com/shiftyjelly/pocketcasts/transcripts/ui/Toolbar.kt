@@ -424,7 +424,7 @@ private fun ToolbarPreview(
                 modifier = Modifier.fillMaxWidth(),
             )
             Toolbar(
-                initialSearchState = SearchState.Empty,
+                initialSearchState = SearchState.Empty.copy(isSearchOpen = true),
                 modifier = Modifier.fillMaxWidth(),
             )
             Toolbar(
@@ -459,7 +459,7 @@ private fun ToolbarPlayerPreview(
                     modifier = Modifier.fillMaxWidth(),
                 )
                 Toolbar(
-                    initialSearchState = SearchState.Empty,
+                    initialSearchState = SearchState.Empty.copy(isSearchOpen = true),
                     colors = transcriptTheme.toolbarColors,
                     modifier = Modifier.fillMaxWidth(),
                 )
