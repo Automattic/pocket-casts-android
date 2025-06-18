@@ -16,12 +16,14 @@ import au.com.shiftyjelly.pocketcasts.repositories.R
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationSchedulerImpl.Companion.DOWNLOADED_EPISODES
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationSchedulerImpl.Companion.SUBCATEGORY
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SuggestedFoldersManager
+import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import java.time.Instant
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.reactive.asFlow
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 @HiltWorker
@@ -32,6 +34,7 @@ class NotificationWorker @AssistedInject constructor(
     private val notificationHelper: NotificationHelper,
     private val notificationManager: NotificationManager,
     private val suggestedFoldersManager: SuggestedFoldersManager,
+    private val userManager: UserManager,
 ) : CoroutineWorker(context, params) {
     override suspend fun doWork(): Result {
         val subcategory = inputData.getString(SUBCATEGORY) ?: return Result.failure()
@@ -58,6 +61,10 @@ class NotificationWorker @AssistedInject constructor(
 
     private suspend fun shouldSchedule(type: NotificationType): Boolean {
         return when (type) {
+            is TrendingAndRecommendationsNotificationType.Recommendations -> {
+                val isSignedIn = userManager.getSignInState().map { it.isSignedIn }.asFlow().firstOrNull()
+                isSignedIn ?: false
+            }
             is NewFeaturesAndTipsNotificationType.SmartFolders -> {
                 suggestedFoldersManager.refreshSuggestedFolders()
                 val folders = suggestedFoldersManager.observeSuggestedFolders().firstOrNull()
