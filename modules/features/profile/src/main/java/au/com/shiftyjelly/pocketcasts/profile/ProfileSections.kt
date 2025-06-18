@@ -111,6 +111,10 @@ internal enum class ProfileSection(
         iconId = IR.drawable.ic_help,
         labelId = LR.string.settings_title_help,
     ),
+    Hack(
+        iconId = IR.drawable.ic_arrow_right_small,
+        labelId = LR.string.settings_title_hack,
+    )
 }
 
 @Preview

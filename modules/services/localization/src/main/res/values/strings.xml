@@ -1504,6 +1504,7 @@
     <string name="settings_title_excluded_podcasts">Excluded Podcasts</string>
     <string name="settings_title_headphone_controls">Headphone controls</string>
     <string name="settings_title_help">Help &amp; feedback</string>
+    <string name="settings_title_hack">Hack week EOY</string>
     <string name="settings_title_import_export">Import &amp; export OPML</string>
     <string name="settings_title_privacy">Privacy</string>
     <string name="settings_title_manage_downloads" translatable="false">@string/settings_storage_downloaded_files</string>
