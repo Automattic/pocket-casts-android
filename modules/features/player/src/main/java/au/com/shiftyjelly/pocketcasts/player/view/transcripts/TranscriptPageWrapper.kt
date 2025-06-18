@@ -250,12 +250,12 @@ fun TranscriptToolbar(
                 ) {
                     SearchBar(
                         text = searchText,
-                        leadingIcon = {
+                        leadingContent = {
                             SearchBarLeadingIcons(
                                 onDoneClicked = onSearchDoneClicked,
                             )
                         },
-                        trailingIcon = {
+                        trailingContent = {
                             SearchBarTrailingIcons(
                                 text = searchText,
                                 searchState = searchState,
@@ -267,7 +267,7 @@ fun TranscriptToolbar(
                         placeholder = stringResource(LR.string.search),
                         onTextChanged = onSearchQueryChanged,
                         onSearch = {},
-                        cornerRadius = SearchViewCornerRadius,
+                        cornerRadius = 16.dp,
                         modifier = Modifier
                             .width(SearchBarMaxWidth)
                             .height(SearchBarHeight)

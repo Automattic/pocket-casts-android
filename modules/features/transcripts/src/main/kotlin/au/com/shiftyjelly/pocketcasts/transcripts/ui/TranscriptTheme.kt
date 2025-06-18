@@ -12,12 +12,13 @@ import au.com.shiftyjelly.pocketcasts.compose.ThemeColors
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.R
 
-data class TranscriptTheme(
+internal data class TranscriptTheme(
     val background: Color,
     val text: Color,
     val secondaryElement: Color,
     val searchDefaultSpanStyle: SpanStyle,
     val searchHighlightSpanStyle: SpanStyle,
+    val toolbarColors: ToolbarColors,
 ) {
     companion object {
         internal val RobotoSerifFontFamily = FontFamily(Font(R.font.roboto_serif))
@@ -34,6 +35,7 @@ data class TranscriptTheme(
                 background = colors.primaryText01,
                 color = colors.primaryUi01,
             ),
+            toolbarColors = ToolbarColors.default(colors),
         )
 
         fun player(colors: PlayerColors) = TranscriptTheme(
@@ -48,12 +50,13 @@ data class TranscriptTheme(
                 background = Color.White,
                 color = Color.Black,
             ),
+            toolbarColors = ToolbarColors.player(colors),
         )
     }
 }
 
 @Composable
-fun rememberTranscriptTheme(): TranscriptTheme {
+internal fun rememberTranscriptTheme(): TranscriptTheme {
     val theme = MaterialTheme.theme
     val playerColors = theme.rememberPlayerColors()
 
