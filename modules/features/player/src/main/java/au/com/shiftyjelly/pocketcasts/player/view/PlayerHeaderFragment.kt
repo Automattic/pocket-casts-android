@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
@@ -69,6 +70,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedNonNullVisibili
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
+import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterPlayerHeaderBinding
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivity
@@ -182,6 +184,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                     val playerColors = MaterialTheme.theme.rememberPlayerColorsOrDefault()
 
                     Box(
+                        contentAlignment = Alignment.TopCenter,
                         modifier = Modifier
                             .background(playerColors.background01)
                             .fillMaxSize()
@@ -191,7 +194,9 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                             visible = { it },
                             enter = transcriptEnterTransition,
                             exit = transcriptExitTransition,
-                            modifier = Modifier.fillMaxSize(),
+                            modifier = Modifier
+                                .fillMaxWidth(fraction = ResourcesCompat.getFloat(resources, R.dimen.seekbar_width_percentage))
+                                .fillMaxHeight(),
                         ) {
                             TranscriptPage(
                                 uiState = transcriptUiState,
@@ -211,7 +216,17 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                                     transcriptViewModel.track(AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_SUBSCRIBE_TAPPED)
                                     OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.Upsell(OnboardingUpgradeSource.GENERATED_TRANSCRIPTS))
                                 },
-                                modifier = Modifier.fillMaxWidth(fraction = ResourcesCompat.getFloat(resources, R.dimen.seekbar_width_percentage)),
+                                onShowTranscript = { transcript ->
+                                    val properties = mapOf(
+                                        "type" to transcript.type.analyticsValue,
+                                        "show_as_webpage" to (transcript is Transcript.Web),
+                                    )
+                                    transcriptViewModel.track(AnalyticsEvent.TRANSCRIPT_SHOWN, properties)
+                                },
+                                onShowTransciptPaywall = {
+                                    transcriptViewModel.track(AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_SHOWN)
+                                },
+                                modifier = Modifier.padding(horizontal = 16.dp),
                             )
                         }
                         Column(
@@ -448,14 +463,16 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     private fun observeTranscriptPageTransition() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                var wasTranscriptOpen = shelfSharedViewModel.isTranscriptOpen.value
+
                 shelfSharedViewModel.isTranscriptOpen.collect { isTranscriptOpen ->
                     val uiState = transcriptViewModel.uiState.value
 
-                    if (isTranscriptOpen) {
+                    if (!wasTranscriptOpen && isTranscriptOpen) {
                         val containerFragment = parentFragment as? PlayerContainerFragment
                         containerFragment?.updateTabsVisibility(false)
                         binding?.root?.setScrollingEnabled(false)
-                    } else {
+                    } else if (wasTranscriptOpen && !isTranscriptOpen) {
                         val event = if (uiState.isPaywallVisible) {
                             AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_DISMISSED
                         } else {
@@ -466,6 +483,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                         containerFragment?.updateTabsVisibility(true)
                         binding?.root?.setScrollingEnabled(true)
                     }
+                    wasTranscriptOpen = isTranscriptOpen
                 }
             }
         }

@@ -22,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.transcripts.TranscriptState
 import au.com.shiftyjelly.pocketcasts.transcripts.UiState
 import au.com.shiftyjelly.pocketcasts.utils.search.SearchCoordinates
+import kotlinx.coroutines.delay
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -36,6 +37,8 @@ fun TranscriptPage(
     onShowSearchBar: () -> Unit,
     onHideSearchBar: () -> Unit,
     onClickSubscribe: () -> Unit,
+    onShowTranscript: (Transcript) -> Unit,
+    onShowTransciptPaywall: (Transcript) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
@@ -87,19 +90,12 @@ fun TranscriptPage(
         searchCoordinates = uiState.searchState.matches.selectedCoordinate,
         listState = listState,
     )
-}
 
-@Composable
-private fun ScrollToItemEffect(
-    searchCoordinates: SearchCoordinates?,
-    listState: LazyListState,
-) {
-    val scrollOffset = LocalDensity.current.run { 64.dp.roundToPx() }
-    if (searchCoordinates != null) {
-        LaunchedEffect(searchCoordinates) {
-            listState.animateScrollToItem(searchCoordinates.line, -scrollOffset)
-        }
-    }
+    ShowTranscriptEffect(
+        uiState = uiState,
+        onShowTranscript = onShowTranscript,
+        onShowTransciptPaywall = onShowTransciptPaywall,
+    )
 }
 
 @Composable
@@ -155,6 +151,54 @@ private fun TranscriptContent(
                 colors = theme.failureColors,
                 modifier = modifier.fillMaxSize(),
             )
+        }
+    }
+}
+
+@Composable
+private fun ScrollToItemEffect(
+    searchCoordinates: SearchCoordinates?,
+    listState: LazyListState,
+) {
+    val scrollOffset = LocalDensity.current.run { 64.dp.roundToPx() }
+    if (searchCoordinates != null) {
+        LaunchedEffect(searchCoordinates) {
+            listState.animateScrollToItem(searchCoordinates.line, -scrollOffset)
+        }
+    }
+}
+
+@Composable
+private fun ShowTranscriptEffect(
+    uiState: UiState,
+    onShowTranscript: (Transcript) -> Unit,
+    onShowTransciptPaywall: (Transcript) -> Unit,
+) {
+    val transcript = (uiState.transcriptState as? TranscriptState.Loaded)?.transcript
+    if (transcript != null) {
+        val isPaywallVisible = uiState.isPaywallVisible
+        LaunchedEffect(transcript, isPaywallVisible, onShowTranscript, onShowTransciptPaywall) {
+            // This delay is necessary due to how transcript loading works in the player.
+            //
+            // We trigger the page open animation and transcript loading at the same time.
+            // This means that the callbacks from this effect can be invoked with
+            // lingering state from the previously shown transcript, followed by
+            // the new incoming state. This can result in issues such as analytics overreporting.
+            //
+            // Since loading happens almost immediately when the page opens,
+            // adding a small delay prevents the situation described above,
+            // because the effect will be cancelled before it runs.
+            //
+            // We could potentially clear the transcript state after
+            // closing the page, but this would trigger animations,
+            // resulting in a flicker-like visual experience.
+            delay(100)
+
+            if (isPaywallVisible) {
+                onShowTransciptPaywall(transcript)
+            } else {
+                onShowTranscript(transcript)
+            }
         }
     }
 }
