@@ -694,7 +694,7 @@ class EpisodeManagerImpl @Inject constructor(
     }
 
     override suspend fun findStaleDownloads(): List<PodcastEpisode> {
-        return episodeDao.findStaleDownloads()
+        return episodeDao.findNotFinishedDownloads()
     }
 
     override fun unarchiveBlocking(episode: BaseEpisode) {
