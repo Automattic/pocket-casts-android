@@ -23,7 +23,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import java.time.Instant
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.reactive.asFlow
+import kotlinx.coroutines.reactive.awaitFirstOrNull
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 @HiltWorker
@@ -62,8 +62,7 @@ class NotificationWorker @AssistedInject constructor(
     private suspend fun shouldSchedule(type: NotificationType): Boolean {
         return when (type) {
             is TrendingAndRecommendationsNotificationType.Recommendations -> {
-                val isSignedIn = userManager.getSignInState().map { it.isSignedIn }.asFlow().firstOrNull()
-                isSignedIn ?: false
+                userManager.getSignInState().awaitFirstOrNull()?.isSignedIn == true
             }
             is NewFeaturesAndTipsNotificationType.SmartFolders -> {
                 suggestedFoldersManager.refreshSuggestedFolders()

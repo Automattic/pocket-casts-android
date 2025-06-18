@@ -163,9 +163,9 @@ class NotificationSchedulerImpl @Inject constructor(
         WorkManager.getInstance(context).cancelAllWorkByTag(TAG_OFFERS)
     }
 
-    override fun cancelScheduledWorksByTag(list: List<String>) {
+    override fun cancelScheduledWorksByTag(tags: List<String>) {
         with(WorkManager.getInstance(context)) {
-            list.forEach {
+            tags.forEach {
                 cancelAllWorkByTag(it)
             }
         }
