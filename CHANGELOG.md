@@ -14,6 +14,8 @@
         ([#4103](https://github.com/Automattic/pocket-casts-android/pull/4103))
     *   Specify what files to be backed up on Android 12 and up
         ([#4119](https://github.com/Automattic/pocket-casts-android/pull/4119))
+    *   Fix podcast selector overlapping system status bar on auto add to up next podcast selector
+        ([#4132](https://github.com/Automattic/pocket-casts-android/pull/4132))
     *   Fix downloading episodes after backup and restore
         ([#4130](https://github.com/Automattic/pocket-casts-android/pull/4130))
 
