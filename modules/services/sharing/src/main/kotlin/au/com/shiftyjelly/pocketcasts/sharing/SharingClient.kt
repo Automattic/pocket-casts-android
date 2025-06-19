@@ -626,7 +626,7 @@ data class SharingRequest internal constructor(
             override val podcast = null
 
             override fun toString() = "EoYHackStory file=$screenshot"
-            }
+        }
 
         class EndOfYearStory internal constructor(
             val story: Story,

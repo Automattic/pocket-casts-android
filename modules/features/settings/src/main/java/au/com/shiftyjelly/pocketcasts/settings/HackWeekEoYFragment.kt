@@ -5,13 +5,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.webkit.WebView
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.fragment.compose.content
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
@@ -20,11 +24,12 @@ import au.com.shiftyjelly.pocketcasts.sharing.SharingClient
 import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
 import au.com.shiftyjelly.pocketcasts.ui.extensions.setupKeyboardModePan
 import au.com.shiftyjelly.pocketcasts.ui.extensions.setupKeyboardModeResize
+import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class HackWeekEoYFragment : BaseFragment(), HasBackstack {
@@ -35,12 +40,20 @@ class HackWeekEoYFragment : BaseFragment(), HasBackstack {
 
     @Inject lateinit var sharingClient: SharingClient
 
+    @Inject lateinit var settings: Settings
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = content {
         val coroutineScope = rememberCoroutineScope()
+
+        val bottomPadding by settings.bottomInset.collectAsState(0)
+        val miniPlayerPadding = bottomPadding.pxToDp(LocalContext.current).dp
+
+        val basePadding = 16.dp
+        val totalPadding = basePadding + miniPlayerPadding
 
         AppThemeWithBackground(theme.activeTheme) {
             HackWeekEoYPage(
@@ -65,7 +78,7 @@ class HackWeekEoYFragment : BaseFragment(), HasBackstack {
                 onWebViewCreated = { webView = it },
                 onWebViewDisposed = { webView = null },
                 modifier = Modifier.fillMaxSize()
-                    .background(color = Color.Cyan)
+                    .padding(bottom = totalPadding),
             )
         }
     }

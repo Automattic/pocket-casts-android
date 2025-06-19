@@ -26,11 +26,11 @@ import androidx.core.graphics.createBitmap
 import com.kevinnzou.web.AccompanistWebViewClient
 import com.kevinnzou.web.WebView
 import com.kevinnzou.web.rememberWebViewState
+import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.io.File
 
 @Composable
 internal fun HackWeekEoYPage(
@@ -57,7 +57,7 @@ internal fun HackWeekEoYPage(
                 .zIndex(1f),
             client = remember {
                 WebViewClient(
-                    onPageLoaded = { isWebViewLoading = false }
+                    onPageLoaded = { isWebViewLoading = false },
                 )
             },
             onCreated = { webView ->
@@ -72,7 +72,7 @@ internal fun HackWeekEoYPage(
                             when (it) {
                                 EoYWebMessage.Loaded -> webView.evaluateJavascript(
                                     "window.setUserData({subscriber: ${isSubscribedCallback()}});",
-                                    null
+                                    null,
                                 )
 
                                 EoYWebMessage.Close -> onGoBack()
@@ -81,11 +81,11 @@ internal fun HackWeekEoYPage(
                             }
                         }
                     },
-                    "Android"
+                    "Android",
                 )
                 onWebViewCreated(webView)
             },
-            onDispose = onWebViewDisposed
+            onDispose = onWebViewDisposed,
         )
         AnimatedVisibility(
             visible = isWebViewLoading,
@@ -144,7 +144,6 @@ private class EoYJavascriptInterface(
         onMessageReceived(EoYWebMessage.Close)
     }
 
-
     @JavascriptInterface
     fun shareStory(data: String?) {
         onMessageReceived(EoYWebMessage.ShareStory(data))
@@ -157,7 +156,7 @@ private class EoYJavascriptInterface(
 }
 
 private class WebViewClient(
-    val onPageLoaded: () -> Unit
+    val onPageLoaded: () -> Unit,
 ) : AccompanistWebViewClient() {
     override fun onReceivedHttpAuthRequest(view: WebView?, handler: HttpAuthHandler?, host: String?, realm: String?) {
         handler?.proceed("www-latest", "wjn3tbqwtf4CGMfgk1")
