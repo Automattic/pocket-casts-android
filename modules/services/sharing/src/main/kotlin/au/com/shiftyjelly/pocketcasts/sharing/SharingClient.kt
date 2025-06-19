@@ -289,6 +289,21 @@ class SharingClient(
                 )
             }
         }
+
+        is SharingRequest.Data.EoYHackScreenshot -> {
+            Intent()
+                .setAction(Intent.ACTION_SEND)
+                .setType("image/png")
+                .setExtraStream(data.screenshot)
+                .addFlags(FLAG_GRANT_READ_URI_PERMISSION or FLAG_ACTIVITY_NEW_TASK)
+                .toChooserIntent()
+                .share()
+            SharingResponse(
+                isSuccsessful = true,
+                feedbackMessage = null,
+                error = null,
+            )
+        }
     }
 
     private fun Intent.share() {
@@ -410,6 +425,10 @@ data class SharingRequest internal constructor(
             .setAnalyticsEvent(AnalyticsEvent.END_OF_YEAR_STORY_SHARE)
             .addAnalyticsProperty("story", story.analyticsValue)
             .addAnalyticsProperty("year", year.value)
+
+        fun hackEoYScreenshot(
+            screenshot: File,
+        ) = Builder(Data.EoYHackScreenshot(screenshot = screenshot))
     }
 
     class Builder internal constructor(
@@ -477,6 +496,7 @@ data class SharingRequest internal constructor(
             is Data.ClipVideo -> "clip_video"
             is Data.ReferralLink -> "referral_link"
             is Data.EndOfYearStory -> "end_of_year_story"
+            is Data.EoYHackScreenshot -> "hack_eoy_screenshot"
         }
 
         private val SocialPlatform.analyticsValue get() = when (this) {
@@ -599,6 +619,14 @@ data class SharingRequest internal constructor(
 
             override fun toString() = "ReferralLink(referralCode=$referralCode"
         }
+
+        class EoYHackScreenshot internal constructor(
+            val screenshot: File,
+        ) : Data {
+            override val podcast = null
+
+            override fun toString() = "EoYHackStory file=$screenshot"
+            }
 
         class EndOfYearStory internal constructor(
             val story: Story,
