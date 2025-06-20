@@ -731,7 +731,6 @@ enum class AnalyticsEvent(val key: String) {
     /* Transcripts */
     TRANSCRIPT_SHOWN("transcript_shown"),
     TRANSCRIPT_DISMISSED("transcript_dismissed"),
-    TRANSCRIPT_PULLED_TO_REFRESH("transcript_pulled_to_refresh"),
     TRANSCRIPT_ERROR("transcript_error"),
     TRANSCRIPT_SEARCH_SHOWN("transcript_search_shown"),
     TRANSCRIPT_SEARCH_NEXT_RESULT("transcript_search_next_result"),

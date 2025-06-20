@@ -12,6 +12,8 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
+import au.com.shiftyjelly.pocketcasts.compose.ad.BlazeAd
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -41,6 +43,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jakewharton.rxrelay2.BehaviorRelay
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -61,8 +65,17 @@ import kotlin.time.toDuration
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asObservable
 import kotlinx.coroutines.withContext
@@ -256,8 +269,21 @@ class PlayerViewModel @Inject constructor(
     private val _snackbarMessages = MutableSharedFlow<SnackbarMessage>()
     val snackbarMessages = _snackbarMessages.asSharedFlow()
 
-    var episode: BaseEpisode? = null
-    var podcast: Podcast? = null
+    private val _episodeFlow = MutableStateFlow<BaseEpisode?>(null)
+    val episodeFlow = _episodeFlow.asStateFlow()
+    var episode: BaseEpisode?
+        get() = _episodeFlow.value
+        set(value) {
+            _episodeFlow.value = value
+        }
+
+    private val _podcastFlow = MutableStateFlow<Podcast?>(null)
+    val podcastFlow = _podcastFlow.asStateFlow()
+    var podcast: Podcast?
+        get() = _podcastFlow.value
+        set(value) {
+            _podcastFlow.value = value
+        }
 
     val isSleepRunning = MutableLiveData<Boolean>().apply { postValue(false) }
     val isSleepAtEndOfEpisodeOrChapter = MutableLiveData<Boolean>().apply { postValue(false) }
@@ -285,6 +311,28 @@ class PlayerViewModel @Inject constructor(
             return settings.getSleepTimerCustomMins()
         }
     val playerFlow = playbackManager.playerFlow
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val activeAds = combine(
+        settings.cachedSubscription.flow,
+        FeatureFlag.isEnabledFlow(Feature.BANNER_ADS),
+        ::Pair,
+    ).flatMapLatest { (subscription, isEnabled) ->
+        if (isEnabled && subscription == null) {
+            val mockAd = BlazeAd(
+                id = "ad-id",
+                title = "wordpress.com",
+                ctaText = "Democratize publishing and eCommerce one website at a time.",
+                ctaUrl = "https://wordpress.com/",
+                imageUrl = "https://s.w.org/style/images/about/WordPress-logotype-wmark-white.png",
+            )
+            flow {
+                emit(listOf(mockAd))
+            }
+        } else {
+            flowOf(emptyList())
+        }
+    }.stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = emptyList())
 
     fun setSleepEndOfChapters(chapters: Int = 1, shouldCallUpdateTimer: Boolean = true) {
         val newValue = chapters.coerceIn(1, 240)
@@ -494,23 +542,17 @@ class PlayerViewModel @Inject constructor(
         }
     }
 
-    fun buildBookmarkArguments(onSuccess: (BookmarkArguments) -> Unit) {
-        val episode = episode ?: return
+    suspend fun createBookmarkArguments(): BookmarkArguments? {
+        val episode = episode ?: return null
         val timeSecs = playbackPositionMs / 1000
-        launch {
-            val bookmark = bookmarkManager.findByEpisodeTime(episode, timeSecs)
-            val podcast = podcast
-            val backgroundColor = if (podcast == null) 0xFF000000.toInt() else theme.playerBackgroundColor(podcast)
-            val tintColor = if (podcast == null) 0xFFFFFFFF.toInt() else theme.playerHighlightColor(podcast)
-            val arguments = BookmarkArguments(
-                bookmarkUuid = bookmark?.uuid,
-                episodeUuid = episode.uuid,
-                timeSecs = timeSecs,
-                backgroundColor = backgroundColor,
-                tintColor = tintColor,
-            )
-            onSuccess(arguments)
-        }
+        val bookmark = bookmarkManager.findByEpisodeTime(episode, timeSecs)
+        val podcast = podcast
+        return BookmarkArguments(
+            bookmarkUuid = bookmark?.uuid,
+            episodeUuid = episode.uuid,
+            timeSecs = timeSecs,
+            podcastColors = podcast?.let(::PodcastColors) ?: PodcastColors.ForUserEpisode,
+        )
     }
 
     fun handleDownloadClickFromPlaybackActions(onDeleteStart: () -> Unit, onDownloadStart: () -> Unit) {

@@ -9,39 +9,38 @@ import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 
-object IconButtonDefaults {
-    val RippleRadius = 20.dp
-    val ComponentSize: DpSize = DpSize(32.dp, 32.dp)
-}
-
 @Composable
 fun IconButtonSmall(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    interactionSource: MutableInteractionSource? = null,
     content: @Composable () -> Unit,
 ) {
     Box(
         modifier = modifier
-            .size(IconButtonDefaults.ComponentSize)
+            .size(IconButtonDefaults.Size)
             .clickable(
                 onClick = onClick,
                 enabled = enabled,
                 role = Role.Button,
                 interactionSource = interactionSource,
-                indication = ripple(bounded = false, radius = IconButtonDefaults.RippleRadius),
+                indication = IconButtonDefaults.Ripple,
             ),
         contentAlignment = Alignment.Center,
     ) {
         val contentAlpha = if (enabled) LocalContentAlpha.current else ContentAlpha.disabled
         CompositionLocalProvider(LocalContentAlpha provides contentAlpha, content = content)
     }
+}
+
+private object IconButtonDefaults {
+    val Size: DpSize = DpSize(32.dp, 32.dp)
+    val Ripple = ripple(bounded = false, radius = 20.dp)
 }

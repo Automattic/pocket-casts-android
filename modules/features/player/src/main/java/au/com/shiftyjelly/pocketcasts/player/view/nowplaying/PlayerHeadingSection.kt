@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.player.view.nowplaying
 
-import android.content.res.Resources
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,7 +31,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -45,13 +43,12 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.map
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.PlayerColors
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralMinutes
-import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralSeconds
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.to.ChapterSummaryData
 import au.com.shiftyjelly.pocketcasts.player.R
@@ -59,20 +56,19 @@ import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.TransitionState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import kotlin.time.Duration
-import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun PlayerHeadingSection(
+    playerColors: PlayerColors,
     playerViewModel: PlayerViewModel,
     shelfSharedViewModel: ShelfSharedViewModel,
+    modifier: Modifier = Modifier,
 ) {
-    val state by playerViewModel.listDataLive
-        .map {
+    val state by remember {
+        playerViewModel.listDataLive.map {
             PlayerHeadingSectionState(
-                theme = it.podcastHeader.theme,
                 episodeUuid = it.podcastHeader.episodeUuid,
                 title = it.podcastHeader.title,
                 podcastUuid = it.podcastHeader.podcastUuid,
@@ -85,16 +81,19 @@ fun PlayerHeadingSection(
                 isLastChapter = it.podcastHeader.isLastChapter,
             )
         }
-        .observeAsState(PlayerHeadingSectionState())
+    }.observeAsState(PlayerHeadingSectionState())
+
     var disableAccessibility by remember { mutableStateOf(false) }
 
     Content(
         state = state,
         disableAccessibility = disableAccessibility,
+        playerColors = playerColors,
         onPreviousChapterClick = { playerViewModel.onPreviousChapterClick() },
         onNextChapterClick = { playerViewModel.onNextChapterClick() },
         onChapterTitleClick = { playerViewModel.onChapterTitleClick(it) },
         onPodcastTitleClick = { playerViewModel.onPodcastTitleClick(state.episodeUuid, state.podcastUuid) },
+        modifier = modifier,
     )
 
     LaunchedEffect(Unit) {
@@ -113,12 +112,14 @@ private fun Content(
     onNextChapterClick: () -> Unit,
     onChapterTitleClick: (Chapter) -> Unit,
     onPodcastTitleClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    playerColors: PlayerColors = MaterialTheme.theme.rememberPlayerColorsOrDefault(),
 ) {
     CompositionLocalProvider(
         LocalRippleConfiguration provides RippleConfiguration(Color.White, RippleDefaults.rippleAlpha(Color.White, true)),
     ) {
         Column(
-            modifier = Modifier
+            modifier = modifier
                 .padding(horizontal = 8.dp)
                 .then(
                     if (disableAccessibility) {
@@ -152,7 +153,7 @@ private fun Content(
                 ) {
                     TextH30(
                         text = state.title,
-                        color = Color(ThemeColor.playerContrast01(state.theme)),
+                        color = playerColors.contrast01,
                         textAlign = TextAlign.Center,
                         maxLines = 2,
                         modifier = Modifier
@@ -198,7 +199,7 @@ private fun Content(
                 if (state.isChaptersPresent) {
                     val timeRemainingContentDescription = stringResource(
                         LR.string.chapter_time_remaining_content_description,
-                        formatTimeRemainingContentDescription(state.chapterTimeRemaining, LocalContext.current.resources),
+                        formatTimeRemainingContentDescription(state.chapterTimeRemaining),
                     )
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -228,18 +229,14 @@ private fun Content(
 @Composable
 private fun formatTimeRemainingContentDescription(
     chapterTimeRemaining: String,
-    resources: Resources,
-) = try {
+) = runCatching {
     val duration = Duration.parse(chapterTimeRemaining)
     when {
-        duration.inWholeMinutes > 0 -> resources.getStringPluralMinutes(duration.inWholeMinutes.toInt())
-        duration.inWholeSeconds > 0 -> resources.getStringPluralSeconds(duration.inWholeSeconds.toInt())
-        else -> chapterTimeRemaining
+        duration.inWholeHours > 0 -> pluralStringResource(LR.plurals.hour, duration.inWholeHours.toInt())
+        duration.inWholeMinutes > 0 -> pluralStringResource(LR.plurals.minute, duration.inWholeMinutes.toInt())
+        else -> pluralStringResource(LR.plurals.second, duration.inWholeSeconds.toInt())
     }
-} catch (e: IllegalArgumentException) {
-    Timber.e(e)
-    chapterTimeRemaining
-}
+}.getOrElse { chapterTimeRemaining }
 
 @Composable
 private fun ChapterPreviousButton(
@@ -292,8 +289,7 @@ private fun ChapterNextButtonWithChapterProgressCircle(
     }
 }
 
-data class PlayerHeadingSectionState(
-    val theme: Theme.ThemeType = Theme.ThemeType.DARK,
+private data class PlayerHeadingSectionState(
     val episodeUuid: String = "",
     val title: String = "",
     val podcastUuid: String? = null,
@@ -314,7 +310,6 @@ private fun PlayerHeadingSectionPreview(
     AppTheme(themeType) {
         Content(
             state = PlayerHeadingSectionState(
-                theme = themeType,
                 title = "A very looooooooooooong episode title",
                 episodeUuid = "Episode UUID",
                 podcastTitle = "Podcast Title",
@@ -341,7 +336,6 @@ private fun PlayerHeadingSectionWithoutChapterPreview(
     AppTheme(themeType) {
         Content(
             state = PlayerHeadingSectionState(
-                theme = themeType,
                 title = "Episode title",
                 episodeUuid = "Episode UUID",
                 podcastTitle = "Podcast Title",

@@ -4,7 +4,6 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel.Companion.AnalyticsProp
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel.Companion.ERROR_MINIMUM_SHELF_ITEMS
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel.Companion.ERROR_SHELF_ITEM_INVALID_MOVE_POSITION
@@ -12,7 +11,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfRowItem
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptsManager
+import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import kotlin.collections.listOf
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -38,7 +37,7 @@ class ShelfViewModelTest {
     val coroutineRule = MainCoroutineRule()
 
     @Mock
-    private lateinit var transcriptsManager: TranscriptsManager
+    private lateinit var transcriptManager: TranscriptManager
 
     @Mock
     private lateinit var analyticsTracker: AnalyticsTracker
@@ -214,15 +213,14 @@ class ShelfViewModelTest {
         isEditable: Boolean = true,
     ) {
         val episodeId = "testEpisodeId"
-        val transcript = mock<Transcript>()
-        whenever(transcriptsManager.observeTranscriptForEpisode(episodeId)).thenReturn(flowOf(transcript))
+        whenever(transcriptManager.observeIsTranscriptAvailable(episodeId)).thenReturn(flowOf(true))
         val userSetting = mock<UserSetting<List<ShelfItem>>>()
         whenever(settings.shelfItems).thenReturn(userSetting)
 
         shelfViewModel = ShelfViewModel(
             episodeId = episodeId,
             isEditable = isEditable,
-            transcriptsManager = transcriptsManager,
+            transcriptManager = transcriptManager,
             analyticsTracker = analyticsTracker,
             settings = settings,
         )

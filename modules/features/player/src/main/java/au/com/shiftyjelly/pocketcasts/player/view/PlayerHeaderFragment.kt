@@ -1,9 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.player.view
 
-import android.animation.LayoutTransition
 import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.GestureDetector
 import android.view.LayoutInflater
@@ -11,19 +9,42 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateIntOffset
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.updateTransition
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInVertically
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.material.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.core.view.isInvisible
-import androidx.core.view.isVisible
-import androidx.core.view.marginTop
-import androidx.dynamicanimation.animation.SpringAnimation
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.res.ResourcesCompat
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -31,12 +52,23 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import au.com.shiftyjelly.pocketcasts.ads.AdReportFragment
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
+import au.com.shiftyjelly.pocketcasts.compose.PlayerColors
+import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
+import au.com.shiftyjelly.pocketcasts.compose.ad.AdBanner
+import au.com.shiftyjelly.pocketcasts.compose.ad.BlazeAd
+import au.com.shiftyjelly.pocketcasts.compose.ad.rememberAdColors
+import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedNonNullVisibility
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
-import au.com.shiftyjelly.pocketcasts.player.binding.setSeekBarState
+import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.models.to.Chapters
+import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterPlayerHeaderBinding
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivity
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContract
 import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.PlayerControls
 import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.PlayerHeadingSection
@@ -61,10 +93,9 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSourc
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
-import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog.ButtonType.Danger
-import au.com.shiftyjelly.pocketcasts.views.extensions.spring
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
@@ -80,6 +111,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.reactive.asFlow
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -118,70 +150,160 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val binding = binding ?: return
+        requireNotNull(binding).composeContent.setContentWithViewCompositionStrategy {
+            val headerData by remember { playerHeaderFlow() }.collectAsState(PlayerViewModel.PlayerHeader())
+            val podcastColors by remember { podcastColorsFlow() }.collectAsState(PodcastColors.ForUserEpisode)
+            val ads by viewModel.activeAds.collectAsState()
+            val visualsState by remember { playerVisualsStateFlow() }.collectAsState(PlayerVisualsState.Empty)
+            val player by viewModel.playerFlow.collectAsState()
 
-        binding.seekBar.changeListener = object : PlayerSeekBar.OnUserSeekListener {
-            override fun onSeekPositionChangeStop(progress: Duration, seekComplete: () -> Unit) {
-                val progressMs = progress.inWholeMilliseconds.toInt()
-                viewModel.seekToMs(progressMs, seekComplete)
-                playbackManager.trackPlaybackSeek(progressMs, SourceView.PLAYER)
+            val transcriptTransitionState by shelfSharedViewModel.transitionState.collectAsState(TransitionState.CloseTranscript)
+            val showPlayerTransition = updateTransition(transcriptTransitionState is TransitionState.CloseTranscript)
+            val playerElementsAlpha by showPlayerTransition.animateFloat { showPlayer ->
+                if (showPlayer) 1f else 0f
             }
-
-            override fun onSeekPositionChanging(progress: Duration) {}
-
-            override fun onSeekPositionChangeStart() {
+            val playbackButtonsScale by showPlayerTransition.animateFloat { showPlayer ->
+                if (showPlayer) 1f else 0.6f
             }
-        }
+            val controlsOffsetValue = LocalDensity.current.run { 64.dp.roundToPx() }
+            val controlsOffset by showPlayerTransition.animateIntOffset { showPlayer ->
+                if (showPlayer) IntOffset.Zero else IntOffset(x = 0, y = controlsOffsetValue)
+            }
+            val showPlayerControls = when (val state = transcriptTransitionState) {
+                is TransitionState.CloseTranscript -> true
+                is TransitionState.OpenTranscript -> state.showPlayerControls
+            }
+            val seekBarOffset = controlsOffset * 0.9f
 
-        setupArtworkSectionComposeView()
-        setupPlayerHeadingSectionComposeView()
-        setupPlayerControlsComposeView()
-        setupShelfComposeView()
+            AppTheme(theme.activeTheme) {
+                CompositionLocalProvider(LocalPodcastColors provides podcastColors) {
+                    val playerColors = MaterialTheme.theme.rememberPlayerColorsOrDefault()
 
-        setupTranscriptPage()
-        observeTranscriptPageTransition()
-
-        setupUpNextDrag(binding)
-
-        viewModel.listDataLive.observe(viewLifecycleOwner) {
-            val headerViewModel = it.podcastHeader
-
-            binding.seekBar.setSeekBarState(
-                duration = headerViewModel.durationMs.milliseconds,
-                position = headerViewModel.positionMs.milliseconds,
-                chapters = headerViewModel.chapters,
-                playbackSpeed = headerViewModel.playbackEffects.playbackSpeed,
-                adjustDuration = headerViewModel.adjustRemainingTimeDuration,
-                tintColor = headerViewModel.iconTintColor,
-                bufferedUpTo = headerViewModel.bufferedUpToMs,
-                isBuffering = headerViewModel.isBuffering,
-                theme = headerViewModel.theme,
-            )
-
-            binding.playerGroup.setBackgroundColor(headerViewModel.backgroundColor)
-            binding.seekBar.setSeekBarState(
-                duration = headerViewModel.durationMs.milliseconds,
-                position = headerViewModel.positionMs.milliseconds,
-                chapters = headerViewModel.chapters,
-                playbackSpeed = headerViewModel.playbackEffects.playbackSpeed,
-                adjustDuration = headerViewModel.adjustRemainingTimeDuration,
-                tintColor = headerViewModel.iconTintColor,
-                bufferedUpTo = headerViewModel.bufferedUpToMs,
-                isBuffering = headerViewModel.isBuffering,
-                theme = headerViewModel.theme,
-            )
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.snackbarMessages.collect { message ->
-                    if (message == PlayerViewModel.SnackbarMessage.ShowBatteryWarningIfAppropriate) {
-                        warningsHelper.showBatteryWarningSnackbarIfAppropriate(snackbarParentView = view)
+                    Box(
+                        modifier = Modifier
+                            .background(playerColors.background01)
+                            .fillMaxSize()
+                            .padding(16.dp),
+                    ) {
+                        AnimatedVisibility(
+                            visible = transcriptTransitionState is TransitionState.OpenTranscript,
+                            enter = transcriptEnterTransition,
+                            exit = transcriptExitTransition,
+                            modifier = Modifier.fillMaxSize(),
+                        ) {
+                            TranscriptPageWrapper(
+                                transitionState = transcriptTransitionState,
+                                shelfSharedViewModel = shelfSharedViewModel,
+                                transcriptViewModel = transcriptViewModel,
+                                searchViewModel = transcriptSearchViewModel,
+                                onClickSubscribe = {
+                                    transcriptViewModel.track(AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_SUBSCRIBE_TAPPED)
+                                    OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.Upsell(OnboardingUpgradeSource.GENERATED_TRANSCRIPTS))
+                                },
+                                modifier = Modifier.fillMaxSize(),
+                            )
+                        }
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxWidth()
+                                    .alpha(playerElementsAlpha),
+                            ) {
+                                if (showPlayerTransition.targetState) {
+                                    AnimatedNonNullVisibility(
+                                        item = ads.firstOrNull(),
+                                        enter = adEnterTransition,
+                                        exit = adExitTransition,
+                                    ) { ad ->
+                                        AdBanner(
+                                            ad = ad,
+                                            colors = rememberAdColors().bannerAd,
+                                            onAdClick = { openAd(ad) },
+                                            onOptionsClick = { openAdReportSheet(ad, podcastColors) },
+                                        )
+                                    }
+                                    PlayerVisuals(
+                                        state = visualsState,
+                                        player = player,
+                                        onChapterUrlClick = viewModel::onChapterUrlClick,
+                                        configureVideoView = { videoView ->
+                                            videoView.setOnClickListener { onFullScreenVideoClick() }
+                                        },
+                                    )
+                                }
+                            }
+                            if (showPlayerTransition.targetState) {
+                                PlayerHeadingSection(
+                                    playerColors = playerColors,
+                                    playerViewModel = viewModel,
+                                    shelfSharedViewModel = shelfSharedViewModel,
+                                    modifier = Modifier.alpha(playerElementsAlpha),
+                                )
+                            }
+                            AnimatedVisibility(
+                                visible = showPlayerControls,
+                                modifier = Modifier.fillMaxWidth(),
+                            ) {
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                ) {
+                                    PlayerSeekBar(
+                                        playbackPosition = headerData.positionMs.milliseconds,
+                                        playbackDuration = headerData.durationMs.milliseconds,
+                                        adjustPlaybackDuration = headerData.adjustRemainingTimeDuration,
+                                        playbackSpeed = headerData.playbackEffects.playbackSpeed,
+                                        chapters = headerData.chapters,
+                                        isBuffering = headerData.isBuffering,
+                                        bufferedUpTo = headerData.bufferedUpToMs.milliseconds,
+                                        playerColors = playerColors,
+                                        onSeekToPosition = { progress, onSeekComplete ->
+                                            val progressMs = progress.inWholeMilliseconds.toInt()
+                                            viewModel.seekToMs(progressMs, onSeekComplete)
+                                            playbackManager.trackPlaybackSeek(progressMs, SourceView.PLAYER)
+                                        },
+                                        modifier = Modifier
+                                            .fillMaxWidth(fraction = ResourcesCompat.getFloat(resources, R.dimen.seekbar_width_percentage))
+                                            .offset { seekBarOffset },
+                                    )
+                                    PlayerControls(
+                                        playerColors = playerColors,
+                                        playerViewModel = viewModel,
+                                        modifier = Modifier
+                                            .scale(playbackButtonsScale)
+                                            .offset { controlsOffset },
+                                    )
+                                }
+                            }
+                            AnimatedVisibility(
+                                visible = showPlayerTransition.targetState,
+                                enter = shelfEnterTransition,
+                                exit = shelfExitTransition,
+                            ) {
+                                PlayerShelf(
+                                    playerColors = playerColors,
+                                    shelfSharedViewModel = shelfSharedViewModel,
+                                    playerViewModel = viewModel,
+                                )
+                            }
+                        }
                     }
                 }
             }
         }
 
+        observeNavigationState()
+        observeShelfItemNavigationState()
+        observeTranscriptPageTransition()
+        observeSnackbarMessages()
+        setupUpNextDrag()
+    }
+
+    private fun observeNavigationState() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.navigationState.collect { navigationState ->
@@ -209,7 +331,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                         is PlayerViewModel.NavigationState.OpenChapterUrl -> {
                             val chapterUrl = navigationState.chapterUrl
                             val intent = Intent(Intent.ACTION_VIEW)
-                            intent.data = Uri.parse(chapterUrl)
+                            intent.data = chapterUrl.toUri()
                             try {
                                 startActivity(intent)
                             } catch (e: ActivityNotFoundException) {
@@ -218,85 +340,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                             }
                         }
                     }
-                }
-            }
-        }
-    }
-
-    private fun setupArtworkSectionComposeView() {
-        binding?.artworkSectionComposeView?.setContentWithViewCompositionStrategy {
-            val state by remember { playerVisualsStateFlow() }.collectAsState(PlayerVisualsState.Empty)
-            val player by viewModel.playerFlow.collectAsState()
-
-            AppTheme(theme.activeTheme) {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier.padding(16.dp),
-                ) {
-                    PlayerVisuals(
-                        state = state,
-                        player = player,
-                        onChapterUrlClick = viewModel::onChapterUrlClick,
-                        configureVideoView = { videoView ->
-                            videoView.setOnClickListener { onFullScreenVideoClick() }
-                        },
-                    )
-                }
-            }
-        }
-    }
-
-    private fun setupPlayerHeadingSectionComposeView() {
-        binding?.playerHeadingSectionComposeView?.setContentWithViewCompositionStrategy {
-            AppTheme(theme.activeTheme) {
-                PlayerHeadingSection(
-                    playerViewModel = viewModel,
-                    shelfSharedViewModel = shelfSharedViewModel,
-                )
-            }
-        }
-    }
-
-    private fun setupPlayerControlsComposeView() {
-        binding?.playerControlsComposeView?.setContentWithViewCompositionStrategy {
-            AppTheme(theme.activeTheme) {
-                PlayerControls(
-                    playerViewModel = viewModel,
-                )
-            }
-        }
-    }
-
-    private fun setupShelfComposeView() {
-        binding?.shelfComposeView?.setContentWithViewCompositionStrategy {
-            AppTheme(theme.activeTheme) {
-                PlayerShelf(
-                    theme = theme,
-                    shelfSharedViewModel = shelfSharedViewModel,
-                    transcriptViewModel = transcriptViewModel,
-                    playerViewModel = viewModel,
-                )
-                LaunchedEffect(Unit) {
-                    observeShelfItemNavigationState()
-                }
-                LaunchedEffect(Unit) {
-                    observeShelfItemSnackbarMessages()
-                }
-            }
-        }
-    }
-
-    private fun observeShelfItemSnackbarMessages() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                shelfSharedViewModel.snackbarMessages.collect { message ->
-                    val text = when (message) {
-                        SnackbarMessage.EpisodeDownloadStarted -> LR.string.episode_queued_for_download
-                        SnackbarMessage.EpisodeRemoved -> LR.string.episode_was_removed
-                        SnackbarMessage.TranscriptNotAvailable -> LR.string.transcript_error_not_available
-                        SnackbarMessage.ShareNotAvailable -> LR.string.sharing_is_not_available_for_private_podcasts
-                    }
-                    showSnackBar(text = getString(text))
                 }
             }
         }
@@ -371,8 +414,9 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                         }
 
                         NavigationState.ShowAddBookmark -> {
-                            viewModel.buildBookmarkArguments { arguments ->
-                                activityLauncher.launch(arguments.getIntent(requireContext()))
+                            val bookmarkArguments = viewModel.createBookmarkArguments()
+                            if (bookmarkArguments != null) {
+                                activityLauncher.launch(BookmarkActivity.launchIntent(requireContext(), bookmarkArguments))
                             }
                         }
 
@@ -380,23 +424,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                     }
                 }
             }
-        }
-    }
-
-    private fun setupTranscriptPage() {
-        binding?.transcriptPage?.setContent {
-            TranscriptPageWrapper(
-                playerViewModel = viewModel,
-                shelfSharedViewModel = shelfSharedViewModel,
-                transcriptViewModel = transcriptViewModel,
-                searchViewModel = transcriptSearchViewModel,
-                theme = theme,
-                onClickSubscribe = {
-                    val uiState = transcriptViewModel.uiState.value
-                    transcriptViewModel.track(AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_SUBSCRIBE_TAPPED, uiState.podcastAndEpisode)
-                    OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.Upsell(OnboardingUpgradeSource.GENERATED_TRANSCRIPTS))
-                },
-            )
         }
     }
 
@@ -408,12 +435,9 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
                     when (transitionState) {
                         is TransitionState.OpenTranscript -> {
-                            if (uiState.showPaywall) {
-                                transcriptViewModel.track(AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_SHOWN, uiState.podcastAndEpisode)
-                            }
-                            binding?.openTranscript(
-                                hidePlayerControls = !transitionState.showPlayerControls,
-                            )
+                            val containerFragment = parentFragment as? PlayerContainerFragment
+                            containerFragment?.updateTabsVisibility(false)
+                            binding?.root?.setScrollingEnabled(false)
                         }
 
                         is TransitionState.CloseTranscript -> {
@@ -422,8 +446,10 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                             } else {
                                 AnalyticsEvent.TRANSCRIPT_DISMISSED
                             }
-                            transcriptViewModel.track(event, uiState.podcastAndEpisode)
-                            binding?.closeTranscript()
+                            transcriptViewModel.track(event)
+                            val containerFragment = parentFragment as? PlayerContainerFragment
+                            containerFragment?.updateTabsVisibility(true)
+                            binding?.root?.setScrollingEnabled(true)
                         }
                     }
                 }
@@ -431,55 +457,37 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         }
     }
 
-    private fun AdapterPlayerHeaderBinding.openTranscript(
-        hidePlayerControls: Boolean,
-    ) {
-        if (playerGroup.layoutTransition == null) {
-            playerGroup.layoutTransition = LayoutTransition()
+    private fun observeSnackbarMessages() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.snackbarMessages.collect { message ->
+                    if (message == PlayerViewModel.SnackbarMessage.ShowBatteryWarningIfAppropriate) {
+                        warningsHelper.showBatteryWarningSnackbarIfAppropriate(snackbarParentView = view)
+                    }
+                }
+            }
         }
-        transcriptPage.isVisible = true
-        shelfComposeView.isInvisible = true
-        val shelfOffset = shelfComposeView.height + shelfComposeView.marginTop
-        with(seekBar) {
-            isInvisible = hidePlayerControls
-            spring(SpringAnimation.TRANSLATION_Y).animateToFinalPosition(shelfOffset.toFloat() + 32.dpToPx(context))
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                shelfSharedViewModel.snackbarMessages.collect { message ->
+                    val text = when (message) {
+                        SnackbarMessage.EpisodeDownloadStarted -> LR.string.episode_queued_for_download
+                        SnackbarMessage.EpisodeRemoved -> LR.string.episode_was_removed
+                        SnackbarMessage.TranscriptNotAvailable -> LR.string.transcript_error_not_available
+                        SnackbarMessage.ShareNotAvailable -> LR.string.sharing_is_not_available_for_private_podcasts
+                    }
+                    showSnackBar(text = getString(text))
+                }
+            }
         }
-        with(playerControlsComposeView) {
-            isInvisible = hidePlayerControls
-            spring(SpringAnimation.SCALE_X).animateToFinalPosition(0.6f)
-            spring(SpringAnimation.SCALE_Y).animateToFinalPosition(0.6f)
-            spring(SpringAnimation.TRANSLATION_Y).animateToFinalPosition(shelfOffset.toFloat())
-        }
-        val containerFragment = parentFragment as? PlayerContainerFragment
-        containerFragment?.updateTabsVisibility(false)
-        root.setScrollingEnabled(false)
     }
 
-    private fun AdapterPlayerHeaderBinding.closeTranscript() {
-        shelfComposeView.isVisible = true
-        transcriptPage.isVisible = false
-        with(seekBar) {
-            isVisible = true
-            spring(SpringAnimation.TRANSLATION_Y).animateToFinalPosition(0f)
-        }
-        with(playerControlsComposeView) {
-            isVisible = true
-            spring(SpringAnimation.SCALE_X).animateToFinalPosition(1f)
-            spring(SpringAnimation.SCALE_Y).animateToFinalPosition(1f)
-            spring(SpringAnimation.TRANSLATION_Y).animateToFinalPosition(0f)
-        }
-        val containerFragment = parentFragment as? PlayerContainerFragment
-        containerFragment?.updateTabsVisibility(true)
-        root.setScrollingEnabled(true)
-        playerGroup.layoutTransition = null // Reset to null to avoid animation when changing children visibility anytime later
-    }
-
-    private fun setupUpNextDrag(binding: AdapterPlayerHeaderBinding) {
+    private fun setupUpNextDrag() {
         val flingGestureDetector = GestureDetector(
             requireContext(),
             object : GestureDetector.SimpleOnGestureListener() {
                 override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
-                    if (binding.transcriptPage.isVisible) return false
                     val containerFragment = parentFragment as? PlayerContainerFragment ?: return false
                     val upNextBottomSheetBehavior = containerFragment.upNextBottomSheetBehavior
 
@@ -493,7 +501,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             },
         )
         @Suppress("ClickableViewAccessibility")
-        binding.root.setOnTouchListener { _, event ->
+        binding?.root?.setOnTouchListener { _, event ->
             // This check is a workaround for a behavior between velocityY detected by flingGestureDetector and dragging player bottom sheet.
             // When only the player is expanded and we fling down the velocityY should be positive indicating that direction.
             // However, regardless of flinging up or down the velocityY is always negative because the player's view drags along
@@ -575,6 +583,31 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         }
     }
 
+    private fun openAd(ad: BlazeAd) {
+        runCatching {
+            val intent = Intent(Intent.ACTION_VIEW, ad.ctaUrl.toUri())
+            startActivity(intent)
+        }.onFailure { LogBuffer.e("Ads", it, "Failed to open an ad: ${ad.id}") }
+    }
+
+    private fun openAdReportSheet(ad: BlazeAd, podcastColors: PodcastColors) {
+        if (parentFragmentManager.findFragmentByTag("ad_report") == null) {
+            AdReportFragment
+                .newInstance(ad, podcastColors)
+                .show(parentFragmentManager, "ad_report")
+        }
+    }
+
+    private fun playerHeaderFlow(): Flow<PlayerViewModel.PlayerHeader> {
+        return viewModel.listDataRx.map { it.podcastHeader }.asFlow()
+    }
+
+    private fun podcastColorsFlow(): Flow<PodcastColors> {
+        return viewModel.podcastFlow.map { podcast ->
+            podcast?.let(::PodcastColors) ?: PodcastColors.ForUserEpisode
+        }
+    }
+
     private fun playerVisualsStateFlow(): Flow<PlayerVisualsState> {
         return viewModel.listDataLive.asFlow()
             .distinctUntilChanged(::isListDataEquivalentForVisuals)
@@ -606,3 +639,57 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         return PlayerVisualsState(contentState, header.isPrepared)
     }
 }
+
+@Composable
+private fun PlayerSeekBar(
+    playbackPosition: Duration,
+    playbackDuration: Duration,
+    adjustPlaybackDuration: Boolean,
+    playbackSpeed: Double,
+    chapters: Chapters,
+    isBuffering: Boolean,
+    bufferedUpTo: Duration,
+    playerColors: PlayerColors,
+    modifier: Modifier = Modifier,
+    onSeekToPosition: (Duration, onSeekComplete: () -> Unit) -> Unit,
+) {
+    val theme = MaterialTheme.theme.type
+
+    AndroidView(
+        factory = { context ->
+            PlayerSeekBar(context).apply {
+                changeListener = object : PlayerSeekBar.OnUserSeekListener {
+                    override fun onSeekPositionChangeStop(progress: Duration, seekComplete: () -> Unit) {
+                        onSeekToPosition(progress, seekComplete)
+                    }
+
+                    override fun onSeekPositionChanging(progress: Duration) = Unit
+
+                    override fun onSeekPositionChangeStart() = Unit
+                }
+            }
+        },
+        update = { seekBar ->
+            seekBar.apply {
+                setCurrentTime(playbackPosition)
+                setDuration(playbackDuration)
+                setAdjustDuration(adjustPlaybackDuration)
+                setPlaybackSpeed(playbackSpeed)
+                setChapters(chapters)
+                this.isBuffering = isBuffering
+                bufferedUpToInSecs = bufferedUpTo.inWholeSeconds.toInt()
+                setTintColor(playerColors.highlight01.toArgb(), theme)
+            }
+        },
+        modifier = modifier.fillMaxWidth(),
+    )
+}
+
+private val adEnterTransition = fadeIn(spring(stiffness = Spring.StiffnessVeryLow)) + expandVertically(spring(stiffness = Spring.StiffnessMediumLow))
+private val adExitTransition = fadeOut(spring(stiffness = Spring.StiffnessVeryLow)) + shrinkVertically(spring(stiffness = Spring.StiffnessMediumLow))
+
+private val transcriptEnterTransition = fadeIn(spring(stiffness = Spring.StiffnessVeryLow)) + slideInVertically(initialOffsetY = { it })
+private val transcriptExitTransition = fadeOut(spring(stiffness = Spring.StiffnessHigh))
+
+private val shelfEnterTransition = fadeIn() + expandVertically(expandFrom = Alignment.Top)
+private val shelfExitTransition = fadeOut() + shrinkVertically(shrinkTowards = Alignment.Top)

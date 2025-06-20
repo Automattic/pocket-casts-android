@@ -44,7 +44,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -52,6 +51,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.buttons.CloseButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.IconButtonSmall
@@ -59,9 +59,10 @@ import au.com.shiftyjelly.pocketcasts.compose.components.SearchBar
 import au.com.shiftyjelly.pocketcasts.compose.components.SearchBarDefaults
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.images.R
+import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults.TranscriptColors
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptSearchViewModel.SearchUiState
-import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
+import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.TranscriptState
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.TransitionState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -75,20 +76,17 @@ private val SearchBarPlaceholderColor = SearchBarIconColor
 
 @Composable
 fun TranscriptPageWrapper(
-    playerViewModel: PlayerViewModel,
+    transitionState: TransitionState,
     shelfSharedViewModel: ShelfSharedViewModel,
     transcriptViewModel: TranscriptViewModel,
     searchViewModel: TranscriptSearchViewModel,
-    theme: Theme,
     onClickSubscribe: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     AppTheme(Theme.ThemeType.DARK) {
-        val transitionState by shelfSharedViewModel.transitionState.collectAsStateWithLifecycle(null)
         val uiState by transcriptViewModel.uiState.collectAsStateWithLifecycle()
         val searchState by searchViewModel.searchState.collectAsStateWithLifecycle()
         val searchQuery by searchViewModel.searchQueryFlow.collectAsStateWithLifecycle()
-
-        val configuration = LocalConfiguration.current
 
         var showPaywall by remember { mutableStateOf(false) }
         var showSearch by remember { mutableStateOf(false) }
@@ -104,12 +102,8 @@ fun TranscriptPageWrapper(
             else -> Unit
         }
 
-        val playerBackgroundColor = Color(theme.playerBackgroundColor(uiState.podcastAndEpisode?.podcast))
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(configuration.screenHeightDp.dp)
-                .background(playerBackgroundColor),
+            modifier = modifier,
         ) {
             TranscriptToolbar(
                 onCloseClick = {
@@ -140,7 +134,6 @@ fun TranscriptPageWrapper(
                     shelfSharedViewModel = shelfSharedViewModel,
                     transcriptViewModel = transcriptViewModel,
                     searchViewModel = searchViewModel,
-                    theme = theme,
                 )
 
                 if (showPaywall) {
@@ -175,7 +168,25 @@ fun TranscriptPageWrapper(
                         }
                     }
                 }
-                is TransitionState.CloseTranscript, null -> Unit
+                is TransitionState.CloseTranscript -> Unit
+            }
+        }
+
+        val isTranscriptOpen = (transitionState is TransitionState.OpenTranscript)
+        val transcript = (uiState.transcriptState as? TranscriptState.Loaded)?.transcript
+
+        LaunchedEffect(showPaywall, isTranscriptOpen, transcript?.episodeUuid, transcript?.url) {
+            if (!showPaywall && isTranscriptOpen && transcript != null) {
+                transcriptViewModel.track(
+                    AnalyticsEvent.TRANSCRIPT_SHOWN,
+                    mapOf(
+                        "type" to transcript.type.analyticsValue,
+                        "show_as_webpage" to (transcript is Transcript.Web).toString(),
+                    ),
+                )
+            }
+            if (showPaywall) {
+                transcriptViewModel.track(AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_SHOWN)
             }
         }
     }
@@ -202,16 +213,12 @@ fun TranscriptToolbar(
     AppTheme(Theme.ThemeType.LIGHT) { // Makes search bar always white for any theme
         Box(
             contentAlignment = Alignment.TopEnd,
-            modifier = Modifier
-                .padding(top = 8.dp)
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
         ) {
             val transition = updateTransition(expandSearch, label = "Searchbar transition")
             CompositionLocalProvider(LocalRippleConfiguration provides ToolbarRippleConfiguration) {
                 CloseButton(
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .padding(start = 16.dp),
+                    modifier = Modifier.align(Alignment.TopStart),
                     onClick = onCloseClick,
                     tintColor = TranscriptColors.iconColor(),
                     contentDescription = stringResource(LR.string.transcript_close),
@@ -226,9 +233,7 @@ fun TranscriptToolbar(
                 ) {
                     IconButton(
                         onClick = onSearchClicked,
-                        modifier = Modifier
-                            .padding(end = 16.dp)
-                            .background(Color.White.copy(alpha = 0.2f), shape = RoundedCornerShape(SearchViewCornerRadius)),
+                        modifier = Modifier.background(Color.White.copy(alpha = 0.2f), shape = RoundedCornerShape(SearchViewCornerRadius)),
                     ) {
                         Icon(
                             imageVector = Icons.Default.Search,
@@ -245,12 +250,12 @@ fun TranscriptToolbar(
                 ) {
                     SearchBar(
                         text = searchText,
-                        leadingIcon = {
+                        leadingContent = {
                             SearchBarLeadingIcons(
                                 onDoneClicked = onSearchDoneClicked,
                             )
                         },
-                        trailingIcon = {
+                        trailingContent = {
                             SearchBarTrailingIcons(
                                 text = searchText,
                                 searchState = searchState,
@@ -262,12 +267,12 @@ fun TranscriptToolbar(
                         placeholder = stringResource(LR.string.search),
                         onTextChanged = onSearchQueryChanged,
                         onSearch = {},
-                        cornerRadius = SearchViewCornerRadius,
+                        cornerRadius = 16.dp,
                         modifier = Modifier
                             .width(SearchBarMaxWidth)
                             .height(SearchBarHeight)
                             .focusRequester(focusRequester)
-                            .padding(start = 85.dp, end = 16.dp),
+                            .padding(start = 72.dp),
                         colors = SearchBarDefaults.colors(
                             leadingIconColor = SearchBarIconColor,
                             trailingIconColor = SearchBarIconColor,

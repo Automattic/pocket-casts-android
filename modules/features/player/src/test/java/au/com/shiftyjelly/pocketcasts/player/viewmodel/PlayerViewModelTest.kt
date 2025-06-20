@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel.NavigationState
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel.PlaybackEffectsSettingsTab
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel.SnackbarMessage
@@ -269,6 +270,9 @@ class PlayerViewModelTest {
         val useRealTimeForPlaybackRemainingTimeMock = mock<UserSetting<Boolean>>()
         whenever(useRealTimeForPlaybackRemainingTimeMock.flow).thenReturn(MutableStateFlow(false))
         whenever(settings.useRealTimeForPlaybackRemaingTime).thenReturn(useRealTimeForPlaybackRemainingTimeMock)
+        val cachedSubscriptionMock = mock<UserSetting<Subscription?>>()
+        whenever(cachedSubscriptionMock.flow).thenReturn(MutableStateFlow(null))
+        whenever(settings.cachedSubscription).thenReturn(cachedSubscriptionMock)
 
         viewModel = PlayerViewModel(
             playbackManager = playbackManager,

@@ -50,6 +50,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivity
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksSortByDialog
 import au.com.shiftyjelly.pocketcasts.podcasts.BuildConfig
 import au.com.shiftyjelly.pocketcasts.podcasts.R
@@ -946,9 +947,10 @@ class PodcastFragment : BaseFragment() {
         }
     }
 
-    private fun onEditBookmarkClick() {
-        viewModel.buildBookmarkArguments { arguments ->
-            startActivity(arguments.getIntent(requireContext()))
+    private suspend fun onEditBookmarkClick() {
+        val bookmarkArguments = viewModel.createBookmarkArguments()
+        if (bookmarkArguments != null) {
+            startActivity(BookmarkActivity.launchIntent(requireContext(), bookmarkArguments))
         }
     }
 
@@ -1156,22 +1158,26 @@ class PodcastFragment : BaseFragment() {
      * Episode search needs at least a page worth of space under the search box so the user can see the results below.
      */
     private fun addPaddingForEpisodeSearch(episodes: List<PodcastEpisode>) {
-        val rowCount = episodes.size
         val binding = binding ?: return
+        val rowCount = episodes.size
+
+        // No padding for empty state to avoid excessive whitespace
+        if (rowCount == 0) {
+            binding.episodesRecyclerView.updatePadding(bottom = 0)
+            return
+        }
+
         val pageHeight = binding.episodesRecyclerView.height
         val context = binding.episodesRecyclerView.context
         val episodeHeaderHeightPx = 90.dpToPx(context)
-        val rowHeightPx: Int = 80.dpToPx(context)
-
+        val rowHeightPx = 80.dpToPx(context)
         val actualHeight = episodeHeaderHeightPx + (rowCount * rowHeightPx)
-
         val missingHeightPx = pageHeight - actualHeight
 
-        // only add padding to stop the screen jumping to the wrong location
-        if (binding.episodesRecyclerView.paddingBottom > missingHeightPx) {
-            return
+        // Only add padding if needed to prevent screen jump
+        if (binding.episodesRecyclerView.paddingBottom <= missingHeightPx && missingHeightPx > 0) {
+            binding.episodesRecyclerView.updatePadding(bottom = missingHeightPx)
         }
-        binding.episodesRecyclerView.updatePadding(bottom = if (missingHeightPx < 0) 0 else missingHeightPx)
     }
 
     override fun onDestroyView() {

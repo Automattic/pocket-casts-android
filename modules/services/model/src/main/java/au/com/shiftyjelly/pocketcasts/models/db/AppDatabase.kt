@@ -63,6 +63,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.models.entity.SearchHistoryItem
 import au.com.shiftyjelly.pocketcasts.models.entity.SuggestedFolder
+import au.com.shiftyjelly.pocketcasts.models.entity.Transcript
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextChange
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextHistory
@@ -70,7 +71,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserNotifications
 import au.com.shiftyjelly.pocketcasts.models.entity.UserPodcastRating
 import au.com.shiftyjelly.pocketcasts.models.to.DbChapter
-import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import java.io.File
 import java.util.Arrays
 import java.util.Date
@@ -98,7 +98,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         UpNextHistory::class,
         UserNotifications::class,
     ],
-    version = 114,
+    version = 115,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 81, to = 82, spec = AppDatabase.Companion.DeleteSilenceRemovedMigration::class),
@@ -1014,6 +1014,12 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_114_115 = addMigration(114, 115) { database ->
+            with(database) {
+                execSQL("DROP INDEX transcript_episode_uuid_index")
+            }
+        }
+
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
             databaseBuilder.addMigrations(
                 addMigration(1, 2) { },
@@ -1418,6 +1424,7 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_111_112,
                 MIGRATION_112_113,
                 MIGRATION_113_114,
+                MIGRATION_114_115,
             )
         }
 

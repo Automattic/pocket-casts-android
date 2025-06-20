@@ -4,6 +4,7 @@ import androidx.work.WorkerFactory
 import au.com.shiftyjelly.pocketcasts.analytics.AccountStatusInfo
 import au.com.shiftyjelly.pocketcasts.crashlogging.CrashReportPermissionCheck
 import au.com.shiftyjelly.pocketcasts.crashlogging.ObserveUser
+import au.com.shiftyjelly.pocketcasts.models.to.TranscriptType
 import au.com.shiftyjelly.pocketcasts.payment.PurchaseApprover
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.SettingsImpl
@@ -43,8 +44,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManagerImpl
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptsManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptsManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
@@ -63,16 +62,26 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncAccountManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManagerImpl
+import au.com.shiftyjelly.pocketcasts.repositories.transcript.HtmlParser
+import au.com.shiftyjelly.pocketcasts.repositories.transcript.JsonParser
+import au.com.shiftyjelly.pocketcasts.repositories.transcript.SrtParser
+import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
+import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManagerImpl
+import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptParser
+import au.com.shiftyjelly.pocketcasts.repositories.transcript.WebVttParser
 import au.com.shiftyjelly.pocketcasts.repositories.user.ObserveTrackableUser
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserSettingsCrashReportPermission
+import com.squareup.moshi.Moshi
 import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import dagger.multibindings.IntoMap
 import javax.inject.Singleton
 
 @Module
@@ -184,9 +193,6 @@ abstract class RepositoryModule {
     abstract fun provideExternalDataManager(externalDataManagerImpl: ExternalDataManagerImpl): ExternalDataManager
 
     @Binds
-    abstract fun provideTranscriptsManager(transcriptsManagerImpl: TranscriptsManagerImpl): TranscriptsManager
-
-    @Binds
     abstract fun provideReferralManager(referralManagerImpl: ReferralManagerImpl): ReferralManager
 
     @Binds
@@ -206,4 +212,37 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun provideNotificationScheduler(notificationSchedulerImpl: NotificationSchedulerImpl): NotificationScheduler
+
+    @Binds
+    abstract fun provideTranscriptManager(transcriptsManagerImpl: TranscriptManagerImpl): TranscriptManager
+
+    companion object {
+        @Provides
+        @IntoMap
+        @TranscriptTypeKey(TranscriptType.Vtt)
+        fun provideVttParser(): TranscriptParser {
+            return WebVttParser()
+        }
+
+        @Provides
+        @IntoMap
+        @TranscriptTypeKey(TranscriptType.Json)
+        fun provideJsonParser(moshi: Moshi): TranscriptParser {
+            return JsonParser(moshi)
+        }
+
+        @Provides
+        @IntoMap
+        @TranscriptTypeKey(TranscriptType.Srt)
+        fun provideSrtParser(): TranscriptParser {
+            return SrtParser()
+        }
+
+        @Provides
+        @IntoMap
+        @TranscriptTypeKey(TranscriptType.Html)
+        fun provideHtmlParser(): TranscriptParser {
+            return HtmlParser()
+        }
+    }
 }

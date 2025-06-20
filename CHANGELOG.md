@@ -1,12 +1,29 @@
 7.92
 -----
-
+*   Updates
+    *   Improve transcripts parsing and loading
+        ([#4115](https://github.com/Automattic/pocket-casts-android/pull/4115))
+    *   Remove bottom padding with empty episode list
+        ([#4121](https://github.com/Automattic/pocket-casts-android/pull/4121))
+*   Bug Fixes
+    *   Fix keyboard blocking WebView input fields in Help & Feedback page
+        ([#4109](https://github.com/Automattic/pocket-casts-android/pull/4109))
+    *   Fix player's theming responsiveness
+        ([#4091](https://github.com/Automattic/pocket-casts-android/pull/4091))
+    *   Respect embedded file artwork in media notifications
+        ([#4103](https://github.com/Automattic/pocket-casts-android/pull/4103))
+    *   Specify what files to be backed up on Android 12 and up
+        ([#4119](https://github.com/Automattic/pocket-casts-android/pull/4119))
+    *   Fix podcast selector overlapping system status bar on auto add to up next podcast selector
+        ([#4132](https://github.com/Automattic/pocket-casts-android/pull/4132))
+    *   Fix downloading episodes after backup and restore
+        ([#4130](https://github.com/Automattic/pocket-casts-android/pull/4130))
 
 7.91
 -----
 *   New Features
-    *   Notifications Revamp
-        ([#4073](https://github.com/Automattic/pocket-casts-android/pull/4073))
+    *   Introduce new notifications and give better control over them
+        ([#4107](https://github.com/Automattic/pocket-casts-android/pull/4107))
 *   Updates
     *   Upgrade to the latest version of Jetpack Compose
         ([#4049](https://github.com/Automattic/pocket-casts-android/pull/4049))

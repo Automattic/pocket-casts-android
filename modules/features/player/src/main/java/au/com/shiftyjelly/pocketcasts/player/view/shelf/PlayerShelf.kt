@@ -13,11 +13,9 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -29,21 +27,18 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.map
 import androidx.mediarouter.app.MediaRouteButton
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.PlayerColors
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.player.R
-import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel
-import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.TranscriptState
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.PlayerShelfData
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.ShelfItemSource
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
-import au.com.shiftyjelly.pocketcasts.ui.helper.ColorUtils
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.views.extensions.updateColor
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.SimpleColorFilter
@@ -61,12 +56,11 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun PlayerShelf(
-    theme: Theme,
+    playerColors: PlayerColors,
     shelfSharedViewModel: ShelfSharedViewModel,
-    transcriptViewModel: TranscriptViewModel,
     playerViewModel: PlayerViewModel,
+    modifier: Modifier = Modifier,
 ) {
-    val transcriptUiState by transcriptViewModel.uiState.collectAsStateWithLifecycle()
     val shelfItemsState by shelfSharedViewModel.uiState.collectAsStateWithLifecycle()
     val playerShelfData by playerViewModel.listDataLive
         .map {
@@ -86,21 +80,11 @@ fun PlayerShelf(
         }
         .observeAsState(PlayerShelfData())
 
-    val normalColor = MaterialTheme.theme.colors.playerContrast03
-    val iconColors = remember(theme, playerShelfData) {
-        val playerHighlightColor = playerHighlightColor(theme, playerShelfData)
-        val highlightColor = Color(AndroidColor.parseColor(ColorUtils.colorIntToHexString(playerHighlightColor)))
-        PlayerShelfIconColors(
-            normalColor = normalColor,
-            highlightColor = highlightColor,
-        )
-    }
-
     PlayerShelfContent(
         shelfItems = shelfItemsState.playerShelfItems,
-        transcriptUiState = transcriptUiState,
-        iconColors = iconColors,
+        isTranscriptAvailable = shelfItemsState.isTranscriptAvailable,
         playerShelfData = playerShelfData,
+        playerColors = playerColors,
         onEffectsClick = {
             shelfSharedViewModel.onEffectsClick(ShelfItemSource.Shelf)
         },
@@ -156,14 +140,14 @@ fun PlayerShelf(
         onMoreClick = {
             shelfSharedViewModel.onMoreClick()
         },
+        modifier = modifier,
     )
 }
 
 @Composable
 private fun PlayerShelfContent(
     shelfItems: List<ShelfItem>,
-    transcriptUiState: TranscriptViewModel.UiState,
-    iconColors: PlayerShelfIconColors,
+    isTranscriptAvailable: Boolean,
     playerShelfData: PlayerShelfData,
     onEffectsClick: () -> Unit,
     onSleepClick: () -> Unit,
@@ -177,13 +161,15 @@ private fun PlayerShelfContent(
     onAddBookmarkClick: () -> Unit,
     onTranscriptClick: (Boolean) -> Unit,
     onMoreClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    playerColors: PlayerColors = MaterialTheme.theme.rememberPlayerColorsOrDefault(),
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .height(56.dp)
             .background(
-                color = MaterialTheme.theme.colors.playerContrast06,
+                color = playerColors.contrast06,
                 shape = RoundedCornerShape(12.dp),
             ),
         horizontalArrangement = Arrangement.SpaceEvenly,
@@ -193,74 +179,82 @@ private fun PlayerShelfContent(
             when (shelfItem) {
                 ShelfItem.Effects -> EffectsButton(
                     isEffectsOn = playerShelfData.isEffectsOn,
-                    iconColors = iconColors,
+                    playerColors = playerColors,
                     onClick = onEffectsClick,
                 )
+
                 ShelfItem.Sleep -> SleepButton(
                     isSleepRunning = playerShelfData.isSleepRunning,
-                    iconColors = iconColors,
+                    playerColors = playerColors,
                     onClick = onSleepClick,
                 )
+
                 ShelfItem.Star -> StarButton(
                     isStarred = playerShelfData.isStarred,
-                    iconColors = iconColors,
+                    playerColors = playerColors,
                     onClick = onStarClick,
                 )
+
                 ShelfItem.Transcript -> TranscriptButton(
-                    isTranscriptAvailable = transcriptUiState.transcriptState !is TranscriptState.Empty,
-                    iconColors = iconColors,
+                    isTranscriptAvailable = isTranscriptAvailable,
+                    playerColors = playerColors,
                     onClick = onTranscriptClick,
                 )
+
                 ShelfItem.Download -> DownloadButton(
                     isPodcastEpisode = !playerShelfData.isUserEpisode,
                     downloadData = playerShelfData.downloadData,
-                    iconColors = iconColors,
+                    playerColors = playerColors,
                     onClick = onDownloadClick,
                 )
+
                 ShelfItem.Share -> ShareButton(
-                    iconColors = iconColors,
+                    playerColors = playerColors,
                     onClick = onShareClick,
                 )
+
                 ShelfItem.Podcast -> PodcastButton(
-                    iconColors = iconColors,
+                    playerColors = playerColors,
                     onClick = onShowPodcast,
                 )
+
                 ShelfItem.Cast -> CastButton(
-                    iconColors = iconColors,
+                    playerColors = playerColors,
                     onClick = onCastClick,
                 )
+
                 ShelfItem.Played -> PlayedButton(
-                    iconColors = iconColors,
+                    playerColors = playerColors,
                     onClick = onPlayedClick,
                 )
+
                 ShelfItem.Bookmark -> BookmarkButton(
-                    iconColors = iconColors,
+                    playerColors = playerColors,
                     onClick = onAddBookmarkClick,
                 )
+
                 ShelfItem.Archive -> ArchiveButton(
                     isUserEpisode = playerShelfData.isUserEpisode,
-                    iconColors = iconColors,
+                    playerColors = playerColors,
                     onClick = onArchiveClick,
                 )
             }
         }
         MoreButton(
-            iconColors = iconColors,
+            playerColors = playerColors,
             onClick = onMoreClick,
         )
     }
 }
 
 @Composable
-fun EffectsButton(
+private fun EffectsButton(
     isEffectsOn: Boolean,
-    iconColors: PlayerShelfIconColors,
+    playerColors: PlayerColors,
     onClick: () -> Unit,
 ) {
-    val effectsTint =
-        if (isEffectsOn) iconColors.highlightColor else iconColors.normalColor
-    val effectsResource =
-        if (isEffectsOn) R.drawable.ic_effects_on_32 else R.drawable.ic_effects_off_32
+    val effectsTint = if (isEffectsOn) playerColors.highlight01 else playerColors.contrast03
+    val effectsResource = if (isEffectsOn) R.drawable.ic_effects_on_32 else R.drawable.ic_effects_off_32
     IconButton(onClick = onClick) {
         Icon(
             painterResource(id = effectsResource),
@@ -271,13 +265,12 @@ fun EffectsButton(
 }
 
 @Composable
-fun SleepButton(
+private fun SleepButton(
     isSleepRunning: Boolean = false,
-    iconColors: PlayerShelfIconColors,
+    playerColors: PlayerColors,
     onClick: () -> Unit,
 ) {
-    val sleepTint =
-        if (isSleepRunning) iconColors.highlightColor else iconColors.normalColor
+    val sleepTint = if (isSleepRunning) playerColors.highlight01 else playerColors.contrast03
     val alpha = if (isSleepRunning) 1F else AndroidColor.alpha(sleepTint.toArgb()) / 255F * 2F
     val lottieComposition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.sleep_button))
     val progress by animateLottieCompositionAsState(
@@ -305,12 +298,12 @@ fun SleepButton(
 }
 
 @Composable
-fun StarButton(
+private fun StarButton(
     isStarred: Boolean,
-    iconColors: PlayerShelfIconColors,
+    playerColors: PlayerColors,
     onClick: () -> Unit,
 ) {
-    val starTint = if (isStarred) iconColors.highlightColor else iconColors.normalColor
+    val starTint = if (isStarred) playerColors.highlight01 else playerColors.contrast03
     val starResource = if (isStarred) R.drawable.ic_star_filled_32 else R.drawable.ic_star_32
     IconButton(onClick = onClick) {
         Icon(
@@ -322,36 +315,36 @@ fun StarButton(
 }
 
 @Composable
-fun ShareButton(
-    iconColors: PlayerShelfIconColors,
+private fun ShareButton(
+    playerColors: PlayerColors,
     onClick: () -> Unit,
 ) {
     IconButton(onClick = onClick) {
         Icon(
             painterResource(id = R.drawable.ic_share_android_32),
             contentDescription = stringResource(LR.string.share_podcast),
-            tint = iconColors.normalColor,
+            tint = playerColors.contrast03,
         )
     }
 }
 
 @Composable
-fun PodcastButton(
-    iconColors: PlayerShelfIconColors,
+private fun PodcastButton(
+    playerColors: PlayerColors,
     onClick: () -> Unit,
 ) {
     IconButton(onClick = onClick) {
         Icon(
             painterResource(id = IR.drawable.ic_goto_32),
             contentDescription = stringResource(LR.string.go_to_podcast),
-            tint = iconColors.normalColor,
+            tint = playerColors.contrast03,
         )
     }
 }
 
 @Composable
 fun CastButton(
-    iconColors: PlayerShelfIconColors,
+    playerColors: PlayerColors,
     onClick: () -> Unit,
 ) {
     AndroidView(
@@ -359,7 +352,7 @@ fun CastButton(
             MediaRouteButton(context).apply {
                 CastButtonFactory.setUpMediaRouteButton(context, this)
                 visibility = View.VISIBLE
-                updateColor(iconColors.normalColor.toArgb())
+                updateColor(playerColors.contrast03.toArgb())
                 setOnClickListener { onClick() }
                 CastButtonFactory.setUpMediaRouteButton(context, this)
             }
@@ -368,53 +361,53 @@ fun CastButton(
 }
 
 @Composable
-fun PlayedButton(
-    iconColors: PlayerShelfIconColors,
+private fun PlayedButton(
+    playerColors: PlayerColors,
     onClick: () -> Unit,
 ) {
     IconButton(onClick = onClick) {
         Icon(
             painterResource(id = R.drawable.ic_tick_circle_ol_32),
             contentDescription = stringResource(LR.string.mark_as_played),
-            tint = iconColors.normalColor,
+            tint = playerColors.contrast03,
         )
     }
 }
 
 @Composable
-fun ArchiveButton(
+private fun ArchiveButton(
     isUserEpisode: Boolean,
-    iconColors: PlayerShelfIconColors,
+    playerColors: PlayerColors,
     onClick: () -> Unit,
 ) {
-    val archiveResource = (if (isUserEpisode) R.drawable.ic_delete_32 else R.drawable.ic_archive_32)
+    val archiveResource = if (isUserEpisode) R.drawable.ic_delete_32 else R.drawable.ic_archive_32
     IconButton(onClick = onClick) {
         Icon(
             painterResource(id = archiveResource),
             contentDescription = stringResource(LR.string.archive_episode),
-            tint = iconColors.normalColor,
+            tint = playerColors.contrast03,
         )
     }
 }
 
 @Composable
-fun BookmarkButton(
-    iconColors: PlayerShelfIconColors,
+private fun BookmarkButton(
+    playerColors: PlayerColors,
     onClick: () -> Unit,
 ) {
     IconButton(onClick = onClick) {
         Icon(
             painterResource(id = IR.drawable.ic_bookmark),
             contentDescription = stringResource(LR.string.add_bookmark),
-            tint = iconColors.normalColor,
+            tint = playerColors.contrast03,
         )
     }
 }
 
 @Composable
-fun TranscriptButton(
+private fun TranscriptButton(
     isTranscriptAvailable: Boolean,
-    iconColors: PlayerShelfIconColors,
+    playerColors: PlayerColors,
     onClick: (Boolean) -> Unit,
 ) {
     val alpha = if (isTranscriptAvailable) 1f else 0.4f
@@ -422,17 +415,17 @@ fun TranscriptButton(
         Icon(
             painterResource(id = IR.drawable.ic_transcript_24),
             contentDescription = stringResource(LR.string.transcript),
-            tint = iconColors.normalColor,
+            tint = playerColors.contrast03,
             modifier = Modifier.alpha(alpha),
         )
     }
 }
 
 @Composable
-fun DownloadButton(
+private fun DownloadButton(
     isPodcastEpisode: Boolean,
     downloadData: PlayerShelfData.DownloadData,
-    iconColors: PlayerShelfIconColors,
+    playerColors: PlayerColors,
     onClick: () -> Unit,
 ) {
     val downloadIcon = when {
@@ -449,38 +442,24 @@ fun DownloadButton(
         Icon(
             painterResource(id = downloadIcon),
             contentDescription = contentDescription,
-            tint = iconColors.normalColor,
+            tint = playerColors.contrast03,
         )
     }
 }
 
 @Composable
-fun MoreButton(
+private fun MoreButton(
+    playerColors: PlayerColors,
     onClick: () -> Unit,
-    iconColors: PlayerShelfIconColors,
 ) {
     IconButton(onClick = onClick) {
         Icon(
             painterResource(id = R.drawable.ic_more),
             contentDescription = stringResource(LR.string.more),
-            tint = iconColors.normalColor,
+            tint = playerColors.contrast03,
         )
     }
 }
-
-private fun playerHighlightColor(
-    theme: Theme,
-    playerShelfData: PlayerShelfData,
-) = if (playerShelfData.isUserEpisode) {
-    theme.getUserFilePlayerHighlightColor()
-} else {
-    ThemeColor.playerHighlight01(playerShelfData.theme, playerShelfData.iconTintColor)
-}
-
-data class PlayerShelfIconColors(
-    val normalColor: Color,
-    val highlightColor: Color,
-)
 
 @Preview
 @Composable
@@ -490,11 +469,7 @@ private fun PlayerShelfPreview(
     AppTheme(themeType) {
         PlayerShelfContent(
             shelfItems = ShelfItem.entries.toList().take(4),
-            transcriptUiState = TranscriptViewModel.UiState.Empty,
-            iconColors = PlayerShelfIconColors(
-                normalColor = MaterialTheme.theme.colors.playerContrast03,
-                highlightColor = MaterialTheme.theme.colors.playerContrast01,
-            ),
+            isTranscriptAvailable = false,
             playerShelfData = PlayerShelfData(),
             onEffectsClick = {},
             onSleepClick = {},

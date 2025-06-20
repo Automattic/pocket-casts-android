@@ -459,10 +459,6 @@ interface Settings {
     fun getCustomStorageLimitGb(): Long
     fun getCancelledAcknowledged(): Boolean
     fun setCancelledAcknowledged(value: Boolean)
-    fun getSeenPlayerTour(): Boolean
-    fun setSeenPlayerTour(value: Boolean)
-    fun setSeenUpNextTour(value: Boolean)
-    fun getSeenUpNextTour(): Boolean
     fun setTrialFinishedSeen(seen: Boolean)
     fun getTrialFinishedSeen(): Boolean
     val autoSubscribeToPlayed: UserSetting<Boolean>

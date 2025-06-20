@@ -20,15 +20,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material.pullrefresh.PullRefreshIndicator
-import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
@@ -52,9 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.media3.common.text.Cue
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.extractor.text.CuesWithTiming
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -63,24 +58,23 @@ import au.com.shiftyjelly.pocketcasts.compose.components.FadedLazyColumn
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.extensions.verticalScrollBar
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
+import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.compose.toolbars.textselection.CustomMenuItemOption
 import au.com.shiftyjelly.pocketcasts.compose.toolbars.textselection.CustomTextToolbar
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
-import au.com.shiftyjelly.pocketcasts.models.to.TranscriptCuesInfo
+import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
+import au.com.shiftyjelly.pocketcasts.models.to.TranscriptType
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults.TranscriptColors
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults.TranscriptFontFamily
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults.bottomPadding
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults.scrollToHighlightedTextOffset
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptSearchViewModel.SearchUiState
-import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.DisplayInfo
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.DisplayItem
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.TranscriptState
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.TransitionState
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptFormat
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Util
-import com.google.common.collect.ImmutableList
 import com.kevinnzou.web.LoadingState
 import com.kevinnzou.web.WebView
 import com.kevinnzou.web.rememberWebViewNavigator
@@ -93,31 +87,20 @@ fun TranscriptPage(
     shelfSharedViewModel: ShelfSharedViewModel,
     transcriptViewModel: TranscriptViewModel,
     searchViewModel: TranscriptSearchViewModel,
-    theme: Theme,
     modifier: Modifier = Modifier,
 ) {
     val uiState by transcriptViewModel.uiState.collectAsStateWithLifecycle()
     val transcriptState = uiState.transcriptState
     val transitionState by shelfSharedViewModel.transitionState.collectAsStateWithLifecycle(null)
     val searchState by searchViewModel.searchState.collectAsStateWithLifecycle()
-    val refreshing by transcriptViewModel.isRefreshing.collectAsStateWithLifecycle()
-    val pullRefreshState = rememberPullRefreshState(refreshing, {
-        transcriptViewModel.parseAndLoadTranscript(pulledToRefresh = true)
-    })
-    val playerBackgroundColor = Color(theme.playerBackgroundColor(uiState.podcastAndEpisode?.podcast))
-    val colors = TranscriptColors(playerBackgroundColor)
+    val playerColors = MaterialTheme.theme.rememberPlayerColors()
+    val colors = TranscriptColors(playerColors?.background01 ?: Color(0xFF3D3D3D))
 
     Box(
-        modifier = modifier
-            .fillMaxSize()
-            .pullRefresh(pullRefreshState),
+        modifier = modifier.fillMaxSize(),
     ) {
         when (transcriptState) {
-            is TranscriptState.Empty -> {
-                EmptyView(Modifier.background(colors.backgroundColor()))
-            }
-
-            is TranscriptState.Found -> {
+            is TranscriptState.Loading -> {
                 LoadingView(
                     color = TranscriptColors.textColor(),
                     modifier = Modifier
@@ -134,46 +117,27 @@ fun TranscriptPage(
                     transitionState = transitionState,
                     showPaywall = uiState.showPaywall,
                 )
-
-                PullRefreshIndicator(
-                    refreshing = refreshing,
-                    state = pullRefreshState,
-                    backgroundColor = TranscriptColors.contentColor(),
-                    contentColor = TranscriptColors.iconColor(),
-                    modifier = Modifier.align(Alignment.TopCenter),
-                )
             }
 
-            is TranscriptState.Error -> {
+            is TranscriptState.Failure -> {
                 TranscriptError(
                     state = transcriptState,
-                    onRetry = {
-                        transcriptViewModel.parseAndLoadTranscript(retryOnFail = true)
-                    },
+                    onRetry = transcriptViewModel::reloadTranscripts,
                     colors = colors,
                 )
             }
         }
     }
 
-    val transcript = uiState.transcriptState.transcript
-    LaunchedEffect(transcript?.episodeUuid, transcript?.url, transitionState) {
-        if (transitionState is TransitionState.OpenTranscript) {
-            transcriptViewModel.parseAndLoadTranscript()
-        }
-    }
     if (transcriptState is TranscriptState.Loaded) {
         LaunchedEffect(transcriptState.displayInfo.text) {
-            searchViewModel.setSearchInput(transcriptState.displayInfo.text, uiState.podcastAndEpisode)
+            searchViewModel.setSearchInput(
+                searchSourceText = transcriptState.displayInfo.text,
+                episodeUuid = transcriptState.transcript.episodeUuid,
+                podcastUuid = transcriptState.transcript.podcastUuid,
+            )
         }
     }
-}
-
-@Composable
-private fun EmptyView(
-    modifier: Modifier = Modifier,
-) {
-    Box(modifier = modifier.fillMaxSize())
 }
 
 @Composable
@@ -217,9 +181,7 @@ private fun TranscriptContent(
                 TextP40(
                     text = stringResource(LR.string.transcript_empty),
                     color = TranscriptColors.textColor(),
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .padding(top = 60.dp),
+                    modifier = Modifier.padding(top = 60.dp),
                 )
             } else {
                 ScrollableTranscriptView(
@@ -332,11 +294,11 @@ private fun TranscriptItems(
                 fontSize = 12.sp,
                 lineHeight = 18.sp,
                 color = TranscriptColors.textColor(),
-                modifier = Modifier.padding(horizontal = 32.dp, vertical = 16.dp),
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp),
             )
             Box(
                 modifier = Modifier
-                    .padding(horizontal = 32.dp)
+                    .padding(horizontal = 16.dp)
                     .background(TranscriptColors.accentColor())
                     .width(48.dp)
                     .height(1.dp),
@@ -385,7 +347,7 @@ private fun TranscriptItem(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 32.dp)
+            .padding(horizontal = 16.dp)
             .padding(bottom = if (item.isSpeaker) 8.dp else 16.dp)
             .padding(top = if (item.isSpeaker) 16.dp else 0.dp),
     ) {
@@ -493,33 +455,13 @@ private fun TranscriptContentPreview(
     AppThemeWithBackground(Theme.ThemeType.DARK) {
         TranscriptContent(
             state = TranscriptState.Loaded(
-                transcript = Transcript(
-                    episodeUuid = "uuid",
-                    type = TranscriptFormat.HTML.mimeType,
-                    url = "url",
+                transcript = Transcript.Text(
+                    entries = TranscriptEntry.PreviewList,
+                    type = TranscriptType.Vtt,
+                    url = "",
                     isGenerated = isGenerated,
-                ),
-                cuesInfo = ImmutableList.of(
-                    TranscriptCuesInfo(
-                        CuesWithTiming(
-                            ImmutableList.of(
-                                Cue.Builder().setText(
-                                    "Speaker 1",
-                                ).build(),
-                            ),
-                            0,
-                            0,
-                        ),
-                    ),
-                ),
-                displayInfo = DisplayInfo(
-                    text = "",
-                    items = listOf(
-                        DisplayItem("Lorem ipsum odor amet, consectetuer adipiscing elit.", false, 0, 52),
-                        DisplayItem("Speaker 1", true, 0, 8),
-                        DisplayItem("Sodales sem fusce elementum commodo risus purus auctor neque.", false, 53, 114),
-                        DisplayItem("Maecenas fermentum senectus penatibus tenectus integer per vulputate tellus ted.", false, 115, 195),
-                    ),
+                    episodeUuid = "episode-uuid",
+                    podcastUuid = "podcast-uuid",
                 ),
             ),
             searchState = searchState,
@@ -537,16 +479,13 @@ private fun TranscriptEmptyContentPreview() {
     AppThemeWithBackground(Theme.ThemeType.DARK) {
         TranscriptContent(
             state = TranscriptState.Loaded(
-                transcript = Transcript(
-                    episodeUuid = "uuid",
-                    type = TranscriptFormat.HTML.mimeType,
-                    url = "url",
+                transcript = Transcript.Text(
+                    entries = emptyList(),
+                    type = TranscriptType.Vtt,
+                    url = "",
                     isGenerated = false,
-                ),
-                cuesInfo = emptyList(),
-                displayInfo = DisplayInfo(
-                    text = "",
-                    items = emptyList(),
+                    episodeUuid = "episode-uuid",
+                    podcastUuid = "podcast-uuid",
                 ),
             ),
             searchState = SearchUiState(),

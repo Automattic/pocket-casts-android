@@ -18,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
@@ -27,14 +28,18 @@ import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlow
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class ShelfSharedViewModel @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
@@ -45,6 +50,7 @@ class ShelfSharedViewModel @Inject constructor(
     podcastManager: PodcastManager,
     private val settings: Settings,
     private val userEpisodeManager: UserEpisodeManager,
+    private val transcriptManager: TranscriptManager,
 ) : ViewModel() {
     private val upNextStateObservable: Observable<UpNextQueue.State> =
         playbackManager.upNextQueue.getChangesObservableWithLiveCurrentEpisode(
@@ -72,6 +78,9 @@ class ShelfSharedViewModel @Inject constructor(
     val uiState = combine(
         settings.shelfItems.flow,
         shelfUpNextObservable.asFlow(),
+        shelfUpNextObservable.asFlow()
+            .mapNotNull { state -> (state as? UpNextQueue.State.Loaded)?.episode?.uuid }
+            .flatMapLatest { episodeUuid -> transcriptManager.observeIsTranscriptAvailable(episodeUuid) },
         ::createUiState,
     ).stateIn(
         viewModelScope,
@@ -82,12 +91,13 @@ class ShelfSharedViewModel @Inject constructor(
     private fun createUiState(
         shelfItems: List<ShelfItem>,
         shelfUpNext: UpNextQueue.State,
+        isTranscriptAvailable: Boolean,
     ): UiState {
         val episode = (shelfUpNext as? UpNextQueue.State.Loaded)?.episode
         return uiState.value.copy(
-            shelfItems = shelfItems
-                .filter { it.showIf(episode) },
+            shelfItems = shelfItems.filter { it.showIf(episode) },
             episode = episode,
+            isTranscriptAvailable = isTranscriptAvailable,
         )
     }
 
@@ -285,6 +295,7 @@ class ShelfSharedViewModel @Inject constructor(
     data class UiState(
         val shelfItems: List<ShelfItem> = emptyList(),
         val episode: BaseEpisode? = null,
+        val isTranscriptAvailable: Boolean = false,
     ) {
         val playerShelfItems: List<ShelfItem>
             get() = shelfItems.take(MIN_SHELF_ITEMS_SIZE)
