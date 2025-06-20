@@ -1,11 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-05-27 17:54:03+0000
+Translation-Revision-Date: 2025-06-17 09:54:03+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="onboarding_plus_feature_no_banner_ads">Никаких рекламных баннеров</string>
+    <string name="banner_ad_plus_prompt">Забудьте о рекламных баннерах и не только благодаря Pocket Casts Plus</string>
+    <string name="ad_report_reason_other">Другое</string>
+    <string name="ad_report_reason_too_often">Я вижу эту рекламу слишком часто</string>
+    <string name="ad_report_reason_malicious">Это вредоносная реклама</string>
+    <string name="ad_report_reason_broken">Похоже, эта реклама работает некорректно</string>
+    <string name="ad_report_reason_question">Почему вы хотите пожаловаться на эту рекламу?</string>
+    <string name="report_ad">Пожаловаться на рекламу</string>
+    <string name="remove_ads">Отключить рекламу</string>
+    <string name="price_per_month_usd">\u0024%1$.2f в месяц</string>
+    <string name="price_per_month">%1$.2f %2$s в месяц</string>
+    <string name="go_to_ad">Перейти к рекламе: %1$s</string>
+    <string name="ad_image">Рекламное изображение</string>
+    <string name="ad_options">Опции рекламы</string>
+    <string name="ad">Реклама</string>
+    <string name="notification_mockup_image_description">Макет изображения</string>
+    <string name="notification_snack_cta">Открыть настройки</string>
+    <string name="notification_snack_message">Разрешите уведомления в настройках устройства</string>
+    <string name="notification_prompt_cta">Разрешить уведомления</string>
+    <string name="notification_prompt_message">Уведомления — лучший способ отслеживать новые выпуски, получать рекомендации новых шоу и советы по Pocket Casts.</string>
+    <string name="notification_prompt_title">Будьте в курсе событий!</string>
+    <string name="notification_offers_upgrade_message">Приобретите подписку на Plus и пользуйтесь эксклюзивными функциями, такими как «Папки», «Закладки» и др.</string>
+    <string name="notification_offers_upgrade_title">Ваши подкасты — ваши правила</string>
+    <string name="notification_new_features_smart_folders_message">Попробуйте Plus и автоматически распределите свои шоу по папкам</string>
+    <string name="notification_new_features_smart_folders_title">Организация подкастов</string>
+    <string name="notifications_settings_turn_on_push_button">Открыть настройки устройства</string>
+    <string name="notifications_settings_turn_on_push_message">Чтобы получать уведомления от Pocket Casts, необходимо включить их в настройках устройства.</string>
+    <string name="notifications_settings_turn_on_push_title">Включить push-уведомления?</string>
+    <string name="notification_content_recommendations_message">Раздумываете, что послушать дальше? Взгляните на эти шоу!</string>
+    <string name="notification_content_recommendations_title">Новые рекомендации для вас</string>
+    <string name="notification_content_recommendations_trending_message">Посмотрите, что популярно на этой неделе.</string>
+    <string name="notification_content_recommendations_trending_title">Тренды недели</string>
+    <string name="notification_reengage_catch_up_offline_title">Слушайте офлайн</string>
+    <string name="notification_reengage_we_miss_you_message">Вы уже давно ничего не слушали. Возвращайтесь с удовольствием!</string>
+    <string name="notification_reengage_we_miss_you_title">Нам вас не хватает!</string>
+    <string name="notification_plus_upsell_message">Приобретите подписку на Plus и пользуйтесь эксклюзивными функциями, такими как «Папки», «Закладки» и др.</string>
+    <string name="notification_plus_upsell_title">Ваши подкасты — ваши правила</string>
+    <string name="notification_staff_picks_message">Идеальные подкасты, вручную отобранные специально для вас настоящими знатоками и любителями подкастов.</string>
+    <string name="notification_staff_picks_title">Выбор наших экспертов</string>
+    <string name="notification_themes_message">Просмотрите наши темы и найдите ту, которая отвечает вашему стилю.</string>
+    <string name="notification_themes_title">Пора освежить дизайн</string>
+    <string name="notification_filters_message">Создавайте умные фильтры, чтобы упорядочивать выпуски.</string>
+    <string name="notification_filters_title">Упорядочивайте выпуски</string>
+    <string name="notification_up_next_message">Создавайте списки воспроизведения и забудьте о беспорядке в выпусках.</string>
+    <string name="notification_up_next_title">Упростите очередь</string>
+    <string name="notification_import_message">Переходите из другого приложения? Перенесите все любимые шоу в Pocket Casts.</string>
+    <string name="notification_import_title">Импортируйте подкасты без проблем</string>
+    <string name="notification_sync_message">Создайте бесплатную учётную запись, чтобы синхронизировать шоу и прослушивать их на любых устройствах.</string>
+    <string name="notification_sync_title">Ваши шоу на любом устройстве!</string>
+    <string name="notification_channel_description_offers">Показывает уведомления об эксклюзивных предложениях, скидках и промоакциях, которые помогут вам максимально эффективно использовать возможности Pocket Casts</string>
+    <string name="notification_channel_description_new_features_and_tips">Показывает уведомления о новых функциях и обновлениях, а также полезные советы, которые помогут вам оптимизировать использование Pocket Casts</string>
+    <string name="notification_channel_description_trending_and_recommendations">Показывает популярные подкасты и тщательно подобранные рекомендации, которые помогут вам находить новое и интересное</string>
+    <string name="notification_channel_description_daily_reminders">Показывает полезные рекомендации, чтобы поддерживать привычку к прослушиванию.</string>
+    <string name="settings_notification_offers">Предложения Pocket Casts</string>
+    <string name="settings_notification_new_features">Новые функции и советы</string>
+    <string name="settings_notification_recommendations">Тренды и рекомендации</string>
+    <string name="settings_notification_daily_reminders">Ежедневные напоминания</string>
     <string name="bookmarks_search_results_not_found">Не удалось найти закладки по вашему запросу. Попробуйте поискать по другому ключевому слову.</string>
     <string name="podcast_no_episodes_matching">Не удалось найти выпуски по этому запросу. Попробуйте поискать по другому ключевому слову.</string>
     <string name="podcast_no_bookmarks_matching">В этом подкасте нет закладок, соответствующих вашему запросу. Попробуйте поискать по другому ключевому слову.</string>
@@ -1976,6 +2033,11 @@ Language: ru
         <item quantity="one">%1$d мес.</item>
         <item quantity="few">%1$d мес.</item>
         <item quantity="many">%1$d мес.</item>
+    </plurals>
+    <plurals name="notification_reengage_catch_up_offline_message">
+        <item quantity="one">Вы скачали %d новый выпуск и можете начинать слушать!</item>
+        <item quantity="few">Вы скачали новые выпуски (%d) и можете начинать слушать!</item>
+        <item quantity="many">Вы скачали новые выпуски (%d) и можете начинать слушать!</item>
     </plurals>
     <plurals name="player_up_next_header_title">
         <item quantity="one" formatted="true">%1$d выпуск — %2$s осталось</item>

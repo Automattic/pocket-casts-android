@@ -1,11 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-05-27 09:54:03+0000
+Translation-Revision-Date: 2025-06-17 09:54:04+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="onboarding_plus_feature_no_banner_ads">배너 광고 없음</string>
+    <string name="banner_ad_plus_prompt">Pocket Casts Plus로 배너 광고를 제거하고 다양한 기능을 이용해 보세요</string>
+    <string name="ad_report_reason_other">기타</string>
+    <string name="ad_report_reason_too_often">이 광고가 너무 자주 표시됩니다</string>
+    <string name="ad_report_reason_malicious">악성 광고입니다</string>
+    <string name="ad_report_reason_broken">이 광고가 제대로 표시되지 않습니다</string>
+    <string name="ad_report_reason_question">이 광고를 신고하는 이유가 무엇인가요?</string>
+    <string name="report_ad">광고 신고</string>
+    <string name="remove_ads">광고 제거</string>
+    <string name="price_per_month_usd">\u0024%1$.2f/월</string>
+    <string name="price_per_month">%1$.2f %2$s/월</string>
+    <string name="go_to_ad">다음 광고로 이동: %1$s</string>
+    <string name="ad_image">광고 이미지</string>
+    <string name="ad_options">광고 옵션</string>
+    <string name="ad">광고</string>
+    <string name="notification_mockup_image_description">목업 이미지</string>
+    <string name="notification_snack_cta">설정 열기</string>
+    <string name="notification_snack_message">기기 설정에서 알림을 허용하세요.</string>
+    <string name="notification_prompt_cta">알림 허용</string>
+    <string name="notification_prompt_message">알림은 새 에피소드를 추적하고, 새 프로그램의 추천과 Pocket Casts에 대한 팁을 얻는 가장 좋은 방법입니다.</string>
+    <string name="notification_prompt_title">최신 상태로 유지하세요!</string>
+    <string name="notification_offers_upgrade_message">Plus로 폴더, 북마크를 비롯한 독점 기능을 잠금 해제하세요!</string>
+    <string name="notification_offers_upgrade_title">팟캐스트 수준 높이기</string>
+    <string name="notification_new_features_smart_folders_message">Plus를 사용해 보고 폴더로 프로그램을 자동으로 정리하세요.</string>
+    <string name="notification_new_features_smart_folders_title">간편하게 팟캐스트 정리하기</string>
+    <string name="notifications_settings_turn_on_push_button">기기 설정으로 이동</string>
+    <string name="notifications_settings_turn_on_push_message">Pocket Casts의 알림을 받으려면 기기 설정에서 알림을 켜야 합니다.</string>
+    <string name="notifications_settings_turn_on_push_title">푸시 알림을 켜는 방법</string>
+    <string name="notification_content_recommendations_message">다음에 어떤 걸 들어야 할지 모르시겠나요? 이러한 프로그램을 확인하세요!</string>
+    <string name="notification_content_recommendations_title">회원님을 위한 새로운 추천</string>
+    <string name="notification_content_recommendations_trending_message">이번 주에 다른 사람들이 어떤 걸 듣고 있는지 확인하세요.</string>
+    <string name="notification_content_recommendations_trending_title">이번 주 인기 항목</string>
+    <string name="notification_reengage_catch_up_offline_title">오프라인으로 따라잡기</string>
+    <string name="notification_reengage_we_miss_you_message">마지막으로 청취하신 지 시간이 꽤 흘렀습니다. 다시 뛰어들어 즐겨보세요!</string>
+    <string name="notification_reengage_we_miss_you_title">보고 싶었어요!</string>
+    <string name="notification_plus_upsell_message">Plus로 폴더, 북마크를 비롯한 독점 기능을 잠금 해제하세요!</string>
+    <string name="notification_plus_upsell_title">팟캐스트 수준 높이기</string>
+    <string name="notification_staff_picks_message">실제로 팟캐스트를 좋아하는 사람들이 회원님을 위해 엄선한 완벽하게 무르익은 팟캐스트입니다.</string>
+    <string name="notification_staff_picks_title">스태프 선정 둘러보기</string>
+    <string name="notification_themes_message">테마를 둘러보며 회원님의 스타일에 어울리는 테마를 찾아보세요.</string>
+    <string name="notification_themes_title">새로운 모습을 위한 시간</string>
+    <string name="notification_filters_message">스마트 필터를 생성하여 에피소드를 정리하세요.</string>
+    <string name="notification_filters_title">에피소드 정리</string>
+    <string name="notification_up_next_message">재생 대기열을 만들어 한 에피소드가 끝나도 헤매지 않도록 하세요.</string>
+    <string name="notification_up_next_title">대기열 간소화</string>
+    <string name="notification_import_message">다른 앱에서 전환하려고 하시나요? 여러분이 좋아하는 모든 프로그램을 Pocket Casts로 가져오세요.</string>
+    <string name="notification_import_title">손쉽게 팟캐스트 가져오기</string>
+    <string name="notification_sync_message">무료 계정을 만들어 프로그램을 동기화하고 어디에서나 청취하세요.</string>
+    <string name="notification_sync_title">모든 기기에서 프로그램을 청취할 수 있습니다!</string>
+    <string name="notification_channel_description_offers">독점 혜택, 할인, 프로모션에 대한 알림을 표시하여 Pocket Casts 경험을 최대한 활용하는 데 도움을 받습니다.</string>
+    <string name="notification_channel_description_new_features_and_tips">새로운 기능, 업데이트, 유용한 팁에 대한 알림을 표시하여 Pocket Casts 경험을 최적화하는 데 도움을 받습니다.</string>
+    <string name="notification_channel_description_trending_and_recommendations">인기 팟캐스트와 엄선된 추천 항목을 표시하여 마음에 드는 프로그램을 찾는 데 도움을 받습니다.</string>
+    <string name="notification_channel_description_daily_reminders">유용한 제안을 표시하여 청취 루틴에 도움을 받습니다.</string>
+    <string name="settings_notification_offers">Pocket Casts 혜택</string>
+    <string name="settings_notification_new_features">새로운 기능 및 팁</string>
+    <string name="settings_notification_recommendations">인기 및 추천 항목</string>
+    <string name="settings_notification_daily_reminders">일일 알림</string>
     <string name="bookmarks_search_results_not_found">검색 기준과 일치하는 북마크가 없습니다. 다른 키워드를 사용해 보세요.</string>
     <string name="podcast_no_episodes_matching">해당 검색어와 일치하는 에피소드가 없습니다. 다른 키워드를 사용해 보세요.</string>
     <string name="podcast_no_bookmarks_matching">이 팟캐스트에 검색 기준과 일치하는 북마크가 없습니다. 다른 키워드를 사용해 보세요.</string>
@@ -1962,6 +2019,9 @@ Language: ko_KR
     </plurals>
     <plurals name="month_with_count">
         <item quantity="other">%1$d개월</item>
+    </plurals>
+    <plurals name="notification_reengage_catch_up_offline_message">
+        <item quantity="other">새 에피소드%d개가 다운로드되었으며, 바로 청취하실 수 있습니다!</item>
     </plurals>
     <plurals name="player_up_next_header_title">
         <item quantity="other" formatted="true">%1$d 에피소드 - %2$s 남음</item>
