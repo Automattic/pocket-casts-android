@@ -1,9 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.settings
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.Canvas
 import android.webkit.HttpAuthHandler
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
@@ -22,22 +19,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.zIndex
-import androidx.core.graphics.createBitmap
 import com.kevinnzou.web.AccompanistWebViewClient
 import com.kevinnzou.web.WebView
 import com.kevinnzou.web.rememberWebViewState
-import java.io.File
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import timber.log.Timber
 
 @Composable
 internal fun HackWeekEoYPage(
     onGoBack: () -> Unit,
     isSubscribedCallback: () -> Boolean,
     onUpsell: () -> Unit,
-    onShareScreenshot: (File) -> Unit,
+    onShareScreenshot: () -> Unit,
     modifier: Modifier = Modifier,
     onWebViewCreated: (WebView) -> Unit = {},
     onWebViewDisposed: (WebView) -> Unit = {},
@@ -65,6 +57,7 @@ internal fun HackWeekEoYPage(
                     @SuppressLint("SetJavaScriptEnabled")
                     javaScriptEnabled = true
                     domStorageEnabled = true
+                    textZoom = 100
                 }
                 webView.addJavascriptInterface(
                     EoYJavascriptInterface {
@@ -77,7 +70,7 @@ internal fun HackWeekEoYPage(
 
                                 EoYWebMessage.Close -> onGoBack()
                                 EoYWebMessage.Upsell -> onUpsell()
-                                is EoYWebMessage.ShareStory -> takeScreenshotAndShare(webView, onShareScreenshot)
+                                is EoYWebMessage.ShareStory -> onShareScreenshot()
                             }
                         }
                     },
@@ -95,33 +88,6 @@ internal fun HackWeekEoYPage(
             CircularProgressIndicator()
         }
     }
-}
-
-private suspend fun takeScreenshotAndShare(webView: WebView, shareCallback: (File) -> Unit) = runCatching {
-    val width = webView.width
-    val height = webView.height
-    val bitmap = createBitmap(width, height)
-    val canvas = Canvas(bitmap)
-    webView.draw(canvas)
-    bitmap
-}.onSuccess {
-    runCatching {
-        writeToFileAndShare(webView.context, it)
-    }.onSuccess {
-        shareCallback(it)
-    }.onFailure {
-        Timber.d("Failed to compress bitmap to png file: $it")
-    }.getOrNull()
-}.onFailure {
-    Timber.d("Failed to take screenshot of webview: $it")
-}.getOrNull()
-
-private suspend fun writeToFileAndShare(context: Context, bitmap: Bitmap) = withContext(Dispatchers.IO) {
-    val file = File(context.cacheDir, "pocket-casts-eoy.png")
-    file.outputStream().use { stream ->
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
-    }
-    file
 }
 
 sealed class EoYWebMessage {

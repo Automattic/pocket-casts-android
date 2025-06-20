@@ -20,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
+import au.com.shiftyjelly.pocketcasts.settings.util.WebViewScreenshotCapture
 import au.com.shiftyjelly.pocketcasts.sharing.SharingClient
 import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
 import au.com.shiftyjelly.pocketcasts.ui.extensions.setupKeyboardModePan
@@ -41,6 +42,8 @@ class HackWeekEoYFragment : BaseFragment(), HasBackstack {
     @Inject lateinit var sharingClient: SharingClient
 
     @Inject lateinit var settings: Settings
+
+    @Inject lateinit var screenshotCapture: WebViewScreenshotCapture
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -71,8 +74,16 @@ class HackWeekEoYFragment : BaseFragment(), HasBackstack {
                     )
                 },
                 onShareScreenshot = {
-                    coroutineScope.launch {
-                        sharingClient.share(SharingRequest.hackEoYScreenshot(it).build())
+                    val activity = activity
+                    val webView = webView
+
+                    if (activity != null && webView != null) {
+                        coroutineScope.launch {
+                            val file = screenshotCapture.captureScreenshot(webView, activity)
+                            file?.let {
+                                sharingClient.share(SharingRequest.hackEoYScreenshot(it).build())
+                            }
+                        }
                     }
                 },
                 onWebViewCreated = { webView = it },
