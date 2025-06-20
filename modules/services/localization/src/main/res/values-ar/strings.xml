@@ -1,11 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-05-26 12:54:04+0000
+Translation-Revision-Date: 2025-06-16 13:54:03+0000
 Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;
 Generator: GlotPress/2.4.0-alpha
 Language: ar
 -->
 <resources>
+    <string name="onboarding_plus_feature_no_banner_ads">لا توجد إعلانات شعارات</string>
+    <string name="banner_ad_plus_prompt">قل وداعًا لإعلانات الشعارات وغيرها باستخدام Pocket Casts Plus</string>
+    <string name="ad_report_reason_other">أخرى</string>
+    <string name="ad_report_reason_too_often">ترى هذا الإعلان كثيرًا</string>
+    <string name="ad_report_reason_malicious">هذا إعلان ضار</string>
+    <string name="ad_report_reason_broken">يبدو هذا الإعلان معطلًا</string>
+    <string name="ad_report_reason_question">لماذا تُبلغ عن هذا الإعلان؟</string>
+    <string name="report_ad">الإبلاغ عن إعلان</string>
+    <string name="remove_ads">حذف الإعلانات</string>
+    <string name="price_per_month_usd">\u0024%1$.2f/شهريًا</string>
+    <string name="price_per_month">%1$.2f ⁦%2$s⁩/شهريًا</string>
+    <string name="go_to_ad">انتقل إلى الإعلان: ⁦%1$s⁩</string>
+    <string name="ad_image">الصورة الخاصة بالإعلان</string>
+    <string name="ad_options">خيارات الإعلان</string>
+    <string name="ad">إعلان</string>
+    <string name="notification_mockup_image_description">صورة نموذج بالحجم الطبيعي</string>
+    <string name="notification_snack_cta">فتح الإعدادات</string>
+    <string name="notification_snack_message">يُرجى السماح بالتنبيهات في إعدادات جهازك</string>
+    <string name="notification_prompt_cta">السماح بالتنبيهات</string>
+    <string name="notification_prompt_message">تعد التنبيهات أفضل طريقة لتتبع الحلقات الجديدة والحصول على توصيات بالعروض والنصائح الجديدة حول Pocket Casts.</string>
+    <string name="notification_prompt_title">ابق على اطلاع!</string>
+    <string name="notification_offers_upgrade_message">افتح الميزات الحصرية مثل المجلدات، والإشارات المرجعية، وغير ذلك المزيد باستخدام Plus!</string>
+    <string name="notification_offers_upgrade_title">الارتقاء بمستوى لعبة البودكاست لديك</string>
+    <string name="notification_new_features_smart_folders_message">جرب Plus ونظم عروضك تلقائيًا باستخدام المجلدات</string>
+    <string name="notification_new_features_smart_folders_title">تم تنظيم حلقات البودكاست لديك</string>
+    <string name="notifications_settings_turn_on_push_button">انتقل إلى إعدادات الجهاز</string>
+    <string name="notifications_settings_turn_on_push_message">للحصول على تنبيهات من Pocket Casts، سيتعين عليك تشغيلها في إعدادات الجهاز لديك.</string>
+    <string name="notifications_settings_turn_on_push_title">هل ترغب في تشغيل التنبيهات المؤقتة؟</string>
+    <string name="notification_content_recommendations_message">هل تتساءل عما يجب عليك سماعه بعد ذلك؟ تحقق من هذه العروض!</string>
+    <string name="notification_content_recommendations_title">توصيات جديدة لك</string>
+    <string name="notification_content_recommendations_trending_message">تحقق من ما يستمع إليه الجميع هذا الأسبوع.</string>
+    <string name="notification_content_recommendations_trending_title">الرائج في هذا الأسبوع</string>
+    <string name="notification_reengage_catch_up_offline_title">ابق على اطلاع من دون اتصال بالإنترنت</string>
+    <string name="notification_reengage_we_miss_you_message">لقد مضى بعض الوقت منذ أن استمعت. أسترخي قليلًا واستمتع!</string>
+    <string name="notification_reengage_we_miss_you_title">نحن نفتقدك!</string>
+    <string name="notification_plus_upsell_message">افتح ميزات حصرية مثل المجلدات، والإشارات المرجعية، وغير ذلك المزيد باستخدام Plus!</string>
+    <string name="notification_plus_upsell_title">الارتقاء بمستوى لعبة البودكاست لديك</string>
+    <string name="notification_staff_picks_message">حلقات بودكاست ناضجة تمامًا، تم انتقاؤها من أجلك فقط من قبل أشخاص حقيقيين يحبون البودكاست.</string>
+    <string name="notification_staff_picks_title">استكشف اختيارات فريق العمل لدينا</string>
+    <string name="notification_themes_message">تصفح القوالب لدينا واعثر على القالب الذي يناسب أسلوبك.</string>
+    <string name="notification_themes_title">حان الوقت لإضافة مظهر جديد</string>
+    <string name="notification_filters_message">أنشئ عوامل تصفية ذكية لتنظيم حلقاتك.</string>
+    <string name="notification_filters_title">تنظيم حلقاتك</string>
+    <string name="notification_up_next_message">أنشئ قائمة انتظار التشغيل ولا تفوت الحلقات.</string>
+    <string name="notification_up_next_title">تبسيط قائمة الانتظار لديك</string>
+    <string name="notification_import_message">هل ترغب في التبديل من تطبيق آخر؟ أحضر كل عروضك المفضلة إلى Pocket Casts.</string>
+    <string name="notification_import_title">احصل على حلقات البودكاست لديك بسهولة</string>
+    <string name="notification_sync_message">أنشئ حسابًا مجانيًا لمزامنة عروضك والاستماع إليها من أي مكان.</string>
+    <string name="notification_sync_title">تابع عروضك، على أي جهاز!</string>
+    <string name="notification_channel_description_offers">يعرض تنبيهات حول العروض الحصرية، والتخفيضات، والعروض الترويجية لمساعدتك على تحقيق أقصى إستفادة من تجربتك على Pocket Casts</string>
+    <string name="notification_channel_description_new_features_and_tips">يعرض تنبيهات حول الميزات الجديدة، والتحديثات، والنصائح المفيدة لمساعدتك على تحسين تجربة Pocket Casts الخاصة بك</string>
+    <string name="notification_channel_description_trending_and_recommendations">يعرض حلقات البودكاست الرائجة والتوصيات المنسقة لمساعدتك على اكتشاف مفضلات جديدة</string>
+    <string name="notification_channel_description_daily_reminders">يعرض اقتراحات مفيدة لدعم روتين الاستماع لديك.</string>
+    <string name="settings_notification_offers">يوفر Pocket Casts</string>
+    <string name="settings_notification_new_features">الميزات والنصائح الجديدة</string>
+    <string name="settings_notification_recommendations">المحتوى الرائج والتوصيات</string>
+    <string name="settings_notification_daily_reminders">التذكيرات اليومية</string>
     <string name="bookmarks_search_results_not_found">لم نعثر على أي إشارة مرجعية تطابق معايير البحث. جرِّب كلمة مفتاحية أخرى.</string>
     <string name="podcast_no_episodes_matching">لم نعثر على أي حلقة تطابق هذا البحث. جرِّب كلمة مفتاحية أخرى.</string>
     <string name="podcast_no_bookmarks_matching">لا يتضمن هذا البث الصوتي أي إشارات مرجعية تطابق معايير البحث. جرِّب كلمة مفتاحية أخرى.</string>
@@ -1995,6 +2052,14 @@ Language: ar
         <item quantity="few">⁦%1$d⁩ من الأشهر</item>
         <item quantity="many">⁦%1$d⁩ من الأشهر</item>
         <item quantity="other">⁦%1$d⁩ من الأشهر</item>
+    </plurals>
+    <plurals name="notification_reengage_catch_up_offline_message">
+        <item quantity="zero">لديك حلقة %d جديدة تم تنزيلها وأصبحت جاهزة للبدء!</item>
+        <item quantity="one">لديك حلقة %d جديدة تم تنزيلها وأصبحت جاهزة للبدء!</item>
+        <item quantity="two">لديك حلقات %d جديدة تم تنزيلها وأصبحت جاهزة للبدء!</item>
+        <item quantity="few">لديك حلقات %d جديدة تم تنزيلها وأصبحت جاهزة للبدء!</item>
+        <item quantity="many">لديك حلقات %d جديدة تم تنزيلها وأصبحت جاهزة للبدء!</item>
+        <item quantity="other">لديك حلقات %d جديدة تم تنزيلها وأصبحت جاهزة للبدء!</item>
     </plurals>
     <plurals name="player_up_next_header_title">
         <item quantity="zero">⁦%1$d⁩ من الحلقات - ⁦%2$s⁩ لليسار</item>

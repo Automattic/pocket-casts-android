@@ -1,11 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-05-27 14:54:05+0000
+Translation-Revision-Date: 2025-06-18 09:54:07+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="onboarding_plus_feature_no_banner_ads">Geen banneradvertenties</string>
+    <string name="banner_ad_plus_prompt">Zeg vaarwel tegen banneradvertenties en meer met Pocket Casts Plus</string>
+    <string name="ad_report_reason_other">Anders</string>
+    <string name="ad_report_reason_too_often">Ik zie deze advertentie te vaak</string>
+    <string name="ad_report_reason_malicious">Dit is een schadelijke advertentie</string>
+    <string name="ad_report_reason_broken">Deze advertentie lijkt kapot</string>
+    <string name="ad_report_reason_question">Waarom rapporteer je deze advertentie?</string>
+    <string name="report_ad">Advertentie rapporteren</string>
+    <string name="remove_ads">Advertenties verwijderen</string>
+    <string name="price_per_month_usd">\u0024%1$.2f/maand</string>
+    <string name="price_per_month">%1$.2f %2$s/maand</string>
+    <string name="go_to_ad">Ga naar advertentie: %1$s</string>
+    <string name="ad_image">Advertentie-afbeelding</string>
+    <string name="ad_options">Advertentie-opties</string>
+    <string name="notification_mockup_image_description">Mockup-afbeelding</string>
+    <string name="notification_snack_cta">Instellingen openen</string>
+    <string name="notification_snack_message">Sta meldingen toe in je apparaatinstellingen</string>
+    <string name="notification_prompt_cta">Meldingen toestaan</string>
+    <string name="notification_prompt_message">Meldingen zijn de beste manier om op de hoogte te blijven van nieuwe afleveringen, aanbevelingen te krijgen voor nieuwe shows en tips over Pocket Casts.</string>
+    <string name="notification_prompt_title">Blijf op de hoogte!</string>
+    <string name="notification_offers_upgrade_message">Ontgrendel exclusieve functies zoals mappen, bladwijzers en meer met Plus!</string>
+    <string name="notification_offers_upgrade_title">Verbeter je podcastbeleving</string>
+    <string name="notification_new_features_smart_folders_message">Probeer Plus en organiseer je shows automatisch in mappen</string>
+    <string name="notification_new_features_smart_folders_title">Jouw podcasts geordend</string>
+    <string name="notifications_settings_turn_on_push_button">Apparaatinstellingen openen</string>
+    <string name="notifications_settings_turn_on_push_message">Om meldingen van Pocket Casts te ontvangen, moet je ze inschakelen in de instellingen van je apparaat.</string>
+    <string name="notifications_settings_turn_on_push_title">Pushmeldingen aanzetten?</string>
+    <string name="notification_content_recommendations_message">Benieuwd naar wat je nu gaat luisteren? Bekijk deze shows!</string>
+    <string name="notification_content_recommendations_title">Nieuwe aanbevelingen voor jou</string>
+    <string name="notification_content_recommendations_trending_message">Bekijk hier waar anderen deze week naar luisteren.</string>
+    <string name="notification_content_recommendations_trending_title">Trending deze week</string>
+    <string name="notification_reengage_catch_up_offline_title">Offline inhalen</string>
+    <string name="notification_reengage_we_miss_you_message">Het is een tijdje geleden dat je hebt geluisterd. We hopen je snel weer te zien.</string>
+    <string name="notification_reengage_we_miss_you_title">We missen je!</string>
+    <string name="notification_plus_upsell_message">Ontgrendel exclusieve functies zoals mappen, bladwijzers en meer met Plus!</string>
+    <string name="notification_plus_upsell_title">Verbeter je podcastbeleving</string>
+    <string name="notification_staff_picks_message">Perfect rijpe podcasts, speciaal voor jou gekozen door echte podcastliefhebbers.</string>
+    <string name="notification_staff_picks_title">Ontdek de keuzes van onze medewerkers</string>
+    <string name="notification_themes_message">Blader door onze thema\'s en vind het thema dat bij je stijl past.</string>
+    <string name="notification_themes_title">Tijd voor een nieuwe look</string>
+    <string name="notification_filters_message">Maak slimme filters aan om je afleveringen te organiseren.</string>
+    <string name="notification_filters_title">Organiseer je afleveringen</string>
+    <string name="notification_up_next_message">Maak een afspeelwachtrij en neem afscheid van zoeken naar afleveringen.</string>
+    <string name="notification_up_next_title">Vereenvoudig je wachtrij</string>
+    <string name="notification_import_message">Stap je over van een andere app? Neem al je favoriete shows mee naar Pocket Casts.</string>
+    <string name="notification_import_title">Importeer je podcasts eenvoudig</string>
+    <string name="notification_sync_message">Maak een gratis account aan om je shows te synchroniseren en overal te luisteren.</string>
+    <string name="notification_sync_title">Je shows, op elk apparaat!</string>
+    <string name="notification_channel_description_offers">Laat meldingen zien over exclusieve aanbiedingen, kortingen en promoties om je te helpen het beste uit Pocket Casts te halen</string>
+    <string name="notification_channel_description_new_features_and_tips">Laat meldingen zien over nieuwe functies, updates en handige tips om je te helpen je Pocket Casts-ervaring te optimaliseren</string>
+    <string name="notification_channel_description_trending_and_recommendations">Toont trending podcasts en speciaal geselecteerde aanbevelingen om je te helpen nieuwe favorieten te ontdekken</string>
+    <string name="notification_channel_description_daily_reminders">Laat nuttige suggesties zien om je luisterroutine te ondersteunen.</string>
+    <string name="settings_notification_offers">Pocket Casts-aanbiedingen</string>
+    <string name="settings_notification_new_features">Nieuwe functies en tips</string>
+    <string name="settings_notification_recommendations">Trending en aanbevelingen</string>
+    <string name="settings_notification_daily_reminders">Dagelijkse herinneringen</string>
     <string name="bookmarks_search_results_not_found">We kunnen geen bladwijzer vinden die aan je zoekopdracht voldoet. Probeer een ander trefwoord.</string>
     <string name="podcast_no_episodes_matching">We kunnen geen aflevering vinden voor die zoekopdracht. Probeer een ander trefwoord.</string>
     <string name="podcast_no_bookmarks_matching">Deze podcast heeft geen bladwijzers die overeenkomen met je zoekcriteria. Probeer een ander trefwoord.</string>
@@ -1969,6 +2025,10 @@ Language: nl
     <plurals name="month_with_count">
         <item quantity="one">%1$d maand</item>
         <item quantity="other">%1$d maanden</item>
+    </plurals>
+    <plurals name="notification_reengage_catch_up_offline_message">
+        <item quantity="one">Je hebt %d nieuwe aflevering gedownload en deze is klaar voor gebruik!</item>
+        <item quantity="other">Je hebt %d nieuwe afleveringen gedownload en ze zijn klaar voor gebruik!</item>
     </plurals>
     <plurals name="player_up_next_header_title">
         <item quantity="one" formatted="true">%1$d aflevering - nog %2$s</item>

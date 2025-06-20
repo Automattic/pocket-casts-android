@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-06-05 17:37:31+0000
+Translation-Revision-Date: 2025-06-17 23:32:45+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: ca
 -->
 <resources>
+    <string name="onboarding_plus_feature_no_banner_ads">Sense anuncis publicitaris</string>
+    <string name="banner_ad_plus_prompt">Digues adeu als anuncis publicitaris i més amb Pocket Casts Plus</string>
+    <string name="ad_report_reason_other">Altres</string>
+    <string name="ad_report_reason_too_often">Veig aquest anunci massa sovint</string>
+    <string name="ad_report_reason_malicious">Aquest és un anunci maliciós</string>
+    <string name="ad_report_reason_broken">Aquest anunci sembla trencat</string>
+    <string name="ad_report_reason_question">Per què estàs denunciant aquest anunci?</string>
+    <string name="report_ad">Denunciar l\'anunci</string>
+    <string name="remove_ads">Esborrar anuncis</string>
     <string name="price_per_month_usd">\u0024%1$.2f/mes</string>
     <string name="price_per_month">%1$.2f %2$s/mes</string>
     <string name="go_to_ad">Vés a l\'anunci: %1$s</string>
@@ -68,7 +77,7 @@ Language: ca
     <string name="onboarding_plus_recurring_after_intro_offer">Pagament recurrent a %1$s després del teu primer any (%2$s)</string>
     <string name="you_might_like_empty_title">No s\'han pogut carregar les recomanacions</string>
     <string name="onboarding_plus_feature_libro_title">Àudiollibre gratuït de &lt;a href=\"https://libro.fm/\"&gt;Libro.fm&lt;/a&gt;</string>
-    <string name="you_might_like">Et podria agradar</string>
+    <string name="you_might_like">Et pot agradar</string>
     <string name="podroll_information_button">D\'acord</string>
     <string name="podroll_information_summary">Les seleccions del creador són pòdcasts recomanats pel creador  mitjançant Podroll.</string>
     <string name="podroll_information_title">Què són les seleccions del creador?</string>

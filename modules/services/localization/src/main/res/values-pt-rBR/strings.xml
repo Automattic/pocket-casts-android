@@ -1,11 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-05-26 16:54:03+0000
+Translation-Revision-Date: 2025-06-17 16:54:03+0000
 Plural-Forms: nplurals=2; plural=(n > 1);
 Generator: GlotPress/2.4.0-alpha
 Language: pt_BR
 -->
 <resources>
+    <string name="onboarding_plus_feature_no_banner_ads">Sem anúncios de banner</string>
+    <string name="banner_ad_plus_prompt">Diga adeus aos anúncios de banner e muito mais com o Pocket Casts Plus</string>
+    <string name="ad_report_reason_other">Outro</string>
+    <string name="ad_report_reason_too_often">Vejo este anúncio com muita frequência</string>
+    <string name="ad_report_reason_malicious">Este anúncio é mal-intencionado</string>
+    <string name="ad_report_reason_broken">Este anúncio parece estar corrompido</string>
+    <string name="ad_report_reason_question">Por que você está denunciando este anúncio?</string>
+    <string name="report_ad">Denunciar anúncio</string>
+    <string name="remove_ads">Remover anúncios</string>
+    <string name="price_per_month_usd">\u0024 %1$.2f/mês</string>
+    <string name="price_per_month">%1$.2f %2$s/mês</string>
+    <string name="go_to_ad">Ir para publicidade: %1$s</string>
+    <string name="ad_image">Imagem de publicidade</string>
+    <string name="ad_options">Opções de publicidade</string>
+    <string name="ad">Anúncio</string>
+    <string name="notification_mockup_image_description">Imagem de exemplo</string>
+    <string name="notification_snack_cta">Abrir configurações</string>
+    <string name="notification_snack_message">Permita notificações nas configurações do seu dispositivo</string>
+    <string name="notification_prompt_cta">Permitir notificações</string>
+    <string name="notification_prompt_message">As notificações são a melhor maneira de acompanhar novos episódios, obter recomendações de novos programas e receber dicas sobre o Pocket Casts.</string>
+    <string name="notification_prompt_title">Fique por dentro!</string>
+    <string name="notification_offers_upgrade_message">Desbloqueie funcionalidades exclusivas, como pastas, favoritos e muito mais, com o Plus!</string>
+    <string name="notification_offers_upgrade_title">Melhore sua experiência com podcast</string>
+    <string name="notification_new_features_smart_folders_message">Experimente o Plus e organize automaticamente seus programas com pastas</string>
+    <string name="notification_new_features_smart_folders_title">Seus podcasts organizados</string>
+    <string name="notifications_settings_turn_on_push_button">Ir para as configurações do dispositivo</string>
+    <string name="notifications_settings_turn_on_push_message">Ative as notificações do Pocket Casts nas configurações do dispositivo para começar a recebê-las.</string>
+    <string name="notifications_settings_turn_on_push_title">Ativar notificações por push?</string>
+    <string name="notification_content_recommendations_message">Não sabe o que ouvir a seguir? Confira estes programas!</string>
+    <string name="notification_content_recommendations_title">Novas recomendações para você</string>
+    <string name="notification_content_recommendations_trending_message">Confira o que todo mundo está ouvindo esta semana.</string>
+    <string name="notification_content_recommendations_trending_title">Em alta esta semana</string>
+    <string name="notification_reengage_catch_up_offline_title">Ouça offline</string>
+    <string name="notification_reengage_we_miss_you_message">Faz tempo que você não ouve nada. Volte e aproveite!</string>
+    <string name="notification_reengage_we_miss_you_title">Estamos com saudade!</string>
+    <string name="notification_plus_upsell_message">Desbloqueie funcionalidades exclusivas, como pastas, favoritos e muito mais, com o Plus!</string>
+    <string name="notification_plus_upsell_title">Melhore sua experiência com podcast</string>
+    <string name="notification_staff_picks_message">Uma seleção de podcasts feita com carinho por apaixonados por podcasts como você.</string>
+    <string name="notification_staff_picks_title">Confira a seleção da nossa equipe</string>
+    <string name="notification_themes_message">Dê uma olhada nos nossos temas e escolha um que combine com você.</string>
+    <string name="notification_themes_title">Hora de dar uma repaginada</string>
+    <string name="notification_filters_message">Crie filtros inteligentes para organizar seus episódios.</string>
+    <string name="notification_filters_title">Organize seus episódios</string>
+    <string name="notification_up_next_message">Monte sua fila de reprodução e ouça os episódios em sequência.</string>
+    <string name="notification_up_next_title">Simplifique sua fila</string>
+    <string name="notification_import_message">Vindo de outro aplicativo? Traga todos os seus programas favoritos para o Pocket Casts.</string>
+    <string name="notification_import_title">Importe seus podcasts com facilidade</string>
+    <string name="notification_sync_message">Crie uma conta gratuita para sincronizar seus programas e ouvir em qualquer lugar.</string>
+    <string name="notification_sync_title">Ouça seus programas em qualquer dispositivo!</string>
+    <string name="notification_channel_description_offers">Mostra notificações sobre ofertas exclusivas, descontos e promoções para você aproveitar ao máximo sua experiência no Pocket Casts</string>
+    <string name="notification_channel_description_new_features_and_tips">Mostra notificações sobre novas funcionalidades, atualizações e dicas úteis para otimizar sua experiência no Pocket Casts</string>
+    <string name="notification_channel_description_trending_and_recommendations">Mostra os podcasts em destaque e recomendações selecionadas para ajudar você a descobrir novos favoritos</string>
+    <string name="notification_channel_description_daily_reminders">Mostra sugestões úteis para ajudar você a colocar os podcasts na sua rotina.</string>
+    <string name="settings_notification_offers">Ofertas do Pocket Casts</string>
+    <string name="settings_notification_new_features">Novas funcionalidades e dicas</string>
+    <string name="settings_notification_recommendations">Podcasts em alta e recomendações</string>
+    <string name="settings_notification_daily_reminders">Lembretes diários</string>
     <string name="bookmarks_search_results_not_found">Não encontramos nenhum favorito que corresponda aos seus critérios de pesquisa. Tente outra palavra-chave.</string>
     <string name="podcast_no_episodes_matching">Não encontramos nenhum episódio para essa pesquisa. Tente outra palavra-chave.</string>
     <string name="podcast_no_bookmarks_matching">Este podcast não tem favoritos correspondentes aos seus critérios de pesquisa. Tente outra palavra-chave.</string>
@@ -272,6 +329,7 @@ Language: pt_BR
     <string name="onboarding_plus_feature_dream_with_slumber_studios">&lt;a href=\"https://slumberstudios.com/\"&gt;Sonhe com o conteúdo do Slumber Studios&lt;/a&gt;</string>
     <string name="gift">Presente</string>
     <string name="got_it">Entendi</string>
+    <string name="transcript_search_close">Fechar pesquisa</string>
     <string name="transcript_search">Pesquisar transcrição</string>
     <string name="transcript_close">Fechar transcrição</string>
     <string name="onboarding_subscribe_to_plus">Assinar o Plus</string>
@@ -1969,6 +2027,10 @@ Language: pt_BR
     <plurals name="month_with_count">
         <item quantity="one">%1$d mês</item>
         <item quantity="other">%1$d meses</item>
+    </plurals>
+    <plurals name="notification_reengage_catch_up_offline_message">
+        <item quantity="one">Você tem %d novo episódio baixado e pronto para reproduzir.</item>
+        <item quantity="other">Você tem %d novos episódios baixados e prontos para reproduzir.</item>
     </plurals>
     <plurals name="player_up_next_header_title">
         <item quantity="one" formatted="true">%1$d episódio - %2$s restante(s)</item>

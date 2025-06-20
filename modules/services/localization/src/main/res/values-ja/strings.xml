@@ -1,11 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-05-27 09:54:03+0000
+Translation-Revision-Date: 2025-06-17 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="onboarding_plus_feature_no_banner_ads">バナー広告なし</string>
+    <string name="banner_ad_plus_prompt">Pocket Casts Plus でバナー広告などにさよならしましょう</string>
+    <string name="ad_report_reason_other">その他</string>
+    <string name="ad_report_reason_too_often">この広告の表示頻度が高すぎる</string>
+    <string name="ad_report_reason_malicious">この広告には悪意がある</string>
+    <string name="ad_report_reason_broken">この広告は表示に不具合がある</string>
+    <string name="ad_report_reason_question">この広告を報告する理由</string>
+    <string name="report_ad">広告を報告する</string>
+    <string name="remove_ads">広告を削除する</string>
+    <string name="price_per_month_usd">\u0024%1$.2f/ 月</string>
+    <string name="price_per_month">%1$.2f %2$s/ 月</string>
+    <string name="go_to_ad">広告に移動: %1$s</string>
+    <string name="ad_image">広告画像</string>
+    <string name="ad_options">広告オプション</string>
+    <string name="ad">広告</string>
+    <string name="notification_mockup_image_description">モックアップ画像</string>
+    <string name="notification_snack_cta">設定を開く</string>
+    <string name="notification_snack_message">端末設定で通知を許可してください</string>
+    <string name="notification_prompt_cta">通知を許可</string>
+    <string name="notification_prompt_message">通知は、新しいエピソードを確認したり、新番組のおすすめ情報や Pocket Casts に関するヒントを得たりするのにぴったりの方法です。</string>
+    <string name="notification_prompt_title">最新情報を受け取りましょう !</string>
+    <string name="notification_offers_upgrade_message">Plus でフォルダーやブックマークなどの限定機能を自由に使いましょう !</string>
+    <string name="notification_offers_upgrade_title">ポッドキャストゲームをレベルアップ</string>
+    <string name="notification_new_features_smart_folders_message">Plus を試して、フォルダーを使って番組を自動整理しましょう</string>
+    <string name="notification_new_features_smart_folders_title">ポッドキャストを整理</string>
+    <string name="notifications_settings_turn_on_push_button">端末設定に移動</string>
+    <string name="notifications_settings_turn_on_push_message">Pocket Casts から通知を受け取るには、端末設定で通知をオンにする必要があります。</string>
+    <string name="notifications_settings_turn_on_push_title">プッシュ通知を有効にしますか ?</string>
+    <string name="notification_content_recommendations_message">次に何を聴くか迷っていますか ? これらの番組をチェックしましょう !</string>
+    <string name="notification_content_recommendations_title">あなたへの新しいおすすめ</string>
+    <string name="notification_content_recommendations_trending_message">他のユーザーが今週聴いているポッドキャストをチェックしましょう。</string>
+    <string name="notification_content_recommendations_trending_title">今週のトレンド</string>
+    <string name="notification_reengage_catch_up_offline_title">オフラインで確認</string>
+    <string name="notification_reengage_we_miss_you_message">しばらくご利用いただいてないようです。 戻ってお楽しみください !</string>
+    <string name="notification_reengage_we_miss_you_title">ご利用をお待ちしております !</string>
+    <string name="notification_plus_upsell_message">Plus でフォルダーやブックマークなどの限定機能を利用しましょう !</string>
+    <string name="notification_plus_upsell_title">ポッドキャストゲームをレベルアップ</string>
+    <string name="notification_staff_picks_message">心からポッドキャストを愛するスタッフが、あなたのために最高のポッドキャストを厳選しました。</string>
+    <string name="notification_staff_picks_title">スタッフのピックアップを確認</string>
+    <string name="notification_themes_message">テーマを閲覧し、自分のスタイルに合ったものを見つけましょう。</string>
+    <string name="notification_themes_title">新しい外観を利用</string>
+    <string name="notification_filters_message">スマートフィルターを作成してエピソードを整理します。</string>
+    <string name="notification_filters_title">エピソードを整理</string>
+    <string name="notification_up_next_message">再生キューを作成します。エピソード間を移動する手間はもう必要ありません。</string>
+    <string name="notification_up_next_title">キューを簡素化</string>
+    <string name="notification_import_message">別のアプリから切り替えますか ? お気に入りの番組をすべて Pocket Casts に移行しましょう。</string>
+    <string name="notification_import_title">ポッドキャストを簡単にインポート</string>
+    <string name="notification_sync_message">無料アカウントを作成すると、番組を同期して場所を問わず聴取できます。</string>
+    <string name="notification_sync_title">あらゆる端末で番組を楽しめます !</string>
+    <string name="notification_channel_description_offers">限定オファー、割引、プロモーションに関する通知を表示して、Pocket Casts を最大限に活用します</string>
+    <string name="notification_channel_description_new_features_and_tips">新機能、アップデート、便利なヒントに関する通知を表示して、Pocket Casts のエクスペリエンスを最適化します</string>
+    <string name="notification_channel_description_trending_and_recommendations">流行のポッドキャストと厳選されたおすすめを表示して、新しいお気に入りの発見に役立てます</string>
+    <string name="notification_channel_description_daily_reminders">参考になるおすすめを表示して、日々の聴取を手助けします。</string>
+    <string name="settings_notification_offers">Pocket Casts オファー</string>
+    <string name="settings_notification_new_features">新機能とヒント</string>
+    <string name="settings_notification_recommendations">トレンドとおすすめ</string>
+    <string name="settings_notification_daily_reminders">毎日のリマインダー</string>
     <string name="bookmarks_search_results_not_found">検索条件に一致するブックマークが見つかりませんでした。 別のキーワードを試してください。</string>
     <string name="podcast_no_episodes_matching">その検索に該当するエピソードは見つかりませんでした。 別のキーワードを試してください。</string>
     <string name="podcast_no_bookmarks_matching">このポッドキャストには検索条件に一致するブックマークがありません。 別のキーワードを試してください。</string>
@@ -272,6 +329,7 @@ Language: ja_JP
     <string name="onboarding_plus_feature_dream_with_slumber_studios">&lt;a href=\"https://slumberstudios.com/\"&gt;「Slumber Studios でぐっすり眠る」のコンテンツ&lt;/a&gt;</string>
     <string name="gift">ギフト</string>
     <string name="got_it">OK</string>
+    <string name="transcript_search_close">検索を閉じる</string>
     <string name="transcript_search">トランスクリプトを検索</string>
     <string name="transcript_close">トランスクリプトを閉じる</string>
     <string name="onboarding_subscribe_to_plus">Plus に登録</string>
@@ -1962,6 +2020,9 @@ Language: ja_JP
     </plurals>
     <plurals name="month_with_count">
         <item quantity="other">%1$d月</item>
+    </plurals>
+    <plurals name="notification_reengage_catch_up_offline_message">
+        <item quantity="other">%d件の新しいエピソードがダウンロードされ、準備が完了しました。</item>
     </plurals>
     <plurals name="player_up_next_header_title">
         <item quantity="other" formatted="true">%1$d件のエピソード - 残り%2$s</item>
