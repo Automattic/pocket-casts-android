@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.transcripts.ui
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -17,7 +16,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
-import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.transcripts.TranscriptState
 import au.com.shiftyjelly.pocketcasts.transcripts.UiState
@@ -40,13 +38,14 @@ fun TranscriptPage(
     onShowTranscript: (Transcript) -> Unit,
     onShowTransciptPaywall: (Transcript) -> Unit,
     modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(0.dp),
+    toolbarPadding: PaddingValues = PaddingValues(0.dp),
+    transcriptPadding: PaddingValues = PaddingValues(0.dp),
+    paywallPadding: PaddingValues = PaddingValues(0.dp),
 ) {
     val theme = rememberTranscriptTheme()
     val listState = rememberLazyListState()
 
     Column(
-        verticalArrangement = Arrangement.spacedBy(16.dp),
         modifier = modifier.background(theme.background),
     ) {
         Toolbar(
@@ -60,7 +59,9 @@ fun TranscriptPage(
             onShowSearchBar = onShowSearchBar,
             onHideSearchBar = onHideSearchBar,
             colors = theme.toolbarColors,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(toolbarPadding),
         )
 
         Box(
@@ -73,7 +74,9 @@ fun TranscriptPage(
                 listState = listState,
                 theme = theme,
                 onClickReload = onClickReload,
-                modifier = Modifier.padding(contentPadding),
+                modifier = Modifier
+                    .padding(top = 16.dp)
+                    .padding(transcriptPadding),
             )
 
             if (uiState.isPaywallVisible) {
@@ -81,6 +84,7 @@ fun TranscriptPage(
                     isFreeTrialAvailable = uiState.isFreeTrialAvailable,
                     onClickSubscribe = onClickSubscribe,
                     theme = theme,
+                    contentPadding = paywallPadding,
                 )
             }
         }

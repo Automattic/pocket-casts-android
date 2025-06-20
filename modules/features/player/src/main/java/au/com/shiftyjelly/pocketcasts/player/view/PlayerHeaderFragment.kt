@@ -43,7 +43,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -200,7 +199,9 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                         ) {
                             TranscriptPage(
                                 uiState = transcriptUiState,
-                                contentPadding = PaddingValues(bottom = dimensionResource(id = R.dimen.transcript_text_bottom_padding)),
+                                toolbarPadding = PaddingValues(horizontal = 16.dp),
+                                paywallPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
+                                transcriptPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 132.dp),
                                 onClickClose = {
                                     transcriptViewModel.hideSearch()
                                     shelfSharedViewModel.closeTranscript()
@@ -226,7 +227,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                                 onShowTransciptPaywall = {
                                     transcriptViewModel.track(AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_SHOWN)
                                 },
-                                modifier = Modifier.padding(horizontal = 16.dp),
                             )
                         }
                         Column(

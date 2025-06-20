@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.platform.LocalClipboard
@@ -172,7 +173,7 @@ private fun TranscriptLine(
 
 private fun Modifier.obsureContent(): Modifier {
     return if (Build.VERSION.SDK_INT >= 31) {
-        blur(6.dp)
+        blur(6.dp, BlurredEdgeTreatment.Unbounded)
     } else {
         alpha(0.1f)
     }
