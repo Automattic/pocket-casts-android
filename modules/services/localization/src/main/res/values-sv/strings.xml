@@ -1,23 +1,65 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-06-05 18:08:27+0000
+Translation-Revision-Date: 2025-06-18 09:54:04+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="onboarding_plus_feature_no_banner_ads">Inga bannerannonser</string>
+    <string name="banner_ad_plus_prompt">Säg adjö till bannerannonser och mer med Pocket Casts Plus</string>
+    <string name="ad_report_reason_other">Övrigt</string>
+    <string name="ad_report_reason_too_often">Får upp denna annons för ofta</string>
+    <string name="ad_report_reason_malicious">Det här är en skadlig annons</string>
+    <string name="ad_report_reason_broken">Annonsen verkar trasig</string>
+    <string name="ad_report_reason_question">Varför rapporterar du annonsen?</string>
+    <string name="report_ad">Rapportera annonsen</string>
+    <string name="remove_ads">Ta bort annonser</string>
     <string name="price_per_month_usd">\u0024%1$.2f/månad</string>
     <string name="price_per_month">%1$.2f %2$s/månad</string>
+    <string name="go_to_ad">Gå till annons: %1$s</string>
+    <string name="ad_image">Annonsbild</string>
+    <string name="ad_options">Annonsalternativ</string>
+    <string name="ad">Annons</string>
+    <string name="notification_mockup_image_description">Mockup-bild</string>
     <string name="notification_snack_cta">Öppna inställningar</string>
     <string name="notification_snack_message">Tillåt aviseringar i dina enhetsinställningar</string>
     <string name="notification_prompt_cta">Tillåt aviseringar</string>
+    <string name="notification_prompt_message">Aviseringar är det bästa sättet att hålla koll på nya avsnitt, få rekommendationer om nya program och tips om Pocket Casts.</string>
     <string name="notification_prompt_title">Håll dig uppdaterad!</string>
+    <string name="notification_offers_upgrade_message">Lås upp exklusiva funktioner som mappar, bokmärken och mycket annat med Plus.</string>
+    <string name="notification_offers_upgrade_title">Ta ditt podcastlyssnande till nästa nivå</string>
+    <string name="notification_new_features_smart_folders_message">Prova Plus och organisera dina shower automatiskt med mappar</string>
+    <string name="notification_new_features_smart_folders_title">Dina podcasts organiserade</string>
+    <string name="notifications_settings_turn_on_push_button">Gå till enhetens inställningar</string>
+    <string name="notifications_settings_turn_on_push_message">För att få notiser från Pocket Casts måste du aktivera dem i dina enhetsinställningar.</string>
+    <string name="notifications_settings_turn_on_push_title">Slå på push-meddelanden?</string>
+    <string name="notification_content_recommendations_message">Undrar du vad du ska lyssna på härnäst? Kolla in dessa shower.</string>
     <string name="notification_content_recommendations_title">Nya rekommendationer för dig</string>
+    <string name="notification_content_recommendations_trending_message">Kolla in vad alla andra lyssnar på denna vecka.</string>
     <string name="notification_content_recommendations_trending_title">Trendande denna vecka</string>
+    <string name="notification_reengage_catch_up_offline_title">Kom ikapp offline</string>
+    <string name="notification_reengage_we_miss_you_message">Det var ett tag sedan du lyssnade. Hoppa in igen och njut.</string>
     <string name="notification_reengage_we_miss_you_title">Vi saknar dig!</string>
+    <string name="notification_plus_upsell_message">Lås upp exklusiva funktioner som mappar, bokmärken och mycket annat med Plus.</string>
+    <string name="notification_plus_upsell_title">Ta ditt podcastlyssnande till nästa nivå</string>
+    <string name="notification_staff_picks_message">Perfekt mogna podcasts, utvalda just för dig av riktiga, podcastälskande människor.</string>
+    <string name="notification_staff_picks_title">Utforska redaktionens favoriter</string>
+    <string name="notification_themes_message">Bläddra bland våra teman och hitta det som passar din stil.</string>
     <string name="notification_themes_title">Dags för ett nytt utseende</string>
     <string name="notification_filters_message">Skapa smarta filter för att organisera dina avsnitt.</string>
     <string name="notification_filters_title">Organisera dina avsnitt</string>
+    <string name="notification_up_next_message">Bygg en uppspelningskö och säg adjö till att hoppa runt mellan avsnitt.</string>
+    <string name="notification_up_next_title">Förenkla din kö</string>
+    <string name="notification_import_message">Byter du från en annan app? Ta med alla dina favoritshower till Pocket Casts.</string>
+    <string name="notification_import_title">Importera enkelt dina podcasts</string>
+    <string name="notification_sync_message">Skapa ett gratis konto för att synkronisera dina shower och lyssna var som helst.</string>
+    <string name="notification_sync_title">Dina shower, på vilken enhet som helst.</string>
+    <string name="notification_channel_description_offers">Visar aviseringar om exklusiva erbjudanden, rabatter och kampanjer som hjälper dig att göra det mesta möjliga av din Pocket Casts-upplevelse</string>
+    <string name="notification_channel_description_new_features_and_tips">Visar aviseringar om nya funktioner, uppdateringar och praktiska tips som hjälper dig att optimera din Pocket Casts-upplevelse</string>
+    <string name="notification_channel_description_trending_and_recommendations">Visar trendande podcasts och utvalda rekommendationer som hjälper dig att upptäcka nya favoriter</string>
+    <string name="notification_channel_description_daily_reminders">Visar användbara förslag för att stödja din lyssningsrutin.</string>
+    <string name="settings_notification_offers">Pocket Casts-erbjudanden</string>
     <string name="settings_notification_new_features">Nya funktioner och tips</string>
     <string name="settings_notification_recommendations">Trendande och rekommendationer</string>
     <string name="settings_notification_daily_reminders">Dagliga påminnelser</string>
@@ -1984,6 +2026,10 @@ Language: sv_SE
     <plurals name="month_with_count">
         <item quantity="one">%1$d månad</item>
         <item quantity="other">%1$d månader</item>
+    </plurals>
+    <plurals name="notification_reengage_catch_up_offline_message">
+        <item quantity="one">Du har %d nytt avsnitt nedladdat och redo att spelas upp.</item>
+        <item quantity="other">Du har %d nya avsnitt nedladdade och redo att spelas upp.</item>
     </plurals>
     <plurals name="player_up_next_header_title">
         <item quantity="one" formatted="true">%1$d avsnitt - %2$s kvar</item>

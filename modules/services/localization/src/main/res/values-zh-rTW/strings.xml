@@ -1,11 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-05-27 09:54:03+0000
+Translation-Revision-Date: 2025-06-17 12:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="onboarding_plus_feature_no_banner_ads">沒有橫幅廣告</string>
+    <string name="banner_ad_plus_prompt">使用 Pocket Casts Plus，從此向橫幅廣告等內容告別</string>
+    <string name="ad_report_reason_other">其他</string>
+    <string name="ad_report_reason_too_often">看到這則廣告的次數太頻繁</string>
+    <string name="ad_report_reason_malicious">這是惡意廣告</string>
+    <string name="ad_report_reason_broken">這則廣告似乎無法正常運作</string>
+    <string name="ad_report_reason_question">檢舉這則廣告的原因？</string>
+    <string name="report_ad">檢舉這則廣告</string>
+    <string name="remove_ads">移除廣告</string>
+    <string name="price_per_month_usd">\u0024%1$.2f/月</string>
+    <string name="price_per_month">%1$.2f %2$s/月</string>
+    <string name="go_to_ad">前往廣告：%1$s</string>
+    <string name="ad_image">廣告圖片</string>
+    <string name="ad_options">廣告選項</string>
+    <string name="ad">廣告</string>
+    <string name="notification_mockup_image_description">模擬圖片</string>
+    <string name="notification_snack_cta">開啟設定</string>
+    <string name="notification_snack_message">請在裝置設定中允許通知</string>
+    <string name="notification_prompt_cta">允許通知</string>
+    <string name="notification_prompt_message">允許「通知」，用最佳方式追蹤新單集、取得新節目推薦和 Pocket Casts 秘訣。</string>
+    <string name="notification_prompt_title">掌握最新內容！</string>
+    <string name="notification_offers_upgrade_message">透過 Plus 解鎖資料夾、書籤等獨家功能！</string>
+    <string name="notification_offers_upgrade_title">升級你的 Podcast 體驗</string>
+    <string name="notification_new_features_smart_folders_message">試用 Plus 並自動使用資料夾整理你的節目資料</string>
+    <string name="notification_new_features_smart_folders_title">你的 Podcast 整理好了</string>
+    <string name="notifications_settings_turn_on_push_button">前往裝置設定</string>
+    <string name="notifications_settings_turn_on_push_message">若要接收 Pocket Casts 的通知，請在裝置設定中開啟通知。</string>
+    <string name="notifications_settings_turn_on_push_title">是否開啟推播通知？</string>
+    <string name="notification_content_recommendations_message">還不知道接下來要聽什麼嗎？ 不妨試試這些節目！</string>
+    <string name="notification_content_recommendations_title">適合你的全新推薦內容</string>
+    <string name="notification_content_recommendations_trending_message">查看其他人這週都在聽什麼。</string>
+    <string name="notification_content_recommendations_trending_title">本週熱播</string>
+    <string name="notification_reengage_catch_up_offline_title">離線補聽</string>
+    <string name="notification_reengage_we_miss_you_message">距離你上次收聽已經有一段時間了。 重新加入並盡情暢聽！</string>
+    <string name="notification_reengage_we_miss_you_title">我們很想你！</string>
+    <string name="notification_plus_upsell_message">透過 Plus 解鎖資料夾、書籤等獨家功能！</string>
+    <string name="notification_plus_upsell_title">升級你的 Podcast 體驗</string>
+    <string name="notification_staff_picks_message">由 Podcast 忠實粉絲精挑細選出的各式 Podcast 節目。</string>
+    <string name="notification_staff_picks_title">探索我們的員工精選</string>
+    <string name="notification_themes_message">瀏覽我們的佈景主題，尋找適合你的風格。</string>
+    <string name="notification_themes_title">是時候換個新形象了</string>
+    <string name="notification_filters_message">建立用來整理單集的智慧篩選條件。</string>
+    <string name="notification_filters_title">整理你的單集</string>
+    <string name="notification_up_next_message">建立播放佇列，告別手動瀏覽集數的麻煩。</string>
+    <string name="notification_up_next_title">簡化你的佇列</string>
+    <string name="notification_import_message">從其他應用程式過來的使用者？ 將所有最愛節目轉移到 Pocket Casts。</string>
+    <string name="notification_import_title">輕鬆匯入你的 Podcast</string>
+    <string name="notification_sync_message">建立免費帳號即可同步你的節目，隨時隨地收聽。</string>
+    <string name="notification_sync_title">透過任何裝置收聽節目！</string>
+    <string name="notification_channel_description_offers">顯示專屬優惠、折扣和促銷的通知，協助你充分運用 Pocket Casts 體驗</string>
+    <string name="notification_channel_description_new_features_and_tips">顯示新功能、更新和實用秘訣的通知，協助你將 Pocket Casts 體驗最佳化</string>
+    <string name="notification_channel_description_trending_and_recommendations">顯示熱門 Podcast 和精選建議，協助你探索未來新歡</string>
+    <string name="notification_channel_description_daily_reminders">顯示能協助你建立聆聽習慣的實用建議。</string>
+    <string name="settings_notification_offers">Pocket Casts 優惠</string>
+    <string name="settings_notification_new_features">全新功能與秘訣</string>
+    <string name="settings_notification_recommendations">流行趨勢與推薦</string>
+    <string name="settings_notification_daily_reminders">每日提醒</string>
     <string name="bookmarks_search_results_not_found">找不到任何符合搜尋條件的書籤。 請嘗試其他關鍵字。</string>
     <string name="podcast_no_episodes_matching">找不到符合該搜尋條件的單集。 請嘗試其他關鍵字。</string>
     <string name="podcast_no_bookmarks_matching">此 Podcast 沒有符合搜尋條件的書籤。 請嘗試其他關鍵字。</string>
@@ -1962,6 +2019,9 @@ Language: zh_TW
     </plurals>
     <plurals name="month_with_count">
         <item quantity="other">%1$d 個月</item>
+    </plurals>
+    <plurals name="notification_reengage_catch_up_offline_message">
+        <item quantity="other">你已下載 %d 個新單集並準備就緒！</item>
     </plurals>
     <plurals name="player_up_next_header_title">
         <item quantity="other" formatted="true">%1$d 集單集 - 剩餘 %2$s</item>
