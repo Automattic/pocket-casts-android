@@ -215,6 +215,12 @@ data class UiState(
     val isPlusUser: Boolean,
     val isFreeTrialAvailable: Boolean,
 ) {
+    val isPaywallVisible get() = !isPlusUser && (transcriptState as? TranscriptState.Loaded)?.transcript?.isGenerated == true
+
+    val isTextTranscriptLoaded get() = (transcriptState as? TranscriptState.Loaded)?.transcript is Transcript.Text
+
+    val transcriptEpisodeUuid get() = (transcriptState as? TranscriptState.Loaded)?.transcript?.episodeUuid
+
     companion object {
         val Empty = UiState(
             transcriptState = TranscriptState.Loading,

@@ -28,6 +28,7 @@ dependencies {
 
     implementation(platform(libs.compose.bom))
 
+    implementation(libs.androidx.webkit)
     implementation(libs.compose.material)
     implementation(libs.compose.material.icons.core)
     implementation(libs.compose.foundation)
@@ -35,6 +36,7 @@ dependencies {
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.graphics)
     implementation(libs.compose.ui.tooling.preview)
+    implementation(libs.compose.webview)
     implementation(libs.coroutines.core)
     implementation(libs.coroutines.reactive)
     implementation(libs.coroutines.rx2)

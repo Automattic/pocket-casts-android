@@ -14,7 +14,6 @@ import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.NavigationState
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.ShelfItemSource
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.SnackbarMessage
-import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.TransitionState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
@@ -34,12 +33,12 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
-import org.mockito.Mockito.mock
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -123,13 +122,18 @@ class ShelfSharedViewModelTest {
     }
 
     @Test
-    fun `given transcript available, when transcript button clicked, then transcript is opened with transition`() =
+    fun `given transcript available, when transcript button clicked, it is toggled`() =
         runTest {
             initViewModel()
 
-            shelfSharedViewModel.transitionState.test {
+            shelfSharedViewModel.isTranscriptOpen.test {
+                assertFalse(awaitItem())
+
                 shelfSharedViewModel.onTranscriptClick(true, ShelfItemSource.Shelf)
-                assertEquals(TransitionState.OpenTranscript(showPlayerControls = true), awaitItem())
+                assertTrue(awaitItem())
+
+                shelfSharedViewModel.closeTranscript()
+                assertFalse(awaitItem())
             }
         }
 
@@ -141,17 +145,6 @@ class ShelfSharedViewModelTest {
             shelfSharedViewModel.snackbarMessages.test {
                 shelfSharedViewModel.onTranscriptClick(false, ShelfItemSource.Shelf)
                 assertEquals(SnackbarMessage.TranscriptNotAvailable, awaitItem())
-            }
-        }
-
-    @Test
-    fun `when close transcript called, then transcript is closed with transition`() =
-        runTest {
-            initViewModel()
-
-            shelfSharedViewModel.transitionState.test {
-                shelfSharedViewModel.closeTranscript()
-                assertEquals(TransitionState.CloseTranscript, awaitItem())
             }
         }
 

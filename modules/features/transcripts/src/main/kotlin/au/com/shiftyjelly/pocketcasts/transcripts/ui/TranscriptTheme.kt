@@ -20,6 +20,7 @@ internal data class TranscriptTheme(
     val searchDefaultSpanStyle: SpanStyle,
     val searchHighlightSpanStyle: SpanStyle,
     val toolbarColors: ToolbarColors,
+    val failureColors: TransciptFailureColor,
 ) {
     companion object {
         internal val RobotoSerifFontFamily = FontFamily(Font(R.font.roboto_serif))
@@ -38,6 +39,7 @@ internal data class TranscriptTheme(
                 color = colors.primaryUi01,
             ),
             toolbarColors = ToolbarColors.default(colors),
+            failureColors = TransciptFailureColor.default(colors),
         )
 
         fun player(colors: PlayerColors) = TranscriptTheme(
@@ -54,6 +56,7 @@ internal data class TranscriptTheme(
                 color = Color.Black,
             ),
             toolbarColors = ToolbarColors.player(colors),
+            failureColors = TransciptFailureColor.player(colors),
         )
     }
 }

@@ -1150,7 +1150,7 @@
     <string name="profile_stats_total">TOTAL</string>
     <string name="profile_stats_variable_speed">Variable Speed</string>
     <string name="profile_status_error_internet">🤔\n\nUnable to load stats,\ncheck your internet connection.</string>
-    <string name="profile_start_free_trial">Start free trial</string>
+    <string name="profile_start_free_trial">Start Free Trial</string>
     <string name="profile_sub_android_goto">To cancel your subscription, you&#x2019;ll need to cancel via the Google Play Store.</string>
     <string name="profile_sub_cancel_hint0">Your current subscription will remain active until</string>
     <string name="profile_sub_cancel_hint1">Access to Pocket Casts Plus features will be locked</string>
@@ -2041,10 +2041,10 @@
     <string name="onboarding_plus_continuing_agrees_to">By continuing, you agree to our %1$s and %2$s.</string>
     <string name="onboarding_plus_privacy_policy">Privacy Policy</string>
     <string name="onboarding_plus_terms_and_conditions">Terms and Conditions</string>
-    <string name="onboarding_plus_start_free_trial_and_subscribe">Start free trial &amp; subscribe</string>
+    <string name="onboarding_plus_start_free_trial_and_subscribe">Start Free Trial &amp; Subscribe</string>
     <string name="onboarding_plus_subscribe">Subscribe to Pocket&#160;Casts Plus</string>
     <string name="onboarding_subscribe_to_plus">Subscribe to Plus</string>
-    <string name="onboarding_start_free_trial_upgrade_button">Start free trial</string>
+    <string name="onboarding_start_free_trial_upgrade_button">Start Free Trial</string>
     <!-- %1$s is period like 1 week, 2 months, etc. %2$s is the date when this period ends. -->
     <string name="onboarding_plus_recurring_after_free_trial">Recurring payments will begin after your %1$s (%2$s)</string>
     <!-- %1$s is a price and %2$s is date when the billing at this price starts -->

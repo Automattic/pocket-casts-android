@@ -30,8 +30,10 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapNotNull
@@ -69,8 +71,8 @@ class ShelfSharedViewModel @Inject constructor(
     private val _navigationState: MutableSharedFlow<NavigationState> = MutableSharedFlow()
     val navigationState = _navigationState.asSharedFlow()
 
-    private val _transitionState = MutableSharedFlow<TransitionState>()
-    val transitionState = _transitionState.asSharedFlow()
+    private val _isTranscriptOpen = MutableStateFlow(false)
+    val isTranscriptOpen = _isTranscriptOpen.asStateFlow()
 
     private val _snackbarMessages = MutableSharedFlow<SnackbarMessage>()
     val snackbarMessages = _snackbarMessages.asSharedFlow()
@@ -133,23 +135,19 @@ class ShelfSharedViewModel @Inject constructor(
         viewModelScope.launch {
             if (isTranscriptAvailable) {
                 trackShelfAction(ShelfItem.Transcript, source)
-                openTranscript(showPlayerControls = true)
+                openTranscript()
             } else {
                 _snackbarMessages.emit(SnackbarMessage.TranscriptNotAvailable)
             }
         }
     }
 
-    fun openTranscript(showPlayerControls: Boolean) {
-        viewModelScope.launch {
-            _transitionState.emit(TransitionState.OpenTranscript(showPlayerControls))
-        }
+    fun openTranscript() {
+        _isTranscriptOpen.value = true
     }
 
     fun closeTranscript() {
-        viewModelScope.launch {
-            _transitionState.emit(TransitionState.CloseTranscript)
-        }
+        _isTranscriptOpen.value = false
     }
 
     fun onEpisodeDownloadStart(source: ShelfItemSource) {
@@ -353,11 +351,6 @@ class ShelfSharedViewModel @Inject constructor(
         data object EpisodeRemoved : SnackbarMessage
         data object TranscriptNotAvailable : SnackbarMessage
         data object ShareNotAvailable : SnackbarMessage
-    }
-
-    sealed class TransitionState {
-        data class OpenTranscript(val showPlayerControls: Boolean) : TransitionState()
-        data object CloseTranscript : TransitionState()
     }
 
     enum class ShelfItemSource {
