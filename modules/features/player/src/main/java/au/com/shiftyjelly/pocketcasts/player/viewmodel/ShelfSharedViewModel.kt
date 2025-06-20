@@ -353,11 +353,6 @@ class ShelfSharedViewModel @Inject constructor(
         data object ShareNotAvailable : SnackbarMessage
     }
 
-    sealed class TransitionState {
-        data class OpenTranscript(val showPlayerControls: Boolean) : TransitionState()
-        data object CloseTranscript : TransitionState()
-    }
-
     enum class ShelfItemSource {
         Shelf,
         OverflowMenu,
