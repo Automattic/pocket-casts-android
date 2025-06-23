@@ -12,14 +12,19 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
+import androidx.compose.ui.platform.LocalClipboard
+import androidx.compose.ui.platform.LocalTextToolbar
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -37,6 +42,8 @@ import au.com.shiftyjelly.pocketcasts.compose.components.FadedLazyColumn
 import au.com.shiftyjelly.pocketcasts.compose.extensions.verticalScrollBar
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.compose.toolbars.textselection.CustomMenuItemOption
+import au.com.shiftyjelly.pocketcasts.compose.toolbars.textselection.CustomTextToolbar
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
@@ -65,22 +72,38 @@ internal fun TranscriptLines(
             )
         }
 
-        FadedLazyColumn(
-            state = state,
-            modifier = Modifier.verticalScrollBar(
-                scrollState = state,
-                thumbColor = theme.secondaryElement,
-                contentPadding = PaddingValues(bottom = 64.dp),
+        CompositionLocalProvider(
+            LocalTextToolbar provides CustomTextToolbar(
+                view = LocalView.current,
+                customMenuItems = buildList {
+                    // Only show the share option on older versions of Android, as the new versions
+                    // have a share feature built into the copy
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+                        add(CustomMenuItemOption.Share)
+                    }
+                },
+                clipboard = LocalClipboard.current,
             ),
         ) {
-            itemsIndexed(transcript.entries) { index, entry ->
-                TranscriptLine(
-                    entryIndex = index,
-                    entry = entry,
-                    searchState = searchState,
-                    theme = theme,
-                    modifier = Modifier.padding(entry.padding()),
-                )
+            SelectionContainer {
+                FadedLazyColumn(
+                    state = state,
+                    modifier = Modifier.verticalScrollBar(
+                        scrollState = state,
+                        thumbColor = theme.secondaryElement,
+                        contentPadding = PaddingValues(bottom = 64.dp),
+                    ),
+                ) {
+                    itemsIndexed(transcript.entries) { index, entry ->
+                        TranscriptLine(
+                            entryIndex = index,
+                            entry = entry,
+                            searchState = searchState,
+                            theme = theme,
+                            modifier = Modifier.padding(entry.padding()),
+                        )
+                    }
+                }
             }
         }
     }
@@ -150,7 +173,7 @@ private fun TranscriptLine(
 
 private fun Modifier.obsureContent(): Modifier {
     return if (Build.VERSION.SDK_INT >= 31) {
-        blur(6.dp)
+        blur(6.dp, BlurredEdgeTreatment.Unbounded)
     } else {
         alpha(0.1f)
     }
@@ -177,15 +200,17 @@ private fun isValidHighlightRange(start: Int, end: Int, maxLength: Int): Boolean
 
 private val SimpleTextStyle = TextStyle(
     fontSize = 16.sp,
+    lineHeight = 24.sp,
     fontWeight = FontWeight.Medium,
     fontFamily = TranscriptTheme.RobotoSerifFontFamily,
 )
 private val SpeakerTextStyle = SimpleTextStyle.copy(
     fontSize = 12.sp,
+    lineHeight = 18.sp,
 )
 
 private val SimplePadding = PaddingValues(bottom = 16.dp)
-private val SpeakerPadding = PaddingValues(bottom = 8.dp, top = 16.dp)
+private val SpeakerPadding = PaddingValues(bottom = 12.dp, top = 16.dp)
 
 @Preview
 @Composable

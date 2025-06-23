@@ -4,7 +4,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -22,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -52,7 +56,13 @@ internal fun TranscriptsPaywall(
     onClickSubscribe: () -> Unit,
     modifier: Modifier = Modifier,
     theme: TranscriptTheme = TranscriptTheme.default(MaterialTheme.theme.colors),
+    contentPadding: PaddingValues = PaddingValues(16.dp),
 ) {
+    val topPadding = contentPadding.calculateTopPadding()
+    val bottomPadding = contentPadding.calculateBottomPadding()
+    val startPadding = contentPadding.calculateStartPadding(LocalLayoutDirection.current)
+    val endPadding = contentPadding.calculateEndPadding(LocalLayoutDirection.current)
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -66,7 +76,7 @@ internal fun TranscriptsPaywall(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(theme.background)
-                .padding(top = 24.dp),
+                .padding(top = topPadding, start = startPadding, end = endPadding),
         ) {
             SubscriptionBadge(
                 iconRes = R.drawable.ic_plus,
@@ -101,8 +111,9 @@ internal fun TranscriptsPaywall(
             val colorsStops = arrayOf(
                 0.0f to theme.background,
                 0.05f to theme.background,
-                0.15f to Color.Transparent,
-                1f to Color.Transparent,
+                0.25f to Color.Transparent,
+                0.9f to Color.Transparent,
+                1f to theme.background,
             )
             Brush.verticalGradient(colorStops = colorsStops)
         }
@@ -115,26 +126,29 @@ internal fun TranscriptsPaywall(
             Spacer(
                 modifier = Modifier.weight(1f),
             )
-            CompositionLocalProvider(
-                LocalRippleConfiguration provides RippleConfiguration(color = Color.Black),
-            ) {
-                RowButton(
-                    text = if (isFreeTrialAvailable) {
-                        stringResource(LR.string.profile_start_free_trial)
-                    } else {
-                        stringResource(LR.string.onboarding_subscribe_to_plus)
-                    },
-                    textColor = Color.Black,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    colors = ButtonDefaults.buttonColors(
-                        backgroundColor = Color.plusGoldLight,
-                    ),
-                    includePadding = false,
-                    onClick = onClickSubscribe,
-                    modifier = Modifier.padding(bottom = 24.dp),
-                )
-            }
+        }
+
+        CompositionLocalProvider(
+            LocalRippleConfiguration provides RippleConfiguration(color = Color.Black),
+        ) {
+            RowButton(
+                text = if (isFreeTrialAvailable) {
+                    stringResource(LR.string.profile_start_free_trial)
+                } else {
+                    stringResource(LR.string.onboarding_subscribe_to_plus)
+                },
+                textColor = Color.Black,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.SemiBold,
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color.plusGoldLight,
+                ),
+                includePadding = false,
+                onClick = onClickSubscribe,
+                modifier = Modifier
+                    .background(theme.background)
+                    .padding(bottom = bottomPadding, start = startPadding, end = endPadding),
+            )
         }
     }
 }
@@ -148,7 +162,6 @@ private fun TranscriptsPaywallPreview(
         TranscriptsPaywall(
             isFreeTrialAvailable = false,
             onClickSubscribe = {},
-            modifier = Modifier.padding(horizontal = 16.dp),
         )
     }
 }
@@ -164,8 +177,7 @@ private fun TranscriptsPaywallPreview(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(transcriptTheme.background)
-                    .padding(horizontal = 16.dp),
+                    .background(transcriptTheme.background),
             ) {
                 TranscriptsPaywall(
                     isFreeTrialAvailable = true,

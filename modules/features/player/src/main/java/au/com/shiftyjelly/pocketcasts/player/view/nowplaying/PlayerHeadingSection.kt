@@ -20,7 +20,6 @@ import androidx.compose.material.RippleConfiguration
 import androidx.compose.material.RippleDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -53,8 +52,6 @@ import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.to.ChapterSummaryData
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
-import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel
-import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.TransitionState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import kotlin.time.Duration
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -63,7 +60,6 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun PlayerHeadingSection(
     playerColors: PlayerColors,
     playerViewModel: PlayerViewModel,
-    shelfSharedViewModel: ShelfSharedViewModel,
     modifier: Modifier = Modifier,
 ) {
     val state by remember {
@@ -95,12 +91,6 @@ fun PlayerHeadingSection(
         onPodcastTitleClick = { playerViewModel.onPodcastTitleClick(state.episodeUuid, state.podcastUuid) },
         modifier = modifier,
     )
-
-    LaunchedEffect(Unit) {
-        shelfSharedViewModel.transitionState.collect {
-            disableAccessibility = it is TransitionState.OpenTranscript
-        }
-    }
 }
 
 @OptIn(ExperimentalMaterialApi::class)
