@@ -1,12 +1,11 @@
 7.93
 -----
-
-
-7.92
------
 *   New Features
     *   Display transcripts in the episode details UI
         ([#4143](https://github.com/Automattic/pocket-casts-android/pull/4143))
+
+7.92
+-----
 *   Updates
     *   Improve transcripts parsing and loading
         ([#4115](https://github.com/Automattic/pocket-casts-android/pull/4115))
