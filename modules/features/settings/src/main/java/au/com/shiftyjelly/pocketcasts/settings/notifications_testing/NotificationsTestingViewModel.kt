@@ -6,10 +6,14 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import androidx.work.workDataOf
-import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationType
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NewFeaturesAndTipsNotificationType
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationWorker
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationWorker.Companion.DOWNLOADED_EPISODES
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationWorker.Companion.SHOULD_SKIP_VALIDATIONS
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationWorker.Companion.SUBCATEGORY
+import au.com.shiftyjelly.pocketcasts.repositories.notification.OffersNotificationType
+import au.com.shiftyjelly.pocketcasts.repositories.notification.OnboardingNotificationType
+import au.com.shiftyjelly.pocketcasts.repositories.notification.ReEngagementNotificationType
 import au.com.shiftyjelly.pocketcasts.repositories.notification.TrendingAndRecommendationsNotificationType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -34,27 +38,30 @@ internal class NotificationsTestingViewModel @Inject constructor(
     }
 
     private fun buildRequest(trigger: NotificationTrigger): OneTimeWorkRequest {
-        val workData = when (trigger.notificationType) {
-            NotificationType.TRENDING -> {
-                workDataOf(
-                    SUBCATEGORY to TrendingAndRecommendationsNotificationType.SUBCATEGORY_TRENDING,
-                    SHOULD_SKIP_VALIDATIONS to true
-                )
-            }
-            NotificationType.RECOMMENDATIONS -> {
-                workDataOf(
-                    SUBCATEGORY to TrendingAndRecommendationsNotificationType.SUBCATEGORY_RECOMMENDATIONS,
-                    SHOULD_SKIP_VALIDATIONS to true
-                )
-            }
-            NotificationType.DAILY_REMINDER_X -> TODO()
-            NotificationType.NEW_FEATURE_X -> TODO()
-            NotificationType.TIPS -> TODO()
-            NotificationType.OFFERS -> TODO()
+        val subCategory = when (trigger.notificationType) {
+            NotificationType.TRENDING -> TrendingAndRecommendationsNotificationType.Trending.subcategory
+            NotificationType.RECOMMENDATIONS -> TrendingAndRecommendationsNotificationType.Recommendations.subcategory
+            NotificationType.NEW_FEATURE_FOLDERS -> NewFeaturesAndTipsNotificationType.SmartFolders.subcategory
+            NotificationType.OFFERS -> OffersNotificationType.UpgradeNow.subcategory
+            NotificationType.DAILY_REMINDER_MISS_YOU -> ReEngagementNotificationType.WeMissYou.subcategory
+            NotificationType.DAILY_REMINDER_DOWNLOADS_OFFLINE -> ReEngagementNotificationType.CatchUpOffline.subcategory
+            NotificationType.DAILY_REMINDER_SYNC -> OnboardingNotificationType.Sync.subcategory
+            NotificationType.DAILY_REMINDER_IMPORT -> OnboardingNotificationType.Import.subcategory
+            NotificationType.DAILY_REMINDER_UP_NEXT -> OnboardingNotificationType.UpNext.subcategory
+            NotificationType.DAILY_REMINDER_FILTERS -> OnboardingNotificationType.Filters.subcategory
+            NotificationType.DAILY_REMINDERS_STAFF_PICKS -> OnboardingNotificationType.StaffPicks.subcategory
+            NotificationType.DAILY_REMINDERS_THEMES -> OnboardingNotificationType.Themes.subcategory
+            NotificationType.DAILY_REMINDERS_UPSELL -> OnboardingNotificationType.PlusUpsell.subcategory
         }
 
         return OneTimeWorkRequest.Builder(NotificationWorker::class.java)
-            .setInputData(workData).apply {
+            .setInputData(
+                workDataOf(
+                    SUBCATEGORY to subCategory,
+                    SHOULD_SKIP_VALIDATIONS to true,
+                    DOWNLOADED_EPISODES to 999
+                )
+            ).apply {
                 if (trigger.triggerType is NotificationTriggerType.Delayed) {
                     setInitialDelay(trigger.triggerType.delaySeconds.toLong(), TimeUnit.SECONDS)
                 }
@@ -84,9 +91,16 @@ internal class NotificationsTestingViewModel @Inject constructor(
     enum class NotificationType {
         TRENDING,
         RECOMMENDATIONS,
-        DAILY_REMINDER_X,
-        NEW_FEATURE_X,
-        TIPS,
+        DAILY_REMINDER_MISS_YOU,
+        DAILY_REMINDER_DOWNLOADS_OFFLINE,
+        DAILY_REMINDER_SYNC,
+        DAILY_REMINDER_IMPORT,
+        DAILY_REMINDER_UP_NEXT,
+        DAILY_REMINDER_FILTERS,
+        DAILY_REMINDERS_STAFF_PICKS,
+        DAILY_REMINDERS_THEMES,
+        DAILY_REMINDERS_UPSELL,
+        NEW_FEATURE_FOLDERS,
         OFFERS
     }
 
