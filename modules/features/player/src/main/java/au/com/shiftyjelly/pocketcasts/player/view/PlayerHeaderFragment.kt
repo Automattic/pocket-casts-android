@@ -104,6 +104,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
 import kotlin.math.abs
 import kotlin.time.Duration
@@ -130,7 +131,14 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
     private val viewModel: PlayerViewModel by activityViewModels()
     private val shelfSharedViewModel: ShelfSharedViewModel by activityViewModels()
-    private val transcriptViewModel by viewModels<TranscriptViewModel>({ requireParentFragment() })
+    private val transcriptViewModel by viewModels<TranscriptViewModel>(
+        ownerProducer = { requireParentFragment() },
+        extrasProducer = {
+            defaultViewModelCreationExtras.withCreationCallback<TranscriptViewModel.Factory> { factory ->
+                factory.create(TranscriptViewModel.Source.Player)
+            }
+        },
+    )
     private var binding: AdapterPlayerHeaderBinding? = null
     private val sourceView = SourceView.PLAYER
 

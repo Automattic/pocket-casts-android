@@ -14,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.os.BundleCompat
@@ -22,6 +23,7 @@ import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
+import au.com.shiftyjelly.pocketcasts.compose.components.rememberViewInteropNestedScrollConnection
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
@@ -30,6 +32,7 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSourc
 import au.com.shiftyjelly.pocketcasts.transcripts.ui.TranscriptPage
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.withCreationCallback
 import kotlinx.parcelize.Parcelize
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -51,7 +54,16 @@ class TranscriptFragment : BaseDialogFragment() {
             "Missing input parameters"
         }
 
-    private val transcriptViewModel by viewModels<TranscriptViewModel>()
+    private val viewModel by viewModels<TranscriptViewModel>(
+        ownerProducer = { requireParentFragment() },
+        extrasProducer = {
+            defaultViewModelCreationExtras.withCreationCallback<TranscriptViewModel.Factory> { factory ->
+                val viewModel = factory.create(TranscriptViewModel.Source.Episode)
+                viewModel.loadTranscript(args.episodeUuid)
+                viewModel
+            }
+        },
+    )
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -59,18 +71,17 @@ class TranscriptFragment : BaseDialogFragment() {
         savedInstanceState: Bundle?,
     ) = contentWithoutConsumedInsets {
         CallOnce {
-            transcriptViewModel.track(
+            viewModel.track(
                 AnalyticsEvent.EPISODE_TRANSCRIPT_SHOWN,
                 buildMap {
                     put("episode_uuid", args.episodeUuid)
                     args.podcastUuid?.let { uuid -> put("podcast_uuid", uuid) }
                 },
             )
-            transcriptViewModel.loadTranscript(args.episodeUuid)
         }
 
         AppTheme(theme.activeTheme) {
-            val uiState by transcriptViewModel.uiState.collectAsState()
+            val uiState by viewModel.uiState.collectAsState()
 
             Box(
                 contentAlignment = Alignment.Center,
@@ -84,18 +95,18 @@ class TranscriptFragment : BaseDialogFragment() {
                     paywallPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
                     transcriptPadding = PaddingValues(start = 20.dp, end = 20.dp, bottom = 16.dp),
                     onClickClose = {
-                        transcriptViewModel.hideSearch()
+                        viewModel.hideSearch()
                         dismiss()
                     },
-                    onClickReload = transcriptViewModel::reloadTranscript,
-                    onUpdateSearchTerm = transcriptViewModel::searchInTranscript,
-                    onClearSearchTerm = transcriptViewModel::clearSearch,
-                    onSelectPreviousSearch = transcriptViewModel::selectPreviousSearchMatch,
-                    onSelectNextSearch = transcriptViewModel::selectNextSearchMatch,
-                    onShowSearchBar = transcriptViewModel::openSearch,
-                    onHideSearchBar = transcriptViewModel::hideSearch,
+                    onClickReload = viewModel::reloadTranscript,
+                    onUpdateSearchTerm = viewModel::searchInTranscript,
+                    onClearSearchTerm = viewModel::clearSearch,
+                    onSelectPreviousSearch = viewModel::selectPreviousSearchMatch,
+                    onSelectNextSearch = viewModel::selectNextSearchMatch,
+                    onShowSearchBar = viewModel::openSearch,
+                    onHideSearchBar = viewModel::hideSearch,
                     onClickSubscribe = {
-                        transcriptViewModel.track(AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_SUBSCRIBE_TAPPED)
+                        viewModel.track(AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_SUBSCRIBE_TAPPED)
                         OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.Upsell(OnboardingUpgradeSource.GENERATED_TRANSCRIPTS))
                     },
                     onShowTranscript = { transcript ->
@@ -103,12 +114,14 @@ class TranscriptFragment : BaseDialogFragment() {
                             "type" to transcript.type.analyticsValue,
                             "show_as_webpage" to (transcript is Transcript.Web),
                         )
-                        transcriptViewModel.track(AnalyticsEvent.TRANSCRIPT_SHOWN, properties)
+                        viewModel.track(AnalyticsEvent.TRANSCRIPT_SHOWN, properties)
                     },
                     onShowTransciptPaywall = {
-                        transcriptViewModel.track(AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_SHOWN)
+                        viewModel.track(AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_SHOWN)
                     },
-                    modifier = Modifier.fillMaxWidth(fraction = ResourcesCompat.getFloat(resources, UR.dimen.seekbar_width_percentage)),
+                    modifier = Modifier
+                        .fillMaxWidth(fraction = ResourcesCompat.getFloat(resources, UR.dimen.seekbar_width_percentage))
+                        .nestedScroll(rememberViewInteropNestedScrollConnection()),
                 )
             }
         }
