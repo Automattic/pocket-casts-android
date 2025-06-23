@@ -27,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
@@ -524,25 +525,30 @@ class EpisodeFragment : BaseFragment() {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(start = 16.dp, end = 16.dp, top = 16.dp)
-                                .clickable {
-                                    if (parentFragmentManager.findFragmentByTag("episode_transcript") == null) {
-                                        val fragment = TranscriptFragment.newInstance(episodeUuid, podcastUuid)
-                                        fragment.show(parentFragmentManager, "episode_transcript")
-                                    }
-                                    analyticsTracker.track(
-                                        AnalyticsEvent.EPISODE_DETAIL_TRANSCRIPT_CARD_TAPPED,
-                                        buildMap {
-                                            put("episode_uuid", episodeUuid)
-                                            podcastUuid?.let { uuid -> put("podcast_uuid", uuid) }
-                                        },
-                                    )
-                                },
+                                .padding(start = 16.dp, end = 16.dp, top = 16.dp),
                         ) {
                             TranscriptExcerptBanner(
                                 text = remember(textTranscript.url) { textTranscript.getExcerpt() },
                                 isGenerated = textTranscript.isGenerated,
-                                modifier = Modifier.align(Alignment.CenterHorizontally),
+                                modifier = Modifier
+                                    .align(Alignment.CenterHorizontally)
+                                    .clickable(
+                                        role = Role.Button,
+                                        onClickLabel = stringResource(LR.string.transcript_open),
+                                        onClick = {
+                                            if (parentFragmentManager.findFragmentByTag("episode_transcript") == null) {
+                                                val fragment = TranscriptFragment.newInstance(episodeUuid, podcastUuid)
+                                                fragment.show(parentFragmentManager, "episode_transcript")
+                                            }
+                                            analyticsTracker.track(
+                                                AnalyticsEvent.EPISODE_DETAIL_TRANSCRIPT_CARD_TAPPED,
+                                                buildMap {
+                                                    put("episode_uuid", episodeUuid)
+                                                    podcastUuid?.let { uuid -> put("podcast_uuid", uuid) }
+                                                },
+                                            )
+                                        },
+                                    ),
                             )
                             Spacer(
                                 modifier = Modifier.height(16.dp),
