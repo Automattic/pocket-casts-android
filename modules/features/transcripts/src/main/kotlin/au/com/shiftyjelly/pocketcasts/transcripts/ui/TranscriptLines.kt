@@ -200,15 +200,17 @@ private fun isValidHighlightRange(start: Int, end: Int, maxLength: Int): Boolean
 
 private val SimpleTextStyle = TextStyle(
     fontSize = 16.sp,
+    lineHeight = 24.sp,
     fontWeight = FontWeight.Medium,
     fontFamily = TranscriptTheme.RobotoSerifFontFamily,
 )
 private val SpeakerTextStyle = SimpleTextStyle.copy(
     fontSize = 12.sp,
+    lineHeight = 18.sp,
 )
 
 private val SimplePadding = PaddingValues(bottom = 16.dp)
-private val SpeakerPadding = PaddingValues(bottom = 8.dp, top = 16.dp)
+private val SpeakerPadding = PaddingValues(bottom = 12.dp, top = 16.dp)
 
 @Preview
 @Composable
