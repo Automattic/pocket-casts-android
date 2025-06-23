@@ -9,8 +9,11 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -21,18 +24,25 @@ import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
+import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedPlayPauseButton
 import au.com.shiftyjelly.pocketcasts.compose.components.rememberViewInteropNestedScrollConnection
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
+import au.com.shiftyjelly.pocketcasts.transcripts.ui.ToolbarColors
 import au.com.shiftyjelly.pocketcasts.transcripts.ui.TranscriptPage
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
+import javax.inject.Inject
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -64,6 +74,9 @@ class TranscriptFragment : BaseDialogFragment() {
             }
         },
     )
+
+    @Inject
+    internal lateinit var playbackManger: PlaybackManager
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -119,12 +132,46 @@ class TranscriptFragment : BaseDialogFragment() {
                     onShowTransciptPaywall = {
                         viewModel.track(AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_SHOWN)
                     },
+                    toolbarTrailingContent = { toolbarColors ->
+                        PlayPauseButton(toolbarColors)
+                    },
                     modifier = Modifier
                         .fillMaxWidth(fraction = ResourcesCompat.getFloat(resources, UR.dimen.seekbar_width_percentage))
                         .nestedScroll(rememberViewInteropNestedScrollConnection()),
                 )
             }
         }
+    }
+
+    @Composable
+    private fun PlayPauseButton(
+        toolbarColors: ToolbarColors,
+        modifier: Modifier = Modifier,
+    ) {
+        val scope = rememberCoroutineScope()
+        val playbackState by remember {
+            playbackManger.playbackStateFlow.map { it.episodeUuid to it.isPlaying }
+        }.collectAsState(initial = null)
+        val isPlayingThisEpisode = playbackState?.first == args.episodeUuid && playbackState?.second == true
+
+        AnimatedPlayPauseButton(
+            isPlaying = isPlayingThisEpisode,
+            onClick = {
+                if (isPlayingThisEpisode) {
+                    playbackManger.pause(sourceView = SourceView.EPISODE_TRANSCRIPT)
+                } else {
+                    scope.launch {
+                        playbackManger.playNowSuspend(args.episodeUuid, sourceView = SourceView.EPISODE_TRANSCRIPT)
+                    }
+                }
+            },
+            iconWidth = 24.dp,
+            iconHeight = 24.dp,
+            circleSize = 48.dp,
+            iconTint = toolbarColors.button,
+            circleColor = toolbarColors.buttonBackground,
+            modifier = modifier,
+        )
     }
 
     @Parcelize

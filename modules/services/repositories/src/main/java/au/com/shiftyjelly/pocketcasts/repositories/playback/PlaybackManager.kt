@@ -589,6 +589,7 @@ open class PlaybackManager @Inject constructor(
             SourceView.LISTENING_HISTORY,
             SourceView.DOWNLOADS,
             SourceView.EPISODE_DETAILS,
+            SourceView.EPISODE_TRANSCRIPT,
             SourceView.FILES,
             SourceView.FILTERS,
             SourceView.PODCAST_SCREEN,
