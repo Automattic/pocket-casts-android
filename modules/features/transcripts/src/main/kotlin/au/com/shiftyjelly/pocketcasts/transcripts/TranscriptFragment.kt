@@ -40,8 +40,9 @@ class TranscriptFragment : BaseDialogFragment() {
 
         fun newInstance(
             episodeUuid: String,
+            podcastUuid: String?,
         ) = TranscriptFragment().apply {
-            arguments = bundleOf(NEW_INSTANCE_KEY to Args(episodeUuid))
+            arguments = bundleOf(NEW_INSTANCE_KEY to Args(episodeUuid, podcastUuid))
         }
     }
 
@@ -58,6 +59,13 @@ class TranscriptFragment : BaseDialogFragment() {
         savedInstanceState: Bundle?,
     ) = contentWithoutConsumedInsets {
         CallOnce {
+            transcriptViewModel.track(
+                AnalyticsEvent.EPISODE_TRANSCRIPT_SHOWN,
+                buildMap {
+                    put("episode_uuid", args.episodeUuid)
+                    args.podcastUuid?.let { uuid -> put("podcast_uuid", uuid) }
+                },
+            )
             transcriptViewModel.loadTranscript(args.episodeUuid)
         }
 
@@ -109,5 +117,6 @@ class TranscriptFragment : BaseDialogFragment() {
     @Parcelize
     private class Args(
         val episodeUuid: String,
+        val podcastUuid: String?,
     ) : Parcelable
 }

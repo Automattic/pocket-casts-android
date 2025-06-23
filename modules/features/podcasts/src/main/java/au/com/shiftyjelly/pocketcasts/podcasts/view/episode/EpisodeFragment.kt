@@ -21,8 +21,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -518,14 +518,25 @@ class EpisodeFragment : BaseFragment() {
                     AnimatedNonNullVisibility(
                         item = transcript as? Transcript.Text,
                     ) { textTranscript ->
+                        val episodeUuid = textTranscript.episodeUuid
+                        val podcastUuid = textTranscript.podcastUuid
+
                         Column(
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier
+                                .fillMaxWidth()
                                 .padding(start = 16.dp, end = 16.dp, top = 16.dp)
                                 .clickable {
                                     if (parentFragmentManager.findFragmentByTag("episode_transcript") == null) {
-                                        val fragment = TranscriptFragment.newInstance(textTranscript.episodeUuid)
+                                        val fragment = TranscriptFragment.newInstance(episodeUuid, podcastUuid)
                                         fragment.show(parentFragmentManager, "episode_transcript")
                                     }
+                                    analyticsTracker.track(
+                                        AnalyticsEvent.EPISODE_DETAIL_TRANSCRIPT_CARD_TAPPED,
+                                        buildMap {
+                                            put("episode_uuid", episodeUuid)
+                                            podcastUuid?.let { uuid -> put("podcast_uuid", uuid) }
+                                        },
+                                    )
                                 },
                         ) {
                             TranscriptExcerptBanner(
@@ -538,6 +549,15 @@ class EpisodeFragment : BaseFragment() {
                             )
                             TextH40(
                                 text = stringResource(LR.string.episode_description),
+                            )
+                        }
+                        LaunchedEffect(podcastUuid, episodeUuid) {
+                            analyticsTracker.track(
+                                AnalyticsEvent.EPISODE_DETAIL_TRANSCRIPT_CARD_SHOWN,
+                                buildMap {
+                                    put("episode_uuid", episodeUuid)
+                                    podcastUuid?.let { uuid -> put("podcast_uuid", uuid) }
+                                },
                             )
                         }
                     }

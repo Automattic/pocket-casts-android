@@ -424,6 +424,7 @@ enum class AnalyticsEvent(val key: String) {
     EPISODE_ADDED_TO_UP_NEXT("episode_added_to_up_next"),
     EPISODE_BULK_ADD_TO_UP_NEXT("episode_bulk_add_to_up_next"),
     EPISODE_REMOVED_FROM_UP_NEXT("episode_removed_from_up_next"),
+    EPISODE_TRANSCRIPT_SHOWN("episode_transcript_shown"),
     PODCAST_SHARED("podcast_shared"),
 
     /* Auto Play */
@@ -436,6 +437,8 @@ enum class AnalyticsEvent(val key: String) {
     EPISODE_DETAIL_PODCAST_NAME_TAPPED("episode_detail_podcast_name_tapped"),
     EPISODE_DETAIL_SHOW_NOTES_LINK_TAPPED("episode_detail_show_notes_link_tapped"),
     EPISODE_DETAIL_TAB_CHANGED("episode_detail_tab_changed"),
+    EPISODE_DETAIL_TRANSCRIPT_CARD_SHOWN("episode_detail_transcript_card_shown"),
+    EPISODE_DETAIL_TRANSCRIPT_CARD_TAPPED("episode_detail_transcript_card_tapped"),
 
     /* Recommendations */
     RECOMMENDATIONS_SHOWN("recommendations_shown"),
