@@ -7,6 +7,8 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import androidx.work.workDataOf
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationWorker.Companion.DOWNLOADED_EPISODES
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationWorker.Companion.SUBCATEGORY
 import au.com.shiftyjelly.pocketcasts.repositories.notification.ReEngagementNotificationType.Companion.SUBCATEGORY_REENGAGE_CATCH_UP_OFFLINE
 import au.com.shiftyjelly.pocketcasts.repositories.notification.ReEngagementNotificationType.Companion.SUBCATEGORY_REENGAGE_WE_MISS_YOU
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -21,9 +23,6 @@ class NotificationSchedulerImpl @Inject constructor(
 ) : NotificationScheduler {
 
     companion object {
-        const val SUBCATEGORY = "subcategory"
-        const val DOWNLOADED_EPISODES = "downloaded_episodes"
-
         const val TAG_TRENDING_RECOMMENDATIONS = "trending_and_recommendations"
         private const val TAG_REENGAGEMENT = "daily_re_engagement_check"
         private const val TAG_ONBOARDING = "onboarding_notification"

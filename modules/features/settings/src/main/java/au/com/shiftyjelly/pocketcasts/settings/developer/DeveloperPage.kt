@@ -60,6 +60,7 @@ fun DeveloperPage(
     bottomInset: Dp,
     onSendCrash: (String) -> Unit,
     onShowWhatsNewClick: () -> Unit,
+    onShowNotificationsTestingClick: () -> Unit,
     onResetSuggestedFoldersSuggestion: () -> Unit,
 ) {
     var openCrashMessageDialog by remember { mutableStateOf(false) }
@@ -104,6 +105,9 @@ fun DeveloperPage(
         }
         item {
             ShowWhatsNew(onClick = onShowWhatsNewClick)
+        }
+        item {
+            NotificationsTesting(onClick = onShowNotificationsTestingClick)
         }
 
         if (openCrashMessageDialog) {
@@ -286,6 +290,19 @@ private fun ShowWhatsNew(
 }
 
 @Composable
+private fun NotificationsTesting(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    SettingRow(
+        primaryText = "Notifications testing",
+        secondaryText = "Adjust delays and trigger notifications on-demand",
+        icon = rememberVectorPainter(Icons.Outlined.Notifications),
+        modifier = modifier.clickable { onClick() },
+    )
+}
+
+@Composable
 private fun ResetSuggestedFoldersSuggestion(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -328,6 +345,7 @@ private fun DeveloperPagePreview() {
         onSendCrash = {},
         onShowWhatsNewClick = {},
         onResetSuggestedFoldersSuggestion = {},
+        onShowNotificationsTestingClick = {}
     )
 }
 
