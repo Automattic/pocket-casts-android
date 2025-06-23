@@ -2,11 +2,14 @@ package au.com.shiftyjelly.pocketcasts.settings.notifications_testing
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import androidx.work.workDataOf
+import au.com.shiftyjelly.pocketcasts.models.db.dao.UserNotificationsDao
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NewFeaturesAndTipsNotificationType
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationScheduler
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationWorker
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationWorker.Companion.DOWNLOADED_EPISODES
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationWorker.Companion.SHOULD_SKIP_VALIDATIONS
@@ -22,14 +25,17 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 internal class NotificationsTestingViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
+    private val notificationScheduler: NotificationScheduler,
+    private val userNotificationsDao: UserNotificationsDao,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow<List<NotificationType>>(NotificationType.entries)
-    val state: StateFlow<List<NotificationType>> = _state.asStateFlow()
+    private val _state = MutableStateFlow(UiState())
+    val state: StateFlow<UiState> = _state.asStateFlow()
 
     private val workManager by lazy { WorkManager.getInstance(context) }
 
@@ -78,6 +84,57 @@ internal class NotificationsTestingViewModel @Inject constructor(
         )
     }
 
+    fun clearNotificationsTable() {
+        viewModelScope.launch {
+            userNotificationsDao.deleteAll()
+        }
+    }
+
+    fun cancelAllNotifications() {
+        viewModelScope.launch {
+            notificationScheduler.cancelScheduledReEngagementNotifications()
+            notificationScheduler.cancelScheduledOffersNotifications()
+            notificationScheduler.cancelScheduledOnboardingNotifications()
+            notificationScheduler.cancelScheduledTrendingAndRecommendationsNotifications()
+            notificationScheduler.cancelScheduledNewFeaturesAndTipsNotifications()
+            notificationScheduler.cancelScheduledOffersNotifications()
+        }
+    }
+
+    fun scheduleCategory(schedule: NotificationCategorySchedule) {
+        viewModelScope.launch {
+            when (schedule.category) {
+                NotificationCategoryType.DAILY_REMINDERS -> {
+                    notificationScheduler.setupOnboardingNotifications {
+                        val indexOfType = OnboardingNotificationType.values.indexOf(it)
+                        (1 + indexOfType) * schedule.consecutiveDelaySeconds * 1000L
+                    }
+                    notificationScheduler.setupReEngagementNotification {
+                        val indexOfType = ReEngagementNotificationType.values.indexOf(it)
+                        (1 + indexOfType) * schedule.consecutiveDelaySeconds * 1000L
+                    }
+                }
+                NotificationCategoryType.TRENDING_AND_RECOMMENDATIONS -> notificationScheduler.setupTrendingAndRecommendationsNotifications {
+                    val indexOfType = TrendingAndRecommendationsNotificationType.values.indexOf(it)
+                    (1 + indexOfType) * schedule.consecutiveDelaySeconds * 1000L
+                }
+                NotificationCategoryType.NEW_FEATURES_AND_TIPS -> notificationScheduler.setupNewFeaturesAndTipsNotifications {
+                    val indexOfType = NewFeaturesAndTipsNotificationType.values.indexOf(it)
+                    (1 + indexOfType) * schedule.consecutiveDelaySeconds * 1000L
+                }
+                NotificationCategoryType.POCKET_CASTS_OFFERS -> notificationScheduler.setupOffersNotifications {
+                    val indexOfType = OffersNotificationType.values.indexOf(it)
+                    (1 + indexOfType) * schedule.consecutiveDelaySeconds * 1000L
+                }
+            }
+        }
+    }
+
+    data class UiState(
+        val uniqueNotifications: List<NotificationType> = NotificationType.entries,
+        val notificationCategories: List<NotificationCategoryType> = NotificationCategoryType.entries
+    )
+
     sealed interface NotificationTriggerType {
         data object Now : NotificationTriggerType
         data class Delayed(val delaySeconds: Int) : NotificationTriggerType
@@ -86,6 +143,11 @@ internal class NotificationsTestingViewModel @Inject constructor(
     data class NotificationTrigger(
         val notificationType: NotificationType,
         val triggerType: NotificationTriggerType
+    )
+
+    data class NotificationCategorySchedule(
+        val category: NotificationCategoryType,
+        val consecutiveDelaySeconds: Int,
     )
 
     enum class NotificationType {
@@ -102,6 +164,13 @@ internal class NotificationsTestingViewModel @Inject constructor(
         DAILY_REMINDERS_UPSELL,
         NEW_FEATURE_FOLDERS,
         OFFERS
+    }
+
+    enum class NotificationCategoryType {
+        TRENDING_AND_RECOMMENDATIONS,
+        DAILY_REMINDERS,
+        NEW_FEATURES_AND_TIPS,
+        POCKET_CASTS_OFFERS
     }
 
     companion object {

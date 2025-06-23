@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.models.db.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -21,4 +22,7 @@ abstract class UserNotificationsDao {
 
     @Update
     abstract suspend fun update(userNotifications: UserNotifications)
+
+    @Query("DELETE FROM user_notifications")
+    abstract suspend fun deleteAll()
 }
