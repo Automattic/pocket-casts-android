@@ -763,8 +763,7 @@ private class DeveloperOptionsAdapter : DeepLinkAdapter {
         val host = uriData.host
 
         return if (intent.action == ACTION_VIEW && scheme == "pktc" && host == "developer_options") {
-            val subMenu = DeveloperOptionsDeeplink.SubMenu.findBySegment(uriData.pathSegments.firstOrNull().orEmpty())
-            DeveloperOptionsDeeplink(subMenu = subMenu)
+            DeveloperOptionsDeeplink
         } else {
             null
         }

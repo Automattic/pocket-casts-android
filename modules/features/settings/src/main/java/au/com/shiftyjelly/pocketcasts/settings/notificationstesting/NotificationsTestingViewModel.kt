@@ -22,6 +22,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -40,26 +42,28 @@ internal class NotificationsTestingViewModel @Inject constructor(
     private val workManager by lazy { WorkManager.getInstance(context) }
 
     fun trigger(trigger: NotificationTrigger) {
-        triggerOneTimeNotification(buildRequest(trigger))
+        val subCategory = trigger.notificationType.subCategory
+        triggerOneTimeNotification(buildRequest(trigger), "$TAG_UNIQUE_WORK-$subCategory")
+    }
+
+    private val NotificationType.subCategory get() = when (this) {
+        NotificationType.TRENDING -> TrendingAndRecommendationsNotificationType.Trending.subcategory
+        NotificationType.RECOMMENDATIONS -> TrendingAndRecommendationsNotificationType.Recommendations.subcategory
+        NotificationType.NEW_FEATURE_FOLDERS -> NewFeaturesAndTipsNotificationType.SmartFolders.subcategory
+        NotificationType.OFFERS -> OffersNotificationType.UpgradeNow.subcategory
+        NotificationType.DAILY_REMINDER_MISS_YOU -> ReEngagementNotificationType.WeMissYou.subcategory
+        NotificationType.DAILY_REMINDER_DOWNLOADS_OFFLINE -> ReEngagementNotificationType.CatchUpOffline.subcategory
+        NotificationType.DAILY_REMINDER_SYNC -> OnboardingNotificationType.Sync.subcategory
+        NotificationType.DAILY_REMINDER_IMPORT -> OnboardingNotificationType.Import.subcategory
+        NotificationType.DAILY_REMINDER_UP_NEXT -> OnboardingNotificationType.UpNext.subcategory
+        NotificationType.DAILY_REMINDER_FILTERS -> OnboardingNotificationType.Filters.subcategory
+        NotificationType.DAILY_REMINDERS_STAFF_PICKS -> OnboardingNotificationType.StaffPicks.subcategory
+        NotificationType.DAILY_REMINDERS_THEMES -> OnboardingNotificationType.Themes.subcategory
+        NotificationType.DAILY_REMINDERS_UPSELL -> OnboardingNotificationType.PlusUpsell.subcategory
     }
 
     private fun buildRequest(trigger: NotificationTrigger): OneTimeWorkRequest {
-        val subCategory = when (trigger.notificationType) {
-            NotificationType.TRENDING -> TrendingAndRecommendationsNotificationType.Trending.subcategory
-            NotificationType.RECOMMENDATIONS -> TrendingAndRecommendationsNotificationType.Recommendations.subcategory
-            NotificationType.NEW_FEATURE_FOLDERS -> NewFeaturesAndTipsNotificationType.SmartFolders.subcategory
-            NotificationType.OFFERS -> OffersNotificationType.UpgradeNow.subcategory
-            NotificationType.DAILY_REMINDER_MISS_YOU -> ReEngagementNotificationType.WeMissYou.subcategory
-            NotificationType.DAILY_REMINDER_DOWNLOADS_OFFLINE -> ReEngagementNotificationType.CatchUpOffline.subcategory
-            NotificationType.DAILY_REMINDER_SYNC -> OnboardingNotificationType.Sync.subcategory
-            NotificationType.DAILY_REMINDER_IMPORT -> OnboardingNotificationType.Import.subcategory
-            NotificationType.DAILY_REMINDER_UP_NEXT -> OnboardingNotificationType.UpNext.subcategory
-            NotificationType.DAILY_REMINDER_FILTERS -> OnboardingNotificationType.Filters.subcategory
-            NotificationType.DAILY_REMINDERS_STAFF_PICKS -> OnboardingNotificationType.StaffPicks.subcategory
-            NotificationType.DAILY_REMINDERS_THEMES -> OnboardingNotificationType.Themes.subcategory
-            NotificationType.DAILY_REMINDERS_UPSELL -> OnboardingNotificationType.PlusUpsell.subcategory
-        }
-
+        val subCategory = trigger.notificationType.subCategory
         return OneTimeWorkRequest.Builder(NotificationWorker::class.java)
             .setInputData(
                 workDataOf(
@@ -69,16 +73,16 @@ internal class NotificationsTestingViewModel @Inject constructor(
                 ),
             ).apply {
                 if (trigger.triggerType is NotificationTriggerType.Delayed) {
-                    setInitialDelay(trigger.triggerType.delaySeconds.toLong(), TimeUnit.SECONDS)
+                    setInitialDelay(trigger.triggerType.delay.inWholeMilliseconds, TimeUnit.MILLISECONDS)
                 }
             }
-            .addTag(TAG_UNIQUE_WORK)
+            .addTag("$TAG_UNIQUE_WORK-$subCategory")
             .build()
     }
 
-    private fun triggerOneTimeNotification(oneTimeWorkRequest: OneTimeWorkRequest) {
+    private fun triggerOneTimeNotification(oneTimeWorkRequest: OneTimeWorkRequest, tag: String) {
         workManager.enqueueUniqueWork(
-            uniqueWorkName = TAG_UNIQUE_WORK,
+            uniqueWorkName = tag,
             existingWorkPolicy = ExistingWorkPolicy.REPLACE,
             request = oneTimeWorkRequest,
         )
@@ -107,24 +111,24 @@ internal class NotificationsTestingViewModel @Inject constructor(
                 NotificationCategoryType.DAILY_REMINDERS -> {
                     notificationScheduler.setupOnboardingNotifications {
                         val indexOfType = OnboardingNotificationType.values.indexOf(it)
-                        (1 + indexOfType) * schedule.consecutiveDelaySeconds * 1000L
+                        ((1 + indexOfType) * schedule.consecutiveDelaySeconds * 1000L).milliseconds
                     }
                     notificationScheduler.setupReEngagementNotification {
                         val indexOfType = ReEngagementNotificationType.values.indexOf(it)
-                        (1 + indexOfType) * schedule.consecutiveDelaySeconds * 1000L
+                        ((1 + indexOfType) * schedule.consecutiveDelaySeconds * 1000L).milliseconds
                     }
                 }
                 NotificationCategoryType.TRENDING_AND_RECOMMENDATIONS -> notificationScheduler.setupTrendingAndRecommendationsNotifications {
                     val indexOfType = TrendingAndRecommendationsNotificationType.values.indexOf(it)
-                    (1 + indexOfType) * schedule.consecutiveDelaySeconds * 1000L
+                    ((1 + indexOfType) * schedule.consecutiveDelaySeconds * 1000L).milliseconds
                 }
                 NotificationCategoryType.NEW_FEATURES_AND_TIPS -> notificationScheduler.setupNewFeaturesAndTipsNotifications {
                     val indexOfType = NewFeaturesAndTipsNotificationType.values.indexOf(it)
-                    (1 + indexOfType) * schedule.consecutiveDelaySeconds * 1000L
+                    ((1 + indexOfType) * schedule.consecutiveDelaySeconds * 1000L).milliseconds
                 }
                 NotificationCategoryType.POCKET_CASTS_OFFERS -> notificationScheduler.setupOffersNotifications {
                     val indexOfType = OffersNotificationType.values.indexOf(it)
-                    (1 + indexOfType) * schedule.consecutiveDelaySeconds * 1000L
+                    ((1 + indexOfType) * schedule.consecutiveDelaySeconds * 1000L).milliseconds
                 }
             }
         }
@@ -137,7 +141,7 @@ internal class NotificationsTestingViewModel @Inject constructor(
 
     sealed interface NotificationTriggerType {
         data object Now : NotificationTriggerType
-        data class Delayed(val delaySeconds: Int) : NotificationTriggerType
+        data class Delayed(val delay: Duration) : NotificationTriggerType
     }
 
     data class NotificationTrigger(

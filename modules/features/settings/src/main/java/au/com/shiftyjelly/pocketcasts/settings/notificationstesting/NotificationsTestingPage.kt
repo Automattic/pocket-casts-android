@@ -38,6 +38,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
+import kotlin.time.Duration.Companion.seconds
 
 @Composable
 internal fun NotificationsTestingPage(
@@ -128,7 +129,7 @@ private fun SettingNotifications(
         var selectedCategory by remember { mutableStateOf<NotificationsTestingViewModel.NotificationCategoryType?>(null) }
         var selectedDelay by remember { mutableIntStateOf(1) }
 
-        var notificationSchedule = if (selectedDelay > 0 && selectedCategory != null) {
+        val notificationSchedule = if (selectedDelay > 0 && selectedCategory != null) {
             NotificationsTestingViewModel.NotificationCategorySchedule(
                 category = selectedCategory!!,
                 consecutiveDelaySeconds = selectedDelay,
@@ -197,7 +198,13 @@ private fun UniqueNotificationSchedulerContent(
     val notificationTrigger = selectedType?.let {
         NotificationsTestingViewModel.NotificationTrigger(
             notificationType = it,
-            triggerType = if (selectedDelay > 0) NotificationsTestingViewModel.NotificationTriggerType.Delayed(selectedDelay) else NotificationsTestingViewModel.NotificationTriggerType.Now,
+            triggerType = if (selectedDelay > 0) {
+                NotificationsTestingViewModel.NotificationTriggerType.Delayed(
+                    selectedDelay.toLong().seconds,
+                )
+            } else {
+                NotificationsTestingViewModel.NotificationTriggerType.Now
+            },
         )
     }
 
