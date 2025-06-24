@@ -62,6 +62,7 @@ import au.com.shiftyjelly.pocketcasts.deeplink.CreateAccountDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_PAGE
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLinkFactory
 import au.com.shiftyjelly.pocketcasts.deeplink.DeleteBookmarkDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.DeveloperOptionsDeeplink
 import au.com.shiftyjelly.pocketcasts.deeplink.DownloadsDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ImportDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.NativeShareDeepLink
@@ -156,6 +157,7 @@ import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList.Companio
 import au.com.shiftyjelly.pocketcasts.settings.AppearanceSettingsFragment
 import au.com.shiftyjelly.pocketcasts.settings.ExportSettingsFragment
 import au.com.shiftyjelly.pocketcasts.settings.SettingsFragment
+import au.com.shiftyjelly.pocketcasts.settings.developer.DeveloperFragment
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
@@ -1494,6 +1496,9 @@ class MainActivity :
                 }
                 is ThemesDeepLink -> {
                     addFragment(AppearanceSettingsFragment.newInstance())
+                }
+                is DeveloperOptionsDeeplink -> {
+                    addFragment(DeveloperFragment())
                 }
                 null -> {
                     LogBuffer.i("DeepLink", "Did not find any matching deep link for: $intent")
