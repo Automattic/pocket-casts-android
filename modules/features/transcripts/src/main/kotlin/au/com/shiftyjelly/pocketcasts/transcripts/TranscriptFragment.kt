@@ -136,7 +136,7 @@ class TranscriptFragment : BaseDialogFragment() {
                         PlayPauseButton(toolbarColors)
                     },
                     modifier = Modifier
-                        .fillMaxWidth(fraction = ResourcesCompat.getFloat(resources, UR.dimen.seekbar_width_percentage))
+                        .fillMaxWidth(fraction = ResourcesCompat.getFloat(resources, UR.dimen.player_max_content_width_fraction))
                         .nestedScroll(rememberViewInteropNestedScrollConnection()),
                 )
             }

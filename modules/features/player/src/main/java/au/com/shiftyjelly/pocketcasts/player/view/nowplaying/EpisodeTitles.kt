@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -18,7 +19,6 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.LocalRippleConfiguration
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.RippleConfiguration
-import androidx.compose.material.RippleDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -105,98 +105,109 @@ private fun Content(
     playerColors: PlayerColors = MaterialTheme.theme.rememberPlayerColorsOrDefault(),
 ) {
     CompositionLocalProvider(
-        LocalRippleConfiguration provides RippleConfiguration(Color.White, RippleDefaults.rippleAlpha(Color.White, true)),
+        LocalRippleConfiguration provides RippleConfiguration(color = playerColors.contrast01),
     ) {
-        Column(
+        Row(
             modifier = modifier,
         ) {
-            Row {
-                if (state.isChaptersPresent) {
-                    ChapterPreviousButton(
-                        enabled = !state.isFirstChapter,
-                        alpha = if (state.isFirstChapter) 0.5f else 1f,
-                        onClick = onPreviousChapterClick,
-                    )
-                }
+            if (state.isChaptersPresent) {
+                ChapterPreviousButton(
+                    enabled = !state.isFirstChapter,
+                    alpha = if (state.isFirstChapter) 0.5f else 1f,
+                    iconTint = playerColors.contrast01,
+                    onClick = onPreviousChapterClick,
+                )
+            }
 
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .align(Alignment.CenterVertically)
+                    .padding(horizontal = if (state.isChaptersPresent) 8.dp else 0.dp)
+                    .weight(1f),
+            ) {
+                TextH30(
+                    text = state.title,
+                    color = playerColors.contrast01,
+                    textAlign = TextAlign.Center,
+                    maxLines = 2,
                     modifier = Modifier
-                        .padding(start = 8.dp, end = 8.dp, top = 8.dp)
-                        .weight(1f),
-                ) {
-                    TextH30(
-                        text = state.title,
-                        color = playerColors.contrast01,
-                        textAlign = TextAlign.Center,
-                        maxLines = 2,
-                        modifier = if (state.isChaptersPresent) {
-                            Modifier.clickable { state.chapter?.let { onChapterTitleClick(it) } }
-                        } else {
-                            Modifier
-                        },
-                    )
+                        .fillMaxWidth()
+                        .then(
+                            if (state.isChaptersPresent) {
+                                Modifier.clickable { state.chapter?.let { onChapterTitleClick(it) } }
+                            } else {
+                                Modifier
+                            },
+                        ),
+                )
 
-                    if (!state.isChaptersPresent) {
-                        state.podcastTitle?.takeIf { it.isNotBlank() }?.let {
-                            Spacer(
-                                modifier = Modifier.height(4.dp),
-                            )
-
-                            TextH50(
-                                text = state.podcastTitle,
-                                color = MaterialTheme.theme.colors.playerContrast02,
-                                maxLines = 1,
-                                modifier = Modifier
-                                    .clickable { onPodcastTitleClick() },
-                            )
-                        }
-                    }
-
-                    if (state.isChaptersPresent) {
-                        state.chapterSummary.takeIf { it.currentIndex != -1 && it.size > 0 }?.let { summary ->
-                            val chapterSummary = stringResource(LR.string.chapter_count_summary, summary.currentIndex, summary.size)
-                            val contentDescription = "$chapterSummary ${pluralStringResource(id = LR.plurals.chapter, count = summary.size)}"
-
-                            Spacer(
-                                modifier = Modifier.height(4.dp),
-                            )
-
-                            TextH70(
-                                text = chapterSummary,
-                                maxLines = 1,
-                                color = Color.White.copy(alpha = 0.7f),
-                                modifier = Modifier.semantics { this.contentDescription = contentDescription },
-                            )
-                        }
-                    }
-                }
-
-                if (state.isChaptersPresent) {
-                    val timeRemainingContentDescription = stringResource(
-                        LR.string.chapter_time_remaining_content_description,
-                        formatTimeRemainingContentDescription(state.chapterTimeRemaining),
-                    )
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        ChapterNextButtonWithChapterProgressCircle(
-                            enabled = !state.isLastChapter,
-                            alpha = if (state.isLastChapter) 0.5f else 1f,
-                            progress = state.chapterProgress,
-                            onClick = onNextChapterClick,
+                if (!state.isChaptersPresent) {
+                    state.podcastTitle?.takeIf { it.isNotBlank() }?.let {
+                        Spacer(
+                            modifier = Modifier.height(4.dp),
                         )
 
-                        Spacer(modifier = Modifier.height(4.dp))
+                        TextH50(
+                            text = state.podcastTitle,
+                            color = playerColors.contrast02,
+                            textAlign = TextAlign.Center,
+                            maxLines = 1,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { onPodcastTitleClick() },
+                        )
+                    }
+                }
+
+                if (state.isChaptersPresent) {
+                    state.chapterSummary.takeIf { it.currentIndex != -1 && it.size > 0 }?.let { summary ->
+                        val chapterSummary = stringResource(LR.string.chapter_count_summary, summary.currentIndex, summary.size)
+                        val contentDescription = "$chapterSummary ${pluralStringResource(id = LR.plurals.chapter, count = summary.size)}"
+
+                        Spacer(
+                            modifier = Modifier.height(4.dp),
+                        )
 
                         TextH70(
-                            text = state.chapterTimeRemaining,
-                            color = Color.White,
+                            text = chapterSummary,
+                            color = playerColors.contrast02,
+                            textAlign = TextAlign.Center,
+                            maxLines = 1,
                             modifier = Modifier
-                                .semantics { this.contentDescription = timeRemainingContentDescription }
-                                .alpha(0.4f),
+                                .fillMaxWidth()
+                                .semantics { this.contentDescription = contentDescription },
                         )
                     }
+                }
+            }
+
+            if (state.isChaptersPresent) {
+                val timeRemainingContentDescription = stringResource(
+                    LR.string.chapter_time_remaining_content_description,
+                    formatTimeRemainingContentDescription(state.chapterTimeRemaining),
+                )
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    ChapterNextButtonWithChapterProgressCircle(
+                        enabled = !state.isLastChapter,
+                        alpha = if (state.isLastChapter) 0.5f else 1f,
+                        progress = state.chapterProgress,
+                        iconTint = playerColors.contrast01,
+                        progressTint = playerColors.contrast04,
+                        onClick = onNextChapterClick,
+                    )
+
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    TextH70(
+                        text = state.chapterTimeRemaining,
+                        color = playerColors.contrast02,
+                        modifier = Modifier
+                            .semantics { this.contentDescription = timeRemainingContentDescription }
+                            .alpha(0.4f),
+                    )
                 }
             }
         }
@@ -207,6 +218,7 @@ private fun Content(
 private fun ChapterPreviousButton(
     enabled: Boolean,
     alpha: Float,
+    iconTint: Color,
     onClick: () -> Unit,
 ) {
     IconButton(
@@ -219,8 +231,8 @@ private fun ChapterPreviousButton(
             modifier = Modifier.clip(CircleShape),
         ) {
             Icon(
-                painterResource(R.drawable.ic_chapter_skipbackwards),
-                tint = Color.White,
+                painter = painterResource(R.drawable.ic_chapter_skipbackwards),
+                tint = iconTint,
                 contentDescription = stringResource(LR.string.player_action_previous_chapter),
             )
         }
@@ -232,6 +244,8 @@ private fun ChapterNextButtonWithChapterProgressCircle(
     enabled: Boolean,
     progress: Float,
     alpha: Float,
+    iconTint: Color,
+    progressTint: Color,
     onClick: () -> Unit,
 ) {
     val contentDescription = stringResource(LR.string.player_action_next_chapter)
@@ -243,13 +257,14 @@ private fun ChapterNextButtonWithChapterProgressCircle(
             .semantics { this.contentDescription = contentDescription },
     ) {
         Icon(
-            painterResource(R.drawable.ic_chapter_skipforward),
-            tint = Color.White,
+            painter = painterResource(R.drawable.ic_chapter_skipforward),
+            tint = iconTint,
             contentDescription = null,
         )
 
         ChapterProgressCircle(
             progress = progress,
+            tint = progressTint,
         )
     }
 }
@@ -257,6 +272,7 @@ private fun ChapterNextButtonWithChapterProgressCircle(
 @Composable
 private fun ChapterProgressCircle(
     progress: Float,
+    tint: Color,
     modifier: Modifier = Modifier,
 ) {
     Canvas(
@@ -264,7 +280,7 @@ private fun ChapterProgressCircle(
     ) {
         val degrees = 360f * (1f - progress)
         drawArc(
-            color = Color.White.copy(alpha = 0.4f),
+            color = tint,
             startAngle = -90f,
             sweepAngle = -degrees,
             useCenter = false,

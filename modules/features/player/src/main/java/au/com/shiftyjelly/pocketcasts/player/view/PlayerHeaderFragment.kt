@@ -25,17 +25,22 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -58,6 +63,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
+import au.com.shiftyjelly.pocketcasts.compose.PlayerColors
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.ad.AdBanner
 import au.com.shiftyjelly.pocketcasts.compose.ad.BlazeAd
@@ -66,6 +72,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedNonNullVisibili
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
+import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterPlayerHeaderBinding
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivity
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContract
@@ -115,6 +122,7 @@ import kotlinx.coroutines.reactive.asFlow
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.transcripts.UiState as TranscriptsUiState
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 private const val UP_NEXT_FLING_VELOCITY_THRESHOLD = 1000.0f
@@ -158,181 +166,57 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         super.onViewCreated(view, savedInstanceState)
 
         requireNotNull(binding).composeContent.setContentWithViewCompositionStrategy {
-            val headerData by remember { playerHeaderFlow() }.collectAsState(PlayerViewModel.PlayerHeader())
             val podcastColors by remember { podcastColorsFlow() }.collectAsState(PodcastColors.ForUserEpisode)
+
+            val headerData by remember { playerHeaderFlow() }.collectAsState(PlayerViewModel.PlayerHeader())
             val artworkOrVideoState by remember { playerVisualsStateFlow() }.collectAsState(ArtworkOrVideoState.NoContent)
-            val transcriptUiState by transcriptViewModel.uiState.collectAsState()
             val ads by viewModel.activeAds.collectAsState()
 
             val isTranscriptOpen by shelfSharedViewModel.isTranscriptOpen.collectAsState()
-            val showTranscriptTransition = updateTransition(isTranscriptOpen)
-            val playerElementsAlpha by showTranscriptTransition.animateFloat { showTranscript ->
-                if (showTranscript) 0f else 1f
-            }
-            val playbackButtonsScale by showTranscriptTransition.animateFloat { showTranscript ->
-                if (showTranscript) 0.6f else 1f
-            }
-            val controlsOffsetValue = LocalDensity.current.run { 64.dp.roundToPx() }
-            val controlsOffset by showTranscriptTransition.animateIntOffset { showTranscript ->
-                if (showTranscript) IntOffset(x = 0, y = controlsOffsetValue) else IntOffset.Zero
-            }
-            val seekBarOffset = controlsOffset * 0.9f
-            val showPlayerControls = if (isTranscriptOpen) {
-                !transcriptUiState.isPaywallVisible
-            } else {
-                true
-            }
+            val transcriptUiState by transcriptViewModel.uiState.collectAsState()
+
+            val transitionData = updateTranscriptTransitionData(
+                isTranscriptOpen = isTranscriptOpen,
+                showTranscriptPaywall = transcriptUiState.isPaywallVisible,
+            )
 
             AppTheme(theme.activeTheme) {
                 CompositionLocalProvider(LocalPodcastColors provides podcastColors) {
                     val playerColors = MaterialTheme.theme.rememberPlayerColorsOrDefault()
-
                     Box(
                         contentAlignment = Alignment.TopCenter,
                         modifier = Modifier
                             .background(playerColors.background01)
-                            .fillMaxSize()
-                            .padding(16.dp),
+                            .fillMaxSize(),
                     ) {
-                        showTranscriptTransition.AnimatedVisibility(
-                            visible = { it },
-                            enter = transcriptEnterTransition,
-                            exit = transcriptExitTransition,
+                        TranscriptContent(
+                            state = transcriptUiState,
+                            isVisible = transitionData.isTranscriptOpen,
                             modifier = Modifier
-                                .fillMaxWidth(fraction = ResourcesCompat.getFloat(resources, UR.dimen.seekbar_width_percentage))
-                                .fillMaxHeight(),
-                        ) {
-                            TranscriptPage(
-                                uiState = transcriptUiState,
-                                toolbarPadding = PaddingValues(horizontal = 16.dp),
-                                paywallPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
-                                transcriptPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 132.dp),
-                                onClickClose = {
-                                    transcriptViewModel.hideSearch()
-                                    shelfSharedViewModel.closeTranscript()
-                                },
-                                onClickReload = transcriptViewModel::reloadTranscript,
-                                onUpdateSearchTerm = transcriptViewModel::searchInTranscript,
-                                onClearSearchTerm = transcriptViewModel::clearSearch,
-                                onSelectPreviousSearch = transcriptViewModel::selectPreviousSearchMatch,
-                                onSelectNextSearch = transcriptViewModel::selectNextSearchMatch,
-                                onShowSearchBar = transcriptViewModel::openSearch,
-                                onHideSearchBar = transcriptViewModel::hideSearch,
-                                onClickSubscribe = {
-                                    transcriptViewModel.track(AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_SUBSCRIBE_TAPPED)
-                                    OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.Upsell(OnboardingUpgradeSource.GENERATED_TRANSCRIPTS))
-                                },
-                                onShowTranscript = { transcript ->
-                                    val properties = mapOf(
-                                        "type" to transcript.type.analyticsValue,
-                                        "show_as_webpage" to (transcript is Transcript.Web),
-                                    )
-                                    transcriptViewModel.track(AnalyticsEvent.TRANSCRIPT_SHOWN, properties)
-                                },
-                                onShowTransciptPaywall = {
-                                    transcriptViewModel.track(AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_SHOWN)
-                                },
-                            )
-                        }
-                        Column(
-                            modifier = Modifier.fillMaxWidth(),
-                        ) {
-                            Column(
-                                verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .fillMaxWidth()
-                                    .alpha(playerElementsAlpha),
-                            ) {
-                                if (!isTranscriptOpen) {
-                                    AnimatedNonNullVisibility(
-                                        item = ads.firstOrNull(),
-                                        enter = adEnterTransition,
-                                        exit = adExitTransition,
-                                    ) { ad ->
-                                        AdBanner(
-                                            ad = ad,
-                                            colors = rememberAdColors().bannerAd,
-                                            onAdClick = { openAd(ad) },
-                                            onOptionsClick = { openAdReportSheet(ad, podcastColors) },
-                                        )
-                                    }
-                                    ArtworkOrVideo(
-                                        state = artworkOrVideoState,
-                                        onChapterUrlClick = viewModel::onChapterUrlClick,
-                                        configureVideoView = { videoView ->
-                                            videoView.setOnClickListener { onFullScreenVideoClick() }
-                                        },
-                                    )
-                                }
-                            }
-                            if (!isTranscriptOpen) {
-                                EpisodeTitles(
-                                    playerColors = playerColors,
-                                    playerViewModel = viewModel,
-                                    modifier = Modifier.alpha(playerElementsAlpha),
-                                )
-                            }
-                            AnimatedVisibility(
-                                visible = showPlayerControls,
-                                modifier = Modifier.fillMaxWidth(),
-                            ) {
-                                Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                ) {
-                                    PlayerSeekBar(
-                                        playbackPosition = headerData.positionMs.milliseconds,
-                                        playbackDuration = headerData.durationMs.milliseconds,
-                                        adjustPlaybackDuration = headerData.adjustRemainingTimeDuration,
-                                        playbackSpeed = headerData.playbackEffects.playbackSpeed,
-                                        chapters = headerData.chapters,
-                                        isBuffering = headerData.isBuffering,
-                                        bufferedUpTo = headerData.bufferedUpToMs.milliseconds,
-                                        playerColors = playerColors,
-                                        onSeekToPosition = { progress, onSeekComplete ->
-                                            val progressMs = progress.inWholeMilliseconds.toInt()
-                                            viewModel.seekToMs(progressMs, onSeekComplete)
-                                            playbackManager.trackPlaybackSeek(progressMs, SourceView.PLAYER)
-                                        },
-                                        modifier = Modifier
-                                            .fillMaxWidth(fraction = ResourcesCompat.getFloat(resources, UR.dimen.seekbar_width_percentage))
-                                            .offset { seekBarOffset },
-                                    )
-                                    PlayerControls(
-                                        playerColors = playerColors,
-                                        playerViewModel = viewModel,
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(start = 8.dp, end = 8.dp, bottom = dimensionResource(R.dimen.large_play_button_margin_bottom))
-                                            .scale(playbackButtonsScale)
-                                            .offset { controlsOffset },
-                                    )
-                                }
-                            }
-                            AnimatedVisibility(
-                                visible = !isTranscriptOpen,
-                                enter = shelfEnterTransition,
-                                exit = shelfExitTransition,
-                            ) {
-                                PlayerShelf(
-                                    playerColors = playerColors,
-                                    shelfSharedViewModel = shelfSharedViewModel,
-                                    playerViewModel = viewModel,
-                                )
-                            }
-                        }
+                                .fillMaxWidth(fraction = ResourcesCompat.getFloat(resources, UR.dimen.player_max_content_width_fraction))
+                                .fillMaxHeight()
+                                .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+                        )
+                        VerticalPlayerContent(
+                            ad = ads.firstOrNull(),
+                            artworkOrVideoState = artworkOrVideoState,
+                            headerData = headerData,
+                            playerColors = playerColors,
+                            transitionData = transitionData,
+                            modifier = Modifier
+                                .fillMaxWidth(fraction = ResourcesCompat.getFloat(resources, UR.dimen.player_max_content_width_fraction))
+                                .fillMaxHeight()
+                                .padding(16.dp),
+                        )
                     }
                 }
             }
 
-            val playerEpisodeUuid = headerData.episodeUuid
-            val transcriptEpisodeUuid = transcriptUiState.transcriptEpisodeUuid
-            LaunchedEffect(isTranscriptOpen, playerEpisodeUuid, transcriptEpisodeUuid) {
-                if (isTranscriptOpen && playerEpisodeUuid != transcriptEpisodeUuid) {
-                    transcriptViewModel.loadTranscript(playerEpisodeUuid)
-                }
-            }
+            LoadTranscriptEffect(
+                isTranscriptOpen = transitionData.isTranscriptOpen,
+                playerEpisodeUuid = headerData.episodeUuid,
+                transcriptEpisodeUuid = transcriptUiState.transcriptEpisodeUuid,
+            )
         }
 
         observeNavigationState()
@@ -686,6 +570,223 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             else -> ArtworkOrVideoState.NoContent
         }
     }
+
+    @Composable
+    private fun VerticalPlayerContent(
+        ad: BlazeAd?,
+        artworkOrVideoState: ArtworkOrVideoState,
+        headerData: PlayerViewModel.PlayerHeader,
+        playerColors: PlayerColors,
+        transitionData: TranscriptTransitionData,
+        modifier: Modifier = Modifier,
+    ) {
+        Column(
+            modifier = modifier,
+        ) {
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .alpha(transitionData.nonTranscriptElementsAlpha),
+            ) {
+                if (!transitionData.isTranscriptOpen) {
+                    AnimatedNonNullVisibility(
+                        item = ad,
+                        enter = adEnterTransition,
+                        exit = adExitTransition,
+                    ) { ad ->
+                        AdBanner(
+                            ad = ad,
+                            colors = rememberAdColors().bannerAd,
+                            onAdClick = { openAd(ad) },
+                            onOptionsClick = { openAdReportSheet(ad, playerColors.podcastColors) },
+                        )
+                    }
+                    Spacer(
+                        modifier = Modifier.height(16.dp),
+                    )
+                    ArtworkOrVideo(
+                        state = artworkOrVideoState,
+                        onChapterUrlClick = viewModel::onChapterUrlClick,
+                        configureVideoView = { videoView ->
+                            videoView.setOnClickListener { onFullScreenVideoClick() }
+                        },
+                    )
+                }
+            }
+            if (!transitionData.isTranscriptOpen) {
+                Spacer(
+                    modifier = Modifier.height(8.dp),
+                )
+                EpisodeTitles(
+                    playerColors = playerColors,
+                    playerViewModel = viewModel,
+                    modifier = Modifier.alpha(transitionData.nonTranscriptElementsAlpha),
+                )
+            }
+            AnimatedVisibility(
+                visible = transitionData.showPlayerControls,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Spacer(
+                        modifier = Modifier.height(8.dp),
+                    )
+                    PlayerSeekBar(
+                        playbackPosition = headerData.positionMs.milliseconds,
+                        playbackDuration = headerData.durationMs.milliseconds,
+                        adjustPlaybackDuration = headerData.adjustRemainingTimeDuration,
+                        playbackSpeed = headerData.playbackEffects.playbackSpeed,
+                        chapters = headerData.chapters,
+                        isBuffering = headerData.isBuffering,
+                        bufferedUpTo = headerData.bufferedUpToMs.milliseconds,
+                        playerColors = playerColors,
+                        onSeekToPosition = { progress, onSeekComplete ->
+                            val progressMs = progress.inWholeMilliseconds.toInt()
+                            viewModel.seekToMs(progressMs, onSeekComplete)
+                            playbackManager.trackPlaybackSeek(progressMs, SourceView.PLAYER)
+                        },
+                        modifier = Modifier.offset { transitionData.seekBarOffset },
+                    )
+                    Spacer(
+                        modifier = Modifier.height(16.dp),
+                    )
+                    PlayerControls(
+                        playerColors = playerColors,
+                        playerViewModel = viewModel,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp)
+                            .scale(transitionData.controlsScale)
+                            .offset { transitionData.controlsOffset },
+                    )
+                    Spacer(
+                        modifier = Modifier.height(dimensionResource(R.dimen.large_play_button_margin_bottom)),
+                    )
+                }
+            }
+            AnimatedVisibility(
+                visible = !transitionData.isTranscriptOpen,
+                enter = shelfEnterTransition,
+                exit = shelfExitTransition,
+            ) {
+                PlayerShelf(
+                    playerColors = playerColors,
+                    shelfSharedViewModel = shelfSharedViewModel,
+                    playerViewModel = viewModel,
+                )
+            }
+        }
+    }
+
+    @Composable
+    private fun TranscriptContent(
+        state: TranscriptsUiState,
+        isVisible: Boolean,
+        modifier: Modifier = Modifier,
+    ) {
+        AnimatedVisibility(
+            visible = isVisible,
+            enter = transcriptEnterTransition,
+            exit = transcriptExitTransition,
+            modifier = modifier,
+        ) {
+            TranscriptPage(
+                uiState = state,
+                toolbarPadding = PaddingValues(horizontal = 16.dp),
+                paywallPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
+                transcriptPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 96.dp),
+                onClickClose = {
+                    transcriptViewModel.hideSearch()
+                    shelfSharedViewModel.closeTranscript()
+                },
+                onClickReload = transcriptViewModel::reloadTranscript,
+                onUpdateSearchTerm = transcriptViewModel::searchInTranscript,
+                onClearSearchTerm = transcriptViewModel::clearSearch,
+                onSelectPreviousSearch = transcriptViewModel::selectPreviousSearchMatch,
+                onSelectNextSearch = transcriptViewModel::selectNextSearchMatch,
+                onShowSearchBar = transcriptViewModel::openSearch,
+                onHideSearchBar = transcriptViewModel::hideSearch,
+                onClickSubscribe = {
+                    transcriptViewModel.track(AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_SUBSCRIBE_TAPPED)
+                    OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.Upsell(OnboardingUpgradeSource.GENERATED_TRANSCRIPTS))
+                },
+                onShowTranscript = { transcript ->
+                    val properties = mapOf(
+                        "type" to transcript.type.analyticsValue,
+                        "show_as_webpage" to (transcript is Transcript.Web),
+                    )
+                    transcriptViewModel.track(AnalyticsEvent.TRANSCRIPT_SHOWN, properties)
+                },
+                onShowTransciptPaywall = {
+                    transcriptViewModel.track(AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_SHOWN)
+                },
+            )
+        }
+    }
+
+    @Composable
+    private fun updateTranscriptTransitionData(
+        isTranscriptOpen: Boolean,
+        showTranscriptPaywall: Boolean,
+    ): TranscriptTransitionData {
+        val controlsOffsetValue = LocalDensity.current.run { 64.dp.roundToPx() }
+
+        val transcriptOpenState = rememberUpdatedState(isTranscriptOpen)
+        val transition = updateTransition(transcriptOpenState.value)
+        val nonTranscriptElementsAlpha = transition.animateFloat { showTranscript ->
+            if (showTranscript) 0f else 1f
+        }
+        val controlsScale = transition.animateFloat { showTranscript ->
+            if (showTranscript) 0.6f else 1f
+        }
+        val seekbarOffset = transition.animateIntOffset { showTranscript ->
+            if (showTranscript) IntOffset(x = 0, y = controlsOffsetValue) else IntOffset.Zero
+        }
+        val showPlayerControls = rememberUpdatedState(if (transcriptOpenState.value) !showTranscriptPaywall else true)
+
+        return remember(transition, transcriptOpenState, showPlayerControls) {
+            TranscriptTransitionData(
+                isTranscriptOpen = transcriptOpenState,
+                nonTranscriptElementsAlpha = nonTranscriptElementsAlpha,
+                showPlayerControls = showPlayerControls,
+                seekbarOffset = seekbarOffset,
+                controlsScale = controlsScale,
+            )
+        }
+    }
+
+    @Composable
+    private fun LoadTranscriptEffect(
+        isTranscriptOpen: Boolean,
+        playerEpisodeUuid: String,
+        transcriptEpisodeUuid: String?,
+    ) {
+        LaunchedEffect(isTranscriptOpen, playerEpisodeUuid, transcriptEpisodeUuid) {
+            if (isTranscriptOpen && playerEpisodeUuid != transcriptEpisodeUuid) {
+                transcriptViewModel.loadTranscript(playerEpisodeUuid)
+            }
+        }
+    }
+}
+
+private class TranscriptTransitionData(
+    isTranscriptOpen: State<Boolean>,
+    nonTranscriptElementsAlpha: State<Float>,
+    showPlayerControls: State<Boolean>,
+    seekbarOffset: State<IntOffset>,
+    controlsScale: State<Float>,
+) {
+    val isTranscriptOpen by isTranscriptOpen
+    val nonTranscriptElementsAlpha by nonTranscriptElementsAlpha
+    val seekBarOffset by seekbarOffset
+    val showPlayerControls by showPlayerControls
+    val controlsOffset get() = seekBarOffset * 0.9f
+    val controlsScale by controlsScale
 }
 
 private val adEnterTransition = fadeIn(spring(stiffness = Spring.StiffnessVeryLow)) + expandVertically(spring(stiffness = Spring.StiffnessMediumLow))

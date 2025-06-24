@@ -97,7 +97,7 @@ private fun Content(
 ) {
     Row(
         modifier = modifier,
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         SkipButton(
@@ -112,6 +112,7 @@ private fun Content(
             onClick = onPlayPauseClick,
             iconTint = playerColors.background01,
             circleColor = playerColors.contrast01,
+            modifier = Modifier.padding(horizontal = 24.dp),
         )
 
         SkipButton(
@@ -157,7 +158,7 @@ private fun SkipButton(
     ) {
         Box(
             modifier = modifier
-                .size(103.dp)
+                .size(80.dp)
                 .clip(CircleShape)
                 .combinedClickable(
                     role = Role.Button,
