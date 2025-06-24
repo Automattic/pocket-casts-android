@@ -70,7 +70,6 @@ import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompo
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
-import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterPlayerHeaderBinding
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivity
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContract
@@ -105,6 +104,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
 import kotlin.math.abs
 import kotlin.time.Duration
@@ -117,6 +117,7 @@ import kotlinx.coroutines.reactive.asFlow
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 private const val UP_NEXT_FLING_VELOCITY_THRESHOLD = 1000.0f
 
@@ -130,7 +131,14 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
     private val viewModel: PlayerViewModel by activityViewModels()
     private val shelfSharedViewModel: ShelfSharedViewModel by activityViewModels()
-    private val transcriptViewModel by viewModels<TranscriptViewModel>({ requireParentFragment() })
+    private val transcriptViewModel by viewModels<TranscriptViewModel>(
+        ownerProducer = { requireParentFragment() },
+        extrasProducer = {
+            defaultViewModelCreationExtras.withCreationCallback<TranscriptViewModel.Factory> { factory ->
+                factory.create(TranscriptViewModel.Source.Player)
+            }
+        },
+    )
     private var binding: AdapterPlayerHeaderBinding? = null
     private val sourceView = SourceView.PLAYER
 
@@ -194,7 +202,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                             enter = transcriptEnterTransition,
                             exit = transcriptExitTransition,
                             modifier = Modifier
-                                .fillMaxWidth(fraction = ResourcesCompat.getFloat(resources, R.dimen.seekbar_width_percentage))
+                                .fillMaxWidth(fraction = ResourcesCompat.getFloat(resources, UR.dimen.seekbar_width_percentage))
                                 .fillMaxHeight(),
                         ) {
                             TranscriptPage(
@@ -292,7 +300,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                                             playbackManager.trackPlaybackSeek(progressMs, SourceView.PLAYER)
                                         },
                                         modifier = Modifier
-                                            .fillMaxWidth(fraction = ResourcesCompat.getFloat(resources, R.dimen.seekbar_width_percentage))
+                                            .fillMaxWidth(fraction = ResourcesCompat.getFloat(resources, UR.dimen.seekbar_width_percentage))
                                             .offset { seekBarOffset },
                                     )
                                     PlayerControls(

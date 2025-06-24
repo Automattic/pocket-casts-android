@@ -15,6 +15,20 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.unit.dp
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
 import androidx.core.os.BundleCompat
@@ -26,8 +40,13 @@ import androidx.lifecycle.Observer
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedNonNullVisibility
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
+import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
@@ -38,6 +57,8 @@ import au.com.shiftyjelly.pocketcasts.reimagine.ShareDialogFragment
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
+import au.com.shiftyjelly.pocketcasts.transcripts.TranscriptFragment
+import au.com.shiftyjelly.pocketcasts.transcripts.ui.TranscriptExcerptBanner
 import au.com.shiftyjelly.pocketcasts.ui.R
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
@@ -487,6 +508,68 @@ class EpisodeFragment : BaseFragment() {
         binding?.btnAddToUpNext?.setup(ToggleActionButton.State.On(LR.string.podcasts_up_next, IR.drawable.ic_upnext_remove), ToggleActionButton.State.Off(LR.string.podcasts_up_next, IR.drawable.ic_upnext_playnext), false)
         binding?.btnPlayed?.setup(ToggleActionButton.State.On(LR.string.podcasts_mark_unplayed, IR.drawable.ic_markasunplayed), ToggleActionButton.State.Off(LR.string.podcasts_mark_played, IR.drawable.ic_markasplayed), false)
         binding?.btnArchive?.setup(ToggleActionButton.State.On(LR.string.podcasts_unarchive, IR.drawable.ic_unarchive), ToggleActionButton.State.Off(LR.string.podcasts_archive, IR.drawable.ic_archive), false)
+
+        binding?.episodeTranscript?.setContentWithViewCompositionStrategy {
+            val transcript = viewModel.transcript.collectAsState().value
+
+            AppTheme(theme.activeTheme) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    AnimatedNonNullVisibility(
+                        item = transcript as? Transcript.Text,
+                    ) { textTranscript ->
+                        val episodeUuid = textTranscript.episodeUuid
+                        val podcastUuid = textTranscript.podcastUuid
+
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 16.dp, end = 16.dp, top = 16.dp),
+                        ) {
+                            TranscriptExcerptBanner(
+                                text = remember(textTranscript.url) { textTranscript.getExcerpt() },
+                                isGenerated = textTranscript.isGenerated,
+                                modifier = Modifier
+                                    .align(Alignment.CenterHorizontally)
+                                    .clickable(
+                                        role = Role.Button,
+                                        onClickLabel = stringResource(LR.string.transcript_open),
+                                        onClick = {
+                                            if (parentFragmentManager.findFragmentByTag("episode_transcript") == null) {
+                                                val fragment = TranscriptFragment.newInstance(episodeUuid, podcastUuid)
+                                                fragment.show(parentFragmentManager, "episode_transcript")
+                                            }
+                                            analyticsTracker.track(
+                                                AnalyticsEvent.EPISODE_DETAIL_TRANSCRIPT_CARD_TAPPED,
+                                                buildMap {
+                                                    put("episode_uuid", episodeUuid)
+                                                    podcastUuid?.let { uuid -> put("podcast_uuid", uuid) }
+                                                },
+                                            )
+                                        },
+                                    ),
+                            )
+                            Spacer(
+                                modifier = Modifier.height(16.dp),
+                            )
+                            TextH40(
+                                text = stringResource(LR.string.episode_description),
+                            )
+                        }
+                        LaunchedEffect(podcastUuid, episodeUuid) {
+                            analyticsTracker.track(
+                                AnalyticsEvent.EPISODE_DETAIL_TRANSCRIPT_CARD_SHOWN,
+                                buildMap {
+                                    put("episode_uuid", episodeUuid)
+                                    podcastUuid?.let { uuid -> put("podcast_uuid", uuid) }
+                                },
+                            )
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private fun loadShowNotes(notes: String) {
