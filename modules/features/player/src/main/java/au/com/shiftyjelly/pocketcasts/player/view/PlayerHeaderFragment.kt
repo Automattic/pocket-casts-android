@@ -74,11 +74,11 @@ import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterPlayerHeaderBinding
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivity
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContract
+import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.ArtworkImageState
+import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.ArtworkOrVideo
+import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.ArtworkOrVideoState
 import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.PlayerControls
 import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.PlayerHeadingSection
-import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.PlayerVisuals
-import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.PlayerVisualsState
-import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.VisualContentState
 import au.com.shiftyjelly.pocketcasts.player.view.shelf.PlayerShelf
 import au.com.shiftyjelly.pocketcasts.player.view.video.VideoActivity
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
@@ -87,6 +87,7 @@ import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.Navi
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.SnackbarMessage
 import au.com.shiftyjelly.pocketcasts.reimagine.ShareDialogFragment
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.Player
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
@@ -110,6 +111,7 @@ import kotlin.math.abs
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -154,10 +156,9 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         requireNotNull(binding).composeContent.setContentWithViewCompositionStrategy {
             val headerData by remember { playerHeaderFlow() }.collectAsState(PlayerViewModel.PlayerHeader())
             val podcastColors by remember { podcastColorsFlow() }.collectAsState(PodcastColors.ForUserEpisode)
-            val ads by viewModel.activeAds.collectAsState()
-            val visualsState by remember { playerVisualsStateFlow() }.collectAsState(PlayerVisualsState.Empty)
-            val player by viewModel.playerFlow.collectAsState()
+            val artworkOrVideoState by remember { playerVisualsStateFlow() }.collectAsState(ArtworkOrVideoState.NoContent)
             val transcriptUiState by transcriptViewModel.uiState.collectAsState()
+            val ads by viewModel.activeAds.collectAsState()
 
             val isTranscriptOpen by shelfSharedViewModel.isTranscriptOpen.collectAsState()
             val showTranscriptTransition = updateTransition(isTranscriptOpen)
@@ -253,9 +254,8 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                                             onOptionsClick = { openAdReportSheet(ad, podcastColors) },
                                         )
                                     }
-                                    PlayerVisuals(
-                                        state = visualsState,
-                                        player = player,
+                                    ArtworkOrVideo(
+                                        state = artworkOrVideoState,
                                         onChapterUrlClick = viewModel::onChapterUrlClick,
                                         configureVideoView = { videoView ->
                                             videoView.setOnClickListener { onFullScreenVideoClick() }
@@ -640,10 +640,11 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         }
     }
 
-    private fun playerVisualsStateFlow(): Flow<PlayerVisualsState> {
-        return viewModel.listDataLive.asFlow()
+    private fun playerVisualsStateFlow(): Flow<ArtworkOrVideoState> {
+        val listDataFlow = viewModel.listDataLive
+            .asFlow()
             .distinctUntilChanged(::isListDataEquivalentForVisuals)
-            .map(::createPlayerVisualState)
+        return combine(listDataFlow, viewModel.playerFlow, ::createPlayerVisualState)
     }
 
     private fun isListDataEquivalentForVisuals(old: PlayerViewModel.ListData, new: PlayerViewModel.ListData): Boolean {
@@ -653,22 +654,31 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             old.podcastHeader.isPrepared == new.podcastHeader.isPrepared
     }
 
-    private fun createPlayerVisualState(listData: PlayerViewModel.ListData): PlayerVisualsState {
+    private fun createPlayerVisualState(
+        listData: PlayerViewModel.ListData,
+        player: Player?,
+    ): ArtworkOrVideoState {
         val header = listData.podcastHeader
-        val contentState = when {
-            header.isVideo -> VisualContentState.DisplayVideo(
+        return when {
+            header.isVideo -> ArtworkOrVideoState.Video(
+                player = player,
                 chapterUrl = header.chapter?.url,
             )
 
-            header.episode == null -> VisualContentState.NoContent
-            else -> VisualContentState.DisplayArtwork(
-                episode = header.episode,
-                chapterArtworkPath = header.chapter?.imagePath,
-                chapterUrl = header.chapter?.url,
-                canDisplayEpisodeArtwork = header.useEpisodeArtwork,
-            )
+            header.episode != null -> {
+                val chapterPath = header.chapter?.imagePath
+                ArtworkOrVideoState.Artwork(
+                    artworkImageState = when {
+                        chapterPath != null -> ArtworkImageState.Chapter(chapterPath)
+                        header.useEpisodeArtwork -> ArtworkImageState.Episode(header.episode)
+                        else -> ArtworkImageState.Podcast(header.episode)
+                    },
+                    chapterUrl = header.chapter?.url,
+                )
+            }
+
+            else -> ArtworkOrVideoState.NoContent
         }
-        return PlayerVisualsState(contentState, header.isPrepared)
     }
 }
 
