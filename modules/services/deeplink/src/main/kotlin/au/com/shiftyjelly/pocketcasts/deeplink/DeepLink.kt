@@ -314,6 +314,20 @@ data object SmartFoldersDeepLink : IntentableDeepLink {
         .setData(Uri.parse("pktc://features/suggestedFolders"))
 }
 
+data class DeveloperOptionsDeeplink(val subMenu: SubMenu? = null) : IntentableDeepLink {
+
+    enum class SubMenu(val uriSegment: String) {
+        NOTIFICATIONS_TESTING("notifications_testing");
+
+        companion object {
+            fun findBySegment(segment: String) = SubMenu.entries.find { it.uriSegment == segment }
+        }
+    }
+
+    override fun toIntent(context: Context) = Intent(ACTION_VIEW)
+        .setData(Uri.parse("pktc://developer_options" + ("/${subMenu?.uriSegment}").takeIf { subMenu != null }))
+}
+
 private val Context.launcherIntent get() = requireNotNull(packageManager.getLaunchIntentForPackage(packageName)) {
     "Missing launcher intent for $packageName"
 }

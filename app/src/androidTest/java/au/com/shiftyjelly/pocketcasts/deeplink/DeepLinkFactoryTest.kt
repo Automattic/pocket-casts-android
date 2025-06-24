@@ -1156,4 +1156,21 @@ class DeepLinkFactoryTest {
 
         assertEquals(SmartFoldersDeepLink, deepLink)
     }
+
+    @Test
+    fun developerOptions() {
+        val intent = Intent(ACTION_VIEW)
+            .setData(Uri.parse("pktc://developer_options"))
+
+        val deeplink = factory.create(intent)
+
+        assertEquals(DeveloperOptionsDeeplink(), deeplink)
+
+        val notificationsTestingIntent = Intent(ACTION_VIEW)
+            .setData(Uri.parse("pktc://developer_options/${DeveloperOptionsDeeplink.SubMenu.NOTIFICATIONS_TESTING.uriSegment}"))
+
+        val notificationsDeeplink = factory.create(notificationsTestingIntent)
+
+        assertEquals(DeveloperOptionsDeeplink(subMenu = DeveloperOptionsDeeplink.SubMenu.NOTIFICATIONS_TESTING), notificationsDeeplink)
+    }
 }

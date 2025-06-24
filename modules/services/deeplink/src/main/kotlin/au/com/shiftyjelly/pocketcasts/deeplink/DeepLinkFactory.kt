@@ -71,6 +71,7 @@ class DeepLinkFactory(
         ThemesAdapter(),
         AppOpenAdapter(),
         CreateAccountAdapter(),
+        DeveloperOptionsAdapter()
     )
 
     fun create(intent: Intent): DeepLink? {
@@ -481,6 +482,7 @@ private class ShareLinkNativeAdapter : DeepLinkAdapter {
             "settings",
             "discover",
             "features",
+            "developer_options"
         )
     }
 }
@@ -608,6 +610,7 @@ private class OpmlAdapter(
             "open",
             "signup",
             "features",
+            "developer_options"
         )
     }
 }
@@ -747,6 +750,21 @@ private class ThemesAdapter : DeepLinkAdapter {
 
         return if (intent.action == ACTION_VIEW && scheme == "pktc" && host == "settings" && path == "/themes") {
             ThemesDeepLink
+        } else {
+            null
+        }
+    }
+}
+
+private class DeveloperOptionsAdapter : DeepLinkAdapter {
+    override fun create(intent: Intent): DeepLink? {
+        val uriData = intent.data ?: return null
+        val scheme = uriData.scheme
+        val host = uriData.host
+
+        return if (intent.action == ACTION_VIEW && scheme == "pktc" && host == "developer_options") {
+            val subMenu = DeveloperOptionsDeeplink.SubMenu.findBySegment(uriData.pathSegments.firstOrNull().orEmpty())
+            DeveloperOptionsDeeplink(subMenu = subMenu)
         } else {
             null
         }
