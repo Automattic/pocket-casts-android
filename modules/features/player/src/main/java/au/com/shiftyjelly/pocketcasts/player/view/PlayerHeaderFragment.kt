@@ -31,7 +31,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -41,11 +40,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
@@ -60,7 +58,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
-import au.com.shiftyjelly.pocketcasts.compose.PlayerColors
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.ad.AdBanner
 import au.com.shiftyjelly.pocketcasts.compose.ad.BlazeAd
@@ -68,7 +65,6 @@ import au.com.shiftyjelly.pocketcasts.compose.ad.rememberAdColors
 import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedNonNullVisibility
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterPlayerHeaderBinding
@@ -77,8 +73,9 @@ import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContr
 import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.ArtworkImageState
 import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.ArtworkOrVideo
 import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.ArtworkOrVideoState
+import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.EpisodeTitles
 import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.PlayerControls
-import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.PlayerHeadingSection
+import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.PlayerSeekBar
 import au.com.shiftyjelly.pocketcasts.player.view.shelf.PlayerShelf
 import au.com.shiftyjelly.pocketcasts.player.view.video.VideoActivity
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
@@ -108,7 +105,6 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlin.math.abs
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -264,7 +260,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                                 }
                             }
                             if (!isTranscriptOpen) {
-                                PlayerHeadingSection(
+                                EpisodeTitles(
                                     playerColors = playerColors,
                                     playerViewModel = viewModel,
                                     modifier = Modifier.alpha(playerElementsAlpha),
@@ -299,6 +295,8 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                                         playerColors = playerColors,
                                         playerViewModel = viewModel,
                                         modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(start = 8.dp, end = 8.dp, bottom = dimensionResource(R.dimen.large_play_button_margin_bottom))
                                             .scale(playbackButtonsScale)
                                             .offset { controlsOffset },
                                     )
@@ -680,51 +678,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             else -> ArtworkOrVideoState.NoContent
         }
     }
-}
-
-@Composable
-private fun PlayerSeekBar(
-    playbackPosition: Duration,
-    playbackDuration: Duration,
-    adjustPlaybackDuration: Boolean,
-    playbackSpeed: Double,
-    chapters: Chapters,
-    isBuffering: Boolean,
-    bufferedUpTo: Duration,
-    playerColors: PlayerColors,
-    modifier: Modifier = Modifier,
-    onSeekToPosition: (Duration, onSeekComplete: () -> Unit) -> Unit,
-) {
-    val theme = MaterialTheme.theme.type
-
-    AndroidView(
-        factory = { context ->
-            PlayerSeekBar(context).apply {
-                changeListener = object : PlayerSeekBar.OnUserSeekListener {
-                    override fun onSeekPositionChangeStop(progress: Duration, seekComplete: () -> Unit) {
-                        onSeekToPosition(progress, seekComplete)
-                    }
-
-                    override fun onSeekPositionChanging(progress: Duration) = Unit
-
-                    override fun onSeekPositionChangeStart() = Unit
-                }
-            }
-        },
-        update = { seekBar ->
-            seekBar.apply {
-                setCurrentTime(playbackPosition)
-                setDuration(playbackDuration)
-                setAdjustDuration(adjustPlaybackDuration)
-                setPlaybackSpeed(playbackSpeed)
-                setChapters(chapters)
-                this.isBuffering = isBuffering
-                bufferedUpToInSecs = bufferedUpTo.inWholeSeconds.toInt()
-                setTintColor(playerColors.highlight01.toArgb(), theme)
-            }
-        },
-        modifier = modifier.fillMaxWidth(),
-    )
 }
 
 private val adEnterTransition = fadeIn(spring(stiffness = Spring.StiffnessVeryLow)) + expandVertically(spring(stiffness = Spring.StiffnessMediumLow))

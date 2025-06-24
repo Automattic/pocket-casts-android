@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.player.R
 
 @Composable
-internal fun ChapterButton(
+internal fun ChapterLinkButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {

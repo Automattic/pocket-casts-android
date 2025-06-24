@@ -38,7 +38,7 @@ internal fun ArtworkOrVideo(
         }
         val chapterUrl = state.chapterUrl
         if (chapterUrl != null) {
-            ChapterButton(
+            ChapterLinkButton(
                 onClick = { onChapterUrlClick(chapterUrl) },
                 modifier = Modifier
                     .align(Alignment.TopEnd)

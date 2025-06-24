@@ -1,15 +1,16 @@
 package au.com.shiftyjelly.pocketcasts.player.view.nowplaying
 
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
@@ -22,18 +23,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
@@ -42,7 +42,9 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.map
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.PlayerColors
+import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
@@ -57,7 +59,7 @@ import kotlin.time.Duration
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-fun PlayerHeadingSection(
+fun EpisodeTitles(
     playerColors: PlayerColors,
     playerViewModel: PlayerViewModel,
     modifier: Modifier = Modifier,
@@ -75,15 +77,13 @@ fun PlayerHeadingSection(
                 isChaptersPresent = it.podcastHeader.isChaptersPresent,
                 isFirstChapter = it.podcastHeader.isFirstChapter,
                 isLastChapter = it.podcastHeader.isLastChapter,
+                chapterProgress = it.podcastHeader.chapterProgress,
             )
         }
     }.observeAsState(PlayerHeadingSectionState())
 
-    var disableAccessibility by remember { mutableStateOf(false) }
-
     Content(
         state = state,
-        disableAccessibility = disableAccessibility,
         playerColors = playerColors,
         onPreviousChapterClick = { playerViewModel.onPreviousChapterClick() },
         onNextChapterClick = { playerViewModel.onNextChapterClick() },
@@ -97,7 +97,6 @@ fun PlayerHeadingSection(
 @Composable
 private fun Content(
     state: PlayerHeadingSectionState,
-    disableAccessibility: Boolean,
     onPreviousChapterClick: () -> Unit,
     onNextChapterClick: () -> Unit,
     onChapterTitleClick: (Chapter) -> Unit,
@@ -109,36 +108,21 @@ private fun Content(
         LocalRippleConfiguration provides RippleConfiguration(Color.White, RippleDefaults.rippleAlpha(Color.White, true)),
     ) {
         Column(
-            modifier = modifier
-                .padding(horizontal = 8.dp)
-                .then(
-                    if (disableAccessibility) {
-                        Modifier
-                            .semantics(mergeDescendants = true) {}
-                            .clearAndSetSemantics { contentDescription = "" }
-                    } else {
-                        Modifier
-                    },
-                ),
+            modifier = modifier,
         ) {
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier
-                    .fillMaxWidth(),
-            ) {
+            Row {
                 if (state.isChaptersPresent) {
                     ChapterPreviousButton(
-                        onClick = onPreviousChapterClick,
                         enabled = !state.isFirstChapter,
                         alpha = if (state.isFirstChapter) 0.5f else 1f,
+                        onClick = onPreviousChapterClick,
                     )
                 }
 
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
-                        .padding(top = 8.dp)
-                        .padding(horizontal = 16.dp)
+                        .padding(start = 8.dp, end = 8.dp, top = 8.dp)
                         .weight(1f),
                 ) {
                     TextH30(
@@ -146,8 +130,11 @@ private fun Content(
                         color = playerColors.contrast01,
                         textAlign = TextAlign.Center,
                         maxLines = 2,
-                        modifier = Modifier
-                            .then(if (state.isChaptersPresent) Modifier.clickable { state.chapter?.let { onChapterTitleClick(it) } } else Modifier),
+                        modifier = if (state.isChaptersPresent) {
+                            Modifier.clickable { state.chapter?.let { onChapterTitleClick(it) } }
+                        } else {
+                            Modifier
+                        },
                     )
 
                     if (!state.isChaptersPresent) {
@@ -167,9 +154,9 @@ private fun Content(
                     }
 
                     if (state.isChaptersPresent) {
-                        state.chapterSummary.takeIf { it.currentIndex != -1 && it.size > 0 }?.let {
-                            val chapterSummary = stringResource(LR.string.chapter_count_summary, state.chapterSummary.currentIndex, state.chapterSummary.size)
-                            val contentDescription = "$chapterSummary ${pluralStringResource(id = LR.plurals.chapter, count = state.chapterSummary.size)}"
+                        state.chapterSummary.takeIf { it.currentIndex != -1 && it.size > 0 }?.let { summary ->
+                            val chapterSummary = stringResource(LR.string.chapter_count_summary, summary.currentIndex, summary.size)
+                            val contentDescription = "$chapterSummary ${pluralStringResource(id = LR.plurals.chapter, count = summary.size)}"
 
                             Spacer(
                                 modifier = Modifier.height(4.dp),
@@ -179,8 +166,7 @@ private fun Content(
                                 text = chapterSummary,
                                 maxLines = 1,
                                 color = Color.White.copy(alpha = 0.7f),
-                                modifier = Modifier
-                                    .semantics { this.contentDescription = contentDescription },
+                                modifier = Modifier.semantics { this.contentDescription = contentDescription },
                             )
                         }
                     }
@@ -195,9 +181,10 @@ private fun Content(
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         ChapterNextButtonWithChapterProgressCircle(
-                            onClick = onNextChapterClick,
                             enabled = !state.isLastChapter,
                             alpha = if (state.isLastChapter) 0.5f else 1f,
+                            progress = state.chapterProgress,
+                            onClick = onNextChapterClick,
                         )
 
                         Spacer(modifier = Modifier.height(4.dp))
@@ -217,34 +204,19 @@ private fun Content(
 }
 
 @Composable
-private fun formatTimeRemainingContentDescription(
-    chapterTimeRemaining: String,
-) = runCatching {
-    val duration = Duration.parse(chapterTimeRemaining)
-    when {
-        duration.inWholeHours > 0 -> pluralStringResource(LR.plurals.hour, duration.inWholeHours.toInt())
-        duration.inWholeMinutes > 0 -> pluralStringResource(LR.plurals.minute, duration.inWholeMinutes.toInt())
-        else -> pluralStringResource(LR.plurals.second, duration.inWholeSeconds.toInt())
-    }
-}.getOrElse { chapterTimeRemaining }
-
-@Composable
 private fun ChapterPreviousButton(
-    onClick: () -> Unit,
     enabled: Boolean,
     alpha: Float,
+    onClick: () -> Unit,
 ) {
     IconButton(
-        onClick = onClick,
         enabled = enabled,
-        modifier = Modifier
-            .alpha(alpha),
+        onClick = onClick,
+        modifier = Modifier.alpha(alpha),
     ) {
         Box(
             contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .clip(CircleShape)
-                .wrapContentSize(),
+            modifier = Modifier.clip(CircleShape),
         ) {
             Icon(
                 painterResource(R.drawable.ic_chapter_skipbackwards),
@@ -257,14 +229,15 @@ private fun ChapterPreviousButton(
 
 @Composable
 private fun ChapterNextButtonWithChapterProgressCircle(
-    onClick: () -> Unit,
     enabled: Boolean,
+    progress: Float,
     alpha: Float,
+    onClick: () -> Unit,
 ) {
     val contentDescription = stringResource(LR.string.player_action_next_chapter)
     IconButton(
-        onClick = onClick,
         enabled = enabled,
+        onClick = onClick,
         modifier = Modifier
             .alpha(alpha)
             .semantics { this.contentDescription = contentDescription },
@@ -275,9 +248,42 @@ private fun ChapterNextButtonWithChapterProgressCircle(
             contentDescription = null,
         )
 
-        ChapterProgressCircle()
+        ChapterProgressCircle(
+            progress = progress,
+        )
     }
 }
+
+@Composable
+private fun ChapterProgressCircle(
+    progress: Float,
+    modifier: Modifier = Modifier,
+) {
+    Canvas(
+        modifier.size(28.dp),
+    ) {
+        val degrees = 360f * (1f - progress)
+        drawArc(
+            color = Color.White.copy(alpha = 0.4f),
+            startAngle = -90f,
+            sweepAngle = -degrees,
+            useCenter = false,
+            style = Stroke(2.dp.toPx(), cap = StrokeCap.Butt),
+        )
+    }
+}
+
+@Composable
+private fun formatTimeRemainingContentDescription(
+    chapterTimeRemaining: String,
+) = runCatching {
+    val duration = Duration.parse(chapterTimeRemaining)
+    when {
+        duration.inWholeHours > 0 -> pluralStringResource(LR.plurals.hour, duration.inWholeHours.toInt())
+        duration.inWholeMinutes > 0 -> pluralStringResource(LR.plurals.minute, duration.inWholeMinutes.toInt())
+        else -> pluralStringResource(LR.plurals.second, duration.inWholeSeconds.toInt())
+    }
+}.getOrElse { chapterTimeRemaining }
 
 private data class PlayerHeadingSectionState(
     val episodeUuid: String = "",
@@ -290,6 +296,7 @@ private data class PlayerHeadingSectionState(
     val isChaptersPresent: Boolean = false,
     val isFirstChapter: Boolean = false,
     val isLastChapter: Boolean = false,
+    val chapterProgress: Float = 0.5f,
 )
 
 @Preview
@@ -297,49 +304,64 @@ private data class PlayerHeadingSectionState(
 private fun PlayerHeadingSectionPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
-    AppTheme(themeType) {
-        Content(
-            state = PlayerHeadingSectionState(
-                title = "A very looooooooooooong episode title",
-                episodeUuid = "Episode UUID",
-                podcastTitle = "Podcast Title",
-                chapterSummary = ChapterSummaryData(1, 5),
-                chapterTimeRemaining = "1:23",
-                isChaptersPresent = true,
-                isFirstChapter = false,
-                isLastChapter = false,
-            ),
-            disableAccessibility = false,
-            onPreviousChapterClick = {},
-            onNextChapterClick = {},
-            onChapterTitleClick = {},
-            onPodcastTitleClick = {},
-        )
-    }
-}
+    val state = PlayerHeadingSectionState(
+        title = "Episode title",
+        episodeUuid = "Episode UUID",
+        podcastTitle = "Podcast Title",
+        chapterSummary = ChapterSummaryData(1, 5),
+        chapterTimeRemaining = "1:23",
+        isChaptersPresent = false,
+        isFirstChapter = false,
+        isLastChapter = false,
+    )
 
-@Preview
-@Composable
-private fun PlayerHeadingSectionWithoutChapterPreview(
-    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
-) {
     AppTheme(themeType) {
-        Content(
-            state = PlayerHeadingSectionState(
-                title = "Episode title",
-                episodeUuid = "Episode UUID",
-                podcastTitle = "Podcast Title",
-                chapterSummary = ChapterSummaryData(1, 5),
-                chapterTimeRemaining = "1:23",
-                isChaptersPresent = false,
-                isFirstChapter = false,
-                isLastChapter = false,
-            ),
-            disableAccessibility = false,
-            onPreviousChapterClick = {},
-            onNextChapterClick = {},
-            onChapterTitleClick = {},
-            onPodcastTitleClick = {},
-        )
+        CompositionLocalProvider(
+            LocalPodcastColors provides PodcastColors.TheDailyPreview,
+        ) {
+            val playerColors = MaterialTheme.theme.rememberPlayerColorsOrDefault()
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.background(playerColors.background01),
+            ) {
+                Content(
+                    state = state,
+                    onPreviousChapterClick = {},
+                    onNextChapterClick = {},
+                    onChapterTitleClick = {},
+                    onPodcastTitleClick = {},
+                )
+
+                Content(
+                    state = state.copy(
+                        title = "Episode title / ".repeat(10),
+                        podcastTitle = "Podcast title / ".repeat(10),
+                    ),
+                    onPreviousChapterClick = {},
+                    onNextChapterClick = {},
+                    onChapterTitleClick = {},
+                    onPodcastTitleClick = {},
+                )
+
+                Content(
+                    state = state.copy(isChaptersPresent = true),
+                    onPreviousChapterClick = {},
+                    onNextChapterClick = {},
+                    onChapterTitleClick = {},
+                    onPodcastTitleClick = {},
+                )
+
+                Content(
+                    state = state.copy(
+                        title = "Episode title / ".repeat(10),
+                        isChaptersPresent = true,
+                    ),
+                    onPreviousChapterClick = {},
+                    onNextChapterClick = {},
+                    onChapterTitleClick = {},
+                    onPodcastTitleClick = {},
+                )
+            }
+        }
     }
 }
