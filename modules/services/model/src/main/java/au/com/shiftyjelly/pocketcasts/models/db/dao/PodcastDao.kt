@@ -26,33 +26,43 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 abstract class PodcastDao {
 
+    @Transaction
     @Query("SELECT * FROM podcasts WHERE subscribed = 1 ORDER BY LOWER(title) ASC")
     abstract fun findSubscribedBlocking(): List<Podcast>
 
+    @Transaction
     @Query("SELECT * FROM podcasts WHERE subscribed = 1 ORDER BY LOWER(title) ASC")
     abstract fun findSubscribedFlow(): Flow<List<Podcast>>
 
+    @Transaction
     @Query("SELECT * FROM podcasts WHERE subscribed = 1 ORDER BY LOWER(title) ASC")
     abstract fun findSubscribedRxSingle(): Single<List<Podcast>>
 
+    @Transaction
     @Query("SELECT * FROM podcasts WHERE subscribed = 1")
     abstract suspend fun findSubscribedNoOrder(): List<Podcast>
 
+    @Transaction
     @Query("SELECT uuid FROM podcasts WHERE subscribed = 1")
     abstract suspend fun findSubscribedUuids(): List<String>
 
+    @Transaction
     @Query("SELECT * FROM podcasts WHERE subscribed = 0")
     abstract fun findUnsubscribedBlocking(): List<Podcast>
 
+    @Transaction
     @Query("SELECT podcasts.uuid FROM podcasts WHERE subscribed = 0")
     abstract fun findUnsubscribedUuidRxFlowable(): Flowable<List<String>>
 
+    @Transaction
     @Query("SELECT * FROM podcasts WHERE subscribed = 1")
     abstract fun findSubscribedRxFlowable(): Flowable<List<Podcast>>
 
+    @Transaction
     @Query("SELECT * FROM podcasts WHERE subscribed = 1 AND folder_uuid = :folderUuid ORDER BY CASE WHEN LOWER(SUBSTR(title,1,4)) = 'the ' THEN LOWER(SUBSTR(title,5)) ELSE LOWER(title) END ASC")
     protected abstract fun observeFolderOrderByNameAsc(folderUuid: String): Flow<List<Podcast>>
 
+    @Transaction
     @Query("SELECT * FROM podcasts WHERE subscribed = 1 AND folder_uuid = :folderUuid ORDER BY CASE WHEN LOWER(SUBSTR(title,1,4)) = 'the ' THEN LOWER(SUBSTR(title,5)) ELSE LOWER(title) END DESC")
     protected abstract fun observeFolderOrderByNameDesc(folderUuid: String): Flow<List<Podcast>>
 
@@ -60,12 +70,15 @@ abstract class PodcastDao {
         return if (orderAsc) observeFolderOrderByNameAsc(folderUuid = folderUuid) else observeFolderOrderByNameDesc(folderUuid = folderUuid)
     }
 
+    @Transaction
     @Query("SELECT * FROM podcasts WHERE auto_download_status = 1 AND subscribed = 1")
     abstract fun findPodcastsAutoDownloadBlocking(): List<Podcast>
 
+    @Transaction
     @Query("SELECT * FROM podcasts WHERE subscribed = 1 AND folder_uuid = :folderUuid ORDER BY added_date ASC")
     protected abstract fun observeFolderOrderByAddedDateAsc(folderUuid: String): Flow<List<Podcast>>
 
+    @Transaction
     @Query("SELECT * FROM podcasts WHERE subscribed = 1 AND folder_uuid = :folderUuid ORDER BY added_date DESC")
     protected abstract fun observeFolderOrderByAddedDateDesc(folderUuid: String): Flow<List<Podcast>>
 
@@ -73,15 +86,19 @@ abstract class PodcastDao {
         return if (orderAsc) observeFolderOrderByAddedDateAsc(folderUuid = folderUuid) else observeFolderOrderByAddedDateDesc(folderUuid = folderUuid)
     }
 
+    @Transaction
     @Query("SELECT * FROM podcasts WHERE subscribed = 1 AND auto_add_to_up_next > 0 ORDER BY LOWER(title) ASC")
     abstract fun findAutoAddToUpNextPodcastsRxFlowable(): Flowable<List<Podcast>>
 
+    @Transaction
     @Query("SELECT * FROM podcasts WHERE auto_add_to_up_next > 0")
     abstract suspend fun findAutoAddToUpNextPodcasts(): List<Podcast>
 
+    @Transaction
     @Query("SELECT podcasts.* FROM podcasts LEFT JOIN podcast_episodes ON podcasts.uuid = podcast_episodes.podcast_id AND podcast_episodes.uuid = (SELECT podcast_episodes.uuid FROM podcast_episodes WHERE podcast_episodes.archived = 0 AND podcast_episodes.podcast_id = podcasts.uuid AND podcast_episodes.playing_status != 2 ORDER BY podcast_episodes.published_date DESC LIMIT 1) WHERE podcasts.subscribed = 1 ORDER BY CASE WHEN podcast_episodes.published_date IS NULL THEN 1 ELSE 0 END, podcast_episodes.published_date ASC, podcasts.latest_episode_date ASC")
     protected abstract fun observeSubscribedOrderByLatestEpisodeAsc(): Flow<List<Podcast>>
 
+    @Transaction
     @Query("SELECT podcasts.* FROM podcasts LEFT JOIN podcast_episodes ON podcasts.uuid = podcast_episodes.podcast_id AND podcast_episodes.uuid = (SELECT podcast_episodes.uuid FROM podcast_episodes WHERE podcast_episodes.archived = 0 AND podcast_episodes.podcast_id = podcasts.uuid AND podcast_episodes.playing_status != 2 ORDER BY podcast_episodes.published_date DESC LIMIT 1) WHERE podcasts.subscribed = 1 ORDER BY CASE WHEN podcast_episodes.published_date IS NULL THEN 1 ELSE 0 END, podcast_episodes.published_date DESC, podcasts.latest_episode_date DESC")
     protected abstract fun observeSubscribedOrderByLatestEpisodeDesc(): Flow<List<Podcast>>
 
@@ -114,9 +131,11 @@ abstract class PodcastDao {
     )
     abstract fun observePodcastsOrderByRecentlyPlayedEpisode(folderUuid: String? = null): Flow<List<Podcast>>
 
+    @Transaction
     @Query("SELECT podcasts.* FROM podcasts LEFT JOIN podcast_episodes ON podcasts.uuid = podcast_episodes.podcast_id AND podcast_episodes.uuid = (SELECT podcast_episodes.uuid FROM podcast_episodes WHERE podcast_episodes.archived = 0 AND podcast_episodes.podcast_id = podcasts.uuid AND podcast_episodes.playing_status != 2 ORDER BY podcast_episodes.published_date DESC LIMIT 1) WHERE podcasts.subscribed = 1 AND folder_uuid = :folderUuid ORDER BY CASE WHEN podcast_episodes.published_date IS NULL THEN 1 ELSE 0 END, podcast_episodes.published_date ASC, podcasts.latest_episode_date ASC")
     protected abstract fun observeFolderOrderByLatestEpisodeAsc(folderUuid: String): Flow<List<Podcast>>
 
+    @Transaction
     @Query("SELECT podcasts.* FROM podcasts LEFT JOIN podcast_episodes ON podcasts.uuid = podcast_episodes.podcast_id AND podcast_episodes.uuid = (SELECT podcast_episodes.uuid FROM podcast_episodes WHERE podcast_episodes.archived = 0 AND podcast_episodes.podcast_id = podcasts.uuid AND podcast_episodes.playing_status != 2 ORDER BY podcast_episodes.published_date DESC LIMIT 1) WHERE podcasts.subscribed = 1 AND folder_uuid = :folderUuid ORDER BY CASE WHEN podcast_episodes.published_date IS NULL THEN 1 ELSE 0 END, podcast_episodes.published_date DESC, podcasts.latest_episode_date DESC")
     protected abstract fun observeFolderOrderByLatestEpisodeDesc(folderUuid: String): Flow<List<Podcast>>
 
@@ -124,9 +143,11 @@ abstract class PodcastDao {
         return if (orderAsc) observeFolderOrderByLatestEpisodeAsc(folderUuid = folderUuid) else observeFolderOrderByLatestEpisodeDesc(folderUuid = folderUuid)
     }
 
+    @Transaction
     @Query("SELECT podcasts.* FROM podcasts LEFT JOIN podcast_episodes ON podcasts.uuid = podcast_episodes.podcast_id AND podcast_episodes.uuid = (SELECT podcast_episodes.uuid FROM podcast_episodes WHERE podcast_episodes.podcast_id = podcasts.uuid AND podcast_episodes.playing_status != 2 ORDER BY podcast_episodes.published_date DESC LIMIT 1) WHERE podcasts.subscribed = 1 ORDER BY CASE WHEN podcast_episodes.published_date IS NULL THEN 1 ELSE 0 END, podcast_episodes.published_date ASC, podcasts.latest_episode_date ASC")
     abstract suspend fun findSubscribedOrderByLatestEpisodeAsc(): List<Podcast>
 
+    @Transaction
     @Query("SELECT podcasts.* FROM podcasts LEFT JOIN podcast_episodes ON podcasts.uuid = podcast_episodes.podcast_id AND podcast_episodes.uuid = (SELECT podcast_episodes.uuid FROM podcast_episodes WHERE podcast_episodes.podcast_id = podcasts.uuid AND podcast_episodes.playing_status != 2 ORDER BY podcast_episodes.published_date DESC LIMIT 1) WHERE podcasts.subscribed = 1 ORDER BY CASE WHEN podcast_episodes.published_date IS NULL THEN 1 ELSE 0 END, podcast_episodes.published_date DESC, podcasts.latest_episode_date DESC")
     abstract suspend fun findSubscribedOrderByLatestEpisodeDesc(): List<Podcast>
 
@@ -134,9 +155,11 @@ abstract class PodcastDao {
         return if (orderAsc) findSubscribedOrderByLatestEpisodeAsc() else findSubscribedOrderByLatestEpisodeDesc()
     }
 
+    @Transaction
     @Query("SELECT podcasts.* FROM podcasts LEFT JOIN podcast_episodes ON podcasts.uuid = podcast_episodes.podcast_id AND podcast_episodes.uuid = (SELECT podcast_episodes.uuid FROM podcast_episodes WHERE podcast_episodes.podcast_id = podcasts.uuid AND podcast_episodes.playing_status != 2 ORDER BY podcast_episodes.published_date DESC LIMIT 1) WHERE podcasts.subscribed = 1 AND folder_uuid = :folderUuid ORDER BY CASE WHEN podcast_episodes.published_date IS NULL THEN 1 ELSE 0 END, podcast_episodes.published_date DESC, podcasts.latest_episode_date DESC")
     abstract suspend fun findFolderPodcastsOrderByLatestEpisodeBlocking(folderUuid: String): List<Podcast>
 
+    @Transaction
     @Query(
         """
         SELECT 
@@ -162,6 +185,7 @@ abstract class PodcastDao {
     )
     abstract suspend fun findPodcastsOrderByRecentlyPlayedEpisode(folderUuid: String? = null): List<Podcast>
 
+    @Transaction
     @Query("SELECT * FROM podcasts WHERE subscribed = 1 AND folder_uuid = :folderUuid ORDER BY sort_order ASC")
     abstract fun observeFolderOrderByUserSort(folderUuid: String): Flow<List<Podcast>>
 
@@ -180,15 +204,19 @@ abstract class PodcastDao {
     @Query("SELECT * FROM podcasts WHERE uuid = :uuid")
     abstract fun findByUuidRxMaybe(uuid: String): Maybe<Podcast>
 
+    @Transaction
     @Query("SELECT * FROM podcasts WHERE uuid IN (:uuids)")
     abstract fun findByUuidsBlocking(uuids: Array<String>): List<Podcast>
 
+    @Transaction
     @Query("SELECT * FROM podcasts WHERE folder_uuid = :folderUuid")
     abstract suspend fun findPodcastsInFolder(folderUuid: String): List<Podcast>
 
+    @Transaction
     @Query("SELECT * FROM podcasts WHERE folder_uuid = :folderUuid")
     abstract fun findPodcastsInFolderRxSingle(folderUuid: String): Single<List<Podcast>>
 
+    @Transaction
     @Query("SELECT * FROM podcasts WHERE folder_uuid IS NULL")
     abstract suspend fun findPodcastsNotInFolder(): List<Podcast>
 
