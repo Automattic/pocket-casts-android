@@ -3,6 +3,9 @@
 *   New Features
     *   Display transcripts in the episode details UI
         ([#4143](https://github.com/Automattic/pocket-casts-android/pull/4143))
+*   Bug Fixes
+    *   Collapse player when opening a notification
+        ([#4150](https://github.com/Automattic/pocket-casts-android/pull/4150))
 
 7.92
 -----
