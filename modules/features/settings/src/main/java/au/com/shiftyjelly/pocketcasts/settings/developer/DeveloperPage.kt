@@ -292,7 +292,7 @@ private fun ShowWhatsNew(
 @Composable
 private fun NotificationsTesting(
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     SettingRow(
         primaryText = "Notifications testing",
@@ -345,7 +345,7 @@ private fun DeveloperPagePreview() {
         onSendCrash = {},
         onShowWhatsNewClick = {},
         onResetSuggestedFoldersSuggestion = {},
-        onShowNotificationsTestingClick = {}
+        onShowNotificationsTestingClick = {},
     )
 }
 

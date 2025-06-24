@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.settings.notifications_testing
+package au.com.shiftyjelly.pocketcasts.settings.notificationstesting
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
@@ -65,8 +65,8 @@ internal class NotificationsTestingViewModel @Inject constructor(
                 workDataOf(
                     SUBCATEGORY to subCategory,
                     SHOULD_SKIP_VALIDATIONS to true,
-                    DOWNLOADED_EPISODES to 999
-                )
+                    DOWNLOADED_EPISODES to 999,
+                ),
             ).apply {
                 if (trigger.triggerType is NotificationTriggerType.Delayed) {
                     setInitialDelay(trigger.triggerType.delaySeconds.toLong(), TimeUnit.SECONDS)
@@ -80,7 +80,7 @@ internal class NotificationsTestingViewModel @Inject constructor(
         workManager.enqueueUniqueWork(
             uniqueWorkName = TAG_UNIQUE_WORK,
             existingWorkPolicy = ExistingWorkPolicy.REPLACE,
-            request = oneTimeWorkRequest
+            request = oneTimeWorkRequest,
         )
     }
 
@@ -132,7 +132,7 @@ internal class NotificationsTestingViewModel @Inject constructor(
 
     data class UiState(
         val uniqueNotifications: List<NotificationType> = NotificationType.entries,
-        val notificationCategories: List<NotificationCategoryType> = NotificationCategoryType.entries
+        val notificationCategories: List<NotificationCategoryType> = NotificationCategoryType.entries,
     )
 
     sealed interface NotificationTriggerType {
@@ -142,7 +142,7 @@ internal class NotificationsTestingViewModel @Inject constructor(
 
     data class NotificationTrigger(
         val notificationType: NotificationType,
-        val triggerType: NotificationTriggerType
+        val triggerType: NotificationTriggerType,
     )
 
     data class NotificationCategorySchedule(
@@ -163,14 +163,14 @@ internal class NotificationsTestingViewModel @Inject constructor(
         DAILY_REMINDERS_THEMES,
         DAILY_REMINDERS_UPSELL,
         NEW_FEATURE_FOLDERS,
-        OFFERS
+        OFFERS,
     }
 
     enum class NotificationCategoryType {
         TRENDING_AND_RECOMMENDATIONS,
         DAILY_REMINDERS,
         NEW_FEATURES_AND_TIPS,
-        POCKET_CASTS_OFFERS
+        POCKET_CASTS_OFFERS,
     }
 
     companion object {

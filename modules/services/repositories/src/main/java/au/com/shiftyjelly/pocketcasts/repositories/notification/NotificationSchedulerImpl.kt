@@ -43,7 +43,7 @@ class NotificationSchedulerImpl @Inject constructor(
             val delay = delayProvider?.invoke(type) ?: delayCalculator.calculateDelayForOnboardingNotification(type)
 
             val workData = workDataOf(
-                SUBCATEGORY to type.subcategory
+                SUBCATEGORY to type.subcategory,
             )
 
             val notificationWork = OneTimeWorkRequest.Builder(NotificationWorker::class.java)

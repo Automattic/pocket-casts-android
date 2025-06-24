@@ -71,7 +71,7 @@ class DeepLinkFactory(
         ThemesAdapter(),
         AppOpenAdapter(),
         CreateAccountAdapter(),
-        DeveloperOptionsAdapter()
+        DeveloperOptionsAdapter(),
     )
 
     fun create(intent: Intent): DeepLink? {
@@ -482,7 +482,7 @@ private class ShareLinkNativeAdapter : DeepLinkAdapter {
             "settings",
             "discover",
             "features",
-            "developer_options"
+            "developer_options",
         )
     }
 }
@@ -610,7 +610,7 @@ private class OpmlAdapter(
             "open",
             "signup",
             "features",
-            "developer_options"
+            "developer_options",
         )
     }
 }

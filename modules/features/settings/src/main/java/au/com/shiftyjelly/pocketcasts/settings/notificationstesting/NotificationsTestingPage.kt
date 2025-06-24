@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.settings.notifications_testing
+package au.com.shiftyjelly.pocketcasts.settings.notificationstesting
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -44,7 +44,6 @@ internal fun NotificationsTestingPage(
     modifier: Modifier = Modifier,
     viewModel: NotificationsTestingViewModel = hiltViewModel(),
 ) {
-
     val state = viewModel.state.collectAsStateWithLifecycle()
 
     NotificationsTestingContent(
@@ -55,9 +54,8 @@ internal fun NotificationsTestingPage(
         onScheduleNotification = viewModel::trigger,
         onResetDatabase = viewModel::clearNotificationsTable,
         onCancelNotifications = viewModel::cancelAllNotifications,
-        onScheduleCategory = viewModel::scheduleCategory
+        onScheduleCategory = viewModel::scheduleCategory,
     )
-
 }
 
 @Composable
@@ -67,9 +65,8 @@ private fun NotificationsTestingContent(
     onResetDatabase: () -> Unit,
     onCancelNotifications: () -> Unit,
     onScheduleCategory: (NotificationsTestingViewModel.NotificationCategorySchedule) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
-
     Column(modifier = modifier.verticalScroll(rememberScrollState())) {
         UniqueNotificationSchedulerContent(
             notificationTypes = state.uniqueNotifications,
@@ -84,7 +81,7 @@ private fun NotificationsTestingContent(
             onResetDatabase = onResetDatabase,
             onCancelNotifications = onCancelNotifications,
             categories = state.notificationCategories,
-            scheduleCategory = onScheduleCategory
+            scheduleCategory = onScheduleCategory,
         )
     }
 }
@@ -95,13 +92,13 @@ private fun SettingNotifications(
     onResetDatabase: () -> Unit,
     onCancelNotifications: () -> Unit,
     scheduleCategory: (NotificationsTestingViewModel.NotificationCategorySchedule) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
         TextP60(
             modifier = Modifier
                 .padding(horizontal = 16.dp),
-            text = "Alternatively, you can utilize the real NotificationScheduler to schedule notifications that fall into specific settings categories.\nIt is recommended to clear the table first, then cancel all the scheduled work. Use the buttons below to achieve that."
+            text = "Alternatively, you can utilize the real NotificationScheduler to schedule notifications that fall into specific settings categories.\nIt is recommended to clear the table first, then cancel all the scheduled work. Use the buttons below to achieve that.",
         )
         Button(
             colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.theme.colors.primaryInteractive03),
@@ -112,7 +109,7 @@ private fun SettingNotifications(
         ) {
             TextP40(
                 text = "Reset notifications table",
-                color = MaterialTheme.theme.colors.primaryText02
+                color = MaterialTheme.theme.colors.primaryText02,
             )
         }
         Button(
@@ -124,7 +121,7 @@ private fun SettingNotifications(
         ) {
             TextP40(
                 text = "Cancel ALL scheduled notifications",
-                color = MaterialTheme.theme.colors.primaryText02
+                color = MaterialTheme.theme.colors.primaryText02,
             )
         }
 
@@ -134,7 +131,7 @@ private fun SettingNotifications(
         var notificationSchedule = if (selectedDelay > 0 && selectedCategory != null) {
             NotificationsTestingViewModel.NotificationCategorySchedule(
                 category = selectedCategory!!,
-                consecutiveDelaySeconds = selectedDelay
+                consecutiveDelaySeconds = selectedDelay,
             )
         } else {
             null
@@ -152,26 +149,26 @@ private fun SettingNotifications(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(
-                    horizontal = 16.dp
+                    horizontal = 16.dp,
                 ),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             TextP40(
-                text = "Select consecutive delay (seconds)"
+                text = "Select consecutive delay (seconds)",
             )
             Spacer(modifier = Modifier.width(8.dp))
             FormField(
                 value = selectedDelay.toString(),
                 placeholder = "Enter seconds here",
                 onValueChange = { selectedDelay = it.toIntOrNull() ?: 0 },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             )
         }
         TextP60(
             modifier = Modifier.padding(
-                horizontal = 16.dp
+                horizontal = 16.dp,
             ),
-            text = "Enter a positive number! When we schedule a category, its notifications will be scheduled sequentially, delayed by the specified amount"
+            text = "Enter a positive number! When we schedule a category, its notifications will be scheduled sequentially, delayed by the specified amount",
         )
 
         Button(
@@ -181,7 +178,7 @@ private fun SettingNotifications(
             enabled = notificationSchedule != null,
             onClick = {
                 scheduleCategory(notificationSchedule!!)
-            }
+            },
         ) {
             TextP40(text = "Schedule category notifications")
         }
@@ -192,7 +189,7 @@ private fun SettingNotifications(
 private fun UniqueNotificationSchedulerContent(
     notificationTypes: List<NotificationsTestingViewModel.NotificationType>,
     onButtonClick: (NotificationsTestingViewModel.NotificationTrigger) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     var selectedType by remember { mutableStateOf<NotificationsTestingViewModel.NotificationType?>(null) }
     var selectedDelay by remember { mutableIntStateOf(0) }
@@ -200,13 +197,12 @@ private fun UniqueNotificationSchedulerContent(
     val notificationTrigger = selectedType?.let {
         NotificationsTestingViewModel.NotificationTrigger(
             notificationType = it,
-            triggerType = if (selectedDelay > 0) NotificationsTestingViewModel.NotificationTriggerType.Delayed(selectedDelay) else NotificationsTestingViewModel.NotificationTriggerType.Now
+            triggerType = if (selectedDelay > 0) NotificationsTestingViewModel.NotificationTriggerType.Delayed(selectedDelay) else NotificationsTestingViewModel.NotificationTriggerType.Now,
         )
     }
 
-
     Column(
-        modifier = modifier
+        modifier = modifier,
     ) {
         SettingRadioDialogRow(
             primaryText = "Select notification type",
@@ -220,26 +216,26 @@ private fun UniqueNotificationSchedulerContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(
-                    horizontal = 16.dp
+                    horizontal = 16.dp,
                 ),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             TextP40(
-                text = "Select delay seconds"
+                text = "Select delay seconds",
             )
             Spacer(modifier = Modifier.width(8.dp))
             FormField(
                 value = selectedDelay.toString(),
                 placeholder = "Enter seconds here",
                 onValueChange = { selectedDelay = it.toIntOrNull() ?: 0 },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             )
         }
         TextP60(
             modifier = Modifier.padding(
-                horizontal = 16.dp
+                horizontal = 16.dp,
             ),
-            text = "A delay of 0 seconds means that the notification will be displayed instantaneously\nPreviously scheduled, but not yet displayed notifications will be cancelled when scheduling a new one."
+            text = "A delay of 0 seconds means that the notification will be displayed instantaneously\nPreviously scheduled, but not yet displayed notifications will be cancelled when scheduling a new one.",
         )
 
         Button(
@@ -249,7 +245,7 @@ private fun UniqueNotificationSchedulerContent(
             enabled = notificationTrigger != null,
             onClick = {
                 onButtonClick(notificationTrigger!!)
-            }
+            },
         ) {
             TextP40(text = if (notificationTrigger?.triggerType is NotificationsTestingViewModel.NotificationTriggerType.Delayed) "Schedule" else "Fire now")
         }
@@ -267,7 +263,7 @@ private fun PreviewNotificationTestingScreen(
             onScheduleNotification = {},
             onResetDatabase = {},
             onCancelNotifications = {},
-            onScheduleCategory = {}
+            onScheduleCategory = {},
         )
     }
 }

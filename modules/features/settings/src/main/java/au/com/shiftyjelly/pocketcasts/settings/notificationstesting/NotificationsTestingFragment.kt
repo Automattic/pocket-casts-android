@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.settings.notifications_testing
+package au.com.shiftyjelly.pocketcasts.settings.notificationstesting
 
 import android.os.Bundle
 import android.view.LayoutInflater

@@ -317,7 +317,8 @@ data object SmartFoldersDeepLink : IntentableDeepLink {
 data class DeveloperOptionsDeeplink(val subMenu: SubMenu? = null) : IntentableDeepLink {
 
     enum class SubMenu(val uriSegment: String) {
-        NOTIFICATIONS_TESTING("notifications_testing");
+        NOTIFICATIONS_TESTING("notifications_testing"),
+        ;
 
         companion object {
             fun findBySegment(segment: String) = SubMenu.entries.find { it.uriSegment == segment }
