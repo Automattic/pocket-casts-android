@@ -140,7 +140,7 @@ private fun SettingNotifications(
 
         SettingRadioDialogRow(
             primaryText = "Select category",
-            secondaryText = selectedCategory?.toString(),
+            secondaryText = selectedCategory?.toString() ?: "Nothing is selected",
             options = categories,
             savedOption = selectedCategory,
             optionToLocalisedString = { it.toString() },
@@ -214,7 +214,7 @@ private fun UniqueNotificationSchedulerContent(
     ) {
         SettingRadioDialogRow(
             primaryText = "Select notification type",
-            secondaryText = selectedType?.toString(),
+            secondaryText = selectedType?.toString() ?: "Nothing is selected",
             options = notificationTypes,
             savedOption = selectedType,
             optionToLocalisedString = { it.toString() },
