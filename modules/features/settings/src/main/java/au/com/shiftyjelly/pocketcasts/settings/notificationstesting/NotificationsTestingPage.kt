@@ -98,14 +98,14 @@ private fun SettingNotifications(
     Column(modifier = modifier) {
         TextP60(
             modifier = Modifier
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 24.dp),
             text = "Alternatively, you can utilize the real NotificationScheduler to schedule notifications that fall into specific settings categories.\nIt is recommended to clear the table first, then cancel all the scheduled work. Use the buttons below to achieve that.",
         )
         Button(
             colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.theme.colors.primaryInteractive03),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 24.dp),
             onClick = onResetDatabase,
         ) {
             TextP40(
@@ -117,7 +117,7 @@ private fun SettingNotifications(
             colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.theme.colors.primaryInteractive03),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 24.dp),
             onClick = onCancelNotifications,
         ) {
             TextP40(
@@ -145,12 +145,13 @@ private fun SettingNotifications(
             savedOption = selectedCategory,
             optionToLocalisedString = { it.toString() },
             onSave = { selectedCategory = it },
+            indent = false
         )
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(
-                    horizontal = 16.dp,
+                    horizontal = 24.dp,
                 ),
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -167,7 +168,7 @@ private fun SettingNotifications(
         }
         TextP60(
             modifier = Modifier.padding(
-                horizontal = 16.dp,
+                horizontal = 24.dp,
             ),
             text = "Enter a positive number! When we schedule a category, its notifications will be scheduled sequentially, delayed by the specified amount",
         )
@@ -175,7 +176,7 @@ private fun SettingNotifications(
         Button(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 24.dp),
             enabled = notificationSchedule != null,
             onClick = {
                 scheduleCategory(notificationSchedule!!)
@@ -218,12 +219,13 @@ private fun UniqueNotificationSchedulerContent(
             savedOption = selectedType,
             optionToLocalisedString = { it.toString() },
             onSave = { selectedType = it },
+            indent = false
         )
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(
-                    horizontal = 16.dp,
+                    horizontal = 24.dp,
                 ),
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -240,7 +242,7 @@ private fun UniqueNotificationSchedulerContent(
         }
         TextP60(
             modifier = Modifier.padding(
-                horizontal = 16.dp,
+                horizontal = 24.dp,
             ),
             text = "A delay of 0 seconds means that the notification will be displayed instantaneously\nPreviously scheduled, but not yet displayed notifications will be cancelled when scheduling a new one.",
         )
@@ -248,7 +250,7 @@ private fun UniqueNotificationSchedulerContent(
         Button(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 24.dp),
             enabled = notificationTrigger != null,
             onClick = {
                 onButtonClick(notificationTrigger!!)
