@@ -27,10 +27,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -237,7 +241,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                         modifier = Modifier
                             .fillMaxWidth(fraction = maxWidthFraction)
                             .fillMaxHeight()
-                            .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = if (isPortraitPlayer) 32.dp else 0.dp),
+                            .padding(start = 16.dp, end = 16.dp, top = 16.dp),
                     )
                 }
             }
@@ -584,7 +588,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 headerData = headerData,
                 playerColors = playerColors,
                 transitionData = transitionData,
-                modifier = modifier,
+                modifier = modifier.navigationBarsPadding(),
             )
         } else {
             HorizontalPlayerContent(
@@ -737,7 +741,8 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight()
-                    .verticalScroll(rememberScrollState(), flingBehavior = ShowUpNextFlingBehavior),
+                    .verticalScroll(rememberScrollState(), flingBehavior = ShowUpNextFlingBehavior)
+                    .navigationBarsPadding(),
             ) {
                 AdAndArtworkHorizontal(
                     artworkOrVideoState = artworkOrVideoState,
@@ -776,7 +781,8 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight()
-                    .verticalScroll(rememberScrollState(), flingBehavior = ShowUpNextFlingBehavior),
+                    .verticalScroll(rememberScrollState(), flingBehavior = ShowUpNextFlingBehavior)
+                    .navigationBarsPadding(),
             ) {
                 Spacer(
                     modifier = Modifier.weight(1f),
@@ -804,7 +810,8 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState(), flingBehavior = ShowUpNextFlingBehavior),
+                .verticalScroll(rememberScrollState(), flingBehavior = ShowUpNextFlingBehavior)
+                .navigationBarsPadding(),
         ) {
             Row {
                 val windowWithPx = LocalWindowInfo.current.containerSize.width
@@ -873,11 +880,12 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             exit = transcriptExitTransition,
             modifier = modifier,
         ) {
+            val navigationBarPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
             TranscriptPage(
                 uiState = state,
                 toolbarPadding = PaddingValues(horizontal = 16.dp),
                 paywallPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
-                transcriptPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = if (isPortraitPlayer) 96.dp else 16.dp),
+                transcriptPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = navigationBarPadding + if (isPortraitPlayer) 96.dp else 16.dp),
                 onClickClose = {
                     transcriptViewModel.hideSearch()
                     shelfSharedViewModel.closeTranscript()
