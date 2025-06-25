@@ -11,6 +11,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.settings.notificationstesting.NotificationsTestingFragment
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewFragment
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
@@ -45,6 +46,7 @@ class DeveloperFragment : BaseFragment() {
                 onSendCrash = viewModel::onSendCrash,
                 onShowWhatsNewClick = ::onShowWhatsNewClick,
                 onResetSuggestedFoldersSuggestion = viewModel::resetSuggestedFoldersSuggestion,
+                onShowNotificationsTestingClick = ::onShowNotificationsTestingClick,
             )
         }
     }
@@ -63,5 +65,9 @@ class DeveloperFragment : BaseFragment() {
 
     private fun onShowWhatsNewClick() {
         (activity as? FragmentHostListener)?.showBottomSheet(fragment = WhatsNewFragment())
+    }
+
+    private fun onShowNotificationsTestingClick() {
+        (activity as? FragmentHostListener)?.showBottomSheet(fragment = NotificationsTestingFragment())
     }
 }

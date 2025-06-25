@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.compose.compiler)
@@ -25,6 +26,7 @@ dependencies {
     api(projects.modules.services.analytics)
     api(projects.modules.services.payment)
     api(projects.modules.services.repositories)
+    api(projects.modules.services.views)
 
     implementation(platform(libs.compose.bom))
 
@@ -42,6 +44,7 @@ dependencies {
     implementation(libs.coroutines.rx2)
     implementation(libs.rx2.java)
 
+    implementation(projects.modules.features.settings)
     implementation(projects.modules.services.compose)
     implementation(projects.modules.services.images)
     implementation(projects.modules.services.localization)
